@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes: []
@@ -53,7 +54,10 @@ packagesImpacted:
   - "@warpgogol/share"
   - "@warpgogol/site-kernel-content"
   - "@warpgogol/site-kernel-checks"
-successSignals: []
+successSignals:
+  - "content.references.validate passes with this. references in offering files"
+  - "resolveReference expands this. to collection.file. prefix before index lookup"
+  - "resolveReferencesInString resolves this. in plain refs, =(this.field) formulas, and pipe-formatted expressions"
 nonGoals:
   - "Does not introduce relative references to other files (e.g. ../sibling.field) — only this. for same-file self-reference"
   - "Does not change the content reference index format or generation pipeline"
@@ -173,16 +177,24 @@ export function resolveFormula(
 ): FormulaResolution;
 ```
 
-**Expansion rule:** When a reference starts with `this.`, the resolver replaces `this.` with `${sourceRef.collection}.${sourceRef.file}.` before matching against `REF_PATTERN`. If `sourceRef` is not provided, the resolver returns error code `REF-10: this. reference used without sourceRef context`.
+**Expansion rule:** When a reference starts with `this.`, the resolver replaces `this.` with `${sourceRef.collection}.${sourceRef.file}.` **before** matching against `REF_PATTERN`. This pre-expansion step is the first operation in `resolveReference`, `resolveReferencesInString`, and `resolveFormula` — it happens before any pattern matching (`REF_PATTERN`, `PURE_REF_PATTERN`, `BRACELESS_SCAN_PATTERN`, `REF_IN_FORMULA_PATTERN`). Without this ordering, `this` would be misinterpreted as a collection name by the existing patterns. If `sourceRef` is not provided, the resolver returns error code `REF-12: this. reference used without sourceRef context`.
+
+**Error code numbering:** REF-10 is already assigned by RFC-0729 to "Unknown pipe formatter" in `formula-eval.ts`. This RFC uses REF-12 (missing sourceRef) and REF-13 (field not found after expansion) to avoid collision.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/share/src/content-reference.ts` | Add `SourceRef` type, `sourceRef` parameter, `this.` expansion logic |
-| `packages/share/src/formula-eval.ts` | Add `sourceRef` parameter, update `REF_IN_FORMULA_PATTERN` to recognize `this.` prefix |
+| `packages/share/src/content-reference.ts` | Add `SourceRef` type, `sourceRef` parameter, `this.` expansion logic (pre-expansion before pattern matching) |
+| `packages/share/src/formula-eval.ts` | Add `sourceRef` parameter, expand `this.` before `REF_IN_FORMULA_PATTERN` matching |
 | `packages/os/site-kernel-content/src/semantic-loader.ts` | Pass `sourceRef` from entity context to `resolveReferencesInString` / `resolveReferencesDeep` |
-| `packages/os/site-kernel-checks/src/content-references.ts` | Recognize `this.` references, expand via file context, validate with REF-10/REF-11 |
+| `packages/pbp/src/semantic-model.ts` | Pass `sourceRef` from entity context when resolving references in PBP entity data |
+| `packages/share/src/astro/page-handler/semantic.ts` | Pass `sourceRef` from page context when resolving references |
+| `packages/share/src/astro/content.ts` | Pass `sourceRef` from entity context when resolving references |
+| `packages/ui/src/sections/markdown/prose-pipeline.ts` | Pass `sourceRef` from prose context when resolving references |
+| `packages/ui/src/components/section-body/rich/section-rich.astro` | Pass `sourceRef` from section context when resolving references |
+| `packages/os/site-kernel-codegen/src/material-metadata-write.ts` | Pass `sourceRef` from material context when resolving references |
+| `packages/os/site-kernel-checks/src/content-references.ts` | Recognize `this.` references, derive `sourceRef` from file path, expand via file context, validate with REF-12/REF-13 |
 | `packages/share/src/tests/content-ref-index.test.ts` | Add `this.` reference tests |
 | `packages/share/src/tests/formula-eval.test.ts` | Add `this.` in formula tests |
 
@@ -195,8 +207,8 @@ export function resolveFormula(
   "command": "content.references.validate",
   "status": "fail",
   "violations": [
-    "REF-10: this. reference used without sourceRef context in src/content/business-profile/uk/offerings/digital-foundation.md",
-    "REF-11: this.guarantees.delivery.label unresolved in src/content/business-profile/uk/offerings/digital-foundation.md — field \"delivery\" not found"
+    "REF-12: this. reference used without sourceRef context in src/content/business-profile/uk/offerings/digital-foundation.md",
+    "REF-13: this.guarantees.delivery.label unresolved in src/content/business-profile/uk/offerings/digital-foundation.md — field \"delivery\" not found"
   ]
 }
 ```
@@ -205,19 +217,20 @@ export function resolveFormula(
 
 | Code | Condition | Severity |
 | --- | --- | --- |
-| REF-10 | `this.` reference encountered but no `sourceRef` provided (resolver called without context) | error |
-| REF-11 | `this.` reference expanded but field path not found in the current file's data | error |
+| REF-12 | `this.` reference encountered but no `sourceRef` provided (resolver called without context) | error |
+| REF-13 | `this.` reference expanded but field path not found in the current file's data | error |
 | REF-01..09 | Existing error codes apply after `this.` expansion (e.g. collection not found, file not found, language fallback) | error |
+| REF-10 | Existing: Unknown pipe formatter (RFC-0729) — not reused by this RFC | error |
 
-`this.` references that resolve successfully are silent (no warning, no info). The validator exits non-zero if any REF-10 or REF-11 error is found.
+`this.` references that resolve successfully are silent (no warning, no info). The validator exits non-zero if any REF-12 or REF-13 error is found.
 
 ## Rollout
 
 - **Default behavior:** `this.` references are recognized immediately upon implementation. No feature flag, no opt-in period.
-- **Backward compatibility:** Existing absolute references continue to work unchanged. The `sourceRef` parameter is optional — callers that don't pass it simply cannot use `this.` references (REF-10 if they try).
+- **Backward compatibility:** Existing absolute references continue to work unchanged. The `sourceRef` parameter is optional — callers that don't pass it simply cannot use `this.` references (REF-12 if they try).
 - **Adoption:** Content authors may adopt `this.` references incrementally. No migration is required — absolute references remain valid. Authors are encouraged to use `this.` for self-references to reduce path coupling.
 - **Integration:** `content.references.validate` in `build.check` automatically validates `this.` references. No pipeline changes.
-- **RFC-0730 integration:** When RFC-0730 is implemented, the canonical references it introduces should use `this.` where the reference targets the same entity file. This makes RFC-0730's display routing concise and decoupled from file paths.
+- **RFC-0730 integration:** RFC-0730 is already `implemented`. The canonical references it introduced (e.g. `business-profile.offerings/digital-foundation.guarantees.delivery.label`) should be migrated to `this.` syntax where the reference targets the same entity file. This makes RFC-0730's display routing concise and decoupled from file paths. Migration is incremental — absolute references remain valid.
 
 ## Alternatives considered
 
@@ -229,9 +242,9 @@ export function resolveFormula(
 
 ## Risks
 
-- **Agent misinterpretation** — Agents may use `this.` in cross-file contexts (e.g. in a page file referencing an offering field). The validator must catch this with REF-11 (field not found in current file). The `sourceRef` is determined by the file being processed, not by the author's intent.
+- **Agent misinterpretation** — Agents may use `this.` in cross-file contexts (e.g. in a page file referencing an offering field). The validator must catch this with REF-13 (field not found in current file). The `sourceRef` is determined by the file being processed, not by the author's intent.
 - **Pattern collision** — `this` is a common English word. The `this.` prefix must only be recognized as a reference when followed by a valid field path pattern (`this.[a-zA-Z0-9_-]+`). The pattern `this.guarantees.delivery.label` is a reference; the word "this" in prose is not affected because it lacks the dotted field path suffix.
-- **Call site coverage** — All call sites that pass strings to `resolveReferencesInString` or `resolveFormula` must be updated to pass `sourceRef`. Missed call sites will produce REF-10 errors when `this.` is used, which is the correct fail-safe behavior.
+- **Call site coverage** — All call sites that pass strings to `resolveReferencesInString` or `resolveFormula` must be updated to pass `sourceRef`. Missed call sites will produce REF-12 errors when `this.` is used, which is the correct fail-safe behavior.
 - **Performance** — Negligible. The `this.` expansion is a single string prefix check and replacement before the existing resolution path.
 
 ## Acceptance criteria
@@ -239,11 +252,11 @@ export function resolveFormula(
 - [ ] `SourceRef` interface and `sourceRef` optional parameter added to `resolveReference`, `resolveReferencesInString`, `resolveReferencesDeep` in `@warpgogol/share/content-reference`
 - [ ] `sourceRef` optional parameter added to `resolveFormula` in `@warpgogol/share/formula-eval`; `REF_IN_FORMULA_PATTERN` updated to recognize `this.` prefix
 - [ ] `this.` expansion logic implemented: `this.field.path` → `${sourceRef.collection}.${sourceRef.file}.field.path` before index lookup
-- [ ] REF-10 error code emitted when `this.` is used without `sourceRef`
-- [ ] REF-11 error code emitted when `this.` reference is expanded but field path is not found in the current file's data
-- [ ] `content.references.validate` in `@warpgogol/site-kernel-checks` recognizes and validates `this.` references
+- [ ] REF-12 error code emitted when `this.` is used without `sourceRef`
+- [ ] REF-13 error code emitted when `this.` reference is expanded but field path is not found in the current file's data
+- [ ] `content.references.validate` in `@warpgogol/site-kernel-checks` recognizes and validates `this.` references, deriving `sourceRef` from file path
 - [ ] `semantic-loader.ts` in `@warpgogol/site-kernel-content` passes `sourceRef` from entity context
-- [ ] Unit tests in `packages/share/src/tests/content-ref-index.test.ts` cover `this.` in plain references, `this.` without `sourceRef` (REF-10), and `this.` with unresolvable field (REF-11)
+- [ ] Unit tests in `packages/share/src/tests/content-ref-index.test.ts` cover `this.` in plain references, `this.` without `sourceRef` (REF-12), and `this.` with unresolvable field (REF-13)
 - [ ] Unit tests in `packages/share/src/tests/formula-eval.test.ts` cover `this.` in formula expressions and pipe-formatted expressions
 - [ ] Existing absolute references continue to resolve without behavior change (regression tests pass)
 - [ ] `rfc.validate` passes on this file
@@ -254,6 +267,6 @@ export function resolveFormula(
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
-- Agents MUST update all call sites that pass strings to `resolveReferencesInString` or `resolveFormula` to pass `sourceRef`. The `sourceRef` is derived from the entity being processed (collection + file slug), not from the file path on disk.
-- Agents MUST use `this.` for self-references within entity files when RFC-0730 is implemented, to keep references concise and decoupled from file paths.
+- Agents MUST update all call sites that pass strings to `resolveReferencesInString`, `resolveReferencesDeep`, or `resolveFormula` to pass `sourceRef`. The full call site inventory is listed in the file system responsibilities table above. The `sourceRef` is derived from the entity being processed (collection + file slug), not from the file path on disk.
+- Agents MUST use `this.` for self-references within entity files to keep references concise and decoupled from file paths.
 - Agents MUST NOT use `this.` in cross-file contexts — `this.` always refers to the current file being processed.
