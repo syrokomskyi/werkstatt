@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes: []
@@ -51,9 +52,9 @@ packagesImpacted:
   - "@warpgogol/pbp"
 successSignals:
   - "offeringSchema charges field uses pbpChargeSchema instead of z.unknown()"
-  - "All UK offering files have quoted decimal strings for value/unitValue/minimum/maximum fields"
-  - "All UK offering files have model discriminator on every charge amount"
-  - "All UK offering files have purpose field on every charge"
+  - "All 12 offering files (6 UK + 6 DE) have quoted decimal strings for value/unitValue/minimum/maximum fields"
+  - "All 12 offering files (6 UK + 6 DE) have model discriminator on every charge amount"
+  - "All 12 offering files (6 UK + 6 DE) have purpose field on every charge"
   - "pnpm --filter @warpgogol/pbp build:check passes"
   - "pnpm --filter @warpgogol/pbp test passes"
 nonGoals:
@@ -92,7 +93,7 @@ However, the offering schema (`packages/pbp/src/schemas/offering.ts:42`) declare
 2. The `model` discriminator (`fixed`, `range`, `unit-rate`, `tiered`) is optional in practice — charges omit it entirely.
 3. The `purpose` field (required by `pbpChargeSchema`) is absent from all offering files.
 
-The warpgogol-com site (the only active site) has 6 UK offering files with inconsistent charge data: `digital-foundation.md` uses unquoted decimals and lacks `model`/`purpose`; `automation.md` has `model: range` but no `purpose`; others have neither `model` nor `purpose`.
+The warpgogol-com site (the only active site) is multilingual (DE + UK). Both language versions have 6 offering files each (12 total) with inconsistent charge data: `digital-foundation.md` uses unquoted decimals and lacks `model`/`purpose` in both UK and DE; `automation.md` has `model: range` but no `purpose`; others have neither `model` nor `purpose`.
 
 ## Problem
 
@@ -100,19 +101,19 @@ The `charges` field in `offeringSchema` (`packages/pbp/src/schemas/offering.ts:4
 
 1. **ADR-012 violation goes undetected.** YAML parses `value: 70.00` as float `70.0`, stripping trailing zeros. The schema does not reject this because `z.unknown()` accepts any type. For monetary values, this is a precision and formatting violation per `pbp-specification-package/01-PBP-System-Specification.md` §10.3 and §30 invariant #10.
 
-2. **Missing `model` discriminator.** `pbpChargeAmountSchema` is a `z.discriminatedUnion("model", ...)` — every charge amount requires a `model` field (`fixed`, `range`, `unit-rate`, `tiered`). Without schema enforcement, 5 of 6 offering files omit `model`, making charges structurally ambiguous.
+2. **Missing `model` discriminator.** `pbpChargeAmountSchema` is a `z.discriminatedUnion("model", ...)` — every charge amount requires a `model` field (`fixed`, `range`, `unit-rate`, `tiered`). Without schema enforcement, 5 of 6 UK offering files omit `model` (same in DE), making charges structurally ambiguous.
 
-3. **Missing `purpose` field.** `pbpChargeSchema` requires `purpose: nonEmptyString` — a semantic label for the charge (e.g. `subscription`, `activation`, `additional-service`). All 6 offering files omit it.
+3. **Missing `purpose` field.** `pbpChargeSchema` requires `purpose: nonEmptyString` — a semantic label for the charge (e.g. `subscription`, `activation`, `additional-service`). All 12 offering files (6 UK + 6 DE) omit it.
 
 The strict `pbpChargeSchema` already exists (RFC-0466) but is never applied. This RFC closes the gap between the defined contract and the runtime schema.
 
 ## Decision
 
-The `offeringSchema` `pricing.charges` field is changed from `z.record(z.string(), z.unknown())` to `z.record(z.string(), pbpChargeSchema)`, enforcing the strict charge schema defined in RFC-0466. All offering content files are updated to comply: decimal values are quoted strings, every charge amount has a `model` discriminator, and every charge has a `purpose` field.
+The `offeringSchema` `pricing.charges` field is changed from `z.record(z.string(), z.unknown())` to `z.record(z.string(), pbpChargeSchema)`, enforcing the strict charge schema defined in RFC-0466. All offering content files in both language versions (UK and DE, 12 files total) are updated to comply: decimal values are quoted strings, every charge amount has a `model` discriminator, and every charge has a `purpose` field.
 
 ## Architectural fit
 
-- **DNA-55 (Spec vendoring contract).** This RFC applies `pbp-specification-package/ADR-012` (decimal string money) to the runtime Zod schema. The spec is the source of truth; this RFC closes the enforcement gap.
+- **DNA-55 (Spec vendoring contract).** By applying `pbp-specification-package/ADR-012` (decimal string money) to the runtime Zod schema, this RFC makes the vendored spec binding for charge data — the spec becomes the single source of truth not just in principle but at runtime. Without enforcement, the spec's ADR-012 decision is advisory; with it, the spec's contract is enforced during `astro build`. This protects DNA-55 by ensuring spec decisions are reflected in runtime schemas, not just documentation.
 - **RFC-0400 (Primitive types).** Established `decimalString` and `validateDecimal`. This RFC uses the existing primitive — does not redefine it.
 - **RFC-0437 (Pricing core).** Defined `PbpCharge` and `PbpChargeAmount` TypeScript interfaces. This RFC enforces them at the Zod schema level.
 - **RFC-0466 (Runtime Zod schemas).** Created `pbpChargeSchema` and `pbpChargeAmountSchema`. This RFC applies them to `offeringSchema` — the schema was defined but never wired.
@@ -158,7 +159,8 @@ const pbpPricingSchema = z.object({
 | --- | --- |
 | `packages/pbp/src/schemas/offering.ts` | Schema change: `charges` field type |
 | `packages/pbp/src/schemas/pricing.ts` | Source of `pbpChargeSchema` (no changes needed) |
-| `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/uk/offerings/*.md` | 6 offering files updated to comply with schema |
+| `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/uk/offerings/*.md` | 6 UK offering files updated to comply with schema |
+| `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/de/offerings/*.md` | 6 DE offering files updated to comply with schema |
 
 ### Output format
 
@@ -173,7 +175,7 @@ N/A — no new commands. Schema violations surface as Astro content collection e
 ## Rollout
 
 - **Immediate, no grace period.** The schema change and content updates ship in the same implementation commit. There is no transitional period where the schema is strict but content is non-compliant.
-- **Single site impact.** Warpgogol-com is the only active site. All 6 UK offering files are updated in the same mission workpiece. No multi-site migration needed.
+- **Single site impact.** Warpgogol-com is the only active site. All 12 offering files (6 UK + 6 DE) are updated in the same mission workpiece. No multi-site migration needed.
 - **No new commands.** Enforcement happens through the existing Astro content collection pipeline (`pbpCollections` from `@warpgogol/pbp/astro`). No `build.check` integration changes — the Zod schema is already wired into content collection parsing.
 - **Follow-up RFC planned.** `pricing.plans` and `pricing.adjustments` remain `z.unknown()`. A separate RFC will enforce `pbpPlanSchema` and `pbpAdjustmentSchema` once plan/adjustment content is designed.
 
@@ -189,7 +191,7 @@ N/A — no new commands. Schema violations surface as Astro content collection e
 
 ## Risks
 
-- **Build breakage on non-compliant content.** The schema change is fail-hard — any offering file missing `model` or `purpose`, or using unquoted decimals, will break `astro build`. Mitigation: all 6 UK offering files are updated in the same implementation commit.
+- **Build breakage on non-compliant content.** The schema change is fail-hard — any offering file missing `model` or `purpose`, or using unquoted decimals, will break `astro build`. Mitigation: all 12 offering files (6 UK + 6 DE) are updated in the same implementation commit.
 - **Agent authoring friction.** Agents creating new offering files must know to include `model`, `purpose`, and quoted decimal strings. Mitigation: the Zod error messages are self-documenting (missing required field, invalid type). The `pbpChargeSchema` structure is visible in `packages/pbp/src/schemas/pricing.ts`.
 - **`plans`/`adjustments` enforcement gap remains.** Until the follow-up RFC, `plans` and `adjustments` remain `z.unknown()`. Agents may assume all pricing sub-fields are typed. Mitigation: `nonGoals` section explicitly documents the deferral.
 - **No `purpose` controlled vocabulary.** `pbpChargeSchema` types `purpose` as `nonEmptyString`, not an enum. Agents may use inconsistent values. Mitigation: PBP spec examples (`subscription`, `activation`, `additional-service`) serve as convention; a controlled vocabulary can be added in a future RFC without breaking changes.
@@ -197,9 +199,9 @@ N/A — no new commands. Schema violations surface as Astro content collection e
 ## Acceptance criteria
 
 - [ ] `offeringSchema` in `packages/pbp/src/schemas/offering.ts` uses `z.record(z.string(), pbpChargeSchema)` for `charges` instead of `z.record(z.string(), z.unknown())`
-- [ ] All 6 UK offering files have quoted decimal strings for all `value`, `unitValue`, `minimum`, `maximum` fields
-- [ ] All 6 UK offering files have `model` discriminator on every charge amount (`fixed`, `range`, `unit-rate`, or `tiered`)
-- [ ] All 6 UK offering files have `purpose` field on every charge
+- [ ] All 12 offering files (6 UK + 6 DE) have quoted decimal strings for all `value`, `unitValue`, `minimum`, `maximum` fields
+- [ ] All 12 offering files (6 UK + 6 DE) have `model` discriminator on every charge amount (`fixed`, `range`, `unit-rate`, or `tiered`)
+- [ ] All 12 offering files (6 UK + 6 DE) have `purpose` field on every charge
 - [ ] `pnpm --filter @warpgogol/pbp build:check` passes (typecheck)
 - [ ] `pnpm --filter @warpgogol/pbp test` passes
 - [ ] `rfc.validate` passes on this file
