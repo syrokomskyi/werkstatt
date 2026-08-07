@@ -24,6 +24,28 @@ propsSchema:
     - section-visual
     - section-header
     - body-list
+  shape: |
+    z.object({
+      offeringRef: z.string().optional(),
+      body: z.object({
+        kind: z.literal("list"),
+        items: z.array(z.object({
+          text: z.string().min(1),
+          chargeRef: z.string().optional(),
+          icon: z.object({
+            vendor: z.string(),
+            collection: z.string(),
+            name: z.string(),
+            size: z.number().optional(),
+          }).optional(),
+        })).min(1),
+        note: z.string().optional(),
+        iconColor: z.enum(["primary", "accent", "success", "warning", "error", "muted"]).optional(),
+        align: z.enum(["left", "center", "right"]).optional(),
+        itemAlign: z.enum(["left", "center", "right"]).optional(),
+        hideMarkers: z.boolean().optional(),
+      }),
+    }).passthrough()
 acceptedCosmicNames:
   - Helene
 constraints:

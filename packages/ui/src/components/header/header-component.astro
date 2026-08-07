@@ -108,7 +108,7 @@ const ctaHref = ctaTarget
             )
         }
         {
-          currencies.length > 0 && (
+          currencies.length > 0 && activeLang !== defaultLang && (
             <CurrencySelector
               lang={activeLang}
               defaultLanguage={defaultLang}
@@ -118,6 +118,12 @@ const ctaHref = ctaTarget
         }
       </div>
       {content.motto && <span class="site-header__motto">{content.motto}</span>}
+      {currencies.length > 0 && activeLang === defaultLang && (
+        <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR" }}>
+          try { localStorage.setItem("wg-currency", defaultCurrency); } catch {}
+          window.dispatchEvent(new CustomEvent("wg-currency-change", { detail: { currency: defaultCurrency } }));
+        </script>
+      )}
     </div>
 
     <nav

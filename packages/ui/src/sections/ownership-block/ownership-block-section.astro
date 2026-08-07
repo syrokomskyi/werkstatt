@@ -16,14 +16,61 @@ import type { SectionProps } from "@warpgogol/share/page";
 import { cast, need, resolveSectionAnchor } from "@warpgogol/share";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
-import SectionList from "@warpgogol/ui/components/section-body/list/section-list.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../price-card/price-variants.ts";
 import type { OwnershipBlockSectionContent } from "./ownership-block-section.types.generated.ts";
+import "../../components/section-body/list/section-list.css";
 import "./ownership-block-section.css";
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type ItemPart = TextPart | PricePart;
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "ownership");
 const props = cast<OwnershipBlockSectionContent>(pageOverride);
-const body = need("body", props.body);
+const body = props.body;
+
+const derivedPrices = loadDerivedPrices();
+const offeringRef = props.offeringRef;
+const align = body.align ?? "left";
+const itemAlign = body.itemAlign ?? "left";
+const iconColor = body.iconColor ?? "accent";
+const hideMarkers = body.hideMarkers ?? false;
+
+const renderedItems = body.items.map((it) => {
+  if (!offeringRef || !it.chargeRef)
+    return { ...it, parts: [{ kind: "text", value: it.text }] as ItemPart[] };
+  const marker = "{total}";
+  const idx = it.text.indexOf(marker);
+  if (idx === -1) return { ...it, parts: [{ kind: "text", value: it.text }] as ItemPart[] };
+  const before = it.text.slice(0, idx);
+  const after = it.text.slice(idx + marker.length);
+  const entries = derivedPrices?.[offeringRef];
+  const matching = entries?.filter((e) => e.chargeRef === it.chargeRef) ?? [];
+  const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+  const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+  const variants = buildPriceVariants(
+    sourceProp,
+    it.chargeRef,
+    lang,
+    offeringRef,
+    derivedPrices,
+    undefined,
+  );
+  return {
+    ...it,
+    parts: [
+      { kind: "text", value: before },
+      { kind: "price", variants },
+      { kind: "text", value: after },
+    ] as ItemPart[],
+  };
+});
 ---
 
 <SectionShell
@@ -46,13 +93,30 @@ const body = need("body", props.body);
     hideSectionNumber={props.header?.hideSectionNumber}
     id="ownership-title"
   />
-  <SectionList
-    items={body.items}
-    note={body.note}
-    iconColor={body.iconColor}
-    align={body.align}
-    itemAlign={body.itemAlign}
-    hideMarkers={body.hideMarkers}
-    effects={body.effects}
-  />
+  <div
+    class:list={["section-list-wrap", `section-list-wrap--align-${align}`]}
+    data-icon-color={iconColor}
+  >
+    <ul class:list={["section-list", `section-list--item-${itemAlign}`]} role="list">
+      {
+        renderedItems.map((it) => (
+          <li>
+            <div class="section-list__item section-list__item-surface">
+              {!hideMarkers && <span class="section-list__marker" aria-hidden="true" />}
+              <span class="section-list__text">
+                {it.parts.map((part) =>
+                  part.kind === "text" ? (
+                    part.value
+                  ) : part.variants ? (
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  ) : null,
+                )}
+              </span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    {body.note && <p class="section-list__note">{body.note}</p>}
+  </div>
 </SectionShell>
