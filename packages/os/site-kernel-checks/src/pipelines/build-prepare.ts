@@ -18,6 +18,7 @@
   <item>RFC-0658: added bordbuch.validate after bordbuch.generate and before bordbuch.commit to validate hash-chain integrity before build proceeds.</item>
   <item>RFC-0707: added nachweis.manifest.generate after bordbuch.commit, before passport.key.ensure.</item>
   <item>RFC-0721: added behavior.snapshot.staleness.check to both SITES_BUILD_PREPARE_PIPELINE and SITES_BUILD_PREPARE_DEV_PIPELINE.</item>
+  <item>RFC-0741: added rate-snapshot.resolve, currency-pricing.compile, derived-prices.materialize after entitlements.resolve in both pipelines.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -47,6 +48,11 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "env.example.generate" },
   // RFC-0169: resolve subscription entitlements before module-gating generators run
   { command: "entitlements.resolve" },
+  // RFC-0741: multi-currency steps (gated by gate.conditional.entitlement: multi-currency)
+  // after entitlements are known and before surface.generate consumes projection data.
+  { command: "rate-snapshot.resolve" },
+  { command: "currency-pricing.compile" },
+  { command: "derived-prices.materialize" },
   // RFC-0192: expand the Programmatic Surface into src/surface.generated.yaml (pseo-gated)
   // after entitlements are known and before routes/sitemap consume the registry.
   { command: "surface.generate" },
@@ -168,6 +174,10 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "api.routes.generate" },
   { command: "env.example.generate" },
   { command: "entitlements.resolve" },
+  // RFC-0741: multi-currency steps (gated by gate.conditional.entitlement: multi-currency)
+  { command: "rate-snapshot.resolve" },
+  { command: "currency-pricing.compile" },
+  { command: "derived-prices.materialize" },
   { command: "surface.generate" },
   { command: "surface.freshness" },
   { command: "surface.starmap" },

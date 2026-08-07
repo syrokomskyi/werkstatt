@@ -64,6 +64,8 @@ import {
   runSourceMonitorRun,
 } from "../source-monitor.ts";
 import { runDerivedPricesMaterialize } from "../derived-prices-materialize.ts";
+import { runRateSnapshotResolve } from "../rate-snapshot-resolve.ts";
+import { runCurrencyPricingCompile } from "../currency-pricing-compile.ts";
 
 export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
@@ -747,6 +749,78 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/src/content/business-profile/**/*.md"],
     writes: ["<app>/src/derived-prices.generated.json"],
     execute: runDerivedPricesMaterialize,
+    gate: {
+      severity: "error",
+      phase: "author",
+      conditional: {
+        kind: "entitlement",
+        ref: "multi-currency",
+        description: "Only runs when multi-currency entitlement is active",
+      },
+    },
+  },
+  {
+    name: "rate-snapshot.resolve",
+    description:
+      "Resolve rate snapshots for all RatePolicy entities — business-fixed mode reads RateSchedule entries, external mode requires Rate Fetcher Service (RFC-0744). RFC-0741.",
+    scope: "workspace",
+    flags: {
+      system: {
+        kind: "string",
+        description: "Sternsystem ID.",
+      },
+      "build-time": {
+        kind: "string",
+        description: "ISO 8601 timestamp to use as build time (defaults to now).",
+      },
+      dev: {
+        kind: "boolean",
+        description: "Dev mode — external mode is skipped with a warning.",
+      },
+    },
+    supportsAllSites: false,
+    cacheable: false,
+    reads: ["<app>/src/content/business-profile/**/*.md"],
+    writes: ["<app>/src/content/business-profile/rate-snapshots/**/*.md"],
+    execute: runRateSnapshotResolve,
+    gate: {
+      severity: "error",
+      phase: "author",
+      conditional: {
+        kind: "entitlement",
+        ref: "multi-currency",
+        description: "Only runs when multi-currency entitlement is active",
+      },
+    },
+  },
+  {
+    name: "currency-pricing.compile",
+    description:
+      "Validate the CurrencyPricingPolicy for the business — target currencies registered, ratePolicyRefs resolve, derivationContractRefs resolve, currentUses valid for current phase. RFC-0741.",
+    scope: "workspace",
+    flags: {
+      system: {
+        kind: "string",
+        description: "Sternsystem ID.",
+      },
+      "build-time": {
+        kind: "string",
+        description: "ISO 8601 timestamp to use as build time (defaults to now).",
+      },
+    },
+    supportsAllSites: false,
+    cacheable: false,
+    reads: ["<app>/src/content/business-profile/**/*.md"],
+    execute: runCurrencyPricingCompile,
+    gate: {
+      severity: "error",
+      phase: "author",
+      conditional: {
+        kind: "entitlement",
+        ref: "multi-currency",
+        description: "Only runs when multi-currency entitlement is active",
+      },
+    },
   },
   {
     name: "source.monitor.run",
