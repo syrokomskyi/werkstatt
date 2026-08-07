@@ -319,16 +319,16 @@ Example `PbpPriceProjection` JSON:
 
 ## Acceptance criteria
 
-- [ ] `PbpPriceProjection` interface exported from `@warpgogol/pbp`
-- [ ] `PbpPriceDisplayConfig` interface exported
-- [ ] `buildPriceProjection` function exported
-- [ ] Website Projection includes `priceProjections` when multi-currency entitled
-- [ ] AI Answer Projection includes `priceTraces` when multi-currency entitled
-- [ ] `allowedUses` enforcement prevents projection when `false`
-- [ ] Display config follows decisions #29, #31, #32, #33, #34
-- [ ] `tsc --noEmit` passes
-- [ ] `vitest run` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpPriceProjection` interface exported from `@warpgogol/pbp` (evidence: packages/pbp/src/index.ts:615, packages/pbp/src/projections/price-projection.ts:44)
+- [x] `PbpPriceDisplayConfig` interface exported (evidence: packages/pbp/src/index.ts:616, packages/pbp/src/projections/price-projection.ts:27)
+- [x] `buildPriceProjection` function exported (evidence: packages/pbp/src/index.ts:617, packages/pbp/src/projections/price-projection.ts:143)
+- [x] Website Projection includes `priceProjections` when multi-currency entitled (evidence: packages/pbp/src/projections/website.ts:18, packages/pbp/src/compiler/projection.ts:28-44)
+- [x] AI Answer Projection includes `priceTraces` when multi-currency entitled (evidence: packages/pbp/src/projections/ai-answer.ts:20, packages/pbp/src/compiler/projection.ts:46-62)
+- [x] `allowedUses` enforcement prevents projection when `false` (evidence: packages/pbp/src/projections/price-projection.ts:149, price-projection.test.ts:46-50)
+- [x] Display config follows decisions #29, #31, #32, #33, #34 (evidence: packages/pbp/src/projections/price-projection.ts:63-68 DEFAULT_DISPLAY_CONFIG, price-projection.test.ts:91-95)
+- [x] `tsc --noEmit` passes (evidence: pnpm --filter @warpgogol/pbp run build:check exit 0)
+- [x] `vitest run` passes (evidence: pnpm --filter @warpgogol/pbp exec vitest run src/projections/**tests**/price-projection.test.ts — 10 tests passed)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0742 --json — 0 violations)
 
 ## Implementation notes for agents
 
