@@ -13,7 +13,7 @@ import {
   registerPipeFormatter,
   getPipeFormatter,
 } from "../formula-eval.ts";
-import type { ContentRefIndex } from "../content-reference.ts";
+import type { ContentRefIndex, SourceRef } from "../content-reference.ts";
 import { EMPTY_CONTENT_REF_INDEX } from "../content-reference.ts";
 
 describe("extractNumeric", () => {
@@ -535,5 +535,85 @@ describe("RFC-0729: invalid rate param", () => {
     );
     expect(result.resolved).toBe(true);
     expect(result.value).toBe("70\u00A0€");
+  });
+});
+
+describe("RFC-0731: this. self-reference in formulas", () => {
+  const mockIndex: ContentRefIndex = {
+    version: 1,
+    generatedAt: "2026-01-01",
+    collections: ["business-profile"],
+    entries: {
+      "business-profile": {
+        "offerings/digital-foundation": {
+          de: {
+            pricing: {
+              charges: {
+                monthlySubscription: { amount: { value: "70.00" } },
+                setup: { amount: { value: "200.00" } },
+              },
+            },
+            presentation: {
+              price: {
+                setup: "200 €",
+                monthly: "70 €",
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
+  const sourceRef: SourceRef = {
+    collection: "business-profile",
+    file: "offerings/digital-foundation",
+  };
+
+  it("resolves this. in arithmetic formula expression", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "this.pricing.charges.monthlySubscription.amount.value + this.pricing.charges.setup.amount.value",
+      "de",
+      "de",
+      sourceRef,
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("270");
+  });
+
+  it("resolves this. as single-ref string interpolation =(this.field)", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "this.presentation.price.monthly",
+      "de",
+      "de",
+      sourceRef,
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("70");
+  });
+
+  it("resolves this. with pipe formatter =(this.field | money)", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "this.pricing.charges.monthlySubscription.amount.value | money currency=EUR locale=de",
+      "de",
+      "de",
+      sourceRef,
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toContain("70");
+  });
+
+  it("returns REF-12 when this. is used without sourceRef", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "this.pricing.charges.monthlySubscription.amount.value",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(false);
+    expect(result.error).toContain("REF-12");
   });
 });

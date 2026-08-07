@@ -5,6 +5,7 @@ import {
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
   type ContentRefIndex,
+  type SourceRef,
 } from "../content-reference.ts";
 
 const TEST_INDEX: ContentRefIndex = {
@@ -250,4 +251,78 @@ test("resolveReferencesInString — reference at end of line without trailing pu
     "de",
   );
   expect(out).toBe("Kontakt: Warpgogol GmbH");
+});
+
+// RFC-0731: this. self-reference tests
+
+const OFFER_SOURCE_REF: SourceRef = { collection: "business", file: "offer" };
+
+test("RFC-0731: resolveReference with this. prefix and sourceRef — resolves to same-file field", () => {
+  const result = resolveReference(TEST_INDEX, "this.price.monthly", "de", "de", OFFER_SOURCE_REF);
+  expect(result.resolved).toBe(true);
+  expect(result.value).toBe("70 €/Monat");
+});
+
+test("RFC-0731: resolveReference with this. prefix but no sourceRef — returns REF-12", () => {
+  const result = resolveReference(TEST_INDEX, "this.price.monthly", "de", "de");
+  expect(result.resolved).toBe(false);
+  expect(result.error).toContain("REF-12");
+});
+
+test("RFC-0731: resolveReference with this. prefix, sourceRef provided, but field not found — returns REF-13", () => {
+  const result = resolveReference(
+    TEST_INDEX,
+    "this.nonexistent.field",
+    "de",
+    "de",
+    OFFER_SOURCE_REF,
+  );
+  expect(result.resolved).toBe(false);
+  expect(result.error).toContain("REF-13");
+});
+
+test("RFC-0731: resolveReferencesInString with this. as pure reference — resolves correctly", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "this.price.monthly",
+    "de",
+    "de",
+    OFFER_SOURCE_REF,
+  );
+  expect(out).toBe("70 €/Monat");
+});
+
+test("RFC-0731: resolveReferencesInString with this. in embedded text — resolves correctly", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "Preis: this.price.monthly monatlich",
+    "de",
+    "de",
+    OFFER_SOURCE_REF,
+  );
+  expect(out).toBe("Preis: 70 €/Monat monatlich");
+});
+
+test("RFC-0731: resolveReferencesDeep with this. in nested object — resolves correctly", async () => {
+  const data = {
+    label: "Monatlicher Preis",
+    value: "this.price.monthly",
+    nested: { description: "Kosten: this.price.monthly" },
+  };
+  const result = await resolveReferencesDeep(TEST_INDEX, data, "de", "de", OFFER_SOURCE_REF);
+  expect(result).toEqual({
+    label: "Monatlicher Preis",
+    value: "70 €/Monat",
+    nested: { description: "Kosten: 70 €/Monat" },
+  });
+});
+
+test("RFC-0731: resolveReferencesInString with this. but no sourceRef — leaves text unchanged", () => {
+  const out = resolveReferencesInString(TEST_INDEX, "this.price.monthly", "de", "de");
+  expect(out).toBe("this.price.monthly");
+});
+
+test("RFC-0731: regression — existing absolute references still resolve without sourceRef", () => {
+  const out = resolveReferencesInString(TEST_INDEX, "business.offer.price.monthly", "de", "de");
+  expect(out).toBe("70 €/Monat");
 });
