@@ -11,11 +11,12 @@
   <item>Established by RFC-0741 — command handler for rate-snapshot.resolve.</item>
   <item>RFC-0741 review fixes: use writeFileIfChanged, top-level crypto import, site URL from config, type guards, shared helpers, remove unused snapshotsReused field, external mode as warning.</item>
   <item>RFC-0744: external mode now queries Supabase rate_observations table for latest observation and creates RateSnapshot from it.</item>
+  <item>RFC-0746: add idempotency for business-fixed mode — reuse existing fresh snapshot with same value + entryKey instead of creating a new one; normalize validFrom to UTC before comparison in findApplicableScheduleEntry.</item>
 </CHANGE_SUMMARY>
 */
 
 import { join } from "node:path";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import type {
@@ -36,24 +37,101 @@ import { flagString, resolveRef, findRatePolicies, findRateSchedules } from "./l
 const RATE_SNAPSHOTS_DIR = "src/content/business-profile/rate-snapshots";
 
 /**
+ * Normalize an ISO 8601 string to UTC (Z suffix) for deterministic comparison.
+ * RFC-0746: prevents timezone-fragile lexicographic ordering of validFrom values.
+ */
+function normalizeToUtc(isoString: string): string {
+  try {
+    return new Date(isoString).toISOString();
+  } catch {
+    return isoString;
+  }
+}
+
+/**
  * Find the applicable RateSchedule entry for a given time.
  *
- * Entries are sorted by validFrom descending. The first entry with
- * validFrom <= now is the applicable one.
+ * Entries are sorted by validFrom (normalized to UTC) descending. The first
+ * entry with validFrom <= now (both normalized to UTC) is the applicable one.
+ * RFC-0746: normalizes validFrom to UTC before comparison to prevent
+ * timezone-fragile string ordering (e.g. +02:00 sorting after Z).
  */
 function findApplicableScheduleEntry(
   schedule: { entries: Record<string, PbpRateScheduleEntry> },
   now: string,
 ): PbpRateScheduleEntry | undefined {
+  const nowUtc = normalizeToUtc(now);
   const entries = Object.entries(schedule.entries).sort(([, a], [, b]) =>
-    b.validFrom.localeCompare(a.validFrom),
+    normalizeToUtc(b.validFrom).localeCompare(normalizeToUtc(a.validFrom)),
   );
   for (const [, entry] of entries) {
-    if (entry.validFrom <= now) {
+    if (normalizeToUtc(entry.validFrom) <= nowUtc) {
       return entry;
     }
   }
   return undefined;
+}
+
+/**
+ * RFC-0746: Scan existing snapshot files for a reusable snapshot.
+ *
+ * A snapshot is reusable if all of the following match:
+ * - Same sourceCurrency / targetCurrency pair
+ * - source.kind === "business-fixed"
+ * - source.rateScheduleEntryKey matches expectedEntryKey
+ * - value matches expectedValue
+ * - freshUntil is still in the future
+ *
+ * Returns the snapshot ID if a reusable snapshot is found, null otherwise.
+ */
+async function findReusableSnapshot(
+  outputDir: string,
+  sourceCurrency: string,
+  targetCurrency: string,
+  expectedValue: string,
+  expectedEntryKey: string,
+  buildTime: string,
+): Promise<string | null> {
+  let files: string[];
+  try {
+    files = await readdir(outputDir);
+  } catch {
+    return null;
+  }
+
+  const prefix = `${sourceCurrency}-${targetCurrency}-`;
+  const nowMs = new Date(buildTime).getTime();
+
+  for (const file of files) {
+    if (!file.startsWith(prefix) || !file.endsWith(".md")) continue;
+    try {
+      const raw = await readFile(join(outputDir, file), "utf8");
+      const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
+      if (!fmMatch) continue;
+      const fm = JSON.parse(fmMatch[1]) as {
+        id?: string;
+        pair?: { sourceCurrency?: string; targetCurrency?: string };
+        value?: string;
+        source?: {
+          kind?: string;
+          rateScheduleEntryKey?: string;
+        };
+        freshUntil?: string;
+      };
+      if (fm.pair?.sourceCurrency !== sourceCurrency) continue;
+      if (fm.pair?.targetCurrency !== targetCurrency) continue;
+      if (fm.source?.kind !== "business-fixed") continue;
+      if (fm.source?.rateScheduleEntryKey !== expectedEntryKey) continue;
+      if (fm.value !== expectedValue) continue;
+      if (!fm.freshUntil) continue;
+      const freshMs = new Date(fm.freshUntil).getTime();
+      if (Number.isNaN(freshMs) || freshMs <= nowMs) continue;
+      return fm.id ?? null;
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
 
 /**
@@ -302,6 +380,23 @@ export async function runRateSnapshotResolve(
       continue;
     }
 
+    const entryKey = Object.entries(schedule.entries).find(([, e]) => e === entry)?.[0];
+    const outputDir = join(appDir, RATE_SNAPSHOTS_DIR, locale);
+
+    // RFC-0746: Idempotency check — reuse existing fresh snapshot with same value + entryKey
+    const reusableId = await findReusableSnapshot(
+      outputDir,
+      sourceCurrency,
+      targetCurrency,
+      entry.value,
+      entryKey ?? "",
+      buildTime,
+    );
+    if (reusableId) {
+      snapshotsCreated.push(reusableId);
+      continue;
+    }
+
     const observedAt = buildTime;
     const digest = computeDigest(entry.value, observedAt);
     const snapshotIdStr = snapshotId(siteUrl, sourceCurrency, targetCurrency, observedAt);
@@ -323,7 +418,7 @@ export async function runRateSnapshotResolve(
       source: {
         kind: "business-fixed" as const,
         rateScheduleRef: { ref: schedule.id },
-        rateScheduleEntryKey: Object.entries(schedule.entries).find(([, e]) => e === entry)?.[0],
+        rateScheduleEntryKey: entryKey,
       },
       observedAt,
       freshUntil,
@@ -334,7 +429,6 @@ export async function runRateSnapshotResolve(
     };
 
     const fileName = `${sourceCurrency}-${targetCurrency}-${observedAt.replace(/[:.]/g, "-").slice(0, 19)}.md`;
-    const outputDir = join(appDir, RATE_SNAPSHOTS_DIR, locale);
     const outputPath = join(outputDir, fileName);
     const content = `---\n${JSON.stringify(frontmatter, null, 2)}\n---\n`;
 

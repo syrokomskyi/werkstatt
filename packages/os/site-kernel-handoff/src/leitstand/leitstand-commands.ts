@@ -282,6 +282,10 @@ export interface FreshnessResult {
 const FRESHNESS_MAX_ATTEMPTS = 5;
 const FRESHNESS_BACKOFF_DELAYS_MS = [3_000, 6_000, 12_000, 24_000];
 
+// RFC-0747: Retry constants for alt health check in leitstand.promote.
+const ALT_HEALTH_MAX_ATTEMPTS = 3;
+const ALT_HEALTH_BACKOFF_DELAYS_MS = [3_000, 6_000];
+
 // RFC-0649 / RFC-0657: Verify CDN freshness by fetching build-identity.json from the CDN URL
 // and comparing distTreeHash against the local build-identity. Retries up to 5 times with
 // exponential backoff (3s, 6s, 12s, 24s). First attempt is immediate; subsequent attempts
@@ -2114,19 +2118,33 @@ export async function runLeitstandPromote(
     }
     logger.success(`  Build identity verified for ${releaseId}`);
 
-    // 3. Run health check against alt deployment
-    const altHealthResult = await adapter.health({
-      systemId,
-      channel: "alt",
-      deploymentUrl: altConfig.url,
-      releaseId,
-      expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
-      workspaceRoot,
-    });
+    // 3. Run health check against alt deployment (RFC-0747: retry with backoff)
+    let altHealthResult: { state: string; checks: unknown[] } = { state: "unhealthy", checks: [] };
+    for (let attempt = 1; attempt <= ALT_HEALTH_MAX_ATTEMPTS; attempt++) {
+      if (attempt > 1) {
+        const delayMs = ALT_HEALTH_BACKOFF_DELAYS_MS[attempt - 2];
+        logger.info(
+          `  Alt health retry ${attempt}/${ALT_HEALTH_MAX_ATTEMPTS} after ${delayMs / 1000}s...`,
+        );
+        await sleep(delayMs);
+      }
+      altHealthResult = await adapter.health({
+        systemId,
+        channel: "alt",
+        deploymentUrl: altConfig.url,
+        releaseId,
+        expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
+        workspaceRoot,
+      });
+      if (altHealthResult.state === "healthy") break;
+      if (attempt < ALT_HEALTH_MAX_ATTEMPTS) {
+        logger.warn(`  Alt health check: ${altHealthResult.state} — will retry...`);
+      }
+    }
 
     if (altHealthResult.state !== "healthy") {
       throw new Error(
-        `[leitstand.promote] alt deployment is not healthy (state: ${altHealthResult.state}). Cannot promote to main.`,
+        `[leitstand.promote] alt deployment is not healthy after ${ALT_HEALTH_MAX_ATTEMPTS} attempts (state: ${altHealthResult.state}). Cannot promote to main.`,
       );
     }
 

@@ -4,29 +4,30 @@
 
 set -euo pipefail
 
-# ecosystem.commit sets ECOSYSTEM_COMMIT=1 when invoking git commit
-if [ -n "${ECOSYSTEM_COMMIT:-}" ]; then
-  exit 0
-fi
+# ecosystem.commit sets ECOSYSTEM_COMMIT=1 when invoking git commit.
+# It bypasses the platform-scope guard (ecosystem.commit IS the platform commit path),
+# but CSS token validation and ENV-CONTRACT checks still run.
+if [ -z "${ECOSYSTEM_COMMIT:-}" ]; then
+  # Check if any staged file matches platform scope
+  PLATFORM_FILES=$(git diff --cached --name-only -- 'packages/' 'integrations/' 'services/' || true)
 
-# Check if any staged file matches platform scope
-PLATFORM_FILES=$(git diff --cached --name-only -- 'packages/' 'integrations/' 'services/' || true)
-
-if [ -n "$PLATFORM_FILES" ]; then
-  echo "ERROR: Direct git commit blocked for platform-scope changes." >&2
-  echo "" >&2
-  echo "Staged files touch platform scope (packages/**, integrations/**, services/**)." >&2
-  echo "Use ecosystem.commit instead:" >&2
-  echo "" >&2
-  echo "  pnpm exec site-kernel run ecosystem.commit --message \"<your message>\" [--rfc RFC-XXXX]" >&2
-  echo "" >&2
-  echo "Tip for AI agents: remember this rule — platform-scope changes MUST use" >&2
-  echo "ecosystem.commit, not git commit. Non-platform changes (docs/rfcs/**, missions/**)" >&2
-  echo "may use git commit directly." >&2
-  exit 1
+  if [ -n "$PLATFORM_FILES" ]; then
+    echo "ERROR: Direct git commit blocked for platform-scope changes." >&2
+    echo "" >&2
+    echo "Staged files touch platform scope (packages/**, integrations/**, services/**)." >&2
+    echo "Use ecosystem.commit instead:" >&2
+    echo "" >&2
+    echo "  pnpm exec site-kernel run ecosystem.commit --message \"<your message>\" [--rfc RFC-XXXX]" >&2
+    echo "" >&2
+    echo "Tip for AI agents: remember this rule — platform-scope changes MUST use" >&2
+    echo "ecosystem.commit, not git commit. Non-platform changes (docs/rfcs/**, missions/**)" >&2
+    echo "may use git commit directly." >&2
+    exit 1
+  fi
 fi
 
 # ENV-CONTRACT-06: blank line between variable blocks in .env.example files
+# These checks run regardless of ECOSYSTEM_COMMIT — they protect all commits.
 ENV_EXAMPLE_FILES=$(git diff --cached --name-only -- '*.env.example' '.env.example' '**/.env.example' || true)
 if [ -n "$ENV_EXAMPLE_FILES" ]; then
   ENV_ERRORS=""
