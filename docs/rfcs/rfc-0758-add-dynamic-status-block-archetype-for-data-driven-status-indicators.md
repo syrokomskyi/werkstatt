@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -25,6 +26,7 @@ related:
   - RFC-0757
   - RFC-0026
   - RFC-0047
+  - RFC-0040
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -37,7 +39,7 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: minor
+versionBump: patch
 commands:
   proposed: []
   added: []
@@ -80,9 +82,9 @@ nonGoals:
 
 ## Context
 
-The platform's archetype catalog (`packages/ontology/archetypes/sections/`) includes 28 section archetypes covering common page patterns: hero, approach, comparison-cards, faq-list, final-cta, send-message, etc. All are static-content sections — their content is authored in page block props and rendered at build time.
+The platform's archetype catalog (`packages/ontology/archetypes/sections/`) includes 29 section archetypes covering common page patterns: hero, approach, comparison-cards, faq-list, final-cta, send-message, etc. All are static-content sections — their content is authored in page block props and rendered at build time.
 
-A new page planned for warpgogol-com ("Відповідальні рекомендації" — Responsible Recommendations) includes a section showing the current number of open mandates ("Відкритих мандатів: 1"). This is a data-driven status indicator — the value changes over time and is not authored content. None of the existing 28 archetypes cover this pattern:
+A new page planned for warpgogol-com ("Відповідальні рекомендації" — Responsible Recommendations) includes a section showing the current number of open mandates ("Відкритих мандатів: 1"). This is a data-driven status indicator — the value changes over time and is not authored content. None of the existing 29 archetypes cover this pattern:
 
 - `impact` — static curated stats (e.g. "50 projects delivered")
 - `social-proof` — static testimonials
@@ -111,7 +113,7 @@ A new `dynamic-status-block` archetype is added to the shared archetype catalog.
 - **RFC-0026 (Block-declarative pages):** The archetype participates in the standard block composition pipeline. Its `propsSchema` composes shared section-props fragments (`section-visual`, `section-header`).
 - **RFC-0047 (Thin apps):** The section implementation lives in `packages/ui/src/sections/dynamic-status-block/`. Sites reference it via `type: dynamic-status-block` in their page block configuration — no site-local code.
 - **RFC-0101..0107 (Section framework):** The section is a thin dispatcher composed of `<SectionShell>` → `<SectionHeader>` → body (value + label + context). All visual styling flows through `--ds-*` biome tokens.
-- **Layer C:** No URL, JSON-LD, or sitemap changes — `breaksC: false`.
+- **Layer C:** No URL, JSON-LD, or sitemap changes — `breaksC: false`. The `rfc.validate` V-30 warning (`@warpgogol/ontology` in `packagesImpacted` without `breaksC: true`) is a false positive: this RFC adds a new file under `packages/ontology/archetypes/sections/`, not under `packages/ontology/src/external-surfaces/` (the Layer C contract directory, RFC-0480).
 
 ## Design
 
@@ -120,10 +122,10 @@ A new `dynamic-status-block` archetype is added to the shared archetype catalog.
 The section is materialized by the existing `section.scaffold` command:
 
 ```sh
-pnpm exec site-kernel run section.scaffold --archetype dynamic-status-block --site warpgogol-com
+pnpm exec site-kernel run section.scaffold --name dynamic-status-block --archetype dynamic-status-block
 ```
 
-No new commands. The archetype is registered in the archetype catalog and consumed via standard block-declarative page composition.
+No new commands. The archetype is registered in the archetype catalog and consumed via standard block-declarative page composition. After scaffolding, run `archetype.registry.build` to regenerate `index.yaml` and `index.json` — `PLANET_IMPORT_PATHS` in `packages/share/src/page.ts` is registry-derived (RFC-0091) and requires no manual edit.
 
 ### TypeScript contracts
 
@@ -137,9 +139,11 @@ interface DynamicStatusBlockProps {
   valuePrefix?: string;           // Optional prefix (e.g. currency symbol)
   valueSuffix?: string;           // Optional suffix (e.g. " available")
   tone?: "default" | "success" | "warning" | "muted";  // Visual tone of the value
-  animated?: boolean;             // Optional count-up animation (RFC-0040 style)
+  animated?: boolean;             // Optional count-up animation via shared gsap-counter script (RFC-0040)
 }
 ```
+
+The `animated` prop reuses the shared `gsap-counter` script from `@warpgogol/share/scripts/gsap-counter` (RFC-0040). Since `dynamic-status-block` uses `bodyKind: composite` (bespoke layout, not `SectionStats`), the section template imports the counter script directly and applies it to the value element when `animated: true` and `value` is numeric. This avoids duplicating GSAP logic while keeping the composite layout flexible.
 
 The archetype YAML:
 
@@ -184,13 +188,12 @@ constraints: {}
 | Path | Role |
 | --- | --- |
 | `packages/ontology/archetypes/sections/dynamic-status-block.yaml` | New archetype definition with propsSchema, semanticRole, acceptedCosmicNames |
-| `packages/ontology/archetypes/index.yaml` | Register `dynamic-status-block` in `blockTypeToCosmicName`, `roleByCosmicName`, `planetImportPaths` |
+| `packages/ontology/archetypes/index.yaml` | Regenerated by `archetype.registry.build` (not hand-edited) |
 | `packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.astro` | Section template: SectionShell + SectionHeader + value/label/context rendering |
 | `packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.manifest.yaml` | Section manifest with `archetype: dynamic-status-block`, cosmicName, propsSchema |
-| `packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.types.ts` | TypeScript prop shape |
+| `packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.types.generated.ts` | Generated TypeScript prop shape (via `props.types.generate`) |
 | `packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.css` | Colocated CSS using only `--ds-*` tokens |
 | `packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.story.md` | At least one realistic props example |
-| `packages/share/src/page.ts` | Add `PLANET_IMPORT_PATHS` entry for the picked cosmic name |
 
 ### Output format
 
@@ -207,7 +210,7 @@ No `--json` output. The section renders as HTML at build time via the standard `
 - **Materialization:** The section is created via `section.scaffold` which generates the full file set (archetype YAML, section files, manifest, CSS, story). The cosmic name is picked by `cosmic.name.pick` from the `PlanetCatalog`.
 - **warpgogol-com adoption:** The "Відповідальні рекомендації" page (separate RFC) will use `type: dynamic-status-block` in its block configuration with a `{collection.file.field}` reference or hardcoded value for the open-mandate count.
 - **New sites:** Available to all sites via standard block-declarative page composition. No migration needed — the archetype is additive.
-- **Pipeline integration:** `section.contract.validate` in `PACKAGES_CHECK_PIPELINE` validates the new section's manifest, archetype reference, and cosmic name. `page.block.validate` validates block props against the archetype's `propsSchema`.
+- **Pipeline integration:** `section.contract.validate` in `PACKAGES_CHECK_PIPELINE` validates the new section's manifest, archetype reference, and cosmic name. `page.block.validate` validates block props against the archetype's `propsSchema`. `archetype.registry.build` regenerates `index.yaml` and `index.json`; `PLANET_IMPORT_PATHS` in `packages/share/src/page.ts` is registry-derived (RFC-0091) and requires no manual edit. `props.types.generate` regenerates the TypeScript prop types.
 - **No migrator needed:** The archetype is additive — no existing blocks are changed or removed.
 
 ## Alternatives considered
@@ -218,7 +221,7 @@ No `--json` output. The section renders as HTML at build time via the standard `
 
 - **Use `markdown` with inline value.** Rejected — `markdown` renders authored prose content. A data-driven value would need to be injected into the markdown at build time, which is not how `contentRef` works. The value would be stale unless manually updated.
 
-- **Extend `impact` with a `dynamicValue` prop.** Rejected — `impact` has a specific semantic role (`impact-highlight`) and `bodyKind: stats`. Adding a single-value data-driven mode would overload the archetype and confuse its intent. A separate archetype is cleaner.
+- **Extend `impact` with a `dynamicValue` prop.** Rejected — `impact` has a specific semantic role (`impact`) and `bodyKind: stats`. Adding a single-value data-driven mode would overload the archetype and confuse its intent. A separate archetype is cleaner.
 
 ## Risks
 
@@ -233,9 +236,9 @@ No `--json` output. The section renders as HTML at build time via the standard `
 ## Acceptance criteria
 
 - [ ] `dynamic-status-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (value, label, contextText?, valuePrefix?, valueSuffix?, tone?, animated?), `semanticRole: data-driven-status-indicator`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: archetype YAML file)
-- [ ] Archetype registered in `packages/ontology/archetypes/index.yaml` (`blockTypeToCosmicName`, `roleByCosmicName`, `planetImportPaths`) (evidence: index.yaml entries)
-- [ ] Section files created in `packages/ui/src/sections/dynamic-status-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.types.ts`, `.css`, `.story.md`) (evidence: file set exists)
-- [ ] `PLANET_IMPORT_PATHS` updated in `packages/share/src/page.ts` for the picked cosmic name (evidence: page.ts entry)
+- [ ] `archetype.registry.build` run to regenerate `packages/ontology/archetypes/index.yaml` including `dynamic-status-block` (evidence: index.yaml contains the new entry)
+- [ ] Section files created in `packages/ui/src/sections/dynamic-status-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.css`, `.story.md`) (evidence: file set exists)
+- [ ] `props.types.generate` run to produce `.types.generated.ts` (evidence: generated file exists)
 - [ ] `section.contract.validate` passes for the new section (evidence: validator output, zero violations)
 - [ ] `page.block.validate` accepts `type: dynamic-status-block` blocks with valid props (evidence: validator output)
 - [ ] `AGENTS.md` updated where agent behavior rules changed (evidence: `packages/ui/AGENTS.md` or `packages/ontology/AGENTS.md` if needed)
@@ -247,6 +250,8 @@ No `--json` output. The section renders as HTML at build time via the standard `
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST use `section.scaffold` to materialize the section — never copy a sibling section folder. The scaffold command guarantees the file set, manifest fields, propsSchema wiring, and import-path registration.
+- Agents MUST run `archetype.registry.build` after adding the archetype YAML to regenerate `index.yaml` and `PLANET_IMPORT_PATHS` (RFC-0091 — these are registry-derived, not hand-edited).
+- Agents MUST run `props.types.generate` after `section.scaffold` to produce `.types.generated.ts`.
 - Agents MUST NOT confuse `dynamic-status-block` with `impact`: `impact` = static curated multi-stat grid; `dynamic-status-block` = single data-driven value with label and optional context.
 - Agents MUST NOT add client-side hydration or React islands to this section — it renders at build time (SSG). Real-time data is out of scope.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
