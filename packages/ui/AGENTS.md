@@ -36,6 +36,8 @@ Every section under `packages/ui/src/sections/<slug>/` MUST:
 
 **New sections are materialized only by `section.scaffold`.** Never copy a sibling section folder; the scaffold command guarantees the file set, the manifest fields, the `propsSchemaCompose` wiring, and the import-paths registration in `@warpgogol/share/src/page.ts` `PLANET_IMPORT_PATHS`.
 
+**Structural UI labels must use optional label props with fallbacks for i18n.** Shared sections that render structural UI text (e.g. `<dt>` labels in metadata blocks, `aria-label` on `<nav>`) MUST NOT hardcode English strings. Instead, add optional label props (e.g. `versionLabel`, `linksLabel`) to the archetype `propsSchema` and manifest `propsSchema`, and use the `props.<label> ?? "English fallback"` pattern in the `.astro` template. This lets content authors override labels per-block for localization without requiring a full site-labels lookup. Discovered during RFC-0759 code review (finding E-1).
+
 ## Canonical structure
 
 ```text
