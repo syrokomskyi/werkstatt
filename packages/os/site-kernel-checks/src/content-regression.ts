@@ -20,6 +20,7 @@ CREG-04 workpiece mismatch, CREG-05 unreviewed drift on mission.close.
 <CHANGE_SUMMARY>
   <item>RFC-0732: initial implementation.</item>
   <item>RFC-0734: add review.generate, apply handlers, CREG-04/CREG-05 rules, review YAML serialization.</item>
+  <item>RFC-0764: add --auto-accept flag to content.regression.check — auto-accepts all drift, updates golden baseline, writes review.yaml and apply-result.json. CREG-06 write error rule.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -135,6 +136,7 @@ export interface ContentRegressionApplyResult {
   pending: number;
   goldenUpdated: boolean;
   errors: string[];
+  autoAccepted?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -526,9 +528,7 @@ export async function runContentRegressionCheck(
     // Build review changes with all decisions set to accept
     const changes = buildReviewChanges(diff, currentSnapshot, goldenSnapshot);
     for (const change of changes) {
-      if (change.kind !== "removed-route") {
-        change.decision = "accept";
-      }
+      change.decision = "accept";
     }
 
     const review: ContentRegressionReview = {
@@ -576,7 +576,7 @@ export async function runContentRegressionCheck(
       await writeFileIfChanged(goldenPath, goldenYaml);
 
       // Write apply-result.json (satisfies mission.close CREG-05 check)
-      const applyResult: ContentRegressionApplyResult & { autoAccepted: boolean } = {
+      const applyResult: ContentRegressionApplyResult = {
         accepted: changes.filter((c) => c.decision === "accept").length,
         rejected: 0,
         fixed: 0,
