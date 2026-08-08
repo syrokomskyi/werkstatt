@@ -262,7 +262,7 @@ No `--json` output. The page renders as static HTML at `/vidpovidalni-rekomendat
 - [x] Page does NOT render in DE build — no `/vidpovidalni-rekomendatsiyi` in German sitemap (evidence: sitemap output)
 - [x] Two `send-message` blocks have unique `formId` values (`recommendation-form` and `market-steward-form`) (evidence: block props)
 - [x] `service-metadata-block` includes `stats[]` for dynamic mandate counts (evidence: block props) — note: `stats[]` is not a valid prop on `service-metadata-block` (RFC-0759 archetype schema uses `.strict()`); dynamic mandate counts are rendered by the `dynamic-status-block` (block #16) per RFC-0759 rollout. This criterion is satisfied by the `dynamic-status-block` section.
-- [x] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate exitCode 0, zero violations)
 
 ## Implementation notes for agents
 
