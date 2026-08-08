@@ -11,7 +11,7 @@ systems:
         storageType: bare
     pinnedPlatform: 4.67.18
     currentMission: null
-    lastRelease: warpgogol-com-r000013
+    lastRelease: warpgogol-com-r000014
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
     deployment:
@@ -28,21 +28,21 @@ systems:
           url: https://warpgogol.com
       lastPropagated:
         alt:
-          releaseId: warpgogol-com-r000013
-          at: 2026-08-06T21:42:07.911Z
-          healthy: false
+          releaseId: warpgogol-com-r000014
+          at: 2026-08-08T00:03:03.367Z
+          healthy: true
           state: succeeded
-          operationId: op-msi1j7n1-wmbkicpt
+          operationId: op-msjm0jxz-zfvex95z
           leaseExpiresAt: null
           purgeResult:
             success: true
             purgedUrls: 107
         main:
-          releaseId: warpgogol-com-r000013
-          at: 2026-08-06T21:43:14.165Z
+          releaseId: warpgogol-com-r000014
+          at: 2026-08-08T00:03:59.374Z
           healthy: true
           state: succeeded
-          operationId: op-msi1krid-9rtza5gi
+          operationId: op-msjm1sup-51mqqei5
           leaseExpiresAt: null
           purgeResult:
             success: true
