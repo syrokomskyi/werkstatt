@@ -25,7 +25,7 @@ Agents have read-only access to the fleet telemetry backend (SigNoz) through the
 - Every telemetry-grounded incident investigation MUST end in a committed incident note at `docs/observability/incidents/YYYY-MM-DD-<slug>.md` (template: `docs/observability/incidents/README.md`). Cite queries and values inline — no screenshots.
 - `observability.mcp.validate` (OBS-MCP-01..03) enforces the entry, secret-leak backstop, and incidents template.
 
-## Env-and-deploy contract (RFC-0388 / DNA-40)
+## Env-and-deploy contract (RFC-0761 / DNA-40)
 
 Every `systems/*`, `services/*`, and root project that reads environment variables from `process.env`, `astro:env/server`, `astro:env/client`, a `getEnv()` helper, or a Cloudflare Worker `Env` interface MUST ship a `.env.example` file in its project root.
 
@@ -33,13 +33,12 @@ Every `systems/*`, `services/*`, and root project that reads environment variabl
 - Every variable MUST include a `# How to obtain:` instruction line with concrete steps for acquiring its value.
 - Values in `.env.example` MUST stay empty — never commit real secrets.
 - `README.md` files MUST NOT duplicate env-variable tables — they reference `.env.example` instead.
-- `systems/*` projects with `.env.example` MUST also have `.env` (local), `.env.main` (main/deploy), and `.env.alt` (alt/deploy) on disk. All are gitignored.
-- `services/*` projects with `.env.example` MUST have `.env` on disk. It is gitignored.
+- `systems/*` and `services/*` projects with `.env.example` MUST have `.env` on disk (local development + deploy). It is gitignored.
 - `systems/*/package.json` MUST contain the six canonical deploy scripts: `build:main`, `build:alt`, `deploy:main`, `deploy:alt`, `build:deploy:main`, `build:deploy:alt`.
-- `deploy:main` MUST use `--secrets-file .env.main`, `deploy:alt` MUST use `--secrets-file .env.alt`.
+- `deploy:main` and `deploy:alt` MUST use `--secrets-file .env`.
 - `services/*/package.json` deploy scripts MUST use `--secrets-file .env`.
 - All deploy scripts MUST be prefixed with `deploy.preflight` to validate env file presence, key completeness, no extra keys, and no empty values.
-- Enforced by `env.contract.validate`, `env.local.check`, `env.main.check`, `env.alt.check`, `deploy.scripts.validate`, and `deploy.preflight`. `env.contract.validate` runs in both `sites-check.author` and `services.check.run`. `deploy.scripts.validate` runs in `sites-check.author`.
+- Enforced by `env.contract.validate`, `env.local.check`, `deploy.scripts.validate`, and `deploy.preflight`. `env.contract.validate` runs in both `sites-check.author` and `services.check.run`. `deploy.scripts.validate` runs in `sites-check.author`.
 
 ## Testing policy (RFC-0347)
 

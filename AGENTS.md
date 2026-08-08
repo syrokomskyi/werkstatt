@@ -223,7 +223,7 @@ See [`docs/policies/agent-surface-ops.md`](docs/policies/agent-surface-ops.md) f
 
 - Agent Surface (RFC-0286..0290) — manifest, projections, discipline rules
 - Telemetry-read lane (RFC-0344) — read-only SigNoz access, incident notes
-- Env-and-deploy contract (RFC-0388 / DNA-40) — .env.example, .env.main, .env.alt, deploy.preflight, # How to obtain: instructions
+- Env-and-deploy contract (RFC-0761 / DNA-40) — .env.example, .env, deploy.preflight, # How to obtain: instructions
 - Testing policy (RFC-0347) — vitest, fast-check, PBT conventions
 
 ## Build verification discipline

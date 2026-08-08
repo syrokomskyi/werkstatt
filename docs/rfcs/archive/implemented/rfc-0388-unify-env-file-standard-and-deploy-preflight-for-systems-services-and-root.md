@@ -17,7 +17,8 @@ supersedes:
   - RFC-0346
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0761
 related:
   - DNA-1
   - DNA-2
