@@ -39,7 +39,7 @@ import {
 } from "../mission/mission-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "../werkstatt/atomic.ts";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
@@ -702,8 +702,8 @@ export async function runReleaseReady(
     manifest.readyAt = now;
     await writeReleaseYaml(workspaceRoot, releaseId, manifest);
 
-    // Append Bordbuch entry
-    await appendBordbuchEntry(
+    // Append Bordbuch entry (RFC-0750: commit atomically)
+    await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "release-ready",
@@ -713,6 +713,7 @@ export async function runReleaseReady(
         writerRole: "release",
         metadata: { releaseId, semver: manifest.semver },
       },
+      `Bordbuch: release-ready ${releaseId}`,
     );
 
     // Update registry
@@ -896,7 +897,7 @@ export async function runReleaseRollback(
     manifest.state = "rolled-back";
     await writeReleaseYaml(workspaceRoot, releaseId, manifest);
 
-    await appendBordbuchEntry(
+    await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "release-rolled-back",
@@ -906,6 +907,7 @@ export async function runReleaseRollback(
         writerRole: "release",
         metadata: { releaseId },
       },
+      `Bordbuch: release-rolled-back ${releaseId}`,
     );
 
     logger.success(`[release.rollback] ${releaseId} rolled back`);

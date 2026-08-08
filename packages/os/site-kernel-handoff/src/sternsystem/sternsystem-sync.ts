@@ -32,7 +32,7 @@ import {
   resolveCachePath,
   isGitAccessible,
 } from "./registry-io.ts";
-import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 
 export interface SternsystemSyncData {
   systemId: string;
@@ -215,7 +215,7 @@ export async function runSternsystemSync(
   const syncedAt = new Date().toISOString();
 
   try {
-    await appendBordbuchEntry(
+    await appendAndCommitBordbuch(
       workspaceRoot,
       id,
       "mirror-sync",
@@ -231,18 +231,16 @@ export async function runSternsystemSync(
           result: "ok",
         },
       },
+      `Bordbuch: mirror-sync ${id}`,
     );
   } catch (err) {
     logger.error(`[sternsystem.sync] Bordbuch write failed: ${(err as Error).message}`);
   }
 
-  // Commit and push bordbuch to system git repo (RFC-0477)
-  const systemDir = await resolveCachePath(workspaceRoot, id);
-  await commitAndPushBordbuch(systemDir, `Bordbuch: mirror-sync ${id}`);
-
   // RFC-0705: Update refs/mirror/${branch} in bare repo to track the last
-  // successfully pushed SHA. This MUST run after commitAndPushBordbuch, which
-  // adds a bordbuch entry commit and pushes it to the bare repo, advancing HEAD.
+  // successfully pushed SHA. This MUST run after the bordbuch commit+push (now
+  // handled atomically by appendAndCommitBordbuch), which pushes the bordbuch
+  // entry commit to the bare repo, advancing HEAD.
   // mission.close checks this ref to determine if external mirrors are in sync.
   if (externalMirrors.length > 0 && !syncAll) {
     try {

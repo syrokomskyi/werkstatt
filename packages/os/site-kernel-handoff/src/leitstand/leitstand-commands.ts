@@ -50,7 +50,7 @@ import type {
 } from "@warpgogol/ontology/operations";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readReleaseManifest, writeReleaseYaml } from "../release/release-commands.ts";
 import { orchestrateSnap01Recovery } from "../mission/snapshot-auto-regen.ts";
 import { buildIdentitySchema } from "@warpgogol/ontology/operations";
@@ -1954,8 +1954,8 @@ export async function runLeitstandPropagate(
       await writeReleaseYaml(workspaceRoot, releaseId, releaseManifest);
     }
 
-    // Append Bordbuch
-    await appendBordbuchEntry(
+    // Append Bordbuch (RFC-0750: commit atomically)
+    await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "deployment",
@@ -1971,6 +1971,7 @@ export async function runLeitstandPropagate(
           operationId,
         },
       },
+      `Bordbuch: deployment ${releaseId} ${channel}`,
     );
 
     logger.success(
@@ -2241,8 +2242,8 @@ export async function runLeitstandPromote(
       await writeReleaseYaml(workspaceRoot, releaseId, releaseManifest);
     }
 
-    // 8. Append Bordbuch
-    await appendBordbuchEntry(
+    // 8. Append Bordbuch (RFC-0750: commit atomically)
+    await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "deployment",
@@ -2260,6 +2261,7 @@ export async function runLeitstandPromote(
           operationId,
         },
       },
+      `Bordbuch: deployment ${releaseId} main`,
     );
 
     logger.success(
@@ -2549,8 +2551,8 @@ export async function runLeitstandRollback(
       }
     }
 
-    // Append Bordbuch
-    await appendBordbuchEntry(
+    // Append Bordbuch (RFC-0750: commit atomically)
+    await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "release-rolled-back",
@@ -2565,6 +2567,7 @@ export async function runLeitstandRollback(
           rolledBackTo: targetRelease,
         },
       },
+      `Bordbuch: release-rolled-back ${systemId} ${channel}`,
     );
 
     logger.success(

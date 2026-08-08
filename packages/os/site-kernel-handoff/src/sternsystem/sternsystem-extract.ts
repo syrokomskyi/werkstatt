@@ -28,7 +28,7 @@ import {
 } from "../sternsystem/registry-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
 import { allMigratorIds } from "../migrators/registry.ts";
 import { highestRfcId, snapshotCapabilities } from "./pin-helpers.ts";
@@ -135,8 +135,8 @@ export async function runSternsystemExtract(
       JSON.stringify(pin, null, 2) + "\n",
     );
 
-    // Write initial Bordbuch
-    await appendBordbuchEntry(
+    // Write initial Bordbuch (RFC-0750: commit atomically)
+    await appendAndCommitBordbuch(
       workspaceRoot,
       siteId,
       "pin-update",
@@ -146,6 +146,7 @@ export async function runSternsystemExtract(
         writerRole: "sternsystem",
         metadata: { oldVersion: null, newVersion: pinVersion },
       },
+      `Bordbuch: pin-update ${siteId}`,
     );
 
     // Update registry
