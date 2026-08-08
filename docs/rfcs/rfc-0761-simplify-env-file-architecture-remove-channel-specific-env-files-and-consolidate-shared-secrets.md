@@ -342,25 +342,25 @@ function resolveConventionSecretsPath(basePath: string): string | undefined {
 
 ## Acceptance criteria
 
-- [ ] `resolveConventionSecretsPath` in `leitstand-commands.ts` returns `.env` path for all channels (no channel parameter)
-- [ ] `leitstand.rollback` uses `.env` for all channels (no channel-dependent env file resolution)
-- [ ] Preflight `convention-env-exists` check in `leitstand-commands.ts` checks for `.env` (not `.env.alt` / `.env.main`)
-- [ ] `mission.materialize` creates only `.env` from `.env.example` (no `.env.main` / `.env.alt`)
-- [ ] `release.prepare` copies `.env` to release directory (not `.env.main` / `.env.alt`)
-- [ ] `deploy.preflight` no longer accepts `--env` flag for sites; targets `.env`
-- [ ] `deploy.scripts.validate` checks `deploy:main` and `deploy:alt` use `--secrets-file .env`
-- [ ] `env.main.check` and `env.alt.check` commands removed from command table and handlers
-- [ ] `env.example.generate` does not include `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID` in site template
-- [ ] Root `.env.example` includes `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOGOL_OTLP_TOKEN` with `# How to obtain:` instructions
-- [ ] `cf-analytics-poller/.env.example` and `fleet-probe-runner/.env.example` do not list `WARPGOGOL_OTLP_*`
-- [ ] `package.template.json` in `site-kernel-onboarding` uses `--secrets-file .env` for `deploy:main` and `deploy:alt`
-- [ ] Root `.env.secrets-main` and `.env.secrets-alt` files deleted
-- [ ] All `systems/*/package.json` deploy scripts updated to `--secrets-file .env`
-- [ ] `DNA-40` in `docs/architecture-dna.md` updated to reflect single-file model
-- [ ] Root `AGENTS.md` env-and-deploy contract summary updated (remove `.env.main`, `.env.alt`)
-- [ ] `services/AGENTS.md` env-and-deploy contract section updated
-- [ ] `HOW_TO_OBTAIN` map in `env-example.ts` updated (remove `WARPGOGOL_OTLP_*` from site generator)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `resolveConventionSecretsPath` in `leitstand-commands.ts` returns `.env` path for all channels (no channel parameter)
+- [x] `leitstand.rollback` uses `.env` for all channels (no channel-dependent env file resolution)
+- [x] Preflight `convention-env-exists` check in `leitstand-commands.ts` checks for `.env` (not `.env.alt` / `.env.main`)
+- [x] `mission.materialize` creates only `.env` from `.env.example` (no `.env.main` / `.env.alt`)
+- [x] `release.prepare` copies `.env` to release directory (not `.env.main` / `.env.alt`)
+- [x] `deploy.preflight` no longer accepts `--env` flag for sites; targets `.env`
+- [x] `deploy.scripts.validate` checks `deploy:main` and `deploy:alt` use `--secrets-file .env`
+- [x] `env.main.check` and `env.alt.check` commands removed from command table and handlers
+- [x] `env.example.generate` does not include `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID` in site template
+- [x] Root `.env.example` includes `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOGOL_OTLP_TOKEN` with `# How to obtain:` instructions
+- [x] `cf-analytics-poller/.env.example` and `fleet-probe-runner/.env.example` do not list `WARPGOGOL_OTLP_*`
+- [x] `package.template.json` in `site-kernel-onboarding` uses `--secrets-file .env` for `deploy:main` and `deploy:alt`
+- [x] Root `.env.secrets-main` and `.env.secrets-alt` files deleted
+- [x] All `systems/*/package.json` deploy scripts updated to `--secrets-file .env`
+- [x] `DNA-40` in `docs/architecture-dna.md` updated to reflect single-file model
+- [x] Root `AGENTS.md` env-and-deploy contract summary updated (remove `.env.main`, `.env.alt`)
+- [x] `services/AGENTS.md` env-and-deploy contract section updated
+- [x] `HOW_TO_OBTAIN` map in `env-example.ts` updated (remove `WARPGOGOL_OTLP_*` from site generator)
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
