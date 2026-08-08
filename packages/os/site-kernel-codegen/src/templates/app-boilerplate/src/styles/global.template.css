@@ -156,21 +156,25 @@
 
 @layer components {
   /* Single deterministic header-offset rule for the whole platform.
-     The first flow child of main — a hero OR a breadcrumbs bar, regardless of
-     element type — pulls its background up behind the glass header (margin-top)
-     while its content is held clear of the header (padding-top). The margin and
-     padding are equal and opposite, so content can NEVER slide under the fixed
-     header on any screen width. Sections that follow flow normally, so a
-     breadcrumbs + hero pair never double-offsets or overlaps.
+     The first section child of main — a hero OR a breadcrumbs bar — pulls its
+     background up behind the glass header (margin-top) while its content is
+     held clear of the header (padding-top). The margin and padding are equal
+     and opposite, so content can NEVER slide under the fixed header on any
+     screen width. Sections that follow flow normally, so a breadcrumbs + hero
+     pair never double-offsets or overlaps.
+
+     `:first-of-type` (not `:first-child`) is used because Astro dev mode
+     injects <script> tags as the first child of <main>; `:first-child` would
+     match the script tag instead of the section, causing a gap.
 
      This lives in the components layer (not base) so its padding-top reliably
      overrides `.section-shell { padding-block }` — a base-layer rule would lose
      the cascade-layer contest to section-shell regardless of specificity. The
-     `main > :first-child` specificity (0,0,1,1) beats `.section-shell` (0,0,1,0),
-     so only the top padding is replaced; the shell's padding-bottom is kept.
-     This is the only place the header offset is expressed; section CSS must not
-     re-add it. */
-  main > :first-child {
+     `main > section:first-of-type` specificity (0,0,1,1) beats `.section-shell`
+     (0,0,1,0), so only the top padding is replaced; the shell's padding-bottom
+     is kept. This is the only place the header offset is expressed; section CSS
+     must not re-add it. */
+  main > section:first-of-type {
     margin-top: calc(var(--ds-size-header-height, 72px) * -1);
     padding-top: var(--ds-size-header-height, 72px);
   }

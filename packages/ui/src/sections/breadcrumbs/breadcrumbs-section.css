@@ -14,7 +14,7 @@
 
 @layer components {
   /* The fixed-header offset (margin-top + padding-top) is owned globally by the
-     `main > :first-child` rule in global.css; this section only paints the bar
+     `main > section:first-of-type` rule in global.css; this section only paints the bar
      background so the header-offset zone is filled by the bar colour (no page
      background showing through) when breadcrumbs are the first section. */
   .breadcrumbs-section {

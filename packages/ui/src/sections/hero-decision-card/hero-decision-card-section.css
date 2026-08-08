@@ -19,10 +19,12 @@
     flex-direction: column;
   }
   /* Full-viewport hero only when it is the first section. The header
-     offset/clearance is owned globally by `main > :first-child`. After
-     breadcrumbs the hero sizes to its content (compact sub-page header), so
-     there is no large gap and no text slipping under the fixed header. */
-  main > .section-shell[data-slug="hero-decision-card"]:first-child {
+     offset/clearance is owned globally by `main > section:first-of-type`.
+     After breadcrumbs the hero sizes to its content (compact sub-page header),
+     so there is no large gap and no text slipping under the fixed header.
+     `:first-of-type` is used because Astro dev mode injects <script> tags as
+     the first child of <main>. */
+  main > .section-shell[data-slug="hero-decision-card"]:first-of-type {
     min-height: 100vh;
   }
 

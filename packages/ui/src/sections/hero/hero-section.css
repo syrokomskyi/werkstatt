@@ -36,10 +36,12 @@
     justify-content: flex-end;
   }
   /* Full-viewport hero only when it is the first section (e.g. home page).
-     The header offset/clearance is owned globally by `main > :first-child`.
+     The header offset/clearance is owned globally by `main > section:first-of-type`.
      After breadcrumbs the hero is a compact sub-page header that sizes to its
-     content, so there is no large gap and no overlap with the fixed header. */
-  main > .section-shell[data-slug="hero"]:first-child {
+     content, so there is no large gap and no overlap with the fixed header.
+     `:first-of-type` is used because Astro dev mode injects <script> tags as
+     the first child of <main>. */
+  main > .section-shell[data-slug="hero"]:first-of-type {
     min-height: 100svh;
   }
   .section-shell[data-slug="hero"] > .section-shell__container {
