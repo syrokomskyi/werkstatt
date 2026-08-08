@@ -7,6 +7,7 @@ for all Sternsystem operations.
 RFC-0561: fleetRegistryEntrySchema gains optional owner field (did:web VC subject id).
 RFC-0574: replace repo/mirror with parameterized mirrors[] array.
 RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, services[] with subdomains to fleetRegistrySchema.
+RFC-0751: extend serviceEntrySchema with deployment fields (kind, url, publicEndpoints, routes, upstreams, lastDeployed, healthCheckPath).
 </purpose>
 <non-goals>
   <item>Do not perform file IO or git operations — pure shape only.</item>
@@ -19,6 +20,7 @@ RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, services[] with subd
   <item>RFC-0561: add optional owner field (did:web VC subject id) to fleetRegistryEntrySchema.</item>
   <item>RFC-0574: replace repo/mirror with mirrors[] array (mirrorEntrySchema, mirrorStorageTypeSchema).</item>
   <item>RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, serviceSubdomainSchema + serviceEntrySchema + services[] to fleetRegistrySchema.</item>
+  <item>RFC-0751: extend serviceEntrySchema with kind, url, publicEndpoints, routes, upstreams, lastDeployed, healthCheckPath.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -95,10 +97,23 @@ export const serviceSubdomainSchema = z.object({
 
 export const serviceEntrySchema = z.object({
   id: z.string().regex(kebabRe, "service id must be kebab-case, lowercase, latin-only"),
+  kind: z.enum(["proxy-worker", "scheduled-worker"]),
   workerName: z.string().min(1, "workerName must be non-empty"),
   hostedBy: z.enum(["studio"]),
-  workersDevUrl: z.string().url().optional(),
+  url: z.string().min(1, "url must be non-empty"),
+  workersDevUrl: z.string().min(1, "workersDevUrl must be non-empty").optional(),
+  publicEndpoints: z.boolean().default(false),
+  routes: z.array(z.string()).optional(),
+  upstreams: z.array(z.string()).optional(),
   subdomains: z.array(serviceSubdomainSchema).default([]),
+  lastDeployed: z
+    .object({
+      at: z.string().datetime().nullable(),
+      state: z.enum(["succeeded", "failed"]).nullable(),
+      operationId: z.string().nullable(),
+    })
+    .default({ at: null, state: null, operationId: null }),
+  healthCheckPath: z.string().optional(),
 });
 
 export const fleetRegistrySchema = z.object({
