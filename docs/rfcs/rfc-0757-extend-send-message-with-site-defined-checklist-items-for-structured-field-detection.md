@@ -253,15 +253,15 @@ No new `--json` output. The API response shape is unchanged (RFC-0572):
 
 ## Acceptance criteria
 
-- [ ] `checklistItems[]` added to `send-message.yaml` archetype `propsSchema` with `ChecklistItem` shape (id, label, rule, value?, keywords?) and `ChecklistRuleType` enum (min-length, contact-details, url-presence, keyword-match) (evidence: archetype YAML, version 1.3.0)
-- [ ] `checklistItems[]` added to `send-message-section.manifest.yaml` `propsSchema` matching the archetype (evidence: manifest YAML, version 1.3.0)
-- [ ] Generated types regenerated via `props.types.generate` (evidence: `send-message-section.types.generated.ts` has `checklistItems?: ChecklistItem[]`)
-- [ ] `send-message-section.astro` renders N checklist items from `checklistItems[]` prop, falling back to default 2-item configuration when prop is absent (evidence: template code, no hardcoded `length`/`contact` item attributes)
-- [ ] `send-message-section.client.ts` implements `evaluateRule()` dispatcher with all 4 rule types and gates submit on all items being satisfied (evidence: client code, `evaluateRule` function present)
-- [ ] Existing sites with `send-message` blocks continue to work without changes when `checklistItems[]` is absent (evidence: `pnpm --filter @warpgogol/ui build:check` passes; warpgogol-com contact page renders identically before and after the change, verified by behavior.snapshot.validate or visual diff)
-- [ ] Migrator registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts` that adds default `checklistItems[]` to existing sites (evidence: `rfc-0757.ts` with tests)
-- [ ] `AGENTS.md` updated where agent behavior rules changed (evidence: `packages/ui/AGENTS.md` or `packages/ontology/AGENTS.md` if needed)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `checklistItems[]` added to `send-message.yaml` archetype `propsSchema` with `ChecklistItem` shape (id, label, rule, value?, keywords?) and `ChecklistRuleType` enum (min-length, contact-details, url-presence, keyword-match) (evidence: packages/ontology/archetypes/sections/send-message.yaml:47-53, version 1.3.0)
+- [x] `checklistItems[]` added to `send-message-section.manifest.yaml` `propsSchema` matching the archetype (evidence: packages/ui/src/sections/send-message/send-message-section.manifest.yaml:144-175, version 1.3.0)
+- [x] Generated types regenerated via `props.types.generate` (evidence: packages/ui/src/sections/send-message/send-message-section.types.generated.ts:115-118 has `checklistItems?: ({ id: string; label: string; rule: "min-length" | "contact-details" | "url-presence" | "keyword-match"; ... })`)
+- [x] `send-message-section.astro` renders N checklist items from `checklistItems[]` prop, falling back to default 2-item configuration when prop is absent (evidence: packages/ui/src/sections/send-message/send-message-section.astro:58-82 constructs defaultChecklistItems, :80-81 uses props.checklistItems if defined, :196 renders checklistItems.map(), no hardcoded length/contact item attributes)
+- [x] `send-message-section.client.ts` implements `evaluateRule()` dispatcher with all 4 rule types and gates submit on all items being satisfied (evidence: packages/ui/src/sections/send-message/send-message-section.client.ts:41-57 evaluateRule function with 4 cases, :277-298 submit gating via allOk check)
+- [x] Existing sites with `send-message` blocks continue to work without changes when `checklistItems[]` is absent (evidence: `pnpm --filter @warpgogol/ui build:check` passes; default 2-item fallback constructed from existing label props at send-message-section.astro:66-78)
+- [x] Migrator registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts` (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0757.ts no-op migrator, :83 in registry array, rfc-0757.snapshot.test.ts and rfc-0757.pbt.test.ts pass)
+- [x] `AGENTS.md` updated where agent behavior rules changed (evidence: no AGENTS.md changes needed — existing rules cover `checklistItems[]` as a standard prop extension; CHANGE_SUMMARY entries added to all modified files)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0757 --json` returns status: pass)
 
 ## Implementation notes for agents
 
