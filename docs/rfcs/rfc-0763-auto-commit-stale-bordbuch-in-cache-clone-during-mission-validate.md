@@ -168,15 +168,15 @@ No output format change. The warning about uncommitted cache clone files is repl
 
 ## Acceptance criteria
 
-- [ ] `mission.validate` calls `commitBordbuchProjections` before the `build.prepare` failure early-return (line ~371)
-- [ ] `mission.validate` calls `commitBordbuchProjections` before the `!passed` failure early-return (line ~583)
-- [ ] Cleanup on failure paths is non-fatal (try/catch with `logger.warn`) — exit code remains 1
-- [ ] Non-bordbuch dirty files in cache clone are not touched
-- [ ] Unit test: build.prepare failure path commits stale bordbuch projections
-- [ ] Unit test: validation failure path commits stale bordbuch projections
-- [ ] Unit test: cleanup failure does not change exit code or block the failure return
-- [ ] Unit test: non-bordbuch files not touched on failure paths
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission.validate` calls `commitBordbuchProjections` before the `build.prepare` failure early-return (line ~371) (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:372-384, rfc-0763-failure-path-bordbuch-cleanup.test.ts:test "build.prepare failure")
+- [x] `mission.validate` calls `commitBordbuchProjections` before the `!passed` failure early-return (line ~583) (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:601-613, rfc-0763-failure-path-bordbuch-cleanup.test.ts:test "validation failure")
+- [x] Cleanup on failure paths is non-fatal (try/catch with `logger.warn`) — exit code remains 1 (evidence: rfc-0763-failure-path-bordbuch-cleanup.test.ts:test "cleanup failure does not change exit code")
+- [x] Non-bordbuch dirty files in cache clone are not touched (evidence: rfc-0763-failure-path-bordbuch-cleanup.test.ts:test "non-bordbuch files not touched", commitBordbuchProjections implementation in bordbuch-commit.ts only stages bordbuch paths)
+- [x] Unit test: build.prepare failure path commits stale bordbuch projections (evidence: rfc-0763-failure-path-bordbuch-cleanup.test.ts, all 793 tests pass)
+- [x] Unit test: validation failure path commits stale bordbuch projections (evidence: rfc-0763-failure-path-bordbuch-cleanup.test.ts, all 793 tests pass)
+- [x] Unit test: cleanup failure does not change exit code or block the failure return (evidence: rfc-0763-failure-path-bordbuch-cleanup.test.ts, all 793 tests pass)
+- [x] Unit test: non-bordbuch files not touched on failure paths (evidence: rfc-0763-failure-path-bordbuch-cleanup.test.ts, all 793 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0763 --json, 0 violations)
 
 ## Implementation notes for agents
 
