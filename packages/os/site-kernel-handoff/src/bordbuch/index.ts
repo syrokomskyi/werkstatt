@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0626: remove stale createBordbuchModule duplicate — bordbuch.module.ts is the single registration source.</item>
   <item>RFC-0626: add barrel exports for bordbuch.commit.</item>
+  <item>RFC-0750: remove commitAndPushBordbuch from barrel (internal only), add appendAndCommitBordbuch and appendBatchAndCommitBordbuch helpers.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,12 +32,19 @@ export {
   appendBordbuchEntry,
   readBordbuch,
   validateWriterRole,
-  commitAndPushBordbuch,
   computeEntryHash,
   DEPRECATED_KIND_MIGRATIONS,
   migrateDeprecatedKind,
   type BordbuchViolation,
   type CommitAndPushResult,
 } from "./bordbuch-io.ts";
+export {
+  appendAndCommitBordbuch,
+  appendBatchAndCommitBordbuch,
+  type AppendAndCommitResult,
+  type AppendBatchAndCommitResult,
+  type AppendBordbuchOptions,
+  type BatchBordbuchEntrySpec,
+} from "./bordbuch-commit-helper.ts";
 
 export { createBordbuchModule } from "./bordbuch.module.ts";

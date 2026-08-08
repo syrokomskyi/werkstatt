@@ -23,6 +23,7 @@ import { gitExecWithRetry, type RetryOptions } from "../werkstatt/git-exec.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
 const BORDBUCH_PROJECTION_PATHS = [
+  "bordbuch/events.ndjson",
   "bordbuch/status.generated.yaml",
   "public/.well-known/bordbuch.json",
   "public/.well-known/bordbuch/index.html",
