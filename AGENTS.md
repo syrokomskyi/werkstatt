@@ -343,7 +343,7 @@ This rule is complementary to RFC-0480's per-response `git status` verification,
 
 1. **Mark acceptance criteria** — every `[ ]` must be `[x]` with inline `(evidence: <file:line>)` annotations (V-26/V-27).
 2. **Regenerate command manifest** — if the RFC added or changed commands, run `rtk pnpm exec site-kernel run command.manifest.generate` and commit `docs/command-manifest.generated.yaml`. A stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`.
-3. **Stamp implemented** — run `rfc.implement.stamp --id RFC-XXXX --implementation-commit <sha>` and commit the stamped RFC file.
+3. **Stamp implemented** — run `rfc.implement.stamp --id RFC-XXXX` (auto-detects the implementation commit via `git log --grep`, RFC-0756; pass `--implementation-commit <sha>` to override) and commit the stamped RFC file.
 4. **Validate** — run `rfc.validate --id RFC-XXXX` and confirm zero errors.
 5. **Commit** — all changes must be committed before session end.
 
@@ -463,7 +463,7 @@ Merge commits and git-generated reverts are exempt. Run `pnpm exec site-kernel r
 
 RFC (Request for Comments) is the formal lifecycle for architectural decisions in this monorepo. See [`docs/policies/rfc-governance.md`](docs/policies/rfc-governance.md) for the full protocol: when to consult RFCs, execution gate, status transitions, reviewer identity, decision log consultation, escalation, verification evidence, YAML discipline, and frontmatter rules.
 
-**RFC-0476:** The `accepted → implemented` transition MUST be performed by `rfc.implement.stamp --id <id> --implementation-commit <sha>`. Direct edits to `status`, `implementedAt`, and `updatedAt` for this transition are prohibited for all actors. The implementation commit and the stamp commit MUST be separate.
+**RFC-0476:** The `accepted → implemented` transition MUST be performed by `rfc.implement.stamp --id <id>` (auto-detects the implementation commit via `git log --grep` when `--implementation-commit` is omitted, RFC-0756; pass `--implementation-commit <sha>` to override). Direct edits to `status`, `implementedAt`, and `updatedAt` for this transition are prohibited for all actors. The implementation commit and the stamp commit MUST be separate.
 
 **Agent discipline (derived from RFC-0476 + RFC-0224):** Agents MUST NOT edit RFC `status`, `implementedAt`, or `closedAt` fields directly — these are human-operator-only fields. Agents MUST NOT stamp an RFC as `implemented` or `closed`. When all code changes and documentation updates are complete, the agent MUST: (1) verify all acceptance criteria checkboxes in the RFC are `[x]` or document why unchecked ones remain, (2) verify all files listed in the plan `scope.docs` section are updated, (3) request the human operator to run `rfc.implement.stamp`. The plan file `status` field follows the same rule — agents MUST NOT stamp a plan as `implemented`; only the human operator does so after verifying the RFC transition.
 
