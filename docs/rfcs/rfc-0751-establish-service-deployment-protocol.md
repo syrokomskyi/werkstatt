@@ -43,21 +43,21 @@ packagesImpacted:
   - "@warpgogol/site-kernel-checks"
   - "@warpgogol/site-kernel-check-warpgogol"
 successSignals:
-  - Any `services/*` Cloudflare Worker can be deployed to production via a single `leitstand.service.deploy --service <id>` command without manual wrangler invocations.
-  - Service deployment state (lastDeployed, workerName, url) is tracked in a machine-readable service registry in `systems/registry.yaml`.
-  - `deploy.preflight` runs automatically before every service deploy, blocking on missing or empty env values.
-  - `subdomain.validate` runs automatically before every service deploy, blocking if DNS record or Workers route is missing (RFC-0752).
-  - `service.naming.validate` enforces that Worker names match service IDs — no `gogol-*` or `warpgogol-*` prefixes.
-  - The matomo-proxy service is the first production deployment using this protocol.
+  - "Any `services/*` Cloudflare Worker can be deployed to production via a single `leitstand.service.deploy --service <id>` command without manual wrangler invocations."
+  - "Service deployment state (lastDeployed, workerName, url) is tracked in a machine-readable service registry in `systems/registry.yaml`."
+  - "`deploy.preflight` runs automatically before every service deploy, blocking on missing or empty env values."
+  - "`subdomain.validate` runs automatically before every service deploy, blocking if DNS record or Workers route is missing (RFC-0752)."
+  - "`service.naming.validate` enforces that Worker names match service IDs — no `gogol-*` or `warpgogol-*` prefixes."
+  - "The matomo-proxy service is the first production deployment using this protocol."
 nonGoals:
-  - Do not implement multi-channel (dev/alt/main) service deployment — services use a single production channel.
-  - Do not implement CDN cache purge for services — services are Workers, not static sites.
-  - Do not implement rollback for services — use `wrangler rollback` directly for now.
-  - Do not implement Axiom evidence gates for services — services have no visitor-facing HTML to audit.
-  - Do not implement DNS record management — that is RFC-0753.
-  - Do not implement subdomain registration logic — that is RFC-0752. This RFC depends on RFC-0752 for the `subdomain.validate` gate.
-  - Do not register non-Cloudflare-Worker services (node-runner, compose-stack) — this protocol covers Cloudflare Worker services only. Non-Worker services are deployed through their own mechanisms.
-  - Do not implement concurrent deploy locking — assumed single-operator. A lock mechanism can be added later if needed.
+  - "Do not implement multi-channel (dev/alt/main) service deployment — services use a single production channel."
+  - "Do not implement CDN cache purge for services — services are Workers, not static sites."
+  - "Do not implement rollback for services — use `wrangler rollback` directly for now."
+  - "Do not implement Axiom evidence gates for services — services have no visitor-facing HTML to audit."
+  - "Do not implement DNS record management — that is RFC-0753."
+  - "Do not implement subdomain registration logic — that is RFC-0752. This RFC depends on RFC-0752 for the `subdomain.validate` gate."
+  - "Do not register non-Cloudflare-Worker services (node-runner, compose-stack) — this protocol covers Cloudflare Worker services only. Non-Worker services are deployed through their own mechanisms."
+  - "Do not implement concurrent deploy locking — assumed single-operator. A lock mechanism can be added later if needed."
 ---
 
 # RFC-0751: Establish service deployment protocol for shared Cloudflare Worker services
@@ -321,19 +321,19 @@ Adding a `services:` top-level key to `systems/registry.yaml` changes the file's
 
 ## Acceptance criteria
 
-- [ ] `leitstand.service.deploy` command registered in the kernel command table
-- [ ] `service.registry.validate` command registered in the kernel command table
-- [ ] `service.naming.validate` command registered in the kernel command table
-- [ ] `systems/registry.yaml` has a `services:` key with entries for all Cloudflare Worker services (matomo-proxy, rate-fetcher-worker, lagebild-sync-worker, telegram-alert-bridge)
-- [ ] `systems/registry.yaml` `systems[]` entries have `cloudflareZoneId` field
-- [ ] All Worker names in `wrangler.jsonc` match service IDs (no `gogol-*` or `warpgogol-*` prefixes)
-- [ ] `leitstand.service.deploy --service matomo-proxy` successfully deploys the matomo-proxy Worker
-- [ ] Deployment state is recorded in the registry after deploy
-- [ ] `service.registry.validate` passes on the initial registry
-- [ ] `service.naming.validate` passes on all services
-- [ ] `service.naming.validate` is integrated into `services.check.run`
-- [ ] `AGENTS.md` updated with service deployment protocol documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `leitstand.service.deploy` command registered in the kernel command table
+- [x] `service.registry.validate` command registered in the kernel command table
+- [x] `service.naming.validate` command registered in the kernel command table
+- [x] `systems/registry.yaml` has a `services:` key with entries for all Cloudflare Worker services (matomo-proxy, rate-fetcher-worker, lagebild-sync-worker, telegram-alert-bridge)
+- [x] `systems/registry.yaml` `systems[]` entries have `cloudflareZoneId` field
+- [x] All Worker names in `wrangler.jsonc` match service IDs (no `gogol-*` or `warpgogol-*` prefixes)
+- [x] `leitstand.service.deploy --service matomo-proxy` successfully deploys the matomo-proxy Worker
+- [x] Deployment state is recorded in the registry after deploy
+- [x] `service.registry.validate` passes on the initial registry
+- [x] `service.naming.validate` passes on all services
+- [x] `service.naming.validate` is integrated into `services.check.run`
+- [x] `AGENTS.md` updated with service deployment protocol documentation
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
