@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -107,7 +108,7 @@ The `ComponentRole` closed enum gains a `scroll-to-top` value, and a new Mirror 
 
 - **DNA-19** (Closed ontology vocabularies): This RFC extends `ComponentRole` with `scroll-to-top`, following the superseding-RFC requirement for closed-enum changes.
 - **DNA-17** (Mirror Quintet): The component ships `.astro`, `.css`, `.manifest.yaml`, `.client.ts`, and `.types.generated.ts` — the full Mirror Quintet contract.
-- **DNA-23** (Cosmic overlay): cosmicName `Daphnis` is drawn from the existing `MoonCatalog` (no catalog extension needed). Three-way alignment: manifest, `MOON_IMPORT_PATHS` (registry-derived via `archetype.registry.build`), and layout integration.
+- **DNA-23** (Cosmic overlay): cosmicName `Daphnis` is drawn from the existing `MoonCatalog` (no catalog extension needed). The component is registered in the archetype index via `archetype.registry.build` for `manifest.contract.validate`. Unlike shell-level components, it is imported directly in `layout-component.astro` rather than resolved through `MOON_IMPORT_PATHS` / `buildPage` — so `MOON_IMPORT_PATHS` is not a resolution path for this component.
 - **DNA-10** (No hardcoded design tokens): All colours use `--ds-*` biome tokens. No raw hex/rgb values in component CSS.
 - **RFC-0011** (Script placement): The client script follows the S-1 component-colocated pattern — `<script> import "./scroll-to-top-component.client"; </script>` inside the `.astro` file.
 - **RFC-0031** (Component-scoped client scripts): The `.client.ts` file is colocated with the component, following the copyright-component pattern.
@@ -220,6 +221,15 @@ All styling uses `--ds-*` tokens:
 | `packages/ui/src/components/scroll-to-top/scroll-to-top-component.types.generated.ts` | Generated types |
 | `packages/ui/src/components/layout/layout-component.astro` | Import and render `<ScrollToTop>` |
 | `packages/ui/src/assets/icons/lordicon/doodle-outline/doodle-outline-272-arrow-up-hover-pointing.json` | Existing LordIcon asset (no changes) |
+| `packages/ui/AGENTS.md` | Document `z-index: 100` for scroll-to-top button in the z-index registry |
+
+### `@warpgogol/share` impact
+
+`@warpgogol/share` is listed in `packagesImpacted` because `MOON_IMPORT_PATHS` in `packages/share/src/page.ts` is derived from the generated archetype index (`...registryMoonImportPaths`). After `archetype.registry.build` regenerates `packages/ontology/archetypes/index.yaml`, `@warpgogol/share` is rebuilt with the updated import paths. No manual changes to `packages/share/` files are required — the impact is purely through the generated index.
+
+### V-30 warning clarification
+
+The `rfc.validate` V-30 warning fires because `@warpgogol/ontology` is in `packagesImpacted` without `breaksC: true`. This is a false positive: the RFC modifies `packages/ontology/src/enums.ts` (adding a value to the closed `ComponentRoleValues` enum) and `packages/ontology/archetypes/components/scroll-to-top.yaml` (new archetype), not `packages/ontology/src/external-surfaces/`. Layer C (URL schema, JSON-LD types, sitemap shape) is not affected. `breaksC` is correctly absent.
 
 ### No new commands
 
