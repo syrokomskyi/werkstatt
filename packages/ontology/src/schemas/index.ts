@@ -82,6 +82,14 @@ export type { PageEntry, BlockEntry } from "./page-entry.ts";
 export { capabilityInputOutputSchema, capabilityRecordSchema } from "./capability.ts";
 export type { CapabilityInputOutputSchema, CapabilityRecord } from "./capability.ts";
 
+// RFC-0753: DNS record declaration file schema
+export {
+  dnsRecordTypeSchema,
+  dnsRecordDeclarationSchema,
+  dnsRecordFileSchema,
+} from "./dns-records.ts";
+export type { DnsRecordType, DnsRecordDeclaration, DnsRecordFile } from "./dns-records.ts";
+
 // Platform operations schemas (handoff, sternsystem, werkstatt, mission,
 // release, leitstand, notausgang, materialization, artifact-store,
 // naming-policy) have been extracted to @warpgogol/ontology/operations.
