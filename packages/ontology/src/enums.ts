@@ -89,6 +89,7 @@ export type SemanticRole = string;
  * site-background | [RFC-0105] Full-viewport background shell-layer component
  * currency-selector | [RFC-0743] Currency selector dropdown for multi-currency sites
  * price-display    | [RFC-0743] Currency-aware price display with pre-rendered variants
+ * scroll-to-top   | [RFC-0768] Floating scroll-to-top button with Lenis smooth scrolling
  */
 export const ComponentRoleValues = [
   "header",
@@ -108,6 +109,7 @@ export const ComponentRoleValues = [
   "site-background",
   "currency-selector",
   "price-display",
+  "scroll-to-top",
 ] as const;
 
 export const componentRoleSchema = z.enum(ComponentRoleValues);
