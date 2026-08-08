@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -23,7 +24,6 @@ related:
   - ADR-0033
 satisfies:
   - DNA-4
-  - DNA-16
 versionBump: minor
 commands:
   proposed: []
@@ -43,6 +43,8 @@ nonGoals:
   - "Does not add multi-currency variants to JSON-LD — JSON-LD uses source currency (EUR) only"
   - "Does not change the semantic model structure — only resolves marker strings before they enter the model"
   - "Does not resolve price markers in prose body for semantic projections — prose body is not part of JSON-LD"
+  - "Does not resolve price markers in the frontmatter title field — titles are short page names that do not contain price markers in practice"
+  - "Does not resolve price markers in block-derived SemanticBlock content (items, body, summaries) — block extractors produce structured data for ItemList nodes, not headline/description fields; price markers in block props are resolved at the component render level (RFC-0765)"
 ---
 
 # RFC-0767: Resolve price markers in semantic projections
@@ -52,6 +54,7 @@ nonGoals:
 The semantic layer (`packages/share/src/semantic/`) builds `SemanticPageModel` objects from page frontmatter. These models drive JSON-LD generation (`buildJsonLd`) and meta tags (`<meta name="description">`, Open Graph, etc.).
 
 `buildSemanticPageModelWith` in `packages/share/src/semantic/build-page.ts` reads frontmatter fields:
+
 - `title` → `page.title` → JSON-LD `name`
 - `description` → `page.description` → JSON-LD `description`, `<meta name="description">`
 - `header.heading` (from blocks) → `page.heading` → JSON-LD `headline`
@@ -118,13 +121,11 @@ function resolvePriceMarkersForSemantic(text: string, lang: string): string {
 
 Where `formatSourcePrice` formats the amount with the source currency symbol (e.g., `70 €` for EUR).
 
-### 3. Derived prices access
+### 3. Derived prices access and type relocation
 
-The semantic layer needs access to `derived-prices.generated.json`. This file is already read by `packages/ui` via `loadDerivedPrices`. The resolution function either:
-- Reads the file directly from `process.cwd()/src/derived-prices.generated.json` (same pattern as `packages/ui`)
-- Or receives the derived prices as a parameter from the caller
+The semantic layer needs access to `derived-prices.generated.json`. This file is already read by `packages/ui` via `loadDerivedPrices`. To avoid a circular dependency (`packages/share` cannot import from `packages/ui`), the `DerivedPriceEntry` type, `OFFERING_URI_PREFIX` constant, and `PRICE_MARKER_RE` regex are **moved from `packages/ui` to `packages/share/src/semantic/price-marker-resolver.ts`**. `packages/ui` imports them from `@warpgogol/share/semantic`.
 
-The direct-read approach is simpler and matches the existing `loadDerivedPrices` pattern. A shared utility in `packages/ui/src/utils/price-marker.ts` or a new `packages/share/src/semantic/price-marker-resolver.ts` can encapsulate this.
+The `loadDerivedPrices` function stays in `packages/ui` (it reads from `process.cwd()`, which is a UI-level concern). The semantic layer loads the file once at the `buildSemanticPageModelWith` level and passes the result as a parameter to `resolvePriceMarkersForSemantic`. This avoids repeated file I/O across multiple pages.
 
 ### 4. Frontmatter description markers
 
@@ -139,7 +140,6 @@ The semantic layer resolves these to EUR strings for JSON-LD and meta tags.
 ## Architectural fit
 
 - **DNA-4 (Canonical content in `src/content/`).** Price markers in frontmatter resolve from `derived-prices.generated.json`, which is derived from PBP entity files. No hardcoded prices in frontmatter.
-- **DNA-16 (Semantic layer shares topology with navigation).** The semantic layer reads the same frontmatter as the visible page. Price marker resolution ensures the semantic layer sees the same price values as the visible HTML (in source currency).
 - **RFC-0743 (currency selector UI).** This RFC ensures JSON-LD and meta tags have correct price values, complementing the visible HTML price display.
 - **RFC-0765 (price marker documentation).** This RFC extends price marker resolution to the semantic layer, the last pipeline stage that lacked support.
 
@@ -149,8 +149,10 @@ The semantic layer resolves these to EUR strings for JSON-LD and meta tags.
 
 | Path | Role |
 | --- | --- |
-| `packages/share/src/semantic/build-page.ts` | Resolve price markers in heading, lead, description before building SemanticPageModel |
-| `packages/share/src/semantic/price-marker-resolver.ts` | New file: `resolvePriceMarkersForSemantic` function |
+| `packages/share/src/semantic/price-marker-resolver.ts` | New file: `resolvePriceMarkersForSemantic` function, `DerivedPriceEntry` type, `OFFERING_URI_PREFIX` and `PRICE_MARKER_RE` constants, `formatSourcePrice` helper |
+| `packages/share/src/semantic/build-page.ts` | Load derived prices once, resolve markers in heading, lead, description before building SemanticPageModel |
+| `packages/ui/src/sections/price-card/price-variants.ts` | Import `DerivedPriceEntry` from `@warpgogol/share/semantic` instead of defining locally |
+| `packages/ui/src/utils/price-marker.ts` | Import `OFFERING_URI_PREFIX` and `PRICE_MARKER_RE` from `@warpgogol/share/semantic` instead of defining locally |
 
 ### TypeScript contracts
 
@@ -158,22 +160,61 @@ The semantic layer resolves these to EUR strings for JSON-LD and meta tags.
 // packages/share/src/semantic/price-marker-resolver.ts
 
 /**
+ * Derived price entry shape (moved from packages/ui to packages/share
+ * so both the semantic layer and UI components share a single type).
+ */
+export interface DerivedPriceEntry {
+  chargeRef: string;
+  targetCurrency: string;
+  amount: { value: string; currency: string };
+  trace: {
+    source: { amount: string; currency: string };
+    rate: { value: string; pair: string };
+  };
+}
+
+export const OFFERING_URI_PREFIX = "https://warpgogol.com/id/offerings/";
+export const PRICE_MARKER_RE = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+
+/**
+ * Format a source-currency amount for semantic projections.
+ * Unlike formatPrice in packages/ui, this does NOT append a recurrence
+ * suffix — JSON-LD headline/description fields are free-text strings
+ * where the recurrence context is already in the surrounding sentence.
+ * Uses Intl.NumberFormat with currencyDisplay: "narrowSymbol".
+ * Output contains a non-breaking space (U+00A0) between number and symbol.
+ */
+function formatSourcePrice(amount: string, lang: string): string {
+  const numericAmount = Number(amount);
+  if (!Number.isFinite(numericAmount)) return "0\u00A0€";
+  return new Intl.NumberFormat(lang, {
+    style: "currency",
+    currency: "EUR",
+    currencyDisplay: "narrowSymbol",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(numericAmount);
+}
+
+/**
  * Resolve {price:offering:chargeRef} markers in a string to source-currency
  * (EUR) formatted strings for use in semantic projections (JSON-LD, meta tags).
  *
  * Returns the input string unchanged if no markers are present.
- * Returns "0 €" for unknown offerings or chargeRefs (same fallback as parsePriceMarkers).
+ * Returns "0 €" (with non-breaking space) for unknown offerings or chargeRefs
+ * (same fallback as parsePriceMarkers in packages/ui).
  */
 export function resolvePriceMarkersForSemantic(
   text: string,
   lang: string,
-  derivedPrices?: Record<string, DerivedPriceEntry[]>,
+  derivedPrices?: Record<string, DerivedPriceEntry[]> | null,
 ): string;
 ```
 
 ### Output format
 
 Before resolution (current behavior):
+
 ```json
 {
   "headline": "Рекомендуйте Warpgogol і отримайте {price:referral-fee:activation} за кожну підписку",
@@ -182,6 +223,7 @@ Before resolution (current behavior):
 ```
 
 After resolution:
+
 ```json
 {
   "headline": "Рекомендуйте Warpgogol і отримайте 70 € за кожну підписку",
@@ -191,16 +233,17 @@ After resolution:
 
 ### Failure modes
 
-- **Missing derived prices file:** `loadDerivedPrices()` returns `null`. Markers resolve to `"0 €"`. No crash. Same behavior as `parsePriceMarkers` in UI components.
-- **Unknown offering ID:** Marker resolves to `"0 €"`. No crash.
+- **Missing derived prices file (ENOENT):** `loadDerivedPrices()` returns `null`. Markers resolve to `"0\u00A0€"`. No crash. Same behavior as `parsePriceMarkers` in UI components.
+- **Malformed JSON (parse error):** `loadDerivedPrices()` throws `SyntaxError` from `JSON.parse`. The exception propagates — a malformed generated file is a bug in the generation pipeline (`derived-prices.materialize`), not a missing-file scenario. The build fails loudly so the operator fixes the generator.
+- **Unknown offering ID:** Marker resolves to `"0\u00A0€"`. No crash.
 - **No markers in text:** `resolvePriceMarkersForSemantic` returns the input string unchanged. No performance overhead from regex replacement.
-- **Site without multi-currency entitlement:** `derived-prices.generated.json` does not exist. Markers resolve to `"0 €"`. This is acceptable — sites without multi-currency should not use price markers in frontmatter.
+- **Site without multi-currency entitlement:** `derived-prices.generated.json` does not exist. Markers resolve to `"0\u00A0€"`. This is acceptable — sites without multi-currency should not use price markers in frontmatter.
 
 ## Rollout
 
-- **Immediate:** Upon acceptance, `resolvePriceMarkersForSemantic` is added to `packages/share/src/semantic/` and integrated into `build-page.ts`.
+- **Immediate:** Upon acceptance, `resolvePriceMarkersForSemantic` and the relocated types/constants are added to `packages/share/src/semantic/` and integrated into `build-page.ts`. `packages/ui` imports the relocated types/constants from `@warpgogol/share/semantic`.
 - **No content migration needed:** Existing frontmatter without markers is unaffected. Frontmatter with markers (currently only `vidpovidalni-rekomendatsiyi.md` heading) is automatically resolved.
-- **Backward compatible:** The resolution function is additive. No existing API changes.
+- **Additive:** The resolution function is additive — it resolves markers in existing string fields without changing the SemanticPageModel structure. No existing API is removed.
 - **Frontmatter description update:** After implementation, the `description` field in `vidpovidalni-rekomendatsiyi.md` can be updated to use `{price:...}` markers instead of hardcoded prices.
 
 ## Alternatives considered
@@ -217,16 +260,20 @@ After resolution:
 
 - **Semantic layer depends on derived prices file:** The semantic layer currently has no dependency on `derived-prices.generated.json`. This RFC adds one. Mitigation: the dependency is optional — if the file is missing, markers resolve to `"0 €"` and the semantic layer continues to function.
 - **Price format in JSON-LD:** The resolved price string (e.g., `"70 €"`) is a human-readable string, not a structured `PriceSpecification` node. This is acceptable for `headline` and `description` fields, which are free-text strings. The existing `Offer` + `PriceSpecification` JSON-LD nodes (from PBP semantic profile) already provide structured price data.
-- **Cross-package import:** `packages/share` needs to import derived prices loading logic from `packages/ui` or duplicate it. Mitigation: the `resolvePriceMarkersForSemantic` function reads `derived-prices.generated.json` directly using the same pattern as `loadDerivedPrices` in `packages/ui`. No cross-package import needed.
+- **Cross-package type relocation:** `DerivedPriceEntry`, `OFFERING_URI_PREFIX`, and `PRICE_MARKER_RE` move from `packages/ui` to `packages/share`. This is a breaking change for `packages/ui` imports — all imports of these symbols are updated to use `@warpgogol/share/semantic`. The `loadDerivedPrices` function stays in `packages/ui` (it reads from `process.cwd()`, a UI-level concern). The semantic layer loads the file once at the caller level and passes the result as a parameter.
 
 ## Acceptance criteria
 
 - [ ] `resolvePriceMarkersForSemantic` function added to `packages/share/src/semantic/price-marker-resolver.ts`
-- [ ] `buildSemanticPageModelWith` in `build-page.ts` resolves markers in heading, lead, and description
-- [ ] JSON-LD `headline` contains resolved EUR price string instead of `{price:...}` marker
-- [ ] JSON-LD `description` contains resolved EUR price string instead of `{price:...}` marker
+- [ ] `DerivedPriceEntry` type, `OFFERING_URI_PREFIX`, `PRICE_MARKER_RE` moved from `packages/ui` to `packages/share/src/semantic/price-marker-resolver.ts`
+- [ ] `packages/ui` imports relocated symbols from `@warpgogol/share/semantic`
+- [ ] `buildSemanticPageModelWith` in `build-page.ts` loads derived prices once and resolves markers in heading, lead, and description
+- [ ] JSON-LD `headline` contains resolved EUR price string (with non-breaking space U+00A0) instead of `{price:...}` marker
+- [ ] JSON-LD `description` contains resolved EUR price string (with non-breaking space U+00A0) instead of `{price:...}` marker
 - [ ] `<meta name="description">` contains resolved EUR price string
 - [ ] Pages without price markers have unchanged JSON-LD and meta tags
+- [ ] Missing `derived-prices.generated.json` (ENOENT) resolves markers to `"0\u00A0€"` without crash
+- [ ] Malformed `derived-prices.generated.json` (parse error) throws — build fails loudly
 - [ ] `tsc --noEmit` passes
 - [ ] `vitest run` passes
 - [ ] `rfc.validate` passes on this file
