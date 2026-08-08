@@ -170,14 +170,14 @@ The new violation follows the existing `{ rule, message, severity? }` shape in `
 
 ## Acceptance criteria
 
-- [ ] `rfc.validate` fails with `V-RFC-33` when an RFC file's frontmatter cannot be parsed as YAML
-- [ ] The violation message includes file name, line number, column, and parser error text
-- [ ] `rfc.implement.stamp` `RFC-IMP-01` violation includes parse error details when applicable
-- [ ] `readAndParseRfc` returns parse error information instead of silently returning `undefined` on YAML parse failure
-- [ ] All 16 call sites across 13 files are updated to handle the new return type
-- [ ] All existing RFCs in `docs/rfcs/` pass `V-RFC-33`
-- [ ] Unit test verifies a malformed-YAML RFC file triggers `V-RFC-33`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` fails with `V-RFC-33` when an RFC file's frontmatter cannot be parsed as YAML (evidence: packages/forge/os/rfc/handlers/validate.ts:63-66)
+- [x] The violation message includes file name, line number, column, and parser error text (evidence: packages/forge/os/rfc/handlers/validate-rules.ts:915-929)
+- [x] `rfc.implement.stamp` `RFC-IMP-01` violation includes parse error details when applicable (evidence: packages/forge/os/rfc/handlers/implement-stamp.ts:231-237)
+- [x] `readAndParseRfc` returns parse error information instead of silently returning `undefined` on YAML parse failure (evidence: packages/forge/os/rfc/frontmatter-io.ts:76-95)
+- [x] All 16 call sites across 13 files are updated to handle the new return type (evidence: build:check passes with zero errors)
+- [x] All existing RFCs in `docs/rfcs/` pass `V-RFC-33` (evidence: rfc.validate output contains zero V-RFC-33 violations)
+- [x] Unit test verifies a malformed-YAML RFC file triggers `V-RFC-33` (evidence: packages/forge/os/rfc/frontmatter-io.test.ts:63-81, packages/forge/os/rfc/handlers/validate-rules.test.ts:732-761)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0755` → All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
