@@ -189,4 +189,6 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "methodologies.validate" },
   // RFC-0684: validate workshop-level Axiom suppression config (systems/axiom-suppressions.yaml).
   { command: "suppressions.validate" },
+  // RFC-0750: enforce bordbuch commit parity — no direct appendBordbuchEntry outside whitelist.
+  { command: "bordbuch.commit.parity.lint", args: ["--mode", "warning"] },
 ];

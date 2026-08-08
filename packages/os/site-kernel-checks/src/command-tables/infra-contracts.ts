@@ -36,6 +36,7 @@ import { runCommandReadsValidate } from "../command-reads-validate.ts";
 import { runPlaywrightChromiumEnsure } from "../playwright-chromium-ensure.ts";
 import { runMethodologiesValidate } from "../methodologies-validate.ts";
 import { runSuppressionsValidate } from "../suppressions-validate.ts";
+import { runBordbuchCommitParityLint } from "../bordbuch-commit-parity-lint.ts";
 
 // Note: evidence.sync and evidence.fetch are registered by createEvidenceModule
 // in @warpgogol/site-kernel-handoff/src/evidence/evidence-module.ts (RFC-0651).
@@ -474,5 +475,25 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     reads: ["systems/methodologies.md"],
     flags: {},
     execute: runMethodologiesValidate,
+  },
+  {
+    name: "bordbuch.commit.parity.lint",
+    description:
+      "RFC-0750: scan site-kernel-handoff source for direct appendBordbuchEntry calls outside " +
+      "the whitelist (bordbuch-io.ts, bordbuch-append.ts, bordbuch-commit-helper.ts). " +
+      "Use --mode warning (default) or --mode fail.",
+    scope: "workspace",
+    supportsAllSites: false,
+    mutatesState: false,
+    cacheable: false,
+    reads: ["packages/os/site-kernel-handoff/src/**/*.ts"],
+    flags: {
+      mode: {
+        kind: "string",
+        default: "warning",
+        description: "Diagnostic mode: warning or fail.",
+      },
+    },
+    execute: runBordbuchCommitParityLint,
   },
 ];
