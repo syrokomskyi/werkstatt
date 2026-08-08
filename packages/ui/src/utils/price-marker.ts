@@ -2,19 +2,19 @@
 // from PBP offering entities via derivedPrices, enabling dynamic currency-aware
 // pricing for both own and competitor prices (range model supported).
 // RFC-0766: renderPriceDisplayHtml generates HTML strings for prose content.
+// RFC-0767: OFFERING_URI_PREFIX and PRICE_MARKER_RE relocated to @warpgogol/share/semantic.
 import {
   buildPriceVariants,
   loadDerivedPrices,
   type SourcePriceProp,
 } from "../sections/price-card/price-variants.ts";
+import { OFFERING_URI_PREFIX, PRICE_MARKER_RE } from "@warpgogol/share/semantic";
 
 export type TextPart = { kind: "text"; value: string };
 export type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
 export type TextOrPrice = TextPart | PricePart;
 
-const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
-export const PRICE_MARKER_PATTERN = "\\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\\}";
-const priceMarkerRe = new RegExp(PRICE_MARKER_PATTERN, "g");
+const priceMarkerRe = PRICE_MARKER_RE;
 
 function escapeHtml(s: string): string {
   return s
@@ -38,7 +38,7 @@ export function renderPriceDisplayHtml(
   lang: string,
   derivedPrices: ReturnType<typeof loadDerivedPrices>,
 ): string {
-  const ref = offeringUriPrefix + offeringId;
+  const ref = OFFERING_URI_PREFIX + offeringId;
   const entries = derivedPrices?.[ref];
   const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
   const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
@@ -73,7 +73,7 @@ export function parsePriceMarkers(
     }
     const offeringId = match[1]!;
     const chargeRef = match[2]!;
-    const ref = offeringUriPrefix + offeringId;
+    const ref = OFFERING_URI_PREFIX + offeringId;
     const entries = derivedPrices?.[ref];
     const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
     const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";

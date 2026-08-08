@@ -34,8 +34,9 @@ import GithubSlugger from "github-slugger";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts";
-import { renderPriceDisplayHtml, PRICE_MARKER_PATTERN } from "../../utils/price-marker.ts";
+import { renderPriceDisplayHtml } from "../../utils/price-marker.ts";
 import { loadDerivedPrices } from "../price-card/price-variants.ts";
+import { PRICE_MARKER_RE as PRICE_MARKER_GLOBAL_RE } from "@warpgogol/share/semantic";
 
 /**
  * Render markdown to HTML with GFM support (tables, strikethrough, task lists,
@@ -76,8 +77,7 @@ export interface ProsePipelineOptions {
   creditsSiteDefault: AttributionSiteDefault;
 }
 
-const PRICE_MARKER_RE = new RegExp(PRICE_MARKER_PATTERN);
-const PRICE_MARKER_GLOBAL_RE = new RegExp(PRICE_MARKER_PATTERN, "g");
+const PRICE_MARKER_RE = new RegExp(PRICE_MARKER_GLOBAL_RE.source);
 const CODE_PRE_SPLIT_RE = /(<code[^>]*>[\s\S]*?<\/code>|<pre[^>]*>[\s\S]*?<\/pre>)/g;
 
 function hasPriceMarkers(text: string): boolean {
