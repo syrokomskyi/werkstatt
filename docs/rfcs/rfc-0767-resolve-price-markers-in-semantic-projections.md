@@ -270,19 +270,19 @@ After resolution:
 
 ## Acceptance criteria
 
-- [ ] `resolvePriceMarkersForSemantic` function added to `packages/share/src/semantic/price-marker-resolver.ts`
-- [ ] `DerivedPriceEntry` type, `OFFERING_URI_PREFIX`, `PRICE_MARKER_RE` moved from `packages/ui` to `packages/share/src/semantic/price-marker-resolver.ts`
-- [ ] `packages/ui` imports relocated symbols from `@warpgogol/share/semantic`
-- [ ] `buildSemanticPageModelWith` in `build-page.ts` loads derived prices once and resolves markers in heading, lead, and description
-- [ ] JSON-LD `headline` contains resolved EUR price string (with non-breaking space U+00A0) instead of `{price:...}` marker
-- [ ] JSON-LD `description` contains resolved EUR price string (with non-breaking space U+00A0) instead of `{price:...}` marker
-- [ ] `<meta name="description">` contains resolved EUR price string
-- [ ] Pages without price markers have unchanged JSON-LD and meta tags
-- [ ] Missing `derived-prices.generated.json` (ENOENT) resolves markers to `"0\u00A0€"` without crash
-- [ ] Malformed `derived-prices.generated.json` (parse error) throws — build fails loudly
-- [ ] `tsc --noEmit` passes
-- [ ] `vitest run` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `resolvePriceMarkersForSemantic` function added to `packages/share/src/semantic/price-marker-resolver.ts` (evidence: packages/share/src/semantic/price-marker-resolver.ts:73-84, packages/share/src/tests/price-marker-resolver.test.ts:1-120)
+- [x] `DerivedPriceEntry` type, `OFFERING_URI_PREFIX`, `PRICE_MARKER_RE` moved from `packages/ui` to `packages/share/src/semantic/price-marker-resolver.ts` (evidence: packages/share/src/semantic/price-marker-resolver.ts:25-34, packages/ui/src/sections/price-card/price-variants.ts:19-21)
+- [x] `packages/ui` imports relocated symbols from `@warpgogol/share/semantic` (evidence: packages/ui/src/sections/price-card/price-variants.ts:17-18, packages/ui/src/utils/price-marker.ts:11-14, packages/ui/src/sections/markdown/prose-pipeline.ts:39)
+- [x] `buildSemanticPageModelWith` in `build-page.ts` loads derived prices once and resolves markers in heading, lead, and description (evidence: packages/share/src/semantic/build-page.ts:251-256, packages/share/src/tests/build-page-price-markers.test.ts:68-162)
+- [x] JSON-LD `headline` contains resolved EUR price string (with non-breaking space U+00A0) instead of `{price:...}` marker (evidence: packages/share/src/tests/build-page-price-markers.test.ts:95-98, packages/share/src/tests/price-marker-resolver.test.ts:43-45)
+- [x] JSON-LD `description` contains resolved EUR price string (with non-breaking space U+00A0) instead of `{price:...}` marker (evidence: packages/share/src/semantic/build-page.ts:254-256, packages/share/src/tests/price-marker-resolver.test.ts:43-45)
+- [x] `<meta name="description">` contains resolved EUR price string (evidence: packages/share/src/semantic/build-page.ts:256 — resolvedDescription flows into baseInput.description which feeds meta tags via MarkdownPageInput)
+- [x] Pages without price markers have unchanged JSON-LD and meta tags (evidence: packages/share/src/tests/build-page-price-markers.test.ts:134-162)
+- [x] Missing `derived-prices.generated.json` (ENOENT) resolves markers to `"0\u00A0€"` without crash (evidence: packages/share/src/tests/price-marker-resolver.test.ts:63-68, packages/share/src/tests/build-page-price-markers.test.ts:112-131)
+- [x] Malformed `derived-prices.generated.json` (parse error) throws — build fails loudly (evidence: packages/share/src/semantic/derived-prices-loader.ts:30-31 — JSON.parse throws SyntaxError on malformed input, ENOENT is the only caught exception)
+- [x] `tsc --noEmit` passes (evidence: `pnpm --filter @warpgogol/share,@warpgogol/ui,@warpgogol/site-kernel-content,@warpgogol/pbp run build:check` — all 4 packages pass)
+- [x] `vitest run` passes (evidence: `pnpm --filter @warpgogol/share run test -- --run` — 33 files, 320 tests passed)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0767 — see command output below)
 
 ## Implementation notes for agents
 
