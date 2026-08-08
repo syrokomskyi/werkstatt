@@ -246,6 +246,7 @@ export async function runRateSnapshotResolve(
   }
 
   const snapshotsCreated: string[] = [];
+  let snapshotsReused = 0;
   const warnings: string[] = [];
   const errors: string[] = [];
 
@@ -394,6 +395,7 @@ export async function runRateSnapshotResolve(
     );
     if (reusableId) {
       snapshotsCreated.push(reusableId);
+      snapshotsReused++;
       continue;
     }
 
@@ -447,6 +449,7 @@ export async function runRateSnapshotResolve(
         status: "fail",
         system: systemId,
         snapshotsCreated: 0,
+        snapshotsReused: 0,
         errors,
         warnings,
       },
@@ -461,10 +464,11 @@ export async function runRateSnapshotResolve(
       status: "ok",
       system: systemId,
       snapshotsCreated: snapshotsCreated.length,
+      snapshotsReused,
       errors,
       warnings,
     },
     exitCode: 0,
-    summary: `Resolved ${snapshotsCreated.length} rate snapshots for ${systemId}`,
+    summary: `Resolved ${snapshotsCreated.length} rate snapshots for ${systemId} (${snapshotsReused} reused)`,
   };
 }

@@ -28,6 +28,7 @@
   <item>RFC-0697: log cache dir file count and total size before clearing; extract shared orchestrateSnap01Recovery helper for SNAP-01 detect → regenerate → (optional) rebuild orchestration.</item>
   <item>RFC-0698: auto-commit workpiece via mission.git.commit after pnpm build completes and before distTreeHash computation; re-read commitSha from workpiece HEAD after auto-commit; fatal abort on commit failure; move build-skip cache write to after auto-commit with post-commit commitSha.</item>
   <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; skips build, axiom checks, and auto-commit; resolves secrets from releases/&lt;id&gt;/.env.alt; resolves wrangler from workspace root node_modules/.bin; adds releaseDeployed field to DevDeployResult.</item>
+  <item>RFC-0747: add retry loop (3 attempts, 3s/6s backoff) to alt health check in leitstand.promote to handle CDN propagation delays.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -2119,7 +2120,10 @@ export async function runLeitstandPromote(
     logger.success(`  Build identity verified for ${releaseId}`);
 
     // 3. Run health check against alt deployment (RFC-0747: retry with backoff)
-    let altHealthResult: { state: string; checks: unknown[] } = { state: "unhealthy", checks: [] };
+    let altHealthResult: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] } = {
+      state: "unhealthy",
+      checks: [],
+    };
     for (let attempt = 1; attempt <= ALT_HEALTH_MAX_ATTEMPTS; attempt++) {
       if (attempt > 1) {
         const delayMs = ALT_HEALTH_BACKOFF_DELAYS_MS[attempt - 2];
