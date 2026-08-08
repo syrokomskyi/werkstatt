@@ -27,6 +27,7 @@
   <item>RFC-0697: refactor mission.validate SNAP-01 path to use shared orchestrateSnap01Recovery helper; dirtyBeforeBuildPost check remains caller-side.</item>
   <item>RFC-0702: add commitBordbuchProjections cleanup call in distribution reuse path to clean dirty bordbuch files from previous runs.</item>
   <item>RFC-0705: add non-fatal sternsystem.sync call after git push origin in reconcile when external mirrors exist; add mirrorSync to MissionReconcileData and reconciliation-report.json.</item>
+  <item>RFC-0749: add post-validation commitBordbuchProjections cleanup call in mission.validate to commit bordbuch projections that were regenerated during build.prepare but not committed by bordbuch.commit due to transient git failure.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -573,6 +574,23 @@ export async function runMissionValidate(
   if (dirtyCheck.dirty) {
     logger.warn(
       `[mission.validate] workpiece has ${dirtyCheck.fileCount} uncommitted file(s) — reconcile will auto-commit these before merge. Run \`git status\` to review.`,
+    );
+  }
+
+  // RFC-0749: post-validation bordbuch cleanup — commit any bordbuch projections
+  // that were regenerated during build.prepare but not committed by bordbuch.commit
+  // (e.g. due to transient git failure). This prevents the RFC-0522 dirty cache clone
+  // warning from firing for bordbuch files and unblocks mission.reconcile.
+  try {
+    const postValidateBordbuch = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
+    if (postValidateBordbuch.committed) {
+      logger.info(
+        `  Bordbuch post-validate cleanup: committed ${postValidateBordbuch.filesCommitted.length} file(s)`,
+      );
+    }
+  } catch (err) {
+    logger.warn(
+      `  Bordbuch post-validate cleanup failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
     );
   }
 

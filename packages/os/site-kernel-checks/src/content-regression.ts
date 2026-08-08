@@ -902,6 +902,16 @@ export async function runContentRegressionReviewGenerate(
   // Build review changes
   const changes = buildReviewChanges(diff, currentSnapshot, goldenSnapshot);
 
+  // RFC-0748: --auto-accept pre-sets all non-removed-route changes to accept
+  const autoAccept = flagBool(input, "auto-accept");
+  if (autoAccept) {
+    for (const change of changes) {
+      if (change.kind !== "removed-route") {
+        change.decision = "accept";
+      }
+    }
+  }
+
   const review: ContentRegressionReview = {
     schemaVersion: 1,
     systemId,
@@ -921,11 +931,13 @@ export async function runContentRegressionReviewGenerate(
   const dryRun = flagBool(input, "dry-run");
   const reviewYaml = reviewToYaml(review, systemId, missionId);
 
+  const autoAcceptLabel = autoAccept ? " (auto-accepted)" : "";
+
   if (dryRun) {
     context.logger.info(reviewYaml);
     return passResult(
       "content.regression.review.generate",
-      `content.regression.review.generate: ${changes.length} change(s) detected (dry run)`,
+      `content.regression.review.generate: ${changes.length} change(s) detected${autoAcceptLabel} (dry run)`,
     );
   }
 
@@ -940,7 +952,7 @@ export async function runContentRegressionReviewGenerate(
 
   return passResult(
     "content.regression.review.generate",
-    `content.regression.review.generate: ${changes.length} change(s) detected. Review manifest: ${relativePath}`,
+    `content.regression.review.generate: ${changes.length} change(s) detected${autoAcceptLabel}. Review manifest: ${relativePath}`,
   );
 }
 

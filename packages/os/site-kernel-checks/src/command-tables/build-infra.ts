@@ -212,6 +212,13 @@ export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
         kind: "boolean",
         description: "Print review YAML to stdout without writing file.",
       },
+      "auto-accept": {
+        kind: "boolean",
+        description:
+          "RFC-0748: pre-set all non-removed-route changes to decision: accept, " +
+          "allowing immediate content.regression.apply without manual YAML editing. " +
+          "Removed routes remain pending (structural change requires explicit confirmation).",
+      },
     },
     reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
     execute: runContentRegressionReviewGenerate,
