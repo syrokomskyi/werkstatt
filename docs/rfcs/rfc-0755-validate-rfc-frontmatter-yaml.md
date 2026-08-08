@@ -1,7 +1,7 @@
 ---
 id: RFC-0755
 title: "Validate RFC frontmatter YAML parseability in rfc.validate"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
