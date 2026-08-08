@@ -206,14 +206,14 @@ When sync fails (non-fatal):
 
 ## Acceptance criteria
 
-- [ ] `mission.close` calls `sternsystem.sync` after cache clone commits when `mirrors.length > 2`
-- [ ] Sync failure is non-fatal — `mission.close` still succeeds with a warning
-- [ ] `CloseReport.mirror` includes `synced` and `syncError` fields
-- [ ] No external mirrors (`mirrors.length <= 2`) — sync skipped, no warning
-- [ ] Unit test: sync called when mirrors > 2
-- [ ] Unit test: sync failure does not block close
-- [ ] Unit test: sync skipped when mirrors <= 2
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission.close` calls `sternsystem.sync` after cache clone commits when `mirrors.length > 2` (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:539-572, rfc-0762-close-mirror-sync.test.ts test 1)
+- [x] Sync failure is non-fatal — `mission.close` still succeeds with a warning (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:549-557, rfc-0762-close-mirror-sync.test.ts test 2)
+- [x] `CloseReport.mirror` includes `synced` and `syncError` fields (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:82-89, build:check passes)
+- [x] No external mirrors (`mirrors.length <= 2`) — sync skipped, no warning (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:539, rfc-0762-close-mirror-sync.test.ts test 3)
+- [x] Unit test: sync called when mirrors > 2 (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0762-close-mirror-sync.test.ts test 1, vitest run passes)
+- [x] Unit test: sync failure does not block close (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0762-close-mirror-sync.test.ts test 2, vitest run passes)
+- [x] Unit test: sync skipped when mirrors <= 2 (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0762-close-mirror-sync.test.ts test 3, vitest run passes)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0762 --json` — 0 errors)
 
 ## Implementation notes for agents
 
