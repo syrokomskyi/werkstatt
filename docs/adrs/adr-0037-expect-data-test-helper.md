@@ -26,11 +26,9 @@ reviewers:
 
 Add a shared test helper `expectData<T>(result: KernelCommandResult<T>): T` in `src/tests/helpers/kernel-result-helpers.ts` that asserts `data` is defined and returns it with the correct type. Tests use `const data = expectData(result)` instead of `result.data!.field`.
 
-- **Positive**: eliminates `!` assertions throughout test files.
-- **Positive**: provides a clear assertion failure ("expected result.data to be defined") instead of `TypeError: Cannot read properties of undefined`.
-- **Positive**: the helper is reusable across all kernel command tests in `site-kernel-handoff` and other packages that return `KernelCommandResult`.
-- **Negative**: adds one import line per test file.
-- **Technical debt**: none — this is a pure test utility with no production impact.
+## Justification
+
+TypeScript non-null assertions (`!`) silence the compiler without adding runtime safety — if `data` is `undefined`, the test fails with a cryptic `TypeError` instead of a descriptive assertion. A dedicated helper provides both compile-time type narrowing and a runtime guard with a clear error message. The alternative — wrapping each access in `if (!result.data) throw ...` — is more verbose and equally repetitive. The helper is a pure test utility with no production code impact.
 
 ## Consequences
 

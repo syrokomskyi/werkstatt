@@ -28,10 +28,9 @@ This problem will recur for any test that constructs YAML registry fixtures with
 
 Build registry fixtures using `yaml.stringify()` from a JS object instead of string interpolation. Provide a shared helper `buildRegistry(opts)` in `src/tests/helpers/registry-builder.ts` that accepts a typed options object and returns a valid YAML string.
 
-- **Positive**: YAML validity is guaranteed by the serializer — no manual newline management.
-- **Positive**: optional fields are simply `undefined` in the JS object, and `yaml.stringify` omits them automatically.
-- **Positive**: the helper is reusable across all tests that need registry fixtures (subdomain, leitstand, mission, sternsystem).
-- **Negative**: the helper adds a dependency on the `yaml` package in test files (already a dependency of the package).
+## Justification
+
+String interpolation of YAML is fragile: conditional fields require manual `\n` prefix management, and any mistake produces cryptic YAML parser errors at test runtime. The `yaml` package is already a dependency of `site-kernel-handoff` (used by `registry-io.ts` for reading and writing `registry.yaml`), so no new dependency is introduced. The typed options interface catches field-name typos at compile time, which string interpolation cannot do. The alternative — hand-writing YAML templates per test — was the status quo that produced the bug motivating this ADR.
 
 ## Consequences
 
