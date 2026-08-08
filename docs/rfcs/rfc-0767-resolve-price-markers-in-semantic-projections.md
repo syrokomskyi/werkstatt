@@ -99,9 +99,10 @@ Price markers are resolved in `buildSemanticPageModelWith` in `build-page.ts`, a
 
 ```ts
 const { heading, lead } = extractPageHeading(allBlocks, title, description);
-const resolvedHeading = resolvePriceMarkersForSemantic(heading, lang);
-const resolvedLead = lead ? resolvePriceMarkersForSemantic(lead, lang) : undefined;
-const resolvedDescription = resolvePriceMarkersForSemantic(description, lang);
+const derivedPrices = reader.getDerivedPrices();
+const resolvedHeading = resolvePriceMarkersForSemantic(heading, lang, derivedPrices);
+const resolvedLead = lead ? resolvePriceMarkersForSemantic(lead, lang, derivedPrices) : undefined;
+const resolvedDescription = resolvePriceMarkersForSemantic(description, lang, derivedPrices);
 ```
 
 ### 2. Resolution function
@@ -123,9 +124,11 @@ Where `formatSourcePrice` formats the amount with the source currency symbol (e.
 
 ### 3. Derived prices access and type relocation
 
-The semantic layer needs access to `derived-prices.generated.json`. This file is already read by `packages/ui` via `loadDerivedPrices`. To avoid a circular dependency (`packages/share` cannot import from `packages/ui`), the `DerivedPriceEntry` type, `OFFERING_URI_PREFIX` constant, and `PRICE_MARKER_RE` regex are **moved from `packages/ui` to `packages/share/src/semantic/price-marker-resolver.ts`**. `packages/ui` imports them from `@warpgogol/share/semantic`.
+The semantic layer needs access to `derived-prices.generated.json`. This file is currently read by `packages/ui` via `loadDerivedPrices`. To avoid a circular dependency (`packages/share` cannot import from `packages/ui`), the `DerivedPriceEntry` type, `OFFERING_URI_PREFIX` constant, and `PRICE_MARKER_RE` regex are **moved from `packages/ui` to `packages/share/src/semantic/price-marker-resolver.ts`**. `packages/ui` imports them from `@warpgogol/share/semantic`.
 
-The `loadDerivedPrices` function stays in `packages/ui` (it reads from `process.cwd()`, which is a UI-level concern). The semantic layer loads the file once at the `buildSemanticPageModelWith` level and passes the result as a parameter to `resolvePriceMarkersForSemantic`. This avoids repeated file I/O across multiple pages.
+The `loadDerivedPrices` function is also relocated to `packages/share/src/semantic/derived-prices-loader.ts` (a Node-only subpath export, not in the semantic barrel — avoids pulling `node:fs` into client bundles). Both `packages/ui` and the semantic readers import it from `@warpgogol/share/semantic/derived-prices-loader`.
+
+Derived prices are accessed via a new `getDerivedPrices()` method on the `SemanticContentReader` interface. This preserves the `build-page.ts` module contract ("Do not read files — all I/O flows through the injected reader"). The method is called once per page in `buildSemanticPageModelWith` and the result is passed to `resolvePriceMarkersForSemantic`.
 
 ### 4. Frontmatter description markers
 
@@ -149,10 +152,13 @@ The semantic layer resolves these to EUR strings for JSON-LD and meta tags.
 
 | Path | Role |
 | --- | --- |
-| `packages/share/src/semantic/price-marker-resolver.ts` | New file: `resolvePriceMarkersForSemantic` function, `DerivedPriceEntry` type, `OFFERING_URI_PREFIX` and `PRICE_MARKER_RE` constants, `formatSourcePrice` helper |
-| `packages/share/src/semantic/build-page.ts` | Load derived prices once, resolve markers in heading, lead, description before building SemanticPageModel |
-| `packages/ui/src/sections/price-card/price-variants.ts` | Import `DerivedPriceEntry` from `@warpgogol/share/semantic` instead of defining locally |
-| `packages/ui/src/utils/price-marker.ts` | Import `OFFERING_URI_PREFIX` and `PRICE_MARKER_RE` from `@warpgogol/share/semantic` instead of defining locally |
+| `packages/share/src/semantic/price-marker-resolver.ts` | New file (pure, no `node:fs`): `resolvePriceMarkersForSemantic` function, `DerivedPriceEntry` type, `OFFERING_URI_PREFIX` and `PRICE_MARKER_RE` constants, `formatSourcePrice` helper. Exported from semantic barrel. |
+| `packages/share/src/semantic/derived-prices-loader.ts` | New file (Node-only, imports `node:fs`): `loadDerivedPrices` function. Subpath export only — NOT in semantic barrel to avoid pulling `node:fs` into client bundles. |
+| `packages/share/src/semantic/build-page.ts` | Add `getDerivedPrices()` to `SemanticContentReader` interface; call `reader.getDerivedPrices()` once, resolve markers in heading, lead, description before building SemanticPageModel |
+| `packages/os/site-kernel-content/src/semantic-loader.ts` | Implement `getDerivedPrices()` in `createFsSemanticReader` using `loadDerivedPrices` from `@warpgogol/share/semantic/derived-prices-loader` |
+| `packages/pbp/src/semantic-model.ts` | Implement `getDerivedPrices()` in `astroSemanticReader` using `loadDerivedPrices` from `@warpgogol/share/semantic/derived-prices-loader` |
+| `packages/ui/src/sections/price-card/price-variants.ts` | Import `DerivedPriceEntry` from `@warpgogol/share/semantic`; import `loadDerivedPrices` from `@warpgogol/share/semantic/derived-prices-loader` |
+| `packages/ui/src/utils/price-marker.ts` | Import `OFFERING_URI_PREFIX` and `PRICE_MARKER_RE` from `@warpgogol/share/semantic` |
 
 ### TypeScript contracts
 
@@ -260,7 +266,7 @@ After resolution:
 
 - **Semantic layer depends on derived prices file:** The semantic layer currently has no dependency on `derived-prices.generated.json`. This RFC adds one. Mitigation: the dependency is optional — if the file is missing, markers resolve to `"0 €"` and the semantic layer continues to function.
 - **Price format in JSON-LD:** The resolved price string (e.g., `"70 €"`) is a human-readable string, not a structured `PriceSpecification` node. This is acceptable for `headline` and `description` fields, which are free-text strings. The existing `Offer` + `PriceSpecification` JSON-LD nodes (from PBP semantic profile) already provide structured price data.
-- **Cross-package type relocation:** `DerivedPriceEntry`, `OFFERING_URI_PREFIX`, and `PRICE_MARKER_RE` move from `packages/ui` to `packages/share`. This is a breaking change for `packages/ui` imports — all imports of these symbols are updated to use `@warpgogol/share/semantic`. The `loadDerivedPrices` function stays in `packages/ui` (it reads from `process.cwd()`, a UI-level concern). The semantic layer loads the file once at the caller level and passes the result as a parameter.
+- **Cross-package type relocation:** `DerivedPriceEntry`, `OFFERING_URI_PREFIX`, and `PRICE_MARKER_RE` move from `packages/ui` to `packages/share`. This is a breaking change for `packages/ui` imports — all imports of these symbols are updated to use `@warpgogol/share/semantic`. The `loadDerivedPrices` function also moves to `packages/share/semantic/derived-prices-loader.ts` (Node-only subpath) to avoid a circular dependency. Derived prices are accessed in the semantic layer via `reader.getDerivedPrices()` on the `SemanticContentReader` interface, preserving the `build-page.ts` module contract (no direct file I/O).
 
 ## Acceptance criteria
 
