@@ -12,6 +12,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runSubdomainRegister } from "../subdomain/subdomain-register.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import { setupCloudflareApiMock, cfSuccessResponse } from "./helpers/cloudflare-api-mock.ts";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
@@ -60,7 +61,7 @@ function createRegistry(
   mkdirSync(registryDir, { recursive: true });
   const zoneIdLine = opts?.withZoneId !== false ? "\n    cloudflareZoneId: zone-123" : "";
   const workersDevUrlLine = opts?.withWorkersDevUrl
-    ? "\n    workersDevUrl: \"https://matomo-proxy.myaccount.workers.dev\""
+    ? '\n    workersDevUrl: "https://matomo-proxy.myaccount.workers.dev"'
     : "";
   const registryContent = `schemaVersion: "1.0.0"
 systems:
@@ -89,53 +90,15 @@ systems:
           url: https://warpgogol.com${zoneIdLine}
 services:
   - id: matomo-proxy
+    kind: proxy-worker
     workerName: matomo-proxy
-    hostedBy: studio${workersDevUrlLine}
+    hostedBy: studio
+    url: https://matomo-proxy.warpgogol.com${workersDevUrlLine}
     subdomains:
       - domain: matomo-proxy.warpgogol.com
         zone: warpgogol.com
 `;
   writeFileSync(join(registryDir, "registry.yaml"), registryContent);
-}
-
-function mockResponse(ok: boolean, status: number, body: unknown): Response {
-  return {
-    ok,
-    status,
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  } as Response;
-}
-
-function setupFetchMock(handlers: {
-  dnsList?: () => Response;
-  routeList?: () => Response;
-  createDns?: () => Response;
-  createRoute?: () => Response;
-}): void {
-  mockFetch.mockImplementation(async (url: string, opts?: { method?: string }) => {
-    if (url.includes("/dns_records") && (!opts?.method || opts.method === "GET")) {
-      return handlers.dnsList
-        ? handlers.dnsList()
-        : mockResponse(true, 200, { success: true, errors: [], messages: [], result: [] });
-    }
-    if (url.includes("/workers/routes") && (!opts?.method || opts.method === "GET")) {
-      return handlers.routeList
-        ? handlers.routeList()
-        : mockResponse(true, 200, { success: true, errors: [], messages: [], result: [] });
-    }
-    if (url.includes("/dns_records") && opts?.method === "POST") {
-      return handlers.createDns
-        ? handlers.createDns()
-        : mockResponse(true, 200, { success: true, errors: [], messages: [], result: {} });
-    }
-    if (url.includes("/workers/routes") && opts?.method === "POST") {
-      return handlers.createRoute
-        ? handlers.createRoute()
-        : mockResponse(true, 200, { success: true, errors: [], messages: [], result: {} });
-    }
-    return mockResponse(true, 200, { success: true, errors: [], messages: [], result: [] });
-  });
 }
 
 test("registers new DNS CNAME and Workers route when none exist", async () => {
@@ -144,33 +107,23 @@ test("registers new DNS CNAME and Workers route when none exist", async () => {
   let createdDns = false;
   let createdRoute = false;
 
-  setupFetchMock({
+  setupCloudflareApiMock(mockFetch, {
     createDns: () => {
       createdDns = true;
-      return mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: {
-          id: "dns-new",
-          type: "CNAME",
-          name: "matomo-proxy.warpgogol.com",
-          content: "matomo-proxy.test-account.workers.dev",
-          proxied: true,
-        },
+      return cfSuccessResponse({
+        id: "dns-new",
+        type: "CNAME",
+        name: "matomo-proxy.warpgogol.com",
+        content: "matomo-proxy.test-account.workers.dev",
+        proxied: true,
       });
     },
     createRoute: () => {
       createdRoute = true;
-      return mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: {
-          id: "route-new",
-          pattern: "matomo-proxy.warpgogol.com/*",
-          script: "matomo-proxy",
-        },
+      return cfSuccessResponse({
+        id: "route-new",
+        pattern: "matomo-proxy.warpgogol.com/*",
+        script: "matomo-proxy",
       });
     },
   });
@@ -196,42 +149,32 @@ test("is idempotent — skips creation when DNS and route already correct", asyn
   let createdDns = false;
   let createdRoute = false;
 
-  setupFetchMock({
+  setupCloudflareApiMock(mockFetch, {
     dnsList: () =>
-      mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: [
-          {
-            id: "dns-existing",
-            type: "CNAME",
-            name: "matomo-proxy.warpgogol.com",
-            content: "matomo-proxy.test-account.workers.dev",
-            proxied: true,
-          },
-        ],
-      }),
+      cfSuccessResponse([
+        {
+          id: "dns-existing",
+          type: "CNAME",
+          name: "matomo-proxy.warpgogol.com",
+          content: "matomo-proxy.test-account.workers.dev",
+          proxied: true,
+        },
+      ]),
     routeList: () =>
-      mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: [
-          {
-            id: "route-existing",
-            pattern: "matomo-proxy.warpgogol.com/*",
-            script: "matomo-proxy",
-          },
-        ],
-      }),
+      cfSuccessResponse([
+        {
+          id: "route-existing",
+          pattern: "matomo-proxy.warpgogol.com/*",
+          script: "matomo-proxy",
+        },
+      ]),
     createDns: () => {
       createdDns = true;
-      return mockResponse(true, 200, { success: true, errors: [], messages: [], result: {} });
+      return cfSuccessResponse({});
     },
     createRoute: () => {
       createdRoute = true;
-      return mockResponse(true, 200, { success: true, errors: [], messages: [], result: {} });
+      return cfSuccessResponse({});
     },
   });
 
@@ -251,22 +194,17 @@ test("is idempotent — skips creation when DNS and route already correct", asyn
 test("errors when DNS record exists with wrong target", async () => {
   createRegistry(tmpDir);
 
-  setupFetchMock({
+  setupCloudflareApiMock(mockFetch, {
     dnsList: () =>
-      mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: [
-          {
-            id: "dns-wrong",
-            type: "CNAME",
-            name: "matomo-proxy.warpgogol.com",
-            content: "wrong-target.workers.dev",
-            proxied: true,
-          },
-        ],
-      }),
+      cfSuccessResponse([
+        {
+          id: "dns-wrong",
+          type: "CNAME",
+          name: "matomo-proxy.warpgogol.com",
+          content: "wrong-target.workers.dev",
+          proxied: true,
+        },
+      ]),
   });
 
   await expect(
@@ -277,40 +215,32 @@ test("errors when DNS record exists with wrong target", async () => {
 test("errors when Workers route exists with wrong script", async () => {
   createRegistry(tmpDir);
 
-  setupFetchMock({
+  setupCloudflareApiMock(mockFetch, {
     dnsList: () =>
-      mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: [
-          {
-            id: "dns-ok",
-            type: "CNAME",
-            name: "matomo-proxy.warpgogol.com",
-            content: "matomo-proxy.test-account.workers.dev",
-            proxied: true,
-          },
-        ],
-      }),
+      cfSuccessResponse([
+        {
+          id: "dns-ok",
+          type: "CNAME",
+          name: "matomo-proxy.warpgogol.com",
+          content: "matomo-proxy.test-account.workers.dev",
+          proxied: true,
+        },
+      ]),
     routeList: () =>
-      mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: [
-          {
-            id: "route-wrong",
-            pattern: "matomo-proxy.warpgogol.com/*",
-            script: "wrong-worker",
-          },
-        ],
-      }),
+      cfSuccessResponse([
+        {
+          id: "route-wrong",
+          pattern: "matomo-proxy.warpgogol.com/*",
+          script: "wrong-worker",
+        },
+      ]),
   });
 
   await expect(
     runSubdomainRegister(makeInput({ service: "matomo-proxy" }), makeContext(tmpDir)),
-  ).rejects.toThrow("Workers route for 'matomo-proxy.warpgogol.com/*' exists but points to wrong script");
+  ).rejects.toThrow(
+    "Workers route for 'matomo-proxy.warpgogol.com/*' exists but points to wrong script",
+  );
 });
 
 test("errors when CLOUDFLARE_API_TOKEN is missing", async () => {
@@ -342,30 +272,20 @@ test("resolves <account> from workersDevUrl when CLOUDFLARE_ACCOUNT_ID is not se
   createRegistry(tmpDir, { withWorkersDevUrl: true });
   delete process.env.CLOUDFLARE_ACCOUNT_ID;
 
-  setupFetchMock({
+  setupCloudflareApiMock(mockFetch, {
     createDns: () =>
-      mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: {
-          id: "dns-new",
-          type: "CNAME",
-          name: "matomo-proxy.warpgogol.com",
-          content: "matomo-proxy.myaccount.workers.dev",
-          proxied: true,
-        },
+      cfSuccessResponse({
+        id: "dns-new",
+        type: "CNAME",
+        name: "matomo-proxy.warpgogol.com",
+        content: "matomo-proxy.myaccount.workers.dev",
+        proxied: true,
       }),
     createRoute: () =>
-      mockResponse(true, 200, {
-        success: true,
-        errors: [],
-        messages: [],
-        result: {
-          id: "route-new",
-          pattern: "matomo-proxy.warpgogol.com/*",
-          script: "matomo-proxy",
-        },
+      cfSuccessResponse({
+        id: "route-new",
+        pattern: "matomo-proxy.warpgogol.com/*",
+        script: "matomo-proxy",
       }),
   });
 

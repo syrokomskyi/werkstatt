@@ -12,6 +12,11 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runSubdomainList } from "../subdomain/subdomain-list.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import {
+  setupCloudflareApiMock,
+  dnsListResponse,
+  routeListResponse,
+} from "./helpers/cloudflare-api-mock.ts";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
@@ -83,28 +88,11 @@ systems:
   writeFileSync(join(registryDir, "registry.yaml"), registryContent);
 }
 
-function mockResponse(ok: boolean, status: number, body: unknown): Response {
-  return {
-    ok,
-    status,
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  } as Response;
-}
-
-function dnsListResponse(records: unknown[]): Response {
-  return mockResponse(true, 200, { success: true, errors: [], messages: [], result: records });
-}
-
-function routeListResponse(routes: unknown[]): Response {
-  return mockResponse(true, 200, { success: true, errors: [], messages: [], result: routes });
-}
-
 test("cross-references DNS records with Workers routes", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () =>
       dnsListResponse([
         {
           id: "dns-1",
@@ -121,8 +109,7 @@ test("cross-references DNS records with Workers routes", async () => {
           proxied: false,
         },
       ]),
-    )
-    .mockResolvedValueOnce(
+    routeList: () =>
       routeListResponse([
         {
           id: "route-1",
@@ -130,12 +117,9 @@ test("cross-references DNS records with Workers routes", async () => {
           script: "matomo-proxy",
         },
       ]),
-    );
+  });
 
-  const result = await runSubdomainList(
-    makeInput({ zone: "warpgogol.com" }),
-    makeContext(tmpDir),
-  );
+  const result = await runSubdomainList(makeInput({ zone: "warpgogol.com" }), makeContext(tmpDir));
 
   expect(result.data!.zone).toBe("warpgogol.com");
   expect(result.data!.subdomains).toHaveLength(2);
@@ -155,9 +139,9 @@ test("cross-references DNS records with Workers routes", async () => {
 test("includes routes without DNS records", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(dnsListResponse([]))
-    .mockResolvedValueOnce(
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () => dnsListResponse([]),
+    routeList: () =>
       routeListResponse([
         {
           id: "route-orphan",
@@ -165,12 +149,9 @@ test("includes routes without DNS records", async () => {
           script: "orphan-worker",
         },
       ]),
-    );
+  });
 
-  const result = await runSubdomainList(
-    makeInput({ zone: "warpgogol.com" }),
-    makeContext(tmpDir),
-  );
+  const result = await runSubdomainList(makeInput({ zone: "warpgogol.com" }), makeContext(tmpDir));
 
   expect(result.data!.subdomains).toHaveLength(1);
   expect(result.data!.subdomains[0].domain).toBe("orphan.warpgogol.com");
@@ -181,14 +162,12 @@ test("includes routes without DNS records", async () => {
 test("returns empty list for zone with no records", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(dnsListResponse([]))
-    .mockResolvedValueOnce(routeListResponse([]));
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () => dnsListResponse([]),
+    routeList: () => routeListResponse([]),
+  });
 
-  const result = await runSubdomainList(
-    makeInput({ zone: "warpgogol.com" }),
-    makeContext(tmpDir),
-  );
+  const result = await runSubdomainList(makeInput({ zone: "warpgogol.com" }), makeContext(tmpDir));
 
   expect(result.data!.subdomains).toHaveLength(0);
 });
@@ -205,7 +184,7 @@ test("errors when CLOUDFLARE_API_TOKEN is missing", async () => {
 test("errors when --zone is missing", async () => {
   createRegistry(tmpDir);
 
-  await expect(
-    runSubdomainList(makeInput({}), makeContext(tmpDir)),
-  ).rejects.toThrow("--zone is required");
+  await expect(runSubdomainList(makeInput({}), makeContext(tmpDir))).rejects.toThrow(
+    "--zone is required",
+  );
 });

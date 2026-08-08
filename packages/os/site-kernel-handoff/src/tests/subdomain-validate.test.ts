@@ -12,6 +12,11 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runSubdomainValidate } from "../subdomain/subdomain-validate.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import {
+  setupCloudflareApiMock,
+  dnsListResponse,
+  routeListResponse,
+} from "./helpers/cloudflare-api-mock.ts";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
@@ -83,8 +88,10 @@ systems:
           url: https://warpgogol.com
 services:
   - id: matomo-proxy
+    kind: proxy-worker
     workerName: matomo-proxy
     hostedBy: studio
+    url: https://matomo-proxy.warpgogol.com
     subdomains:
       - domain: matomo-proxy.warpgogol.com
         zone: warpgogol.com
@@ -92,28 +99,11 @@ services:
   writeFileSync(join(registryDir, "registry.yaml"), registryContent);
 }
 
-function mockResponse(ok: boolean, status: number, body: unknown): Response {
-  return {
-    ok,
-    status,
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  } as Response;
-}
-
-function dnsListResponse(records: unknown[]): Response {
-  return mockResponse(true, 200, { success: true, errors: [], messages: [], result: records });
-}
-
-function routeListResponse(routes: unknown[]): Response {
-  return mockResponse(true, 200, { success: true, errors: [], messages: [], result: routes });
-}
-
 test("reports valid when both DNS and route exist and are correct", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () =>
       dnsListResponse([
         {
           id: "dns-ok",
@@ -123,8 +113,7 @@ test("reports valid when both DNS and route exist and are correct", async () => 
           proxied: true,
         },
       ]),
-    )
-    .mockResolvedValueOnce(
+    routeList: () =>
       routeListResponse([
         {
           id: "route-ok",
@@ -132,7 +121,7 @@ test("reports valid when both DNS and route exist and are correct", async () => 
           script: "matomo-proxy",
         },
       ]),
-    );
+  });
 
   const result = await runSubdomainValidate(
     makeInput({ service: "matomo-proxy" }),
@@ -147,9 +136,10 @@ test("reports valid when both DNS and route exist and are correct", async () => 
 test("reports not-registered when both DNS and route are missing", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(dnsListResponse([]))
-    .mockResolvedValueOnce(routeListResponse([]));
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () => dnsListResponse([]),
+    routeList: () => routeListResponse([]),
+  });
 
   const result = await runSubdomainValidate(
     makeInput({ service: "matomo-proxy" }),
@@ -164,8 +154,8 @@ test("reports not-registered when both DNS and route are missing", async () => {
 test("reports mismatched when DNS has wrong target", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () =>
       dnsListResponse([
         {
           id: "dns-wrong",
@@ -175,8 +165,7 @@ test("reports mismatched when DNS has wrong target", async () => {
           proxied: true,
         },
       ]),
-    )
-    .mockResolvedValueOnce(
+    routeList: () =>
       routeListResponse([
         {
           id: "route-ok",
@@ -184,7 +173,7 @@ test("reports mismatched when DNS has wrong target", async () => {
           script: "matomo-proxy",
         },
       ]),
-    );
+  });
 
   const result = await runSubdomainValidate(
     makeInput({ service: "matomo-proxy" }),
@@ -199,8 +188,8 @@ test("reports mismatched when DNS has wrong target", async () => {
 test("reports mismatched when Workers route has wrong script", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () =>
       dnsListResponse([
         {
           id: "dns-ok",
@@ -210,8 +199,7 @@ test("reports mismatched when Workers route has wrong script", async () => {
           proxied: true,
         },
       ]),
-    )
-    .mockResolvedValueOnce(
+    routeList: () =>
       routeListResponse([
         {
           id: "route-wrong",
@@ -219,7 +207,7 @@ test("reports mismatched when Workers route has wrong script", async () => {
           script: "wrong-worker",
         },
       ]),
-    );
+  });
 
   const result = await runSubdomainValidate(
     makeInput({ service: "matomo-proxy" }),
@@ -234,8 +222,8 @@ test("reports mismatched when Workers route has wrong script", async () => {
 test("reports not-registered when DNS exists but route is missing", async () => {
   createRegistry(tmpDir);
 
-  mockFetch
-    .mockResolvedValueOnce(
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () =>
       dnsListResponse([
         {
           id: "dns-ok",
@@ -245,8 +233,8 @@ test("reports not-registered when DNS exists but route is missing", async () => 
           proxied: true,
         },
       ]),
-    )
-    .mockResolvedValueOnce(routeListResponse([]));
+    routeList: () => routeListResponse([]),
+  });
 
   const result = await runSubdomainValidate(
     makeInput({ service: "matomo-proxy" }),

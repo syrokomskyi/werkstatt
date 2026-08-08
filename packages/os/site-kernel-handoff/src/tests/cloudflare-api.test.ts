@@ -14,6 +14,11 @@ import {
   listWorkersRoutes,
   createWorkersRoute,
 } from "../leitstand/adapters/cloudflare-api.ts";
+import {
+  setupCloudflareApiMock,
+  cfSuccessResponse,
+  cfErrorResponse,
+} from "./helpers/cloudflare-api-mock.ts";
 
 let mockFetch: ReturnType<typeof vi.fn>;
 
@@ -27,26 +32,19 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function mockResponse(ok: boolean, status: number, body: unknown): Response {
-  return {
-    ok,
-    status,
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  } as Response;
-}
-
 test("listDnsRecords sends GET with auth header and optional name filter", async () => {
-  mockFetch.mockResolvedValue(
-    mockResponse(true, 200, {
-      success: true,
-      errors: [],
-      messages: [],
-      result: [
-        { id: "rec1", type: "CNAME", name: "test.example.com", content: "target.workers.dev", proxied: true },
-      ],
-    }),
-  );
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () =>
+      cfSuccessResponse([
+        {
+          id: "rec1",
+          type: "CNAME",
+          name: "test.example.com",
+          content: "target.workers.dev",
+          proxied: true,
+        },
+      ]),
+  });
 
   const result = await listDnsRecords("zone123", "token456", "test.example.com");
 
@@ -61,9 +59,9 @@ test("listDnsRecords sends GET with auth header and optional name filter", async
 });
 
 test("listDnsRecords without name filter omits query param", async () => {
-  mockFetch.mockResolvedValue(
-    mockResponse(true, 200, { success: true, errors: [], messages: [], result: [] }),
-  );
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () => cfSuccessResponse([]),
+  });
 
   await listDnsRecords("zone123", "token456");
 
@@ -72,14 +70,16 @@ test("listDnsRecords without name filter omits query param", async () => {
 });
 
 test("createDnsRecord sends POST with correct payload", async () => {
-  mockFetch.mockResolvedValue(
-    mockResponse(true, 200, {
-      success: true,
-      errors: [],
-      messages: [],
-      result: { id: "new-rec", type: "CNAME", name: "test.example.com", content: "target.workers.dev", proxied: true },
-    }),
-  );
+  setupCloudflareApiMock(mockFetch, {
+    createDns: () =>
+      cfSuccessResponse({
+        id: "new-rec",
+        type: "CNAME",
+        name: "test.example.com",
+        content: "target.workers.dev",
+        proxied: true,
+      }),
+  });
 
   const result = await createDnsRecord("zone123", "token456", {
     type: "CNAME",
@@ -99,16 +99,10 @@ test("createDnsRecord sends POST with correct payload", async () => {
 });
 
 test("listWorkersRoutes sends GET with auth header", async () => {
-  mockFetch.mockResolvedValue(
-    mockResponse(true, 200, {
-      success: true,
-      errors: [],
-      messages: [],
-      result: [
-        { id: "route1", pattern: "test.example.com/*", script: "test-worker" },
-      ],
-    }),
-  );
+  setupCloudflareApiMock(mockFetch, {
+    routeList: () =>
+      cfSuccessResponse([{ id: "route1", pattern: "test.example.com/*", script: "test-worker" }]),
+  });
 
   const result = await listWorkersRoutes("zone123", "token456");
 
@@ -120,14 +114,10 @@ test("listWorkersRoutes sends GET with auth header", async () => {
 });
 
 test("createWorkersRoute sends POST with correct payload", async () => {
-  mockFetch.mockResolvedValue(
-    mockResponse(true, 200, {
-      success: true,
-      errors: [],
-      messages: [],
-      result: { id: "new-route", pattern: "test.example.com/*", script: "test-worker" },
-    }),
-  );
+  setupCloudflareApiMock(mockFetch, {
+    createRoute: () =>
+      cfSuccessResponse({ id: "new-route", pattern: "test.example.com/*", script: "test-worker" }),
+  });
 
   const result = await createWorkersRoute("zone123", "token456", {
     pattern: "test.example.com/*",
@@ -144,14 +134,9 @@ test("createWorkersRoute sends POST with correct payload", async () => {
 });
 
 test("API errors throw with descriptive message", async () => {
-  mockFetch.mockResolvedValue(
-    mockResponse(true, 200, {
-      success: false,
-      errors: [{ code: 1003, message: "Invalid or missing zone id" }],
-      messages: [],
-      result: null,
-    }),
-  );
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () => cfErrorResponse(200, [{ code: 1003, message: "Invalid or missing zone id" }]),
+  });
 
   await expect(listDnsRecords("bad-zone", "token456")).rejects.toThrow(
     "listDnsRecords API errors: 1003: Invalid or missing zone id",
@@ -159,9 +144,7 @@ test("API errors throw with descriptive message", async () => {
 });
 
 test("HTTP error throws with status and body", async () => {
-  mockFetch.mockResolvedValue(
-    mockResponse(false, 401, "Unauthorized"),
-  );
+  mockFetch.mockResolvedValue(cfErrorResponse(401, [{ code: 1003, message: "Unauthorized" }]));
 
   await expect(listDnsRecords("zone123", "bad-token")).rejects.toThrow(
     "listDnsRecords failed: HTTP 401",
