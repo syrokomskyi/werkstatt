@@ -13,7 +13,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 - **`parseMarkdownFrontmatter(source)`** — parses `--- YAML ---` frontmatter, returns `{ content, data }`.
 - **`stringifyMarkdownFrontmatter(content, data)`** — serializes back to frontmatter + content string.
 - **`ParsedFrontmatter`** — exported type.
-- **`loadSemanticSiteModel`** / **`createFsSemanticReader`** — semantic site model loader; uses the RFC-0527 index-based resolver from `@warpgogol/share/content-reference` (RFC-0529).
+- **`loadSemanticSiteModel`** / **`createFsSemanticReader`** — semantic site model loader; uses the RFC-0527 index-based resolver from `@warpgogol/share/content-reference` (RFC-0529). RFC-0767: `createFsSemanticReader` implements `getDerivedPrices()` via `loadDerivedPrices` from `@warpgogol/share/semantic/derived-prices-loader`.
 
 ## Core boundaries
 
