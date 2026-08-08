@@ -24,6 +24,10 @@ propsSchema:
       version: z.string().optional(),
       effectiveDate: z.string().optional(),
       nextReviewDate: z.string().optional(),
+      versionLabel: z.string().optional(),
+      effectiveDateLabel: z.string().optional(),
+      nextReviewDateLabel: z.string().optional(),
+      linksLabel: z.string().optional(),
       links: z.array(z.object({
         label: z.string().min(1),
         href: z.string().min(1),

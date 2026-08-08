@@ -631,6 +631,7 @@ planetImportPaths:
   Pan: "@warpgogol/ui/sections/price-card"
   Callisto: "@warpgogol/ui/sections/problem"
   Ceres: "@warpgogol/ui/sections/send-message"
+  Sedna: "@warpgogol/ui/sections/service-metadata-block"
   Enceladus: "@warpgogol/ui/sections/social-proof"
   Metis: "@warpgogol/ui/sections/toc"
   Tethys: "@warpgogol/ui/sections/transparency"
@@ -704,6 +705,7 @@ blockTypeToCosmicName:
   price-card: Pan
   problem: Callisto
   send-message: Ceres
+  service-metadata-block: Sedna
   social-proof: Enceladus
   toc: Metis
   transparency: Tethys
@@ -780,6 +782,7 @@ roleByCosmicName:
   Pan: pricing-disclosure
   Callisto: problem
   Ceres: lead-message-capture
+  Sedna: page-metadata-footer
   Enceladus: social-proof
   Metis: table-of-contents
   Tethys: transparency

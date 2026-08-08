@@ -33,6 +33,14 @@ propsSchema:
       type: string
     nextReviewDate:
       type: string
+    versionLabel:
+      type: string
+    effectiveDateLabel:
+      type: string
+    nextReviewDateLabel:
+      type: string
+    linksLabel:
+      type: string
     links:
       type: array
       items:
