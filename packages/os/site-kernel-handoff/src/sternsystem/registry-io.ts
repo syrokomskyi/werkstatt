@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0354: Shared registry IO helpers for reading and writing systems/registry.yaml. RFC-0574: mirror path resolution helpers.</purpose>
+<purpose>RFC-0354: Shared registry IO helpers for reading and writing systems/registry.yaml. RFC-0574: mirror path resolution helpers. RFC-0751: findServiceEntry helper.</purpose>
 <non-goals>
   <item>Do not implement command logic — that lives in the individual command files.</item>
 </non-goals>
@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0354: initial registry IO helpers.</item>
   <item>RFC-0574: add resolveMirrors() and resolveCachePath() for parameterized mirror topology.</item>
+  <item>RFC-0751: add findServiceEntry() helper for service registry lookups.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,6 +21,7 @@ import {
   type FleetRegistry,
   type FleetRegistryEntry,
   type MirrorEntry,
+  type ServiceEntry,
 } from "@warpgogol/ontology/operations";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 
@@ -54,6 +56,10 @@ export async function registryExists(workspaceRoot: string): Promise<boolean> {
 
 export function findEntry(registry: FleetRegistry, id: string): FleetRegistryEntry | undefined {
   return registry.systems.find((s) => s.id === id);
+}
+
+export function findServiceEntry(registry: FleetRegistry, id: string): ServiceEntry | undefined {
+  return registry.services?.find((s) => s.id === id);
 }
 
 export function findEntryByStar(
