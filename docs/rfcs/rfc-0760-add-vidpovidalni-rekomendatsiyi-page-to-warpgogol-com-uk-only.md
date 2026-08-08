@@ -252,17 +252,17 @@ No `--json` output. The page renders as static HTML at `/vidpovidalni-rekomendat
 
 ## Acceptance criteria
 
-- [ ] `vidpovidalniRekomendatsiyi` page entry added to `system.md` `pages[]` with `semanticType: content`, `routes: { uk: vidpovidalni-rekomendatsiyi }`, `locales: [uk]`, `output.sitemap`, `cosmicStar`, `planets[]` (with cosmicPlanet objects and pins), and `shell` (evidence: system.md entry)
-- [ ] Page content file created at `src/content/pages/uk/vidpovidalni-rekomendatsiyi.md` with `kind: page`, `lang: uk`, `blocks[]` array (evidence: file exists, frontmatter valid)
-- [ ] Prose content files created in `src/content/prose/vidpovidalni-rekomendatsiyi/*.uk.md` for all `contentRef` references (evidence: files exist)
-- [ ] `page.block.validate` passes with zero violations for the new page (evidence: validator output)
-- [ ] `mirror.quintet.validate` passes (evidence: validator output)
-- [ ] `build.check` passes for warpgogol-com (evidence: build output, zero errors)
-- [ ] Page renders at `/vidpovidalni-rekomendatsiyi` in UK build (evidence: build output, HTML file generated)
-- [ ] Page does NOT render in DE build — no `/vidpovidalni-rekomendatsiyi` in German sitemap (evidence: sitemap output)
-- [ ] Two `send-message` blocks have unique `formId` values (`recommendation-form` and `market-steward-form`) (evidence: block props)
-- [ ] `service-metadata-block` includes `stats[]` for dynamic mandate counts (evidence: block props)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `vidpovidalniRekomendatsiyi` page entry added to `system.md` `pages[]` with `semanticType: content`, `routes: { uk: vidpovidalni-rekomendatsiyi }`, `locales: [uk]`, `output.sitemap`, `cosmicStar`, `planets[]` (with cosmicPlanet objects and pins), and `shell` (evidence: system.md entry)
+- [x] Page content file created at `src/content/pages/uk/vidpovidalni-rekomendatsiyi.md` with `kind: page`, `lang: uk`, `blocks[]` array (evidence: file exists, frontmatter valid)
+- [x] Prose content files created in `src/content/prose/vidpovidalni-rekomendatsiyi/*.uk.md` for all `contentRef` references (evidence: files exist)
+- [x] `page.block.validate` passes with zero violations for the new page (evidence: validator output)
+- [x] `mirror.quintet.validate` passes (evidence: validator output)
+- [x] `build.check` passes for warpgogol-com (evidence: build output, zero errors)
+- [x] Page renders at `/vidpovidalni-rekomendatsiyi` in UK build (evidence: build output, HTML file generated)
+- [x] Page does NOT render in DE build — no `/vidpovidalni-rekomendatsiyi` in German sitemap (evidence: sitemap output)
+- [x] Two `send-message` blocks have unique `formId` values (`recommendation-form` and `market-steward-form`) (evidence: block props)
+- [x] `service-metadata-block` includes `stats[]` for dynamic mandate counts (evidence: block props) — note: `stats[]` is not a valid prop on `service-metadata-block` (RFC-0759 archetype schema uses `.strict()`); dynamic mandate counts are rendered by the `dynamic-status-block` (block #16) per RFC-0759 rollout. This criterion is satisfied by the `dynamic-status-block` section.
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
