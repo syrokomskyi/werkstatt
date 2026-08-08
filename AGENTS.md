@@ -281,6 +281,12 @@ When the operator asks to start a new mission, the agent workflow is:
 
 Agents MUST NOT begin investigating, diagnosing, or fixing the issue immediately after materialization. The operator will provide specific instructions on what to do next. This is non-negotiable workflow discipline that applies to all agents in all IDEs.
 
+Avoid double `mission.open` calls:
+
+- Check the command output for `[OK]` before considering the mission opened.
+- If the command returns `already has open mission`, the first call succeeded — do not retry.
+- When in doubt, verify `systems/registry.yaml` (`currentMission` field) before attempting `mission.open` again.
+
 ## Session-end discipline (RFC-0581)
 
 **Session-end retro with git hygiene check (NON-NEGOTIABLE, RFC-0581):** When the operator signals session end ("we're done", "на этом всё", "that's it", "мы закончили", "das war's", "wir sind fertig", "Завершаем сессию", or similar), the agent MUST invoke `fo-session-retro` via the `skill` tool BEFORE producing any closing summary. Do NOT write a session summary first and then offer to run the retro — the retro skill IS the closing protocol. The skill's report is the session-end output.
