@@ -1,7 +1,7 @@
 ---
 id: RFC-0754
 title: "Unify commit path: ecosystem.commit auto-detect and fallback"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
