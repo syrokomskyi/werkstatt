@@ -139,7 +139,7 @@ interface DynamicStatusBlockProps {
   contextText?: string;           // Optional explanatory text below the value
   valuePrefix?: string;           // Optional prefix (e.g. currency symbol)
   valueSuffix?: string;           // Optional suffix (e.g. " available")
-  tone?: "default" | "success" | "warning" | "muted";  // Visual tone of the value
+  valueTone?: "default" | "success" | "warning" | "muted";  // Visual tone of the value (renamed from `tone` to avoid collision with section-visual's `tone`)
   animated?: boolean;             // Optional count-up animation via shared gsap-counter script (RFC-0040)
 }
 ```
@@ -176,7 +176,7 @@ propsSchema:
       contextText: z.string().optional(),
       valuePrefix: z.string().optional(),
       valueSuffix: z.string().optional(),
-      tone: z.enum(["default", "success", "warning", "muted"]).optional(),
+      valueTone: z.enum(["default", "success", "warning", "muted"]).optional(),
       animated: z.boolean().optional(),
     }).strict()
 acceptedCosmicNames:
@@ -236,7 +236,7 @@ No `--json` output. The section renders as HTML at build time via the standard `
 
 ## Acceptance criteria
 
-- [ ] `dynamic-status-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (value, label, contextText?, valuePrefix?, valueSuffix?, tone?, animated?), `semanticRole: data-driven-status-indicator`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: archetype YAML file)
+- [ ] `dynamic-status-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (value, label, contextText?, valuePrefix?, valueSuffix?, valueTone?, animated?), `semanticRole: data-driven-status-indicator`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: archetype YAML file)
 - [ ] `archetype.registry.build` run to regenerate `packages/ontology/archetypes/index.yaml` including `dynamic-status-block` (evidence: index.yaml contains the new entry)
 - [ ] Section files created in `packages/ui/src/sections/dynamic-status-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.css`, `.story.md`) (evidence: file set exists)
 - [ ] `props.types.generate` run to produce `.types.generated.ts` (evidence: generated file exists)
