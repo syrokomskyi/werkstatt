@@ -171,10 +171,10 @@ The existing "Dynamic pricing in UI components" section (lines 382-388) in `pack
 
 ## Acceptance criteria
 
-- [ ] Root `AGENTS.md` contains a "Content syntax reference" section listing all three mechanisms with syntax, layer, return type, and examples
-- [ ] `packages/ui/AGENTS.md` contains a price marker documentation entry
-- [ ] The section explicitly states that `{price:...}` is NOT a content reference and must not be migrated to `=(...)`
-- [ ] `rfc.validate` passes on this file
+- [x] Root `AGENTS.md` contains a "Content syntax reference" section listing all three mechanisms with syntax, layer, return type, and examples (evidence: `AGENTS.md:599-611`)
+- [x] `packages/ui/AGENTS.md` contains a price marker documentation entry (evidence: `packages/ui/AGENTS.md:384`)
+- [x] The section explicitly states that `{price:...}` is NOT a content reference and must not be migrated to `=(...)` (evidence: `AGENTS.md:609`, `packages/ui/AGENTS.md:384`)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0765 --json` exit 0, 0 violations)
 
 ## Implementation notes for agents
 
