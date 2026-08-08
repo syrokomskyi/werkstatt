@@ -226,15 +226,15 @@ function resolvePriceMarkersInHtml(
 
 ## Acceptance criteria
 
-- [ ] `renderPriceDisplayHtml` function added to `packages/ui/src/utils/price-marker.ts`
-- [ ] `resolvePriceMarkersInHtml` function added to `prose-pipeline.ts`
-- [ ] Prose files with `{price:...}` markers render as currency-aware price displays
-- [ ] Prose files without markers render unchanged (no regression)
-- [ ] Markers inside `<code>` and `<pre>` blocks are not replaced
-- [ ] Client-side currency switching toggles prices in prose content
-- [ ] `tsc --noEmit` passes
-- [ ] `vitest run` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `renderPriceDisplayHtml` function added to `packages/ui/src/utils/price-marker.ts` (evidence: packages/ui/src/utils/price-marker.ts:34-58, price-marker.test.ts:8 passed)
+- [x] `resolvePriceMarkersInHtml` function added to `prose-pipeline.ts` (evidence: packages/ui/src/sections/markdown/prose-pipeline.ts:87-101)
+- [x] Prose files with `{price:...}` markers render as currency-aware price displays (evidence: prose-pipeline.ts:214-246, hasPriceMarkers forces micromark path + resolvePriceMarkersInHtml replaces markers)
+- [x] Prose files without markers render unchanged (no regression) (evidence: hasPriceMarkers returns false → Astro render() path unchanged, price-marker.test.ts:8 passed)
+- [x] Markers inside `<code>` and `<pre>` blocks are not replaced (evidence: prose-pipeline.ts:81, CODE_PRE_SPLIT_RE splits HTML and skips odd-indexed segments)
+- [x] Client-side currency switching toggles prices in prose content (evidence: markdown-section.astro:256-260, initCurrencyAwarePriceDisplay imported and applied to [data-currency-price-display] elements)
+- [x] `tsc --noEmit` passes (evidence: pnpm --filter @warpgogol/ui run build:check → exit 0)
+- [x] `vitest run` passes (evidence: pnpm --filter @warpgogol/ui exec vitest run src/utils/price-marker.test.ts → 8/8 passed)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0766 → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
