@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:check": "pnpm exec tsc --noEmit",
-    "deploy": "site-kernel run deploy.preflight --service telegram-alert-bridge && wrangler deploy --secrets-file .env"
+    "build:check": "pnpm exec tsc --noEmit"
   },
   "devDependencies": {
     "wrangler": "^4.118.0"

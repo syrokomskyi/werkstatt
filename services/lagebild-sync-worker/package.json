@@ -6,8 +6,7 @@
   "description": "RFC-0186: Shared Lagebild sync worker. Multi-tenant cron worker that syncs CRM buffer outbox for all clients via tenant registry.",
   "main": "src/index.ts",
   "scripts": {
-    "build:check": "tsc --noEmit",
-    "deploy": "site-kernel run deploy.preflight --service lagebild-sync-worker && wrangler deploy --secrets-file .env"
+    "build:check": "tsc --noEmit"
   },
   "dependencies": {
     "@warpgogol/integration-adapter-supabase-crm": "workspace:*",

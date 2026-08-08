@@ -49,3 +49,53 @@ systems:
             purgedUrls: 107
     notes: ""
 
+services:
+  - id: matomo-proxy
+    kind: proxy-worker
+    workerName: matomo-proxy
+    hostedBy: studio
+    url: https://matomo-proxy.syrokomskyi.workers.dev
+    publicEndpoints: true
+    routes:
+      - /_wg/analytics/*
+    upstreams:
+      - matomo-cloud
+    subdomains: []
+    lastDeployed:
+      at: null
+      state: null
+      operationId: null
+    healthCheckPath: /_wg/analytics/health
+  - id: rate-fetcher-worker
+    kind: scheduled-worker
+    workerName: rate-fetcher-worker
+    hostedBy: studio
+    url: https://rate-fetcher-worker.syrokomskyi.workers.dev
+    publicEndpoints: false
+    subdomains: []
+    lastDeployed:
+      at: null
+      state: null
+      operationId: null
+  - id: lagebild-sync-worker
+    kind: scheduled-worker
+    workerName: lagebild-sync-worker
+    hostedBy: studio
+    url: https://lagebild-sync-worker.syrokomskyi.workers.dev
+    publicEndpoints: false
+    subdomains: []
+    lastDeployed:
+      at: null
+      state: null
+      operationId: null
+  - id: telegram-alert-bridge
+    kind: proxy-worker
+    workerName: telegram-alert-bridge
+    hostedBy: studio
+    url: https://telegram-alert-bridge.syrokomskyi.workers.dev
+    publicEndpoints: true
+    subdomains: []
+    lastDeployed:
+      at: null
+      state: null
+      operationId: null

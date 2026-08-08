@@ -6,8 +6,7 @@
   "description": "RFC-0744: Rate Fetcher Service. Multi-tenant cron worker that fetches exchange rates from external sources and stores observations in Supabase.",
   "main": "src/index.ts",
   "scripts": {
-    "build:check": "tsc --noEmit",
-    "deploy": "site-kernel run deploy.preflight --service rate-fetcher-worker && wrangler deploy --secrets-file .env"
+    "build:check": "tsc --noEmit"
   },
   "dependencies": {
     "@warpgogol/pbp-rate-adapters": "workspace:*",

@@ -7,8 +7,7 @@
     "dev": "pnpm run gen:upstreams && wrangler dev",
     "build:check": "pnpm run gen:upstreams && tsc --noEmit",
     "check": "site-kernel run matomo.proxy.validate",
-    "gen:upstreams": "tsx scripts/gen-upstreams.ts",
-    "deploy": "pnpm run gen:upstreams && wrangler deploy"
+    "gen:upstreams": "tsx scripts/gen-upstreams.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.0",
