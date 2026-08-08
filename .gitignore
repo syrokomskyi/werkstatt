@@ -207,8 +207,6 @@ dist
 
 content-validation-report.txt
 
-uni.registry.json
-
 # Local scratch output. Durable review reports belong under docs/audits/.
 tmp/
 
