@@ -174,11 +174,6 @@ describe("ecosystem.commit", () => {
         cwd: root,
       });
       expect(headMsg).not.toContain("X-Platform-Bump");
-      const { stdout: prevMsg } = await execFileAsync(
-        "git",
-        ["log", "-2", "--format=%B", "--reverse"],
-        { cwd: root },
-      );
       // The platform commit (second from HEAD) should have trailers
       const { stdout: platformMsg } = await execFileAsync(
         "git",
