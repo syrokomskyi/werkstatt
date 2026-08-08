@@ -9,8 +9,8 @@ systems:
         storageType: bare
       - path: git@github.com:syrokomskyi/warpgogol-com.git
         storageType: bare
-    pinnedPlatform: 4.67.32
-    currentMission: warpgogol-com-m000039
+    pinnedPlatform: 4.70.0
+    currentMission: null
     lastRelease: warpgogol-com-r000014
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
@@ -48,7 +48,6 @@ systems:
             success: true
             purgedUrls: 107
     notes: ""
-
 services:
   - id: matomo-proxy
     kind: proxy-worker
@@ -99,3 +98,4 @@ services:
       at: null
       state: null
       operationId: null
+
