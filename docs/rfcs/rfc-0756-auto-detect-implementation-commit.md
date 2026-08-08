@@ -1,7 +1,7 @@
 ---
 id: RFC-0756
 title: "Auto-detect implementation commit in rfc.implement.stamp"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
