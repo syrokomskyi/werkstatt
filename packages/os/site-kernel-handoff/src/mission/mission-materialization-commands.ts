@@ -28,7 +28,7 @@
   <item>RFC-0702: add commitBordbuchProjections cleanup call in distribution reuse path to clean dirty bordbuch files from previous runs.</item>
   <item>RFC-0705: add non-fatal sternsystem.sync call after git push origin in reconcile when external mirrors exist; add mirrorSync to MissionReconcileData and reconciliation-report.json.</item>
   <item>RFC-0749: add post-validation commitBordbuchProjections cleanup call in mission.validate to commit bordbuch projections that were regenerated during build.prepare but not committed by bordbuch.commit due to transient git failure.</item>
-  <item>RFC-0763: add commitBordbuchProjections cleanup on build.prepare failure and validation failure early-return paths to clean bordbuch projections from cache clone on all exit paths.</item>
+  <item>RFC-0763: add commitBordbuchProjections cleanup on build.prepare failure and validation failure early-return paths to clean bordbuch projections from cache clone on all exit paths. Extract cleanupBordbuchOnFailure helper to avoid duplication.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -66,6 +66,28 @@ import { orchestrateSnap01Recovery } from "./snapshot-auto-regen.ts";
 import { commitBordbuchProjections } from "../bordbuch/bordbuch-commit.ts";
 
 const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
+
+// RFC-0763: shared helper for bordbuch cleanup on failure paths.
+// Avoids duplicating the try/catch/log block at each failure early-return.
+async function cleanupBordbuchOnFailure(
+  workspaceRoot: string,
+  systemId: string,
+  label: string,
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+): Promise<void> {
+  try {
+    const result = await commitBordbuchProjections(workspaceRoot, systemId);
+    if (result.committed) {
+      logger.info(
+        `  Bordbuch cleanup on ${label}: committed ${result.filesCommitted.length} file(s)`,
+      );
+    }
+  } catch (err) {
+    logger.warn(
+      `  Bordbuch cleanup on ${label} failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+}
 
 async function copyDir(src: string, dest: string): Promise<void> {
   if (!existsSync(src)) return;
@@ -370,18 +392,12 @@ export async function runMissionValidate(
       JSON.stringify(report, null, 2) + "\n",
     );
     // RFC-0763: clean bordbuch projections on build.prepare failure path
-    try {
-      const failBordbuch = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
-      if (failBordbuch.committed) {
-        logger.info(
-          `  Bordbuch cleanup on build.prepare failure: committed ${failBordbuch.filesCommitted.length} file(s)`,
-        );
-      }
-    } catch (err) {
-      logger.warn(
-        `  Bordbuch cleanup on build.prepare failure failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
+    await cleanupBordbuchOnFailure(
+      workspaceRoot,
+      manifest.systemId,
+      "build.prepare failure",
+      logger,
+    );
     return {
       data: report as unknown as MissionValidateData,
       exitCode: 1,
@@ -599,18 +615,7 @@ export async function runMissionValidate(
       },
     ];
     // RFC-0763: clean bordbuch projections on validation failure path
-    try {
-      const failBordbuch = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
-      if (failBordbuch.committed) {
-        logger.info(
-          `  Bordbuch cleanup on validation failure: committed ${failBordbuch.filesCommitted.length} file(s)`,
-        );
-      }
-    } catch (err) {
-      logger.warn(
-        `  Bordbuch cleanup on validation failure failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
+    await cleanupBordbuchOnFailure(workspaceRoot, manifest.systemId, "validation failure", logger);
     return {
       data: report as unknown as MissionValidateData,
       exitCode: 1,
