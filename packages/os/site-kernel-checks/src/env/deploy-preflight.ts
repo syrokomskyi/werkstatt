@@ -1,15 +1,16 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0388: Pre-deploy validation gate. deploy.preflight checks that the target env file
-(.env.main, .env.alt for sites; .env for services) exists, contains all keys from .env.example,
+<purpose>RFC-0761: Pre-deploy validation gate. deploy.preflight checks that the target env file
+(.env for both sites and services) exists, contains all keys from .env.example,
 has no extra keys, and has no empty values. Exits non-zero on any failure, blocking the deploy.</purpose>
 <non-goals>
-  <item>Do not create missing env files — use env.local.check / env.alt.check / env.main.check for that.</item>
+  <item>Do not create missing env files — use env.local.check for that.</item>
   <item>Do not read or validate root .env — root is tooling-only, not deployed.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0388: initial implementation — deploy.preflight command.</item>
+  <item>RFC-0761: remove --env flag, target is always .env for sites and services.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,7 +32,6 @@ const ENV_EXAMPLE = ".env.example";
 interface DeployPreflightInput {
   site?: string;
   service?: string;
-  env?: "main" | "alt";
 }
 
 function parseEnvFile(raw: string): Map<string, string> {
@@ -56,7 +56,21 @@ export async function runDeployPreflight(
   const flags = input.flags ?? {};
   const siteName = (flags.site as string) ?? (flags["--site"] as string);
   const serviceName = (flags.service as string) ?? (flags["--service"] as string);
-  const env = (flags.env as string) ?? (flags["--env"] as string);
+
+  // RFC-0761: --env flag is no longer supported
+  const envFlag = (flags.env as string) ?? (flags["--env"] as string);
+  if (envFlag) {
+    return {
+      data: {
+        command: "deploy.preflight",
+        status: "fail",
+        diagnostics: [],
+        summary: { error: 1, warning: 0, info: 0 },
+      },
+      exitCode: 1,
+      summary: `deploy.preflight: --env flag is no longer supported. Use --secrets-file .env. See RFC-0761.`,
+    };
+  }
 
   const diagnostics: Diagnostic[] = [];
   let targetPath: string;
@@ -78,22 +92,9 @@ export async function runDeployPreflight(
         summary: `deploy.preflight: site "${siteName}" not found`,
       };
     }
-    const envFile = env === "main" ? ".env.main" : env === "alt" ? ".env.alt" : null;
-    if (!envFile) {
-      return {
-        data: {
-          command: "deploy.preflight",
-          status: "fail",
-          diagnostics: [],
-          summary: { error: 1, warning: 0, info: 0 },
-        },
-        exitCode: 1,
-        summary: `deploy.preflight: --env must be "main" or "alt" for sites`,
-      };
-    }
-    targetPath = join(site.directory, envFile);
+    targetPath = join(site.directory, ".env");
     examplePath = join(site.directory, ENV_EXAMPLE);
-    targetLabel = `${siteName}/${envFile}`;
+    targetLabel = `${siteName}/.env`;
   } else if (serviceName) {
     targetPath = join(context.workspaceRoot, "services", serviceName, ".env");
     examplePath = join(context.workspaceRoot, "services", serviceName, ENV_EXAMPLE);
@@ -107,7 +108,7 @@ export async function runDeployPreflight(
         summary: { error: 1, warning: 0, info: 0 },
       },
       exitCode: 1,
-      summary: `deploy.preflight: must specify --site <name> --env <main|alt> or --service <name>`,
+      summary: `deploy.preflight: must specify --site <name> or --service <name>`,
     };
   }
 
@@ -118,7 +119,7 @@ export async function runDeployPreflight(
       severity: "error",
       file: targetLabel,
       message: `Target env file ${targetLabel} does not exist.`,
-      fixHint: `Run env.${env ?? "local"}.check to create it from .env.example, then fill the values.`,
+      fixHint: `Run env.local.check to create it from .env.example, then fill the values.`,
     });
     return diagnosticsResult("deploy.preflight", diagnostics);
   }

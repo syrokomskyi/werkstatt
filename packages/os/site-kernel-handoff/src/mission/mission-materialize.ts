@@ -8,7 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0356: initial mission.materialize command handler.</item>
   <item>RFC-0389: replace minimal inline stubs with full boilerplate generation using @warpgogol/site-kernel-codegen generators and @warpgogol/site-kernel-onboarding templates.</item>
-  <item>RFC-0388: generate .env.example via env.example.generate and copy to .env.main/.env.alt (DNA-40 env-and-deploy contract).</item>
+  <item>RFC-0388: generate .env.example via env.example.generate and copy to .env (DNA-40 env-and-deploy contract).</item>
   <item>RFC-0480: add paused status guard; init git in workpiece and commit materialized state.</item>
   <item>RFC-0517: add preflight content quality gate between atomicMoveDir and git init.</item>
   <item>Run build.prepare pipeline after atomicMoveDir to generate all derived artifacts (surface, sitemap, video/image variants, etc.) before git init.</item>
@@ -20,7 +20,7 @@
   <item>RFC-0597: skip preflight on unchanged cache clone HEAD, run build.prepare.dev instead of build.prepare, warm .cache/video/ and .cache/video-live/ from cache clone.</item>
   <item>RFC-0620: replace hardcoded bordbuch file removal with ownership-map-driven filter that excludes all workspace-absolute generated files from STERNSYSTEM_DATA_PATHS copy.</item>
   <item>RFC-0659: add workpiece artifact cache — skip codegen on repeated materialization when cache key (cacheCloneHead + platformVersion + platformSemanticHash) matches.</item>
-  <item>Preserve operator-filled .env/.env.main/.env.alt from old workpiece before atomicMoveDir and restore after — prevents secret loss (CLOUDFLARE_API_TOKEN, R2 keys) on re-materialization.</item>
+  <item>Preserve operator-filled .env from old workpiece before atomicMoveDir and restore after — prevents secret loss (CLOUDFLARE_API_TOKEN, R2 keys) on re-materialization.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -339,17 +339,15 @@ async function generateFullBoilerplate(
     logger.info(`  ${name} completed`);
   }
 
-  // Step 5: Copy .env.example to .env, .env.main and .env.alt (RFC-0388 / DNA-40)
+  // Step 5: Copy .env.example to .env (RFC-0761 / DNA-40)
   // .env.example has empty values with # How to obtain: instructions;
-  // .env, .env.main and .env.alt are identical templates for the operator to fill in.
+  // .env is the single template for the operator to fill in.
   const envExamplePath = path.join(stagingDir, ".env.example");
   if (existsSync(envExamplePath)) {
     const envExampleContent = await fs.readFile(envExamplePath, "utf8");
     await atomicWriteFile(path.join(stagingDir, ".env"), envExampleContent);
-    await atomicWriteFile(path.join(stagingDir, ".env.main"), envExampleContent);
-    await atomicWriteFile(path.join(stagingDir, ".env.alt"), envExampleContent);
-    regeneratedFiles.push(".env.example", ".env", ".env.main", ".env.alt");
-    logger.info(`  .env.example, .env, .env.main, .env.alt written`);
+    regeneratedFiles.push(".env.example", ".env");
+    logger.info(`  .env.example, .env written`);
   }
 
   return regeneratedFiles;
@@ -1079,7 +1077,7 @@ export async function runMissionMaterialize(
     // secrets (CLOUDFLARE_API_TOKEN, R2_AXIOM_ACCESS_KEY_ID, etc.) that the operator
     // manually filled in. The new workpiece gets empty .env files from
     // .env.example — we restore the old values after the move.
-    const envFilesToPreserve = [".env", ".env.main", ".env.alt"];
+    const envFilesToPreserve = [".env"];
     const preservedEnv: Record<string, string> = {};
     for (const envFile of envFilesToPreserve) {
       const oldEnvPath = path.join(workpieceDir, envFile);
@@ -1099,7 +1097,7 @@ export async function runMissionMaterialize(
     // Restore preserved .env files, merging operator-filled values over the
     // empty .env.example template. Then set PUBLIC_IMAGE_PROVIDER=build-portable.
     // Also set process.env so the kernel command sees it without Astro's dotenv.
-    const envFiles = [".env", ".env.main", ".env.alt"];
+    const envFiles = [".env"];
     for (const envFile of envFiles) {
       const envPath = path.join(workpieceDir, envFile);
       let envContent: string;

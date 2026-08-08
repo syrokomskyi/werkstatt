@@ -19,8 +19,6 @@ import { runGeneratedEditGuard } from "../generated-edit-guard.ts";
 import {
   runEnvContractValidate,
   runEnvLocalCheck,
-  runEnvMainCheck,
-  runEnvAltCheck,
   runDeployScriptsValidate,
 } from "../env/env-contract.ts";
 import { runDeployPreflight } from "../env/deploy-preflight.ts";
@@ -153,35 +151,11 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     execute: runEnvLocalCheck,
   },
   {
-    name: "env.main.check",
-    description:
-      "Check and create .env.main from .env.example in sites when missing (RFC-0388 Rule 7). " +
-      "The .env.main file is a copy of .env.example — the operator fills values afterward.",
-    scope: "workspace",
-    flags: {},
-    mutatesState: true,
-    reads: ["systems/*/.env.example", "missions/*/workpiece/.env.example"],
-    writes: ["systems/*/.env.main", "missions/*/workpiece/.env.main"],
-    execute: runEnvMainCheck,
-  },
-  {
-    name: "env.alt.check",
-    description:
-      "Check and create .env.alt from .env.example in sites when missing (RFC-0388 Rule 7). " +
-      "The .env.alt file is a copy of .env.example — the operator fills values afterward.",
-    scope: "workspace",
-    flags: {},
-    mutatesState: true,
-    reads: ["systems/*/.env.example", "missions/*/workpiece/.env.example"],
-    writes: ["systems/*/.env.alt", "missions/*/workpiece/.env.alt"],
-    execute: runEnvAltCheck,
-  },
-  {
     name: "deploy.preflight",
     description:
-      "Pre-deploy validation gate (RFC-0388 Rule 5). Validates that the target env file exists, " +
+      "Pre-deploy validation gate (RFC-0761). Validates that the target env file exists, " +
       "contains all keys from .env.example, has no extra keys, and has no empty values. " +
-      "Use --site <name> --env main|alt for sites, or --service <name> for services.",
+      "Use --site <name> for sites, or --service <name> for services.",
     scope: "workspace",
     flags: {
       site: {
@@ -192,15 +166,10 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
         kind: "string",
         description: "Service name (e.g. lagebild-sync-worker). Required for service deploys.",
       },
-      env: {
-        kind: "string",
-        description: 'Environment: "main" or "alt". Required with --site.',
-      },
     },
     reads: [
       "systems/*/.env.example",
-      "systems/*/.env.main",
-      "systems/*/.env.alt",
+      "systems/*/.env",
       "services/*/.env.example",
       "services/*/.env",
     ],
@@ -209,9 +178,9 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
   {
     name: "deploy.scripts.validate",
     description:
-      "Validate deploy scripts in systems/*/package.json (deploy:main with --secrets-file .env.main, " +
-      "deploy:alt with --secrets-file .env.alt) and services/*/package.json (deploy with --secrets-file .env) " +
-      "(RFC-0388 Rule 6, DNA-40).",
+      "Validate deploy scripts in systems/*/package.json (deploy:main and deploy:alt with --secrets-file .env) " +
+      "and services/*/package.json (deploy with --secrets-file .env) " +
+      "(RFC-0761 Rule 5, DNA-40).",
     scope: "workspace",
     flags: {},
     reads: [

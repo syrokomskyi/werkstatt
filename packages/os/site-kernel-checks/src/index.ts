@@ -128,12 +128,10 @@ export { runBillingConfigValidate, runBillingSecretsValidate } from "./billing.t
 // RFC-0168 (Session C): generated, leak-guarded .env.example
 export { runEnvExampleGenerate, runEnvExampleValidate } from "./env/env-example.ts";
 
-// RFC-0346: env-and-deploy contract commands (DNA-40)
+// RFC-0761: env-and-deploy contract commands (DNA-40)
 export {
   runEnvContractValidate,
   runEnvLocalCheck,
-  runEnvMainCheck,
-  runEnvAltCheck,
   runDeployScriptsValidate,
   parseEnvExample,
   checkEnvContract06,

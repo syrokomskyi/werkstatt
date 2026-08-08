@@ -27,7 +27,7 @@
   <item>RFC-0689: clear Axiom browser evidence cache before mission.check; auto-regenerate behavior snapshot on SNAP-01 when pnpm build fails; check stale snapshot when build is skipped (RFC-0653).</item>
   <item>RFC-0697: log cache dir file count and total size before clearing; extract shared orchestrateSnap01Recovery helper for SNAP-01 detect → regenerate → (optional) rebuild orchestration.</item>
   <item>RFC-0698: auto-commit workpiece via mission.git.commit after pnpm build completes and before distTreeHash computation; re-read commitSha from workpiece HEAD after auto-commit; fatal abort on commit failure; move build-skip cache write to after auto-commit with post-commit commitSha.</item>
-  <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; skips build, axiom checks, and auto-commit; resolves secrets from releases/&lt;id&gt;/.env.alt; resolves wrangler from workspace root node_modules/.bin; adds releaseDeployed field to DevDeployResult.</item>
+  <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; skips build, axiom checks, and auto-commit; resolves secrets from releases/&lt;id&gt;/.env; resolves wrangler from workspace root node_modules/.bin; adds releaseDeployed field to DevDeployResult.</item>
   <item>RFC-0747: add retry loop (3 attempts, 3s/6s backoff) to alt health check in leitstand.promote to handle CDN propagation delays.</item>
 </CHANGE_SUMMARY>
 */
@@ -169,12 +169,8 @@ function getChannelConfig(dep: DeploymentConfig, channel: Channel): DeploymentCh
   return channelConfig;
 }
 
-function resolveConventionSecretsPath(
-  basePath: string,
-  channel: "dev" | "alt" | "main",
-): string | undefined {
-  const envFile = channel === "main" ? ".env.main" : ".env.alt";
-  const filePath = path.join(basePath, envFile);
+function resolveConventionSecretsPath(basePath: string): string | undefined {
+  const filePath = path.join(basePath, ".env");
   return existsSync(filePath) ? filePath : undefined;
 }
 
@@ -416,16 +412,15 @@ async function runPreflight(
     detail: channelConfig ? `Channel '${channel}' configured` : `Channel '${channel}' not defined`,
   });
 
-  // 3. Convention env file existence (RFC-0666)
-  const envFile = channel === "main" ? ".env.main" : ".env.alt";
-  const envPath = basePath ? path.join(basePath, envFile) : "";
+  // 3. Convention env file existence (RFC-0761: single .env file)
+  const envPath = basePath ? path.join(basePath, ".env") : "";
   checks.push({
     name: "convention-env-exists",
     passed: true, // info-level — always passed
     detail:
       basePath && existsSync(envPath)
-        ? `${envFile} found at ${envPath}`
-        : `${envFile} not found — using process.env fallback`,
+        ? `.env found at ${envPath}`
+        : `.env not found — using process.env fallback`,
   });
 
   // 4. Dist directory exists and artifact hash verifies
@@ -685,7 +680,7 @@ export async function runLeitstandDevDeploy(
 
     const serverDistPath = path.join(distPath, "server");
     const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
-    const secretsFilePath = resolveConventionSecretsPath(releaseDir, channel);
+    const secretsFilePath = resolveConventionSecretsPath(releaseDir);
 
     // Resolve wrangler binary from workspace root node_modules/.bin (release dir has no node_modules)
     const workspaceBin = path.join(workspaceRoot, "node_modules", ".bin");
@@ -831,7 +826,7 @@ export async function runLeitstandDevDeploy(
     throw new Error(`[leitstand.dev-deploy] workpiece not found at '${workpiecePath}'`);
   }
 
-  const secretsFilePath = resolveConventionSecretsPath(workpiecePath, channel);
+  const secretsFilePath = resolveConventionSecretsPath(workpiecePath);
 
   // RFC-0665: Pre-flight — validate methodologies config before building, so
   // invalid configs fail fast instead of after a long build+deploy cycle.
@@ -1845,7 +1840,6 @@ export async function runLeitstandPropagate(
     const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
     const secretsFilePath = resolveConventionSecretsPath(
       path.join(workspaceRoot, "releases", releaseId),
-      channel,
     );
 
     // Preflight
@@ -2159,7 +2153,6 @@ export async function runLeitstandPromote(
     const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
     const secretsFilePath = resolveConventionSecretsPath(
       path.join(workspaceRoot, "releases", releaseId),
-      "main",
     );
 
     // Rehydrate dist from artifact store if missing
@@ -2487,7 +2480,6 @@ export async function runLeitstandRollback(
     const distPath = path.join(workspaceRoot, "releases", targetRelease, "dist");
     const secretsFilePath = resolveConventionSecretsPath(
       path.join(workspaceRoot, "releases", targetRelease),
-      channel,
     );
 
     // Rehydrate dist from artifact store if missing

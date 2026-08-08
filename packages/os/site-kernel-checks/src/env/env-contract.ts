@@ -1,15 +1,13 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0388: Workspace-scoped env-and-deploy contract commands (supersedes RFC-0346).
+<purpose>RFC-0761: Workspace-scoped env-and-deploy contract commands.
 env.contract.validate — checks .env.example presence, comments, # How to obtain: instructions, README reference,
 and empty values across all env-consuming systems/*, services/*, and root.
 env.local.check — checks/creates .env from .env.example when missing.
-env.main.check — checks/creates .env.main from .env.example (sites only).
-env.alt.check — checks/creates .env.alt from .env.example (sites only).
 deploy.scripts.validate — validates deploy scripts in systems and services package.json files.</purpose>
 <non-goals>
   <item>Do not auto-generate .env.example for services — each service is unique and hand-authored.</item>
-  <item>Do not read or write real secret values — .env and .env.main/.env.alt hold operator-filled values only.</item>
+  <item>Do not read or write real secret values — .env holds operator-filled values only.</item>
   <item>Do not check packages — packages consume env via adapters, not direct process.env reads.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -17,6 +15,7 @@ deploy.scripts.validate — validates deploy scripts in systems and services pac
   <item>RFC-0346: initial implementation — four workspace-scoped env-and-deploy contract commands.</item>
   <item>RFC-0388: extend parseEnvExample with hasHowToObtain, add ENV-CONTRACT-05 rule, add root scope.</item>
   <item>RFC-0388: add ENV-CONTRACT-06 rule — no commented-out variables, blank line between variable blocks.</item>
+  <item>RFC-0761: remove env.main.check and env.alt.check commands; update deploy.scripts.validate to check --secrets-file .env.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -35,8 +34,6 @@ import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";
 const ENV_LOCAL = ".env";
-const ENV_MAIN = ".env.main";
-const ENV_ALT = ".env.alt";
 const README = "README.md";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -216,7 +213,7 @@ function readmeDuplicatesEnv(raw: string): { duplicated: boolean; line?: number 
   return { duplicated: false };
 }
 
-/** Create a .env, .env.main, or .env.alt file from .env.example (preserving comments, keeping values empty). */
+/** Create a .env file from .env.example (preserving comments, keeping values empty). */
 async function createEnvFromExample(examplePath: string, targetPath: string): Promise<void> {
   const example = await readFile(examplePath, "utf-8");
   // The .env file is an exact copy of .env.example — comments and empty KEY= lines.
@@ -539,106 +536,6 @@ export async function runEnvLocalCheck(
   );
 }
 
-// ─── env.main.check ────────────────────────────────────────────────────────
-
-export async function runEnvMainCheck(
-  _input: KernelCommandInput,
-  context: KernelRuntimeContext,
-): Promise<KernelCommandResult<CheckResult>> {
-  const results: Array<{ project: string; action: string; path: string }> = [];
-  const apps = await listApps(context);
-
-  for (const site of apps) {
-    const appDir = site.directory;
-    const projectRel = site.name;
-
-    const examplePath = join(appDir, ENV_EXAMPLE);
-    if (!existsSync(examplePath)) {
-      results.push({
-        project: projectRel,
-        action: "not-required",
-        path: `${projectRel}/${ENV_MAIN}`,
-      });
-      continue;
-    }
-
-    const mainPath = join(appDir, ENV_MAIN);
-    if (existsSync(mainPath)) {
-      results.push({
-        project: projectRel,
-        action: "present",
-        path: `${projectRel}/${ENV_MAIN}`,
-      });
-      continue;
-    }
-
-    if (!context.dryRun) {
-      await mkdir(appDir, { recursive: true });
-      await createEnvFromExample(examplePath, mainPath);
-    }
-    results.push({
-      project: projectRel,
-      action: "created",
-      path: `${projectRel}/${ENV_MAIN}`,
-    });
-  }
-
-  return passResult(
-    "env.main.check",
-    `env.main.check: ${results.filter((r) => r.action === "present").length} present, ${results.filter((r) => r.action === "created").length} created, ${results.filter((r) => r.action === "not-required").length} not-required`,
-  );
-}
-
-// ─── env.alt.check ─────────────────────────────────────────────────────────
-
-export async function runEnvAltCheck(
-  _input: KernelCommandInput,
-  context: KernelRuntimeContext,
-): Promise<KernelCommandResult<CheckResult>> {
-  const results: Array<{ project: string; action: string; path: string }> = [];
-  const apps = await listApps(context);
-
-  for (const site of apps) {
-    const appDir = site.directory;
-    const projectRel = site.name;
-
-    const examplePath = join(appDir, ENV_EXAMPLE);
-    if (!existsSync(examplePath)) {
-      results.push({
-        project: projectRel,
-        action: "not-required",
-        path: `${projectRel}/${ENV_ALT}`,
-      });
-      continue;
-    }
-
-    const altPath = join(appDir, ENV_ALT);
-    if (existsSync(altPath)) {
-      results.push({
-        project: projectRel,
-        action: "present",
-        path: `${projectRel}/${ENV_ALT}`,
-      });
-      continue;
-    }
-
-    if (!context.dryRun) {
-      await mkdir(appDir, { recursive: true });
-      await createEnvFromExample(examplePath, altPath);
-    }
-    results.push({
-      project: projectRel,
-      action: "created",
-      path: `${projectRel}/${ENV_ALT}`,
-    });
-  }
-
-  return passResult(
-    "env.alt.check",
-    `env.alt.check: ${results.filter((r) => r.action === "present").length} present, ${results.filter((r) => r.action === "created").length} created, ${results.filter((r) => r.action === "not-required").length} not-required`,
-  );
-}
-
 // ─── deploy.scripts.validate ──────────────────────────────────────────────
 
 const REQUIRED_DEPLOY_SCRIPTS = [
@@ -685,30 +582,30 @@ export async function runDeployScriptsValidate(
       }
     }
 
-    // Validate deploy:main uses --secrets-file .env.main
+    // Validate deploy:main uses --secrets-file .env
     if (pkg.scripts?.["deploy:main"]) {
       const deployMain = pkg.scripts["deploy:main"];
-      if (!deployMain.includes("--secrets-file .env.main")) {
+      if (!deployMain.includes("--secrets-file .env")) {
         diagnostics.push({
           ruleId: "DEPLOY-SCRIPTS-03",
           severity: "error",
           file: `${site.name}/package.json`,
-          message: `deploy:main script must use "--secrets-file .env.main" (RFC-0388 Rule 6).`,
-          fixHint: `Set deploy:main to: site-kernel run deploy.preflight --site ${site.name} --env main && wrangler deploy --name ${site.name} --secrets-file .env.main`,
+          message: `deploy:main script must use "--secrets-file .env" (RFC-0761 Rule 5).`,
+          fixHint: `Set deploy:main to: site-kernel run deploy.preflight --site ${site.name} && wrangler deploy --name ${site.name} --secrets-file .env`,
         });
       }
     }
 
-    // Validate deploy:alt uses --secrets-file .env.alt
+    // Validate deploy:alt uses --secrets-file .env
     if (pkg.scripts?.["deploy:alt"]) {
       const deployAlt = pkg.scripts["deploy:alt"];
-      if (!deployAlt.includes("--secrets-file .env.alt")) {
+      if (!deployAlt.includes("--secrets-file .env")) {
         diagnostics.push({
           ruleId: "DEPLOY-SCRIPTS-03",
           severity: "error",
           file: `${site.name}/package.json`,
-          message: `deploy:alt script must use "--secrets-file .env.alt" (RFC-0388 Rule 6).`,
-          fixHint: `Set deploy:alt to: site-kernel run deploy.preflight --site ${site.name} --env alt && wrangler deploy --name alt-${site.name} --secrets-file .env.alt`,
+          message: `deploy:alt script must use "--secrets-file .env" (RFC-0761 Rule 5).`,
+          fixHint: `Set deploy:alt to: site-kernel run deploy.preflight --site ${site.name} && wrangler deploy --name alt-${site.name} --secrets-file .env`,
         });
       }
     }
