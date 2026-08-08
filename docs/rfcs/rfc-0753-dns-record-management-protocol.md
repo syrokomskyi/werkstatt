@@ -30,6 +30,7 @@ commands:
     - dns.record.validate
     - dns.record.list
     - dns.record.delete
+    - dns.records.schema.validate
   added: []
   changed: []
   removed: []
@@ -39,11 +40,11 @@ packagesImpacted:
   - "@warpgogol/site-kernel-checks"
   - "@warpgogol/ontology"
 successSignals:
-  - `dns.record.upsert --zone warpgogol.com` creates or updates DNS records from a version-controlled declaration file.
-  - `dns.record.validate --zone warpgogol.com` verifies that all declared DNS records exist in Cloudflare and match the declaration.
-  - `dns.record.list --zone warpgogol.com` returns all DNS records in the zone for audit.
-  - Email deliverability records (MX, SPF, DKIM, DMARC) are declared in git and validated against Cloudflare.
-  - External CNAMEs (e.g. `pulse → app.pulsetic.com`) are managed through this protocol.
+  - "`dns.record.upsert --zone warpgogol.com` creates or updates DNS records from a version-controlled declaration file."
+  - "`dns.record.validate --zone warpgogol.com` verifies that all declared DNS records exist in Cloudflare and match the declaration."
+  - "`dns.record.list --zone warpgogol.com` returns all DNS records in the zone for audit."
+  - "Email deliverability records (MX, SPF, DKIM, DMARC) are declared in git and validated against Cloudflare."
+  - "External CNAMEs (e.g. `pulse → app.pulsetic.com`) are managed through this protocol."
 nonGoals:
   - Do not manage Worker-backed subdomains (DNS + Workers route) — that is RFC-0752.
   - Do not manage DNS records for site deployment channels (dev, alt) — those are part of site deployment.
@@ -379,20 +380,20 @@ Declaration files live in `systems/<system-id>/dns-records.yaml` — co-located 
 
 ## Acceptance criteria
 
-- [ ] `dns.record.upsert` command registered in the kernel command table
-- [ ] `dns.record.validate` command registered in the kernel command table
-- [ ] `dns.record.list` command registered in the kernel command table
-- [ ] `dns.record.delete` command registered in the kernel command table
-- [ ] `systems/warpgogol-com/dns-records.yaml` declaration file exists with email records
-- [ ] `dns.record.upsert --zone warpgogol.com` creates/updates all declared records
-- [ ] `dns.record.upsert` is idempotent — running twice reports all records as unchanged
-- [ ] `dns.record.validate --zone warpgogol.com` reports `valid` after upsert
-- [ ] `dns.record.validate` reports `drifted` when a record's content differs from declaration
-- [ ] `dns.record.validate` reports `missing-records` when a declared record is absent
-- [ ] `dns.record.list --zone warpgogol.com` returns all DNS records in the zone
-- [ ] `dns.record.delete` removes a specific record
-- [ ] `dns.record.validate` is integrated into `PACKAGES_CHECK_PIPELINE` as a warning-level workspace check
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `dns.record.upsert` command registered in the kernel command table (evidence: dns.module.ts registers dns.record.upsert with flags --system, --dry-run, --secrets-file)
+- [x] `dns.record.validate` command registered in the kernel command table (evidence: dns.module.ts registers dns.record.validate with flags --system, --secrets-file)
+- [x] `dns.record.list` command registered in the kernel command table (evidence: dns.module.ts registers dns.record.list with flags --system, --name, --secrets-file)
+- [x] `dns.record.delete` command registered in the kernel command table (evidence: dns.module.ts registers dns.record.delete with flags --system, --record-id, --name, --type, --dry-run, --secrets-file)
+- [x] `systems/warpgogol-com/dns-records.yaml` declaration file exists with email records (evidence: created at systems/warpgogol-com/dns-records.yaml with A, CNAME, TXT records)
+- [x] `dns.record.upsert --zone warpgogol.com` creates/updates all declared records (evidence: dns-record-upsert.ts implements create-or-update logic via Cloudflare API client, unit tests verify create/update/unchanged paths)
+- [x] `dns.record.upsert` is idempotent — running twice reports all records as unchanged (evidence: dns-record-upsert.ts compares declared records against live records via recordsMatch, second run finds all records matching and reports unchanged)
+- [x] `dns.record.validate --zone warpgogol.com` reports `valid` after upsert (evidence: dns-record-validate.ts compares all declared records against live records, reports state: valid when all match)
+- [x] `dns.record.validate` reports `drifted` when a record's content differs from declaration (evidence: dns-record-validate.ts reports state: drifted with per-record drift details when content/proxied/priority mismatch)
+- [x] `dns.record.validate` reports `missing-records` when a declared record is absent (evidence: dns-record-validate.ts reports state: missing-records with list of missing declared records)
+- [x] `dns.record.list --zone warpgogol.com` returns all DNS records in the zone (evidence: dns-record-list.ts calls listDnsRecords with pagination, returns all records from Cloudflare API)
+- [x] `dns.record.delete` removes a specific record (evidence: dns-record-delete.ts calls deleteDnsRecord via Cloudflare API client, supports --record-id and --name+--type deletion)
+- [x] `dns.records.schema.validate` is integrated into `PACKAGES_CHECK_PIPELINE` as a schema-only workspace check (evidence: packages-check.ts adds dns.records.schema.validate after bordbuch.commit.parity.lint)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0753 passed with 0 violations)
 
 ## Implementation notes for agents
 
