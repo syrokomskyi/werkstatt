@@ -271,6 +271,16 @@ Rules:
 - **Session-start pre-flight (NON-NEGOTIABLE, RFC-0575):** At the start of `fo-idea-implement` and `fo-fix` skill pipelines, the agent MUST run `git status --short` in the werkstatt root and in each active mission workpiece (if any). If foreign uncommitted changes are found, the agent MUST: (1) report them to the operator, (2) never modify, stage, or discard them, (3) stage only its own files by explicit path, (4) verify `git diff --cached --name-only` before every commit excludes foreign files.
 - **Git hook activation (RFC-0534).** The pre-commit hook at `hooks/pre-commit` requires `git config core.hooksPath hooks/` to be active. Agents MUST invoke the `setup-ecosystem` skill when setting up a new development environment or after cloning the repository without onboarding. The `onboard` skill's Prepare step checks and configures this automatically for new onboarding.
 
+## Mission lifecycle discipline
+
+When the operator asks to start a new mission, the agent workflow is:
+
+1. `mission.open --system <id> --brief "<brief>"`
+2. `mission.materialize --mission <missionId>`
+3. **STOP** — wait for further commands from the operator.
+
+Agents MUST NOT begin investigating, diagnosing, or fixing the issue immediately after materialization. The operator will provide specific instructions on what to do next. This is non-negotiable workflow discipline that applies to all agents in all IDEs.
+
 ## Session-end discipline (RFC-0581)
 
 **Session-end retro with git hygiene check (NON-NEGOTIABLE, RFC-0581):** When the operator signals session end ("we're done", "на этом всё", "that's it", "мы закончили", "das war's", "wir sind fertig", "Завершаем сессию", or similar), the agent MUST invoke `fo-session-retro` via the `skill` tool BEFORE producing any closing summary. Do NOT write a session summary first and then offer to run the retro — the retro skill IS the closing protocol. The skill's report is the session-end output.
