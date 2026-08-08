@@ -41,6 +41,8 @@ export {
   mirrorEntrySchema,
   fleetRegistryEntrySchema,
   fleetRegistrySchema,
+  serviceSubdomainSchema,
+  serviceEntrySchema,
 } from "./sternsystem.ts";
 export type {
   SystemPin,
@@ -48,6 +50,8 @@ export type {
   MirrorEntry,
   FleetRegistryEntry,
   FleetRegistry,
+  ServiceSubdomain,
+  ServiceEntry,
 } from "./sternsystem.ts";
 
 // RFC-0362: Werkstatt consistency primitive schemas.

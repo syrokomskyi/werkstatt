@@ -6,6 +6,7 @@ fleet registry, and version pin. These schemas are the machine-checkable contrac
 for all Sternsystem operations.
 RFC-0561: fleetRegistryEntrySchema gains optional owner field (did:web VC subject id).
 RFC-0574: replace repo/mirror with parameterized mirrors[] array.
+RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, services[] with subdomains to fleetRegistrySchema.
 </purpose>
 <non-goals>
   <item>Do not perform file IO or git operations — pure shape only.</item>
@@ -17,6 +18,7 @@ RFC-0574: replace repo/mirror with parameterized mirrors[] array.
   <item>RFC-0479: migratorCursor changed from SemVer string to string[] (migrator-id list).</item>
   <item>RFC-0561: add optional owner field (did:web VC subject id) to fleetRegistryEntrySchema.</item>
   <item>RFC-0574: replace repo/mirror with mirrors[] array (mirrorEntrySchema, mirrorStorageTypeSchema).</item>
+  <item>RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, serviceSubdomainSchema + serviceEntrySchema + services[] to fleetRegistrySchema.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -73,6 +75,11 @@ export const fleetRegistryEntrySchema = z.object({
   status: z.enum(["registered", "active", "paused", "archived"]),
   registeredAt: z.string().datetime(),
   deployment: deploymentConfigSchema.optional(),
+  cloudflareZoneId: z
+    .string()
+    .min(1, "cloudflareZoneId must be non-empty")
+    .optional()
+    .describe("Cloudflare zone ID for DNS and Workers route management (RFC-0752)"),
   owner: z
     .string()
     .regex(didWebRe, "owner must be a did:web identifier (did:web:<domain>#<key-version>)")
@@ -81,11 +88,27 @@ export const fleetRegistryEntrySchema = z.object({
   notes: z.string().default(""),
 });
 
+export const serviceSubdomainSchema = z.object({
+  domain: z.string().min(1, "subdomain domain must be non-empty"),
+  zone: z.string().min(1, "subdomain zone must be non-empty"),
+});
+
+export const serviceEntrySchema = z.object({
+  id: z.string().regex(kebabRe, "service id must be kebab-case, lowercase, latin-only"),
+  workerName: z.string().min(1, "workerName must be non-empty"),
+  hostedBy: z.enum(["studio"]),
+  workersDevUrl: z.string().url().optional(),
+  subdomains: z.array(serviceSubdomainSchema).default([]),
+});
+
 export const fleetRegistrySchema = z.object({
   schemaVersion: z.string().min(1),
   systems: z.array(fleetRegistryEntrySchema),
+  services: z.array(serviceEntrySchema).optional(),
 });
 
 export type SystemPin = z.infer<typeof systemPinSchema>;
 export type FleetRegistryEntry = z.infer<typeof fleetRegistryEntrySchema>;
 export type FleetRegistry = z.infer<typeof fleetRegistrySchema>;
+export type ServiceSubdomain = z.infer<typeof serviceSubdomainSchema>;
+export type ServiceEntry = z.infer<typeof serviceEntrySchema>;
