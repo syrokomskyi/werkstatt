@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 const mockState = vi.hoisted(() => ({
   validateResult: {
@@ -276,7 +277,7 @@ test("mission.close succeeds when workpiece has no .cache/ directory", async () 
 
   const result = await runMissionClose(input, context);
 
-  expect(result.data!.state).toBe("closed");
+  expect(expectData(result).state).toBe("closed");
   // State file should still be written
   const statePath = join(tmpWorkspace, "systems", "test-system", ".materialization-state.json");
   expect(existsSync(statePath)).toBe(true);

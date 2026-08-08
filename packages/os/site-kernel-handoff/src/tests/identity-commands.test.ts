@@ -17,6 +17,7 @@ import { runIdentityCredentialIssue } from "../identity/identity-credential-issu
 import { runIdentityCredentialVerify } from "../identity/identity-credential-verify.ts";
 import { runIdentityCredentialRevoke } from "../identity/identity-credential-revoke.ts";
 import { readIdentityConfig } from "../identity/identity-io.ts";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 function makeInput(flags: Record<string, string | boolean>): KernelCommandInput {
   return { flags } as KernelCommandInput;
@@ -47,13 +48,13 @@ describe("identity commands", () => {
       );
 
       expect(result.exitCode).toBe(0);
-      expect(result.data!.operatorName).toBe("Test Operator");
-      expect(result.data!.domain).toBe("warpgogol.com");
-      expect(result.data!.authMode).toBe("permissive");
-      expect(result.data!.selfOwnershipCredentialId).toBeTruthy();
-      expect(result.data!.privateKeyHex).toBeTruthy();
+      expect(expectData(result).operatorName).toBe("Test Operator");
+      expect(expectData(result).domain).toBe("warpgogol.com");
+      expect(expectData(result).authMode).toBe("permissive");
+      expect(expectData(result).selfOwnershipCredentialId).toBeTruthy();
+      expect(expectData(result).privateKeyHex).toBeTruthy();
 
-      privateKeyHex = result.data!.privateKeyHex;
+      privateKeyHex = expectData(result).privateKeyHex;
       process.env["PASSPORT_SIGNING_KEY"] = privateKeyHex;
 
       const config = await readIdentityConfig(tempDir);
@@ -74,7 +75,7 @@ describe("identity commands", () => {
         makeInput({ "operator-name": "Test Operator", domain: "warpgogol.com" }),
         makeContext(tempDir),
       );
-      privateKeyHex = bootstrapResult.data!.privateKeyHex;
+      privateKeyHex = expectData(bootstrapResult).privateKeyHex;
       process.env["PASSPORT_SIGNING_KEY"] = privateKeyHex;
     });
 
@@ -91,14 +92,14 @@ describe("identity commands", () => {
       );
 
       expect(issueResult.exitCode).toBe(0);
-      expect(issueResult.data!.type).toBe("ActorDelegationCredential");
+      expect(expectData(issueResult).type).toBe("ActorDelegationCredential");
 
       const verifyResult = await runIdentityCredentialVerify(
-        makeInput({ "credential-id": issueResult.data!.credentialId }),
+        makeInput({ "credential-id": expectData(issueResult).credentialId }),
         makeContext(tempDir),
       );
 
-      expect(verifyResult.data!.valid).toBe(true);
+      expect(expectData(verifyResult).valid).toBe(true);
     });
 
     it("revokes a credential", async () => {
@@ -114,19 +115,19 @@ describe("identity commands", () => {
       );
 
       const revokeResult = await runIdentityCredentialRevoke(
-        makeInput({ "credential-id": issueResult.data!.credentialId }),
+        makeInput({ "credential-id": expectData(issueResult).credentialId }),
         makeContext(tempDir),
       );
 
-      expect(revokeResult.data!.revoked).toBe(true);
+      expect(expectData(revokeResult).revoked).toBe(true);
 
       const verifyResult = await runIdentityCredentialVerify(
-        makeInput({ "credential-id": issueResult.data!.credentialId }),
+        makeInput({ "credential-id": expectData(issueResult).credentialId }),
         makeContext(tempDir),
       );
 
-      expect(verifyResult.data!.valid).toBe(false);
-      expect(verifyResult.data!.error).toBe("revoked");
+      expect(expectData(verifyResult).valid).toBe(false);
+      expect(expectData(verifyResult).error).toBe("revoked");
     });
 
     it("detects expired credentials", async () => {
@@ -142,12 +143,12 @@ describe("identity commands", () => {
       );
 
       const verifyResult = await runIdentityCredentialVerify(
-        makeInput({ "credential-id": issueResult.data!.credentialId }),
+        makeInput({ "credential-id": expectData(issueResult).credentialId }),
         makeContext(tempDir),
       );
 
-      expect(verifyResult.data!.valid).toBe(false);
-      expect(verifyResult.data!.error).toBe("expired");
+      expect(expectData(verifyResult).valid).toBe(false);
+      expect(expectData(verifyResult).error).toBe("expired");
     });
 
     it("returns not-found for unknown credential id", async () => {
@@ -156,8 +157,8 @@ describe("identity commands", () => {
         makeContext(tempDir),
       );
 
-      expect(verifyResult.data!.valid).toBe(false);
-      expect(verifyResult.data!.error).toBe("not-found");
+      expect(expectData(verifyResult).valid).toBe(false);
+      expect(expectData(verifyResult).error).toBe("not-found");
     });
   });
 });

@@ -58,6 +58,7 @@ vi.mock("../werkstatt/git-exec.ts", () => ({
 }));
 
 import { commitBordbuchProjections, runBordbuchCommit } from "../bordbuch/bordbuch-commit.ts";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -252,7 +253,7 @@ describe("runBordbuchCommit", () => {
     gitCalls.statusOutput = "";
     const result = await runBordbuchCommit(makeInput({ system: "my-system" }), makeContext(tmpDir));
     expect(result.data).toBeDefined();
-    expect(result.data!.systemId).toBe("my-system");
+    expect(expectData(result).systemId).toBe("my-system");
   });
 
   it("uses systemId from context.site.name when flag is absent", async () => {
@@ -268,7 +269,7 @@ describe("runBordbuchCommit", () => {
     gitCalls.statusOutput = "";
     const result = await runBordbuchCommit(makeInput(), ctx);
     expect(result.data).toBeDefined();
-    expect(result.data!.systemId).toBe("context-system");
+    expect(expectData(result).systemId).toBe("context-system");
   });
 
   // RFC-0702: logger.warn on git failure
@@ -293,8 +294,8 @@ describe("runBordbuchCommit", () => {
       fileIntents: [],
     } as unknown as KernelRuntimeContext;
     const result = await runBordbuchCommit(makeInput({ system: "test-system" }), ctx);
-    expect(result.data!.committed).toBe(false);
-    expect(result.data!.error).toContain("git error");
+    expect(expectData(result).committed).toBe(false);
+    expect(expectData(result).error).toContain("git error");
     expect(warnCalls).toHaveLength(1);
     expect(warnCalls[0]).toContain("git operation failed");
     expect(warnCalls[0]).toContain("test-system");
@@ -319,8 +320,8 @@ describe("runBordbuchCommit", () => {
       fileIntents: [],
     } as unknown as KernelRuntimeContext;
     const result = await runBordbuchCommit(makeInput({ system: "test-system" }), ctx);
-    expect(result.data!.committed).toBe(false);
-    expect(result.data!.error).toBeUndefined();
+    expect(expectData(result).committed).toBe(false);
+    expect(expectData(result).error).toBeUndefined();
     expect(warnCalls).toHaveLength(0);
   });
 });

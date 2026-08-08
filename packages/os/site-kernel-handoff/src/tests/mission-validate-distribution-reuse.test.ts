@@ -14,6 +14,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 const mockPipeline = vi.hoisted(() => ({
   prepareResult: { ok: true, steps: [{ ok: true, commandName: "config.regenerate", exitCode: 0 }] },
@@ -238,9 +239,9 @@ test("hash match → build cycle skipped, distributionReused: true", async () =>
 
   expect(result.summary).toContain("distribution reused");
   expect(result.summary).toContain("passed");
-  expect(result.data!.distributionReused).toBe(true);
-  expect(result.data!.fullBuildRan).toBe(false);
-  expect(result.data!.buildInputHash).toBe("sha256:matching-hash");
+  expect(expectData(result).distributionReused).toBe(true);
+  expect(expectData(result).fullBuildRan).toBe(false);
+  expect(expectData(result).buildInputHash).toBe("sha256:matching-hash");
   expect(mockPipeline.execSyncCalled).toBe(false);
 });
 
@@ -254,9 +255,9 @@ test("hash mismatch → full build cycle runs, distributionReused: false", async
   const result = await runMissionValidate(makeInput(), makeContext());
 
   expect(result.summary).toContain("passed");
-  expect(result.data!.distributionReused).toBe(false);
-  expect(result.data!.fullBuildRan).toBe(true);
-  expect(result.data!.buildInputHash).toBeNull();
+  expect(expectData(result).distributionReused).toBe(false);
+  expect(expectData(result).fullBuildRan).toBe(true);
+  expect(expectData(result).buildInputHash).toBeNull();
   expect(mockPipeline.execSyncCalled).toBe(true);
 });
 
@@ -270,8 +271,8 @@ test("--force → full build cycle runs regardless of hash match", async () => {
   const result = await runMissionValidate(makeInput({ force: true }), makeContext());
 
   expect(result.summary).toContain("passed");
-  expect(result.data!.distributionReused).toBe(false);
-  expect(result.data!.fullBuildRan).toBe(true);
+  expect(expectData(result).distributionReused).toBe(false);
+  expect(expectData(result).fullBuildRan).toBe(true);
   expect(mockPipeline.execSyncCalled).toBe(true);
 });
 
@@ -282,8 +283,8 @@ test("distribution/ missing → full build runs, distributionReused: false", asy
   const result = await runMissionValidate(makeInput(), makeContext());
 
   expect(result.summary).toContain("passed");
-  expect(result.data!.distributionReused).toBe(false);
-  expect(result.data!.fullBuildRan).toBe(true);
+  expect(expectData(result).distributionReused).toBe(false);
+  expect(expectData(result).fullBuildRan).toBe(true);
   expect(mockPipeline.execSyncCalled).toBe(true);
 });
 
@@ -300,8 +301,8 @@ test("build-input-hash.json corrupt → full build runs, distributionReused: fal
   const result = await runMissionValidate(makeInput(), makeContext());
 
   expect(result.summary).toContain("passed");
-  expect(result.data!.distributionReused).toBe(false);
-  expect(result.data!.fullBuildRan).toBe(true);
+  expect(expectData(result).distributionReused).toBe(false);
+  expect(expectData(result).fullBuildRan).toBe(true);
   expect(mockPipeline.execSyncCalled).toBe(true);
 });
 
@@ -315,8 +316,8 @@ test("hash matches but distribution/dist/ missing → full build runs", async ()
   const result = await runMissionValidate(makeInput(), makeContext());
 
   expect(result.summary).toContain("passed");
-  expect(result.data!.distributionReused).toBe(false);
-  expect(result.data!.fullBuildRan).toBe(true);
+  expect(expectData(result).distributionReused).toBe(false);
+  expect(expectData(result).fullBuildRan).toBe(true);
   expect(mockPipeline.execSyncCalled).toBe(true);
 });
 

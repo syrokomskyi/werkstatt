@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { runLeitstandPromote } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -374,10 +375,10 @@ test("leitstand.promote succeeds and transitions to promoted when all checks pas
 
   const result = await runLeitstandPromote(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  expect(result.data!.state).toBe("succeeded");
-  expect(result.data!.channel).toBe("main");
-  expect(result.data!.buildIdentityVerified).toBe(true);
-  expect(result.data!.releaseState).toBe("promoted");
+  expect(expectData(result).state).toBe("succeeded");
+  expect(expectData(result).channel).toBe("main");
+  expect(expectData(result).buildIdentityVerified).toBe(true);
+  expect(expectData(result).releaseState).toBe("promoted");
   expect(readReleaseState(tmpDir, releaseId)).toBe("promoted");
 });
 

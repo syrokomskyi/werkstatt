@@ -19,6 +19,7 @@ import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { runNotausgangExport } from "../notausgang/notausgang-commands.ts";
 import { runNotausgangValidate } from "../notausgang/notausgang-commands.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let workspaceRoot: string;
 
@@ -181,7 +182,7 @@ test("export writes YAML artifacts (not JSON)", async () => {
     makeContext(workspaceRoot),
   );
 
-  expect(result.data!.systemId).toBe("test-site");
+  expect(expectData(result).systemId).toBe("test-site");
   expect(existsSync(join(outputDir, "notausgang-manifest.yaml"))).toBe(true);
   expect(existsSync(join(outputDir, "notausgang-manifest.json"))).toBe(false);
   expect(existsSync(join(outputDir, "system.pin.yaml"))).toBe(true);
@@ -200,9 +201,9 @@ test("export hashes use sha256: prefix from @warpgogol/fingerprint", async () =>
     makeContext(workspaceRoot),
   );
 
-  expect(result.data!.distHash).toMatch(/^sha256:/);
-  expect(result.data!.siteHash).toMatch(/^sha256:/);
-  expect(result.data!.bordbuchHash).toMatch(/^sha256:/);
+  expect(expectData(result).distHash).toMatch(/^sha256:/);
+  expect(expectData(result).siteHash).toMatch(/^sha256:/);
+  expect(expectData(result).bordbuchHash).toMatch(/^sha256:/);
 });
 
 test("validate passes on a valid export package", async () => {
@@ -221,19 +222,19 @@ test("validate passes on a valid export package", async () => {
   );
 
   expect(result.exitCode).toBe(0);
-  expect(result.data!.violations).toHaveLength(0);
-  expect(result.data!.manifest).toBe("valid");
-  expect(result.data!.dist).toBe("valid");
-  expect(result.data!.site).toBe("valid");
-  expect(result.data!.bordbuch).toBe("valid");
-  expect(result.data!.pin).toBe("valid");
-  expect(result.data!.snapshots).toBe("valid");
-  expect(result.data!.artifactManifest).toBe("valid");
-  expect(result.data!.distHashMatch).toBe(true);
-  expect(result.data!.siteHashMatch).toBe(true);
-  expect(result.data!.bordbuchHashMatch).toBe(true);
-  expect(result.data!.snapshotHashMatch).toBe(true);
-  expect(result.data!.artifactHashMatch).toBe(true);
+  expect(expectData(result).violations).toHaveLength(0);
+  expect(expectData(result).manifest).toBe("valid");
+  expect(expectData(result).dist).toBe("valid");
+  expect(expectData(result).site).toBe("valid");
+  expect(expectData(result).bordbuch).toBe("valid");
+  expect(expectData(result).pin).toBe("valid");
+  expect(expectData(result).snapshots).toBe("valid");
+  expect(expectData(result).artifactManifest).toBe("valid");
+  expect(expectData(result).distHashMatch).toBe(true);
+  expect(expectData(result).siteHashMatch).toBe(true);
+  expect(expectData(result).bordbuchHashMatch).toBe(true);
+  expect(expectData(result).snapshotHashMatch).toBe(true);
+  expect(expectData(result).artifactHashMatch).toBe(true);
 });
 
 test("validate fails on dist hash mismatch (tampered dist file)", async () => {
@@ -255,7 +256,7 @@ test("validate fails on dist hash mismatch (tampered dist file)", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.violations.some((v) => v.rule === "dist-hash-mismatch")).toBe(true);
+  expect(expectData(result).violations.some((v) => v.rule === "dist-hash-mismatch")).toBe(true);
 });
 
 test("validate fails on manifest schema violation (corrupted manifest)", async () => {
@@ -277,8 +278,10 @@ test("validate fails on manifest schema violation (corrupted manifest)", async (
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.manifest).toBe("invalid");
-  expect(result.data!.violations.some((v) => v.rule === "manifest-schema-invalid")).toBe(true);
+  expect(expectData(result).manifest).toBe("invalid");
+  expect(expectData(result).violations.some((v) => v.rule === "manifest-schema-invalid")).toBe(
+    true,
+  );
 });
 
 test("validate fails on Bordbuch line parse error", async () => {
@@ -302,7 +305,7 @@ test("validate fails on Bordbuch line parse error", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.violations.some((v) => v.rule === "bordbuch-line-parse")).toBe(true);
+  expect(expectData(result).violations.some((v) => v.rule === "bordbuch-line-parse")).toBe(true);
 });
 
 test("validate fails on pin content mismatch (systemId)", async () => {
@@ -326,7 +329,7 @@ test("validate fails on pin content mismatch (systemId)", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.violations.some((v) => v.rule === "pin-content-mismatch")).toBe(true);
+  expect(expectData(result).violations.some((v) => v.rule === "pin-content-mismatch")).toBe(true);
 });
 
 test("validate fails on legacy notausgang-manifest.json", async () => {
@@ -351,7 +354,7 @@ test("validate fails on legacy notausgang-manifest.json", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.violations.some((v) => v.rule === "legacy-json-artifact")).toBe(true);
+  expect(expectData(result).violations.some((v) => v.rule === "legacy-json-artifact")).toBe(true);
 });
 
 test("validate fails on legacy system.pin.json", async () => {
@@ -375,7 +378,7 @@ test("validate fails on legacy system.pin.json", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.violations.some((v) => v.rule === "legacy-pin-format")).toBe(true);
+  expect(expectData(result).violations.some((v) => v.rule === "legacy-pin-format")).toBe(true);
 });
 
 test("validate fails on missing behavior-snapshots directory", async () => {
@@ -397,8 +400,8 @@ test("validate fails on missing behavior-snapshots directory", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.snapshots).toBe("missing");
-  expect(result.data!.violations.some((v) => v.rule === "snapshots-missing")).toBe(true);
+  expect(expectData(result).snapshots).toBe("missing");
+  expect(expectData(result).violations.some((v) => v.rule === "snapshots-missing")).toBe(true);
 });
 
 test("validate fails on secret detected outside safe locations", async () => {
@@ -423,7 +426,7 @@ test("validate fails on secret detected outside safe locations", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  expect(result.data!.violations.some((v) => v.rule === "secret-detected")).toBe(true);
+  expect(expectData(result).violations.some((v) => v.rule === "secret-detected")).toBe(true);
 });
 
 test("NotausgangValidateData uses CheckStatus enum values", async () => {
@@ -442,13 +445,13 @@ test("NotausgangValidateData uses CheckStatus enum values", async () => {
   );
 
   const validStatuses = ["valid", "invalid", "missing"];
-  expect(validStatuses).toContain(result.data!.manifest);
-  expect(validStatuses).toContain(result.data!.site);
-  expect(validStatuses).toContain(result.data!.dist);
-  expect(validStatuses).toContain(result.data!.bordbuch);
-  expect(validStatuses).toContain(result.data!.pin);
-  expect(validStatuses).toContain(result.data!.snapshots);
-  expect(validStatuses).toContain(result.data!.artifactManifest);
+  expect(validStatuses).toContain(expectData(result).manifest);
+  expect(validStatuses).toContain(expectData(result).site);
+  expect(validStatuses).toContain(expectData(result).dist);
+  expect(validStatuses).toContain(expectData(result).bordbuch);
+  expect(validStatuses).toContain(expectData(result).pin);
+  expect(validStatuses).toContain(expectData(result).snapshots);
+  expect(validStatuses).toContain(expectData(result).artifactManifest);
 });
 
 test("NotausgangViolation has no severity field", async () => {
@@ -470,7 +473,7 @@ test("NotausgangViolation has no severity field", async () => {
   );
 
   expect(result.exitCode).toBe(1);
-  for (const v of result.data!.violations) {
+  for (const v of expectData(result).violations) {
     expect("severity" in v).toBe(false);
     expect(v.rule).toBeTruthy();
     expect(v.message).toBeTruthy();

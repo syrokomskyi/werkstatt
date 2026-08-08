@@ -15,6 +15,7 @@ import { join } from "node:path";
 import { runLeitstandRollback } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -162,8 +163,8 @@ test("leitstand.rollback auto-detects main from promoted, steps to alt-deployed"
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("succeeded");
-  expect(result.data!.channel).toBe("main");
+  expect(expectData(result).state).toBe("succeeded");
+  expect(expectData(result).channel).toBe("main");
   expect(readReleaseState(tmpDir, currentRelease)).toBe("alt-deployed");
 });
 
@@ -191,7 +192,7 @@ test("leitstand.rollback auto-detects alt from alt-deployed, steps to published"
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("succeeded");
-  expect(result.data!.channel).toBe("alt");
+  expect(expectData(result).state).toBe("succeeded");
+  expect(expectData(result).channel).toBe("alt");
   expect(readReleaseState(tmpDir, currentRelease)).toBe("ready");
 });

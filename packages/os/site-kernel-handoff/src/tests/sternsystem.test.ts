@@ -18,6 +18,7 @@ import { runSternsystemList } from "../sternsystem/sternsystem-list.ts";
 import { runSternsystemValidate } from "../sternsystem/sternsystem-validate.ts";
 import { runSternsystemPin } from "../sternsystem/sternsystem-pin.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let workspaceRoot: string;
 
@@ -121,7 +122,7 @@ test("validate passes for a system with a local path repo", async () => {
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
-  expect(result.data!.violations).toHaveLength(0);
+  expect(expectData(result).violations).toHaveLength(0);
 });
 
 test("list returns all registered systems", async () => {
@@ -134,8 +135,8 @@ test("list returns all registered systems", async () => {
   );
 
   const result = await runSternsystemList(makeInput({}), makeContext(workspaceRoot));
-  expect(result.data!.count).toBe(2);
-  expect(result.data!.systems.map((s) => s.id)).toEqual(["site-a", "site-b"]);
+  expect(expectData(result).count).toBe(2);
+  expect(expectData(result).systems.map((s) => s.id)).toEqual(["site-a", "site-b"]);
 });
 
 test("validate passes on a clean registry", async () => {
@@ -149,8 +150,8 @@ test("validate passes on a clean registry", async () => {
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
-  expect(result.data!.validated).toBe(1);
-  expect(result.data!.violations).toHaveLength(0);
+  expect(expectData(result).validated).toBe(1);
+  expect(expectData(result).violations).toHaveLength(0);
   expect(result.exitCode).toBe(0);
 });
 
@@ -166,8 +167,8 @@ test("validate detects apps/ collision", async () => {
   await mkdir(join(workspaceRoot, "apps", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
-  expect(result.data!.violations).toHaveLength(1);
-  expect(result.data!.violations[0].rule).toBe("apps-collision");
+  expect(expectData(result).violations).toHaveLength(1);
+  expect(expectData(result).violations[0].rule).toBe("apps-collision");
   expect(result.exitCode).toBe(1);
 });
 
@@ -185,8 +186,8 @@ test("pin writes system.pin.json and activates the system", async () => {
     makeInput({ id: "test-site", platform: "4.5.0" }),
     makeContext(workspaceRoot),
   );
-  expect(result.data!.systemId).toBe("test-site");
-  expect(result.data!.platform).toBe("4.5.0");
+  expect(expectData(result).systemId).toBe("test-site");
+  expect(expectData(result).platform).toBe("4.5.0");
 
   const pinPath = join(workspaceRoot, "systems", "test-site", "system.pin.json");
   expect(existsSync(pinPath)).toBe(true);

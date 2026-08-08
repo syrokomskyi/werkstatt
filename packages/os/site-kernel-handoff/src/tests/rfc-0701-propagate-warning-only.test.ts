@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { runLeitstandPropagate } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -225,8 +226,8 @@ async function runPropagate(buildIdentityOverrides: Record<string, unknown> = {}
 test("RFC-0701: distTreeHash mismatch with matching commitSha produces warning, not error", async () => {
   const result = await runPropagate({ distTreeHash: DEVIATING_DIST_TREE_HASH });
 
-  expect(result.data!.state).toBe("succeeded");
-  expect(result.data!.releaseState).toBe("alt-deployed");
+  expect(expectData(result).state).toBe("succeeded");
+  expect(expectData(result).releaseState).toBe("alt-deployed");
   expect(warnSpy).toHaveBeenCalledWith(
     expect.stringContaining("distTreeHash mismatch (commitSha matches)"),
   );
@@ -241,8 +242,8 @@ test("RFC-0701: distTreeHash mismatch with matching commitSha produces warning, 
 test("RFC-0701: siteContentHash mismatch with matching commitSha produces warning, not error", async () => {
   const result = await runPropagate({ siteContentHash: DEVIATING_SITE_CONTENT_HASH });
 
-  expect(result.data!.state).toBe("succeeded");
-  expect(result.data!.releaseState).toBe("alt-deployed");
+  expect(expectData(result).state).toBe("succeeded");
+  expect(expectData(result).releaseState).toBe("alt-deployed");
   expect(warnSpy).toHaveBeenCalledWith(
     expect.stringContaining("siteContentHash mismatch (commitSha matches)"),
   );
@@ -260,8 +261,8 @@ test("RFC-0701: both distTreeHash and siteContentHash mismatch with matching com
     siteContentHash: DEVIATING_SITE_CONTENT_HASH,
   });
 
-  expect(result.data!.state).toBe("succeeded");
-  expect(result.data!.releaseState).toBe("alt-deployed");
+  expect(expectData(result).state).toBe("succeeded");
+  expect(expectData(result).releaseState).toBe("alt-deployed");
   const distTreeWarnings = warnSpy.mock.calls.filter((c) =>
     c[0]?.includes("distTreeHash mismatch"),
   );

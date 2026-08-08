@@ -16,6 +16,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 // --- Mocks for mission.reconcile tests ---
 
@@ -195,7 +196,7 @@ test("reconcile with external mirrors calls sternsystem.sync and sets mirrorSync
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionReconcile(input, context);
-  const data = result.data!;
+  const data = expectData(result);
 
   expect(data.mirrorSync).toBeDefined();
   expect(data.mirrorSync!.attempted).toBe(true);
@@ -222,7 +223,7 @@ test("reconcile with sync failure sets mirrorSync.succeeded=false and completes 
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionReconcile(input, context);
-  const data = result.data!;
+  const data = expectData(result);
 
   expect(data.mirrorSync).toBeDefined();
   expect(data.mirrorSync!.attempted).toBe(true);
@@ -245,7 +246,7 @@ test("reconcile without external mirrors does not attempt sync", async () => {
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionReconcile(input, context);
-  const data = result.data!;
+  const data = expectData(result);
 
   expect(data.mirrorSync).toBeUndefined();
   expect(result.summary).not.toContain("mirror sync");

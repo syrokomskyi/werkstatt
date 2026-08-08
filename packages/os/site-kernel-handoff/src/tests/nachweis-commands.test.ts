@@ -23,6 +23,7 @@ import type {
   KernelFlagValue,
 } from "@warpgogol/site-kernel";
 import { createDefaultIO, createKernelLogger } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 // ── Mock state ──────────────────────────────────────────────────────────────
 
@@ -257,10 +258,10 @@ describe("RFC-0707: nachweis.ingest", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.dryRun).toBe(true);
-    expect(result.data!.bordbuchEventId).toBeNull();
+    expect(expectData(result).dryRun).toBe(true);
+    expect(expectData(result).bordbuchEventId).toBeNull();
     expect(mockR2State.putCalls).toBe(0);
-    expect(result.data!.sourceSha256).toMatch(/^sha256:/);
+    expect(expectData(result).sourceSha256).toMatch(/^sha256:/);
   });
 
   it("uploads to R2 and appends bordbuch on success", async () => {
@@ -286,10 +287,10 @@ describe("RFC-0707: nachweis.ingest", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.dryRun).toBe(false);
+    expect(expectData(result).dryRun).toBe(false);
     expect(mockR2State.putCalls).toBe(1);
-    expect(result.data!.r2Path).toContain("test-sys/private/");
-    expect(result.data!.bordbuchEventId).toBeTruthy();
+    expect(expectData(result).r2Path).toContain("test-sys/private/");
+    expect(expectData(result).bordbuchEventId).toBeTruthy();
   });
 });
 
@@ -326,9 +327,9 @@ describe("RFC-0707: nachweis.manifest.generate", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.records).toEqual([]);
-    expect(result.data!.generatedAt).toBeNull();
-    expect(result.data!.expiresAt).toBeNull();
+    expect(expectData(result).records).toEqual([]);
+    expect(expectData(result).generatedAt).toBeNull();
+    expect(expectData(result).expiresAt).toBeNull();
 
     const manifestPath = join(cachePath, "public", "nachweise", "manifest.json");
     expect(existsSync(manifestPath)).toBe(true);
@@ -368,8 +369,8 @@ describe("RFC-0707: nachweis.manifest.generate", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.records).toHaveLength(1);
-    expect(result.data!.records[0].slug).toBe("public-record");
+    expect(expectData(result).records).toHaveLength(1);
+    expect(expectData(result).records[0].slug).toBe("public-record");
   });
 });
 
@@ -414,8 +415,10 @@ describe("RFC-0707: nachweis.validate", () => {
     );
 
     expect(result.exitCode).toBe(1);
-    expect(result.data!.violations.length).toBeGreaterThan(0);
-    const shaViolation = result.data!.violations.find((v) => v.rule === "evidence-missing-sha256");
+    expect(expectData(result).violations.length).toBeGreaterThan(0);
+    const shaViolation = expectData(result).violations.find(
+      (v) => v.rule === "evidence-missing-sha256",
+    );
     expect(shaViolation).toBeTruthy();
   });
 
@@ -443,7 +446,7 @@ describe("RFC-0707: nachweis.validate", () => {
       makeContext("test-sys"),
     );
 
-    expect(result.data!.violations).toContainEqual(
+    expect(expectData(result).violations).toContainEqual(
       expect.objectContaining({ rule: "consent-granted-without-timestamp" }),
     );
   });
@@ -467,7 +470,9 @@ describe("RFC-0707: nachweis.validate", () => {
       makeContext("test-sys"),
     );
 
-    expect(result.data!.violations.filter((v) => v.rule !== "bordbuch-hash-chain")).toEqual([]);
+    expect(expectData(result).violations.filter((v) => v.rule !== "bordbuch-hash-chain")).toEqual(
+      [],
+    );
   });
 });
 
@@ -522,9 +527,9 @@ describe("RFC-0707: nachweis.consent.update", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.previousStatus).toBe("not_requested");
-    expect(result.data!.newStatus).toBe("granted");
-    expect(result.data!.bordbuchEventId).toBeTruthy();
+    expect(expectData(result).previousStatus).toBe("not_requested");
+    expect(expectData(result).newStatus).toBe("granted");
+    expect(expectData(result).bordbuchEventId).toBeTruthy();
 
     // Verify file was updated
     const consentFile = join(
@@ -583,9 +588,9 @@ describe("RFC-0707: nachweis.publish", () => {
     );
 
     expect(result.exitCode).toBe(1);
-    expect(result.data!.published).toBe(false);
-    expect(result.data!.gateResult.allPassed).toBe(false);
-    expect(result.data!.gateResult.consentGranted).toBe(false);
+    expect(expectData(result).published).toBe(false);
+    expect(expectData(result).gateResult.allPassed).toBe(false);
+    expect(expectData(result).gateResult.consentGranted).toBe(false);
   });
 });
 
@@ -631,9 +636,9 @@ describe("RFC-0707: nachweis.withdraw", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.withdrawn).toBe(false);
-    expect(result.data!.alreadyWithdrawn).toBe(true);
-    expect(result.data!.bordbuchEventIds).toEqual([]);
+    expect(expectData(result).withdrawn).toBe(false);
+    expect(expectData(result).alreadyWithdrawn).toBe(true);
+    expect(expectData(result).bordbuchEventIds).toEqual([]);
   });
 
   it("withdraws record and appends bordbuch entries", async () => {
@@ -657,9 +662,9 @@ describe("RFC-0707: nachweis.withdraw", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.withdrawn).toBe(true);
-    expect(result.data!.alreadyWithdrawn).toBe(false);
-    expect(result.data!.bordbuchEventIds).toHaveLength(2);
+    expect(expectData(result).withdrawn).toBe(true);
+    expect(expectData(result).alreadyWithdrawn).toBe(false);
+    expect(expectData(result).bordbuchEventIds).toHaveLength(2);
 
     // Verify file was updated
     const evidenceFile = join(
@@ -728,9 +733,9 @@ describe("RFC-0714: nachweis.approve", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.verificationLevel).toBe("N2");
-    expect(result.data!.legalContentCheckPassed).toBe(true);
-    expect(result.data!.bordbuchEventId).toBeTruthy();
+    expect(expectData(result).verificationLevel).toBe("N2");
+    expect(expectData(result).legalContentCheckPassed).toBe(true);
+    expect(expectData(result).bordbuchEventId).toBeTruthy();
 
     const bordbuchPath = join(tmpDir, "systems-cache", "test-sys", "bordbuch", "events.ndjson");
     const bordbuchRaw = await readFile(bordbuchPath, "utf8");
@@ -776,7 +781,7 @@ describe("RFC-0714: nachweis.approve", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.bordbuchEventId).toBeNull();
+    expect(expectData(result).bordbuchEventId).toBeNull();
     expect(result.summary).toContain("DRY RUN");
 
     const bordbuchPath = join(tmpDir, "systems-cache", "test-sys", "bordbuch", "events.ndjson");
@@ -938,11 +943,11 @@ describe("RFC-0714: nachweis.public-derivative", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.alreadyUploaded).toBe(false);
-    expect(result.data!.r2Path).toContain("test-sys/public/");
-    expect(result.data!.r2Path).toContain("public.pdf");
-    expect(result.data!.publicDerivativeSha256).toMatch(/^sha256:/);
-    expect(result.data!.bordbuchEventId).toBeTruthy();
+    expect(expectData(result).alreadyUploaded).toBe(false);
+    expect(expectData(result).r2Path).toContain("test-sys/public/");
+    expect(expectData(result).r2Path).toContain("public.pdf");
+    expect(expectData(result).publicDerivativeSha256).toMatch(/^sha256:/);
+    expect(expectData(result).bordbuchEventId).toBeTruthy();
     expect(mockR2State.putCalls).toBe(1);
 
     const evidenceFile = join(
@@ -956,7 +961,7 @@ describe("RFC-0714: nachweis.public-derivative", () => {
     );
     const raw = await readFile(evidenceFile, "utf8");
     expect(raw).toContain("public");
-    expect(raw).toContain(result.data!.publicDerivativeSha256);
+    expect(raw).toContain(expectData(result).publicDerivativeSha256);
   });
 
   it("is idempotent — returns alreadyUploaded true when same SHA-256 already recorded", async () => {
@@ -996,8 +1001,8 @@ describe("RFC-0714: nachweis.public-derivative", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.alreadyUploaded).toBe(true);
-    expect(result.data!.bordbuchEventId).toBeNull();
+    expect(expectData(result).alreadyUploaded).toBe(true);
+    expect(expectData(result).bordbuchEventId).toBeNull();
     expect(mockR2State.putCalls).toBe(0);
   });
 
@@ -1033,8 +1038,8 @@ describe("RFC-0714: nachweis.public-derivative", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.alreadyUploaded).toBe(false);
-    expect(result.data!.bordbuchEventId).toBeNull();
+    expect(expectData(result).alreadyUploaded).toBe(false);
+    expect(expectData(result).bordbuchEventId).toBeNull();
     expect(result.summary).toContain("DRY RUN");
     expect(mockR2State.putCalls).toBe(0);
   });
@@ -1127,7 +1132,7 @@ describe("RFC-0715: nachweis.validate consent matching by c.id fallback", () => 
     );
 
     // Gate should pass — consent matched by c.id fallback
-    const gate = result.data!.gateResults.find((g) => g.slug === "test-record");
+    const gate = expectData(result).gateResults.find((g) => g.slug === "test-record");
     expect(gate).toBeTruthy();
     expect(gate!.consentGranted).toBe(true);
   });

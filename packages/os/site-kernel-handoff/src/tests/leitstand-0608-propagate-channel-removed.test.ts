@@ -16,6 +16,7 @@ import { join } from "node:path";
 import { runLeitstandPropagate } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -224,8 +225,8 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("succeeded");
-  expect(result.data!.channel).toBe("alt");
-  expect(result.data!.releaseState).toBe("alt-deployed");
+  expect(expectData(result).state).toBe("succeeded");
+  expect(expectData(result).channel).toBe("alt");
+  expect(expectData(result).releaseState).toBe("alt-deployed");
   expect(readReleaseState(tmpDir, releaseId)).toBe("alt-deployed");
 }, 15_000);

@@ -20,6 +20,7 @@ import {
   routeListResponse,
 } from "./helpers/cloudflare-api-mock.ts";
 import { buildRegistry } from "./helpers/registry-builder.ts";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
@@ -125,9 +126,9 @@ test("reports valid when both DNS and route exist and are correct", async () => 
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("valid");
-  expect(result.data!.dnsRecord.correct).toBe(true);
-  expect(result.data!.workersRoute.correct).toBe(true);
+  expect(expectData(result).state).toBe("valid");
+  expect(expectData(result).dnsRecord.correct).toBe(true);
+  expect(expectData(result).workersRoute.correct).toBe(true);
 });
 
 test("reports not-registered when both DNS and route are missing", async () => {
@@ -143,9 +144,9 @@ test("reports not-registered when both DNS and route are missing", async () => {
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("not-registered");
-  expect(result.data!.dnsRecord.exists).toBe(false);
-  expect(result.data!.workersRoute.exists).toBe(false);
+  expect(expectData(result).state).toBe("not-registered");
+  expect(expectData(result).dnsRecord.exists).toBe(false);
+  expect(expectData(result).workersRoute.exists).toBe(false);
 });
 
 test("reports mismatched when DNS has wrong target", async () => {
@@ -177,9 +178,9 @@ test("reports mismatched when DNS has wrong target", async () => {
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("mismatched");
-  expect(result.data!.dnsRecord.correct).toBe(false);
-  expect(result.data!.dnsRecord.exists).toBe(true);
+  expect(expectData(result).state).toBe("mismatched");
+  expect(expectData(result).dnsRecord.correct).toBe(false);
+  expect(expectData(result).dnsRecord.exists).toBe(true);
 });
 
 test("reports mismatched when Workers route has wrong script", async () => {
@@ -211,9 +212,9 @@ test("reports mismatched when Workers route has wrong script", async () => {
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("mismatched");
-  expect(result.data!.workersRoute.correct).toBe(false);
-  expect(result.data!.workersRoute.exists).toBe(true);
+  expect(expectData(result).state).toBe("mismatched");
+  expect(expectData(result).workersRoute.correct).toBe(false);
+  expect(expectData(result).workersRoute.exists).toBe(true);
 });
 
 test("reports not-registered when DNS exists but route is missing", async () => {
@@ -238,9 +239,9 @@ test("reports not-registered when DNS exists but route is missing", async () => 
     makeContext(tmpDir),
   );
 
-  expect(result.data!.state).toBe("mismatched");
-  expect(result.data!.dnsRecord.exists).toBe(true);
-  expect(result.data!.workersRoute.exists).toBe(false);
+  expect(expectData(result).state).toBe("mismatched");
+  expect(expectData(result).dnsRecord.exists).toBe(true);
+  expect(expectData(result).workersRoute.exists).toBe(false);
 });
 
 test("errors when CLOUDFLARE_API_TOKEN is missing", async () => {

@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runSternsystemRegister, createContentStub } from "../sternsystem/sternsystem-register.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let workspaceRoot: string;
 
@@ -161,9 +162,9 @@ test("register rolls back registry entry when materialize fails", async () => {
     makeContext(workspaceRoot),
   );
 
-  expect(result.data!.status).toBe("fail");
+  expect(expectData(result).status).toBe("fail");
   expect(result.exitCode).toBe(1);
-  expect(result.data!.diagnostics.some((d) => d.includes("failed"))).toBe(true);
+  expect(expectData(result).diagnostics.some((d) => d.includes("failed"))).toBe(true);
 
   // Registry should be cleaned up (entry removed)
   const raw = await readFile(join(workspaceRoot, "systems", "registry.yaml"), "utf8");

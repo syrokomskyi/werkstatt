@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 const mockState = vi.hoisted(() => ({
   validateResult: {
@@ -226,7 +227,7 @@ test("mission.close succeeds when bordbuch is valid", async () => {
 
   const result = await runMissionClose(input, context);
 
-  expect(result.data!.bordbuchValidation).toBeDefined();
-  expect(result.data!.bordbuchValidation.checked).toBe(true);
-  expect(result.data!.bordbuchValidation.violations).toHaveLength(0);
+  expect(expectData(result).bordbuchValidation).toBeDefined();
+  expect(expectData(result).bordbuchValidation.checked).toBe(true);
+  expect(expectData(result).bordbuchValidation.violations).toHaveLength(0);
 });

@@ -16,6 +16,7 @@ import { runSubdomainRegister } from "../subdomain/subdomain-register.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
 import { setupCloudflareApiMock, cfSuccessResponse } from "./helpers/cloudflare-api-mock.ts";
 import { buildRegistry } from "./helpers/registry-builder.ts";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
@@ -129,13 +130,14 @@ test("registers new DNS CNAME and Workers route when none exist", async () => {
     makeInput({ service: "matomo-proxy" }),
     makeContext(tmpDir),
   );
+  const data = expectData(result);
 
-  expect(result.data!.state).toBe("registered");
-  expect(result.data!.dnsRecord.created).toBe(true);
-  expect(result.data!.dnsRecord.id).toBe("dns-new");
-  expect(result.data!.workersRoute.created).toBe(true);
-  expect(result.data!.workersRoute.id).toBe("route-new");
-  expect(result.data!.dnsRecord.content).toBe("matomo-proxy.test-account.workers.dev");
+  expect(data.state).toBe("registered");
+  expect(data.dnsRecord.created).toBe(true);
+  expect(data.dnsRecord.id).toBe("dns-new");
+  expect(data.workersRoute.created).toBe(true);
+  expect(data.workersRoute.id).toBe("route-new");
+  expect(data.dnsRecord.content).toBe("matomo-proxy.test-account.workers.dev");
   expect(createdDns).toBe(true);
   expect(createdRoute).toBe(true);
 });
@@ -179,11 +181,12 @@ test("is idempotent — skips creation when DNS and route already correct", asyn
     makeInput({ service: "matomo-proxy" }),
     makeContext(tmpDir),
   );
+  const data = expectData(result);
 
-  expect(result.data!.state).toBe("already-registered");
-  expect(result.data!.dnsRecord.created).toBe(false);
-  expect(result.data!.dnsRecord.id).toBe("dns-existing");
-  expect(result.data!.workersRoute.created).toBe(false);
+  expect(data.state).toBe("already-registered");
+  expect(data.dnsRecord.created).toBe(false);
+  expect(data.dnsRecord.id).toBe("dns-existing");
+  expect(data.workersRoute.created).toBe(false);
   expect(createdDns).toBe(false);
   expect(createdRoute).toBe(false);
 });
@@ -290,8 +293,9 @@ test("resolves <account> from workersDevUrl when CLOUDFLARE_ACCOUNT_ID is not se
     makeInput({ service: "matomo-proxy" }),
     makeContext(tmpDir),
   );
+  const data = expectData(result);
 
-  expect(result.data!.dnsRecord.content).toBe("matomo-proxy.myaccount.workers.dev");
+  expect(data.dnsRecord.content).toBe("matomo-proxy.myaccount.workers.dev");
 });
 
 test("errors when <account> cannot be resolved from any source", async () => {

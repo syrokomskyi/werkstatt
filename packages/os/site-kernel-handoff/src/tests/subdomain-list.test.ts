@@ -20,6 +20,7 @@ import {
   routeListResponse,
 } from "./helpers/cloudflare-api-mock.ts";
 import { buildRegistry } from "./helpers/registry-builder.ts";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
@@ -117,16 +118,18 @@ test("cross-references DNS records with Workers routes", async () => {
 
   const result = await runSubdomainList(makeInput({ zone: "warpgogol.com" }), makeContext(tmpDir));
 
-  expect(result.data!.zone).toBe("warpgogol.com");
-  expect(result.data!.subdomains).toHaveLength(2);
+  expect(expectData(result).zone).toBe("warpgogol.com");
+  expect(expectData(result).subdomains).toHaveLength(2);
 
-  const matomo = result.data!.subdomains.find((s) => s.domain === "matomo-proxy.warpgogol.com");
+  const matomo = expectData(result).subdomains.find(
+    (s) => s.domain === "matomo-proxy.warpgogol.com",
+  );
   expect(matomo).toBeDefined();
   expect(matomo!.dnsRecord.exists).toBe(true);
   expect(matomo!.workersRoute.exists).toBe(true);
   expect(matomo!.workersRoute.script).toBe("matomo-proxy");
 
-  const dev = result.data!.subdomains.find((s) => s.domain === "dev.warpgogol.com");
+  const dev = expectData(result).subdomains.find((s) => s.domain === "dev.warpgogol.com");
   expect(dev).toBeDefined();
   expect(dev!.dnsRecord.exists).toBe(true);
   expect(dev!.workersRoute.exists).toBe(false);
@@ -149,10 +152,10 @@ test("includes routes without DNS records", async () => {
 
   const result = await runSubdomainList(makeInput({ zone: "warpgogol.com" }), makeContext(tmpDir));
 
-  expect(result.data!.subdomains).toHaveLength(1);
-  expect(result.data!.subdomains[0].domain).toBe("orphan.warpgogol.com");
-  expect(result.data!.subdomains[0].dnsRecord.exists).toBe(false);
-  expect(result.data!.subdomains[0].workersRoute.exists).toBe(true);
+  expect(expectData(result).subdomains).toHaveLength(1);
+  expect(expectData(result).subdomains[0].domain).toBe("orphan.warpgogol.com");
+  expect(expectData(result).subdomains[0].dnsRecord.exists).toBe(false);
+  expect(expectData(result).subdomains[0].workersRoute.exists).toBe(true);
 });
 
 test("returns empty list for zone with no records", async () => {
@@ -165,7 +168,7 @@ test("returns empty list for zone with no records", async () => {
 
   const result = await runSubdomainList(makeInput({ zone: "warpgogol.com" }), makeContext(tmpDir));
 
-  expect(result.data!.subdomains).toHaveLength(0);
+  expect(expectData(result).subdomains).toHaveLength(0);
 });
 
 test("errors when CLOUDFLARE_API_TOKEN is missing", async () => {

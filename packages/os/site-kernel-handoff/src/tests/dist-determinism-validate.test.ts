@@ -26,6 +26,7 @@ vi.mock("../mission/mission-io.ts", () => ({
 }));
 
 import { runDistDeterminismValidate } from "../release/release-commands.ts";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let tmpDir: string;
 
@@ -72,7 +73,7 @@ describe("dist.determinism.validate with --release", () => {
       makeContext(tmpDir),
     );
     expect(result.exitCode).toBe(1);
-    expect(result.data!.totalFiles).toBe(0);
+    expect(expectData(result).totalFiles).toBe(0);
   });
 
   it("detects deterministic files (all match)", async () => {
@@ -86,9 +87,9 @@ describe("dist.determinism.validate with --release", () => {
       makeContext(tmpDir),
     );
 
-    expect(result.data!.hashesMatch).toBe(true);
-    expect(result.data!.nonDeterministicFiles).toHaveLength(0);
-    expect(result.data!.totalFiles).toBe(2);
+    expect(expectData(result).hashesMatch).toBe(true);
+    expect(expectData(result).nonDeterministicFiles).toHaveLength(0);
+    expect(expectData(result).totalFiles).toBe(2);
     expect(result.exitCode).toBeUndefined();
   });
 
@@ -105,9 +106,9 @@ describe("dist.determinism.validate with --release", () => {
       makeContext(tmpDir),
     );
 
-    expect(result.data!.hashesMatch).toBe(false);
-    expect(result.data!.nonDeterministicFiles.length).toBeGreaterThan(0);
-    expect(result.data!.nonDeterministicFiles[0]!.normalizer).toBe("json-stable");
+    expect(expectData(result).hashesMatch).toBe(false);
+    expect(expectData(result).nonDeterministicFiles.length).toBeGreaterThan(0);
+    expect(expectData(result).nonDeterministicFiles[0]!.normalizer).toBe("json-stable");
     expect(result.exitCode).toBe(1);
   });
 });
@@ -119,7 +120,7 @@ describe("dist.determinism.validate with --mission", () => {
       makeContext(tmpDir),
     );
     expect(result.exitCode).toBe(1);
-    expect(result.data!.totalFiles).toBe(0);
+    expect(expectData(result).totalFiles).toBe(0);
   });
 
   it("validates workpiece dist when it exists", async () => {
@@ -132,9 +133,9 @@ describe("dist.determinism.validate with --mission", () => {
       makeContext(tmpDir),
     );
 
-    expect(result.data!.distPath).toContain("workpiece");
-    expect(result.data!.totalFiles).toBe(1);
-    expect(result.data!.hashesMatch).toBe(true);
+    expect(expectData(result).distPath).toContain("workpiece");
+    expect(expectData(result).totalFiles).toBe(1);
+    expect(expectData(result).hashesMatch).toBe(true);
   });
 
   it("falls back to distribution dist when workpiece dist does not exist", async () => {
@@ -147,7 +148,7 @@ describe("dist.determinism.validate with --mission", () => {
       makeContext(tmpDir),
     );
 
-    expect(result.data!.distPath).toContain("distribution");
-    expect(result.data!.totalFiles).toBe(1);
+    expect(expectData(result).distPath).toContain("distribution");
+    expect(expectData(result).totalFiles).toBe(1);
   });
 });

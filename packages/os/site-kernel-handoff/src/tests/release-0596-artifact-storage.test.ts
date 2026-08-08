@@ -22,6 +22,7 @@ import { join } from "node:path";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import { runReleaseReady, runReleaseValidate } from "../release/release-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 function makeContext(workspaceRoot: string): KernelRuntimeContext {
   return {
@@ -212,10 +213,10 @@ test("release.ready stores artifact before state transition", async () => {
 
   const result = await runReleaseReady(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  expect(result.data!.state).toBe("ready");
-  expect(result.data!.artifactUri).not.toBeNull();
-  expect(result.data!.distArtifactHash).not.toBeNull();
-  expect(result.data!.distArtifactHash).toMatch(/^sha256:/);
+  expect(expectData(result).state).toBe("ready");
+  expect(expectData(result).artifactUri).not.toBeNull();
+  expect(expectData(result).distArtifactHash).not.toBeNull();
+  expect(expectData(result).distArtifactHash).toMatch(/^sha256:/);
 
   // Verify release.yaml has artifact and distArtifactHash set AND state: ready
   const manifest = readReleaseManifestFile(tmpDir, releaseId);
@@ -251,8 +252,8 @@ test("release.ready output includes distArtifactHash field", async () => {
   const result = await runReleaseReady(makeInput({ release: releaseId }), makeContext(tmpDir));
 
   expect(result.data).toHaveProperty("distArtifactHash");
-  expect(result.data!.distArtifactHash).not.toBeNull();
-  expect(result.data!.distArtifactHash).toMatch(/^sha256:/);
+  expect(expectData(result).distArtifactHash).not.toBeNull();
+  expect(expectData(result).distArtifactHash).toMatch(/^sha256:/);
 });
 
 test("release.ready fails on missing dist — state remains prepared", async () => {
@@ -298,8 +299,8 @@ test("release.validate flags ready release without artifact", async () => {
 
   const result = await runReleaseValidate(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  expect(result.data!.state).toBe("ready");
-  expect(result.data!.artifactPresent).toBe(false);
+  expect(expectData(result).state).toBe("ready");
+  expect(expectData(result).artifactPresent).toBe(false);
 });
 
 test("release.validate passes ready release with artifact", async () => {
@@ -318,6 +319,6 @@ test("release.validate passes ready release with artifact", async () => {
 
   const result = await runReleaseValidate(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  expect(result.data!.state).toBe("ready");
-  expect(result.data!.artifactPresent).toBe(true);
+  expect(expectData(result).state).toBe("ready");
+  expect(expectData(result).artifactPresent).toBe(true);
 });

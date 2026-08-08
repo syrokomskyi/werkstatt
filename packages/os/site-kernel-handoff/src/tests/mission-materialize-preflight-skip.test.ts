@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { createMaterializeWorkspace, gitHead } from "./helpers/materialize-fixture.ts";
+import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 const mockPipeline = vi.hoisted(() => ({
   pipelineResult: {
@@ -111,9 +112,9 @@ test("preflight is skipped when state file HEAD matches cache clone HEAD", async
 
   const result = await runMissionMaterialize(input, context);
 
-  expect(result.data!.preflightSkipped).toBe(true);
-  expect(result.data!.preflightSkipReason).toBe("cache-clone-head-unchanged");
-  expect(result.data!.pipelineUsed).toBe("build.prepare.dev");
+  expect(expectData(result).preflightSkipped).toBe(true);
+  expect(expectData(result).preflightSkipReason).toBe("cache-clone-head-unchanged");
+  expect(expectData(result).pipelineUsed).toBe("build.prepare.dev");
   expect(mockPipeline.pipelineNameUsed).toBe("build.prepare.dev");
 });
 
@@ -132,8 +133,8 @@ test("preflight runs normally when state file is missing", async () => {
 
   const result = await runMissionMaterialize(input, context);
 
-  expect(result.data!.preflightSkipped).toBe(false);
-  expect(result.data!.preflightSkipReason).toBe(null);
+  expect(expectData(result).preflightSkipped).toBe(false);
+  expect(expectData(result).preflightSkipReason).toBe(null);
 });
 
 test("preflight runs normally when state file HEAD does not match", async () => {
@@ -166,8 +167,8 @@ test("preflight runs normally when state file HEAD does not match", async () => 
 
   const result = await runMissionMaterialize(input, context);
 
-  expect(result.data!.preflightSkipped).toBe(false);
-  expect(result.data!.preflightSkipReason).toBe(null);
+  expect(expectData(result).preflightSkipped).toBe(false);
+  expect(expectData(result).preflightSkipReason).toBe(null);
 });
 
 test("preflight runs normally when state file is corrupt", async () => {
@@ -188,8 +189,8 @@ test("preflight runs normally when state file is corrupt", async () => {
 
   const result = await runMissionMaterialize(input, context);
 
-  expect(result.data!.preflightSkipped).toBe(false);
-  expect(result.data!.preflightSkipReason).toBe(null);
+  expect(expectData(result).preflightSkipped).toBe(false);
+  expect(expectData(result).preflightSkipReason).toBe(null);
 });
 
 test("--skip-preflight flag takes precedence over state file and does not consult it", async () => {
@@ -223,6 +224,6 @@ test("--skip-preflight flag takes precedence over state file and does not consul
 
   const result = await runMissionMaterialize(input, context);
 
-  expect(result.data!.preflightSkipped).toBe(true);
-  expect(result.data!.preflightSkipReason).toBe("operator-override");
+  expect(expectData(result).preflightSkipped).toBe(true);
+  expect(expectData(result).preflightSkipReason).toBe("operator-override");
 });
