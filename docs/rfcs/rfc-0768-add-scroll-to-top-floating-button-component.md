@@ -265,17 +265,17 @@ This RFC does not introduce, change, or remove any Site OS commands. The compone
 
 ## Acceptance criteria
 
-- [ ] `scroll-to-top` added to `ComponentRoleValues` in `packages/ontology/src/enums.ts` (evidence: `packages/ontology/src/enums.ts:NNN`)
-- [ ] Archetype YAML created at `packages/ontology/archetypes/components/scroll-to-top.yaml` with `acceptedCosmicNames: [Daphnis]` (evidence: file exists, `archetype.registry.build` exit 0)
-- [ ] Mirror Quintet component created at `packages/ui/src/components/scroll-to-top/` with all 5 files (evidence: `manifest.contract.validate` exit 0)
-- [ ] Component manifest has `cosmicName: Daphnis`, `role: scroll-to-top`, `archetype: scroll-to-top` (evidence: `scroll-to-top-component.manifest.yaml`)
-- [ ] `layout-component.astro` imports and renders `<ScrollToTop>` after `<slot />` (evidence: `packages/ui/src/components/layout/layout-component.astro:NNN`)
-- [ ] Client script uses `window.wgLenis` with native `scrollTo` fallback and respects `prefers-reduced-motion` (evidence: `scroll-to-top-component.client.ts:NNN`)
-- [ ] CSS uses only `--ds-*` tokens, no raw hex/rgb (evidence: `tokens.ds.lint` exit 0, `tokens.colors.lint` exit 0)
-- [ ] `@media print` hides the button (evidence: `scroll-to-top-component.css` contains `@media print` rule)
-- [ ] Button appears only after `window.scrollY > window.innerHeight` (evidence: `scroll-to-top-component.client.ts` scroll threshold check)
-- [ ] `archetype.registry.build` passes and registers the new archetype (evidence: command exit 0)
-- [ ] `rfc.validate --id RFC-0768` passes with zero errors (evidence: command exit 0)
+- [x] `scroll-to-top` added to `ComponentRoleValues` in `packages/ontology/src/enums.ts` (evidence: `packages/ontology/src/enums.ts:112`)
+- [x] Archetype YAML created at `packages/ontology/archetypes/components/scroll-to-top.yaml` with `acceptedCosmicNames: [Daphnis]` (evidence: file exists, `archetype.registry.build` exit 0 — 61 entries written)
+- [x] Mirror Quintet component created at `packages/ui/src/components/scroll-to-top/` with all 5 files (evidence: `manifest.contract.validate` exit 0 — 86 manifests valid)
+- [x] Component manifest has `cosmicName: Daphnis`, `role: scroll-to-top`, `archetype: scroll-to-top` (evidence: `packages/ui/src/components/scroll-to-top/scroll-to-top-component.manifest.yaml:7-9`)
+- [x] `layout-component.astro` imports and renders `<ScrollToTop>` after `<slot />` (evidence: `packages/ui/src/components/layout/layout-component.astro:30,228`)
+- [x] Client script uses `window.wgLenis` with native `scrollTo` fallback and respects `prefers-reduced-motion` (evidence: `packages/ui/src/components/scroll-to-top/scroll-to-top-component.client.ts:38-44,22`)
+- [x] CSS uses only `--ds-*` tokens, no raw hex/rgb (evidence: `tokens.ds.lint` exit 0, `tokens.colors.lint` exit 0)
+- [x] `@media print` hides the button (evidence: `packages/ui/src/components/scroll-to-top/scroll-to-top-component.css:48-50`)
+- [x] Button appears only after `window.scrollY > window.innerHeight` (evidence: `packages/ui/src/components/scroll-to-top/scroll-to-top-component.client.ts:29`)
+- [x] `archetype.registry.build` passes and registers the new archetype (evidence: command exit 0 — 61 entries, 73 planetImportPaths)
+- [x] `rfc.validate --id RFC-0768` passes with zero errors (evidence: command exit 0, V-30 warning is documented false positive)
 
 ## Implementation notes for agents
 
