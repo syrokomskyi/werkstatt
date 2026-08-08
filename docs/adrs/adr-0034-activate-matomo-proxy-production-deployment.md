@@ -1,7 +1,7 @@
 ---
 id: ADR-0034
 title: "Activate matomo-proxy as shared multi-tenant Worker for analytics"
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-08
@@ -14,7 +14,8 @@ related:
   - RFC-0305
   - RFC-0751
   - RFC-0752
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0034: Activate matomo-proxy as shared multi-tenant Worker for analytics
