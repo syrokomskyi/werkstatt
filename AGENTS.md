@@ -150,6 +150,10 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - **RFC-to-code consistency MUST be verified when transitioning to `implemented`.** Before stamping `implemented`, the agent opens every file referenced in the RFC and confirms that: (1) evidence line numbers in acceptance criteria point to the actual implementation being verified, not nearby unrelated code; (2) TypeScript contracts and JSON output examples use field names and types from the real interface, not invented ones; (3) file paths in the Design section match actual files on disk. The RFC describes the code — the code is the source of truth, not the RFC.
 - **Deferred or future-phase criteria MUST NOT stay in the Acceptance criteria section.** `rfc.implement.stamp` (RFC-IMP-02) blocks stamping if any `[ ]` unchecked criteria remain. Move Phase 2 / deferred / external-package-blocked criteria to a separate "Future work" or "Phase 2" section outside the Acceptance criteria block. Only criteria that are actually met with evidence belong in Acceptance criteria.
 
+## ADR validation conventions
+
+- **`adr.validate` enforces AV-12: `## Justification` is a required markdown section.** The ADR template (`adr-0000-template.md`) includes it, but hand-written ADRs sometimes omit it. Always run `adr.validate --id ADR-XXXX` after creating or transitioning an ADR and add any missing required sections before proceeding.
+
 ## Operator preferences (RFC-0370)
 
 Before starting an interactive skill, read `PREFERENCES.md` at the repository root. If it is missing, ask the operator for the relevant language preference and create it using the `my-preferences` skill.
