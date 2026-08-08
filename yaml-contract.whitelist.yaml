@@ -39,8 +39,6 @@ windsurf:
   - ".windsurf/*.json"
 changelogSystem:
   - ".changelog-system/*.json"
-opencode:
-  - opencode.json
 integrity:
   - "apps/*/.integrity/**/*.json"
 fingerprint:
