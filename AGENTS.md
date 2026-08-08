@@ -596,6 +596,20 @@ Content origin and asset origin are reachable only through `@warpgogol/content-s
 - **`system.md` stays engineering-owned** and is never served by a provider (`ContentDomain` excludes it).
 - `content.source.parity` is the migration guard: the fs adapter's enumeration must match the on-disk content inventory.
 
+## Content syntax reference
+
+Three string-embedding mechanisms operate at different pipeline layers. Agents MUST use the correct one for each context.
+
+1. **Content references** — `collection.file.field` (pure) or `=(collection.file.field)` (in mixed strings). Resolved by `@warpgogol/share` before the component renders. Returns a string. Use for business data (email, address, legal name) and structured props (amount, currency, recurrence). See RFC-0529, RFC-0723.
+
+2. **Formula expressions** — `=(ref + ref * 2 | money currency=EUR)`. Resolved by `@warpgogol/share/formula-eval` before the component renders. Returns a formatted string. Use for numeric arithmetic over content references. See RFC-0570.
+
+3. **Price markers** — `{price:offering-id:chargeRef}`. Parsed by `packages/ui/src/utils/price-marker.ts` during component render. Returns a `CurrencyAwarePriceDisplay` component with multi-currency variants. Use for inline currency-aware prices in component text. See RFC-0743, ADR-0033.
+
+**`{price:...}` is NOT a content reference.** RFC-0529 removed brace-delimited content references (`{collection.file.field}`). Price markers are a separate component-level namespace. Do not migrate `{price:...}` to `=(...)` — this breaks currency switching.
+
+**`=(...)` cannot create interactive components.** It returns a plain string. If you need currency-aware price display, use `{price:...}` markers.
+
 ## Content references in mixed strings (RFC-0723)
 
 Content references inside mixed strings MUST use `=(ref)` formula syntax. A bare braceless reference (e.g. `business-profile.offerings/digital-foundation.presentation.price.monthly`) inside a mixed string (e.g. `"Ab business-profile.offerings/..."`) is prohibited — `content.references.validate` emits REF-04. Use `=(business-profile.offerings/...)` to explicitly mark it as a reference. Pure refs (where the entire field value is just the reference, with no surrounding text) remain valid without `=(...)`. This rule is non-negotiable for all AI agents.
