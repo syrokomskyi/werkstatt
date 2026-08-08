@@ -92,6 +92,11 @@ function resolvePreviewImage(domain: MaterialTargetDomain, id: string): ImageDes
       if (mod?.default) return mod.default;
     }
   }
+  for (const ext of IMAGE_EXTENSIONS) {
+    const key = `/src/content/${domain}/assets/${id}.${ext}`;
+    const mod = contentAssetImages[key];
+    if (mod?.default) return mod.default;
+  }
   return null;
 }
 
@@ -102,6 +107,11 @@ function resolvePreviewVideo(domain: MaterialTargetDomain, id: string): string |
       const url = contentAssetVideos[key];
       if (url) return url;
     }
+  }
+  for (const ext of VIDEO_EXTENSIONS) {
+    const key = `/src/content/${domain}/assets/${id}.${ext}`;
+    const url = contentAssetVideos[key];
+    if (url) return url;
   }
   return null;
 }
@@ -229,7 +239,7 @@ const galleryCards = selectLocalizedRecords(parseMaterialCreditMap(contentAssetC
         level={1}
         hideSectionNumber={true}
         id="credits-gallery-title"
-      lang={lang}
+        lang={lang}
       />
     )
   }
