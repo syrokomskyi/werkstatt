@@ -1,12 +1,13 @@
 ---
 id: RFC-0763
 title: "Auto-commit stale bordbuch projections in cache clone during mission.validate"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
 enhancedAt: 2026-08-08
