@@ -55,10 +55,6 @@ function evaluateRule(rule: ChecklistRuleType, message: string, item: ChecklistI
   }
 }
 
-function hasContactDetails(message: string): boolean {
-  return EMAIL_EXTRACT_REGEX.test(message) || PHONE_EXTRACT_REGEX.test(message);
-}
-
 function orEmpty(v: string | undefined): string {
   return v ?? "";
 }
@@ -173,9 +169,14 @@ function updateChecklist(
   message: string,
   checklistItems: ChecklistItem[],
   checklistLabels: { readyLabel: string; title: string },
-): { allOk: boolean; firstFailingItem: HTMLElement | null } {
+): {
+  allOk: boolean;
+  firstFailingItem: HTMLElement | null;
+  firstFailingRule: ChecklistRuleType | null;
+} {
   const els = getChecklistElements(form);
   let firstFailingItem: HTMLElement | null = null;
+  let firstFailingRule: ChecklistRuleType | null = null;
   let allOk = true;
 
   for (const item of checklistItems) {
@@ -185,7 +186,10 @@ function updateChecklist(
     updateItemText(form, item, message);
     if (!checked) {
       allOk = false;
-      if (!firstFailingItem) firstFailingItem = itemEl;
+      if (!firstFailingItem) {
+        firstFailingItem = itemEl;
+        firstFailingRule = item.rule;
+      }
     }
   }
 
@@ -203,7 +207,7 @@ function updateChecklist(
     playChecklistIcon(els.iconReady);
   }
 
-  return { allOk, firstFailingItem };
+  return { allOk, firstFailingItem, firstFailingRule };
 }
 
 function bindForm(root: HTMLElement): void {
@@ -230,7 +234,6 @@ function bindForm(root: HTMLElement): void {
   const defaultLabel = button.dataset.defaultLabel ?? button.textContent ?? "";
   const successMessage = form.dataset.successMessage;
   const errorMessage = form.dataset.errorMessage;
-  const minMessageLength = Number(form.dataset.minMessageLength ?? "0");
   const fallbackEmail = form.dataset.fallbackEmail ?? "";
   const contactRequirementMessage = form.dataset.contactRequirementMessage;
   const referrerFieldEnabled = form.dataset.referrerFieldEnabled === "true";
@@ -270,7 +273,7 @@ function bindForm(root: HTMLElement): void {
     const message = textarea.value.trim();
     const referrer = referrerInput?.value.trim() ?? "";
 
-    const { allOk, firstFailingItem } = updateChecklist(
+    const { allOk, firstFailingItem, firstFailingRule } = updateChecklist(
       form,
       message,
       checklistItems,
@@ -278,11 +281,8 @@ function bindForm(root: HTMLElement): void {
     );
 
     if (!allOk) {
-      const firstItem = checklistItems.find((item) => !evaluateRule(item.rule, message, item));
-      if (firstItem && firstItem.rule === "min-length") {
+      if (firstFailingRule === "min-length") {
         setStatus(statusEl, "error", emptyMessage, "");
-      } else if (firstItem && firstItem.rule === "contact-details") {
-        setStatus(statusEl, "error", contactRequirementMessage, "");
       } else {
         setStatus(statusEl, "error", contactRequirementMessage, "");
       }

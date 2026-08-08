@@ -128,7 +128,6 @@ const hasChecklist = checklistItems.length > 0;
       data-sending-label={resolveLabel("sendingLabel", "")}
       data-success-message={resolveLabel("successMessage", "")}
       data-error-message={resolveLabel("errorMessage", "")}
-      data-min-message-length={String(props.minMessageLength ?? 12)}
       data-fallback-email={fallbackEmail}
       data-fallback-email-label={resolveLabel("fallbackEmailLabel", "")}
       data-fallback-body-label={resolveLabel("fallbackBodyLabel", "")}
@@ -140,8 +139,6 @@ const hasChecklist = checklistItems.length > 0;
       data-referrer-field-placeholder={resolveLabel("referrerFieldPlaceholder", "")}
       data-checklist-title={resolveLabel("checklistTitle", "")}
       data-checklist-ready-label={resolveLabel("checklistReadyLabel", "")}
-      data-checklist-length-label={resolveLabel("checklistLengthLabel", "")}
-      data-checklist-contact-label={resolveLabel("checklistContactLabel", "")}
       data-checklist-items={hasChecklist ? JSON.stringify(checklistItems) : ""}
     >
       {
