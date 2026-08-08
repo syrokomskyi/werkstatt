@@ -7,4 +7,5 @@ usesBrowserAutomation: false
 upstreams:
   - matomo-cloud
 routes:
-  - /_wg/analytics/*
+  - /_wg/analytics/*/matomo.js
+  - /_wg/analytics/*/matomo.php

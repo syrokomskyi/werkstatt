@@ -12,6 +12,7 @@
   <item>Architecture review: narrow module interface — mapProxyPath, buildForwardHeaders, and UpstreamTarget are now private. proxyMatomoRequest is the sole export.</item>
   <item>Architecture review: collapse dead header denylist — allowlist already excludes everything except accept, accept-language, content-type. Removed the denylist set, cf-* and x-* prefix checks, and the drop: marker comment.</item>
   <item>RFC-0751: Multi-tenant path-based routing — extract appId from path, look up upstream in UPSTREAMS, forward to per-site Matomo Cloud host.</item>
+  <item>ADR-0034: Activate matomo-proxy as shared multi-tenant Worker — path-based routing with bundled upstream registry, no env-based config, no origin validation.</item>
 </CHANGE_SUMMARY>
 */
 
