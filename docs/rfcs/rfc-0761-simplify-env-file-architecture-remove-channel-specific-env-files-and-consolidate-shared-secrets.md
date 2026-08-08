@@ -40,6 +40,10 @@ commands:
     - deploy.scripts.validate
     - env.contract.validate
     - env.example.generate
+    - leitstand.dev-deploy
+    - leitstand.propagate
+    - leitstand.promote
+    - leitstand.rollback
   removed:
     - env.main.check
     - env.alt.check
@@ -125,7 +129,7 @@ Root `.env.example` is updated to include `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOG
 
 ### Rule 3 — Site .env.example excludes shared secrets
 
-The `env.example.generate` command no longer includes `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, or `CLOUDFLARE_READONLY_API_TOKEN` in the site `.env.example` template. These are shared secrets from root `.env`.
+The `env.example.generate` command no longer includes `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID` in the site `.env.example` template. These are shared secrets from root `.env`.
 
 Site `.env.example` retains `CLOUDFLARE_ZONE_ID` (site-specific) and `CLOUDFLARE_READONLY_API_TOKEN` (optional, for client sites on different Cloudflare accounts that need a read-only validation token).
 
@@ -290,14 +294,15 @@ function resolveConventionSecretsPath(basePath: string): string | undefined {
 12. Update `package.template.json` in `site-kernel-onboarding`: `deploy:main` and `deploy:alt` use `--secrets-file .env`.
 13. Delete root `.env.secrets-main` and `.env.secrets-alt` (local filesystem operation — these files are gitignored).
 14. Delete all `.env.main` and `.env.alt` files in workpieces and releases (local filesystem operation — these files are gitignored and cannot be deleted via a git commit).
+15. Update `DNA-40` in `docs/architecture-dna.md`: remove `.env.main` / `.env.alt` mandate, `env.main.check` / `env.alt.check` references. Add `WARPGOGOL_OTLP_*` to root env scope.
+16. Update `RFC-0388` frontmatter: add `RFC-0761` to `amendedBy` array.
+17. Update root `AGENTS.md` line 226: remove `.env.main`, `.env.alt` from the env-and-deploy contract summary.
+18. Update `services/AGENTS.md` env-and-deploy contract section.
+19. Update `HOW_TO_OBTAIN` map in `env-example.ts`: remove `WARPGOGOL_OTLP_*` entries (now in root only).
+20. Update existing `systems/*/package.json` deploy scripts: `--secrets-file .env.main` → `--secrets-file .env`, `--secrets-file .env.alt` → `--secrets-file .env`.
+21. Update existing leitstand tests: remove channel parameter from `resolveConventionSecretsPath` calls, update `convention-env-exists` preflight check assertions.
 
 **Implementation order:** Steps 6-7 (`deploy.preflight` and `deploy.scripts.validate`) MUST be implemented simultaneously — updating one without the other breaks validation for existing deploy scripts. Steps 12 and 18 (package template and existing `systems/*/package.json` deploy scripts) should follow immediately after.
-
-15. Update `DNA-40` in `docs/architecture-dna.md`: remove `.env.main` / `.env.alt` mandate, `env.main.check` / `env.alt.check` references. Add `WARPGOGOL_OTLP_*` to root env scope.
-16. Update root `AGENTS.md` line 226: remove `.env.main`, `.env.alt` from the env-and-deploy contract summary.
-17. Update `services/AGENTS.md` env-and-deploy contract section.
-18. Update `HOW_TO_OBTAIN` map in `env-example.ts`: remove `WARPGOGOL_OTLP_*` entries (now in root only).
-19. Update existing `systems/*/package.json` deploy scripts: `--secrets-file .env.main` → `--secrets-file .env`, `--secrets-file .env.alt` → `--secrets-file .env`.
 
 ### Phase 2 — Pipeline integration
 
@@ -327,13 +332,13 @@ function resolveConventionSecretsPath(basePath: string): string | undefined {
 
 ## Risks
 
-- **Channel-specific deploy secrets are no longer possible.** If a future site needs different secrets for main vs alt channels, the operator cannot use `.env.main` / `.env.alt`. Mitigation: shell environment variables can override before deploy, or a new RFC can introduce an override mechanism. Low risk — no current site needs this.
+- **Channel-specific deploy secrets are no longer possible.** If a future site needs different secrets for main vs alt channels, the operator cannot use `.env.main` / `.env.alt`. Mitigation: shell environment variables can override before deploy, or a new RFC can introduce an override mechanism. Low risk — zero current sites have different values in `.env.main` vs `.env.alt`; all were empty copies of `.env.example`.
+
+- **Root `.env` becomes the single point of failure for shared secrets.** If root `.env` is missing or has wrong values, all sites and services are affected. This is not a regression — `.env.main` / `.env.alt` were never filled with different values; they were always empty copies of `.env.example`, and real secrets came from root `.env` via `process.env`. Mitigation: root `.env.example` documents all variables with `# How to obtain:` instructions. `env.local.check` creates root `.env` from `.env.example` if missing.
 
 - **Operators must update deploy scripts.** `deploy:main` and `deploy:alt` scripts in `systems/*/package.json` change from `--secrets-file .env.main` / `--secrets-file .env.alt` to `--secrets-file .env`. This is a one-time update during implementation. `deploy.scripts.validate` enforces the new shape.
 
 - **`deploy.preflight` API change.** The `--env` flag is removed for sites. Any scripts or agents that pass `--env main` or `--env alt` will fail. Mitigation: the flag is removed entirely (not just ignored), so the failure is immediate and clear.
-
-- **Root `.env` becomes the single point of failure for shared secrets.** If root `.env` is missing or has wrong values, all sites and services are affected. Mitigation: root `.env.example` documents all variables with `# How to obtain:` instructions. `env.local.check` creates root `.env` from `.env.example` if missing.
 
 ## Acceptance criteria
 
