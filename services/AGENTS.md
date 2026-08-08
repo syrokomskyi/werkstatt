@@ -14,7 +14,7 @@ Rules:
 - Add reusable runtime contracts to packages before using them from a service.
 - **Test temp directories:** Unit tests that create temp directories (via `mkdtemp`/`mkdtempSync`) MUST use the `tmp-*` naming pattern (e.g. `tmp-runner-XXXX-`). These directories are gitignored via `tmp-*/` in `.gitignore`. Agents MUST clean up `tmp-*` directories they create during a session — the session-end workflow automates this, but agents should also clean up manually if a session is not formally closed.
 
-## Env-and-deploy contract (RFC-0388 / DNA-40)
+## Env-and-deploy contract (RFC-0761 / DNA-40)
 
 Every `services/*` project that reads environment variables from `process.env`, a `getEnv()` helper, or a Cloudflare Worker `Env` interface MUST ship a `.env.example` file in its project root.
 
