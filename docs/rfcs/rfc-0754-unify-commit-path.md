@@ -221,20 +221,20 @@ The split is performed via `git reset HEAD -- <non-platform-files>` + `git add <
 
 ## Acceptance criteria
 
-- [ ] `ecosystem.commit` handles platform-scope-only commits with version bump (existing behavior preserved)
-- [ ] `ecosystem.commit` handles non-platform-scope-only commits without version bump (new fallback)
-- [ ] `ecosystem.commit` handles mixed-scope commits by splitting into two sequential commits
-- [ ] RFC-0704 `skipPlatformBump` path is preserved — `.md`-only and `independentVersionPackages` files in platform scope still skip the bump
-- [ ] `--rfc` trailer is attached to the platform commit only in mixed-scope commits
-- [ ] `--bump` override applies to the platform commit only in mixed-scope commits
-- [ ] `--amend` amends the platform commit; errors if no platform files are staged
-- [ ] `--dry-run` reports what would happen for each scope
-- [ ] `--json` output includes `nonPlatformCommit` field when mixed-scope split occurs
-- [ ] Direct `git commit` guard for platform-scope files remains functional (hooks/pre-commit unchanged)
-- [ ] Root `AGENTS.md` updated to direct agents to always use `ecosystem.commit`
-- [ ] Unit tests cover all three scope scenarios (platform-only, non-platform-only, mixed-scope)
-- [ ] Unit tests verify `skipPlatformBump` is still applied within the platform subset
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `ecosystem.commit` handles platform-scope-only commits with version bump (existing behavior preserved) (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:488-748, test 'actual commit bumps version and writes trailers')
+- [x] `ecosystem.commit` handles non-platform-scope-only commits without version bump (new fallback) (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:327-374, test 'RFC-0754: non-platform-only commit succeeds without version bump')
+- [x] `ecosystem.commit` handles mixed-scope commits by splitting into two sequential commits (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:377-386,691-729, test 'RFC-0754: mixed-scope commit splits into two commits')
+- [x] RFC-0704 `skipPlatformBump` path is preserved — `.md`-only and `independentVersionPackages` files in platform scope still skip the bump (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:285-300,385-486, test 'RFC-0754: skipPlatformBump preserved — .md files in packages/ still skip bump in mixed-scope')
+- [x] `--rfc` trailer is attached to the platform commit only in mixed-scope commits (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:616-618, test 'RFC-0754: --rfc trailer on platform commit only in mixed-scope')
+- [x] `--bump` override applies to the platform commit only in mixed-scope commits (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:488-501, non-platform commit at 691-729 uses plain message without bump)
+- [x] `--amend` amends the platform commit; errors if no platform files are staged (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:276-283 EC-11, test 'RFC-0754: EC-11 --amend with non-platform only → error')
+- [x] `--dry-run` reports what would happen for each scope (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:329-346,387-413,627-661, tests 'RFC-0754: non-platform-only commit succeeds without version bump (dry-run)' and 'RFC-0754: mixed-scope commit splits into two commits (dry-run)')
+- [x] `--json` output includes `nonPlatformCommit` field when mixed-scope split occurs (evidence: packages/os/site-kernel-checks/src/ecosystem-commit.ts:74-77,743, test 'RFC-0754: mixed-scope commit splits into two commits (actual)' verifies nonPlatformCommit.sha and .files)
+- [x] Direct `git commit` guard for platform-scope files remains functional (hooks/pre-commit unchanged) (evidence: hooks/pre-commit:10-20, ECOSYSTEM_COMMIT env var bypass preserved)
+- [x] Root `AGENTS.md` updated to direct agents to always use `ecosystem.commit` (evidence: AGENTS.md:108-113, 'Agents MUST use ecosystem.commit for all commits')
+- [x] Unit tests cover all three scope scenarios (platform-only, non-platform-only, mixed-scope) (evidence: packages/os/site-kernel-checks/src/tests/ecosystem-commit.test.ts, tests 'actual commit bumps version and writes trailers', 'RFC-0754: non-platform-only commit succeeds without version bump', 'RFC-0754: mixed-scope commit splits into two commits')
+- [x] Unit tests verify `skipPlatformBump` is still applied within the platform subset (evidence: packages/os/site-kernel-checks/src/tests/ecosystem-commit.test.ts, test 'RFC-0754: skipPlatformBump preserved — .md files in packages/ still skip bump in mixed-scope')
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0754 --json → exitCode 0, zero errors)
 
 ## Implementation notes for agents
 
