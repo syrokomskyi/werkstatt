@@ -1,6 +1,6 @@
 schemaVersion: 1.0.0
 generatedAt: null
-totalCount: 83
+totalCount: 85
 entries:
   - id: brand-label-component
     uniName: brand-label-component
@@ -983,6 +983,26 @@ entries:
     siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/donation-use/donation-use-section.manifest.yaml
     astroFile: packages/ui/src/sections/donation-use/donation-use-section.astro
+  - id: dynamic-status-block-section
+    uniName: dynamic-status-block-section
+    layer: section
+    role: data-driven-status-indicator
+    semanticId: dynamic-status-block
+    version: 1.0.0
+    intent:
+      - build-trust
+      - establish-identity
+      - clarify-positioning
+    industryFit:
+      - trades-and-construction
+      - consulting-and-coaching
+      - legal-services
+      - non-profit
+    contentSchemaKey: dynamic-status-block-section
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.manifest.yaml
+    astroFile: packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.astro
   - id: faq-list-section
     uniName: faq-list-section
     layer: section
@@ -1207,7 +1227,7 @@ entries:
     layer: section
     role: lead-message-capture
     semanticId: send-message
-    version: 1.2.0
+    version: 1.3.0
     intent:
       - drive-contact
       - capture-lead
@@ -1218,6 +1238,25 @@ entries:
     siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/send-message/send-message-section.manifest.yaml
     astroFile: packages/ui/src/sections/send-message/send-message-section.astro
+  - id: service-metadata-block-section
+    uniName: service-metadata-block-section
+    layer: section
+    role: page-metadata-footer
+    semanticId: service-metadata-block
+    version: 1.0.0
+    intent:
+      - build-trust
+      - legal-clarity
+    industryFit:
+      - trades-and-construction
+      - consulting-and-coaching
+      - legal-services
+      - non-profit
+    contentSchemaKey: service-metadata-block-section
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/sections/service-metadata-block/service-metadata-block-section.manifest.yaml
+    astroFile: packages/ui/src/sections/service-metadata-block/service-metadata-block-section.astro
   - id: social-proof-section
     uniName: social-proof-section
     layer: section
