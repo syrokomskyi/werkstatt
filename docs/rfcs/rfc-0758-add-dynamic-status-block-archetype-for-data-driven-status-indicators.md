@@ -1,7 +1,7 @@
 ---
 id: RFC-0758
 title: "Add dynamic-status-block archetype for data-driven status indicators"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
 enhancedAt: 2026-08-08
-implementedAt:
+implementedAt: 2026-08-08
 closedAt:
 supersedes: []
 supersededBy:
