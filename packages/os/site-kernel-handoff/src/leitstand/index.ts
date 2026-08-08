@@ -11,6 +11,7 @@
   <item>RFC-0608: propagate always alt (removes --channel); add leitstand.promote for alt→main with build-identity verification; rollback transitions release state.</item>
   <item>RFC-0627: add leitstand.deploy for dev channel with Axiom gate; rollback auto-detects channel and auto-steps release state; status/health support dev channel.</item>
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; propagate gate checks published + commitSha + missionId; rollback auto-step removes dev-deployed.</item>
+  <item>RFC-0751: add leitstand.service.deploy for shared Cloudflare Worker services.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,6 +24,7 @@ import {
   runLeitstandRollback,
   runLeitstandHealth,
 } from "./leitstand-commands.ts";
+import { runLeitstandServiceDeploy } from "./service-deploy.ts";
 
 export {
   runLeitstandDevDeploy,
@@ -38,6 +40,7 @@ export {
   runLeitstandHealth,
   type LeitstandHealthData,
 } from "./leitstand-commands.ts";
+export { runLeitstandServiceDeploy, type ServiceDeployData } from "./service-deploy.ts";
 export type {
   DeploymentAdapter,
   CommandRunner,
@@ -168,6 +171,24 @@ export function createLeitstandModule(): KernelModule {
           },
         },
         execute: runLeitstandHealth,
+      });
+      registry.registerCommand({
+        name: "leitstand.service.deploy",
+        description:
+          "Deploy a shared Cloudflare Worker service with preflight, subdomain validation, wrangler deploy, and health check (RFC-0751). Flags: --service.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          service: {
+            kind: "string",
+            required: true,
+            description: "Service id from the services: key in systems/registry.yaml.",
+          },
+        },
+        writes: ["systems/registry.yaml"],
+        reads: ["systems/registry.yaml", "services/{service}/**"],
+        execute: runLeitstandServiceDeploy,
       });
     },
   };
