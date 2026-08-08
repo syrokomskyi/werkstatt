@@ -105,9 +105,9 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - **`actions/checkout@v5`** and **`actions/setup-node@v5`** — use the latest action versions with Node 24 runtime. Older versions (`@v4` and below) run on the deprecated Node 20 runtime.
 - **Windows CI** — only add Windows to the matrix where the product genuinely supports or ships Windows artifacts. If Windows is included, set `core.longpaths` via `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0` env **before** the checkout step. Do not pin to `windows-latest` — use a specific image version (e.g. `windows-2022`) if native compilation is critical.
 
-## Platform-scope commit discipline (RFC-0703)
+## Platform-scope commit discipline (RFC-0703, RFC-0754)
 
-- Agents MUST use `ecosystem.commit` for all changes to `packages/**`, `integrations/**`, `services/**`. Direct `git commit` for these paths is blocked by the pre-commit hook (`hooks/pre-commit`) and the CI gate (`platform.commit.discipline.validate`).
+- Agents MUST use `ecosystem.commit` for all commits. It auto-detects scope: platform-only commits get version bump + trailers, non-platform-only commits delegate to `git commit` without bump, mixed-scope commits split into two sequential commits (platform + non-platform). Direct `git commit` for `packages/**`, `integrations/**`, `services/**` is blocked by the pre-commit hook (`hooks/pre-commit`) and the CI gate (`platform.commit.discipline.validate`).
 - The pre-commit hook is activated via `git config core.hooksPath hooks` (one-time per clone). New clones need this activation.
 - `ecosystem.commit` sets `ECOSYSTEM_COMMIT=1` env var to bypass the hook — this is the only sanctioned bypass.
 - `mission.close` auto-pins the platform version by calling `sternsystem.pin` after successful close (RFC-0703).

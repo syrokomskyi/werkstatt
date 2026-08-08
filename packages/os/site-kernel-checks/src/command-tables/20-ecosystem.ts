@@ -16,6 +16,7 @@
   <item>RFC-0533: register ecosystem.commit command.</item>
   <item>RFC-0557: register template.imports.validate and workpiece.imports.validate.</item>
   <item>RFC-0703: register platform.commit.discipline.validate.</item>
+  <item>RFC-0754: update ecosystem.commit description for auto-detect and split-commit behavior.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -305,7 +306,7 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
   {
     name: "ecosystem.commit",
     description:
-      "Atomic version bump, semantic hash computation, and commit with trailers for platform-scope changes (RFC-0533). Replaces direct git commit for packages/**, integrations/**, services/**.",
+      "Auto-detects scope and commits with atomic version bump, semantic hash, and trailers for platform-scope changes (RFC-0533, RFC-0754). Non-platform-only commits delegate to git commit without bump. Mixed-scope commits split into platform + non-platform commits. Replaces direct git commit for packages/**, integrations/**, services/**.",
     scope: "workspace",
     flags: {
       message: {
