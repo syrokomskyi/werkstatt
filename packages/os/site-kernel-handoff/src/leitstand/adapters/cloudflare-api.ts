@@ -1,10 +1,10 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-RFC-0752: Cloudflare REST API client for DNS records and Workers routes.
-Provides typed functions for listing, creating, and verifying DNS CNAME records
-and Workers routes via the Cloudflare API. Separate from cloudflare-workers.ts
-(which wraps wrangler CLI) — this module uses the REST API directly.
+RFC-0752/RFC-0753: Cloudflare REST API client for DNS records and Workers routes.
+Provides typed functions for listing, creating, updating, deleting, and verifying
+DNS records and Workers routes via the Cloudflare API. Separate from
+cloudflare-workers.ts (which wraps wrangler CLI) — this module uses the REST API directly.
 </purpose>
 <non-goals>
   <item>Do not log, echo, or serialize secret values or resolved secrets-file contents.</item>
@@ -14,6 +14,7 @@ and Workers routes via the Cloudflare API. Separate from cloudflare-workers.ts
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0752: initial Cloudflare REST API client — listDnsRecords, createDnsRecord, listWorkersRoutes, createWorkersRoute.</item>
+  <item>RFC-0753: add pagination, retry, updateDnsRecord, deleteDnsRecord, generalized createDnsRecord for all record types.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,6 +26,7 @@ interface CloudflareDnsRecord {
   name: string;
   content: string;
   proxied: boolean;
+  priority: number | null;
 }
 
 interface CloudflareWorkersRoute {
@@ -38,6 +40,13 @@ interface CloudflareListResponse<T> {
   errors: { code: number; message: string }[];
   messages: { code: number; message: string }[];
   result: T[];
+  result_info?: {
+    page: number;
+    per_page: number;
+    total_pages: number;
+    count: number;
+    total_count: number;
+  };
 }
 
 interface CloudflareCreateResponse<T> {
@@ -54,46 +63,100 @@ function authHeaders(apiToken: string): Record<string, string> {
   };
 }
 
+const RETRYABLE_STATUSES = new Set([502, 503, 504, 522]);
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAYS_MS = [1000, 2000];
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url: string, init: RequestInit, label: string): Promise<Response> {
+  let lastError: Error | undefined;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(url, init);
+      if (response.ok || !RETRYABLE_STATUSES.has(response.status)) {
+        return response;
+      }
+      lastError = new Error(`[cloudflare-api] ${label} transient failure: HTTP ${response.status}`);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+    }
+    if (attempt < RETRY_DELAYS_MS.length) {
+      await sleep(RETRY_DELAYS_MS[attempt]);
+    }
+  }
+  throw lastError ?? new Error(`[cloudflare-api] ${label} exhausted retries`);
+}
+
 export async function listDnsRecords(
   zoneId: string,
   apiToken: string,
   name?: string,
 ): Promise<CloudflareDnsRecord[]> {
-  const url = new URL(`${CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`);
-  if (name) {
-    url.searchParams.set("name", name);
-  }
+  const allRecords: CloudflareDnsRecord[] = [];
+  let page = 1;
+  const perPage = 50;
 
-  const response = await fetch(url.toString(), {
-    headers: authHeaders(apiToken),
-  });
+  while (true) {
+    const url = new URL(`${CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`);
+    url.searchParams.set("per_page", String(perPage));
+    url.searchParams.set("page", String(page));
+    if (name) {
+      url.searchParams.set("name", name);
+    }
 
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => `HTTP ${response.status}`);
-    throw new Error(
-      `[cloudflare-api] listDnsRecords failed: HTTP ${response.status}: ${errorText}`,
+    const response = await fetchWithRetry(
+      url.toString(),
+      { headers: authHeaders(apiToken) },
+      "listDnsRecords",
     );
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => `HTTP ${response.status}`);
+      throw new Error(
+        `[cloudflare-api] listDnsRecords failed: HTTP ${response.status}: ${errorText}`,
+      );
+    }
+
+    const body = (await response.json()) as CloudflareListResponse<CloudflareDnsRecord>;
+    if (!body.success) {
+      const errorMessages = body.errors.map((e) => `${e.code}: ${e.message}`).join(", ");
+      throw new Error(`[cloudflare-api] listDnsRecords API errors: ${errorMessages}`);
+    }
+
+    allRecords.push(...body.result);
+
+    const totalPages = body.result_info?.total_pages ?? 1;
+    if (page >= totalPages) break;
+    page++;
   }
 
-  const body = (await response.json()) as CloudflareListResponse<CloudflareDnsRecord>;
-  if (!body.success) {
-    const errorMessages = body.errors.map((e) => `${e.code}: ${e.message}`).join(", ");
-    throw new Error(`[cloudflare-api] listDnsRecords API errors: ${errorMessages}`);
-  }
-
-  return body.result;
+  return allRecords;
 }
 
 export async function createDnsRecord(
   zoneId: string,
   apiToken: string,
-  record: { type: "CNAME"; name: string; content: string; proxied: boolean },
+  record: {
+    type: string;
+    name: string;
+    content: string;
+    proxied?: boolean;
+    priority?: number;
+    comment?: string;
+  },
 ): Promise<CloudflareDnsRecord> {
-  const response = await fetch(`${CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`, {
-    method: "POST",
-    headers: authHeaders(apiToken),
-    body: JSON.stringify(record),
-  });
+  const response = await fetchWithRetry(
+    `${CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`,
+    {
+      method: "POST",
+      headers: authHeaders(apiToken),
+      body: JSON.stringify(record),
+    },
+    "createDnsRecord",
+  );
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => `HTTP ${response.status}`);
@@ -109,6 +172,73 @@ export async function createDnsRecord(
   }
 
   return body.result;
+}
+
+export async function updateDnsRecord(
+  zoneId: string,
+  apiToken: string,
+  recordId: string,
+  record: {
+    type: string;
+    name: string;
+    content: string;
+    proxied?: boolean;
+    priority?: number;
+    comment?: string;
+  },
+): Promise<CloudflareDnsRecord> {
+  const response = await fetchWithRetry(
+    `${CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records/${recordId}`,
+    {
+      method: "PUT",
+      headers: authHeaders(apiToken),
+      body: JSON.stringify(record),
+    },
+    "updateDnsRecord",
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => `HTTP ${response.status}`);
+    throw new Error(
+      `[cloudflare-api] updateDnsRecord failed: HTTP ${response.status}: ${errorText}`,
+    );
+  }
+
+  const body = (await response.json()) as CloudflareCreateResponse<CloudflareDnsRecord>;
+  if (!body.success) {
+    const errorMessages = body.errors.map((e) => `${e.code}: ${e.message}`).join(", ");
+    throw new Error(`[cloudflare-api] updateDnsRecord API errors: ${errorMessages}`);
+  }
+
+  return body.result;
+}
+
+export async function deleteDnsRecord(
+  zoneId: string,
+  apiToken: string,
+  recordId: string,
+): Promise<void> {
+  const response = await fetchWithRetry(
+    `${CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records/${recordId}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(apiToken),
+    },
+    "deleteDnsRecord",
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => `HTTP ${response.status}`);
+    throw new Error(
+      `[cloudflare-api] deleteDnsRecord failed: HTTP ${response.status}: ${errorText}`,
+    );
+  }
+
+  const body = (await response.json()) as CloudflareCreateResponse<unknown>;
+  if (!body.success) {
+    const errorMessages = body.errors.map((e) => `${e.code}: ${e.message}`).join(", ");
+    throw new Error(`[cloudflare-api] deleteDnsRecord API errors: ${errorMessages}`);
+  }
 }
 
 export async function listWorkersRoutes(
@@ -140,14 +270,11 @@ export async function createWorkersRoute(
   apiToken: string,
   route: { pattern: string; script: string },
 ): Promise<CloudflareWorkersRoute> {
-  const response = await fetch(
-    `${CLOUDFLARE_API_BASE}/zones/${zoneId}/workers/routes`,
-    {
-      method: "POST",
-      headers: authHeaders(apiToken),
-      body: JSON.stringify(route),
-    },
-  );
+  const response = await fetch(`${CLOUDFLARE_API_BASE}/zones/${zoneId}/workers/routes`, {
+    method: "POST",
+    headers: authHeaders(apiToken),
+    body: JSON.stringify(route),
+  });
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => `HTTP ${response.status}`);

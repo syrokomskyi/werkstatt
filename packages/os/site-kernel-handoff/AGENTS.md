@@ -9,6 +9,7 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - It must not change `client.export`; that external full-fork deliverable remains owned by `@warpgogol/site-kernel-deploy`.
 - It owns the Notausgang emergency export and validation commands (`notausgang.export`, `notausgang.validate`).
 - RFC-0752: It owns the subdomain management command family (`subdomain.register`, `subdomain.validate`, `subdomain.list`) in `src/subdomain/` and the Cloudflare REST API client (`src/leitstand/adapters/cloudflare-api.ts`).
+- RFC-0753: It owns the DNS record management command family (`dns.record.upsert`, `dns.record.validate`, `dns.record.list`, `dns.record.delete`, `dns.records.schema.validate`) in `src/dns/`. The Cloudflare API client (`cloudflare-api.ts`) is extended with pagination, retry, `updateDnsRecord`, and `deleteDnsRecord`. Declaration files live at `systems/<id>/dns-records.yaml` and are validated by the Zod schema in `@warpgogol/ontology/schemas`. The `dns.records.schema.validate` command is integrated into `PACKAGES_CHECK_PIPELINE` for CI schema-only validation (no API calls, no `CLOUDFLARE_API_TOKEN` needed).
 
 ## Implementation Rules
 

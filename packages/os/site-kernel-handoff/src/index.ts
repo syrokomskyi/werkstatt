@@ -134,6 +134,7 @@ export { createBehaviorSnapshotModule } from "./behavior-snapshot/index.ts";
 export { createReleaseModule } from "./release/index.ts";
 export { createLeitstandModule } from "./leitstand/index.ts";
 export { createSubdomainModule } from "./subdomain/index.ts";
+export { createDnsModule } from "./dns/index.ts";
 export { createNotausgangModule } from "./notausgang/index.ts";
 export { createDeployModule } from "./deploy/index.ts";
 export { createEvidenceModule } from "./evidence/index.ts";

@@ -25,6 +25,7 @@
   <item>RFC-0311: Add offline IndexNow submit contract validation.</item>
   <item>RFC-0364: Add fingerprint.usage.lint (warning mode) and fingerprint.fixtures.validate.</item>
   <item>RFC-0366: Add fail-hard adr.validate after rfc.dna.trace.validate.</item>
+  <item>RFC-0753: Add dns.records.schema.validate for DNS record declaration file schema validation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -191,4 +192,6 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "suppressions.validate" },
   // RFC-0750: enforce bordbuch commit parity — no direct appendBordbuchEntry outside whitelist.
   { command: "bordbuch.commit.parity.lint", args: ["--mode", "warning"] },
+  // RFC-0753: schema-only validation of DNS record declaration files.
+  { command: "dns.records.schema.validate" },
 ];
