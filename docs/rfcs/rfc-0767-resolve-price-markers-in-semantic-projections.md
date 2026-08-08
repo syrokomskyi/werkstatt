@@ -1,7 +1,7 @@
 ---
 id: RFC-0767
 title: "Resolve price markers in semantic projections"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
