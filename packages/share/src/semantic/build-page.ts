@@ -30,6 +30,8 @@ import {
   type MarkdownPageInput,
 } from "./page-builders/markdown-page.ts";
 import { extractAnswerBlocksFromMarkdown, toSemanticAnswerBlocks } from "./page-utils.ts";
+import type { DerivedPriceEntry } from "./price-marker-resolver.ts";
+import { resolvePriceMarkersForSemantic } from "./price-marker-resolver.ts";
 
 /** The organization profile + enrichment pools the builder draws from. */
 export interface SemanticBuildProfile {
@@ -49,6 +51,13 @@ export interface SemanticContentReader {
   getProseBody(proseSlug: string, lang: string): Promise<string>;
   getHomeLabel(lang: string): Promise<string>;
   getFaqEntries(lang: string): Promise<SemanticFaqEntry[]>;
+  /**
+   * RFC-0767: load derived prices for price marker resolution. Returns null
+   * when the derived prices file does not exist (ENOENT). Synchronous because
+   * the underlying loader uses readFileSync — the method is on the reader
+   * interface to keep build-page.ts I/O-free per its module contract.
+   */
+  getDerivedPrices(): Record<string, DerivedPriceEntry[]> | null;
 }
 
 export interface SemanticPageBuildArgs {
@@ -204,8 +213,7 @@ export async function buildSemanticPageModelWith(
   if (!frontmatter) return null;
 
   const title = (frontmatter["title"] as string) ?? "";
-  const description = (frontmatter["description"] as string) ?? "";
-  const baseInput = { lang, url, title, description };
+  const rawDescription = (frontmatter["description"] as string) ?? "";
 
   const allBlocks = (frontmatter["blocks"] as Array<Record<string, unknown>> | undefined) ?? [];
 
@@ -235,7 +243,17 @@ export async function buildSemanticPageModelWith(
 
   // RFC-0372: Extract page heading from frontmatter block props (any block type with
   // header.heading), falling back to title/description.
-  const { heading, lead } = extractPageHeading(allBlocks, title, description);
+  const { heading, lead } = extractPageHeading(allBlocks, title, rawDescription);
+
+  // RFC-0767: resolve {price:offering:chargeRef} markers to source-currency (EUR)
+  // strings for JSON-LD and meta tags. Markers in heading, lead, and description
+  // are resolved before entering the SemanticPageModel.
+  const derivedPrices = reader.getDerivedPrices();
+  const resolvedHeading = resolvePriceMarkersForSemantic(heading, lang, derivedPrices);
+  const resolvedLead = lead ? resolvePriceMarkersForSemantic(lead, lang, derivedPrices) : undefined;
+  const resolvedDescription = resolvePriceMarkersForSemantic(rawDescription, lang, derivedPrices);
+
+  const baseInput = { lang, url, title, description: resolvedDescription };
 
   const homeLabel = await reader.getHomeLabel(lang);
   const enrichmentKey = PAGE_ENRICHMENT_MAP[semanticType];
@@ -244,8 +262,8 @@ export async function buildSemanticPageModelWith(
     type: semanticType,
     ...baseInput,
     ...(args.audience ? { audience: args.audience } : {}),
-    heading,
-    ...(lead ? { lead } : {}),
+    heading: resolvedHeading,
+    ...(resolvedLead ? { lead: resolvedLead } : {}),
     blocks: mergedBlocks,
     breadcrumbsContent: { homeLabel },
     ...(args.breadcrumbs && args.breadcrumbs.length > 0 ? { breadcrumbs: args.breadcrumbs } : {}),

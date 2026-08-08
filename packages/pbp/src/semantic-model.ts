@@ -20,6 +20,7 @@ has no dependency on PBP entity schemas or loaders.
 */
 
 import { getEntry, getCollection } from "astro:content";
+import { loadDerivedPrices } from "@warpgogol/share/semantic/derived-prices-loader";
 import {
   buildSemanticPageModelWith,
   type SemanticBreadcrumb,
@@ -164,6 +165,10 @@ const astroSemanticReader: SemanticContentReader = {
 
   async getFaqEntries(lang): Promise<SemanticFaqEntry[]> {
     return getFaqEntries(lang);
+  },
+
+  getDerivedPrices() {
+    return loadDerivedPrices();
   },
 };
 

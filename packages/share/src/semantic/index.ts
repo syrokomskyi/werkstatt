@@ -33,3 +33,4 @@ export * from "./block-extraction.ts";
 export * from "./block-extractors/index.ts";
 export * from "./update-stamp.ts";
 export * from "./markdown-twin-provenance.ts";
+export * from "./price-marker-resolver.ts";

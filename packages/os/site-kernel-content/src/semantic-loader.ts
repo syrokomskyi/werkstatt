@@ -38,6 +38,7 @@ import {
 import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import { localizeUrl } from "@warpgogol/share/url-policy";
 import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/share/people-profile-defaults";
+import { loadDerivedPrices } from "@warpgogol/share/semantic/derived-prices-loader";
 import { FS_CAPABILITIES } from "@warpgogol/content-source";
 import type {
   ContentEntry,
@@ -476,6 +477,10 @@ export function createFsSemanticReader(
         });
       }
       return faqEntries;
+    },
+
+    getDerivedPrices() {
+      return loadDerivedPrices();
     },
   };
 }

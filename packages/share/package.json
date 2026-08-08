@@ -151,6 +151,14 @@
       "types": "./src/semantic/build-page.ts",
       "default": "./src/semantic/build-page.ts"
     },
+    "./semantic/price-marker-resolver": {
+      "types": "./src/semantic/price-marker-resolver.ts",
+      "default": "./src/semantic/price-marker-resolver.ts"
+    },
+    "./semantic/derived-prices-loader": {
+      "types": "./src/semantic/derived-prices-loader.ts",
+      "default": "./src/semantic/derived-prices-loader.ts"
+    },
     "./semantic/output-projection": {
       "types": "./src/semantic/output-projection.ts",
       "default": "./src/semantic/output-projection.ts"
@@ -272,9 +280,7 @@
       "default": "./src/css-value-normalize.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "echo 'No build step required — TypeScript sources consumed directly'",
     "build:check": "tsc --noEmit",
