@@ -6,10 +6,11 @@ kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
-implementedAt:
+implementedAt: 2026-08-08
 closedAt:
 supersedes: []
 supersededBy:
@@ -178,13 +179,13 @@ New field `snapshotsReused` indicates how many existing snapshots were reused in
 
 ## Acceptance criteria
 
-- [ ] `findReusableSnapshot` function implemented in `rate-snapshot-resolve.ts`
-- [ ] `findApplicableScheduleEntry` normalizes `validFrom` to UTC before comparison
-- [ ] Running `rate-snapshot.resolve` twice produces no new files on the second run (business-fixed mode)
-- [ ] `snapshotsReused` field added to command output
-- [ ] Unit tests for idempotency and timezone normalization
-- [ ] `mission.close` succeeds without requiring distribution reuse workaround
-- [ ] `rfc.validate` passes on this file
+- [x] `findReusableSnapshot` function implemented in `rate-snapshot-resolve.ts` (evidence: `packages/os/site-kernel-checks/src/rate-snapshot-resolve.ts:87-135`)
+- [x] `findApplicableScheduleEntry` normalizes `validFrom` to UTC before comparison (evidence: `packages/os/site-kernel-checks/src/rate-snapshot-resolve.ts:43-73`)
+- [x] Running `rate-snapshot.resolve` twice produces no new files on the second run (business-fixed mode) (evidence: idempotency check at `rate-snapshot-resolve.ts:386-400` reuses existing fresh snapshots)
+- [x] `snapshotsReused` field added to command output (evidence: `rate-snapshot-resolve.ts:249,252,467` — counter incremented on reuse, included in return data)
+- [x] Unit tests for idempotency and timezone normalization (evidence: 16 tests in `packages/os/site-kernel-checks/src/tests/rate-snapshot-resolve-idempotency.test.ts`)
+- [x] `mission.close` succeeds without requiring distribution reuse workaround (evidence: idempotency check prevents new snapshot files, so `build-input-hash` is stable across repeated `build.prepare` runs)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0746` returns OK)
 
 ## Implementation notes for agents
 

@@ -6,10 +6,11 @@ kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
-implementedAt:
+implementedAt: 2026-08-08
 closedAt:
 supersedes: []
 supersededBy:
@@ -120,10 +121,10 @@ if (altHealthResult.state !== "healthy") {
 
 ## Acceptance criteria
 
-- [ ] Retry loop implemented in `leitstand.promote` around `adapter.health()` call
-- [ ] `ALT_HEALTH_MAX_ATTEMPTS` and `ALT_HEALTH_BACKOFF_DELAYS_MS` constants defined
-- [ ] Error message includes attempt count when all retries fail
-- [ ] `rfc.validate` passes on this file
+- [x] Retry loop implemented in `leitstand.promote` around `adapter.health()` call (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:2122-2149`)
+- [x] `ALT_HEALTH_MAX_ATTEMPTS` and `ALT_HEALTH_BACKOFF_DELAYS_MS` constants defined (evidence: `leitstand-commands.ts:286-287`)
+- [x] Error message includes attempt count when all retries fail (evidence: `leitstand-commands.ts:2147-2149` — "after ${ALT_HEALTH_MAX_ATTEMPTS} attempts")
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0747` returns OK)
 
 ## Implementation notes for agents
 
