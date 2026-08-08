@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0533: ecosystem.commit command handler — atomic version bump, semantic hash, and commit with trailers for platform-scope changes.</purpose>
+  <purpose>RFC-0533: ecosystem.commit command handler — auto-detects scope (platform, non-platform, mixed), atomic version bump, semantic hash, and commit with trailers for platform-scope changes. RFC-0754: unified commit path with non-platform fallback and mixed-scope split.</purpose>
   <non-goals>
     <item>Do not manage git staging of operator files — the operator stages platform files; ecosystem.commit only adds package.json and the version log.</item>
     <item>Do not validate conventional commit message format — message body is the operator's responsibility.</item>
@@ -11,6 +11,7 @@
   <item>RFC-0533: initial ecosystem.commit command handler.</item>
   <item>RFC-0704: added independentVersionPackages skip-bump logic — when all staged platform files belong to independent packages, skips root version bump, version log write, and platform trailers.</item>
   <item>Fix: readRfcVersionBump now scans docs/rfcs/ recursively via collectFiles, finding RFCs in draft/ and other subdirectories (not just top-level and archive/).</item>
+  <item>RFC-0754: auto-detect scope — non-platform-only commits delegate to git commit without bump; mixed-scope commits split into platform + non-platform commits.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -70,6 +71,10 @@ export interface EcosystemCommitResult {
   violations?: EcosystemCommitViolation[];
   skipPlatformBump?: boolean;
   warnings?: string[];
+  nonPlatformCommit?: {
+    sha: string;
+    files: string[];
+  };
 }
 
 export interface EcosystemCommitViolation {
@@ -254,16 +259,27 @@ export async function runEcosystemCommit(
     });
   }
 
-  // Get staged files
+  // Get staged files and partition by scope (RFC-0754)
   const stagedFiles = await getStagedFiles(workspaceRoot);
   const platformStaged = stagedFiles.filter(isPlatformScope);
+  const nonPlatformStaged = stagedFiles.filter((f) => !isPlatformScope(f));
 
-  // EC-01: no staged files in platform scope
-  if (platformStaged.length === 0) {
+  // EC-01: no staged files at all
+  if (stagedFiles.length === 0) {
     violations.push({
       code: "EC-01",
-      message: "No staged files match platform scope (packages/**, integrations/**, services/**).",
-      fixHint: "Use `git commit` for non-platform changes, or stage platform files first.",
+      message: "No staged files to commit.",
+      fixHint: "Stage files with `git add` before running ecosystem.commit.",
+    });
+  }
+
+  // --amend requires platform-scope files (RFC-0754)
+  if (amend && platformStaged.length === 0) {
+    violations.push({
+      code: "EC-11",
+      message: "--amend requires platform-scope files.",
+      fixHint:
+        "Stage platform files (packages/**, integrations/**, services/**) or remove --amend.",
     });
   }
 
@@ -289,7 +305,7 @@ export async function runEcosystemCommit(
   }
 
   // In skip mode, EC-02 and EC-03 do not apply — ecosystem.commit does not touch package.json or the version log
-  if (!skipPlatformBump) {
+  if (!skipPlatformBump && platformStaged.length > 0) {
     // EC-02: package.json already staged
     if (stagedFiles.includes(PACKAGE_JSON_PATH)) {
       violations.push({
@@ -309,8 +325,8 @@ export async function runEcosystemCommit(
     }
   }
 
-  // Skip-bump path: commit without version bump, version log, or platform trailers
-  if (skipPlatformBump && violations.length === 0) {
+  // RFC-0754 Case 2: non-platform-only commit — delegate to git commit without bump
+  if (platformStaged.length === 0 && nonPlatformStaged.length > 0 && violations.length === 0) {
     if (dryRun) {
       return {
         data: {
@@ -327,15 +343,12 @@ export async function runEcosystemCommit(
           warnings: warnings.length > 0 ? warnings : undefined,
         },
         exitCode: 0,
-        summary: `Dry-run: skip platform bump (all staged files in independentVersionPackages)`,
+        summary: `Dry-run: non-platform commit (no version bump)`,
       };
     }
 
-    // Commit with just the operator's message — no platform trailers
-    const skipCommitArgs = amend
-      ? ["commit", "--amend", "-m", message!]
-      : ["commit", "-m", message!];
-    await execFileAsync("git", skipCommitArgs, {
+    const commitArgs = ["commit", "-m", message!];
+    await execFileAsync("git", commitArgs, {
       cwd: workspaceRoot,
       env: { ...process.env, ECOSYSTEM_COMMIT: "1" },
     });
@@ -357,7 +370,120 @@ export async function runEcosystemCommit(
         warnings: warnings.length > 0 ? warnings : undefined,
       },
       exitCode: 0,
-      summary: `Committed independent-package change (skip platform bump)`,
+      summary: `Committed non-platform change (no version bump)`,
+    };
+  }
+
+  // RFC-0754 Case 3: mixed-scope commit — unstage non-platform files before platform commit
+  let nonPlatformCommit: { sha: string; files: string[] } | undefined;
+  let didUnstageNonPlatform = false;
+  if (platformStaged.length > 0 && nonPlatformStaged.length > 0 && violations.length === 0) {
+    // Unstage non-platform files so the platform commit only includes platform files
+    await execFileAsync("git", ["reset", "HEAD", "--", ...nonPlatformStaged], {
+      cwd: workspaceRoot,
+    });
+    didUnstageNonPlatform = true;
+  }
+
+  // Skip-bump path: commit without version bump, version log, or platform trailers
+  if (skipPlatformBump && platformStaged.length > 0 && violations.length === 0) {
+    if (dryRun) {
+      // Re-stage non-platform files if we unstaged them (dry-run should not change state)
+      if (nonPlatformStaged.length > 0) {
+        await execFileAsync("git", ["add", ...nonPlatformStaged], {
+          cwd: workspaceRoot,
+        });
+      }
+      return {
+        data: {
+          command: "ecosystem.commit",
+          status: "dry-run",
+          previousVersion: "",
+          newVersion: "",
+          bumpType: "none",
+          rfcId: rfcId ?? null,
+          platformSemanticHash: "",
+          commitSha: null,
+          trailers: {},
+          skipPlatformBump: true,
+          warnings: warnings.length > 0 ? warnings : undefined,
+          nonPlatformCommit:
+            nonPlatformStaged.length > 0 ? { sha: "", files: nonPlatformStaged } : undefined,
+        },
+        exitCode: 0,
+        summary: `Dry-run: skip platform bump (all staged platform files in independentVersionPackages or docs-only)`,
+      };
+    }
+
+    // Commit platform files with just the operator's message — no platform trailers
+    const skipCommitArgs = amend
+      ? ["commit", "--amend", "-m", message!]
+      : ["commit", "-m", message!];
+    await execFileAsync("git", skipCommitArgs, {
+      cwd: workspaceRoot,
+      env: { ...process.env, ECOSYSTEM_COMMIT: "1" },
+    });
+
+    const platformCommitSha = await getHeadCommitSha(workspaceRoot);
+
+    // If mixed-scope, commit non-platform files as a separate commit
+    if (nonPlatformStaged.length > 0) {
+      await execFileAsync("git", ["add", ...nonPlatformStaged], {
+        cwd: workspaceRoot,
+      });
+      try {
+        await execFileAsync("git", ["commit", "-m", message!], {
+          cwd: workspaceRoot,
+          env: { ...process.env, ECOSYSTEM_COMMIT: "1" },
+        });
+        const nonPlatformSha = await getHeadCommitSha(workspaceRoot);
+        nonPlatformCommit = { sha: nonPlatformSha, files: nonPlatformStaged };
+      } catch (error) {
+        // Second commit failed — platform commit succeeded
+        return {
+          data: {
+            command: "ecosystem.commit",
+            status: "blocked",
+            previousVersion: "",
+            newVersion: "",
+            bumpType: "none",
+            rfcId: rfcId ?? null,
+            platformSemanticHash: "",
+            commitSha: platformCommitSha,
+            trailers: {},
+            skipPlatformBump: true,
+            violations: [
+              {
+                code: "EC-12",
+                message: `Non-platform commit failed after platform commit ${platformCommitSha} succeeded.`,
+                fixHint: `Run \`git add ${nonPlatformStaged.join(" ")} && git commit -m '${message}'\` to commit the remaining files manually.`,
+              },
+            ],
+            warnings: warnings.length > 0 ? warnings : undefined,
+          },
+          exitCode: 1,
+          summary: `Platform commit ${platformCommitSha} succeeded, non-platform commit failed`,
+        };
+      }
+    }
+
+    return {
+      data: {
+        command: "ecosystem.commit",
+        status: "ok",
+        previousVersion: "",
+        newVersion: "",
+        bumpType: "none",
+        rfcId: rfcId ?? null,
+        platformSemanticHash: "",
+        commitSha: platformCommitSha,
+        trailers: {},
+        skipPlatformBump: true,
+        warnings: warnings.length > 0 ? warnings : undefined,
+        nonPlatformCommit,
+      },
+      exitCode: 0,
+      summary: `Committed ${nonPlatformCommit ? "mixed-scope (skip-bump platform + non-platform)" : "independent-package change (skip platform bump)"}`,
     };
   }
 
@@ -452,8 +578,13 @@ export async function runEcosystemCommit(
     }
   }
 
-  // If violations, return blocked
+  // If violations, return blocked (re-stage non-platform files if we unstaged them)
   if (violations.length > 0) {
+    if (didUnstageNonPlatform) {
+      await execFileAsync("git", ["add", ...nonPlatformStaged], {
+        cwd: workspaceRoot,
+      });
+    }
     return {
       data: {
         command: "ecosystem.commit",
@@ -493,8 +624,13 @@ export async function runEcosystemCommit(
     trailers["X-RFC"] = resolvedRfcId;
   }
 
-  // Dry-run: return forecast without committing
+  // Dry-run: return forecast without committing (re-stage non-platform files if we unstaged them)
   if (dryRun) {
+    if (didUnstageNonPlatform) {
+      await execFileAsync("git", ["add", ...nonPlatformStaged], {
+        cwd: workspaceRoot,
+      });
+    }
     const lastLog = await readVersionLog(workspaceRoot);
     const hashChanged = lastLog ? lastLog.hash !== platformSemanticHash : true;
     const versionBumpedFromLog = lastLog ? lastLog.version !== newVersion : true;
@@ -516,6 +652,8 @@ export async function runEcosystemCommit(
           pc03: pc03 as "pass" | "error",
         },
         warnings: warnings.length > 0 ? warnings : undefined,
+        nonPlatformCommit:
+          nonPlatformStaged.length > 0 ? { sha: "", files: nonPlatformStaged } : undefined,
       },
       exitCode: 0,
       summary: `Dry-run: ${amend ? previousVersion : currentVersion} → ${newVersion} (${bumpType}${resolvedRfcId ? `, ${resolvedRfcId}` : ""})`,
@@ -549,6 +687,46 @@ export async function runEcosystemCommit(
 
   const commitSha = await getHeadCommitSha(workspaceRoot);
 
+  // RFC-0754: If mixed-scope, commit non-platform files as a separate commit
+  if (nonPlatformStaged.length > 0) {
+    await execFileAsync("git", ["add", ...nonPlatformStaged], {
+      cwd: workspaceRoot,
+    });
+    try {
+      await execFileAsync("git", ["commit", "-m", message!], {
+        cwd: workspaceRoot,
+        env: { ...process.env, ECOSYSTEM_COMMIT: "1" },
+      });
+      const nonPlatformSha = await getHeadCommitSha(workspaceRoot);
+      nonPlatformCommit = { sha: nonPlatformSha, files: nonPlatformStaged };
+    } catch {
+      // Second commit failed — platform commit succeeded
+      return {
+        data: {
+          command: "ecosystem.commit",
+          status: "blocked",
+          previousVersion: amend ? previousVersion : currentVersion,
+          newVersion,
+          bumpType,
+          rfcId: resolvedRfcId,
+          platformSemanticHash,
+          commitSha,
+          trailers,
+          violations: [
+            {
+              code: "EC-12",
+              message: `Non-platform commit failed after platform commit ${commitSha} succeeded.`,
+              fixHint: `Run \`git add ${nonPlatformStaged.join(" ")} && git commit -m '${message}'\` to commit the remaining files manually.`,
+            },
+          ],
+          warnings: warnings.length > 0 ? warnings : undefined,
+        },
+        exitCode: 1,
+        summary: `Platform commit ${commitSha} succeeded, non-platform commit failed`,
+      };
+    }
+  }
+
   return {
     data: {
       command: "ecosystem.commit",
@@ -561,8 +739,9 @@ export async function runEcosystemCommit(
       commitSha,
       trailers,
       warnings: warnings.length > 0 ? warnings : undefined,
+      nonPlatformCommit,
     },
     exitCode: 0,
-    summary: `Committed platform change: ${amend ? previousVersion : currentVersion} → ${newVersion} (${bumpType})`,
+    summary: `Committed ${nonPlatformCommit ? "mixed-scope (platform + non-platform)" : "platform change"}: ${amend ? previousVersion : currentVersion} → ${newVersion} (${bumpType})`,
   };
 }
