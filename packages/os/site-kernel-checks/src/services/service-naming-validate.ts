@@ -41,7 +41,10 @@ interface PackageJson {
 }
 
 function parseJsonc(content: string): unknown {
-  const cleaned = content.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  const cleaned = content
+    .replace(/\/\/.*$/gm, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/,(\s*[}\]])/g, "$1");
   return JSON.parse(cleaned);
 }
 
