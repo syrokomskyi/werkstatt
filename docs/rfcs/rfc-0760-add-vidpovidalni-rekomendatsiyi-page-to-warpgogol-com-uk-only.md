@@ -52,7 +52,7 @@ packagesImpacted: []
 successSignals:
   - "A new page with route `uk: vidpovidalni-rekomendatsiyi` is registered in system.md and renders at build time on warpgogol-com."
   - "The page is UK-only — no DE route is declared, and the page does not appear in the German site navigation or sitemap."
-  - "The page composes ~19 blocks using existing and newly added archetypes (hero, markdown, comparison-cards, audience-cards, controlled-responsibility-block, send-message with custom checklist, dynamic-status-block, faq-list, final-cta, service-metadata-block)."
+  - "The page composes ~23 blocks using existing and newly added archetypes (hero, markdown, audience-cards, controlled-responsibility-block, send-message with custom checklist, dynamic-status-block, faq-list, final-cta, service-metadata-block with stats[])."
   - "The page passes page.block.validate, mirror.quintet.validate, and build.check with zero violations."
 nonGoals:
   - "Does not create a German (DE) version of the page — UK-only for initial launch."
@@ -82,11 +82,11 @@ nonGoals:
 
 ## Context
 
-The warpgogol-com site (mission `warpgogol-com-m000039`) needs a new page titled "Відповідальні рекомендації" (Responsible Recommendations). The page content was drafted by an expert and covers two programs: (1) a recommendation program where clients recommend Warpgogol to other businesses, and (2) a Market Steward program where a trusted partner manages open mandates in their region.
+The warpgogol-com site (mission `warpgogol-com-m000039`) needs a new page titled "Відповідальні рекомендації" (Responsible Recommendations). The page content was drafted by an expert and covers a single program with a clear progression path: (1) recommend Warpgogol to a business and receive 70€ per confirmed subscription, (2) after 12 confirmed subscriptions, a 3-month pilot Market Steward mandate may be offered (300€/month + 70€ per new subscription), (3) after the pilot, a full Market Steward mandate at 2000€/month opens when the market cell generates at least 4000€ monthly marginal income before steward payment.
 
-The page is initially UK-only — no German translation is needed for the first launch. The content draft includes ~19 sections: hero, program explanation, comparison table, audience cards, responsibility blocks, Market Steward intro, dynamic status (open mandate count), two forms with different informational requirements, FAQ, final CTA, and a service metadata footer.
+The page is initially UK-only — no German translation is needed for the first launch. The content draft includes ~23 sections: hero, 4-step path, payment conditions, client openness, audience cards, responsibility blocks, pilot mandate details, Market Steward responsibilities, pilot evaluation, full mandate threshold, marginal income explanation, threshold stability, full mandate reward, decline review, mandate counts (dynamic), prohibited practices, public verifiability, two single-textarea forms with different checklist configurations, FAQ (12 items), final CTA, and a service metadata footer with dynamic mandate counts.
 
-Three new archetypes are required to render all sections: `send-message` with custom checklist items (RFC-0757), `dynamic-status-block` (RFC-0758), and `service-metadata-block` (RFC-0759). This RFC depends on all three being accepted and implemented first.
+Three new archetypes are required to render all sections: `send-message` with custom checklist items (RFC-0757), `dynamic-status-block` (RFC-0758), and `service-metadata-block` with `stats[]` for dynamic values (RFC-0759). This RFC depends on all three being accepted and implemented first.
 
 ## Problem
 
@@ -98,7 +98,7 @@ Three new archetypes are required to render all sections: `send-message` with cu
 
 ## Decision
 
-A new page `vidpovidalni-rekomendatsiyi` is added to warpgogol-com's `system.md` with a UK-only route (`uk: vidpovidalni-rekomendatsiyi`, no `de` route). The page is composed of ~19 blocks using existing and newly added archetypes. The page content lives in `src/content/pages/uk/vidpovidalni-rekomendatsiyi.md` as a frontmatter-only block-declarative entry (DNA-24), with prose content in `src/content/prose/vidpovidalni-rekomendatsiyi.uk.md`.
+A new page `vidpovidalni-rekomendatsiyi` is added to warpgogol-com's `system.md` with a UK-only route (`uk: vidpovidalni-rekomendatsiyi`, no `de` route). The page is composed of ~23 blocks using existing and newly added archetypes. The page content lives in `src/content/pages/uk/vidpovidalni-rekomendatsiyi.md` as a frontmatter-only block-declarative entry (DNA-24), with prose content in `src/content/prose/vidpovidalni-rekomendatsiyi/*.uk.md`.
 
 ## Architectural fit
 
@@ -109,7 +109,7 @@ A new page `vidpovidalni-rekomendatsiyi` is added to warpgogol-com's `system.md`
 - **RFC-0049 (hreflang/sitemap generation):** The sitemap generator excludes pages without a route for a given language. A UK-only page appears only in the UK sitemap.
 - **RFC-0757 (send-message checklist):** The two forms on the page use `send-message` with custom `checklistItems[]` configurations.
 - **RFC-0758 (dynamic-status-block):** The open-mandate counter section uses `dynamic-status-block`.
-- **RFC-0759 (service-metadata-block):** The page footer uses `service-metadata-block`.
+- **RFC-0759 (service-metadata-block):** The page footer uses `service-metadata-block` with `stats[]` for dynamic mandate counts (open pilot mandates, open full mandates).
 - **Biome:** The page uses the existing `handwerk-material-warm` biome — no biome changes.
 - **Layer C:** New URL (`/vidpovidalni-rekomendatsiyi`), added to UK sitemap — `breaksC: true`.
 
@@ -130,15 +130,18 @@ No new commands. The page is created by adding content files and a `system.md` e
   planets:
     - hero
     - markdown
-    - comparison-cards
+    - markdown
+    - markdown
     - audience-cards
     - controlled-responsibility-block
     - markdown
-    - audience-cards
     - markdown
     - markdown
     - markdown
-    - controlled-responsibility-block
+    - markdown
+    - markdown
+    - markdown
+    - markdown
     - markdown
     - dynamic-status-block
     - controlled-responsibility-block
@@ -152,29 +155,33 @@ No new commands. The page is created by adding content files and a `system.md` e
     background: default
 ```
 
-### Block composition (~19 blocks)
+### Block composition (~23 blocks)
 
 | § | Block type | Content source |
 | --- | --- | --- |
-| 1 | `hero` | Authored props (heading, subheading, CTA) |
-| 2 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/how-it-works.uk.md` |
-| 3 | `comparison-cards` | Authored props (what-you-pay table) |
-| 4 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/openness-to-client.uk.md` |
-| 5 | `audience-cards` | Authored props (who-is-this-for) |
-| 6 | `controlled-responsibility-block` | Authored props (who-not-recommend) |
-| 7 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/market-steward-intro.uk.md` |
-| 8 | `audience-cards` | Authored props (what-ms-does, 5 zones) |
-| 9 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/how-mandate-opens.uk.md` |
-| 10 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/what-ms-gets.uk.md` |
-| 11 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/mandate-not-lifetime.uk.md` |
-| 12 | `dynamic-status-block` | Authored props (value: open mandate count, label) |
-| 13 | `controlled-responsibility-block` | Authored props (what-ms-cannot-do) |
-| 14 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/public-verifiability.uk.md` |
-| 15 | `send-message` | Authored props with custom `checklistItems[]` (website URL, CMS, contact) |
-| 16 | `send-message` | Authored props with custom `checklistItems[]` (motivation, availability, contact) |
-| 17 | `faq-list` | Authored props (FAQ items) |
-| 18 | `final-cta` | Authored props (CTA to contact page) |
-| 19 | `service-metadata-block` | Authored props (version, dates, links) |
+| 1 | `hero` | Authored props (heading: 70€ per subscription, subheading, 2 CTAs, short explanation) |
+| 2 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/how-it-works.uk.md` — 4-step path (recommendation → 12 subscriptions → pilot → full mandate) |
+| 3 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/what-70-eur-pays-for.uk.md` — what we don't pay for, 6 conditions, premium amount |
+| 4 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/openness-to-client.uk.md` — client knows about reward, client freedom |
+| 5 | `audience-cards` | Authored props (who can recommend: entrepreneur, client, consultant, IT specialist, etc.) |
+| 6 | `controlled-responsibility-block` | Authored props (who NOT to recommend to: large shops, complex portals, aggressive SEO, etc.) |
+| 7 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/after-12-subscriptions.uk.md` — transition from recommendations to pilot opportunity |
+| 8 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/pilot-mandate.uk.md` — 3 months, 300€/month + 70€ per subscription, market area definition |
+| 9 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/what-ms-does.uk.md` — responsibilities: find, explain, prepare, return knowledge, protect expectations, support quality |
+| 10 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/pilot-evaluation.uk.md` — evaluation criteria, 3 possible decisions |
+| 11 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/when-rate-rises.uk.md` — 2000€ threshold: 4000€ monthly marginal income |
+| 12 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/marginal-income.uk.md` — formula: payments minus direct costs, steward reward not subtracted |
+| 13 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/threshold-stability.uk.md` — 3 consecutive months, quality checks |
+| 14 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/full-ms-reward.uk.md` — 2000€/month + 70€ per subscription, defined area, metrics access |
+| 15 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/if-results-decline.uk.md` — review process, 3-month grace, possible decisions |
+| 16 | `dynamic-status-block` | Authored props (stats: open pilot mandates, open full mandates — data-driven counts) |
+| 17 | `controlled-responsibility-block` | Authored props (prohibited: bought contacts, spam, hidden rewards, pressure, false urgency, guaranteed leads, etc.) |
+| 18 | `markdown` | `contentRef: vidpovidalni-rekomendatsiyi/public-verifiability.uk.md` — annual anonymized report, 5 promises |
+| 19 | `send-message` | Authored props with custom `checklistItems[]` (business name/type, city/country, why Warpgol fits, contact details) — formId: `recommendation-form` |
+| 20 | `send-message` | Authored props with custom `checklistItems[]` (market cell, trust/access, who doesn't fit, expected questions, country, contact details) — formId: `market-steward-form` |
+| 21 | `faq-list` | Authored props (12 FAQ items: payment timing, activation, price, transparency, consent, pilot auto-open, rate auto-rise, threshold rationale, 70€ persistence, market cell changes, pilot end, earned premiums) |
+| 22 | `final-cta` | Authored props (summary: 70€ per subscription, 12 subscriptions → pilot, 300€/month pilot, 2000€ full mandate; 2 CTAs) |
+| 23 | `service-metadata-block` | Authored props (version: v1.0, effectiveDate, nextReviewDate, stats[] for mandate counts, links to legal pages) |
 
 ### File system responsibilities
 
@@ -224,7 +231,7 @@ No `--json` output. The page renders as static HTML at `/vidpovidalni-rekomendat
 
 - **UK-only precedent.** This is the first UK-only page on warpgogol-com. The route registry, sitemap generator, and hreflang tags must correctly handle a page with no DE route. Mitigation: RFC-0048 and RFC-0049 already support per-language routes — a page with only a `uk` route is a valid configuration. The `build.check` pipeline validates route registry consistency.
 
-- **Content volume.** The page has ~19 blocks, which is more than typical pages (home: ~8, services: ~10). Mitigation: the block-declarative system handles arbitrary block counts. `page.block.validate` validates each block independently. Performance impact is negligible — each block is a static SSG render.
+- **Content volume.** The page has ~23 blocks, which is more than typical pages (home: ~8, services: ~10). Mitigation: the block-declarative system handles arbitrary block counts. `page.block.validate` validates each block independently. Performance impact is negligible — each block is a static SSG render.
 
 - **Two forms on one page.** The page has two `send-message` blocks. Each must have a unique `formId` to distinguish API submissions. Mitigation: the `send-message` section already supports `formId` via props — the two forms use different `formId` values (e.g. `recommendation-form` and `market-steward-form`).
 
@@ -240,7 +247,8 @@ No `--json` output. The page renders as static HTML at `/vidpovidalni-rekomendat
 - [ ] `build.check` passes for warpgogol-com (evidence: build output, zero errors)
 - [ ] Page renders at `/vidpovidalni-rekomendatsiyi` in UK build (evidence: build output, HTML file generated)
 - [ ] Page does NOT render in DE build — no `/vidpovidalni-rekomendatsiyi` in German sitemap (evidence: sitemap output)
-- [ ] Two `send-message` blocks have unique `formId` values (evidence: block props)
+- [ ] Two `send-message` blocks have unique `formId` values (`recommendation-form` and `market-steward-form`) (evidence: block props)
+- [ ] `service-metadata-block` includes `stats[]` for dynamic mandate counts (evidence: block props)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents

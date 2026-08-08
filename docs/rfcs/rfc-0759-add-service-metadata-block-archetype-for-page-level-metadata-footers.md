@@ -83,7 +83,7 @@ nonGoals:
 
 The platform's archetype catalog includes 28 section archetypes, all focused on primary page content (hero, approach, comparison-cards, faq-list, etc.). None cover the pattern of a page-level metadata footer — a small, visually muted block at the bottom of a page that displays service metadata: rules version, effective date, next review date, and links to related documents.
 
-A new page planned for warpgogol-com ("Відповідальні рекомендації" — Responsible Recommendations) includes a service metadata footer (§19 of the expert recommendation): version of the recommendation rules, date of last update, date of next review, and links to the legal pages. This is a common pattern for policy, program, and recommendation pages — the visitor needs to know when the rules were last updated and when they will be reviewed again.
+A new page planned for warpgogol-com ("Відповідальні рекомендації" — Responsible Recommendations) includes a service metadata footer (§23 of the expert recommendation): version of the recommendation rules, effective date, next review date, links to legal pages, and **dynamic mandate counts** (open pilot mandates, open full mandates). The mandate counts are data-driven values that change over time, while the rest is static authored metadata. This is a common pattern for policy, program, and recommendation pages — the visitor needs to know when the rules were last updated, when they will be reviewed again, and the current availability of mandates.
 
 The closest existing archetypes are `markdown` (static authored content) and `transparency` (trust-building claims), but neither is designed for the specific metadata footer pattern with structured fields (version, dates, links).
 
@@ -97,7 +97,7 @@ The closest existing archetypes are `markdown` (static authored content) and `tr
 
 ## Decision
 
-A new `service-metadata-block` archetype is added to the shared archetype catalog. It renders a visually muted page-level metadata footer with structured fields: version, effective date, next review date, and optional related links. The archetype follows the standard section framework (SectionShell + optional SectionHeader + body) and uses `--ds-*` biome tokens with a `tone: muted` default.
+A new `service-metadata-block` archetype is added to the shared archetype catalog. It renders a visually muted page-level metadata footer with structured fields: version, effective date, next review date, optional related links, and optional `stats[]` for dynamic values (e.g., open mandate counts). The `stats[]` array allows the block to display data-driven indicators alongside static metadata without requiring a separate `dynamic-status-block` section. The archetype follows the standard section framework (SectionShell + optional SectionHeader + body) and uses `--ds-*` biome tokens with a `tone: muted` default.
 
 ## Architectural fit
 
@@ -135,6 +135,11 @@ interface ServiceMetadataBlockProps {
     href: string;
     rel?: string;
   }>;
+  stats?: Array<{                // Dynamic value indicators (e.g., open mandate counts)
+    label: string;               // e.g. "Відкриті пілотні мандати"
+    value: string;               // e.g. "3" or a data-source reference
+    dataSource?: string;         // Optional: reference to a data provider (e.g., "open-mandates:pilot")
+  }>;
   footnote?: string;            // Optional freeform footnote text
 }
 ```
@@ -171,6 +176,11 @@ propsSchema:
         href: z.string().min(1),
         rel: z.string().optional(),
       })).optional(),
+      stats: z.array(z.object({
+        label: z.string().min(1),
+        value: z.string().min(1),
+        dataSource: z.string().optional(),
+      })).optional(),
       footnote: z.string().optional(),
     }).strict()
 acceptedCosmicNames:
@@ -200,11 +210,13 @@ No `--json` output. The section renders as HTML at build time.
 - **All fields absent:** If all optional fields are absent, the section renders an empty muted block. `page.block.validate` may warn about an empty metadata block, but does not fail — the block is valid but empty.
 - **Invalid date format:** Dates are stored as strings and rendered as-is. No date parsing or validation is performed by the section — the author is responsible for providing readable date strings. A future enhancement could add date format validation.
 - **Missing `links[]` items:** If `links` is absent or empty, no links section is rendered.
+- **Missing `stats[]` items:** If `stats` is absent or empty, no stats row is rendered. The block still shows static metadata (version, dates, links).
+- **`stats[]` with `dataSource`:** When `dataSource` is specified, the section resolves the value at build time from the referenced data provider. If the data source is unavailable, the stat value falls back to the authored `value` string (which may be a placeholder like "—"). Build-time resolution failure is non-fatal — the block renders with the fallback value.
 
 ## Rollout
 
 - **Materialization:** The section is created via `section.scaffold` which generates the full file set. The cosmic name is picked by `cosmic.name.pick`.
-- **warpgogol-com adoption:** The "Відповідальні рекомендації" page (separate RFC) will use `type: service-metadata-block` for its §19 service metadata footer.
+- **warpgogol-com adoption:** The "Відповідальні рекомендації" page (separate RFC) will use `type: service-metadata-block` for its §23 service metadata footer, including `stats[]` for dynamic mandate counts.
 - **New sites:** Available to all sites. No migration needed — the archetype is additive.
 - **Pipeline integration:** `section.contract.validate` and `page.block.validate` validate the new section and its block props.
 - **No migrator needed:** The archetype is additive.
