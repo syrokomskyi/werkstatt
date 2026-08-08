@@ -31,7 +31,10 @@ import {
 } from "./page-builders/markdown-page.ts";
 import { extractAnswerBlocksFromMarkdown, toSemanticAnswerBlocks } from "./page-utils.ts";
 import type { DerivedPriceEntry } from "./price-marker-resolver.ts";
-import { resolvePriceMarkersForSemantic } from "./price-marker-resolver.ts";
+import {
+  resolvePriceMarkersForSemantic,
+  resolveAmountMarkersForSemantic,
+} from "./price-marker-resolver.ts";
 
 /** The organization profile + enrichment pools the builder draws from. */
 export interface SemanticBuildProfile {
@@ -249,9 +252,20 @@ export async function buildSemanticPageModelWith(
   // strings for JSON-LD and meta tags. Markers in heading, lead, and description
   // are resolved before entering the SemanticPageModel.
   const derivedPrices = reader.getDerivedPrices();
-  const resolvedHeading = resolvePriceMarkersForSemantic(heading, lang, derivedPrices);
-  const resolvedLead = lead ? resolvePriceMarkersForSemantic(lead, lang, derivedPrices) : undefined;
-  const resolvedDescription = resolvePriceMarkersForSemantic(rawDescription, lang, derivedPrices);
+  const resolvedHeading = resolveAmountMarkersForSemantic(
+    resolvePriceMarkersForSemantic(heading, lang, derivedPrices),
+    lang,
+  );
+  const resolvedLead = lead
+    ? resolveAmountMarkersForSemantic(
+        resolvePriceMarkersForSemantic(lead, lang, derivedPrices),
+        lang,
+      )
+    : undefined;
+  const resolvedDescription = resolveAmountMarkersForSemantic(
+    resolvePriceMarkersForSemantic(rawDescription, lang, derivedPrices),
+    lang,
+  );
 
   const baseInput = { lang, url, title, description: resolvedDescription };
 
@@ -278,7 +292,17 @@ export async function buildSemanticPageModelWith(
 
   const faqEntries = await resolveFaqEntries(reader, lang, allBlocks, pageId, semanticType);
   if (faqEntries) {
-    input.faqEntries = faqEntries;
+    input.faqEntries = faqEntries.map((e) => ({
+      ...e,
+      question: resolveAmountMarkersForSemantic(
+        resolvePriceMarkersForSemantic(e.question, lang, derivedPrices),
+        lang,
+      ),
+      answer: resolveAmountMarkersForSemantic(
+        resolvePriceMarkersForSemantic(e.answer, lang, derivedPrices),
+        lang,
+      ),
+    }));
   }
 
   return buildMarkdownPageSemantic(input);

@@ -5,10 +5,11 @@
 // RFC-0767: OFFERING_URI_PREFIX and PRICE_MARKER_RE relocated to @warpgogol/share/semantic.
 import {
   buildPriceVariants,
+  formatPrice,
   loadDerivedPrices,
   type SourcePriceProp,
 } from "../sections/price-card/price-variants.ts";
-import { OFFERING_URI_PREFIX, PRICE_MARKER_RE } from "@warpgogol/share/semantic";
+import { OFFERING_URI_PREFIX, PRICE_MARKER_RE, AMOUNT_MARKER_RE } from "@warpgogol/share/semantic";
 
 export type TextPart = { kind: "text"; value: string };
 export type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
@@ -52,6 +53,61 @@ export function renderPriceDisplayHtml(
         ? `<span class="currency-aware-price-display__note">${escapeHtml(variant.note)}</span>`
         : "";
       return `<span class="currency-aware-price-display__variant" data-currency="${escapeHtml(variant.currency)}"${index !== 0 ? " hidden" : ""} aria-label="${escapeHtml(variant.formatted)}"><span class="currency-aware-price-display__amount">${escapeHtml(variant.formatted)}</span>${noteHtml}</span>`;
+    })
+    .join("");
+
+  return `<span class="currency-aware-price-display" data-currency-price-display aria-live="polite">${variantHtml}</span>`;
+}
+
+/**
+ * RFC-0766: Generate the HTML string for a {amount:NNNN} marker.
+ * Extracts exchange rates from derived prices to build currency variants
+ * for literal EUR amounts (e.g. thresholds) not tied to an offering.
+ * Returns empty string when no derived prices are available.
+ */
+export function renderAmountDisplayHtml(
+  amountEur: string,
+  lang: string,
+  derivedPrices: ReturnType<typeof loadDerivedPrices>,
+): string {
+  if (!derivedPrices) return "";
+
+  const sourceProp: SourcePriceProp = { amount: amountEur, currency: "EUR" };
+  const sourceFormatted = formatPrice(sourceProp, lang);
+  const variants: { currency: string; formatted: string; note: string | null }[] = [];
+
+  if (sourceFormatted) {
+    variants.push({ currency: "EUR", formatted: sourceFormatted, note: null });
+  }
+
+  const seenCurrencies = new Set<string>(["EUR"]);
+  for (const entries of Object.values(derivedPrices)) {
+    for (const entry of entries) {
+      const targetCurrency = entry.amount.currency;
+      if (seenCurrencies.has(targetCurrency)) continue;
+      seenCurrencies.add(targetCurrency);
+
+      const rate = Number(entry.trace.rate.value);
+      if (!Number.isFinite(rate)) continue;
+
+      const numericAmount = Number(amountEur) * rate;
+      const formatted = new Intl.NumberFormat(lang, {
+        style: "currency",
+        currency: targetCurrency,
+        currencyDisplay: "narrowSymbol",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(numericAmount);
+
+      variants.push({ currency: targetCurrency, formatted, note: null });
+    }
+  }
+
+  if (variants.length <= 1) return "";
+
+  const variantHtml = variants
+    .map((variant, index) => {
+      return `<span class="currency-aware-price-display__variant" data-currency="${escapeHtml(variant.currency)}"${index !== 0 ? " hidden" : ""} aria-label="${escapeHtml(variant.formatted)}"><span class="currency-aware-price-display__amount">${escapeHtml(variant.formatted)}</span></span>`;
     })
     .join("");
 

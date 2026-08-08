@@ -34,9 +34,12 @@ import GithubSlugger from "github-slugger";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts";
-import { renderPriceDisplayHtml } from "../../utils/price-marker.ts";
+import { renderPriceDisplayHtml, renderAmountDisplayHtml } from "../../utils/price-marker.ts";
 import { loadDerivedPrices } from "../price-card/price-variants.ts";
-import { PRICE_MARKER_RE as PRICE_MARKER_GLOBAL_RE } from "@warpgogol/share/semantic";
+import {
+  PRICE_MARKER_RE as PRICE_MARKER_GLOBAL_RE,
+  AMOUNT_MARKER_RE as AMOUNT_MARKER_GLOBAL_RE,
+} from "@warpgogol/share/semantic";
 
 /**
  * Render markdown to HTML with GFM support (tables, strikethrough, task lists,
@@ -78,10 +81,11 @@ export interface ProsePipelineOptions {
 }
 
 const PRICE_MARKER_RE = new RegExp(PRICE_MARKER_GLOBAL_RE.source);
+const AMOUNT_MARKER_RE = new RegExp(AMOUNT_MARKER_GLOBAL_RE.source);
 const CODE_PRE_SPLIT_RE = /(<code[^>]*>[\s\S]*?<\/code>|<pre[^>]*>[\s\S]*?<\/pre>)/g;
 
 function hasPriceMarkers(text: string): boolean {
-  return PRICE_MARKER_RE.test(text);
+  return PRICE_MARKER_RE.test(text) || AMOUNT_MARKER_RE.test(text);
 }
 
 function resolvePriceMarkersInHtml(
@@ -93,9 +97,13 @@ function resolvePriceMarkersInHtml(
   return segments
     .map((segment, index) => {
       if (index % 2 === 1) return segment;
-      return segment.replace(PRICE_MARKER_GLOBAL_RE, (_match, offeringId, chargeRef) =>
+      let resolved = segment.replace(PRICE_MARKER_GLOBAL_RE, (_match, offeringId, chargeRef) =>
         renderPriceDisplayHtml(offeringId, chargeRef, lang, derivedPrices),
       );
+      resolved = resolved.replace(AMOUNT_MARKER_GLOBAL_RE, (_match, amountEur) =>
+        renderAmountDisplayHtml(amountEur, lang, derivedPrices),
+      );
+      return resolved;
     })
     .join("");
 }

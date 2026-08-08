@@ -29,6 +29,7 @@ export interface DerivedPriceEntry {
 
 export const OFFERING_URI_PREFIX = "https://warpgogol.com/id/offerings/";
 export const PRICE_MARKER_RE = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+export const AMOUNT_MARKER_RE = /\{amount:([0-9]+(?:\.[0-9]+)?)\}/g;
 
 /**
  * Format a source-currency amount for semantic projections.
@@ -68,5 +69,16 @@ export function resolvePriceMarkersForSemantic(
     const entry = derivedPrices?.[ref]?.find((e) => e.chargeRef === chargeRef);
     const sourceAmount = entry?.trace?.source?.amount ?? "0";
     return formatSourcePrice(sourceAmount, lang);
+  });
+}
+
+/**
+ * Resolve {amount:NNNN} markers to source-currency (EUR) formatted strings
+ * for semantic projections (JSON-LD, meta tags). These markers represent
+ * literal EUR amounts (e.g. thresholds) that are not tied to an offering.
+ */
+export function resolveAmountMarkersForSemantic(text: string, lang: string): string {
+  return text.replace(AMOUNT_MARKER_RE, (_match, amount: string) => {
+    return formatSourcePrice(amount, lang);
   });
 }

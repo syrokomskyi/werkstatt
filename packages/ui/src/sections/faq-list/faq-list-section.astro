@@ -19,8 +19,10 @@ import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import CurrencyAwarePriceDisplay from "@warpgogol/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
 import {
   buildPriceVariants,
+  formatPrice,
   loadDerivedPrices,
   type SourcePriceProp,
+  type PriceVariant,
 } from "../price-card/price-variants.ts";
 import type { FaqListSectionContent } from "./faq-list-section.types.generated.ts";
 import type { FaqListItem } from "./faq-list-section.types.ts";
@@ -44,32 +46,71 @@ type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants
 type TextOrPrice = TextPart | PricePart;
 
 const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+const amountMarkerRe = /\{amount:([0-9]+(?:\.[0-9]+)?)\}/g;
+
+function buildAmountVariants(amountEur: string): PriceVariant[] | null {
+  if (!derivedPrices) return null;
+  const sourceProp: SourcePriceProp = { amount: amountEur, currency: "EUR" };
+  const sourceFormatted = formatPrice(sourceProp, lang);
+  const variants: PriceVariant[] = [];
+  if (sourceFormatted) {
+    variants.push({ currency: "EUR", formatted: sourceFormatted, note: null });
+  }
+  const seenCurrencies = new Set<string>(["EUR"]);
+  for (const entries of Object.values(derivedPrices)) {
+    for (const entry of entries) {
+      const targetCurrency = entry.amount.currency;
+      if (seenCurrencies.has(targetCurrency)) continue;
+      seenCurrencies.add(targetCurrency);
+      const rate = Number(entry.trace.rate.value);
+      if (!Number.isFinite(rate)) continue;
+      const numericAmount = Number(amountEur) * rate;
+      const formatted = new Intl.NumberFormat(lang, {
+        style: "currency",
+        currency: targetCurrency,
+        currencyDisplay: "narrowSymbol",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(numericAmount);
+      variants.push({ currency: targetCurrency, formatted, note: null });
+    }
+  }
+  return variants.length > 1 ? variants : null;
+}
 
 function parsePriceMarkers(text: string): TextOrPrice[] {
   const parts: TextOrPrice[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
   priceMarkerRe.lastIndex = 0;
-  while ((match = priceMarkerRe.exec(text)) !== null) {
+  amountMarkerRe.lastIndex = 0;
+  const combinedRe =
+    /\{(?:price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)|amount:([0-9]+(?:\.[0-9]+)?))\}/g;
+  while ((match = combinedRe.exec(text)) !== null) {
     if (match.index > lastIndex) {
       parts.push({ kind: "text", value: text.slice(lastIndex, match.index) });
     }
-    const offeringId = match[1]!;
-    const chargeRef = match[2]!;
-    const offeringRef = offeringUriPrefix + offeringId;
-    const entries = derivedPrices?.[offeringRef];
-    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
-    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
-    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
-    const variants = buildPriceVariants(
-      sourceProp,
-      chargeRef,
-      lang,
-      offeringRef,
-      derivedPrices,
-      undefined,
-    );
-    parts.push({ kind: "price", variants });
+    if (match[1] && match[2]) {
+      const offeringId = match[1];
+      const chargeRef = match[2];
+      const offeringRef = offeringUriPrefix + offeringId;
+      const entries = derivedPrices?.[offeringRef];
+      const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+      const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+      const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+      const variants = buildPriceVariants(
+        sourceProp,
+        chargeRef,
+        lang,
+        offeringRef,
+        derivedPrices,
+        undefined,
+      );
+      parts.push({ kind: "price", variants });
+    } else if (match[3]) {
+      const variants = buildAmountVariants(match[3]);
+      parts.push({ kind: "price", variants });
+    }
     lastIndex = match.index + match[0].length;
   }
   if (lastIndex < text.length) {
@@ -124,8 +165,8 @@ const faqItems: FaqItemWithParts[] = allFaqEntries
     level={props.header?.level ?? 2}
     hideSectionNumber={props.header?.hideSectionNumber}
     id="faq-list-title"
-  lang={lang}
-    />
+    lang={lang}
+  />
 
   <div class="faq-list-section__items">
     {
