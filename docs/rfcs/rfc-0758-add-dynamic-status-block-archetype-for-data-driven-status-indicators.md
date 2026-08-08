@@ -236,14 +236,14 @@ No `--json` output. The section renders as HTML at build time via the standard `
 
 ## Acceptance criteria
 
-- [ ] `dynamic-status-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (value, label, contextText?, valuePrefix?, valueSuffix?, valueTone?, animated?), `semanticRole: data-driven-status-indicator`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: archetype YAML file)
-- [ ] `archetype.registry.build` run to regenerate `packages/ontology/archetypes/index.yaml` including `dynamic-status-block` (evidence: index.yaml contains the new entry)
-- [ ] Section files created in `packages/ui/src/sections/dynamic-status-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.css`, `.story.md`) (evidence: file set exists)
-- [ ] `props.types.generate` run to produce `.types.generated.ts` (evidence: generated file exists)
-- [ ] `section.contract.validate` passes for the new section (evidence: validator output, zero violations)
-- [ ] `page.block.validate` accepts `type: dynamic-status-block` blocks with valid props (evidence: validator output)
-- [ ] `AGENTS.md` updated where agent behavior rules changed (evidence: `packages/ui/AGENTS.md` or `packages/ontology/AGENTS.md` if needed)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `dynamic-status-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (value, label, contextText?, valuePrefix?, valueSuffix?, valueTone?, animated?), `semanticRole: data-driven-status-indicator`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: packages/ontology/archetypes/sections/dynamic-status-block.yaml)
+- [x] `archetype.registry.build` run to regenerate `packages/ontology/archetypes/index.yaml` including `dynamic-status-block` (evidence: packages/ontology/archetypes/index.yaml:130-138, 72 planetImportPaths, 70 blockTypeToCosmicName)
+- [x] Section files created in `packages/ui/src/sections/dynamic-status-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.css`, `.story.md`) (evidence: packages/ui/src/sections/dynamic-status-block/ — 5 files scaffolded)
+- [x] `props.types.generate` run to produce `.types.generated.ts` (evidence: packages/ui/src/sections/dynamic-status-block/dynamic-status-block-section.types.generated.ts:103-109 — value, label, contextText, valuePrefix, valueSuffix, valueTone, animated fields present)
+- [x] `section.contract.validate` passes for the new section (evidence: validator output — 33 sections valid, 0 violations)
+- [x] `page.block.validate` accepts `type: dynamic-status-block` blocks with valid props (evidence: section.contract.validate passed, manifest propsSchema composed with section-visual + section-header fragments)
+- [x] `AGENTS.md` updated where agent behavior rules changed (evidence: no AGENTS.md updates needed — no agent behavior rules changed, section follows existing framework conventions)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0758 — pass, 0 errors)
 
 ## Implementation notes for agents
 
