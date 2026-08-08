@@ -1,10 +1,10 @@
 ---
 rfcId: RFC-0750
 planId: PLAN-RFC-0750-01
-status: draft
+status: complete
 owner: architecture
 createdAt: 2026-08-08
-updatedAt:
+updatedAt: 2026-08-08
 scope:
   apps: []
   packages:
@@ -19,13 +19,13 @@ scope:
 
 ## 1. Objectives
 
-- [ ] O1 — Create `appendAndCommitBordbuch` and `appendBatchAndCommitBordbuch` helpers — maps to acceptance criterion "appendAndCommitBordbuch and appendBatchAndCommitBordbuch defined in bordbuch/bordbuch-commit-helper.ts"
-- [ ] O2 — Remove `commitAndPushBordbuch` from barrel exports — maps to acceptance criterion "commitAndPushBordbuch removed from bordbuch/index.ts barrel exports"
-- [ ] O3 — Migrate all 20 command call sites to use new helpers — maps to acceptance criterion "All 20 commands migrated"
-- [ ] O4 — Create `bordbuch.commit.parity.lint` command and integrate into `PACKAGES_CHECK_PIPELINE` — maps to acceptance criterion "bordbuch.commit.parity.lint command registered and integrated"
-- [ ] O5 — Add `bordbuch/events.ndjson` to `BORDBUCH_PROJECTION_PATHS` — maps to acceptance criterion "bordbuch/events.ndjson added to BORDBUCH_PROJECTION_PATHS"
-- [ ] O6 — Update `AGENTS.md` for `site-kernel-handoff` — maps to acceptance criterion "AGENTS.md updated with appendAndCommitBordbuch as canonical API"
-- [ ] O7 — Unit tests for helpers — maps to acceptance criteria "Unit tests verify helper appends + commits + pushes" and "Unit tests verify appendBatchAndCommitBordbuch commits once for multiple entries"
+- [x] O1 — Create `appendAndCommitBordbuch` and `appendBatchAndCommitBordbuch` helpers — maps to acceptance criterion "appendAndCommitBordbuch and appendBatchAndCommitBordbuch defined in bordbuch/bordbuch-commit-helper.ts"
+- [x] O2 — Remove `commitAndPushBordbuch` from barrel exports — maps to acceptance criterion "commitAndPushBordbuch removed from bordbuch/index.ts barrel exports"
+- [x] O3 — Migrate all 20 command call sites to use new helpers — maps to acceptance criterion "All 20 commands migrated"
+- [x] O4 — Create `bordbuch.commit.parity.lint` command and integrate into `PACKAGES_CHECK_PIPELINE` — maps to acceptance criterion "bordbuch.commit.parity.lint command registered and integrated"
+- [x] O5 — Add `bordbuch/events.ndjson` to `BORDBUCH_PROJECTION_PATHS` — maps to acceptance criterion "bordbuch/events.ndjson added to BORDBUCH_PROJECTION_PATHS"
+- [x] O6 — Update `AGENTS.md` for `site-kernel-handoff` — maps to acceptance criterion "AGENTS.md updated with appendAndCommitBordbuch as canonical API"
+- [x] O7 — Unit tests for helpers — maps to acceptance criteria "Unit tests verify helper appends + commits + pushes" and "Unit tests verify appendBatchAndCommitBordbuch commits once for multiple entries"
 
 ## 2. Affected artifacts
 
