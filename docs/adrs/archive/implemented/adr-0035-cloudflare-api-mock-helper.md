@@ -28,10 +28,9 @@ This problem will recur for any test that mocks `fetch` for a multi-step API int
 
 Use `mockImplementation` with URL+HTTP-method routing instead of `mockResolvedValueOnce` sequences for all multi-call `fetch` mocks. Provide a shared helper in `src/tests/helpers/cloudflare-api-mock.ts`.
 
-- **Positive**: mock order is irrelevant; adding internal calls (like `sourceDotenv`) does not break tests.
-- **Positive**: the helper is reusable across all Cloudflare API tests (subdomain commands, cache purge, workers adapter).
-- **Negative**: slightly more verbose than `mockResolvedValueOnce` for single-call tests.
-- **Technical debt**: the helper is Cloudflare-specific; a generic REST mock helper could be extracted later if other API clients need similar patterns.
+## Justification
+
+The alternative — wrapping each `mockResolvedValueOnce` sequence in fragile ordering assumptions — breaks on any internal call insertion or reorder. A URL+method-based router is order-independent, making tests resilient to internal implementation changes (e.g. adding `sourceDotenv` or caching layers). The helper is a pure test utility with no production code impact.
 
 ## Consequences
 
