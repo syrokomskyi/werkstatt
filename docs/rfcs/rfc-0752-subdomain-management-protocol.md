@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -34,7 +35,6 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
   - "@warpgogol/site-kernel-checks"
-  - "@warpgogol/ontology"
 successSignals:
   - `subdomain.register --service matomo-proxy` creates DNS CNAME + Workers route in Cloudflare atomarly and idempotently.
   - `subdomain.validate --service matomo-proxy` verifies that DNS record and Workers route exist and point to the correct Worker.
@@ -81,6 +81,7 @@ The platform gains a **subdomain management protocol** with three commands:
 ### Cloudflare API authorization
 
 Uses the existing `CLOUDFLARE_API_TOKEN` environment variable (already used by `wrangler deploy`). The token must have permissions:
+
 - `Zone:DNS:Edit` — for creating DNS records.
 - `Workers Routes:Edit` — for creating Workers routes.
 
@@ -88,7 +89,7 @@ If the current token lacks these permissions, the operator extends the token sco
 
 ### Zone ID resolution
 
-Each `systems[]` entry in `systems/registry.yaml` gains a `cloudflareZoneId` field:
+This RFC declares the `cloudflareZoneId` field on `systems[]` entries in `systems/registry.yaml`. RFC-0751 (Service Deployment Protocol) references this field for the same Cloudflare API operations. The field is owned by this RFC because subdomain management is the primary consumer of the Cloudflare DNS and Workers Routes APIs.
 
 ```yaml
 systems:
@@ -101,6 +102,7 @@ systems:
 `subdomain.register` and `subdomain.validate` resolve the zone ID from the registry by matching the `subdomains[].zone` field to the `systems[]` entry whose domain matches.
 
 **Justification for storing `cloudflareZoneId` in the registry:**
+
 - The zone ID is stable — it does not change after zone creation.
 - It is not a secret — it is visible in the Cloudflare Dashboard and API responses.
 - Storing it avoids an extra API call (`GET /zones?name=...`) on every subdomain operation.
@@ -183,6 +185,29 @@ interface SubdomainValidateResult {
   };
   state: "valid" | "not-registered" | "mismatched";
 }
+
+interface SubdomainListEntry {
+  domain: string;
+  dnsRecord: {
+    exists: boolean;
+    id: string | null;
+    type: string | null;
+    content: string | null;
+    proxied: boolean | null;
+  };
+  workersRoute: {
+    exists: boolean;
+    id: string | null;
+    pattern: string | null;
+    script: string | null;
+  };
+}
+
+interface SubdomainListResult {
+  command: "subdomain.list";
+  zone: string;
+  subdomains: SubdomainListEntry[];
+}
 ```
 
 ### DNS record creation
@@ -199,7 +224,11 @@ POST /zones/{zone_id}/dns_records
 }
 ```
 
-The `<account>` subdomain is derived from `CLOUDFLARE_ACCOUNT_ID` or from the existing `workersDevUrl` in the registry.
+The `<account>` subdomain is resolved with the following fallback chain:
+
+1. **`workersDevUrl`** from the service entry in the registry (RFC-0751) — extract the `<account>` segment from `https://<worker>.<account>.workers.dev`.
+2. **`CLOUDFLARE_ACCOUNT_ID`** environment variable — construct `<worker>.<account>.workers.dev`.
+3. **Error** — if neither is available, `subdomain.register` fails with a clear message.
 
 ### Workers route creation
 
@@ -214,6 +243,7 @@ POST /zones/{zone_id}/workers/routes
 ### Idempotency
 
 `subdomain.register` checks for existing DNS records and Workers routes before creating:
+
 - If DNS record exists with correct CNAME target and proxied status → skip DNS creation.
 - If Workers route exists with correct pattern and script → skip route creation.
 - If DNS record exists with wrong target → report error (do not auto-update, to avoid breaking production).
@@ -223,30 +253,65 @@ POST /zones/{zone_id}/workers/routes
 
 The `pulse` subdomain (`pulse.warpgogol.com`) is a CNAME to `app.pulsetic.com` (external monitoring), not a Workers route. This is handled by RFC-0753 (DNS Record Management) as a plain DNS record, not by this RFC. `subdomain.register` is only for Worker-backed subdomains.
 
+### File system responsibilities
+
+| Path | Role |
+| --- | --- |
+| `systems/registry.yaml` | Gains `cloudflareZoneId` on `systems[]` entries; `services:` key with `subdomains[]` declared by RFC-0751 |
+| `packages/os/site-kernel-handoff/src/subdomain/` | New directory — `subdomain-register.ts`, `subdomain-validate.ts`, `subdomain-list.ts` |
+| `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-api.ts` | New Cloudflare REST API client (DNS records + Workers routes), separate from the existing `cloudflare-workers.ts` wrangler adapter |
+| `packages/os/site-kernel-checks/src/` | `subdomain-validate.ts` validator wrapper if integrated into pipeline checks |
+
+### Output format
+
+All three commands return `KernelCommandResult<T>` with `--json` output:
+
+```json
+{
+  "command": "subdomain.register",
+  "serviceId": "matomo-proxy",
+  "subdomain": { "domain": "matomo-proxy.warpgogol.com", "zone": "warpgogol.com" },
+  "dnsRecord": { "id": "abc123", "type": "CNAME", "name": "matomo-proxy", "content": "matomo-proxy.syrokomskyi.workers.dev", "proxied": true, "created": true },
+  "workersRoute": { "id": "def456", "pattern": "matomo-proxy.warpgogol.com/*", "script": "matomo-proxy", "created": true },
+  "state": "registered"
+}
+```
+
+`subdomain.validate` returns `state: "valid" | "not-registered" | "mismatched"` with per-resource detail. `subdomain.list` returns `{ zone, subdomains: SubdomainListEntry[] }`.
+
+### Failure modes
+
+| Condition | Exit code | Behavior |
+| --- | --- | --- |
+| Missing `CLOUDFLARE_API_TOKEN` | 1 | Error with instructions to set it |
+| Missing `cloudflareZoneId` in registry | 1 | Error pointing to the `systems[]` entry that needs it |
+| Missing service in registry | 1 | Error with available service IDs |
+| API call failure | 1 | Retry with exponential backoff (3 attempts), then error |
+| DNS record exists with wrong target | 1 | Report current vs expected target; do not auto-update |
+| Workers route exists with wrong script | 1 | Report current vs expected script; do not auto-update |
+| `subdomain.validate` reports `not-registered` | 0 | Validation result (not an error — used as pre-deploy gate) |
+| `subdomain.validate` reports `mismatched` | 0 | Validation result (not an error — used as pre-deploy gate) |
+
 ## Architectural fit
 
 - **RFC-0751**: `leitstand.service.deploy` depends on `subdomain.validate` as a pre-deploy gate and calls `subdomain.register` automatically when validation reports "not registered".
 - **RFC-0753**: DNS Record Management Protocol handles arbitrary DNS records (MX, SPF, DKIM, external CNAMEs like `pulse`). This RFC is specifically for Worker-backed subdomains (DNS + Workers route).
-- **DNA-40**: Extends the deployment contract with subdomain validation as a pre-deploy gate.
+- **DNA-40**: The env-example and deploy-script contract (DNA-40) establishes `deploy.preflight` as a mandatory pre-deploy gate. This RFC extends the deploy pipeline with `subdomain.validate` as an additional pre-deploy gate called by `leitstand.service.deploy` (RFC-0751). The `CLOUDFLARE_API_TOKEN` used by subdomain commands is already documented in `.env.example` files per DNA-40; this RFC does not introduce new env vars but documents additional token permissions (`Zone:DNS:Edit`, `Workers Routes:Edit`) in the Cloudflare API authorization section.
+- **AGENTS.md updates**: `packages/os/site-kernel-handoff/AGENTS.md` should document the subdomain command family and the Cloudflare API client. Root `AGENTS.md` should reference the subdomain protocol in the deployment section.
+- **Compass sync**: No `docs/*.xml` changes required — this RFC adds new commands without changing existing repository-wide requirements or shared package contracts.
 
 ## Design
 
 ### subdomain.register
 
 1. **Read registry** — find the service entry by `--service <id>`, extract `subdomains[]`.
-2. **For each subdomain**:
-   a. **Resolve zone ID** — find `systems[]` entry whose domain matches `subdomain.zone`, read `cloudflareZoneId`.
-   b. **Check DNS record** — `GET /zones/{zone_id}/dns_records?name={subdomain.domain}`. If exists with correct CNAME target and proxied status → skip. If exists with wrong target → error. If missing → create.
-   c. **Check Workers route** — `GET /zones/{zone_id}/workers/routes?pattern={subdomain.domain}/*`. If exists with correct script → skip. If exists with wrong script → error. If missing → create.
+2. **For each subdomain**: a. **Resolve zone ID** — find `systems[]` entry whose domain matches `subdomain.zone`, read `cloudflareZoneId`. b. **Check DNS record** — `GET /zones/{zone_id}/dns_records?name={subdomain.domain}`. If exists with correct CNAME target and proxied status → skip. If exists with wrong target → error. If missing → create. c. **Check Workers route** — list all routes via `GET /zones/{zone_id}/workers/routes` and filter client-side by pattern (the Cloudflare API does not support filtering routes by pattern query parameter). If a route with the correct pattern and script exists → skip. If a route with the correct pattern but wrong script exists → error. If missing → create.
 3. **Return result** — structured JSON with DNS record and Workers route state.
 
 ### subdomain.validate
 
 1. **Read registry** — find the service entry, extract `subdomains[]`.
-2. **For each subdomain**:
-   a. **Resolve zone ID** — same as `subdomain.register`.
-   b. **Check DNS record** — exists? correct type (CNAME)? correct target? proxied?
-   c. **Check Workers route** — exists? correct pattern? correct script?
+2. **For each subdomain**: a. **Resolve zone ID** — same as `subdomain.register`. b. **Check DNS record** — exists? correct type (CNAME)? correct target? proxied? c. **Check Workers route** — exists? correct pattern? correct script?
 3. **Return result** — `valid` if both exist and are correct, `not-registered` if either is missing, `mismatched` if either exists but points to wrong target/script.
 
 ### subdomain.list
@@ -284,7 +349,8 @@ The `pulse` subdomain (`pulse.warpgogol.com`) is a CNAME to `app.pulsetic.com` (
 - **Cloudflare API rate limits**: Bulk subdomain registration could hit rate limits. Mitigated by idempotency (re-run safely) and per-subdomain API calls (not bulk).
 - **Token permissions**: The existing `CLOUDFLARE_API_TOKEN` may not have `Zone:DNS:Edit` or `Workers Routes:Edit` permissions. Mitigated by clear error messages with instructions to extend token scope.
 - **Zone ID drift**: If a zone is deleted and recreated, the zone ID changes. Mitigated by `subdomain.validate` reporting zone ID mismatch.
-- **Race condition**: Two operators running `subdomain.register` simultaneously could create duplicate records. Mitigated by idempotency check before creation.
+- **Race condition (TOCTOU)**: Two operators running `subdomain.register` simultaneously could create duplicate records. The idempotency check before creation has a time-of-check-to-time-of-use window — between the check and the create, another process could create the same record. Mitigated by: (a) idempotency check before creation, (b) Cloudflare API returns an error on duplicate DNS records for single-value types (CNAME), which the command handles gracefully. For operators, this is acceptable — subdomain registration is not a high-frequency operation.
+- **Token permission documentation**: The additional `Zone:DNS:Edit` and `Workers Routes:Edit` permissions are documented in the Cloudflare API authorization section of this RFC. Operators extend the token scope via Cloudflare Dashboard (one-time). No `.env.example` changes are needed — the env var name (`CLOUDFLARE_API_TOKEN`) is unchanged, only its permission scope changes.
 
 ## Acceptance criteria
 
