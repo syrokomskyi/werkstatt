@@ -325,16 +325,16 @@ On violation:
 
 ## Acceptance criteria
 
-- [ ] `appendAndCommitBordbuch` and `appendBatchAndCommitBordbuch` defined in `bordbuch/bordbuch-commit-helper.ts` with correct TypeScript types
-- [ ] `commitAndPushBordbuch` removed from `bordbuch/index.ts` barrel exports — internal only
-- [ ] All 20 commands migrated to use `appendAndCommitBordbuch` or `appendBatchAndCommitBordbuch` — no direct `appendBordbuchEntry` calls outside whitelist
-- [ ] `bordbuch.commit.parity.lint` command registered in `site-kernel-checks` and integrated into `PACKAGES_CHECK_PIPELINE`
-- [ ] `bordbuch/events.ndjson` added to `BORDBUCH_PROJECTION_PATHS` in `bordbuch-commit.ts`
-- [ ] `bordbuch.commit.parity.lint` passes with zero violations after migration
-- [ ] `AGENTS.md` for `packages/os/site-kernel-handoff` updated with `appendAndCommitBordbuch` as canonical API
-- [ ] Unit tests verify helper appends + commits + pushes in one call
-- [ ] Unit tests verify `appendBatchAndCommitBordbuch` commits once for multiple entries
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `appendAndCommitBordbuch` and `appendBatchAndCommitBordbuch` defined in `bordbuch/bordbuch-commit-helper.ts` with correct TypeScript types (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit-helper.ts)
+- [x] `commitAndPushBordbuch` removed from `bordbuch/index.ts` barrel exports — internal only (evidence: packages/os/site-kernel-handoff/src/bordbuch/index.ts)
+- [x] All 20 commands migrated to use `appendAndCommitBordbuch` or `appendBatchAndCommitBordbuch` — no direct `appendBordbuchEntry` calls outside whitelist (evidence: bordbuch.commit.parity.lint passes with 0 violations)
+- [x] `bordbuch.commit.parity.lint` command registered in `site-kernel-checks` and integrated into `PACKAGES_CHECK_PIPELINE` (evidence: packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts, packages/os/site-kernel-checks/src/pipelines/packages-check.ts)
+- [x] `bordbuch/events.ndjson` added to `BORDBUCH_PROJECTION_PATHS` in `bordbuch-commit.ts` (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts)
+- [x] `bordbuch.commit.parity.lint` passes with zero violations after migration (evidence: site-kernel run bordbuch.commit.parity.lint --mode fail → 0 error(s), 0 warning(s))
+- [x] `AGENTS.md` for `packages/os/site-kernel-handoff` updated with `appendAndCommitBordbuch` as canonical API (evidence: packages/os/site-kernel-handoff/AGENTS.md)
+- [x] Unit tests verify helper appends + commits + pushes in one call (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit-helper.test.ts)
+- [x] Unit tests verify `appendBatchAndCommitBordbuch` commits once for multiple entries (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit-helper.test.ts)
+- [x] `rfc.validate` passes on this file before merging (evidence: this validation run)
 
 ## Implementation notes for agents
 
