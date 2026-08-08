@@ -29,6 +29,7 @@ Every section under `packages/ui/src/sections/<slug>/` MUST:
 - Carry a `cosmicName` listed in the archetype's `acceptedCosmicNames`. The picker `cosmic.name.pick` chooses a free name during `section.scaffold`; do not hand-pick.
 - Have colocated `<slug>-section.types.ts` exporting the TypeScript prop shape consumed by the `.astro` template. The **runtime contract** is the JSON Schema composed from the manifest's `propsSchemaCompose` plus inline `propsSchema` — evaluated by `page.block.validate` against authored page blocks. There is **no** sidecar `*.props.schema.ts` Zod file: it was retired by RFC-0123 because the manifest is the single source of truth (RFC-0110 / RFC-0119).
 - Have colocated `<slug>.css` using only `--ds-*` tokens (no raw colors / sizes; enforced by `tokens.colors.lint` + `tokens.ds.lint`; section-framework primitives additionally enforced by `tokens.colors.section-shell.lint` per RFC-0122).
+- **Use `main > section:first-of-type`, never `main > :first-child`** in CSS rules targeting the first section. Astro dev mode injects `<script>` tags as the first child of `<main>`; `:first-child` matches the script tag instead of the section, breaking header-offset and min-height rules.
 - Have `<slug>-section.story.md` with at least one realistic props example.
 
 `section.contract.validate` enforces these in `PACKAGES_CHECK_PIPELINE`. Detect near-duplicates with `section.similarity.report`.
