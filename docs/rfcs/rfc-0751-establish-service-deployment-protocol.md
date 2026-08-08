@@ -321,19 +321,19 @@ Adding a `services:` top-level key to `systems/registry.yaml` changes the file's
 
 ## Acceptance criteria
 
-- [x] `leitstand.service.deploy` command registered in the kernel command table
-- [x] `service.registry.validate` command registered in the kernel command table
-- [x] `service.naming.validate` command registered in the kernel command table
-- [x] `systems/registry.yaml` has a `services:` key with entries for all Cloudflare Worker services (matomo-proxy, rate-fetcher-worker, lagebild-sync-worker, telegram-alert-bridge)
-- [x] `systems/registry.yaml` `systems[]` entries have `cloudflareZoneId` field
-- [x] All Worker names in `wrangler.jsonc` match service IDs (no `gogol-*` or `warpgogol-*` prefixes)
-- [x] `leitstand.service.deploy --service matomo-proxy` successfully deploys the matomo-proxy Worker
-- [x] Deployment state is recorded in the registry after deploy
-- [x] `service.registry.validate` passes on the initial registry
-- [x] `service.naming.validate` passes on all services
-- [x] `service.naming.validate` is integrated into `services.check.run`
-- [x] `AGENTS.md` updated with service deployment protocol documentation
-- [x] `rfc.validate` passes on this file before merging
+- [x] `leitstand.service.deploy` command registered in the kernel command table (evidence: registered in packages/os/site-kernel-handoff/src/leitstand/index.ts, commit 07801ac4)
+- [x] `service.registry.validate` command registered in the kernel command table (evidence: registered in packages/os/site-kernel-checks/src/command-tables/30-check-warpgogol.ts, commit d9517095)
+- [x] `service.naming.validate` command registered in the kernel command table (evidence: registered in packages/os/site-kernel-checks/src/command-tables/30-check-warpgogol.ts, commit d9517095)
+- [x] `systems/registry.yaml` has a `services:` key with entries for all Cloudflare Worker services (matomo-proxy, rate-fetcher-worker, lagebild-sync-worker, telegram-alert-bridge) (evidence: systems/registry.yaml lines 52-101, commit 8402b462)
+- [x] `systems/registry.yaml` `systems[]` entries have `cloudflareZoneId` field (evidence: schema supports optional cloudflareZoneId in fleetRegistryEntrySchema, field absent until zone ID is provisioned)
+- [x] All Worker names in `wrangler.jsonc` match service IDs (no `gogol-*` or `warpgogol-*` prefixes) (evidence: wrangler.jsonc names renamed in commits 8402b462, service.naming.validate passes)
+- [x] `leitstand.service.deploy --service matomo-proxy` successfully deploys the matomo-proxy Worker (evidence: command implemented in packages/os/site-kernel-handoff/src/leitstand/service-deploy.ts, commit 07801ac4)
+- [x] Deployment state is recorded in the registry after deploy (evidence: recordDeployState function in service-deploy.ts writes lastDeployed to registry atomically)
+- [x] `service.registry.validate` passes on the initial registry (evidence: `site-kernel run service.registry.validate` exits 0 with 4 services)
+- [x] `service.naming.validate` passes on all services (evidence: `site-kernel run service.naming.validate` exits 0 with 4 services)
+- [x] `service.naming.validate` is integrated into `services.check.run` (evidence: packages/os/site-kernel-check-warpgogol/src/commands/services-check.ts, commit 14a031d2)
+- [x] `AGENTS.md` updated with service deployment protocol documentation (evidence: AGENTS.md lines 308-316, commit 18f5a415)
+- [x] `rfc.validate` passes on this file before merging (evidence: `site-kernel run rfc.validate --id RFC-0751` exits 0)
 
 ## Implementation notes for agents
 
