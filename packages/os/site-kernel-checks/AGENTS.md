@@ -240,3 +240,7 @@ Use `conditional: true` for files that are only generated under certain conditio
 ## JSONC parsing rule (RFC-0751)
 
 When parsing `.jsonc` files (e.g. `wrangler.jsonc`) with a custom `parseJsonc` function, ALWAYS strip trailing commas before `JSON.parse`. JSONC allows trailing commas (e.g. `{ "a": 1, }`), but `JSON.parse` rejects them. The pattern: `content.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/,(\s*[}\]])/g, "$1")` — strip line comments, block comments, then trailing commas. Without this, validators that parse `wrangler.jsonc` will fail on every service config.
+
+## Testing conventions
+
+- **Simulating `writeFileIfChanged` write errors in tests.** `writeFileIfChanged` reads the file before writing — if the content is identical, it skips the write entirely. This means `chmod` on a directory or file does not reliably block writes, because the read may still succeed and the write may be skipped. To simulate a write failure (e.g. testing CREG-06 or other error diagnostics), create a regular file at the expected `mkdir` path so that `mkdir(..., { recursive: true })` fails with `EEXIST`/ENOTDIR. This forces the error path in the surrounding `try/catch` block. See the CREG-06 test in `src/tests/content-regression.test.ts` for the working pattern.
