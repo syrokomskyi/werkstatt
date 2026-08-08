@@ -1,11 +1,11 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  [RFC-0026/RFC-0041/RFC-0045] Prose rendering pipeline — orchestrates the
+  [RFC-0026/RFC-0041/RFC-0045/RFC-0766] Prose rendering pipeline — orchestrates the
   decision tree for rendering prose content: reference substitution → micromark,
   image-bearing → micromark + image resolution, or Astro render() for plain prose.
-  Also handles inline-number animation wrapping. Returns either an HTML string
-  (for set:html) or an Astro Component (for <Component />).
+  Also handles inline-number animation wrapping and price marker resolution.
+  Returns either an HTML string (for set:html) or an Astro Component (for <Component />).
 </purpose>
 <non-goals>
   <item>Do not own section layout, SectionShell, or language columns — caller handles those.</item>
@@ -14,6 +14,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Extracted from markdown-section.astro to create a testable internal seam for prose rendering orchestration.</item>
+  <item>RFC-0766: Added hasPriceMarkers detection, resolvePriceMarkersInHtml post-processing, and integration into all HTML-returning paths.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +34,8 @@ import GithubSlugger from "github-slugger";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts";
+import { renderPriceDisplayHtml } from "../../utils/price-marker.ts";
+import { loadDerivedPrices } from "../price-card/price-variants.ts";
 
 /**
  * Render markdown to HTML with GFM support (tables, strikethrough, task lists,
@@ -71,6 +74,30 @@ export interface ProsePipelineOptions {
   numberDuration?: number;
   materialCreditLabels: MaterialCreditLabels;
   creditsSiteDefault: AttributionSiteDefault;
+}
+
+const PRICE_MARKER_RE = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/;
+const PRICE_MARKER_GLOBAL_RE = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+const CODE_PRE_SPLIT_RE = /(<code>[\s\S]*?<\/code>|<pre>[\s\S]*?<\/pre>)/g;
+
+function hasPriceMarkers(text: string): boolean {
+  return PRICE_MARKER_RE.test(text);
+}
+
+function resolvePriceMarkersInHtml(
+  html: string,
+  lang: string,
+  derivedPrices: ReturnType<typeof loadDerivedPrices>,
+): string {
+  const segments = html.split(CODE_PRE_SPLIT_RE);
+  return segments
+    .map((segment, index) => {
+      if (index % 2 === 1) return segment;
+      return segment.replace(PRICE_MARKER_GLOBAL_RE, (_match, offeringId, chargeRef) =>
+        renderPriceDisplayHtml(offeringId, chargeRef, lang, derivedPrices),
+      );
+    })
+    .join("");
 }
 
 export type ProseRenderResult =
@@ -116,13 +143,17 @@ export async function renderProse(opts: ProsePipelineOptions): Promise<ProseRend
       defaultLanguageCode,
       contentRef ? { collection: "prose", file: contentRef } : undefined,
     );
-    const html = resolveProseImages(
+    let html = resolveProseImages(
       renderMarkdownGfm(resolvedBody, true),
       lang,
       defaultLanguageCode,
       materialCreditLabels,
       creditsSiteDefault,
     );
+    if (hasPriceMarkers(resolvedBody)) {
+      const derivedPrices = loadDerivedPrices();
+      html = resolvePriceMarkersInHtml(html, lang, derivedPrices);
+    }
     return { kind: "html", html };
   }
 
@@ -165,37 +196,52 @@ export async function renderProse(opts: ProsePipelineOptions): Promise<ProseRend
     }
 
     if (rawHtml) {
-      const html = resolveProseImages(
+      let html = resolveProseImages(
         wrapInlineNumbers(rawHtml, { animateYears, duration: numberDuration }),
         lang,
         defaultLanguageCode,
         materialCreditLabels,
         creditsSiteDefault,
       );
+      if (hasPriceMarkers(sourceBody ?? "")) {
+        const derivedPrices = loadDerivedPrices();
+        html = resolvePriceMarkersInHtml(html, lang, derivedPrices);
+      }
       return { kind: "html", html };
     }
   }
 
-  // Render prose: use micromark only if there were references to substitute, otherwise use Astro's render()
-  if (hasReferences && proseBody) {
-    const html = resolveProseImages(
+  // [RFC-0766] Detect price markers — force micromark path if present.
+  const hasPriceMarkersInBody = hasPriceMarkers(proseBody) || hasPriceMarkers(sourceBody ?? "");
+
+  // Render prose: use micromark if there were references, images, or price markers; otherwise use Astro's render()
+  if ((hasReferences || hasPriceMarkersInBody) && proseBody) {
+    let html = resolveProseImages(
       renderMarkdownGfm(proseBody, true),
       lang,
       defaultLanguageCode,
       materialCreditLabels,
       creditsSiteDefault,
     );
+    if (hasPriceMarkersInBody) {
+      const derivedPrices = loadDerivedPrices();
+      html = resolvePriceMarkersInHtml(html, lang, derivedPrices);
+    }
     return { kind: "html", html };
   }
 
-  if (markdownHasImages(sourceBody)) {
-    const html = resolveProseImages(
+  if (markdownHasImages(sourceBody) || hasPriceMarkers(sourceBody ?? "")) {
+    let html = resolveProseImages(
       renderMarkdownGfm(sourceBody ?? "", true),
       lang,
       defaultLanguageCode,
       materialCreditLabels,
       creditsSiteDefault,
     );
+    if (hasPriceMarkers(sourceBody ?? "")) {
+      const derivedPrices = loadDerivedPrices();
+      html = resolvePriceMarkersInHtml(html, lang, derivedPrices);
+    }
     return { kind: "html", html };
   }
 

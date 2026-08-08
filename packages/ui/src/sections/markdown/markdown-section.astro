@@ -14,6 +14,7 @@
 
 import "./markdown-section.css";
 import "../../components/material-credit/material-credit.css";
+import "../../components/currency-aware-price-display/currency-aware-price-display-component.css";
 
 import { getEntry, render } from "astro:content";
 import type {
@@ -204,8 +205,8 @@ const shouldShowLanguageLabels = showLanguageColumns && showLanguageLabels;
           id="markdown-section-title"
           sectionNumber={sectionNumber}
           hideSectionNumber={hideSectionNumber}
-        lang={lang}
-      />
+          lang={lang}
+        />
       )
     }
     {
@@ -251,4 +252,10 @@ const shouldShowLanguageLabels = showLanguageColumns && showLanguageLabels;
   document.querySelectorAll(".markdown-section__content table").forEach((table) => {
     if (!table.hasAttribute("tabindex")) table.setAttribute("tabindex", "0");
   });
+
+  import { initCurrencyAwarePriceDisplay } from "../../components/currency-aware-price-display/currency-aware-price-display-component.client.ts";
+  const priceContainers = document.querySelectorAll<HTMLElement>("[data-currency-price-display]");
+  for (const container of priceContainers) {
+    initCurrencyAwarePriceDisplay(container);
+  }
 </script>
