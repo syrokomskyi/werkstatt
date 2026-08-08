@@ -8,6 +8,7 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - It validates thin handoff bundles, compares ecosystem versions, diffs consumed capabilities, and owns the forward migrator registry.
 - It must not change `client.export`; that external full-fork deliverable remains owned by `@warpgogol/site-kernel-deploy`.
 - It owns the Notausgang emergency export and validation commands (`notausgang.export`, `notausgang.validate`).
+- RFC-0752: It owns the subdomain management command family (`subdomain.register`, `subdomain.validate`, `subdomain.list`) in `src/subdomain/` and the Cloudflare REST API client (`src/leitstand/adapters/cloudflare-api.ts`).
 
 ## Implementation Rules
 
