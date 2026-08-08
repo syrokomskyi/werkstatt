@@ -4,7 +4,7 @@ date: 2026-08-08
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: 1abd7641^...HEAD
 filesReviewed:
   - packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts
@@ -14,9 +14,9 @@ filesReviewed:
 
 # Code Review: RFC-0763 failure-path bordbuch cleanup
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The implementation correctly adds `commitBordbuchProjections` cleanup to both failure paths with proper non-fatal try/catch. However, Axis A finds a duplicated code pattern — the same try/catch/log block is copy-pasted at two insertion points. This should be extracted into a shared helper to follow DRY and reduce maintenance burden.
+The implementation correctly adds `commitBordbuchProjections` cleanup to both failure paths with proper non-fatal try/catch. The duplicated code pattern identified in the initial review (F-A1) has been resolved by extracting a `cleanupBordbuchOnFailure` helper. All axes pass.
 
 ### Mechanical floor
 
@@ -24,7 +24,7 @@ Pass — `pnpm --filter @warpgogol/site-kernel-handoff run build:check` exits 0.
 
 ### Axis A — Structural correctness
 
-- **F-A1 (FINDING): Duplicated Code** — The same try/catch/log block is duplicated at `mission-materialization-commands.ts:372-384` (build.prepare failure) and `mission-materialization-commands.ts:601-613` (validation failure). The only difference is the log message string ("build.prepare failure" vs "validation failure"). This is a textbook Duplicated Code smell. Extract a shared helper function (e.g. `cleanupBordbuchOnFailure(workspaceRoot, systemId, label, logger)`) and call it from both sites. This reduces 12 lines of duplication to 2 one-line calls.
+- **F-A1 (RESOLVED): Duplicated Code** — The same try/catch/log block was duplicated at two insertion points. Fixed by extracting `cleanupBordbuchOnFailure` helper function (mission-materialization-commands.ts:72-90). Both failure paths now call the helper with a label parameter, eliminating the duplication.
 
 ### Axis B — DNA alignment
 
@@ -44,7 +44,7 @@ No issues. Compass scaffolding (CHANGE_SUMMARY) updated with RFC-0763 entry. RFC
 
 ### Axis F — Pragmatism
 
-- **F-F1 (FINDING): Minimality ladder** — The duplicated code pattern (F-A1) also violates the minimality ladder. A shared helper would be a single function extracted to the module level, reducing total lines of code. The current approach of copy-pasting the block is the least minimal solution.
+- **F-F1 (RESOLVED): Minimality ladder** — The duplicated code pattern (F-A1) has been resolved by extracting the `cleanupBordbuchOnFailure` helper. The total code is now more minimal.
 
 ### Axis G — Blind spots
 
@@ -64,4 +64,4 @@ No issues. The RFC's Failure modes section explicitly addresses the `bordbuch.co
 
 ### Questions for the author
 
-1. **Should the duplicated try/catch/log block be extracted into a shared helper?** The same 12-line pattern appears at two sites with only the log label differing. A `cleanupBordbuchOnFailure(workspaceRoot, systemId, label, logger)` helper would eliminate the duplication.
+1. ~~Should the duplicated try/catch/log block be extracted into a shared helper?~~ **Resolved:** `cleanupBordbuchOnFailure` helper extracted and used at both call sites.
