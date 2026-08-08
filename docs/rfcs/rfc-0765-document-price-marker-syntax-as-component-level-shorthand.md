@@ -1,7 +1,7 @@
 ---
 id: RFC-0765
 title: "Document price marker syntax as component-level shorthand"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
