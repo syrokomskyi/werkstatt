@@ -176,6 +176,20 @@
   /* min-width (Nch) is set server-side as an inline style to pre-reserve the full end-value width */
 }
 
+/* RFC-0766: Price displays in prose must render inline within <p> elements.
+   The component CSS uses display: block for standalone usage; in prose context
+   we override to inline to prevent line breaks inside formatted prices. */
+.markdown-section__content .currency-aware-price-display,
+.markdown-section__content .currency-aware-price-display__variant,
+.markdown-section__content .currency-aware-price-display__amount {
+  display: inline;
+}
+
+.markdown-section__content .currency-aware-price-display__note {
+  display: inline;
+  margin: 0 0 0 0.25em;
+}
+
 .markdown-section__content strong {
   color: var(--ds-color-primary);
 }

@@ -34,7 +34,7 @@ import GithubSlugger from "github-slugger";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts";
-import { renderPriceDisplayHtml } from "../../utils/price-marker.ts";
+import { renderPriceDisplayHtml, PRICE_MARKER_PATTERN } from "../../utils/price-marker.ts";
 import { loadDerivedPrices } from "../price-card/price-variants.ts";
 
 /**
@@ -76,9 +76,9 @@ export interface ProsePipelineOptions {
   creditsSiteDefault: AttributionSiteDefault;
 }
 
-const PRICE_MARKER_RE = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/;
-const PRICE_MARKER_GLOBAL_RE = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
-const CODE_PRE_SPLIT_RE = /(<code>[\s\S]*?<\/code>|<pre>[\s\S]*?<\/pre>)/g;
+const PRICE_MARKER_RE = new RegExp(PRICE_MARKER_PATTERN);
+const PRICE_MARKER_GLOBAL_RE = new RegExp(PRICE_MARKER_PATTERN, "g");
+const CODE_PRE_SPLIT_RE = /(<code[^>]*>[\s\S]*?<\/code>|<pre[^>]*>[\s\S]*?<\/pre>)/g;
 
 function hasPriceMarkers(text: string): boolean {
   return PRICE_MARKER_RE.test(text);

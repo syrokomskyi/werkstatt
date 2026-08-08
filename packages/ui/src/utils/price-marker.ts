@@ -13,7 +13,8 @@ export type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceV
 export type TextOrPrice = TextPart | PricePart;
 
 const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
-const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+export const PRICE_MARKER_PATTERN = "\\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\\}";
+const priceMarkerRe = new RegExp(PRICE_MARKER_PATTERN, "g");
 
 function escapeHtml(s: string): string {
   return s
