@@ -32,7 +32,8 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
-import { appendBordbuchEntry, readBordbuch } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
+import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
@@ -168,7 +169,7 @@ export async function runNachweisSign(
 
   let bordbuchEventId: string;
   try {
-    const entry = await appendBordbuchEntry(
+    const { entry } = await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "nachweis-signed",
@@ -183,6 +184,7 @@ export async function runNachweisSign(
           payloadHash: byteHash(canonicalBytes).replace("sha256:", ""),
         },
       },
+      `Bordbuch: nachweis-signed ${systemId} ${slug}`,
     );
     bordbuchEventId = entry.id;
   } finally {

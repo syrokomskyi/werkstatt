@@ -29,7 +29,7 @@ import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
 } from "@warpgogol/site-kernel-content";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
@@ -117,7 +117,7 @@ export async function runNachweisConsentUpdate(
 
   let bordbuchEventId: string;
   try {
-    const entry = await appendBordbuchEntry(
+    const { entry } = await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "nachweis-consent",
@@ -132,6 +132,7 @@ export async function runNachweisConsentUpdate(
           method,
         },
       },
+      `Bordbuch: nachweis-consent ${systemId} ${consentId}`,
     );
     bordbuchEventId = entry.id;
   } finally {

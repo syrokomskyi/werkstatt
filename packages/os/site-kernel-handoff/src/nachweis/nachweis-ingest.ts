@@ -28,7 +28,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   computeSourceSha256,
@@ -165,7 +165,7 @@ export async function runNachweisIngest(
 
   let bordbuchEventId: string | null = null;
   try {
-    const entry = await appendBordbuchEntry(
+    const { entry } = await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "nachweis-record",
@@ -186,6 +186,7 @@ export async function runNachweisIngest(
           ...(titleEn ? { titleEn } : {}),
         },
       },
+      `Bordbuch: nachweis-record ${systemId} ${slug}`,
     );
     bordbuchEventId = entry.id;
   } catch (err) {

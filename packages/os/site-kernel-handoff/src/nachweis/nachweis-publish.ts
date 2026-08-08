@@ -34,7 +34,7 @@ import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
 } from "@warpgogol/site-kernel-content";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
@@ -172,7 +172,7 @@ export async function runNachweisPublish(
 
   let bordbuchEventId: string | null = null;
   try {
-    const entry = await appendBordbuchEntry(
+    const { entry } = await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "nachweis-record",
@@ -186,6 +186,7 @@ export async function runNachweisPublish(
           publishedAt: publication.publishedAt,
         },
       },
+      `Bordbuch: nachweis-record ${systemId} ${slug}`,
     );
     bordbuchEventId = entry.id;
   } finally {

@@ -27,7 +27,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { appendBordbuchEntry, readBordbuch } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
+import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
@@ -138,7 +139,7 @@ export async function runNachweisTimestamp(
 
   let bordbuchEventId: string;
   try {
-    const entry = await appendBordbuchEntry(
+    const { entry } = await appendAndCommitBordbuch(
       workspaceRoot,
       systemId,
       "nachweis-timestamped",
@@ -153,6 +154,7 @@ export async function runNachweisTimestamp(
           tsaName: adapter.name,
         },
       },
+      `Bordbuch: nachweis-timestamped ${systemId} ${slug}`,
     );
     bordbuchEventId = entry.id;
   } finally {

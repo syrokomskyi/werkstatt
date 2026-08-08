@@ -32,7 +32,7 @@ import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
 } from "@warpgogol/site-kernel-content";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendBatchAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
@@ -136,31 +136,34 @@ export async function runNachweisWithdraw(
 
   const bordbuchEventIds: string[] = [];
   try {
-    const consentEntry = await appendBordbuchEntry(
+    const { entries } = await appendBatchAndCommitBordbuch(
       workspaceRoot,
       systemId,
-      "nachweis-consent",
-      `Consent revoked for '${slug}': ${reason}`,
-      "agent",
-      {
-        writerRole: "nachweis",
-        metadata: { slug, reason, action: "withdraw" },
-      },
+      [
+        {
+          kind: "nachweis-consent",
+          summary: `Consent revoked for '${slug}': ${reason}`,
+          actor: "agent",
+          options: {
+            writerRole: "nachweis",
+            metadata: { slug, reason, action: "withdraw" },
+          },
+        },
+        {
+          kind: "nachweis-record",
+          summary: `Withdrawn '${slug}': ${reason}`,
+          actor: "agent",
+          options: {
+            writerRole: "nachweis",
+            metadata: { slug, reason, action: "withdraw" },
+          },
+        },
+      ],
+      `Bordbuch: nachweis-withdraw ${systemId} ${slug}`,
     );
-    bordbuchEventIds.push(consentEntry.id);
-
-    const recordEntry = await appendBordbuchEntry(
-      workspaceRoot,
-      systemId,
-      "nachweis-record",
-      `Withdrawn '${slug}': ${reason}`,
-      "agent",
-      {
-        writerRole: "nachweis",
-        metadata: { slug, reason, action: "withdraw" },
-      },
-    );
-    bordbuchEventIds.push(recordEntry.id);
+    for (const e of entries) {
+      bordbuchEventIds.push(e.id);
+    }
   } finally {
     await releaseLock(workspaceRoot, `bordbuch:${systemId}`);
     await releaseLock(workspaceRoot, `system:${systemId}`);
