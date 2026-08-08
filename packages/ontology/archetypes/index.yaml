@@ -606,6 +606,7 @@ planetImportPaths:
   Makemake: "@warpgogol/ui/sections/credits-gallery"
   Pandora: "@warpgogol/ui/sections/donation-card"
   Rhea: "@warpgogol/ui/sections/donation-use"
+  Elara: "@warpgogol/ui/sections/dynamic-status-block"
   Atlas: "@warpgogol/ui/sections/faq-list"
   Dione: "@warpgogol/ui/sections/final-cta"
   Europa: "@warpgogol/ui/sections/hero"
@@ -678,6 +679,7 @@ blockTypeToCosmicName:
   credits: Makemake
   donation-card: Pandora
   donation-use: Rhea
+  dynamic-status-block: Elara
   faq-list: Atlas
   final-cta: Dione
   hero: Europa
@@ -753,6 +755,7 @@ roleByCosmicName:
   Makemake: credits-gallery
   Pandora: donation-use
   Rhea: donation-use
+  Elara: data-driven-status-indicator
   Atlas: approach
   Dione: final-cta
   Europa: hero

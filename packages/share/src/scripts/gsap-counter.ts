@@ -44,7 +44,9 @@ export async function initGsapCounter(options: GsapCounterOptions = {}): Promise
   if (prefersReducedMotion) {
     sections.forEach((section) => {
       section
-        .querySelectorAll<HTMLElement>(".impact-section__stat, .hero__stat, .section-stats__item")
+        .querySelectorAll<HTMLElement>(
+          ".impact-section__stat, .hero__stat, .section-stats__item, .dynamic-status-block__stat",
+        )
         .forEach((statEl) => {
           if (statEl.dataset.gsapReady === "true") return;
           statEl.dataset.gsapReady = "true";
@@ -103,7 +105,7 @@ export async function initGsapCounter(options: GsapCounterOptions = {}): Promise
 
   sections.forEach((section) => {
     const allStats = section.querySelectorAll<HTMLElement>(
-      ".impact-section__stat, .hero__stat, .section-stats__item",
+      ".impact-section__stat, .hero__stat, .section-stats__item, .dynamic-status-block__stat",
     );
     allStats.forEach((statEl) => {
       const valueEl = statEl.querySelector<HTMLElement>(".js-stat-counter");
