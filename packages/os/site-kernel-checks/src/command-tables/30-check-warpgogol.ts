@@ -38,6 +38,8 @@ import {
   runWarpgogolCheckHintsGenerate,
   runWarpgogolCheckHintsValidate,
 } from "@warpgogol/site-kernel-check-warpgogol";
+import { runServiceRegistryValidate } from "../services/service-registry-validate.ts";
+import { runServiceNamingValidate } from "../services/service-naming-validate.ts";
 import type { CheckCommandEntry } from "./types.ts";
 
 export const CHECK_WEBGOGOL_COMMANDS: CheckCommandEntry[] = [
@@ -59,8 +61,32 @@ export const CHECK_WEBGOGOL_COMMANDS: CheckCommandEntry[] = [
     execute: runServicesCheckRun,
   },
   {
+    name: "service.registry.validate",
+    description:
+      "Validate the services: key in systems/registry.yaml and cross-check with service.config.yaml (RFC-0751).",
+    scope: "workspace",
+    reads: ["systems/registry.yaml", "services/*/service.config.yaml", "services/*/wrangler.jsonc"],
+    flags: {},
+    execute: runServiceRegistryValidate,
+  },
+  {
+    name: "service.naming.validate",
+    description:
+      "Enforce Worker name = service id = directory name = package.json name for all CF Worker services (RFC-0751).",
+    scope: "workspace",
+    reads: [
+      "systems/registry.yaml",
+      "services/*/wrangler.jsonc",
+      "services/*/service.config.yaml",
+      "services/*/package.json",
+    ],
+    flags: {},
+    execute: runServiceNamingValidate,
+  },
+  {
     name: "check-warpgogol.runner.validate",
-    description: "Validate the Check Warpgogol Node runner backend and app API boundary (RFC-0304).",
+    description:
+      "Validate the Check Warpgogol Node runner backend and app API boundary (RFC-0304).",
     scope: "workspace",
     reads: [
       "services/check-warpgogol-runner/**",
