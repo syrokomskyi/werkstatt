@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0040: Created as shared GSAP counter initialization module in @warpgogol/share/scripts.</item>
   <item>Extended selector to support .hero__stat in addition to .impact-section__stat.</item>
+  <item>RFC-0758: Extended selector to support .dynamic-status-block__stat.</item>
 </CHANGE_SUMMARY>
 */
 
