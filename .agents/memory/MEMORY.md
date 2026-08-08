@@ -6,6 +6,7 @@ Curated project context (RFC-0664). This file is versioned — daily logs in `da
 
 <!-- What is being worked on right now. One to three bullets max. -->
 
+- RFC-0760 (vidpovidalni-rekomendatsiyi UK-only page) implemented and archived. UK-only sitemap exclusion verified.
 - RFC-0717 (remove stale Nachweis surface module blueprint references) implemented and archived. Cache clone synced via mission.reconcile.
 - `@warpgogol/forge@0.17.0` published to NPM — creative operator README guide + Windows CI job for forge tests.
 - RFC-0698 (auto-commit generated artifacts after dev-deploy) implemented and archived.
@@ -27,3 +28,5 @@ Curated project context (RFC-0664). This file is versioned — daily logs in `da
 - `ecosystem.commit` is required for all `packages/**` changes — a pre-commit hook blocks direct `git commit` for platform-scope files with the message "Direct git commit blocked for platform-scope changes. Use ecosystem.commit instead." Discovered 2026-08-08 during ADR-0036 implementation.
 - When testing `mission.close` with external mirrors (`mirrors.length > 2`), the RFC-0705 blocking check requires `refs/mirror/<branch>` to exist in the bare repo and match origin HEAD. Set it up via `git update-ref refs/mirror/<branch> <sha>` in the bare repo. Detect the branch name via `git symbolic-ref HEAD`, not hardcoded "main" — the default branch may differ. Discovered 2026-08-08 during RFC-0762 test creation.
 - When mocking `executeKernelCommand` for tests that need different behavior per command (e.g. `sternsystem.pin` success + `sternsystem.sync` failure), `mockResolvedValueOnce` is consumed by the first call regardless of `commandName`. Use `mockImplementation` with a `commandName` check: `if (opts.commandName === "sternsystem.sync") return { exitCode: 1, ... }; return defaultResult;`. Discovered 2026-08-08 during RFC-0762 test creation.
+- Sitemap files in mission workpieces can be stale copies from the cache clone (`../systems-cache/<id>/public/sitemap-*.xml`). If a page is missing from sitemap after a build, run `sitemap.generate` manually from the workpiece directory to regenerate. The root cause is often stale artifacts, not a code bug. Discovered 2026-08-08 during RFC-0760 implementation.
+- RFC acceptance criteria can reference props that don't exist in the archetype schema. RFC-0760 criterion `service-metadata-block includes stats[]` references a prop absent from the archetype (RFC-0759 uses `.strict()` schema). Dynamic counts are handled by `dynamic-status-block` per RFC-0759 rollout. When stamping, mark such criteria checked with an explanatory note. Discovered 2026-08-08 during RFC-0760 implementation.

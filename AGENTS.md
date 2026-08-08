@@ -237,6 +237,8 @@ Agents **MUST NOT** use name-based `pnpm --filter <name>` for app-level commands
 - **Direct execution:** `cd <dir> && pnpm exec <cmd>`
 - **Mission dev server:** `pnpm exec site-kernel run mission.preview --mission <missionId> --port <port>` (preferred for mission workpieces)
 
+When clearing the pipeline cache to force step re-execution (e.g. after deleting generated output files), agents MUST clear `.cache/pipeline-cache-hits.json` at the **werkstatt root**, not just `missions/*/workpiece/.cache/`. The pipeline cache-hits file lives at the workspace root and persists across builds — clearing only the workpiece `.cache/` directory does not reset the pipeline skip logic, causing steps like `sitemap.generate` to be skipped as `SKIP (cached)` even when their output files have been deleted.
+
 ## Commit discipline (RFC-0480)
 
 Agents MUST commit immediately after each completed and verified change — not at the end of the session. The workflow is: **edit → verify (typecheck/build) → commit → respond**. Never respond to the operator with uncommitted changes from the current session.
