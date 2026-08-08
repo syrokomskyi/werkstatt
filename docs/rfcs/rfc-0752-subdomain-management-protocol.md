@@ -37,11 +37,11 @@ packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
   - "@warpgogol/site-kernel-checks"
 successSignals:
-  - `subdomain.register --service matomo-proxy` creates DNS CNAME + Workers route in Cloudflare atomarly and idempotently.
-  - `subdomain.validate --service matomo-proxy` verifies that DNS record and Workers route exist and point to the correct Worker.
-  - `subdomain.list --zone warpgogol.com` returns all subdomains registered for a zone.
-  - `leitstand.service.deploy` (RFC-0751) automatically calls `subdomain.register` when `subdomain.validate` reports "not registered".
-  - All subdomain state is declared in `systems/registry.yaml` and validated against Cloudflare API.
+  - "`subdomain.register --service matomo-proxy` creates DNS CNAME + Workers route in Cloudflare atomarly and idempotently."
+  - "`subdomain.validate --service matomo-proxy` verifies that DNS record and Workers route exist and point to the correct Worker."
+  - "`subdomain.list --zone warpgogol.com` returns all subdomains registered for a zone."
+  - "`leitstand.service.deploy` (RFC-0751) automatically calls `subdomain.register` when `subdomain.validate` reports 'not registered'."
+  - "All subdomain state is declared in `systems/registry.yaml` and validated against Cloudflare API."
 nonGoals:
   - Do not manage arbitrary DNS records (MX, SPF, DKIM, DMARC) — that is RFC-0753.
   - Do not manage site-specific subdomains (dev, alt, pulse) — those are part of `systems[].deployment.channels` and registered separately.
