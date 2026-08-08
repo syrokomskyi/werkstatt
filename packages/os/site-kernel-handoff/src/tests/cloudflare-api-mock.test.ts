@@ -14,7 +14,6 @@ import {
   cfErrorResponse,
   dnsListResponse,
   routeListResponse,
-  mockCloudflareResponse,
 } from "./helpers/cloudflare-api-mock.ts";
 
 test("routes DNS list by URL + GET method", async () => {
@@ -37,10 +36,10 @@ test("routes DNS create by URL + POST method", async () => {
   const handler = vi.fn(() => cfSuccessResponse({ id: "new-rec" }));
   setupCloudflareApiMock(mockFetch, { createDns: handler });
 
-  await mockFetch(
-    "https://api.cloudflare.com/client/v4/zones/zone123/dns_records",
-    { method: "POST", body: JSON.stringify({ type: "CNAME" }) },
-  );
+  await mockFetch("https://api.cloudflare.com/client/v4/zones/zone123/dns_records", {
+    method: "POST",
+    body: JSON.stringify({ type: "CNAME" }),
+  });
 
   expect(handler).toHaveBeenCalledOnce();
 });
@@ -65,10 +64,9 @@ test("routes Workers routes create by URL + POST method", async () => {
   const handler = vi.fn(() => cfSuccessResponse({ id: "new-route" }));
   setupCloudflareApiMock(mockFetch, { createRoute: handler });
 
-  await mockFetch(
-    "https://api.cloudflare.com/client/v4/zones/zone123/workers/routes",
-    { method: "POST" },
-  );
+  await mockFetch("https://api.cloudflare.com/client/v4/zones/zone123/workers/routes", {
+    method: "POST",
+  });
 
   expect(handler).toHaveBeenCalledOnce();
 });
@@ -101,13 +99,12 @@ test("returns default empty object for unhandled DNS create call", async () => {
 
 test("routes purge_cache by URL + POST method", async () => {
   const mockFetch = vi.fn();
-  const handler = vi.fn(() => mockCloudflareResponse(true, 200, ""));
+  const handler = vi.fn(() => cfSuccessResponse({ id: "purge-ok" }));
   setupCloudflareApiMock(mockFetch, { purgeCache: handler });
 
-  await mockFetch(
-    "https://api.cloudflare.com/client/v4/zones/zone123/purge_cache",
-    { method: "POST" },
-  );
+  await mockFetch("https://api.cloudflare.com/client/v4/zones/zone123/purge_cache", {
+    method: "POST",
+  });
 
   expect(handler).toHaveBeenCalledOnce();
 });

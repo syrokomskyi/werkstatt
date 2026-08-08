@@ -28,11 +28,7 @@ export interface CloudflareMockHandlers {
   purgeCache?: () => Response;
 }
 
-export function mockCloudflareResponse(
-  ok: boolean,
-  status: number,
-  body: unknown,
-): Response {
+export function mockCloudflareResponse(ok: boolean, status: number, body: unknown): Response {
   return {
     ok,
     status,
@@ -76,32 +72,30 @@ export function setupCloudflareApiMock(
   mockFetch: ReturnType<typeof vi.fn>,
   handlers: CloudflareMockHandlers = {},
 ): void {
-  mockFetch.mockImplementation(
-    async (url: string, opts?: { method?: string }) => {
-      const method = opts?.method ?? "GET";
+  mockFetch.mockImplementation(async (url: string, opts?: { method?: string }) => {
+    const method = opts?.method ?? "GET";
 
-      if (url.includes("/dns_records") && method === "GET") {
-        return handlers.dnsList?.() ?? defaultEmptyResponse;
-      }
-      if (url.includes("/dns_records") && method === "POST") {
-        return handlers.createDns?.() ?? cfSuccessResponse({});
-      }
-      if (url.includes("/dns_records") && method === "PUT") {
-        return handlers.updateDns?.() ?? cfSuccessResponse({});
-      }
-      if (url.includes("/dns_records") && method === "DELETE") {
-        return handlers.deleteDns?.() ?? cfSuccessResponse({});
-      }
-      if (url.includes("/workers/routes") && method === "GET") {
-        return handlers.routeList?.() ?? defaultEmptyResponse;
-      }
-      if (url.includes("/workers/routes") && method === "POST") {
-        return handlers.createRoute?.() ?? cfSuccessResponse({});
-      }
-      if (url.includes("/purge_cache") && method === "POST") {
-        return handlers.purgeCache?.() ?? mockCloudflareResponse(true, 200, "");
-      }
-      return defaultEmptyResponse;
-    },
-  );
+    if (url.includes("/dns_records") && method === "GET") {
+      return handlers.dnsList?.() ?? defaultEmptyResponse;
+    }
+    if (url.includes("/dns_records") && method === "POST") {
+      return handlers.createDns?.() ?? cfSuccessResponse({});
+    }
+    if (url.includes("/dns_records") && method === "PUT") {
+      return handlers.updateDns?.() ?? cfSuccessResponse({});
+    }
+    if (url.includes("/dns_records") && method === "DELETE") {
+      return handlers.deleteDns?.() ?? cfSuccessResponse({});
+    }
+    if (url.includes("/workers/routes") && method === "GET") {
+      return handlers.routeList?.() ?? defaultEmptyResponse;
+    }
+    if (url.includes("/workers/routes") && method === "POST") {
+      return handlers.createRoute?.() ?? cfSuccessResponse({});
+    }
+    if (url.includes("/purge_cache") && method === "POST") {
+      return handlers.purgeCache?.() ?? cfSuccessResponse({ id: "purge-ok" });
+    }
+    return defaultEmptyResponse;
+  });
 }

@@ -4,6 +4,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0752: initial API client tests — listDnsRecords, createDnsRecord, listWorkersRoutes, createWorkersRoute, auth header.</item>
+  <item>ADR-0035: refactored to use shared cloudflare-api-mock helper (setupCloudflareApiMock, cfSuccessResponse, cfErrorResponse).</item>
 </CHANGE_SUMMARY>
 */
 
