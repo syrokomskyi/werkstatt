@@ -30,6 +30,7 @@ ordered by RFC-id (numeric). Replaces the old RFC-0221 SemVer-based registry.</p
   <item>RFC-0572: register rfc-0572 content migrator (send-message emailField/phoneField removal + contactRequirementMessage re-add).</item>
   <item>RFC-0529: register rfc-0529 content migrator (brace-delimited to braceless content reference syntax migration).</item>
   <item>RFC-0548: register rfc-0548 migrator (backup AGENTS.md and regenerate with behavioral layer).</item>
+  <item>RFC-0757: register rfc-0757 no-op migrator (send-message checklistItems generalization, advances cursor).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -55,6 +56,7 @@ import { rfc0514Migrator } from "./rfc-0514.ts";
 import { rfc0572Migrator } from "./rfc-0572.ts";
 import { rfc0529Migrator } from "./rfc-0529.ts";
 import { rfc0548Migrator } from "./rfc-0548.ts";
+import { rfc0757Migrator } from "./rfc-0757.ts";
 
 export const migratorRegistry: readonly Migrator[] = [
   rfc0479Migrator,
@@ -78,6 +80,7 @@ export const migratorRegistry: readonly Migrator[] = [
   rfc0529Migrator,
   rfc0548Migrator,
   rfc0572Migrator,
+  rfc0757Migrator,
 ];
 
 export function numericRfcId(id: string): number {
