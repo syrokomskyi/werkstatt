@@ -396,7 +396,9 @@ export async function runMatomoProxyValidate(
     if (config["kind"] !== "proxy-worker") {
       violations.push(`${MATOMO_PROXY_DIR}/service.config.yaml: kind must be proxy-worker`);
     }
-    if (!Array.isArray(config["routes"]) || !config["routes"].includes("/_wg/analytics/*")) {
+    const routes = Array.isArray(config["routes"]) ? (config["routes"] as string[]) : [];
+    const hasAnalyticsRoute = routes.some((r) => r.startsWith("/_wg/analytics/"));
+    if (!hasAnalyticsRoute) {
       violations.push(
         `${MATOMO_PROXY_DIR}/service.config.yaml: routes must include /_wg/analytics/*`,
       );
