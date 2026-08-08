@@ -5,7 +5,7 @@ title: "Model external competitor prices as PBP offering entities with range pri
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-08
