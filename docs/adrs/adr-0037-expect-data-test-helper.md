@@ -1,7 +1,7 @@
 ---
 id: ADR-0037
 title: "expectData test helper for KernelCommandResult type narrowing"
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-08
