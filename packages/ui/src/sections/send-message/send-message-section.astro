@@ -12,6 +12,7 @@
   <item>RFC-0514: add structured emailField (required) and phoneField (optional) inputs; remove contactRequirementMessage.</item>
   <item>RFC-0572: revert to single-textarea — remove email/phone inputs, re-add contactRequirementMessage.</item>
   <item>Add real-time validation checklist with Lord Icons: to-do-list (pending) and approved-checked (ready).</item>
+  <item>RFC-0757: generalize checklist from 2 hardcoded items to N configurable items via checklistItems[] prop.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -53,6 +54,32 @@ const businessContactEntry =
   (await getEntry("business-profile", "de/contact/general-email"));
 const businessEmail = (businessContactEntry?.data as { value?: string } | undefined)?.value;
 const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
+
+interface ChecklistItem {
+  id: string;
+  label: string;
+  rule: "min-length" | "contact-details" | "url-presence" | "keyword-match";
+  value?: number;
+  keywords?: string[];
+}
+
+const defaultChecklistItems: ChecklistItem[] = [
+  {
+    id: "length",
+    label: resolveLabel("checklistLengthLabel", ""),
+    rule: "min-length",
+    value: props.minMessageLength ?? 12,
+  },
+  {
+    id: "contact",
+    label: resolveLabel("checklistContactLabel", ""),
+    rule: "contact-details",
+  },
+];
+
+const checklistItems: ChecklistItem[] =
+  props.checklistItems !== undefined ? props.checklistItems : defaultChecklistItems;
+const hasChecklist = checklistItems.length > 0;
 ---
 
 <SectionShell
@@ -75,7 +102,7 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
       level={props.header?.level ?? 2}
       hideSectionNumber={props.header?.hideSectionNumber}
       id="send-message-title"
-    lang={lang}
+      lang={lang}
     />
 
     {
@@ -115,6 +142,7 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
       data-checklist-ready-label={resolveLabel("checklistReadyLabel", "")}
       data-checklist-length-label={resolveLabel("checklistLengthLabel", "")}
       data-checklist-contact-label={resolveLabel("checklistContactLabel", "")}
+      data-checklist-items={hasChecklist ? JSON.stringify(checklistItems) : ""}
     >
       {
         props.referrerField?.enabled && (
@@ -144,57 +172,55 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
           aria-describedby="send-message-hint"></textarea>
       </label>
 
-      <div class="send-message__checklist" data-send-message-checklist>
-        <div class="send-message__checklist-header" data-send-message-checklist-header>
-          <span
-            class="send-message__checklist-icon send-message__checklist-icon--pending"
-            data-send-message-checklist-icon-pending
-          >
-            <TodoListIcon size={28} trigger="in" stroke="regular" />
-          </span>
-          <span
-            class="send-message__checklist-icon send-message__checklist-icon--ready"
-            data-send-message-checklist-icon-ready
-            hidden
-          >
-            <ApprovedCheckedIcon size={28} trigger="in" stroke="regular" />
-          </span>
-          <span class="send-message__checklist-title" data-send-message-checklist-title>
-            {resolveLabel("checklistTitle", "")}
-          </span>
-        </div>
-        <ul class="send-message__checklist-items">
-          <li class="send-message__checklist-item" data-send-message-checklist-item="length">
-            <span
-              class="send-message__checklist-indicator send-message__checklist-indicator--pending"
-              data-send-message-checklist-indicator-pending
-              ><RectangleIcon size={24} trigger="in" stroke="regular" /></span
-            >
-            <span
-              class="send-message__checklist-indicator send-message__checklist-indicator--checked"
-              data-send-message-checklist-indicator-checked
-              hidden><ApproveCheckedSimpleIcon size={24} trigger="in" stroke="regular" /></span
-            >
-            <span class="send-message__checklist-text" data-send-message-checklist-text="length"
-            ></span>
-          </li>
-          <li class="send-message__checklist-item" data-send-message-checklist-item="contact">
-            <span
-              class="send-message__checklist-indicator send-message__checklist-indicator--pending"
-              data-send-message-checklist-indicator-pending
-              ><RectangleIcon size={24} trigger="in" stroke="regular" /></span
-            >
-            <span
-              class="send-message__checklist-indicator send-message__checklist-indicator--checked"
-              data-send-message-checklist-indicator-checked
-              hidden><ApproveCheckedSimpleIcon size={24} trigger="in" stroke="regular" /></span
-            >
-            <span class="send-message__checklist-text" data-send-message-checklist-text="contact">
-              {resolveLabel("checklistContactLabel", "")}
-            </span>
-          </li>
-        </ul>
-      </div>
+      {
+        hasChecklist && (
+          <div class="send-message__checklist" data-send-message-checklist>
+            <div class="send-message__checklist-header" data-send-message-checklist-header>
+              <span
+                class="send-message__checklist-icon send-message__checklist-icon--pending"
+                data-send-message-checklist-icon-pending
+              >
+                <TodoListIcon size={28} trigger="in" stroke="regular" />
+              </span>
+              <span
+                class="send-message__checklist-icon send-message__checklist-icon--ready"
+                data-send-message-checklist-icon-ready
+                hidden
+              >
+                <ApprovedCheckedIcon size={28} trigger="in" stroke="regular" />
+              </span>
+              <span class="send-message__checklist-title" data-send-message-checklist-title>
+                {resolveLabel("checklistTitle", "")}
+              </span>
+            </div>
+            <ul class="send-message__checklist-items">
+              {checklistItems.map((item) => (
+                <li class="send-message__checklist-item" data-send-message-checklist-item={item.id}>
+                  <span
+                    class="send-message__checklist-indicator send-message__checklist-indicator--pending"
+                    data-send-message-checklist-indicator-pending
+                  >
+                    <RectangleIcon size={24} trigger="in" stroke="regular" />
+                  </span>
+                  <span
+                    class="send-message__checklist-indicator send-message__checklist-indicator--checked"
+                    data-send-message-checklist-indicator-checked
+                    hidden
+                  >
+                    <ApproveCheckedSimpleIcon size={24} trigger="in" stroke="regular" />
+                  </span>
+                  <span
+                    class="send-message__checklist-text"
+                    data-send-message-checklist-text={item.id}
+                  >
+                    {item.label}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
 
       <div
         class="send-message__hint"

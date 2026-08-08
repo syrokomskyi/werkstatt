@@ -12,6 +12,7 @@
   <item>RFC-0567: Add referrerField handling — query, validate, transmit referrer value.</item>
   <item>RFC-0572: Revert to regex-based hasContactDetails; remove structured email/phone field logic.</item>
   <item>Add real-time validation checklist: update indicators on input, highlight first failing item on submit.</item>
+  <item>RFC-0757: Generalize checklist from 2 hardcoded items to N configurable items via evaluateRule() dispatcher.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,6 +26,34 @@ interface SendMessagePayload {
 
 const EMAIL_EXTRACT_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
 const PHONE_EXTRACT_REGEX = /(?:\+?\d[\d\s\-()]{7,}\d)/;
+const URL_REGEX =
+  /https?:\/\/[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+(?:\/[^\s]*)?/i;
+
+type ChecklistRuleType = "min-length" | "contact-details" | "url-presence" | "keyword-match";
+
+interface ChecklistItem {
+  id: string;
+  label: string;
+  rule: ChecklistRuleType;
+  value?: number;
+  keywords?: string[];
+}
+
+function evaluateRule(rule: ChecklistRuleType, message: string, item: ChecklistItem): boolean {
+  switch (rule) {
+    case "min-length":
+      return message.length >= (item.value ?? 1);
+    case "contact-details":
+      return EMAIL_EXTRACT_REGEX.test(message) || PHONE_EXTRACT_REGEX.test(message);
+    case "url-presence":
+      return URL_REGEX.test(message);
+    case "keyword-match":
+      return (item.keywords ?? []).some((kw) => message.toLowerCase().includes(kw.toLowerCase()));
+    default:
+      console.warn(`[send-message] Unknown checklist rule type: ${rule} (item id: ${item.id})`);
+      return true;
+  }
+}
 
 function hasContactDetails(message: string): boolean {
   return EMAIL_EXTRACT_REGEX.test(message) || PHONE_EXTRACT_REGEX.test(message);
@@ -67,13 +96,14 @@ interface ChecklistElements {
   iconPending: HTMLElement | null;
   iconReady: HTMLElement | null;
   titleEl: HTMLElement | null;
-  lengthItem: HTMLElement | null;
-  contactItem: HTMLElement | null;
-  lengthText: HTMLElement | null;
+  items: HTMLElement[];
 }
 
 function getChecklistElements(form: HTMLFormElement): ChecklistElements {
   const container = form.querySelector<HTMLElement>("[data-send-message-checklist]");
+  const items = container
+    ? Array.from(container.querySelectorAll<HTMLElement>("[data-send-message-checklist-item]"))
+    : [];
   return {
     container,
     iconPending:
@@ -81,12 +111,7 @@ function getChecklistElements(form: HTMLFormElement): ChecklistElements {
     iconReady:
       container?.querySelector<HTMLElement>("[data-send-message-checklist-icon-ready]") ?? null,
     titleEl: container?.querySelector<HTMLElement>("[data-send-message-checklist-title]") ?? null,
-    lengthItem:
-      container?.querySelector<HTMLElement>('[data-send-message-checklist-item="length"]') ?? null,
-    contactItem:
-      container?.querySelector<HTMLElement>('[data-send-message-checklist-item="contact"]') ?? null,
-    lengthText:
-      container?.querySelector<HTMLElement>('[data-send-message-checklist-text="length"]') ?? null,
+    items,
   };
 }
 
@@ -102,6 +127,15 @@ function updateChecklistItem(item: HTMLElement | null, checked: boolean): void {
   if (pending) pending.hidden = checked;
   if (checkedEl) checkedEl.hidden = !checked;
   if (checked) playChecklistIcon(checkedEl);
+}
+
+function updateItemText(form: HTMLFormElement, item: ChecklistItem, message: string): void {
+  if (item.rule !== "min-length") return;
+  const textEl = form.querySelector<HTMLElement>(`[data-send-message-checklist-text="${item.id}"]`);
+  if (!textEl || !item.label) return;
+  const minLen = item.value ?? 1;
+  const remaining = Math.max(minLen - message.length, 0);
+  textEl.textContent = remaining > 0 ? item.label + " (" + remaining + ")" : item.label;
 }
 
 function highlightItem(item: HTMLElement | null): void {
@@ -137,25 +171,24 @@ function playChecklistIcon(icon: HTMLElement | null): void {
 function updateChecklist(
   form: HTMLFormElement,
   message: string,
-  minMessageLength: number,
-  checklistLabels: { lengthLabel: string; readyLabel: string; title: string },
-): { lengthOk: boolean; contactOk: boolean } {
+  checklistItems: ChecklistItem[],
+  checklistLabels: { readyLabel: string; title: string },
+): { allOk: boolean; firstFailingItem: HTMLElement | null } {
   const els = getChecklistElements(form);
-  const lengthOk = message.length >= Math.max(minMessageLength, 1);
-  const contactOk = hasContactDetails(message);
+  let firstFailingItem: HTMLElement | null = null;
+  let allOk = true;
 
-  updateChecklistItem(els.lengthItem, lengthOk);
-  updateChecklistItem(els.contactItem, contactOk);
-
-  if (els.lengthText && checklistLabels.lengthLabel) {
-    const remaining = Math.max(minMessageLength - message.length, 0);
-    els.lengthText.textContent =
-      remaining > 0
-        ? checklistLabels.lengthLabel + " (" + remaining + ")"
-        : checklistLabels.lengthLabel;
+  for (const item of checklistItems) {
+    const checked = evaluateRule(item.rule, message, item);
+    const itemEl = els.items.find((el) => el.dataset.sendMessageChecklistItem === item.id) ?? null;
+    updateChecklistItem(itemEl, checked);
+    updateItemText(form, item, message);
+    if (!checked) {
+      allOk = false;
+      if (!firstFailingItem) firstFailingItem = itemEl;
+    }
   }
 
-  const allOk = lengthOk && contactOk;
   if (els.container) {
     els.container.dataset.checklistState = allOk ? "ready" : "pending";
   }
@@ -170,7 +203,7 @@ function updateChecklist(
     playChecklistIcon(els.iconReady);
   }
 
-  return { lengthOk, contactOk };
+  return { allOk, firstFailingItem };
 }
 
 function bindForm(root: HTMLElement): void {
@@ -209,12 +242,23 @@ function bindForm(root: HTMLElement): void {
   const checklistLabels = {
     title: formEl.dataset.checklistTitle ?? "",
     readyLabel: formEl.dataset.checklistReadyLabel ?? "",
-    lengthLabel: formEl.dataset.checklistLengthLabel ?? "",
-    contactLabel: formEl.dataset.checklistContactLabel ?? "",
   };
 
+  let checklistItems: ChecklistItem[] = [];
+  const checklistItemsJson = formEl.dataset.checklistItems ?? "";
+  if (checklistItemsJson) {
+    try {
+      const parsed = JSON.parse(checklistItemsJson) as ChecklistItem[];
+      if (Array.isArray(parsed)) {
+        checklistItems = parsed;
+      }
+    } catch (err) {
+      console.warn("[send-message] Failed to parse checklist items JSON", err);
+    }
+  }
+
   function syncChecklist(): void {
-    updateChecklist(formEl, textareaEl.value.trim(), minMessageLength, checklistLabels);
+    updateChecklist(formEl, textareaEl.value.trim(), checklistItems, checklistLabels);
   }
 
   textareaEl.addEventListener("input", syncChecklist);
@@ -226,23 +270,23 @@ function bindForm(root: HTMLElement): void {
     const message = textarea.value.trim();
     const referrer = referrerInput?.value.trim() ?? "";
 
-    const { lengthOk, contactOk } = updateChecklist(
+    const { allOk, firstFailingItem } = updateChecklist(
       form,
       message,
-      minMessageLength,
+      checklistItems,
       checklistLabels,
     );
 
-    if (!lengthOk) {
-      setStatus(statusEl, "error", emptyMessage, "");
-      highlightItem(getChecklistElements(form).lengthItem);
-      textarea.focus();
-      return;
-    }
-
-    if (!contactOk) {
-      setStatus(statusEl, "error", contactRequirementMessage, "");
-      highlightItem(getChecklistElements(form).contactItem);
+    if (!allOk) {
+      const firstItem = checklistItems.find((item) => !evaluateRule(item.rule, message, item));
+      if (firstItem && firstItem.rule === "min-length") {
+        setStatus(statusEl, "error", emptyMessage, "");
+      } else if (firstItem && firstItem.rule === "contact-details") {
+        setStatus(statusEl, "error", contactRequirementMessage, "");
+      } else {
+        setStatus(statusEl, "error", contactRequirementMessage, "");
+      }
+      highlightItem(firstFailingItem);
       textarea.focus();
       return;
     }

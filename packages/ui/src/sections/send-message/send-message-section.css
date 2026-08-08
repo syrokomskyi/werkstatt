@@ -11,6 +11,7 @@
   <item>RFC-0514: Add styles for structured email/phone input fields.</item>
   <item>RFC-0572: Remove styles for structured email/phone input fields (reverted to single-textarea).</item>
   <item>Add real-time validation checklist with Lord Icons, indicator dots, and submit highlight.</item>
+  <item>RFC-0757: Generalize checklist item styles for N configurable items (no length/contact-specific classes).</item>
 </CHANGE_SUMMARY>
 */
 
