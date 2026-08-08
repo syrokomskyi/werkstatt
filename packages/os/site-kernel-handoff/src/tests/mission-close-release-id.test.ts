@@ -19,7 +19,14 @@ test("CloseReport interface includes releaseId field", () => {
   const report: CloseReport = {
     releaseId: "sys-r000001",
     git: { commitSha: "abc", pushed: true, pushError: null, dirtyFiles: [] },
-    mirror: { originSha: "abc", mirrorSha: "abc", inSync: true, recommendation: null },
+    mirror: {
+      originSha: "abc",
+      mirrorSha: "abc",
+      inSync: true,
+      recommendation: null,
+      synced: false,
+      syncError: null,
+    },
     reconcile: { reconciledAt: "2026-08-01T10:00:00.000Z", verified: true },
     warnings: [],
   };
@@ -30,7 +37,14 @@ test("CloseReport accepts null releaseId", () => {
   const report: CloseReport = {
     releaseId: null,
     git: { commitSha: "abc", pushed: true, pushError: null, dirtyFiles: [] },
-    mirror: { originSha: "abc", mirrorSha: "abc", inSync: true, recommendation: null },
+    mirror: {
+      originSha: "abc",
+      mirrorSha: "abc",
+      inSync: true,
+      recommendation: null,
+      synced: false,
+      syncError: null,
+    },
     reconcile: { reconciledAt: "2026-08-01T10:00:00.000Z", verified: true },
     warnings: [{ rule: "missing-release-id", message: "test" }],
   };
