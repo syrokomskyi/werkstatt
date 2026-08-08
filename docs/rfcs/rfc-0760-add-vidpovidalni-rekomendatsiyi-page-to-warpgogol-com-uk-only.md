@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -51,7 +52,6 @@ appsImpacted:
 packagesImpacted: []
 successSignals:
   - "A new page with route `uk: vidpovidalni-rekomendatsiyi` is registered in system.md and renders at build time on warpgogol-com."
-  - "The page is UK-only — no DE route is declared, and the page does not appear in the German site navigation or sitemap."
   - "The page composes ~23 blocks using existing and newly added archetypes (hero, markdown, audience-cards, controlled-responsibility-block, send-message with custom checklist, dynamic-status-block, faq-list, final-cta, service-metadata-block with stats[])."
   - "The page passes page.block.validate, mirror.quintet.validate, and build.check with zero violations."
 nonGoals:
@@ -82,7 +82,7 @@ nonGoals:
 
 ## Context
 
-The warpgogol-com site (mission `warpgogol-com-m000039`) needs a new page titled "Відповідальні рекомендації" (Responsible Recommendations). The page content was drafted by an expert and covers a single program with a clear progression path: (1) recommend Warpgogol to a business and receive 70€ per confirmed subscription, (2) after 12 confirmed subscriptions, a 3-month pilot Market Steward mandate may be offered (300€/month + 70€ per new subscription), (3) after the pilot, a full Market Steward mandate at 2000€/month opens when the market cell generates at least 4000€ monthly marginal income before steward payment.
+The warpgogol-com site (mission `warpgogol-com-m000040`) needs a new page titled "Відповідальні рекомендації" (Responsible Recommendations). The page content was drafted by an expert and covers a single program with a clear progression path: (1) recommend Warpgogol to a business and receive 70€ per confirmed subscription, (2) after 12 confirmed subscriptions, a 3-month pilot Market Steward mandate may be offered (300€/month + 70€ per new subscription), (3) after the pilot, a full Market Steward mandate at 2000€/month opens when the market cell generates at least 4000€ monthly marginal income before steward payment.
 
 The page is initially UK-only — no German translation is needed for the first launch. The content draft includes ~23 sections: hero, 4-step path, payment conditions, client openness, audience cards, responsibility blocks, pilot mandate details, Market Steward responsibilities, pilot evaluation, full mandate threshold, marginal income explanation, threshold stability, full mandate reward, decline review, mandate counts (dynamic), prohibited practices, public verifiability, two single-textarea forms with different checklist configurations, FAQ (12 items), final CTA, and a service metadata footer with dynamic mandate counts.
 
@@ -105,7 +105,7 @@ A new page `vidpovidalni-rekomendatsiyi` is added to warpgogol-com's `system.md`
 - **DNA-17 (Uni manifest contract):** The page entry in `system.md` declares `pageId`, `semanticType`, `routes`, `cosmicStar`, `planets[]`, and `shell` — matching the existing manifest contract.
 - **DNA-24 (Block-declarative pages):** The page content file is a frontmatter-only document with `kind: page`, `cosmicStar`, `title`, `description`, `lang: uk`, `blocks[]`. No markdown body — prose lives in `contentRef` entries.
 - **DNA-25 (Single buildPage pipeline):** The page is rendered by the standard `buildPage` pipeline — no custom route handler.
-- **RFC-0048 (Localized page slugs):** The page declares `routes: { uk: vidpovidalni-rekomendatsiyi }` with no `de` route. The route registry handles UK-only pages — the page is excluded from the German sitemap and hreflang tags.
+- **RFC-0048 (Localized page slugs):** The page declares `routes: { uk: vidpovidalni-rekomendatsiyi }` with no `de` route, and `locales: [uk]` per RFC-0097 to explicitly restrict the page to the Ukrainian locale. The route registry handles locale-scoped pages — `resolveLocalizedPagePath` returns null for unsupported locales, `getStaticPaths` skips them, and the language switcher falls back to home.
 - **RFC-0049 (hreflang/sitemap generation):** The sitemap generator excludes pages without a route for a given language. A UK-only page appears only in the UK sitemap.
 - **RFC-0757 (send-message checklist):** The two forms on the page use `send-message` with custom `checklistItems[]` configurations.
 - **RFC-0758 (dynamic-status-block):** The open-mandate counter section uses `dynamic-status-block`.
@@ -123,37 +123,49 @@ No new commands. The page is created by adding content files and a `system.md` e
 
 ```yaml
 - pageId: vidpovidalniRekomendatsiyi
-  semanticType: program-page
+  semanticType: content
+  output:
+    sitemap:
+      lastmod: "2026-08-08"
   routes:
     uk: vidpovidalni-rekomendatsiyi
+  locales:
+    - uk
   cosmicStar: Vega
-  planets:
-    - hero
-    - markdown
-    - markdown
-    - markdown
-    - audience-cards
-    - controlled-responsibility-block
-    - markdown
-    - markdown
-    - markdown
-    - markdown
-    - markdown
-    - markdown
-    - markdown
-    - markdown
-    - markdown
-    - dynamic-status-block
-    - controlled-responsibility-block
-    - markdown
-    - send-message
-    - send-message
-    - faq-list
-    - final-cta
-    - service-metadata-block
   shell:
-    background: default
+    background:
+      enabled: true
+      cosmicMoon: Hermippe
+      pin: 1.0.0
+      props:
+        layers:
+          - kind: image
+            imageName: home-bg
+            fit: cover
+            quality: high
+            loading: eager
+  planets:
+    - cosmicPlanet: Europa
+      pin: 1.1.0
+    - cosmicPlanet: Hyperion
+      pin: 1.0.0
+    - cosmicPlanet: Epimetheus
+      pin: 1.2.0
+    - cosmicPlanet: Calypso
+      pin: 1.2.0
+    - cosmicPlanet: Ceres
+      pin: 1.0.0
+    - cosmicPlanet: <TBD by RFC-0758>
+      pin: <TBD>
+    - cosmicPlanet: Atlas
+      pin: 1.1.0
+    - cosmicPlanet: Dione
+      pin: 1.3.0
+    - cosmicPlanet: <TBD by RFC-0759>
+      pin: <TBD>
 ```
+
+> **Note on TBD planets:** The `cosmicPlanet` names for `dynamic-status-block` (RFC-0758) and `service-metadata-block` (RFC-0759) are picked by `cosmic.name.pick` during `section.scaffold` when those RFCs are implemented. This RFC's `planets[]` entry must be updated with the picked names before implementation. The existing archetypes use established cosmic names: `hero` → Europa, `markdown` → Hyperion, `audience-cards` → Epimetheus, `controlled-responsibility-block` → Calypso, `send-message` → Ceres, `faq-list` → Atlas, `final-cta` → Dione.
 
 ### Block composition (~23 blocks)
 
@@ -187,9 +199,9 @@ No new commands. The page is created by adding content files and a `system.md` e
 
 | Path | Role |
 | --- | --- |
-| `missions/warpgogol-com-m000039/workpiece/src/content/system.md` | Add `vidpovidalniRekomendatsiyi` page entry to `pages[]` array |
-| `missions/warpgogol-com-m000039/workpiece/src/content/pages/uk/vidpovidalni-rekomendatsiyi.md` | New page content file (frontmatter-only, `kind: page`, `lang: uk`, `blocks[]`) |
-| `missions/warpgogol-com-m000039/workpiece/src/content/prose/vidpovidalni-rekomendatsiyi/*.uk.md` | Prose content files referenced by `contentRef` in blocks |
+| `missions/warpgogol-com-m000040/workpiece/src/content/system.md` | Add `vidpovidalniRekomendatsiyi` page entry to `pages[]` array |
+| `missions/warpgogol-com-m000040/workpiece/src/content/pages/uk/vidpovidalni-rekomendatsiyi.md` | New page content file (frontmatter-only, `kind: page`, `lang: uk`, `blocks[]`) |
+| `missions/warpgogol-com-m000040/workpiece/src/content/prose/vidpovidalni-rekomendatsiyi/*.uk.md` | Prose content files referenced by `contentRef` in blocks |
 
 ### Output format
 
@@ -239,7 +251,7 @@ No `--json` output. The page renders as static HTML at `/vidpovidalni-rekomendat
 
 ## Acceptance criteria
 
-- [ ] `vidpovidalniRekomendatsiyi` page entry added to `system.md` `pages[]` with `routes: { uk: vidpovidalni-rekomendatsiyi }` (no `de` route), `cosmicStar`, `planets[]`, and `shell` (evidence: system.md entry)
+- [ ] `vidpovidalniRekomendatsiyi` page entry added to `system.md` `pages[]` with `semanticType: content`, `routes: { uk: vidpovidalni-rekomendatsiyi }`, `locales: [uk]`, `output.sitemap`, `cosmicStar`, `planets[]` (with cosmicPlanet objects and pins), and `shell` (evidence: system.md entry)
 - [ ] Page content file created at `src/content/pages/uk/vidpovidalni-rekomendatsiyi.md` with `kind: page`, `lang: uk`, `blocks[]` array (evidence: file exists, frontmatter valid)
 - [ ] Prose content files created in `src/content/prose/vidpovidalni-rekomendatsiyi/*.uk.md` for all `contentRef` references (evidence: files exist)
 - [ ] `page.block.validate` passes with zero violations for the new page (evidence: validator output)
