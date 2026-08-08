@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -38,7 +39,7 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: minor
+versionBump: patch
 commands:
   proposed: []
   added: []
@@ -83,7 +84,7 @@ nonGoals:
 
 The platform's archetype catalog includes 28 section archetypes, all focused on primary page content (hero, approach, comparison-cards, faq-list, etc.). None cover the pattern of a page-level metadata footer — a small, visually muted block at the bottom of a page that displays service metadata: rules version, effective date, next review date, and links to related documents.
 
-A new page planned for warpgogol-com ("Відповідальні рекомендації" — Responsible Recommendations) includes a service metadata footer (§23 of the expert recommendation): version of the recommendation rules, effective date, next review date, links to legal pages, and **dynamic mandate counts** (open pilot mandates, open full mandates). The mandate counts are data-driven values that change over time, while the rest is static authored metadata. This is a common pattern for policy, program, and recommendation pages — the visitor needs to know when the rules were last updated, when they will be reviewed again, and the current availability of mandates.
+A new page planned for warpgogol-com ("Відповідальні рекомендації" — Responsible Recommendations) includes a service metadata footer (§23 of the expert recommendation): version of the recommendation rules, effective date, next review date, and links to legal pages. This is a common pattern for policy, program, and recommendation pages — the visitor needs to know when the rules were last updated and when they will be reviewed again. Dynamic mandate counts on the same page are handled by a separate `dynamic-status-block` section (RFC-0758).
 
 The closest existing archetypes are `markdown` (static authored content) and `transparency` (trust-building claims), but neither is designed for the specific metadata footer pattern with structured fields (version, dates, links).
 
@@ -97,7 +98,7 @@ The closest existing archetypes are `markdown` (static authored content) and `tr
 
 ## Decision
 
-A new `service-metadata-block` archetype is added to the shared archetype catalog. It renders a visually muted page-level metadata footer with structured fields: version, effective date, next review date, optional related links, and optional `stats[]` for dynamic values (e.g., open mandate counts). The `stats[]` array allows the block to display data-driven indicators alongside static metadata without requiring a separate `dynamic-status-block` section. The archetype follows the standard section framework (SectionShell + optional SectionHeader + body) and uses `--ds-*` biome tokens with a `tone: muted` default.
+A new `service-metadata-block` archetype is added to the shared archetype catalog. It renders a visually muted page-level metadata footer with structured fields: version, effective date, next review date, optional related links, and optional footnote text. The archetype follows the standard section framework (SectionShell + optional SectionHeader + body) and uses `--ds-*` biome tokens with a `tone: muted` default. Dynamic value indicators (e.g. open mandate counts) are handled by the separate `dynamic-status-block` archetype (RFC-0758), not by this block.
 
 ## Architectural fit
 
@@ -116,7 +117,7 @@ A new `service-metadata-block` archetype is added to the shared archetype catalo
 The section is materialized by the existing `section.scaffold` command:
 
 ```sh
-pnpm exec site-kernel run section.scaffold --archetype service-metadata-block --site warpgogol-com
+pnpm exec site-kernel run section.scaffold --name service-metadata-block --archetype service-metadata-block
 ```
 
 No new commands.
@@ -135,14 +136,11 @@ interface ServiceMetadataBlockProps {
     href: string;
     rel?: string;
   }>;
-  stats?: Array<{                // Dynamic value indicators (e.g., open mandate counts)
-    label: string;               // e.g. "Відкриті пілотні мандати"
-    value: string;               // e.g. "3" or a data-source reference
-    dataSource?: string;         // Optional: reference to a data provider (e.g., "open-mandates:pilot")
-  }>;
   footnote?: string;            // Optional freeform footnote text
 }
 ```
+
+All string fields support content references (`{collection.file.field}`) — the `buildPage` pipeline resolves them at build time via the standard content reference resolver (`@warpgogol/share/content-reference`). There is no distinction between "content reference fields" and "plain text fields" — every string value in block props is scanned and resolved.
 
 The archetype YAML:
 
@@ -151,6 +149,8 @@ id: service-metadata-block
 displayName: Service metadata block
 version: 1.0.0
 semanticRole: page-metadata-footer
+description: |
+  Page-level metadata footer. RFC-0103 bodyKind: composite; default tone muted.
 expectedIntents:
   - build-trust
   - legal-clarity
@@ -176,11 +176,6 @@ propsSchema:
         href: z.string().min(1),
         rel: z.string().optional(),
       })).optional(),
-      stats: z.array(z.object({
-        label: z.string().min(1),
-        value: z.string().min(1),
-        dataSource: z.string().optional(),
-      })).optional(),
       footnote: z.string().optional(),
     }).strict()
 acceptedCosmicNames:
@@ -193,13 +188,12 @@ constraints: {}
 | Path | Role |
 | --- | --- |
 | `packages/ontology/archetypes/sections/service-metadata-block.yaml` | New archetype definition |
-| `packages/ontology/archetypes/index.yaml` | Register `service-metadata-block` in catalog indices |
+| `packages/ontology/archetypes/index.yaml` | Regenerated by `archetype.registry.build` (not hand-edited) |
 | `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.astro` | Section template: SectionShell + optional SectionHeader + metadata fields + links |
 | `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.manifest.yaml` | Section manifest |
-| `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.types.ts` | TypeScript prop shape |
+| `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.types.generated.ts` | Generated TypeScript prop shape (via `props.types.generate`) |
 | `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.css` | Colocated CSS using `--ds-*` tokens, muted tone default |
 | `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.story.md` | Realistic props example |
-| `packages/share/src/page.ts` | Add `PLANET_IMPORT_PATHS` entry for the picked cosmic name |
 
 ### Output format
 
@@ -210,15 +204,13 @@ No `--json` output. The section renders as HTML at build time.
 - **All fields absent:** If all optional fields are absent, the section renders an empty muted block. `page.block.validate` may warn about an empty metadata block, but does not fail — the block is valid but empty.
 - **Invalid date format:** Dates are stored as strings and rendered as-is. No date parsing or validation is performed by the section — the author is responsible for providing readable date strings. A future enhancement could add date format validation.
 - **Missing `links[]` items:** If `links` is absent or empty, no links section is rendered.
-- **Missing `stats[]` items:** If `stats` is absent or empty, no stats row is rendered. The block still shows static metadata (version, dates, links).
-- **`stats[]` with `dataSource`:** When `dataSource` is specified, the section resolves the value at build time from the referenced data provider. If the data source is unavailable, the stat value falls back to the authored `value` string (which may be a placeholder like "—"). Build-time resolution failure is non-fatal — the block renders with the fallback value.
 
 ## Rollout
 
 - **Materialization:** The section is created via `section.scaffold` which generates the full file set. The cosmic name is picked by `cosmic.name.pick`.
-- **warpgogol-com adoption:** The "Відповідальні рекомендації" page (separate RFC) will use `type: service-metadata-block` for its §23 service metadata footer, including `stats[]` for dynamic mandate counts.
+- **warpgogol-com adoption:** The "Відповідальні рекомендації" page (separate RFC) will use `type: service-metadata-block` for its §23 service metadata footer. Dynamic mandate counts on the same page are handled by a separate `dynamic-status-block` section (RFC-0758).
 - **New sites:** Available to all sites. No migration needed — the archetype is additive.
-- **Pipeline integration:** `section.contract.validate` and `page.block.validate` validate the new section and its block props.
+- **Pipeline integration:** `section.contract.validate` and `page.block.validate` validate the new section and its block props. `archetype.registry.build` regenerates `index.yaml` and `PLANET_IMPORT_PATHS` automatically. `props.types.generate` regenerates the TypeScript prop types.
 - **No migrator needed:** The archetype is additive.
 
 ## Alternatives considered
@@ -243,10 +235,10 @@ No `--json` output. The section renders as HTML at build time.
 
 ## Acceptance criteria
 
-- [ ] `service-metadata-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (version?, effectiveDate?, nextReviewDate?, links?, footnote?), `semanticRole: page-metadata-footer`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: archetype YAML file)
-- [ ] Archetype registered in `packages/ontology/archetypes/index.yaml` (evidence: index.yaml entries)
-- [ ] Section files created in `packages/ui/src/sections/service-metadata-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.types.ts`, `.css`, `.story.md`) (evidence: file set exists)
-- [ ] `PLANET_IMPORT_PATHS` updated in `packages/share/src/page.ts` for the picked cosmic name (evidence: page.ts entry)
+- [ ] `service-metadata-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (version?, effectiveDate?, nextReviewDate?, links?, footnote?), `description`, `semanticRole: page-metadata-footer`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: archetype YAML file)
+- [ ] `archetype.registry.build` run to regenerate `packages/ontology/archetypes/index.yaml` including `service-metadata-block` (evidence: index.yaml contains the new entry)
+- [ ] Section files created in `packages/ui/src/sections/service-metadata-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.css`, `.story.md`) (evidence: file set exists)
+- [ ] `props.types.generate` run to produce `.types.generated.ts` (evidence: generated file exists)
 - [ ] `section.contract.validate` passes for the new section (evidence: validator output, zero violations)
 - [ ] `page.block.validate` accepts `type: service-metadata-block` blocks with valid props (evidence: validator output)
 - [ ] `AGENTS.md` updated where agent behavior rules changed (evidence: `packages/ui/AGENTS.md` or `packages/ontology/AGENTS.md` if needed)
@@ -258,7 +250,10 @@ No `--json` output. The section renders as HTML at build time.
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST use `section.scaffold` to materialize the section — never copy a sibling section folder.
+- Agents MUST run `archetype.registry.build` after adding the archetype YAML to regenerate `index.yaml` and `PLANET_IMPORT_PATHS` (RFC-0091 — these are registry-derived, not hand-edited).
+- Agents MUST run `props.types.generate` after `section.scaffold` to produce `.types.generated.ts`.
 - Agents MUST NOT confuse `service-metadata-block` with the site-level footer component: this is a page-level section rendered on specific pages, not a shell component rendered on every page.
+- Agents MUST NOT confuse `service-metadata-block` with `dynamic-status-block` (RFC-0758): this block renders static authored metadata (version, dates, links, footnote); `dynamic-status-block` renders a single data-driven value with label and context.
 - Agents MUST NOT add structured-data (JSON-LD) output to this section — it is a visible HTML footer, not a semantic projection.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
