@@ -22,6 +22,25 @@
   display: none;
 }
 
+/* RFC-0766: prose pipeline generates <span> elements — keep them inline */
+span.currency-aware-price-display {
+  display: inline;
+}
+
+span.currency-aware-price-display__variant {
+  display: inline;
+}
+
+span.currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+span.currency-aware-price-display__amount {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
 .currency-aware-price-display__amount {
   font-family: var(--ds-font-heading);
   font-size: var(--ds-text-lg);
