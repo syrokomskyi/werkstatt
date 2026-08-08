@@ -21,7 +21,7 @@ import type {
   CheckResult,
 } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
-import { diagnosticsResult, passResult } from "./result-helpers.ts";
+import { diagnosticsResult } from "./result-helpers.ts";
 
 const WHITELISTED_FILES = new Set([
   "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts",
@@ -58,7 +58,7 @@ export async function runBordbuchCommitParityLint(
         message:
           "Direct appendBordbuchEntry call detected outside whitelist. Use appendAndCommitBordbuch or appendBatchAndCommitBordbuch from bordbuch-commit-helper.ts instead (RFC-0750).",
         fixHint:
-          "Import appendAndCommitBordbuch from ../bordbuch/bordbuch-commit-helper.ts and replace the append+commit pattern with a single helper call.",
+          "Import appendAndCommitBordbuch from bordbuch-commit-helper.ts and replace the append+commit pattern with a single helper call.",
       });
     }
   }
