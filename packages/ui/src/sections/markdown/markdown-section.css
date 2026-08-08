@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>Rename markdown-content-component.css to markdown-section.css and move to section folder.</item>
   <item>Refactor CSS classes from markdown-page to markdown-section for naming consistency.</item>
+  <item>RFC-0766: Add display:inline overrides for currency-aware-price-display in prose context.</item>
 </CHANGE_SUMMARY>
 */
 
