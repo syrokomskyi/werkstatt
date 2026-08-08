@@ -271,6 +271,14 @@ Rules:
 - **Session-start pre-flight (NON-NEGOTIABLE, RFC-0575):** At the start of `fo-idea-implement` and `fo-fix` skill pipelines, the agent MUST run `git status --short` in the werkstatt root and in each active mission workpiece (if any). If foreign uncommitted changes are found, the agent MUST: (1) report them to the operator, (2) never modify, stage, or discard them, (3) stage only its own files by explicit path, (4) verify `git diff --cached --name-only` before every commit excludes foreign files.
 - **Git hook activation (RFC-0534).** The pre-commit hook at `hooks/pre-commit` requires `git config core.hooksPath hooks/` to be active. Agents MUST invoke the `setup-ecosystem` skill when setting up a new development environment or after cloning the repository without onboarding. The `onboard` skill's Prepare step checks and configures this automatically for new onboarding.
 
+## Site content editing rule (non-negotiable)
+
+All site content changes — markdown, YAML, frontmatter, prose, business-profile, navigation, surface, people, FAQ, any file under `src/content/**` — MUST be made in the **active mission workpiece** (`missions/<missionId>/workpiece/`), never in the cache clone (`../systems-cache/<id>/`), bare repo, or external mirrors.
+
+- The cache clone and mirrors are read-only for agents. They are updated exclusively through `mission.reconcile` and `mission.close` pipeline steps.
+- If no mission is open, the agent MUST ask the operator to open one (`mission.open --system <id> --brief "<brief>"`) before making any content changes.
+- This rule applies to all agents in all IDEs. Violating it breaks the audit trail and bypasses the mission lifecycle.
+
 ## Mission lifecycle discipline
 
 When the operator asks to start a new mission, the agent workflow is:
