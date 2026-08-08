@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 747. Raw manifest entries: 1327.
+Generated command rows: 745. Raw manifest entries: 1323.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -210,8 +210,8 @@ Generated command rows: 747. Raw manifest entries: 1327.
 | `deploy.artifact.verify` | workspace | workspace | no | no | Verify an artifact's content hash and signature (RFC-0566). Flags: --hash. |
 | `deploy.atomic.rollback` | workspace | workspace | yes | no | Atomic rollback to the previous artifact via symlink swap (RFC-0566). No flags. |
 | `deploy.atomic.swap` | workspace | workspace | yes | no | Atomic symlink swap to deploy a new artifact (RFC-0566). Flags: --hash. |
-| `deploy.preflight` | site:warpgogol-com, workspace | workspace | no | no | Pre-deploy validation gate (RFC-0388 Rule 5). Validates that the target env file exists, contains all keys from .env.example, has no extra keys, and has no empty values. Use --site <name> --env main\|alt for sites, or --service <name> for services. |
-| `deploy.scripts.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate deploy scripts in systems/*/package.json (deploy:main with --secrets-file .env.main, deploy:alt with --secrets-file .env.alt) and services/*/package.json (deploy with --secrets-file .env) (RFC-0388 Rule 6, DNA-40). |
+| `deploy.preflight` | site:warpgogol-com, workspace | workspace | no | no | Pre-deploy validation gate (RFC-0761). Validates that the target env file exists, contains all keys from .env.example, has no extra keys, and has no empty values. Use --site <name> for sites, or --service <name> for services. |
+| `deploy.scripts.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate deploy scripts in systems/*/package.json (deploy:main and deploy:alt with --secrets-file .env) and services/*/package.json (deploy with --secrets-file .env) (RFC-0761 Rule 5, DNA-40). |
 | `deploy.status` | workspace | workspace | no | no | Report current and previous platform artifact hashes, git SHA, and deployment time (RFC-0566). |
 | `derived-prices.materialize` | site:warpgogol-com, workspace | app | no | no | Materialize derived prices for all Offerings by running currency-conversion derivation for each fixed Charge in each target currency (RFC-0740). |
 | `dht.capacity.publish` | workspace | workspace | no | no | RFC-0565: publish workshop capacity to the DHT for placement decisions. Signs the capacity entry with the operator's Ed25519 keypair. Required: --workshop-id <id>, --available-slots <n>, --endpoint <host:port>. Optional: --storage-limit-mb <n>, --bandwidth-limit-mbps <n>. Use --json for output. |
@@ -247,12 +247,10 @@ Generated command rows: 747. Raw manifest entries: 1327.
 | `entitlement.module.validate` | site:warpgogol-com, workspace | app | no | no | Validate that compiled blueprints/modules are covered by resolved entitlements. RFC-0240. |
 | `entitlements.resolve` | site:warpgogol-com, workspace | app | yes | no | Resolve the app's paid-feature set from Stripe Entitlements and write src/entitlements.generated.yaml (RFC-0169). |
 | `entitlements.validate` | site:warpgogol-com, workspace | app | no | no | Validate the resolved entitlements file against the closed EntitledFeature catalog (RFC-0169). |
-| `env.alt.check` | site:warpgogol-com, workspace | workspace | yes | no | Check and create .env.alt from .env.example in sites when missing (RFC-0388 Rule 7). The .env.alt file is a copy of .env.example — the operator fills values afterward. |
 | `env.contract.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate .env.example presence (ENV-CONTRACT-01), comments (ENV-CONTRACT-02), README reference (ENV-CONTRACT-03), empty values (ENV-CONTRACT-04), # How to obtain: instructions (ENV-CONTRACT-05), and formatting — no commented-out variables, blank line between variable blocks (ENV-CONTRACT-06) — across all env-consuming systems/*, services/*, and root (RFC-0388, DNA-40). |
 | `env.example.generate` | site:warpgogol-com, workspace | app | yes | no | Generate apps/<id>/.env.example from the app's GENERATED env schema plus STRIPE_SECRET_KEY when the app uses entitlements (RFC-0168/0169). |
 | `env.example.validate` | site:warpgogol-com, workspace | app | no | no | Guard that every value in apps/<id>/.env.example stays EMPTY so a real secret can never leak into the repo (RFC-0168). |
 | `env.local.check` | site:warpgogol-com, workspace | workspace | yes | no | Check and create .env from .env.example in sites and services when missing (RFC-0388 Rule 7). The .env file is a copy of .env.example — the operator fills values afterward. |
-| `env.main.check` | site:warpgogol-com, workspace | workspace | yes | no | Check and create .env.main from .env.example in sites when missing (RFC-0388 Rule 7). The .env.main file is a copy of .env.example — the operator fills values afterward. |
 | `escalation.budget.validate` | site:warpgogol-com, workspace | app | no | no | Validate escalation budget exhaustion, mandatory feedback, and near-zero L4 human-minute constraints (RFC-0285). |
 | `escalation.queue.report` | site:warpgogol-com, workspace | app | yes | no | Report open human escalations and human-minutes-per-1000-pages KPI (RFC-0285). |
 | `escalation.route` | site:warpgogol-com, workspace | app | yes | no | Route a typed human escalation into the append-only escalation queue (RFC-0285). |
