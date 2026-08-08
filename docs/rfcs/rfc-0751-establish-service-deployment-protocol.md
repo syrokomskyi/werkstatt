@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -32,13 +33,14 @@ commands:
     - service.registry.validate
     - service.naming.validate
   added: []
-  changed: []
+  changed:
+    - sternsystem.validate
   removed: []
 appsImpacted: []
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
   - "@warpgogol/site-kernel-checks"
-  - "@warpgogol/ontology"
+  - "@warpgogol/site-kernel-check-warpgogol"
 successSignals:
   - Any `services/*` Cloudflare Worker can be deployed to production via a single `leitstand.service.deploy --service <id>` command without manual wrangler invocations.
   - Service deployment state (lastDeployed, workerName, url) is tracked in a machine-readable service registry in `systems/registry.yaml`.
@@ -53,6 +55,8 @@ nonGoals:
   - Do not implement Axiom evidence gates for services — services have no visitor-facing HTML to audit.
   - Do not implement DNS record management — that is RFC-0753.
   - Do not implement subdomain registration logic — that is RFC-0752. This RFC depends on RFC-0752 for the `subdomain.validate` gate.
+  - Do not register non-Cloudflare-Worker services (node-runner, compose-stack) — this protocol covers Cloudflare Worker services only. Non-Worker services are deployed through their own mechanisms.
+  - Do not implement concurrent deploy locking — assumed single-operator. A lock mechanism can be added later if needed.
 ---
 
 # RFC-0751: Establish service deployment protocol for shared Cloudflare Worker services
@@ -72,7 +76,7 @@ This works for simple cases but has gaps:
 2. **No leitstand command** — operators must `cd` into each service directory and run `pnpm deploy`. There is no centralized `leitstand.service.deploy --service <id>` command.
 3. **No state tracking** — after a deploy, there is no persistent record of success/failure, Worker URL, or deployment timestamp.
 4. **No health verification** — the site protocol verifies deployed routes via behavior snapshots; services have no equivalent post-deploy check.
-5. **No naming consistency** — Worker names are ad-hoc: `gogol-rate-fetcher`, `gogol-lagebild-sync`, `telegram-alert-bridge`, `warpgogol-matomo-proxy`. No convention enforced.
+5. **No naming consistency** — Worker names are ad-hoc: `gogol-rate-fetcher`, `gogol-lagebild-sync`, `telegram-alert-bridge`, `matomo-proxy`. No convention enforced.
 
 The immediate trigger is the matomo-proxy service (`services/matomo-proxy`), which needs to be deployed to production as a **shared multi-tenant Worker** serving all sites (RFC-0305).
 
@@ -135,11 +139,11 @@ services:
 
 - `id` = `workerName` = directory name = `package.json` `name` (without `@warpgogol/` scope).
 - No `gogol-*`, `warpgogol-*`, or other client prefixes.
-- Existing Workers renamed:
-  - `gogol-rate-fetcher` → `rate-fetcher`
-  - `gogol-lagebild-sync` → `lagebild-sync`
-  - `warpgogol-matomo-proxy` → `matomo-proxy`
-  - `telegram-alert-bridge`, `cf-analytics-poller` — already bare, unchanged.
+- Existing Workers renamed to match directory names:
+  - `gogol-rate-fetcher` → `rate-fetcher-worker` (directory: `rate-fetcher-worker`)
+  - `gogol-lagebild-sync` → `lagebild-sync-worker` (directory: `lagebild-sync-worker`)
+  - `matomo-proxy` — already bare, no rename needed.
+  - `telegram-alert-bridge` — already bare, unchanged.
 
 ### CLI surface
 
@@ -159,7 +163,7 @@ pnpm exec site-kernel run service.naming.validate
 ```ts
 interface ServiceRegistryEntry {
   id: string;
-  kind: "proxy-worker" | "cron-worker" | "api-worker";
+  kind: "proxy-worker" | "scheduled-worker";
   workerName: string;
   hostedBy: "studio" | "site";
   url: string;
@@ -176,6 +180,7 @@ interface ServiceRegistryEntry {
     state: "succeeded" | "failed" | null;
     operationId: string | null;
   };
+  healthCheckPath?: string;
 }
 
 interface ServiceDeployResult {
@@ -193,12 +198,12 @@ interface ServiceDeployResult {
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
+| --- | --- |
 | `systems/registry.yaml` | Gains `services:` top-level key with service entries |
 | `services/<id>/service.config.yaml` | Existing per-service config, read by the registry builder |
 | `services/<id>/wrangler.jsonc` | Existing wrangler config, `name` must match `id` |
 | `services/<id>/.env` | Secrets file, validated by `deploy.preflight` |
-| `services/<id>/package.json` | Existing deploy script remains as fallback; `leitstand.service.deploy` calls `wrangler deploy` directly |
+| `services/<id>/package.json` | Existing deploy script replaced by `leitstand.service.deploy` proxy; no per-service `deploy` script remains |
 
 ### Output format
 
@@ -241,10 +246,22 @@ interface ServiceDeployResult {
 2. **Run `deploy.preflight`** — validate `.env` exists and has all keys from `.env.example` with non-empty values.
 3. **Run `subdomain.validate`** (RFC-0752) — check DNS record + Workers route exist for each `subdomains[]` entry.
 4. **If `subdomain.validate` reports "not registered"** — automatically call `subdomain.register` (RFC-0752) to create DNS record + Workers route. If registration fails, block the deploy.
-5. **Execute `wrangler deploy`** — from the service directory, with `--secrets-file .env`.
-6. **Health check** — for `publicEndpoints: true` services, fetch the `workersDevUrl` and expect HTTP 200 (or any non-5xx response). For services without public endpoints (e.g. cron workers), skip health check. Health check uses `workersDevUrl`, not the custom domain — DNS propagation does not block the deploy.
-7. **Record state** — update `lastDeployed` in the registry with timestamp, state, and operation ID.
+5. **Execute `wrangler deploy`** — from the service directory, with `--secrets-file .env`. Uses `wrangler.jsonc` config (not `wrangler.json`). The command constructs wrangler args directly; it does not reuse the site `cloudflare-workers` adapter, which expects a `distPath` and `wrangler.json` — services have no build step and use `wrangler.jsonc`.
+6. **Health check** — for `publicEndpoints: true` services, fetch `workersDevUrl + healthCheckPath` (default `/`) and expect any non-5xx response. For services without public endpoints (e.g. scheduled workers), skip health check. Health check uses `workersDevUrl`, not the custom domain — DNS propagation does not block the deploy.
+7. **Record state** — update `lastDeployed` in the registry with timestamp, state, and operation ID. The registry write is atomic: write to a staging file, then rename to `systems/registry.yaml`.
 8. **Return result** — structured JSON with deploy and health state.
+
+### `workersDevUrl` resolution
+
+The `workersDevUrl` in the registry is a template with `<account>` as a placeholder. The account subdomain is resolved with the following fallback chain:
+
+1. **`wrangler deploy` stdout** — extract the deployed URL from wrangler output (e.g. `https://rate-fetcher-worker.<account>.workers.dev`).
+2. **`CLOUDFLARE_ACCOUNT_ID` environment variable** — construct `<workerName>.<account>.workers.dev`.
+3. **Error** — if neither is available, the health check is skipped with `healthState: "unknown"`.
+
+### Concurrent deploy handling
+
+`leitstand.service.deploy` does not implement a lock. The protocol assumes single-operator deploys. If two simultaneous deploys target the same service, both will execute `wrangler deploy` — the last writer wins the `lastDeployed` state. This is acceptable for the current operating model.
 
 ### service.registry.validate
 
@@ -273,12 +290,17 @@ The `services:` key is added to the existing `systems/registry.yaml` alongside t
 
 Each `systems[]` entry gains `cloudflareZoneId: <id>` for the Cloudflare zone of the client domain. This is used by RFC-0752 (`subdomain.register`, `subdomain.validate`) to make Cloudflare API calls for DNS records and Workers routes. The zone ID is stable (does not change after zone creation) and safe to store in version control — it is not a secret.
 
+### Registry schema compatibility
+
+Adding a `services:` top-level key to `systems/registry.yaml` changes the file's schema. `sternsystem.validate` is updated to accept the new `services:` key without failing. Existing registry readers (`readRegistry`, `writeRegistry` in `packages/os/site-kernel-handoff/src/sternsystem/registry-io.ts`) are extended to parse and serialize the `services:` key.
+
 ## Rollout
 
-- **Default behavior**: `leitstand.service.deploy` is available immediately for all `services/*` with a registry entry.
-- **Existing services**: `rate-fetcher-worker`, `lagebild-sync-worker`, `telegram-alert-bridge`, `matomo-proxy`, `cf-analytics-poller`, `fleet-probe-runner`, `check-warpgogol-runner`, and `observability-stack` are registered in the registry.
-- **Worker renaming**: Existing `gogol-*` and `warpgogol-*` Workers are renamed to bare names. `wrangler deploy` with the new `name` creates a new Worker; the old Worker is deleted manually or via `wrangler delete`.
-- **Existing per-service `deploy` scripts** remain as a fallback — they are not removed. `leitstand.service.deploy` is the preferred entry point.
+- **Default behavior**: `leitstand.service.deploy` is available immediately for all Cloudflare Worker services with a registry entry.
+- **Registry scope**: Only Cloudflare Worker services (`kind: proxy-worker` or `kind: scheduled-worker` with a `wrangler.jsonc`) are registered. Non-Worker services (`check-warpgogol-runner` — `node-runner`, `observability-stack` — `compose-stack`) are excluded from the registry and deployed through their own mechanisms.
+- **Existing CF Worker services**: `matomo-proxy`, `rate-fetcher-worker`, `lagebild-sync-worker`, and `telegram-alert-bridge` are registered in the registry.
+- **Worker renaming**: `gogol-rate-fetcher` → `rate-fetcher-worker` and `gogol-lagebild-sync` → `lagebild-sync-worker`. `wrangler deploy` with the new `name` creates a new Worker; the old Worker is deleted manually or via `wrangler delete`.
+- **Per-service `deploy` scripts** are removed from `services/*/package.json`. `leitstand.service.deploy` is the sole entry point for service deploys.
 - **New services**: Must be registered in `systems/registry.yaml` to be deployable via leitstand. The `service.config.yaml` file (already required) is the source of truth for `kind` and `routes`.
 
 ## Alternatives considered
@@ -292,8 +314,8 @@ Each `systems[]` entry gains `cloudflareZoneId: <id>` for the Cloudflare zone of
 ## Risks
 
 - **Registry drift**: If `systems/registry.yaml` service entries drift from `service.config.yaml`, deploys may use stale config. Mitigated by `service.registry.validate` cross-checking.
-- **Health check false negatives**: A Worker may be healthy but return non-200 for its root URL (e.g. matomo-proxy returns 404 for `/`). Mitigated by allowing configurable health check paths.
-- **Worker renaming disruption**: Renaming `gogol-rate-fetcher` → `rate-fetcher` creates a new Worker. The old Worker continues running until deleted. During the transition, both Workers exist. Mitigated by: deploy new name first, verify, then delete old Worker.
+- **Health check false negatives**: A Worker may be healthy but return non-200 for its root URL (e.g. matomo-proxy returns 404 for `/`). Mitigated by the optional `healthCheckPath` field in `ServiceRegistryEntry` — operators can set a service-specific path (e.g. `/_wg/analytics/matomo.php`).
+- **Worker renaming disruption**: Renaming `gogol-rate-fetcher` → `rate-fetcher-worker` creates a new Worker. The old Worker continues running until deleted. During the transition, both Workers exist. Mitigated by: deploy new name first, verify, then delete old Worker.
 - **Dependency on RFC-0752**: `leitstand.service.deploy` depends on `subdomain.validate` and `subdomain.register` from RFC-0752. If RFC-0752 is not yet implemented, `leitstand.service.deploy` must gracefully skip subdomain validation (with a warning) or fail with a clear message.
 
 ## Acceptance criteria
@@ -301,7 +323,7 @@ Each `systems[]` entry gains `cloudflareZoneId: <id>` for the Cloudflare zone of
 - [ ] `leitstand.service.deploy` command registered in the kernel command table
 - [ ] `service.registry.validate` command registered in the kernel command table
 - [ ] `service.naming.validate` command registered in the kernel command table
-- [ ] `systems/registry.yaml` has a `services:` key with entries for all existing services
+- [ ] `systems/registry.yaml` has a `services:` key with entries for all Cloudflare Worker services (matomo-proxy, rate-fetcher-worker, lagebild-sync-worker, telegram-alert-bridge)
 - [ ] `systems/registry.yaml` `systems[]` entries have `cloudflareZoneId` field
 - [ ] All Worker names in `wrangler.jsonc` match service IDs (no `gogol-*` or `warpgogol-*` prefixes)
 - [ ] `leitstand.service.deploy --service matomo-proxy` successfully deploys the matomo-proxy Worker
@@ -320,4 +342,5 @@ Each `systems[]` entry gains `cloudflareZoneId: <id>` for the Cloudflare zone of
 - The `leitstand.service.deploy` command lives in `packages/os/site-kernel-handoff/src/leitstand/` alongside existing leitstand commands.
 - The service registry read/write functions live alongside the existing `readRegistry`/`writeRegistry` in `packages/os/site-kernel-handoff/src/sternsystem/registry-io.ts`.
 - The `service.registry.validate` and `service.naming.validate` commands live in `packages/os/site-kernel-checks/src/`.
+- `service.naming.validate` is integrated into `services.check.run` in `packages/os/site-kernel-check-warpgogol/src/commands/services-check.ts`.
 - **Implementation order**: RFC-0752 (Subdomain Management) should be implemented before or alongside this RFC, because `leitstand.service.deploy` depends on `subdomain.validate` and `subdomain.register`.
