@@ -76,16 +76,169 @@ versionBump: ${versionBump ?? "patch"}
 }
 
 describe("ecosystem.commit", () => {
-  it("EC-01: blocks when no staged files match platform scope", async () => {
+  it("EC-01: blocks when no staged files at all", async () => {
     const root = await setupWorkspace();
     try {
-      // Stage a non-platform file
-      await stageFile(root, "docs/readme.md", "# readme\n");
       const result = await runEcosystemCommit(input({ message: "test" }), ctx(root));
       expect(result.exitCode).toBe(1);
       expect(result.data?.status).toBe("blocked");
       const codes = result.data?.violations?.map((v) => v.code) ?? [];
       expect(codes).toContain("EC-01");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  // RFC-0754: non-platform-only commit — new fallback path
+
+  it("RFC-0754: non-platform-only commit succeeds without version bump (dry-run)", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "docs/readme.md", "# readme\n");
+      const result = await runEcosystemCommit(
+        input({ message: "docs: update readme", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("dry-run");
+      expect(result.data?.skipPlatformBump).toBe(true);
+      expect(result.data?.bumpType).toBe("none");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0754: non-platform-only commit succeeds without version bump (actual)", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "docs/readme.md", "# readme\n");
+      const result = await runEcosystemCommit(input({ message: "docs: update readme" }), ctx(root));
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("ok");
+      expect(result.data?.skipPlatformBump).toBe(true);
+      expect(result.data?.bumpType).toBe("none");
+      expect(result.data?.commitSha).toBeTruthy();
+      // Verify commit message does NOT have platform trailers
+      const { stdout } = await execFileAsync("git", ["log", "-1", "--format=%B"], { cwd: root });
+      expect(stdout).not.toContain("X-Platform-Bump");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0754: mixed-scope commit splits into two commits (dry-run)", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      await stageFile(root, "docs/readme.md", "# readme\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: add y and docs", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("dry-run");
+      expect(result.data?.bumpType).toBe("patch");
+      expect(result.data?.newVersion).toBe("1.0.1");
+      expect(result.data?.nonPlatformCommit).toBeDefined();
+      expect(result.data?.nonPlatformCommit?.files).toContain("docs/readme.md");
+      // Verify no commit was made
+      const { stdout } = await execFileAsync("git", ["log", "--oneline"], { cwd: root });
+      expect(stdout.trim().split("\n").length).toBe(1);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0754: mixed-scope commit splits into two commits (actual)", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      await stageFile(root, "docs/readme.md", "# readme\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: add y and docs" }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("ok");
+      expect(result.data?.newVersion).toBe("1.0.1");
+      expect(result.data?.commitSha).toBeTruthy();
+      expect(result.data?.nonPlatformCommit).toBeDefined();
+      expect(result.data?.nonPlatformCommit?.sha).toBeTruthy();
+      expect(result.data?.nonPlatformCommit?.files).toContain("docs/readme.md");
+      // Verify two commits were made (plus initial = 3 total)
+      const { stdout } = await execFileAsync("git", ["log", "--oneline"], { cwd: root });
+      const lines = stdout.trim().split("\n");
+      expect(lines.length).toBe(3);
+      // First commit (HEAD) is non-platform, second is platform
+      const { stdout: headMsg } = await execFileAsync("git", ["log", "-1", "--format=%B"], {
+        cwd: root,
+      });
+      expect(headMsg).not.toContain("X-Platform-Bump");
+      const { stdout: prevMsg } = await execFileAsync(
+        "git",
+        ["log", "-2", "--format=%B", "--reverse"],
+        { cwd: root },
+      );
+      // The platform commit (second from HEAD) should have trailers
+      const { stdout: platformMsg } = await execFileAsync(
+        "git",
+        ["log", "-2", "--format=%B", "--skip=1"],
+        { cwd: root },
+      );
+      expect(platformMsg).toContain("X-Platform-Bump: patch");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0754: --rfc trailer on platform commit only in mixed-scope", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9003", "patch");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      await stageFile(root, "docs/readme.md", "# readme\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: add y and docs", rfc: "RFC-9003", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.rfcId).toBe("RFC-9003");
+      expect(result.data?.nonPlatformCommit).toBeDefined();
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0754: EC-11 --amend with non-platform only → error", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "docs/readme.md", "# readme\n");
+      const result = await runEcosystemCommit(
+        input({ message: "docs: update readme", amend: true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(1);
+      const codes = result.data?.violations?.map((v) => v.code) ?? [];
+      expect(codes).toContain("EC-11");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0754: skipPlatformBump preserved — .md files in packages/ still skip bump in mixed-scope", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "packages/dummy/AGENTS.md", "# Agent Guide\n");
+      await stageFile(root, "docs/readme.md", "# readme\n");
+      const result = await runEcosystemCommit(
+        input({ message: "docs: update docs", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.skipPlatformBump).toBe(true);
+      expect(result.data?.bumpType).toBe("none");
+      expect(result.data?.nonPlatformCommit).toBeDefined();
+      expect(result.data?.nonPlatformCommit?.files).toContain("docs/readme.md");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
