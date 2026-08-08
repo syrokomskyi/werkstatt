@@ -1,7 +1,7 @@
 ---
 id: RFC-0764
 title: "Add --auto-accept flag to content.regression.check for expected content drift"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
 enhancedAt: 2026-08-08
-implementedAt:
+implementedAt: 2026-08-08
 closedAt:
 supersedes: []
 supersededBy:
