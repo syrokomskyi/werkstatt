@@ -663,3 +663,262 @@ changes:
     expect(creg04!.message).toContain("changed");
   });
 });
+
+// ---------------------------------------------------------------------------
+// RFC-0764: --auto-accept flag tests
+// ---------------------------------------------------------------------------
+
+describe("runContentRegressionCheck --auto-accept (RFC-0764)", () => {
+  let root: string;
+  let appDir: string;
+  let cacheCloneDir: string;
+
+  beforeEach(async () => {
+    root = await mkdtemp(join(tmpdir(), "creg-auto-"));
+    appDir = join(root, "apps", "test-system");
+    cacheCloneDir = join(root, "cache-clones", "test-system");
+    await mkdir(join(appDir, "src", "content"), { recursive: true });
+    await mkdir(join(root, "systems"), { recursive: true });
+    await mkdir(cacheCloneDir, { recursive: true });
+
+    const registry = {
+      systems: [
+        {
+          id: "test-system",
+          mirrors: [{ path: "./cache-clones/test-system" }],
+          currentMission: "test-system-m000001",
+        },
+      ],
+    };
+    await writeFile(join(root, "systems", "registry.yaml"), yamlStringify(registry));
+    await writeFile(
+      join(appDir, "astro.config.mjs"),
+      `export default { site: "https://example.com" };`,
+    );
+  });
+
+  afterEach(async () => {
+    await rm(root, { recursive: true, force: true });
+    vi.clearAllMocks();
+  });
+
+  it("auto-accept passes when drift is detected and updates golden baseline", async () => {
+    // Write golden snapshot with different content
+    const goldenDir = join(cacheCloneDir, ".cache", "content-regression");
+    await mkdir(goldenDir, { recursive: true });
+    const goldenSnapshot: ContentRegressionSnapshot = {
+      schemaVersion: 1,
+      systemId: "test-system",
+      contentHash: "sha256:different",
+      routes: [
+        {
+          route: "/de/",
+          blocks: [
+            {
+              id: "block-1",
+              blockType: "prose",
+              heading: "OLD HEADING",
+              hash: "sha256:old",
+            },
+          ],
+          hash: "sha256:old-route",
+        },
+      ],
+    };
+    await writeFile(
+      join(goldenDir, "test-system.snapshot.yaml"),
+      `# Generated\n${yamlStringify(goldenSnapshot)}`,
+    );
+
+    const input = makeInput({ "auto-accept": true });
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionCheck(input, context);
+    expect(result.exitCode).toBe(0);
+    expect(result.summary).toContain("auto-accepted");
+
+    // Verify golden snapshot was updated
+    const { readFile } = await import("node:fs/promises");
+    const goldenPath = join(goldenDir, "test-system.snapshot.yaml");
+    const updatedContent = await readFile(goldenPath, "utf8");
+    const updatedSnapshot = yamlParse(updatedContent) as ContentRegressionSnapshot;
+    // The golden should now match the current snapshot (from mockSemanticSiteModel)
+    expect(updatedSnapshot.routes[0].blocks[0].heading).toBe("Welcome");
+  });
+
+  it("auto-accept generates audit trail manifest with all decisions set to accept", async () => {
+    // Write golden snapshot with different content
+    const goldenDir = join(cacheCloneDir, ".cache", "content-regression");
+    await mkdir(goldenDir, { recursive: true });
+    const goldenSnapshot: ContentRegressionSnapshot = {
+      schemaVersion: 1,
+      systemId: "test-system",
+      contentHash: "sha256:different",
+      routes: [
+        {
+          route: "/de/",
+          blocks: [
+            {
+              id: "block-1",
+              blockType: "prose",
+              heading: "OLD HEADING",
+              hash: "sha256:old",
+            },
+          ],
+          hash: "sha256:old-route",
+        },
+      ],
+    };
+    await writeFile(
+      join(goldenDir, "test-system.snapshot.yaml"),
+      `# Generated\n${yamlStringify(goldenSnapshot)}`,
+    );
+
+    const input = makeInput({ "auto-accept": true });
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionCheck(input, context);
+    expect(result.exitCode).toBe(0);
+
+    // Verify review.yaml was written with accept decisions
+    const { readFile } = await import("node:fs/promises");
+    const reviewPath = join(
+      root,
+      "missions",
+      "test-system-m000001",
+      "evidence",
+      "content-regression",
+      "review.yaml",
+    );
+    const reviewContent = await readFile(reviewPath, "utf8");
+    expect(reviewContent).toContain("Content Regression Review");
+    expect(reviewContent).toContain("decision: accept");
+
+    // Verify apply-result.json was written with pending: 0 and no errors
+    const applyResultPath = join(
+      root,
+      "missions",
+      "test-system-m000001",
+      "evidence",
+      "content-regression",
+      "apply-result.json",
+    );
+    const applyResultContent = await readFile(applyResultPath, "utf8");
+    const applyResult = JSON.parse(applyResultContent) as {
+      pending: number;
+      errors: string[];
+      goldenUpdated: boolean;
+      autoAccepted: boolean;
+      accepted: number;
+    };
+    expect(applyResult.pending).toBe(0);
+    expect(applyResult.errors).toEqual([]);
+    expect(applyResult.goldenUpdated).toBe(true);
+    expect(applyResult.autoAccepted).toBe(true);
+    expect(applyResult.accepted).toBeGreaterThan(0);
+  });
+
+  it("auto-accept without drift is a no-op (pass, no files written)", async () => {
+    // Write golden snapshot matching the mock semantic model
+    const { runContentRegressionSnapshotUpdate } = await import("../content-regression.ts");
+    const updateInput = makeInput({ confirm: true });
+    const updateContext = makeContext(root, appDir);
+    await runContentRegressionSnapshotUpdate(updateInput, updateContext);
+
+    const input = makeInput({ "auto-accept": true });
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionCheck(input, context);
+    expect(result.exitCode).toBe(0);
+    expect(result.summary).toContain("no drift detected");
+
+    // Verify no review.yaml was written
+    const { readFile } = await import("node:fs/promises");
+    const reviewPath = join(
+      root,
+      "missions",
+      "test-system-m000001",
+      "evidence",
+      "content-regression",
+      "review.yaml",
+    );
+    await expect(readFile(reviewPath, "utf8")).rejects.toThrow();
+  });
+
+  it("default behavior (without --auto-accept) still fails on drift", async () => {
+    // Write golden snapshot with different content
+    const goldenDir = join(cacheCloneDir, ".cache", "content-regression");
+    await mkdir(goldenDir, { recursive: true });
+    const goldenSnapshot: ContentRegressionSnapshot = {
+      schemaVersion: 1,
+      systemId: "test-system",
+      contentHash: "sha256:different",
+      routes: [
+        {
+          route: "/de/",
+          blocks: [
+            {
+              id: "block-1",
+              blockType: "prose",
+              heading: "OLD HEADING",
+              hash: "sha256:old",
+            },
+          ],
+          hash: "sha256:old-route",
+        },
+      ],
+    };
+    await writeFile(
+      join(goldenDir, "test-system.snapshot.yaml"),
+      `# Generated\n${yamlStringify(goldenSnapshot)}`,
+    );
+
+    const input = makeInput();
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionCheck(input, context);
+    expect(result.exitCode).toBe(1);
+    const data = result.data as { diagnostics: Array<{ ruleId: string }> };
+    const creg01s = data.diagnostics.filter((d) => d.ruleId === "CREG-01");
+    expect(creg01s.length).toBeGreaterThan(0);
+  });
+
+  it("auto-accept write failure emits CREG-06", async () => {
+    // Write golden snapshot with different content
+    const goldenDir = join(cacheCloneDir, ".cache", "content-regression");
+    await mkdir(goldenDir, { recursive: true });
+    const goldenSnapshot: ContentRegressionSnapshot = {
+      schemaVersion: 1,
+      systemId: "test-system",
+      contentHash: "sha256:different",
+      routes: [
+        {
+          route: "/de/",
+          blocks: [
+            {
+              id: "block-1",
+              blockType: "prose",
+              heading: "OLD HEADING",
+              hash: "sha256:old",
+            },
+          ],
+          hash: "sha256:old-route",
+        },
+      ],
+    };
+    await writeFile(
+      join(goldenDir, "test-system.snapshot.yaml"),
+      `# Generated\n${yamlStringify(goldenSnapshot)}`,
+    );
+
+    // Create a file at the evidence directory path so mkdir fails
+    const evidenceParentDir = join(root, "missions", "test-system-m000001", "evidence");
+    await mkdir(evidenceParentDir, { recursive: true });
+    await writeFile(join(evidenceParentDir, "content-regression"), "blocking file");
+
+    const input = makeInput({ "auto-accept": true });
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionCheck(input, context);
+    expect(result.exitCode).toBe(1);
+    const data = result.data as { diagnostics: Array<{ ruleId: string; severity: string }> };
+    const creg06 = data.diagnostics.find((d) => d.ruleId === "CREG-06");
+    expect(creg06).toBeDefined();
+    expect(creg06!.severity).toBe("error");
+  });
+});
