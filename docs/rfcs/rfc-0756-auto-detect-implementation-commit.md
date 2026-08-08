@@ -158,15 +158,15 @@ async function autoDetectImplementationCommit(
 
 ## Acceptance criteria
 
-- [ ] `rfc.implement.stamp --id <RFC-ID>` works without `--implementation-commit` when a single matching commit exists
-- [ ] Multiple matching commits are listed with SHAs and messages, asking for explicit flag
-- [ ] No matching commits produce a clear error message
-- [ ] `--implementation-commit <SHA>` explicitly overrides auto-detection
-- [ ] All existing RFC-IMP-01 through RFC-IMP-06 rules continue to work
-- [ ] Unit test verifies auto-detect picks the correct commit
-- [ ] Unit test verifies multiple-candidate error path
-- [ ] `docs/command-manifest.generated.yaml` reflects `required: false` for `--implementation-commit` after running `command.manifest.generate`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `rfc.implement.stamp --id <RFC-ID>` works without `--implementation-commit` when a single matching commit exists (evidence: implement-stamp.ts:305-324 auto-detect helper, implement-stamp.test.ts:290-308 auto-detect success test)
+- [x] Multiple matching commits are listed with SHAs and messages, asking for explicit flag (evidence: implement-stamp.test.ts:310-327 multiple-candidates test, implement-stamp.ts:316-323 candidate listing)
+- [x] No matching commits produce a clear error message (evidence: implement-stamp.test.ts:329-345 no-commit test, implement-stamp.ts:310-314 none path)
+- [x] `--implementation-commit <SHA>` explicitly overrides auto-detection (evidence: implement-stamp.test.ts:347-362 explicit-override test, implement-stamp.ts:306 `if (!implementationCommit)` guard)
+- [x] All existing RFC-IMP-01 through RFC-IMP-06 rules continue to work (evidence: implement-stamp.test.ts:126-276 all 8 existing tests pass unchanged)
+- [x] Unit test verifies auto-detect picks the correct commit (evidence: implement-stamp.test.ts:290-308 "auto-detects the implementation commit" test)
+- [x] Unit test verifies multiple-candidate error path (evidence: implement-stamp.test.ts:310-327 "lists multiple candidate commits" test)
+- [x] `docs/command-manifest.generated.yaml` reflects `required: false` for `--implementation-commit` after running `command.manifest.generate` (evidence: docs/command-manifest.generated.yaml:18793 `required: false`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0756` returns zero violations)
 
 ## Implementation notes for agents
 
