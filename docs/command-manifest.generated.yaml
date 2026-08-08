@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 42a9efda6a502247542492446a0a0f359c5c5ccb28f9454a08342a10337b807c
+  contentHash: 7938c91d92b797802b9f9d74c140e5dadf0dfd66cb98ebd39ef6d5c22d1f20fc
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -18790,9 +18790,10 @@ commands:
         description: Target RFC id to stamp (e.g. RFC-0476).
       implementation-commit:
         kind: string
-        required: true
+        required: false
         description: SHA of the implementation commit (must be reachable from HEAD and
-          reference the RFC id).
+          reference the RFC id). When omitted, the command auto-detects the
+          commit via git log --grep=<RFC-ID> (RFC-0756).
       dry-run:
         kind: boolean
         description: Perform all checks without mutating the RFC file or emitting evidence.
@@ -18822,9 +18823,10 @@ commands:
         description: Target RFC id to stamp (e.g. RFC-0476).
       implementation-commit:
         kind: string
-        required: true
+        required: false
         description: SHA of the implementation commit (must be reachable from HEAD and
-          reference the RFC id).
+          reference the RFC id). When omitted, the command auto-detects the
+          commit via git log --grep=<RFC-ID> (RFC-0756).
       dry-run:
         kind: boolean
         description: Perform all checks without mutating the RFC file or emitting evidence.
