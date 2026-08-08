@@ -13,7 +13,7 @@ secret can never leak into the repo through the tracked example file.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0168 (Session C): initial implementation — generated, personalized, leak-guarded.</item>
-  <item>RFC-0182: Add Cloudflare Regional Services API credentials block (CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID).</item>
+  <item>RFC-0182: Add Cloudflare Regional Services API credentials block (CLOUDFLARE_READONLY_API_TOKEN, CLOUDFLARE_ZONE_ID).</item>
   <item>RFC-0186: Add Lagebild CRM Buffer env block (SUPABASE_BUFFER_SERVICE_KEY, SUPABASE_BUFFER_URL, SUPABASE_BUFFER_TENANT_ID).</item>
   <item>RFC-0204: Add PUBLIC_IMAGE_PROVIDER=build-portable block for build-portable responsive image variants.</item>
   <item>RFC-0388: Add # How to obtain: per-key instructions. Change renderBlock to accept EnvKey[] with howToObtain field.</item>
@@ -272,8 +272,8 @@ function renderEnvExample(opts: {
   //
   // ZONE_ID: Find in Cloudflare Dashboard → Overview → right sidebar "API" section.
   //
-  // CLOUDFLARE_API_TOKEN is kept for backward compatibility; prefer CLOUDFLARE_READONLY_API_TOKEN
-  // for the validation command (least-privilege principle).
+  // CLOUDFLARE_API_TOKEN is kept in HOW_TO_OBTAIN for root .env.example (RFC-0761);
+  // site .env.example only includes CLOUDFLARE_READONLY_API_TOKEN and CLOUDFLARE_ZONE_ID.
   blocks.push(
     renderBlock(
       "Cloudflare Regional Services validation (RFC-0182). Optional — only required when\n" +
@@ -288,13 +288,8 @@ function renderEnvExample(opts: {
         "#\n" +
         "# ACCOUNT_ID & ZONE_ID: Cloudflare Dashboard → Overview → API section (right sidebar).\n" +
         "#   Account ID is at the top; Zone ID is below it for the selected domain.\n" +
-        "# Prefer CLOUDFLARE_READONLY_API_TOKEN over CLOUDFLARE_API_TOKEN (least-privilege).",
-      withHowToObtain([
-        "CLOUDFLARE_ACCOUNT_ID",
-        "CLOUDFLARE_READONLY_API_TOKEN",
-        "CLOUDFLARE_API_TOKEN",
-        "CLOUDFLARE_ZONE_ID",
-      ]),
+        "# Prefer CLOUDFLARE_READONLY_API_TOKEN (least-privilege).",
+      withHowToObtain(["CLOUDFLARE_READONLY_API_TOKEN", "CLOUDFLARE_ZONE_ID"]),
     ),
   );
 
