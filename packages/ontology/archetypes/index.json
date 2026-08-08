@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "totalCount": 58,
+  "totalCount": 59,
   "entries": [
     {
       "id": "approach",
@@ -168,6 +168,18 @@
         "Rhea"
       ],
       "sourceFile": "packages/ontology/archetypes/sections/donation-use.yaml",
+      "layer": "section"
+    },
+    {
+      "id": "dynamic-status-block",
+      "displayName": "Dynamic status block",
+      "semanticRole": "data-driven-status-indicator",
+      "version": "1.0.0",
+      "layoutHint": "single-column",
+      "acceptedCosmicNames": [
+        "Elara"
+      ],
+      "sourceFile": "packages/ontology/archetypes/sections/dynamic-status-block.yaml",
       "layer": "section"
     },
     {
@@ -558,7 +570,7 @@
       "id": "send-message",
       "displayName": "Send message",
       "semanticRole": "lead-message-capture",
-      "version": "1.0.0",
+      "version": "1.3.0",
       "layoutHint": "single-column",
       "acceptedCosmicNames": [
         "Ceres"
@@ -707,6 +719,7 @@
     "client-ownership-disclosure",
     "consent-gated-chat-launcher",
     "credits-gallery",
+    "data-driven-status-indicator",
     "donation-card",
     "donation-use",
     "exit-clause-disclosure",
