@@ -236,14 +236,14 @@ No `--json` output. The section renders as HTML at build time.
 
 ## Acceptance criteria
 
-- [ ] `service-metadata-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (version?, effectiveDate?, nextReviewDate?, links?, footnote?), `description`, `semanticRole: page-metadata-footer`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: archetype YAML file)
-- [ ] `archetype.registry.build` run to regenerate `packages/ontology/archetypes/index.yaml` including `service-metadata-block` (evidence: index.yaml contains the new entry)
-- [ ] Section files created in `packages/ui/src/sections/service-metadata-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.css`, `.story.md`) (evidence: file set exists)
-- [ ] `props.types.generate` run to produce `.types.generated.ts` (evidence: generated file exists)
-- [ ] `section.contract.validate` passes for the new section (evidence: validator output, zero violations)
-- [ ] `page.block.validate` accepts `type: service-metadata-block` blocks with valid props (evidence: validator output)
-- [ ] `AGENTS.md` updated where agent behavior rules changed (evidence: `packages/ui/AGENTS.md` or `packages/ontology/AGENTS.md` if needed)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `service-metadata-block.yaml` archetype created in `packages/ontology/archetypes/sections/` with `propsSchema` (version?, effectiveDate?, nextReviewDate?, links?, footnote?), `description`, `semanticRole: page-metadata-footer`, `bodyKind: composite`, and `acceptedCosmicNames` (evidence: `packages/ontology/archetypes/sections/service-metadata-block.yaml`, commit 5d9f49ce)
+- [x] `archetype.registry.build` run to regenerate `packages/ontology/archetypes/index.yaml` including `service-metadata-block` (evidence: `packages/ontology/archetypes/index.yaml:436`, 60 entries, 72 planetImportPaths)
+- [x] Section files created in `packages/ui/src/sections/service-metadata-block/` via `section.scaffold` (`.astro`, `.manifest.yaml`, `.css`, `.story.md`) (evidence: 5 files in `packages/ui/src/sections/service-metadata-block/`, scaffolded via `section.scaffold --name service-metadata-block --archetype service-metadata-block`)
+- [x] `props.types.generate` run to produce `.types.generated.ts` (evidence: `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.types.generated.ts`, sourceHash 54a8a0f1)
+- [x] `section.contract.validate` passes for the new section (evidence: validator output exitCode 0, zero violations)
+- [x] `page.block.validate` accepts `type: service-metadata-block` blocks with valid props (evidence: validator output exitCode 0, zero violations)
+- [x] `AGENTS.md` updated where agent behavior rules changed (evidence: no update needed — standard archetype addition follows existing patterns documented in `packages/ui/AGENTS.md` § Section archetype contract)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0759` exitCode 0, "All 1 RFC(s) passed validation")
 
 ## Implementation notes for agents
 
