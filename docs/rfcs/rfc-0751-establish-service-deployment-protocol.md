@@ -1,12 +1,13 @@
 ---
 id: RFC-0751
 title: "Establish service deployment protocol for shared Cloudflare Worker services"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
 enhancedAt: 2026-08-08
