@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -118,10 +119,8 @@ This is a documentation-only RFC. No code changes, no validators, no migrations.
 
 ### AGENTS.md section (root)
 
-The following section is added to root `AGENTS.md`:
+A new "Content syntax reference" section is added to root `AGENTS.md`, placed **before** the existing "Content references in mixed strings (RFC-0723)" section (currently at line 599). The new section serves as the general overview of all three syntaxes; the existing RFC-0723 section remains as-is and is referenced by the overview.
 
-> **Content syntax reference**
->
 > Three string-embedding mechanisms operate at different pipeline layers. Agents MUST use the correct one for each context.
 >
 > 1. **Content references** — `collection.file.field` (pure) or `=(collection.file.field)` (in mixed strings). Resolved by `@warpgogol/share` before the component renders. Returns a string. Use for business data (email, address, legal name) and structured props (amount, currency, recurrence). See RFC-0529, RFC-0723.
@@ -136,16 +135,16 @@ The following section is added to root `AGENTS.md`:
 
 ### packages/ui/AGENTS.md entry
 
-The following entry is added to `packages/ui/AGENTS.md`:
+The existing "Dynamic pricing in UI components" section (lines 382-388) in `packages/ui/AGENTS.md` is **merged** with the following entry. The merged section retains the existing `parsePriceMarkers` / `derived-prices.generated.json` / `lang` rules and adds the explicit syntax documentation and the "not a content reference" clarification:
 
 > **Price marker syntax (`{price:offering-id:chargeRef}`).** Parsed by `parsePriceMarkers` in `packages/ui/src/utils/price-marker.ts`. Resolves offering prices from `derived-prices.generated.json` and renders `CurrencyAwarePriceDisplay` with multi-currency variants. Used in `hero-decision-card` `decisionCard.items[].value` and other component text fields that support inline price display. This is a presentation-layer shorthand, not a content reference — do not migrate to `=(...)` formula syntax.
 
 ### File system responsibilities
 
-| Path | Role |
-| --- | --- |
-| `AGENTS.md` (root) | New "Content syntax reference" section |
-| `packages/ui/AGENTS.md` | New price marker documentation entry |
+| Path                    | Role                                                            |
+| ----------------------- | --------------------------------------------------------------- |
+| `AGENTS.md` (root)      | New "Content syntax reference" section before RFC-0723 section  |
+| `packages/ui/AGENTS.md` | Merged into existing "Dynamic pricing in UI components" section |
 
 ## Rollout
 
