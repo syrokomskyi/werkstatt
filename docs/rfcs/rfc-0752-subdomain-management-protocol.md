@@ -1,12 +1,13 @@
 ---
 id: RFC-0752
 title: "Subdomain management protocol for Cloudflare DNS and Workers routes"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
 enhancedAt: 2026-08-08
