@@ -25,15 +25,10 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import {
-  readRegistry,
-  writeRegistry,
-  findEntry,
-  resolveCachePath,
-} from "../sternsystem/registry-io.ts";
+import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty, countOperatorCommits } from "./mission-git-commit.ts";
-import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { resolveActor } from "./actor-identity.ts";
 
@@ -127,7 +122,7 @@ export async function runMissionAbort(
 
     await writeMissionManifest(workspaceRoot, manifest);
 
-    await appendBordbuchEntry(
+    await appendAndCommitBordbuch(
       workspaceRoot,
       manifest.systemId,
       "mission-abort",
@@ -138,11 +133,8 @@ export async function runMissionAbort(
         writerRole: "mission",
         metadata: { reason },
       },
+      `Bordbuch: mission-abort ${missionId}`,
     );
-
-    // Commit and push bordbuch to system git repo (RFC-0477)
-    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
-    await commitAndPushBordbuch(systemDir, `Bordbuch: mission-abort ${missionId}`);
 
     const registry = await readRegistry(workspaceRoot);
     const entry = findEntry(registry, manifest.systemId);

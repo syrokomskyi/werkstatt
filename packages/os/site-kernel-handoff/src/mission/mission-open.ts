@@ -32,12 +32,11 @@ import {
 import { createMissionDirectories, writeMissionManifest, missionExists } from "./mission-io.ts";
 import {
   readBordbuch,
-  appendBordbuchEntry,
   deriveNextMissionNumberSafe,
-  commitAndPushBordbuch,
   validateBordbuch,
   type BordbuchViolation,
 } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import {
   acquireLock,
   releaseLock,
@@ -172,17 +171,18 @@ export async function runMissionOpen(
     };
     await writeMissionManifest(workspaceRoot, manifest);
 
-    // Append Bordbuch entry
-    await appendBordbuchEntry(workspaceRoot, systemId, "mission-open", brief, actor, {
-      missionId,
-      writerRole: "mission",
-      metadata: { brief, pinAtOpen },
-    });
-
-    // Commit and push bordbuch to system git repo (RFC-0477, ADR-0030)
-    const systemDir = await resolveCachePath(workspaceRoot, systemId);
-    const pushResult = await commitAndPushBordbuch(
-      systemDir,
+    // Append Bordbuch entry and commit+push atomically (RFC-0750, ADR-0030)
+    const { commitResult: pushResult } = await appendAndCommitBordbuch(
+      workspaceRoot,
+      systemId,
+      "mission-open",
+      brief,
+      actor,
+      {
+        missionId,
+        writerRole: "mission",
+        metadata: { brief, pinAtOpen },
+      },
       `Bordbuch: mission-open ${missionId}`,
     );
     if (pushResult.commitSha === null) {

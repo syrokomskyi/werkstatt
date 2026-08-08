@@ -44,12 +44,8 @@ import {
 } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty } from "./mission-git-commit.ts";
-import {
-  appendBordbuchEntry,
-  commitAndPushBordbuch,
-  validateBordbuch,
-  type BordbuchViolation,
-} from "../bordbuch/bordbuch-io.ts";
+import { validateBordbuch, type BordbuchViolation } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import {
   runMissionValidate,
   type MissionValidateData,
@@ -343,7 +339,7 @@ export async function runMissionClose(
       );
     }
 
-    await appendBordbuchEntry(
+    const { commitResult: bordbuchResult } = await appendAndCommitBordbuch(
       workspaceRoot,
       manifest.systemId,
       "mission-close",
@@ -355,14 +351,10 @@ export async function runMissionClose(
         writerRole: "mission",
         metadata: releaseId ? { releaseId } : undefined,
       },
-    );
-
-    // Commit and push bordbuch to system git repo (RFC-0477)
-    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
-    const bordbuchResult = await commitAndPushBordbuch(
-      systemDir,
       `Bordbuch: mission-close ${missionId}`,
     );
+
+    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
 
     // Gather dirty files (excluding bordbuch which was just committed)
     let dirtyFiles: string[] = [];
@@ -418,9 +410,9 @@ export async function runMissionClose(
       logger.warn(
         `  Evidence sync skipped — local evidence will be lost when mission.cleanup runs`,
       );
-      // Append Bordbuch entry to make the escape hatch auditable
+      // Append Bordbuch entry to make the escape hatch auditable (RFC-0750: commit atomically)
       try {
-        await appendBordbuchEntry(
+        await appendAndCommitBordbuch(
           workspaceRoot,
           manifest.systemId,
           "mission-close",
@@ -431,6 +423,7 @@ export async function runMissionClose(
             writerRole: "mission",
             metadata: { evidenceSyncSkipped: true, reason: "operator-used-skip-evidence-sync" },
           },
+          `Bordbuch: mission-close-evidence-skipped ${missionId}`,
         );
       } catch (bordbuchErr) {
         logger.warn(

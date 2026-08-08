@@ -71,7 +71,7 @@ import {
   commitWerkstattSideEffects,
 } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
 import { byteHash } from "@warpgogol/fingerprint";
 import type { KernelPipelineStep } from "@warpgogol/site-kernel";
@@ -1206,9 +1206,9 @@ export async function runMissionMaterialize(
       logger,
     );
 
-    // RFC-0517/RFC-0597: append Bordbuch entry when preflight is skipped
+    // RFC-0517/RFC-0597: append Bordbuch entry when preflight is skipped (RFC-0750: commit atomically)
     if (skipPreflight) {
-      await appendBordbuchEntry(
+      await appendAndCommitBordbuch(
         workspaceRoot,
         manifest.systemId,
         "preflight-skipped",
@@ -1219,10 +1219,11 @@ export async function runMissionMaterialize(
           missionId,
           metadata: { reason: "operator override via --skip-preflight flag" },
         },
+        `Bordbuch: preflight-skipped ${missionId}`,
       );
       logger.info(`  Bordbuch: preflight-skipped entry appended`);
     } else if (preflightSkipped) {
-      await appendBordbuchEntry(
+      await appendAndCommitBordbuch(
         workspaceRoot,
         manifest.systemId,
         "preflight-skipped",
@@ -1233,6 +1234,7 @@ export async function runMissionMaterialize(
           missionId,
           metadata: { reason: "cache-clone-head-unchanged" },
         },
+        `Bordbuch: preflight-skipped ${missionId}`,
       );
       logger.info(`  Bordbuch: preflight-skipped entry appended (cache-clone-head-unchanged)`);
     }

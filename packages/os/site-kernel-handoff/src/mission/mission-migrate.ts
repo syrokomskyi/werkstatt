@@ -26,7 +26,7 @@ import type {
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { migratorsToApply } from "../migrators/registry.ts";
 import type {
   Migrator,
@@ -224,7 +224,7 @@ export async function runMissionMigrate(
       `werkstatt: mission.migrate ${missionId}`,
     );
 
-    await appendBordbuchEntry(
+    await appendAndCommitBordbuch(
       workspaceRoot,
       manifest.systemId,
       "mission-migrate",
@@ -237,6 +237,7 @@ export async function runMissionMigrate(
         status: status === "pass" ? "done" : "failed",
         metadata: { appliedMigrators, skippedMigrators, blockedMigrator },
       },
+      `Bordbuch: mission-migrate ${missionId}`,
     );
 
     if (status === "blocked") {
