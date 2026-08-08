@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -83,7 +84,7 @@ packagesImpacted:
 successSignals:
   - "No lifecycle command leaves dirty bordbuch/events.ndjson in the cache clone after successful completion"
   - "bordbuch.commit.parity.lint flags any direct appendBordbuchEntry call outside the whitelist"
-  - "All 19 migrated commands use appendAndCommitBordbuch instead of separate append + commit calls"
+  - "All 20 migrated commands use appendAndCommitBordbuch instead of separate append + commit calls"
 nonGoals:
   - "Does not change bordbuch.append command behavior — it remains a low-level escape hatch"
   - "Does not remove bordbuch.commit pipeline step — it remains for projection files with events.ndjson as defense-in-depth"
@@ -113,7 +114,7 @@ nonGoals:
 
 RFC-0477 established the `commitAndPushBordbuch` helper and mandated its use after `appendBordbuchEntry` in mission lifecycle commands (`mission.open`, `mission.close`, `mission.abort`) and `sternsystem.sync`. This ensured bordbuch events were committed and pushed to the cache clone git repo immediately after append.
 
-However, 15 other commands that call `appendBordbuchEntry` never call `commitAndPushBordbuch`. These include release commands (`release.ready`, `release.rollback`), leitstand commands (`leitstand.propagate`, `leitstand.promote`, `leitstand.rollback`), mission commands (`mission.materialize`, `mission.migrate`), sternsystem commands (`sternsystem.extract`), and all 8 nachweis commands. After these commands complete, `bordbuch/events.ndjson` in the cache clone is dirty — the event was appended to disk but never committed to git.
+However, 16 other commands that call `appendBordbuchEntry` never call `commitAndPushBordbuch`. These include release commands (`release.ready`, `release.rollback`), leitstand commands (`leitstand.propagate`, `leitstand.promote`, `leitstand.rollback`), mission commands (`mission.materialize`, `mission.migrate`), sternsystem commands (`sternsystem.extract`), and all 8 nachweis commands. Additionally, `mission.close` has a second call site (evidence-skipped escape hatch at line 423) that appends without committing. After these commands complete, `bordbuch/events.ndjson` in the cache clone is dirty — the event was appended to disk but never committed to git.
 
 This was observed on 2026-08-08: after `mission.close` (m000037) and subsequent `release.ready` + `leitstand.propagate` + `leitstand.promote` for release r000014, the cache clone had 3 uncommitted bordbuch events (event-000034, event-000035, event-000036). The operator had to manually `cd` into the cache clone and commit them.
 
@@ -121,7 +122,7 @@ RFC-0749 addressed a related symptom — dirty bordbuch **projection** files aft
 
 ## Problem
 
-DNA-46 (Mission lifecycle) states that every mission is recorded in the Sternsystem's Bordbuch. DNA-48 (Release discipline) and DNA-49 (Fleet propagation) track release and deployment events in the same Bordbuch. Yet 15 commands that append bordbuch entries do not commit them:
+DNA-46 (Mission lifecycle) states that every mission is recorded in the Sternsystem's Bordbuch. DNA-48 (Release discipline) and DNA-49 (Fleet propagation) track release and deployment events in the same Bordbuch. Yet 16 commands that append bordbuch entries do not commit them, plus a second call site in `mission.close` (evidence-skipped escape hatch):
 
 | Command | File | Line | Event kind |
 | --- | --- | --- | --- |
@@ -148,7 +149,7 @@ There is also no lint or validator that prevents new commands from calling `appe
 
 ## Decision
 
-The kernel gains `appendAndCommitBordbuch` (single-entry) and `appendBatchAndCommitBordbuch` (multi-entry) helpers in `bordbuch/bordbuch-commit-helper.ts` that combine `appendBordbuchEntry` + `commitAndPushBordbuch` into one atomic operation. All 19 commands that append bordbuch entries are migrated to these helpers. `commitAndPushBordbuch` becomes internal to `bordbuch-io.ts` (no longer exported). A new `bordbuch.commit.parity.lint` command flags any direct `appendBordbuchEntry` call outside a 3-file whitelist. `bordbuch.commit` (pipeline step) adds `events.ndjson` to its projection paths as defense-in-depth.
+The kernel gains `appendAndCommitBordbuch` (single-entry) and `appendBatchAndCommitBordbuch` (multi-entry) helpers in `bordbuch/bordbuch-commit-helper.ts` that combine `appendBordbuchEntry` + `commitAndPushBordbuch` into one atomic operation. All 20 commands that append bordbuch entries are migrated to these helpers. `commitAndPushBordbuch` becomes internal to `bordbuch-io.ts` (no longer exported). A new `bordbuch.commit.parity.lint` command flags any direct `appendBordbuchEntry` call outside a 3-file whitelist. `bordbuch.commit` (pipeline step) adds `events.ndjson` to its projection paths as defense-in-depth.
 
 ## Architectural fit
 
@@ -156,7 +157,7 @@ The kernel gains `appendAndCommitBordbuch` (single-entry) and `appendBatchAndCom
 - **DNA-48 (Release discipline)**: `release.ready` and `release.rollback` bordbuch events are now committed immediately.
 - **DNA-49 (Fleet propagation)**: `leitstand.propagate`, `leitstand.promote`, and `leitstand.rollback` bordbuch events are now committed immediately.
 - **DNA-51 (Werkstatt consistency primitives)**: The new `bordbuch.commit.parity.lint` enforces that all commands use the shared `appendAndCommitBordbuch` helper, preventing future gaps.
-- **RFC-0477**: Extends the bordbuch git synchronization contract from 4 commands to all 19 commands that append entries.
+- **RFC-0477**: Extends the bordbuch git synchronization contract from 4 commands to all 20 commands that append entries.
 - **RFC-0580 (Auto-commit werkstatt side-effects)**: Parallel pattern — RFC-0580 auto-commits werkstatt-level files (registry.yaml, mission.yaml) from lifecycle commands. This RFC applies the same pattern to bordbuch events in the cache clone.
 - **RFC-0749**: Complementary — RFC-0749 handles projection files after `mission.validate`; this RFC handles `events.ndjson` after all lifecycle commands.
 - **Site OS operator model**: The helper lives in `packages/os/site-kernel-handoff/src/bordbuch/`, the same package that owns the Bordbuch command family (DNA-46, RFC-0473). The lint command lives in `packages/os/site-kernel-checks/` alongside other lint commands.
@@ -290,13 +291,14 @@ On violation:
 ### Failure modes
 
 - `appendAndCommitBordbuch` does NOT throw on commit/push failure — returns `commitResult` with `commitSha: null` or `pushed: false`. Callers that need hard guarantees (mission.open per ADR-0030) check the result and throw themselves.
-- `bordbuch.commit.parity.lint` exits non-zero on any violation. Integrated into `build.check` pipeline.
+- `bordbuch.commit.parity.lint` exits non-zero on any violation. Integrated into `PACKAGES_CHECK_PIPELINE`.
 - `bordbuch.commit` pipeline step: adding `events.ndjson` to projection paths is a no-op when the file is not dirty — `git add` on an unchanged file produces no staging.
+- **Batch helper partial failure**: `appendBatchAndCommitBordbuch` appends all entries sequentially before committing. If an `appendBordbuchEntry` call fails mid-batch, already-appended entries are on disk but not committed. The helper does NOT roll back appended entries — the caller receives the error and must decide whether to commit the partial state via `commitAndPushBordbuch` (available internally) or retry the full batch. Currently only `nachweis.withdraw` uses the batch helper (2 entries: consent + record).
 
 ## Rollout
 
-- **No flag day**: All 19 commands are migrated in a single implementation pass. No backward compatibility layer — `commitAndPushBordbuch` export is removed, all callers updated.
-- **Lint integration**: `bordbuch.commit.parity.lint` is added to the `build.check` pipeline immediately. Since all callers are migrated in the same pass, the lint passes from day one.
+- **No flag day**: All 20 commands are migrated in a single implementation pass. No backward compatibility layer — `commitAndPushBordbuch` export is removed, all callers updated.
+- **Lint integration**: `bordbuch.commit.parity.lint` is added to the `PACKAGES_CHECK_PIPELINE` (alongside `fingerprint.usage.lint` and `workspace.write.boundary.lint`) immediately. Since all callers are migrated in the same pass, the lint passes from day one.
 - **No migration path for existing apps**: This is an internal kernel change — site workspaces are unaffected. No `.env` changes, no content changes, no schema changes.
 - **`bordbuch.commit` pipeline step**: `events.ndjson` is added to `BORDBUCH_PROJECTION_PATHS`. This is defense-in-depth — if `appendAndCommitBordbuch` already committed the file, `bordbuch.commit` finds nothing to stage. If a future bug skips the helper, `bordbuch.commit` catches the dirty file.
 - **New commands**: Any future command that needs to append bordbuch entries MUST use `appendAndCommitBordbuch` or `appendBatchAndCommitBordbuch`. The lint enforces this.
@@ -317,14 +319,15 @@ On violation:
 - **Push failure on new Sternsystems**: `sternsystem.extract` creates a new cache clone that may not have a git remote configured yet. `commitAndPushBordbuch` will commit locally but fail to push. The helper returns `{ pushed: false }` — `sternsystem.extract` does not check this, which is correct (push will happen on the next operation).
 - **Lint false positives**: The whitelist is file-path-based. If a file is renamed or a new file needs direct `appendBordbuchEntry` access, the lint will flag it. This is intentional — it forces a conscious decision to add the file to the whitelist.
 - **Agent misinterpretation**: Agents may try to call `appendBordbuchEntry` directly in new commands. The lint catches this at build time, but agents may be confused if they haven't read this RFC. The `AGENTS.md` update for `packages/os/site-kernel-handoff` should document the helper as the canonical API.
-- **Performance**: The helper adds one `git add` + `git commit` + `git push` per bordbuch append. This is the same cost as the existing 4 commands that already do this. No additional overhead beyond closing the gap for the 15 commands that were skipping it.
+- **Performance**: The helper adds one `git add` + `git commit` + `git push` per bordbuch append. This is the same cost as the existing 4 commands that already do this. No additional overhead beyond closing the gap for the 16 commands that were skipping it.
+- **Concurrent execution**: Two commands running simultaneously for the same systemId (e.g. `nachweis.ingest` and `mission.migrate`) both acquire the `bordbuch:${systemId}` lock, which serializes append operations. After releasing the lock, `commitAndPushBordbuch` may interleave — `git add bordbuch/events.ndjson` stages all dirty lines regardless of which command appended them. This is safe: the commit captures all pending entries, and the push is idempotent for already-pushed commits.
 
 ## Acceptance criteria
 
 - [ ] `appendAndCommitBordbuch` and `appendBatchAndCommitBordbuch` defined in `bordbuch/bordbuch-commit-helper.ts` with correct TypeScript types
 - [ ] `commitAndPushBordbuch` removed from `bordbuch/index.ts` barrel exports — internal only
-- [ ] All 19 commands migrated to use `appendAndCommitBordbuch` or `appendBatchAndCommitBordbuch` — no direct `appendBordbuchEntry` calls outside whitelist
-- [ ] `bordbuch.commit.parity.lint` command registered in `site-kernel-checks` and integrated into `build.check` pipeline
+- [ ] All 20 commands migrated to use `appendAndCommitBordbuch` or `appendBatchAndCommitBordbuch` — no direct `appendBordbuchEntry` calls outside whitelist
+- [ ] `bordbuch.commit.parity.lint` command registered in `site-kernel-checks` and integrated into `PACKAGES_CHECK_PIPELINE`
 - [ ] `bordbuch/events.ndjson` added to `BORDBUCH_PROJECTION_PATHS` in `bordbuch-commit.ts`
 - [ ] `bordbuch.commit.parity.lint` passes with zero violations after migration
 - [ ] `AGENTS.md` for `packages/os/site-kernel-handoff` updated with `appendAndCommitBordbuch` as canonical API
