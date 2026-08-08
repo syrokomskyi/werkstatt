@@ -23,7 +23,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0224
-amendedBy: []
+amendedBy:
+  - RFC-0756
 related:
   - RFC-0224
   - RFC-0268
