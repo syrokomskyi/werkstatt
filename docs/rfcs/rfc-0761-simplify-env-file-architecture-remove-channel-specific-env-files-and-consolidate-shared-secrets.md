@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -249,6 +250,20 @@ function resolveConventionSecretsPath(basePath: string): string | undefined {
 | `systems/*/package.json` | Checked for deploy scripts with `--secrets-file .env` by `deploy.scripts.validate`. |
 | `services/*/package.json` | Checked for `deploy` script with preflight + `--secrets-file .env` by `deploy.scripts.validate`. |
 
+### Output format
+
+`deploy.preflight` output shape is unchanged from RFC-0388. The `target` field always points to `.env` (not `.env.main` / `.env.alt`):
+
+```json
+{
+  "command": "deploy.preflight",
+  "status": "pass",
+  "target": "systems/warpgogol-com/.env",
+  "keysChecked": 8,
+  "violations": []
+}
+```
+
 ### Failure modes
 
 - **`deploy.preflight`**: Fails on any violation (missing file, missing key, extra key, empty value). Exits non-zero. Blocks the deploy script.
@@ -261,22 +276,27 @@ function resolveConventionSecretsPath(basePath: string): string | undefined {
 ### Phase 1 — Implementation (this RFC)
 
 1. Update `resolveConventionSecretsPath` in `leitstand-commands.ts`: remove channel parameter, always return `.env` path.
-2. Update all callers of `resolveConventionSecretsPath` (dev-deploy, propagate, promote): remove channel argument.
-3. Update `mission.materialize` step 5: create only `.env` from `.env.example`. Remove `.env.main` / `.env.alt` creation. Update env preservation to preserve only `.env`.
-4. Update `release.prepare`: copy `.env` (not `.env.main` / `.env.alt`) to release directory.
-5. Update `deploy.preflight` in `deploy-preflight.ts`: remove `--env` flag for sites. Target is always `.env`.
-6. Update `deploy.scripts.validate` in `env-contract.ts`: check `deploy:main` and `deploy:alt` use `--secrets-file .env` (not `.env.main` / `.env.alt`).
-7. Remove `env.main.check` and `env.alt.check` commands from `env-contract.ts` and `infra-contracts.ts` command table.
-8. Update `env.example.generate` in `env-example.ts`: remove `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` from the Cloudflare block. Keep `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_READONLY_API_TOKEN`.
-9. Update root `.env.example`: add `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOGOL_OTLP_TOKEN` with `# How to obtain:` instructions.
-10. Update service `.env.example` files: remove `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOGOL_OTLP_TOKEN` from `cf-analytics-poller` and `fleet-probe-runner`.
-11. Update `package.template.json` in `site-kernel-onboarding`: `deploy:main` and `deploy:alt` use `--secrets-file .env`.
-12. Delete root `.env.secrets-main` and `.env.secrets-alt`.
-13. Delete all `.env.main` and `.env.alt` files in workpieces and releases.
-14. Update `DNA-40` in `docs/architecture-dna.md`: remove `.env.main` / `.env.alt` mandate, `env.main.check` / `env.alt.check` references. Add `WARPGOGOL_OTLP_*` to root env scope.
-15. Update `services/AGENTS.md` env-and-deploy contract section.
-16. Update `HOW_TO_OBTAIN` map in `env-example.ts`: remove `WARPGOGOL_OTLP_*` entries (now in root only).
-17. Update existing `systems/*/package.json` deploy scripts: `--secrets-file .env.main` → `--secrets-file .env`, `--secrets-file .env.alt` → `--secrets-file .env`.
+2. Update all callers of `resolveConventionSecretsPath` (dev-deploy, propagate, promote, rollback): remove channel argument. `leitstand.rollback` uses `.env` for all channels — channel detection is no longer needed for secret resolution.
+3. Update preflight checks in `leitstand-commands.ts` (the `convention-env-exists` check at line ~420): check for `.env` instead of `.env.alt` / `.env.main`.
+4. Update `mission.materialize` step 5: create only `.env` from `.env.example`. Remove `.env.main` / `.env.alt` creation. Update env preservation to preserve only `.env`.
+5. Update `release.prepare`: copy `.env` (not `.env.main` / `.env.alt`) to release directory.
+6. Update `deploy.preflight` in `deploy-preflight.ts`: remove `--env` flag for sites. Target is always `.env`.
+7. Update `deploy.scripts.validate` in `env-contract.ts`: check `deploy:main` and `deploy:alt` use `--secrets-file .env` (not `.env.main` / `.env.alt`).
+8. Remove `env.main.check` and `env.alt.check` commands from `env-contract.ts` and `infra-contracts.ts` command table.
+9. Update `env.example.generate` in `env-example.ts`: remove `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` from the Cloudflare block. Keep `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_READONLY_API_TOKEN`.
+10. Update root `.env.example`: add `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOGOL_OTLP_TOKEN` with `# How to obtain:` instructions.
+11. Update service `.env.example` files: remove `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOGOL_OTLP_TOKEN` from `cf-analytics-poller` and `fleet-probe-runner`.
+12. Update `package.template.json` in `site-kernel-onboarding`: `deploy:main` and `deploy:alt` use `--secrets-file .env`.
+13. Delete root `.env.secrets-main` and `.env.secrets-alt` (local filesystem operation — these files are gitignored).
+14. Delete all `.env.main` and `.env.alt` files in workpieces and releases (local filesystem operation — these files are gitignored and cannot be deleted via a git commit).
+
+**Implementation order:** Steps 6-7 (`deploy.preflight` and `deploy.scripts.validate`) MUST be implemented simultaneously — updating one without the other breaks validation for existing deploy scripts. Steps 12 and 18 (package template and existing `systems/*/package.json` deploy scripts) should follow immediately after.
+
+15. Update `DNA-40` in `docs/architecture-dna.md`: remove `.env.main` / `.env.alt` mandate, `env.main.check` / `env.alt.check` references. Add `WARPGOGOL_OTLP_*` to root env scope.
+16. Update root `AGENTS.md` line 226: remove `.env.main`, `.env.alt` from the env-and-deploy contract summary.
+17. Update `services/AGENTS.md` env-and-deploy contract section.
+18. Update `HOW_TO_OBTAIN` map in `env-example.ts`: remove `WARPGOGOL_OTLP_*` entries (now in root only).
+19. Update existing `systems/*/package.json` deploy scripts: `--secrets-file .env.main` → `--secrets-file .env`, `--secrets-file .env.alt` → `--secrets-file .env`.
 
 ### Phase 2 — Pipeline integration
 
@@ -317,6 +337,8 @@ function resolveConventionSecretsPath(basePath: string): string | undefined {
 ## Acceptance criteria
 
 - [ ] `resolveConventionSecretsPath` in `leitstand-commands.ts` returns `.env` path for all channels (no channel parameter)
+- [ ] `leitstand.rollback` uses `.env` for all channels (no channel-dependent env file resolution)
+- [ ] Preflight `convention-env-exists` check in `leitstand-commands.ts` checks for `.env` (not `.env.alt` / `.env.main`)
 - [ ] `mission.materialize` creates only `.env` from `.env.example` (no `.env.main` / `.env.alt`)
 - [ ] `release.prepare` copies `.env` to release directory (not `.env.main` / `.env.alt`)
 - [ ] `deploy.preflight` no longer accepts `--env` flag for sites; targets `.env`
@@ -329,6 +351,7 @@ function resolveConventionSecretsPath(basePath: string): string | undefined {
 - [ ] Root `.env.secrets-main` and `.env.secrets-alt` files deleted
 - [ ] All `systems/*/package.json` deploy scripts updated to `--secrets-file .env`
 - [ ] `DNA-40` in `docs/architecture-dna.md` updated to reflect single-file model
+- [ ] Root `AGENTS.md` env-and-deploy contract summary updated (remove `.env.main`, `.env.alt`)
 - [ ] `services/AGENTS.md` env-and-deploy contract section updated
 - [ ] `HOW_TO_OBTAIN` map in `env-example.ts` updated (remove `WARPGOGOL_OTLP_*` from site generator)
 - [ ] `rfc.validate` passes on this file before merging
