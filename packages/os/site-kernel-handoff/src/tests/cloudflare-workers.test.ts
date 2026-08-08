@@ -280,7 +280,7 @@ test("RFC-0623: rollback retries on transient 502 error then succeeds", async ()
 
 test("ADR-0027: sourceDotenv skips entries with empty values", async () => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "wg-test-adr27-"));
-  const envFile = path.join(tmpDir, ".env.alt");
+  const envFile = path.join(tmpDir, ".env");
   await fs.writeFile(
     envFile,
     [
@@ -309,7 +309,7 @@ test("ADR-0027: sourceDotenv skips entries with empty values", async () => {
 
 test("ADR-0027: sourceDotenv empty-value skip allows process.env fallback in merge order", async () => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "wg-test-adr27-merge-"));
-  const envFile = path.join(tmpDir, ".env.alt");
+  const envFile = path.join(tmpDir, ".env");
   await fs.writeFile(envFile, "CLOUDFLARE_ZONE_ID=\nCLOUDFLARE_API_TOKEN=from-dotenv\n");
 
   const originalZoneId = process.env.CLOUDFLARE_ZONE_ID;

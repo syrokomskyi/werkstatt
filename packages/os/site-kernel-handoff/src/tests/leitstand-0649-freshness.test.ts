@@ -155,14 +155,14 @@ systems:
 function createWorkpieceDist(
   workspaceRoot: string,
   missionId: string,
-  envAltContent?: string,
+  envContent?: string,
 ): string {
   const workpieceDir = join(workspaceRoot, "missions", missionId, "workpiece");
   const distDir = join(workpieceDir, "dist");
   mkdirSync(distDir, { recursive: true });
   writeFileSync(join(distDir, "index.html"), "<html><body>Workpiece</body></html>");
-  if (envAltContent) {
-    writeFileSync(join(workpieceDir, ".env.alt"), envAltContent);
+  if (envContent) {
+    writeFileSync(join(workpieceDir, ".env"), envContent);
   }
   return distDir;
 }
@@ -245,11 +245,11 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  // Write .env.alt with CLOUDFLARE_ZONE_ID so purge doesn't skip
-  const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
+  // Write .env with CLOUDFLARE_ZONE_ID so purge doesn't skip
+  const envContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
   createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
-  createWorkpieceDist(tmpDir, missionId, envAltContent);
+  createWorkpieceDist(tmpDir, missionId, envContent);
 
   // Mock fetch: purge API returns success, build-identity returns mismatched hash on all attempts
   mockFetch.mockImplementation(async (url: string) => {
@@ -287,11 +287,11 @@ test("RFC-0649: cloudflare-workers adapter with freshness verified — normal fl
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  // Write .env.alt
-  const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
+  // Write .env
+  const envContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
   createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
-  createWorkpieceDist(tmpDir, missionId, envAltContent);
+  createWorkpieceDist(tmpDir, missionId, envContent);
 
   // Mock fetch: purge API returns success, build-identity returns matching hash.
   // The local distTreeHash is computed by fingerprintTree from the dist directory.
