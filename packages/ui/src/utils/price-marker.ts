@@ -1,3 +1,6 @@
+// Implements ADR-0033: price markers {price:offering-id:chargeRef} resolve
+// from PBP offering entities via derivedPrices, enabling dynamic currency-aware
+// pricing for both own and competitor prices (range model supported).
 import {
   buildPriceVariants,
   loadDerivedPrices,
@@ -31,14 +34,7 @@ export function parsePriceMarkers(
     const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
     const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
     const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
-    const variants = buildPriceVariants(
-      sourceProp,
-      chargeRef,
-      lang,
-      ref,
-      derivedPrices,
-      undefined,
-    );
+    const variants = buildPriceVariants(sourceProp, chargeRef, lang, ref, derivedPrices, undefined);
     parts.push({ kind: "price", variants });
     lastIndex = match.index + match[0].length;
   }
