@@ -27,6 +27,7 @@ import { resolveImage } from "@warpgogol/share";
 import type { SemanticPageModel } from "@warpgogol/share/semantic";
 import type { OrchestratorConfig } from "@warpgogol/share/astro/page-handler";
 import { contentAssetImages } from "../../content-assets.ts";
+import ScrollToTop from "../scroll-to-top/scroll-to-top-component.astro";
 
 interface Props {
   title: string;
@@ -225,5 +226,6 @@ const robotsContent = robots ?? robotsFromOutput;
     </svg>
 
     <slot />
+    <ScrollToTop />
   </body>
 </html>
