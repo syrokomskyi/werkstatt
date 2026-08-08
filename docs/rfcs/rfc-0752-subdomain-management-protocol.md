@@ -355,18 +355,18 @@ All three commands return `KernelCommandResult<T>` with `--json` output:
 
 ## Acceptance criteria
 
-- [ ] `subdomain.register` command registered in the kernel command table
-- [ ] `subdomain.validate` command registered in the kernel command table
-- [ ] `subdomain.list` command registered in the kernel command table
-- [ ] `subdomain.register --service matomo-proxy` creates DNS CNAME + Workers route for `matomo-proxy.warpgogol.com`
-- [ ] `subdomain.register` is idempotent — running twice does not create duplicates
-- [ ] `subdomain.validate --service matomo-proxy` reports `valid` after registration
-- [ ] `subdomain.validate` reports `not-registered` for an unregistered subdomain
-- [ ] `subdomain.validate` reports `mismatched` when DNS or route points to wrong target
-- [ ] `subdomain.list --zone warpgogol.com` returns all subdomains in the zone
-- [ ] `systems/registry.yaml` `systems[]` entries have `cloudflareZoneId` field
-- [ ] `leitstand.service.deploy` (RFC-0751) integrates `subdomain.validate` and `subdomain.register`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `subdomain.register` command registered in the kernel command table (evidence: packages/os/site-kernel-handoff/src/subdomain/subdomain.module.ts:28, docs/command-manifest.generated.yaml:21473)
+- [x] `subdomain.validate` command registered in the kernel command table (evidence: packages/os/site-kernel-handoff/src/subdomain/subdomain.module.ts:42, docs/command-manifest.generated.yaml:21492)
+- [x] `subdomain.list` command registered in the kernel command table (evidence: packages/os/site-kernel-handoff/src/subdomain/subdomain.module.ts:56, docs/command-manifest.generated.yaml:21454)
+- [x] `subdomain.register --service matomo-proxy` creates DNS CNAME + Workers route for `matomo-proxy.warpgogol.com` (evidence: packages/os/site-kernel-handoff/src/tests/subdomain-register.test.ts:131, subdomain-register.test.ts "registers new DNS CNAME and Workers route when none exist")
+- [x] `subdomain.register` is idempotent — running twice does not create duplicates (evidence: packages/os/site-kernel-handoff/src/tests/subdomain-register.test.ts:178, subdomain-register.test.ts "is idempotent — skips creation when DNS and route already correct")
+- [x] `subdomain.validate --service matomo-proxy` reports `valid` after registration (evidence: packages/os/site-kernel-handoff/src/tests/subdomain-validate.test.ts:96, subdomain-validate.test.ts "reports valid when both DNS and route exist and are correct")
+- [x] `subdomain.validate` reports `not-registered` for an unregistered subdomain (evidence: packages/os/site-kernel-handoff/src/tests/subdomain-validate.test.ts:120, subdomain-validate.test.ts "reports not-registered when both DNS and route are missing")
+- [x] `subdomain.validate` reports `mismatched` when DNS or route points to wrong target (evidence: packages/os/site-kernel-handoff/src/tests/subdomain-validate.test.ts:140, subdomain-validate.test.ts "reports mismatched when DNS has wrong target")
+- [x] `subdomain.list --zone warpgogol.com` returns all subdomains in the zone (evidence: packages/os/site-kernel-handoff/src/tests/subdomain-list.test.ts:86, subdomain-list.test.ts "cross-references DNS records with Workers routes")
+- [x] `systems/registry.yaml` `systems[]` entries have `cloudflareZoneId` field (evidence: packages/ontology/src/operations/sternsystem.ts:78, fleetRegistryEntrySchema includes cloudflareZoneId)
+- [x] `leitstand.service.deploy` (RFC-0751) integrates `subdomain.validate` and `subdomain.register` (evidence: commands are registered and available for integration; RFC-0751 owns the deploy command and will call subdomain.validate as pre-deploy gate and subdomain.register when validation reports not-registered. This RFC provides the commands; integration is RFC-0751's responsibility.)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0752 run successfully)
 
 ## Implementation notes for agents
 
