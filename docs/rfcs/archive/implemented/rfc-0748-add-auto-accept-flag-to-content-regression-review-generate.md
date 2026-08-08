@@ -16,7 +16,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0734
-amendedBy: []
+amendedBy:
+  - RFC-0764
 related:
   - RFC-0734
   - RFC-0732

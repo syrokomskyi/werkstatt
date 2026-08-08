@@ -24,6 +24,7 @@ supersededBy:
 amends: []
 amendedBy:
   - RFC-0734
+  - RFC-0764
 related:
   - DNA-58
   - DNA-48

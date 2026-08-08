@@ -23,7 +23,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0732
-amendedBy: []
+amendedBy:
+  - RFC-0764
 related:
   - DNA-61
   - RFC-0732
