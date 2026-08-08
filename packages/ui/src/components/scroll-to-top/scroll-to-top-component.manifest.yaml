@@ -1,0 +1,22 @@
+id: scroll-to-top-component
+uniName: scroll-to-top-component
+layer: component
+semanticId: scroll-to-top
+archetype: scroll-to-top
+
+cosmicName: Daphnis
+role: scroll-to-top
+version: 1.0.0
+intent:
+  - guide-navigation
+  - orient-visitor
+industryFit: []
+contentSchemaKey: scroll-to-top-component
+contentTypesPath: ./scroll-to-top-component.types.generated.ts
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    ariaLabel:
+      type: string

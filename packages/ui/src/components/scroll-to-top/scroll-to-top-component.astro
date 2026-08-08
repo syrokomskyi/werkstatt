@@ -1,0 +1,46 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/components/scroll-to-top/scroll-to-top-component.astro as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not manage per-site configuration or content-layer labels.</item>
+  <item>Do not handle scroll smoothing logic directly — delegate to the client script.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0768: Created scroll-to-top floating button component with LordIcon and Lenis integration.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { loadVendorIcon } from "../../icons/icon-resolver.ts";
+import "./scroll-to-top-component.css";
+
+export interface Props {
+  ariaLabel?: string;
+}
+
+const { ariaLabel } = Astro.props as Props;
+
+const ArrowUpHoverIcon = await loadVendorIcon({
+  vendor: "lordicon",
+  collection: "doodle-outline",
+  name: "ArrowUpHover",
+});
+
+const label = ariaLabel ?? "Back to top";
+---
+
+<button class="scroll-to-top" data-scroll-to-top aria-label={label} type="button">
+  {ArrowUpHoverIcon && (
+    <ArrowUpHoverIcon
+      class="scroll-to-top__icon"
+      size={28}
+      trigger="hover"
+      aria-hidden="true"
+    />
+  )}
+</button>
+
+<script>
+  import "./scroll-to-top-component.client.ts";
+</script>
