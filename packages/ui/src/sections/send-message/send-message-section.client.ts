@@ -13,6 +13,7 @@
   <item>RFC-0572: Revert to regex-based hasContactDetails; remove structured email/phone field logic.</item>
   <item>Add real-time validation checklist: update indicators on input, highlight first failing item on submit.</item>
   <item>RFC-0757: Generalize checklist from 2 hardcoded items to N configurable items via evaluateRule() dispatcher.</item>
+  <item>RFC-0757 review fix: Remove dead hasContactDetails() and minMessageLength; return firstFailingRule from updateChecklist to avoid double evaluation.</item>
 </CHANGE_SUMMARY>
 */
 
