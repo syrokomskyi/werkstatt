@@ -194,17 +194,17 @@ RFC-0734 added CREG-05 enforcement to `mission.close`: if drift exists and no `a
 
 ## Acceptance criteria
 
-- [ ] `content.regression.check --auto-accept` passes when drift is detected
-- [ ] Golden baseline is updated on auto-accept
-- [ ] Review manifest is generated with all decisions set to `accept` (audit trail)
-- [ ] `mission.validate --auto-accept-regression` propagates the flag to the pipeline
-- [ ] Default behavior (without flag) is unchanged — still fails on drift
-- [ ] Unit test: auto-accept passes with drift
-- [ ] Unit test: auto-accept generates audit trail manifest
-- [ ] Unit test: default behavior still fails on drift
-- [ ] CREG-06 diagnostic rule registered in `diagnostics/rules/core-infra.ts`
-- [ ] `apply-result.json` written on auto-accept to satisfy `mission.close` CREG-05
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `content.regression.check --auto-accept` passes when drift is detected (evidence: unit test "auto-accept passes when drift is detected and updates golden baseline")
+- [x] Golden baseline is updated on auto-accept (evidence: unit test verifies golden snapshot file content matches current after auto-accept)
+- [x] Review manifest is generated with all decisions set to `accept` (audit trail) (evidence: unit test "auto-accept generates audit trail manifest with all decisions set to accept")
+- [x] `mission.validate --auto-accept-regression` propagates the flag to the pipeline (evidence: mission-materialization-commands.ts propagates `auto-accept` flag to build.check pipeline)
+- [x] Default behavior (without flag) is unchanged — still fails on drift (evidence: unit test "default behavior (without --auto-accept) still fails on drift")
+- [x] Unit test: auto-accept passes with drift (evidence: content-regression.test.ts)
+- [x] Unit test: auto-accept generates audit trail manifest (evidence: content-regression.test.ts)
+- [x] Unit test: default behavior still fails on drift (evidence: content-regression.test.ts)
+- [x] CREG-06 diagnostic rule registered in `diagnostics/rules/core-infra.ts` (evidence: core-infra.ts line 526)
+- [x] `apply-result.json` written on auto-accept to satisfy `mission.close` CREG-05 (evidence: unit test verifies apply-result.json with pending:0, errors:[])
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate run, 0 errors, 3 expected V-19 warnings)
 
 ## Implementation notes for agents
 
