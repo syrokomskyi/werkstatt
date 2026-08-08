@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "totalCount": 60,
+  "totalCount": 61,
   "entries": [
     {
       "id": "approach",
@@ -555,6 +555,18 @@
       "layer": "component"
     },
     {
+      "id": "scroll-to-top",
+      "displayName": "Scroll to Top",
+      "semanticRole": "component-scroll-to-top",
+      "version": "1.0.0",
+      "layoutHint": "single-column",
+      "acceptedCosmicNames": [
+        "Daphnis"
+      ],
+      "sourceFile": "packages/ontology/archetypes/components/scroll-to-top.yaml",
+      "layer": "component"
+    },
+    {
       "id": "section-body-offer-capacity",
       "displayName": "Offer capacity",
       "semanticRole": "component-section-body.offer-capacity",
@@ -775,6 +787,7 @@
     "component-person-profile",
     "component-pulsar",
     "component-responsive-image",
+    "component-scroll-to-top",
     "component-section-body.offer-capacity",
     "component-shell.breadcrumbs",
     "component-shell.footer",
