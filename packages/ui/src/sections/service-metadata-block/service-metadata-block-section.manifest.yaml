@@ -1,0 +1,54 @@
+id: service-metadata-block-section
+uniName: service-metadata-block-section
+layer: section
+semanticId: service-metadata-block
+archetype: service-metadata-block
+cosmicName: Sedna
+role: page-metadata-footer
+version: "1.0.0"
+intent:
+  - build-trust
+  - legal-clarity
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+  - non-profit
+contentSchemaKey: service-metadata-block-section
+contentTypesPath: "./service-metadata-block-section.types.generated.ts"
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+  properties:
+    version:
+      type: string
+    effectiveDate:
+      type: string
+    nextReviewDate:
+      type: string
+    links:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - label
+          - href
+        properties:
+          label:
+            type: string
+            minLength: 1
+          href:
+            type: string
+            minLength: 1
+          rel:
+            type: string
+    footnote:
+      type: string

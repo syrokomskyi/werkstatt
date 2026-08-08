@@ -1,5 +1,5 @@
 schemaVersion: 1.0.0
-totalCount: 59
+totalCount: 60
 entries:
   - id: approach
     displayName: Approach
@@ -433,6 +433,15 @@ entries:
       - Ceres
     sourceFile: packages/ontology/archetypes/sections/send-message.yaml
     layer: section
+  - id: service-metadata-block
+    displayName: Service metadata block
+    semanticRole: page-metadata-footer
+    version: 1.0.0
+    layoutHint: single-column
+    acceptedCosmicNames:
+      - Sedna
+    sourceFile: packages/ontology/archetypes/sections/service-metadata-block.yaml
+    layer: section
   - id: shell.breadcrumbs
     displayName: Shell Breadcrumbs
     semanticRole: component-shell.breadcrumbs
@@ -553,6 +562,7 @@ sectionRoles:
   - markdown
   - navigation
   - open-source-registry
+  - page-metadata-footer
   - people
   - pricing-disclosure
   - problem
