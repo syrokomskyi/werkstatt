@@ -331,8 +331,25 @@ export function isWorkpieceDirty(workpieceDir: string): WorkpieceDirtyResult {
     return { dirty: false, fileCount: 0, files: [] };
   }
   const lines = output.split("\n").filter((l) => l.trim().length > 0);
-  const files = lines.map((l) => l.slice(3).trim());
-  return { dirty: lines.length > 0, fileCount: lines.length, files };
+  // Filter out files that match a .gitignore pattern even if still tracked.
+  // This prevents mission.close from blocking on generated files like
+  // derived-prices.generated.json that are gitignored but still tracked.
+  const files: string[] = [];
+  for (const line of lines) {
+    const file = line.slice(3).trim();
+    try {
+      execSync(`git check-ignore --no-index -- "${file}"`, {
+        cwd: workpieceDir,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      // git check-ignore exits 0 → file matches a .gitignore pattern → skip
+    } catch {
+      // git check-ignore exits non-zero → file is NOT gitignored → include it
+      files.push(file);
+    }
+  }
+  return { dirty: files.length > 0, fileCount: files.length, files };
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {

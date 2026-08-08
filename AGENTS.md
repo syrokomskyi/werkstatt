@@ -285,17 +285,16 @@ Agents MUST NOT begin investigating, diagnosing, or fixing the issue immediately
 
 The deployment pipeline is strictly ordered. Agents MUST NOT skip steps, reorder, or deploy directly to Main.
 
-1. **Dev** — `mission.preview --mission <id> --port <port>` — local dev server for manual verification.
-2. **Axiom** — `mission.check --mission <id> --external-preview <url> --base-url <url>` — automated QA via Axiom on the dev/alt preview.
-3. **Alt** — deploy to alt channel (`deploy:alt`) — staging on `alt-warpgogol-com` for operator verification.
-4. **Main** — deploy to main channel (`deploy:main`) — production on `warpgogol-com` only after Alt is verified.
+1. **Dev** — `leitstand.dev-deploy --site <id>` — deploys workpiece to dev channel with Axiom verification gate. For existing releases: `leitstand.dev-deploy --site <id> --release <releaseId>`.
+2. **Alt** — `leitstand.propagate --release <releaseId>` — deploys a verified release to alt channel. Requires Axiom evidence (commitSha + missionId match).
+3. **Main** — `leitstand.promote --release <releaseId>` — promotes an alt-deployed release to main channel. Requires release state `alt-deployed`.
 
 Rules:
 
-- **NEVER deploy to Main without first deploying to Alt and verifying.** This is non-negotiable.
-- **NEVER create workarounds** (symlinks, manual dist copies, custom wrangler configs, `--config` pointing to cache clone). If the pipeline fails, investigate the root cause and fix it — do not bypass.
-- **NEVER skip Axiom verification.** The mission must pass `mission.check` before any deployment.
-- The correct deploy command uses the built wrangler config from the release: `wrangler deploy --config <release>/dist/server/wrangler.json --name <site> --secrets-file <release>/.env.<channel>`. The release directory is under `releases/<site>-r<NNNNN>/`.
+- **NEVER call `wrangler deploy` directly.** This bypasses the pipeline. All deployments MUST go through `leitstand.*` commands, which enforce Axiom gates, build-identity verification, and release state transitions.
+- **NEVER deploy to Main without first deploying to Alt and verifying.** `leitstand.promote` enforces this by requiring `alt-deployed` state.
+- **NEVER skip Axiom verification.** `leitstand.dev-deploy` runs Axiom automatically. `leitstand.propagate` requires Axiom evidence from dev-deploy.
+- **NEVER create workarounds** (symlinks, manual dist copies, custom wrangler configs, `--config` pointing to cache clone, copying `.env.*` files manually). If the pipeline fails, investigate the root cause and fix it — do not bypass.
 - If a step fails, report the error to the operator and wait for guidance. Do not attempt alternative deployment paths.
 
 Avoid double `mission.open` calls:

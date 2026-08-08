@@ -88,3 +88,31 @@ test("isWorkpieceDirty counts multiple dirty files", () => {
   expect(result.files).toContain("a.txt");
   expect(result.files).toContain("c.txt");
 });
+
+test("isWorkpieceDirty ignores gitignored-but-tracked files", () => {
+  gitInit(tmpDir);
+  writeFileSync(join(tmpDir, "file.txt"), "hello");
+  writeFileSync(join(tmpDir, "generated.json"), '{"v":1}');
+  writeFileSync(join(tmpDir, ".gitignore"), "generated.json\n");
+  gitCommit(tmpDir, "initial");
+  // Modify the gitignored-but-tracked file
+  writeFileSync(join(tmpDir, "generated.json"), '{"v":2}');
+  const result = isWorkpieceDirty(tmpDir);
+  expect(result.dirty).toBe(false);
+  expect(result.fileCount).toBe(0);
+  expect(result.files).toEqual([]);
+});
+
+test("isWorkpieceDirty reports dirty when both gitignored and non-gitignored files change", () => {
+  gitInit(tmpDir);
+  writeFileSync(join(tmpDir, "file.txt"), "hello");
+  writeFileSync(join(tmpDir, "generated.json"), '{"v":1}');
+  writeFileSync(join(tmpDir, ".gitignore"), "generated.json\n");
+  gitCommit(tmpDir, "initial");
+  writeFileSync(join(tmpDir, "generated.json"), '{"v":2}');
+  writeFileSync(join(tmpDir, "file.txt"), "modified");
+  const result = isWorkpieceDirty(tmpDir);
+  expect(result.dirty).toBe(true);
+  expect(result.fileCount).toBe(1);
+  expect(result.files).toEqual(["file.txt"]);
+});
