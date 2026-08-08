@@ -281,6 +281,23 @@ When the operator asks to start a new mission, the agent workflow is:
 
 Agents MUST NOT begin investigating, diagnosing, or fixing the issue immediately after materialization. The operator will provide specific instructions on what to do next. This is non-negotiable workflow discipline that applies to all agents in all IDEs.
 
+## Deployment pipeline discipline
+
+The deployment pipeline is strictly ordered. Agents MUST NOT skip steps, reorder, or deploy directly to Main.
+
+1. **Dev** — `mission.preview --mission <id> --port <port>` — local dev server for manual verification.
+2. **Axiom** — `mission.check --mission <id> --external-preview <url> --base-url <url>` — automated QA via Axiom on the dev/alt preview.
+3. **Alt** — deploy to alt channel (`deploy:alt`) — staging on `alt-warpgogol-com` for operator verification.
+4. **Main** — deploy to main channel (`deploy:main`) — production on `warpgogol-com` only after Alt is verified.
+
+Rules:
+
+- **NEVER deploy to Main without first deploying to Alt and verifying.** This is non-negotiable.
+- **NEVER create workarounds** (symlinks, manual dist copies, custom wrangler configs, `--config` pointing to cache clone). If the pipeline fails, investigate the root cause and fix it — do not bypass.
+- **NEVER skip Axiom verification.** The mission must pass `mission.check` before any deployment.
+- The correct deploy command uses the built wrangler config from the release: `wrangler deploy --config <release>/dist/server/wrangler.json --name <site> --secrets-file <release>/.env.<channel>`. The release directory is under `releases/<site>-r<NNNNN>/`.
+- If a step fails, report the error to the operator and wait for guidance. Do not attempt alternative deployment paths.
+
 Avoid double `mission.open` calls:
 
 - Check the command output for `[OK]` before considering the mission opened.
