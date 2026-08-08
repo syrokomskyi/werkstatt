@@ -15,16 +15,33 @@
 */
 
 import type { HorizontalAlign } from "@warpgogol/share";
+import { parsePriceMarkers } from "../../../utils/price-marker.ts";
+import { loadDerivedPrices } from "../../../sections/price-card/price-variants.ts";
+import CurrencyAwarePriceDisplay from "../../currency-aware-price-display/currency-aware-price-display-component.astro";
 import "./section-paragraphs.css";
 
 interface Props {
   paragraphs: string[];
   align?: HorizontalAlign;
+  lang?: string;
 }
 
-const { paragraphs, align = "left" } = Astro.props as Props;
+const { paragraphs, align = "left", lang = "de" } = Astro.props as Props;
+const derivedPrices = loadDerivedPrices();
 ---
 
 <div class:list={["section-paragraphs", `section-paragraphs--align-${align}`]}>
-  {paragraphs.map((p) => <p class="section-paragraphs__text">{p}</p>)}
+  {
+    paragraphs.map((p) => (
+      <p class="section-paragraphs__text">
+        {parsePriceMarkers(p, lang, derivedPrices).map((part) =>
+          part.kind === "text" ? (
+            part.value
+          ) : part.variants ? (
+            <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+          ) : null,
+        )}
+      </p>
+    ))
+  }
 </div>

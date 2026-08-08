@@ -49,11 +49,15 @@ const ctaGroup = need("ctaGroup", props.ctaGroup);
     level={props.header?.level ?? 2}
     hideSectionNumber={props.header?.hideSectionNumber}
     id="final-cta-title"
-  lang={lang}
-    />
+    lang={lang}
+  />
   {
     props.body && (
-      <SectionParagraphs paragraphs={props.body.paragraphs} align={props.body.align ?? "center"} />
+      <SectionParagraphs
+        paragraphs={props.body.paragraphs}
+        align={props.body.align ?? "center"}
+        lang={lang}
+      />
     )
   }
   <SectionCtaGroup align={ctaGroup.align ?? "center"} items={ctaGroup.items} lang={lang} />
