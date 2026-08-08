@@ -1,7 +1,7 @@
 kind: analytics-matomo-fleet-registry
 schemaVersion: 1
 version: 1.0.0
-updatedAt: 2026-07-06
+updatedAt: 2026-08-08
 owner: architecture
 policy:
   sourceOfTruth: git
@@ -9,4 +9,18 @@ policy:
   productionAdapterRequiresRecord: true
   siteIdSource: provisioning
   noSecrets: true
-sites: []
+sites:
+  - appId: warpgogol-com
+    clientSemanticId: warpgogol-com
+    siteId: "1"
+    matomoCloudHost: warpgogol.matomo.cloud
+    status: active
+    provisionedAt: "2026-08-08"
+    dimensions:
+      visit:
+        client_id: 1
+        messkanon_version: 2
+        consent_level: 3
+      action:
+        site_type: 4
+        page_type: 5

@@ -289,6 +289,9 @@ importers:
       '@warpgogol/growth':
         specifier: workspace:*
         version: link:../../../packages/growth
+      '@warpgogol/growth-adapter-matomo':
+        specifier: workspace:*
+        version: link:../../../packages/growth-adapter-matomo
       '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../../../packages/ontology
@@ -1587,6 +1590,9 @@ importers:
 
   services/matomo-proxy:
     devDependencies:
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.1
       wrangler:
         specifier: ^4.118.0
         version: 4.118.0(@cloudflare/workers-types@5.20260801.1)
