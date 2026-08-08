@@ -1,12 +1,13 @@
 ---
 id: RFC-0753
 title: "DNS record management protocol for Cloudflare DNS zones"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
 enhancedAt: 2026-08-08
