@@ -5,6 +5,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0752: initial subdomain.register tests.</item>
   <item>ADR-0035: refactored to use shared cloudflare-api-mock helper (setupCloudflareApiMock).</item>
+  <item>ADR-0036: refactored to use shared registry-builder helper (buildRegistry).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -14,6 +15,7 @@ import { join } from "node:path";
 import { runSubdomainRegister } from "../subdomain/subdomain-register.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
 import { setupCloudflareApiMock, cfSuccessResponse } from "./helpers/cloudflare-api-mock.ts";
+import { buildRegistry } from "./helpers/registry-builder.ts";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
@@ -60,45 +62,39 @@ function createRegistry(
 ): void {
   const registryDir = join(workspaceRoot, "systems");
   mkdirSync(registryDir, { recursive: true });
-  const zoneIdLine = opts?.withZoneId !== false ? "\n    cloudflareZoneId: zone-123" : "";
-  const workersDevUrlLine = opts?.withWorkersDevUrl
-    ? '\n    workersDevUrl: "https://matomo-proxy.myaccount.workers.dev"'
-    : "";
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: warpgogol-com
-    cosmicStar: Vega
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "cloudflare-workers"
-      channels:
-        dev:
-          workerName: wg-dev
-          url: https://dev.warpgogol.com
-        alt:
-          workerName: wg-alt
-          url: https://alt.warpgogol.com
-        main:
-          workerName: wg-main
-          url: https://warpgogol.com${zoneIdLine}
-services:
-  - id: matomo-proxy
-    kind: proxy-worker
-    workerName: matomo-proxy
-    hostedBy: studio
-    url: https://matomo-proxy.warpgogol.com${workersDevUrlLine}
-    subdomains:
-      - domain: matomo-proxy.warpgogol.com
-        zone: warpgogol.com
-`;
+  const registryContent = buildRegistry({
+    systems: [
+      {
+        id: "warpgogol-com",
+        cosmicStar: "Vega",
+        mirrors: [{ path: "/tmp/test-cache", storageType: "non-bare" }],
+        pinnedPlatform: "1.0.0",
+        notes: "",
+        cloudflareZoneId: opts?.withZoneId !== false ? "zone-123" : undefined,
+        deployment: {
+          adapter: "cloudflare-workers",
+          channels: {
+            dev: { workerName: "wg-dev", url: "https://dev.warpgogol.com" },
+            alt: { workerName: "wg-alt", url: "https://alt.warpgogol.com" },
+            main: { workerName: "wg-main", url: "https://warpgogol.com" },
+          },
+        },
+      },
+    ],
+    services: [
+      {
+        id: "matomo-proxy",
+        kind: "proxy-worker",
+        workerName: "matomo-proxy",
+        hostedBy: "studio",
+        url: "https://matomo-proxy.warpgogol.com",
+        workersDevUrl: opts?.withWorkersDevUrl
+          ? "https://matomo-proxy.myaccount.workers.dev"
+          : undefined,
+        subdomains: [{ domain: "matomo-proxy.warpgogol.com", zone: "warpgogol.com" }],
+      },
+    ],
+  });
   writeFileSync(join(registryDir, "registry.yaml"), registryContent);
 }
 
