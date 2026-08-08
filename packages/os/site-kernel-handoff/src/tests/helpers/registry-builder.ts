@@ -17,6 +17,12 @@ fixtures. Reusable across subdomain, leitstand, mission, and sternsystem tests.
 */
 
 import { stringify as stringifyYaml } from "yaml";
+import type {
+  DeploymentAdapterName,
+  MirrorStorageType,
+  ServiceEntry,
+  FleetRegistryEntry,
+} from "@warpgogol/ontology/operations";
 
 export interface RegistryChannelOptions {
   workerName: string;
@@ -24,7 +30,7 @@ export interface RegistryChannelOptions {
 }
 
 export interface RegistryDeploymentOptions {
-  adapter: string;
+  adapter: DeploymentAdapterName;
   channels: {
     dev: RegistryChannelOptions;
     alt: RegistryChannelOptions;
@@ -39,9 +45,9 @@ export interface RegistrySubdomainOptions {
 
 export interface RegistryServiceOptions {
   id: string;
-  kind: string;
+  kind: ServiceEntry["kind"];
   workerName: string;
-  hostedBy: string;
+  hostedBy: ServiceEntry["hostedBy"];
   url: string;
   workersDevUrl?: string;
   subdomains?: RegistrySubdomainOptions[];
@@ -50,11 +56,11 @@ export interface RegistryServiceOptions {
 export interface RegistrySystemOptions {
   id: string;
   cosmicStar: string;
-  mirrors: { path: string; storageType: string }[];
+  mirrors: { path: string; storageType: MirrorStorageType }[];
   pinnedPlatform: string;
   currentMission?: string | null;
   lastRelease?: string | null;
-  status?: string;
+  status?: FleetRegistryEntry["status"];
   registeredAt?: string;
   cloudflareZoneId?: string;
   deployment?: RegistryDeploymentOptions;
