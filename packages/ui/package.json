@@ -239,6 +239,18 @@
       "types": "./src/components/person-profile/person-profile-component.astro",
       "default": "./src/components/person-profile/person-profile-component.astro"
     },
+    "./components/scroll-to-top": {
+      "types": "./src/components/scroll-to-top/scroll-to-top-component.astro",
+      "default": "./src/components/scroll-to-top/scroll-to-top-component.astro"
+    },
+    "./components/scroll-to-top.astro": {
+      "types": "./src/components/scroll-to-top/scroll-to-top-component.astro",
+      "default": "./src/components/scroll-to-top/scroll-to-top-component.astro"
+    },
+    "./components/scroll-to-top/types": {
+      "types": "./src/components/scroll-to-top/scroll-to-top-component.types.generated.ts",
+      "default": "./src/components/scroll-to-top/scroll-to-top-component.types.generated.ts"
+    },
     "./components/section-body/cards": {
       "types": "./src/components/section-body/cards/section-card-grid.astro",
       "default": "./src/components/section-body/cards/section-card-grid.astro"
@@ -609,6 +621,7 @@
     "@warpgogol/integration-adapter-stripe": "workspace:*",
     "@warpgogol/integration-adapter-supabase-crm": "workspace:*",
     "@warpgogol/passport": "workspace:*",
+    "@warpgogol/pbp": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "github-slugger": "^2.0.0",
     "micromark": "^4.0.2",
