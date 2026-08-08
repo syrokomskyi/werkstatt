@@ -1,7 +1,7 @@
 ---
 id: RFC-0766
 title: "Resolve price markers in markdown prose content"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
