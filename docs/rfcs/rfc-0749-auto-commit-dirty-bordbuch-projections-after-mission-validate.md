@@ -1,15 +1,16 @@
 ---
 id: RFC-0749
 title: "Auto-commit dirty bordbuch projections in cache clone after mission.validate"
-status: draft
+status: implemented
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
-implementedAt:
+implementedAt: 2026-08-08
 closedAt:
 supersedes: []
 supersededBy:
@@ -50,7 +51,7 @@ However, `bordbuch.commit` runs as a pipeline step inside `build.prepare`, and `
 
 When `bordbuch.commit` fails silently (non-throwing per RFC-0702), dirty bordbuch projection files remain in the cache clone. The operator sees a warning from `mission.validate` but must manually `cd` into the cache clone and commit the files. If they don't, `mission.reconcile` fails.
 
-The pre-validate auto-commit (RFC-0724) handles dirty files from a *previous* run, but it doesn't help when `bordbuch.commit` fails *during* the current run's `build.prepare`.
+The pre-validate auto-commit (RFC-0724) handles dirty files from a _previous_ run, but it doesn't help when `bordbuch.commit` fails _during_ the current run's `build.prepare`.
 
 ## Decision
 
@@ -78,10 +79,10 @@ No CLI change — this is an internal behavior change in `mission.validate`.
 
 ### File system responsibilities
 
-| Path | Role |
-|---|---|
-| Cache clone `bordbuch/status.generated.yaml` | Committed if dirty |
-| Cache clone `public/.well-known/bordbuch.json` | Committed if dirty |
+| Path                                                 | Role               |
+| ---------------------------------------------------- | ------------------ |
+| Cache clone `bordbuch/status.generated.yaml`         | Committed if dirty |
+| Cache clone `public/.well-known/bordbuch.json`       | Committed if dirty |
 | Cache clone `public/.well-known/bordbuch/index.html` | Committed if dirty |
 
 ### Output format
@@ -114,11 +115,11 @@ No change to output format. A `logger.info` line is emitted if the post-validate
 
 ## Acceptance criteria
 
-- [ ] Post-validation `commitBordbuchProjections` call added to `mission.validate` after pipeline/build completion
-- [ ] Cleanup call is non-fatal (try/catch with `logger.warn`)
-- [ ] `logger.info` emitted when post-validate cleanup commits files
-- [ ] RFC-0522 dirty cache clone warning still fires for non-bordbuch dirty files
-- [ ] `rfc.validate` passes on this file
+- [x] Post-validation `commitBordbuchProjections` call added to `mission.validate` after pipeline/build completion (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:579-597`)
+- [x] Cleanup call is non-fatal (try/catch with `logger.warn`) (evidence: `mission-materialization-commands.ts:583-596` — try/catch block with logger.warn in catch)
+- [x] `logger.info` emitted when post-validate cleanup commits files (evidence: `mission-materialization-commands.ts:588-591`)
+- [x] RFC-0522 dirty cache clone warning still fires for non-bordbuch dirty files (evidence: `mission-materialization-commands.ts:599-608` — warning check remains after cleanup)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0749` returns OK)
 
 ## Implementation notes for agents
 

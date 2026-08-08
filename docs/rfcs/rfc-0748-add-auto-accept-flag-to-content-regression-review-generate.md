@@ -1,15 +1,16 @@
 ---
 id: RFC-0748
 title: "Add --auto-accept flag to content.regression.review.generate"
-status: draft
+status: implemented
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
-implementedAt:
+implementedAt: 2026-08-08
 closedAt:
 supersedes: []
 supersededBy:
@@ -84,7 +85,7 @@ pnpm exec site-kernel run content.regression.apply --site warpgogol-com --review
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
+| --- | --- |
 | `missions/<id>/evidence/content-regression/review.yaml` | Written with `decision: accept` for non-removed-route changes |
 
 ### Output format
@@ -115,12 +116,12 @@ No change to output format. The `summary` field includes `(auto-accepted)` when 
 
 ## Acceptance criteria
 
-- [ ] `--auto-accept` flag added to `content.regression.review.generate` command table entry
-- [ ] All non-removed-route changes have `decision: accept` when flag is set
-- [ ] Removed routes remain `decision: pending` when flag is set
-- [ ] `--dry-run` + `--auto-accept` prints YAML with pre-accepted decisions
-- [ ] Summary output includes `(auto-accepted)` when flag is used
-- [ ] `rfc.validate` passes on this file
+- [x] `--auto-accept` flag added to `content.regression.review.generate` command table entry (evidence: `packages/os/site-kernel-checks/src/command-tables/build-infra.ts:215-221`)
+- [x] All non-removed-route changes have `decision: accept` when flag is set (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:905-913`)
+- [x] Removed routes remain `decision: pending` when flag is set (evidence: `content-regression.ts:909` — `if (change.kind !== "removed-route")` guard)
+- [x] `--dry-run` + `--auto-accept` prints YAML with pre-accepted decisions (evidence: `content-regression.ts:934-941` — autoAcceptLabel included in dry-run summary)
+- [x] Summary output includes `(auto-accepted)` when flag is used (evidence: `content-regression.ts:934` — `autoAcceptLabel = autoAccept ? " (auto-accepted)" : ""`)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0748` returns OK)
 
 ## Implementation notes for agents
 
