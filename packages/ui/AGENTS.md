@@ -375,3 +375,10 @@ Section numbering is controlled by the `numbered` field in each section's manife
 ## Consumer guidance
 
 - App `tsconfig.json` files should map `@warpgogol/ui` to `../../packages/ui/src/index.ts` and `@warpgogol/ui/*` to `../../packages/ui/src/*`.
+
+## Dynamic pricing in UI components
+
+- **Price markers `{price:offering-id:chargeRef}` are distinct from content references `{collection.file.field}`.** Price markers are resolved at render time by UI components (via `parsePriceMarkers`); content references are resolved at build time by the shared page handler. Do not confuse the two syntaxes.
+- **When adding price marker parsing to a component, use the shared `parsePriceMarkers` utility** from `packages/ui/src/utils/price-marker.ts`. Do not duplicate the regex, `derivedPrices` lookup, or `buildPriceVariants` call inline — the utility centralizes the logic and prevents drift across components.
+- **Components that render text fields from authored content (headings, subheadings, list item text, card descriptions, badges, stats values) MUST pass `lang` through to `parsePriceMarkers`** so that `CurrencyAwarePriceDisplay` renders the correct currency variant for the page language.
+- **Inline CSS is required for price display inside text fields.** Add `display: inline` rules for `.currency-aware-price-display` and its children within the component's colocated CSS to prevent line breaks inside formatted prices.
