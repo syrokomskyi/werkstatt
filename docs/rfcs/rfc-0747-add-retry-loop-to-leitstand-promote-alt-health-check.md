@@ -1,7 +1,7 @@
 ---
 id: RFC-0747
 title: "Add retry loop to leitstand.promote alt health check"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:

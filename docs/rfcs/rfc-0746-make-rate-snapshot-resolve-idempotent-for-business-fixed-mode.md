@@ -1,7 +1,7 @@
 ---
 id: RFC-0746
 title: "Make rate-snapshot.resolve idempotent for business-fixed mode"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
