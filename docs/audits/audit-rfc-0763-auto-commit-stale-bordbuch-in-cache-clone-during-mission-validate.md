@@ -1,60 +1,63 @@
 ---
 rfcId: RFC-0763
-auditId: AUDIT-RFC-0763-01
+auditId: AUDIT-RFC-0763-02
 date: 2026-08-08
 auditor:
   skill: fo-idea-audit
   model: claude-sonnet-4-20250514
-verdict: rejected
+verdict: needs-revision
 ---
 
-# Audit: RFC-0763
+# Audit: RFC-0763 (reworked)
 
-## Verdict: Rejected
+## Verdict: Needs revision
 
-RFC-0763 proposes functionality that is **already implemented** in the codebase by two already-implemented RFCs (RFC-0724 and RFC-0749). The exact code the RFC's Design section describes — a post-validation `commitBordbuchProjections` cleanup call in `mission.validate` — exists at `mission-materialization-commands.ts:602-613`, labeled `// RFC-0749`. The RFC is a complete duplicate and should be rejected or superseded by RFC-0749.
+The reworked RFC-0763 identifies a real gap — RFC-0749's post-validation cleanup only runs on the success path, leaving bordbuch projections uncommitted on failure paths. The fix is minimal and architecturally sound. However, several findings need revision before implementation: the `amends` relationship with archived RFC-0749 is mechanically problematic, the `kind` should be `command` not `architecture`, and the `bordbuch.commit` self-failure scenario should be acknowledged.
 
 ## Mechanical validation (rfc.validate)
 
 **Pass** with 1 warning:
-- **V-19**: `RFC-0763.amends includes RFC-0702, but RFC-0702.amendedBy does not include RFC-0763`. RFC-0702 is already `implemented` and archived — its `amendedBy` field includes RFC-0724 but cannot be retroactively updated by a new draft RFC without a supersede chain.
+
+- **V-19**: `RFC-0763.amends includes RFC-0749, but RFC-0749.amendedBy does not include RFC-0763`. RFC-0749 is archived/implemented — its `amendedBy` field cannot be retroactively updated without a new commit to the archived RFC. Consider removing `amends: [RFC-0749]` and using `related` instead, since this RFC extends the pattern rather than changing RFC-0749's contract.
 
 ## Axis A — Structural completeness
 
-- **F-A1 (FAIL)**: The RFC's Design section (lines 83-96) proposes code that **already exists verbatim** in the codebase. `mission-materialization-commands.ts:602-613` contains a post-validation `commitBordbuchProjections` call with try/catch, `logger.info` on success, and `logger.warn` on failure — implemented by RFC-0749. The RFC's TypeScript contract is a near-copy of the existing code.
-- **F-A2 (FAIL)**: The RFC's File system responsibilities table (line 104) lists `bordbuch/bordbuch-commit-helper.ts` as the location of `commitBordbuchProjections`. The function actually lives in `bordbuch/bordbuch-commit.ts` (line 49). `bordbuch-commit-helper.ts` contains different helpers (`appendAndCommitBordbuch`, `appendBatchAndCommitBordbuch` from RFC-0750).
+- **F-A1 (WARN)**: `kind: architecture` — this RFC changes a specific command (`mission.validate`) with a targeted code addition (two `commitBordbuchProjections` calls on failure paths). It does not establish a new architectural pattern or DNA invariant. `kind: command` is more accurate, consistent with RFC-0749 (which is `kind: command`).
+- **F-A2 (PASS)**: Decision is clear and present tense. TypeScript contracts are minimal. File system responsibilities name concrete paths. Failure modes specify exit codes. Acceptance criteria are checkable.
 
 ## Axis B — DNA alignment
 
-- **F-B1 (FAIL)**: `satisfies: [DNA-46]` — the RFC claims to enforce DNA-46 (Mission lifecycle) by ensuring the cache clone is clean for `mission.reconcile`. However, DNA-46 is already enforced in this aspect by RFC-0749 (implemented). The RFC does not explain what gap in DNA-46 enforcement remains after RFC-0749.
-- **F-B2 (WARN)**: `related: [DNA-46, RFC-0355, RFC-0356]` — RFC-0355 and RFC-0356 are the establishing RFCs for DNA-46 and DNA-47. The RFC does not reference RFC-0749 or RFC-0724, which are the directly relevant implemented RFCs that already solve this problem.
+- **F-B1 (PASS)**: `satisfies: [DNA-46]` — the RFC explains how it ensures the cache clone is clean for `mission.reconcile` regardless of validation outcome, which supports DNA-46 (Mission lifecycle).
+- **F-B2 (PASS)**: `related` includes RFC-0702, RFC-0724, RFC-0749 — all directly relevant.
 
 ## Axis C — Ecosystem fit
 
-- **F-C1 (FAIL)**: The RFC amends RFC-0702, but RFC-0702 is already `implemented` and archived. Amending an archived RFC is architecturally incorrect — the amend should target RFC-0749 (the RFC that added the post-validation cleanup), or the RFC should supersede RFC-0749 if it changes the behavior. Instead, RFC-0763 proposes the same behavior RFC-0749 already implemented.
-- **F-C2 (FAIL)**: `packagesImpacted` lists `@warpgogol/site-kernel-handoff` — correct package, but the change already exists there. No new code is needed.
+- **F-C1 (FAIL)**: `amends: [RFC-0749]` — RFC-0749 is `implemented` and archived. The V-19 warning indicates the `amendedBy` backreference cannot be set. This RFC does not change RFC-0749's contract — it extends the same pattern to failure paths. Consider removing `amends` and keeping only `related`, or changing `amends` to `related` if the backreference cannot be resolved.
+- **F-C2 (PASS)**: `packagesImpacted` lists `@warpgogol/site-kernel-handoff` — correct package.
+- **F-C3 (PASS)**: `commands.changed: [mission.validate]` — correct, the only changed command.
 
 ## Axis D — Forward-only compliance
 
-No issues. The RFC does not propose backward compatibility layers or dual-paths. However, the RFC itself is redundant — the forward-only path is already in the codebase.
+No issues. The RFC is additive — it adds cleanup calls on failure paths without changing existing behavior on the success path.
 
 ## Axis E — Agent-facing policy
 
-- **F-E1 (FAIL)**: The RFC's Context section (line 57) states the problem was "observed during missions `warpgogol-com-m000024` and `warpgogol-com-m000039`." RFC-0749 (implemented 2026-08-08) already resolved this exact problem. The RFC does not mention RFC-0749 at all, creating a false impression that the problem is unresolved.
-- No NEEDS CLARIFICATION markers found.
+- **F-E1 (PASS)**: No self-authorizing language. Status is `draft`, implementation notes correctly reference RFC-0224 preconditions.
+- **F-E2 (PASS)**: No NEEDS CLARIFICATION markers.
+- **F-E3 (PASS)**: Implementation notes are explicit behavioral rules.
 
 ## Axis F — Pragmatism
 
-- **F-F1 (FAIL)**: The RFC proposes a new code change that is entirely unnecessary — the code already exists. This is the ultimate pragmatism failure: zero new value, duplicate effort.
-- **F-F2 (WARN)**: The RFC's `amends: [RFC-0702]` is incorrect — RFC-0702 made `commitBordbuchProjections` non-throwing and added the reuse-path cleanup. RFC-0749 added the post-validation cleanup. If this RFC were needed (it isn't), it should amend RFC-0749, not RFC-0702.
+- **F-F1 (PASS)**: The RFC proposes two targeted `commitBordbuchProjections` calls — minimal change, no new types, no new commands. Uses existing helper.
+- **F-F2 (PASS)**: Alternatives section evaluates real alternatives with valid rejection reasons.
 
 ## Axis G — Blind spots
 
-- **F-G1 (FAIL)**: The RFC does not consider that the problem it describes may already be solved. There is no mention of RFC-0749 or RFC-0724 anywhere in the document. The RFC's Context, Problem, and Alternatives sections all describe a state that no longer exists in the codebase.
-- **F-G2 (WARN)**: The RFC's Alternatives section (line 126) rejects "Move cleanup to `mission.reconcile`" — but this alternative was already evaluated and rejected by RFC-0749 (line 109). The RFC re-evaluates a decision already made.
+- **F-G1 (WARN)**: The RFC does not consider the case where `build.prepare` fails at `bordbuch.commit` itself (step 137). If `bordbuch.commit` is the failing step, `commitBordbuchProjections` has already run and returned an error result (non-throwing). The cleanup call on the failure path would call `commitBordbuchProjections` again — which would find the same dirty files and fail again. This is harmless (non-fatal, `logger.warn`) but the RFC should acknowledge this scenario in the Failure modes section.
+- **F-G2 (PASS)**: Performance impact is negligible — `commitBordbuchProjections` runs `git status --porcelain` (fast) and only commits if bordbuch files are dirty.
 
 ## Questions for the author
 
-1. **Why does this RFC exist when RFC-0749 (implemented 2026-08-08) already added the exact post-validation `commitBordbuchProjections` cleanup call at `mission-materialization-commands.ts:602-613`?** The code the RFC proposes is already in the codebase.
-2. **Why does the RFC amend RFC-0702 instead of RFC-0749?** RFC-0702 added the reuse-path cleanup and made `commitBordbuchProjections` non-throwing. RFC-0749 added the post-validation cleanup — which is what this RFC proposes.
-3. **Was the operator aware of RFC-0749 when this RFC was drafted?** The RFC's Context describes a problem state ("The operator must manually `git add && git commit`") that RFC-0749 already resolved. If the problem persists despite RFC-0749, the RFC should describe what specific scenario RFC-0749 does not cover.
+1. **Should `amends` be changed to `related`?** RFC-0749 is archived/implemented — the V-19 warning indicates the `amendedBy` backreference cannot be set. This RFC extends the pattern rather than changing RFC-0749's contract.
+2. **Should `kind` be `command` instead of `architecture`?** The RFC makes a targeted code change to `mission.validate` — no new architectural pattern or DNA invariant.
+3. **What happens when `bordbuch.commit` is the failing step in `build.prepare`?** The cleanup call would re-run `commitBordbuchProjections` and fail again. This is harmless but should be acknowledged in the Failure modes section.
