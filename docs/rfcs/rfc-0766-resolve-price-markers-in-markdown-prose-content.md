@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
@@ -79,7 +80,7 @@ The prose pipeline gains a post-rendering step that resolves `{price:...}` marke
 
 ### 1. Price marker detection
 
-`prose-pipeline.ts` checks the prose body for `{price:...}` markers using the same regex as `parsePriceMarkers`:
+`prose-pipeline.ts` checks the prose body for `{price:...}` markers using the same pattern as `parsePriceMarkers` (without the `g` flag, since `hasPriceMarkers` uses `.test()` and the `g` flag would advance `lastIndex` on repeated calls):
 
 ```ts
 const PRICE_MARKER_RE = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/;
@@ -90,24 +91,31 @@ function hasPriceMarkers(text: string): boolean {
 
 ### 2. Force micromark path when markers are present
 
-In `renderProse`, after resolving content references, if `hasPriceMarkers(proseBody)` is true, the pipeline takes the micromark HTML path (like `hasReferences` does) instead of falling through to Astro `render()`.
+In `renderProse`, after resolving content references, if `hasPriceMarkers(proseBody)` is true, the pipeline takes the micromark HTML path (like `hasReferences` does) instead of falling through to Astro `render()`. This check covers all HTML-returning paths in the pipeline:
+
+- **Inline body path** (no `contentRef`, has `body`): already uses micromark — `resolvePriceMarkersInHtml` is applied to the rendered HTML before returning.
+- **`animateNumbers` path**: if `animateNumbers` is true and the prose body has markers, `resolvePriceMarkersInHtml` is applied after `wrapInlineNumbers` and before `resolveProseImages`.
+- **Reference substitution path**: already uses micromark — `resolvePriceMarkersInHtml` is applied after `resolveProseImages`.
+- **Image-bearing path**: already uses micromark — `resolvePriceMarkersInHtml` is applied after `resolveProseImages`.
+
+The Astro `render()` path (plain prose without references, images, or markers) is never reached when markers are present.
 
 ### 3. Post-process HTML to replace markers
 
 A new function `resolvePriceMarkersInHtml` scans the rendered HTML string for `{price:...}` markers and replaces each with the HTML structure that `CurrencyAwarePriceDisplay` renders:
 
 ```html
-<div class="currency-aware-price-display" data-currency-price-display aria-live="polite">
-  <div class="currency-aware-price-display__variant" data-currency="EUR" aria-label="70 €">
+<span class="currency-aware-price-display" data-currency-price-display aria-live="polite">
+  <span class="currency-aware-price-display__variant" data-currency="EUR" aria-label="70 €">
     <span class="currency-aware-price-display__amount">70 €</span>
-  </div>
-  <div class="currency-aware-price-display__variant" data-currency="UAH" hidden aria-label="3 645,6 ₴">
+  </span>
+  <span class="currency-aware-price-display__variant" data-currency="UAH" hidden aria-label="3 645,6 ₴">
     <span class="currency-aware-price-display__amount">3 645,6 ₴</span>
-  </div>
-</div>
+  </span>
+</span>
 ```
 
-This HTML structure is identical to what `CurrencyAwarePriceDisplay` renders. The client-side script `currency-aware-price-display-component.client.ts` already toggles `data-currency` elements — no client-side changes needed.
+This HTML structure uses `<span>` elements instead of `<div>` to remain valid HTML when inserted inside micromark-generated `<p>` elements (block-level `<div>` inside `<p>` is invalid HTML and causes browsers to auto-close the paragraph). The CSS classes, data attributes, and nested structure match `CurrencyAwarePriceDisplay` — the client-side script `currency-aware-price-display-component.client.ts` uses `querySelectorAll("[data-currency-price-display]")` which works with any element type. When `variant.note` is present, a `<span class="currency-aware-price-display__note">` element is rendered inside the variant. No client-side changes needed.
 
 ### 4. HTML generation function
 
@@ -121,7 +129,11 @@ export function renderPriceDisplayHtml(
   derivedPrices: ReturnType<typeof loadDerivedPrices>,
 ): string {
   // Build variants using the same logic as parsePriceMarkers
-  // Return the HTML string matching CurrencyAwarePriceDisplay's output
+  // Returns empty string when buildPriceVariants returns null
+  //   (single-currency or no derived prices) — consistent with
+  //   section-paragraphs.astro which renders nothing for null variants.
+  // Otherwise returns the HTML string with <span> elements matching
+  //   CurrencyAwarePriceDisplay's CSS classes and data attributes.
 }
 ```
 
@@ -141,7 +153,8 @@ This function is used by both `resolvePriceMarkersInHtml` (prose pipeline) and c
 | Path | Role |
 | --- | --- |
 | `packages/ui/src/utils/price-marker.ts` | Add `renderPriceDisplayHtml` function |
-| `packages/ui/src/sections/markdown/prose-pipeline.ts` | Add `hasPriceMarkers` detection, force micromark path, post-process HTML |
+| `packages/ui/src/sections/markdown/prose-pipeline.ts` | Add `hasPriceMarkers` detection, force micromark path, post-process HTML on all HTML-returning paths |
+| `packages/ui/AGENTS.md` | Update "Dynamic pricing in UI components" section to document prose marker support |
 
 ### TypeScript contracts
 
@@ -150,7 +163,10 @@ This function is used by both `resolvePriceMarkersInHtml` (prose pipeline) and c
 
 /**
  * Generate the HTML string for a {price:offering:chargeRef} marker.
- * The HTML structure matches CurrencyAwarePriceDisplay's output exactly,
+ * Uses <span> elements (not <div>) to remain valid HTML inside <p> elements.
+ * Returns empty string when buildPriceVariants returns null
+ *   (single-currency or no derived prices).
+ * The CSS classes and data attributes match CurrencyAwarePriceDisplay,
  * so the client-side currency switcher toggles variants correctly.
  */
 export function renderPriceDisplayHtml(
@@ -180,7 +196,7 @@ function resolvePriceMarkersInHtml(
 - **Missing derived prices file:** `loadDerivedPrices()` returns `null` (ENOENT). Markers resolve to `0 €` / `0 ₴` — same behavior as existing `parsePriceMarkers` in SectionHeader. No crash.
 - **Unknown offering ID:** `derivedPrices[ref]` is `undefined`. Marker resolves to `0 €` / `0 ₴` — same behavior as existing.
 - **Unknown chargeRef:** `entries.filter(e => e.chargeRef === chargeRef)` returns `[]`. Marker resolves to `0 €` / `0 ₴` — same behavior as existing.
-- **Marker in code block:** micromark renders `{price:...}` inside `<code>` as literal text. The post-processing regex would still match it. Mitigation: skip markers inside `<code>` or `<pre>` elements. The regex should not match inside code blocks — use a negative lookbehind or split-and-skip approach.
+- **Marker in code block:** micromark renders `{price:...}` inside `<code>` as literal text. The post-processing regex would still match it. Mitigation: `resolvePriceMarkersInHtml` splits the HTML string by `<code>...</code>` and `<pre>...</pre>` segments using a regex that captures the delimiters, then applies the marker replacement only to non-code segments, reassembling the string with code segments unchanged. This is more robust than a negative lookbehind because it handles multi-line code blocks and nested angle brackets.
 
 ## Rollout
 
@@ -188,6 +204,7 @@ function resolvePriceMarkersInHtml(
 - **No content migration needed:** Existing prose files without price markers are unaffected (the `hasPriceMarkers` check skips the new path). Prose files with hardcoded prices can be updated incrementally to use `{price:...}` markers.
 - **No client-side changes:** The existing `currency-aware-price-display-component.client.ts` already toggles `data-currency` elements anywhere in the DOM.
 - **Backward compatible:** The new function is additive. No existing API changes.
+- **No Compass sync needed:** The change is internal to `packages/ui` rendering logic and does not alter the cross-workspace contract surface. No `docs/*.xml` synchronization required.
 
 ## Alternatives considered
 
@@ -204,6 +221,8 @@ function resolvePriceMarkersInHtml(
 - **Code block false positives:** If a prose file contains `{price:...}` inside a code block (e.g. documentation about the marker syntax), the post-processing would replace it with price display HTML. Mitigation: the `resolvePriceMarkersInHtml` function skips `<code>` and `<pre>` blocks.
 - **Performance:** The regex scan runs on every prose HTML string. Mitigation: `hasPriceMarkers` is a fast pre-check; the full scan only runs when markers are detected.
 - **HTML structure drift:** If `CurrencyAwarePriceDisplay` changes its HTML structure, `renderPriceDisplayHtml` must be updated to match. Mitigation: both should share the same HTML generation logic. A future refactor could extract a shared `buildPriceDisplayHtml` function used by both the Astro component and the HTML-string renderer.
+- **Footnotes loss for marker-bearing prose:** Prose files with price markers are forced to the micromark path, losing Astro `render()` features like footnotes. Mitigation: authors who need footnotes should not use price markers in the same prose file, or a future RFC can add footnote support to the micromark path.
+- **`<div>` vs `<span>` element difference:** `renderPriceDisplayHtml` uses `<span>` elements while `CurrencyAwarePriceDisplay` uses `<div>`. The CSS classes and data attributes are identical, so the client script works with both. The difference is intentional: `<span>` is valid HTML inside `<p>` elements (prose context), while `<div>` is not. The existing `section-paragraphs.astro` pattern (`<div>` inside `<p>`) is a pre-existing issue that this RFC does not replicate.
 
 ## Acceptance criteria
 
@@ -219,8 +238,10 @@ function resolvePriceMarkersInHtml(
 
 ## Implementation notes for agents
 
-- Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
+- Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented). Status transition uses `rfc.implement.stamp` (RFC-0476).
 - Agents MUST use the micromark HTML path (not Astro render()) when price markers are detected in prose body.
-- Agents MUST skip price marker replacement inside `<code>` and `<pre>` blocks.
+- Agents MUST apply `resolvePriceMarkersInHtml` on all HTML-returning paths in `renderProse`, including the `animateNumbers` path and the inline body path.
+- Agents MUST skip price marker replacement inside `<code>` and `<pre>` blocks by splitting HTML on code/pre segments.
 - Agents MUST NOT hardcode prices in prose files — use `{price:offering:chargeRef}` markers instead.
-- Agents MUST ensure `renderPriceDisplayHtml` produces HTML identical to `CurrencyAwarePriceDisplay` component output.
+- Agents MUST use `<span>` elements (not `<div>`) in `renderPriceDisplayHtml` to ensure valid HTML inside `<p>` elements.
+- Agents MUST return empty string from `renderPriceDisplayHtml` when `buildPriceVariants` returns `null`.
