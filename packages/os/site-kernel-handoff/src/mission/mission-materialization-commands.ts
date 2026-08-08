@@ -45,7 +45,12 @@ import type {
 } from "@warpgogol/site-kernel";
 import { executeKernelCommand, executeKernelPipeline } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
-import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
+import {
+  runPipelinePhase,
+  computeBuildInputHash,
+  writePreliminaryBuildIdentity,
+  cleanupPreliminaryBuildIdentity,
+} from "../build-pipeline-helpers.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import {
   isWorkpieceDirty,
@@ -405,6 +410,17 @@ export async function runMissionValidate(
       await fs.rm(distDir, { recursive: true, force: true });
     }
 
+    const preliminaryBuildIdentityPath = await writePreliminaryBuildIdentity(
+      workpieceDir,
+      {
+        releaseId: `workpiece-${missionId}`,
+        systemId: manifest.systemId,
+        missionId,
+        semver: "0.0.0-workpiece",
+      },
+      logger,
+    );
+
     logger.info(`  Running astro build in ${workpieceDir}…`);
     try {
       const buildOutput = execSync("pnpm exec astro build", {
@@ -517,6 +533,8 @@ export async function runMissionValidate(
         buildError = snapResult.error;
       }
     }
+
+    await cleanupPreliminaryBuildIdentity(preliminaryBuildIdentityPath);
   }
 
   const passed = staticPassed && buildSucceeded;
@@ -676,7 +694,18 @@ export async function runMissionBuild(
   // Phase 2: astro build
   let buildRouteCount = 0;
   let buildSitemapHash = "sha256:no-sitemap";
+  let preliminaryBuildIdentityPath: string | null = null;
   if (!buildError) {
+    preliminaryBuildIdentityPath = await writePreliminaryBuildIdentity(
+      workpieceDir,
+      {
+        releaseId: `workpiece-${missionId}`,
+        systemId: manifest.systemId,
+        missionId,
+        semver: "0.0.0-workpiece",
+      },
+      logger,
+    );
     logger.info(`  Running astro build in ${workpieceDir}…`);
     try {
       const buildOutput = execSync("pnpm exec astro build", {
@@ -714,6 +743,9 @@ export async function runMissionBuild(
 
   buildSucceeded = !buildError;
 
+  if (preliminaryBuildIdentityPath) {
+    await cleanupPreliminaryBuildIdentity(preliminaryBuildIdentityPath);
+  }
   // Copy dist/ from workpiece to distribution/
   const distSrc = path.join(workpieceDir, "dist");
   const distDest = path.join(distributionDir, "dist");
