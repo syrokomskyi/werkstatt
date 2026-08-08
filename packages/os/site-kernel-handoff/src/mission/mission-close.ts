@@ -22,6 +22,7 @@
   <item>RFC-0703: auto-pin platform version via sternsystem.pin after registry update, before werkstatt commit.</item>
   <item>RFC-0705: move mirror status gathering before state transition; add blocking check when external mirrors are desynced.</item>
   <item>RFC-0734: add CREG-05 enforcement — block close when content drift exists and no apply-result.json; add --skip-content-regression flag.</item>
+  <item>RFC-0762: extend CloseReportMirror with synced/syncError; add post-close sternsystem.sync call before state file write.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -83,6 +84,8 @@ export interface CloseReportMirror {
   mirrorSha: string | null;
   inSync: boolean;
   recommendation: string | null;
+  synced: boolean;
+  syncError: string | null;
 }
 
 export interface CloseReportReconcile {
@@ -391,6 +394,8 @@ export async function runMissionClose(
         mirrorSha,
         inSync: mirrorInSync,
         recommendation,
+        synced: false,
+        syncError: null,
       },
       reconcile: {
         reconciledAt: manifest.reconciledAt,
@@ -525,6 +530,45 @@ export async function runMissionClose(
       [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
       `werkstatt: mission.close ${missionId}`,
     );
+
+    // RFC-0762: Sync external mirrors before writing .materialization-state.json.
+    // The sync creates a mirror-sync bordbuch commit in the cache clone (RFC-0477),
+    // so the state file must be written AFTER the sync to capture the final HEAD.
+    // Non-fatal: sync failure logs a warning but does not block close — the mission
+    // is already closed (irreversible). The operator can retry sternsystem.sync manually.
+    if (entry && entry.mirrors.length > 2) {
+      try {
+        const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+        logger.info(`  Syncing external mirrors via sternsystem.sync…`);
+        const syncResult = (await executeKernelCommand({
+          workspaceRoot,
+          commandName: "sternsystem.sync",
+          argv: [`--id=${manifest.systemId}`],
+        })) as { exitCode?: number; summary?: string };
+        const syncExitCode = syncResult.exitCode ?? 0;
+        if (syncExitCode !== 0) {
+          const syncError =
+            syncResult.summary ?? `sternsystem.sync exited with code ${syncExitCode}`;
+          logger.warn(
+            `[mission.close] sternsystem.sync failed — run manually: ` +
+              `sternsystem.sync --id ${manifest.systemId}`,
+          );
+          closeReport.mirror.synced = false;
+          closeReport.mirror.syncError = syncError;
+        } else {
+          closeReport.mirror.synced = true;
+          closeReport.mirror.syncError = null;
+          logger.info(`  External mirrors synced`);
+        }
+      } catch (syncErr) {
+        logger.warn(
+          `[mission.close] sternsystem.sync threw — run manually: ` +
+            `sternsystem.sync --id ${manifest.systemId}: ${syncErr instanceof Error ? syncErr.message : String(syncErr)}`,
+        );
+        closeReport.mirror.synced = false;
+        closeReport.mirror.syncError = syncErr instanceof Error ? syncErr.message : String(syncErr);
+      }
+    }
 
     // RFC-0597: Write materialization state file and copy .cache/ to cache clone.
     // This is the FINAL step — only executed after the close has succeeded (bundle created,
