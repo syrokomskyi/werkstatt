@@ -2,19 +2,19 @@
 id: RFC-0763
 title: "Auto-commit stale bordbuch projections in cache clone during mission.validate"
 status: draft
-kind: architecture
+kind: command
 scope: workspace
 owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-08
 updatedAt: 2026-08-08
+enhancedAt: 2026-08-08
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends:
-  - RFC-0749
+amends: []
 amendedBy: []
 related:
   - DNA-46
@@ -22,6 +22,7 @@ related:
   - RFC-0356
   - RFC-0702
   - RFC-0724
+  - RFC-0749
 satisfies:
   - DNA-46
 versionBump: patch
@@ -141,6 +142,7 @@ No output format change. The warning about uncommitted cache clone files is repl
 - **`commitBordbuchProjections` fails on a failure path**: Non-fatal. `logger.warn` emitted. The failure return proceeds unchanged — exit code is still 1. The validation failure is the primary signal; the cleanup failure is secondary.
 - **No stale bordbuch files**: `commitBordbuchProjections` is a no-op (returns `{ committed: false }` with no `error`). No log output.
 - **`build.prepare` fails before `bordbuch.generate` runs**: No bordbuch projections were written. `commitBordbuchProjections` finds nothing dirty. No-op.
+- **`build.prepare` fails at `bordbuch.commit` itself**: `commitBordbuchProjections` has already run inside `bordbuch.commit` and returned an error result (non-throwing per RFC-0702). The failure-path cleanup calls `commitBordbuchProjections` again — it finds the same dirty files and fails again. This is harmless: the call is non-fatal, `logger.warn` is emitted, and the failure return proceeds with `exitCode: 1`. The bordbuch dirty state will be cleaned by the RFC-0724 pre-validate cleanup on the next run.
 - **Cache clone does not exist**: `commitBordbuchProjections` catches `resolveCachePath` failure and returns `{ committed: false }` (existing behavior, RFC-0702).
 
 ## Rollout
