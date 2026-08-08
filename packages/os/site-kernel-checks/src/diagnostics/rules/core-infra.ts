@@ -523,6 +523,11 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "Content drift exists but no review.yaml has been processed — run content.regression.review.generate",
     "mission.close",
   ),
+  "CREG-06": rule(
+    "CREG-06",
+    "Auto-accept write error — golden baseline update failed during --auto-accept",
+    "content.regression.check",
+  ),
 
   // yaml.contract.lint — YAML-first workspace convention enforcement.
   "YAML-CONTRACT-01": rule(

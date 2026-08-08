@@ -505,6 +505,111 @@ export async function runContentRegressionCheck(
 
   // Diff current vs golden
   const diff = diffSnapshots(currentSnapshot, goldenSnapshot);
+
+  // RFC-0764: --auto-accept flag — auto-accept all drift, update golden baseline,
+  // write review.yaml (audit trail) and apply-result.json (CREG-05 satisfaction)
+  const autoAccept = flagBool(input, "auto-accept");
+  if (autoAccept) {
+    const hasDrift =
+      diff.addedRoutes.length > 0 || diff.removedRoutes.length > 0 || diff.changedRoutes.length > 0;
+
+    if (!hasDrift) {
+      return passResult(
+        "content.regression.check",
+        "content.regression.check: no drift detected (auto-accept: 0 changes).",
+      );
+    }
+
+    // Resolve mission ID for evidence directory path
+    const missionId = await resolveMissionId(workspaceRoot, systemId);
+
+    // Build review changes with all decisions set to accept
+    const changes = buildReviewChanges(diff, currentSnapshot, goldenSnapshot);
+    for (const change of changes) {
+      if (change.kind !== "removed-route") {
+        change.decision = "accept";
+      }
+    }
+
+    const review: ContentRegressionReview = {
+      schemaVersion: 1,
+      systemId,
+      missionId: missionId ?? "standalone",
+      generatedAt: new Date().toISOString(),
+      goldenSnapshotHash: goldenSnapshot.contentHash,
+      currentSnapshotHash: currentSnapshot.contentHash,
+      summary: {
+        totalChanges: changes.length,
+        addedRoutes: diff.addedRoutes.length,
+        removedRoutes: diff.removedRoutes.length,
+        changedRoutes: diff.changedRoutes.length,
+      },
+      changes,
+    };
+
+    // Determine evidence directory: mission evidence dir or cache clone fallback
+    let evidenceDir: string;
+    let reviewRelPath: string;
+    if (missionId) {
+      evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "content-regression");
+      reviewRelPath = `missions/${missionId}/evidence/content-regression/review.yaml`;
+    } else {
+      evidenceDir = join(cacheClonePath, ".cache", "content-regression");
+      reviewRelPath = `.cache/content-regression/review.yaml`;
+    }
+
+    try {
+      // Write review.yaml (audit trail)
+      await mkdir(evidenceDir, { recursive: true });
+      const reviewYaml = reviewToYaml(review, systemId, missionId ?? "standalone");
+      await writeFileIfChanged(join(evidenceDir, "review.yaml"), reviewYaml);
+
+      // Update golden snapshot in cache clone
+      const goldenDir = join(cacheClonePath, ".cache", "content-regression");
+      await mkdir(goldenDir, { recursive: true });
+      const goldenPath = join(goldenDir, `${systemId}.snapshot.yaml`);
+      const goldenYaml = snapshotToYaml(
+        currentSnapshot,
+        "content.regression.check",
+        `.cache/content-regression/${systemId}.snapshot.yaml`,
+      );
+      await writeFileIfChanged(goldenPath, goldenYaml);
+
+      // Write apply-result.json (satisfies mission.close CREG-05 check)
+      const applyResult: ContentRegressionApplyResult & { autoAccepted: boolean } = {
+        accepted: changes.filter((c) => c.decision === "accept").length,
+        rejected: 0,
+        fixed: 0,
+        pending: 0,
+        goldenUpdated: true,
+        errors: [],
+        autoAccepted: true,
+      };
+      await writeFileIfChanged(
+        join(evidenceDir, "apply-result.json"),
+        JSON.stringify(applyResult, null, 2) + "\n",
+      );
+
+      context.logger.info(
+        `  Auto-accepted ${changes.length} change(s). Golden baseline updated. Audit trail: ${reviewRelPath}`,
+      );
+
+      return passResult(
+        "content.regression.check",
+        `content.regression.check: ${changes.length} change(s) auto-accepted. Golden baseline updated. Review manifest: ${reviewRelPath}`,
+      );
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return diagnosticsResult("content.regression.check", [
+        {
+          ruleId: "CREG-06",
+          severity: "error",
+          message: `Failed to update golden baseline during --auto-accept: ${errorMsg}`,
+        },
+      ]);
+    }
+  }
+
   const diagnostics = diffToDiagnostics(diff);
   return diagnosticsResult("content.regression.check", diagnostics);
 }

@@ -207,6 +207,11 @@ export function createMissionModule(): KernelModule {
             kind: "boolean",
             description: "RFC-0732: Skip content regression gate (escape hatch).",
           },
+          "auto-accept-regression": {
+            kind: "boolean",
+            description:
+              "RFC-0764: Auto-accept all content regression drift, update golden baseline directly.",
+          },
         },
         reads: ["missions/{mission}/**"],
         cacheable: false,

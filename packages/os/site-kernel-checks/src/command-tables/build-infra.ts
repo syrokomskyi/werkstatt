@@ -175,6 +175,13 @@ export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
         kind: "boolean",
         description: "Skip the content regression gate (escape hatch).",
       },
+      "auto-accept": {
+        kind: "boolean",
+        description:
+          "RFC-0764: auto-accept all detected content drift, update golden baseline directly, " +
+          "and pass. Generates review.yaml (audit trail) and apply-result.json. " +
+          "Default behavior (fail on drift) is unchanged without this flag.",
+      },
     },
     reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
     execute: runContentRegressionCheck,
