@@ -28,6 +28,7 @@
   <item>RFC-0702: add commitBordbuchProjections cleanup call in distribution reuse path to clean dirty bordbuch files from previous runs.</item>
   <item>RFC-0705: add non-fatal sternsystem.sync call after git push origin in reconcile when external mirrors exist; add mirrorSync to MissionReconcileData and reconciliation-report.json.</item>
   <item>RFC-0749: add post-validation commitBordbuchProjections cleanup call in mission.validate to commit bordbuch projections that were regenerated during build.prepare but not committed by bordbuch.commit due to transient git failure.</item>
+  <item>RFC-0763: add commitBordbuchProjections cleanup on build.prepare failure and validation failure early-return paths to clean bordbuch projections from cache clone on all exit paths.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -368,6 +369,19 @@ export async function runMissionValidate(
       path.join(evidenceDir, "validation-report.json"),
       JSON.stringify(report, null, 2) + "\n",
     );
+    // RFC-0763: clean bordbuch projections on build.prepare failure path
+    try {
+      const failBordbuch = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
+      if (failBordbuch.committed) {
+        logger.info(
+          `  Bordbuch cleanup on build.prepare failure: committed ${failBordbuch.filesCommitted.length} file(s)`,
+        );
+      }
+    } catch (err) {
+      logger.warn(
+        `  Bordbuch cleanup on build.prepare failure failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
     return {
       data: report as unknown as MissionValidateData,
       exitCode: 1,
@@ -584,6 +598,19 @@ export async function runMissionValidate(
         kind: "required",
       },
     ];
+    // RFC-0763: clean bordbuch projections on validation failure path
+    try {
+      const failBordbuch = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
+      if (failBordbuch.committed) {
+        logger.info(
+          `  Bordbuch cleanup on validation failure: committed ${failBordbuch.filesCommitted.length} file(s)`,
+        );
+      }
+    } catch (err) {
+      logger.warn(
+        `  Bordbuch cleanup on validation failure failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
     return {
       data: report as unknown as MissionValidateData,
       exitCode: 1,
