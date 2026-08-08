@@ -314,6 +314,15 @@ Rules:
 - Component scripts MUST NOT be loaded from `layout.astro` (AP-18, RFC-0011 SP-01).
 - Do not write bare `<script is:inline>` blocks with behavioural logic longer than 5 lines.
 
+## Z-index registry
+
+Floating and fixed-position UI elements use documented z-index values to prevent stacking conflicts:
+
+| Element | z-index | Notes |
+| --- | --- | --- |
+| Site header | 200 | Fixed/sticky header (RFC-0768) |
+| Scroll-to-top button (Daphnis) | 100 | Floating button rendered by `layout-component.astro` (RFC-0768) |
+
 ## Passport moon components (RFC-0028 / DNA-31..34)
 
 The five PASSPORT-RESERVED moons are implemented here as Mirror Quintet components (`.astro` + `.css` + `.manifest.yaml`):
