@@ -400,7 +400,7 @@ export async function runMatomoProxyValidate(
     const hasAnalyticsRoute = routes.some((r) => r.startsWith("/_wg/analytics/"));
     if (!hasAnalyticsRoute) {
       violations.push(
-        `${MATOMO_PROXY_DIR}/service.config.yaml: routes must include /_wg/analytics/*`,
+        `${MATOMO_PROXY_DIR}/service.config.yaml: routes must include a /_wg/analytics/ pattern`,
       );
     }
   }
