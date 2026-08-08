@@ -305,6 +305,16 @@ Rules:
 - **NEVER create workarounds** (symlinks, manual dist copies, custom wrangler configs, `--config` pointing to cache clone, copying `.env.*` files manually). If the pipeline fails, investigate the root cause and fix it — do not bypass.
 - If a step fails, report the error to the operator and wait for guidance. Do not attempt alternative deployment paths.
 
+### Service deployment (RFC-0751)
+
+Shared Cloudflare Worker services in `services/*` are deployed via `leitstand.service.deploy --service <id>`. This command runs preflight checks, subdomain validation (RFC-0752), `wrangler deploy`, health checks, and records deployment state atomically in `systems/registry.yaml`.
+
+- Services MUST be registered in the `services:` key of `systems/registry.yaml`.
+- Worker names MUST match the service id (directory name, `package.json` name, `wrangler.jsonc` name).
+- Per-service `deploy` scripts in `package.json` are removed — deployment is centralized.
+- `service.registry.validate` and `service.naming.validate` enforce registry integrity and naming conventions.
+- `services.check.run` includes `service.naming.validate` in its pipeline.
+
 Avoid double `mission.open` calls:
 
 - Check the command output for `[OK]` before considering the mission opened.
