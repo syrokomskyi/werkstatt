@@ -37,6 +37,10 @@ export async function resolveLocales(
     const targetEntity = localeMap.get(targetLocaleKey);
 
     if (!defaultEntity && !targetEntity) {
+      const firstEntity = localeMap.values().next().value;
+      if (firstEntity) {
+        resolved.set(id, firstEntity);
+      }
       continue;
     }
 
