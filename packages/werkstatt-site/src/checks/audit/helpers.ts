@@ -140,6 +140,9 @@ export async function loadAuditAppContext(context: KernelRuntimeContext): Promis
   const biomePath = join(
     context.workspaceRoot,
     "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
     "ontology",
     "biomes",
     `${biomeId}.yaml`,
@@ -153,6 +156,9 @@ export async function loadAuditAppContext(context: KernelRuntimeContext): Promis
   const familyDirectory = join(
     context.workspaceRoot,
     "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
     "ontology",
     "site-families",
     familyId,

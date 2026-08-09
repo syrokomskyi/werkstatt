@@ -83,7 +83,7 @@ function fail(violations: Violation[]): KernelCommandResult<CheckResult> {
 }
 
 async function collectScopedCssFiles(workspaceRoot: string): Promise<string[]> {
-  const componentsRoot = join(workspaceRoot, "packages", "ui", "src", "components");
+  const componentsRoot = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components");
   const exts = new Set([".css"]);
   const out: string[] = [];
   for (const dir of SCOPED_COMPONENT_DIRS) {
@@ -150,7 +150,7 @@ export async function runSectionShellTokenContractValidate(
 ): Promise<KernelCommandResult<CheckResult>> {
   const violations: Violation[] = [];
   // Scan both .css and .astro files in scope — token references appear in both.
-  const componentsRoot = join(context.workspaceRoot, "packages", "ui", "src", "components");
+  const componentsRoot = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components");
   const exts = new Set([".css", ".astro"]);
   const files: string[] = [];
   for (const dir of SCOPED_COMPONENT_DIRS) {

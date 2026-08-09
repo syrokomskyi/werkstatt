@@ -1,0 +1,309 @@
+# Blueprint: website-local v2 (RFC-0238)
+# Five-axis geo-demand cascade: industry × country × region × city × demand.
+# Datasets live in the app: apps/<app>/src/content/surface/{industries,demands}/<lang>/*.md
+# Geo axes (country, region, city) are resolved from @warpgogol/geo (RFC-0237).
+# Gated by the single `pseo` entitlement (RFC-0169 / RFC-0240).
+id: website-local
+entitlement: pseo
+
+# The record set the eligibility engine counts. Each demand record lists the industries,
+# country, region, and city it applies to; a tuple is live when matching records exist.
+dataset:
+  collection: demands
+  status: active
+
+axes:
+  - id: industry
+    universe: { collection: industries, field: slug }
+    match: { recordField: industries }
+  - id: country
+    universe: { provider: geo.countries }
+    match: { recordField: country }
+  - id: region
+    universe: { provider: geo.regions }
+    match: { recordField: region }
+  - id: city
+    universe: { provider: geo.cities }
+    match: { recordField: city }
+  - id: demand
+    universe: { collection: demands, field: slug }
+    match: { recordField: slug }
+
+levels:
+  - depth: 0
+    slug: { de: website, uk: sait }
+    constellation: website-pillar
+    geo: twin-only
+    semanticType: collection
+    titleTemplate:
+      de: "Website für Handwerk und Gewerbe | Branchenübersicht | Warpgogol"
+      uk: "Сайт для ремесла та бізнесу | Огляд галузей | Warpgogol"
+    descriptionTemplate:
+      de: "Wie das Digitale Fundament an Elektriker, Friseure und andere lokale Betriebe angepasst wird: Leistungen, Einsatzgebiet, Kontaktwege und passende Funktionen."
+      uk: "Як Цифровий фундамент адаптується до електриків, перукарів та іншого локального бізнесу: послуги, зона роботи, шляхи контакту та відповідні функції."
+    intro:
+      de: "Das Digitale Fundament bleibt dasselbe. Aufbau, Inhalte, Kontaktwege und optionale Funktionen werden an den jeweiligen Betrieb angepasst. Hinweise zur lokalen Sichtbarkeit im Ratgeber [Lokale Sichtbarkeit](/ratgeber/lokale-sichtbarkeit/)."
+      uk: "Цифровий фундамент залишається тим самим. Структуру, контент, шляхи контакту та додаткові функції адаптуємо до конкретного бізнесу. Вказівки щодо локальної видимості у пораднику [Локальна видимість](/porady/lokalna-vydymist/)."
+    pillar:
+      hero:
+        eyebrow:
+          de: Digitales Fundament für Ihr Gewerbe
+          uk: Цифровий фундамент для вашого бізнесу
+        heading:
+          de: Welche Website braucht Ihr Betrieb?
+          uk: Який сайт потрібен вашому бізнесу?
+        lead:
+          de: "Ein Elektrikerbetrieb, ein Friseursalon und eine Gebäudereinigung benötigen nicht dieselben Inhalte und Kontaktwege. Hier sehen Sie, wie das Digitale Fundament an unterschiedliche Gewerbe angepasst wird."
+          uk: "Електромонтаж, перукарня та прибирання будівель потребують різного контенту та шляхів контакту. Тут видно, як Цифровий фундамент адаптується до різних видів бізнесу."
+        primaryCta:
+          label:
+            de: Gewerbe auswählen
+            uk: Обрати галузь
+          target: "#industry-catalog"
+        secondaryCta:
+          label:
+            de: Digitales Fundament verstehen
+            uk: Зрозуміти Цифровий фундамент
+          target: digitalesFundament
+      adaptation:
+        heading:
+          de: Was sich je nach Gewerbe verändert
+          uk: Що змінюється залежно від галузі
+        dimensions:
+          - heading:
+              de: Leistungen und Sprache
+              uk: Послуги та мова
+            body:
+              de: Welche Leistungen unterschieden werden und wie Kunden sie nennen.
+              uk: Які послуги потрібно розрізняти і як їх називають клієнти.
+          - heading:
+              de: Einsatzgebiet
+              uk: Зона роботи
+            body:
+              de: "Ob der Betrieb an einem Standort, in einem Radius, in mehreren Städten, mit Notdienst oder nur nach Termin arbeitet."
+              uk: "Чи працює бізнес на одному місці, в певному радіусі, у кількох містах, з аварійною службою чи лише за записом."
+          - heading:
+              de: Kontakt und Handlung
+              uk: Контакт та дія
+            body:
+              de: "Welche Aktionen wichtig sind: Anruf, Termin, Notdienst, Angebot, Rückruf, Wegbeschreibung."
+              uk: "Які дії важливі: дзвінок, запис, аварійна служба, пропозиція, зворотний дзвінок, маршрут."
+          - heading:
+              de: Nachweise und Vertrauen
+              uk: Докази та довіра
+            body:
+              de: "Welche Angaben helfen, den Betrieb einzuschätzen: Qualifikationen, Meisterbetrieb, Fotos, Bewertungen, Öffnungszeiten."
+              uk: "Які відомості допомагають оцінити бізнес: кваліфікації, майстерність, фото, відгуки, години роботи."
+      catalogHeading:
+        de: "Gewerbe auswählen"
+        uk: "Обрати галузь"
+      productPrice:
+        heading:
+          de: "Gleiche Grundlage, angepasste Struktur"
+          uk: "Спільна основа, адаптована структура"
+        body:
+          de: "Die Branche verändert nicht automatisch den Basispreis. Zusätzliche Seiten, Sprachen, Buchungsfunktionen oder Integrationen werden gesondert vereinbart."
+          uk: "Галузь не змінює автоматично базову ціну. Додаткові сторінки, мови, функції бронювання чи інтеграції узгоджуються окремо."
+        priceRef: "business-profile.offerings/digital-foundation.presentation.price"
+      finalCta:
+        heading:
+          de: Ihr Gewerbe ist noch nicht aufgeführt?
+          uk: Вашої галузі ще немає в списку?
+        body:
+          de: "Beschreiben Sie kurz Ihren Betrieb, Ihre Leistungen und Ihr Einsatzgebiet. Warpgogol prüft, wie das Digitale Fundament für Ihre Situation aufgebaut werden kann."
+          uk: "Коротко опишіть свій бізнес, послуги та зону роботи. Warpgogol перевірить, як Цифровий фундамент можна побудувати для вашої ситуації."
+        primaryCta:
+          label:
+            de: Unverbindliche Anfrage starten
+            uk: "Почати необов'язковий запит"
+          target: contact
+        secondaryCta:
+          label:
+            de: Preis ansehen
+            uk: Переглянути ціну
+          target: pricing
+  - depth: 1
+    slug: { de: "website/{industry}", uk: "sait/{industry}" }
+    constellation: website-industry
+    geo: full
+    titleTemplate:
+      {
+        de: "Website für {industry.name} erstellen lassen",
+        uk: "Сайт для напрямку: {industry.name}",
+      }
+    # RFC-0492: industry dossier configuration
+    dossier:
+      gate:
+        minServiceCategories: 5
+        minCustomerJourneys: 3
+        minTrustSignals: 4
+        minArchitectureEntries: 1
+        minModuleMappings: 3
+        minUniqueFaq: 5
+      claimRestrictions:
+        - "mehr Anfragen"
+        - "mehr Termin-Anfragen"
+        - "echte Aufträge"
+        - "steigt die Wahrscheinlichkeit"
+        - "weniger Streuverluste"
+        - "höhere Conversion"
+        - "besser gefunden"
+        - "stärkstes Conversion-Signal"
+      doorwayMaxFlaggedShare: 0.30
+      duplicateMaxSimilarity: 0.70
+      mode: warn
+  - depth: 2
+    slug: { de: "website/{industry}/{country}", uk: "sait/{industry}/{country}" }
+    constellation: website-country
+    geo: full
+    titleTemplate:
+      {
+        de: "Website für {industry.name} in {country.name}",
+        uk: "{industry.name}: сайт у {country.name}",
+      }
+  - depth: 3
+    slug: { de: "website/{industry}/{region}", uk: "sait/{industry}/{region}" }
+    constellation: website-region
+    geo: full
+    titleTemplate:
+      {
+        de: "Website für {industry.name} in {region.name}",
+        uk: "{industry.name}: сайт у регіоні {region.name}",
+      }
+  - depth: 4
+    slug: { de: "website/{industry}/{city}", uk: "sait/{industry}/{city}" }
+    constellation: website-city
+    geo: full
+    titleTemplate:
+      {
+        de: "Website für {industry.name} in {city.name}",
+        uk: "{industry.name}: сайт у місті {city.name}",
+      }
+  - depth: 5
+    slug: { de: "website/{industry}/{city}/{demand}", uk: "sait/{industry}/{city}/{demand}" }
+    constellation: bedarfskarte
+    geo: full
+    titleTemplate:
+      {
+        de: "{demand.name} für {industry.name} in {city.name}",
+        uk: "{demand.name} для {industry.name} у {city.name}",
+      }
+    # RFC-0497: intersection gate — depth-5 pages require explicit intersection records
+    intersection:
+      gate:
+        minLocalServiceQuestions: 3
+        minScenarios: 2
+        minLocalEvidence: 2
+        minUniqueContentBlocks: 1
+        minUniqueFaq: 3
+        minSources: 1
+      similarity:
+        similarityToIndustryPage: 0.70
+        similarityToCityPage: 0.70
+        similarityToServicePage: 0.70
+        similarityToOtherIntersections: 0.70
+      substanceIndependenceThreshold: 0.50
+      mode: warn
+
+policy:
+  minRecordsPerDepth: { 0: 0, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 }
+  noindexBelowPerDepth: { 5: 1 }
+  redirectPolicy: nearest-ancestor
+  trailingSlash: true
+  maxStubDepth: 1
+  # RFC-0194 / RFC-0238: anti-thin-content. A Bedarfskarte below substanceMin is auto-noindexed;
+  # pseo.validate fails if more than maxThinShare of a family is thin.
+  substanceMin: 24
+  substanceMinPerDepth: { 0: 24, 1: 36, 4: 52, 5: 64 }
+  # RFC-0274: d5 Bedarfskarten require tuple-specific proof before indexability.
+  evidencePerDepth:
+    5:
+      existenceSource: works
+      minWerkEvidence: 1
+      approvedNarrative: required
+      requiredRecordFields:
+        - searchedAs
+        - neededPage
+        - trustProofs
+        - leadLosingMistakes
+      preferredEvidenceSources:
+        - works
+        - references
+        - verifiedClaims
+      minTupleSpecificFacts: 2
+      freshness: valid-and-current
+      duplicate:
+        method: shingle
+        maxSimilarityWithinCluster: 0.86
+      leadImage: warning
+      mode: error
+  depthRoles:
+    1:
+      indexability: index
+    2:
+      indexability: navigation-noindex
+      canonicalTarget: tradeHub
+      follow: true
+      includeInSitemap: false
+      geo: off
+    3:
+      indexability: navigation-noindex
+      canonicalTarget: tradeHub
+      follow: true
+      includeInSitemap: false
+      geo: off
+    4:
+      indexability: evidence-gated
+      localEvidence:
+        minVerifiedFacts: 3
+        minCitySpecificQa: 1
+        minUniqueTokenShare: 0.30
+        maxBodySimilarityWithinBranch: 0.70
+  demandPerDepth:
+    5:
+      minVolume: 20
+      allowIntents: [commercial, transactional]
+      missing: do-not-emit
+      staleAfterDays: 365
+  maxThinShare: 0.4
+  # RFC-0240: the region-hub level (d3) is the regional-hub upsell — suppressed on the base `pseo`
+  # tier and unlocked only when the resolved entitlements report `pseo.regionalUnlocked`.
+  regionalGateDepths: [3]
+
+linking:
+  children: { limit: 12 }
+  siblings: { limit: 8 }
+  teasers:
+    relevance:
+      - { sharedAxis: industry, weight: 5 }
+      - { sharedAxis: demand, weight: 4 }
+      - { sharedAxis: city, weight: 3 }
+
+# RFC-0196 / RFC-0238: Freshness Ledger. Per-depth SLA tuned for five-level cascade.
+freshness:
+  field: lastVerified
+  slaDaysPerDepth: { 0: 3650, 1: 540, 2: 540, 3: 540, 4: 365, 5: 270 }
+  # "all": an aggregate page decays only when every contributing record is stale.
+  mode: all
+
+rotation:
+  variantsByTupleHash: true
+
+projection:
+  title:
+    de: Website erstellen lassen
+
+# RFC-0197/0207: build-time, frozen, provenanced LLM enrichment.
+enrichedFields:
+  - field: narrative
+    promptId: website-local-narrative
+    kind: narrative
+    scope: tuple
+    scopeDepth: 5
+    maxTokens: 800
+  - field: localMarket
+    promptId: local-market-signal
+    kind: field
+    scope: tuple
+    scopeDepth: 5
+    maxTokens: 200

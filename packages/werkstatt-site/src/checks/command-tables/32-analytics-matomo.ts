@@ -27,7 +27,7 @@ export const ANALYTICS_MATOMO_COMMANDS: CheckCommandEntry[] = [
     description: "Validate the tool-independent Warpgogol Messkanon ontology (RFC-0305).",
     scope: "workspace",
     flags: {},
-    reads: ["packages/ontology/analytics/messkanon.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/analytics/messkanon.yaml"],
     execute: runAnalyticsMesskanonValidate,
   },
   {
@@ -36,7 +36,7 @@ export const ANALYTICS_MATOMO_COMMANDS: CheckCommandEntry[] = [
       "Validate the Matomo Binding against Messkanon and secret-free governance rules (RFC-0305).",
     scope: "workspace",
     flags: {},
-    reads: ["packages/ontology/analytics/**"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/analytics/**"],
     execute: runAnalyticsBindingValidate,
   },
   {
@@ -55,7 +55,7 @@ export const ANALYTICS_MATOMO_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: [
       "packages/os/site-kernel-checks/src/analytics/matomo/provisioning.ts",
-      "packages/ontology/analytics/matomo-fleet.registry.yaml",
+      "packages/werkstatt-site/src/domain/ontology/analytics/matomo-fleet.registry.yaml",
     ],
     execute: runMatomoProvisionValidate,
   },

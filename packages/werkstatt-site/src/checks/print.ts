@@ -230,8 +230,10 @@ export async function runPrintLayoutValidate(
   // PRINT-LAYOUT-05: print.css must be referenced in layout-component.astro
   const layoutPath = join(
     "packages",
-    "ui",
+    "werkstatt-site",
     "src",
+    "domain",
+    "ui",
     "components",
     "layout",
     "layout-component.astro",
@@ -253,7 +255,7 @@ export async function runPrintLayoutValidate(
 
   // PRINT-LAYOUT-01: check for position:fixed/sticky without @media print override
   // in shared UI CSS files
-  const uiComponentsDir = join(monorepoRoot, "packages", "ui", "src", "components");
+  const uiComponentsDir = join(monorepoRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components");
   if (existsSync(uiComponentsDir)) {
     scanCssForPrintBlocking(uiComponentsDir, violations);
   }

@@ -130,7 +130,7 @@ const manifestBaseSchema = z.object({
 
   /**
    * RFC-0072 stable archetype identifier used to bind manifests to the central
-   * archetype catalog in packages/ontology/archetypes/sections/.
+   * archetype catalog in packages/werkstatt-site/src/domain/ontology/archetypes/sections/.
    * Supports grouped ids such as "shell.header".
    */
   archetype: archetypeIdSchema,
@@ -230,7 +230,7 @@ export const sectionManifestSchema = manifestBaseSchema.extend({
    * Eliminates the 60–100 lines of duplicated visual/header/body schema that
    * every section manifest used to carry. Fragments are merged in declared
    * order; the manifest's local `propsSchema` (when present) wins over any
-   * composed property. See packages/ontology/src/shared-section-props/index.ts
+   * composed property. See packages/werkstatt-site/src/domain/ontology/src/shared-section-props/index.ts
    * for the catalog. Unknown ids fail manifest.contract.validate.
    */
   propsSchemaCompose: z
@@ -300,7 +300,7 @@ export const componentManifestSchema = manifestBaseSchema.extend({
    *
    * Passport-reserved names (Methone, Bianca, Klarissa, Adrastea, Despina) are
    * EXCLUSIVELY assigned to the five passport components in
-   * packages/ui/src/components/{passport-header,passport-provenance,
+   * packages/werkstatt-site/src/domain/ui/components/{passport-header,passport-provenance,
    * passport-score-grid,passport-star-map,pulsar} (RFC-0028, DNA-31).
    * Do not use these five names for any other component manifest.
    */

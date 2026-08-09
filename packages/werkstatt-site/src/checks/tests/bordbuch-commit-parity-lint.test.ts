@@ -24,10 +24,10 @@ const logger = {
 
 async function fixtureWorkspace(): Promise<{ root: string; context: KernelRuntimeContext }> {
   const root = await mkdtemp(join(tmpdir(), "bordbuch-parity-lint-"));
-  await mkdir(join(root, "packages", "os", "site-kernel-handoff", "src", "bordbuch"), {
+  await mkdir(join(root, "packages", "werkstatt", "src", "bordbuch"), {
     recursive: true,
   });
-  await mkdir(join(root, "packages", "os", "site-kernel-handoff", "src", "mission"), {
+  await mkdir(join(root, "packages", "werkstatt", "src", "mission"), {
     recursive: true,
   });
   const context = {
@@ -63,7 +63,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
 
   it("red fixture: flags direct appendBordbuchEntry call outside whitelist", async () => {
     await writeFile(
-      join(root, "packages", "os", "site-kernel-handoff", "src", "mission", "mission-open.ts"),
+      join(root, "packages", "werkstatt", "src", "mission", "mission-open.ts"),
       'import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";\n\nawait appendBordbuchEntry(\n  workspaceRoot,\n  systemId,\n  "mission-open",\n  brief,\n  actor,\n);\n',
     );
 
@@ -75,7 +75,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
 
   it("green fixture: whitelisted bordbuch-io.ts is not flagged", async () => {
     await writeFile(
-      join(root, "packages", "os", "site-kernel-handoff", "src", "bordbuch", "bordbuch-io.ts"),
+      join(root, "packages", "werkstatt", "src", "bordbuch", "bordbuch-io.ts"),
       "export async function appendBordbuchEntry() { return; }\n",
     );
 
@@ -85,7 +85,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
 
   it("green fixture: whitelisted bordbuch-append.ts is not flagged", async () => {
     await writeFile(
-      join(root, "packages", "os", "site-kernel-handoff", "src", "bordbuch", "bordbuch-append.ts"),
+      join(root, "packages", "werkstatt", "src", "bordbuch", "bordbuch-append.ts"),
       'import { appendBordbuchEntry } from "./bordbuch-io.ts";\n',
     );
 
@@ -112,7 +112,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
   });
 
   it("green fixture: test files are not flagged", async () => {
-    await mkdir(join(root, "packages", "os", "site-kernel-handoff", "src", "bordbuch", "tests"), {
+    await mkdir(join(root, "packages", "werkstatt", "src", "bordbuch", "tests"), {
       recursive: true,
     });
     await writeFile(
@@ -135,7 +135,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
 
   it("warning mode: violations are warnings, not errors", async () => {
     await writeFile(
-      join(root, "packages", "os", "site-kernel-handoff", "src", "mission", "mission-close.ts"),
+      join(root, "packages", "werkstatt", "src", "mission", "mission-close.ts"),
       'await appendBordbuchEntry(workspaceRoot, systemId, "mission-close", summary, actor);\n',
     );
 
@@ -147,7 +147,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
 
   it("green fixture: file using appendAndCommitBordbuch is not flagged", async () => {
     await writeFile(
-      join(root, "packages", "os", "site-kernel-handoff", "src", "mission", "mission-abort.ts"),
+      join(root, "packages", "werkstatt", "src", "mission", "mission-abort.ts"),
       'import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";\n',
     );
 

@@ -75,7 +75,7 @@ export async function runMirrorTriadValidation(
   // Post-RFC-0023: components live in @warpgogol/werkstatt-site/ui with colocated *.types.ts.
   // A component-content file in the app is satisfied by either:
   //   a) a local schemas/components/<name>.ts (legacy app-resident schema), OR
-  //   b) a packages/ui/src/components/<name>/<name>-component.types.ts (canonical post-migration).
+  //   b) a packages/werkstatt-site/src/domain/ui/components/<name>/<name>-component.types.ts (canonical post-migration).
   // Add (b) to the schemaPaths set so the triad accepts package-resident schemas.
   const packagesUiComponentsDir = join(
     paths.appDirectory,

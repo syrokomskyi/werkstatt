@@ -213,7 +213,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     reads: [
       "<app>/src/content/system.md",
       "<app>/src/content/**/*.md",
-      "packages/ontology/biomes/**/*.yaml",
+      "packages/werkstatt-site/src/domain/ontology/biomes/**/*.yaml",
     ],
     writes: ["<app>/public/preview/**", "<app>/public/og-image.png"],
     modulePaths: ["preview-images.ts", "preview-templates.ts", "lib/i18n.ts"],
@@ -228,7 +228,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     mutatesState: true,
     writes: ["<app>/src/styles/fonts.imports.css"],
-    reads: ["<app>/src/content/system.md", "packages/ontology/site-families/**/*.yaml"],
+    reads: ["<app>/src/content/system.md", "packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml"],
     execute: runFontsImportsGenerate,
   },
   {
@@ -256,22 +256,22 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "manifest.contract.validate",
     description:
-      "Validate every *.manifest.yaml in packages/ui/src/{sections,components,pages}/ against @warpgogol/werkstatt-site/ontology manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).",
+      "Validate every *.manifest.yaml in packages/werkstatt-site/src/domain/ui/{sections,components,pages}/ against @warpgogol/werkstatt-site/ontology manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/{sections,components,pages}/**/*.manifest.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml"],
     modulePaths: ["manifest.ts"],
     execute: runManifestContractValidate,
   },
   {
     name: "mirror.quintet.validate",
     description:
-      "Validate every .astro file in packages/ui/src/{sections,components,pages}/ has a colocated *.manifest.yaml — the fifth Mirror Quintet leg (DNA-17, RFC-0023).",
+      "Validate every .astro file in packages/werkstatt-site/src/domain/ui/{sections,components,pages}/ has a colocated *.manifest.yaml — the fifth Mirror Quintet leg (DNA-17, RFC-0023).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/{sections,components,pages}/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.astro"],
     modulePaths: ["manifest.ts"],
     execute: runMirrorQuintetValidate,
   },
@@ -285,7 +285,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     writes: ["uni.registry.yaml"],
     reads: [
-      "packages/ui/src/{sections,components,pages}/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml",
       "<app>/src/content/system.md",
     ],
     modulePaths: ["registry.ts"],
@@ -298,7 +298,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["uni.registry.yaml", "packages/ui/src/{sections,components,pages}/**/*.manifest.yaml"],
+    reads: ["uni.registry.yaml", "packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml"],
     modulePaths: ["registry.ts"],
     execute: runUniRegistryValidate,
   },
@@ -316,13 +316,13 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "archetype.registry.build",
     description:
-      "Build packages/ontology/archetypes/index.yaml from RFC-0072 archetype YAML files.",
+      "Build packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml from RFC-0072 archetype YAML files.",
     scope: "workspace",
     flags: {},
     mutatesState: true,
     supportsAllSites: true,
-    writes: ["packages/ontology/archetypes/index.yaml"],
-    reads: ["packages/ontology/archetypes/**/*.yaml"],
+    writes: ["packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml"],
     modulePaths: ["archetype.ts", "archetype/registry-build.ts", "archetype/shared.ts"],
     execute: runArchetypeRegistryBuild,
   },
@@ -334,9 +334,9 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ontology/archetypes/index.yaml",
-      "packages/ontology/archetypes/**/*.yaml",
-      "packages/ui/src/{sections,components}/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml",
+      "packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml",
+      "packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml",
     ],
     modulePaths: ["archetype.ts", "archetype/registry-build.ts", "archetype/shared.ts"],
     execute: runArchetypeRegistryValidate,
@@ -382,8 +382,8 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     supportsAllSites: true,
     writes: [
-      "packages/ontology/{archetypes,constellations}/**/*.{yaml,yml,md}",
-      "packages/ui/src/{sections,components}/**/*.{yaml,yml,md}",
+      "packages/werkstatt-site/src/domain/ontology/{archetypes,constellations}/**/*.{yaml,yml,md}",
+      "packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.{yaml,yml,md}",
       "apps/**/*.{yaml,yml,md}",
       "onboarding/.output/**/*.{yaml,yml,md}",
     ],
@@ -393,11 +393,11 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "section.contract.validate",
     description:
-      "Validate section folder contract surfaces in packages/ui/src/sections including manifest, astro, css, types/schema, and story files (RFC-0072).",
+      "Validate section folder contract surfaces in packages/werkstatt-site/src/domain/ui/sections including manifest, astro, css, types/schema, and story files (RFC-0072).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**"],
     modulePaths: ["archetype.ts", "archetype/section-contract.ts", "archetype/shared.ts"],
     execute: runSectionContractValidate,
   },
@@ -418,7 +418,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ontology/constellations/**/*.yaml", "packages/ontology/archetypes/**/*.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/constellations/**/*.yaml", "packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml"],
     modulePaths: ["archetype.ts", "archetype/constellation.ts", "archetype/shared.ts"],
     execute: runConstellationContractValidate,
   },
@@ -447,7 +447,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "section.scaffold",
     description:
-      "Generate a starter section folder from an RFC-0072 archetype contract in packages/ui/src/sections.",
+      "Generate a starter section folder from an RFC-0072 archetype contract in packages/werkstatt-site/src/domain/ui/sections.",
     scope: "workspace",
     flags: {
       name: {
@@ -473,7 +473,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     },
     mutatesState: true,
     supportsAllSites: true,
-    writes: ["packages/ui/src/sections/{section-id}/**"],
+    writes: ["packages/werkstatt-site/src/domain/ui/sections/{section-id}/**"],
     cacheable: false,
     execute: runSectionScaffold,
   },
@@ -485,8 +485,8 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ontology/archetypes/**/*.yaml",
-      "packages/ui/src/sections/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml",
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml",
     ],
     modulePaths: ["archetype.ts", "archetype/registry-build.ts", "archetype/shared.ts"],
     execute: runPlanetImportPathsLint,
@@ -536,8 +536,8 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     supportsAllSites: true,
     writes: [
-      "packages/ui/src/sections/{id}/{id}.types.generated.ts",
-      "packages/ui/src/components/{id}/{id}.types.generated.ts",
+      "packages/werkstatt-site/src/domain/ui/sections/{id}/{id}.types.generated.ts",
+      "packages/werkstatt-site/src/domain/ui/components/{id}/{id}.types.generated.ts",
     ],
     flags: {
       "dry-run": {
@@ -545,7 +545,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
         description: "Report what would be written without touching the filesystem.",
       },
     },
-    reads: ["packages/ui/src/{sections,components}/**/*.manifest.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml"],
     execute: runPropsTypesGenerate,
   },
   {
@@ -556,8 +556,8 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: [
-      "packages/ui/src/{sections,components}/**/*.manifest.yaml",
-      "packages/ui/src/{sections,components}/**/*.types.generated.ts",
+      "packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.types.generated.ts",
     ],
     modulePaths: ["props-contract.ts", "result-helpers.ts"],
     execute: runPropsContractValidate,

@@ -25,8 +25,8 @@ describe("section.defaults.validate", () => {
 
   beforeEach(async () => {
     workspaceRoot = await mkdtemp(join(tmpdir(), "sec-def-"));
-    sectionsDir = join(workspaceRoot, "packages", "ui", "src", "sections");
-    componentsDir = join(workspaceRoot, "packages", "ui", "src", "components");
+    sectionsDir = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
+    componentsDir = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components");
     await mkdir(sectionsDir, { recursive: true });
     await mkdir(componentsDir, { recursive: true });
   });

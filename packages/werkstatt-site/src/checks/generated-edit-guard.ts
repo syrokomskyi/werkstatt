@@ -39,7 +39,7 @@ import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-owners
 export const GENERATED_EDIT_EXEMPTIONS: string[] = [];
 
 const EDIT_INSTEAD_PATTERN = /Edit instead: (\S+)/;
-const GENERATOR_SOURCE_ROOTS = ["packages/os/", "packages/ui/"];
+const GENERATOR_SOURCE_ROOTS = ["packages/werkstatt/src/", "packages/werkstatt-site/src/domain/ui/"];
 
 function toPosix(path: string): string {
   return path.replace(/\\/g, "/");

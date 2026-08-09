@@ -101,7 +101,7 @@ const CLAUDE_MODEL = "claude-opus-4-8";
  */
 function createClaudeProvider(apiKey: string): EnrichProvider {
   return async ({ promptId, maxTokens, kind, lang, vars }) => {
-    const promptPath = join("packages", "ontology", "blueprints", "prompts", `${promptId}.md`);
+    const promptPath = join("packages", "werkstatt-site", "src", "domain", "ontology", "blueprints", "prompts", `${promptId}.md`);
     let template = "";
     try {
       template = await readFile(promptPath, "utf8");
@@ -343,7 +343,7 @@ async function loadDataset(
 }
 
 async function loadBlueprints(workspaceRoot: string): Promise<Blueprint[]> {
-  const dir = join(workspaceRoot, "packages", "ontology", "blueprints");
+  const dir = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "blueprints");
   let files: string[];
   try {
     files = (await readdir(dir)).filter((f) => f.endsWith(".yaml") || f.endsWith(".yml"));

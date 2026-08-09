@@ -114,9 +114,9 @@ surface:
     "utf8",
   );
 
-  await mkdir(join(root, "packages", "ontology", "blueprints"), { recursive: true });
+  await mkdir(join(root, "packages", "werkstatt-site", "src", "domain", "ontology", "blueprints"), { recursive: true });
   await writeFile(
-    join(root, "packages", "ontology", "blueprints", "test-hub.yaml"),
+    join(root, "packages", "werkstatt-site", "src", "domain", "ontology", "blueprints", "test-hub.yaml"),
     blueprintYaml,
     "utf8",
   );

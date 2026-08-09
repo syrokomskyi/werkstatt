@@ -118,7 +118,15 @@ async function collectUsedSectionTypes(contentPagesDirectory: string): Promise<S
 async function collectSectionApiDeclarations(
   workspaceRoot: string,
 ): Promise<Map<string, ApiRouteDeclaration[]>> {
-  const sectionsRoot = path.join(workspaceRoot, "packages", "ui", "src", "sections");
+  const sectionsRoot = path.join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ui",
+    "sections",
+  );
   const byKey = new Map<string, ApiRouteDeclaration[]>();
   const manifests = await walkFiles(sectionsRoot, (f) => f.endsWith(".manifest.yaml"));
   for (const manifestPath of manifests) {

@@ -68,9 +68,9 @@ async function collectFilesMatching(
 /** Resolve the scan roots for packages/ui. */
 function getScanRoots(workspaceRoot: string): string[] {
   return [
-    join(workspaceRoot, "packages", "ui", "src", "sections"),
-    join(workspaceRoot, "packages", "ui", "src", "components"),
-    join(workspaceRoot, "packages", "ui", "src", "pages"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "pages"),
   ];
 }
 
@@ -79,7 +79,7 @@ function getScanRoots(workspaceRoot: string): string[] {
 // ---------------------------------------------------------------------------
 
 /**
- * Validates every *.manifest.yaml file found under packages/ui/src/{sections,components,pages}/:
+ * Validates every *.manifest.yaml file found under packages/werkstatt-site/src/domain/ui/{sections,components,pages}/:
  *   1. Parses and validates against @warpgogol/werkstatt-site/ontology manifestSchema (Zod).
  *   2. Checks that a colocated .astro file of the same stem exists.
  */
@@ -128,7 +128,7 @@ export async function runManifestContractValidate(
     }
 
     // 3. Check for colocated .astro — but skip page-layer manifests in
-    //    packages/ui/src/pages/. These are page-archetype catalog descriptors
+    //    packages/werkstatt-site/src/domain/ui/pages/. These are page-archetype catalog descriptors
     //    (Star metadata) and pages are implemented by apps, not packages/ui.
     //    Sections and components keep the colocated .astro contract.
     const layer =
@@ -177,7 +177,7 @@ export async function runManifestContractValidate(
 // ---------------------------------------------------------------------------
 
 /**
- * Validates that every .astro file under packages/ui/src/{sections,components,pages}/
+ * Validates that every .astro file under packages/werkstatt-site/src/domain/ui/{sections,components,pages}/
  * has a colocated <stem>.manifest.yaml file.
  * This is the fifth leg of the Mirror Quintet (DNA-17, RFC-0023).
  *

@@ -57,7 +57,7 @@ export const GrowthConfigSchema = z.object({
   vendor: GrowthVendorConfigSchema,
 
   /**
-   * Funnel ids active for this app, loaded from packages/ontology/growth/funnels/.
+   * Funnel ids active for this app, loaded from packages/werkstatt-site/src/domain/ontology/growth/funnels/.
    * The bootGrowthLayer() client uses this to set up funnel tracking.
    * Empty array = no funnels active.
    */
@@ -65,7 +65,7 @@ export const GrowthConfigSchema = z.object({
 
   /**
    * Active experiment ids for this page render, resolved server-side from
-   * packages/ontology/growth/experiments/ + src/content/system.md growth.experiments[].
+   * packages/werkstatt-site/src/domain/ontology/growth/experiments/ + src/content/system.md growth.experiments[].
    * Empty array = no experiments active on this page.
    */
   activeExperiments: z.array(z.string()).default([]),

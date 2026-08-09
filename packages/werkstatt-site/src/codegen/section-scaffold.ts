@@ -76,7 +76,7 @@ async function pickCosmicName(
   workspaceRoot: string,
   archetype: SectionArchetypeContract,
 ): Promise<string> {
-  const manifestsRoot = join(workspaceRoot, "packages", "ui", "src", "sections");
+  const manifestsRoot = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
   const used = new Set<string>();
   const manifestFiles = await collectFiles(manifestsRoot, {
     extensions: [".manifest.yaml"],
@@ -108,7 +108,7 @@ export async function runSectionScaffold(
   }
 
   const archetype = await loadArchetype(context.workspaceRoot, archetypeId);
-  const sectionDir = join(context.workspaceRoot, "packages", "ui", "src", "sections", slug);
+  const sectionDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections", slug);
   if (await exists(sectionDir)) {
     return {
       exitCode: 1,

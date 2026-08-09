@@ -1,0 +1,27 @@
+id: video-section
+displayName: Video section
+version: 1.0.0
+semanticRole: video-feature
+description: |
+  RFC-0210 video section: a section header (number + heading + subheading), the unified <Media>
+  feature primitive (HLS-first content video with poster + lazy player + captions), and an
+  optional markdown body beneath the video. The single content-video section for thin sites.
+expectedIntents:
+  - demonstrate-expertise
+  - orient-visitor
+expectedIndustryFit: []
+layoutHint: single-column
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+  shape: |
+    z.object({
+      media: z.record(z.unknown()),
+      contentRef: z.string().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Quaoar
+constraints: {}

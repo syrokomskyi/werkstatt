@@ -1,0 +1,135 @@
+id: handwerk-material-warm
+version: 1.0.0
+displayName: Handwerk · Concrete Blueprint
+family: handwerk-trust-engineering
+provenance:
+  client: warpgogol-handwerk
+  selectedConcept: concept-2
+  selectedDirection: 2
+  sourceFiles:
+    - 19-visual-dna.md
+    - 21-directions.md
+    - 24-concepts-concept-2.visual.json
+    - 26-localized-concept.webp
+    - 28-tone-of-voice.md
+axes:
+  warmth: warm
+  contrast: high
+  density: airy
+  typographySharpness: sharp
+  diagramPresence: central
+  photoStance: founder-only
+  motionStance: restrained
+  textContrast: aa
+  cornerRadius: 2px
+  borderWeight: 1px
+palette:
+  brand: "#8B5406"
+  brandHover: "#6B4205"
+  brandContrast: "#FFFFFF"
+  accent: "#8B5406"
+  surface: "#F4F2EE"
+  surfaceMuted: "#E4E2DE"
+  ink: "#1B1D22"
+  inkSoft: "#373A40"
+  inkMuted: "#5C646B"
+  divider: "#C9C9C4"
+  success: "#3E7456"
+  warning: "#D9951B"
+  danger: "#A13F35"
+  info: "#516A84"
+components:
+  heroOverlay: linear-gradient(90deg, rgb(244 242 238 / 0.96) 0%, rgb(244 242 238
+    / 0.82) 45%, rgb(244 242 238 / 0) 60%, rgb(244 242 238 / 0) 100%)
+  heroText: "#1B1D22"
+  surfaceGlass: rgba(244, 242, 238, 0.96)
+  sectionAltBase: "#E4E2DE"
+  sectionAltText: "#1B1D22"
+  sectionAltTextSoft: "#373A40"
+  sectionAltLink: "#7A4D12"
+  sectionAltLinkHover: "#5E3909"
+  sectionAltLinkVisited: "#6A4E5E"
+  sectionAltAccent: "#8B5406"
+  cardBg: "#F8F7F4"
+  cardBorder: "#C9C9C4"
+  cta: "#8B5406"
+  ctaHover: "#9D6208"
+  ctaText: "#FFFFFF"
+  surfaceAlt: "#EFEDE8"
+  textSoftOnDark: rgb(55 58 64 / 0.94)
+  textInverse84: rgb(27 29 34 / 0.84)
+typography:
+  headingFamily: "'Playfair Display', Georgia, serif"
+  bodyFamily: "'Inter', system-ui, sans-serif"
+  monoFamily: "'DM Mono', ui-monospace, monospace"
+  scaleRatio: 1.22
+  baseSize: 17px
+  lineHeightBody: 1.55
+  lineHeightHeading: 1.08
+  measureBody: 66ch
+  measureHeading: 26ch
+  numericFeatures: tnum, lnum
+spacing:
+  base: 8px
+  sectionPaddingY: clamp(56px, 7vw, 104px)
+  containerMaxWidth: 960px
+  gutter: clamp(18px, 3vw, 36px)
+motion:
+  durationFast: 120ms
+  durationMedium: 200ms
+  durationSlow: 360ms
+  easing: cubic-bezier(0.2, 0.0, 0.0, 1.0)
+  reduceMotionRespect: true
+geometry:
+  diagramLineWeight: 1px
+  diagramAccentColor: "#8B5406"
+  decorativeAllowed: false
+shadows:
+  sm: 0 1px 3px rgb(27 29 34 / 0.08)
+  md: 0 10px 24px rgb(27 29 34 / 0.12)
+  lg: 0 18px 44px rgb(27 29 34 / 0.16)
+  xl: 0 34px 72px rgb(27 29 34 / 0.24)
+  glass: 0 14px 34px rgb(27 29 34 / 0.14)
+  glow: 0 0 30px rgb(227 154 36 / 0.26)
+  header: 0 8px 28px rgb(27 29 34 / 0.12)
+  appeal: 0 18px 42px rgb(27 29 34 / 0.16)
+gradients:
+  accent: "linear-gradient(135deg, #A0620E 0%, #6B4205 100%)"
+  primary: "linear-gradient(135deg, #8B5406 0%, #6B4205 100%)"
+  vignetteDark: radial-gradient(circle at center, transparent 0%, rgb(27 29 34 / 0.34) 100%)
+siteBackground:
+  layers:
+    - kind: color
+      color: var(--ds-color-bg)
+    - kind: gradient
+      direction: radial
+      stops:
+        - at: 0
+          color: var(--ds-color-bg)
+          opacity: 0
+        - at: 1
+          color: rgb(27 29 34 / 0.18)
+          opacity: 1
+fonts:
+  - family: Inter
+    package: "@fontsource/inter"
+    weights: [400, 500, 600]
+  - family: Playfair Display
+    package: "@fontsource/playfair-display"
+    weights: [400, 700]
+    italicWeights: [400]
+  - family: DM Mono
+    package: "@fontsource/dm-mono"
+    weights: [300, 400, 500]
+constraints:
+  forbidStockPhotoTags:
+    - hard-hats
+    - generic-handshake
+    - high-five
+  forbidPhrases:
+    - günstig
+    - von 1 €/Tag
+    - Ergebnis garantiert
+  enforceTabularNumeralsIn:
+    - price
+    - stats

@@ -28,7 +28,7 @@ const logger = {
   },
 };
 
-const SCAN_DIR = join("packages", "os", "site-kernel-checks", "src");
+const SCAN_DIR = join("packages", "werkstatt-site", "src", "checks", "src");
 
 async function fixtureWorkspace(): Promise<{ root: string; context: KernelRuntimeContext }> {
   const root = await mkdtemp(join(tmpdir(), "kernel-io-lint-"));

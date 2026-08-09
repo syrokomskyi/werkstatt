@@ -132,7 +132,7 @@ export async function runEffectsCoverageAudit(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
-  const uiSrc = join(context.workspaceRoot, "packages", "ui", "src");
+  const uiSrc = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src");
   const files: string[] = [];
   await walkSourceFiles(join(uiSrc, "sections"), files);
   await walkSourceFiles(join(uiSrc, "components"), files);

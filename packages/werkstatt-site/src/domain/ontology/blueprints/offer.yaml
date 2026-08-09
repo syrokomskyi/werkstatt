@@ -1,0 +1,39 @@
+# Blueprint: offer (RFC-0239)
+# The owning business's own services at /leistungen/ (de) and /uk/posluhy/ (uk).
+# Mode-polymorphic: Bodenstation = Service/studio; Sternsystem = LocalBusiness/client.
+# Gated by the offer entitlement (RFC-0240).
+id: offer
+entitlement: offer
+
+dataset:
+  collection: offers
+  status: active
+
+axes:
+  - id: offer
+    universe: { collection: offers, field: slug }
+    match: { recordField: slug }
+
+levels:
+  - depth: 0
+    slug: { de: leistungen/uebersicht, uk: posluhy/oglyad }
+    redirectToPageId: services
+    constellation: offer-root
+    geo: full
+    titleTemplate: { de: Leistungen, uk: Послуги }
+  - depth: 1
+    slug: { de: "leistungen/{offer}", uk: "posluhy/{offer}" }
+    constellation: offer-detail
+    geo: full
+    titleTemplate: { de: "{offer.name}", uk: "{offer.name}" }
+
+policy:
+  minRecordsPerDepth: { 0: 0, 1: 1 }
+  redirectPolicy: nearest-ancestor
+  trailingSlash: true
+  substanceMin: 24
+  maxThinShare: 0.6
+
+linking:
+  children: { limit: 12 }
+  siblings: { limit: 8 }

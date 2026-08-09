@@ -41,6 +41,14 @@ export async function buildRegistry(config: KernelAppConfig): Promise<KernelRegi
     for (const [moduleName, loader] of Object.entries(config.moduleLoaders)) {
       process.stderr.write(`  [registry] loading module ${moduleName} …\n`);
       const moduleDefinition = await loader();
+      // Skip plugin objects — they are discovered by werkstatt.plugin.validate,
+      // not registered as kernel modules (RFC-0770).
+      if (
+        typeof (moduleDefinition as unknown as { schema?: string }).schema === "string" &&
+        (moduleDefinition as unknown as { schema: string }).schema === "werkstatt/plugin@1"
+      ) {
+        continue;
+      }
       registry.currentModuleName = moduleName;
       await moduleDefinition.register(registry);
     }

@@ -171,13 +171,13 @@ async function collectManifestFiles(dir: string): Promise<string[]> {
   return results;
 }
 
-/** Walk packages/ui/src/{sections,components} and resolve each manifest's composed schema. */
+/** Walk packages/werkstatt-site/src/domain/ui/{sections,components} and resolve each manifest's composed schema. */
 export async function discoverManifestPropsInfo(
   workspaceRoot: string,
 ): Promise<ManifestPropsInfo[]> {
   const roots: Array<{ dir: string; layer: "section" | "component" }> = [
-    { dir: join(workspaceRoot, "packages", "ui", "src", "sections"), layer: "section" },
-    { dir: join(workspaceRoot, "packages", "ui", "src", "components"), layer: "component" },
+    { dir: join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections"), layer: "section" },
+    { dir: join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components"), layer: "component" },
   ];
 
   const infos: ManifestPropsInfo[] = [];

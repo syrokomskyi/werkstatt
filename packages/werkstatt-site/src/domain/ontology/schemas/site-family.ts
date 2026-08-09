@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-Zod schema for site-family definition files under packages/ontology/site-families/<id>/family.yaml.
+Zod schema for site-family definition files under packages/werkstatt-site/src/domain/ontology/site-families/<id>/family.yaml.
 A Site Family captures reusable onboarding recipes: detection signals, candidate biomes,
 candidate constellations, required section archetypes, audit thresholds, and readiness baselines.
 </purpose>

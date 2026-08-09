@@ -76,7 +76,7 @@ async function fixtureWorkspace(
   id: string,
 ): Promise<string> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "props-types-"));
-  const dir = path.join(root, "packages", "ui", "src", layer, id);
+  const dir = path.join(root, "packages", "werkstatt-site", "src", "domain", "ui", "src", layer, id);
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, `${id}.manifest.yaml`), manifestYaml, "utf8");
   return root;

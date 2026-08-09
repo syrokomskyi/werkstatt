@@ -26,7 +26,7 @@ const logger = {
   },
 };
 
-const CHECKS_SRC = ["packages", "os", "site-kernel-checks", "src"];
+const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks", "src"];
 const BASELINE_REL = [...CHECKS_SRC, "diagnostics", "dsl04-baseline.generated.yaml"];
 
 function ctx(

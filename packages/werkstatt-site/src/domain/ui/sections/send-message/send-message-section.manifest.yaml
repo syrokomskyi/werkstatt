@@ -19,7 +19,7 @@ contentTypesPath: ./send-message-section.types.generated.ts
 # on sites that use it, and projects `secrets` into the app's astro:env schema.
 api:
   - route: send-message
-    handler: "@warpgogol/ui/sections/send-message/api"
+    handler: "@warpgogol/werkstatt-site/ui/sections/send-message/api"
     methods:
       - POST
     # RFC-0181: the form only PUBLISHES to QStash EU; channel/CRM fan-out happens in
@@ -31,7 +31,7 @@ api:
   # chat-widget entry; api.routes.generate dedupes by route) so a form-only site — with
   # no chat widget — still emits /api/integration-route for QStash to call back.
   - route: integration-route
-    handler: "@warpgogol/ui/sections/chat-widget/delivery-api"
+    handler: "@warpgogol/werkstatt-site/ui/sections/chat-widget/delivery-api"
     methods:
       - POST
     secrets:

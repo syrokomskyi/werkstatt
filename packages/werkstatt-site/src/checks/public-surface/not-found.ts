@@ -40,8 +40,10 @@ export async function runNotFoundValidate(
   const componentPath = join(
     context.workspaceRoot,
     "packages",
-    "ui",
+    "werkstatt-site",
     "src",
+    "domain",
+    "ui",
     "components",
     "not-found",
     "not-found-component.astro",
@@ -49,8 +51,10 @@ export async function runNotFoundValidate(
   const cssPath = join(
     context.workspaceRoot,
     "packages",
-    "ui",
+    "werkstatt-site",
     "src",
+    "domain",
+    "ui",
     "components",
     "not-found",
     "not-found-component.css",
@@ -79,11 +83,14 @@ export async function runNotFoundValidate(
           "Regenerate via routes.generate unless the owner intentionally converts it to project-specific ownership.",
       });
     }
-    if (!route.includes("@warpgogol/werkstatt-site/ui/components/not-found/not-found-component.astro")) {
+    if (
+      !route.includes("@warpgogol/werkstatt-site/ui/components/not-found/not-found-component.astro")
+    ) {
       messages.push({
         severity: "error",
         file: workspaceRel(context, routePath),
-        message: "src/pages/404.astro must import the shared @warpgogol/werkstatt-site/ui not-found component.",
+        message:
+          "src/pages/404.astro must import the shared @warpgogol/werkstatt-site/ui not-found component.",
         fixHint: "Regenerate via routes.generate.",
       });
     }
@@ -109,7 +116,7 @@ export async function runNotFoundValidate(
       severity: "error",
       file: workspaceRel(context, componentPath),
       message: "Shared not-found component and CSS must exist in @warpgogol/werkstatt-site/ui.",
-      fixHint: "Add packages/ui/src/components/not-found/not-found-component.astro and .css.",
+      fixHint: "Add packages/werkstatt-site/src/domain/ui/components/not-found/not-found-component.astro and .css.",
     });
   }
   return diagnostics("not-found.validate", messages);

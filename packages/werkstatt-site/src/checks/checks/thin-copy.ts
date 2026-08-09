@@ -349,7 +349,7 @@ export async function runSharedUiThinCopyValidation(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<{ checkedFiles: number }>> {
-  const uiSectionsDirectory = join(context.workspaceRoot, "packages", "ui", "src", "sections");
+  const uiSectionsDirectory = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
   const ignoredDirectoryPaths = new Set<string>();
   const result = await collectThinCopyViolations({
     baseDirectory: context.workspaceRoot,
@@ -358,7 +358,7 @@ export async function runSharedUiThinCopyValidation(
   });
 
   const ignoredRelativePaths = new Set([
-    "packages/ui/src/sections/breadcrumbs/breadcrumbs-section.astro",
+    "packages/werkstatt-site/src/domain/ui/sections/breadcrumbs/breadcrumbs-section.astro",
   ]);
   const filteredViolations = result.violations.filter(
     (violation) => !ignoredRelativePaths.has(violation.filePath),

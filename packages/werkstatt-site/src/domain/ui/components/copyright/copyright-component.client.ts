@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Maintains packages/ui/src/components/copyright/copyright-component.client.ts as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
+<purpose>Maintains packages/werkstatt-site/src/domain/ui/components/copyright/copyright-component.client.ts as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
 <non-goals>
   <item>Do not handle server-side rendering or framework hydration.</item>
   <item>Do not modify yearFirst elements per RFC-0005.</item>

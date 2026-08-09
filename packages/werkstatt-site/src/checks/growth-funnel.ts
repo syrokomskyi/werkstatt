@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-growth.funnel.validate — validates funnel definitions in packages/ontology/growth/funnels/
+growth.funnel.validate — validates funnel definitions in packages/werkstatt-site/src/domain/ontology/growth/funnels/
 and cross-references funnels declared in system.md growth.funnels[] (DNA-28, RFC-0027).
 </purpose>
 <non-goals>
@@ -36,7 +36,7 @@ export async function runGrowthFunnelValidate(
 
   const appDir = context.site?.directory ?? process.cwd();
   const repoRoot = join(appDir, "..", "..");
-  const funnelsDir = join(repoRoot, "packages", "ontology", "growth", "funnels");
+  const funnelsDir = join(repoRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "growth", "funnels");
 
   // Part 1: Validate all funnel YAML files
   const knownFunnelIds = new Set<string>();
@@ -51,7 +51,7 @@ export async function runGrowthFunnelValidate(
       }
 
       const filePath = join(funnelsDir, entry.name);
-      const rel = `packages/ontology/growth/funnels/${entry.name}`;
+      const rel = `packages/werkstatt-site/src/domain/ontology/growth/funnels/${entry.name}`;
 
       let rawContent: string;
       try {
@@ -127,7 +127,7 @@ export async function runGrowthFunnelValidate(
       for (const funnelId of funnelIds) {
         if (!knownFunnelIds.has(funnelId)) {
           violations.push(
-            `GF-07: system.md growth.funnels[] references "${funnelId}" but no matching file found in packages/ontology/growth/funnels/`,
+            `GF-07: system.md growth.funnels[] references "${funnelId}" but no matching file found in packages/werkstatt-site/src/domain/ontology/growth/funnels/`,
           );
         }
       }

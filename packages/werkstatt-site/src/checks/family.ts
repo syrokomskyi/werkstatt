@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 Implements RFC-0071 site-family validation and discovery commands.
-Validates packages/ontology/site-families/<id>/family.yaml and lists family metadata
+Validates packages/werkstatt-site/src/domain/ontology/site-families/<id>/family.yaml and lists family metadata
 for workflow-time onboarding decisions.
 </purpose>
 <non-goals>
@@ -19,7 +19,11 @@ import { access, readdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import YAML from "yaml";
-import { SiteFamilyContract, biomeSchema, constellationSchema } from "@warpgogol/werkstatt-site/ontology";
+import {
+  SiteFamilyContract,
+  biomeSchema,
+  constellationSchema,
+} from "@warpgogol/werkstatt-site/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -77,14 +81,33 @@ async function listFamilyDirs(root: string): Promise<string[]> {
 }
 
 function hasArchetypeCatalog(workspaceRoot: string): boolean {
-  return existsSync(join(workspaceRoot, "packages", "ontology", "archetypes", "sections"));
+  return existsSync(
+    join(
+      workspaceRoot,
+      "packages",
+      "werkstatt-site",
+      "src",
+      "domain",
+      "ontology",
+      "archetypes",
+      "sections",
+    ),
+  );
 }
 
 export async function runFamilyContractValidate(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<FamilyContractData>> {
-  const familiesRoot = join(context.workspaceRoot, "packages", "ontology", "site-families");
+  const familiesRoot = join(
+    context.workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "site-families",
+  );
   const familyDirs = await listFamilyDirs(familiesRoot);
   const violations: FamilyViolation[] = [];
   const archetypeCatalogPresent = hasArchetypeCatalog(context.workspaceRoot);
@@ -238,7 +261,15 @@ export async function runFamilyList(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<FamilyListData>> {
-  const familiesRoot = join(context.workspaceRoot, "packages", "ontology", "site-families");
+  const familiesRoot = join(
+    context.workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "site-families",
+  );
   const familyDirs = await listFamilyDirs(familiesRoot);
   const families: FamilyListEntry[] = [];
 

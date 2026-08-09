@@ -1,0 +1,48 @@
+id: people
+displayName: People
+version: 2.0.0
+semanticRole: people
+description: |
+  RFC-0200 People section. Data-driven: renders canonical Person records selected
+  by slug / affiliation / all — no inline member data. `grid` layout shows a
+  PersonProfile card per person; `spotlight` shows a single featured person
+  (location, stats, statement, CTA) and replaces the former founder-trust-card.
+  When a shown person has a live profile page, the card links to it.
+expectedIntents:
+  - humanise-brand
+  - introduce-team
+  - attribute-ownership
+  - build-trust
+expectedIndustryFit:
+  - non-profit
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+layoutHint: card-grid
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+  shape: |
+    z.object({
+      layout: z.enum(["grid", "spotlight"]).optional(),
+      select: z.object({
+        slugs: z.array(z.string().min(1)).optional(),
+        affiliation: z.enum(["founder", "board", "team", "patron", "author"]).optional(),
+        all: z.boolean().optional(),
+      }).strict(),
+      showRole: z.boolean().optional(),
+      linkToProfile: z.boolean().optional(),
+      defaultImageFade: z.object({
+        top: z.boolean().optional(),
+        bottom: z.boolean().optional(),
+        left: z.boolean().optional(),
+        right: z.boolean().optional(),
+        width: z.number().min(0).max(0.5).optional(),
+      }).strict().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Mimas
+constraints: {}

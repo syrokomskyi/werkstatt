@@ -48,11 +48,11 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "agent.capability.validate",
     description:
-      "Validate the closed capability catalog (packages/ontology/capabilities/) and enforce human-parity + gating for capabilities active on this app (RFC-0288, AGC-01..05).",
+      "Validate the closed capability catalog (packages/werkstatt-site/src/domain/ontology/capabilities/) and enforce human-parity + gating for capabilities active on this app (RFC-0288, AGC-01..05).",
     scope: "app",
     supportsAllSites: true,
     flags: {},
-    reads: ["packages/ontology/capabilities/**/*.yaml", "<app>/src/content/system.md"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/capabilities/**/*.yaml", "<app>/src/content/system.md"],
     modulePaths: ["agent/agent-capability.ts"],
     execute: runAgentCapabilityValidate,
   },

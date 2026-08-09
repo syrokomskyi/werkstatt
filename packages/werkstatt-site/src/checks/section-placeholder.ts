@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 Implements section.placeholder.lint — fails any section component in
-packages/ui/src/sections that still renders pageOverride via
+packages/werkstatt-site/src/domain/ui/sections that still renders pageOverride via
 JSON.stringify, the section-scaffold stub. Shipping such a section
 produces the raw-JSON-on-page failure mode (RFC-0093).
 </purpose>
@@ -45,7 +45,7 @@ export async function runSectionPlaceholderLint(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const workspaceRoot = context.workspaceRoot;
-  const sectionsDir = join(workspaceRoot, "packages", "ui", "src", "sections");
+  const sectionsDir = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
 
   try {
     statSync(sectionsDir);

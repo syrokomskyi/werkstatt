@@ -98,7 +98,7 @@ function extractFrontmatter(content: string): Record<string, unknown> | null {
 
 async function collectMoonManifests(uiPackagePath: string): Promise<Map<string, ManifestInfo>> {
   const manifests = new Map<string, ManifestInfo>();
-  const componentsDir = path.join(uiPackagePath, "src", "components");
+  const componentsDir = path.join(uiPackagePath, "components");
 
   let componentDirs: string[];
   try {
@@ -294,7 +294,14 @@ export async function runPageShellValidate(
   const pages = (frontmatter.pages ?? []) as PageEntry[];
 
   // Collect MoonCatalog manifests from packages/ui
-  const uiPackagePath = path.join(workspaceRoot, "packages", "ui");
+  const uiPackagePath = path.join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ui",
+  );
   const moonManifests = await collectMoonManifests(uiPackagePath);
 
   let shellBlocksFound = 0;

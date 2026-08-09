@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>[RFC-0192/0193] Blueprint discovery: reads + validates the Blueprint YAML specs from
-packages/ontology/blueprints, and reads a site's declared blueprint opt-ins from system.md.</purpose>
+packages/werkstatt-site/src/domain/ontology/blueprints, and reads a site's declared blueprint opt-ins from system.md.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -15,7 +15,14 @@ import { join } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import { parseBlueprint, type Blueprint } from "@warpgogol/werkstatt-site/surface";
 
-const BLUEPRINTS_DIR = join("packages", "ontology", "blueprints");
+const BLUEPRINTS_DIR = join(
+  "packages",
+  "werkstatt-site",
+  "src",
+  "domain",
+  "ontology",
+  "blueprints",
+);
 
 /**
  * RFC-0193: the Blueprint ids a site explicitly adopts via system.md `surface.blueprints`.

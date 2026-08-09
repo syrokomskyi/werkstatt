@@ -24,9 +24,9 @@ import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const WHITELISTED_FILES = new Set([
-  "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts",
-  "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-append.ts",
-  "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit-helper.ts",
+  "packages/werkstatt/src/bordbuch/bordbuch-io.ts",
+  "packages/werkstatt/src/bordbuch/bordbuch-append.ts",
+  "packages/werkstatt/src/bordbuch/bordbuch-commit-helper.ts",
 ]);
 
 const APPEND_CALL_PATTERN = /\bappendBordbuchEntry\s*\(/;

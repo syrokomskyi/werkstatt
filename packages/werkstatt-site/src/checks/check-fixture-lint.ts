@@ -29,7 +29,7 @@ import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { ALL_COMMANDS } from "./command-tables/index.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 
-const CHECKS_SRC = ["packages", "os", "site-kernel-checks", "src"];
+const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks", "src"];
 const COMMAND_TABLES_DIR = [...CHECKS_SRC, "command-tables"];
 const TESTS_DIR = [...CHECKS_SRC, "tests"];
 

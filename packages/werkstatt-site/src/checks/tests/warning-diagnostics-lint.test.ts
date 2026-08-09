@@ -30,7 +30,7 @@ function ctx(root: string): KernelRuntimeContext {
 
 async function setupFixture(source: string): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "warning-diagnostics-"));
-  const src = join(root, "packages", "os", "site-kernel-checks", "src");
+  const src = join(root, "packages", "werkstatt-site", "src", "checks", "src");
   await mkdir(src, { recursive: true });
   await writeFile(join(src, "sample.ts"), source, "utf8");
   return root;

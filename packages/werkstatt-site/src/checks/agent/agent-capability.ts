@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0288: agent.capability.validate loads the closed capability catalog
-(packages/ontology/capabilities/*.yaml), validates each record against the
+(packages/werkstatt-site/src/domain/ontology/capabilities/*.yaml), validates each record against the
 schema, and enforces the contract for capabilities active on the current app:
 AS-2 human-parity (humanEquivalent section must render), required-sections
 presence, extra-entitlement gating, and unknown ids in agent.actionsDisabled.
@@ -37,7 +37,7 @@ import { resolveActiveCapabilities } from "@warpgogol/werkstatt-site/share/agent
 import { readEntitledFeatures } from "../lib/entitlements.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 
-const CAPABILITIES_DIR = join("packages", "ontology", "capabilities");
+const CAPABILITIES_DIR = join("packages", "werkstatt-site", "src", "domain", "ontology", "capabilities");
 
 interface LoadedCatalog {
   records: CapabilityRecord[];
@@ -164,7 +164,7 @@ export async function runAgentCapabilityValidate(
         file: "src/content/system.md",
         message: `agent.actionsDisabled names unknown capability id "${id}".`,
         fixHint:
-          "Remove it, or fix the id to match a capability in packages/ontology/capabilities/.",
+          "Remove it, or fix the id to match a capability in packages/werkstatt-site/src/domain/ontology/capabilities/.",
       });
     }
   }

@@ -33,7 +33,7 @@ export const PAGE_RUNTIME_COMMANDS: CheckCommandEntry[] = [
     reads: [
       "<app>/src/content/system.md",
       "<app>/src/content/pages/**/*.md",
-      "packages/ui/src/sections/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml",
     ],
     execute: runPageBlockValidate,
   },
@@ -86,7 +86,7 @@ export const PAGE_RUNTIME_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/share/src/**/*.ts", "packages/ui/src/**/*.ts"],
+    reads: ["packages/share/src/**/*.ts", "packages/werkstatt-site/src/domain/ui/**/*.ts"],
     execute: runRuntimeContextShape,
   },
   /* RFC-0036: Shell-level block validation */
@@ -97,7 +97,7 @@ export const PAGE_RUNTIME_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/content/system.md", "packages/ui/src/components/**/*.manifest.yaml"],
+    reads: ["<app>/src/content/system.md", "packages/werkstatt-site/src/domain/ui/components/**/*.manifest.yaml"],
     execute: runPageShellValidate,
   },
   /* RFC-0090: content.filename.validate */

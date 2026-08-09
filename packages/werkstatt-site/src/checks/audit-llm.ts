@@ -137,7 +137,7 @@ export async function runAuditLlm(
   const started = Date.now();
   const kind = auditLlmKindSchema.parse(readFlag(input, "kind") ?? input.flags["kind"]);
   const audit = await loadAuditAppContext(context);
-  const packageRoot = join(context.workspaceRoot, "packages", "os", "site-kernel-checks");
+  const packageRoot = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "checks");
   const archetypeId = readFlag(input, "archetype");
 
   if (kind === "archetype-lens" && !archetypeId) {

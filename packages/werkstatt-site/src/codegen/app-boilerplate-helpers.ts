@@ -27,7 +27,7 @@ import type { SystemManifest } from "@warpgogol/werkstatt-site/content";
 import { hasGeneratedMarker } from "./generated-marker.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMPLATES_DIR = path.join(__dirname, "..", "src", "templates", "app-boilerplate");
+const TEMPLATES_DIR = path.join(__dirname, "templates", "app-boilerplate");
 
 export type WarningEntry = {
   file: string;
@@ -276,7 +276,7 @@ export function getDefaultLanguage(manifest: SystemManifest): string {
 }
 
 export function getBiomeDisplayName(workspaceRoot: string, biomeId: string): string {
-  const biomePath = path.join(workspaceRoot, "packages", "ontology", "biomes", `${biomeId}.yaml`);
+  const biomePath = path.join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "biomes", `${biomeId}.yaml`);
   try {
     const raw = readFileSync(biomePath, "utf8");
     const match = raw.match(/^displayName:\s*['"]?(.+?)['"]?\s*$/m);

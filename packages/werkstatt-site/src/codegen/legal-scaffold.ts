@@ -34,7 +34,7 @@ const DE_LOCALES = new Set(["de", "de-DE", "de-AT", "de-CH"]);
 // __dirname is dist/ at runtime; templates ship in src/ alongside (matches
 // the convention used by app-boilerplate.ts).
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMPLATE_DIR = path.join(__dirname, "..", "src", "templates", "legal", "de");
+const TEMPLATE_DIR = path.join(__dirname, "templates", "legal", "de");
 
 interface RenderValues {
   COSMIC_STAR: string;

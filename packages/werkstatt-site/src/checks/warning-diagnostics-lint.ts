@@ -68,7 +68,7 @@ export async function runWarningDiagnosticsLint(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult>> {
-  const checksDir = join(context.workspaceRoot, "packages", "os", "site-kernel-checks", "src");
+  const checksDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "checks", "src");
   let files: string[];
   try {
     files = await collectTypeScriptFiles(checksDir);

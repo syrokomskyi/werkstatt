@@ -76,7 +76,7 @@ async function withTempApp(
 ): Promise<void> {
   const root = await mkdtemp(join(tmpdir(), "intersection-validate-"));
   const appDir = join(root, "apps", "test-app");
-  const bpDir = join(root, "packages", "ontology", "blueprints");
+  const bpDir = join(root, "packages", "werkstatt-site", "src", "domain", "ontology", "blueprints");
   await mkdir(bpDir, { recursive: true });
   await writeFile(join(bpDir, "website-local.yaml"), WEBSITE_LOCAL_BLUEPRINT, "utf8");
   const context = makeTestSiteContext(root, appDir);

@@ -3,7 +3,7 @@
 <purpose>
   [RFC-0193] Zod schema for the Blueprint contract (the declarative surface spec). Co-located with
   the Blueprint type in @warpgogol/werkstatt-site/surface to avoid a package cycle (the engine owns its own contract).
-  The Blueprint YAML data files live in packages/ontology/blueprints/*.yaml; this schema validates
+  The Blueprint YAML data files live in packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml; this schema validates
   them in blueprint.validate and during surface.generate expansion.
 </purpose>
 <non-goals>

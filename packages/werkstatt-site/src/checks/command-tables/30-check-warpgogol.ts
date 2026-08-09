@@ -155,7 +155,7 @@ export const CHECK_WEBGOGOL_COMMANDS: CheckCommandEntry[] = [
         description: "Path to an audience profile YAML file.",
       },
     },
-    reads: ["packages/ontology/check-audiences/**"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/check-audiences/**"],
     execute: runCheckAudienceProfileValidate,
   },
   {
@@ -183,7 +183,7 @@ export const CHECK_WEBGOGOL_COMMANDS: CheckCommandEntry[] = [
         description: "Regenerate even when audience-review.json already exists.",
       },
     },
-    reads: [".check-warpgogol/runs/**", "packages/ontology/check-audiences/**"],
+    reads: [".check-warpgogol/runs/**", "packages/werkstatt-site/src/domain/ontology/check-audiences/**"],
     writes: [".check-warpgogol/runs/**"],
     execute: runCheckAudienceReviewRun,
   },

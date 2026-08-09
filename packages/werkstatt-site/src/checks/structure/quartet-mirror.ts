@@ -199,12 +199,12 @@ export async function runQuartetMirrorValidation(
     }
   }
 
-  // Wave 7 (RFC-0023): Also scan packages/ui/src/{sections,components}/ for components that
+  // Wave 7 (RFC-0023): Also scan packages/werkstatt-site/src/domain/ui/{sections,components}/ for components that
   // have been promoted to the shared package. Their schema + content files stay in the app;
   // only the .astro and colocated CSS live in the package. We register their logical paths in
   // astroPaths so Q-01 does not fire, and record their colocated CSS paths so Q-04 can find them.
-  const uiPackageSectionsDir = join(context.workspaceRoot, "packages", "ui", "src", "sections");
-  const uiPackageComponentsDir = join(context.workspaceRoot, "packages", "ui", "src", "components");
+  const uiPackageSectionsDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
+  const uiPackageComponentsDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components");
   // Maps physical stem (e.g. "section/hero-section") → absolute path of colocated CSS
   const uiColocatedCssMap = new Map<string, string>();
 

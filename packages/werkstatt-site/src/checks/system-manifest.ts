@@ -70,7 +70,7 @@ export async function runSystemManifestValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<SystemManifestResult>> {
   const appsDir = join(context.workspaceRoot, "apps");
-  const constellationsDir = join(context.workspaceRoot, "packages", "ontology", "constellations");
+  const constellationsDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "constellations");
 
   let appEntries: string[] = [];
   try {
@@ -137,8 +137,8 @@ export async function runSystemManifestValidate(
     const errors: string[] = [];
 
     // 2. Check systemStar is used in at least one page manifest
-    // Page manifests live in packages/ui/src/pages/ (RFC-0023), not in apps/*/src/
-    const pagesDir = join(context.workspaceRoot, "packages", "ui", "src", "pages");
+    // Page manifests live in packages/werkstatt-site/src/domain/ui/pages/ (RFC-0023), not in apps/*/src/
+    const pagesDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "pages");
     const pageCosmicNames = new Set<string>();
 
     try {
@@ -160,7 +160,7 @@ export async function runSystemManifestValidate(
     if (!pageCosmicNames.has(system.identity.systemStar)) {
       const msg =
         `identity.systemStar "${system.identity.systemStar}" is not used as cosmicName ` +
-        `in any page manifest in packages/ui/src/pages/`;
+        `in any page manifest in packages/werkstatt-site/src/domain/ui/pages/`;
       errors.push(msg);
       context.logger.error(`${rel}: ${msg}`);
     }
@@ -169,7 +169,7 @@ export async function runSystemManifestValidate(
     for (const slug of system.constellations ?? []) {
       const constellationPath = join(constellationsDir, `${slug}.yaml`);
       if (!(await fileExists(constellationPath))) {
-        const msg = `constellations[] entry "${slug}" has no matching packages/ontology/constellations/${slug}.yaml`;
+        const msg = `constellations[] entry "${slug}" has no matching packages/werkstatt-site/src/domain/ontology/constellations/${slug}.yaml`;
         errors.push(msg);
         context.logger.error(`${rel}: ${msg}`);
       }
@@ -249,7 +249,7 @@ export async function runConstellationComposeValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<ComposeResult>> {
   const appsDir = join(context.workspaceRoot, "apps");
-  const constellationsDir = join(context.workspaceRoot, "packages", "ontology", "constellations");
+  const constellationsDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "constellations");
 
   let appEntries: string[] = [];
   try {

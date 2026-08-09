@@ -20,7 +20,7 @@ import {
 </MODULE_CONTRACT>
 */
 
-const CHECKS_SRC = ["packages", "os", "site-kernel-checks", "src"];
+const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks", "src"];
 
 async function setupCommandTableFixture(tableSource: string): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "check-fixture-lint-"));

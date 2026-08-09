@@ -22,7 +22,7 @@ import {
   type Manifest,
 } from "@warpgogol/werkstatt-site/ontology";
 
-export const ARCHETYPE_REGISTRY_FILENAME = "packages/ontology/archetypes/index.yaml";
+export const ARCHETYPE_REGISTRY_FILENAME = "packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml";
 
 // RFC-0108 §"Proposal E" + RFC-0130: structural primitives introduced by
 // RFC-0101..RFC-0106. They carry component manifests so the cosmic catalog +
@@ -81,7 +81,7 @@ export interface ArchetypeRegistry {
   planetImportPaths: Record<string, string>;
   blockTypeToCosmicName: Record<string, string>;
   // RFC-0097: derived map of shell-component cosmicName → import path.
-  // Sourced from every shell.* archetype manifest under packages/ui/src/components/.
+  // Sourced from every shell.* archetype manifest under packages/werkstatt-site/src/domain/ui/components/.
   moonImportPaths: Record<string, string>;
   // RFC-0263: derived map of cosmicName → the manifest's own authored `role`
   // field (not the archetype's semanticRole). Lets dispatch code (buildPage)
@@ -116,7 +116,7 @@ export async function loadArchetypeFiles(workspaceRoot: string) {
   // schema does not carry a `layer` field — layer is derived from which
   // directory the YAML lives in. The returned `layer` tag enables the
   // strengthened cross-catalog validator below.
-  const archetypeRoot = join(workspaceRoot, "packages", "ontology", "archetypes");
+  const archetypeRoot = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "archetypes");
   const layerDirs: Array<{ layer: ArchetypeLayer; dir: string }> = [
     { layer: "section", dir: join(archetypeRoot, "sections") },
     { layer: "component", dir: join(archetypeRoot, "components") },
@@ -142,8 +142,8 @@ export async function loadArchetypeFiles(workspaceRoot: string) {
 
 export async function loadUiManifestFiles(workspaceRoot: string) {
   const roots = [
-    join(workspaceRoot, "packages", "ui", "src", "sections"),
-    join(workspaceRoot, "packages", "ui", "src", "components"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "sections"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "components"),
   ];
   const manifestFiles: string[] = [];
   for (const root of roots) {

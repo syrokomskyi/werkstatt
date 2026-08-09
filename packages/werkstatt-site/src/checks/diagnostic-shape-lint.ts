@@ -81,7 +81,7 @@ export async function runDiagnosticShapeLint(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult | { file: string; files: number }>> {
-  const checksDir = join(context.workspaceRoot, "packages", "os", "site-kernel-checks", "src");
+  const checksDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "checks", "src");
 
   let files: string[];
   try {

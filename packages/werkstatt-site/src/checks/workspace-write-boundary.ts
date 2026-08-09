@@ -4,7 +4,7 @@
   RFC-0258 workspace-write-boundary lint. Enforces the fourth generator
   invariant introduced by RFC-0258 (parallel-safe) on top of the RFC-0087
   single-owner invariant: every kernel command that writes a file outside its
-  target app directory (workspace root, docs/, packages/ontology/) MUST be
+  target app directory (workspace root, docs/, packages/werkstatt-site/src/domain/ontology/) MUST be
   declared on SHARED_WRITE_ALLOWLIST and MUST write through writeFileAtomic
   or the writeFileIfChanged wrapper from @warpgogol/site-kernel — never a raw
   node:fs/promises writeFile/writeFileSync.
@@ -39,7 +39,7 @@ import { SITES_BUILD_POST_PIPELINE } from "./pipelines/build-post.ts";
 // ---------------------------------------------------------------------------
 // SHARED_WRITE_ALLOWLIST
 // RFC-0258: every kernel command that writes a workspace-shared file (workspace
-// root, docs/, packages/ontology/) must be declared here AND write through
+// root, docs/, packages/werkstatt-site/src/domain/ontology/) must be declared here AND write through
 // writeFileAtomic. Add an entry in the same commit that introduces a new
 // shared writer.
 // ---------------------------------------------------------------------------
@@ -61,7 +61,7 @@ export const SHARED_WRITE_ALLOWLIST: SharedWriteEntry[] = [
   },
   {
     command: "archetype.registry.build",
-    outputs: ["packages/ontology/archetypes/index.yaml"],
+    outputs: ["packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml"],
     module: "packages/os/site-kernel-checks/src/archetype/registry-build.ts",
   },
   {

@@ -201,7 +201,7 @@ describe("surface.doorway-risk.report", () => {
   it("emits warnings (not errors) when dossier mode is warn (RFC-0516)", async () => {
     await withTempApp(async (root, appDir, context) => {
       // Write a valid blueprint with mode: warn
-      const bpDir = join(root, "packages", "ontology", "blueprints");
+      const bpDir = join(root, "packages", "werkstatt-site", "src", "domain", "ontology", "blueprints");
       await mkdir(bpDir, { recursive: true });
       await writeFile(
         join(bpDir, "website-local.yaml"),

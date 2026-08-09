@@ -457,7 +457,7 @@ export function buildCycloneDxSbom(components: SbomComponent[]): string {
 // ─── Template helpers ──────────────────────────────────────────────────────────
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const TEMPLATES_DIR = path.join(__dirname, "..", "src", "templates", "service");
+const TEMPLATES_DIR = path.join(__dirname, "templates", "service");
 
 function readTemplate(templatePath: string): string {
   return readFileSync(path.join(TEMPLATES_DIR, templatePath), "utf8");

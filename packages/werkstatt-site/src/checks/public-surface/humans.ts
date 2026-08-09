@@ -96,8 +96,10 @@ export async function runHumansValidate(
   const layoutPath = join(
     context.workspaceRoot,
     "packages",
-    "ui",
+    "werkstatt-site",
     "src",
+    "domain",
+    "ui",
     "components",
     "layout",
     "layout-component.astro",

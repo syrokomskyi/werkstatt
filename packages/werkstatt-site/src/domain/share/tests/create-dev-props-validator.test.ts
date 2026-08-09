@@ -5,7 +5,7 @@ import { createDevPropsValidator } from "../dev-props-validator.ts";
 <MODULE_CONTRACT>
 <purpose>
   RFC-0262: end-to-end test of createDevPropsValidator against the real
-  packages/ui/src/sections/hero manifest (this test runs from within the
+  packages/werkstatt-site/src/domain/ui/sections/hero manifest (this test runs from within the
   actual monorepo checkout, so workspace-root discovery resolves for real).
 </purpose>
 </MODULE_CONTRACT>

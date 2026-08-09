@@ -85,10 +85,10 @@ interface CosmicNameRenameResult {
 }
 
 const COSMIC_RENAME_SCAN_ROOTS = [
-  "packages/ontology/archetypes",
-  "packages/ontology/constellations",
-  "packages/ui/src/sections",
-  "packages/ui/src/components",
+  "packages/werkstatt-site/src/domain/ontology/archetypes",
+  "packages/werkstatt-site/src/domain/ontology/constellations",
+  "packages/werkstatt-site/src/domain/ui/sections",
+  "packages/werkstatt-site/src/domain/ui/components",
   "apps",
   "onboarding/.output",
 ] as const;
@@ -194,7 +194,7 @@ export async function runCosmicNameRename(
   }
 
   // Pre-flight: every candidate file that mentions --from must either carry the
-  // GENERATED marker OR live under packages/ontology/ (canonical source-of-truth
+  // GENERATED marker OR live under packages/werkstatt-site/src/domain/ontology/ (canonical source-of-truth
   // YAMLs) OR under onboarding/.output/ (agent-authored artifacts). Anything
   // else is treated as a project-specific edit and the command refuses to
   // overwrite it.
@@ -218,10 +218,10 @@ export async function runCosmicNameRename(
     //   - section/component manifests + stories (managed by section.scaffold)
     //   - per-app compiled system.md (managed by system-md.compile)
     //   - onboarding output artifacts (agent-authored, RFC-0076)
-    const isCanonicalOntology = relPath.startsWith("packages/ontology/");
+    const isCanonicalOntology = relPath.startsWith("packages/werkstatt-site/src/domain/ontology/");
     const isUiSectionOrComponent =
-      relPath.startsWith("packages/ui/src/sections/") ||
-      relPath.startsWith("packages/ui/src/components/");
+      relPath.startsWith("packages/werkstatt-site/src/domain/ui/sections/") ||
+      relPath.startsWith("packages/werkstatt-site/src/domain/ui/components/");
     const isCompiledSystemMd = /^apps\/[^/]+\/src\/content\/system\.md$/.test(relPath);
     const isAgentArtifact = relPath.startsWith("onboarding/.output/");
     const isCatalogManaged =

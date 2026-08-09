@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0288: the closed capability catalog record schema — one YAML file per
-AI-agent-invocable action (packages/ontology/capabilities/*.yaml). The
+AI-agent-invocable action (packages/werkstatt-site/src/domain/ontology/capabilities/*.yaml). The
 input/output shape is a deliberately closed JSON-Schema subset chosen for
 lossless projection to both OpenAPI (RFC-0289) and MCP tool schemas (RFC-0290).
 </purpose>
@@ -80,7 +80,7 @@ const capabilityLimitsSchema = z
   })
   .strict();
 
-/** RFC-0288: one capability catalog record (packages/ontology/capabilities/<id>.yaml). */
+/** RFC-0288: one capability catalog record (packages/werkstatt-site/src/domain/ontology/capabilities/<id>.yaml). */
 export const capabilityRecordSchema = z
   .object({
     /** Dot-separated, lowercase; the file stem MUST equal this id. */

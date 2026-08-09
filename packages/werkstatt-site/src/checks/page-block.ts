@@ -47,7 +47,7 @@ import { readScopeFiles, outOfScope } from "./scope.ts";
  * These are valid on every block regardless of section archetype, so the
  * validator strips them before per-section propsSchema validation.
  *
- * Keep this list in sync with packages/ui/src/blocks-renderer.astro.
+ * Keep this list in sync with packages/werkstatt-site/src/domain/ui/blocks-renderer.astro.
  */
 const UNIVERSAL_BLOCK_PROPS: ReadonlySet<string> = new Set([
   "hideSectionNumber", // suppress auto-generated "01"/"02" section number
@@ -170,7 +170,7 @@ export async function runPageBlockValidate(
 
     const pagesDir = join(paths.appDirectory, "src", "content", "pages");
     const contentDir = join(paths.appDirectory, "src", "content");
-    const packagesUiSrc = resolve(paths.appDirectory, "../../packages/ui/src");
+    const packagesUiSrc = resolve(paths.appDirectory, "../../packages/werkstatt-site/src/domain/ui/src");
 
     // Load system manifest for planet-pin cross-reference
     let systemManifest: ReturnType<typeof systemManifestSchema.parse> | null = null;

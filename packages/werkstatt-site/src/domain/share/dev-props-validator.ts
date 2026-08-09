@@ -34,7 +34,7 @@ const ajv = new Ajv({ allErrors: true, strict: false });
  * validator strips them before per-section propsSchema validation.
  *
  * Must stay in sync with packages/os/site-kernel-checks/src/page-block.ts
- * UNIVERSAL_BLOCK_PROPS and packages/ui/src/blocks-renderer.astro.
+ * UNIVERSAL_BLOCK_PROPS and packages/werkstatt-site/src/domain/ui/blocks-renderer.astro.
  */
 const UNIVERSAL_BLOCK_PROPS: ReadonlySet<string> = new Set(["hideSectionNumber", "anchorId"]);
 
@@ -47,7 +47,7 @@ async function resolvePackagesUiRoot(): Promise<string | null> {
       for (let depth = 0; depth < 12; depth += 1) {
         try {
           await stat(join(dir, "pnpm-workspace.yaml"));
-          return join(dir, "packages", "ui", "src");
+          return join(dir, "packages", "werkstatt-site", "src", "domain", "ui", "src");
         } catch {
           const parent = dirname(dir);
           if (parent === dir) return null;

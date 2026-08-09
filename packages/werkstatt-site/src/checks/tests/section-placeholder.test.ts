@@ -23,7 +23,7 @@ describe("section.placeholder.lint", () => {
 
   beforeEach(async () => {
     workspaceRoot = await mkdtemp(join(tmpdir(), "sec-place-"));
-    sectionsDir = join(workspaceRoot, "packages", "ui", "src", "sections");
+    sectionsDir = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
   });
 
   afterEach(async () => {

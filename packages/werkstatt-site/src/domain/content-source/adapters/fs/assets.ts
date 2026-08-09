@@ -197,7 +197,7 @@ export function describeContentAssetResolution(
 // @ai-invariant: resolveImage is the ONE shared content-asset resolver (RFC-0141).
 // Bare filenames only — no paths, no extensions. Extension priority: .webp → .jpg
 // → .jpeg → .png. Automatic fallback to DEFAULT_LANGUAGE ("de"). The glob map is
-// supplied by the consumer (packages/ui/src/content-assets.ts — the ONE allowed
+// supplied by the consumer (packages/werkstatt-site/src/domain/ui/content-assets.ts — the ONE allowed
 // import.meta.glob call site). Never parse AssetRef.token to infer locality.
 
 export function resolveImage(

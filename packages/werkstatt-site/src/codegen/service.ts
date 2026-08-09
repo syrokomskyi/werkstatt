@@ -40,7 +40,7 @@ import { hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts"
 import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMPLATES_DIR = path.join(__dirname, "..", "src", "templates", "service");
+const TEMPLATES_DIR = path.join(__dirname, "templates", "service");
 
 function readTemplate(templatePath: string): string {
   return readFileSync(path.join(TEMPLATES_DIR, templatePath), "utf8");

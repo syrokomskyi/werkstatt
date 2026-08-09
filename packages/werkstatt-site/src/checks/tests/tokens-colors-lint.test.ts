@@ -28,7 +28,7 @@ describe("tokens.colors.lint (RFC-0725)", () => {
     workspaceRoot = await mkdtemp(join(tmpdir(), "tokens-colors-"));
     appDir = join(workspaceRoot, "apps", "test-app");
     stylesDir = join(appDir, "src", "styles");
-    packagesUiSrc = join(workspaceRoot, "packages", "ui", "src");
+    packagesUiSrc = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src");
     await mkdir(stylesDir, { recursive: true });
     await mkdir(packagesUiSrc, { recursive: true });
   });
@@ -72,7 +72,7 @@ describe("tokens.colors.lint (RFC-0725)", () => {
     expect(undefinedFinding).toBeUndefined();
   });
 
-  it("scans packages/ui/src/sections CSS for undefined tokens", async () => {
+  it("scans packages/werkstatt-site/src/domain/ui/sections CSS for undefined tokens", async () => {
     const sectionsDir = join(packagesUiSrc, "sections", "transparency");
     await mkdir(sectionsDir, { recursive: true });
     await writeFile(

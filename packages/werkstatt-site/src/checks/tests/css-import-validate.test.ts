@@ -23,7 +23,7 @@ describe("section.css.import.validate", () => {
 
   beforeEach(async () => {
     workspaceRoot = await mkdtemp(join(tmpdir(), "css-import-"));
-    uiSrc = join(workspaceRoot, "packages", "ui", "src");
+    uiSrc = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src");
     await mkdir(join(uiSrc, "sections", "foo"), { recursive: true });
     await mkdir(join(uiSrc, "components", "bar"), { recursive: true });
   });

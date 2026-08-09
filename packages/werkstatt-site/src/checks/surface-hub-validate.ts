@@ -97,7 +97,7 @@ export async function runSurfaceHubValidate(
       diagnostics.push({
         ruleId: "pillar-hero-cta-not-anchor",
         severity: "error",
-        file: `packages/ontology/blueprints/${bp.id}.yaml`,
+        file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `depth-0 pillar hero primaryCta target "${level0.pillar.hero.primaryCta.target}" is not an anchor (expected "#industry-catalog")`,
         fixHint:
           'Set pillar.hero.primaryCta.target to "#industry-catalog" so the hub guides visitors to the catalog first.',
@@ -109,7 +109,7 @@ export async function runSurfaceHubValidate(
       diagnostics.push({
         ruleId: "pillar-missing-title-template",
         severity: "error",
-        file: `packages/ontology/blueprints/${bp.id}.yaml`,
+        file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `depth-0 pillar level has no titleTemplate — the hub title must communicate the industry-hub function`,
         fixHint:
           "Add a titleTemplate to the depth-0 level that communicates the industry-hub function.",
@@ -178,7 +178,7 @@ export async function runSurfaceHubValidate(
       diagnostics.push({
         ruleId: "pillar-priceref-unresolvable",
         severity: "error",
-        file: `packages/ontology/blueprints/${bp.id}.yaml`,
+        file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `pillar.productPrice.priceRef "${priceRef}" is not a valid PBP reference (expected "business-profile.…")`,
         fixHint: "Use a business-profile.offerings/… reference for the price.",
       });
@@ -187,7 +187,7 @@ export async function runSurfaceHubValidate(
       diagnostics.push({
         ruleId: "pillar-priceref-unresolvable",
         severity: "warning",
-        file: `packages/ontology/blueprints/${bp.id}.yaml`,
+        file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `pillar.productPrice.priceRef "${priceRef}" syntax is valid but PBP resolution is not checked at validation time`,
         fixHint: "Verify the PBP entity and field path exist in the render-time environment.",
       });

@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-Zod schema for Biome definition files (packages/ontology/biomes/*.yaml).
+Zod schema for Biome definition files (packages/werkstatt-site/src/domain/ontology/biomes/*.yaml).
 A Biome is a full visual-DNA contract: family linkage, provenance, closed design
 axes, palette, typography, spacing, motion, geometry, and authoring constraints.
 Applied via html[data-biome="<id>"] in the cascade layer stack.

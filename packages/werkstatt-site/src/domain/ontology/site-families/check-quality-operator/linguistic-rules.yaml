@@ -1,0 +1,6 @@
+family: check-quality-operator
+version: 1.0.0
+rules:
+  - Prefer precise technical German over marketing language.
+  - Ban vague quality claims without evidence.
+  - Use direct, operational phrasing near CTAs.

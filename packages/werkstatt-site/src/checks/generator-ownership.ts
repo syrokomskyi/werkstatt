@@ -450,12 +450,12 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   // prop types. Workspace-relative (packages/ui/, not apps/<id>/) — the
   // {id} placeholder claims the whole generated-types surface for both layers.
   {
-    path: "packages/ui/src/sections/{id}/{id}.types.generated.ts",
+    path: "packages/werkstatt-site/src/domain/ui/sections/{id}/{id}.types.generated.ts",
     command: "props.types.generate",
     module: "packages/os/site-kernel-codegen/src/props-types.ts",
   },
   {
-    path: "packages/ui/src/components/{id}/{id}.types.generated.ts",
+    path: "packages/werkstatt-site/src/domain/ui/components/{id}/{id}.types.generated.ts",
     command: "props.types.generate",
     module: "packages/os/site-kernel-codegen/src/props-types.ts",
   },

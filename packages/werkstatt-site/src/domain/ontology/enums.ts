@@ -43,12 +43,12 @@ export type Layer = z.infer<typeof layerSchema>;
  *
  * RFC-0084 retired the closed `SemanticRoleValues` enum that lived here. The
  * authoritative source of valid section roles is now the section archetype
- * catalog under `packages/ontology/archetypes/sections/*.yaml`. Each
+ * catalog under `packages/werkstatt-site/src/domain/ontology/archetypes/sections/*.yaml`. Each
  * archetype's `semanticRole` field contributes one valid value.
  *
  * - `sectionManifestSchema.role` is `z.string().min(1)` (open vocabulary).
  * - `archetype.registry.build` writes the derived `sectionRoles[]` set to
- *   `packages/ontology/archetypes/index.yaml`.
+ *   `packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml`.
  * - `archetype.registry.validate` cross-checks every section manifest's
  *   `role` against that set with a closest-match hint on miss.
  *

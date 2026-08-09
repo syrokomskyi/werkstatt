@@ -244,7 +244,7 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
   {
     name: "workspace.write.boundary.lint",
     description:
-      "Validate that every workspace-shared file write (workspace root, docs/, packages/ontology/) is atomic (writeFileAtomic) and declared on SHARED_WRITE_ALLOWLIST (RFC-0258).",
+      "Validate that every workspace-shared file write (workspace root, docs/, packages/werkstatt-site/src/domain/ontology/) is atomic (writeFileAtomic) and declared on SHARED_WRITE_ALLOWLIST (RFC-0258).",
     scope: "workspace",
     flags: {},
     reads: [

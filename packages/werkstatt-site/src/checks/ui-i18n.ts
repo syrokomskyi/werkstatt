@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 [RFC-0189] Implements `ui.i18n.lint` — a workspace-scoped validator that scans
-shared UI components (`packages/ui/src/{sections,components}/`) for hardcoded
+shared UI components (`packages/werkstatt-site/src/domain/ui/{sections,components}/`) for hardcoded
 human-readable strings and non-trivial `resolveLabel` fallbacks.
 </purpose>
 <non-goals>
@@ -239,7 +239,7 @@ function scanStringLiterals(
 
 // RFC-0174 legal chrome components: prescribed bilingual boilerplate that
 // is intentionally hardcoded by design and must not vary per app.
-const LEGAL_CHROME_FILES = new Set(["packages/ui/src/legal/translation-notice.astro"]);
+const LEGAL_CHROME_FILES = new Set(["packages/werkstatt-site/src/domain/ui/legal/translation-notice.astro"]);
 
 async function scanAstroFile(file: string, relFile: string): Promise<Violation[]> {
   if (LEGAL_CHROME_FILES.has(relFile)) return [];
@@ -282,7 +282,7 @@ export async function runUiI18nLint(
   const workspaceRoot = context.workspaceRoot;
   const scanPath = input.flags.path
     ? join(workspaceRoot, String(input.flags.path))
-    : join(workspaceRoot, "packages", "ui", "src");
+    : join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src");
 
   const astroFiles = await walkFiles(scanPath, /\.astro$/);
   const tsFiles = await walkFiles(scanPath, /\.(ts|tsx)$/);

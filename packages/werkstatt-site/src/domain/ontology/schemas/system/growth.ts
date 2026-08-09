@@ -57,7 +57,7 @@ export const systemGrowthSchema = z.object({
 
   /**
    * Funnel ids to activate for this app.
-   * Each id must match a file in packages/ontology/growth/funnels/<id>.yaml.
+   * Each id must match a file in packages/werkstatt-site/src/domain/ontology/growth/funnels/<id>.yaml.
    * Validated by growth.funnel.validate.
    */
   funnels: z
@@ -67,7 +67,7 @@ export const systemGrowthSchema = z.object({
 
   /**
    * Experiment ids available for this app.
-   * Each id must match a file in packages/ontology/growth/experiments/<id>.yaml.
+   * Each id must match a file in packages/werkstatt-site/src/domain/ontology/growth/experiments/<id>.yaml.
    * Active experiment assignment per page is resolved server-side.
    * Validated by growth.experiment.validate.
    */

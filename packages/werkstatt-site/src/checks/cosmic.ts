@@ -63,7 +63,7 @@ async function collectAllManifests(
   } else {
     // Workspace-wide scan: only scan packages/ui/src (RFC-0023)
     // Apps consume UI from packages/ui, they do not ship manifests
-    roots.push(join(workspaceRoot, "packages", "ui", "src"));
+    roots.push(join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src"));
   }
 
   return collectManifestFiles(roots);

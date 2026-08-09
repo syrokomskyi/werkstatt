@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-Zod schema for Constellation definition files (packages/ontology/constellations/*.yaml).
+Zod schema for Constellation definition files (packages/werkstatt-site/src/domain/ontology/constellations/*.yaml).
 A Constellation is a named, reusable composition pattern — an ordered sequence of
 section archetypes that forms a proven page structure for a given intent
 (DNA-23, RFC-0025).
@@ -68,7 +68,7 @@ export type ConstellationSlot = z.infer<typeof constellationSlotSchema>;
 
 /**
  * A Constellation definition — a named, reusable page-composition pattern.
- * Stored as packages/ontology/constellations/<slug>.yaml.
+ * Stored as packages/werkstatt-site/src/domain/ontology/constellations/<slug>.yaml.
  */
 export const constellationSchema = z.object({
   /**

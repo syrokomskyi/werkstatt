@@ -3,10 +3,10 @@
 <purpose>
 growth.events.validate — validates that every emit() call in the app source
 references a valid event name from the closed EventName catalog (DNA-27, RFC-0027).
-Also validates that the ontology event catalog files in packages/ontology/growth/events/
+Also validates that the ontology event catalog files in packages/werkstatt-site/src/domain/ontology/growth/events/
 are well-formed YAML with required fields: id, label, category, payload.
 Also verifies that every event name in the closed catalog has a corresponding .yaml
-file in packages/ontology/growth/events/ (ontology coverage check — RFC-0027 AC).
+file in packages/werkstatt-site/src/domain/ontology/growth/events/ (ontology coverage check — RFC-0027 AC).
 </purpose>
 <non-goals>
   <item>Do not validate payload shapes at runtime — only catalog membership and YAML structure.</item>
@@ -19,7 +19,7 @@ file in packages/ontology/growth/events/ (ontology coverage check — RFC-0027 A
   <item>RFC-0030 defect fix: Replace hardcoded VALID_EVENT_NAMES set with imported EVENT_NAMES from
     @warpgogol/werkstatt-site/growth (single source of truth — DNA-27 / RFC-0027 AC).</item>
   <item>RFC-0030 defect fix: Add ontology coverage check — every EVENT_NAMES entry must have a
-    corresponding .yaml file in packages/ontology/growth/events/.</item>
+    corresponding .yaml file in packages/werkstatt-site/src/domain/ontology/growth/events/.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -57,7 +57,16 @@ export async function runGrowthEventsValidate(
   const appDir = context.site?.directory ?? process.cwd();
   const workspaceRoot = context.workspaceRoot;
 
-  const ontologyEventsDir = join(workspaceRoot, "packages", "ontology", "growth", "events");
+  const ontologyEventsDir = join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "growth",
+    "events",
+  );
 
   // ---- Part 1: Validate ontology event YAML structure + ontology coverage ----
 
@@ -72,7 +81,7 @@ export async function runGrowthEventsValidate(
       }
 
       const filePath = join(ontologyEventsDir, entry.name);
-      const rel = `packages/ontology/growth/events/${entry.name}`;
+      const rel = `packages/werkstatt-site/src/domain/ontology/growth/events/${entry.name}`;
 
       let rawContent: string;
       try {
@@ -116,7 +125,7 @@ export async function runGrowthEventsValidate(
     }
   } catch {
     violations.push(
-      "GE-00: packages/ontology/growth/events/ directory not found — growth event catalog is missing",
+      "GE-00: packages/werkstatt-site/src/domain/ontology/growth/events/ directory not found — growth event catalog is missing",
     );
   }
 
@@ -126,7 +135,7 @@ export async function runGrowthEventsValidate(
   for (const eventName of EVENT_NAMES) {
     if (!foundEventIds.has(eventName)) {
       violations.push(
-        `GE-05: packages/ontology/growth/events/${eventName}.yaml is missing — ` +
+        `GE-05: packages/werkstatt-site/src/domain/ontology/growth/events/${eventName}.yaml is missing — ` +
           `every event in the closed EventName catalog must have a corresponding ontology file.`,
       );
     }

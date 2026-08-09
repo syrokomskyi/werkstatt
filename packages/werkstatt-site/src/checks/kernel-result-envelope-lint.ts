@@ -57,7 +57,7 @@ export async function runKernelResultEnvelopeLint(
 ): Promise<KernelCommandResult<CheckResult>> {
   const diagnostics: Diagnostic[] = [];
 
-  const checksDir = join(context.workspaceRoot, "packages", "os", "site-kernel-checks", "src");
+  const checksDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "checks");
 
   let files: string[];
   try {

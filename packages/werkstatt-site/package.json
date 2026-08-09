@@ -95,7 +95,7 @@
       "types": "./src/deploy/index.ts",
       "default": "./src/deploy/index.ts"
     },
-    "./tokens/tokens.css": "./src/tokens.css",
+    "./tokens/tokens.css": "./src/domain/tokens/tokens.css",
     "./faq/astro": {
       "types": "./src/domain/faq/astro.ts",
       "default": "./src/domain/faq/astro.ts"
@@ -1305,9 +1305,7 @@
       "default": "./src/domain/ui/index.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",

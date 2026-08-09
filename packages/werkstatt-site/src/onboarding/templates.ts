@@ -17,7 +17,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-export const TEMPLATES_DIR = join(__dirname, "..", "src", "templates");
+export const TEMPLATES_DIR = join(__dirname, "templates");
 export const RUNTIME_TEMPLATES_DIR = join(TEMPLATES_DIR, "runtime");
 
 export function readTemplate(filename: string): string {

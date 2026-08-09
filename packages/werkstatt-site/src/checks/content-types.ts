@@ -1,13 +1,13 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-content-types.validate — confirms that every manifest.yaml in packages/ui/src/{components,sections}/
+content-types.validate — confirms that every manifest.yaml in packages/werkstatt-site/src/domain/ui/{components,sections}/
 that has a contentSchemaKey field also has a matching .types.ts sibling in the same directory
 (DNA-10, RFC-0034).
 </purpose>
 <non-goals>
   <item>Do not validate propsSchema (JSON Schema) — that is page.block.validate.</item>
-  <item>Do not scan apps/ — only packages/ui/src/.</item>
+  <item>Do not scan apps/ — only packages/werkstatt-site/src/domain/ui/.</item>
   <item>Do not introduce Zod validation — plain TypeScript only.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -81,7 +81,7 @@ export async function runContentTypesValidate(
   const violations: string[] = [];
   const workspaceRoot = context.workspaceRoot;
 
-  const uiSrcDir = join(workspaceRoot, "packages", "ui", "src");
+  const uiSrcDir = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src");
   const scanDirs = [join(uiSrcDir, "components"), join(uiSrcDir, "sections")];
 
   for (const scanDir of scanDirs) {

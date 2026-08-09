@@ -52,17 +52,17 @@ export const LAYOUT_COSMIC_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ontology/site-families/**/*.yaml", "<app>/src/content/system.md"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml", "<app>/src/content/system.md"],
     execute: runBiomeContractValidate,
   },
   {
     name: "family.contract.validate",
     description:
-      "Validate packages/ontology/site-families/<id>/family.yaml contracts, companion files, and recipe references (RFC-0071).",
+      "Validate packages/werkstatt-site/src/domain/ontology/site-families/<id>/family.yaml contracts, companion files, and recipe references (RFC-0071).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ontology/site-families/**/*.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml"],
     execute: runFamilyContractValidate,
   },
   {
@@ -83,8 +83,8 @@ export const LAYOUT_COSMIC_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ui/src/sections/**/*.manifest.yaml",
-      "packages/ui/src/components/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/components/**/*.manifest.yaml",
     ],
     execute: runCosmicCatalogValidate,
   },
@@ -96,8 +96,8 @@ export const LAYOUT_COSMIC_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ui/src/sections/**/*.manifest.yaml",
-      "packages/ui/src/components/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/components/**/*.manifest.yaml",
     ],
     execute: runCosmicNameUnique,
   },
@@ -118,7 +118,7 @@ export const LAYOUT_COSMIC_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/content/system.md", "packages/ui/src/sections/**/*.manifest.yaml"],
+    reads: ["<app>/src/content/system.md", "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml"],
     execute: runConstellationComposeValidate,
   },
   {

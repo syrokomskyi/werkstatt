@@ -64,8 +64,8 @@ export async function runSectionDefaultsValidate(
 ): Promise<KernelCommandResult<CheckResult>> {
   const command = "section.defaults.validate";
   const roots = [
-    join(context.workspaceRoot, "packages", "ui", "src", "sections"),
-    join(context.workspaceRoot, "packages", "ui", "src", "components"),
+    join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections"),
+    join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components"),
   ];
   const diagnostics: Diagnostic[] = [];
 

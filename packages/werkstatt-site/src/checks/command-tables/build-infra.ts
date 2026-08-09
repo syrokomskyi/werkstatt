@@ -37,7 +37,7 @@ export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
       "Validate shared UI section/component fallback defaults and reject app-specific asset/pageId tokens (RFC-0250).",
     scope: "workspace",
     flags: {},
-    reads: ["packages/ui/src/**/*.ts", "packages/ui/src/**/*.tsx"],
+    reads: ["packages/werkstatt-site/src/domain/ui/**/*.ts", "packages/werkstatt-site/src/domain/ui/**/*.tsx"],
     execute: runSectionDefaultsValidate,
   },
   {

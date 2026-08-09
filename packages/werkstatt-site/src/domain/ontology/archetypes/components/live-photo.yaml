@@ -1,0 +1,20 @@
+id: live-photo
+displayName: Living photo
+version: 1.0.0
+semanticRole: component-live-photo
+description: |
+  RFC-0202 living photo: a looping, muted, decorative <video> overlaid on a static
+  <ResponsiveImage> (RFC-0152) that always remains the resting state / poster / fallback.
+  The clip is the sibling `<image-name>.webm`, resolved by convention (no authored path).
+expectedIntents:
+  - orient-visitor
+expectedIndustryFit:
+  - non-profit
+layoutHint: split
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({}).passthrough()
+acceptedCosmicNames:
+  - Aegaeon
+constraints: {}

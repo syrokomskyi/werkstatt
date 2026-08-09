@@ -40,11 +40,11 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
   {
     name: "section.shell.contract.validate",
     description:
-      "Validate every section .astro under packages/ui/src/sections renders through <SectionShell>. Rejects raw <section> roots, missing SectionShell imports, and any reference to the deleted VisualModifiers (RFC-0101 + RFC-0107).",
+      "Validate every section .astro under packages/werkstatt-site/src/domain/ui/sections renders through <SectionShell>. Rejects raw <section> roots, missing SectionShell imports, and any reference to the deleted VisualModifiers (RFC-0101 + RFC-0107).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro"],
     execute: runSectionShellContractValidate,
   },
   {
@@ -54,17 +54,17 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.manifest.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml"],
     execute: runSectionBackgroundContractValidate,
   },
   {
     name: "section.header.contract.validate",
     description:
-      "Validate every section uses <SectionHeader> for headings; raw <h1>/<h2> with section-heading classes inside packages/ui/src/sections are rejected (RFC-0102).",
+      "Validate every section uses <SectionHeader> for headings; raw <h1>/<h2> with section-heading classes inside packages/werkstatt-site/src/domain/ui/sections are rejected (RFC-0102).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro"],
     execute: runSectionHeaderContractValidate,
   },
   {
@@ -74,17 +74,17 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.manifest.yaml", "packages/ontology/src/**/*.ts"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml", "packages/werkstatt-site/src/domain/ontology/src/**/*.ts"],
     execute: runSectionBodyContractValidate,
   },
   {
     name: "section.cta.contract.validate",
     description:
-      'Validate CTAs in shared sections render through <SectionCta> or <SectionCtaGroup>. Raw <a class="btn ..."> markup inside packages/ui/src/sections is rejected (RFC-0104).',
+      'Validate CTAs in shared sections render through <SectionCta> or <SectionCtaGroup>. Raw <a class="btn ..."> markup inside packages/werkstatt-site/src/domain/ui/sections is rejected (RFC-0104).',
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro"],
     execute: runSectionCtaContractValidate,
   },
   {
@@ -94,22 +94,22 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.astro", "packages/ui/src/sections/**/*.manifest.yaml"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro", "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml"],
     execute: runSectionImageContractValidate,
   },
   /* RFC-0598: colocated CSS import integrity */
   {
     name: "section.css.import.validate",
     description:
-      "Validate every colocated .css file under packages/ui/src/sections/ and packages/ui/src/components/ is imported by at least one .astro file (CSS-IMPORT-01) and that .css filename matches colocated .astro filename (CSS-NAME-01).",
+      "Validate every colocated .css file under packages/werkstatt-site/src/domain/ui/sections/ and packages/werkstatt-site/src/domain/ui/components/ is imported by at least one .astro file (CSS-IMPORT-01) and that .css filename matches colocated .astro filename (CSS-NAME-01).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ui/src/sections/**/*.css",
-      "packages/ui/src/sections/**/*.astro",
-      "packages/ui/src/components/**/*.css",
-      "packages/ui/src/components/**/*.astro",
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.css",
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.astro",
+      "packages/werkstatt-site/src/domain/ui/components/**/*.css",
+      "packages/werkstatt-site/src/domain/ui/components/**/*.astro",
     ],
     execute: runSectionCssImportValidate,
   },
@@ -117,12 +117,12 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
   {
     name: "tokens.colors.section-shell.lint",
     description:
-      "Lint CSS under packages/ui/src/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}: raw #hex, rgb()/rgba(), and hsl()/hsla() are forbidden (RFC-0098 + RFC-0108 + RFC-0122).",
+      "Lint CSS under packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}: raw #hex, rgb()/rgba(), and hsl()/hsla() are forbidden (RFC-0098 + RFC-0108 + RFC-0122).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ui/src/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css",
+      "packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css",
     ],
     execute: runSectionShellColorTokenLint,
   },
@@ -135,7 +135,7 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ui/src/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css",
+      "packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css",
       "packages/tokens/src/**/*.ts",
     ],
     execute: runSectionShellTokenContractValidate,
@@ -178,7 +178,7 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ontology/src/**/*.ts"],
+    reads: ["packages/werkstatt-site/src/domain/ontology/src/**/*.ts"],
     execute: runSharedSectionPropsContractValidate,
   },
   {
@@ -195,11 +195,11 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
   {
     name: "section.placeholder.lint",
     description:
-      "Lint packages/ui/src/sections for section components that still render the JSON.stringify scaffold stub. Failing means the section is unfit to ship (RFC-0093).",
+      "Lint packages/werkstatt-site/src/domain/ui/sections for section components that still render the JSON.stringify scaffold stub. Failing means the section is unfit to ship (RFC-0093).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro"],
     execute: runSectionPlaceholderLint,
   },
   /* RFC-0201 */

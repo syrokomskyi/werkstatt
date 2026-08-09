@@ -45,6 +45,9 @@ export function finding(params: Omit<AuditFinding, "id"> & { id?: string }): Aud
 
 export const MATOMO_REGISTRY_PATH = join(
   "packages",
+  "werkstatt-site",
+  "src",
+  "domain",
   "ontology",
   "analytics",
   "matomo-fleet.registry.yaml",

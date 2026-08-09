@@ -29,7 +29,7 @@ export async function runConstellationContractValidate(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<ValidateResult>> {
-  const constellationsRoot = join(context.workspaceRoot, "packages", "ontology", "constellations");
+  const constellationsRoot = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "constellations");
   const files = await collectFilesMatching(constellationsRoot, (filePath) =>
     filePath.endsWith(".yaml"),
   );

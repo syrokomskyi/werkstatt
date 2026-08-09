@@ -3,7 +3,7 @@
 <purpose>
 Implements biome.contract.validate — the OS command that enforces the RFC-0071
 Biome contract:
-  - Every packages/ontology/biomes/*.yaml parses against the extended visual-DNA schema.
+  - Every packages/werkstatt-site/src/domain/ontology/biomes/*.yaml parses against the extended visual-DNA schema.
   - Every biome family pointer resolves to a real site family and is reciprocated.
   - Every app src/content/system.md identity.biome references an existing biome.
   - Every biome field emitted to CSS maps to a known --ds-* token.
@@ -92,7 +92,7 @@ interface BiomeContractResult {
 /**
  * Validates the full Biome contract:
  *
- * 1. Every *.yaml in packages/ontology/biomes/ parses against biomeSchema.
+ * 1. Every *.yaml in packages/werkstatt-site/src/domain/ontology/biomes/ parses against biomeSchema.
  * 2. Every apps/<app>/system.yaml identity.biome references an existing biome.
  * 3. No per-feature CSS files exist outside src/styles/ in any app (ERROR-level).
  *
@@ -102,8 +102,8 @@ export async function runBiomeContractValidate(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<BiomeContractResult>> {
-  const biomesDir = join(context.workspaceRoot, "packages", "ontology", "biomes");
-  const familiesDir = join(context.workspaceRoot, "packages", "ontology", "site-families");
+  const biomesDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "biomes");
+  const familiesDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "site-families");
   const appsDir = join(context.workspaceRoot, "apps");
 
   const biomeDetails: BiomeViolation[] = [];
@@ -168,7 +168,7 @@ export async function runBiomeContractValidate(
 
     if (!familyIds.has(biome.family)) {
       errors.push(
-        `family "${biome.family}" has no matching packages/ontology/site-families/${biome.family}/family.yaml`,
+        `family "${biome.family}" has no matching packages/werkstatt-site/src/domain/ontology/site-families/${biome.family}/family.yaml`,
       );
       familyViolations++;
     }
@@ -219,7 +219,7 @@ export async function runBiomeContractValidate(
       const systemResult = await loadSystemManifest(contentDir);
       const biomeId = systemResult.manifest.identity.biome;
       if (!knownBiomeIds.has(biomeId)) {
-        const msg = `identity.biome "${biomeId}" has no matching packages/ontology/biomes/${biomeId}.yaml`;
+        const msg = `identity.biome "${biomeId}" has no matching packages/werkstatt-site/src/domain/ontology/biomes/${biomeId}.yaml`;
         context.logger.error(`${rel}: ${msg}`);
         systemViolations++;
       }

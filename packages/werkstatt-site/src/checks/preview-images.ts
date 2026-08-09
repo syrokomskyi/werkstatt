@@ -170,7 +170,7 @@ async function readBiomePalette(
   workspaceRoot: string,
   biomeId: string,
 ): Promise<{ surface?: string; ink?: string; brand?: string }> {
-  const biomePath = join(workspaceRoot, "packages", "ontology", "biomes", `${biomeId}.yaml`);
+  const biomePath = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "biomes", `${biomeId}.yaml`);
   try {
     const raw = await readFile(biomePath, "utf-8");
     const data = YAML.parse(raw) || {};

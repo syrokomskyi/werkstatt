@@ -25,7 +25,7 @@ import { semanticPageTypeSchema, articleMetadataSchema, pageOutputSchema } from 
  *
  * Constraints enforced here (structural):
  *   - identity.biome is a scalar (single biome per app — multi-biome is permanently forbidden)
- *   - constellations references are kebab-case slugs matching files in packages/ontology/constellations/
+ *   - constellations references are kebab-case slugs matching files in packages/werkstatt-site/src/domain/ontology/constellations/
  *
  * Cross-file constraints (enforced by validators, not this schema):
  *   - identity.systemStar must match a StarCatalog entry used in one page manifest
@@ -60,7 +60,7 @@ export const systemManifestSchema = z.object({
 
     /**
      * The single Biome applied to this app.
-     * Must match a biome id from packages/ontology/biomes/.
+     * Must match a biome id from packages/werkstatt-site/src/domain/ontology/biomes/.
      * Multi-biome per app is permanently forbidden (DNA-23, RFC-0025).
      * Validated cross-file by biome.contract.validate.
      */
@@ -93,7 +93,7 @@ export const systemManifestSchema = z.object({
 
   /**
    * Constellations (composition patterns) active in this app.
-   * Each entry is a kebab-case slug matching a file in packages/ontology/constellations/.
+   * Each entry is a kebab-case slug matching a file in packages/werkstatt-site/src/domain/ontology/constellations/.
    * Validated cross-file by constellation.compose.validate.
    * Empty array = no composition-pattern validation is performed.
    */
@@ -284,7 +284,7 @@ export const systemManifestSchema = z.object({
 
   /**
    * RFC-0193: explicit Programmatic Surface adoption. `surface.blueprints` lists the Blueprint ids
-   * (in packages/ontology/blueprints/) this site compiles. When declared, only listed Blueprints
+   * (in packages/werkstatt-site/src/domain/ontology/blueprints/) this site compiles. When declared, only listed Blueprints
    * apply (and blueprint.validate requires their datasets). When omitted, the engine falls back to
    * implicit opt-in by datasets (a Blueprint applies if the app ships its dataset collection).
    */

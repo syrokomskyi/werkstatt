@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "totalCount": 61,
+  "totalCount": 57,
   "entries": [
     {
       "id": "approach",
@@ -11,7 +11,7 @@
       "acceptedCosmicNames": [
         "Titan"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/approach.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/approach.yaml",
       "layer": "section"
     },
     {
@@ -23,7 +23,7 @@
       "acceptedCosmicNames": [
         "Io"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/article-list.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/article-list.yaml",
       "layer": "section"
     },
     {
@@ -35,7 +35,7 @@
       "acceptedCosmicNames": [
         "Epimetheus"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/audience-cards.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/audience-cards.yaml",
       "layer": "section"
     },
     {
@@ -47,7 +47,7 @@
       "acceptedCosmicNames": [
         "Proteus"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/brand-label.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/brand-label.yaml",
       "layer": "component"
     },
     {
@@ -59,7 +59,7 @@
       "acceptedCosmicNames": [
         "Thebe"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/breadcrumbs.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/breadcrumbs.yaml",
       "layer": "section"
     },
     {
@@ -71,7 +71,7 @@
       "acceptedCosmicNames": [
         "Amalthea"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/chat-widget.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/chat-widget.yaml",
       "layer": "section"
     },
     {
@@ -83,7 +83,7 @@
       "acceptedCosmicNames": [
         "Janus"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/comparison-cards.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/comparison-cards.yaml",
       "layer": "section"
     },
     {
@@ -95,7 +95,7 @@
       "acceptedCosmicNames": [
         "Calypso"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/controlled-responsibility-block.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/controlled-responsibility-block.yaml",
       "layer": "section"
     },
     {
@@ -107,7 +107,7 @@
       "acceptedCosmicNames": [
         "Charon"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/copyright.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/copyright.yaml",
       "layer": "component"
     },
     {
@@ -119,7 +119,7 @@
       "acceptedCosmicNames": [
         "Makemake"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/credits.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/credits.yaml",
       "layer": "section"
     },
     {
@@ -131,7 +131,7 @@
       "acceptedCosmicNames": [
         "Rosalind"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/currency-aware-price-display.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/currency-aware-price-display.yaml",
       "layer": "component"
     },
     {
@@ -143,7 +143,7 @@
       "acceptedCosmicNames": [
         "Portia"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/currency-selector.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/currency-selector.yaml",
       "layer": "component"
     },
     {
@@ -155,7 +155,7 @@
       "acceptedCosmicNames": [
         "Pandora"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/donation-card.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/donation-card.yaml",
       "layer": "section"
     },
     {
@@ -167,7 +167,7 @@
       "acceptedCosmicNames": [
         "Rhea"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/donation-use.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/donation-use.yaml",
       "layer": "section"
     },
     {
@@ -179,7 +179,7 @@
       "acceptedCosmicNames": [
         "Elara"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/dynamic-status-block.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/dynamic-status-block.yaml",
       "layer": "section"
     },
     {
@@ -191,7 +191,7 @@
       "acceptedCosmicNames": [
         "Atlas"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/faq-list.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/faq-list.yaml",
       "layer": "section"
     },
     {
@@ -203,7 +203,7 @@
       "acceptedCosmicNames": [
         "Dione"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/final-cta.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/final-cta.yaml",
       "layer": "section"
     },
     {
@@ -215,7 +215,7 @@
       "acceptedCosmicNames": [
         "Nereid"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/footer-promo.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/footer-promo.yaml",
       "layer": "component"
     },
     {
@@ -227,7 +227,7 @@
       "acceptedCosmicNames": [
         "Europa"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/hero.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/hero.yaml",
       "layer": "section"
     },
     {
@@ -239,7 +239,7 @@
       "acceptedCosmicNames": [
         "Phobos"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/hero-decision-card.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/hero-decision-card.yaml",
       "layer": "section"
     },
     {
@@ -251,7 +251,7 @@
       "acceptedCosmicNames": [
         "Ganymede"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/impact.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/impact.yaml",
       "layer": "section"
     },
     {
@@ -263,7 +263,7 @@
       "acceptedCosmicNames": [
         "Ophelia"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/lang-switcher.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/lang-switcher.yaml",
       "layer": "component"
     },
     {
@@ -275,7 +275,7 @@
       "acceptedCosmicNames": [
         "Umbriel"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/layout.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/layout.yaml",
       "layer": "component"
     },
     {
@@ -287,7 +287,7 @@
       "acceptedCosmicNames": [
         "Cressida"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/not-found.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/not-found.yaml",
       "layer": "component"
     },
     {
@@ -299,7 +299,7 @@
       "acceptedCosmicNames": [
         "Aegaeon"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/live-photo.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/live-photo.yaml",
       "layer": "component"
     },
     {
@@ -311,7 +311,7 @@
       "acceptedCosmicNames": [
         "Hyperion"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/markdown.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/markdown.yaml",
       "layer": "section"
     },
     {
@@ -323,7 +323,7 @@
       "acceptedCosmicNames": [
         "Cordelia"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/material-credit.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/material-credit.yaml",
       "layer": "component"
     },
     {
@@ -335,7 +335,7 @@
       "acceptedCosmicNames": [
         "Sycorax"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/media.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/media.yaml",
       "layer": "component"
     },
     {
@@ -347,7 +347,7 @@
       "acceptedCosmicNames": [
         "Nix"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/nachweis-card.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-card.yaml",
       "layer": "component"
     },
     {
@@ -359,7 +359,7 @@
       "acceptedCosmicNames": [
         "Kerberos"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/nachweis-detail.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-detail.yaml",
       "layer": "component"
     },
     {
@@ -371,7 +371,7 @@
       "acceptedCosmicNames": [
         "Hydra"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/nachweis-list.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-list.yaml",
       "layer": "component"
     },
     {
@@ -383,7 +383,7 @@
       "acceptedCosmicNames": [
         "Styx"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/nachweis-verify.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-verify.yaml",
       "layer": "component"
     },
     {
@@ -395,7 +395,7 @@
       "acceptedCosmicNames": [
         "Phoebe"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/navigation.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/navigation.yaml",
       "layer": "section"
     },
     {
@@ -407,7 +407,7 @@
       "acceptedCosmicNames": [
         "Telesto"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/notausgang-block.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/notausgang-block.yaml",
       "layer": "section"
     },
     {
@@ -419,7 +419,7 @@
       "acceptedCosmicNames": [
         "Orcus"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/open-source-registry.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/open-source-registry.yaml",
       "layer": "section"
     },
     {
@@ -431,7 +431,7 @@
       "acceptedCosmicNames": [
         "Helene"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/ownership-block.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/ownership-block.yaml",
       "layer": "section"
     },
     {
@@ -443,7 +443,7 @@
       "acceptedCosmicNames": [
         "Methone"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/passport-header.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/passport-header.yaml",
       "layer": "component"
     },
     {
@@ -455,7 +455,7 @@
       "acceptedCosmicNames": [
         "Bianca"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/passport-provenance.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/passport-provenance.yaml",
       "layer": "component"
     },
     {
@@ -467,7 +467,7 @@
       "acceptedCosmicNames": [
         "Klarissa"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/passport-score-grid.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/passport-score-grid.yaml",
       "layer": "component"
     },
     {
@@ -479,7 +479,7 @@
       "acceptedCosmicNames": [
         "Adrastea"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/passport-star-map.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/passport-star-map.yaml",
       "layer": "component"
     },
     {
@@ -491,7 +491,7 @@
       "acceptedCosmicNames": [
         "Mimas"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/people.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/people.yaml",
       "layer": "section"
     },
     {
@@ -503,7 +503,7 @@
       "acceptedCosmicNames": [
         "Miranda"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/person-profile.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/person-profile.yaml",
       "layer": "component"
     },
     {
@@ -515,7 +515,7 @@
       "acceptedCosmicNames": [
         "Pan"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/price-card.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/price-card.yaml",
       "layer": "section"
     },
     {
@@ -527,7 +527,7 @@
       "acceptedCosmicNames": [
         "Callisto"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/problem.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/problem.yaml",
       "layer": "section"
     },
     {
@@ -539,7 +539,7 @@
       "acceptedCosmicNames": [
         "Despina"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/pulsar.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/pulsar.yaml",
       "layer": "component"
     },
     {
@@ -551,7 +551,7 @@
       "acceptedCosmicNames": [
         "Belinda"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/responsive-image.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/responsive-image.yaml",
       "layer": "component"
     },
     {
@@ -563,7 +563,7 @@
       "acceptedCosmicNames": [
         "Daphnis"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/scroll-to-top.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/scroll-to-top.yaml",
       "layer": "component"
     },
     {
@@ -575,7 +575,7 @@
       "acceptedCosmicNames": [
         "Thalassa"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/offer-capacity.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/offer-capacity.yaml",
       "layer": "component"
     },
     {
@@ -587,7 +587,7 @@
       "acceptedCosmicNames": [
         "Ceres"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/send-message.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/send-message.yaml",
       "layer": "section"
     },
     {
@@ -599,56 +599,8 @@
       "acceptedCosmicNames": [
         "Sedna"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/service-metadata-block.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/service-metadata-block.yaml",
       "layer": "section"
-    },
-    {
-      "id": "shell.breadcrumbs",
-      "displayName": "Shell Breadcrumbs",
-      "semanticRole": "component-shell.breadcrumbs",
-      "version": "1.0.0",
-      "layoutHint": "single-column",
-      "acceptedCosmicNames": [
-        "Ariel"
-      ],
-      "sourceFile": "packages/ontology/archetypes/components/shell/breadcrumbs.yaml",
-      "layer": "component"
-    },
-    {
-      "id": "shell.footer",
-      "displayName": "Shell Footer",
-      "semanticRole": "component-shell.footer",
-      "version": "1.0.0",
-      "layoutHint": "horizontal-row",
-      "acceptedCosmicNames": [
-        "Titania"
-      ],
-      "sourceFile": "packages/ontology/archetypes/components/shell/footer.yaml",
-      "layer": "component"
-    },
-    {
-      "id": "shell.header",
-      "displayName": "Shell Header",
-      "semanticRole": "component-shell.header",
-      "version": "1.0.0",
-      "layoutHint": "horizontal-row",
-      "acceptedCosmicNames": [
-        "Oberon"
-      ],
-      "sourceFile": "packages/ontology/archetypes/components/shell/header.yaml",
-      "layer": "component"
-    },
-    {
-      "id": "shell.site-background",
-      "displayName": "Site Background",
-      "semanticRole": "component-shell.site-background",
-      "version": "1.0.0",
-      "layoutHint": "single-column",
-      "acceptedCosmicNames": [
-        "Hermippe"
-      ],
-      "sourceFile": "packages/ontology/archetypes/components/shell/site-background.yaml",
-      "layer": "component"
     },
     {
       "id": "social-meta",
@@ -659,7 +611,7 @@
       "acceptedCosmicNames": [
         "Naiad"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/social-meta.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/social-meta.yaml",
       "layer": "component"
     },
     {
@@ -671,7 +623,7 @@
       "acceptedCosmicNames": [
         "Enceladus"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/social-proof.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/social-proof.yaml",
       "layer": "section"
     },
     {
@@ -683,7 +635,7 @@
       "acceptedCosmicNames": [
         "Triton"
       ],
-      "sourceFile": "packages/ontology/archetypes/components/structured-data.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/structured-data.yaml",
       "layer": "component"
     },
     {
@@ -695,7 +647,7 @@
       "acceptedCosmicNames": [
         "Tethys"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/transparency.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/transparency.yaml",
       "layer": "section"
     },
     {
@@ -707,7 +659,7 @@
       "acceptedCosmicNames": [
         "Deimos"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/trust-strip.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/trust-strip.yaml",
       "layer": "section"
     },
     {
@@ -719,7 +671,7 @@
       "acceptedCosmicNames": [
         "Quaoar"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/video-section.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/video-section.yaml",
       "layer": "section"
     },
     {
@@ -731,7 +683,7 @@
       "acceptedCosmicNames": [
         "Iapetus"
       ],
-      "sourceFile": "packages/ontology/archetypes/sections/women.yaml",
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/women.yaml",
       "layer": "section"
     }
   ],
@@ -789,10 +741,6 @@
     "component-responsive-image",
     "component-scroll-to-top",
     "component-section-body.offer-capacity",
-    "component-shell.breadcrumbs",
-    "component-shell.footer",
-    "component-shell.header",
-    "component-shell.site-background",
     "component-social-meta",
     "component-structured-data",
     "trust-card",
@@ -801,80 +749,80 @@
     "trust-verify"
   ],
   "planetImportPaths": {
-    "Titan": "@warpgogol/ui/sections/approach",
-    "Himalia": "@warpgogol/ui/sections/article-header",
-    "Io": "@warpgogol/ui/sections/article-list",
-    "Epimetheus": "@warpgogol/ui/sections/audience-cards",
-    "Thebe": "@warpgogol/ui/sections/breadcrumbs",
-    "Prometheus": "@warpgogol/ui/sections/changelog",
-    "Amalthea": "@warpgogol/ui/sections/chat-widget",
-    "Janus": "@warpgogol/ui/sections/comparison-cards",
-    "Calypso": "@warpgogol/ui/sections/controlled-responsibility-block",
-    "Makemake": "@warpgogol/ui/sections/credits-gallery",
-    "Pandora": "@warpgogol/ui/sections/donation-card",
-    "Rhea": "@warpgogol/ui/sections/donation-use",
-    "Elara": "@warpgogol/ui/sections/dynamic-status-block",
-    "Atlas": "@warpgogol/ui/sections/faq-list",
-    "Dione": "@warpgogol/ui/sections/final-cta",
-    "Europa": "@warpgogol/ui/sections/hero",
-    "Phobos": "@warpgogol/ui/sections/hero-decision-card",
-    "Ganymede": "@warpgogol/ui/sections/impact",
-    "Hyperion": "@warpgogol/ui/sections/markdown",
-    "Phoebe": "@warpgogol/ui/sections/navigation",
-    "Telesto": "@warpgogol/ui/sections/notausgang-block",
-    "Orcus": "@warpgogol/ui/sections/open-source-registry",
-    "Helene": "@warpgogol/ui/sections/ownership-block",
-    "Mimas": "@warpgogol/ui/sections/people",
-    "Pan": "@warpgogol/ui/sections/price-card",
-    "Callisto": "@warpgogol/ui/sections/problem",
-    "Ceres": "@warpgogol/ui/sections/send-message",
-    "Sedna": "@warpgogol/ui/sections/service-metadata-block",
-    "Enceladus": "@warpgogol/ui/sections/social-proof",
-    "Metis": "@warpgogol/ui/sections/toc",
-    "Tethys": "@warpgogol/ui/sections/transparency",
-    "Deimos": "@warpgogol/ui/sections/trust-strip",
-    "Quaoar": "@warpgogol/ui/sections/video-section",
-    "Iapetus": "@warpgogol/ui/sections/women",
-    "Proteus": "@warpgogol/ui/components/brand-label",
-    "Charon": "@warpgogol/ui/components/copyright",
-    "Rosalind": "@warpgogol/ui/components/currency-aware-price-display",
-    "Portia": "@warpgogol/ui/components/currency-selector",
-    "Galatea": "@warpgogol/ui/components/donation-card",
-    "Puck": "@warpgogol/ui/components/effects",
-    "Nereid": "@warpgogol/ui/components/footer-promo",
-    "Ophelia": "@warpgogol/ui/components/lang-switcher",
-    "Umbriel": "@warpgogol/ui/components/layout",
-    "Aegaeon": "@warpgogol/ui/components/live-photo",
-    "Cordelia": "@warpgogol/ui/components/material-credit",
-    "Sycorax": "@warpgogol/ui/components/media",
-    "Nix": "@warpgogol/ui/components/nachweis-card",
-    "Kerberos": "@warpgogol/ui/components/nachweis-detail",
-    "Hydra": "@warpgogol/ui/components/nachweis-list",
-    "Styx": "@warpgogol/ui/components/nachweis-verify",
-    "Cressida": "@warpgogol/ui/components/not-found",
-    "Methone": "@warpgogol/ui/components/passport-header",
-    "Bianca": "@warpgogol/ui/components/passport-provenance",
-    "Klarissa": "@warpgogol/ui/components/passport-score-grid",
-    "Adrastea": "@warpgogol/ui/components/passport-star-map",
-    "Miranda": "@warpgogol/ui/components/person-profile",
-    "Despina": "@warpgogol/ui/components/pulsar",
-    "Belinda": "@warpgogol/ui/components/responsive-image",
-    "Daphnis": "@warpgogol/ui/components/scroll-to-top",
-    "Praxidike": "@warpgogol/ui/components/cards",
-    "Aitne": "@warpgogol/ui/components/comparison",
-    "Sinope": "@warpgogol/ui/components/list",
-    "Thalassa": "@warpgogol/ui/components/offer-capacity",
-    "Aoede": "@warpgogol/ui/components/paragraphs",
-    "Kalyke": "@warpgogol/ui/components/rich",
-    "Lysithea": "@warpgogol/ui/components/split-list",
-    "Hegemone": "@warpgogol/ui/components/stats",
-    "Isonoe": "@warpgogol/ui/components/section-cta",
-    "Arche": "@warpgogol/ui/components/section-cta-group",
-    "Pasiphae": "@warpgogol/ui/components/section-header",
-    "Taygete": "@warpgogol/ui/components/section-image",
-    "Ananke": "@warpgogol/ui/components/section-shell",
-    "Naiad": "@warpgogol/ui/components/social-meta",
-    "Triton": "@warpgogol/ui/components/structured-data"
+    "Titan": "@warpgogol/werkstatt-site/ui/sections/approach",
+    "Himalia": "@warpgogol/werkstatt-site/ui/sections/article-header",
+    "Io": "@warpgogol/werkstatt-site/ui/sections/article-list",
+    "Epimetheus": "@warpgogol/werkstatt-site/ui/sections/audience-cards",
+    "Thebe": "@warpgogol/werkstatt-site/ui/sections/breadcrumbs",
+    "Prometheus": "@warpgogol/werkstatt-site/ui/sections/changelog",
+    "Amalthea": "@warpgogol/werkstatt-site/ui/sections/chat-widget",
+    "Janus": "@warpgogol/werkstatt-site/ui/sections/comparison-cards",
+    "Calypso": "@warpgogol/werkstatt-site/ui/sections/controlled-responsibility-block",
+    "Makemake": "@warpgogol/werkstatt-site/ui/sections/credits-gallery",
+    "Pandora": "@warpgogol/werkstatt-site/ui/sections/donation-card",
+    "Rhea": "@warpgogol/werkstatt-site/ui/sections/donation-use",
+    "Elara": "@warpgogol/werkstatt-site/ui/sections/dynamic-status-block",
+    "Atlas": "@warpgogol/werkstatt-site/ui/sections/faq-list",
+    "Dione": "@warpgogol/werkstatt-site/ui/sections/final-cta",
+    "Europa": "@warpgogol/werkstatt-site/ui/sections/hero",
+    "Phobos": "@warpgogol/werkstatt-site/ui/sections/hero-decision-card",
+    "Ganymede": "@warpgogol/werkstatt-site/ui/sections/impact",
+    "Hyperion": "@warpgogol/werkstatt-site/ui/sections/markdown",
+    "Phoebe": "@warpgogol/werkstatt-site/ui/sections/navigation",
+    "Telesto": "@warpgogol/werkstatt-site/ui/sections/notausgang-block",
+    "Orcus": "@warpgogol/werkstatt-site/ui/sections/open-source-registry",
+    "Helene": "@warpgogol/werkstatt-site/ui/sections/ownership-block",
+    "Mimas": "@warpgogol/werkstatt-site/ui/sections/people",
+    "Pan": "@warpgogol/werkstatt-site/ui/sections/price-card",
+    "Callisto": "@warpgogol/werkstatt-site/ui/sections/problem",
+    "Ceres": "@warpgogol/werkstatt-site/ui/sections/send-message",
+    "Sedna": "@warpgogol/werkstatt-site/ui/sections/service-metadata-block",
+    "Enceladus": "@warpgogol/werkstatt-site/ui/sections/social-proof",
+    "Metis": "@warpgogol/werkstatt-site/ui/sections/toc",
+    "Tethys": "@warpgogol/werkstatt-site/ui/sections/transparency",
+    "Deimos": "@warpgogol/werkstatt-site/ui/sections/trust-strip",
+    "Quaoar": "@warpgogol/werkstatt-site/ui/sections/video-section",
+    "Iapetus": "@warpgogol/werkstatt-site/ui/sections/women",
+    "Proteus": "@warpgogol/werkstatt-site/ui/components/brand-label",
+    "Charon": "@warpgogol/werkstatt-site/ui/components/copyright",
+    "Rosalind": "@warpgogol/werkstatt-site/ui/components/currency-aware-price-display",
+    "Portia": "@warpgogol/werkstatt-site/ui/components/currency-selector",
+    "Galatea": "@warpgogol/werkstatt-site/ui/components/donation-card",
+    "Puck": "@warpgogol/werkstatt-site/ui/components/effects",
+    "Nereid": "@warpgogol/werkstatt-site/ui/components/footer-promo",
+    "Ophelia": "@warpgogol/werkstatt-site/ui/components/lang-switcher",
+    "Umbriel": "@warpgogol/werkstatt-site/ui/components/layout",
+    "Aegaeon": "@warpgogol/werkstatt-site/ui/components/live-photo",
+    "Cordelia": "@warpgogol/werkstatt-site/ui/components/material-credit",
+    "Sycorax": "@warpgogol/werkstatt-site/ui/components/media",
+    "Nix": "@warpgogol/werkstatt-site/ui/components/nachweis-card",
+    "Kerberos": "@warpgogol/werkstatt-site/ui/components/nachweis-detail",
+    "Hydra": "@warpgogol/werkstatt-site/ui/components/nachweis-list",
+    "Styx": "@warpgogol/werkstatt-site/ui/components/nachweis-verify",
+    "Cressida": "@warpgogol/werkstatt-site/ui/components/not-found",
+    "Methone": "@warpgogol/werkstatt-site/ui/components/passport-header",
+    "Bianca": "@warpgogol/werkstatt-site/ui/components/passport-provenance",
+    "Klarissa": "@warpgogol/werkstatt-site/ui/components/passport-score-grid",
+    "Adrastea": "@warpgogol/werkstatt-site/ui/components/passport-star-map",
+    "Miranda": "@warpgogol/werkstatt-site/ui/components/person-profile",
+    "Despina": "@warpgogol/werkstatt-site/ui/components/pulsar",
+    "Belinda": "@warpgogol/werkstatt-site/ui/components/responsive-image",
+    "Daphnis": "@warpgogol/werkstatt-site/ui/components/scroll-to-top",
+    "Praxidike": "@warpgogol/werkstatt-site/ui/components/cards",
+    "Aitne": "@warpgogol/werkstatt-site/ui/components/comparison",
+    "Sinope": "@warpgogol/werkstatt-site/ui/components/list",
+    "Thalassa": "@warpgogol/werkstatt-site/ui/components/offer-capacity",
+    "Aoede": "@warpgogol/werkstatt-site/ui/components/paragraphs",
+    "Kalyke": "@warpgogol/werkstatt-site/ui/components/rich",
+    "Lysithea": "@warpgogol/werkstatt-site/ui/components/split-list",
+    "Hegemone": "@warpgogol/werkstatt-site/ui/components/stats",
+    "Isonoe": "@warpgogol/werkstatt-site/ui/components/section-cta",
+    "Arche": "@warpgogol/werkstatt-site/ui/components/section-cta-group",
+    "Pasiphae": "@warpgogol/werkstatt-site/ui/components/section-header",
+    "Taygete": "@warpgogol/werkstatt-site/ui/components/section-image",
+    "Ananke": "@warpgogol/werkstatt-site/ui/components/section-shell",
+    "Naiad": "@warpgogol/werkstatt-site/ui/components/social-meta",
+    "Triton": "@warpgogol/werkstatt-site/ui/components/structured-data"
   },
   "blockTypeToCosmicName": {
     "approach": "Titan",
@@ -951,10 +899,10 @@
     "structured-data": "Triton"
   },
   "moonImportPaths": {
-    "Ariel": "@warpgogol/ui/components/breadcrumbs",
-    "Titania": "@warpgogol/ui/components/footer",
-    "Oberon": "@warpgogol/ui/components/header",
-    "Hermippe": "@warpgogol/ui/components/site-background"
+    "Ariel": "@warpgogol/werkstatt-site/ui/components/breadcrumbs",
+    "Titania": "@warpgogol/werkstatt-site/ui/components/footer",
+    "Oberon": "@warpgogol/werkstatt-site/ui/components/header",
+    "Hermippe": "@warpgogol/werkstatt-site/ui/components/site-background"
   },
   "roleByCosmicName": {
     "Titan": "approach",

@@ -28,7 +28,7 @@
 
 /**
  * Canonical closed list of all event names that may be emitted via emit().
- * Generated from packages/ontology/growth/events/*.yaml — the ontology YAML
+ * Generated from packages/werkstatt-site/src/domain/ontology/growth/events/*.yaml — the ontology YAML
  * files are the single source of truth. Run
  * `pnpm --filter @warpgogol/werkstatt-site/growth run codegen:event-names` to regenerate.
  *
@@ -174,7 +174,7 @@ export interface FunnelStep {
   event: EventName;
 }
 
-/** A content-declared funnel loaded from packages/ontology/growth/funnels/. */
+/** A content-declared funnel loaded from packages/werkstatt-site/src/domain/ontology/growth/funnels/. */
 export interface FunnelDefinition {
   /** Machine-readable funnel id (kebab-case, matches filename) */
   id: string;

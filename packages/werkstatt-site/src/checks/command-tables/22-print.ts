@@ -34,7 +34,7 @@ export const PRINT_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/**/*.css", "packages/ui/src/**/*.scss"],
+    reads: ["packages/werkstatt-site/src/domain/ui/**/*.css", "packages/werkstatt-site/src/domain/ui/**/*.scss"],
     execute: runPrintLayoutValidate,
   },
   /* RFC-0257 / RFC-0653: PDF generation via Playwright — writes to .cache/pdf/ */

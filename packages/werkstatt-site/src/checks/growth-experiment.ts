@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 growth.experiment.validate + growth.experiment.archive — validates experiment
-YAML files in packages/ontology/growth/experiments/ and cross-references with
+YAML files in packages/werkstatt-site/src/domain/ontology/growth/experiments/ and cross-references with
 system.md growth.experiments[] (DNA-29, RFC-0027).
 
 growth.experiment.archive checks that archived experiments have a concluded date
@@ -45,7 +45,7 @@ export async function runGrowthExperimentValidate(
 
   const appDir = context.site?.directory ?? process.cwd();
   const repoRoot = join(appDir, "..", "..");
-  const experimentsDir = join(repoRoot, "packages", "ontology", "growth", "experiments");
+  const experimentsDir = join(repoRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "growth", "experiments");
 
   const knownExperimentIds = new Set<string>();
 
@@ -59,7 +59,7 @@ export async function runGrowthExperimentValidate(
       }
 
       const filePath = join(experimentsDir, entry.name);
-      const rel = `packages/ontology/growth/experiments/${entry.name}`;
+      const rel = `packages/werkstatt-site/src/domain/ontology/growth/experiments/${entry.name}`;
 
       let rawContent: string;
       try {
@@ -146,7 +146,7 @@ export async function runGrowthExperimentValidate(
       for (const expId of experimentIds) {
         if (!knownExperimentIds.has(expId)) {
           violations.push(
-            `GX-08: system.md growth.experiments[] references "${expId}" but no matching file found in packages/ontology/growth/experiments/`,
+            `GX-08: system.md growth.experiments[] references "${expId}" but no matching file found in packages/werkstatt-site/src/domain/ontology/growth/experiments/`,
           );
         }
       }
@@ -175,7 +175,7 @@ export async function runGrowthExperimentArchive(
 
   const appDir = context.site?.directory ?? process.cwd();
   const repoRoot = join(appDir, "..", "..");
-  const experimentsDir = join(repoRoot, "packages", "ontology", "growth", "experiments");
+  const experimentsDir = join(repoRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "growth", "experiments");
 
   const concludedIds = new Set<string>();
   const archivedIds = new Set<string>();
@@ -190,7 +190,7 @@ export async function runGrowthExperimentArchive(
       }
 
       const filePath = join(experimentsDir, entry.name);
-      const rel = `packages/ontology/growth/experiments/${entry.name}`;
+      const rel = `packages/werkstatt-site/src/domain/ontology/growth/experiments/${entry.name}`;
 
       let rawContent: string;
       try {

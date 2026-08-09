@@ -148,11 +148,11 @@ async function scanWorkspaceManifests(
     }
   }
 
-  // Shared UI package trees (Wave 7 target directories — packages/ui/src/*)
+  // Shared UI package trees (Wave 7 target directories — packages/werkstatt-site/src/domain/ui/*)
   const pkgUiRoots = [
-    join(workspaceRoot, "packages", "ui", "src", "sections"),
-    join(workspaceRoot, "packages", "ui", "src", "components"),
-    join(workspaceRoot, "packages", "ui", "src", "pages"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components"),
+    join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "pages"),
   ];
   for (const root of pkgUiRoots) {
     const found = await collectFilesMatching(root, (f) => f.endsWith(".manifest.yaml"));

@@ -25,19 +25,38 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
-const MESSKANON_PATH = join("packages", "ontology", "analytics", "messkanon.yaml");
-const MATOMO_BINDING_PATH = join("packages", "ontology", "analytics", "matomo-binding.yaml");
+const MESSKANON_PATH = join(
+  "packages",
+  "werkstatt-site",
+  "src",
+  "domain",
+  "ontology",
+  "analytics",
+  "messkanon.yaml",
+);
+const MATOMO_BINDING_PATH = join(
+  "packages",
+  "werkstatt-site",
+  "src",
+  "domain",
+  "ontology",
+  "analytics",
+  "matomo-binding.yaml",
+);
 const MATOMO_FLEET_REGISTRY_PATH = join(
   "packages",
+  "werkstatt-site",
+  "src",
+  "domain",
   "ontology",
   "analytics",
   "matomo-fleet.registry.yaml",
 );
 const MATOMO_SUPPORT_DIR = join(
   "packages",
-  "os",
-  "site-kernel-checks",
+  "werkstatt-site",
   "src",
+  "checks",
   "analytics",
   "matomo",
 );
@@ -516,9 +535,19 @@ export function runMatomoExportValidate(
 }
 
 export async function listAnalyticsFiles(workspaceRoot: string): Promise<string[]> {
-  const dir = join(workspaceRoot, "packages", "ontology", "analytics");
+  const dir = join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "analytics",
+  );
   try {
-    return (await readdir(dir)).map((name) => join("packages", "ontology", "analytics", name));
+    return (await readdir(dir)).map((name) =>
+      join("packages", "werkstatt-site", "src", "domain", "ontology", "analytics", name),
+    );
   } catch {
     return [];
   }

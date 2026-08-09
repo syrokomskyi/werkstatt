@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>archetype.registry.build / archetype.registry.validate / planet.import-paths.lint —
-builds and validates packages/ontology/archetypes/index.yaml from archetype YAML + UI manifests.</purpose>
+builds and validates packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml from archetype YAML + UI manifests.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -95,6 +95,9 @@ export async function runArchetypeRegistryBuild(
   const outputFile = join(
     context.workspaceRoot,
     "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
     "ontology",
     "archetypes",
     "index.yaml",
@@ -102,12 +105,15 @@ export async function runArchetypeRegistryBuild(
   const outputJsonFile = join(
     context.workspaceRoot,
     "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
     "ontology",
     "archetypes",
     "index.json",
   );
   if (!context.dryRun) {
-    // RFC-0258: workspace-root output (packages/ontology/) — must be atomic.
+    // RFC-0258: workspace-root output (packages/werkstatt-site/src/domain/ontology/) — must be atomic.
     await writeFileAtomic(outputFile, yamlStringify(registry) + "\n");
     await writeFileAtomic(outputJsonFile, JSON.stringify(registry, null, 2) + "\n");
   }
@@ -138,6 +144,9 @@ export async function runPlanetImportPathsLint(
   const outputFile = join(
     context.workspaceRoot,
     "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
     "ontology",
     "archetypes",
     "index.yaml",
@@ -249,6 +258,9 @@ export async function runArchetypeRegistryValidate(
   const outputFile = join(
     context.workspaceRoot,
     "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
     "ontology",
     "archetypes",
     "index.yaml",
@@ -348,7 +360,7 @@ export async function runArchetypeRegistryValidate(
 
   // RFC-0084: cross-check section-manifest roles against the archetype-derived
   // sectionRoles[] set. Replaces the closed SemanticRoleValues enum so adding
-  // a new section archetype no longer requires editing packages/ontology/src/enums.ts.
+  // a new section archetype no longer requires editing packages/werkstatt-site/src/domain/ontology/src/enums.ts.
   // Component-layer cross-check is deferred until component manifests are
   // reconciled with their archetype semanticRoles (component manifests
   // currently use unprefixed role values while archetypes ship `component-*`
@@ -401,7 +413,7 @@ export async function runArchetypeRegistryValidate(
       if (!catalog.allow.has(cosmicName)) {
         const hint = catalog.wrong.has(cosmicName)
           ? ` (this name lives in ${catalog.wrongName}, which is for the other layer; pick a ${catalog.allowName} name or move the archetype to the matching directory)`
-          : ` (${catalog.allowName} members only; see packages/ontology/src/cosmic/)`;
+          : ` (${catalog.allowName} members only; see packages/werkstatt-site/src/domain/ontology/src/cosmic/)`;
         details.push({
           file: relFile,
           message: `archetype \"${archetype.id}\" (${layer}) declares acceptedCosmicNames[\"${cosmicName}\"] but \"${cosmicName}\" is not in the ${layer}-layer ${catalog.allowName}${hint}`,

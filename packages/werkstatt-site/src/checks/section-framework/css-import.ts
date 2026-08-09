@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>section.css.import.validate (CSS-IMPORT-01 + CSS-NAME-01) — every colocated
-.css file under packages/ui/src/ must be imported by an .astro file and match the
+.css file under packages/werkstatt-site/src/domain/ui/ must be imported by an .astro file and match the
 colocated .astro filename.</purpose>
 <non-goals>
   <item>Do not validate CSS content or token usage — owned by tokens.colors.section-shell.lint.</item>
@@ -25,8 +25,8 @@ import type {
 import { ok, fail, type Violation, type CheckResult } from "./shared.ts";
 
 const UI_DIRS = [
-  join("packages", "ui", "src", "sections"),
-  join("packages", "ui", "src", "components"),
+  join("packages", "werkstatt-site", "src", "domain", "ui", "src", "sections"),
+  join("packages", "werkstatt-site", "src", "domain", "ui", "src", "components"),
 ];
 
 async function collectByExtension(workspaceRoot: string, extension: string): Promise<string[]> {
@@ -79,7 +79,7 @@ export async function runSectionCssImportValidate(
       violations.push({
         file: cssRel,
         rule: "CSS-IMPORT-01",
-        message: `CSS file '${cssBasename}' is not imported by any .astro file in packages/ui/src/`,
+        message: `CSS file '${cssBasename}' is not imported by any .astro file in packages/werkstatt-site/src/domain/ui/`,
         fix: `Add import "./${cssBasename}" to the colocated .astro file.`,
       });
     }

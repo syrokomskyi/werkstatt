@@ -46,8 +46,16 @@ export async function runBiomeTokensValidate(
   let cssFilesScanned = 0;
   let tokenUsesFound = 0;
 
-  const biomesDir = join(context.workspaceRoot, "packages", "ontology", "biomes");
-  const uiDir = join(context.workspaceRoot, "packages", "ui", "src");
+  const biomesDir = join(
+    context.workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "biomes",
+  );
+  const uiDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src");
   const appsDir = join(context.workspaceRoot, "apps");
 
   // Determine target apps from context/flags
@@ -130,7 +138,7 @@ export async function runBiomeTokensValidate(
           token: "N/A",
           biomeId,
           message: `Biome YAML not found: ${biomeId}`,
-          fixHint: `Create packages/ontology/biomes/${biomeId}.yaml or update system.md identity.biome.`,
+          fixHint: `Create packages/werkstatt-site/src/domain/ontology/biomes/${biomeId}.yaml or update system.md identity.biome.`,
         });
         continue;
       }
@@ -194,7 +202,7 @@ export async function runBiomeTokensValidate(
               biomeId,
               message: `${isGenerated ? "Generated" : "App-local"} CSS defines biome token ${token}.`,
               fixHint: isGenerated
-                ? `Update packages/ontology/biomes/${biomeId}.yaml and the generator, not the generated file.`
+                ? `Update packages/werkstatt-site/src/domain/ontology/biomes/${biomeId}.yaml and the generator, not the generated file.`
                 : `Consider moving token definition to the biome YAML for cross-site consistency.`,
             });
           }
@@ -224,7 +232,7 @@ export async function runBiomeTokensValidate(
               biomeId,
               source: resolution.source,
               message: `Token ${use.token} used at ${use.selector} is not defined.`,
-              fixHint: `Add ${use.token} to packages/ontology/biomes/${biomeId}.yaml or verify the token name.`,
+              fixHint: `Add ${use.token} to packages/werkstatt-site/src/domain/ontology/biomes/${biomeId}.yaml or verify the token name.`,
             });
           }
 
@@ -245,7 +253,7 @@ export async function runBiomeTokensValidate(
               source: resolution.source,
               biomeId,
               message: `Light biome "${biomeId}" inherits dark-background token ${use.token} from packages/tokens while ${use.selector} uses it on a light surface.`,
-              fixHint: `Add an explicit semantic value for ${use.token} to packages/ontology/biomes/${biomeId}.yaml, or change the component to use an adaptive/light-surface token. Do not patch generated app CSS.`,
+              fixHint: `Add an explicit semantic value for ${use.token} to packages/werkstatt-site/src/domain/ontology/biomes/${biomeId}.yaml, or change the component to use an adaptive/light-surface token. Do not patch generated app CSS.`,
             });
           }
         }

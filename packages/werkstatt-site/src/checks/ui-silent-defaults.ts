@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 [RFC-0205] Implements `ui.silent-defaults.lint` — a workspace-scoped validator that scans
-shared UI components (`packages/ui/src/{sections,components}/`) for empty-string fallbacks
+shared UI components (`packages/werkstatt-site/src/domain/ui/{sections,components}/`) for empty-string fallbacks
 on UI-visible text props. These silent defaults produce invisible or broken UI instead of
 failing loudly, allowing missing content to ship undetected.
 </purpose>
@@ -303,7 +303,7 @@ export async function runUiSilentDefaultsLint(
   const workspaceRoot = context.workspaceRoot;
   const scanPath = input.flags.path
     ? join(workspaceRoot, String(input.flags.path))
-    : join(workspaceRoot, "packages", "ui", "src");
+    : join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src");
 
   const files = await walkFiles(scanPath, /\.(astro|ts|tsx)$/);
   const allViolations: Violation[] = [];

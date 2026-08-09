@@ -328,7 +328,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
       },
     },
     supportsAllSites: true,
-    reads: ["<app>/src/pages/**/*.astro", "packages/ui/src/sections/navigation-section/**/*.astro"],
+    reads: ["<app>/src/pages/**/*.astro", "packages/werkstatt-site/src/domain/ui/sections/navigation-section/**/*.astro"],
     modulePaths: ["structure-hierarchy.ts"],
     execute: runStructureHierarchyValidate,
   },
@@ -456,13 +456,13 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
   {
     name: "content-types.validate",
     description:
-      "Validate that every manifest.yaml in packages/ui/src/{components,sections}/ with contentSchemaKey has a matching .types.ts sibling (DNA-10, RFC-0034).",
+      "Validate that every manifest.yaml in packages/werkstatt-site/src/domain/ui/{components,sections}/ with contentSchemaKey has a matching .types.ts sibling (DNA-10, RFC-0034).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
     reads: [
-      "packages/ui/src/{components,sections}/**/*.manifest.yaml",
-      "packages/ui/src/{components,sections}/**/*.types.ts",
+      "packages/werkstatt-site/src/domain/ui/{components,sections}/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ui/{components,sections}/**/*.types.ts",
     ],
     execute: runContentTypesValidate,
   },

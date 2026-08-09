@@ -146,7 +146,7 @@ async function createFixture(): Promise<{ root: string; app: string }> {
   const root = await mkdtemp(join(tmpdir(), "rfc-0719-body-kind-"));
   const app = join(root, "apps", "fixture-app");
   const content = join(app, "src", "content");
-  const packagesUiSrc = join(root, "packages", "ui", "src");
+  const packagesUiSrc = join(root, "packages", "werkstatt-site", "src", "domain", "ui", "src");
 
   await mkdir(join(content, "pages", "de"), { recursive: true });
   await mkdir(join(packagesUiSrc, "sections", "test-list"), { recursive: true });

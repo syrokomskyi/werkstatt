@@ -31,7 +31,7 @@ export async function runSectionContractValidate(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<SectionContractResult>> {
-  const sectionsRoot = join(context.workspaceRoot, "packages", "ui", "src", "sections");
+  const sectionsRoot = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
   const manifestFiles = await collectFilesMatching(sectionsRoot, (filePath) =>
     filePath.endsWith(".manifest.yaml"),
   );

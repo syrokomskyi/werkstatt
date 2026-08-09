@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 Zod schema for RFC-0072 section archetype catalog entries stored under
-packages/ontology/archetypes/sections/ recursive YAML catalog files.
+packages/werkstatt-site/src/domain/ontology/archetypes/sections/ recursive YAML catalog files.
 </purpose>
 <non-goals>
   <item>Do not parse YAML here.</item>

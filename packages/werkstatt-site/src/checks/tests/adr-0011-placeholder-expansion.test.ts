@@ -73,8 +73,8 @@ describe("ADR-0011: expandOwnershipPlaceholders — all placeholders expanded", 
 
   it("{id} expands to *", () => {
     expect(
-      expandOwnershipPlaceholders("packages/ui/src/sections/{id}/{id}.types.generated.ts"),
-    ).toBe("packages/ui/src/sections/*/*.types.generated.ts");
+      expandOwnershipPlaceholders("packages/werkstatt-site/src/domain/ui/sections/{id}/{id}.types.generated.ts"),
+    ).toBe("packages/werkstatt-site/src/domain/ui/sections/*/*.types.generated.ts");
   });
 
   it("{category} expands to *", () => {

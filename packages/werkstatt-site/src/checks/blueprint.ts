@@ -3,7 +3,7 @@ import { parse as yamlParse } from "yaml";
 <MODULE_CONTRACT>
 <purpose>
   [RFC-0193] blueprint.validate: validate every Programmatic Surface Blueprint
-  (packages/ontology/blueprints/*.yaml) against the schema and cross-check it against the app's
+  (packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml) against the schema and cross-check it against the app's
   datasets — axis universe collections + the record dataset must exist, and every level slug
   template may only reference axes in scope at that depth. No-op pass when `pseo` is not entitled.
 </purpose>
@@ -28,7 +28,7 @@ import { parseBlueprint, type Blueprint } from "@warpgogol/werkstatt-site/surfac
 import { failResult, passResult } from "./result-helpers.ts";
 import { readDeclaredBlueprints } from "./surface-expand.ts";
 
-const BLUEPRINTS_DIR = join("packages", "ontology", "blueprints");
+const BLUEPRINTS_DIR = join("packages", "werkstatt-site", "src", "domain", "ontology", "blueprints");
 
 async function readEntitledFeatures(appDir: string): Promise<string[] | null> {
   try {

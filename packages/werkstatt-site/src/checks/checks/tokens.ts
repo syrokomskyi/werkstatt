@@ -180,7 +180,7 @@ async function scanPackagesUiCss(
   tokenNameSet: ReadonlySet<string>,
   logger: { warn: (msg: string) => void },
 ): Promise<ColorLintFinding[]> {
-  const packagesUiSrc = resolve(workspaceRoot, "packages/ui/src");
+  const packagesUiSrc = resolve(workspaceRoot, "packages/werkstatt-site/src/domain/ui/src");
 
   let files: string[];
   try {
@@ -340,7 +340,7 @@ async function detectBrandedStudioInheritance(
     return [];
   }
 
-  const biomePath = join(workspaceRoot, "packages", "ontology", "biomes", `${biomeId}.yaml`);
+  const biomePath = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "biomes", `${biomeId}.yaml`);
   let biomeRaw: string;
   try {
     biomeRaw = await readFile(biomePath, "utf-8");
@@ -371,7 +371,7 @@ async function detectBrandedStudioInheritance(
     if (biomeDeclares(t.biomePath)) continue;
     hints.push(
       `biome "${biomeId}" inherits studio default ${t.cssVar} which is tinted with ${t.tint}. ` +
-        `Declare ${t.biomePath} in packages/ontology/biomes/${biomeId}.yaml to avoid rendering with another brand's identity (RFC-0098).`,
+        `Declare ${t.biomePath} in packages/werkstatt-site/src/domain/ontology/biomes/${biomeId}.yaml to avoid rendering with another brand's identity (RFC-0098).`,
     );
   }
   return hints;
@@ -431,7 +431,7 @@ export async function runBiomeCoverageHint(
   for (const hint of hints) {
     context.logger.info(
       `${relativePath}:${hint.line} ${hint.token} = ${hint.value}` +
-        ` — consider promoting to packages/ontology/biomes/<id>.yaml so sibling sites can reuse it.`,
+        ` — consider promoting to packages/werkstatt-site/src/domain/ontology/biomes/<id>.yaml so sibling sites can reuse it.`,
     );
   }
 

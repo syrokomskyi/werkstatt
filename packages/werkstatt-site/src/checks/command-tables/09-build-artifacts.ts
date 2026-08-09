@@ -555,7 +555,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/entitlements.generated.yaml", "packages/ontology/entitlements/**/*.yaml"],
+    reads: ["<app>/src/entitlements.generated.yaml", "packages/werkstatt-site/src/domain/ontology/entitlements/**/*.yaml"],
     modulePaths: ["entitlements.ts", "result-helpers.ts"],
     execute: runEntitlementsValidate,
   },

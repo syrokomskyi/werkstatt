@@ -91,11 +91,11 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
     name: "shared-ui.thin-copy.validate",
     description:
-      "Detect hardcoded copy in shared UI Astro sections under packages/ui/src/sections.",
+      "Detect hardcoded copy in shared UI Astro sections under packages/werkstatt-site/src/domain/ui/sections.",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/ui/src/sections/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro"],
     modulePaths: ["checks/thin-copy.ts"],
     execute: runSharedUiThinCopyValidation,
   },
@@ -179,7 +179,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
       "Report surviving legacy effect props in packages/ui renderers and how many files reference the effects system — RFC-0156.",
     scope: "workspace",
     flags: {},
-    reads: ["packages/ui/src/{sections,components}/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro"],
     modulePaths: ["effects-contract.ts"],
     execute: runEffectsCoverageAudit,
   },
@@ -190,7 +190,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/content/**/*.md", "packages/ontology/site-families/**/*.yaml"],
+    reads: ["<app>/src/content/**/*.md", "packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml"],
     modulePaths: ["content-voice.ts"],
     execute: runContentVoiceLint,
   },
@@ -222,7 +222,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/styles/**/*.css", "packages/ui/src/**/*.css"],
+    reads: ["<app>/src/styles/**/*.css", "packages/werkstatt-site/src/domain/ui/**/*.css"],
     modulePaths: ["checks/tokens.ts"],
     execute: runHardcodedColorLint,
   },
@@ -268,7 +268,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/*/package.json", "packages/ui/src/{sections,components,pages}/**/*.astro"],
+    reads: ["packages/*/package.json", "packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.astro"],
     modulePaths: ["astro-exports.ts"],
     execute: runAstroExportsLint,
   },
@@ -382,7 +382,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
     name: "ui.i18n.lint",
     description:
-      "Scan packages/ui/src/{sections,components}/ for hardcoded human-readable strings and non-trivial resolveLabel fallbacks (RFC-0189).",
+      "Scan packages/werkstatt-site/src/domain/ui/{sections,components}/ for hardcoded human-readable strings and non-trivial resolveLabel fallbacks (RFC-0189).",
     scope: "workspace",
     flags: {
       path: {
@@ -391,7 +391,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
       },
     },
     supportsAllSites: true,
-    reads: ["packages/ui/src/{sections,components}/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro"],
     modulePaths: ["ui-i18n.ts"],
     execute: runUiI18nLint,
   },
@@ -428,7 +428,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
     name: "ui.silent-defaults.lint",
     description:
-      'Scan packages/ui/src/{sections,components}/ for silent empty-string fallbacks (?? "", = "", defaultContent) on UI-visible text props (RFC-0205).',
+      'Scan packages/werkstatt-site/src/domain/ui/{sections,components}/ for silent empty-string fallbacks (?? "", = "", defaultContent) on UI-visible text props (RFC-0205).',
     scope: "workspace",
     flags: {
       path: {
@@ -437,7 +437,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
       },
     },
     supportsAllSites: true,
-    reads: ["packages/ui/src/{sections,components}/**/*.astro"],
+    reads: ["packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro"],
     modulePaths: ["ui-silent-defaults.ts"],
     execute: runUiSilentDefaultsLint,
   },

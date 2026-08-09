@@ -28,7 +28,7 @@ export async function runCheckAudienceProfileValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult>> {
   const profilePath =
-    getStringFlag(input, "profile") ?? "packages/ontology/check-audiences/handwerk-owner-de.yaml";
+    getStringFlag(input, "profile") ?? "packages/werkstatt-site/src/domain/ontology/check-audiences/handwerk-owner-de.yaml";
   try {
     parseAudienceProfile(
       YAML.parse(await context.io.readFile(resolveWorkspacePath(context, profilePath))),
@@ -55,7 +55,7 @@ export async function runCheckAudienceReviewRun(
   if (!result.graph) return diagnosticsResult("check.audience.review.run", result.diagnostics);
   const { graph, runId, runDir, relRunDir } = result;
   const profilePath =
-    getStringFlag(input, "profile") ?? "packages/ontology/check-audiences/handwerk-owner-de.yaml";
+    getStringFlag(input, "profile") ?? "packages/werkstatt-site/src/domain/ontology/check-audiences/handwerk-owner-de.yaml";
   const profile = parseAudienceProfile(
     YAML.parse(await context.io.readFile(resolveWorkspacePath(context, profilePath))),
   );
