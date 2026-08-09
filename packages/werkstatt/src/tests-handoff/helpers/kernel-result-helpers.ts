@@ -17,7 +17,7 @@ message instead of a cryptic TypeError.
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandResult } from "@warpgogol/site-kernel";
+import type { KernelCommandResult } from "@warpgogol/werkstatt/kernel";
 
 export function expectData<T>(result: KernelCommandResult<T>): T {
   if (result.data === undefined) {

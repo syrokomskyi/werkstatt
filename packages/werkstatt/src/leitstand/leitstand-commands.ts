@@ -39,7 +39,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type {
   PropagationResult,
   HealthCheck,
@@ -47,13 +47,13 @@ import type {
   DeploymentChannel,
   LastPropagatedChannel,
   PurgeResult,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readReleaseManifest, writeReleaseYaml } from "../release/release-commands.ts";
 import { orchestrateSnap01Recovery } from "../mission/snapshot-auto-regen.ts";
-import { buildIdentitySchema } from "@warpgogol/ontology/operations";
+import { buildIdentitySchema } from "@warpgogol/werkstatt/schemas";
 import type {
   DeploymentAdapter,
   DeploymentLimits,
@@ -76,7 +76,7 @@ import {
 } from "./cache-purge.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
-import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 import { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";
 import type { Finding } from "@syrokomskyi/axiom-study";
 import {
@@ -87,7 +87,7 @@ import {
   type SuppressedFinding,
 } from "@warpgogol/site-kernel-checks/suppressions-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
-import { computeBuildInputHash } from "../build-pipeline-helpers.ts";
+import { computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 
 function logCacheDirSize(cacheDir: string, logger: { info: (msg: string) => void }): void {
   try {
@@ -210,7 +210,7 @@ export async function runMissionCheckWithResilience(
   logger: { info: (m: string) => void; warn: (m: string) => void },
   noReport = true,
 ): Promise<{ exitCode: number; data?: Record<string, unknown> }> {
-  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
 
   for (let attempt = 0; attempt <= MISSION_CHECK_MAX_RETRIES; attempt++) {
     try {
@@ -887,7 +887,7 @@ export async function runLeitstandDevDeploy(
   // RFC-0665: Pre-flight — validate methodologies config before building, so
   // invalid configs fail fast instead of after a long build+deploy cycle.
   try {
-    const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
+    const { executeKernelCommand: executeValidate } = await import("@warpgogol/werkstatt/kernel");
     const validateResult = (await executeValidate({
       workspaceRoot,
       commandName: "methodologies.validate",
@@ -1028,7 +1028,7 @@ export async function runLeitstandDevDeploy(
     // RFC-0689/RFC-0697: When build is skipped, build.post (which runs behavior.snapshot.validate)
     // doesn't execute. Check for stale snapshot separately and regenerate if SNAP-01.
     try {
-      const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
+      const { executeKernelCommand: executeValidate } = await import("@warpgogol/werkstatt/kernel");
       const snapResult = await orchestrateSnap01Recovery({
         workspaceRoot,
         systemId,
@@ -1076,7 +1076,7 @@ export async function runLeitstandDevDeploy(
       // snapshot and re-run the build.
       let snapshotRegenerated = false;
       try {
-        const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
+        const { executeKernelCommand: executeValidate } = await import("@warpgogol/werkstatt/kernel");
         const snapResult = await orchestrateSnap01Recovery({
           workspaceRoot,
           systemId,
@@ -1231,7 +1231,7 @@ export async function runLeitstandDevDeploy(
     summary,
   });
   try {
-    const { executeKernelCommand: executeCommit } = await import("@warpgogol/site-kernel");
+    const { executeKernelCommand: executeCommit } = await import("@warpgogol/werkstatt/kernel");
     const commitResult = (await executeCommit({
       workspaceRoot,
       commandName: "mission.git.commit",
@@ -1525,7 +1525,7 @@ export async function runLeitstandDevDeploy(
 
   // RFC-0633: Auto-invoke axiom.report after mission.check (best-effort, non-blocking)
   try {
-    const { executeKernelCommand: executeReport } = await import("@warpgogol/site-kernel");
+    const { executeKernelCommand: executeReport } = await import("@warpgogol/werkstatt/kernel");
     const reportResult = (await executeReport({
       workspaceRoot,
       commandName: "axiom.report",
@@ -1548,7 +1548,7 @@ export async function runLeitstandDevDeploy(
 
   if (!skipEvidenceSync) {
     try {
-      const { executeKernelCommand: executeSync } = await import("@warpgogol/site-kernel");
+      const { executeKernelCommand: executeSync } = await import("@warpgogol/werkstatt/kernel");
       await executeSync({
         workspaceRoot,
         commandName: "evidence.sync",

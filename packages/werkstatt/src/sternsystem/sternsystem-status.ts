@@ -20,8 +20,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import type { BordbuchEntry } from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/kernel";
+import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import { readRegistry, findEntry, resolveMirrors, resolveMirrorPath } from "./registry-io.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { readMissionManifest } from "../mission/mission-io.ts";

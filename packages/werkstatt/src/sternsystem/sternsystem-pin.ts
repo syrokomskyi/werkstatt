@@ -19,9 +19,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { systemPinSchema, type SystemPin } from "@warpgogol/ontology/operations";
-import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
+} from "@warpgogol/werkstatt/kernel";
+import { systemPinSchema, type SystemPin } from "@warpgogol/werkstatt/schemas";
+import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../handoff/bundle-io.ts";
 import { allMigratorIds } from "../migrators/registry.ts";
 import { readRegistry, writeRegistry, findEntry, resolveCachePath } from "./registry-io.ts";
 import { highestRfcId, snapshotCapabilities } from "./pin-helpers.ts";

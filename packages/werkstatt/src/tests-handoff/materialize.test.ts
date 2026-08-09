@@ -12,7 +12,7 @@ Migrator chain application tests moved to migrators.test.ts (RFC-0479).</purpose
 */
 
 import { test, expect } from "vitest";
-import { toAppRelative } from "../materialize.ts";
+import { toAppRelative } from "../handoff/materialize.ts";
 
 test("toAppRelative strips the site/ prefix and rejects non-site paths", () => {
   expect(toAppRelative("site/src/content/business-profile/de/business.md")).toBe(

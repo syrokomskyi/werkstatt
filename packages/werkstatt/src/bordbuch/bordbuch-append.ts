@@ -14,8 +14,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import type { BordbuchEntryKind } from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/kernel";
+import type { BordbuchEntryKind } from "@warpgogol/werkstatt/schemas";
 import { appendBordbuchEntry, validateWriterRole, readBordbuch } from "./bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 

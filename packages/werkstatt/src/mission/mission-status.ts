@@ -14,7 +14,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { readMissionManifest } from "./mission-io.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 

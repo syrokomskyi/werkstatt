@@ -19,8 +19,8 @@ import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import type { PropagationResult, HealthCheck, RouteFact } from "@warpgogol/ontology/operations";
-import { hashHtml } from "@warpgogol/fingerprint";
+import type { PropagationResult, HealthCheck, RouteFact } from "@warpgogol/werkstatt/schemas";
+import { hashHtml } from "@warpgogol/werkstatt/fingerprint";
 import type {
   CommandRunner,
   DeploymentAdapter,

@@ -15,7 +15,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { generateKeypair } from "@warpgogol/passport/sign";
 import { signIdentityCredential } from "@warpgogol/passport/identity-sign";
 import type { WerkstattIdentityConfig, SiteOwnershipCredentialSubject } from "@warpgogol/passport";

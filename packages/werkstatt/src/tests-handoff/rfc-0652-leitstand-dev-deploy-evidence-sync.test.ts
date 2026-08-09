@@ -11,7 +11,7 @@
 import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 const mockState = vi.hoisted(() => ({
   syncCalled: false,
@@ -32,8 +32,8 @@ vi.mock("node:child_process", () => ({
   }),
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...original,
     executeKernelCommand: vi.fn(

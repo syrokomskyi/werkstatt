@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 
 export interface MissionCleanupData {

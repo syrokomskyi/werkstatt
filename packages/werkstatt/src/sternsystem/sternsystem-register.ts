@@ -23,7 +23,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
   KernelFlagValue,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { StarCatalog, type StarName } from "@warpgogol/ontology/cosmic";
 import { parseBriefFrontmatter } from "@warpgogol/site-kernel-onboarding";
 import {

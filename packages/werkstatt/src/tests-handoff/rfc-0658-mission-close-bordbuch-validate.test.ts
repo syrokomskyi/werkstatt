@@ -13,7 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 const mockState = vi.hoisted(() => ({
@@ -31,7 +31,7 @@ vi.mock("../mission/mission-materialization-commands.ts", () => ({
   runMissionReconcile: vi.fn(),
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
   const original = (await importOriginal()) as Record<string, unknown>;
   return {
     ...original,

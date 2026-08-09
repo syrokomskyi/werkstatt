@@ -12,7 +12,7 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 const mockState = vi.hoisted(() => ({
   validateResult: {
@@ -35,7 +35,7 @@ vi.mock("../mission/mission-materialization-commands.ts", () => ({
   runMissionReconcile: vi.fn(),
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
   const original = (await importOriginal()) as Record<string, unknown>;
   return {
     ...original,
@@ -167,7 +167,7 @@ test("mission.close fails when sternsystem.pin fails", async () => {
   setupWorkspace();
 
   // Override the mock to return failure for sternsystem.pin
-  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
   vi.mocked(executeKernelCommand).mockImplementationOnce(async (args: { commandName: string }) => {
     if (args.commandName === "sternsystem.pin") {
       return { exitCode: 1, data: {}, summary: "pin failed: cache clone missing" } as never;

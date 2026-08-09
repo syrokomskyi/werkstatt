@@ -12,10 +12,10 @@ keyed by the unique uni.registry entry id (semanticId is not unique across layer
 */
 
 import { test, expect } from "vitest";
-import { diffCapabilities, worstTier } from "../capability-diff.ts";
-import type { HandoffCapability } from "@warpgogol/ontology/operations";
+import { diffCapabilities, worstTier } from "../handoff/capability-diff.ts";
+import type { HandoffCapability } from "@warpgogol/werkstatt/schemas";
 import type { Migrator } from "../migrators/types.ts";
-import type { RegistryView } from "../types.ts";
+import type { RegistryView } from "../handoff/types.ts";
 
 function registry(
   entries: Record<string, { version: string; semanticId?: string; intent: string[] }>,

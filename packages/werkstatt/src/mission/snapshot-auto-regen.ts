@@ -11,8 +11,8 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 
 interface SnapshotDiagnostics {
   diagnostics?: { ruleId: string }[];

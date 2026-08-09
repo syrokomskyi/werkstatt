@@ -43,15 +43,15 @@ import type {
   KernelNextStep,
   KernelPipelineReport,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { executeKernelCommand, executeKernelPipeline } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { executeKernelCommand, executeKernelPipeline } from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/share/fs";
 import {
   runPipelinePhase,
   computeBuildInputHash,
   writePreliminaryBuildIdentity,
   cleanupPreliminaryBuildIdentity,
-} from "../build-pipeline-helpers.ts";
+} from "../handoff/build-pipeline-helpers.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import {
   isWorkpieceDirty,
@@ -473,7 +473,7 @@ export async function runMissionValidate(
       // Compute sitemap hash if sitemap exists
       const sitemapPath = path.join(workpieceDir, "dist", "sitemap-index.xml");
       if (existsSync(sitemapPath)) {
-        const { byteHashFile } = await import("@warpgogol/fingerprint");
+        const { byteHashFile } = await import("@warpgogol/werkstatt/fingerprint");
         sitemapHash = await byteHashFile(sitemapPath);
       } else {
         sitemapHash = "sha256:no-sitemap";
@@ -757,7 +757,7 @@ export async function runMissionBuild(
       }
       const sitemapPath = path.join(workpieceDir, "dist", "sitemap-index.xml");
       if (existsSync(sitemapPath)) {
-        const { byteHashFile } = await import("@warpgogol/fingerprint");
+        const { byteHashFile } = await import("@warpgogol/werkstatt/fingerprint");
         buildSitemapHash = await byteHashFile(sitemapPath);
       }
     } catch (err) {

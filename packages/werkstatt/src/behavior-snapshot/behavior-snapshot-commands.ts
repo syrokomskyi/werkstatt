@@ -23,7 +23,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/share/fs";
 import {
   parseRedirectRules,
@@ -31,8 +31,8 @@ import {
   type RedirectRule,
 } from "@warpgogol/share/redirects";
 import { isHtmlRedirectPage } from "@warpgogol/share/semantic";
-import { hashHtml } from "@warpgogol/fingerprint";
-import type { RouteFact } from "@warpgogol/ontology/operations";
+import { hashHtml } from "@warpgogol/werkstatt/fingerprint";
+import type { RouteFact } from "@warpgogol/werkstatt/schemas";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];

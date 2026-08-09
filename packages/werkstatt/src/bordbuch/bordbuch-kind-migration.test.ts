@@ -12,7 +12,7 @@ import fs from "node:fs/promises";
 import { existsSync, mkdirSync, mkdtempSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import type { BordbuchEntry } from "@warpgogol/ontology/operations";
+import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import {
   computeEntryHash,
   readBordbuch,
@@ -20,7 +20,7 @@ import {
   migrateDeprecatedKind,
   DEPRECATED_KIND_MIGRATIONS,
 } from "./bordbuch-io.ts";
-import { bordbuchEntryKindSchema } from "@warpgogol/ontology/operations";
+import { bordbuchEntryKindSchema } from "@warpgogol/werkstatt/schemas";
 
 let tmpDir: string;
 const systemId = "test-system";

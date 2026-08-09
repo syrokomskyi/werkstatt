@@ -16,7 +16,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 export {
   isNachweisEntitled,

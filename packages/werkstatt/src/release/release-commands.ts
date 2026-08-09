@@ -30,8 +30,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+} from "@warpgogol/werkstatt/kernel";
+import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 import {
   readMissionManifest,
   writeMissionManifest,
@@ -41,7 +41,7 @@ import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/inde
 import { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
-import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
+import { runPipelinePhase, computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
 import { checkBreaksCDeclaration } from "./breaks-c-helper.ts";
 import {
@@ -534,7 +534,7 @@ export async function runReleasePrepare(
       // RFC-0520: C-surface regression check delegated to evaluateCSurfaceGate
       let cSurfaceVerdict: "pass" | "fail" | "skipped" = "skipped";
       try {
-        const { runSurfaceContractValidate } = await import("../surface-contract.ts");
+        const { runSurfaceContractValidate } = await import("../handoff/surface-contract.ts");
         const surfaceResult = await runSurfaceContractValidate(
           { flags: { app: systemId }, argv: [] },
           context,

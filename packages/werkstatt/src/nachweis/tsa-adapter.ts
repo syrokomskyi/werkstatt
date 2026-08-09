@@ -20,7 +20,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 
 export interface TsaAdapter {
   readonly name: string;

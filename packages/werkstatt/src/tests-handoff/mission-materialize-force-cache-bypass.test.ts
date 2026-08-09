@@ -11,7 +11,7 @@
 import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createMaterializeWorkspace } from "./helpers/materialize-fixture.ts";
 
 const mockPipeline = vi.hoisted(() => ({
@@ -19,8 +19,8 @@ const mockPipeline = vi.hoisted(() => ({
   pipelineNameUsed: "" as string,
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     executeKernelPipeline: vi.fn(async (opts: { pipelineName: string; force?: boolean }) => {

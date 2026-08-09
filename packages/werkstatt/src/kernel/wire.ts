@@ -121,14 +121,14 @@ function buildModuleDecisions(
     { key: "deploy", include: true },
     {
       key: "integrity",
-      include: passportEnabled || hasPackage(packageJson, "@warpgogol/site-kernel-integrity"),
+      include: passportEnabled || hasPackage(packageJson, "@warpgogol/werkstatt/integrity"),
       reason: passportEnabled
         ? undefined
         : "passport disabled and integrity package not required by manifest",
     },
     {
       key: "changelog",
-      include: hasPackage(packageJson, "@warpgogol/site-kernel-changelog"),
+      include: hasPackage(packageJson, "@warpgogol/werkstatt/changelog"),
       reason: "changelog package not installed",
     },
     {
@@ -336,7 +336,7 @@ export async function runKernelWire(
     });
     files.push({
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "integrity.ts"),
-      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-integrity", [
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/werkstatt/integrity", [
         "runIntegrityInit",
         "runIntegrityUpdate",
         "runIntegrityVerify",
@@ -356,7 +356,7 @@ export async function runKernelWire(
     });
     files.push({
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "changelog.ts"),
-      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-changelog", [
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/werkstatt/changelog", [
         "runChangelogGenerate",
         "runChangelogRebuildIndex",
         "runChangelogBackfill",

@@ -18,24 +18,14 @@
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@astrojs/compiler": "^4.0.0",
-    "@typescript-eslint/typescript-estree": "^8.65.0",
-    "@warpgogol/share": "workspace:*",
-    "jsonc-parser": "^3.3.1",
-    "pdf-lib": "^1.17.1",
-    "postcss": "^8.5.25",
-    "remark-frontmatter": "^5.0.0",
-    "remark-mdx": "^3.1.1",
-    "remark-parse": "^11.0.0",
-    "unified": "^11.0.5",
-    "yaml": "^2.9.0"
+    "@warpgogol/werkstatt": "workspace:*"
   },
   "devDependencies": {
-    "fast-check": "^4.9.0",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
 }

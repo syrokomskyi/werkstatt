@@ -15,26 +15,14 @@
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@warpgogol/fingerprint": "workspace:*",
-    "@warpgogol/share": "workspace:*",
-    "@warpgogol/site-kernel": "workspace:*",
-    "ajv": "^8.20.0",
-    "ajv-formats": "^3.0.1",
-    "uuid": "^14.0.1"
+    "@warpgogol/werkstatt": "workspace:*"
   },
   "devDependencies": {
-    "fast-check": "^4.9.0",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.10"
-  },
-  "gogol": {
-    "testSignal": {
-      "signal": "direct",
-      "owner": "architecture",
-      "rationale": "Vitest unit tests cover stableStringify determinism and integrity path utilities."
-    }
   }
 }

@@ -13,7 +13,7 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { runLeitstandDevDeploy } from "../leitstand/leitstand-commands.ts";
-import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 const { mockExecSync, mockExecuteKernelCommand } = vi.hoisted(() => ({
   mockExecSync: vi.fn(),
@@ -30,8 +30,8 @@ vi.mock("node:child_process", () => ({
   execSync: mockExecSync,
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...original,
     executeKernelCommand: mockExecuteKernelCommand,

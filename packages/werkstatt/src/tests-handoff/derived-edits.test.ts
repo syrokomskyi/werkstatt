@@ -8,8 +8,8 @@
 */
 
 import { test, expect } from "vitest";
-import { reportDerivedEdits } from "../derived-edits.ts";
-import type { HandoffManifest } from "@warpgogol/ontology/operations";
+import { reportDerivedEdits } from "../handoff/derived-edits.ts";
+import type { HandoffManifest } from "@warpgogol/werkstatt/schemas";
 
 test("detects hash mismatches on derived entries", async () => {
   // Mock manifest with a derived entry and mismatched hash.

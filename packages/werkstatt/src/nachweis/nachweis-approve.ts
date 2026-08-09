@@ -27,7 +27,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";

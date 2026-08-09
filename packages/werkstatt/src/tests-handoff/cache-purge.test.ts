@@ -14,7 +14,7 @@ import {
   purgeCacheByUrls,
   skippedPurgeResult,
 } from "../leitstand/cache-purge.ts";
-import type { RouteFact } from "@warpgogol/ontology/operations";
+import type { RouteFact } from "@warpgogol/werkstatt/schemas";
 
 test("collectPurgeUrls maps routes to full URLs and appends build-identity", () => {
   const routes: RouteFact[] = [

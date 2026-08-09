@@ -25,12 +25,12 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import * as ed from "@noble/ed25519";
-import { stableStringify, byteHash } from "@warpgogol/fingerprint";
+import { stableStringify, byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";

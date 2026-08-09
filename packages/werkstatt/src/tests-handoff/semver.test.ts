@@ -8,7 +8,7 @@
 */
 
 import { test, expect } from "vitest";
-import { compareSemver, inOpenClosedRange, parseSemver } from "../semver.ts";
+import { compareSemver, inOpenClosedRange, parseSemver } from "../handoff/semver.ts";
 
 test("compareSemver: orders by major, minor, patch", () => {
   expect(compareSemver("4.5.0", "4.5.0")).toBe(0);

@@ -16,12 +16,12 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { create as tarCreate, extract as tarExtract } from "tar";
-import { byteHash, byteHashFile } from "@warpgogol/fingerprint";
+import { byteHash, byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/share/fs";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";

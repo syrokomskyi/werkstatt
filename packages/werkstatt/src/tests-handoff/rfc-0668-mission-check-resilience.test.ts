@@ -10,8 +10,8 @@
 
 import { test, expect, beforeEach, vi } from "vitest";
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...original,
     executeKernelCommand: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
 });
 
 import { runMissionCheckWithResilience } from "../leitstand/leitstand-commands.ts";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 
 function makeLogger() {
   return {

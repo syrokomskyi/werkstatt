@@ -12,7 +12,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { BordbuchEntry, BordbuchEntryKind } from "@warpgogol/ontology/operations";
+import type { BordbuchEntry, BordbuchEntryKind } from "@warpgogol/werkstatt/schemas";
 import {
   appendBordbuchEntry,
   commitAndPushBordbuch,

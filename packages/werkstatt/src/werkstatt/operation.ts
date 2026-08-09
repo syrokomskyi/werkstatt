@@ -17,7 +17,7 @@ import { createHash } from "node:crypto";
 import {
   werkstattOperationRecordSchema,
   type WerkstattOperationRecord,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";
 
 const OPERATIONS_DIR = path.join(".werkstatt", "operations");
 

@@ -14,8 +14,8 @@ import { join, basename } from "node:path";
 import { execSync } from "node:child_process";
 import { runMissionOpen } from "../mission/mission-open.ts";
 import { computeEntryHash } from "../bordbuch/bordbuch-io.ts";
-import type { BordbuchEntry } from "@warpgogol/ontology/operations";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 function gitInit(dir: string): void {
   execSync("git init", { cwd: dir, stdio: "pipe" });

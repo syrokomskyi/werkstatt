@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { systemPinSchema, type SystemPin } from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/kernel";
+import { systemPinSchema, type SystemPin } from "@warpgogol/werkstatt/schemas";
 import {
   readRegistry,
   writeRegistry,
@@ -29,7 +29,7 @@ import {
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
-import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
+import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../handoff/bundle-io.ts";
 import { allMigratorIds } from "../migrators/registry.ts";
 import { highestRfcId, snapshotCapabilities } from "./pin-helpers.ts";
 

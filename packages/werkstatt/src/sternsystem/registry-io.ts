@@ -22,7 +22,7 @@ import {
   type FleetRegistryEntry,
   type MirrorEntry,
   type ServiceEntry,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 
 const REGISTRY_PATH = path.join("systems", "registry.yaml");

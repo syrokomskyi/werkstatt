@@ -20,24 +20,14 @@
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@warpgogol/integration": "workspace:*",
-    "@warpgogol/ontology": "workspace:*",
-    "@warpgogol/share": "workspace:*",
-    "astro": "^7.1.6"
+    "@warpgogol/werkstatt": "workspace:*"
   },
   "devDependencies": {
-    "fast-check": "^4.9.0",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.10"
-  },
-  "gogol": {
-    "testSignal": {
-      "status": "green",
-      "owner": "architecture",
-      "rationale": "Fixture-based JSON-RPC conformance corpus (agent.gate.fixtures.run) plus unit tests for the action interpreter."
-    }
   }
 }

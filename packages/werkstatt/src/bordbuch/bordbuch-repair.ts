@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import type { BordbuchEntry } from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/kernel";
+import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import {
   readBordbuch,
   validateBordbuch,

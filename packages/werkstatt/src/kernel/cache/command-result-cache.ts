@@ -25,8 +25,8 @@ import { join, relative, sep } from "node:path";
 import type { Dirent } from "node:fs";
 import picomatch from "picomatch";
 
-import { byteHash, stableJsonHash } from "@warpgogol/fingerprint";
-import { fingerprintFile, fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { byteHash, stableJsonHash } from "@warpgogol/werkstatt/fingerprint";
+import { fingerprintFile, fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 
 import type { CacheLayer } from "./cache-layer.ts";
 import type { KernelExecutionReport } from "../types.ts";

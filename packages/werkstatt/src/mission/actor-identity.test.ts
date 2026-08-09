@@ -10,7 +10,7 @@
 
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { resolveActorFromEnv, resolveActor } from "./actor-identity.ts";
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {

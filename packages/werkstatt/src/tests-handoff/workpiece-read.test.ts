@@ -16,7 +16,7 @@ import type {
   KernelCommandInput,
   KernelRuntimeContext,
   KernelFlagValue,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 
 let tmpDir: string;
 let workpieceDir: string;

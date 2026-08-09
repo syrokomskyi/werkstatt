@@ -13,7 +13,7 @@ import fs from "node:fs/promises";
 import { existsSync, symlinkSync, readlinkSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 import {
   artifactDir,

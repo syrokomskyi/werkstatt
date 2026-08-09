@@ -11,6 +11,7 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { runDnsRecordsSchemaValidate } from "./dns-records-schema-validate.ts";
+import type { KernelCommandInput, KernelRuntimeContext } from "../kernel/types.ts";
 
 let tmpDir: string;
 
@@ -46,8 +47,8 @@ records:
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "test-system" }) as unknown,
-    { workspaceRoot: tmpDir } as unknown,
+    makeInput({ system: "test-system" }) as unknown as KernelCommandInput,
+    { workspaceRoot: tmpDir } as unknown as KernelRuntimeContext,
   );
 
   expect(result.data!.state).toBe("valid");
@@ -72,8 +73,8 @@ records:
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "test-system" }) as unknown,
-    { workspaceRoot: tmpDir } as unknown,
+    makeInput({ system: "test-system" }) as unknown as KernelCommandInput,
+    { workspaceRoot: tmpDir } as unknown as KernelRuntimeContext,
   );
 
   expect(result.data!.state).toBe("invalid");
@@ -84,8 +85,8 @@ records:
 
 test("schema.validate: missing file is skipped (not an error)", async () => {
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "nonexistent" }) as unknown,
-    { workspaceRoot: tmpDir } as unknown,
+    makeInput({ system: "nonexistent" }) as unknown as KernelCommandInput,
+    { workspaceRoot: tmpDir } as unknown as KernelRuntimeContext,
   );
 
   expect(result.data!.state).toBe("valid");
@@ -115,8 +116,8 @@ records: []
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({}) as unknown,
-    { workspaceRoot: tmpDir } as unknown,
+    makeInput({}) as unknown as KernelCommandInput,
+    { workspaceRoot: tmpDir } as unknown as KernelRuntimeContext,
   );
 
   expect(result.data!.state).toBe("valid");
@@ -136,8 +137,8 @@ records: []
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "test-system" }) as unknown,
-    { workspaceRoot: tmpDir } as unknown,
+    makeInput({ system: "test-system" }) as unknown as KernelCommandInput,
+    { workspaceRoot: tmpDir } as unknown as KernelRuntimeContext,
   );
 
   expect(result.data!.state).toBe("invalid");

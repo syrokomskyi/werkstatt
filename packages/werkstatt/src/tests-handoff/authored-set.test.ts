@@ -9,7 +9,7 @@
 */
 
 import { test, expect } from "vitest";
-import { isGeneratedPublicArtifact } from "../authored-set.ts";
+import { isGeneratedPublicArtifact } from "../handoff/authored-set.ts";
 
 test("matches build.prepare public generator outputs", () => {
   for (const p of [

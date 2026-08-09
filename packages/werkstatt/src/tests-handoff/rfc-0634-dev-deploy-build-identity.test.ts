@@ -9,8 +9,8 @@
 */
 
 import { test, expect } from "vitest";
-import { buildIdentitySchema } from "@warpgogol/ontology/operations";
-import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { buildIdentitySchema } from "@warpgogol/werkstatt/schemas";
+import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

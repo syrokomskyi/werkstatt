@@ -26,7 +26,7 @@ import {
   bordbuchEntrySchema,
   type BordbuchEntry,
   type BordbuchEntryKind,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 import { gitExec } from "../werkstatt/git-exec.ts";

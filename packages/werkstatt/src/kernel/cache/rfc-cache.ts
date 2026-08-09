@@ -19,7 +19,7 @@ entries using the CacheLayer interface. Content hashing uses @warpgogol/fingerpr
 import { readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 
-import { byteHashFile } from "@warpgogol/fingerprint";
+import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 
 import type { CacheLayer } from "./cache-layer.ts";
 import { listRfcFiles, parseRfcFile, type ParsedRfc } from "@warpgogol/forge/os/rfc";

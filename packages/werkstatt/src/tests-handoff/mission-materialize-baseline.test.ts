@@ -12,14 +12,14 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 const mockExecuteKernelCommand = vi.hoisted(() => ({
   calls: [] as Array<{ commandName: string; argv?: string[] }>,
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     executeKernelPipeline: vi.fn(async () => [
@@ -181,7 +181,7 @@ test("RFC-0617: compass.audit.baseline failure is non-fatal (materialization suc
   setupWorkspace();
 
   // Override the mock to throw for compass.audit.baseline
-  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
   vi.mocked(executeKernelCommand).mockImplementationOnce(async (opts) => {
     if (opts.commandName === "compass.audit.baseline") {
       throw new Error("baseline failed");

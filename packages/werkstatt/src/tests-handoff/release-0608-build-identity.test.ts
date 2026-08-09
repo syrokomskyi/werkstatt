@@ -9,7 +9,7 @@
 */
 
 import { test, expect } from "vitest";
-import { buildIdentitySchema } from "@warpgogol/ontology/operations";
+import { buildIdentitySchema } from "@warpgogol/werkstatt/schemas";
 
 const VALID_BUILD_IDENTITY = {
   releaseId: "test-sys-r000001",

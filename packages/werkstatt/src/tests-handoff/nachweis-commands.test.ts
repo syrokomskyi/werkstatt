@@ -21,8 +21,8 @@ import type {
   KernelCommandInput,
   KernelRuntimeContext,
   KernelFlagValue,
-} from "@warpgogol/site-kernel";
-import { createDefaultIO, createKernelLogger } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { createDefaultIO, createKernelLogger } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 // ── Mock state ──────────────────────────────────────────────────────────────
@@ -71,8 +71,8 @@ vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
 });
 
 // Mock executeKernelCommand for bordbuch.validate delegation
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     executeKernelCommand: vi.fn(async () => ({

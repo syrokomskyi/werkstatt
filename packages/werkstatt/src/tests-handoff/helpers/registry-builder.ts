@@ -22,7 +22,7 @@ import type {
   MirrorStorageType,
   ServiceEntry,
   FleetRegistryEntry,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";
 
 export interface RegistryChannelOptions {
   workerName: string;

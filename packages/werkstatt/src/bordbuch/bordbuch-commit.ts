@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { gitExecWithRetry, type RetryOptions } from "../werkstatt/git-exec.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 

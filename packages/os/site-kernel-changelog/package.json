@@ -11,27 +11,18 @@
       "default": "./src/index.ts"
     }
   },
-  "files": ["src", "prompts"],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.27",
-    "@ai-sdk/openai": "^4.0.27",
-    "@warpgogol/site-kernel": "workspace:*",
-    "ai": "^7.0.47",
-    "p-limit": "^7.3.1",
-    "semver": "^7.8.5",
-    "simple-git": "^3.36.0",
-    "zod": "^4.4.3"
+    "@warpgogol/werkstatt": "workspace:*"
   },
   "devDependencies": {
-    "@types/json-schema": "^7.0.15",
-    "@types/semver": "^7.7.1",
-    "fast-check": "^4.9.0",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
 }
