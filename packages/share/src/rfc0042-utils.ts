@@ -59,7 +59,7 @@ export function need<T>(fieldName: string, value: T | undefined | null): T | str
  * const props = cast<TeamSectionContent>(pageOverride);
  * ```
  */
-export function cast<T extends Record<string, any>>(pageOverride: Record<string, any>): T {
+export function cast<T extends Record<string, unknown>>(pageOverride: Record<string, unknown>): T {
   return pageOverride as unknown as T;
 }
 

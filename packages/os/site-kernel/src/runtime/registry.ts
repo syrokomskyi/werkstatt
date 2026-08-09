@@ -23,7 +23,6 @@ import { getOrBuildRegistry, getOrBuildWorkspaceRegistry } from "./registry-cach
 import type {
   DiscoveredSiteWorkspace,
   KernelAppConfig,
-  KernelModule,
   SiteWorkspacesListResult,
   KernelCommandDefinition,
   KernelRegisteredCommandInfo,

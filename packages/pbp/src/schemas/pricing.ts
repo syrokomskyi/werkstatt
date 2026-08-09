@@ -13,7 +13,7 @@ import { pbpEntityRefSchema } from "./entity-ref.js";
 import { nonEmptyString, decimalString } from "./primitives.js";
 
 const pbpChargeTypeSchema = z.enum(["one-time", "recurring", "usage", "deposit"]);
-const pbpAmountModelSchema = z.enum(["fixed", "range", "tiered", "unit-rate"]);
+const _pbpAmountModelSchema = z.enum(["fixed", "range", "tiered", "unit-rate"]);
 
 const pbpChargeAmountSchema = z.discriminatedUnion("model", [
   z.object({ model: z.literal("fixed"), value: decimalString }),

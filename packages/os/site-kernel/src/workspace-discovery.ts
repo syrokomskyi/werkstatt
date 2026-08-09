@@ -74,7 +74,7 @@ function workspaceDiscoveryDiagnostic(
   };
 }
 
-function workspacePackageGlobsFromYaml(source: string, diagnostics: Diagnostic[]): string[] {
+function workspacePackageGlobsFromYaml(source: string, _diagnostics: Diagnostic[]): string[] {
   const parsed = parse(source) as { packages?: unknown };
   if (!Array.isArray(parsed.packages)) return [];
   return parsed.packages

@@ -14,7 +14,8 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { join } from "node:path";
-import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { AppPublicContext } from "../public-surface/shared.ts";
 
 // Mock readTextIfExists so we can control which source SVGs "exist"
 const mockFiles = new Map<string, string>();
@@ -80,9 +81,9 @@ const mockApp = {
   domain: "test.example.com",
   siteUrl: "https://test.example.com",
   biomePalette: { surface: "#1a1a2e", brand: "#e94560" },
-} as any;
+} as unknown as AppPublicContext;
 
-function errorMessages(result: { data?: unknown }): string[] {
+function _errorMessages(result: { data?: unknown }): string[] {
   const data = result.data as
     { diagnostics?: Array<{ message: string; ruleId?: string }> } | undefined;
   return (data?.diagnostics ?? []).map((d) => d.message);
@@ -151,7 +152,10 @@ describe("RFC-0631 validateSourceSvg (ICON-SRC diagnostics)", () => {
     mockFiles.set(join(CONTENT_DIR, "favicon.svg"), wrongViewBox);
 
     const context = makeContext("/test");
-    const result = await runPublicIconsValidate({ argv: [], flags: {} } as any, context);
+    const result = await runPublicIconsValidate(
+      { argv: [], flags: {} } as unknown as KernelCommandInput,
+      context,
+    );
 
     const ids = ruleIds(result);
     expect(ids).toContain("ICON-SRC-01");
@@ -162,7 +166,10 @@ describe("RFC-0631 validateSourceSvg (ICON-SRC diagnostics)", () => {
     mockFiles.set(join(CONTENT_DIR, "favicon.svg"), invalidXml);
 
     const context = makeContext("/test");
-    const result = await runPublicIconsValidate({ argv: [], flags: {} } as any, context);
+    const result = await runPublicIconsValidate(
+      { argv: [], flags: {} } as unknown as KernelCommandInput,
+      context,
+    );
 
     const ids = ruleIds(result);
     expect(ids).toContain("ICON-SRC-02");
@@ -170,7 +177,10 @@ describe("RFC-0631 validateSourceSvg (ICON-SRC diagnostics)", () => {
 
   it("does not report ICON-SRC diagnostics when no source SVGs exist", async () => {
     const context = makeContext("/test");
-    const result = await runPublicIconsValidate({ argv: [], flags: {} } as any, context);
+    const result = await runPublicIconsValidate(
+      { argv: [], flags: {} } as unknown as KernelCommandInput,
+      context,
+    );
 
     const ids = ruleIds(result);
     expect(ids).not.toContain("ICON-SRC-01");
@@ -260,7 +270,10 @@ describe("RFC-0632 ICON-SRC-04 warning", () => {
     mockFiles.set(join(CONTENT_DIR, "favicon.svg"), svg);
 
     const context = makeContext("/test");
-    const result = await runPublicIconsValidate({ argv: [], flags: {} } as any, context);
+    const result = await runPublicIconsValidate(
+      { argv: [], flags: {} } as unknown as KernelCommandInput,
+      context,
+    );
 
     const ids = ruleIds(result);
     expect(ids).toContain("ICON-SRC-04");
@@ -273,7 +286,10 @@ describe("RFC-0632 ICON-SRC-04 warning", () => {
 
   it("does not report ICON-SRC-04 when no favicon.svg exists", async () => {
     const context = makeContext("/test");
-    const result = await runPublicIconsValidate({ argv: [], flags: {} } as any, context);
+    const result = await runPublicIconsValidate(
+      { argv: [], flags: {} } as unknown as KernelCommandInput,
+      context,
+    );
 
     const ids = ruleIds(result);
     expect(ids).not.toContain("ICON-SRC-04");
@@ -293,7 +309,10 @@ describe("RFC-0631 sharp conversion failure fallback", () => {
 
     const context = makeContext("/test");
     // The generator should not throw — it should fall back to buildIconSvg
-    const result = await runPublicIconsGenerate({ argv: [], flags: {} } as any, context);
+    const result = await runPublicIconsGenerate(
+      { argv: [], flags: {} } as unknown as KernelCommandInput,
+      context,
+    );
 
     expect(result.exitCode).toBe(0);
     expect(result.summary).toContain("public.icons.generate: wrote");

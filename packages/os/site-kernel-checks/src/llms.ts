@@ -29,7 +29,6 @@ import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/share/semantic";
 import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/share/canonical-url";
-import { failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { includeInLlms, type SurfaceArtifact } from "@warpgogol/surface";
 import { loadLazySurfacePages } from "@warpgogol/share/astro/surface-routes";
@@ -147,8 +146,8 @@ export async function runLlmsGenerate(
   const llmsPath = join(paths.publicDirectory, "llms.txt");
   const llmsFullPath = join(paths.publicDirectory, "llms-full.txt");
 
-  const llmsStatus = await writeGeneratedFile(llmsPath, llmsTxt, context.dryRun ?? false);
-  const fullStatus = await writeGeneratedFile(llmsFullPath, llmsFullTxt, context.dryRun ?? false);
+  const _llmsStatus = await writeGeneratedFile(llmsPath, llmsTxt, context.dryRun ?? false);
+  const _fullStatus = await writeGeneratedFile(llmsFullPath, llmsFullTxt, context.dryRun ?? false);
 
   return {
     data: {

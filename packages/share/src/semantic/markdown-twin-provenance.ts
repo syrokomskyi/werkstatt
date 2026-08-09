@@ -200,7 +200,7 @@ export function parseMarkdownTwinFrontmatter(
   const body = content.slice(endIdx + 5).replace(/^\n/, "");
 
   const frontmatter: Record<string, unknown> = {};
-  let currentKey = "";
+  let _currentKey = "";
   let currentList: string[] | null = null;
 
   for (const line of yamlBlock.split("\n")) {
@@ -214,11 +214,11 @@ export function parseMarkdownTwinFrontmatter(
     if (match) {
       const [, key, value] = match;
       if (value === "") {
-        currentKey = key;
+        _currentKey = key;
         currentList = [];
         frontmatter[key] = currentList;
       } else {
-        currentKey = "";
+        _currentKey = "";
         currentList = null;
         const stripped = value.replace(/^["']|["']$/g, "");
         frontmatter[key] = stripped === "null" ? null : stripped;

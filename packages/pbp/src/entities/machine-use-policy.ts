@@ -6,7 +6,6 @@
  */
 
 import type { PbpEntity } from "../envelope.js";
-import type { PbpEntityRef } from "../entity-ref.js";
 import { pbpSchemaId } from "../schema-id.js";
 
 export const MACHINE_USE_POLICY_SCHEMA_ID = pbpSchemaId("machine-use-policy");

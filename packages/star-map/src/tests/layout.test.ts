@@ -1,6 +1,6 @@
 import { test, expect, describe } from "vitest";
 import { computeLayout } from "../layout.ts";
-import type { StarMapGraph, NodePosition } from "../types.ts";
+import type { StarMapGraph } from "../types.ts";
 
 function makeGraph(overrides: Partial<StarMapGraph> = {}): StarMapGraph {
   return {

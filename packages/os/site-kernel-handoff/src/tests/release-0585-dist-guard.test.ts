@@ -9,7 +9,7 @@
 */
 
 import { test, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runReleaseReady } from "../release/release-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";

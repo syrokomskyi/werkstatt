@@ -11,7 +11,7 @@
 */
 
 import { execSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { compilePbpProfile } from "./compiler/index.js";
 import type { PbpCompilerResult } from "./compiler/types.js";
@@ -92,7 +92,7 @@ export async function runCutoverCheck(appDirectory: string): Promise<PbpCutoverC
 
   const noSiteImportsFromLegacy = checkNoLegacyImports(appDirectory);
 
-  let legacyTestsPass = true; // No legacy layer — PBP is canonical
+  const legacyTestsPass = true; // No legacy layer — PBP is canonical
   let pbpTestsPass = true;
 
   try {

@@ -189,7 +189,7 @@ export async function runRatgeberProvenanceValidate(
   const appDir = paths.appDirectory;
   const contentDir = join(appDir, "src", "content");
   const { manifest } = await loadSystemManifest(contentDir);
-  const defaultLang = defaultLanguageFromManifest(manifest);
+  const _defaultLang = defaultLanguageFromManifest(manifest);
 
   const records = await loadArticleRecords(appDir);
   if (records.length === 0) {

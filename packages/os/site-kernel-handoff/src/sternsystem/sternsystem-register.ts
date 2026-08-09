@@ -244,11 +244,11 @@ export async function runSternsystemRegister(
 
   const pinnedPlatform = platform ?? registry.systems[0]?.pinnedPlatform ?? "0.0.0";
 
-  const VALID_STORAGE_TYPES = ["non-bare", "bare", "bundle"] as const;
+  type ValidStorageType = "non-bare" | "bare" | "bundle";
   const mirrors = mirrorsFlag.split(",").map((entry) => {
     const m = entry.match(/^(.+):(non-bare|bare|bundle)$/);
     if (m) {
-      return { path: m[1], storageType: m[2] as (typeof VALID_STORAGE_TYPES)[number] };
+      return { path: m[1], storageType: m[2] as ValidStorageType };
     }
     return { path: entry, storageType: "non-bare" as const };
   });

@@ -39,7 +39,7 @@ import { ARTIFACT_FILE } from "./surface/shared.ts";
 
 const DEFAULT_DOORWAY_MAX_FLAGGED_SHARE = 0.3;
 
-const REQUIRED_LOCAL_FIELDS = [
+const _REQUIRED_LOCAL_FIELDS = [
   "localDemandContext",
   "uniqueIntro",
   "uniqueFaq",

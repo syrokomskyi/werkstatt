@@ -18,7 +18,6 @@ import {
   runHardcodedColorLint,
   runBiomeCoverageHint,
 } from "../checks/tokens.ts";
-import { runMirroringValidation } from "../checks/mirroring.ts";
 import { runSemanticDriftValidation } from "../checks/semantic-drift.ts";
 // compass.* handlers migrated to @warpgogol/forge — see packages/forge/os/compass/
 import { runContentVoiceLint } from "../content-voice.ts";

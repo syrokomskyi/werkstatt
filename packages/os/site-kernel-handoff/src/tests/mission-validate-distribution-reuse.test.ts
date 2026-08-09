@@ -229,7 +229,7 @@ function makeContext(): KernelRuntimeContext {
 }
 
 test("hash match → build cycle skipped, distributionReused: true", async () => {
-  const workpieceDir = setupWorkspace();
+  const _workpieceDir = setupWorkspace();
   const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
   writeDistributionHash(missionDir, "sha256:matching-hash");
   writeDistributionDist(missionDir, 7);

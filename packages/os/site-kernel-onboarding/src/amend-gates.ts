@@ -99,7 +99,7 @@ function sha256(value: string): string {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
 
-async function pathExists(target: string): Promise<boolean> {
+async function _pathExists(target: string): Promise<boolean> {
   try {
     await access(target);
     return true;

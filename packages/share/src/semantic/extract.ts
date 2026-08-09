@@ -11,10 +11,6 @@
 */
 
 import type {
-  SemanticContactPoint,
-  SemanticDonationAccount,
-  SemanticFaqEntry,
-  SemanticInitiative,
   SemanticPerson,
   SemanticPostalAddress,
 } from "./models.ts";

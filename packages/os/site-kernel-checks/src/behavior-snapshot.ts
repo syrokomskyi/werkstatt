@@ -26,7 +26,6 @@ import { join, relative } from "node:path";
 import { fileExists, collectFiles } from "@warpgogol/share/fs";
 import { isHtmlRedirectPage, markdownTwinRelPath } from "@warpgogol/share/semantic";
 import {
-  GENERATED_MARKER,
   hasGeneratedMarker,
   writeFileIfChanged,
   type CheckResult,

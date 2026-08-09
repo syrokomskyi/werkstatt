@@ -1001,7 +1001,7 @@ export async function runMissionReconcile(
     const copiedPaths: string[] = [];
     let autoResolvedPaths: string[] = [];
     // RFC-0705: mirror sync status — populated inside the git branch, used in report and return data
-    let mirrorSync: { attempted: boolean; succeeded: boolean; error: string | null } = {
+    const mirrorSync: { attempted: boolean; succeeded: boolean; error: string | null } = {
       attempted: false,
       succeeded: false,
       error: null,
@@ -1111,8 +1111,8 @@ export async function runMissionReconcile(
         });
       } catch (err) {
         // Check if all conflicts are bordbuch-only (delete/modify)
-        let conflictedPaths: string[] = [];
-        let bordbuchDeletedPaths: string[] = [];
+        const conflictedPaths: string[] = [];
+        const bordbuchDeletedPaths: string[] = [];
         try {
           const statusOutput = execSync("git status --porcelain", {
             cwd: systemDir,

@@ -299,9 +299,9 @@ export async function runSwimMembers(
 ): Promise<KernelCommandResult<SwimMembersResult>> {
   const { workspaceRoot } = context;
 
-  let config: SwimConfig;
+  let _config: SwimConfig;
   try {
-    config = await loadSwimConfig(workspaceRoot);
+    _config = await loadSwimConfig(workspaceRoot);
   } catch {
     return {
       data: {

@@ -25,13 +25,8 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/share/canonical-url";
-import {
-  resolvePageUpdateStamp,
-  isValidStampDate,
-  type PageUpdateStampResult,
-} from "@warpgogol/share/semantic";
-import { localizeUrl } from "@warpgogol/share/url-policy";
-import { diagnosticsResult, passResult } from "./result-helpers.ts";
+import { resolvePageUpdateStamp, isValidStampDate } from "@warpgogol/share/semantic";
+import { diagnosticsResult } from "./result-helpers.ts";
 import type { Diagnostic } from "@warpgogol/site-kernel";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
@@ -281,7 +276,7 @@ export async function runContentUpdateStampsValidate(
       }
 
       // Check that expected lastmods are present
-      for (const [url, expected] of expectedLastmods) {
+      for (const [url, _expected] of expectedLastmods) {
         if (!actualLastmods.has(url) && expectedNoLastmod.size === 0) {
           // This is OK — lastmod may be omitted if the generator chose to
         }

@@ -232,7 +232,7 @@ async function transformTopicsToArticles(
     const transformed = transformFrontmatter(frontmatter, slug);
     const after = JSON.stringify(transformed);
 
-    let body = fmMatch[2];
+    const body = fmMatch[2];
 
     if (hasSections && transformed.sections !== undefined) {
       const lang = path.basename(path.dirname(filePath));

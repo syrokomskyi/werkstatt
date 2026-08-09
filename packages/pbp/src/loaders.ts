@@ -14,7 +14,6 @@
 import { getCollection, getEntry } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "@warpgogol/share/content";
-import { emitPipelineLogEvent } from "@warpgogol/site-kernel-content";
 import { pbpSchemaById } from "./schemas/index.js";
 import { validateSchemaId } from "./schema-id.js";
 

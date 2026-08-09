@@ -27,10 +27,8 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import {
-  GENERATED_MARKER,
   KERNEL_UNIVERSAL_FLAGS,
   listRegisteredKernelCommands,
-  buildGeneratedHeader,
 } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";

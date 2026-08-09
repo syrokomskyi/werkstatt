@@ -22,7 +22,7 @@ app layout contract (DNA-21, RFC-0025; amended by RFC-0031):
 */
 
 import { readdir, stat } from "node:fs/promises";
-import { join, relative, extname, dirname, basename } from "node:path";
+import { join, relative, extname, basename } from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,

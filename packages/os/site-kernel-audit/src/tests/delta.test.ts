@@ -1,4 +1,4 @@
-import { test, expect, describe, vi } from "vitest";
+import { test, expect, describe } from "vitest";
 import { runAuditDeltaRun } from "../delta.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 

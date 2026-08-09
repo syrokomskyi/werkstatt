@@ -29,7 +29,6 @@ import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { migratorsToApply } from "../migrators/registry.ts";
 import type {
-  Migrator,
   SternsystemData,
   MigrationContext,
   MigrationViolation,

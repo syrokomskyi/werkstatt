@@ -7,7 +7,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, beforeEach, afterEach, vi } from "vitest";
+import { test, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs/promises";
 import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";

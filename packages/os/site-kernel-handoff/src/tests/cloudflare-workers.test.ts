@@ -9,7 +9,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, vi, beforeEach, afterEach } from "vitest";
+import { test, expect, vi } from "vitest";
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";

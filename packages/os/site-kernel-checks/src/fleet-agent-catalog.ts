@@ -32,16 +32,12 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import {
-  GENERATED_MARKER,
   buildGeneratedHeader,
-  discoverSiteWorkspaces,
   stripGeneratedMarker,
 } from "@warpgogol/site-kernel";
 import {
   buildFleetAgentCatalog,
-  computeFleetCatalogContentHash,
   type FleetAgentCatalog,
-  type FleetAgentCatalogEntry,
   type FleetAgentCatalogSiteInput,
 } from "@warpgogol/share/agent";
 import { diagnosticsResult } from "./result-helpers.ts";

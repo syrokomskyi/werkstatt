@@ -108,7 +108,7 @@ export function createLagebildSharedSyncWorker() {
 async function processTenant(
   tenant: SyncTenant,
   resolved: TenantWithSecrets,
-  registry: RegistryClient,
+  _registry: RegistryClient,
 ): Promise<void> {
   const secrets = resolved.secrets!; // null checked by caller
 

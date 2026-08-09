@@ -43,10 +43,10 @@ export async function runFirstPartyDataValidate(
     );
   }
   const strategy = (await pathExists(strategyPath))
-    ? (parseYaml(await readFile(strategyPath, "utf8")) as Record<string, any>)
+    ? (parseYaml(await readFile(strategyPath, "utf8")) as Record<string, unknown>)
     : {};
   const allowedFields = new Set<string>(
-    (strategy.fields ?? []).map((field: any) => String(field.name ?? field.id ?? field)),
+    (strategy.fields ?? []).map((field: unknown) => String(field.name ?? field.id ?? field)),
   );
   // Consent text is only required when the strategy declares it. Surfaces that
   // collect a single free-text message and no structured PII can opt out via

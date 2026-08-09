@@ -51,7 +51,7 @@ describe("funnel trigger overlay (RFC-0219)", () => {
   });
 
   it("every FUNNEL_TRANSITION_TRIGGERS trigger is a valid event kind or system trigger", () => {
-    const validTriggers = new Set<string>([
+    const _validTriggers = new Set<string>([
       ...FUNNEL_SYSTEM_TRIGGERS,
       // Collect event kinds from the triggers themselves — they are typed so this is circular,
       // but we can also check that system trigger spellings are stable.

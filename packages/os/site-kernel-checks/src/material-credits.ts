@@ -563,7 +563,7 @@ export async function runMaterialCreditsDriftValidate(
 ): Promise<KernelCommandResult> {
   const command = "material.credits.drift.validate";
   const state = await buildMaterialCreditsState(ctx);
-  const paths = requireAstroSitePaths(ctx);
+  const _paths = requireAstroSitePaths(ctx);
   const violations: string[] = [];
 
   const proseDir = join(state.contentRoot, "prose");

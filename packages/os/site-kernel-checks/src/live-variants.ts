@@ -39,7 +39,6 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import type { LiveVideoManifest, LiveVideoManifestEntry } from "@warpgogol/share/schemas/media";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";

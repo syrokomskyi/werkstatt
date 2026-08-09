@@ -86,7 +86,7 @@ function ensureVideoSources(video: HTMLVideoElement): void {
   if (changed) video.load();
 }
 
-function attemptPlay(root: HTMLElement, video: HTMLVideoElement, byUser: boolean): void {
+function attemptPlay(root: HTMLElement, video: HTMLVideoElement, _byUser: boolean): void {
   ensureVideoSources(video);
   const canPlay = video.readyState >= 3; // HAVE_FUTURE_DATA
 

@@ -201,8 +201,8 @@ export async function runFingerprintFixturesValidate(
     const beforeFiles = entries.filter((f) => f.includes(".before."));
 
     for (const beforeFile of beforeFiles) {
-      const ext = path.extname(beforeFile);
-      const baseName = beforeFile.replace(".before", "");
+      const _ext = path.extname(beforeFile);
+      const _baseName = beforeFile.replace(".before", "");
       const afterFile = beforeFile.replace(".before", ".after");
 
       if (!entries.includes(afterFile)) continue;

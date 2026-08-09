@@ -34,7 +34,7 @@ export const defaultNavigationGroups = ["navigation", "legal", "contact"] as con
  * @param groupEnum - Zod enum schema for allowed navigation groups
  * @returns Zod schema for a single navigation target
  */
-export const navigationTargetSchema = (groupEnum: z.ZodEnum<any>) =>
+export const navigationTargetSchema = (groupEnum: z.ZodEnum<unknown>) =>
   z.object({
     id: z.string(),
     label: z.string(),
@@ -61,7 +61,7 @@ export const navigationTargetSchema = (groupEnum: z.ZodEnum<any>) =>
  * @param groupEnum - Zod enum schema for allowed navigation groups
  * @returns Zod schema for the full navigation structure
  */
-export const navigationSchema = (groupEnum: z.ZodEnum<any>) =>
+export const navigationSchema = (groupEnum: z.ZodEnum<unknown>) =>
   z.object({
     targets: z.array(navigationTargetSchema(groupEnum)),
   });

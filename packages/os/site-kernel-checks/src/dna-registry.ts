@@ -124,7 +124,7 @@ export async function runDnaRegistryValidate(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult>> {
-  const { workspaceRoot, logger } = context;
+  const { workspaceRoot, _logger } = context;
 
   let registrySrc: string;
   try {

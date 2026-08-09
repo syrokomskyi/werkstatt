@@ -29,7 +29,6 @@ import {
   findEntry,
   resolveMirrors,
   resolveMirrorPath,
-  resolveCachePath,
   isGitAccessible,
 } from "./registry-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";

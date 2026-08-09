@@ -11,7 +11,7 @@
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { execSync } from "node:child_process";
 import fs from "node:fs/promises";
-import { existsSync, statSync } from "node:fs";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { investigateUntrackedFiles, isWorkpieceDirty } from "./mission-git-commit.ts";
@@ -241,7 +241,7 @@ test("git merge --no-ff is idempotent via preReconcileSha reset", async () => {
   const workpieceBranch = git(workpieceDir, "rev-parse --abbrev-ref HEAD");
   git(cacheCloneDir, `fetch ${JSON.stringify(workpieceDir)} ${JSON.stringify(workpieceBranch)}`);
   git(cacheCloneDir, `merge --no-ff FETCH_HEAD -m "reconcile mission test"`);
-  const firstPostSha = git(cacheCloneDir, "rev-parse HEAD");
+  const _firstPostSha = git(cacheCloneDir, "rev-parse HEAD");
 
   // Simulate idempotent re-run: reset to preReconcileSha and re-merge
   git(cacheCloneDir, `reset --hard ${preReconcileSha}`);

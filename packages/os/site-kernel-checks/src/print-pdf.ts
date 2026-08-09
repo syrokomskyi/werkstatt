@@ -20,7 +20,7 @@ print.pdf.validate verifies that all expected PDFs exist and are non-empty.
 import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { existsSync, mkdirSync, statSync } from "node:fs";
-import { writeFile, readFile, copyFile } from "node:fs/promises";
+import { readFile, copyFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { createServer } from "node:http";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
@@ -34,7 +34,7 @@ import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 // ---------------------------------------------------------------------------
 
 export async function runPrintPdfGenerate(
-  input: any,
+  input: unknown,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const app = context.site;
@@ -51,7 +51,7 @@ export async function runPrintPdfGenerate(
   const force = input?.force === true || input?.f === true;
 
   // 1. Read system.md and check output.printPdf
-  let manifest: any;
+  let manifest: unknown;
   try {
     const result = await loadSystemManifest(contentDir);
     manifest = result.manifest;
@@ -243,7 +243,7 @@ export async function runPrintPdfGenerate(
   // 6. Launch Playwright and generate PDFs
   let generated = 0;
   const errors: Array<{ route: string; error: string }> = [];
-  let browser: any = null;
+  let browser: unknown = null;
 
   try {
     const playwright = await import("playwright");
@@ -293,11 +293,11 @@ export async function runPrintPdfGenerate(
         await writeFileIfChanged(pdfPath, Buffer.from(pdfBuffer));
         generated++;
         await page.close();
-      } catch (err: any) {
+      } catch (err: unknown) {
         errors.push({ route: target.route, error: err.message ?? String(err) });
       }
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       exitCode: 1,
       summary: `Playwright error: ${err.message ?? String(err)}. Ensure Playwright Chromium is installed (pnpm exec playwright install chromium).`,
@@ -355,7 +355,7 @@ export async function runPrintPdfGenerate(
 // ---------------------------------------------------------------------------
 
 export async function runPrintPdfCopy(
-  _input: any,
+  _input: unknown,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const app = context.site;
@@ -390,7 +390,7 @@ export async function runPrintPdfCopy(
   try {
     const raw = await readFile(manifestPath, "utf-8");
     manifest = JSON.parse(raw);
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       exitCode: 1,
       summary: `Failed to read PDF manifest: ${err.message ?? String(err)}`,
@@ -459,7 +459,7 @@ export async function runPrintPdfCopy(
 // ---------------------------------------------------------------------------
 
 export async function runPrintPdfValidate(
-  _input: any,
+  _input: unknown,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const app = context.site;
@@ -476,7 +476,7 @@ export async function runPrintPdfValidate(
   const printDir = join(distDir, "_print");
 
   // Check if printPdf is enabled
-  let manifest: any;
+  let manifest: unknown;
   try {
     const result = await loadSystemManifest(contentDir);
     manifest = result.manifest;

@@ -137,7 +137,7 @@ export async function substituteBlockPropReferences(
       props: (await resolveReferencesDeep(index, block.props, lang, defaultLang, {
         collection: "pages",
         file: fileSlug,
-      })) as Record<string, any>,
+      })) as Record<string, unknown>,
     })),
   );
 }

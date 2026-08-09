@@ -36,7 +36,7 @@ describe("UChatWidgetAdapter.load", () => {
     // return a div so appendChild doesn't trigger script loading
     const realCreateElement = document.createElement.bind(document);
     vi.spyOn(document, "createElement").mockImplementation(
-      (tag: string) => realCreateElement(tag === "script" ? "div" : tag) as any,
+      (tag: string) => realCreateElement(tag === "script" ? "div" : tag) as unknown,
     );
   });
 

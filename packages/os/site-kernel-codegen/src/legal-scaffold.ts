@@ -22,7 +22,7 @@ import path, { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
-import { GENERATED_MARKER, hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
+import { hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
 import type {
   KernelCommandInput,
   KernelCommandResult,

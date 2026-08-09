@@ -39,7 +39,7 @@ async function loadIdentityConfig(workspaceRoot: string): Promise<WerkstattIdent
  * Check if a workshop endpoint is in the SWIM dead members list.
  * Returns true if the workshop is alive (or SWIM is not configured).
  */
-async function isWorkshopAlive(workspaceRoot: string, _endpoint: string): Promise<boolean> {
+async function isWorkshopAlive(_workspaceRoot: string, _endpoint: string): Promise<boolean> {
   // In the pilot, SWIM dead-workshop detection is handled by the DHT routing
   // layer itself (it skips unreachable peers). This function is a seam for
   // future integration with SWIM membership view.

@@ -18,8 +18,6 @@
 */
 
 import fs from "node:fs/promises";
-import { existsSync } from "node:fs";
-import path from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -30,7 +28,7 @@ import {
   artifactDir,
   currentSymlinkPath,
   listArtifactHashes,
-  platformArtifactsBase,
+  _platformArtifactsBase,
   previousSymlinkPath,
   readSymlinkBasename,
 } from "./deploy-utils.ts";

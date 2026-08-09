@@ -69,7 +69,7 @@ export function generateSitemapXml(clusters: PageCluster[]): string {
     }));
 
     return cluster.locales.map((locale) => {
-      const linksXml = alternates
+      const _linksXml = alternates
         .map(
           ({ lang, href }) =>
             `<xhtml:link rel="alternate" hreflang="${escapeXml(lang)}" href="${escapeXml(href)}" />`,

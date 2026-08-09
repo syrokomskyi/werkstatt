@@ -233,7 +233,7 @@ function bindForm(root: HTMLElement): void {
   const emptyMessage = form.dataset.emptyMessage;
   const sendingLabel = form.dataset.sendingLabel ?? button.textContent ?? "";
   const defaultLabel = button.dataset.defaultLabel ?? button.textContent ?? "";
-  const successMessage = form.dataset.successMessage;
+  const _successMessage = form.dataset.successMessage;
   const errorMessage = form.dataset.errorMessage;
   const fallbackEmail = form.dataset.fallbackEmail ?? "";
   const contactRequirementMessage = form.dataset.contactRequirementMessage;

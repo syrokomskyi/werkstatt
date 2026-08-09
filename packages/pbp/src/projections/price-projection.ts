@@ -19,7 +19,6 @@ import type {
   PbpCommercialMeaning,
 } from "../materialized-derived-price.js";
 import type { PbpCurrentUses } from "../entities/currency-pricing-policy.js";
-import type { PbpCurrencyConversionTrace } from "../derivations/currency-conversion.js";
 
 /**
  * Display configuration for a price projection.

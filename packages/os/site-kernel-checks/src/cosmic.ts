@@ -16,7 +16,7 @@ apps and packages.
 */
 
 import { readFile } from "node:fs/promises";
-import { join, relative, basename } from "node:path";
+import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { starNameSchema, planetNameSchema, moonNameSchema } from "@warpgogol/ontology/cosmic";
 import type {

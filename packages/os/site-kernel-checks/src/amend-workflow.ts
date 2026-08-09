@@ -20,7 +20,6 @@ import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parseOnboardingArtifactHeader } from "@warpgogol/share/onboarding-yaml";
 import { executeKernelCommand } from "@warpgogol/site-kernel";
-import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,

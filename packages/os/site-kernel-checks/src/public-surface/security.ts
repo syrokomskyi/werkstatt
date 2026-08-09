@@ -29,7 +29,6 @@ import {
   loadPublicContext,
   normalizeUrl,
   readTextIfExists,
-  SECURITY_EXPIRES,
   TODAY,
   wildcardRobotsGroupDisallowsAll,
   workspaceRel,

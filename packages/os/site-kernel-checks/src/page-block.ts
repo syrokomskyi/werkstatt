@@ -24,9 +24,8 @@ Checks performed (fail-first):
 </CHANGE_SUMMARY>
 */
 
-import { readFile, readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
-import { parse as parseYaml } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,

@@ -65,7 +65,7 @@ function isPublicActive(p: ParticipantView): boolean {
   return p.visibility === "public" && p.status === "active";
 }
 
-function hasConsentField(p: ParticipantView, field: string): boolean {
+function _hasConsentField(p: ParticipantView, field: string): boolean {
   const approved = p.consent?.approvedFields;
   return Array.isArray(approved) && approved.includes(field);
 }

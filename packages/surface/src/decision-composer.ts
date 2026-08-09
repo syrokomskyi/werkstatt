@@ -51,7 +51,7 @@ export function composeIndexDecision(
   base: IndexDecision,
   results: readonly GateResult[],
 ): { decision: IndexDecision; suppress: boolean } {
-  let decision = { ...base };
+  const decision = { ...base };
   let suppress = false;
 
   const byGate = new Map<GateResult["gate"], GateResult>();

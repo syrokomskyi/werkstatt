@@ -47,7 +47,7 @@ export interface BlockEntry {
   id?: string;
   type?: string; // CMS-facing archetype slug — validated by page.block.validate
   use?: string; // PlanetName or MoonName — normalized from type for internal resolution
-  props: Record<string, any>;
+  props: Record<string, unknown>;
   visibility?: import("./visibility.ts").VisibilityExpr;
   /** Block layer — shell blocks render before content blocks (RFC-0036). */
   layer?: "shell" | "section";
@@ -61,7 +61,7 @@ export interface ShellBlockConfig {
   enabled?: boolean;
   cosmicMoon: string; // MoonName from MoonCatalog
   pin: string;
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
 }
 
 export interface ShellConfig {
@@ -87,7 +87,7 @@ export interface ResolvedBlock {
    */
   readonly componentImportPath: string;
   /** Props already evaluated and ready to spread into the component. */
-  readonly props: Record<string, any>;
+  readonly props: Record<string, unknown>;
   /** The raw visibility expression (retained for attribution / debugging). null if absent. */
   readonly visibility: import("./visibility.ts").VisibilityExpr | null;
   /** Block layer — shell blocks are prepended and render before content blocks (RFC-0036). */
@@ -124,13 +124,13 @@ export interface SectionProps {
   /** Optional link registry for CTA/link resolution */
   linkRegistry?: Record<string, string | null>;
   /** Complete block.props as declared in page frontmatter */
-  pageOverride: Record<string, any>;
+  pageOverride: Record<string, unknown>;
   /** RFC-0048: Stable pageId for localized anchor resolution */
   pageId?: string;
 }
 
 /** Type helper for sections to declare their specific pageOverride shape */
-export type SectionPageOverride<T extends Record<string, any>> = SectionProps & {
+export type SectionPageOverride<T extends Record<string, unknown>> = SectionProps & {
   pageOverride: T;
 };
 

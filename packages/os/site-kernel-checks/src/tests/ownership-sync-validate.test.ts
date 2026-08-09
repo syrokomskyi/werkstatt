@@ -173,7 +173,7 @@ describe("ownership.sync.validate (RFC-0612)", () => {
   });
 
   it("green: empty public/ -> exitCode 0 (OWN-02 may fire for missing entries)", async () => {
-    const appDir = await createAppDir(root);
+    const _appDir = await createAppDir(root);
 
     const result = await runOwnershipSyncValidate(input, ctx(root));
 

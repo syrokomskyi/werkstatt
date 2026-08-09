@@ -22,7 +22,6 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-  buildGeneratedHeader,
 } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";

@@ -20,7 +20,7 @@ plan.gate.red consumed by APPS_CHECK (Phase 3).
 </CHANGE_SUMMARY>
 */
 
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
 import { recordClaimsSchema } from "@warpgogol/share/schemas";
@@ -52,7 +52,7 @@ import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { passResult } from "./result-helpers.ts";
 import { pathExists, readMarkdownDocument } from "./content-discipline.ts";
 import { collectClaimSidecars, recordPathForSidecar, toPosix } from "./content-claims.ts";
-import { OUTBOX_FILE, readOutbox } from "./content-source-binding.ts";
+import { readOutbox } from "./content-source-binding.ts";
 
 const PLAN_FILE = "src/maintenance-plan.generated.yaml";
 const FRESHNESS_LEDGER_FILE = "src/freshness.generated.yaml";

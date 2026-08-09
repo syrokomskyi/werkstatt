@@ -17,7 +17,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { GENERATED_MARKER, buildGeneratedHeader } from "@warpgogol/site-kernel";
+import { buildGeneratedHeader } from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { stringify as yamlStringify } from "yaml";
 import { ALERT_RULES, NOTIFICATION_CHANNELS } from "../alert-rules.ts";

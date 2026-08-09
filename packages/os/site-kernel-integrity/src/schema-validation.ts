@@ -17,7 +17,6 @@
  * Validates all integrity JSON files against their defined schemas.
  */
 
-import type { ErrorObject } from "ajv/dist/2020";
 import { discoverManagedDirectories } from "./discover.ts";
 import { pathExists } from "./fs.ts";
 import { readJsonFile } from "./json.ts";

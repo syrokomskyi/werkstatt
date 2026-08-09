@@ -17,7 +17,7 @@
 </CHANGE_SUMMARY> 
 */
 
-import { basename, dirname, join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import { fileExists } from "./lib/file-exists.ts";
 import type {
@@ -97,7 +97,7 @@ async function collectAllFiles(dir: string, extensions: string[] = []): Promise<
 }
 
 async function checkLegacySchemaSurface(
-  paths: any,
+  paths: unknown,
   violations: ContentSurfaceViolation[],
 ): Promise<void> {
   const componentSchemasDir = join(paths.contentDirectory, "schemas", "components");
@@ -134,7 +134,7 @@ function isPublicException(relPath: string): boolean {
 }
 
 async function checkSystemManifest(
-  paths: any,
+  paths: unknown,
   violations: ContentSurfaceViolation[],
   _warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -176,7 +176,7 @@ async function checkSystemManifest(
 }
 
 async function checkContentFolders(
-  paths: any,
+  paths: unknown,
   violations: ContentSurfaceViolation[],
   warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -228,7 +228,7 @@ async function checkContentFolders(
 }
 
 async function checkAssetsStructure(
-  paths: any,
+  paths: unknown,
   violations: ContentSurfaceViolation[],
   warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -260,7 +260,7 @@ async function checkAssetsStructure(
 }
 
 async function checkPublicFolder(
-  paths: any,
+  paths: unknown,
   violations: ContentSurfaceViolation[],
   warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -288,9 +288,9 @@ async function checkPublicFolder(
 }
 
 async function checkPageBlocks(
-  paths: any,
+  paths: unknown,
   violations: ContentSurfaceViolation[],
-  warnings: ContentSurfaceViolation[],
+  _warnings: ContentSurfaceViolation[],
 ): Promise<void> {
   const pagesDir = join(paths.contentDirectory, "pages");
   const langDirs = await collectLangSubdirs(pagesDir);
@@ -305,7 +305,7 @@ async function checkPageBlocks(
         const lines = content.split("\n");
 
         let inFrontmatter = false;
-        let frontmatterEnd = false;
+        let _frontmatterEnd = false;
 
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i].trim();
@@ -316,7 +316,7 @@ async function checkPageBlocks(
           }
 
           if (inFrontmatter && line === "---") {
-            frontmatterEnd = true;
+            _frontmatterEnd = true;
             inFrontmatter = false;
             continue;
           }

@@ -20,7 +20,6 @@ import type {
 } from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { WARPGOGOL_METRIC_REGISTRY } from "@warpgogol/observability";
-import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { ALERT_RULES, NOTIFICATION_CHANNELS } from "../alert-rules.ts";
 

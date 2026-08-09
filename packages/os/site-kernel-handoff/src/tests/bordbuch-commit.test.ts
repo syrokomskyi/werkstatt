@@ -14,12 +14,11 @@
 */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
   KernelCommandInput,
-  KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { createDefaultIO } from "@warpgogol/site-kernel";

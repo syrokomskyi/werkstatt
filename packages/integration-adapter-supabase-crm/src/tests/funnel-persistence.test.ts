@@ -21,15 +21,15 @@ import { persistEventToBuffer } from "../adapter.ts";
 
 function makeFakeClient() {
   const calls = {
-    deals: [] as any[],
-    funnelEvents: [] as any[],
-    consents: [] as any[],
-    orgs: [] as any[],
-    transitions: [] as any[],
-    outbox: [] as any[],
-    invoices: [] as any[],
-    subs: [] as any[],
-    balanceAdjusts: [] as any[],
+    deals: [] as unknown[],
+    funnelEvents: [] as unknown[],
+    consents: [] as unknown[],
+    orgs: [] as unknown[],
+    transitions: [] as unknown[],
+    outbox: [] as unknown[],
+    invoices: [] as unknown[],
+    subs: [] as unknown[],
+    balanceAdjusts: [] as unknown[],
   };
   const stubs: {
     org: { id: string } | null;

@@ -22,7 +22,6 @@ import type {
   SyncOutboxRow,
   BufferDealStage,
   BufferSubscription,
-  BufferInvoice,
 } from "@warpgogol/integration/crm-buffer";
 import { BUFFER_DEAL_STAGES } from "@warpgogol/integration/crm-buffer";
 import type { SubscriptionStatus } from "@warpgogol/integration";

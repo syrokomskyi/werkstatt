@@ -98,7 +98,7 @@ export async function runSectionCssImportValidate(
       );
 
       if (!hasMatchingAstro && !importedBySameDirAstro) {
-        const astroRel = relative(context.workspaceRoot, astroInSameDir[0]).replace(/\\/g, "/");
+        const _astroRel = relative(context.workspaceRoot, astroInSameDir[0]).replace(/\\/g, "/");
         const astroBasename = basename(astroInSameDir[0]);
         violations.push({
           file: cssRel,

@@ -49,7 +49,7 @@ export async function runNamingStylesLint(
     SKIP_DIRS,
   );
 
-  let checkedFiles = cssFilesInSrc.length;
+  const checkedFiles = cssFilesInSrc.length;
   for (const filePath of cssFilesInSrc) {
     const relFromSrc = relative(paths.srcDirectory, filePath).replace(/\\/g, "/");
     if (!relFromSrc.startsWith("styles/")) {

@@ -18,7 +18,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { access, readdir } from "node:fs/promises";
+import { readdir } from "node:fs/promises";
 import { executeKernelCommand } from "@warpgogol/site-kernel";
 import {
   loadAuditAppContext,

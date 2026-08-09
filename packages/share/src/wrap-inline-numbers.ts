@@ -69,7 +69,7 @@ function isClosingTag(token: string): boolean {
  * - Each span carries `style="display:inline;min-width:Nch"` to prevent CLS.
  */
 export function wrapInlineNumbers(html: string, options: WrapInlineNumbersOptions = {}): string {
-  const { animateYears = false, duration = 3.0 } = options;
+  const { animateYears: _animateYears = false, duration = 3.0 } = options;
   const currentYear = new Date().getFullYear();
   const isYear = (n: number) => n >= 1200 && n <= currentYear + 120;
 

@@ -241,7 +241,7 @@ test("dev middleware: enabled config normalizes HTML response", async () => {
   const mw = createDevNormalizeMiddleware(ALL_ON);
   const html = "<p>he said \u201chi\u201d\u2014ok</p>";
   const next = async () => makeResponse(html, "text/html; charset=utf-8");
-  const res = await mw({} as any, next);
+  const res = await mw({} as unknown, next);
   if (!(res instanceof Response)) throw new Error("expected Response");
   const body = await res.text();
   expect(body).toBe(`<p>he said "hi"-ok</p>`);
@@ -252,7 +252,7 @@ test("dev middleware: disabled config is pass-through", async () => {
   const mw = createDevNormalizeMiddleware(off);
   const html = "<p>a\u2014b</p>";
   const next = async () => makeResponse(html, "text/html");
-  const res = await mw({} as any, next);
+  const res = await mw({} as unknown, next);
   if (!(res instanceof Response)) throw new Error("expected Response");
   const body = await res.text();
   expect(body).toBe(html);
@@ -262,7 +262,7 @@ test("dev middleware: non-HTML response is pass-through", async () => {
   const mw = createDevNormalizeMiddleware(ALL_ON);
   const json = '{"a":"b\u2014c"}';
   const next = async () => makeResponse(json, "application/json");
-  const res = await mw({} as any, next);
+  const res = await mw({} as unknown, next);
   if (!(res instanceof Response)) throw new Error("expected Response");
   const body = await res.text();
   expect(body).toBe(json);
@@ -272,7 +272,7 @@ test("dev middleware: try/catch falls back to original on error", async () => {
   const mw = createDevNormalizeMiddleware(ALL_ON);
   const html = "<p>valid</p>";
   let threw = false;
-  const res = await mw({} as any, async () => {
+  const res = await mw({} as unknown, async () => {
     const r = makeResponse(html, "text/html");
     r.text = async () => {
       threw = true;

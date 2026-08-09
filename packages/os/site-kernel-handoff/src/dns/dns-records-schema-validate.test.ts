@@ -7,7 +7,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, vi, beforeEach, afterEach } from "vitest";
+import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { runDnsRecordsSchemaValidate } from "./dns-records-schema-validate.ts";
@@ -46,8 +46,8 @@ records:
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "test-system" }) as any,
-    { workspaceRoot: tmpDir } as any,
+    makeInput({ system: "test-system" }) as unknown,
+    { workspaceRoot: tmpDir } as unknown,
   );
 
   expect(result.data!.state).toBe("valid");
@@ -72,8 +72,8 @@ records:
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "test-system" }) as any,
-    { workspaceRoot: tmpDir } as any,
+    makeInput({ system: "test-system" }) as unknown,
+    { workspaceRoot: tmpDir } as unknown,
   );
 
   expect(result.data!.state).toBe("invalid");
@@ -84,8 +84,8 @@ records:
 
 test("schema.validate: missing file is skipped (not an error)", async () => {
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "nonexistent" }) as any,
-    { workspaceRoot: tmpDir } as any,
+    makeInput({ system: "nonexistent" }) as unknown,
+    { workspaceRoot: tmpDir } as unknown,
   );
 
   expect(result.data!.state).toBe("valid");
@@ -115,8 +115,8 @@ records: []
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({}) as any,
-    { workspaceRoot: tmpDir } as any,
+    makeInput({}) as unknown,
+    { workspaceRoot: tmpDir } as unknown,
   );
 
   expect(result.data!.state).toBe("valid");
@@ -136,8 +136,8 @@ records: []
   );
 
   const result = await runDnsRecordsSchemaValidate(
-    makeInput({ system: "test-system" }) as any,
-    { workspaceRoot: tmpDir } as any,
+    makeInput({ system: "test-system" }) as unknown,
+    { workspaceRoot: tmpDir } as unknown,
   );
 
   expect(result.data!.state).toBe("invalid");

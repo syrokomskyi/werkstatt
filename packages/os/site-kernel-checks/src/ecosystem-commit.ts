@@ -438,7 +438,7 @@ export async function runEcosystemCommit(
         });
         const nonPlatformSha = await getHeadCommitSha(workspaceRoot);
         nonPlatformCommit = { sha: nonPlatformSha, files: nonPlatformStaged };
-      } catch (error) {
+      } catch {
         // Second commit failed — platform commit succeeded
         return {
           data: {

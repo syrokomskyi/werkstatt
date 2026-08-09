@@ -59,7 +59,7 @@ export function createMetricsPusher(
 
   const points: AccumulatedPoint[] = [];
   const startTimeNano = nowUnixNano();
-  let droppedCount = 0;
+  let _droppedCount = 0;
 
   const isStrict = environment === "development" || environment === "ci";
 
@@ -67,27 +67,27 @@ export function createMetricsPusher(
     if (!isMetricNameValid(name)) {
       const msg = `[observability] metric name "${name}" does not match the naming grammar`;
       if (isStrict) throw new Error(msg);
-      droppedCount++;
+      _droppedCount++;
       return;
     }
     const spec = findMetricSpec(name);
     if (!spec) {
       const msg = `[observability] metric name "${name}" is not declared in WARPGOGOL_METRIC_REGISTRY`;
       if (isStrict) throw new Error(msg);
-      droppedCount++;
+      _droppedCount++;
       return;
     }
     for (const key of Object.keys(labels)) {
       if (isLabelKeyForbidden(key)) {
         const msg = `[observability] label key "${key}" is forbidden for metric "${name}"`;
         if (isStrict) throw new Error(msg);
-        droppedCount++;
+        _droppedCount++;
         return;
       }
       if (!spec.labelKeys.includes(key)) {
         const msg = `[observability] label key "${key}" is not declared for metric "${name}"`;
         if (isStrict) throw new Error(msg);
-        droppedCount++;
+        _droppedCount++;
         return;
       }
     }

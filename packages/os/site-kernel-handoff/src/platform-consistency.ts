@@ -26,7 +26,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { resolvePlatformSemanticHash } from "./bundle-io.ts";
-import { hasPlatformScopeFiles, hasTrailer, isPlatformScope } from "./platform-scope.ts";
+import { hasPlatformScopeFiles, hasTrailer } from "./platform-scope.ts";
 import { compareSemver } from "./semver.ts";
 
 export interface PlatformConsistencyData {

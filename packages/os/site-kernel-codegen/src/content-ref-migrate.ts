@@ -51,11 +51,11 @@ function migrateYamlString(value: string): string {
   return result;
 }
 
-function migratePureYamlValue(line: string): string {
+function _migratePureYamlValue(line: string): string {
   const match = line.match(/^(\s*-?\s*)(["'])(.*)\2\s*$/);
   if (!match) return line;
   const indent = match[1];
-  const quote = match[2];
+  const _quote = match[2];
   const content = match[3];
 
   const pureRefPattern = /^[a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+$/;

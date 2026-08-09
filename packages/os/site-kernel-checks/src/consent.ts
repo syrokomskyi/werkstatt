@@ -181,7 +181,7 @@ export async function runConsentActivationValidate(
 /** Collect Datenschutz / privacy-policy prose text across locales (lowercased). */
 async function loadDisclosureText(appDir: string): Promise<string> {
   const proseDir = join(appDir, "src", "content", "prose");
-  let texts: string[] = [];
+  const texts: string[] = [];
   let langs: import("node:fs").Dirent[];
   try {
     langs = await readdir(proseDir, { withFileTypes: true });

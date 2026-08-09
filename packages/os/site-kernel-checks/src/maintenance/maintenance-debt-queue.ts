@@ -16,7 +16,6 @@ import { mkdir, readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { byteHash } from "@warpgogol/fingerprint";
 import {
-  GENERATED_MARKER,
   listSiteWorkspaces,
   listRegisteredKernelCommands,
   writeFileAtomic,
@@ -25,7 +24,6 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-  buildGeneratedHeader,
 } from "@warpgogol/site-kernel";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
 import { z } from "zod";

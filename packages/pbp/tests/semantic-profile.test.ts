@@ -7,7 +7,7 @@ vi.mock("astro:content", () => ({
 
 import { projectToSemanticSiteProfile } from "../src/semantic-profile.js";
 import type { PbpCompilerResult } from "../src/compiler/types.js";
-import type { PbpBuildContext, PbpBuildStrictness } from "../src/compiler-pipeline.js";
+import type { PbpBuildContext } from "../src/compiler-pipeline.js";
 import type { PbpSourceInventoryReport } from "../src/compiler-pipeline.js";
 import type { PbpFallbackReport } from "../src/locale.js";
 

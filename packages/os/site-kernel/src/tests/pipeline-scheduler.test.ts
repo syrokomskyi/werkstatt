@@ -3,7 +3,6 @@ import {
   buildSchedule,
   executeScheduledSteps,
   ScheduleError,
-  type ScheduledStep,
 } from "../runtime/pipeline-scheduler.ts";
 import type { KernelExecutionReport, KernelPipelineStep } from "../types.ts";
 

@@ -22,7 +22,7 @@ import type {
   KernelFlagValue,
 } from "../types.ts";
 
-const VALUE_FLAG_NAMES = new Set(["root", "package", "history"]);
+const _VALUE_FLAG_NAMES = new Set(["root", "package", "history"]);
 
 function addFlagValue(
   target: Record<string, KernelFlagValue>,

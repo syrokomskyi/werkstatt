@@ -122,7 +122,7 @@ test("validate resolves cache dir from mirrors[0].path", async () => {
   await mkdir(join(workspaceRoot, "..", "systems-cache", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
-  const cacheViolations = result.data!.violations.filter(
+  const _cacheViolations = result.data!.violations.filter(
     (v) => v.rule === "bundle-contract" || v.rule === "cache-missing",
   );
   // Bundle contract check should find the cache dir at the resolved path

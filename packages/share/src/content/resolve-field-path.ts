@@ -20,7 +20,7 @@ export interface FieldResolution {
  * missing field name, or null if the entire path resolves.
  */
 export function resolveFieldPath(data: unknown, fieldPath: string[]): FieldResolution {
-  let value: any = data;
+  let value: unknown = data;
   for (let i = 0; i < fieldPath.length; i++) {
     const field = fieldPath[i];
     if (value === null || value === undefined) {

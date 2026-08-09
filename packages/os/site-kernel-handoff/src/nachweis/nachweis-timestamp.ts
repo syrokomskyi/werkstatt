@@ -33,7 +33,6 @@ import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/inde
 import {
   isNachweisEntitled,
   makeSkipResult,
-  resolveNachweisCachePath,
   flagString,
   flagBool,
   type NachweisTimestampResult,

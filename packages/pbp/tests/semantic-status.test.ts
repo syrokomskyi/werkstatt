@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   PBP_SEMANTIC_STATUSES,
   isPbpSemanticStatus,
-  type PbpSemanticStatus,
 } from "../src/semantic-status.js";
 
 describe("PbpSemanticStatus", () => {

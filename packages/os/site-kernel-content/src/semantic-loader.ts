@@ -118,7 +118,7 @@ async function readLocalizedData(
   return result?.data;
 }
 
-async function readLocalizedBody(
+async function _readLocalizedBody(
   contentDir: string,
   collection: string,
   lang: string,

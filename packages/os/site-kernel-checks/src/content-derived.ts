@@ -38,7 +38,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { diagnosticsResult, passResult, failResult } from "./result-helpers.ts";
 import { getContentDisciplinePaths, readMarkdownDocument } from "./content-discipline.ts";
-import { collectClaimSidecars, keyLine, recordPathForSidecar, toPosix } from "./content-claims.ts";
+import { collectClaimSidecars, keyLine, toPosix } from "./content-claims.ts";
 
 interface CriticalRule {
   match: string;

@@ -23,7 +23,6 @@ import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import {
   PRINT_ORIENTATIONS,
   PRINT_PAGE_SIZES,
-  PRINT_MARGINS,
   PRINT_BACKGROUND_MODES,
   PRINT_REGIONS,
 } from "@warpgogol/share/schemas/print";
@@ -42,7 +41,7 @@ interface PrintViolation {
 // ---------------------------------------------------------------------------
 
 export async function runPrintContractValidate(
-  _input: any,
+  _input: unknown,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const app = context.site;
@@ -57,7 +56,7 @@ export async function runPrintContractValidate(
   const contentDir = join(appDir, "src", "content");
   const violations: PrintViolation[] = [];
 
-  let manifest: any;
+  let manifest: unknown;
   try {
     const result = await loadSystemManifest(contentDir);
     manifest = result.manifest;
@@ -130,7 +129,7 @@ export async function runPrintContractValidate(
       const hide = printCfg.hide;
       if (Array.isArray(hide)) {
         for (const region of hide) {
-          if (typeof region === "string" && !PRINT_REGIONS.includes(region as any)) {
+          if (typeof region === "string" && !PRINT_REGIONS.includes(region as unknown)) {
             violations.push({
               rule: "PRINT-CONTRACT-02",
               severity: "error",
@@ -146,7 +145,7 @@ export async function runPrintContractValidate(
       if (
         printCfg.orientation !== undefined &&
         typeof printCfg.orientation === "string" &&
-        !PRINT_ORIENTATIONS.includes(printCfg.orientation as any)
+        !PRINT_ORIENTATIONS.includes(printCfg.orientation as unknown)
       ) {
         violations.push({
           rule: "PRINT-CONTRACT-03",
@@ -161,7 +160,7 @@ export async function runPrintContractValidate(
       if (
         printCfg.pageSize !== undefined &&
         typeof printCfg.pageSize === "string" &&
-        !PRINT_PAGE_SIZES.includes(printCfg.pageSize as any)
+        !PRINT_PAGE_SIZES.includes(printCfg.pageSize as unknown)
       ) {
         violations.push({
           rule: "PRINT-CONTRACT-04",
@@ -176,7 +175,7 @@ export async function runPrintContractValidate(
       if (
         printCfg.background !== undefined &&
         typeof printCfg.background === "string" &&
-        !PRINT_BACKGROUND_MODES.includes(printCfg.background as any)
+        !PRINT_BACKGROUND_MODES.includes(printCfg.background as unknown)
       ) {
         violations.push({
           rule: "PRINT-CONTRACT-05",
@@ -215,7 +214,7 @@ export async function runPrintContractValidate(
 // ---------------------------------------------------------------------------
 
 export async function runPrintLayoutValidate(
-  _input: any,
+  _input: unknown,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const app = context.site;

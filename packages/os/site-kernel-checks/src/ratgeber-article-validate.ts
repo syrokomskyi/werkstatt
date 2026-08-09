@@ -23,7 +23,6 @@ RG-ART-09 (changelog entry schema + authorId resolution), RG-ART-10 (secondaryCt
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
-import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
   Diagnostic,
@@ -290,7 +289,7 @@ function checkTypeSpecificRequirement(articleType: string, proseContent: string)
   }
 }
 
-async function loadArticleRecords(appDir: string, defaultLang: string): Promise<ArticleRecord[]> {
+async function loadArticleRecords(appDir: string, _defaultLang: string): Promise<ArticleRecord[]> {
   const records: ArticleRecord[] = [];
   const articlesBaseDir = join(appDir, "src", "content", "surface", "articles");
 

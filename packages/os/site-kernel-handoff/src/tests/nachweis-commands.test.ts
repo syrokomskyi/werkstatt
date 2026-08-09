@@ -13,7 +13,7 @@
 */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, mkdir, writeFile, readFile, readdir } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, writeFile, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -127,7 +127,7 @@ async function writeEntitlements(cachePath: string, features: string[]): Promise
   await writeSystemManifest(cachePath);
 }
 
-async function writeBordbuch(cachePath: string, entries: unknown[]): Promise<void> {
+async function _writeBordbuch(cachePath: string, entries: unknown[]): Promise<void> {
   const dir = join(cachePath, "bordbuch");
   await mkdir(dir, { recursive: true });
   const lines = entries.map((e) => JSON.stringify(e)).join("\n") + (entries.length > 0 ? "\n" : "");

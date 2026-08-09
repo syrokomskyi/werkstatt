@@ -9,7 +9,7 @@
 */
 
 import { test, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
@@ -47,7 +47,7 @@ function gitInit(dir: string): void {
   execSync("git config user.name Test", { cwd: dir, stdio: "pipe" });
 }
 
-function gitCommit(dir: string, msg: string): void {
+function _gitCommit(dir: string, msg: string): void {
   execSync("git add -A", { cwd: dir, stdio: "pipe" });
   execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd: dir, stdio: "pipe" });
 }

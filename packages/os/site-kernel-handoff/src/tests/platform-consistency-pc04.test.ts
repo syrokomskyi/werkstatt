@@ -7,14 +7,14 @@
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, beforeEach, afterEach } from "vitest";
+import { test, expect } from "vitest";
 import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
-import { runPlatformConsistencyValidate, PC_04_CUTOFF_SHA } from "../platform-consistency.ts";
+import { runPlatformConsistencyValidate } from "../platform-consistency.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 const execFileAsync = promisify(execFile);

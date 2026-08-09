@@ -56,7 +56,7 @@ export interface CachedCommandResultEntry {
   inputsHash?: string;
 }
 
-const BYTE_MODE_EXTENSIONS = new Set([".md", ".yaml", ".yml", ".json", ".jsonc", ".txt"]);
+const _BYTE_MODE_EXTENSIONS = new Set([".md", ".yaml", ".yml", ".json", ".jsonc", ".txt"]);
 
 const SEMANTIC_MODE_EXTENSIONS = new Set([".ts", ".tsx", ".astro", ".css", ".js", ".mjs"]);
 

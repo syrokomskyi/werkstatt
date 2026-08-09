@@ -10,7 +10,7 @@ error codes, malformed config, permissive vs enforced modes.
 </CHANGE_SUMMARY>
 */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

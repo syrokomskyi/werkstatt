@@ -66,7 +66,7 @@ const IMAGE_EXTENSIONS = new Set([
   ".svg",
 ]);
 
-async function isImageFile(fileName: string): Promise<boolean> {
+async function _isImageFile(fileName: string): Promise<boolean> {
   const ext = fileName.slice(fileName.lastIndexOf(".")).toLowerCase();
   return IMAGE_EXTENSIONS.has(ext);
 }

@@ -22,7 +22,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { BriefFrontmatter, parseBriefFrontmatter } from "./brief.ts";
+import { parseBriefFrontmatter } from "./brief.ts";
 
 export interface OnboardingSynthesizeManifest {
   version: 1;

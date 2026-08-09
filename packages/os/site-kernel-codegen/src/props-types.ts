@@ -29,7 +29,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { GENERATED_MARKER, buildGeneratedHeader } from "./generated-marker.ts";
+import { buildGeneratedHeader } from "./generated-marker.ts";
 
 // ---------------------------------------------------------------------------
 // JSON Schema -> TypeScript emission (pure, deterministic)

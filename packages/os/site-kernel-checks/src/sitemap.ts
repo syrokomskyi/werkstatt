@@ -33,7 +33,6 @@ import { passResult, failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import {
   IMAGE_SITEMAP_FILENAME,
-  type PageCluster,
   buildClustersFromSystemMd,
   groupClustersByCategory,
   generateSitemapIndex,

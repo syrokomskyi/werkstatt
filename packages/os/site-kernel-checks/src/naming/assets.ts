@@ -53,7 +53,7 @@ export async function runAssetsStructureLint(
     SKIP_DIRS,
   );
 
-  let checkedFiles = imageFiles.length;
+  const checkedFiles = imageFiles.length;
   for (const filePath of imageFiles) {
     const rel = relative(paths.appDirectory, filePath).replace(/\\/g, "/");
     const relSrc = relative(paths.srcDirectory, filePath).replace(/\\/g, "/");

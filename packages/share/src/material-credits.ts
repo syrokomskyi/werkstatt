@@ -22,15 +22,9 @@ import {
   type MaterialCreditLabels,
   type MaterialKind,
   type MaterialTarget,
-  type MaterialSourceType,
-  type MaterialCreditStatus,
-  type UsageBasisType,
   materialCreditSchema,
   materialTargetKey,
   formatMaterialCreditLine,
-  labelForSourceType,
-  labelForStatus,
-  labelForUsageBasis,
 } from "./schemas/material-credit.ts";
 
 // RFC-0488: re-export label mapping helpers for @warpgogol/share/material-credits consumers.

@@ -23,7 +23,6 @@ import { runNamingPolicyValidate } from "../structure/naming-policy.ts";
 import {
   runRouteSlimValidation,
   runFeatureVisibilityValidation,
-  runSemanticMirrorValidate,
 } from "../semantic.ts";
 import {
   runFeatureGraphValidate,
@@ -42,7 +41,6 @@ import {
   runNamingLayoutsLint,
 } from "../naming.ts";
 import { runScriptsPlacementValidation } from "../scripts-placement.ts";
-import { runCssImportantLint } from "../css-important-lint.ts";
 import { runKernelResultEnvelopeLint } from "../kernel-result-envelope-lint.ts";
 import { runDiagnosticShapeLint } from "../diagnostic-shape-lint.ts";
 import { runWarningDiagnosticsLint } from "../warning-diagnostics-lint.ts";
@@ -64,15 +62,9 @@ import {
   runVideoDistPrune,
 } from "../video/video-variants.ts";
 import { runLiveVariantsGenerate } from "../live-variants.ts";
-import { runLagebildValidate } from "../lagebild.ts";
 import { runCloudflareAssetsValidate } from "../cloudflare-assets.ts";
 import { runCloudflareResidencyValidate } from "../cloudflare-residency.ts";
 import { runCloudflareRegionalServicesValidate } from "../cloudflare-regional-services.ts";
-import { runOnboardingYamlImportLint } from "../onboarding-yaml-import-lint.ts";
-import { runGeneratorOwnershipLint } from "../generator-ownership.ts";
-import { runAstroExportsLint } from "../astro-exports.ts";
-import { runImportExtensionsLint } from "../import-extensions.ts";
-import { runTsconfigShapeLint } from "../tsconfig-shape.ts";
 import { runContentLayoutsValidation } from "../checks/content-layouts.ts";
 
 export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [

@@ -32,7 +32,6 @@ import {
   collectMarkdownFilesSafe,
   flattenStringValues,
   findLineNumbersContaining,
-  getContentDisciplinePaths,
   readMarkdownDocument,
 } from "./content-discipline.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
@@ -221,7 +220,7 @@ export async function runContentLinksValidate(
   const contentDir = join(paths.srcDirectory, "content");
   const { manifest } = await loadSystemManifest(contentDir);
 
-  const i18n = (manifest.i18n as { default?: string; supported?: Record<string, unknown> }) ?? {};
+  const _i18n = (manifest.i18n as { default?: string; supported?: Record<string, unknown> }) ?? {};
   const defaultLanguage = defaultLanguageFromManifest(manifest);
   const pages = (manifest.pages ?? []) as SystemPage[];
 
@@ -278,7 +277,7 @@ export async function runContentLinksValidate(
 
     // For page files, extract pageId, prose heading IDs, and block anchorIds
     let filePageId: string | null = null;
-    let proseHeadingIds: string[] = [];
+    const proseHeadingIds: string[] = [];
     let blockAnchorIds: string[] = [];
     if (isPageFile) {
       filePageId = typeof doc.frontmatter.pageId === "string" ? doc.frontmatter.pageId : null;

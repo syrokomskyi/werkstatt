@@ -9,14 +9,14 @@ identical.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, beforeEach, afterEach } from "vitest";
+import { test, expect } from "vitest";
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { rfc0502Migrator } from "./rfc-0502.ts";
 import type { SternsystemData, MigrationContext } from "./types.ts";
 
-function makeCtx(tmpDir: string): MigrationContext {
+function makeCtx(_tmpDir: string): MigrationContext {
   return {
     systemId: "test-system",
     missionId: "test-mission",
@@ -43,7 +43,7 @@ test("rfc-0502 migrator is idempotent — f(f(x)) == f(x)", async () => {
     const firstAuthorsDir = path.join(tmpDir, "src", "content", "surface", "authors");
     const firstFiles = await fs.readdir(firstAuthorsDir).catch(() => []);
 
-    const second = await rfc0502Migrator.transform(first, ctx);
+    const _second = await rfc0502Migrator.transform(first, ctx);
     const secondAuthorsDir = path.join(tmpDir, "src", "content", "surface", "authors");
     const secondFiles = await fs.readdir(secondAuthorsDir).catch(() => []);
 

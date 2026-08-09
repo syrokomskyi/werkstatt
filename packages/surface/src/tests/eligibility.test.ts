@@ -13,7 +13,7 @@ import {
   liveSiblingsOf,
   type AxisFieldMap,
 } from "../eligibility.ts";
-import type { SurfaceAxis, SurfaceRecord, EligibilityPolicy, AxisTuple } from "../types.ts";
+import type { SurfaceAxis, SurfaceRecord, EligibilityPolicy } from "../types.ts";
 
 const SEGMENT_PATTERN = /^[a-z0-9-]+$/;
 

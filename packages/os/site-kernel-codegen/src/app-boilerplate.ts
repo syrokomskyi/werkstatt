@@ -33,8 +33,6 @@ import {
   readFileIfExists,
   readTemplate,
   applyTokens,
-  writeManagedFile,
-  normalizeAppPath,
   buildRetiredSurfaceRedirectBlock,
   buildRetiredPageRoutesBlock,
   buildRetiredTombstoneSlugs,

@@ -653,11 +653,11 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
 
   // Read system.md for shell/growth/config/biome/ctaTarget
   const systemEntries = await getCollection("system");
-  const systemEntry = systemEntries.find((e: any) => e.id === "system");
-  const systemData = systemEntry?.data as Record<string, any> | undefined;
+  const systemEntry = systemEntries.find((e: unknown) => e.id === "system");
+  const systemData = systemEntry?.data as Record<string, unknown> | undefined;
 
   const pages = Array.isArray(systemData?.pages) ? systemData.pages : [];
-  const pageSystemConfig = pages.find((p: any) => p.pageId === pageId);
+  const pageSystemConfig = pages.find((p: unknown) => p.pageId === pageId);
   const requiredPageIds = Array.isArray(systemData?.sharedContext?.requiredPageIds)
     ? (systemData.sharedContext.requiredPageIds as string[])
     : [];
@@ -810,7 +810,7 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
   const isUtilityPageWithoutTwin = !authoredSemanticType && !surfaceEntry;
 
   // Read biome from system.md identity
-  const identity = systemData?.identity as Record<string, any> | undefined;
+  const identity = systemData?.identity as Record<string, unknown> | undefined;
   const biome = (identity?.biome as string) ?? "default";
 
   // Read ctaTarget from identity (app-level) with per-page override
@@ -821,7 +821,7 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
   if (!siteEntry && lang !== defaultLang) {
     siteEntry = await getEntry("site", `${defaultLang}/layout`);
   }
-  const layoutData = siteEntry?.data as Record<string, any> | undefined;
+  const layoutData = siteEntry?.data as Record<string, unknown> | undefined;
   const skipLinkLabel = (layoutData?.skipLinkLabel as string) ?? "Skip to main content";
   const defaultDescription = (layoutData?.defaultDescription as string) ?? "";
 
@@ -831,7 +831,7 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
   if (!labelsEntry && lang !== defaultLang) {
     labelsEntry = await getEntry("site", `${defaultLang}/labels`);
   }
-  const labelsData = labelsEntry?.data as Record<string, any> | undefined;
+  const labelsData = labelsEntry?.data as Record<string, unknown> | undefined;
   const siteOrchestrator = (labelsData?.orchestrator ?? {}) as Record<string, unknown>;
 
   // RFC-0163: the page's own absolute canonical URL (origin + localized path). Passing

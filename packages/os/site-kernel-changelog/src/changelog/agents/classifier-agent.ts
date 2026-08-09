@@ -24,7 +24,7 @@ import { createRateLimiter } from "../core/rate-limiter.ts";
 import { retryWithBackoff } from "../utils/retry.ts";
 import type { ChangelogCtx } from "../context.ts";
 
-const CONVENTIONAL_REGEX = /^(feat|fix|refactor|docs|perf|test|build|ci|chore|style)(\(.+\))?(!)?:/;
+const _CONVENTIONAL_REGEX = /^(feat|fix|refactor|docs|perf|test|build|ci|chore|style)(\(.+\))?(!)?:/;
 const SKIP_PATTERNS = [/^chore(\(.+\))?: (bump|update) (version|deps|lock)/i, /^(build|ci): /i];
 
 // START_BLOCK_DETERMINISTIC

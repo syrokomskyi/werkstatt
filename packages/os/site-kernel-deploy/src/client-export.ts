@@ -53,7 +53,7 @@ function patternToRegex(raw: string): RegExp | null {
   const isRooted = hasLeadingSlash || hasInternalSlash;
 
   // Escape all regex meta-characters except the glob characters (* ? [)
-  let regexStr = p
+  const regexStr = p
     .replace(/[.+^${}()|[\]\\]/g, "\\$&")
     .replace(/\*\*/g, "\x00") // protect ** before replacing *
     .replace(/\*/g, "[^/]*")

@@ -161,7 +161,7 @@ test("mission.close writes .materialization-state.json with current cache clone 
   await runMissionClose(input, context);
 
   // Read HEAD after close — close creates bordbuch commits that change HEAD
-  const headAfterClose = gitHead(systemDir);
+  const _headAfterClose = gitHead(systemDir);
 
   const statePath = join(systemDir, ".materialization-state.json");
   expect(existsSync(statePath)).toBe(true);

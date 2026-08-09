@@ -9,7 +9,7 @@
 */
 
 import { test, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, existsSync, readFileSync, statSync, mkdirSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { installBordbuchPreCommitHook } from "../bordbuch/bordbuch-hook.ts";

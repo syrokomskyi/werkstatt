@@ -27,7 +27,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
+import type { SurfaceArtifact } from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { ARTIFACT_FILE, readLangs } from "./surface/shared.ts";
 
@@ -46,7 +46,7 @@ const COMMERCIAL_CLAIM_PHRASES = [
   "Top-bewertet",
 ];
 
-const REQUIRED_ARTICLE_FIELDS = [
+const _REQUIRED_ARTICLE_FIELDS = [
   "question",
   "summary",
   "readTime",
@@ -205,7 +205,7 @@ export async function runRatgeberHubValidate(
         const catSlug = (data.slug as string) ?? catFile.split("/").pop()?.replace(".md", "");
         if (!catSlug) continue;
         // Check if any article references this category
-        const hasArticles = articleEntries.some((entry) => {
+        const hasArticles = articleEntries.some((_entry) => {
           // Articles don't directly carry categoryId in the surface artifact;
           // we check via the page content or axes. This is a best-effort check.
           return true; // Articles exist; detailed category mapping is checked at content level
@@ -267,7 +267,7 @@ export async function runRatgeberHubValidate(
     const blocks = Array.isArray(page.blocks) ? page.blocks : [];
     const nonFaqBlocks = blocks.filter((b) => {
       if (typeof b !== "object" || b === null) return true;
-      const props = (b as unknown as Record<string, unknown>).props as
+      const _props = (b as unknown as Record<string, unknown>).props as
         Record<string, unknown> | undefined;
       // FAQ blocks are markdown blocks with a heading that looks like a question
       // We exclude blocks after the first contentRef block (FAQ section)

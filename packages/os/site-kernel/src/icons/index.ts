@@ -93,7 +93,7 @@ function toPascalCase(str: string): string {
 /**
  * Convert icon name to camelCase for variable export
  */
-function toCamelCase(str: string): string {
+function _toCamelCase(str: string): string {
   const pascal = toPascalCase(str);
   return pascal.charAt(0).toLowerCase() + pascal.slice(1);
 }
@@ -176,7 +176,7 @@ async function processIconSet(
       continue;
     }
 
-    const { name, id } = parsed;
+    const { name, id: _id } = parsed;
     const baseName = toPascalCase(name) + "Icon";
     const componentName = /^\d/.test(baseName) ? `Icon${baseName}` : baseName;
     const componentFileName = `${name}-icon.astro`;

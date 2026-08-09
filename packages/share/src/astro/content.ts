@@ -94,14 +94,12 @@ export async function getLayoutContentData(
   }
 
   const entryId = getCollectionId(languageCode, layoutPath);
-  // @ts-ignore - dynamic collection name
   const entry = await getEntry("layouts", entryId);
 
   if (entry) return entry.data as Record<string, unknown>;
 
   if (languageCode !== defaultLanguageCode) {
     const defaultEntryId = getCollectionId(defaultLanguageCode, layoutPath);
-    // @ts-ignore - dynamic collection name
     const defaultEntry = await getEntry("layouts", defaultEntryId);
     if (defaultEntry) {
       console.warn(

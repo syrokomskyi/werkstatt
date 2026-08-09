@@ -412,7 +412,7 @@ export function citySpecificQaList(
  * RFC-0490: read the pillar block for a depth-0 level, with language fallback.
  * Returns undefined when the level has no pillar configuration.
  */
-export function pillarFor(ctx: BakeCtx, depth: number, lang: string): BlueprintPillar | undefined {
+export function pillarFor(ctx: BakeCtx, depth: number, _lang: string): BlueprintPillar | undefined {
   const level = ctx.levels.find((l) => l.depth === depth);
   return level?.pillar;
 }

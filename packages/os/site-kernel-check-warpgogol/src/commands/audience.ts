@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { join, posix } from "node:path";
+import { join } from "node:path";
 import YAML from "yaml";
 import { parseAudienceProfile, parseAudienceReview } from "@warpgogol/check-core";
 import type {

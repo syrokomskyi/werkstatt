@@ -1033,7 +1033,7 @@ export async function runReleaseStateValidate(
 async function validateReleaseState(
   workspaceRoot: string,
   target: { missionId: string | null; releaseId: string | null; systemId: string | null },
-  logger: { warn: (msg: string) => void; info: (msg: string) => void },
+  _logger: { warn: (msg: string) => void; info: (msg: string) => void },
 ): Promise<ReleaseStateCheck[]> {
   const checks: ReleaseStateCheck[] = [];
   const { missionId, releaseId, systemId } = target;

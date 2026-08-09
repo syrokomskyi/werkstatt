@@ -62,7 +62,7 @@ const allIconModules = (
  * Resolve a VendorIconConfig to the default Astro component export.
  * Returns null if the vendor/collection/name cannot be matched.
  */
-export async function loadVendorIcon(config: VendorIconConfig | undefined): Promise<any> {
+export async function loadVendorIcon(config: VendorIconConfig | undefined): Promise<unknown> {
   if (!config) return null;
   const fileName = resolveIconFileName(config.name);
   const suffix = `/${config.vendor}/${config.collection}/${fileName}`;

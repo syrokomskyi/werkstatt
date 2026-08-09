@@ -137,7 +137,7 @@ function resolveComponentCandidates(componentPath: string): string[] {
   return candidates;
 }
 
-async function checkAnchorExists(
+async function _checkAnchorExists(
   appDir: string,
   componentPath: string,
   anchor: string,
@@ -504,7 +504,7 @@ export async function runFeatureProjectionsValidate(
     // No feature graph in this app — nothing to check
   }
 
-  let checkedFiles = featureFiles.length;
+  const checkedFiles = featureFiles.length;
 
   for (const filePath of featureFiles) {
     const source = await readFile(filePath, "utf8");

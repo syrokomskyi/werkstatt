@@ -262,13 +262,13 @@ export async function runEnvContractValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult>> {
   const diagnostics: Diagnostic[] = [];
-  let projectsChecked = 0;
+  let _projectsChecked = 0;
 
   // ── site workspaces (Sternsystemen + transitional apps/*) ──
   const apps = await listApps(context);
   for (const site of apps) {
     const appDir = site.directory;
-    projectsChecked++;
+    _projectsChecked++;
 
     const examplePath = join(appDir, ENV_EXAMPLE);
     const exampleRaw = await readIfExists(examplePath);
@@ -348,7 +348,7 @@ export async function runEnvContractValidate(
 
     if (!consumesEnv) continue; // exempt — no env vars needed
 
-    projectsChecked++;
+    _projectsChecked++;
 
     const examplePath = join(serviceDir, ENV_EXAMPLE);
     const exampleRaw = await readIfExists(examplePath);
@@ -424,7 +424,7 @@ export async function runEnvContractValidate(
   const rootExamplePath = join(context.workspaceRoot, ENV_EXAMPLE);
   const rootExampleRaw = await readIfExists(rootExamplePath);
   if (rootExampleRaw) {
-    projectsChecked++;
+    _projectsChecked++;
     const vars = parseEnvExample(rootExampleRaw);
     for (const v of vars) {
       if (!v.hasComment) {

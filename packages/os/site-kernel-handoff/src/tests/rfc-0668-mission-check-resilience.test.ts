@@ -9,8 +9,6 @@
 */
 
 import { test, expect, beforeEach, vi } from "vitest";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 
 vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
   const original = await importOriginal<typeof import("@warpgogol/site-kernel")>();

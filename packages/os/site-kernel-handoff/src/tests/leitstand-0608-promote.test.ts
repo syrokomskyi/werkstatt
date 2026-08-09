@@ -184,7 +184,7 @@ systems:
   writeFileSync(join(registryDir, "registry.yaml"), registryContent);
 }
 
-function createBehaviorSnapshot(workspaceRoot: string, releaseId: string): void {
+function _createBehaviorSnapshot(workspaceRoot: string, releaseId: string): void {
   const snapshotPath = join(workspaceRoot, "releases", releaseId, "behavior-snapshot.json");
   const snapshot = {
     schemaVersion: "1.0.0",

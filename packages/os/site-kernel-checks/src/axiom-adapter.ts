@@ -210,7 +210,6 @@ export async function runMissionCheck(
     runTimestamp = new Date().toISOString().replace(/[:.]/g, "-");
   }
 
-  let locales: string[] | undefined;
   const localesRaw = input.flags["locales"];
   const localesFlag = typeof localesRaw === "string" ? localesRaw : undefined;
   let explicitLocales: string[] | undefined;
@@ -240,7 +239,7 @@ export async function runMissionCheck(
   if (resolvedLocales.length === 1 && resolvedLocales[0] === "en-US" && !explicitLocales) {
     logger.warn(`  No i18n config found in workpiece, falling back to en-US locale`);
   }
-  locales = resolvedLocales;
+  const locales = resolvedLocales;
 
   const methodologiesConfig = tryLoadMethodologiesConfig(workspaceRoot);
   const axiomMethodologiesConfig = mapMethodologiesConfig(methodologiesConfig);

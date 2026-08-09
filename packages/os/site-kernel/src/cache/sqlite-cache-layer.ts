@@ -54,10 +54,6 @@ interface CacheRow {
   updated_at: number;
 }
 
-interface StatsRow {
-  hits: number;
-  misses: number;
-}
 
 interface NamespaceCountRow {
   namespace: string;

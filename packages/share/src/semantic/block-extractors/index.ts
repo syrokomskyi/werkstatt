@@ -80,7 +80,7 @@ BLOCK_EXTRACTORS.register<Record<string, unknown>>({
   blockType: "comparison-cards",
   extract(props) {
     const heading = safeString(safeGet(props, "header.heading"));
-    const labels = safeGet(props, "labels") as Record<string, string> | undefined;
+    const _labels = safeGet(props, "labels") as Record<string, string> | undefined;
     const rows = safeArray(safeGet(props, "rows"), (row) => {
       const left = safeString(safeGet(row, "left"));
       const right = safeString(safeGet(row, "right"));

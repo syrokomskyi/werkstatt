@@ -1,11 +1,11 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 
 import { runAxiomReport, renderAxiomReportHtml } from "../axiom-adapter.ts";
 import type { EvidenceMetadata } from "../axiom-adapter.ts";
-import { makeTestContext, testInput } from "./helpers.ts";
+import { makeTestContext } from "./helpers.ts";
 import type { KernelCommandInput } from "@warpgogol/site-kernel";
 
 import type { StudyRun, Finding, ObservationBundle } from "@syrokomskyi/axiom-study";

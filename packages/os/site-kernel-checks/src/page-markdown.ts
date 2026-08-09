@@ -315,7 +315,7 @@ export async function runPageMarkdownGenerate(
       DEFAULT_PROFILE_BASE_BY_LANG[lang] ??
       "team";
     const peopleDir = join(contentDir, "people", defaultLang);
-    let personSlugs: string[] = [];
+    const personSlugs: string[] = [];
     try {
       const personFiles = await readdir(peopleDir);
       for (const f of personFiles) {

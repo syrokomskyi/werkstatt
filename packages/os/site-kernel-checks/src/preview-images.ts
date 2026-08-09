@@ -16,7 +16,7 @@
 
 import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { writeFileIfChanged } from "@warpgogol/site-kernel";
-import { access, mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
@@ -36,7 +36,7 @@ export interface PreviewValidationViolation {
 }
 
 export async function runPreviewImagesValidate(
-  input: any,
+  input: unknown,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const app = context.site;
@@ -110,7 +110,7 @@ export async function runPreviewImagesValidate(
         }
       }
     }
-  } catch (err) {
+  } catch {
     // If system.md doesn't load we don't break the build here
   }
 
@@ -195,7 +195,7 @@ function ogSourceHasSignals(strings: Array<string | undefined>, cfg: NormalizeCo
 }
 
 export async function runPreviewImagesGenerate(
-  input: any,
+  input: unknown,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const app = context.site;
@@ -212,7 +212,7 @@ export async function runPreviewImagesGenerate(
   const forceNormalize = Boolean(input?.flags?.["force-normalize"] ?? input?.flags?.forceNormalize);
 
   const appDir = app.directory;
-  const items: any[] = [];
+  const items: unknown[] = [];
   let generatedCount = 0;
   let skippedCount = 0;
   let optOutCount = 0;
@@ -222,7 +222,7 @@ export async function runPreviewImagesGenerate(
   try {
     const result = await loadSystemManifest(contentDir);
     manifest = result.manifest;
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       exitCode: 1,
       summary: `Failed to load system manifest: ${err.message}`,
@@ -279,7 +279,7 @@ export async function runPreviewImagesGenerate(
         template: "ultimate-fallback",
       });
       generatedCount++;
-    } catch (err: any) {
+    } catch (err: unknown) {
       items.push({
         pageId: "fallback",
         lang: "all",
@@ -450,7 +450,7 @@ export async function runPreviewImagesGenerate(
           fileSlug,
         });
         generatedCount++;
-      } catch (err: any) {
+      } catch (err: unknown) {
         items.push({
           pageId,
           lang,

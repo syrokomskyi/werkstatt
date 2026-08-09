@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { join, posix } from "node:path";
+import { join } from "node:path";
 import type { CheckReport } from "@warpgogol/check-core";
 import type {
   CheckResult,

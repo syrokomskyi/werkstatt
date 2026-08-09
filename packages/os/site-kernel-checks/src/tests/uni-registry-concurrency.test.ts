@@ -26,7 +26,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { byteHash } from "@warpgogol/fingerprint";
 import { executeKernelCommand } from "@warpgogol/site-kernel";
-import { parse as yamlParse, stringify as yamlStringify } from "yaml";
+import { parse as yamlParse } from "yaml";
 
 interface UniRegistrySnapshot {
   schemaVersion: string;

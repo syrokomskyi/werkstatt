@@ -15,7 +15,6 @@
   <item>RFC-0375: initial implementation.</item>
 </CHANGE_SUMMARY>
 */
-import { join } from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -127,7 +126,7 @@ function matchOwnershipEntry(relPath: string, app?: string): OwnershipEntry | nu
   return null;
 }
 
-function resolvePath(rawPath: string, app: string | undefined, workspaceRoot: string): string {
+function resolvePath(rawPath: string, app: string | undefined, _workspaceRoot: string): string {
   const posixPath = toPosix(rawPath);
 
   const isWorkspaceAbsolute =

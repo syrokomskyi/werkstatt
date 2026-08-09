@@ -30,7 +30,7 @@ const REGISTRY_ONLY_PATHS = new Set(
   GENERATOR_OWNERSHIP_MAP.filter((e) => e.markerPolicy === "registry-only").map((e) => e.path),
 );
 
-function isRegistryOnly(appRelativePath: string): boolean {
+function _isRegistryOnly(appRelativePath: string): boolean {
   const posixPath = appRelativePath.replace(/\\/g, "/");
   return REGISTRY_ONLY_PATHS.has(posixPath);
 }

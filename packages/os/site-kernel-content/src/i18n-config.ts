@@ -87,7 +87,7 @@ export async function loadI18nConfig(appDirectory: string): Promise<ResolvedI18n
     }
 
     config = validateI18nConfig(frontmatter.i18n);
-  } catch (error) {
+  } catch {
     // If system.md doesn't exist or has no i18n, provide minimal fallback
     // This allows gradual migration per RFC-0038
     config = {

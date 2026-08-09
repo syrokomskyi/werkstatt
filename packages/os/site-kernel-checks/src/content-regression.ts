@@ -27,7 +27,6 @@ CREG-04 workpiece mismatch, CREG-05 unreviewed drift on mission.close.
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { mkdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import {
   writeFileIfChanged,
@@ -1191,7 +1190,7 @@ export async function runContentRegressionApply(
         change.field !== "removed-block"
       ) {
         const currentBlock = currentRoute?.blocks.find((b) => b.id === change.blockId);
-        const goldenBlock = goldenRoute?.blocks.find((b) => b.id === change.blockId);
+        const _goldenBlock = goldenRoute?.blocks.find((b) => b.id === change.blockId);
         const currentVal = getBlockFieldValue(currentBlock, change.field);
         if (currentVal !== change.golden) {
           result.errors.push(

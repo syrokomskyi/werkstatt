@@ -16,7 +16,6 @@
 import type {
   FeaturePolicy,
   FeaturePolicyBehaviorValue,
-  FeaturePolicyTargetKind,
   FeaturePolicyTargetRef,
   FeaturePolicyVisibility,
   ResolvedFeaturePolicy,

@@ -14,7 +14,6 @@
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm, mkdir, writeFile, readFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
@@ -33,7 +32,7 @@ import { runEvidenceFetch } from "../evidence/evidence-fetch.ts";
 
 const RUN_TIMESTAMP = "2026-08-02T00-00-00-000Z";
 const MISSION_ID = "warpgogol-com-integration-test";
-const SYSTEM_ID = "warpgogol-com";
+const _SYSTEM_ID = "warpgogol-com";
 
 function makeInput(flags: Record<string, KernelFlagValue>): KernelCommandInput {
   return { argv: [], flags };

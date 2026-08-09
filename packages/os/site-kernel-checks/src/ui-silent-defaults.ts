@@ -130,7 +130,7 @@ const ALLOWLISTED_PROP_NAMES: ReadonlySet<string> = new Set([
  * This is a best-effort heuristic; we look backwards for the nearest
  * identifier before the operator.
  */
-function extractPropName(source: string, matchIndex: number): string | null {
+function _extractPropName(source: string, matchIndex: number): string | null {
   const before = source.slice(0, matchIndex);
   // Look for identifier.propName or const { propName = ... } or propName ??
   // Match the last identifier sequence before the operator position

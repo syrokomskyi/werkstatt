@@ -103,7 +103,7 @@ function makeContext(root: string, appDir: string): KernelRuntimeContext {
   } as unknown as KernelRuntimeContext;
 }
 
-function makeRegistry(root: string, systemId: string, cacheClonePath: string): string {
+function _makeRegistry(root: string, _systemId: string, _cacheClonePath: string): string {
   const registryDir = join(root, "systems");
   return registryDir;
 }

@@ -12,21 +12,13 @@
 
 import { execSync } from "node:child_process";
 import type { PbpBuildContext } from "../compiler-pipeline.js";
-import type { PbpPublicationSnapshot } from "../publication.js";
 import type {
   PbpCompilerInput,
   PbpCompilerResult,
   PbpResolvedGraph,
-  PbpProjectionSet,
-  PbpBuyerView,
   PartialCompilerResult,
 } from "./types.js";
-import type { PbpSourceInventoryReport } from "../compiler-pipeline.js";
 import type { PbpEntity } from "../envelope.js";
-import type { PbpFallbackReport } from "../locale.js";
-import type { PbpGraphIntegrityError, PbpCycleCheckResult } from "../reference-resolution.js";
-import type { PbpValidationError } from "../validation-errors.js";
-import type { PbpDerivationResult } from "../derivation.js";
 import { byteHash } from "@warpgogol/fingerprint";
 
 export async function publish(
@@ -51,7 +43,7 @@ export async function publish(
   };
 }
 
-function buildContext(input: PbpCompilerInput, partial: PartialCompilerResult): PbpBuildContext {
+function buildContext(input: PbpCompilerInput, _partial: PartialCompilerResult): PbpBuildContext {
   const sourceRevision = getGitRevision(input.sourceDirectory);
   const schemaSetDigest = byteHash("pbp-schema-set-v1");
   const derivationSetDigest = byteHash(

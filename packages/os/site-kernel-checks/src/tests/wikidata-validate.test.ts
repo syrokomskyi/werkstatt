@@ -229,8 +229,8 @@ describe("validateProjectionParity (RFC-0531)", () => {
 });
 
 describe("validateNotabilityEvidence (RFC-0535)", () => {
-  const CLAIMS_DIR = "src/content/business-profile/de/claims";
-  const EVIDENCE_SOURCES_DIR = "src/content/business-profile/de/evidence-sources";
+  const _CLAIMS_DIR = "src/content/business-profile/de/claims";
+  const _EVIDENCE_SOURCES_DIR = "src/content/business-profile/de/evidence-sources";
 
   it("returns null when Business has no QID", () => {
     const result = validateNotabilityEvidence(false, [], BUSINESS_FILE);

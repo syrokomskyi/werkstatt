@@ -114,7 +114,7 @@ function writeReleaseManifest(
   writeFileSync(join(releaseDir, "release.yaml"), lines.join("\n") + "\n");
 }
 
-function readReleaseState(workspaceRoot: string, releaseId: string): string {
+function _readReleaseState(workspaceRoot: string, releaseId: string): string {
   const content = readFileSync(join(workspaceRoot, "releases", releaseId, "release.yaml"), "utf8");
   for (const line of content.split("\n")) {
     const match = line.match(/^state:\s*(.*)$/);

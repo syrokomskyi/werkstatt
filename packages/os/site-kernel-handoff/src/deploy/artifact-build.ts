@@ -30,13 +30,12 @@ import { signJsonPayload, requireEnv } from "@warpgogol/site-kernel-integrity";
 import type { ArtifactBuildResult, ArtifactManifest } from "./types.ts";
 import {
   artifactDir,
-  distPath,
   hashArtifactDir,
   platformArtifactsBase,
   writeManifest,
 } from "./deploy-utils.ts";
 
-function flagString(input: KernelCommandInput, key: string): string | undefined {
+function _flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
   return typeof v === "string" ? v : undefined;
 }

@@ -27,7 +27,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
-import { GENERATED_MARKER, hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
+import { hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

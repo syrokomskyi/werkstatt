@@ -34,7 +34,7 @@ export interface TypedHistogram<L extends readonly string[]> {
   record(pusher: MetricsPusher, value: number, labels?: LabelMap<L>): void;
 }
 
-function defineCounter<L extends readonly string[]>(name: string, labelKeys: L): TypedCounter<L> {
+function defineCounter<L extends readonly string[]>(name: string, _labelKeys: L): TypedCounter<L> {
   return {
     name,
     add(pusher, value, labels) {
@@ -43,7 +43,7 @@ function defineCounter<L extends readonly string[]>(name: string, labelKeys: L):
   };
 }
 
-function defineGauge<L extends readonly string[]>(name: string, labelKeys: L): TypedGauge<L> {
+function defineGauge<L extends readonly string[]>(name: string, _labelKeys: L): TypedGauge<L> {
   return {
     name,
     set(pusher, value, labels) {
@@ -54,7 +54,7 @@ function defineGauge<L extends readonly string[]>(name: string, labelKeys: L): T
 
 function defineHistogram<L extends readonly string[]>(
   name: string,
-  labelKeys: L,
+  _labelKeys: L,
 ): TypedHistogram<L> {
   return {
     name,

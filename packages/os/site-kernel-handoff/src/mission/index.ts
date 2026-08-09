@@ -24,7 +24,6 @@ import {
   runMissionReconcile,
 } from "./mission-materialization-commands.ts";
 import { runMissionPreview } from "./mission-preview.ts";
-import { runMissionGitCommit } from "./mission-git-commit.ts";
 
 export { runMissionOpen, type MissionOpenData } from "./mission-open.ts";
 export { runMissionStatus, type MissionStatusData } from "./mission-status.ts";

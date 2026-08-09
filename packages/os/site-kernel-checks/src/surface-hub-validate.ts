@@ -27,7 +27,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry, Blueprint } from "@warpgogol/surface";
+import type { SurfaceArtifact } from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceBlueprints } from "./surface-expand.ts";
 import { ARTIFACT_FILE, readLangs } from "./surface/shared.ts";
@@ -76,7 +76,7 @@ export async function runSurfaceHubValidate(
   const entries = Array.isArray(artifact.entries) ? artifact.entries : [];
 
   const blueprints = await loadSurfaceBlueprints(context.workspaceRoot);
-  const bpById = new Map(blueprints.map((b) => [b.id, b]));
+  const _bpById = new Map(blueprints.map((b) => [b.id, b]));
 
   const { defaultLang } = await readLangs(app.directory);
 
@@ -132,7 +132,7 @@ export async function runSurfaceHubValidate(
     // pillar-orphan-industry (warn)
     const industryAxis = bp.axes.find((a) => a.id === "industry");
     if (industryAxis && depth0Entry) {
-      const publishedSlugs = new Set(
+      const _publishedSlugs = new Set(
         depth1Entries.map((e) => e.axes["industry"]).filter(Boolean) as string[],
       );
       // The universe is a collection or provider — we can only check entries that exist.

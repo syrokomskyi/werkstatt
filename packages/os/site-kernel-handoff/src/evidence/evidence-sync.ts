@@ -30,7 +30,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { resolveMissionDir } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
-import { readRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import { readRegistry } from "../sternsystem/registry-io.ts";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "./r2-client.ts";
 
 export interface EvidenceSyncResult {

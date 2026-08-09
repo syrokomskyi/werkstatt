@@ -9,7 +9,7 @@ import {
   loadDerivedPrices,
   type SourcePriceProp,
 } from "../sections/price-card/price-variants.ts";
-import { OFFERING_URI_PREFIX, PRICE_MARKER_RE, AMOUNT_MARKER_RE } from "@warpgogol/share/semantic";
+import { OFFERING_URI_PREFIX, PRICE_MARKER_RE } from "@warpgogol/share/semantic";
 import { decimalMultiply, decimalRound, type PbpRoundingMode } from "@warpgogol/pbp";
 
 export type TextPart = { kind: "text"; value: string };

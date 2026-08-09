@@ -40,7 +40,7 @@ const PRINT_REGIONS = [
 // the schema here is for Astro content-collection integration.
 // ---------------------------------------------------------------------------
 
-const visibilityExprSchema: z.ZodType<any> = z.lazy(() =>
+const visibilityExprSchema: z.ZodType<unknown> = z.lazy(() =>
   z.union([
     z.object({ feature: z.string().min(1) }),
     z.object({ locale: z.union([z.string().min(1), z.array(z.string().min(1))]) }),

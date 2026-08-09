@@ -32,7 +32,7 @@ export function createLanguageRedirectMiddleware(options: {
   supportedLangs: readonly string[];
   defaultLang: string;
 }) {
-  return defineMiddleware((ctx: any, next: any) => {
+  return defineMiddleware((ctx: unknown, next: unknown) => {
     const url = new URL(ctx.request.url);
     const segments = url.pathname.split("/").filter(Boolean);
     const firstSegment = segments[0];

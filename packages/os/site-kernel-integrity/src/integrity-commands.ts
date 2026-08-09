@@ -172,7 +172,7 @@ export async function runIntegrityVerifyRelease(
   const manifestSource =
     getStringArg(input, 0, signedManifestPath(app.directory)) ?? signedManifestPath(app.directory);
   const manifest = await loadSignedManifest(manifestSource);
-  let publicKeyPemPath = await optionalEnv("PUBLIC_KEY_PEM_PATH", app.directory);
+  const publicKeyPemPath = await optionalEnv("PUBLIC_KEY_PEM_PATH", app.directory);
   const publicKeyUrl = await optionalEnv("PUBLIC_KEY_URL", app.directory);
 
   // Fallback to default public key location if no other source provided

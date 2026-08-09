@@ -13,7 +13,6 @@
 import { localizeUrl } from "../url-policy.ts";
 import type { LanguageCode, PageId } from "./registry.ts";
 import { getRouteRegistry } from "./registry.ts";
-import type { RouteRegistry } from "./registry.ts";
 
 /**
  * RFC-0159: Canonical contract for the root entry page (`/`).

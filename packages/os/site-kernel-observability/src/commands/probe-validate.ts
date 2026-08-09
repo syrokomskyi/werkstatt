@@ -21,8 +21,6 @@ import type {
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { parse as yamlParse } from "yaml";
 import { readAstroSiteUrl } from "@warpgogol/site-kernel-checks/lib/astro-site-url";
-import { readDefaultLanguageCode } from "@warpgogol/site-kernel-checks/lib/i18n";
-import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 
 interface ProbeTarget {
   siteId: string;

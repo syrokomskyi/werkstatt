@@ -230,7 +230,7 @@ export async function runAgentSurfaceSign(
     const entries = await context.io.readdir(knowledgeDir);
     for (const entry of entries) {
       if (entry.isDirectory || !entry.name.endsWith(".json")) continue;
-      const domainName = entry.name.replace(/\.json$/, "");
+      const _domainName = entry.name.replace(/\.json$/, "");
       const filePath = join(knowledgeDir, entry.name);
 
       try {

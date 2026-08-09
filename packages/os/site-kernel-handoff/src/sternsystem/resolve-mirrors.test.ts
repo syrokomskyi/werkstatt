@@ -14,7 +14,6 @@ import {
   resolveMirrorPath,
   inferMirrorProtocol,
   isGitAccessible,
-  type MirrorProtocol,
 } from "./registry-io.ts";
 import type { FleetRegistryEntry } from "@warpgogol/ontology/operations";
 import { join } from "node:path";

@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 import fc from "fast-check";
 import { computeLayout } from "../layout.ts";
-import type { StarMapGraph, StarMapNode, StarMapEdge } from "../types.ts";
+import type { StarMapGraph } from "../types.ts";
 
 const nodeKinds = ["constellation", "star", "planet", "moon"] as const;
 

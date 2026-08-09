@@ -9,7 +9,6 @@ import { validateTargetSafety } from "../safety.ts";
 import {
   collectTechnicalDiagnostics,
   collectLocalizationDiagnostics,
-  collectAccessibilityDiagnostics,
   collectContentSurfaceDiagnostics,
   collectDeterministicDiagnostics,
   containsSecretLikeText,

@@ -11,7 +11,6 @@
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { execSync } from "node:child_process";
 import fs from "node:fs/promises";
-import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 

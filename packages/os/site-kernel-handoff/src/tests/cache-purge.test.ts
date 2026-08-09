@@ -8,7 +8,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, beforeEach, afterEach, vi } from "vitest";
+import { test, expect, vi } from "vitest";
 import { collectPurgeUrls, purgeCacheByUrls, skippedPurgeResult } from "../leitstand/cache-purge.ts";
 import type { RouteFact } from "@warpgogol/ontology/operations";
 

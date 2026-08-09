@@ -10,8 +10,7 @@
 
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { execSync } from "node:child_process";
-import { mkdtemp, rm, mkdir, writeFile, readFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runSternsystemSync } from "./sternsystem-sync.ts";

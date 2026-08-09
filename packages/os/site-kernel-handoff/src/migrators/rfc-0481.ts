@@ -32,7 +32,7 @@ interface LegacyCompanyFrontmatter {
 
 function mapCompanyToBusiness(
   frontmatter: Record<string, unknown>,
-  lang: string,
+  _lang: string,
 ): Record<string, unknown> {
   const company = frontmatter as LegacyCompanyFrontmatter;
   const name = company.brand?.name ?? company.name ?? "Warpgogol";

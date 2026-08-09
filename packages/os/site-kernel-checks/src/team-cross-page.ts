@@ -67,13 +67,13 @@ async function collectPeople(appDir: string): Promise<PeopleRecord[]> {
   return records;
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
+function _isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 async function fileExists(path: string): Promise<boolean> {
   try {
-    const s = await readFile(path, "utf-8");
+    const _s = await readFile(path, "utf-8");
     return true;
   } catch {
     return false;
@@ -146,7 +146,7 @@ export async function runTeamCrossPageValidate(
     // team.md may not exist — team.hub.validate handles that
   }
 
-  const hubSlugs = new Set<string>();
+  const _hubSlugs = new Set<string>();
   for (const block of teamBlocks) {
     if (block.type !== "people") continue;
     const select = block.props?.select;
@@ -239,7 +239,14 @@ export async function runTeamCrossPageValidate(
   const teamDir = join(distDir, "team");
   const profilesJsonPath = join(teamDir, "profiles.json");
 
-  let profilesJson: { participants?: Array<{ slug?: string; status?: string; publicName?: string; participantType?: string }> } | null = null;
+  let profilesJson: {
+    participants?: Array<{
+      slug?: string;
+      status?: string;
+      publicName?: string;
+      participantType?: string;
+    }>;
+  } | null = null;
   try {
     const raw = await readFile(profilesJsonPath, "utf-8");
     profilesJson = JSON.parse(raw);

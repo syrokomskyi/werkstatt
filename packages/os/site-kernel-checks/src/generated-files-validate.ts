@@ -201,7 +201,7 @@ export async function expandGlob(
         const parts = rel.split("/");
         const lastPart = parts[parts.length - 1] ?? "";
         if (regex.test(lastPart)) {
-          const subPath = join(dir, remaining);
+          const _subPath = join(dir, remaining);
           const subFiles = await expandGlob(dir, remaining, workspaceRoot);
           matched.push(...subFiles);
         }

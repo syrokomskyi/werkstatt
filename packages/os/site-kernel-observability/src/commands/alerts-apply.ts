@@ -11,7 +11,6 @@
 </CHANGE_SUMMARY>
 */
 
-import { join } from "node:path";
 import type {
   CheckResult,
   KernelCommandInput,
@@ -27,7 +26,7 @@ import {
 } from "../signoz-api-client.ts";
 import { ALERT_RULES, NOTIFICATION_CHANNELS } from "../alert-rules.ts";
 
-function stripGeneratedHeader(text: string): string {
+function _stripGeneratedHeader(text: string): string {
   return text.replace(/^\/\/ GENERATED.*\n/, "");
 }
 

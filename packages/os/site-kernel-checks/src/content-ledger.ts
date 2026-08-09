@@ -18,7 +18,7 @@ Diagnostics CKL-LEDG-01/02 surface broken lineage as warnings.
 </CHANGE_SUMMARY>
 */
 
-import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
   buildLineage,

@@ -151,7 +151,7 @@ function applyTokens(template: string, tokens: Record<string, string>): string {
   return template.replace(/{{\s*(\w+)\s*}}/g, (_match, key) => tokens[key] ?? "");
 }
 
-function buildKernelConfigFile(appName: string, includedModules: string[]): string {
+function buildKernelConfigFile(appName: string, _includedModules: string[]): string {
   return wireContent(
     "tools/kernel.config.template.ts",
     appName,

@@ -34,7 +34,7 @@ import {
   sameSitePath,
 } from "./shared.ts";
 import { passResult } from "../result-helpers.ts";
-import { parseRedirectRules, type RedirectRule } from "@warpgogol/share/redirects";
+import { parseRedirectRules } from "@warpgogol/share/redirects";
 
 function normalizeUrlPath(pathname: string): string {
   const clean = pathname.trim().replace(/^\/+|\/+$/g, "");

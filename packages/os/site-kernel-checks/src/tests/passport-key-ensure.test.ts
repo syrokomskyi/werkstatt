@@ -209,7 +209,7 @@ test("PKE-03: corrupt key file → fail", async () => {
 });
 
 test("PKE-04: private key output path unwritable → fail", async () => {
-  const badPath = path.join(tmpDir, "nonexistent-deep-dir", "nested", "private-key.txt");
+  const _badPath = path.join(tmpDir, "nonexistent-deep-dir", "nested", "private-key.txt");
   // Don't create the parent directory — but mkdir recursive should handle it...
   // Use a path that will fail: a path under a file (not a directory)
   const blockingFile = path.join(tmpDir, "blocking-file");

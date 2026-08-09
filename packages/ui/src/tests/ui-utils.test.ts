@@ -1,4 +1,4 @@
-import { test, expect, describe, beforeEach } from "vitest";
+import { test, expect, describe } from "vitest";
 import { json, INTEGRATION_CALLBACK_PATH } from "../section-api-utils.ts";
 import { claimCreditNode } from "../components/material-credit/credit-dedup.ts";
 import {

@@ -242,7 +242,7 @@ export async function runDhtRegister(
 
     // Check for existing entry (LWW conflict resolution)
     let conflictResolved = false;
-    let entryToPublish = candidateEntry;
+    const entryToPublish = candidateEntry;
 
     const existingBytes = await dhtGet(node, key, 3);
     if (existingBytes) {

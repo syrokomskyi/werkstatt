@@ -38,7 +38,7 @@ export async function runAstroExportsLint(
   const packagesDir = join(workspaceRoot, "packages");
 
   // Collect all package.json files under packages/
-  let pkgDirs: string[] = [];
+  const pkgDirs: string[] = [];
   try {
     const topEntries = readdirSync(packagesDir);
     for (const entry of topEntries) {

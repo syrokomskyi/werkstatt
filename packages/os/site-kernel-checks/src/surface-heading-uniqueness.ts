@@ -75,7 +75,7 @@ function collectTextContent(node: TreeNode): string {
  * Find the first descendant element with a tag name in the given set,
  * using depth-first search.
  */
-function findFirstDescendantByTag(
+function _findFirstDescendantByTag(
   node: TreeParentNode,
   tagNames: Set<string>,
 ): TreeElementNode | null {

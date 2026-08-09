@@ -31,7 +31,7 @@ export function getCollectionId(languageCode: string, componentPath: string): st
   return `${languageCode}/${normalizeComponentPath(componentPath)}`;
 }
 
-let _knownIds: Map<string, Set<string>> = new Map();
+const _knownIds: Map<string, Set<string>> = new Map();
 
 export async function getKnownIdsForCollection(collectionName: string): Promise<Set<string>> {
   if (!_knownIds.has(collectionName)) {

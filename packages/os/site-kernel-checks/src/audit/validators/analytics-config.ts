@@ -50,9 +50,9 @@ export async function runAnalyticsConfigValidate(
   } else {
     const analyticsConfig = parseYaml(await readFile(analyticsConfigPath, "utf8")) as Record<
       string,
-      any
+      Record<string, unknown>
     >;
-    const growth = (audit.systemManifest.growth ?? {}) as Record<string, any>;
+    const growth = (audit.systemManifest.growth ?? {}) as Record<string, Record<string, unknown>>;
     const expectedAdapter = analyticsConfig.vendor?.adapter ?? analyticsConfig.adapter;
     const actualAdapter = growth.vendor?.adapter;
     if (expectedAdapter !== undefined && expectedAdapter !== actualAdapter) {
@@ -67,7 +67,7 @@ export async function runAnalyticsConfigValidate(
       );
     }
   }
-  const growth = (audit.systemManifest.growth ?? {}) as Record<string, any>;
+  const growth = (audit.systemManifest.growth ?? {}) as Record<string, Record<string, unknown>>;
   if (isProductionMatomo(growth)) {
     const options = (growth.vendor?.options ?? {}) as Record<string, string>;
     for (const legacyKey of ["url", "cookieless"]) {

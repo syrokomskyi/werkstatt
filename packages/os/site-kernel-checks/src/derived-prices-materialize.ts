@@ -25,7 +25,6 @@ import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { compilePbpProfile } from "@warpgogol/pbp/compiler";
 import type { PbpCompilerResult } from "@warpgogol/pbp/compiler";
 import { materializeDerivedPrices } from "@warpgogol/pbp/compiler";
-import type { PbpCurrencyPricingPolicy } from "@warpgogol/pbp";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
 import { flagString, findCurrencyPricingPolicy } from "./lib/pbp-helpers.ts";

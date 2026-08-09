@@ -1,12 +1,8 @@
-import { describe, it, expect, expectTypeOf } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   PBP_SOURCE_ADAPTER_TYPES,
   isPbpSourceAdapterType,
-  type PbpSourceAdapterType,
-  type PbpSourceProfile,
   type PbpPackageManifest,
-  type PbpLocaleProfile,
-  type PbpBuildConfig,
   type PbpBuildRequest,
 } from "../src/index.js";
 

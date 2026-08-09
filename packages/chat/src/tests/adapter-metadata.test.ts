@@ -4,7 +4,6 @@ import {
   isChatAdapterId,
   ChatWidgetConfigSchema,
   CHAT_CONFIG_SCRIPT_ID,
-  type ChatAdapterId,
 } from "../port.ts";
 import {
   CHAT_ADAPTER_METADATA,

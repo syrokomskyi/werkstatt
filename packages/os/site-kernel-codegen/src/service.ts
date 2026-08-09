@@ -22,7 +22,10 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
-import { parseMaterialCreditMap, type MaterialCreditRecord } from "@warpgogol/share/material-credits";
+import {
+  parseMaterialCreditMap,
+  type MaterialCreditRecord,
+} from "@warpgogol/share/material-credits";
 import {
   formatMaterialCreditLine,
   labelForMaterialCreditRole,
@@ -33,7 +36,7 @@ import {
   materialTargetKey,
   type MaterialCreditLabels,
 } from "@warpgogol/share/schemas/material-credit";
-import { GENERATED_MARKER, hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
+import { hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
 import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -59,7 +62,7 @@ async function collectFilesNamed(
  * Converts a string to kebab-case (lowercase with hyphens).
  * Handles PascalCase and camelCase by inserting hyphens before uppercase letters.
  */
-function toKebabCase(value: string): string {
+function _toKebabCase(value: string): string {
   return value
     .replace(/([a-z])([A-Z])/g, "$1-$2")
     .replace(/[^a-zA-Z0-9]+/g, "-")
@@ -98,7 +101,7 @@ async function readFileIfExists(filePath: string): Promise<string | null> {
   }
 }
 
-async function writeIfChanged(
+async function _writeIfChanged(
   filePath: string,
   content: string,
   dryRun: boolean,
@@ -199,7 +202,7 @@ async function generateIndexFilesRecursively(
   return writes;
 }
 
-function toCleanText(value: string): string {
+function _toCleanText(value: string): string {
   return value.replace(/\r\n/g, "\n").trim();
 }
 
@@ -490,7 +493,7 @@ export async function discoverUsageLocations(
   }
   for (const record of records) {
     const targetId = record.credit.target.id;
-    const targetDomain = record.credit.target.domain ?? "pages";
+    const _targetDomain = record.credit.target.domain ?? "pages";
     const found: string[] = [];
     for (const pageFile of pageFiles) {
       const rel = path.relative(pagesDir, pageFile).replace(/\\/g, "/").replace(/\.md$/, "");
@@ -538,7 +541,8 @@ export async function runGenerateMaterialCreditsPage(
   KernelCommandResult<{ writtenFiles: number; creditCount: number; diagnostics?: string[] }>
 > {
   const paths = requireAstroSitePaths(context);
-  const { loadI18nConfigSync, loadSystemManifestSync } = await import("@warpgogol/site-kernel-content");
+  const { loadI18nConfigSync, loadSystemManifestSync } =
+    await import("@warpgogol/site-kernel-content");
   const i18n = loadI18nConfigSync(paths.appDirectory);
   const system = loadSystemManifestSync(paths.contentDirectory).manifest;
 

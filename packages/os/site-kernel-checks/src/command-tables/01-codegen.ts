@@ -42,7 +42,6 @@ import {
 } from "../archetype.ts";
 import { runPreviewImagesValidate, runPreviewImagesGenerate } from "../preview-images.ts";
 import { runFontsContractValidate, runFontsOriginValidate } from "../fonts.ts";
-import { runSitemapGenerate, runSitemapValidate } from "../sitemap.ts";
 import { runOnboardingYamlImportLint } from "../onboarding-yaml-import-lint.ts";
 import { runGeneratedMarkerValidate } from "../generated-marker-validate.ts";
 import { runGeneratedFileLookup } from "../generated-file-lookup.ts";

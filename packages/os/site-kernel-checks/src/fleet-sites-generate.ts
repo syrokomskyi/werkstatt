@@ -25,7 +25,6 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import {
-  GENERATED_MARKER,
   buildGeneratedHeader,
   discoverSiteWorkspaces,
   stripGeneratedMarker,

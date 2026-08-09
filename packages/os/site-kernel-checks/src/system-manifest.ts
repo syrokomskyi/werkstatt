@@ -265,7 +265,7 @@ export async function runConstellationComposeValidate(
 
   const details: ComposeViolation[] = [];
   let constellationsChecked = 0;
-  let totalWarnings = 0;
+  const totalWarnings = 0;
 
   for (const appSlug of appEntries) {
     let system;

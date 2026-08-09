@@ -4,7 +4,6 @@ import {
   validateMoneyRange,
   containsHtml,
   isEmptyValue,
-  DECIMAL_RE,
 } from "../src/validation.js";
 import type { PbpMoneyRange } from "../src/primitives.js";
 

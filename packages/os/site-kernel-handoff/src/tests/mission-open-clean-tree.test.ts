@@ -9,7 +9,7 @@
 */
 
 import { test, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, copyFileSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import { execSync } from "node:child_process";
 import { runMissionOpen } from "../mission/mission-open.ts";

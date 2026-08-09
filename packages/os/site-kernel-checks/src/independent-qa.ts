@@ -261,7 +261,7 @@ export async function runIndependentQa(
 
   try {
     // Launch Playwright
-    let chromium: any;
+    let chromium: unknown;
     try {
       const pw = await import("playwright");
       chromium = pw.chromium;
@@ -300,7 +300,7 @@ export async function runIndependentQa(
         const consoleErrors: string[] = [];
 
         const page = await browser.newPage();
-        page.on("console", (msg: any) => {
+        page.on("console", (msg: unknown) => {
           if (msg.type() === "error") {
             consoleErrors.push(msg.text());
           }

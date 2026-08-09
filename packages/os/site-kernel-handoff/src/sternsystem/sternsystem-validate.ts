@@ -28,7 +28,6 @@ import { StarCatalog } from "@warpgogol/ontology/cosmic";
 import { systemPinSchema } from "@warpgogol/ontology/operations";
 import {
   readRegistry,
-  findEntry,
   hasAppsCollision,
   resolveMirrors,
   resolveMirrorPath,

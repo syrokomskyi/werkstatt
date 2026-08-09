@@ -21,7 +21,6 @@ import { join, relative } from "node:path";
 import { byteHash } from "@warpgogol/fingerprint";
 import { readJsonFile } from "@warpgogol/share/fs";
 import {
-  GENERATED_MARKER,
   listSiteWorkspaces,
   listRegisteredKernelCommands,
   loadWorkspaceConfig,
@@ -525,7 +524,7 @@ export async function buildEcosystemManifest(workspaceRoot: string): Promise<Eco
   const commands = groupedCommands(await listRegisteredKernelCommands(workspaceRoot));
   const testSignals = { real: 0, noop: 0, absent: 0, skipped: 0 };
   let testSignalPolicyErrors = 0;
-  let testSignalPolicyWarnings = 0;
+  const testSignalPolicyWarnings = 0;
   for (const pkg of packages) {
     testSignals[pkg.testSignal.signal] += 1;
     if (pkg.testSignal.signal === "real") continue;

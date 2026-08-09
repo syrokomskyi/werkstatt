@@ -27,7 +27,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { optionalEnv } from "@warpgogol/site-kernel-integrity";
-import { passResult, failResult, resultFromViolations } from "./result-helpers.ts";
+import { failResult } from "./result-helpers.ts";
 
 /** Cloudflare Regional Services API response shape (tolerant). */
 interface RegionalHostnameEntry {

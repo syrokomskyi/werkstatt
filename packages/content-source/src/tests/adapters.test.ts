@@ -1,10 +1,5 @@
 import { test, expect, describe, vi } from "vitest";
 import {
-  IMAGE_EXTENSIONS,
-  CONTENT_ASSET_DOMAINS,
-  VIDEO_EXTENSIONS,
-  MEDIA_SOURCE_EXTENSIONS,
-  DEFAULT_LANGUAGE,
   contentAssetSyntaxDiagnostics,
   describeContentAssetResolution,
   resolveImage,

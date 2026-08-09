@@ -29,7 +29,7 @@ Rules:
 */
 
 import { readdir, stat } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { readFile } from "node:fs/promises";
 import { systemManifestSchema } from "@warpgogol/ontology/schemas";
@@ -44,7 +44,7 @@ import { fileExists } from "./lib/file-exists.ts";
 // Helpers
 // ---------------------------------------------------------------------------
 
-async function dirExists(p: string): Promise<boolean> {
+async function _dirExists(p: string): Promise<boolean> {
   try {
     const s = await stat(p);
     return s.isDirectory();

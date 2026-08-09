@@ -12,7 +12,7 @@
 */
 
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { byteHash } from "@warpgogol/fingerprint";
 import { parse as yamlParse } from "yaml";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";

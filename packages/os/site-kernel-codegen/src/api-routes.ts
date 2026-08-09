@@ -23,7 +23,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
-import { GENERATED_MARKER, hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
+import { hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
 
 interface ApiRouteDeclaration {
   route: string;

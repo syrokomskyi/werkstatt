@@ -141,7 +141,7 @@ describe("PassportSchema", () => {
   });
 
   test("defaults stars to empty array when omitted", () => {
-    const { stars, ...withoutStars } = validPassport.composition;
+    const { _stars, ...withoutStars } = validPassport.composition;
     const result = PassportSchema.safeParse({
       ...validPassport,
       composition: withoutStars,

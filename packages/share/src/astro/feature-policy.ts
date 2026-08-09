@@ -17,7 +17,7 @@ import type {
   FeaturePolicyTargetRef,
   FeaturePolicyResolverOptions,
 } from "../feature-policy.ts";
-import { createFeaturePolicyResolver, clearFeaturePolicyCache } from "../feature-policy.ts";
+import { createFeaturePolicyResolver } from "../feature-policy.ts";
 
 /**
  * Load Feature Policy content context from RFC-0047 content domains.

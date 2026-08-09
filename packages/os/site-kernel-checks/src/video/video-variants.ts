@@ -30,7 +30,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { join, relative, basename, extname, dirname } from "node:path";
+import { join, basename, extname, dirname } from "node:path";
 import { readdir, readFile, writeFile, mkdir, stat, copyFile, unlink } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { fileExists, collectFiles } from "@warpgogol/share/fs";
@@ -42,7 +42,6 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import type {
   VideoManifest,

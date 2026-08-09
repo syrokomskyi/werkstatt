@@ -37,7 +37,7 @@ test("PBT: normalizeSegment is idempotent", () => {
 });
 
 test("PBT: countMatchingIndexed matches countMatching for any tuple", () => {
-  const axes: SurfaceAxis[] = [
+  const _axes: SurfaceAxis[] = [
     { id: "trade", universe: ["elektriker", "friseur", "baker"] },
     { id: "region", universe: ["berlin", "hamburg", "munich"] },
   ];

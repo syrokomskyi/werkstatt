@@ -45,7 +45,7 @@ function formatKeyValue(key: string, value: string | undefined): string | null {
   return `${key}: ${value}`;
 }
 
-function formatList(key: string, values: string[] | undefined): string | null {
+function _formatList(key: string, values: string[] | undefined): string | null {
   if (!values || values.length === 0) return null;
   return `${key}: ${values.join(", ")}`;
 }

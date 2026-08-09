@@ -28,7 +28,7 @@ import type { AuditFinding } from "../types.ts";
  */
 const anyPayloadSchema = z.unknown();
 
-export function parseYaml(source: string): any {
+export function parseYaml(source: string): unknown {
   return parseOnboardingArtifactPayload(source, anyPayloadSchema);
 }
 
@@ -52,17 +52,17 @@ export const MATOMO_REGISTRY_PATH = join(
 
 export async function loadMatomoFleetRegistry(
   workspaceRoot: string,
-): Promise<Record<string, any>[]> {
+): Promise<Record<string, unknown>[]> {
   try {
     const raw = await readFile(join(workspaceRoot, MATOMO_REGISTRY_PATH), "utf8");
-    const parsed = parseYaml(raw) as Record<string, any>;
+    const parsed = parseYaml(raw) as Record<string, unknown>;
     return Array.isArray(parsed?.sites) ? parsed.sites : [];
   } catch {
     return [];
   }
 }
 
-export function isProductionMatomo(growth: Record<string, any>): boolean {
+export function isProductionMatomo(growth: Record<string, unknown>): boolean {
   return growth.vendor?.adapter === "matomo";
 }
 

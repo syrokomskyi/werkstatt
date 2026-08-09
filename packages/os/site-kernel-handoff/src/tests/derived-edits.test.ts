@@ -13,7 +13,7 @@ import type { HandoffManifest } from "@warpgogol/ontology/operations";
 
 test("detects hash mismatches on derived entries", async () => {
   // Mock manifest with a derived entry and mismatched hash.
-  const manifest: HandoffManifest = {
+  const _manifest: HandoffManifest = {
     schemaVersion: "1.0.0",
     app: "test-app",
     entries: [

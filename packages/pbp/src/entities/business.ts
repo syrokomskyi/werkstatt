@@ -5,7 +5,7 @@
  * @see RFC-0403
  */
 
-import type { PbpEntity, PbpGovernance } from "../envelope.js";
+import type { PbpEntity } from "../envelope.js";
 import type { PbpEntityRef } from "../entity-ref.js";
 import type { PbpControlledValue, PbpExternalIdentifier } from "../primitives.js";
 import { pbpSchemaId } from "../schema-id.js";

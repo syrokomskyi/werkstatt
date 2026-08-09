@@ -34,7 +34,7 @@ import {
 } from "@warpgogol/surface";
 import { diagnosticsResult } from "./result-helpers.ts";
 
-const FLEET_DIR = "fleet";
+const _FLEET_DIR = "fleet";
 const FLEET_SITES_FILE = "fleet/fleet.sites.yaml";
 const FLEET_STATUS_FILE = "fleet/fleet.status.generated.yaml";
 const FLEET_PLAN_FILE = "fleet/fleet.plan.generated.yaml";

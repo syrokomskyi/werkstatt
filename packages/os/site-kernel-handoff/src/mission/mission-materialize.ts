@@ -67,7 +67,6 @@ import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./
 import {
   acquireLock,
   releaseLock,
-  generateOperationId,
   commitWerkstattSideEffects,
 } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
@@ -1195,7 +1194,7 @@ export async function runMissionMaterialize(
     // RFC-0517: preflight content quality gate — runs after atomicMoveDir, before git init
     // RFC-0597: preflight is skipped if --skip-preflight flag is set OR state file HEAD matches
     const effectiveSkipPreflight = skipPreflight || preflightSkipped;
-    const preflightReport = await runPreflightGate(
+    const _preflightReport = await runPreflightGate(
       workspaceRoot,
       workpieceDir,
       manifest.systemId,

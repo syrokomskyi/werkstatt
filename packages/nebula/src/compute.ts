@@ -22,12 +22,11 @@
  * Only `computedAt` reflects wall time (excluded from digest).
  */
 
-import { NEBULA_WEIGHTS, NEBULA_WEIGHTS_VERSION } from "./weights.ts";
+import { NEBULA_WEIGHTS_VERSION } from "./weights.ts";
 import type { NebulaWeightKey } from "./weights.ts";
 import type {
   NebulaInputs,
   NebulaScore,
-  NebulaPillarScore,
   LighthouseResult,
   AxeResult,
   ContentCheckReport,

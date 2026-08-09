@@ -13,7 +13,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { discoverWorkspacePackages, writeFileAtomic } from "@warpgogol/site-kernel";
-import { parse as yamlParse, stringify as yamlStringify } from "yaml";
+import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
   Diagnostic,

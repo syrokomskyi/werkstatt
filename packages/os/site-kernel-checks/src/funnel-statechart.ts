@@ -32,7 +32,6 @@ import {
   isValidFunnelStage,
 } from "@warpgogol/integration";
 import type { VisitorFunnelStage } from "@warpgogol/integration";
-import type { SubscriptionStatus } from "@warpgogol/integration";
 import { SUBSCRIPTION_STATUSES } from "@warpgogol/integration";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
@@ -60,7 +59,7 @@ export function checkFunnelTriggerBijection(): string[] {
 
   // Build the trigger edge set and check for unknown / duplicate entries.
   const triggerEdges = new Set<string>();
-  const allTriggers = new Set<string>([
+  const _allTriggers = new Set<string>([
     ...FUNNEL_SYSTEM_TRIGGERS,
     // VisitorFunnelEventKind values are not imported directly — extract from the triggers.
   ]);

@@ -51,7 +51,7 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
   return typeof v === "string" ? v : undefined;
 }
 
-function flagBool(input: KernelCommandInput, key: string): boolean {
+function _flagBool(input: KernelCommandInput, key: string): boolean {
   const v = input.flags[key];
   return v === true || v === "true";
 }

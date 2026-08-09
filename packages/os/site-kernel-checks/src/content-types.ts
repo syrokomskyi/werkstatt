@@ -26,7 +26,6 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { resultFromViolations } from "./result-helpers.ts";
-import { fileExists } from "./lib/file-exists.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers

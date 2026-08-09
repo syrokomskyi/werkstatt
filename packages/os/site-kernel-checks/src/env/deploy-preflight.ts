@@ -29,10 +29,6 @@ import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";
 
-interface DeployPreflightInput {
-  site?: string;
-  service?: string;
-}
 
 function parseEnvFile(raw: string): Map<string, string> {
   const result = new Map<string, string>();
