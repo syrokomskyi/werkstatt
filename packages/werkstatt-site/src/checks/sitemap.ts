@@ -20,6 +20,7 @@
   <item>Removed lastmod from generated sitemap index and sub-sitemaps to avoid daily no-op commits.</item>
   <item>RFC-0267: routed all filesystem access through context.io (WorkspaceIO port) — sitemap.generate gains universal --dry-run and drops its hand-rolled dryRun guard; the module no longer imports node:fs (readdir now returns port-neutral DirEntry[]).</item>
   <item>RFC-0788: Build markdownTwins map from public/*.md files and pass to generateSitemapXml/validateSitemapFile for markdown alternate link support.</item>
+  <item>RFC-0788 fix: Add diagnostic log when no markdown twins found in public/ — helps operators distinguish "no twins generated yet" from "directory missing".</item>
 </CHANGE_SUMMARY>
 */
 

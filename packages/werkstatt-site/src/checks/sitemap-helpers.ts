@@ -9,6 +9,7 @@ import { parse as yamlParse } from "yaml";
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted helpers from sitemap.ts into sitemap-helpers.ts.</item>
   <item>RFC-0788: Add markdown alternate link support — generateSitemapXml accepts optional markdownTwins map, SitemapUrlEntry gains markdownAlternates field, parseSitemapXml extracts type-bearing alternates, validateSitemapFile validates markdown alternates separately from hreflang.</item>
+  <item>RFC-0788 fix: parseSitemapXml now uses attribute-order-independent regex — single regex captures all xhtml:link elements, dispatches by attribute presence.</item>
 </CHANGE_SUMMARY>
 */
 
