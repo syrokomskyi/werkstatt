@@ -19,7 +19,7 @@ long-running daemon in the pilot.
 */
 
 import type { DHTConfig } from "./types.ts";
-import type { WerkstattIdentityConfig } from "@warpgogol/passport";
+import type { WerkstattIdentityConfig } from "@warpgogol/werkstatt-site/passport";
 
 /**
  * Opaque DHT node handle — the internal libp2p node is not exposed to callers.
@@ -114,7 +114,7 @@ export async function generateSybilResistantNodeId(
 
   // PoW mode: generate keypairs until we find one with the required prefix
   // This is computationally expensive — only used for open membership
-  const { generateKeypair } = await import("@warpgogol/passport/sign");
+  const { generateKeypair } = await import("@warpgogol/werkstatt-site/passport/sign");
   for (let attempt = 0; attempt < 100000; attempt++) {
     const keypair = await generateKeypair();
     // The peer ID is derived from the public key hash

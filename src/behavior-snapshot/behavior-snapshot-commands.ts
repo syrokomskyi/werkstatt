@@ -24,13 +24,13 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import {
   parseRedirectRules,
   extractRedirectTarget,
   type RedirectRule,
-} from "@warpgogol/share/redirects";
-import { isHtmlRedirectPage } from "@warpgogol/share/semantic";
+} from "@warpgogol/werkstatt-site/share/redirects";
+import { isHtmlRedirectPage } from "@warpgogol/werkstatt-site/share/semantic";
 import { hashHtml } from "@warpgogol/werkstatt/fingerprint";
 import type { RouteFact } from "@warpgogol/werkstatt/schemas";
 

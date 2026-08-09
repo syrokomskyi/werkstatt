@@ -13,7 +13,7 @@
 
 import { z } from "zod";
 import { STERNSYSTEM_ID_REGEX, RELEASE_ID_REGEX } from "./naming-policy.ts";
-import { starNameSchema } from "@warpgogol/ontology/cosmic";
+import { starNameSchema } from "@warpgogol/werkstatt-site/ontology/cosmic";
 
 export const integrationSecretLocationSchema = z.object({
   file: z.string(),

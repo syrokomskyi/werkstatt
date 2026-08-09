@@ -33,7 +33,7 @@ import {
   getGenomeLogSize,
   isGenomeLogSizeWarning,
 } from "./genome-log.ts";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/passport";
+import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-site/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 const PASSPORT_SIGNING_KEY_ENV = "PASSPORT_SIGNING_KEY";

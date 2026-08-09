@@ -23,7 +23,7 @@ import type {
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import type { Dirent } from "node:fs";
-import { dnsRecordFileSchema } from "@warpgogol/ontology/schemas";
+import { dnsRecordFileSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
 import { flagString } from "./dns-helpers.ts";
 
 export interface DnsRecordsSchemaValidateResult {

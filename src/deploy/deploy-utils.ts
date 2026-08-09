@@ -21,7 +21,7 @@
 import fs from "node:fs/promises";
 import { existsSync, readlinkSync, symlinkSync } from "node:fs";
 import path from "node:path";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type { ArtifactFile, ArtifactManifest } from "./types.ts";
 

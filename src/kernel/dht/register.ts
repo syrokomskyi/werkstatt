@@ -24,8 +24,8 @@ import { dhtSiteEntrySchema } from "./types.ts";
 import { loadDhtConfig } from "./config.ts";
 import { clearCachedEntry } from "./cache.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtPut, dhtGet } from "./node.ts";
-import { signDhtEntry, verifyDhtEntry } from "@warpgogol/passport/dht-sign";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/passport";
+import { signDhtEntry, verifyDhtEntry } from "@warpgogol/werkstatt-site/passport/dht-sign";
+import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-site/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 const PASSPORT_SIGNING_KEY_ENV = "PASSPORT_SIGNING_KEY";

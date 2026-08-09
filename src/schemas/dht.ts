@@ -9,7 +9,7 @@ are the operations-layer contract consumed by @warpgogol/site-kernel DHT command
 <non-goals>
   <item>Do not perform file IO or network operations — pure shape only.</item>
   <item>Do not define DHT routing protocol logic — that lives in site-kernel.</item>
-  <item>Do not define Ed25519 signing logic — that lives in @warpgogol/passport/dht-sign.</item>
+  <item>Do not define Ed25519 signing logic — that lives in @warpgogol/werkstatt-site/passport/dht-sign.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

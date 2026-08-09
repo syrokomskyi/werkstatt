@@ -568,7 +568,7 @@ async function checkDistSize(
   let totalSize = 0;
   let largestFile = 0;
   let largestFilePath = "";
-  const { collectFiles } = await import("@warpgogol/share/fs");
+  const { collectFiles } = await import("@warpgogol/werkstatt-site/share/fs");
   for (const file of await collectFiles(distPath)) {
     const stat = await fs.stat(file);
     totalSize += stat.size;

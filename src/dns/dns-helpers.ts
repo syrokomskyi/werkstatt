@@ -15,8 +15,8 @@ zone ID resolution, environment variable resolution, and record identity.
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { dnsRecordFileSchema } from "@warpgogol/ontology/schemas";
-import type { DnsRecordDeclaration, DnsRecordFile } from "@warpgogol/ontology/schemas";
+import { dnsRecordFileSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
+import type { DnsRecordDeclaration, DnsRecordFile } from "@warpgogol/werkstatt-site/ontology/schemas";
 import { filterEnv, sourceDotenv } from "../leitstand/adapters/cloudflare-workers.ts";
 import { resolveZoneId } from "../subdomain/subdomain-helpers.ts";
 

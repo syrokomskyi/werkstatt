@@ -17,13 +17,13 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { signIdentityCredential } from "@warpgogol/passport/identity-sign";
+import { signIdentityCredential } from "@warpgogol/werkstatt-site/passport/identity-sign";
 import type {
   WerkstattCredential,
   SiteOwnershipCredentialSubject,
   ActorDelegationCredentialSubject,
   IdentityCredentialSubject,
-} from "@warpgogol/passport";
+} from "@warpgogol/werkstatt-site/passport";
 import { readIdentityConfig, writeIdentityConfig, generateCredentialId } from "./identity-io.ts";
 
 export interface IdentityCredentialIssueData {

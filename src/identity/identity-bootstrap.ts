@@ -16,9 +16,9 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { generateKeypair } from "@warpgogol/passport/sign";
-import { signIdentityCredential } from "@warpgogol/passport/identity-sign";
-import type { WerkstattIdentityConfig, SiteOwnershipCredentialSubject } from "@warpgogol/passport";
+import { generateKeypair } from "@warpgogol/werkstatt-site/passport/sign";
+import { signIdentityCredential } from "@warpgogol/werkstatt-site/passport/identity-sign";
+import type { WerkstattIdentityConfig, SiteOwnershipCredentialSubject } from "@warpgogol/werkstatt-site/passport";
 import { writeIdentityConfig, generateCredentialId } from "./identity-io.ts";
 
 export interface IdentityBootstrapData {

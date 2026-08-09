@@ -18,7 +18,7 @@ apps/<id> directories and materialized mission workpieces missions/<missionId>/w
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "yaml";
-import { fileExists } from "@warpgogol/share/fs";
+import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
 import type { DiscoveredSiteWorkspace } from "./types.ts";
 // @ai-invariant: The resolver must refuse dual representation — a site existing as both apps/<id> and a mission workpiece is an error, not a fallback.
 

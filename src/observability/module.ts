@@ -32,7 +32,7 @@ export const observabilityModule: KernelModule = {
     registry.registerCommand({
       name: "observability.conventions.validate",
       description:
-        "Offline lint: every metric name/label key is declared in WARPGOGOL_METRIC_REGISTRY, naming grammar is valid, no forbidden label keys, no duplicate names, no direct OTLP env reads outside @warpgogol/observability (RFC-0337).",
+        "Offline lint: every metric name/label key is declared in WARPGOGOL_METRIC_REGISTRY, naming grammar is valid, no forbidden label keys, no duplicate names, no direct OTLP env reads outside @warpgogol/werkstatt-site/observability (RFC-0337).",
       scope: "workspace",
       reads: [
         "packages/observability/src/metric-registry.ts",

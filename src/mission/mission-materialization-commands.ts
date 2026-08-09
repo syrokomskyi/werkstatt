@@ -45,7 +45,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { executeKernelCommand, executeKernelPipeline } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import {
   runPipelinePhase,
   computeBuildInputHash,

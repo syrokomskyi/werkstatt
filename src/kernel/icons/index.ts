@@ -294,7 +294,7 @@ export const iconsModule = {
   commands: {
     generate: {
       name: "generate",
-      description: "Generate icon components for @warpgogol/ui package",
+      description: "Generate icon components for @warpgogol/werkstatt-site/ui package",
       run: runIconsGenerate,
     },
   },

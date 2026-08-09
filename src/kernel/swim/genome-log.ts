@@ -20,7 +20,7 @@ reporting for the 10MB threshold warning.
 
 import { readFile, appendFile, stat } from "node:fs/promises";
 import { join } from "node:path";
-import { signBytes, verifyBytes } from "@warpgogol/passport";
+import { signBytes, verifyBytes } from "@warpgogol/werkstatt-site/passport";
 import type { GenomeLogEntry, SwimMembershipView, SwimMember, SwimMemberStatus } from "./types.ts";
 
 const GENOME_LOG_FILENAME = "werkstatt.genome.log";
