@@ -18,6 +18,7 @@ import { runSternsystemPin } from "./sternsystem-pin.ts";
 import { runSternsystemExtract } from "./sternsystem-extract.ts";
 import { runSternsystemSync } from "./sternsystem-sync.ts";
 import { runSternsystemStatus } from "./sternsystem-status.ts";
+import { runSternsystemDiscover } from "./sternsystem-discover.ts";
 
 export { runSternsystemRegister, type SternsystemRegisterData } from "./sternsystem-register.ts";
 export { runSternsystemList, type SternsystemListData } from "./sternsystem-list.ts";
@@ -26,6 +27,7 @@ export { runSternsystemPin, type SternsystemPinData } from "./sternsystem-pin.ts
 export { runSternsystemExtract, type SternsystemExtractData } from "./sternsystem-extract.ts";
 export { runSternsystemSync, type SternsystemSyncData } from "./sternsystem-sync.ts";
 export { runSternsystemStatus, type SternsystemStatusData } from "./sternsystem-status.ts";
+export { runSternsystemDiscover, type SternsystemDiscoverData } from "./sternsystem-discover.ts";
 
 // RFC-0790: Convention-based discovery IO helpers
 export {
@@ -33,6 +35,7 @@ export {
   resolveWorkpiecePath,
   readSystemConfig,
   readSystemConfigFromWorkpiece,
+  writeSystemConfig,
   readSystemState,
   readSystemStateFromWorkpiece,
   writeSystemState,
@@ -172,6 +175,17 @@ export function createSternsystemModule(): KernelModule {
           "missions/*/mission.yaml",
         ],
         execute: runSternsystemStatus,
+      });
+      registry.registerCommand({
+        name: "sternsystem.discover",
+        description:
+          "Scan ../systems-cache/ for system-config.yaml files and list all discovered systems (RFC-0790).",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: false,
+        flags: {},
+        reads: ["../systems-cache/*/system-config.yaml"],
+        execute: runSternsystemDiscover,
       });
     },
   };

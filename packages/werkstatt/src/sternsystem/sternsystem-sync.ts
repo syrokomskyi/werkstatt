@@ -25,8 +25,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import {
-  readRegistry,
-  findEntry,
+  readSystemConfig,
   resolveMirrors,
   resolveMirrorPath,
   isGitAccessible,
@@ -79,17 +78,13 @@ export async function runSternsystemSync(
 
   const syncAll = flagBoolean(input, "all");
 
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, id);
-  if (!entry) {
-    throw new Error(`[sternsystem.sync] system '${id}' not found in registry`);
-  }
+  const config = await readSystemConfig(workspaceRoot, id);
 
-  if (entry.mirrors.length < 2) {
+  if (config.mirrors.length < 2) {
     throw new Error(`[sternsystem.sync] system '${id}' has no bare mirror configured`);
   }
 
-  const { gitMirrors, cachePath } = resolveMirrors(workspaceRoot, entry);
+  const { gitMirrors, cachePath } = resolveMirrors(workspaceRoot, config);
   const bareRepoPath = resolveMirrorPath(workspaceRoot, gitMirrors[0].path);
   if (!existsSync(bareRepoPath)) {
     throw new Error(`[sternsystem.sync] bare repo not found at ${bareRepoPath}`);
@@ -116,7 +111,7 @@ export async function runSternsystemSync(
   }
 
   // External mirrors are mirrors[2+] (git accessible, non-bundle)
-  const externalMirrors = entry.mirrors.slice(2).filter((m) => isGitAccessible(m.path));
+  const externalMirrors = config.mirrors.slice(2).filter((m) => isGitAccessible(m.path));
   const mirrorUrls = externalMirrors.map((m) => m.path);
 
   if (syncAll) {
@@ -166,7 +161,7 @@ export async function runSternsystemSync(
   }
 
   // RFC-0574: bundle mirrors — create git bundle from bare repo and copy to backup endpoints
-  const bundleMirrors = entry.mirrors.slice(2).filter((m) => m.storageType === "bundle");
+  const bundleMirrors = config.mirrors.slice(2).filter((m) => m.storageType === "bundle");
   for (const bundleMirror of bundleMirrors) {
     const bundlePath = path.join(tmpdir(), `${id}-${Date.now()}.bundle`);
     try {

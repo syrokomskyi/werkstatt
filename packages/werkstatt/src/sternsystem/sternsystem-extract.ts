@@ -21,9 +21,9 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { systemPinSchema, type SystemPin } from "@warpgogol/werkstatt/schemas";
 import {
-  readRegistry,
-  writeRegistry,
-  findEntry,
+  readSystemConfig,
+  writeSystemConfig,
+  resolveCacheClonePath,
   resolveMirrors,
 } from "../sternsystem/registry-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
@@ -93,11 +93,15 @@ export async function runSternsystemExtract(
   await acquireLock(workspaceRoot, `system:${siteId}`, operationId, "sternsystem.extract", "agent");
 
   try {
-    const registry = await readRegistry(workspaceRoot);
-    const regEntry = findEntry(registry, siteId);
-    const systemDir = regEntry
-      ? resolveMirrors(workspaceRoot, regEntry).cachePath
-      : path.resolve(workspaceRoot, mirrors[0].path);
+    let config: Awaited<ReturnType<typeof readSystemConfig>> | null = null;
+    try {
+      config = await readSystemConfig(workspaceRoot, siteId);
+    } catch {
+      config = null;
+    }
+    const systemDir = config
+      ? resolveMirrors(workspaceRoot, config).cachePath
+      : resolveCacheClonePath(workspaceRoot, siteId);
     await fs.mkdir(systemDir, { recursive: true });
 
     // Copy data paths
@@ -118,7 +122,7 @@ export async function runSternsystemExtract(
     const pin: SystemPin = {
       schemaVersion: "1.0.0",
       systemId: siteId,
-      cosmicStar: regEntry?.cosmicStar ?? "Vega",
+      cosmicStar: config?.cosmicStar ?? "Vega",
       pinnedAt: new Date().toISOString(),
       platform: {
         version: pinVersion,
@@ -149,15 +153,15 @@ export async function runSternsystemExtract(
       `Bordbuch: pin-update ${siteId}`,
     );
 
-    // Update registry
-    if (regEntry) {
-      regEntry.status = "active";
-      regEntry.pinnedPlatform = pinVersion;
-      regEntry.mirrors = mirrors as Array<{
+    // Update config
+    if (config) {
+      config.status = "active";
+      config.pinnedPlatform = pinVersion;
+      config.mirrors = mirrors as Array<{
         path: string;
         storageType: "non-bare" | "bare" | "bundle";
       }>;
-      await writeRegistry(workspaceRoot, registry);
+      await writeSystemConfig(workspaceRoot, siteId, config);
     }
 
     const now = new Date().toISOString();

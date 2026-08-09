@@ -27,12 +27,12 @@ import type {
 import { StarCatalog, type StarName } from "@warpgogol/werkstatt-site/ontology/cosmic";
 import { parseBriefFrontmatter } from "@warpgogol/werkstatt-site/onboarding";
 import {
-  readRegistry,
-  writeRegistry,
-  findEntry,
-  findEntryByStar,
+  discoverSystems,
+  readSystemConfig,
+  writeSystemConfig,
   hasAppsCollision,
   resolveMirrorPath,
+  resolveCacheClonePath,
 } from "./registry-io.ts";
 import { runSternsystemPin } from "./sternsystem-pin.ts";
 import { runMissionOpen } from "../mission/mission-open.ts";
@@ -106,12 +106,11 @@ legalJurisdiction: ${brief.legalJurisdiction}
   await writeFile(join(contentDir, "system.md"), systemMd, "utf8");
 }
 
-async function rollbackRegistry(workspaceRoot: string, id: string): Promise<void> {
-  const registry = await readRegistry(workspaceRoot);
-  const entryIndex = registry.systems.findIndex((s) => s.id === id);
-  if (entryIndex >= 0) {
-    registry.systems.splice(entryIndex, 1);
-    await writeRegistry(workspaceRoot, registry);
+async function rollbackConfig(workspaceRoot: string, id: string): Promise<void> {
+  const cacheClone = resolveCacheClonePath(workspaceRoot, id);
+  const configPath = join(cacheClone, "system-config.yaml");
+  if (existsSync(configPath)) {
+    await rm(configPath, { force: true });
   }
 }
 
@@ -155,18 +154,12 @@ export async function runSternsystemRegister(
   const diagnostics: string[] = [];
 
   if (isAmend) {
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, id);
-    if (!entry) {
-      throw new Error(
-        `[sternsystem.register] --amend: system '${id}' does not exist in systems/registry.yaml`,
-      );
-    }
+    const config = await readSystemConfig(workspaceRoot, id);
 
     if (owner) {
-      entry.owner = owner;
-      await writeRegistry(workspaceRoot, registry);
-      logger.info(`[sternsystem.register] --amend: updated owner for '${id}' to '${owner}'`);
+      // owner field not in systemConfigSchema — would need schema extension
+      // For now, log warning that owner update is not supported in convention-based config
+      logger.info(`[sternsystem.register] --amend: owner update not yet supported for '${id}'`);
     }
 
     const pinInput: Record<string, KernelFlagValue> = { id };
@@ -229,20 +222,23 @@ export async function runSternsystemRegister(
     );
   }
 
-  const registry = await readRegistry(workspaceRoot);
+  // Check for existing system via discovery
+  const { systems: existingSystems } = await discoverSystems(workspaceRoot);
 
-  if (findEntry(registry, id)) {
-    throw new Error(`[sternsystem.register] id '${id}' already exists in systems/registry.yaml`);
+  if (existingSystems.some((s) => s.id === id)) {
+    throw new Error(`[sternsystem.register] id '${id}' already exists in ../systems-cache/`);
   }
 
-  const starOwner = findEntryByStar(registry, cosmicStar, "archived");
+  const starOwner = existingSystems.find(
+    (s) => s.cosmicStar === cosmicStar && s.status !== "archived",
+  );
   if (starOwner) {
     throw new Error(
       `[sternsystem.register] cosmicStar '${cosmicStar}' is already used by '${starOwner.id}' (status: ${starOwner.status})`,
     );
   }
 
-  const pinnedPlatform = platform ?? registry.systems[0]?.pinnedPlatform ?? "0.0.0";
+  const pinnedPlatform = platform ?? existingSystems[0]?.pinnedPlatform ?? "0.0.0";
 
   type ValidStorageType = "non-bare" | "bare" | "bundle";
   const mirrors = mirrorsFlag.split(",").map((entry) => {
@@ -253,24 +249,20 @@ export async function runSternsystemRegister(
     return { path: entry, storageType: "non-bare" as const };
   });
 
-  const entry = {
+  const newConfig = {
+    schemaVersion: "1.0.0" as const,
     id,
     cosmicStar: cosmicStar as StarName,
     mirrors,
     pinnedPlatform,
-    currentMission: null,
-    lastRelease: null,
     status: "registered" as const,
     registeredAt: new Date().toISOString(),
-    owner: owner ?? undefined,
     notes: "",
   };
 
-  registry.systems.push(entry);
-  await writeRegistry(workspaceRoot, registry);
-
   const systemDir = resolveMirrorPath(workspaceRoot, mirrors[0].path);
   await mkdir(systemDir, { recursive: true });
+  await writeSystemConfig(workspaceRoot, id, newConfig);
 
   let pinCreated = false;
   let contentCreated = false;
@@ -329,7 +321,7 @@ export async function runSternsystemRegister(
           id,
           cosmicStar,
           status: "active",
-          registeredAt: entry.registeredAt,
+          registeredAt: newConfig.registeredAt,
         },
         pinPath,
         firstMissionId: missionId,
@@ -360,7 +352,7 @@ export async function runSternsystemRegister(
     if (pinCreated) {
       await rollbackPin(systemDir);
     }
-    await rollbackRegistry(workspaceRoot, id);
+    await rollbackConfig(workspaceRoot, id);
     await rollbackSystemDirIfEmpty(systemDir);
 
     diagnostics.push(

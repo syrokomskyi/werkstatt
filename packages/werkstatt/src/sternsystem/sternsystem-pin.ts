@@ -23,7 +23,7 @@ import type {
 import { systemPinSchema, type SystemPin } from "@warpgogol/werkstatt/schemas";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../handoff/bundle-io.ts";
 import { allMigratorIds } from "../migrators/registry.ts";
-import { readRegistry, writeRegistry, findEntry, resolveCachePath } from "./registry-io.ts";
+import { readSystemConfig, writeSystemConfig, resolveCacheClonePath } from "./registry-io.ts";
 import { highestRfcId, snapshotCapabilities } from "./pin-helpers.ts";
 
 export interface SternsystemPinData {
@@ -54,13 +54,9 @@ export async function runSternsystemPin(
   const id = flagString(input, "id");
   if (!id) throw new Error("[sternsystem.pin] requires --id <system-id>");
 
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, id);
-  if (!entry) {
-    throw new Error(`[sternsystem.pin] system '${id}' is not registered`);
-  }
+  const config = await readSystemConfig(workspaceRoot, id);
 
-  const cacheDir = await resolveCachePath(workspaceRoot, id);
+  const cacheDir = resolveCacheClonePath(workspaceRoot, id);
   if (!existsSync(cacheDir)) {
     throw new Error(
       `[sternsystem.pin] cache clone for '${id}' is absent — run sternsystem.register first`,
@@ -94,7 +90,7 @@ export async function runSternsystemPin(
   const pin: SystemPin = {
     schemaVersion: "1.0.0",
     systemId: id,
-    cosmicStar: entry.cosmicStar,
+    cosmicStar: config.cosmicStar,
     pinnedAt: new Date().toISOString(),
     platform: {
       version: platform,
@@ -109,18 +105,18 @@ export async function runSternsystemPin(
   systemPinSchema.parse(pin);
   await atomicWriteFile(pinPath, JSON.stringify(pin, null, 2) + "\n");
 
-  // Update registry: always activate on pin, update pinnedPlatform if changed
-  let registryChanged = false;
-  if (entry.pinnedPlatform !== platform) {
-    entry.pinnedPlatform = platform;
-    registryChanged = true;
+  // Update config: always activate on pin, update pinnedPlatform if changed
+  let configChanged = false;
+  if (config.pinnedPlatform !== platform) {
+    config.pinnedPlatform = platform;
+    configChanged = true;
   }
-  if (entry.status === "registered") {
-    entry.status = "active";
-    registryChanged = true;
+  if (config.status === "registered") {
+    config.status = "active";
+    configChanged = true;
   }
-  if (registryChanged) {
-    await writeRegistry(workspaceRoot, registry);
+  if (configChanged) {
+    await writeSystemConfig(workspaceRoot, id, config);
   }
 
   logger.success(`[sternsystem.pin] pinned '${id}' to platform ${platform} (${rfcHead})`);
