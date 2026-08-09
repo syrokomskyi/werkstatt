@@ -22,25 +22,16 @@
 // @ai-invariant: Runs on every GET request. Fast Accept header check before any fetch.
 // RFC-0785: markdown content negotiation for agent requests.
 import { defineMiddleware } from "astro:middleware";
+import { markdownTwinUrlPath } from "@warpgogol/werkstatt-site/share/semantic";
 
-/**
- * Map a page URL pathname to its .md twin path.
- * RFC-0166 generates twins as index.md inside route directories:
- *   /about/     -> /about/index.md
- *   /          -> /index.md
- *   /de/preise/ -> /de/preise/index.md
- *
- * Returns null for non-page routes (API, .well-known, static assets).
- */
-function resolveMarkdownTwinPath(pathname: string): string | null {
-  if (pathname.startsWith("/api/")) return null;
-  if (pathname.startsWith("/.well-known/")) return null;
+const SUPPORTED_LANGS = {{SUPPORTED_LANGS}};
+
+function isPageRoute(pathname: string): boolean {
+  if (pathname.startsWith("/api/")) return false;
+  if (pathname.startsWith("/.well-known/")) return false;
   if (/\.(ico|png|jpg|jpeg|svg|css|js|json|txt|xml|woff|woff2|ttf|otf|webmanifest)$/.test(pathname))
-    return null;
-
-  const trimmed = pathname.replace(/\/$/, "");
-  if (trimmed === "") return "/index.md";
-  return `${trimmed}/index.md`;
+    return false;
+  return true;
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
@@ -50,9 +41,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (!accept.includes("text/markdown")) return next();
 
   const url = new URL(request.url);
-  const twinPath = resolveMarkdownTwinPath(url.pathname);
-  if (!twinPath) return next();
+  if (!isPageRoute(url.pathname)) return next();
 
+  const twinPath = markdownTwinUrlPath(url.pathname, { supportedLangs: SUPPORTED_LANGS });
   const twinUrl = new URL(twinPath, url.origin);
   const twinResponse = await fetch(twinUrl);
   if (!twinResponse.ok) return next();

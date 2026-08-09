@@ -14,6 +14,8 @@ so the root middleware.ts import always resolves.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0785: initial markdown negotiation middleware generator.</item>
+  <item>Review fix A-1: use canonical markdownTwinUrlPath from share package, remove duplicated resolveMarkdownTwinPath.</item>
+  <item>Review fix B-1: add content comparison before writing to avoid DNA-58 churn.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -60,15 +62,16 @@ import { defineMiddleware } from "astro:middleware";
 export const onRequest = defineMiddleware((_ctx, next) => next());
 `;
 
-export function resolveMarkdownTwinPath(pathname: string): string | null {
-  if (pathname.startsWith("/api/")) return null;
-  if (pathname.startsWith("/.well-known/")) return null;
-  if (/\.(ico|png|jpg|jpeg|svg|css|js|json|txt|xml|woff|woff2|ttf|otf|webmanifest)$/.test(pathname))
-    return null;
-
-  const trimmed = pathname.replace(/\/$/, "");
-  if (trimmed === "") return "/index.md";
-  return `${trimmed}/index.md`;
+async function writeFileIfChanged(
+  context: KernelRuntimeContext,
+  filePath: string,
+  content: string,
+): Promise<void> {
+  if (await context.io.exists(filePath)) {
+    const existing = await context.io.readFile(filePath);
+    if (existing === content) return;
+  }
+  await context.io.writeFile(filePath, content);
 }
 
 export async function runAgentMarkdownNegotiationGenerate(
@@ -78,6 +81,10 @@ export async function runAgentMarkdownNegotiationGenerate(
   const paths = requireAstroSitePaths(context);
   const { manifest } = await loadSystemManifest(paths.contentDirectory);
   const enabled = readAgentBlock(manifest).enabled !== false;
+  const languages = manifest.i18n?.supported
+    ? Object.keys(manifest.i18n.supported)
+    : [manifest.i18n?.default ?? "de"];
+  const supportedLangsLiteral = JSON.stringify(languages);
   const middlewarePath = join(paths.appDirectory, MIDDLEWARE_FILE);
 
   const header = buildGeneratedHeader({
@@ -89,7 +96,7 @@ export async function runAgentMarkdownNegotiationGenerate(
   if (!enabled) {
     const content = NOOP_CONTENT.replace("{{GENERATED_HEADER}}", header);
     await context.io.mkdir(join(paths.appDirectory, "src", "middleware"));
-    await context.io.writeFile(middlewarePath, content);
+    await writeFileIfChanged(context, middlewarePath, content);
     return {
       data: {
         command: "agent.markdown-negotiation.generate",
@@ -103,9 +110,11 @@ export async function runAgentMarkdownNegotiationGenerate(
   }
 
   const template = readFileSync(TEMPLATE_PATH, "utf8");
-  const content = template.replace("{{GENERATED_HEADER}}", header);
+  const content = template
+    .replace("{{GENERATED_HEADER}}", header)
+    .replace("{{SUPPORTED_LANGS}}", supportedLangsLiteral);
   await context.io.mkdir(join(paths.appDirectory, "src", "middleware"));
-  await context.io.writeFile(middlewarePath, content);
+  await writeFileIfChanged(context, middlewarePath, content);
 
   return {
     data: {

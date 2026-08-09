@@ -1,86 +1,59 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Unit tests for resolveMarkdownTwinPath (RFC-0785).</purpose>
+<purpose>Unit tests for markdown twin path resolution (RFC-0785).
+
+Tests the canonical markdownTwinUrlPath from the share package to verify
+it produces the correct twin paths for the markdown negotiation middleware.
+These tests complement the existing twin-path.test.ts in the share package
+by focusing on the RFC-0785 use case: middleware content negotiation.
+</purpose>
 <non-goals>
   <item>Do not test middleware runtime behavior — that requires a full Astro dev server.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0785: initial unit tests for resolveMarkdownTwinPath.</item>
+  <item>RFC-0785: initial unit tests for markdown twin path resolution in negotiation context.</item>
+  <item>Review fix A-1: test canonical markdownTwinUrlPath instead of duplicated resolveMarkdownTwinPath.</item>
 </CHANGE_SUMMARY>
 */
 
 import { describe, it, expect } from "vitest";
-import { resolveMarkdownTwinPath } from "./agent-markdown-negotiation.ts";
+import { markdownTwinUrlPath } from "@warpgogol/werkstatt-site/share/semantic";
 
-describe("resolveMarkdownTwinPath", () => {
+const supportedLangs = ["de", "en", "uk"];
+
+describe("markdownTwinUrlPath (RFC-0785 negotiation context)", () => {
   it("maps root path to /index.md", () => {
-    expect(resolveMarkdownTwinPath("/")).toBe("/index.md");
+    expect(markdownTwinUrlPath("/", { supportedLangs })).toBe("/index.md");
   });
 
-  it("maps simple page with trailing slash", () => {
-    expect(resolveMarkdownTwinPath("/about/")).toBe("/about/index.md");
+  it("maps simple page with trailing slash to /about.md", () => {
+    expect(markdownTwinUrlPath("/about/", { supportedLangs })).toBe("/about.md");
   });
 
-  it("maps simple page without trailing slash", () => {
-    expect(resolveMarkdownTwinPath("/about")).toBe("/about/index.md");
+  it("maps simple page without trailing slash to /about.md", () => {
+    expect(markdownTwinUrlPath("/about", { supportedLangs })).toBe("/about.md");
   });
 
-  it("maps i18n path", () => {
-    expect(resolveMarkdownTwinPath("/de/preise/")).toBe("/de/preise/index.md");
+  it("maps language root to /de/index.md", () => {
+    expect(markdownTwinUrlPath("/de/", { supportedLangs })).toBe("/de/index.md");
   });
 
-  it("maps nested path", () => {
-    expect(resolveMarkdownTwinPath("/blog/post-1/")).toBe("/blog/post-1/index.md");
+  it("maps nested path to /de/preise.md", () => {
+    expect(markdownTwinUrlPath("/de/preise/", { supportedLangs })).toBe("/de/preise.md");
   });
 
   it("maps deeply nested path", () => {
-    expect(resolveMarkdownTwinPath("/docs/guides/getting-started/")).toBe(
-      "/docs/guides/getting-started/index.md",
+    expect(markdownTwinUrlPath("/docs/guides/getting-started/", { supportedLangs })).toBe(
+      "/docs/guides/getting-started.md",
     );
   });
 
-  it("returns null for /api/ routes", () => {
-    expect(resolveMarkdownTwinPath("/api/agent/mcp")).toBeNull();
+  it("maps English language root to /en/index.md", () => {
+    expect(markdownTwinUrlPath("/en/", { supportedLangs })).toBe("/en/index.md");
   });
 
-  it("returns null for /.well-known/ routes", () => {
-    expect(resolveMarkdownTwinPath("/.well-known/agent.json")).toBeNull();
-  });
-
-  it("returns null for .ico files", () => {
-    expect(resolveMarkdownTwinPath("/favicon.ico")).toBeNull();
-  });
-
-  it("returns null for .css files", () => {
-    expect(resolveMarkdownTwinPath("/style.css")).toBeNull();
-  });
-
-  it("returns null for .js files", () => {
-    expect(resolveMarkdownTwinPath("/script.js")).toBeNull();
-  });
-
-  it("returns null for .png files", () => {
-    expect(resolveMarkdownTwinPath("/logo.png")).toBeNull();
-  });
-
-  it("returns null for .svg files", () => {
-    expect(resolveMarkdownTwinPath("/icon.svg")).toBeNull();
-  });
-
-  it("returns null for .json files", () => {
-    expect(resolveMarkdownTwinPath("/data.json")).toBeNull();
-  });
-
-  it("returns null for .webmanifest files", () => {
-    expect(resolveMarkdownTwinPath("/site.webmanifest")).toBeNull();
-  });
-
-  it("returns null for .woff2 files", () => {
-    expect(resolveMarkdownTwinPath("/font.woff2")).toBeNull();
-  });
-
-  it("returns null for .xml files", () => {
-    expect(resolveMarkdownTwinPath("/sitemap.xml")).toBeNull();
+  it("maps Ukrainian path to /uk/preise.md", () => {
+    expect(markdownTwinUrlPath("/uk/preise/", { supportedLangs })).toBe("/uk/preise.md");
   });
 });
