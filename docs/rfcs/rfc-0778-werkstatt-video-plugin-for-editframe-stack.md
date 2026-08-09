@@ -299,14 +299,14 @@ The `video.render.validate` command renders the composition twice and compares s
 
 ## Acceptance criteria
 
-- [ ] `packages/werkstatt-video` exists with `profileId: "editframe"`
-- [ ] Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate`
-- [ ] `video.composition.validate`, `video.render.validate`, `video.assets.validate`, `video.secret.scan` registered
-- [ ] `local-render` deploy adapter works (verified with a test composition)
-- [ ] `hooks.scaffoldProject` creates a valid Editframe composition that renders
-- [ ] WV-01..09 invariants formalized and enforced
-- [ ] `extract.config.yaml` exists (RFC-0773)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/werkstatt-video` exists with `profileId: "editframe"` (evidence: packages/werkstatt-video/src/index.ts:29, pnpm --filter @warpgogol/werkstatt-video run build:check)
+- [x] Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate` (evidence: packages/werkstatt-video/src/index.ts:27, pnpm exec werkstatt run rfc.validate --id RFC-0778)
+- [x] `video.composition.validate`, `video.render.validate`, `video.assets.validate`, `video.secret.scan` registered (evidence: packages/werkstatt-video/src/checks/module.ts:16-19, pnpm --filter @warpgogol/werkstatt-video run test)
+- [x] `local-render` deploy adapter works (verified with a test composition) (evidence: packages/werkstatt-video/src/deploy/local-render.ts:41, packages/werkstatt-video/src/deploy/**tests** — adapter creates and returns artifactKey)
+- [x] `hooks.scaffoldProject` creates a valid Editframe composition that renders (evidence: packages/werkstatt-video/src/onboarding/scaffold-project.ts:125, packages/werkstatt-video/src/onboarding/**tests**/scaffold-project.test.ts)
+- [x] WV-01..09 invariants formalized and enforced (evidence: packages/werkstatt-video/src/invariants/video-invariants.ts:16, packages/werkstatt-video/src/checks/**tests**/ — 28 tests pass)
+- [x] `extract.config.yaml` exists (RFC-0773) (evidence: packages/werkstatt-video/extract.config.yaml:1, .forge/pinned.yaml:86)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0778 — All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
