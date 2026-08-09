@@ -23,6 +23,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@warpgogol/werkstatt-site": "workspace:*",
     "@warpgogol/fingerprint": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
     "@warpgogol/passport": "workspace:*",

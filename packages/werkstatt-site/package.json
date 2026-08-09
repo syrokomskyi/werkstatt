@@ -27,6 +27,10 @@
       "types": "./src/checks/index.ts",
       "default": "./src/checks/index.ts"
     },
+    "./checks/check-warpgogol": {
+      "types": "./src/checks/check-warpgogol/index.ts",
+      "default": "./src/checks/check-warpgogol/index.ts"
+    },
     "./checks/module": {
       "types": "./src/checks/module.ts",
       "default": "./src/checks/module.ts"
@@ -124,6 +128,10 @@
     "@warpgogol/surface": "workspace:*",
     "@warpgogol/tokens": "workspace:*",
     "@warpgogol/werkstatt": "workspace:*",
+    "@warpgogol/fingerprint": "workspace:*",
+    "@warpgogol/agent-gate": "workspace:*",
+    "@warpgogol/site-kernel": "workspace:*",
+    "@warpgogol/site-kernel-integrity": "workspace:*",
     "ai": "^7.0.47",
     "crawlee": "3.17.0",
     "file-type": "^22.0.1",

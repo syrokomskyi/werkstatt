@@ -19,6 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@warpgogol/werkstatt-site": "workspace:*",
     "@warpgogol/content-source": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "yaml": "^2.9.0"

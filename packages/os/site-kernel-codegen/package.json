@@ -19,6 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@warpgogol/werkstatt-site": "workspace:*",
     "@cyclonedx/cyclonedx-library": "^1.14.0",
     "@warpgogol/ontology": "workspace:*",
     "@warpgogol/share": "workspace:*",
