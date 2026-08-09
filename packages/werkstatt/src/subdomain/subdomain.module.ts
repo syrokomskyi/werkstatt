@@ -35,10 +35,10 @@ export function createSubdomainModule(): KernelModule {
           service: {
             kind: "string",
             required: true,
-            description: "Service id from systems/registry.yaml services[].",
+            description: "Service id from services/registry.yaml services[].",
           },
         },
-        reads: ["systems/registry.yaml"],
+        reads: ["services/registry.yaml", "systems-cache/{system}/system-config.yaml"],
         cacheable: false,
         execute: runSubdomainRegister,
       });
@@ -53,10 +53,10 @@ export function createSubdomainModule(): KernelModule {
           service: {
             kind: "string",
             required: true,
-            description: "Service id from systems/registry.yaml services[].",
+            description: "Service id from services/registry.yaml services[].",
           },
         },
-        reads: ["systems/registry.yaml"],
+        reads: ["services/registry.yaml", "systems-cache/{system}/system-config.yaml"],
         cacheable: false,
         execute: runSubdomainValidate,
       });
@@ -74,7 +74,7 @@ export function createSubdomainModule(): KernelModule {
             description: "Zone domain name (e.g. warpgogol.com).",
           },
         },
-        reads: ["systems/registry.yaml"],
+        reads: ["systems-cache/*/system-config.yaml"],
         cacheable: false,
         execute: runSubdomainList,
       });

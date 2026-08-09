@@ -38,14 +38,17 @@ export function createDnsModule(): KernelModule {
           system: {
             kind: "string",
             required: true,
-            description: "System ID from systems/registry.yaml.",
+            description: "System ID from system-config.yaml.",
           },
           "dry-run": {
             kind: "boolean",
             description: "Preview changes without making API calls.",
           },
         },
-        reads: ["systems/registry.yaml", "systems/{system}/dns-records.yaml"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/dns-records.yaml",
+        ],
         cacheable: false,
         execute: runDnsRecordUpsert,
       });
@@ -60,10 +63,13 @@ export function createDnsModule(): KernelModule {
           system: {
             kind: "string",
             required: true,
-            description: "System ID from systems/registry.yaml.",
+            description: "System ID from system-config.yaml.",
           },
         },
-        reads: ["systems/registry.yaml", "systems/{system}/dns-records.yaml"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/dns-records.yaml",
+        ],
         cacheable: false,
         execute: runDnsRecordValidate,
       });
@@ -78,14 +84,14 @@ export function createDnsModule(): KernelModule {
           system: {
             kind: "string",
             required: true,
-            description: "System ID from systems/registry.yaml.",
+            description: "System ID from system-config.yaml.",
           },
           name: {
             kind: "string",
             description: "Filter by record name (e.g. warpgogol.com).",
           },
         },
-        reads: ["systems/registry.yaml"],
+        reads: ["systems-cache/{system}/system-config.yaml"],
         cacheable: false,
         execute: runDnsRecordList,
       });
@@ -101,7 +107,7 @@ export function createDnsModule(): KernelModule {
           system: {
             kind: "string",
             required: true,
-            description: "System ID from systems/registry.yaml.",
+            description: "System ID from system-config.yaml.",
           },
           "record-id": {
             kind: "string",
@@ -120,7 +126,7 @@ export function createDnsModule(): KernelModule {
             description: "Preview deletion without making API calls.",
           },
         },
-        reads: ["systems/registry.yaml"],
+        reads: ["systems-cache/{system}/system-config.yaml"],
         cacheable: false,
         execute: runDnsRecordDelete,
       });
@@ -137,7 +143,7 @@ export function createDnsModule(): KernelModule {
             description: "System ID. If omitted, validates all systems with dns-records.yaml.",
           },
         },
-        reads: ["systems/{system}/dns-records.yaml"],
+        reads: ["systems-cache/{system}/dns-records.yaml"],
         cacheable: true,
         execute: runDnsRecordsSchemaValidate,
       });

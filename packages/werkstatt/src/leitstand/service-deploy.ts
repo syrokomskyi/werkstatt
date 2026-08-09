@@ -113,7 +113,7 @@ export async function runLeitstandServiceDeploy(
   const serviceEntry = findServiceEntry(registry, serviceId);
   if (!serviceEntry) {
     throw new Error(
-      `[leitstand.service.deploy] service '${serviceId}' not found in systems/registry.yaml`,
+      `[leitstand.service.deploy] service '${serviceId}' not found in services/registry.yaml`,
     );
   }
 

@@ -6,7 +6,7 @@ apps/<id> directories and materialized mission workpieces missions/<missionId>/w
 </purpose>
 <non-goals>
   <item>Do not define mission lifecycle or materialization semantics — that is RFC-0355/RFC-0356.</item>
-  <item>Do not manage fleet registry state — that is systems/registry.yaml ownership.</item>
+  <item>Do not manage fleet registry state — that is system-config.yaml ownership.</item>
   <item>Do not handle deployment or propagation — that is RFC-0379.</item>
 </non-goals>
 </MODULE_CONTRACT>

@@ -58,7 +58,8 @@ export function createLeitstandModule(): KernelModule {
         },
         writes: ["missions/{mission}/evidence/axiom/**"],
         reads: [
-          "systems/registry.yaml",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
           "missions/{mission}/workpiece/**",
           "releases/{release}/**",
         ],
@@ -81,11 +82,15 @@ export function createLeitstandModule(): KernelModule {
           },
         },
         writes: [
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
           "releases/{release}/release.yaml",
         ],
-        reads: ["releases/{release}/**", "systems/registry.yaml"],
+        reads: [
+          "releases/{release}/**",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
         cacheable: false,
         execute: runLeitstandPropagate,
       });
@@ -104,11 +109,15 @@ export function createLeitstandModule(): KernelModule {
           },
         },
         writes: [
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
           "releases/{release}/release.yaml",
         ],
-        reads: ["releases/{release}/**", "systems/registry.yaml"],
+        reads: [
+          "releases/{release}/**",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
         cacheable: false,
         execute: runLeitstandPromote,
       });
@@ -125,7 +134,11 @@ export function createLeitstandModule(): KernelModule {
             description: "Filter to a single channel: dev, alt, or main.",
           },
         },
-        reads: ["systems/registry.yaml", "systems/{system}/system.pin.json"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/system.pin.json",
+        ],
         cacheable: false,
         execute: runLeitstandStatus,
       });
@@ -141,11 +154,15 @@ export function createLeitstandModule(): KernelModule {
           "to-release": { kind: "string", description: "Explicit target release id." },
         },
         writes: [
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
           "releases/{release}/release.yaml",
         ],
-        reads: ["systems/registry.yaml", "releases/*/release.yaml"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+          "releases/*/release.yaml",
+        ],
         cacheable: false,
         execute: runLeitstandRollback,
       });

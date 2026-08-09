@@ -3,7 +3,7 @@
 <purpose>werkstatt.plugin.validate command handler (RFC-0770). Validates that exactly
 one stack plugin is registered in tools/kernel.config.ts, that the plugin's profileId
 matches forge.yaml's profile field, that all plugin moduleLoaders resolve, and that
-deploy adapters referenced in systems/registry.yaml are provided by the engine or plugin.</purpose>
+deploy adapters referenced in system-config.yaml are provided by the engine or plugin.</purpose>
 <non-goals>
   <item>Does not modify any files — read-only validator.</item>
   <item>Does not load full kernel registry — only inspects moduleLoaders for plugin schema.</item>
@@ -190,7 +190,7 @@ export async function validatePlugin(
     }
   }
 
-  // 6. Read systems/registry.yaml deploy adapter references → PLUGIN-04
+  // 6. Read system-config.yaml deploy adapter references → PLUGIN-04
   const registryAdapters = await readRegistryDeployAdapters(workspaceRoot);
   if (registryAdapters.length > 0) {
     const pluginAdapters = new Set(Object.keys(discoveredPlugin.deployAdapters ?? {}));
@@ -199,7 +199,7 @@ export async function validatePlugin(
         violations.push({
           ruleId: "PLUGIN-04",
           severity: "error",
-          message: `Deploy adapter "${adapterId}" referenced in systems/registry.yaml but not provided by the plugin.`,
+          message: `Deploy adapter "${adapterId}" referenced in system-config.yaml but not provided by the plugin.`,
         });
         logger.error(`PLUGIN-04: adapter "${adapterId}" not provided`);
       }

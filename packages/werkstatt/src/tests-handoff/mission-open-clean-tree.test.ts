@@ -61,24 +61,28 @@ test("after mission.open, git status in monorepo is clean", async () => {
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
   gitCommit(tmpWorkspace, "initial");
 
-  // Create systems/registry.yaml
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
-      - path: "./systems/test-system"
-        storageType: non-bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
+  // Create per-system config and state files
+  const cacheDir = join(tmpWorkspace, "..", "systems-cache", "test-system");
+  mkdirSync(cacheDir, { recursive: true });
+  const configContent = `schemaVersion: system-config/v1
+id: test-system
+cosmicStar: Vega
+mirrors:
+  - path: "./systems/test-system"
+    storageType: non-bare
+pinnedPlatform: "4.5.0"
+status: active
+registeredAt: "2026-01-01T00:00:00Z"
+notes: ""
 `;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+  const stateContent = `schemaVersion: system-state/v1
+systemId: test-system
+currentMission: null
+lastRelease: null
+`;
+  writeFileSync(join(cacheDir, "system-state.yaml"), stateContent);
+  gitCommit(tmpWorkspace, "add system config");
 
   // Create cache clone directory with pin file
   mkdirSync(join(tmpWorkspace, "systems", "test-system"), { recursive: true });

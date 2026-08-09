@@ -55,10 +55,13 @@ export function createMissionModule(): KernelModule {
         },
         writes: [
           "missions/{mission}/**",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
-        reads: ["systems/registry.yaml", "systems/{system}/system.pin.json"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system.pin.json",
+        ],
         cacheable: false,
         execute: runMissionOpen,
       });
@@ -101,10 +104,14 @@ export function createMissionModule(): KernelModule {
         writes: [
           "missions/{mission}/mission.yaml",
           "missions/{mission}/evidence/close-report.json",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
-        reads: ["missions/{mission}/mission.yaml", "systems/registry.yaml"],
+        reads: [
+          "missions/{mission}/mission.yaml",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
         cacheable: false,
         execute: runMissionClose,
       });
@@ -132,10 +139,14 @@ export function createMissionModule(): KernelModule {
           "missions/{mission}/mission.yaml",
           "missions/{mission}/workpiece/**",
           "missions/{mission}/distribution/**",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
-        reads: ["missions/{mission}/mission.yaml", "systems/registry.yaml"],
+        reads: [
+          "missions/{mission}/mission.yaml",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
         cacheable: false,
         execute: runMissionAbort,
       });
@@ -147,7 +158,7 @@ export function createMissionModule(): KernelModule {
         flags: {
           system: { kind: "string", description: "Filter by Sternsystem id." },
         },
-        reads: ["missions/*/mission.yaml", "systems/registry.yaml"],
+        reads: ["missions/*/mission.yaml", "systems-cache/*/system-config.yaml"],
         execute: runMissionList,
       });
       registry.registerCommand({
