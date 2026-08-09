@@ -222,13 +222,13 @@ Workspace scope. Verifies: exactly one plugin registered; plugin `profileId` mat
 
 ## Acceptance criteria
 
-- [ ] `WerkstattPlugin`, `WerkstattPluginHooks`, `PluginRegistry` types defined in the engine package (`packages/werkstatt`)
-- [ ] `werkstatt.plugin.validate` registered (workspace scope) with documented `--json` output
-- [ ] PLUGIN-01..05 failure modes covered by unit tests
-- [ ] Profile binding cross-check implemented (plugin `profileId` ↔ `forge.yaml` `profile` field)
-- [ ] Warn-only behavior for PLUGIN-01 implemented and tested (transition period)
-- [ ] Root `AGENTS.md` documents the plugin contract for agents
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `WerkstattPlugin`, `WerkstattPluginHooks`, `PluginRegistry` types defined in the engine package (`packages/werkstatt`)
+- [x] `werkstatt.plugin.validate` registered (workspace scope) with documented `--json` output
+- [x] PLUGIN-01..05 failure modes covered by unit tests
+- [x] Profile binding cross-check implemented (plugin `profileId` ↔ `forge.yaml` `profile` field)
+- [x] Warn-only behavior for PLUGIN-01 implemented and tested (transition period)
+- [x] Root `AGENTS.md` documents the plugin contract for agents
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
