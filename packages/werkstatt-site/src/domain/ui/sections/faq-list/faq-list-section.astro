@@ -191,7 +191,7 @@ const faqItems: FaqItemWithParts[] = allFaqEntries
                 part.kind === "text" ? (
                   part.value
                 ) : part.variants ? (
-                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={lang} />
                 ) : null,
               )}
             </span>
@@ -214,7 +214,7 @@ const faqItems: FaqItemWithParts[] = allFaqEntries
                 part.kind === "text" ? (
                   part.value
                 ) : part.variants ? (
-                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={lang} />
                 ) : null,
               )}
             </span>

@@ -96,7 +96,7 @@ const resolvedItems = await Promise.all(
                 part.kind === "text" ? (
                   part.value
                 ) : part.variants ? (
-                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={lang} />
                 ) : null,
               )}
             </span>

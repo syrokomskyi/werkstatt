@@ -14,6 +14,7 @@ visibility based on the selected currency.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0743: Initial creation of currency-aware price display component.</item>
+  <item>RFC-0782: Add lang prop, locale-scoped localStorage key in inline script, pass lang to initCurrencyAwarePriceDisplay.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,9 +26,10 @@ interface Props {
     formatted: string;
     note: string | null;
   }>;
+  lang: string;
 }
 
-const { priceVariants } = Astro.props as Props;
+const { priceVariants, lang } = Astro.props as Props;
 
 const variantCurrencies = priceVariants.map((v) => v.currency);
 ---
@@ -47,11 +49,11 @@ const variantCurrencies = priceVariants.map((v) => v.currency);
     ))
   }
 </span>
-<script is:inline define:vars={{ variantCurrencies }}>
+<script is:inline define:vars={{ variantCurrencies, lang }}>
   try {
     var c = document.documentElement.getAttribute("data-wg-currency");
     if (!c) {
-      c = localStorage.getItem("wg-currency");
+      c = localStorage.getItem("wg-currency:" + lang);
     }
     if (c && variantCurrencies.indexOf(c) !== -1) {
       var containers = document.querySelectorAll("[data-currency-price-display]");
@@ -80,6 +82,6 @@ const variantCurrencies = priceVariants.map((v) => v.currency);
   import { initCurrencyAwarePriceDisplay } from "./currency-aware-price-display-component.client.ts";
   const containers = document.querySelectorAll<HTMLElement>("[data-currency-price-display]");
   for (const container of containers) {
-    initCurrencyAwarePriceDisplay(container);
+    initCurrencyAwarePriceDisplay(container, document.documentElement.lang);
   }
 </script>

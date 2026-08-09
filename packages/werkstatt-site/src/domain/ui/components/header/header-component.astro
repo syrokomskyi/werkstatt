@@ -119,10 +119,11 @@ const ctaHref = ctaTarget
       </div>
       {content.motto && <span class="site-header__motto">{content.motto}</span>}
       {currencies.length > 0 && (
-        <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR" }}>
+        <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR", lang: activeLang }}>
           try {
-            var c = localStorage.getItem("wg-currency");
-            if (!c) { c = defaultCurrency; localStorage.setItem("wg-currency", c); }
+            var key = "wg-currency:" + lang;
+            var c = localStorage.getItem(key);
+            if (!c) { c = defaultCurrency; localStorage.setItem(key, c); }
             document.documentElement.setAttribute("data-wg-currency", c);
           } catch {
             document.documentElement.setAttribute("data-wg-currency", defaultCurrency);

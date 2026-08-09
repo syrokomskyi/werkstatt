@@ -16,7 +16,12 @@
 /* RFC-0103: transparency thin dispatcher — list body + optional report link. */
 
 import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
-import { cast, need, resolveSectionAnchor, resolveSemanticTarget } from "@warpgogol/werkstatt-site/share";
+import {
+  cast,
+  need,
+  resolveSectionAnchor,
+  resolveSemanticTarget,
+} from "@warpgogol/werkstatt-site/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import CurrencyAwarePriceDisplay from "@warpgogol/werkstatt-site/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
@@ -127,7 +132,7 @@ if (props.cta?.target) {
                   part.kind === "text" ? (
                     part.value
                   ) : part.variants ? (
-                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={lang} />
                   ) : null,
                 )}
               </span>

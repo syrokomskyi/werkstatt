@@ -15,8 +15,16 @@
 </CHANGE_SUMMARY>
 */
 
-import { creditByTarget, resolveEffectsForTarget, resolveImage } from "@warpgogol/werkstatt-site/share";
-import type { StandardCard, HorizontalAlign, EffectAssignment } from "@warpgogol/werkstatt-site/share";
+import {
+  creditByTarget,
+  resolveEffectsForTarget,
+  resolveImage,
+} from "@warpgogol/werkstatt-site/share";
+import type {
+  StandardCard,
+  HorizontalAlign,
+  EffectAssignment,
+} from "@warpgogol/werkstatt-site/share";
 import EffectHost from "../../../components/effects/effect-host.astro";
 import ResponsiveImage from "@warpgogol/werkstatt-site/ui/components/responsive-image.astro";
 import CurrencyAwarePriceDisplay from "@warpgogol/werkstatt-site/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
@@ -153,7 +161,7 @@ const resolved = await Promise.all(
                   part.kind === "text" ? (
                     part.value
                   ) : part.variants ? (
-                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={langCode} />
                   ) : null,
                 )}
               </span>
@@ -165,7 +173,7 @@ const resolved = await Promise.all(
                   part.kind === "text" ? (
                     part.value
                   ) : part.variants ? (
-                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={langCode} />
                   ) : null,
                 )}
               </p>

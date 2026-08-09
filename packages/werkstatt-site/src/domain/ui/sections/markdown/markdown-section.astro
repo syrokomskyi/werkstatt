@@ -259,6 +259,6 @@ const shouldShowLanguageLabels = showLanguageColumns && showLanguageLabels;
   import { initCurrencyAwarePriceDisplay } from "../../components/currency-aware-price-display/currency-aware-price-display-component.client.ts";
   const priceContainers = document.querySelectorAll<HTMLElement>("[data-currency-price-display]");
   for (const container of priceContainers) {
-    initCurrencyAwarePriceDisplay(container);
+    initCurrencyAwarePriceDisplay(container, document.documentElement.lang);
   }
 </script>

@@ -130,7 +130,7 @@ const setupVariants = buildPriceVariants(
             <dt>{monthlyLabel}</dt>
             <dd>
               {monthlyVariants ? (
-                <CurrencyAwarePriceDisplay priceVariants={monthlyVariants} />
+                <CurrencyAwarePriceDisplay priceVariants={monthlyVariants} lang={lang} />
               ) : (
                 monthlyPrice
               )}
@@ -144,7 +144,7 @@ const setupVariants = buildPriceVariants(
             <dt>{yearlyLabel}</dt>
             <dd>
               {yearlyVariants ? (
-                <CurrencyAwarePriceDisplay priceVariants={yearlyVariants} />
+                <CurrencyAwarePriceDisplay priceVariants={yearlyVariants} lang={lang} />
               ) : (
                 yearlyPrice
               )}
@@ -158,7 +158,7 @@ const setupVariants = buildPriceVariants(
             <dt>{setupLabel}</dt>
             <dd>
               {setupVariants ? (
-                <CurrencyAwarePriceDisplay priceVariants={setupVariants} />
+                <CurrencyAwarePriceDisplay priceVariants={setupVariants} lang={lang} />
               ) : (
                 setupPrice
               )}

@@ -13,6 +13,7 @@ dispatches wg-currency-change events.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0743: Initial creation of currency selector component.</item>
+  <item>RFC-0782: Locale-scoped localStorage key in inline script, lang passed to initCurrencySelector.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -53,11 +54,11 @@ const currencyCodes = currencies.map((c) => c.code);
     ))
   }
 </div>
-<script is:inline define:vars={{ currencyCodes }}>
+<script is:inline define:vars={{ currencyCodes, lang }}>
   try {
     var c = document.documentElement.getAttribute("data-wg-currency");
     if (!c) {
-      c = localStorage.getItem("wg-currency");
+      c = localStorage.getItem("wg-currency:" + lang);
     }
     if (c && currencyCodes.indexOf(c) !== -1) {
       var selectors = document.querySelectorAll("[data-currency-selector]");
@@ -81,6 +82,6 @@ const currencyCodes = currencies.map((c) => c.code);
     const codes = Array.from(
       container.querySelectorAll<HTMLButtonElement>("[data-currency-option]"),
     ).map((btn) => btn.getAttribute("data-currency-option") ?? "");
-    initCurrencySelector(container, codes);
+    initCurrencySelector(container, codes, lang);
   }
 </script>

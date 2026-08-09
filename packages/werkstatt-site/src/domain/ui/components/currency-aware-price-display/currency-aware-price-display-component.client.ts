@@ -13,6 +13,7 @@ data-wg-currency on <html> for cross-component sync.
 <CHANGE_SUMMARY>
   <item>RFC-0743: Initial creation of currency-aware price display client script.</item>
   <item>Flash fix: inline script in .astro handles initial state during parsing. Module script handles event-driven updates.</item>
+  <item>RFC-0782: Accept lang parameter, pass to getSelectedCurrency for locale-scoped localStorage key.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -21,7 +22,7 @@ import {
   getSelectedCurrency,
 } from "../../components/currency-selector/currency-selector-component.client.ts";
 
-export function initCurrencyAwarePriceDisplay(container: HTMLElement): void {
+export function initCurrencyAwarePriceDisplay(container: HTMLElement, lang: string): void {
   const variants = container.querySelectorAll<HTMLElement>("[data-currency]");
 
   if (variants.length === 0) return;
@@ -45,7 +46,7 @@ export function initCurrencyAwarePriceDisplay(container: HTMLElement): void {
     }
   }
 
-  const stored = getSelectedCurrency();
+  const stored = getSelectedCurrency(lang);
   if (stored) {
     showCurrency(stored);
   }

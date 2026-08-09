@@ -241,13 +241,13 @@ function parsePriceMarkers(text: string): TextOrPrice[] {
                   <dt>{it.label}</dt>
                   <dd>
                     {variants ? (
-                      <CurrencyAwarePriceDisplay priceVariants={variants} />
+                      <CurrencyAwarePriceDisplay priceVariants={variants} lang={lang} />
                     ) : (
                       parsePriceMarkers(it.value).map((part) =>
                         part.kind === "text" ? (
                           part.value
                         ) : part.variants ? (
-                          <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                          <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={lang} />
                         ) : null,
                       )
                     )}

@@ -38,7 +38,7 @@ const derivedPrices = loadDerivedPrices();
           part.kind === "text" ? (
             part.value
           ) : part.variants ? (
-            <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+            <CurrencyAwarePriceDisplay priceVariants={part.variants} lang={lang} />
           ) : null,
         )}
       </p>
