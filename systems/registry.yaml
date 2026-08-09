@@ -10,7 +10,7 @@ systems:
       - path: git@github.com:syrokomskyi/warpgogol-com.git
         storageType: bare
     pinnedPlatform: 4.82.12
-    currentMission: null
+    currentMission: warpgogol-com-m000041
     lastRelease: warpgogol-com-r000016
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
@@ -104,3 +104,4 @@ services:
       at: null
       state: null
       operationId: null
+
