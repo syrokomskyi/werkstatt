@@ -1,0 +1,34 @@
+# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-video
+# Extracts packages/werkstatt-video from the werkstatt monorepo into a standalone private repo.
+# RFC-0773: Engine publication pipeline via repo-extract to private npm.
+# RFC-0778: Video plugin publication config.
+
+projectDir: packages/werkstatt-video
+destName: werkstatt-video
+standalone: true
+
+workspacePrefixes:
+  - "@warpgogol/"
+stripScopes:
+  - "@warpgogol/"
+preservePackages:
+  - "@warpgogol/werkstatt-video"
+  - "@warpgogol/werkstatt"
+packageManager: "pnpm"
+
+ignoreDirs:
+  - .turbo
+  - .agents
+  - node_modules
+  - tmp-*
+
+excludePathSegments:
+  - .npmrc
+
+postProcess:
+  - action: delete
+    path: AGENTS.md
+
+git:
+  remote: git@github.com:syrokomskyi/werkstatt-video.git
+  autoPush: true
