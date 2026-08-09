@@ -71,6 +71,10 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.manifest.generate" },
   // RFC-0289: project the manifest into a static OpenAPI 3.1 document.
   { command: "agent.openapi.generate" },
+  // RFC-0783: project the manifest into RFC 9727 API Catalog linkset+json.
+  { command: "agent.api-catalog.generate" },
+  // RFC-0783: project the manifest into SEP-1649 MCP Server Card.
+  { command: "agent.mcp-card.generate" },
   // RFC-0290: generate the thin Agent Gate route re-exports (needs the manifest's action ids).
   { command: "agent.routes.generate" },
   // RFC-0308: sign agent surface artifacts with detached Ed25519 proofs (no-op without PASSPORT_SIGNING_KEY).
@@ -185,6 +189,8 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.knowledge.generate" },
   { command: "agent.manifest.generate" },
   { command: "agent.openapi.generate" },
+  { command: "agent.api-catalog.generate" },
+  { command: "agent.mcp-card.generate" },
   { command: "agent.routes.generate" },
   { command: "agent.surface.sign" },
   { command: "styles.global.generate" },

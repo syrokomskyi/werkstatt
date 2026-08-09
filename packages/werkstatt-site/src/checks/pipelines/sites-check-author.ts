@@ -198,6 +198,10 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.surface.validate" },
   // RFC-0289: OpenAPI projection — well-formedness + manifest↔document bijection
   { command: "agent.openapi.validate" },
+  // RFC-0783: API Catalog — well-formedness + manifest↔linkset bijection
+  { command: "agent.api-catalog.validate" },
+  // RFC-0783: MCP Server Card — well-formedness + manifest↔card bijection
+  { command: "agent.mcp-card.validate" },
   // RFC-0308: verify detached Ed25519 proofs on agent surface artifacts (non-failing when unsigned).
   { command: "agent.surface.verify" },
   // RFC-0186: Lagebild shared sync worker validation (no per-site Workers)
