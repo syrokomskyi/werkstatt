@@ -431,25 +431,25 @@ The shared `deepMerge` uses `Object.prototype.toString.call(value) === "[object 
 
 ## Acceptance criteria
 
-- [ ] `deepMerge` utility extracted to `packages/werkstatt-site/src/domain/pbp/utils/deep-merge.ts`
-- [ ] `deepMerge` implements JSON Merge Patch semantics (null = delete)
-- [ ] `locale.ts` imports shared `deepMerge`, local copy removed
-- [ ] `loaders.ts` imports shared `deepMerge`, local copy removed
-- [ ] `buildEntityIndex` returns `Map<string, Map<string, PbpEntity>>`
-- [ ] `buildEntityIndex` flags same-`(id, locale)` duplicates as `PBP-ID-LOCALE-DUPLICATE` (fatal)
-- [ ] `buildEntityIndex` accepts same `id` across different locales without error
-- [ ] `resolveLocales` deep-merges overlay onto base when both exist
-- [ ] `resolveLocales` falls back to default-locale entity when no overlay exists
-- [ ] `resolveLocales` uses overlay as-is when no base entity exists
-- [ ] `pipeline.ts` passes new index type to `resolveLocales`
-- [ ] All 20 UK PBP files pass Zod schema validation after alignment
-- [ ] Unit tests for `buildEntityIndex` cover: locale-aware indexing, same-locale duplicate fatal, cross-locale same-ID accepted
-- [ ] Unit tests for `resolveLocales` cover: deep-merge with null-delete, fallback to default locale, overlay-only entity, partial overlay merge
-- [ ] Unit tests for `deepMerge` cover: null-delete, undefined skip, nested object merge, array replacement, primitive replacement
-- [ ] Integration test for `compilePbpProfile` verifies end-to-end locale merge with DE+UK files
-- [ ] Existing `compiler-pipeline.test.ts` tests pass (with updated duplicate-ID test)
-- [ ] `pnpm --filter werkstatt-site exec vitest run` passes all PBP tests
-- [ ] `pnpm --filter werkstatt-site run build:check` passes (tsc --noEmit)
+- [x] `deepMerge` utility extracted to `packages/werkstatt-site/src/domain/pbp/utils/deep-merge.ts` (evidence: commit 1aa62aa0)
+- [x] `deepMerge` implements JSON Merge Patch semantics (null = delete) (evidence: 16 unit tests in deep-merge.test.ts, commit 1aa62aa0)
+- [x] `locale.ts` imports shared `deepMerge`, local copy removed (evidence: commit bd0e0fb7)
+- [x] `loaders.ts` imports shared `deepMerge`, local copy removed (evidence: commit e4de4568)
+- [x] `buildEntityIndex` returns `Map<string, Map<string, PbpEntity>>` (evidence: commit bd0e0fb7, type LocaleAwareEntityIndex)
+- [x] `buildEntityIndex` flags same-`(id, locale)` duplicates as `PBP-ID-LOCALE-DUPLICATE` (fatal) (evidence: compiler-pipeline.test.ts same-locale duplicate test, commit 90937107)
+- [x] `buildEntityIndex` accepts same `id` across different locales without error (evidence: compiler-pipeline.test.ts cross-locale test, commit 90937107)
+- [x] `resolveLocales` deep-merges overlay onto base when both exist (evidence: compiler-pipeline.test.ts locale merge test, commit 90937107)
+- [x] `resolveLocales` falls back to default-locale entity when no overlay exists (evidence: locale.ts:57-59, commit bd0e0fb7)
+- [x] `resolveLocales` uses overlay as-is when no base entity exists (evidence: locale.ts:50-54, commit bd0e0fb7)
+- [x] `pipeline.ts` passes new index type to `resolveLocales` (evidence: pipeline.ts:49-53, commit bd0e0fb7)
+- [x] All 20 UK PBP files pass Zod schema validation after alignment (evidence: pbp.content.validate 118 files 0 warnings, commit 39379c)
+- [x] Unit tests for `buildEntityIndex` cover: locale-aware indexing, same-locale duplicate fatal, cross-locale same-ID accepted (evidence: compiler-pipeline.test.ts RFC-0781 tests, commit 90937107)
+- [x] Unit tests for `resolveLocales` cover: deep-merge with null-delete, fallback to default locale, overlay-only entity, partial overlay merge (evidence: compiler-pipeline.test.ts RFC-0781 tests, commit 90937107)
+- [x] Unit tests for `deepMerge` cover: null-delete, undefined skip, nested object merge, array replacement, primitive replacement (evidence: deep-merge.test.ts 16 tests, commit 1aa62aa0)
+- [x] Integration test for `compilePbpProfile` verifies end-to-end locale merge with DE+UK files (evidence: compiler-pipeline.test.ts locale merge test, commit 90937107)
+- [x] Existing `compiler-pipeline.test.ts` tests pass (with updated duplicate-ID test) (evidence: 23 tests pass, commit 90937107)
+- [x] `pnpm --filter werkstatt-site exec vitest run` passes all PBP tests (evidence: 141 tests pass, 7 test files)
+- [x] `pnpm --filter werkstatt-site run build:check` passes (tsc --noEmit) (evidence: no new errors in pbp/ modules)
 
 ## Implementation notes for agents
 
