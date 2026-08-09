@@ -1445,60 +1445,12 @@ importers:
       '@warpgogol/agent-gate':
         specifier: workspace:*
         version: link:../agent-gate
-      '@warpgogol/chat':
-        specifier: workspace:*
-        version: link:../chat
-      '@warpgogol/chat-adapter-null':
-        specifier: workspace:*
-        version: link:../chat-adapter-null
-      '@warpgogol/chat-adapter-uchat':
-        specifier: workspace:*
-        version: link:../chat-adapter-uchat
-      '@warpgogol/check-core':
-        specifier: workspace:*
-        version: link:../check-core
-      '@warpgogol/check-runner-node':
-        specifier: workspace:*
-        version: link:../check-runner-node
-      '@warpgogol/content-source':
-        specifier: workspace:*
-        version: link:../content-source
       '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../fingerprint
       '@warpgogol/forge':
         specifier: workspace:*
         version: link:../forge
-      '@warpgogol/geo':
-        specifier: workspace:*
-        version: link:../geo
-      '@warpgogol/growth':
-        specifier: workspace:*
-        version: link:../growth
-      '@warpgogol/integration':
-        specifier: workspace:*
-        version: link:../integration
-      '@warpgogol/integration-adapter-stripe':
-        specifier: workspace:*
-        version: link:../integration-adapter-stripe
-      '@warpgogol/integration-adapter-supabase-crm':
-        specifier: workspace:*
-        version: link:../integration-adapter-supabase-crm
-      '@warpgogol/nebula':
-        specifier: workspace:*
-        version: link:../nebula
-      '@warpgogol/ontology':
-        specifier: workspace:*
-        version: link:../ontology
-      '@warpgogol/passport':
-        specifier: workspace:*
-        version: link:../passport
-      '@warpgogol/pbp':
-        specifier: workspace:*
-        version: link:../pbp
-      '@warpgogol/share':
-        specifier: workspace:*
-        version: link:../share
       '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../os/site-kernel
@@ -1511,15 +1463,6 @@ importers:
       '@warpgogol/site-kernel-integrity':
         specifier: workspace:*
         version: link:../os/site-kernel-integrity
-      '@warpgogol/star-map':
-        specifier: workspace:*
-        version: link:../star-map
-      '@warpgogol/surface':
-        specifier: workspace:*
-        version: link:../surface
-      '@warpgogol/tokens':
-        specifier: workspace:*
-        version: link:../tokens
       '@warpgogol/werkstatt':
         specifier: workspace:*
         version: link:../werkstatt
