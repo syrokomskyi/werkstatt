@@ -1,10 +1,10 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0744: Rate Fetcher Worker. Multi-tenant scheduled worker that reads
-rate_sources from Supabase, fetches rates via @warpgogol/pbp-rate-adapters, and
+rate_sources from Supabase, fetches rates via @warpgogol/werkstatt-site/pbp-rate-adapters, and
 stores observations in rate_observations table.</purpose>
 <non-goals>
-  <item>Does not define adapter logic — that lives in @warpgogol/pbp-rate-adapters.</item>
+  <item>Does not define adapter logic — that lives in @warpgogol/werkstatt-site/pbp-rate-adapters.</item>
   <item>Does not create RateSnapshot content files — that is rate-snapshot.resolve (RFC-0741).</item>
   <item>Does not implement tenant registry access — uses direct Supabase queries.</item>
 </non-goals>
@@ -20,7 +20,7 @@ import {
   getRateSourceAdapter,
   registerRateSourceAdapter,
   type RateSourceAdapter,
-} from "@warpgogol/pbp-rate-adapters";
+} from "@warpgogol/werkstatt-site/pbp-rate-adapters";
 
 export interface RateFetcherWorkerEnv {
   RATE_FETCHER_SUPABASE_URL: string;

@@ -16,7 +16,7 @@ import {
   parseCheckRunRequest,
   type CheckRunRequest,
   type CheckRunStatus,
-} from "@warpgogol/check-core";
+} from "@warpgogol/werkstatt-site/check-core";
 import type { RunnerConfig } from "./config.ts";
 
 export async function ensureStore(config: RunnerConfig): Promise<void> {

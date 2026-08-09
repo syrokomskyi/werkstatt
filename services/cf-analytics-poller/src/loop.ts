@@ -12,7 +12,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { type MetricsPusher } from "@warpgogol/observability";
+import { type MetricsPusher } from "@warpgogol/werkstatt-site/observability";
 import { createPollerPusher } from "./pusher-factory.ts";
 import { loadConfig } from "./config.ts";
 import { transformZoneResponse, transformWorkersResponse, type MetricPoint } from "./poll.ts";

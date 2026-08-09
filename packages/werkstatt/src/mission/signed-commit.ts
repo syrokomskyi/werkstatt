@@ -3,18 +3,18 @@
 <purpose>RFC-0560: Ed25519 signed commit helper for mission workpiece git commits.</purpose>
 <non-goals>
   <item>Does not verify signatures — verification is a future RFC.</item>
-  <item>Does not handle GPG signing — uses Ed25519 via @warpgogol/passport signBytes.</item>
+  <item>Does not handle GPG signing — uses Ed25519 via @warpgogol/werkstatt-site/passport signBytes.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0560: initial signed commit helper using Ed25519 via @warpgogol/passport.</item>
+  <item>RFC-0560: initial signed commit helper using Ed25519 via @warpgogol/werkstatt-site/passport.</item>
 </CHANGE_SUMMARY>
 */
 
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { signBytes } from "@warpgogol/passport";
+import { signBytes } from "@warpgogol/werkstatt-site/passport";
 
 export interface SignedCommitResult {
   commitSha: string;

@@ -9,8 +9,7 @@
     "build:check": "tsc --noEmit"
   },
   "dependencies": {
-    "@warpgogol/integration-adapter-supabase-crm": "workspace:*",
-    "@warpgogol/share": "workspace:*"
+    "@warpgogol/werkstatt-site": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260801.1",

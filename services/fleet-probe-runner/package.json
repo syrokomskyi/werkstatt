@@ -9,7 +9,7 @@
     "health": "tsx src/run-once.ts"
   },
   "dependencies": {
-    "@warpgogol/observability": "workspace:*"
+    "@warpgogol/werkstatt-site": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.23.1"

@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0565: TypeScript contracts for the S/Kademlia-hardened DHT site registry and
-content placement subsystem. Re-exports types from @warpgogol/ontology/operations
+content placement subsystem. Re-exports types from @warpgogol/werkstatt-site/ontology/operations
 so that DHT command handlers in site-kernel consume the same canonical types as
 all other platform operations.
 </purpose>

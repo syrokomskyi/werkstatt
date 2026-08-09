@@ -23,8 +23,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/share/fs";
-import { StarCatalog } from "@warpgogol/ontology/cosmic";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { StarCatalog } from "@warpgogol/werkstatt-site/ontology/cosmic";
 import { systemPinSchema } from "@warpgogol/werkstatt/schemas";
 import {
   readRegistry,

@@ -23,8 +23,8 @@ import type { WorkshopCapacity } from "./types.ts";
 import { workshopCapacitySchema } from "./types.ts";
 import { loadDhtConfig } from "./config.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtPut } from "./node.ts";
-import { signBytes, verifyBytes } from "@warpgogol/passport/sign";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/passport";
+import { signBytes, verifyBytes } from "@warpgogol/werkstatt-site/passport/sign";
+import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-site/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 const PASSPORT_SIGNING_KEY_ENV = "PASSPORT_SIGNING_KEY";

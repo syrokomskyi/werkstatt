@@ -15,7 +15,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { createMetricsPusher, METRIC_REFS } from "@warpgogol/observability";
+import { createMetricsPusher, METRIC_REFS } from "@warpgogol/werkstatt-site/observability";
 
 const UI_URL = "https://observe.warpgogol.com";
 const INGEST_URL = "https://ingest.observe.warpgogol.com";

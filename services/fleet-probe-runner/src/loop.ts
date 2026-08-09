@@ -13,7 +13,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { connect as tlsConnect, type TLSSocket } from "node:tls";
-import { createMetricsPusher, type MetricsPusher, METRIC_REFS } from "@warpgogol/observability";
+import { createMetricsPusher, type MetricsPusher, METRIC_REFS } from "@warpgogol/werkstatt-site/observability";
 import { loadConfig } from "./config.ts";
 import {
   probeTarget,

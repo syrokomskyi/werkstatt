@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { createMetricsPusher } from "@warpgogol/observability";
+import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
 import { runProbeCycle } from "./loop.ts";
 
 async function main() {

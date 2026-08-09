@@ -1,6 +1,6 @@
 # `@warpgogol/werkstatt-site` — Agent Guide
 
-RFC-0774/0775: Werkstatt site plugin — Astro stack engine modules and domain layer. Consolidates `site-kernel-astro`, `site-kernel-checks`, `site-kernel-codegen`, `site-kernel-content`, `site-kernel-onboarding`, `site-kernel-audit`, `site-kernel-check-warpgogol`, `site-kernel-changelog` renderers, and `site-kernel-deploy` into a single plugin package implementing `werkstatt/plugin@1`.
+RFC-0774/0775: Werkstatt site plugin — Astro stack engine modules and domain layer. Consolidates `site-kernel-astro`, `site-kernel-checks`, `site-kernel-codegen`, `site-kernel-content`, `site-kernel-onboarding`, `site-kernel-audit`, `site-kernel-check-warpgogol`, `site-kernel-changelog` renderers, and `site-kernel-deploy` (RFC-0774) plus 27 domain packages (RFC-0775) into a single plugin package implementing `werkstatt/plugin@1`.
 
 **Workspace type:** Package
 
@@ -8,20 +8,20 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 
 ## Entry points
 
-| Entry point | Module |
-| --- | --- |
-| `@warpgogol/werkstatt-site` | `./src/index.ts` (plugin entry point) |
-| `@warpgogol/werkstatt-site/paths` | `./src/paths/index.ts` |
-| `@warpgogol/werkstatt-site/content` | `./src/content/index.ts` |
-| `@warpgogol/werkstatt-site/codegen` | `./src/codegen/index.ts` |
-| `@warpgogol/werkstatt-site/checks` | `./src/checks/index.ts` |
-| `@warpgogol/werkstatt-site/checks/module` | `./src/checks/module.ts` |
+| Entry point                                        | Module                                  |
+| -------------------------------------------------- | --------------------------------------- |
+| `@warpgogol/werkstatt-site`                        | `./src/index.ts` (plugin entry point)   |
+| `@warpgogol/werkstatt-site/paths`                  | `./src/paths/index.ts`                  |
+| `@warpgogol/werkstatt-site/content`                | `./src/content/index.ts`                |
+| `@warpgogol/werkstatt-site/codegen`                | `./src/codegen/index.ts`                |
+| `@warpgogol/werkstatt-site/checks`                 | `./src/checks/index.ts`                 |
+| `@warpgogol/werkstatt-site/checks/module`          | `./src/checks/module.ts`                |
 | `@warpgogol/werkstatt-site/checks/check-warpgogol` | `./src/checks/check-warpgogol/index.ts` |
-| `@warpgogol/werkstatt-site/onboarding` | `./src/onboarding/index.ts` |
-| `@warpgogol/werkstatt-site/onboarding/module` | `./src/onboarding/module.ts` |
-| `@warpgogol/werkstatt-site/audit` | `./src/audit/index.ts` |
-| `@warpgogol/werkstatt-site/changelog` | `./src/changelog/index.ts` |
-| `@warpgogol/werkstatt-site/deploy` | `./src/deploy/index.ts` |
+| `@warpgogol/werkstatt-site/onboarding`             | `./src/onboarding/index.ts`             |
+| `@warpgogol/werkstatt-site/onboarding/module`      | `./src/onboarding/module.ts`            |
+| `@warpgogol/werkstatt-site/audit`                  | `./src/audit/index.ts`                  |
+| `@warpgogol/werkstatt-site/changelog`              | `./src/changelog/index.ts`              |
+| `@warpgogol/werkstatt-site/deploy`                 | `./src/deploy/index.ts`                 |
 
 ## Scripts
 
@@ -53,3 +53,45 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `src/checks/check-warpgogol/` | `site-kernel-check-warpgogol` | `moduleLoaders` (check-warpgogol ecosystem) |
 | `src/deploy/` | `site-kernel-deploy` | `deployAdapters` |
 | `src/changelog/` | `site-kernel-changelog` renderers | `moduleLoaders` |
+
+## Domain layer (RFC-0775)
+
+The `src/domain/` directory consolidates 27 site-specific domain packages into a single plugin package. Each domain module is accessible via subpath exports (e.g. `@warpgogol/werkstatt-site/share`, `@warpgogol/werkstatt-site/ui`).
+
+### Domain modules
+
+| Domain | Former package | Key exports |
+| --- | --- | --- |
+| `src/domain/tokens/` | `@warpgogol/tokens` | Design tokens, `TOKEN_NAMES`, `TOKEN_CATEGORIES` |
+| `src/domain/geo/` | `@warpgogol/geo` | Geographic normalization, slug helpers |
+| `src/domain/faq/` | `@warpgogol/faq` | FAQ collection schema, loaders |
+| `src/domain/passport/` | `@warpgogol/passport` | Content passport signing, DHT, pipeline |
+| `src/domain/content-source/` | `@warpgogol/content-source` | Content Source Provider port |
+| `src/domain/check-core/` | `@warpgogol/check-core` | Check-warpgogol schemas, builders, diagnostics |
+| `src/domain/check-runner/` | `@warpgogol/check-runner-node` | Playwright evidence capture |
+| `src/domain/observability/` | `@warpgogol/observability` | Observability stack types |
+| `src/domain/nebula/` | `@warpgogol/nebula` | Semantic computation, collection |
+| `src/domain/star-map/` | `@warpgogol/star-map` | Star map rendering |
+| `src/domain/surface/` | `@warpgogol/surface` | Surface module, I/O |
+| `src/domain/studio-gate/` | `@warpgogol/studio-gate` | Studio Gate MCP server |
+| `src/domain/ontology/` | `@warpgogol/ontology` | Closed UI taxonomy, cosmic catalogs, schemas |
+| `src/domain/share/` | `@warpgogol/share` | App-agnostic utilities, schemas, semantic models |
+| `src/domain/pbp/` | `@warpgogol/pbp` | Public Business Profile entity, compiler |
+| `src/domain/pbp-rate-adapters/` | `@warpgogol/pbp-rate-adapters` | Rate source adapters (ECB) |
+| `src/domain/growth/` | `@warpgogol/growth` | Growth analytics, adapters, provider |
+| `src/domain/growth-adapter-matomo/` | `@warpgogol/growth-adapter-matomo` | Matomo adapter |
+| `src/domain/integration/` | `@warpgogol/integration` | Integration port, CRM buffer |
+| `src/domain/integration-adapter-stripe/` | `@warpgogol/integration-adapter-stripe` | Stripe adapter |
+| `src/domain/integration-adapter-supabase-crm/` | `@warpgogol/integration-adapter-supabase-crm` | Supabase CRM adapter |
+| `src/domain/chat/` | `@warpgogol/chat` | Chat port |
+| `src/domain/chat-adapter-null/` | `@warpgogol/chat-adapter-null` | Null chat adapter |
+| `src/domain/chat-adapter-uchat/` | `@warpgogol/chat-adapter-uchat` | uChat adapter |
+| `src/domain/ui/` | `@warpgogol/ui` | UI components, sections, LordIcon assets |
+
+### Intra-domain imports
+
+Domain modules import from each other via subpath exports: `@warpgogol/werkstatt-site/<name>` (e.g. `@warpgogol/werkstatt-site/share/content`). Direct relative imports across domain boundaries are forbidden.
+
+### Workshop-wide rewrite
+
+Other packages that still import from the old `@warpgogol/<name>` packages will break until RFC-0776 rewrites those imports. This is expected during the transition wave.

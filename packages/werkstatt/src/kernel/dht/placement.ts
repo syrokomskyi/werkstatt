@@ -23,7 +23,7 @@ import { workshopCapacitySchema } from "./types.ts";
 import { loadDhtConfig } from "./config.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtGet } from "./node.ts";
 import { verifyCapacity } from "./capacity.ts";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/passport";
+import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-site/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 

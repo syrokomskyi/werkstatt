@@ -15,7 +15,9 @@
       "default": "./src/module.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -25,9 +27,6 @@
   "dependencies": {
     "@warpgogol/werkstatt-site": "workspace:*",
     "@warpgogol/fingerprint": "workspace:*",
-    "@warpgogol/ontology": "workspace:*",
-    "@warpgogol/passport": "workspace:*",
-    "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel": "workspace:*",
     "@warpgogol/site-kernel-astro": "workspace:*",
     "@warpgogol/site-kernel-codegen": "workspace:*",

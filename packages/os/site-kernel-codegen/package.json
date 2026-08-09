@@ -11,7 +11,9 @@
       "default": "./src/index.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -21,8 +23,6 @@
   "dependencies": {
     "@warpgogol/werkstatt-site": "workspace:*",
     "@cyclonedx/cyclonedx-library": "^1.14.0",
-    "@warpgogol/ontology": "workspace:*",
-    "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel": "workspace:*",
     "@warpgogol/site-kernel-astro": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",

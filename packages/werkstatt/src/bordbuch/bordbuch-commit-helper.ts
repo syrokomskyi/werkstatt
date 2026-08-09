@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0750: appendAndCommitBordbuch and appendBatchAndCommitBordbuch helpers that combine appendBordbuchEntry + commitAndPushBordbuch into one atomic operation.</purpose>
 <non-goals>
-  <item>Does not define bordbuch event schema — that lives in @warpgogol/ontology/operations.</item>
+  <item>Does not define bordbuch event schema — that lives in @warpgogol/werkstatt-site/ontology/operations.</item>
   <item>Does not implement git operations — those live in bordbuch-io.ts commitAndPushBordbuch.</item>
   <item>Does not throw on commit/push failure — returns commitResult for caller to decide.</item>
 </non-goals>

@@ -24,8 +24,8 @@ import { stringify as yamlStringify } from "yaml";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import { readBordbuch } from "./bordbuch-io.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
-import { loadSurfaceModuleContexts, readVisibilityOutcomes } from "@warpgogol/surface/io";
-import type { SurfaceModuleContext } from "@warpgogol/surface";
+import { loadSurfaceModuleContexts, readVisibilityOutcomes } from "@warpgogol/werkstatt-site/surface/io";
+import type { SurfaceModuleContext } from "@warpgogol/werkstatt-site/surface";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 
 const FREEZE_FILE = "src/surface/freeze.generated.yaml";

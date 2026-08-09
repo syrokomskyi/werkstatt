@@ -55,7 +55,9 @@
       "default": "./src/suppressions-config.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -71,20 +73,8 @@
     "@syrokomskyi/axiom-factory-app": "link:../../../../pipelines/apps/axiom/factory",
     "@syrokomskyi/axiom-study": "link:../../../../pipelines/packages/axiom/axiom-study",
     "@warpgogol/agent-gate": "workspace:*",
-    "@warpgogol/chat": "workspace:*",
-    "@warpgogol/check-core": "workspace:*",
-    "@warpgogol/check-runner-node": "workspace:*",
-    "@warpgogol/content-source": "workspace:*",
     "@warpgogol/fingerprint": "workspace:*",
     "@warpgogol/forge": "workspace:*",
-    "@warpgogol/geo": "workspace:*",
-    "@warpgogol/growth": "workspace:*",
-    "@warpgogol/integration": "workspace:*",
-    "@warpgogol/nebula": "workspace:*",
-    "@warpgogol/ontology": "workspace:*",
-    "@warpgogol/passport": "workspace:*",
-    "@warpgogol/pbp": "workspace:*",
-    "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel": "workspace:*",
     "@warpgogol/site-kernel-astro": "workspace:*",
     "@warpgogol/site-kernel-audit": "workspace:*",
@@ -92,9 +82,6 @@
     "@warpgogol/site-kernel-codegen": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",
     "@warpgogol/site-kernel-integrity": "workspace:*",
-    "@warpgogol/star-map": "workspace:*",
-    "@warpgogol/surface": "workspace:*",
-    "@warpgogol/tokens": "workspace:*",
     "ai": "^7.0.47",
     "crawlee": "3.17.0",
     "file-type": "^22.0.1",

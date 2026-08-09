@@ -12,7 +12,7 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { captureSiteEvidenceGraph } from "@warpgogol/check-runner-node";
+import { captureSiteEvidenceGraph } from "@warpgogol/werkstatt-site/check-runner";
 import {
   redactCheckTarget,
   validateTargetSafety,
@@ -27,7 +27,7 @@ import {
   type CheckReport,
   type CheckRunRequest,
   type CheckRunStatus,
-} from "@warpgogol/check-core";
+} from "@warpgogol/werkstatt-site/check-core";
 import { loadRunnerConfig } from "./config.ts";
 import { claimNextRequest, completeRequest, ensureStore, writeStatus } from "./local-store.ts";
 

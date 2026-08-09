@@ -10,9 +10,8 @@
     "check": "site-kernel run check-warpgogol.runner.validate"
   },
   "dependencies": {
-    "@warpgogol/check-core": "workspace:*",
-    "@warpgogol/check-runner-node": "workspace:*",
-    "@warpgogol/site-kernel-check-warpgogol": "workspace:*"
+    "@warpgogol/site-kernel-check-warpgogol": "workspace:*",
+    "@warpgogol/werkstatt-site": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.23.1"

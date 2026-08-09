@@ -11,7 +11,7 @@
 */
 
 import { join } from "node:path";
-import { findWorkspaceRoot } from "@warpgogol/check-core";
+import { findWorkspaceRoot } from "@warpgogol/werkstatt-site/check-core";
 
 export interface RunnerConfig {
   workspaceRoot: string;

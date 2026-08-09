@@ -17,7 +17,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
-import { createMetricsPusher, METRIC_REFS } from "@warpgogol/observability";
+import { createMetricsPusher, METRIC_REFS } from "@warpgogol/werkstatt-site/observability";
 
 export async function runObservabilityFactorySmoke(
   _input: KernelCommandInput,

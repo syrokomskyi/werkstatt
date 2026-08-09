@@ -24,7 +24,7 @@ import {
   type KernelCommandResult,
   type KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { fingerprintTree, fingerprintFile } from "@warpgogol/werkstatt/fingerprint/semantic";
 import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { notausgangManifestSchema, type NotausgangManifest } from "@warpgogol/werkstatt/schemas";
