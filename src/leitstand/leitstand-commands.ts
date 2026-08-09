@@ -43,13 +43,13 @@ import type {
 import type {
   PropagationResult,
   HealthCheck,
-  DeploymentConfig,
+  DeploymentStaticConfig,
   DeploymentChannel,
   LastPropagatedChannel,
   PurgeResult,
 } from "@warpgogol/werkstatt/schemas";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
-import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import { readSystemConfig, readSystemState, writeSystemState } from "../sternsystem/registry-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readReleaseManifest, writeReleaseYaml } from "../release/release-commands.ts";
 import { orchestrateSnap01Recovery } from "../mission/snapshot-auto-regen.ts";
@@ -161,7 +161,7 @@ function resolveAdapter(name: string | undefined): DeploymentAdapter {
   throw new Error(`[leitstand] adapter-not-implemented: '${name}' has no concrete implementation`);
 }
 
-function getChannelConfig(dep: DeploymentConfig, channel: Channel): DeploymentChannel {
+function getChannelConfig(dep: DeploymentStaticConfig, channel: Channel): DeploymentChannel {
   const channelConfig =
     channel === "dev" ? dep.channels.dev : channel === "alt" ? dep.channels.alt : dep.channels.main;
   if (!channelConfig) {
@@ -413,7 +413,7 @@ interface PreflightCheck {
 async function runPreflight(
   workspaceRoot: string,
   releaseId: string,
-  dep: DeploymentConfig,
+  dep: DeploymentStaticConfig,
   channel: Channel,
   channelConfig: DeploymentChannel,
   adapter: DeploymentAdapter,
@@ -651,14 +651,9 @@ export async function runLeitstandDevDeploy(
 
   const channel: Channel = "dev";
 
-  // Read registry to resolve currentMission and dev channel config
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, systemId);
-  if (!entry) {
-    throw new Error(`[leitstand.dev-deploy] system '${systemId}' not found in registry`);
-  }
-
-  const dep = entry.deployment as DeploymentConfig;
+  // Read system config for dev channel config
+  const config = await readSystemConfig(workspaceRoot, systemId);
+  const dep = config.deployment as DeploymentStaticConfig | undefined;
   if (!dep) {
     throw new Error(`[leitstand.dev-deploy] system '${systemId}' has no deployment config`);
   }
@@ -869,7 +864,8 @@ export async function runLeitstandDevDeploy(
   }
 
   // Workpiece path (existing behavior) — requires open mission
-  const missionId = entry.currentMission as string | undefined;
+  const systemState = await readSystemState(workspaceRoot, systemId);
+  const missionId = systemState.currentMission as string | undefined;
   if (!missionId) {
     throw new Error(`[leitstand.dev-deploy] system '${systemId}' has no active mission`);
   }
@@ -1076,7 +1072,8 @@ export async function runLeitstandDevDeploy(
       // snapshot and re-run the build.
       let snapshotRegenerated = false;
       try {
-        const { executeKernelCommand: executeValidate } = await import("@warpgogol/werkstatt/kernel");
+        const { executeKernelCommand: executeValidate } =
+          await import("@warpgogol/werkstatt/kernel");
         const snapResult = await orchestrateSnap01Recovery({
           workspaceRoot,
           systemId,
@@ -1786,12 +1783,8 @@ export async function runLeitstandPropagate(
 
   // RFC-0634: Verify dev build-identity.json before deploying to alt
   // Fetch build-identity.json from the dev channel URL and verify against release manifest
-  const registryForDev = await readRegistry(workspaceRoot);
-  const entryForDev = findEntry(registryForDev, systemId);
-  if (!entryForDev) {
-    throw new Error(`[leitstand.propagate] system '${systemId}' not found in registry`);
-  }
-  const depForDev = entryForDev.deployment as DeploymentConfig;
+  const configForDev = await readSystemConfig(workspaceRoot, systemId);
+  const depForDev = configForDev.deployment as DeploymentStaticConfig | undefined;
   if (!depForDev) {
     throw new Error(`[leitstand.propagate] system '${systemId}' has no deployment config`);
   }
@@ -1878,13 +1871,8 @@ export async function runLeitstandPropagate(
   );
 
   try {
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, systemId);
-    if (!entry) {
-      throw new Error(`[leitstand.propagate] system '${systemId}' not found in registry`);
-    }
-
-    const dep = entry.deployment as DeploymentConfig;
+    const config = await readSystemConfig(workspaceRoot, systemId);
+    const dep = config.deployment as DeploymentStaticConfig | undefined;
     if (!dep) {
       throw new Error(`[leitstand.propagate] system '${systemId}' has no deployment config`);
     }
@@ -1984,19 +1972,19 @@ export async function runLeitstandPropagate(
 
     const healthy = result.state === "succeeded" && healthResult.state === "healthy";
 
-    // Update registry — per-channel lastPropagated
-    if (!dep.lastPropagated) {
-      dep.lastPropagated = {};
+    // Update state — per-channel lastPropagated
+    const propState = await readSystemState(workspaceRoot, systemId);
+    if (!propState.lastPropagated) {
+      propState.lastPropagated = {};
     }
-    dep.lastPropagated[channel] = buildLastPropagatedEntry(
+    propState.lastPropagated[channel] = buildLastPropagatedEntry(
       releaseId,
       result.state === "succeeded" ? "succeeded" : "failed",
       healthy,
       operationId,
       purgeResult,
     );
-    entry.deployment = dep;
-    await writeRegistry(workspaceRoot, registry);
+    await writeSystemState(workspaceRoot, systemId, propState);
 
     // RFC-0608: transition release state to alt-deployed on success
     if (result.state === "succeeded") {
@@ -2094,13 +2082,8 @@ export async function runLeitstandPromote(
   );
 
   try {
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, systemId);
-    if (!entry) {
-      throw new Error(`[leitstand.promote] system '${systemId}' not found in registry`);
-    }
-
-    const dep = entry.deployment as DeploymentConfig;
+    const config = await readSystemConfig(workspaceRoot, systemId);
+    const dep = config.deployment as DeploymentStaticConfig | undefined;
     if (!dep) {
       throw new Error(`[leitstand.promote] system '${systemId}' has no deployment config`);
     }
@@ -2277,19 +2260,19 @@ export async function runLeitstandPromote(
       workspaceRoot,
     });
 
-    // 6. Update registry — main channel lastPropagated
-    if (!dep.lastPropagated) {
-      dep.lastPropagated = {};
+    // 6. Update state — main channel lastPropagated
+    const promoteState = await readSystemState(workspaceRoot, systemId);
+    if (!promoteState.lastPropagated) {
+      promoteState.lastPropagated = {};
     }
-    dep.lastPropagated["main"] = buildLastPropagatedEntry(
+    promoteState.lastPropagated["main"] = buildLastPropagatedEntry(
       releaseId,
       result.state === "succeeded" ? "succeeded" : "failed",
       result.state === "succeeded" && mainHealthResult.state === "healthy",
       operationId,
       purgeResult,
     );
-    entry.deployment = dep;
-    await writeRegistry(workspaceRoot, registry);
+    await writeSystemState(workspaceRoot, systemId, promoteState);
 
     // 7. Transition release state to promoted on success
     if (result.state === "succeeded") {
@@ -2380,14 +2363,10 @@ export async function runLeitstandStatus(
 
   const channelFilter = flagString(input, "channel");
 
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, systemId);
-  if (!entry) {
-    throw new Error(`[leitstand.status] system '${systemId}' not found in registry`);
-  }
-
-  const dep = entry.deployment as DeploymentConfig | undefined;
-  const lp = dep?.lastPropagated;
+  const config = await readSystemConfig(workspaceRoot, systemId);
+  const dep = config.deployment as DeploymentStaticConfig | undefined;
+  const state = await readSystemState(workspaceRoot, systemId);
+  const lp = state.lastPropagated;
 
   function channelStatus(c: Channel) {
     const e = lp?.[c];
@@ -2484,23 +2463,20 @@ export async function runLeitstandRollback(
   );
 
   try {
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, systemId);
-    if (!entry) {
-      throw new Error(`[leitstand.rollback] system '${systemId}' not found in registry`);
-    }
-
-    const dep = entry.deployment as DeploymentConfig;
+    const config = await readSystemConfig(workspaceRoot, systemId);
+    const dep = config.deployment as DeploymentStaticConfig | undefined;
     if (!dep) {
       throw new Error(`[leitstand.rollback] system '${systemId}' has no deployment config`);
     }
 
+    const rbState = await readSystemState(workspaceRoot, systemId);
+
     // RFC-0627: Auto-detect channel from current release state
     // Find the current release from any channel's lastPropagated, then read its state
     const currentRelease =
-      dep.lastPropagated?.main?.releaseId ??
-      dep.lastPropagated?.alt?.releaseId ??
-      dep.lastPropagated?.dev?.releaseId ??
+      rbState.lastPropagated?.main?.releaseId ??
+      rbState.lastPropagated?.alt?.releaseId ??
+      rbState.lastPropagated?.dev?.releaseId ??
       null;
     if (!currentRelease) {
       throw new Error(`[leitstand.rollback] no previous release found for '${systemId}'`);
@@ -2576,18 +2552,17 @@ export async function runLeitstandRollback(
     }
 
     // Update registry — per-channel lastPropagated
-    if (!dep.lastPropagated) {
-      dep.lastPropagated = {};
+    if (!rbState.lastPropagated) {
+      rbState.lastPropagated = {};
     }
-    dep.lastPropagated[channel] = buildLastPropagatedEntry(
+    rbState.lastPropagated[channel] = buildLastPropagatedEntry(
       targetRelease,
       result.state === "succeeded" ? "succeeded" : "failed",
       result.state === "succeeded",
       operationId,
       purgeResult,
     );
-    entry.deployment = dep;
-    await writeRegistry(workspaceRoot, registry);
+    await writeSystemState(workspaceRoot, systemId, rbState);
 
     // RFC-0627: auto-step release state one step back in the deployment chain
     let newReleaseState = "";
@@ -2664,20 +2639,16 @@ export async function runLeitstandHealth(
 
   const channel = parseChannel(flagString(input, "channel"), "alt");
 
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, systemId);
-  if (!entry) {
-    throw new Error(`[leitstand.health] system '${systemId}' not found in registry`);
-  }
-
-  const dep = entry.deployment as DeploymentConfig;
+  const config = await readSystemConfig(workspaceRoot, systemId);
+  const dep = config.deployment as DeploymentStaticConfig | undefined;
   if (!dep) {
     throw new Error(`[leitstand.health] system '${systemId}' has no deployment config`);
   }
 
   const channelConfig = getChannelConfig(dep, channel);
   const adapter = resolveAdapter(dep.adapter);
-  const releaseId = dep.lastPropagated?.[channel]?.releaseId ?? "";
+  const healthState = await readSystemState(workspaceRoot, systemId);
+  const releaseId = healthState.lastPropagated?.[channel]?.releaseId ?? "";
 
   const result = await adapter.health({
     systemId,

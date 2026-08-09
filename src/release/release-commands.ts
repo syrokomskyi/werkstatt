@@ -40,7 +40,7 @@ import {
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
-import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import { readSystemState, writeSystemState } from "../sternsystem/registry-io.ts";
 import { runPipelinePhase, computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
 import { checkBreaksCDeclaration } from "./breaks-c-helper.ts";
@@ -714,13 +714,10 @@ export async function runReleaseReady(
       `Bordbuch: release-ready ${releaseId}`,
     );
 
-    // Update registry
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, systemId);
-    if (entry) {
-      entry.lastRelease = releaseId;
-      await writeRegistry(workspaceRoot, registry);
-    }
+    // Update state
+    const state = await readSystemState(workspaceRoot, systemId);
+    state.lastRelease = releaseId;
+    await writeSystemState(workspaceRoot, systemId, state);
 
     logger.success(`[release.ready] ${releaseId} marked ready`);
 
@@ -1135,36 +1132,35 @@ async function validateReleaseState(
         });
       }
 
-      // Check 5: registry-last-release-consistent
+      // Check 5: state-last-release-consistent
       if (state === "promoted" && systemId) {
         try {
-          const registry = await readRegistry(workspaceRoot);
-          const entry = findEntry(registry, systemId);
-          const lastRelease = entry?.lastRelease as string | null | undefined;
+          const systemState = await readSystemState(workspaceRoot, systemId);
+          const lastRelease = systemState.lastRelease as string | null | undefined;
           if (!lastRelease) {
             checks.push({
-              rule: "registry-last-release-consistent",
+              rule: "state-last-release-consistent",
               status: "warn",
-              message: `release '${effectiveReleaseId}' is promoted but registry.yaml has no lastRelease for system '${systemId}'`,
+              message: `release '${effectiveReleaseId}' is promoted but system-state.yaml has no lastRelease for system '${systemId}'`,
             });
           } else if (lastRelease !== effectiveReleaseId) {
             checks.push({
-              rule: "registry-last-release-consistent",
+              rule: "state-last-release-consistent",
               status: "warn",
-              message: `registry.yaml lastRelease '${lastRelease}' does not match promoted release '${effectiveReleaseId}'`,
+              message: `system-state.yaml lastRelease '${lastRelease}' does not match promoted release '${effectiveReleaseId}'`,
             });
           } else {
             checks.push({
-              rule: "registry-last-release-consistent",
+              rule: "state-last-release-consistent",
               status: "pass",
-              message: `registry.yaml lastRelease is consistent`,
+              message: `system-state.yaml lastRelease is consistent`,
             });
           }
         } catch {
           checks.push({
-            rule: "registry-last-release-consistent",
+            rule: "state-last-release-consistent",
             status: "warn",
-            message: `failed to read registry.yaml for system '${systemId}'`,
+            message: `failed to read system-state.yaml for system '${systemId}'`,
           });
         }
       }

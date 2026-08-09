@@ -23,8 +23,11 @@ import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { stringify as yamlStringify } from "yaml";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import { readBordbuch } from "./bordbuch-io.ts";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
-import { loadSurfaceModuleContexts, readVisibilityOutcomes } from "@warpgogol/werkstatt-site/surface/io";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
+import {
+  loadSurfaceModuleContexts,
+  readVisibilityOutcomes,
+} from "@warpgogol/werkstatt-site/surface/io";
 import type { SurfaceModuleContext } from "@warpgogol/werkstatt-site/surface";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 
@@ -76,7 +79,7 @@ async function buildProjection(
   systemId: string,
   entries: BordbuchEntry[],
 ): Promise<BordbuchProjection> {
-  const systemDir = await resolveCachePath(workspaceRoot, systemId);
+  const systemDir = await resolveCacheClonePath(workspaceRoot, systemId);
   const moduleContexts = await loadSurfaceModuleContexts(systemDir).catch(() => ({
     modules: {},
     declaredBlueprints: [],
@@ -197,7 +200,7 @@ export async function runBordbuchGenerate(
     const entries = await readBordbuch(workspaceRoot, systemId);
     const projection = await buildProjection(workspaceRoot, systemId, entries);
 
-    const cachePath = await resolveCachePath(workspaceRoot, systemId);
+    const cachePath = await resolveCacheClonePath(workspaceRoot, systemId);
     const baseDir = join(cachePath, "public", ".well-known");
     const jsonPath = join(baseDir, "bordbuch.json");
     const htmlPath = join(baseDir, "bordbuch", "index.html");

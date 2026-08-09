@@ -17,8 +17,8 @@ apps/<id> directories and materialized mission workpieces missions/<missionId>/w
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { parse } from "yaml";
 import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
+import { discoverSystems, readSystemState } from "../sternsystem/registry-io.ts";
 import type { DiscoveredSiteWorkspace } from "./types.ts";
 // @ai-invariant: The resolver must refuse dual representation — a site existing as both apps/<id> and a mission workpiece is an error, not a fallback.
 
@@ -27,16 +27,6 @@ export type SiteWorkspaceSource = "apps" | "mission";
 export interface SiteWorkspace extends DiscoveredSiteWorkspace {
   source: SiteWorkspaceSource;
   missionId: string | null;
-}
-
-interface RegistryEntry {
-  id: string;
-  currentMission?: string;
-}
-
-interface RegistryFile {
-  version: string;
-  systems?: RegistryEntry[];
 }
 
 const APP_CONFIG_FILENAMES = [
@@ -69,39 +59,42 @@ async function resolveConfigPath(directory: string): Promise<string | null> {
   return null;
 }
 
-async function readRegistry(workspaceRoot: string): Promise<RegistryFile | null> {
-  const registryPath = path.join(workspaceRoot, "systems", "registry.yaml");
-  try {
-    const raw = await fs.readFile(registryPath, "utf8");
-    return parse(raw) as RegistryFile;
-  } catch {
-    return null;
-  }
+interface SystemInfo {
+  id: string;
+  currentMission?: string;
 }
 
-function findRegistryEntry(
-  registry: RegistryFile | null,
-  siteId: string,
-): RegistryEntry | undefined {
-  if (!registry?.systems) return undefined;
-  return registry.systems.find((entry) => entry.id === siteId);
+async function discoverSystemInfos(workspaceRoot: string): Promise<SystemInfo[]> {
+  const { systems } = await discoverSystems(workspaceRoot);
+  const infos: SystemInfo[] = [];
+  for (const sys of systems) {
+    let currentMission: string | undefined;
+    try {
+      const state = await readSystemState(workspaceRoot, sys.id);
+      currentMission = state.currentMission ?? undefined;
+    } catch {
+      // State not available
+    }
+    infos.push({ id: sys.id, currentMission });
+  }
+  return infos;
 }
 
 async function tryResolveMissionWorkpiece(
   workspaceRoot: string,
-  entry: RegistryEntry,
+  info: SystemInfo,
 ): Promise<SiteWorkspace | null> {
-  if (!entry.currentMission) return null;
-  const workpieceDir = path.join(workspaceRoot, "missions", entry.currentMission, "workpiece");
+  if (!info.currentMission) return null;
+  const workpieceDir = path.join(workspaceRoot, "missions", info.currentMission, "workpiece");
   if (!(await fileExists(path.join(workpieceDir, "package.json")))) return null;
   const configPath = await resolveConfigPath(workpieceDir);
   const packageName = await readPackageName(path.join(workpieceDir, "package.json"));
   return {
-    name: entry.id,
+    name: info.id,
     source: "mission",
     directory: workpieceDir,
     toolsDirectory: path.join(workpieceDir, "tools"),
-    missionId: entry.currentMission,
+    missionId: info.currentMission,
     configPath: configPath ?? undefined,
     packageName,
   };
@@ -130,13 +123,13 @@ export async function resolveSiteWorkspace(
   workspaceRoot: string,
   siteId: string,
 ): Promise<SiteWorkspace> {
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findRegistryEntry(registry, siteId);
-  const missionWorkspace = entry ? await tryResolveMissionWorkpiece(workspaceRoot, entry) : null;
+  const infos = await discoverSystemInfos(workspaceRoot);
+  const info = infos.find((i) => i.id === siteId);
+  const missionWorkspace = info ? await tryResolveMissionWorkpiece(workspaceRoot, info) : null;
   const appsWorkspace = await tryResolveAppsDirectory(workspaceRoot, siteId);
 
   if (missionWorkspace && appsWorkspace) {
-    if (entry?.currentMission) {
+    if (info?.currentMission) {
       return missionWorkspace;
     }
     throw new Error(
@@ -153,18 +146,16 @@ export async function resolveSiteWorkspace(
 }
 
 export async function discoverSiteWorkspaces(workspaceRoot: string): Promise<SiteWorkspace[]> {
-  const registry = await readRegistry(workspaceRoot);
+  const infos = await discoverSystemInfos(workspaceRoot);
   const results: SiteWorkspace[] = [];
   const seen = new Set<string>();
 
-  // Mission workpieces from registry
-  if (registry?.systems) {
-    for (const entry of registry.systems) {
-      const ws = await tryResolveMissionWorkpiece(workspaceRoot, entry);
-      if (ws) {
-        results.push(ws);
-        seen.add(entry.id);
-      }
+  // Mission workpieces from discovered systems
+  for (const info of infos) {
+    const ws = await tryResolveMissionWorkpiece(workspaceRoot, info);
+    if (ws) {
+      results.push(ws);
+      seen.add(info.id);
     }
   }
 
@@ -184,8 +175,8 @@ export async function discoverSiteWorkspaces(workspaceRoot: string): Promise<Sit
       // When the registry entry has currentMission set, the mission workpiece
       // wins (mirrors resolveSiteWorkspace logic). Otherwise this is a real
       // dual-representation error (RFC-0354 §6.4).
-      const registryEntry = registry?.systems?.find((r) => r.id === entry.name);
-      if (registryEntry?.currentMission) continue;
+      const sysInfo = infos.find((r) => r.id === entry.name);
+      if (sysInfo?.currentMission) continue;
       const missionWs = results.find((ws) => ws.name === entry.name);
       throw new Error(
         `dual-representation: site "${entry.name}" exists both as apps/${entry.name} and as mission workpiece missions/${missionWs?.missionId}/workpiece. RFC-0354 §6.4 forbids dual representation.`,

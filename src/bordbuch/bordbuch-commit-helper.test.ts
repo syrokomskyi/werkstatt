@@ -20,17 +20,17 @@ vi.mock("./bordbuch-io.ts", () => ({
 }));
 
 vi.mock("../sternsystem/registry-io.ts", () => ({
-  resolveCachePath: vi.fn(),
+  resolveCacheClonePath: vi.fn(),
 }));
 
 import { appendAndCommitBordbuch, appendBatchAndCommitBordbuch } from "./bordbuch-commit-helper.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "./bordbuch-io.ts";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 
 const mockAppendBordbuchEntry = vi.mocked(appendBordbuchEntry);
 const mockCommitAndPushBordbuch = vi.mocked(commitAndPushBordbuch);
-const mockResolveCachePath = vi.mocked(resolveCachePath);
+const mockResolveCachePath = vi.mocked(resolveCacheClonePath);
 
 let tmpDir: string;
 const systemId = "test-system";

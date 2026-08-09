@@ -21,7 +21,7 @@ import type {
   DeploymentAdapterName,
   MirrorStorageType,
   ServiceEntry,
-  FleetRegistryEntry,
+  SystemConfig,
 } from "@warpgogol/werkstatt/schemas";
 
 export interface RegistryChannelOptions {
@@ -60,7 +60,7 @@ export interface RegistrySystemOptions {
   pinnedPlatform: string;
   currentMission?: string | null;
   lastRelease?: string | null;
-  status?: FleetRegistryEntry["status"];
+  status?: SystemConfig["status"];
   registeredAt?: string;
   cloudflareZoneId?: string;
   deployment?: RegistryDeploymentOptions;

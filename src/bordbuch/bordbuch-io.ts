@@ -28,7 +28,7 @@ import {
   type BordbuchEntryKind,
 } from "@warpgogol/werkstatt/schemas";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import { gitExec } from "../werkstatt/git-exec.ts";
 
 const BORDBUCH_PATH = path.join("bordbuch", "events.ndjson");
@@ -37,7 +37,7 @@ export async function resolveBordbuchPath(
   workspaceRoot: string,
   systemId: string,
 ): Promise<string> {
-  const cachePath = await resolveCachePath(workspaceRoot, systemId);
+  const cachePath = resolveCacheClonePath(workspaceRoot, systemId);
   return path.join(cachePath, BORDBUCH_PATH);
 }
 
@@ -281,15 +281,14 @@ export async function validateBordbuch(
     }
   }
 
-  // Unmatched open missions — skip the currently active mission (registry.currentMission)
+  // Unmatched open missions — skip the currently active mission (state.currentMission)
   let currentMission: string | null = null;
   try {
-    const { readRegistry, findEntry } = await import("../sternsystem/registry-io.ts");
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, systemId);
-    currentMission = entry?.currentMission ?? null;
+    const { readSystemState } = await import("../sternsystem/registry-io.ts");
+    const state = await readSystemState(workspaceRoot, systemId);
+    currentMission = state.currentMission ?? null;
   } catch {
-    // Registry not available — check all missions
+    // State not available — check all missions
   }
   for (const openId of openMissions) {
     if (openId === currentMission) continue;

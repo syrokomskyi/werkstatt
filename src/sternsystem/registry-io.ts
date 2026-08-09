@@ -18,7 +18,7 @@ RFC-0751: findServiceEntry helper (preserved, reads from services/registry.yaml)
 </CHANGE_SUMMARY>
 */
 
-import { readFile, readdir, mkdir } from "node:fs/promises";
+import { readFile, readdir, mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
@@ -197,6 +197,15 @@ export async function readServicesRegistry(workspaceRoot: string): Promise<Servi
 
 export function findServiceEntry(registry: ServicesRegistry, id: string): ServiceEntry | undefined {
   return registry.services.find((s) => s.id === id);
+}
+
+export async function writeServicesRegistry(
+  workspaceRoot: string,
+  registry: ServicesRegistry,
+): Promise<void> {
+  const filePath = path.join(workspaceRoot, SERVICES_REGISTRY_PATH);
+  const yaml = stringifyYaml(registry) + "\n";
+  await writeFile(filePath, yaml, "utf8");
 }
 
 // --- Existing helpers (preserved) ---

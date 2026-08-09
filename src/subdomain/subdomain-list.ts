@@ -18,7 +18,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readRegistry } from "../sternsystem/registry-io.ts";
+import { discoverSystems } from "../sternsystem/registry-io.ts";
 import { listDnsRecords, listWorkersRoutes } from "../leitstand/adapters/cloudflare-api.ts";
 import { flagString, resolveZoneId, resolveSubdomainEnv } from "./subdomain-helpers.ts";
 
@@ -53,8 +53,8 @@ export async function runSubdomainList(
   const zoneDomain = flagString(input, "zone");
   if (!zoneDomain) throw new Error("[subdomain.list] --zone is required");
 
-  const registry = await readRegistry(workspaceRoot);
-  const zoneId = resolveZoneId(registry, zoneDomain);
+  const { systems } = await discoverSystems(workspaceRoot);
+  const zoneId = resolveZoneId(systems, zoneDomain);
 
   const env = await resolveSubdomainEnv();
   const apiToken = env["CLOUDFLARE_API_TOKEN"];

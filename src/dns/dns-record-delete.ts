@@ -20,7 +20,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readRegistry } from "../sternsystem/registry-io.ts";
+import { discoverSystems } from "../sternsystem/registry-io.ts";
 import { listDnsRecords, deleteDnsRecord } from "../leitstand/adapters/cloudflare-api.ts";
 import {
   flagString,
@@ -61,9 +61,9 @@ export async function runDnsRecordDelete(
     );
   }
 
-  const registry = await readRegistry(workspaceRoot);
-  const zoneDomain = resolveZoneDomainForSystem(registry, systemId);
-  const zoneId = resolveDnsZoneId(registry, zoneDomain);
+  const { systems } = await discoverSystems(workspaceRoot);
+  const zoneDomain = resolveZoneDomainForSystem(systems, systemId);
+  const zoneId = resolveDnsZoneId(systems, zoneDomain);
 
   const env = await resolveDnsEnv();
   const apiToken = env["CLOUDFLARE_API_TOKEN"];

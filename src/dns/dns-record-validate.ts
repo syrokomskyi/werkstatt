@@ -20,7 +20,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readRegistry } from "../sternsystem/registry-io.ts";
+import { discoverSystems } from "../sternsystem/registry-io.ts";
 import { listDnsRecords } from "../leitstand/adapters/cloudflare-api.ts";
 import {
   flagString,
@@ -57,8 +57,8 @@ export async function runDnsRecordValidate(
     throw new Error(`[dns.record.validate] No dns-records.yaml found for system '${systemId}'.`);
   }
 
-  const registry = await readRegistry(workspaceRoot);
-  const zoneId = resolveDnsZoneId(registry, declaration.zone);
+  const { systems } = await discoverSystems(workspaceRoot);
+  const zoneId = resolveDnsZoneId(systems, declaration.zone);
 
   const env = await resolveDnsEnv();
   const apiToken = env["CLOUDFLARE_API_TOKEN"];

@@ -22,7 +22,11 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import type { ServiceEntry } from "@warpgogol/werkstatt/schemas";
-import { readRegistry, writeRegistry, findServiceEntry } from "../sternsystem/registry-io.ts";
+import {
+  readServicesRegistry,
+  writeServicesRegistry,
+  findServiceEntry,
+} from "../sternsystem/registry-io.ts";
 import { generateOperationId } from "../werkstatt/index.ts";
 
 export interface ServiceDeployData {
@@ -104,8 +108,8 @@ export async function runLeitstandServiceDeploy(
   const operationId = generateOperationId();
   const startedAt = new Date().toISOString();
 
-  // 1. Read registry — find service entry
-  const registry = await readRegistry(workspaceRoot);
+  // 1. Read services registry — find service entry
+  const registry = await readServicesRegistry(workspaceRoot);
   const serviceEntry = findServiceEntry(registry, serviceId);
   if (!serviceEntry) {
     throw new Error(
@@ -271,13 +275,13 @@ export async function runLeitstandServiceDeploy(
     operationId,
   });
 
-  // Update workersDevUrl in registry if resolved from wrangler output
+  // Update workersDevUrl in services registry if resolved from wrangler output
   if (deployedUrl && deployedUrl !== serviceEntry.workersDevUrl) {
-    const updatedRegistry = await readRegistry(workspaceRoot);
+    const updatedRegistry = await readServicesRegistry(workspaceRoot);
     const updatedEntry = findServiceEntry(updatedRegistry, serviceId);
     if (updatedEntry) {
       updatedEntry.workersDevUrl = deployedUrl;
-      await writeRegistry(workspaceRoot, updatedRegistry);
+      await writeServicesRegistry(workspaceRoot, updatedRegistry);
     }
   }
 
@@ -305,13 +309,13 @@ async function recordDeployState(
   serviceId: string,
   state: { at: string; state: "succeeded" | "failed"; operationId: string },
 ): Promise<void> {
-  const registry = await readRegistry(workspaceRoot);
-  const entry = registry.services?.find((s: ServiceEntry) => s.id === serviceId);
+  const registry = await readServicesRegistry(workspaceRoot);
+  const entry = registry.services.find((s: ServiceEntry) => s.id === serviceId);
   if (!entry) return;
   entry.lastDeployed = {
     at: state.at,
     state: state.state,
     operationId: state.operationId,
   };
-  await writeRegistry(workspaceRoot, registry);
+  await writeServicesRegistry(workspaceRoot, registry);
 }
