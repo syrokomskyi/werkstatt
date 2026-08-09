@@ -46,9 +46,9 @@ satisfies: []
 # major (architectural, manually reserved). Default: patch.
 versionBump: minor
 commands:
-  proposed:
+  proposed: []
+  added:
     - werkstatt.autonomy.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []
