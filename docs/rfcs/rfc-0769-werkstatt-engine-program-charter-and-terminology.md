@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -32,6 +33,7 @@ related:
 satisfies:
   - DNA-1
   - DNA-2
+  - DNA-64
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -88,7 +90,7 @@ This RFC is the program charter for extracting the Werkstatt engine into private
 
 Three structural couplings prevent reuse of the engine outside this monorepo:
 
-1. **Engine ↔ stack coupling.** `@warpgogol/site-kernel-handoff` (missions, releases, Leitstand) statically imports Astro-specific packages (`site-kernel-astro`, `site-kernel-checks`, `site-kernel-codegen`, `site-kernel-onboarding`). The universal lifecycle engine cannot run without the site stack.
+1. **Engine ↔ stack coupling.** `@warpgogol/site-kernel-handoff` (missions, releases, Leitstand) declares Astro-specific packages as dependencies (`site-kernel-astro`, `site-kernel-checks`, `site-kernel-codegen`, `site-kernel-onboarding`) and statically imports from `site-kernel-checks` in production code (`leitstand-commands.ts`). The universal lifecycle engine cannot run without the site stack.
 2. **Engine ↔ workshop coupling.** Engine code lives in `packages/os/*` of this monorepo; a new workshop cannot install it — it would have to fork the whole repository.
 3. **No plugin contract.** `tools/kernel.config.ts` demonstrates dynamic module loading (`moduleLoaders`), but there is no formal contract binding a forge stack profile to a set of engine modules, paths, validators, and deploy adapters.
 
