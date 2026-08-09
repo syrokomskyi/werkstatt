@@ -1,0 +1,30 @@
+kind: dns-records
+schemaVersion: 1
+zone: warpgogol.com
+updatedAt: 2026-08-09
+records:
+  - name: warpgogol.com
+    type: A
+    content: 192.0.2.1
+    proxied: true
+    comment: "Root apex A record (placeholder — replace with actual Cloudflare proxied IP)"
+  - name: www
+    type: CNAME
+    content: warpgogol.com
+    proxied: true
+    comment: "WWW subdomain CNAME to apex"
+  - name: _dmarc
+    type: TXT
+    content: "v=DMARC1; p=quarantine; rua=mailto:dmarc@warpgogol.com"
+    comment: "DMARC policy record"
+  - name: warpgogol.com
+    type: TXT
+    content: "v=spf1 include:_spf.mx.cloudflare.net ~all"
+    comment: "SPF record for email deliverability"
+  # BEGIN dns-aid
+  - name: _agent.warpgogol.com
+    type: TXT
+    content: "https://warpgogol.com/.well-known/agent.json"
+    ttl: 3600
+    proxied: false
+# END dns-aid
