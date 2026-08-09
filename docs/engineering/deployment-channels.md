@@ -1,6 +1,8 @@
 # Engineering: Deployment Channels & Cloudflare Cache
 
 > Operator runbook for dev/alt/main deployment channels, DNS setup, CDN cache configuration, and `.env` loading.
+>
+> **First-time setup?** See [workshop-setup.md](./workshop-setup.md) for the complete guide from clone to first deploy.
 
 ---
 
@@ -30,11 +32,11 @@ Each promotion step verifies `build-identity.json` freshness before proceeding (
 
 Each channel needs a DNS record pointing to its Worker via the Workers custom domain feature:
 
-| Channel | DNS type | Content | Proxied |
-| --- | --- | --- | --- |
-| `dev.<domain>` | AAAA | `100::` (Workers custom domain) | Yes |
-| `alt.<domain>` | AAAA | `100::` (Workers custom domain) | Yes |
-| `<domain>` | AAAA | `100::` (Workers custom domain) | Yes |
+| Channel        | DNS type | Content                         | Proxied |
+| -------------- | -------- | ------------------------------- | ------- |
+| `dev.<domain>` | AAAA     | `100::` (Workers custom domain) | Yes     |
+| `alt.<domain>` | AAAA     | `100::` (Workers custom domain) | Yes     |
+| `<domain>`     | AAAA     | `100::` (Workers custom domain) | Yes     |
 
 The `100::` address is Cloudflare's reserved IPv6 for Workers custom domains. The DNS record is automatically created when you enable the Workers custom domain in the dashboard or via `wrangler` / API.
 
@@ -101,10 +103,24 @@ The site-kernel CLI automatically loads `.env` from the workspace root via `impo
 
 | Variable | Purpose | Used by |
 | --- | --- | --- |
-| `CLOUDFLARE_ZONE_ID` | Zone ID for CDN cache purge | `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.release` |
-| `CLOUDFLARE_API_TOKEN` | API token with Cache Purge permission | Same as above |
+| `CLOUDFLARE_ZONE_ID` | Zone ID for CDN cache purge | `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote` |
+| `CLOUDFLARE_API_TOKEN` | API token (see permissions below) | Same as above + `wrangler deploy`, `subdomain.register` |
 | `CLOUDFLARE_ACCOUNT_ID` | Account ID for wrangler deploy | `leitstand.dev-deploy` (wrangler) |
 | `PASSPORT_SIGNING_KEY` | Ed25519 signing key for commits | `mission.git.commit`, `bordbuch.commit` |
+
+#### `CLOUDFLARE_API_TOKEN` permissions
+
+Create a **User API Token** (My Profile → API Tokens → Create Custom Token), NOT an Account API Token. Required permissions:
+
+| Permission                | Scope   | Level | Purpose                         |
+| ------------------------- | ------- | ----- | ------------------------------- |
+| Zone → Cache Purge        | Zone    | Purge | CDN cache purge after deploy    |
+| Account → Workers Scripts | Account | Edit  | `wrangler deploy`               |
+| Zone → Workers Routes     | Zone    | Edit  | Workers route management        |
+| Zone → DNS                | Zone    | Edit  | `subdomain.register` (RFC-0752) |
+| Zone → Page Rules         | Zone    | Edit  | Dev channel cache bypass rule   |
+
+Scope to specific account and zone only (least-privilege). Full guide: [workshop-setup.md](./workshop-setup.md).
 
 ### `.env.example`
 
@@ -140,5 +156,6 @@ rtk cp .env.example .env
 ### `report.html` missing after `mission.check`
 
 `mission.check` auto-generates `report.html` in `missions/<mission>/evidence/axiom/` after writing evidence files. If it's missing:
+
 1. Check the `mission.check` output for a `Report generation failed` warning
 2. Run `pnpm exec site-kernel run axiom.report --mission <missionId>` manually as a fallback
