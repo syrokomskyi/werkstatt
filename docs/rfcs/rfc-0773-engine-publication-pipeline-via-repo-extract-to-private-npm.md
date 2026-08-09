@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -27,7 +28,8 @@ related:
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies: []
+satisfies:
+  - DNA-62
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -43,7 +45,11 @@ commands:
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
-packagesImpacted: []
+packagesImpacted:
+  - packages/werkstatt
+  - packages/werkstatt-site
+  - packages/werkstatt-game
+  - packages/werkstatt-video
 successSignals:
   - "Dry-run extraction of packages/werkstatt succeeds and the packed tarball's CLI runs"
   - "Private npm install of @warpgogol/werkstatt in a scratch folder resolves and typechecks"
@@ -88,41 +94,65 @@ Each published package (`werkstatt`, `werkstatt-site`, `werkstatt-game`, `werkst
 - Engine and plugins version **independently** (SemVer each), but every plugin declares a `peerDependency` on a compatible engine range (e.g. `@warpgogol/werkstatt: ^1.x`).
 - Workspace `workspace:*` deps between engine and plugins are rewritten by repo-extract; plugins pin the engine peer range in their own `package.json` explicitly (not `*`).
 - Version bumps follow the existing platform version log discipline (`ecosystem.commit`).
+- **Breaking engine major → all plugins republished simultaneously.** A breaking contract change (engine major) requires all plugin packages to be updated with the new peerDependency range and republished in the same publication window. Compatible plugins are not silently left on an stale peer range.
+- **Workshop version migration.** After full RFC-0769..0779 implementation (all waves complete), the workshop Turborepo package is bumped from version 4 to version 5 to mark the engine extraction milestone.
 
 ## Architectural fit
 
 - **Forge precedent** — identical mechanism; this RFC only standardizes it as policy and adds a verification gate.
-- **DNA-62 (pinned files)** — `extract.config.yaml` files join `.forge/pinned.yaml` (protect mode) so they cannot be silently deleted.
+- **DNA-62 (pinned files)** — `extract.config.yaml` files join `.forge/pinned.yaml` (protect mode) so they cannot be silently deleted. This RFC extends DNA-62 by adding a new category of pinned file (extraction configs) to the manifest.
 
 ## Design
 
+### File system responsibilities
+
+| Path | Action |
+| --- | --- |
+| `packages/werkstatt/extract.config.yaml` | Created — engine extraction config |
+| `packages/werkstatt-site/extract.config.yaml` | Created — site plugin extraction config |
+| `packages/werkstatt-game/extract.config.yaml` | Created — game plugin extraction config (wave 5) |
+| `packages/werkstatt-video/extract.config.yaml` | Created — video plugin extraction config (wave 5) |
+| `.forge/pinned.yaml` | Modified — add `extract.config.yaml` entries (protect mode) |
+| `docs/technology.xml` | Modified — add publication pipeline technology entry |
+| `docs/authoring/publication-runbook.md` | Created — operator-facing publication runbook |
+| Engine package README | Modified — versioning policy + runbook reference |
+| Root `AGENTS.md` | Modified — agent publication rules (agents MUST NOT trigger npm publish) |
+
 ### Extraction configs
 
-Each published package: `packages/<name>/extract.config.yaml` with `standalone: true`, `stripScopes: ["@warpgogol/"]`, `preservePackages` for the package itself plus its published `@warpgogol/*` dependencies (engine for plugins), `ignoreDirs`, secret scanning enabled, `git.remote` pointing to a private repo, `autoPush: true`.
+Each published package: `packages/<name>/extract.config.yaml` with `standalone: true`, `stripScopes: ["@warpgogol/"]`, `preservePackages` for the package itself plus its published `@warpgogol/*` dependencies (engine for plugins), `ignoreDirs`, secret scanning enabled, `git.remote` pointing to a private repo, `autoPush: true`. All extraction configs MUST include `excludePathSegments: [".npmrc"]` to prevent npm tokens from being extracted or committed (following the forge precedent at `packages/forge/extract.config.yaml`).
 
 ### Private access
 
 - Packages carry `"private": false` with `"publishConfig": { "access": "restricted" }`.
 - Consumer workshops need an `.npmrc` with an npm token that has read access to the `@warpgogol` scope; documented in the runbook and in RFC-0779 scaffolding.
+- **Token management:** the npm token lives in `.npmrc` inside the extraction folder only. It is never committed to git (excluded via `excludePathSegments` in `extract.config.yaml`). Token rotation is operator-triggered; the old token is revoked in the npm dashboard before the new one is written. The runbook documents the token scope (`read` for consumers, `publish` for the operator).
 
 ### Verification gate (runbook, operator-triggered)
 
 1. `repo-extract --config packages/<name>/extract.config.yaml --dry-run` — plan review.
 2. Real extraction to the external folder.
 3. In the extraction folder: `pnpm install && pnpm build && pnpm test`.
-4. `npm pack` → install the tarball into a scratch project → run the `werkstatt` CLI smoke command (`werkstatt --version`, `werkstatt run werkstatt.plugin.validate` in a fixture workshop).
+4. `npm pack` → install the tarball into a **fixture workshop** (a minimal workshop with `forge.yaml`, `tools/kernel.config.ts`, empty `systems/` and `missions/` directories, maintained in the engine package test fixtures) → run the `werkstatt` CLI smoke command (`werkstatt --version`, `werkstatt run werkstatt.plugin.validate`).
 5. `npm publish` (restricted) from the extraction folder.
+
+### Rollback
+
+If `npm publish` succeeds but the published package is broken: `npm deprecate <pkg>@<version> "<reason>"` marks the version as broken, and a fix-forward patch version is published immediately. `npm unpublish` is available within 72h for new packages but is not the primary path — the ecosystem is forward-only. The runbook documents both options.
 
 ### Failure modes
 
-- Secret scan hit → abort publication; fix in monorepo, re-extract.
-- Tarball smoke test failure → abort; the monorepo dogfooding gap that allowed it must be closed (add the missing check to `packages.check`).
+- Secret scan hit → abort publication (non-zero exit from the publication script); fix in monorepo, re-extract.
+- Tarball smoke test failure → abort (non-zero exit from the smoke test step); the monorepo dogfooding gap that allowed it must be closed (add the missing check to `packages.check`).
+- `npm publish` network failure → retry; npm registry is eventually consistent, a failed publish may leave the package in a pending state. Check `npm view <pkg>@<version>` before retrying.
 
 ## Rollout
 
 - First publication happens after RFC-0772 (engine) and again after RFC-0774/0775 (site plugin).
-- The runbook lives in the engine package README (extracted with it) and in `docs/authoring/`.
+- The runbook lives in the engine package README (extracted with it) and in `docs/authoring/publication-runbook.md`.
 - Game/video plugins reuse the identical config shape when they land.
+- **Compass sync:** `docs/technology.xml` gains an entry for the repo-extract-based private npm publication model.
+- **AGENTS.md update:** root `AGENTS.md` gains a rule: "Agents MUST NOT trigger `npm publish` without an explicit operator command. Publication is operator-triggered, never automated."
 
 ## Alternatives considered
 
@@ -136,11 +166,20 @@ Each published package: `packages/<name>/extract.config.yaml` with `standalone: 
 
 ## Acceptance criteria
 
-- [ ] `extract.config.yaml` exists for `packages/werkstatt` (and plugin packages as they land)
-- [ ] Versioning policy (independent SemVer + engine peerDependency ranges) documented in engine README
-- [ ] Publication runbook written and verified end-to-end once (dry-run → extract → build → pack → scratch install → publish)
-- [ ] Extraction configs pinned in `.forge/pinned.yaml`
+**Agent-executable:**
+
+- [ ] `extract.config.yaml` exists for `packages/werkstatt` (and plugin packages as they land) with `excludePathSegments: [".npmrc"]`
+- [ ] Versioning policy (independent SemVer + engine peerDependency ranges + breaking-major-all-plugins-republished rule) documented in engine README
+- [ ] Publication runbook written at `docs/authoring/publication-runbook.md` (dry-run → extract → build → pack → fixture install → publish)
+- [ ] Fixture workshop created in engine package test fixtures
+- [ ] Extraction configs pinned in `.forge/pinned.yaml` (protect mode)
+- [ ] `docs/technology.xml` updated with publication pipeline entry
+- [ ] Root `AGENTS.md` updated with agent publication rule
 - [ ] `rfc.validate` passes on this file before merging
+
+**Operator-executable (requires npm token, registry access):**
+
+- [ ] Publication runbook verified end-to-end once (dry-run → extract → build → pack → fixture install → `npm publish`)
 
 ## Implementation notes for agents
 
