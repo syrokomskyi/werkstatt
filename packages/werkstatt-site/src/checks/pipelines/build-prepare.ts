@@ -20,6 +20,7 @@
   <item>RFC-0721: added behavior.snapshot.staleness.check to both SITES_BUILD_PREPARE_PIPELINE and SITES_BUILD_PREPARE_DEV_PIPELINE.</item>
   <item>RFC-0741: added rate-snapshot.resolve, currency-pricing.compile, derived-prices.materialize after entitlements.resolve in both pipelines.</item>
   <item>RFC-0786: added agent.dns-aid.generate after agent.manifest.generate in SITES_BUILD_PREPARE_PIPELINE only.</item>
+  <item>RFC-0787: removed agent.api-catalog.generate and agent.mcp-card.generate from SITES_BUILD_PREPARE_DEV_PIPELINE (public/ producers not needed for dev).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -194,8 +195,8 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.knowledge.generate" },
   { command: "agent.manifest.generate" },
   { command: "agent.openapi.generate" },
-  { command: "agent.api-catalog.generate" },
-  { command: "agent.mcp-card.generate" },
+  // RFC-0787: agent.api-catalog.generate and agent.mcp-card.generate excluded from dev pipeline
+  // (they produce public/.well-known/ artifacts not needed for astro dev).
   { command: "agent.routes.generate" },
   { command: "agent.surface.sign" },
   { command: "styles.global.generate" },
