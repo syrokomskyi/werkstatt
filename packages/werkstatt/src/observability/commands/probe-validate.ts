@@ -17,7 +17,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { parse as yamlParse } from "yaml";
 import { readAstroSiteUrl } from "@warpgogol/site-kernel-checks/lib/astro-site-url";

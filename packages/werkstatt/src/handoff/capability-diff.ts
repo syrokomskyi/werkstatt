@@ -11,9 +11,9 @@ uni.registry, classifying each into a green / yellow / red catch-up tier.</purpo
 </CHANGE_SUMMARY>
 */
 
-import type { HandoffCapability } from "@warpgogol/ontology/operations";
+import type { HandoffCapability } from "@warpgogol/werkstatt/schemas";
 import type { CapabilityDiffItem, CatchupTier, RegistryView } from "./types.ts";
-import type { Migrator } from "./migrators/types.ts";
+import type { Migrator } from "../migrators/types.ts";
 
 const TIER_RANK: Record<CatchupTier, number> = { green: 0, yellow: 1, red: 2 };
 

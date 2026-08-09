@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 // @ai-invariant STANDARD_INTEGRITY_PIPELINE is the single authoritative ordered sequence for
 // integrity release operations. Apps spread this constant into their pipelines to get

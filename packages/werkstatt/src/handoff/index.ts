@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@warpgogol/site-kernel";
+import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 import { runHandoffAbsorb } from "./handoff-absorb.ts";
 import { runHandoffPack } from "./handoff-pack.ts";
 import { runHandoffValidate } from "./handoff-validate.ts";
@@ -41,14 +41,14 @@ export {
   migratorsToApply,
   numericRfcId,
   allMigratorIds,
-} from "./migrators/registry.ts";
+} from "../migrators/registry.ts";
 export type {
   Migrator as NewMigrator,
   SternsystemData,
   MigrationContext,
   MigrationViolation,
-} from "./migrators/types.ts";
-export { MigrationError } from "./migrators/types.ts";
+} from "../migrators/types.ts";
+export { MigrationError } from "../migrators/types.ts";
 export {
   compareSemver,
   eqSemver,
@@ -88,7 +88,7 @@ export {
   type SternsystemListData,
   type SternsystemValidateData,
   type SternsystemPinData,
-} from "./sternsystem/index.ts";
+} from "../sternsystem/index.ts";
 
 // createWerkstattModule migrated to @warpgogol/forge — see packages/forge/os/werkstatt/
 export {
@@ -110,34 +110,34 @@ export {
   atomicWriteFile,
   atomicMoveDir,
   resolveStagingDir,
-} from "./werkstatt/index.ts";
+} from "../werkstatt/index.ts";
 
-export { createMissionModule } from "./mission/index.ts";
+export { createMissionModule } from "../mission/index.ts";
 export {
   runWorkpieceRead,
   runWorkpieceWrite,
   isClientEditable,
   type WorkpieceReadResult,
   type WorkpieceWriteResult,
-} from "./workpiece/index.ts";
-export { createBordbuchModule } from "./bordbuch/index.ts";
-export { createNachweisModule } from "./nachweis/index.ts";
+} from "../workpiece/index.ts";
+export { createBordbuchModule } from "../bordbuch/index.ts";
+export { createNachweisModule } from "../nachweis/index.ts";
 export {
   appendBordbuchEntry,
   readBordbuch,
   runBordbuchGenerate,
   runBordbuchStatus,
   type BordbuchViolation,
-} from "./bordbuch/index.ts";
-export { createArtifactStoreModule } from "./artifact-store/index.ts";
-export { createBehaviorSnapshotModule } from "./behavior-snapshot/index.ts";
-export { createReleaseModule } from "./release/index.ts";
-export { createLeitstandModule } from "./leitstand/index.ts";
-export { createSubdomainModule } from "./subdomain/index.ts";
-export { createDnsModule } from "./dns/index.ts";
-export { createNotausgangModule } from "./notausgang/index.ts";
-export { createDeployModule } from "./deploy/index.ts";
-export { createEvidenceModule } from "./evidence/index.ts";
+} from "../bordbuch/index.ts";
+export { createArtifactStoreModule } from "../artifact-store/index.ts";
+export { createBehaviorSnapshotModule } from "../behavior-snapshot/index.ts";
+export { createReleaseModule } from "../release/index.ts";
+export { createLeitstandModule } from "../leitstand/index.ts";
+export { createSubdomainModule } from "../subdomain/index.ts";
+export { createDnsModule } from "../dns/index.ts";
+export { createNotausgangModule } from "../notausgang/index.ts";
+export { createDeployModule } from "../deploy/index.ts";
+export { createEvidenceModule } from "../evidence/index.ts";
 export { createPlatformModule } from "./platform-module.ts";
 export {
   runPlatformConsistencyValidate,

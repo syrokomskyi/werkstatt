@@ -17,7 +17,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   buildLatestDir,
   compareManifestWithLocalArtifacts,
@@ -36,7 +36,7 @@ import {
   signLatestBuildArtifacts,
   verifyManifestSignature,
   writeText,
-} from "@warpgogol/site-kernel-integrity";
+} from "@warpgogol/werkstatt/integrity";
 
 function requireApp(context: KernelRuntimeContext) {
   if (!context.site) {

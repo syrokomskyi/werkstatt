@@ -19,7 +19,7 @@
  */
 
 import path from "node:path";
-import { byteHashFile } from "@warpgogol/fingerprint";
+import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { discoverManagedFiles, groupFilesByDirectory } from "./discover.ts";
 import { getFileHistory, getFileRevisionFromHistory } from "./git.ts";
 import { writeJsonFile } from "./json.ts";

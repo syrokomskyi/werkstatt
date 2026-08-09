@@ -23,7 +23,7 @@ import {
   verify as cryptoVerify,
 } from "node:crypto";
 import path from "node:path";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import { ensureDir, pathExists, readBuffer, readText, writeText } from "./fs.ts";
 import { readJsonFile, stableStringify } from "./json.ts";
 import {

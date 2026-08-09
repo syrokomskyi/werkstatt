@@ -15,7 +15,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { createMetricsPusher, METRIC_REFS } from "@warpgogol/observability";
 

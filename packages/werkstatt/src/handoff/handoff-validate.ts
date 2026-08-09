@@ -15,7 +15,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { hashFile, readLock, readManifest } from "./bundle-io.ts";
 
 export interface HandoffValidateData {

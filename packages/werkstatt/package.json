@@ -26,6 +26,10 @@
       "types": "./os/werkstatt-plugin.module.ts",
       "default": "./os/werkstatt-plugin.module.ts"
     },
+    "./os/werkstatt-autonomy-module": {
+      "types": "./os/werkstatt-autonomy.module.ts",
+      "default": "./os/werkstatt-autonomy.module.ts"
+    },
     "./package.json": "./package.json",
     "./kernel": {
       "types": "./src/kernel/index.ts",

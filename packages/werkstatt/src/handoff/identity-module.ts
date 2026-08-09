@@ -13,20 +13,20 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@warpgogol/site-kernel";
+import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 
 export function createIdentityModule(): KernelModule {
   return {
     name: "identity",
     version: "0.1.0",
     async register(registry) {
-      const { runIdentityBootstrap } = await import("./identity/identity-bootstrap.ts");
+      const { runIdentityBootstrap } = await import("../identity/identity-bootstrap.ts");
       const { runIdentityCredentialIssue } =
-        await import("./identity/identity-credential-issue.ts");
+        await import("../identity/identity-credential-issue.ts");
       const { runIdentityCredentialVerify } =
-        await import("./identity/identity-credential-verify.ts");
+        await import("../identity/identity-credential-verify.ts");
       const { runIdentityCredentialRevoke } =
-        await import("./identity/identity-credential-revoke.ts");
+        await import("../identity/identity-credential-revoke.ts");
 
       registry.registerCommand({
         name: "identity.bootstrap",

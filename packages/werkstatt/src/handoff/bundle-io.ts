@@ -21,9 +21,9 @@ import {
   handoffManifestSchema,
   type HandoffLock,
   type HandoffManifest,
-} from "@warpgogol/ontology/operations";
-import { byteHash } from "@warpgogol/fingerprint";
-import { resolvePlatformSemanticHash } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/schemas";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import { resolvePlatformSemanticHash } from "@warpgogol/werkstatt/kernel";
 import type { RegistryView } from "./types.ts";
 import type { ValidationPack } from "./validation-pack.ts";
 

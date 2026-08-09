@@ -17,7 +17,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { WARPGOGOL_METRIC_REGISTRY } from "@warpgogol/observability";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";

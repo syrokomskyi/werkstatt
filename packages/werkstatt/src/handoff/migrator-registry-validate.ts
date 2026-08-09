@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { migratorRegistry, numericRfcId, allMigratorIds } from "./migrators/registry.ts";
+} from "@warpgogol/werkstatt/kernel";
+import { migratorRegistry, numericRfcId, allMigratorIds } from "../migrators/registry.ts";
 
 export interface MigratorRegistryValidateData {
   migratorCount: number;

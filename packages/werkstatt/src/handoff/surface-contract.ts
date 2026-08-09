@@ -20,9 +20,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { urlSchema, jsonldTypes, sitemapShape } from "@warpgogol/ontology/external-surfaces";
-import { resolveCachePath } from "./sternsystem/registry-io.ts";
+import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
 export interface SurfaceContractValidateData {
   systemId: string | null;

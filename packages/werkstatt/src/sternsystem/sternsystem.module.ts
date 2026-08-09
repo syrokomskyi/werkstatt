@@ -12,7 +12,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@warpgogol/site-kernel";
+import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 
 export function createSternsystemModule(): KernelModule {
   return {
@@ -26,7 +26,7 @@ export function createSternsystemModule(): KernelModule {
       const { runSternsystemExtract } = await import("./sternsystem-extract.ts");
       const { runSternsystemSync } = await import("./sternsystem-sync.ts");
       const { runSternsystemStatus } = await import("./sternsystem-status.ts");
-      const { runSurfaceContractValidate } = await import("../surface-contract.ts");
+      const { runSurfaceContractValidate } = await import("../handoff/surface-contract.ts");
       registry.registerCommand({
         name: "sternsystem.register",
         description:
