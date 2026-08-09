@@ -170,6 +170,10 @@ export async function runPublicSurfaceLint(
     }
   }
   routePaths.add("/.well-known/agent.json");
+  // RFC-0789: agent discovery surface files linked from llms.txt.
+  routePaths.add("/.well-known/api-catalog");
+  routePaths.add("/.well-known/mcp/server-card.json");
+  routePaths.add("/.well-known/agent.openapi.json");
   // Also include PSEO surface routes from surface.generated.yaml so that
   // llms.txt links to programmatic surface pages are recognized as locally known.
   try {
