@@ -237,11 +237,11 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "agent.dns-aid.generate",
     description:
-      "Generate the DNS-AID TXT record declaration in systems/<id>/dns-records.yaml from the Agent Surface Manifest (RFC-0786).",
+      "Generate the DNS-AID TXT record declaration in systems-cache/<id>/dns-records.yaml from the Agent Surface Manifest (RFC-0786).",
     scope: "app",
     supportsAllSites: true,
     mutatesState: true,
-    writes: ["systems/<id>/dns-records.yaml"],
+    writes: ["systems-cache/<id>/dns-records.yaml"],
     flags: {},
     reads: ["<app>/src/agent-surface.generated.yaml", "<app>/src/content/system.md"],
     modulePaths: ["agent/agent-dns-aid.ts"],
@@ -255,7 +255,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: [
-      "systems/<id>/dns-records.yaml",
+      "systems-cache/<id>/dns-records.yaml",
       "<app>/src/agent-surface.generated.yaml",
       "<app>/src/content/system.md",
     ],

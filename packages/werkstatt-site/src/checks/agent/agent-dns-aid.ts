@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0786: agent.dns-aid.generate writes the DNS-AID TXT record declaration
-to systems/<id>/dns-records.yaml in a marked section (# BEGIN dns-aid / # END dns-aid).
+to systems-cache/<id>/dns-records.yaml in a marked section (# BEGIN dns-aid / # END dns-aid).
 agent.dns-aid.validate verifies the declared record matches the agent surface
 manifest and checks Cloudflare for presence (AGD-01..04).
 </purpose>
@@ -17,7 +17,6 @@ manifest and checks Cloudflare for presence (AGD-01..04).
 */
 
 import { join } from "node:path";
-import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
   Diagnostic,
@@ -25,6 +24,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
+import { resolveCacheClonePath, readSystemConfig } from "@warpgogol/werkstatt/sternsystem";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { buildDnsAidRecord, type DnsAidRecord } from "@warpgogol/werkstatt-site/share/agent";
@@ -51,7 +51,7 @@ function resolveDnsRecordsPath(context: KernelRuntimeContext): string {
   if (!systemId) {
     throw new Error("agent.dns-aid: requires a site-scoped runtime context.");
   }
-  return join(context.workspaceRoot, "systems", systemId, DNS_RECORDS_FILE);
+  return join(resolveCacheClonePath(context.workspaceRoot, systemId), DNS_RECORDS_FILE);
 }
 
 // ---------------------------------------------------------------------------
@@ -333,7 +333,7 @@ export async function runAgentDnsAidValidate(
         diagnostics.push({
           ruleId: "AGD-03",
           severity: "error",
-          file: `systems/${context.site?.name}/${DNS_RECORDS_FILE}`,
+          file: `systems-cache/${context.site?.name}/${DNS_RECORDS_FILE}`,
           message: "agent.enabled is false but DNS-AID section still exists in dns-records.yaml.",
           fixHint: "Rerun agent.dns-aid.generate to remove the stale section.",
         });
@@ -355,7 +355,7 @@ export async function runAgentDnsAidValidate(
     diagnostics.push({
       ruleId: "AGD-01",
       severity: "error",
-      file: `systems/${context.site?.name}/${DNS_RECORDS_FILE}`,
+      file: `systems-cache/${context.site?.name}/${DNS_RECORDS_FILE}`,
       message: "dns-records.yaml does not exist. DNS-AID record is missing.",
       fixHint: "Run agent.dns-aid.generate to create the file with the DNS-AID record.",
     });
@@ -370,7 +370,7 @@ export async function runAgentDnsAidValidate(
     diagnostics.push({
       ruleId: "AGD-01",
       severity: "error",
-      file: `systems/${context.site?.name}/${DNS_RECORDS_FILE}`,
+      file: `systems-cache/${context.site?.name}/${DNS_RECORDS_FILE}`,
       message: "DNS-AID record missing from dns-records.yaml (no marked section found).",
       fixHint: "Run agent.dns-aid.generate to add the DNS-AID record.",
     });
@@ -422,20 +422,11 @@ async function checkCloudflarePresence(
   const systemId = context.site?.name;
   if (!systemId) return;
 
-  // Read registry to resolve zone ID
-  const registryPath = join(context.workspaceRoot, "systems", "registry.yaml");
+  // Read system-config.yaml to resolve zone ID
   let zoneId: string | undefined;
   try {
-    const registryRaw = await context.io.readFile(registryPath);
-    const registry = yamlParse(registryRaw) as {
-      systems?: Array<{
-        id: string;
-        cloudflareZoneId?: string;
-        deployment?: { channels?: { main?: { url: string } } };
-      }>;
-    };
-    const system = registry.systems?.find((s) => s.id === systemId);
-    zoneId = system?.cloudflareZoneId;
+    const config = await readSystemConfig(context.workspaceRoot, systemId);
+    zoneId = config.cloudflareZoneId;
   } catch {
     return;
   }

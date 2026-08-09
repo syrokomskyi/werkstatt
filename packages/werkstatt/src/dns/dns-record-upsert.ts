@@ -68,7 +68,7 @@ export async function runDnsRecordUpsert(
   if (!declaration) {
     throw new Error(
       `[dns.record.upsert] No dns-records.yaml found for system '${systemId}'. ` +
-        `Create systems/${systemId}/dns-records.yaml first.`,
+        `Create systems-cache/${systemId}/dns-records.yaml first.`,
     );
   }
 

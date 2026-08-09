@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-RFC-0753: Zod schema for DNS record declaration files (systems/<id>/dns-records.yaml).
+RFC-0753: Zod schema for DNS record declaration files (systems-cache/<id>/dns-records.yaml).
 Defines the canonical structure for version-controlled DNS record declarations
 that are synced to Cloudflare via the dns.record.* command family.
 </purpose>
