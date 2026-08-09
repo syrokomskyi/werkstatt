@@ -41,3 +41,62 @@ describe("parseUrl trailing-slash normalization (RFC-0576)", () => {
     expect(normalizeTrailingSlash("/de")).toBe("/de");
   });
 });
+
+// extractBlockAnchorIds is not exported — we test it by replicating the logic.
+// The function scans page frontmatter blocks[] and collects props.anchorId values.
+// These are the section-level anchor targets that SectionShell renders as HTML id attributes.
+
+describe("extractBlockAnchorIds logic", () => {
+  function extractBlockAnchorIds(frontmatter: Record<string, unknown>): string[] {
+    const ids: string[] = [];
+    const blocks = frontmatter.blocks;
+    if (!Array.isArray(blocks)) return ids;
+
+    for (const block of blocks) {
+      if (!block || typeof block !== "object") continue;
+      const b = block as Record<string, unknown>;
+      if (typeof b.props === "object" && b.props !== null) {
+        const props = b.props as Record<string, unknown>;
+        if (typeof props.anchorId === "string") {
+          ids.push(props.anchorId);
+        }
+      }
+    }
+    return ids;
+  }
+
+  it("collects anchorId from block props", () => {
+    const frontmatter = {
+      blocks: [
+        { id: "hero", type: "hero-decision-card", props: {} },
+        { id: "form", type: "send-message", props: { anchorId: "recommendation-form" } },
+        { id: "faq", type: "faq-list", props: { anchorId: "faq" } },
+      ],
+    };
+    expect(extractBlockAnchorIds(frontmatter)).toEqual(["recommendation-form", "faq"]);
+  });
+
+  it("returns empty array when no blocks have anchorId", () => {
+    const frontmatter = {
+      blocks: [
+        { id: "hero", type: "hero-decision-card", props: {} },
+        { id: "how-it-works", type: "markdown", props: { heading: "How it works" } },
+      ],
+    };
+    expect(extractBlockAnchorIds(frontmatter)).toEqual([]);
+  });
+
+  it("returns empty array when blocks is missing", () => {
+    expect(extractBlockAnchorIds({})).toEqual([]);
+  });
+
+  it("handles blocks without props", () => {
+    const frontmatter = {
+      blocks: [
+        { id: "hero", type: "hero" },
+        { id: "form", props: { anchorId: "form" } },
+      ],
+    };
+    expect(extractBlockAnchorIds(frontmatter)).toEqual(["form"]);
+  });
+});

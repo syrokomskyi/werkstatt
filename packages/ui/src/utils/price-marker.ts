@@ -10,6 +10,7 @@ import {
   type SourcePriceProp,
 } from "../sections/price-card/price-variants.ts";
 import { OFFERING_URI_PREFIX, PRICE_MARKER_RE, AMOUNT_MARKER_RE } from "@warpgogol/share/semantic";
+import { decimalMultiply, decimalRound, type PbpRoundingMode } from "@warpgogol/pbp";
 
 export type TextPart = { kind: "text"; value: string };
 export type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
@@ -87,10 +88,23 @@ export function renderAmountDisplayHtml(
       if (seenCurrencies.has(targetCurrency)) continue;
       seenCurrencies.add(targetCurrency);
 
-      const rate = Number(entry.trace.rate.value);
-      if (!Number.isFinite(rate)) continue;
+      const rateStr = entry.trace.rate.value;
+      const rateNum = Number(rateStr);
+      if (!Number.isFinite(rateNum)) continue;
 
-      const numericAmount = Number(amountEur) * rate;
+      const converted = decimalMultiply(amountEur, rateStr);
+      const rounding = entry.trace.calculation?.rounding;
+      const rounded = rounding
+        ? decimalRound(
+            converted,
+            rounding.mode as PbpRoundingMode,
+            rounding.increment,
+            rounding.decimalPlaces,
+          )
+        : converted;
+      const numericAmount = Number(rounded);
+      if (!Number.isFinite(numericAmount)) continue;
+
       const formatted = new Intl.NumberFormat(lang, {
         style: "currency",
         currency: targetCurrency,

@@ -28,6 +28,7 @@ import {
   getSiteLabelsData,
   materialCreditLabelsSchema,
   readCreditsSiteDefault,
+  resolveSectionAnchor,
 } from "@warpgogol/share";
 import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
@@ -40,7 +41,7 @@ interface MarkdownPageOverride {
   eyebrow?: string;
   lead?: string;
   body?: string;
-  /** RFC-0102: hide the section-number prefix on <SectionHeader>. Default true for prose pages. */
+  /** RFC-0102: hide the section-number prefix on <SectionHeader>. Default false — set true for single-block prose pages. */
   hideSectionNumber?: boolean;
   variant?: "default" | "open-source";
   pageId?: string;
@@ -73,12 +74,13 @@ interface MarkdownPageOverride {
 }
 
 const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, undefined);
 const {
   heading,
   eyebrow,
   lead,
   body,
-  hideSectionNumber = true,
+  hideSectionNumber = false,
   variant = "default",
   pageId,
   languages = [],
@@ -175,6 +177,7 @@ const shouldShowLanguageLabels = showLanguageColumns && showLanguageLabels;
 
 <SectionShell
   slug="markdown"
+  sectionId={sectionId}
   sectionNumber={sectionNumber}
   ariaLabelledBy={heading ? "markdown-section-title" : undefined}
   background={background ?? { kind: "color" }}

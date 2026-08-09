@@ -24,6 +24,7 @@ import {
   type SourcePriceProp,
   type PriceVariant,
 } from "../price-card/price-variants.ts";
+import { decimalMultiply, decimalRound, type PbpRoundingMode } from "@warpgogol/pbp";
 import type { FaqListSectionContent } from "./faq-list-section.types.generated.ts";
 import type { FaqListItem } from "./faq-list-section.types.ts";
 import "./faq-list-section.css";
@@ -62,9 +63,21 @@ function buildAmountVariants(amountEur: string): PriceVariant[] | null {
       const targetCurrency = entry.amount.currency;
       if (seenCurrencies.has(targetCurrency)) continue;
       seenCurrencies.add(targetCurrency);
-      const rate = Number(entry.trace.rate.value);
-      if (!Number.isFinite(rate)) continue;
-      const numericAmount = Number(amountEur) * rate;
+      const rateStr = entry.trace.rate.value;
+      const rateNum = Number(rateStr);
+      if (!Number.isFinite(rateNum)) continue;
+      const converted = decimalMultiply(amountEur, rateStr);
+      const rounding = entry.trace.calculation?.rounding;
+      const rounded = rounding
+        ? decimalRound(
+            converted,
+            rounding.mode as PbpRoundingMode,
+            rounding.increment,
+            rounding.decimalPlaces,
+          )
+        : converted;
+      const numericAmount = Number(rounded);
+      if (!Number.isFinite(numericAmount)) continue;
       const formatted = new Intl.NumberFormat(lang, {
         style: "currency",
         currency: targetCurrency,

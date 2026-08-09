@@ -17,6 +17,13 @@
   <item>Initial creation per RFC-0101 step 1 — additive landing of the framework primitive.</item>
   <item>RFC-0134 routes section-level effects through the shared EffectHost primitive.</item>
 </CHANGE_SUMMARY>
+
+@ai-invariant: The section element's `id` attribute MUST be the bare `sectionId` string
+WITHOUT any `sectionNumber` prefix. This id is the anchor target for CTA `#anchor` links.
+Prefixing it with `sectionNumber` (e.g. `01-recommendation-form`) breaks all anchor navigation
+because CTA hrefs use the bare anchorId (`#recommendation-form`). This bug was introduced and
+fixed twice (m000027 commit ca0e592e, m000040) — do NOT re-introduce the prefix.
+The `sectionNumber` prefix is ONLY used for `aria-labelledby` (heading id uniqueness).
 */
 
 import { resolveEffectsForTarget, resolveImage, type SectionShellProps } from "@warpgogol/share";
@@ -126,7 +133,7 @@ const inlineStyle =
   data-motion-stagger={staggerDelay !== undefined ? "true" : undefined}
   data-motion-stagger-delay={staggerDelay !== undefined ? String(staggerDelay) : undefined}
   data-motion-stagger-child={staggerChild}
-  id={sectionId ? (sectionNumber ? `${sectionNumber}-${sectionId}` : sectionId) : undefined}
+  id={sectionId || undefined}
   aria-label={ariaLabel}
   aria-labelledby={ariaLabelledBy
     ? sectionNumber

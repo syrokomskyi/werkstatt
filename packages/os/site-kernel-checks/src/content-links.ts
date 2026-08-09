@@ -13,6 +13,7 @@
   <item>RFC-0206: Introduce content link and anchor validation.</item>
   <item>RFC-0576: Migrate to diagnosticsResult with registered LINK-01..03 ruleIds, add fixHints, normalize parseUrl trailing slashes.</item>
   <item>RFC-0576 review fix: Rename Violation.rule to Violation.ruleId for consistency.</item>
+  <item>Extend LINK-01 to validate anchor targets against block-level anchorId props (not just system.md registry and prose headings). Catches CTA buttons pointing to #anchor when no block declares anchorId on the page.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -121,6 +122,29 @@ function extractProseRefs(frontmatter: Record<string, unknown>): string[] {
   return refs;
 }
 
+/**
+ * Extract anchorId values from page frontmatter blocks.
+ * These are the section-level anchor targets that SectionShell renders as HTML id attributes.
+ * CTA #anchor links must resolve to one of these, a prose heading, or a system.md registry entry.
+ */
+function extractBlockAnchorIds(frontmatter: Record<string, unknown>): string[] {
+  const ids: string[] = [];
+  const blocks = frontmatter.blocks;
+  if (!Array.isArray(blocks)) return ids;
+
+  for (const block of blocks) {
+    if (!block || typeof block !== "object") continue;
+    const b = block as Record<string, unknown>;
+    if (typeof b.props === "object" && b.props !== null) {
+      const props = b.props as Record<string, unknown>;
+      if (typeof props.anchorId === "string") {
+        ids.push(props.anchorId);
+      }
+    }
+  }
+  return ids;
+}
+
 /** Infer language from relative path like src/content/pages/de/home.md */
 function inferLangFromPath(relativeFile: string, fallback: string): string {
   const match = relativeFile.replace(/\\/g, "/").match(/src\/content\/[a-z-]+\/([a-z]{2})\//);
@@ -211,6 +235,28 @@ export async function runContentLinksValidate(
     }
   }
 
+  // Pre-scan page files to build blockAnchorIdsByPage: pageId -> anchorId[]
+  // This lets cross-page anchor links validate against block-level anchorId props.
+  const blockAnchorIdsByPage = new Map<string, string[]>();
+  const pagesDir = join(contentDir, "pages");
+  let pageFiles: string[] = [];
+  try {
+    pageFiles = await collectMarkdownFilesSafe(pagesDir);
+  } catch {
+    // pages directory may not exist in all workspaces
+  }
+  for (const filePath of pageFiles) {
+    const doc = await readMarkdownDocument(context.workspaceRoot, filePath);
+    const pageId = typeof doc.frontmatter.pageId === "string" ? doc.frontmatter.pageId : null;
+    if (pageId) {
+      const anchorIds = extractBlockAnchorIds(doc.frontmatter);
+      if (anchorIds.length > 0) {
+        const existing = blockAnchorIdsByPage.get(pageId) ?? [];
+        blockAnchorIdsByPage.set(pageId, [...existing, ...anchorIds]);
+      }
+    }
+  }
+
   const directories = [
     join(contentDir, "pages"),
     join(contentDir, "prose"),
@@ -230,11 +276,13 @@ export async function runContentLinksValidate(
     const lang = inferLangFromPath(doc.relativeFile, defaultLanguage);
     const isPageFile = doc.relativeFile.includes("/content/pages/");
 
-    // For page files, extract pageId and prose heading IDs
+    // For page files, extract pageId, prose heading IDs, and block anchorIds
     let filePageId: string | null = null;
     let proseHeadingIds: string[] = [];
+    let blockAnchorIds: string[] = [];
     if (isPageFile) {
       filePageId = typeof doc.frontmatter.pageId === "string" ? doc.frontmatter.pageId : null;
+      blockAnchorIds = extractBlockAnchorIds(doc.frontmatter);
       const proseRefs = extractProseRefs(doc.frontmatter);
       for (const ref of proseRefs) {
         // Resolve prose ref like "prose/donate-contact" to file path
@@ -270,8 +318,10 @@ export async function runContentLinksValidate(
         lang,
         filePageId,
         proseHeadingIds,
+        blockAnchorIds,
         routeMap,
         anchorRegistryByPage,
+        blockAnchorIdsByPage,
         defaultLanguage,
         violations,
       );
@@ -294,8 +344,10 @@ export async function runContentLinksValidate(
         lang,
         filePageId,
         proseHeadingIds,
+        blockAnchorIds,
         routeMap,
         anchorRegistryByPage,
+        blockAnchorIdsByPage,
         defaultLanguage,
         violations,
       );
@@ -321,8 +373,10 @@ function validateUrl(
   lang: string,
   filePageId: string | null,
   proseHeadingIds: string[],
+  blockAnchorIds: string[],
   routeMap: Map<string, RouteEntry>,
   anchorRegistryByPage: Map<string, AnchorRegistry>,
+  blockAnchorIdsByPage: Map<string, string[]>,
   defaultLanguage: string,
   violations: Violation[],
 ): void {
@@ -339,13 +393,26 @@ function validateUrl(
     const resolved = resolveAnchor(anchorId, pageAnchors, lang, defaultLanguage);
     const inProseHeadings = proseHeadingIds.includes(anchorId);
     const inRegistryKeys = pageAnchors ? Object.keys(pageAnchors).includes(anchorId) : false;
-    if (resolved === null && !inProseHeadings && !inRegistryKeys) {
+    const inBlockAnchors = blockAnchorIds.includes(anchorId);
+    if (resolved === null && !inProseHeadings && !inRegistryKeys && !inBlockAnchors) {
       violations.push({
         file: relativeFile,
         line,
         ruleId: "LINK-01",
-        message: `Anchor "${anchor}" not found on page "${filePageId}" for lang "${lang}". Add to system.md anchor registry or prose heading.`,
-        fixHint: `Anchor "${anchor}" not found on page "${filePageId}". Add the anchor to system.md anchors registry for this page, or add a matching heading in the prose file, or fix the anchor text.`,
+        message: `Anchor "${anchor}" not found on page "${filePageId}" for lang "${lang}". Add anchorId to a block on this page, or to system.md anchor registry, or add a matching prose heading.`,
+        fixHint: `Anchor "${anchor}" not found on page "${filePageId}". Add "anchorId: ${anchorId}" to the target block's props on this page, or add the anchor to system.md anchors registry, or add a matching heading in the prose file, or fix the anchor text.`,
+      });
+    }
+    // LINK-04: anchor is in system.md registry but not rendered by any block or prose heading.
+    // The registry declares intent but without a block anchorId or prose heading,
+    // no HTML id is rendered and the anchor link will be broken.
+    if ((resolved !== null || inRegistryKeys) && !inBlockAnchors && !inProseHeadings) {
+      violations.push({
+        file: relativeFile,
+        line,
+        ruleId: "LINK-04",
+        message: `Anchor "${anchor}" is declared in system.md registry for page "${filePageId}" but no block on this page renders it. Add "anchorId: ${anchorId}" to the target block's props.`,
+        fixHint: `Anchor "${anchor}" is in the system.md anchor registry but no block renders HTML id="${anchorId}". Add "anchorId: ${anchorId}" to the target block's props on this page, or remove the anchor from the registry if it is unused.`,
       });
     }
     return;
@@ -405,19 +472,30 @@ function validateUrl(
     if (anchor) {
       const anchorId = anchor.slice(1);
       const targetPageAnchors = anchorRegistryByPage.get(routeEntry.pageId);
+      const targetBlockAnchorIds = blockAnchorIdsByPage.get(routeEntry.pageId);
+      const inBlockAnchors = targetBlockAnchorIds?.includes(anchorId) ?? false;
       if (targetPageAnchors) {
         const langMap = targetPageAnchors[anchorId];
-        if (!langMap) {
+        if (!langMap && !inBlockAnchors) {
           violations.push({
             file: relativeFile,
             line,
             ruleId: "LINK-01",
             message: `Anchor "${anchor}" not found on target page "${routeEntry.pageId}"`,
-            fixHint: `Anchor "${anchor}" not found on page "${routeEntry.pageId}". Add the anchor to system.md anchors registry for this page, or add a matching heading in the prose file, or fix the anchor text.`,
+            fixHint: `Anchor "${anchor}" not found on page "${routeEntry.pageId}". Add "anchorId: ${anchorId}" to a block on that page, or add the anchor to system.md anchors registry, or add a matching heading in the prose file, or fix the anchor text.`,
           });
         }
+      } else if (!inBlockAnchors) {
+        // No anchor registry for target page, but block anchorIds may still match
+        // If neither source has the anchor, report it
+        violations.push({
+          file: relativeFile,
+          line,
+          ruleId: "LINK-01",
+          message: `Anchor "${anchor}" not found on target page "${routeEntry.pageId}"`,
+          fixHint: `Anchor "${anchor}" not found on page "${routeEntry.pageId}". Add "anchorId: ${anchorId}" to a block on that page, or add the anchor to system.md anchors registry, or fix the anchor text.`,
+        });
       }
-      // If no anchor registry for target page, we can't validate — skip silently
     }
   }
 }

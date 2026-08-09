@@ -26,6 +26,7 @@ import type { PbpEntityRef } from "../entity-ref.js";
 import type { PbpDerivationContract } from "../derivation.js";
 import { computeCurrencyConversion } from "../derivations/currency-conversion.js";
 import type { PbpCurrencyConversionResult } from "../derivations/currency-conversion.js";
+import type { PbpPriceDerivationPipeline } from "../derivations/currency-conversion.js";
 import Big from "big.js";
 
 /**
@@ -126,8 +127,14 @@ function buildConversionContract(
   sourceAmount: string,
   sourceCurrency: string,
   targetCurrency: string,
+  pipelineOverride?: Partial<PbpPriceDerivationPipeline>,
 ): PbpDerivationContract {
-  const pipeline = buildDefaultPipeline(sourceAmount, sourceCurrency, targetCurrency);
+  const defaultPipeline = buildDefaultPipeline(sourceAmount, sourceCurrency, targetCurrency);
+  const pipeline = {
+    ...defaultPipeline,
+    ...pipelineOverride,
+    conversion: { sourceAmount, sourceCurrency, targetCurrency },
+  } as PbpPriceDerivationPipeline;
   return {
     derivationRef: "currency-conversion",
     contractVersion: "1",
@@ -255,6 +262,7 @@ export function materializeDerivedPrices(
             sourceAmount,
             sourceCurrency,
             targetCurrency,
+            target.pipelineOverride,
           );
 
           const result: PbpCurrencyConversionResult = computeCurrencyConversion(

@@ -24,6 +24,14 @@ export interface DerivedPriceEntry {
   trace: {
     source: { amount: string; currency: string };
     rate: { value: string; pair: string };
+    calculation?: {
+      rounding?: {
+        mode: string;
+        increment?: string;
+        decimalPlaces?: number;
+        output: string;
+      };
+    };
   };
 }
 

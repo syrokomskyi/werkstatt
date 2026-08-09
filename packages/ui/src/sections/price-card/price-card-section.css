@@ -22,6 +22,10 @@
     border: 1px solid var(--ds-color-card-border);
     border-radius: var(--ds-radius-2);
     box-shadow: var(--ds-shadow-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--ds-space-5);
   }
   .effect-host--glass.price-card__panel-surface {
     background: transparent;
@@ -32,7 +36,7 @@
       var(--ds-shadow-glass);
   }
   .price-card__prices {
-    margin: 0 0 var(--ds-space-5);
+    margin: 0;
     display: grid;
     grid-template-columns: auto 1fr;
     gap: var(--ds-space-3);
@@ -54,14 +58,14 @@
   }
   .price-card__includes h3 {
     font-family: var(--ds-font-heading);
-    margin: 0 0 var(--ds-space-3);
+    margin: 0;
     font-size: var(--ds-text-sm);
     color: var(--ds-color-text-muted);
     text-transform: uppercase;
     letter-spacing: var(--ds-tracking-md);
   }
   .price-card__includes ul {
-    margin: 0;
+    margin: var(--ds-space-3) 0 0;
     padding: 0;
     list-style: none;
     display: grid;

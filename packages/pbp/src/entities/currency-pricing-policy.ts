@@ -7,6 +7,7 @@
 import type { PbpEntity } from "../envelope.js";
 import type { PbpEntityRef } from "../entity-ref.js";
 import { pbpSchemaId } from "../schema-id.js";
+import type { PbpPriceDerivationPipeline } from "../derivations/currency-conversion.js";
 
 export type PbpCurrencyStrategy = "derived" | "fixed";
 
@@ -33,6 +34,7 @@ export interface PbpCurrencyTarget {
   strategy: PbpCurrencyStrategy;
   derivationContractRef?: PbpEntityRef;
   ratePolicyRef?: PbpEntityRef;
+  pipelineOverride?: Partial<PbpPriceDerivationPipeline>;
   currentUses: PbpCurrentUses;
 }
 

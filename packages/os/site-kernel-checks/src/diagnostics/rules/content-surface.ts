@@ -511,6 +511,11 @@ export const CONTENT_SURFACE_RULES: Record<string, RuleDescriptor> = {
     "Internal path does not resolve to a known route",
     "content.links.validate",
   ),
+  "LINK-04": rule(
+    "LINK-04",
+    "Anchor declared in system.md registry but not rendered by any block or prose heading",
+    "content.links.validate",
+  ),
 
   // mirroring.validate (RFC-0576) — language mirroring enforcement (DNA-11).
   "MIRROR-MISSING": rule(

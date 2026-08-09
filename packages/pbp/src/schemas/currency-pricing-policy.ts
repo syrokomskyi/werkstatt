@@ -23,11 +23,22 @@ export const pbpCurrentUsesSchema = z.object({
 
 export const pbpCurrencyStrategySchema = z.enum(["derived", "fixed"]);
 
+export const pbpRoundingOverrideSchema = z.object({
+  mode: z.enum(["ceiling", "floor", "half-up", "half-even"]),
+  increment: z.string().optional(),
+  decimalPlaces: z.number().optional(),
+});
+
+export const pbpPipelineOverrideSchema = z.object({
+  rounding: pbpRoundingOverrideSchema.optional(),
+});
+
 export const pbpCurrencyTargetSchema = z.object({
   currency: nonEmptyString,
   strategy: pbpCurrencyStrategySchema,
   derivationContractRef: pbpEntityRefSchema.optional(),
   ratePolicyRef: pbpEntityRefSchema.optional(),
+  pipelineOverride: pbpPipelineOverrideSchema.optional(),
   currentUses: pbpCurrentUsesSchema,
 });
 
