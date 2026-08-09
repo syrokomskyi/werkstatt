@@ -1,7 +1,7 @@
 ---
 id: RFC-0783
 title: "Add agent discovery metadata generators for API Catalog and MCP Server Card"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
 enhancedAt: 2026-08-09
-implementedAt:
+implementedAt: 2026-08-09
 closedAt:
 supersedes: []
 supersededBy:
