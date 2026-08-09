@@ -20,11 +20,11 @@ import { join } from "node:path";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createDefaultIO } from "@warpgogol/werkstatt/kernel";
 
-// Mock resolveCachePath to return our temp dir
+// Mock resolveCacheClonePath to return our temp dir
 const mockCachePath = vi.hoisted(() => ({ value: "" as string }));
 
 vi.mock("../sternsystem/registry-io.ts", () => ({
-  resolveCachePath: vi.fn(async () => mockCachePath.value),
+  resolveCacheClonePath: vi.fn(async () => mockCachePath.value),
 }));
 
 // Mock gitExecWithRetry to capture git commands

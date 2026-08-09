@@ -30,14 +30,34 @@ async function writeWorkpiece(wsRoot: string, missionId: string, siteId: string)
   );
 }
 
-async function writeRegistry(
+async function writeSystemFiles(
   wsRoot: string,
   systems: { id: string; currentMission?: string }[],
 ): Promise<void> {
-  await fs.writeFile(
-    path.join(wsRoot, "systems", "registry.yaml"),
-    `version: 1.0.0\nsystems:\n${systems.map((s) => `  - id: ${s.id}${s.currentMission ? `\n    currentMission: ${s.currentMission}` : ""}`).join("\n")}\n`,
-  );
+  const { stringify: stringifyYaml } = await import("yaml");
+  for (const sys of systems) {
+    const cacheDir = path.join(wsRoot, "..", "systems-cache", sys.id);
+    await fs.mkdir(cacheDir, { recursive: true });
+    const config = {
+      schemaVersion: "system-config/v1",
+      id: sys.id,
+      cosmicStar: "Vega",
+      mirrors: [{ path: `./systems/${sys.id}`, storageType: "non-bare" }],
+      pinnedPlatform: "4.5.0",
+      status: "active",
+      registeredAt: "2026-01-01T00:00:00Z",
+      notes: "",
+    };
+    await fs.writeFile(path.join(cacheDir, "system-config.yaml"), stringifyYaml(config) + "\n");
+    if (sys.currentMission) {
+      const state = {
+        schemaVersion: "system-state/v1",
+        systemId: sys.id,
+        currentMission: sys.currentMission,
+      };
+      await fs.writeFile(path.join(cacheDir, "system-state.yaml"), stringifyYaml(state) + "\n");
+    }
+  }
 }
 
 describe("resolveSiteWorkspace", () => {
@@ -52,7 +72,7 @@ describe("resolveSiteWorkspace", () => {
 
   test("resolves from mission workpiece when registry has currentMission", async () => {
     const ws = await makeWorkspace();
-    await writeRegistry(ws, [{ id: "demo", currentMission: "demo-m000001" }]);
+    await writeSystemFiles(ws, [{ id: "demo", currentMission: "demo-m000001" }]);
     await writeWorkpiece(ws, "demo-m000001", "demo");
     const result = await resolveSiteWorkspace(ws, "demo");
     expect(result.source).toBe("mission");
@@ -62,7 +82,7 @@ describe("resolveSiteWorkspace", () => {
 
   test("prefers mission workpiece when both apps/ and workpiece exist with currentMission", async () => {
     const ws = await makeWorkspace();
-    await writeRegistry(ws, [{ id: "demo", currentMission: "demo-m000001" }]);
+    await writeSystemFiles(ws, [{ id: "demo", currentMission: "demo-m000001" }]);
     await writeApp(ws, "demo");
     await writeWorkpiece(ws, "demo-m000001", "demo");
     const result = await resolveSiteWorkspace(ws, "demo");
@@ -91,7 +111,7 @@ describe("discoverSiteWorkspaces", () => {
 
   test("discovers mission workpieces from registry", async () => {
     const ws = await makeWorkspace();
-    await writeRegistry(ws, [{ id: "gamma", currentMission: "gamma-m000001" }]);
+    await writeSystemFiles(ws, [{ id: "gamma", currentMission: "gamma-m000001" }]);
     await writeWorkpiece(ws, "gamma-m000001", "gamma");
     const results = await discoverSiteWorkspaces(ws);
     expect(results.length).toBe(1);
@@ -100,7 +120,7 @@ describe("discoverSiteWorkspaces", () => {
 
   test("prefers mission workpiece during discovery when currentMission is set", async () => {
     const ws = await makeWorkspace();
-    await writeRegistry(ws, [{ id: "delta", currentMission: "delta-m000001" }]);
+    await writeSystemFiles(ws, [{ id: "delta", currentMission: "delta-m000001" }]);
     await writeApp(ws, "delta");
     await writeWorkpiece(ws, "delta-m000001", "delta");
     const results = await discoverSiteWorkspaces(ws);
@@ -111,7 +131,7 @@ describe("discoverSiteWorkspaces", () => {
 
   test("discovers apps/ entry when workpiece exists but registry has no currentMission", async () => {
     const ws = await makeWorkspace();
-    await writeRegistry(ws, [{ id: "delta" }]);
+    await writeSystemFiles(ws, [{ id: "delta" }]);
     await writeApp(ws, "delta");
     await writeWorkpiece(ws, "delta-m000001", "delta");
     // Without currentMission, tryResolveMissionWorkpiece returns null, so

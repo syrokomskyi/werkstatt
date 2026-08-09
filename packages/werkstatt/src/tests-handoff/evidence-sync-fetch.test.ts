@@ -85,26 +85,28 @@ vi.mock("../evidence/r2-client.ts", () => ({
   })),
 }));
 
-// Mock registry-io to return a test registry
+// Mock registry-io to return test systems
 vi.mock("../sternsystem/registry-io.ts", () => ({
-  readRegistry: vi.fn(async () => ({
-    schemaVersion: "1.0.0",
+  discoverSystems: vi.fn(async () => ({
     systems: [
       {
+        schemaVersion: "system-config/v1",
         id: "warpgogol-com",
         cosmicStar: "Vega",
         mirrors: [],
         pinnedPlatform: "4.5.0",
-        currentMission: "warpgogol-com-m000025",
-        lastRelease: null,
         status: "active",
         registeredAt: "2026-07-13T00:00:00.000Z",
-        deployment: { adapter: "null", channels: {} },
+        notes: "",
       },
     ],
   })),
-  findEntry: vi.fn(),
-  resolveRegistryPath: vi.fn(),
+  readSystemState: vi.fn(async () => ({
+    schemaVersion: "system-state/v1",
+    systemId: "warpgogol-com",
+    currentMission: "warpgogol-com-m000025",
+    lastRelease: null,
+  })),
 }));
 
 import { runEvidenceSync } from "../evidence/evidence-sync.ts";

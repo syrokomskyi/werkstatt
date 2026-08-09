@@ -15,6 +15,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { stringify as stringifyYaml } from "yaml";
 
 const mockTsImport = vi.fn();
 
@@ -45,29 +46,25 @@ function writeForgeYaml(workspaceRoot: string, profile?: string): void {
   writeFileSync(join(workspaceRoot, "forge.yaml"), content, "utf8");
 }
 
-function writeRegistryYaml(
-  workspaceRoot: string,
-  adapters: string[],
-): void {
+function writeRegistryYaml(workspaceRoot: string, adapters: string[]): void {
   if (adapters.length === 0) {
-    writeFileSync(
-      join(workspaceRoot, "systems", "registry.yaml"),
-      "schemaVersion: 1.0.0\nsystems: []\n",
-      "utf8",
-    );
+    // No systems — ensure systems-cache dir doesn't exist or is empty
     return;
   }
-  const systems = adapters
-    .map(
-      (adapter) =>
-        `  - id: test-system\n    deployment:\n      adapter: ${adapter}\n    mirrors: []\n`,
-    )
-    .join("");
-  writeFileSync(
-    join(workspaceRoot, "systems", "registry.yaml"),
-    `schemaVersion: 1.0.0\nsystems:\n${systems}`,
-    "utf8",
-  );
+  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-system");
+  mkdirSync(cacheDir, { recursive: true });
+  const config = {
+    schemaVersion: "system-config/v1",
+    id: "test-system",
+    cosmicStar: "Vega",
+    mirrors: [{ path: "./test-system", storageType: "non-bare" }],
+    pinnedPlatform: "4.5.0",
+    status: "active",
+    registeredAt: "2026-01-01T00:00:00Z",
+    notes: "",
+    deployment: { adapter: adapters[0], channels: {} },
+  };
+  writeFileSync(join(cacheDir, "system-config.yaml"), stringifyYaml(config) + "\n", "utf8");
 }
 
 function makePlugin(

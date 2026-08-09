@@ -59,12 +59,12 @@ vi.mock("../evidence/r2-client.ts", () => ({
   })),
 }));
 
-// Mock resolveCachePath to avoid needing systems/registry.yaml
+// Mock resolveCacheClonePath to avoid needing system-config.yaml
 vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../sternsystem/registry-io.ts")>();
   return {
     ...actual,
-    resolveCachePath: vi.fn(async (workspaceRoot: string, systemId: string) => {
+    resolveCacheClonePath: vi.fn(async (workspaceRoot: string, systemId: string) => {
       return join(workspaceRoot, "systems-cache", systemId);
     }),
   };

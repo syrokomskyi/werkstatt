@@ -12,6 +12,7 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { stringify as stringifyYaml } from "yaml";
 import { runSternsystemValidate } from "./sternsystem-validate.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
@@ -38,9 +39,25 @@ function makeContext(root: string): KernelRuntimeContext {
   } as unknown as KernelRuntimeContext;
 }
 
-async function writeRegistry(root: string, yaml: string): Promise<void> {
-  await mkdir(join(root, "systems"), { recursive: true });
-  await writeFile(join(root, "systems", "registry.yaml"), yaml, "utf8");
+interface MirrorEntry {
+  path: string;
+  storageType: "non-bare" | "bare" | "bundle";
+}
+
+async function writeSystemConfig(root: string, mirrors: MirrorEntry[]): Promise<void> {
+  const cacheDir = join(root, "..", "systems-cache", "test-site");
+  await mkdir(cacheDir, { recursive: true });
+  const config = {
+    schemaVersion: "system-config/v1",
+    id: "test-site",
+    cosmicStar: "Vega",
+    mirrors,
+    pinnedPlatform: "4.5.0",
+    status: "active",
+    registeredAt: "2026-01-01T00:00:00Z",
+    notes: "",
+  };
+  await writeFile(join(cacheDir, "system-config.yaml"), stringifyYaml(config) + "\n", "utf8");
 }
 
 const BASE_SETUP = async (root: string) => {
@@ -66,10 +83,9 @@ afterEach(async () => {
 });
 
 test("validate passes with single non-bare mirror (cache only)", async () => {
-  await writeRegistry(
-    workspaceRoot,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-  );
+  await writeSystemConfig(workspaceRoot, [
+    { path: "./systems/test-site", storageType: "non-bare" },
+  ]);
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
@@ -77,10 +93,11 @@ test("validate passes with single non-bare mirror (cache only)", async () => {
 });
 
 test("validate passes with 3 mirrors (cache + bare + external)", async () => {
-  await writeRegistry(
-    workspaceRoot,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n      - path: "../systems-git/test-site"\n        storageType: bare\n      - path: "git@github.com:foo/test.git"\n        storageType: bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-  );
+  await writeSystemConfig(workspaceRoot, [
+    { path: "./systems/test-site", storageType: "non-bare" },
+    { path: "../systems-git/test-site", storageType: "bare" },
+    { path: "git@github.com:foo/test.git", storageType: "bare" },
+  ]);
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
@@ -89,10 +106,11 @@ test("validate passes with 3 mirrors (cache + bare + external)", async () => {
 });
 
 test("validate detects embedded credentials in external mirror URL", async () => {
-  await writeRegistry(
-    workspaceRoot,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n      - path: "../systems-git/test-site"\n        storageType: bare\n      - path: "https://user:pass@github.com/foo/test.git"\n        storageType: bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-  );
+  await writeSystemConfig(workspaceRoot, [
+    { path: "./systems/test-site", storageType: "non-bare" },
+    { path: "../systems-git/test-site", storageType: "bare" },
+    { path: "https://user:pass@github.com/foo/test.git", storageType: "bare" },
+  ]);
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
@@ -102,10 +120,10 @@ test("validate detects embedded credentials in external mirror URL", async () =>
 });
 
 test("validate does not flag credentials when no external mirror exists", async () => {
-  await writeRegistry(
-    workspaceRoot,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n      - path: "../systems-git/test-site"\n        storageType: bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-  );
+  await writeSystemConfig(workspaceRoot, [
+    { path: "./systems/test-site", storageType: "non-bare" },
+    { path: "../systems-git/test-site", storageType: "bare" },
+  ]);
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
@@ -114,18 +132,15 @@ test("validate does not flag credentials when no external mirror exists", async 
 });
 
 test("validate resolves cache dir from mirrors[0].path", async () => {
-  await writeRegistry(
-    workspaceRoot,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "../systems-cache/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-  );
-  // Create the cache dir at the resolved path (outside workspaceRoot)
-  await mkdir(join(workspaceRoot, "..", "systems-cache", "test-site"), { recursive: true });
+  await writeSystemConfig(workspaceRoot, [
+    { path: "../systems-cache/test-site", storageType: "non-bare" },
+  ]);
+  // Cache dir already created by writeSystemConfig
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   const _cacheViolations = result.data!.violations.filter(
     (v) => v.rule === "bundle-contract" || v.rule === "cache-missing",
   );
-  // Bundle contract check should find the cache dir at the resolved path
   expect(result.exitCode).toBe(0);
 
   // Cleanup
@@ -133,10 +148,7 @@ test("validate resolves cache dir from mirrors[0].path", async () => {
 });
 
 test("validate detects mirrors[0] with wrong storageType (bare instead of non-bare)", async () => {
-  await writeRegistry(
-    workspaceRoot,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-  );
+  await writeSystemConfig(workspaceRoot, [{ path: "./systems/test-site", storageType: "bare" }]);
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
@@ -148,10 +160,11 @@ test("validate detects mirrors[0] with wrong storageType (bare instead of non-ba
 });
 
 test("validate detects bundle storageType with git-accessible protocol", async () => {
-  await writeRegistry(
-    workspaceRoot,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n      - path: "../systems-git/test-site"\n        storageType: bare\n      - path: "git@github.com:foo/test.git"\n        storageType: bundle\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-  );
+  await writeSystemConfig(workspaceRoot, [
+    { path: "./systems/test-site", storageType: "non-bare" },
+    { path: "../systems-git/test-site", storageType: "bare" },
+    { path: "git@github.com:foo/test.git", storageType: "bundle" },
+  ]);
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
