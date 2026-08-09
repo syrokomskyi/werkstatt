@@ -18,6 +18,10 @@
       "types": "./src/plugin-contract.ts",
       "default": "./src/plugin-contract.ts"
     },
+    "./plugin/invoke-hook": {
+      "types": "./src/plugin/invoke-hook.ts",
+      "default": "./src/plugin/invoke-hook.ts"
+    },
     "./os/werkstatt-plugin-module": {
       "types": "./os/werkstatt-plugin.module.ts",
       "default": "./os/werkstatt-plugin.module.ts"
@@ -126,6 +130,146 @@
     "./kernel/dht-module": {
       "types": "./src/kernel/dht/dht-module.ts",
       "default": "./src/kernel/dht/dht-module.ts"
+    },
+    "./mission": {
+      "types": "./src/mission/index.ts",
+      "default": "./src/mission/index.ts"
+    },
+    "./sternsystem": {
+      "types": "./src/sternsystem/index.ts",
+      "default": "./src/sternsystem/index.ts"
+    },
+    "./bordbuch": {
+      "types": "./src/bordbuch/index.ts",
+      "default": "./src/bordbuch/index.ts"
+    },
+    "./artifact-store": {
+      "types": "./src/artifact-store/index.ts",
+      "default": "./src/artifact-store/index.ts"
+    },
+    "./behavior-snapshot": {
+      "types": "./src/behavior-snapshot/index.ts",
+      "default": "./src/behavior-snapshot/index.ts"
+    },
+    "./release": {
+      "types": "./src/release/index.ts",
+      "default": "./src/release/index.ts"
+    },
+    "./leitstand": {
+      "types": "./src/leitstand/index.ts",
+      "default": "./src/leitstand/index.ts"
+    },
+    "./notausgang": {
+      "types": "./src/notausgang/index.ts",
+      "default": "./src/notausgang/index.ts"
+    },
+    "./evidence": {
+      "types": "./src/evidence/index.ts",
+      "default": "./src/evidence/index.ts"
+    },
+    "./handoff": {
+      "types": "./src/handoff/index.ts",
+      "default": "./src/handoff/index.ts"
+    },
+    "./handoff-module": {
+      "types": "./src/handoff/handoff.module.ts",
+      "default": "./src/handoff/handoff.module.ts"
+    },
+    "./mission-module": {
+      "types": "./src/mission/mission.module.ts",
+      "default": "./src/mission/mission.module.ts"
+    },
+    "./sternsystem-module": {
+      "types": "./src/sternsystem/sternsystem.module.ts",
+      "default": "./src/sternsystem/sternsystem.module.ts"
+    },
+    "./bordbuch-module": {
+      "types": "./src/bordbuch/bordbuch.module.ts",
+      "default": "./src/bordbuch/bordbuch.module.ts"
+    },
+    "./artifact-store-module": {
+      "types": "./src/artifact-store/artifact-store.module.ts",
+      "default": "./src/artifact-store/artifact-store.module.ts"
+    },
+    "./behavior-snapshot-module": {
+      "types": "./src/behavior-snapshot/behavior-snapshot.module.ts",
+      "default": "./src/behavior-snapshot/behavior-snapshot.module.ts"
+    },
+    "./release-module": {
+      "types": "./src/release/release.module.ts",
+      "default": "./src/release/release.module.ts"
+    },
+    "./leitstand-module": {
+      "types": "./src/leitstand/leitstand.module.ts",
+      "default": "./src/leitstand/leitstand.module.ts"
+    },
+    "./subdomain-module": {
+      "types": "./src/subdomain/subdomain.module.ts",
+      "default": "./src/subdomain/subdomain.module.ts"
+    },
+    "./dns-module": {
+      "types": "./src/dns/dns.module.ts",
+      "default": "./src/dns/dns.module.ts"
+    },
+    "./notausgang-module": {
+      "types": "./src/notausgang/notausgang.module.ts",
+      "default": "./src/notausgang/notausgang.module.ts"
+    },
+    "./deploy-module": {
+      "types": "./src/deploy/deploy.module.ts",
+      "default": "./src/deploy/deploy.module.ts"
+    },
+    "./platform-module": {
+      "types": "./src/handoff/platform-module.ts",
+      "default": "./src/handoff/platform-module.ts"
+    },
+    "./identity-module": {
+      "types": "./src/handoff/identity-module.ts",
+      "default": "./src/handoff/identity-module.ts"
+    },
+    "./evidence-module": {
+      "types": "./src/evidence/evidence-module.ts",
+      "default": "./src/evidence/evidence-module.ts"
+    },
+    "./nachweis-module": {
+      "types": "./src/nachweis/nachweis.module.ts",
+      "default": "./src/nachweis/nachweis.module.ts"
+    },
+    "./integrity": {
+      "types": "./src/integrity/index.ts",
+      "default": "./src/integrity/index.ts"
+    },
+    "./observability": {
+      "types": "./src/observability/index.ts",
+      "default": "./src/observability/index.ts"
+    },
+    "./observability/module": {
+      "types": "./src/observability/module.ts",
+      "default": "./src/observability/module.ts"
+    },
+    "./fingerprint": {
+      "types": "./src/fingerprint/index.ts",
+      "default": "./src/fingerprint/index.ts"
+    },
+    "./fingerprint/semantic": {
+      "types": "./src/fingerprint/semantic.ts",
+      "default": "./src/fingerprint/semantic.ts"
+    },
+    "./agent-gate": {
+      "types": "./src/agent-gate/index.ts",
+      "default": "./src/agent-gate/index.ts"
+    },
+    "./agent-gate/astro": {
+      "types": "./src/agent-gate/astro.ts",
+      "default": "./src/agent-gate/astro.ts"
+    },
+    "./changelog": {
+      "types": "./src/changelog/index.ts",
+      "default": "./src/changelog/index.ts"
+    },
+    "./schemas": {
+      "types": "./src/schemas/index.ts",
+      "default": "./src/schemas/index.ts"
     }
   },
   "files": ["src", "bin", "os"],
@@ -150,12 +294,45 @@
     "@warpgogol/passport": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",
+    "@warpgogol/site-kernel-astro": "workspace:*",
+    "@warpgogol/site-kernel-checks": "workspace:*",
+    "@warpgogol/site-kernel-codegen": "workspace:*",
+    "@warpgogol/site-kernel-integrity": "workspace:*",
+    "@warpgogol/site-kernel-onboarding": "workspace:*",
+    "@warpgogol/surface": "workspace:*",
+    "@aws-sdk/client-s3": "^3.1101.0",
+    "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
+    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study",
+    "@noble/ed25519": "^3.1.0",
+    "asn1js": "^3.0.10",
+    "pkijs": "^3.3.3",
+    "tar": "^7.5.22",
     "dotenv": "^17.4.2",
     "libp2p": "^3.3.8",
     "picomatch": "^4.0.5",
     "tsx": "^4.23.1",
     "uuid": "^14.0.1",
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.0",
+    "@warpgogol/integration": "workspace:*",
+    "astro": "^7.1.6",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "@astrojs/compiler": "^4.0.0",
+    "@typescript-eslint/typescript-estree": "^8.65.0",
+    "jsonc-parser": "^3.3.1",
+    "pdf-lib": "^1.17.1",
+    "postcss": "^8.5.25",
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx": "^3.1.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5",
+    "@ai-sdk/anthropic": "^4.0.27",
+    "@ai-sdk/openai": "^4.0.27",
+    "ai": "^7.0.47",
+    "p-limit": "^7.3.1",
+    "semver": "^7.8.5",
+    "simple-git": "^3.36.0",
+    "zod": "^4.4.3"
   },
   "optionalDependencies": {
     "better-sqlite3": "^13.0.2"
