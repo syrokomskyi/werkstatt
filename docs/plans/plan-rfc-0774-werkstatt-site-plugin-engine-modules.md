@@ -53,7 +53,7 @@ scope:
   - `packages/os/site-kernel-changelog/src/` (renderers only; pipeline core stays in engine per RFC-0771) → `packages/werkstatt-site/src/changelog/`
   - Cloudflare Workers adapter from `packages/os/site-kernel-handoff/src/deploy/` + `packages/os/site-kernel-deploy/src/` → `packages/werkstatt-site/src/deploy/cloudflare-workers/`
 - **No command ids change** — all existing kernel commands keep their ids and behavior
-- **`tools/kernel.config.ts`** — NOT modified in this RFC (RFC-0776 does the atomic switch; re-export scaffold from RFC-0772 bridges the gap)
+- **`tools/kernel.config.ts`** — NOT modified in this RFC (RFC-0776 does the atomic switch; RFC-0774 installs its own re-export shims for site-stack packages it moves, same pattern as RFC-0772 but scoped to site-stack packages only)
 
 ### 2.2 Configuration and data
 
@@ -111,11 +111,11 @@ scope:
 - Move `packages/os/site-kernel-codegen/src/` → `packages/werkstatt-site/src/codegen/` (boilerplate, templates, props types, open-source page, section scaffold)
 - Move `packages/os/site-kernel-onboarding/src/` → `packages/werkstatt-site/src/onboarding/` (scaffold templates, token application)
 - Move `packages/os/site-kernel-audit/src/` → `packages/werkstatt-site/src/audit/` (delta audit engine)
-- Move `packages/os/site-kernel-check-warpgogol/src/` → `packages/werkstatt-site/src/checks/check-warpgogol/` (check-warpgogol ecosystem commands)
+- Move `packages/os/site-kernel-check-warpgogol/src/` → `packages/werkstatt-site/src/checks/check-warpgogol/` (check-warpgogol ecosystem commands). **Temporary dependency:** `check-warpgogol` imports `@warpgogol/check-core` and `@warpgogol/check-runner-node` from their old locations (`packages/check-core`, `packages/check-runner-node`) until RFC-0775 moves them into `domain/check-core/` and `domain/check-runner/`. This preserves wave 3 parallelism — RFC-0774 and RFC-0775 can proceed independently.
 - Move `packages/os/site-kernel-changelog/src/` renderers → `packages/werkstatt-site/src/changelog/` (pipeline core stays in engine per RFC-0771)
 - Update intra-plugin import paths: `@warpgogol/site-kernel-astro` → `./paths/`, `@warpgogol/site-kernel-content` → `./content/`, etc.
 - Update `package.json` exports map with subpath exports for each moved module
-- Install temporary re-export shims in old package entry points (per RFC-0772 scaffold pattern) so `tools/kernel.config.ts` keeps building
+- Install temporary re-export shims in old package entry points (RFC-0774 installs its own shims for site-stack packages, same pattern as RFC-0772 but scoped to site-stack packages only) so `tools/kernel.config.ts` keeps building
 
 **Validation:**
 
@@ -268,7 +268,7 @@ scope:
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-  - Criterion 4 (deploy adapter): lightweight check = adapter factory unit test + `werkstatt.plugin.validate` passing. Full `leitstand dev-deploy → promote` cycle verification is deferred to post-implementation (RFC-0776 workshop migration), noted in the evidence annotation.
+  - Criterion 4 (deploy adapter): lightweight check = adapter factory unit test + `werkstatt.plugin.validate` passing. Full `leitstand dev-deploy → promote` cycle verification is deferred to RFC-0776 (workshop migration), when `tools/kernel.config.ts` is switched to import from the plugin. RFC-0774 does not switch `kernel.config.ts`, so a full deploy cycle is not possible until RFC-0776. Noted in the evidence annotation.
 - **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0774 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
@@ -303,15 +303,15 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | `site-kernel-checks` is the largest os package (command tables, surface machinery, Axiom adapter) | Step 3 is a dedicated step for `site-kernel-checks` with command id parity check and test fixture path repair budget |
 | Cross-imports between checks and codegen become intra-package imports | Steps 2–3 update all `@warpgogol/site-kernel-*` imports to intra-plugin paths; typecheck gates each step |
 | Command ids are contract — must not change | Step 3 includes `command.manifest.generate` diff check; Step 5 validates via `werkstatt.plugin.validate` |
 | Test fixture path references to old package names | Step 3 budgets explicit time for test fixture path repair (140 test files) |
-| Old packages deleted but `kernel.config.ts` still imports from them | Re-export scaffold from RFC-0772 bridges the gap; RFC-0776 does the atomic switch |
+| Old packages deleted but `kernel.config.ts` still imports from them | RFC-0774 installs its own re-export shims for site-stack packages (same pattern as RFC-0772); RFC-0776 does the atomic switch and removes the shims |
 
 ## 6. Escalation triggers
 
 - If implementation reveals an invariant conflict with DNA-3 or DNA-5, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0774 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the plugin contract (RFC-0770) is missing a needed hook or module loader slot, do not bypass the registry — create an amending RFC via `fo-idea-create-rfc` with `amends: [RFC-0770]`.
-- If `site-kernel-check-warpgogol` cannot resolve its `check-core`/`check-runner-node` dependencies through RFC-0775's domain layer (e.g. RFC-0775 not yet implemented), escalate to the operator — the dependency ordering between RFC-0774 and RFC-0775 may need adjustment.
+- If `site-kernel-check-warpgogol` cannot resolve its `check-core`/`check-runner-node` dependencies (e.g. packages deleted before RFC-0775 moves them), escalate to the operator — the temporary import strategy from old locations depends on those packages existing until RFC-0775 is implemented.
