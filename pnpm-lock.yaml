@@ -63,6 +63,9 @@ importers:
       '@warpgogol/werkstatt':
         specifier: workspace:*
         version: link:packages/werkstatt
+      '@warpgogol/werkstatt-site':
+        specifier: workspace:*
+        version: link:packages/werkstatt-site
       eslint:
         specifier: ^10.8.0
         version: 10.8.0
