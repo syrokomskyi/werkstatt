@@ -224,19 +224,19 @@ Both validators exit non-zero on any error. `--json` output follows the standard
 
 ## Acceptance criteria
 
-- [ ] `buildRobotsTxt()` outputs `Content-Signal:` line when `contentSignal` field is present in `RobotsPolicy`
-- [ ] `RobotsPolicy` interface has `contentSignal?: string[]` field
-- [ ] `robots.generate` passes `contentSignal` from `system.md` robots block (or default)
-- [ ] `_headers.template` includes `Link:` headers in `/*` block pointing to all 5 agent discovery endpoints
-- [ ] `public.infrastructure.generate` output (`_headers`) contains the Link headers
-- [ ] `headers.security.validate` includes new `HDR-07` rule: `Link:` headers present in `/*` block when `agent.enabled !== false`
-- [ ] `robots.validate` includes new `PUBTXT-CS` rule: `Content-Signal:` directive present in `robots.txt`
-- [ ] `HDR-07` is silent when `agent.enabled: false` (Link headers absent, no error)
-- [ ] `headers.security.validate` still passes (HDR-01..04 unchanged)
-- [ ] `robots.validate` still passes (existing PUBTXT rules unchanged)
-- [ ] `isitagentready.com` reports Link headers present for warpgogol.com after deploy
-- [ ] `isitagentready.com` reports Content-Signal directive present for warpgogol.com after deploy
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `buildRobotsTxt()` outputs `Content-Signal:` line when `contentSignal` field is present in `RobotsPolicy` (evidence: packages/werkstatt-site/src/domain/share/semantic/robots.ts:43-47, rfc-0784-robots-headers.test.ts:buildRobotsTxt emits Content-Signal)
+- [x] `RobotsPolicy` interface has `contentSignal?: string[]` field (evidence: packages/werkstatt-site/src/domain/share/semantic/robots.ts:32-33)
+- [x] `robots.generate` passes `contentSignal` from `system.md` robots block (or default) (evidence: packages/werkstatt-site/src/checks/robots.ts:72-78, rfc-0784-robots-headers.test.ts:robots.generate default contentSignal)
+- [x] `_headers.template` includes `Link:` headers in `/*` block pointing to all 5 agent discovery endpoints (evidence: packages/werkstatt-site/src/codegen/templates/app-boilerplate/public/_headers.template:11, {{AGENT_LINK_HEADERS}} token)
+- [x] `public.infrastructure.generate` output (`_headers`) contains the Link headers (evidence: packages/werkstatt-site/src/codegen/app-boilerplate.ts:344-352, rfc-0784-robots-headers.test.ts:public.infrastructure.generate includes Link headers)
+- [x] `headers.security.validate` includes new `HDR-07` rule: `Link:` headers present in `/*` block when `agent.enabled !== false` (evidence: packages/werkstatt-site/src/checks/public-surface/security.ts:343-358, rfc-0784-robots-headers.test.ts:HDR-07 passes when Link headers present)
+- [x] `robots.validate` includes new `PUBTXT-CS` rule: `Content-Signal:` directive present in `robots.txt` (evidence: packages/werkstatt-site/src/checks/robots.ts:175-184, rfc-0784-robots-headers.test.ts:robots.validate fails when Content-Signal absent)
+- [x] `HDR-07` is silent when `agent.enabled: false` (Link headers absent, no error) (evidence: packages/werkstatt-site/src/checks/public-surface/security.ts:346-347, rfc-0784-robots-headers.test.ts:HDR-07 silent when agent.enabled: false)
+- [x] `headers.security.validate` still passes (HDR-01..04 unchanged) (evidence: packages/werkstatt-site/src/checks/public-surface/security.ts:231-340, existing rules untouched)
+- [x] `robots.validate` still passes (existing PUBTXT rules unchanged) (evidence: packages/werkstatt-site/src/checks/robots.ts:159-170, existing rules untouched)
+- [ ] `isitagentready.com` reports Link headers present for warpgogol.com after deploy (requires post-deploy verification)
+- [ ] `isitagentready.com` reports Content-Signal directive present for warpgogol.com after deploy (requires post-deploy verification)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0784 --json, exitCode: 0)
 
 ## Implementation notes for agents
 
