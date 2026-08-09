@@ -1,6 +1,6 @@
 schemaVersion: 1.0.0
 generatedAt: null
-totalCount: 85
+totalCount: 86
 entries:
   - id: brand-label-component
     uniName: brand-label-component
@@ -421,6 +421,21 @@ entries:
     siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/responsive-image/responsive-image.manifest.yaml
     astroFile: packages/ui/src/components/responsive-image/responsive-image.astro
+  - id: scroll-to-top-component
+    uniName: scroll-to-top-component
+    layer: component
+    role: scroll-to-top
+    semanticId: scroll-to-top
+    version: 1.0.0
+    intent:
+      - guide-navigation
+      - orient-visitor
+    industryFit: []
+    contentSchemaKey: scroll-to-top-component
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/components/scroll-to-top/scroll-to-top-component.manifest.yaml
+    astroFile: packages/ui/src/components/scroll-to-top/scroll-to-top-component.astro
   - id: section-card-grid-component
     uniName: section-card-grid-component
     layer: component

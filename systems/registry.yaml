@@ -11,7 +11,7 @@ systems:
         storageType: bare
     pinnedPlatform: 4.82.12
     currentMission: null
-    lastRelease: warpgogol-com-r000014
+    lastRelease: warpgogol-com-r000016
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
     deployment:
@@ -28,25 +28,31 @@ systems:
           url: https://warpgogol.com
       lastPropagated:
         alt:
-          releaseId: warpgogol-com-r000014
-          at: 2026-08-08T00:03:03.367Z
-          healthy: true
+          releaseId: warpgogol-com-r000016
+          at: 2026-08-09T00:24:41.637Z
+          healthy: false
           state: succeeded
-          operationId: op-msjm0jxz-zfvex95z
+          operationId: op-msl2875c-tj9w1y00
           leaseExpiresAt: null
           purgeResult:
-            success: true
-            purgedUrls: 107
+            success: false
+            purgedUrls: 0
+            error: 'Cloudflare purge API returned 401:
+              {"result":null,"success":false,"errors":[{"code":10000,"message":"Authentication
+              error"}],"messages":[]}'
         main:
-          releaseId: warpgogol-com-r000014
-          at: 2026-08-08T00:03:59.374Z
-          healthy: true
+          releaseId: warpgogol-com-r000016
+          at: 2026-08-09T00:25:54.991Z
+          healthy: false
           state: succeeded
-          operationId: op-msjm1sup-51mqqei5
+          operationId: op-msl298yw-t0svkhh3
           leaseExpiresAt: null
           purgeResult:
-            success: true
-            purgedUrls: 107
+            success: false
+            purgedUrls: 0
+            error: 'Cloudflare purge API returned 401:
+              {"result":null,"success":false,"errors":[{"code":10000,"message":"Authentication
+              error"}],"messages":[]}'
     notes: ""
 services:
   - id: matomo-proxy
