@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 33bb2c29fd99bb0a0e0c11eddf542e702dd67d1fbb9a766eb08ab3e8e14b398c
+  contentHash: 1b6539df079dda5ae72613eb026a6a4fb93b825cd3c0ee1f6f42498cabbd5334
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -6309,8 +6309,7 @@ commands:
       bundle:
         kind: string
         description: Path to the handoff bundle directory.
-    reads:
-      - handoff/**/*
+    reads: []
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -7678,8 +7677,7 @@ commands:
     requiresNetwork: false
     timeoutMs: null
     flags: {}
-    reads:
-      - docs/rfcs/**/*.md
+    reads: []
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -13930,6 +13928,22 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/surface/werk-records/**/*.md
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: werkstatt.autonomy.validate
+    description: Scan packages/werkstatt/src/** for forbidden @warpgogol/* imports
+      (excluding self-imports and shared schema packages). Enforces DNA-64
+      engine/plugin boundary (RFC-0772).
+    scope: workspace
+    provider: workspace
+    module: werkstatt-autonomy
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - packages/werkstatt/src/**
     writes: []
     validatesOutputs: []
     pipelines: []
