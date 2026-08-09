@@ -1,0 +1,67 @@
+{
+  "name": "@warpgogol/werkstatt-video",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Werkstatt video plugin — Editframe stack (RFC-0778).",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./paths": {
+      "types": "./src/paths/editframe-paths.ts",
+      "default": "./src/paths/editframe-paths.ts"
+    },
+    "./checks": {
+      "types": "./src/checks/index.ts",
+      "default": "./src/checks/index.ts"
+    },
+    "./checks/module": {
+      "types": "./src/checks/module.ts",
+      "default": "./src/checks/module.ts"
+    },
+    "./invariants": {
+      "types": "./src/invariants/video-invariants.ts",
+      "default": "./src/invariants/video-invariants.ts"
+    },
+    "./onboarding": {
+      "types": "./src/onboarding/index.ts",
+      "default": "./src/onboarding/index.ts"
+    },
+    "./onboarding/module": {
+      "types": "./src/onboarding/module.ts",
+      "default": "./src/onboarding/module.ts"
+    },
+    "./deploy": {
+      "types": "./src/deploy/index.ts",
+      "default": "./src/deploy/index.ts"
+    },
+    "./build": {
+      "types": "./src/build/editframe-build.ts",
+      "default": "./src/build/editframe-build.ts"
+    },
+    "./release-evidence": {
+      "types": "./src/release-evidence/video-evidence.ts",
+      "default": "./src/release-evidence/video-evidence.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@warpgogol/werkstatt": "workspace:*",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  }
+}
