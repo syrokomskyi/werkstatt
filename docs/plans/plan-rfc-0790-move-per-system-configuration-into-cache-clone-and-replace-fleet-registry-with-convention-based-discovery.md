@@ -38,11 +38,13 @@ scope:
 ### 2.1 Code and commands
 
 **`packages/werkstatt/src/schemas/`**
+
 - `sternsystem.ts` — add `systemConfigSchema`, `systemStateSchema`, `servicesRegistrySchema`; remove `fleetRegistryEntrySchema`, `fleetRegistrySchema`
 - `leitstand.ts` — replace `deploymentConfigSchema` with `deploymentStaticConfigSchema` (without `lastPropagated`)
 - `index.ts` — export new schemas, remove old exports
 
 **`packages/werkstatt/src/sternsystem/`**
+
 - `registry-io.ts` — add `discoverSystems`, `readSystemConfig`, `readSystemState`, `writeSystemState`, `resolveCacheClonePath`, `readServicesRegistry`; remove `readRegistry`, `writeRegistry`, `findEntry`, `findEntryByStar`, `resolveCachePath`, `registryExists`, `resolveRegistryPath`; change `resolveMirrors` signature to accept `SystemConfig`
 - `sternsystem-discover.ts` — **new file**: `sternsystem.discover` command handler
 - `sternsystem-register.ts`, `sternsystem-validate.ts`, `sternsystem-list.ts`, `sternsystem-sync.ts`, `sternsystem-pin.ts`, `sternsystem-extract.ts`, `sternsystem-status.ts` — update to use new IO helpers
@@ -72,6 +74,7 @@ scope:
 **`packages/werkstatt/src/werkstatt/`** — `werkstatt-commit.ts`
 
 **`packages/werkstatt-site/src/`**
+
 - `domain/ontology/operations/index.ts` — update re-exports
 - `domain/studio-gate/auth.ts` — read `system-config.yaml` instead of `fleetRegistrySchema.parse()`
 - `checks/analytics-matomo.ts` — read from `services/registry.yaml`
@@ -91,6 +94,8 @@ scope:
 - `systems/axiom-suppressions.yaml` — **moved** to `../systems-cache/<id>/axiom-suppressions.yaml`
 - `../systems-cache/<id>/system-config.yaml` — **created** per system
 - `../systems-cache/<id>/system-state.yaml` — **created** per system
+- `missions/<missionId>/workpiece/system-config.yaml` — **copied** during materialization (dual-path)
+- `missions/<missionId>/workpiece/system-state.yaml` — **copied** during materialization (dual-path)
 - `systems/methodologies.md` — remains unchanged
 
 ### 2.3 Documentation and specs
@@ -172,9 +177,13 @@ scope:
 
 - In `packages/werkstatt/src/sternsystem/registry-io.ts`:
   - Add `resolveCacheClonePath(workspaceRoot: string, systemId: string): string` — returns `path.resolve(workspaceRoot, "..", "systems-cache", systemId)`.
-  - Add `readSystemConfig(workspaceRoot: string, systemId: string): Promise<SystemConfig>` — reads `../systems-cache/<id>/system-config.yaml`, validates with `systemConfigSchema`.
-  - Add `readSystemState(workspaceRoot: string, systemId: string): Promise<SystemState>` — reads `../systems-cache/<id>/system-state.yaml`. Returns fresh state if file missing.
-  - Add `writeSystemState(workspaceRoot: string, systemId: string, state: SystemState): Promise<void>` — writes via `atomicWriteFile`, auto-commits to cache clone git.
+  - Add `resolveWorkpiecePath(workspaceRoot: string, missionId: string): string` — returns `path.join(workspaceRoot, "missions", missionId, "workpiece")`.
+  - Add `readSystemConfig(workspaceRoot: string, systemId: string): Promise<SystemConfig>` — reads `../systems-cache/<id>/system-config.yaml` (OUTSIDE mission).
+  - Add `readSystemConfigFromWorkpiece(workpieceDir: string): Promise<SystemConfig>` — reads `system-config.yaml` from workpiece (INSIDE mission).
+  - Add `readSystemState(workspaceRoot: string, systemId: string): Promise<SystemState>` — reads `../systems-cache/<id>/system-state.yaml` (OUTSIDE mission). Returns fresh state if file missing.
+  - Add `readSystemStateFromWorkpiece(workpieceDir: string): Promise<SystemState>` — reads `system-state.yaml` from workpiece (INSIDE mission).
+  - Add `writeSystemStateToWorkpiece(workpieceDir: string, state: SystemState): Promise<void>` — writes to workpiece (INSIDE mission, no git commit).
+  - Add `writeSystemState(workspaceRoot: string, systemId: string, state: SystemState): Promise<void>` — writes to cache clone (OUTSIDE mission), auto-commits to cache clone git.
   - Add `discoverSystems(workspaceRoot: string): Promise<{ systems: SystemConfig[]; errors: Array<{ id: string; error: string }> }>` — scans `../systems-cache/`, collects errors per-system (does not throw on single bad config).
   - Add `readServicesRegistry(workspaceRoot: string): Promise<ServicesRegistry>` — reads `services/registry.yaml`.
   - Change `resolveMirrors` signature to accept `SystemConfig` instead of `FleetRegistryEntry`.
@@ -230,10 +239,12 @@ scope:
 
 **Agent actions:**
 
-- In `mission-open.ts`: replace registry IO with `readSystemConfig`/`readSystemState`/`writeSystemState`. Replace `resolveCachePath` with `resolveCacheClonePath`. Remove `registry` lock.
-- In `mission-close.ts`: same pattern. Write `currentMission: null` to `system-state.yaml`. Update `sternsystem.pin` call.
+- In `mission-open.ts`: replace registry IO with `readSystemConfig`/`readSystemState`/`writeSystemState`. Replace `resolveCachePath` with `resolveCacheClonePath`. Remove `registry` lock. Write `currentMission` to `system-state.yaml` in cache clone (outside mission context at open time).
+- In `mission-close.ts`: read `system-config.yaml`/`system-state.yaml` from **workpiece** (inside mission). Write `currentMission: null` to workpiece `system-state.yaml`. Propagate back to cache clone during close. Update `sternsystem.pin` call.
 - In `mission-abort.ts`: same pattern. Remove `registry` lock.
-- In `mission-materialize.ts`, `mission-materialization-commands.ts`, `mission-migrate.ts`: replace `resolveCachePath` with `resolveCacheClonePath`.
+- In `mission-materialize.ts`: add `system-config.yaml` and `system-state.yaml` to `STERNSYSTEM_DATA_PATHS` so they are copied into workpiece during materialization. Replace `resolveCachePath` with `resolveCacheClonePath`.
+- In `mission-materialization-commands.ts`, `mission-migrate.ts`: replace `resolveCachePath` with `resolveCacheClonePath`.
+- In `mission-reconcile.ts`: ensure `system-config.yaml` and `system-state.yaml` are propagated from workpiece back to cache clone (they are in `STERNSYSTEM_DATA_PATHS`, so existing reconcile logic handles them).
 - Run `pnpm --filter @warpgogol/werkstatt run build:check` and fix TypeScript errors in mission module.
 
 **Validation:**
@@ -252,12 +263,12 @@ scope:
 
 **Agent actions:**
 
-- `release-commands.ts`: write `lastRelease` to `system-state.yaml`.
-- `leitstand-commands.ts`: read deployment channels from `system-config.yaml`. Write `lastPropagated` to `system-state.yaml`.
+- `release-commands.ts`: write `lastRelease` to `system-state.yaml` in **workpiece** (inside mission).
+- `leitstand-commands.ts`: read deployment channels from `system-config.yaml` in **workpiece** (inside mission). Write `lastPropagated` to `system-state.yaml` in **workpiece**.
 - `service-deploy.ts`: read from `services/registry.yaml`.
 - `bordbuch-io.ts`, `bordbuch-commit.ts`, `bordbuch-commit-helper.ts`, `bordbuch-generate.ts`: resolve cache clone from convention path.
 - `notausgang-commands.ts`: resolve cache clone from convention path.
-- `dns-record-*.ts`: read from cache clone.
+- `dns-record-*.ts`: read from cache clone (outside mission context).
 - `evidence-fetch.ts`, `evidence-sync.ts`: resolve cache clone from convention path.
 - `handoff-absorb.ts`, `surface-contract.ts`, `bundle-io.ts`, `index.ts`: resolve cache clone from convention path.
 - `nachweis-io.ts`: resolve cache clone from convention path.
