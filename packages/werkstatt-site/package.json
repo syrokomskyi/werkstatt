@@ -1,0 +1,147 @@
+{
+  "name": "@warpgogol/werkstatt-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Werkstatt site plugin — Astro stack engine modules and domain layer (RFC-0774/0775).",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./paths": {
+      "types": "./src/paths/index.ts",
+      "default": "./src/paths/index.ts"
+    },
+    "./content": {
+      "types": "./src/content/index.ts",
+      "default": "./src/content/index.ts"
+    },
+    "./codegen": {
+      "types": "./src/codegen/index.ts",
+      "default": "./src/codegen/index.ts"
+    },
+    "./checks": {
+      "types": "./src/checks/index.ts",
+      "default": "./src/checks/index.ts"
+    },
+    "./checks/module": {
+      "types": "./src/checks/module.ts",
+      "default": "./src/checks/module.ts"
+    },
+    "./checks/suppressions-config": {
+      "types": "./src/checks/suppressions-config.ts",
+      "default": "./src/checks/suppressions-config.ts"
+    },
+    "./checks/methodologies-config": {
+      "types": "./src/checks/methodologies-config.ts",
+      "default": "./src/checks/methodologies-config.ts"
+    },
+    "./checks/pipelines/packages-check": {
+      "types": "./src/checks/pipelines/packages-check.ts",
+      "default": "./src/checks/pipelines/packages-check.ts"
+    },
+    "./checks/pipelines": {
+      "types": "./src/checks/pipelines/index.ts",
+      "default": "./src/checks/pipelines/index.ts"
+    },
+    "./checks/result-helpers": {
+      "types": "./src/checks/result-helpers.ts",
+      "default": "./src/checks/result-helpers.ts"
+    },
+    "./checks/audit/types": {
+      "types": "./src/checks/audit/types.ts",
+      "default": "./src/checks/audit/types.ts"
+    },
+    "./checks/ecosystem": {
+      "types": "./src/checks/ecosystem.ts",
+      "default": "./src/checks/ecosystem.ts"
+    },
+    "./checks/lib/astro-site-url": {
+      "types": "./src/checks/lib/astro-site-url.ts",
+      "default": "./src/checks/lib/astro-site-url.ts"
+    },
+    "./checks/lib/i18n": {
+      "types": "./src/checks/lib/i18n.ts",
+      "default": "./src/checks/lib/i18n.ts"
+    },
+    "./checks/maintenance-debt-queue": {
+      "types": "./src/checks/maintenance-debt-queue.ts",
+      "default": "./src/checks/maintenance-debt-queue.ts"
+    },
+    "./onboarding": {
+      "types": "./src/onboarding/index.ts",
+      "default": "./src/onboarding/index.ts"
+    },
+    "./onboarding/module": {
+      "types": "./src/onboarding/module.ts",
+      "default": "./src/onboarding/module.ts"
+    },
+    "./audit": {
+      "types": "./src/audit/index.ts",
+      "default": "./src/audit/index.ts"
+    },
+    "./changelog": {
+      "types": "./src/changelog/index.ts",
+      "default": "./src/changelog/index.ts"
+    },
+    "./deploy": {
+      "types": "./src/deploy/index.ts",
+      "default": "./src/deploy/index.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.27",
+    "@ai-sdk/openai": "^4.0.27",
+    "@astrojs/compiler": "^4.0.0",
+    "@cyclonedx/cyclonedx-library": "^1.14.0",
+    "@syrokomskyi/axiom-capture": "link:../../../../pipelines/packages/axiom/axiom-capture",
+    "@syrokomskyi/axiom-factory-app": "link:../../../../pipelines/apps/axiom/factory",
+    "@syrokomskyi/axiom-study": "link:../../../../pipelines/packages/axiom/axiom-study",
+    "@warpgogol/chat": "workspace:*",
+    "@warpgogol/check-core": "workspace:*",
+    "@warpgogol/check-runner-node": "workspace:*",
+    "@warpgogol/content-source": "workspace:*",
+    "@warpgogol/forge": "workspace:*",
+    "@warpgogol/geo": "workspace:*",
+    "@warpgogol/growth": "workspace:*",
+    "@warpgogol/integration": "workspace:*",
+    "@warpgogol/nebula": "workspace:*",
+    "@warpgogol/ontology": "workspace:*",
+    "@warpgogol/passport": "workspace:*",
+    "@warpgogol/pbp": "workspace:*",
+    "@warpgogol/share": "workspace:*",
+    "@warpgogol/star-map": "workspace:*",
+    "@warpgogol/surface": "workspace:*",
+    "@warpgogol/tokens": "workspace:*",
+    "@warpgogol/werkstatt": "workspace:*",
+    "ai": "^7.0.47",
+    "crawlee": "3.17.0",
+    "file-type": "^22.0.1",
+    "gray-matter": "^4.0.3",
+    "parse5": "^7.3.0",
+    "picomatch": "^4.0.5",
+    "playwright": "1.62.1",
+    "sharp": "^0.35.3",
+    "spdx-license-list": "^6.12.0",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@quantco/pnpm-licenses": "2.4.2",
+    "@types/picomatch": "^4.0.3",
+    "astro": "^7.1.6",
+    "fast-check": "^4.9.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  }
+}

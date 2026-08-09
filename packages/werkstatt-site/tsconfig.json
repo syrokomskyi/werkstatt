@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig/node-lib.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.template.*", "dist/**", "node_modules/**"]
+}
