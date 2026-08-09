@@ -12,13 +12,20 @@
 */
 
 import type { KernelModule } from "@warpgogol/werkstatt/kernel/types";
+import { createAssetsValidateCommand } from "./assets-validate.ts";
+import { createScenesValidateCommand } from "./scenes-validate.ts";
+import { createBundleValidateCommand } from "./bundle-validate.ts";
+import { createSecretScanCommand } from "./secret-scan.ts";
 
 export function createGameCheckModule(): KernelModule {
   return {
     name: "game-checks",
     version: "0.1.0",
-    register() {
-      // Validators registered in Step 2
+    register(registry) {
+      registry.registerCommand(createAssetsValidateCommand());
+      registry.registerCommand(createScenesValidateCommand());
+      registry.registerCommand(createBundleValidateCommand());
+      registry.registerCommand(createSecretScanCommand());
     },
   };
 }
