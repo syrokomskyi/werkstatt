@@ -74,9 +74,9 @@ export async function validateComposition(
     });
   }
 
-  const fpsMatch = content.match(/\bfps\s*=\s*["']?(\d+)["']?/);
+  const fpsMatch = content.match(/\bfps\s*=\s*(?:["']?(\d+)["']?|\{(\d+)\})/);
   const hasFps = fpsMatch !== null;
-  const fpsValue = fpsMatch ? parseInt(fpsMatch[1]!, 10) : 30;
+  const fpsValue = fpsMatch ? parseInt(fpsMatch[1] ?? fpsMatch[2] ?? "30", 10) : 30;
 
   if (hasFps && fpsValue <= 0) {
     violations.push({
