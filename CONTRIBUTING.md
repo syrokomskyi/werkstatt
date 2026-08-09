@@ -27,9 +27,9 @@ This repository is optimized for a high-signal workflow for both humans and AI a
   - Prettier check (CI gate).
 - `pnpm compass:validate`
   - Run Compass validation workspace-wide.
-- `pnpm exec site-kernel run tokens.ds.lint`
+- `pnpm exec werkstatt run tokens.ds.lint`
   - Validate ultra-strict design token rule: only `--ds-*` CSS custom properties are allowed.
-- `pnpm exec site-kernel run tokens.colors.lint`
+- `pnpm exec werkstatt run tokens.colors.lint`
   - Validate no raw colors in app CSS.
 
 ## Project invariants (do not break)
@@ -57,7 +57,7 @@ This repository is optimized for a high-signal workflow for both humans and AI a
 - [ ] `pnpm build:check` passes.
 - [ ] `pnpm test` passes.
 - [ ] `pnpm lint:packages` passes.
-- [ ] `pnpm exec site-kernel run tokens.ds.lint` passes.
+- [ ] `pnpm exec werkstatt run tokens.ds.lint` passes.
 - [ ] URL routing behavior is unchanged unless explicitly intended.
 
 ### Performance

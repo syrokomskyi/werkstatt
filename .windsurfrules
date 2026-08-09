@@ -52,8 +52,8 @@ without `rtk` for the entire session.
 When a skill instruction uses `ref(forge.yaml bindings.commands.<key>)`, do not
 prefix the `ref()` with `rtk`. Instead, add `rtk` after the binding is resolved
 to a concrete command. Example: `ref(forge.yaml bindings.commands.validateRfc)`
-resolves to `pnpm exec site-kernel run rfc.validate` — run as
-`rtk pnpm exec site-kernel run rfc.validate`.
+resolves to `pnpm exec werkstatt run rfc.validate` — run as
+`rtk pnpm exec werkstatt run rfc.validate`.
 
 ## RTK's own commands exemption
 

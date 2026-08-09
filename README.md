@@ -14,7 +14,7 @@ missions/<missionId>/workpiece/       ◄── active mission workpiece (deploy
 ├─ src/content/business-profile/<lang>/*  ── canonical business data (consumed by @warpgogol/pbp)
 ├─ src/pages/[...slug].astro          ── thin unprefixed default-language route
 ├─ src/pages/[lang]/[...slug].astro   ── thin non-default-language route
-└─ tools/kernel.config.ts             ── site-kernel pipelines
+└─ tools/kernel.config.ts             ── kernel pipelines
 
 services/                             ◄── deployable backend runtime compositions
 └─ check-warpgogol-runner              ── Node/Playwright runner for Check Warpgogol runs
@@ -28,7 +28,7 @@ packages/                             ◄── all logic lives here
 ├─ integration-adapter-stripe / -supabase-crm  ── Stripe billing source + CRM-buffer destination
 ├─ pbp / growth / growth-adapter-* / passport / nebula / star-map / tokens
 ├─ agent-gate                          ── stateless MCP endpoint + action routes (RFC-0290)
-└─ os/site-kernel*                    ── CLI core + content loaders + validators + scaffold + internal handoff
+└─ werkstatt                          ── CLI core + content loaders + validators + scaffold + internal handoff (RFC-0772)
 ```
 
 Sites are registered as Sternsystemen in `systems/registry.yaml` and materialized as mission workpieces under `missions/<missionId>/workpiece/`. Pages are declared in `src/content/system.md` (which `cosmicPlanet` sections each route uses) and authored as YAML-only `*.md` blocks in `src/content/pages/`. Thin generated routes call `buildPage()` and dispatch each block to a `@warpgogol/ui` section by `cosmicName`; the default language is served unprefixed, while non-default languages live under `/<lang>/`. The `apps/*` directory is retired (RFC-0381). Read the architecture diagrams and rules in [`AGENTS.md`](AGENTS.md), [`docs/authoring/site-composition.md`](docs/authoring/site-composition.md), and [`packages/AGENTS.md`](packages/AGENTS.md).
@@ -60,8 +60,8 @@ pnpm --filter <site-name> build
 # Type-check the whole workspace
 pnpm -r build:check
 
-# Run the site-kernel CLI (validators, scaffolds, codegen)
-pnpm exec site-kernel --help
+# Run the werkstatt CLI (validators, scaffolds, codegen)
+pnpm exec werkstatt --help
 ```
 
 If you cloned without running onboarding, invoke the `setup-ecosystem` skill to configure hooks and verify the ecosystem automatically.
@@ -76,7 +76,7 @@ pnpm --filter check-warpgogol-runner run:once
 pnpm --filter check-warpgogol-runner dev
 
 # Backend workspace validators
-pnpm exec site-kernel run services.check.run
+pnpm exec werkstatt run services.check.run
 ```
 
 Keep the Check Warpgogol product surface and `services/check-warpgogol-runner` decoupled through shared contracts in `packages/check-core`; the site never imports runner code, and the runner never imports site code.
@@ -84,12 +84,12 @@ Keep the Check Warpgogol product surface and `services/check-warpgogol-runner` d
 ## Onboarding a new client site
 
 ```sh
-pnpm exec site-kernel run onboarding.scaffold \
+pnpm exec werkstatt run onboarding.scaffold \
   --client <id> --domain <fqdn> \
   --biome <biome-id> --constellation <constellation-id>
 
-pnpm exec site-kernel run onboarding.checklist --client <id>
-pnpm exec site-kernel run app.contract.full --site <id>
+pnpm exec werkstatt run onboarding.checklist --client <id>
+pnpm exec werkstatt run app.contract.full --site <id>
 ```
 
 Then edit only the mission workpiece's `src/content/system.md` and the contents of `src/content/**`. Never copy an existing site workspace.
@@ -101,11 +101,11 @@ RFC-0221 adds a thin internal handoff model for moving a site between developers
 Implemented commands:
 
 ```sh
-pnpm exec site-kernel run handoff.validate --bundle ../handoff/<app>
-pnpm exec site-kernel run migrator.registry.validate
-pnpm exec site-kernel run handoff.pack --site <app>
-pnpm exec site-kernel run handoff.absorb --bundle ../handoff/<app> --report-only
-pnpm exec site-kernel run handoff.absorb --bundle ../handoff/<app> --regen
+pnpm exec werkstatt run handoff.validate --bundle ../handoff/<app>
+pnpm exec werkstatt run migrator.registry.validate
+pnpm exec werkstatt run handoff.pack --site <app>
+pnpm exec werkstatt run handoff.absorb --bundle ../handoff/<app> --report-only
+pnpm exec werkstatt run handoff.absorb --bundle ../handoff/<app> --regen
 ```
 
 `handoff.absorb` builds the catch-up report, refuses downgrades (older recipient ecosystem → `git pull` first), then materializes: it applies the forward migrator chain, injects the authored set into the target site workspace, and delegates regeneration + validation to `build.prepare` / `build.check`. Use `--report-only` to stop before any write, `--as <name>` to materialize under a different site name, `--regen` to run regeneration immediately, and `--force` to override the red-tier manual-decision gate. The bundle carries the Compass-complete authored partition (authored code + content + assets, generated files excluded); `--regen` is reliable for in-place absorb into an existing site — a from-scratch new-site pilot (scaffold + install) is the open follow-up.
@@ -120,25 +120,25 @@ The project uses RFCs (`docs/rfcs/`) for structural changes. Key commands:
 
 ```sh
 # Create a new RFC draft
-pnpm exec site-kernel run rfc.create --title "Short title" --kind architecture
+pnpm exec werkstatt run rfc.create --title "Short title" --kind architecture
 
 # Validate all RFCs
-pnpm exec site-kernel run rfc.validate --json
+pnpm exec werkstatt run rfc.validate --json
 
 # Emit verification evidence for an RFC with acceptance probes
-pnpm exec site-kernel run rfc.verification.emit --id RFC-XXXX
+pnpm exec werkstatt run rfc.verification.emit --id RFC-XXXX
 
 # Generate the DNA-trace matrix (which RFCs satisfy which DNA invariants)
-pnpm exec site-kernel run rfc.dna.trace.generate
+pnpm exec werkstatt run rfc.dna.trace.generate
 
 # Generate the decision log (rejected/superseded RFCs + alternatives)
-pnpm exec site-kernel run rfc.decision-log.generate
+pnpm exec werkstatt run rfc.decision-log.generate
 
 # Run independent black-box QA against a built app (page probes via Playwright)
-pnpm exec site-kernel run qa.independent.run --site <app-name>
+pnpm exec werkstatt run qa.independent.run --site <app-name>
 
 # Derive change impact class and recommended check profile
-pnpm exec site-kernel run change.impact.derive --paths "src/foo.ts,docs/bar.md"
+pnpm exec werkstatt run change.impact.derive --paths "src/foo.ts,docs/bar.md"
 ```
 
 Architecture and contract RFCs must declare `satisfies: [DNA-XX]` (RFC-0331). Decided RFCs require `reviewers: [human:<handle>]` (RFC-0335).
