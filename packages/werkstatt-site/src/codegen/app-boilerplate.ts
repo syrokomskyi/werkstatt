@@ -14,6 +14,7 @@
   <item>RFC-0309: routes.generate no longer emits a favicon.ico redirect route; public.icons.generate owns the binary favicon.</item>
   <item>RFC-0310: routes.generate emits the generated shared 404 route.</item>
   <item>RFC-0318: public.infrastructure.generate merges generated retired-surface redirects.</item>
+  <item>RFC-0784: public.infrastructure.generate resolves {{AGENT_LINK_HEADERS}} token based on agent.enabled flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -334,6 +335,22 @@ export async function runGeneratePublicInfrastructure(
   }
 
   const defaultLang = getDefaultLanguage(manifest);
+
+  // RFC-0784: Resolve agent discovery Link headers based on agent.enabled flag.
+  // When agent.enabled is false, omit all agent-surface Link headers.
+  const agentBlock = (manifest as unknown as Record<string, unknown>).agent as
+    { enabled?: boolean } | undefined;
+  const agentEnabled = agentBlock?.enabled !== false;
+  const agentLinkHeaders = agentEnabled
+    ? [
+        '  Link: < /.well-known/agent.json>; rel="service-meta"; type="application/json"',
+        '  Link: < /.well-known/agent.openapi.json>; rel="service-desc"; type="application/json"',
+        '  Link: < /.well-known/api-catalog>; rel="service-desc"; type="application/linkset+json"',
+        '  Link: < /.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"',
+        '  Link: < /llms.txt>; rel="service-doc"; type="text/plain"',
+      ].join("\n")
+    : "";
+
   const tokens: Record<string, string> = {
     DOMAIN: domain,
     DEFAULT_LANG: defaultLang,
@@ -348,6 +365,7 @@ export async function runGeneratePublicInfrastructure(
       site: manifest.app,
       filePath: "public/_headers",
     }).trimEnd(),
+    AGENT_LINK_HEADERS: agentLinkHeaders,
   };
   // robots.txt is owned by `robots.generate` (RFC-0052) — the build pipeline's
   // canonical builder reads identity.domain + system.md robots: block.
