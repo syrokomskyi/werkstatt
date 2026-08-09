@@ -212,12 +212,12 @@ This RFC is a specification; it has no runtime rollout. It is `implemented` when
 
 ## Acceptance criteria
 
-- [ ] Module map table reviewed and accepted by the operator
-- [ ] Every `packages/os/*` package and `packages/fingerprint`, `packages/agent-gate` assigned to engine, plugin, or workshop-local
-- [ ] Engine subpath export list drafted
-- [ ] Decision protocol for unlisted files documented
-- [ ] RFC-0772 references this map as its normative input
-- [ ] `rfc.validate` passes on this file before merging
+- [x] Module map table reviewed and accepted by the operator (evidence: operator confirmed classifications during enhance/grilling — selected "Site plugin" for `check-core` and `studio-gate`, reviewed all 22 engine modules, 13 plugin modules, 7 workshop-local items)
+- [x] Every `packages/os/*` package and `packages/fingerprint`, `packages/agent-gate` assigned to engine, plugin, or workshop-local (evidence: `docs/rfcs/rfc-0771-werkstatt-engine-core-package-composition.md:106-158` — 22 engine modules, 13 plugin modules, 7 workshop-local items; all 12 `packages/os/*` + `packages/fingerprint` + `packages/agent-gate` classified)
+- [x] Engine subpath export list drafted (evidence: `docs/plans/plan-rfc-0771-werkstatt-engine-core-package-composition.md:170-293` — Appendix A, 25 subpath entries covering all 22 engine modules + `.` barrel + `./fingerprint/semantic` + `./schemas`)
+- [x] Decision protocol for unlisted files documented (evidence: `docs/rfcs/rfc-0771-werkstatt-engine-core-package-composition.md` — "Decision protocol for unlisted files" section with 4-step protocol)
+- [x] RFC-0772 references this map as its normative input (evidence: `docs/rfcs/rfc-0772-consolidate-engine-core-into-packages-werkstatt-with-plugin-registry.md:79` — "RFC-0771 defines the normative module map for the engine"; `:155` — "packages/werkstatt exists and contains all RFC-0771 engine modules")
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0771 --json` — status: pass, zero violations, 2026-08-09)
 
 ## Implementation notes for agents
 
