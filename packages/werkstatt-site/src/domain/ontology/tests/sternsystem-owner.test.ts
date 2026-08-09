@@ -1,26 +1,25 @@
 import { test, expect, describe } from "vitest";
-import { fleetRegistryEntrySchema } from "../operations/sternsystem.ts";
+import { systemConfigSchema } from "@warpgogol/werkstatt/schemas";
 
 const validBaseEntry = {
+  schemaVersion: "system-config/v1",
   id: "test-site",
   cosmicStar: "Vega",
   mirrors: [{ path: "https://github.com/org/test-site", storageType: "non-bare" }],
   pinnedPlatform: "1.0.0",
-  currentMission: null,
-  lastRelease: null,
-  status: "registered" as const,
+  status: "active" as const,
   registeredAt: "2026-07-27T00:00:00Z",
   notes: "",
 };
 
-describe("fleetRegistryEntrySchema owner field (RFC-0561)", () => {
+describe("systemConfigSchema owner field (RFC-0561)", () => {
   test("accepts entry without owner (backwards compatible)", () => {
-    const result = fleetRegistryEntrySchema.parse(validBaseEntry);
+    const result = systemConfigSchema.parse(validBaseEntry);
     expect(result.owner).toBeUndefined();
   });
 
   test("accepts entry with valid did:web owner", () => {
-    const result = fleetRegistryEntrySchema.parse({
+    const result = systemConfigSchema.parse({
       ...validBaseEntry,
       owner: "did:web:warpgogol.com#operator-v1",
     });
@@ -29,7 +28,7 @@ describe("fleetRegistryEntrySchema owner field (RFC-0561)", () => {
 
   test("rejects entry with non-did:web owner", () => {
     expect(() =>
-      fleetRegistryEntrySchema.parse({
+      systemConfigSchema.parse({
         ...validBaseEntry,
         owner: "not-a-did",
       }),
@@ -38,7 +37,7 @@ describe("fleetRegistryEntrySchema owner field (RFC-0561)", () => {
 
   test("rejects entry with empty string owner", () => {
     expect(() =>
-      fleetRegistryEntrySchema.parse({
+      systemConfigSchema.parse({
         ...validBaseEntry,
         owner: "",
       }),
@@ -47,7 +46,7 @@ describe("fleetRegistryEntrySchema owner field (RFC-0561)", () => {
 
   test("rejects entry with did:web but no key-version fragment", () => {
     expect(() =>
-      fleetRegistryEntrySchema.parse({
+      systemConfigSchema.parse({
         ...validBaseEntry,
         owner: "did:web:warpgogol.com",
       }),
@@ -55,7 +54,7 @@ describe("fleetRegistryEntrySchema owner field (RFC-0561)", () => {
   });
 
   test("accepts entry with did:web owner with subdomain", () => {
-    const result = fleetRegistryEntrySchema.parse({
+    const result = systemConfigSchema.parse({
       ...validBaseEntry,
       owner: "did:web:sub.example.com#key-1",
     });

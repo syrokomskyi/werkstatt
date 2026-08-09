@@ -23,14 +23,14 @@ function makeContext(workspaceRoot: string): KernelRuntimeContext {
 function writeRegistry(dir: string, services: Array<Record<string, unknown>>): void {
   const yaml = [
     "schemaVersion: 1.0.0",
-    "systems: []",
     "services:",
     ...services.map(
       (s) =>
         `  - id: ${s.id}\n    kind: ${s.kind}\n    workerName: ${s.workerName}\n    hostedBy: studio\n    url: ${s.url}\n    publicEndpoints: ${s.publicEndpoints ?? false}\n    subdomains: []\n    lastDeployed:\n      at: null\n      state: null\n      operationId: null`,
     ),
   ].join("\n");
-  writeFileSync(join(dir, "systems", "registry.yaml"), yaml + "\n");
+  mkdirSync(join(dir, "services"), { recursive: true });
+  writeFileSync(join(dir, "services", "registry.yaml"), yaml + "\n");
 }
 
 function writeServiceConfig(dir: string, id: string, opts: { kind?: string } = {}): void {

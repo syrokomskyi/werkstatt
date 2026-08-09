@@ -29,8 +29,7 @@ import {
   type WerkstattIdentityConfig,
   type WerkstattCredential,
 } from "@warpgogol/werkstatt-site/passport";
-import { fleetRegistrySchema } from "@warpgogol/werkstatt-site/ontology/operations";
-import { parse as parseYaml } from "yaml";
+import { readSystemConfig } from "@warpgogol/werkstatt/sternsystem";
 
 export interface StudioGateAuthResult {
   authenticated: boolean;
@@ -203,27 +202,14 @@ export async function verifyOwnership(
   credentialSubjectId: string,
   werkstattRoot: string,
 ): Promise<OwnershipResult> {
-  const registryPath = join(werkstattRoot, "systems", "registry.yaml");
-  let raw: string;
+  let config;
   try {
-    raw = await readFile(registryPath, "utf-8");
+    config = await readSystemConfig(werkstattRoot, siteId);
   } catch {
-    return { verified: false, error: "registry-not-found" };
-  }
-
-  let registry;
-  try {
-    registry = fleetRegistrySchema.parse(parseYaml(raw));
-  } catch (parseErr) {
-    return { verified: false, error: `registry-parse-error: ${(parseErr as Error).message}` };
-  }
-
-  const entry = registry.systems.find((s) => s.id === siteId);
-  if (!entry) {
     return { verified: false, error: "site-not-found" };
   }
 
-  if (!entry.owner) {
+  if (!config.owner) {
     return {
       verified: false,
       error: "owner-not-registered",
@@ -232,18 +218,18 @@ export async function verifyOwnership(
     };
   }
 
-  if (entry.owner !== credentialSubjectId) {
+  if (config.owner !== credentialSubjectId) {
     return {
       verified: false,
       error: "owner-mismatch",
-      registryOwner: entry.owner,
+      registryOwner: config.owner,
       credentialSubjectId,
     };
   }
 
   return {
     verified: true,
-    registryOwner: entry.owner,
+    registryOwner: config.owner,
     credentialSubjectId,
   };
 }

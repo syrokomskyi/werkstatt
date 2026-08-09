@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0751: service.registry.validate — validates the services: key in systems/registry.yaml. Cross-checks each entry with services/<id>/service.config.yaml. Workspace-scoped command.</purpose>
+<purpose>RFC-0751: service.registry.validate — validates services/registry.yaml. Cross-checks each entry with services/<id>/service.config.yaml. Workspace-scoped command.</purpose>
 <non-goals>
   <item>Does not validate Worker names — that is service.naming.validate.</item>
   <item>Does not deploy services — that is leitstand.service.deploy.</item>
@@ -36,14 +36,14 @@ export async function runServiceRegistryValidate(
 ): Promise<KernelCommandResult<CheckResult>> {
   const diagnostics: Diagnostic[] = [];
   const { workspaceRoot } = context;
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
+  const registryPath = join(workspaceRoot, "services", "registry.yaml");
 
   if (!existsSync(registryPath)) {
     diagnostics.push({
       ruleId: "SVC-REG-01",
       severity: "error",
-      file: "systems/registry.yaml",
-      message: "Registry file not found at systems/registry.yaml.",
+      file: "services/registry.yaml",
+      message: "Registry file not found at services/registry.yaml.",
     });
     return diagnosticsResult("service.registry.validate", diagnostics);
   }
@@ -56,7 +56,7 @@ export async function runServiceRegistryValidate(
     diagnostics.push({
       ruleId: "SVC-REG-01",
       severity: "error",
-      file: "systems/registry.yaml",
+      file: "services/registry.yaml",
       message: `Failed to parse registry: ${err instanceof Error ? err.message : String(err)}`,
     });
     return diagnosticsResult("service.registry.validate", diagnostics);
@@ -67,7 +67,7 @@ export async function runServiceRegistryValidate(
     diagnostics.push({
       ruleId: "SVC-REG-02",
       severity: "error",
-      file: "systems/registry.yaml",
+      file: "services/registry.yaml",
       message: "No services: key found in registry. Add CF Worker service entries.",
       fixHint: "Add a services: key with entries for each Cloudflare Worker service.",
     });
@@ -85,7 +85,7 @@ export async function runServiceRegistryValidate(
       diagnostics.push({
         ruleId: "SVC-REG-03",
         severity: "error",
-        file: "systems/registry.yaml",
+        file: "services/registry.yaml",
         message: "Service entry missing required 'id' field.",
       });
       continue;
@@ -96,7 +96,7 @@ export async function runServiceRegistryValidate(
       diagnostics.push({
         ruleId: "SVC-REG-04",
         severity: "error",
-        file: "systems/registry.yaml",
+        file: "services/registry.yaml",
         message: `Duplicate service id '${id}'.`,
       });
     }
@@ -108,14 +108,14 @@ export async function runServiceRegistryValidate(
       diagnostics.push({
         ruleId: "SVC-REG-03",
         severity: "error",
-        file: "systems/registry.yaml",
+        file: "services/registry.yaml",
         message: `Service '${id}' missing required 'workerName' field.`,
       });
     } else if (workerName !== id) {
       diagnostics.push({
         ruleId: "SVC-REG-05",
         severity: "error",
-        file: "systems/registry.yaml",
+        file: "services/registry.yaml",
         message: `Service '${id}': workerName '${workerName}' must equal id '${id}'.`,
       });
     }
@@ -125,7 +125,7 @@ export async function runServiceRegistryValidate(
         diagnostics.push({
           ruleId: "SVC-REG-04",
           severity: "error",
-          file: "systems/registry.yaml",
+          file: "services/registry.yaml",
           message: `Duplicate workerName '${workerName}'.`,
         });
       }
