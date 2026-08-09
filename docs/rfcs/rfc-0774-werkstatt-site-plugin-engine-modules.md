@@ -1,7 +1,7 @@
 ---
 id: RFC-0774
 title: "Werkstatt site plugin engine modules"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
