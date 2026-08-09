@@ -24,7 +24,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 const STUB_PATTERN = /JSON\.stringify\s*\(\s*pageOverride/;
 

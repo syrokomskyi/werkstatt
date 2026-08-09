@@ -6,8 +6,8 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0303: became a thin re-export shim over the canonical @warpgogol/share/fs fileExists; kept so existing "./lib/file-exists.ts" imports keep working.</item>
+  <item>RFC-0303: became a thin re-export shim over the canonical @warpgogol/werkstatt-site/share/fs fileExists; kept so existing "./lib/file-exists.ts" imports keep working.</item>
 </CHANGE_SUMMARY>
 */
 
-export { fileExists } from "@warpgogol/share/fs";
+export { fileExists } from "@warpgogol/werkstatt-site/share/fs";

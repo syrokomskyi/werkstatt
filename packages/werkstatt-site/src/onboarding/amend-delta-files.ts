@@ -19,7 +19,7 @@ shared-context resolution still sees them).</purpose>
 
 import { access, readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {
   KernelCommandInput,

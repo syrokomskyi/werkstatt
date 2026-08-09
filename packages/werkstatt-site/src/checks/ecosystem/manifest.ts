@@ -19,7 +19,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { byteHash } from "@warpgogol/fingerprint";
-import { readJsonFile } from "@warpgogol/share/fs";
+import { readJsonFile } from "@warpgogol/werkstatt-site/share/fs";
 import {
   listSiteWorkspaces,
   listRegisteredKernelCommands,

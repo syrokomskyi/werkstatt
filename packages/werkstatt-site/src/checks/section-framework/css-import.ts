@@ -16,7 +16,7 @@ colocated .astro filename.</purpose>
 
 import { join, relative, basename, dirname } from "node:path";
 import { readFile } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

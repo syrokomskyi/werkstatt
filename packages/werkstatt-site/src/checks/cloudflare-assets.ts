@@ -27,7 +27,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { fileExists } from "./lib/file-exists.ts";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import {
   runRuntimeFunctionalHealthInstrument,
   type RuntimeHealthState,

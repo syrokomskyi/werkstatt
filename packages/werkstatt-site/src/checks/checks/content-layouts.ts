@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>content.layouts.validate — validates the src/content/layouts/ content layer
-structure per RFC-0021 (registry-only apps using @warpgogol/ui's layout are skipped).</purpose>
+structure per RFC-0021 (registry-only apps using @warpgogol/werkstatt-site/ui's layout are skipped).</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -40,7 +40,7 @@ export async function runContentLayoutsValidation(
 
   // Post-RFC-0023: when neither src/content/layouts/ nor
   // src/content/schemas/layouts/ exists, the app uses the canonical
-  // `@warpgogol/ui` layout — this is a valid registry-only configuration. Skip
+  // `@warpgogol/werkstatt-site/ui` layout — this is a valid registry-only configuration. Skip
   // the entire RFC-0021 contract in that case (registry-only mode).
   let layoutsContentDirExists = true;
   let layoutsSchemasDirExists = true;
@@ -59,7 +59,7 @@ export async function runContentLayoutsValidation(
       data: { violations: 0, checkedFiles: 0 },
       exitCode: 0,
       summary:
-        "[content.layouts.validate] skipped — registry-only mode (using @warpgogol/ui layout)",
+        "[content.layouts.validate] skipped — registry-only mode (using @warpgogol/werkstatt-site/ui layout)",
     };
   }
 
@@ -101,7 +101,7 @@ export async function runContentLayoutsValidation(
 
   // Check 3: src/content/schemas/layouts/ exists.
   // Post-RFC-0023: when the directory is absent, the layout schema is provided
-  // by @warpgogol/ui's layout component types. Content still exists locally for
+  // by @warpgogol/werkstatt-site/ui's layout component types. Content still exists locally for
   // translated strings; treat the missing schema dir as registry-only and skip.
   let schemaFiles: string[] = [];
   try {
@@ -112,7 +112,7 @@ export async function runContentLayoutsValidation(
       violations.push(`src/content/schemas/layouts/: no .ts schema files found`);
     }
   } catch {
-    // Registry-only mode: schema lives in @warpgogol/ui — no violation.
+    // Registry-only mode: schema lives in @warpgogol/werkstatt-site/ui — no violation.
   }
 
   // Check 4: schemas must not have -component suffix

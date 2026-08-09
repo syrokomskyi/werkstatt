@@ -18,14 +18,14 @@ from a biome axes block or a full biome YAML, with optional in-place write.
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import YAML from "yaml";
-import { readYamlFile } from "@warpgogol/share/fs";
+import { readYamlFile } from "@warpgogol/werkstatt-site/share/fs";
 import {
   biomeAxesSchema,
   biomeSchema,
   type Biome,
   type BiomeAxes,
   type BiomeSiteBackground,
-} from "@warpgogol/ontology";
+} from "@warpgogol/werkstatt-site/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,

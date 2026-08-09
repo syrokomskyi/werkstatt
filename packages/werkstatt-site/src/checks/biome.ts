@@ -23,9 +23,9 @@ Biome contract:
 import { readFile, readdir } from "node:fs/promises";
 import { join, relative, extname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { biomeSchema, siteFamilySchema } from "@warpgogol/ontology/schemas";
-import { getAllProjectedTokenNames } from "@warpgogol/ontology";
-import { TOKEN_NAME_SET } from "@warpgogol/tokens";
+import { biomeSchema, siteFamilySchema } from "@warpgogol/werkstatt-site/ontology/schemas";
+import { getAllProjectedTokenNames } from "@warpgogol/werkstatt-site/ontology";
+import { TOKEN_NAME_SET } from "@warpgogol/werkstatt-site/tokens";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {
   KernelCommandInput,
@@ -33,7 +33,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { fileExists } from "./lib/file-exists.ts";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -175,7 +175,7 @@ export const INTEGRATION_FUNNEL_COMMANDS: CheckCommandEntry[] = [
   {
     name: "chat.metadata.drift.validate",
     description:
-      "Workspace-scoped drift guard: verify CHAT_ADAPTER_METADATA in @warpgogol/chat matches the requiredOptions/vendorOrigins declared on each ChatWidgetAdapter in chat-adapter-* packages.",
+      "Workspace-scoped drift guard: verify CHAT_ADAPTER_METADATA in @warpgogol/werkstatt-site/chat matches the requiredOptions/vendorOrigins declared on each ChatWidgetAdapter in chat-adapter-* packages.",
     scope: "workspace",
     flags: {},
     reads: ["packages/chat/src/**/*.ts", "packages/chat-adapter-*/src/**/*.ts"],

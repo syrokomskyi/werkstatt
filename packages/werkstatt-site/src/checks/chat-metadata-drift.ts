@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Workspace-scoped drift guard for CHAT_ADAPTER_METADATA (@warpgogol/chat) vs the runtime
+<purpose>Workspace-scoped drift guard for CHAT_ADAPTER_METADATA (@warpgogol/werkstatt-site/chat) vs the runtime
 requiredOptions/vendorOrigins declared on each ChatWidgetAdapter in chat-adapter-* packages.
 The metadata catalog is a build-time twin for Node-side validators that cannot import DOM-targeted
 adapter packages. This check ensures the twin does not silently drift from the runtime declaration.</purpose>
@@ -20,7 +20,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { CHAT_ADAPTER_IDS, getChatAdapterMetadata } from "@warpgogol/chat";
+import { CHAT_ADAPTER_IDS, getChatAdapterMetadata } from "@warpgogol/werkstatt-site/chat";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 /** Extract a `requiredOptions: [["a", "b"]]` literal from source text. */

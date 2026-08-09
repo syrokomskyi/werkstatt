@@ -17,7 +17,7 @@ file in packages/ontology/growth/events/ (ontology coverage check — RFC-0027 A
 <CHANGE_SUMMARY>
   <item>Wave 1 (RFC-0027): Initial creation.</item>
   <item>RFC-0030 defect fix: Replace hardcoded VALID_EVENT_NAMES set with imported EVENT_NAMES from
-    @warpgogol/growth (single source of truth — DNA-27 / RFC-0027 AC).</item>
+    @warpgogol/werkstatt-site/growth (single source of truth — DNA-27 / RFC-0027 AC).</item>
   <item>RFC-0030 defect fix: Add ontology coverage check — every EVENT_NAMES entry must have a
     corresponding .yaml file in packages/ontology/growth/events/.</item>
 </CHANGE_SUMMARY>
@@ -31,11 +31,11 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { EVENT_NAMES } from "@warpgogol/growth/adapter";
+import { EVENT_NAMES } from "@warpgogol/werkstatt-site/growth/adapter";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------
-// Single source of truth — derived from @warpgogol/growth EVENT_NAMES (DNA-27)
+// Single source of truth — derived from @warpgogol/werkstatt-site/growth EVENT_NAMES (DNA-27)
 // Do NOT maintain a separate hardcoded set here.
 // ---------------------------------------------------------------------------
 
@@ -174,8 +174,8 @@ export async function runGrowthEventsValidate(
       continue;
     }
 
-    // Only check files that import from @warpgogol/growth
-    if (!content.includes("@warpgogol/growth")) continue;
+    // Only check files that import from @warpgogol/werkstatt-site/growth
+    if (!content.includes("@warpgogol/werkstatt-site/growth")) continue;
 
     let match: RegExpExecArray | null;
     EMIT_CALL_PATTERN.lastIndex = 0;

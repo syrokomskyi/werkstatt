@@ -12,7 +12,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { parseDocument } from "yaml";
 import type {
   CheckResult,
@@ -24,7 +24,7 @@ import type {
 import {
   calculateOfferCapacityState,
   type OfferCapacityPolicy,
-} from "@warpgogol/share/offer-capacity";
+} from "@warpgogol/werkstatt-site/share/offer-capacity";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const COMMAND = "offer.capacity.validate";

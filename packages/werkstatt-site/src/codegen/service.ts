@@ -25,7 +25,7 @@ import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import {
   parseMaterialCreditMap,
   type MaterialCreditRecord,
-} from "@warpgogol/share/material-credits";
+} from "@warpgogol/werkstatt-site/share/material-credits";
 import {
   formatMaterialCreditLine,
   labelForMaterialCreditRole,
@@ -35,9 +35,9 @@ import {
   materialCreditLabelsSchema,
   materialTargetKey,
   type MaterialCreditLabels,
-} from "@warpgogol/share/schemas/material-credit";
+} from "@warpgogol/werkstatt-site/share/schemas/material-credit";
 import { hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
-import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.join(__dirname, "..", "src", "templates", "service");
@@ -226,11 +226,11 @@ export async function runGenerateIcons(
   }
 
   if (jsonFiles.length === 0) {
-    // Apps that consume icons only from @warpgogol/ui have no app-level icon
+    // Apps that consume icons only from @warpgogol/werkstatt-site/ui have no app-level icon
     // assets — this is the expected case post-RFC-0023. Silently skip.
     return {
       data: { writtenFiles: 0, skippedExists: 0, indexSkipped: 0 },
-      summary: "[icons.generate] no app-level icons (using @warpgogol/ui)",
+      summary: "[icons.generate] no app-level icons (using @warpgogol/werkstatt-site/ui)",
     };
   }
 

@@ -25,7 +25,7 @@ import {
   loadSystemManifest,
   parseMarkdownFrontmatter,
 } from "@warpgogol/werkstatt-site/content";
-import { BLOCK_EXTRACTORS } from "@warpgogol/share/semantic";
+import { BLOCK_EXTRACTORS } from "@warpgogol/werkstatt-site/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { failResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";

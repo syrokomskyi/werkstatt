@@ -20,8 +20,8 @@ Manual command — not in any pipeline. Idempotent: re-running on already-migrat
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { collectMarkdownFiles } from "@warpgogol/werkstatt-site/content";
-import { scanFormulas } from "@warpgogol/share/formula-eval";
-import { loadContentRefIndex } from "@warpgogol/share/content-reference";
+import { scanFormulas } from "@warpgogol/werkstatt-site/share/formula-eval";
+import { loadContentRefIndex } from "@warpgogol/werkstatt-site/share/content-reference";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -35,7 +35,7 @@ const HARDCODED_FORMULA_PATTERN =
   /([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*)\s*[+\-*/]\s*([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*(?:\s*[+\-*/]\s*\d+)*)/g;
 
 // RFC-0723: detect bare braceless refs in mixed strings
-// Field path uses the fixed pattern from @warpgogol/share (no trailing dots)
+// Field path uses the fixed pattern from @warpgogol/werkstatt-site/share (no trailing dots)
 const BRACELESS_PATTERN =
   /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*)\b/g;
 

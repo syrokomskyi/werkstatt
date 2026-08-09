@@ -31,8 +31,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
-import { surfaceAncestorPageIds } from "@warpgogol/share/semantic";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
+import { surfaceAncestorPageIds } from "@warpgogol/werkstatt-site/share/semantic";
 import { failResult, passResult } from "./result-helpers.ts";
 
 const ARTIFACT_FILE = "src/surface.generated.yaml";
@@ -93,7 +93,7 @@ function validateSurfaceHierarchy(entries: VirtualRouteEntry[], defaultLang: str
 
   for (const entry of entries) {
     if (!entry.indexable || entry.noindex) continue;
-    // RFC-0229: the surface hierarchy shape is owned by @warpgogol/share so the validator and the
+    // RFC-0229: the surface hierarchy shape is owned by @warpgogol/werkstatt-site/share so the validator and the
     // render-time resolver cannot drift.
     for (const ancestorId of surfaceAncestorPageIds(entry.pageId)) {
       const ancestor = byId.get(ancestorId);

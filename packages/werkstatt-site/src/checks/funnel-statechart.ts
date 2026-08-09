@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0219: Visitor funnel + subscription lifecycle state-chart generator and drift-validator.
 `funnel.statechart.generate` emits a GENERATED Mermaid stateDiagram-v2 document derived purely from
-the canonical transition + trigger maps in @warpgogol/integration. `funnel.statechart.validate`
+the canonical transition + trigger maps in @warpgogol/werkstatt-site/integration. `funnel.statechart.validate`
 regenerates the document in memory and asserts byte-equality with the committed artifact, plus the
 trigger↔graph bijection invariant for both layers. Node-safe: file I/O + pure contracts only.</purpose>
 <non-goals>
@@ -30,9 +30,9 @@ import {
   SUBSCRIPTION_TRANSITIONS,
   VISITOR_FUNNEL_STAGES,
   isValidFunnelStage,
-} from "@warpgogol/integration";
-import type { VisitorFunnelStage } from "@warpgogol/integration";
-import { SUBSCRIPTION_STATUSES } from "@warpgogol/integration";
+} from "@warpgogol/werkstatt-site/integration";
+import type { VisitorFunnelStage } from "@warpgogol/werkstatt-site/integration";
+import { SUBSCRIPTION_STATUSES } from "@warpgogol/werkstatt-site/integration";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 /** Workspace-relative path to the committed generated document (RFC-0219). */
@@ -195,7 +195,7 @@ export function generateFunnelStatechartDocument(): string {
     "",
     "> Generated from `FUNNEL_TRANSITIONS` + `FUNNEL_TRANSITION_TRIGGERS` (Layer 1) and",
     "> `SUBSCRIPTION_TRANSITIONS` + `SUBSCRIPTION_TRANSITION_TRIGGERS` (Layer 2) in",
-    "> `@warpgogol/integration`. Do not edit — run `funnel.statechart.generate` to regenerate.",
+    "> `@warpgogol/werkstatt-site/integration`. Do not edit — run `funnel.statechart.generate` to regenerate.",
     "",
     "## Layer 1 — Visitor Sales Funnel",
     "",

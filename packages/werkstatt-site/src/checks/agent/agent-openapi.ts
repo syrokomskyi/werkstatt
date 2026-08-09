@@ -31,7 +31,7 @@ import {
   type AgentSurfaceManifest,
   type OpenApiDocument,
   type CapabilitySchemaInput,
-} from "@warpgogol/share/agent";
+} from "@warpgogol/werkstatt-site/share/agent";
 import { loadCapabilityCatalog } from "./agent-capability.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 

@@ -23,8 +23,8 @@ review instead of shipping silently.
 import { createHash } from "node:crypto";
 import { readFile, mkdir } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { fileExists, collectFiles } from "@warpgogol/share/fs";
-import { isHtmlRedirectPage, markdownTwinRelPath } from "@warpgogol/share/semantic";
+import { fileExists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { isHtmlRedirectPage, markdownTwinRelPath } from "@warpgogol/werkstatt-site/share/semantic";
 import {
   hasGeneratedMarker,
   writeFileIfChanged,

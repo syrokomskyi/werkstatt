@@ -26,8 +26,8 @@ import {
   type SurfaceManifest,
   type SurfaceState,
   type VirtualRouteEntry,
-} from "@warpgogol/surface";
-import { markdownTwinRelPath } from "@warpgogol/share/semantic";
+} from "@warpgogol/werkstatt-site/surface";
+import { markdownTwinRelPath } from "@warpgogol/werkstatt-site/share/semantic";
 
 export const ARTIFACT_FILE = "src/surface.generated.yaml";
 export const MANIFEST_FILE = "public/.well-known/pseo-manifest.json";

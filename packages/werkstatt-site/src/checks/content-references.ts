@@ -9,7 +9,7 @@ Validates braceless collection.file.field syntax only — brace-delimited syntax
 </non-goals>
 <notes>
   <item>RFC-0138: references in block props are substituted at render time by the shared
-        page handler (@warpgogol/share astro/page-handler). A reference that passes this
+        page handler (@warpgogol/werkstatt-site/share astro/page-handler). A reference that passes this
         validator therefore renders resolved, not as a literal brace string; a reference
         the render path cannot resolve fails here (no silent empty-string drift).</item>
   <item>RFC-0527: validator now uses the generated content-ref-index instead of reading files from disk.
@@ -45,9 +45,9 @@ import {
   readMarkdownDocument,
 } from "./content-discipline.ts";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
-import type { ContentRefIndex, SourceRef } from "@warpgogol/share/content-reference";
-import { resolveReference } from "@warpgogol/share/content-reference";
-import { scanFormulas, resolveFormula } from "@warpgogol/share/formula-eval";
+import type { ContentRefIndex, SourceRef } from "@warpgogol/werkstatt-site/share/content-reference";
+import { resolveReference } from "@warpgogol/werkstatt-site/share/content-reference";
+import { scanFormulas, resolveFormula } from "@warpgogol/werkstatt-site/share/formula-eval";
 
 const BRACELESS_PATTERN = /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_.-]+)\b/g;
 

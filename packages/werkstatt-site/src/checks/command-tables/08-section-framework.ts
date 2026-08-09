@@ -130,7 +130,7 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
   {
     name: "tokens.section-shell.contract.validate",
     description:
-      "Verify every --ds-* token referenced under the eight section-framework component directories exists in @warpgogol/tokens TOKEN_NAME_SET (RFC-0108 + RFC-0124).",
+      "Verify every --ds-* token referenced under the eight section-framework component directories exists in @warpgogol/werkstatt-site/tokens TOKEN_NAME_SET (RFC-0108 + RFC-0124).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
@@ -226,7 +226,7 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
   {
     name: "tokens.catalog.sync",
     description:
-      "Verify that every --ds-* custom property in packages/tokens/src/tokens.css is listed in @warpgogol/tokens TOKEN_NAMES and vice versa. Reports drift in both directions.",
+      "Verify that every --ds-* custom property in packages/tokens/src/tokens.css is listed in @warpgogol/werkstatt-site/tokens TOKEN_NAMES and vice versa. Reports drift in both directions.",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,

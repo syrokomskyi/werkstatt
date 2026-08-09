@@ -27,7 +27,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 // Permissive pattern: {word.word…} with at least one dot (any number of segments ≥ 2).
 // RFC-0045 field paths can be arbitrarily deep, so no upper bound is imposed.

@@ -23,7 +23,7 @@
 
 import { join, relative, basename, extname } from "node:path";
 import { readFile, writeFile, mkdir, stat, rm } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { byteHash } from "@warpgogol/fingerprint";
 import type {
   KernelCommandInput,
@@ -32,7 +32,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import type { ImageVariantEntry, ImageVariantManifest } from "@warpgogol/share/image-provider";
+import type { ImageVariantEntry, ImageVariantManifest } from "@warpgogol/werkstatt-site/share/image-provider";
 
 const MANIFEST_RELATIVE = "src/image-variants.generated.yaml";
 const VARIANTS_PUBLIC_DIR = "_img";

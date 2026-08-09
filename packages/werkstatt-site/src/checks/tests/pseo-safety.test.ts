@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pageText, type PageEntry } from "@warpgogol/surface";
+import { pageText, type PageEntry } from "@warpgogol/werkstatt-site/surface";
 import { runDemandModifierLint } from "../demand-modifier.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 

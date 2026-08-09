@@ -11,7 +11,7 @@
 */
 
 import { join, posix } from "node:path";
-import { captureSiteEvidenceGraph } from "@warpgogol/check-runner-node";
+import { captureSiteEvidenceGraph } from "@warpgogol/werkstatt-site/check-runner";
 import {
   checkRunArtifactSchema,
   makeRunId,
@@ -19,7 +19,7 @@ import {
   runRelDir,
   runRelPath,
   validateTargetSafety,
-} from "@warpgogol/check-core";
+} from "@warpgogol/werkstatt-site/check-core";
 import type {
   CheckResult,
   Diagnostic,

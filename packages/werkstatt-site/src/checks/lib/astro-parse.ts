@@ -23,7 +23,7 @@ import type { AttributeNode, Node, ParentNode, TagLikeNode } from "@astrojs/comp
 export interface AstroImport {
   /** Local specifier (e.g. "SectionShell", "Image"). */
   specifier: string;
-  /** Source path (e.g. "@warpgogol/ui/components/section-shell.astro"). */
+  /** Source path (e.g. "@warpgogol/werkstatt-site/ui/components/section-shell.astro"). */
   source: string;
 }
 

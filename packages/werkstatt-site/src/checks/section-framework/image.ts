@@ -78,7 +78,7 @@ export async function runSectionImageContractValidate(
         rule: "IMG-01",
         message:
           "Raw <Image> from astro:assets inside a section is forbidden; render images via <SectionImage>.",
-        fix: 'import SectionImage from "@warpgogol/ui/components/section-image.astro"; <SectionImage imageName=... fade=... />',
+        fix: 'import SectionImage from "@warpgogol/werkstatt-site/ui/components/section-image.astro"; <SectionImage imageName=... fade=... />',
       });
     });
   }

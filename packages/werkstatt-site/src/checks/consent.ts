@@ -12,7 +12,7 @@ processor/recipient disclosure + a DPA reference in the Datenschutz/Privacy Poli
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0177: initial implementation.</item>
-  <item>Architecture review: replaced hardcoded CHAT_VENDOR_ORIGINS map with chatAdapterVendorOrigins from @warpgogol/chat.</item>
+  <item>Architecture review: replaced hardcoded CHAT_VENDOR_ORIGINS map with chatAdapterVendorOrigins from @warpgogol/werkstatt-site/chat.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,8 +26,8 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/share/fs";
-import { chatAdapterVendorOrigins } from "@warpgogol/chat";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { chatAdapterVendorOrigins } from "@warpgogol/werkstatt-site/chat";
 import {
   runPrivacyConsentComplianceInstrument,
   type PrivacyConsentState,

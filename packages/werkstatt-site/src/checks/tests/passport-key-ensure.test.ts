@@ -18,7 +18,7 @@ import path from "node:path";
 import os from "node:os";
 import { runPassportKeyEnsure } from "../passport.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import { PassportPublicKeyFileSchema } from "@warpgogol/passport/schema";
+import { PassportPublicKeyFileSchema } from "@warpgogol/werkstatt-site/passport/schema";
 
 async function writeFile(dir: string, rel: string, content: string): Promise<void> {
   const full = path.join(dir, rel);

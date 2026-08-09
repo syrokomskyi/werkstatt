@@ -3,7 +3,7 @@
 <purpose>Open-source page generator: deployment-specific SBOM registry with i18n, SPDX normalization, CycloneDX SBOM, and downloadable artifacts.</purpose>
 <non-goals>
   <item>Does not validate the generated output — that lives in @warpgogol/site-kernel-checks.</item>
-  <item>Does not render UI — the UI section in @warpgogol/ui handles structured rendering.</item>
+  <item>Does not render UI — the UI section in @warpgogol/werkstatt-site/ui handles structured rendering.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

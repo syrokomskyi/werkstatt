@@ -470,7 +470,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
   {
     name: "share.utility.lint",
     description:
-      "Validate that apps use @warpgogol/share utilities instead of re-implementing them locally. Per RFC-0037: allows astro:content imports in @warpgogol/share.",
+      "Validate that apps use @warpgogol/werkstatt-site/share utilities instead of re-implementing them locally. Per RFC-0037: allows astro:content imports in @warpgogol/werkstatt-site/share.",
     scope: "workspace",
     flags: {
       app: { kind: "string", description: "Target a specific app by name." },

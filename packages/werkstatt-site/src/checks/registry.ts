@@ -20,9 +20,9 @@ are reported as violations so build.check fails on any drift.</purpose>
 import { readFile, stat } from "node:fs/promises";
 import { join, relative, basename, dirname } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
-import { manifestSchema } from "@warpgogol/ontology";
+import { manifestSchema } from "@warpgogol/werkstatt-site/ontology";
 import { discoverSiteWorkspaces, writeFileIfChanged } from "@warpgogol/site-kernel";
-import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   CheckResult,
   Diagnostic,
@@ -56,7 +56,7 @@ export interface RegistryEntry {
   industryFit: string[];
   contentSchemaKey: string | null;
   standalone: boolean;
-  /** Kernel app name (e.g. "nicaragua-projekt"), or "@warpgogol/ui" for shared packages. */
+  /** Kernel app name (e.g. "nicaragua-projekt"), or "@warpgogol/werkstatt-site/ui" for shared packages. */
   siteName: string;
   /** Workspace-relative POSIX path to the manifest.yaml file. */
   manifestFile: string;
@@ -160,7 +160,7 @@ async function scanWorkspaceManifests(
       results.push({
         manifestFile: toRelPosix(workspaceRoot, absPath),
         absPath,
-        siteName: "@warpgogol/ui",
+        siteName: "@warpgogol/werkstatt-site/ui",
       });
     }
   }
@@ -222,7 +222,7 @@ async function buildEntry(
 
 /**
  * Scans every *.manifest.yaml across all workspace apps (and packages/ui/),
- * parses each against @warpgogol/ontology manifestSchema, and emits a
+ * parses each against @warpgogol/werkstatt-site/ontology manifestSchema, and emits a
  * deterministic uni.registry.yaml at the workspace root.
  *
  * Manifests that fail schema validation are skipped with a warning (they are
@@ -431,7 +431,7 @@ export async function runUniRegistryValidate(
           .map((i) => `${i.path.map(String).join(".")}: ${i.message}`)
           .join("; ")}`,
         file: relFile,
-        fixHint: "Fix the manifest to satisfy @warpgogol/ontology manifestSchema.",
+        fixHint: "Fix the manifest to satisfy @warpgogol/werkstatt-site/ontology manifestSchema.",
       });
       continue;
     }

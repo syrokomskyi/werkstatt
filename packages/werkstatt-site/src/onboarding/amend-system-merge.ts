@@ -19,7 +19,7 @@ identity, and markdown body.</purpose>
 
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { systemManifestSchema } from "@warpgogol/ontology";
+import { systemManifestSchema } from "@warpgogol/werkstatt-site/ontology";
 import {
   loadSystemManifest,
   parseMarkdownFrontmatter,

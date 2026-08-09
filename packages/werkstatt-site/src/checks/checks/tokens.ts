@@ -15,7 +15,7 @@ studio defaults a biome silently inherits (RFC-0071/0098).</purpose>
 
 import { readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
-import { TOKEN_NAME_SET } from "@warpgogol/tokens";
+import { TOKEN_NAME_SET } from "@warpgogol/werkstatt-site/tokens";
 import type {
   KernelCommandInput,
   KernelCommandResult,

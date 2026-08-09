@@ -29,7 +29,7 @@
 
 import { join } from "node:path";
 import { readFile, writeFile, mkdir, copyFile } from "node:fs/promises";
-import { fileExists, collectFiles } from "@warpgogol/share/fs";
+import { fileExists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { byteHash } from "@warpgogol/fingerprint";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -40,7 +40,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import type { LiveVideoManifest, LiveVideoManifestEntry } from "@warpgogol/share/schemas/media";
+import type { LiveVideoManifest, LiveVideoManifestEntry } from "@warpgogol/werkstatt-site/share/schemas/media";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
 
 const execFileAsync = promisify(execFile);

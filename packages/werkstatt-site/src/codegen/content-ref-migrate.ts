@@ -4,7 +4,7 @@
 brace-delimited {collection.file.field} patterns, and replaces them with braceless
 collection.file.field syntax. Idempotent: re-running on already-migrated files is a no-op.</purpose>
 <non-goals>
-  <item>Do not resolve references — that is the resolver in @warpgogol/share/content-reference.</item>
+  <item>Do not resolve references — that is the resolver in @warpgogol/werkstatt-site/share/content-reference.</item>
   <item>Do not validate references — that is content.references.validate in @warpgogol/site-kernel-checks.</item>
   <item>Do not migrate files outside src/content/.</item>
 </non-goals>
@@ -17,7 +17,7 @@ collection.file.field syntax. Idempotent: re-running on already-migrated files i
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { collectMarkdownFiles } from "@warpgogol/werkstatt-site/content";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

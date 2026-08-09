@@ -23,8 +23,8 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
-import { biomeSchema } from "@warpgogol/ontology/schemas";
-import { parseMaterialCreditMap } from "@warpgogol/share/material-credits";
+import { biomeSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
+import { parseMaterialCreditMap } from "@warpgogol/werkstatt-site/share/material-credits";
 import { diagnosticsResult } from "../result-helpers.ts";
 
 export const TODAY = "2026-07-06";

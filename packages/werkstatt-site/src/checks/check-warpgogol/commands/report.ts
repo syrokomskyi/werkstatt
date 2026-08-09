@@ -11,7 +11,7 @@
 */
 
 import { join } from "node:path";
-import type { CheckReport } from "@warpgogol/check-core";
+import type { CheckReport } from "@warpgogol/werkstatt-site/check-core";
 import type {
   CheckResult,
   Diagnostic,

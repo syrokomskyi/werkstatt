@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Implements RFC-0741 currency-pricing.compile command — reads and validates the CurrencyPricingPolicy for the business.</purpose>
 <non-goals>
-  <item>Does not define CurrencyPricingPolicy type — that is RFC-0736 in @warpgogol/pbp.</item>
+  <item>Does not define CurrencyPricingPolicy type — that is RFC-0736 in @warpgogol/werkstatt-site/pbp.</item>
   <item>Does not materialize derived prices — that is derived-prices.materialize (RFC-0740).</item>
   <item>Does not duplicate RFC-0740 compiler validation rules — those are enforced during derived-prices.materialize.</item>
 </non-goals>
@@ -20,8 +20,8 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { compilePbpProfile } from "@warpgogol/pbp/compiler";
-import type { PbpCompilerResult } from "@warpgogol/pbp/compiler";
+import { compilePbpProfile } from "@warpgogol/werkstatt-site/pbp/compiler";
+import type { PbpCompilerResult } from "@warpgogol/werkstatt-site/pbp/compiler";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
 import { flagString, resolveRef, findCurrencyPricingPolicy } from "./lib/pbp-helpers.ts";

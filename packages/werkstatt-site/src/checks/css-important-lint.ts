@@ -19,8 +19,8 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { collectFiles } from "@warpgogol/share/fs";
-import { getLineColumn } from "@warpgogol/share/text-position";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { getLineColumn } from "@warpgogol/werkstatt-site/share/text-position";
 
 interface ImportantViolation {
   filePath: string;

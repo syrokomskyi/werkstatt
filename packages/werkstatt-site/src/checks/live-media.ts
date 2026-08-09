@@ -32,7 +32,7 @@ import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { fileExists } from "./lib/file-exists.ts";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 const POSTER_EXTENSIONS = [".webp", ".jpg", ".jpeg", ".png"];
 /** Frontmatter keys that may hold the image token paired with a sibling `live` config. */

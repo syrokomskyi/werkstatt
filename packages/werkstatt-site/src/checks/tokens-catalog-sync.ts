@@ -3,7 +3,7 @@
 <purpose>
 Implements tokens.catalog.sync — a workspace-scoped validator that parses
 packages/tokens/src/tokens.css :root block and compares the set of --ds-*
-custom property names against the TOKEN_NAMES array in @warpgogol/tokens.
+custom property names against the TOKEN_NAMES array in @warpgogol/werkstatt-site/tokens.
 Reports drift in either direction: tokens declared in CSS but missing from
 the TS catalog, and tokens listed in the TS catalog but missing from CSS.
 </purpose>
@@ -18,7 +18,7 @@ the TS catalog, and tokens listed in the TS catalog but missing from CSS.
 */
 
 import { join } from "node:path";
-import { TOKEN_NAMES } from "@warpgogol/tokens";
+import { TOKEN_NAMES } from "@warpgogol/werkstatt-site/tokens";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -80,7 +80,7 @@ export async function runTokensCatalogSync(
   } else {
     for (const token of missingInTs) {
       context.logger.error(
-        `${COMMAND}: token "${token}" is declared in tokens.css but missing from TOKEN_NAMES in @warpgogol/tokens`,
+        `${COMMAND}: token "${token}" is declared in tokens.css but missing from TOKEN_NAMES in @warpgogol/werkstatt-site/tokens`,
       );
     }
     for (const token of missingInCss) {

@@ -18,9 +18,9 @@ rendered HTML resolves to an emitted twin.</purpose>
 import { dirname, join, relative } from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/share/people-profile-defaults";
+import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/werkstatt-site/share/people-profile-defaults";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -47,9 +47,9 @@ import {
   PRIORITY_BY_PAGE_TYPE,
   DOMAIN_BY_PAGE_TYPE,
   SEMANTIC_PAGE_TYPES,
-} from "@warpgogol/share/semantic";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/share/canonical-url";
-import { localizeUrl } from "@warpgogol/share/url-policy";
+} from "@warpgogol/werkstatt-site/share/semantic";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/canonical-url";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { failResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
@@ -528,7 +528,7 @@ export async function runPageMarkdownValidate(
 
   // RFC-0320: MDMETA-01..07 — validate provenance frontmatter on generated twins.
   const { parseMarkdownTwinFrontmatter, computeContentHash } =
-    await import("@warpgogol/share/semantic");
+    await import("@warpgogol/werkstatt-site/share/semantic");
   const markdownFiles = await collectFiles(publicDir, { extensions: [".md"], ignore: () => false });
   for (const abs of markdownFiles) {
     const content = await readFile(abs, "utf-8");

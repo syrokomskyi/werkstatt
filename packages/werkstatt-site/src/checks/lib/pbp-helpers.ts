@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Shared helpers for PBP-related command handlers — flag parsing, entity lookup, ref resolution.</purpose>
 <non-goals>
-  <item>Does not define PBP types — those are in @warpgogol/pbp.</item>
+  <item>Does not define PBP types — those are in @warpgogol/werkstatt-site/pbp.</item>
   <item>Does not implement command logic — that is in the individual command handlers.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -12,9 +12,9 @@
 */
 
 import type { KernelCommandInput } from "@warpgogol/site-kernel";
-import type { PbpEntity } from "@warpgogol/pbp";
-import type { PbpCurrencyPricingPolicy } from "@warpgogol/pbp";
-import type { PbpRatePolicy, PbpRateSchedule } from "@warpgogol/pbp";
+import type { PbpEntity } from "@warpgogol/werkstatt-site/pbp";
+import type { PbpCurrencyPricingPolicy } from "@warpgogol/werkstatt-site/pbp";
+import type { PbpRatePolicy, PbpRateSchedule } from "@warpgogol/werkstatt-site/pbp";
 
 export function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];

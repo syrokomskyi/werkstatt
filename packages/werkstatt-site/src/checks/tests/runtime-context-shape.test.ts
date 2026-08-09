@@ -37,7 +37,7 @@ describe("runtime.context.shape", () => {
   it("passes when src has no forbidden RuntimeContext patterns", async () => {
     await writeFile(
       join(srcDir, "helper.ts"),
-      `import { EMPTY_RUNTIME_CONTEXT } from "@warpgogol/share/runtime-context";\nexport const ctx = EMPTY_RUNTIME_CONTEXT("de");\n`,
+      `import { EMPTY_RUNTIME_CONTEXT } from "@warpgogol/werkstatt-site/share/runtime-context";\nexport const ctx = EMPTY_RUNTIME_CONTEXT("de");\n`,
     );
 
     const result = await runRuntimeContextShape(
@@ -51,7 +51,7 @@ describe("runtime.context.shape", () => {
   it("fails when a file has segment set to non-null", async () => {
     await writeFile(
       join(srcDir, "bad.ts"),
-      `import type { RuntimeContext } from "@warpgogol/share/runtime-context";\nconst ctx: RuntimeContext = { locale: "de", segment: "eu", flags: {} };\n`,
+      `import type { RuntimeContext } from "@warpgogol/werkstatt-site/share/runtime-context";\nconst ctx: RuntimeContext = { locale: "de", segment: "eu", flags: {} };\n`,
     );
 
     const result = await runRuntimeContextShape(
@@ -65,7 +65,7 @@ describe("runtime.context.shape", () => {
   it("fails when a file has non-empty flags", async () => {
     await writeFile(
       join(srcDir, "bad.ts"),
-      `import type { RuntimeContext } from "@warpgogol/share/runtime-context";\nconst ctx: RuntimeContext = { locale: "de", segment: null, flags: { feature: true } };\n`,
+      `import type { RuntimeContext } from "@warpgogol/werkstatt-site/share/runtime-context";\nconst ctx: RuntimeContext = { locale: "de", segment: null, flags: { feature: true } };\n`,
     );
 
     const result = await runRuntimeContextShape(

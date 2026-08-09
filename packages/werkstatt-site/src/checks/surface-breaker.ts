@@ -30,7 +30,7 @@ import {
   type ClusterOutcome,
   type SurfaceState,
   type Tripwire,
-} from "@warpgogol/surface";
+} from "@warpgogol/werkstatt-site/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { runAutonomyDemote, runEscalationRoute } from "./pseo/pseo-governance.ts";
 import { readVisibilityOutcomes } from "./pseo/pseo-visibility.ts";

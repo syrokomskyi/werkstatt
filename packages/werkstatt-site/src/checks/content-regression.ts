@@ -40,7 +40,7 @@ import {
 import { byteHash, stableJsonHash } from "@warpgogol/fingerprint";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import type { SemanticBlock, SemanticFaqEntry, SemanticPageModel } from "@warpgogol/share/semantic";
+import type { SemanticBlock, SemanticFaqEntry, SemanticPageModel } from "@warpgogol/werkstatt-site/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";

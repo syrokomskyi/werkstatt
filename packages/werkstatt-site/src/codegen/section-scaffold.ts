@@ -16,12 +16,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { fileExists as exists, collectFiles } from "@warpgogol/share/fs";
+import { fileExists as exists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import {
   sectionArchetypeSchema,
   systemManifestSchema,
   type SectionArchetypeContract,
-} from "@warpgogol/ontology";
+} from "@warpgogol/werkstatt-site/ontology";
 import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
@@ -289,10 +289,10 @@ function renderSectionAstro(slug: string, sectionPascal: string, bodyKind: BodyK
     return `---
 ${sectionCompassMarkers(`${slug} composite section — bespoke layout in SectionShell + SectionHeader.`)}
 
-import type { SectionProps } from "@warpgogol/share/page";
-import { need, cast, resolveSectionAnchor } from "@warpgogol/share";
-import SectionShell from "@warpgogol/ui/components/section-shell.astro";
-import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import type { ${sectionPascal}SectionContent } from "./${slug}-section.types.generated.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
@@ -327,11 +327,11 @@ const props = cast<${sectionPascal}SectionContent>(pageOverride);
   return `---
 ${sectionCompassMarkers(`${slug} thin dispatcher section — ${bodyKind} body.`)}
 
-import type { SectionProps } from "@warpgogol/share/page";
-import { need, cast, resolveSectionAnchor } from "@warpgogol/share";
-import SectionShell from "@warpgogol/ui/components/section-shell.astro";
-import SectionHeader from "@warpgogol/ui/components/section-header.astro";
-import ${component} from "@warpgogol/ui/components/${importPath}";
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import ${component} from "@warpgogol/werkstatt-site/ui/components/${importPath}";
 import type { ${sectionPascal}SectionContent } from "./${slug}-section.types.generated.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;

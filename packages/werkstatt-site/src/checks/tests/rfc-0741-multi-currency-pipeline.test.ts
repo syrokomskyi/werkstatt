@@ -16,7 +16,7 @@ import {
   SITES_BUILD_PREPARE_PIPELINE,
   SITES_BUILD_PREPARE_DEV_PIPELINE,
 } from "../pipelines/build-prepare.ts";
-import { ENTITLED_FEATURES, STRIPE_FEATURE_LOOKUP_MAP } from "@warpgogol/share/entitlement";
+import { ENTITLED_FEATURES, STRIPE_FEATURE_LOOKUP_MAP } from "@warpgogol/werkstatt-site/share/entitlement";
 
 const mainCommands = SITES_BUILD_PREPARE_PIPELINE.map((s) => s.command);
 const devCommands = SITES_BUILD_PREPARE_DEV_PIPELINE.map((s) => s.command);

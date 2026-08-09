@@ -23,13 +23,13 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { pageIdToContentFileSlug } from "@warpgogol/share/content";
-import { buildRssFeed, buildJsonFeed, type FeedItem } from "@warpgogol/share/semantic";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
+import { buildRssFeed, buildJsonFeed, type FeedItem } from "@warpgogol/werkstatt-site/share/semantic";
 import {
   canonicalPageUrl,
   canonicalStaticUrl,
   type CanonicalUrlOptions,
-} from "@warpgogol/share/canonical-url";
+} from "@warpgogol/werkstatt-site/share/canonical-url";
 import { failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { readEntitledFeatures } from "./lib/entitlements.ts";

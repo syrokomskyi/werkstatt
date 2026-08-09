@@ -32,8 +32,8 @@ import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { fileExists } from "../lib/file-exists.ts";
 import { passResult, resultFromViolations } from "../result-helpers.ts";
 import { readDefaultLanguageCode } from "../lib/i18n.ts";
-import type { VideoManifest } from "@warpgogol/share/schemas/media";
-import { collectFiles } from "@warpgogol/share/fs";
+import type { VideoManifest } from "@warpgogol/werkstatt-site/share/schemas/media";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 const SOURCE_EXTENSIONS = [".mp4", ".webm"];
 

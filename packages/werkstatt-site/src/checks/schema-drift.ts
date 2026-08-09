@@ -80,7 +80,7 @@ async function scanApp(appDir: string, siteName: string): Promise<string[]> {
       violations.push(
         `SD-01: ${siteName}/${rel}: non-proxy Zod schema definition found. ` +
           `App-local schemas were retired in RFC-0033. ` +
-          `Move shared schemas to @warpgogol/share or use plain TypeScript interfaces in @warpgogol/ui.`,
+          `Move shared schemas to @warpgogol/werkstatt-site/share or use plain TypeScript interfaces in @warpgogol/werkstatt-site/ui.`,
       );
     }
   }

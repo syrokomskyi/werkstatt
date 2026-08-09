@@ -16,7 +16,7 @@ import { dirname, join, resolve } from "node:path";
 import { byteHash } from "@warpgogol/fingerprint";
 import { parse as yamlParse } from "yaml";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { localizeUrl } from "@warpgogol/share/url-policy";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
 import { defaultLanguageFromManifest } from "../lib/i18n.ts";
 import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
 import {

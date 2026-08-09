@@ -28,7 +28,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { SITES_BUILD_PREPARE_PIPELINE } from "../module.ts";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 const HASH_PREFIX = "sha" + "256:";
 

@@ -3,7 +3,7 @@
 <purpose>
 visibility.expr.validate — workspace-wide scan for VisibilityExpr usages in
 page content and feature-graph YAML files. Every expression must parse against
-VisibilityExprSchema from @warpgogol/share (DNA-26, RFC-0026).
+VisibilityExprSchema from @warpgogol/werkstatt-site/share (DNA-26, RFC-0026).
 </purpose>
 <non-goals>
   <item>Do not evaluate visibility at runtime — only parse/validate the expression structure.</item>
@@ -26,7 +26,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { resultFromViolations, failResult } from "./result-helpers.ts";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { VisibilityExprSchema } from "@warpgogol/share/visibility";
+import { VisibilityExprSchema } from "@warpgogol/werkstatt-site/share/visibility";
 
 // ---------------------------------------------------------------------------
 // Helpers

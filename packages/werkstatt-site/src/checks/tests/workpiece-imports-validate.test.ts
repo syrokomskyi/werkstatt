@@ -136,7 +136,7 @@ describe("runWorkpieceImportsValidate", () => {
       join(srcDir, "index.ts"),
       [
         `import { foo } from "@warpgogol/site-kernel";`,
-        `const bar = await import("@warpgogol/share/fs");`,
+        `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
       ].join("\n"),
     );
 
@@ -149,7 +149,7 @@ describe("runWorkpieceImportsValidate", () => {
       '{"name":"@warpgogol/site-kernel"}',
     );
     await mkdir(join(wgDir, "share"));
-    await writeFile(join(wgDir, "share", "package.json"), '{"name":"@warpgogol/share"}');
+    await writeFile(join(wgDir, "share", "package.json"), '{"name":"@warpgogol/werkstatt-site/share"}');
 
     const result = await runWorkpieceImportsValidate(
       makeInput({ site: "test-site", "workpiece-dir": "missions/m01/workpiece" }),

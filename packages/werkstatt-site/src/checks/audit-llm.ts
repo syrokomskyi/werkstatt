@@ -39,7 +39,7 @@ import {
   type AuditFinding,
   type AuditLlmKind,
 } from "./audit/types.ts";
-import { parseVoiceProfileFile } from "@warpgogol/share/content-discipline";
+import { parseVoiceProfileFile } from "@warpgogol/werkstatt-site/share/content-discipline";
 import { pathExists } from "./content-discipline.ts";
 
 const RULE_FILE_BY_KIND: Partial<Record<AuditLlmKind, string>> = {

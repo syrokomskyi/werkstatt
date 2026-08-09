@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { effectAssignmentSchema } from "@warpgogol/share/schemas/effects";
+import { effectAssignmentSchema } from "@warpgogol/werkstatt-site/share/schemas/effects";
 import { classifyEffectIssue } from "../effects-contract.ts";
 
 /**

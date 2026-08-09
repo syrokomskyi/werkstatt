@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0175: governance for the chat widget configuration surface in system.md.
 chat.config.validate guards that a configured `integrations.chat.adapter` resolves to the closed
-chat adapter catalog (@warpgogol/chat) and that the adapter's required public options are present
+chat adapter catalog (@warpgogol/werkstatt-site/chat) and that the adapter's required public options are present
 (e.g. uchat needs widgetId or scriptUrl). No-op pass when the app declares no chat block.</purpose>
 <non-goals>
   <item>Do not import a chat vendor SDK — read disk only (Node-safe).</item>
@@ -11,7 +11,7 @@ chat adapter catalog (@warpgogol/chat) and that the adapter's required public op
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0175: initial implementation.</item>
-  <item>Architecture review: replaced hardcoded REQUIRED_OPTIONS map with getChatAdapterMetadata from @warpgogol/chat.</item>
+  <item>Architecture review: replaced hardcoded REQUIRED_OPTIONS map with getChatAdapterMetadata from @warpgogol/werkstatt-site/chat.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,7 +23,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { CHAT_ADAPTER_IDS, isChatAdapterId, getChatAdapterMetadata } from "@warpgogol/chat";
+import { CHAT_ADAPTER_IDS, isChatAdapterId, getChatAdapterMetadata } from "@warpgogol/werkstatt-site/chat";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 interface ChatConfig {

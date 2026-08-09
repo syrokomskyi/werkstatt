@@ -10,7 +10,7 @@ and cross-references funnels declared in system.md growth.funnels[] (DNA-28, RFC
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Wave 1 (RFC-0027): Initial creation.</item>
-  <item>Architecture review 2026-07-10: Replace hardcoded VALID_EVENT_NAMES with EVENT_NAMES from @warpgogol/growth; replace system.yaml reads with loadSystemManifest.</item>
+  <item>Architecture review 2026-07-10: Replace hardcoded VALID_EVENT_NAMES with EVENT_NAMES from @warpgogol/werkstatt-site/growth; replace system.yaml reads with loadSystemManifest.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,7 +23,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { EVENT_NAMES } from "@warpgogol/growth/adapter";
+import { EVENT_NAMES } from "@warpgogol/werkstatt-site/growth/adapter";
 import { resultFromViolations } from "./result-helpers.ts";
 
 const VALID_EVENT_NAMES = new Set<string>(EVENT_NAMES);

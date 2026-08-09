@@ -18,7 +18,7 @@ import { access, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
-import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

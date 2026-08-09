@@ -21,7 +21,7 @@ first step.
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { collectFiles, fileExists } from "@warpgogol/share/fs";
+import { collectFiles, fileExists } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   CheckResult,
   Diagnostic,

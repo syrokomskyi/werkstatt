@@ -33,12 +33,12 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { materialCreditSchema } from "@warpgogol/share/schemas/material-credit";
-import type { MaterialCredit } from "@warpgogol/share/schemas/material-credit";
-import type { VideoManifest, LiveVideoManifest } from "@warpgogol/share/schemas/media";
-import type { ImageVariantManifest } from "@warpgogol/share/image-provider";
+import { materialCreditSchema } from "@warpgogol/werkstatt-site/share/schemas/material-credit";
+import type { MaterialCredit } from "@warpgogol/werkstatt-site/share/schemas/material-credit";
+import type { VideoManifest, LiveVideoManifest } from "@warpgogol/werkstatt-site/share/schemas/media";
+import type { ImageVariantManifest } from "@warpgogol/werkstatt-site/share/image-provider";
 import { diagnosticsResult } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 const exec = promisify(execCallback);
 

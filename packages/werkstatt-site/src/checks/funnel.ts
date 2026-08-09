@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0188: static governance for the Visitor Sales Funnel. The PLATFORM owns the funnel
-stage/event/transition graph (@warpgogol/share/integration); these validators guard that the app's
+stage/event/transition graph (@warpgogol/werkstatt-site/share/integration); these validators guard that the app's
 funnel configuration and localized copy stay aligned with it, that no legacy UChat stage string or
 Make.com reference leaks back into the funnel path, and that the canonical transition graph itself
 stays self-consistent (no stranded stage). Node-safe: read disk + pure contracts only — no astro:env,
@@ -36,7 +36,7 @@ import {
   isValidFunnelStage,
   reachableStages,
   scanForMakeComReferences,
-} from "@warpgogol/integration";
+} from "@warpgogol/werkstatt-site/integration";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 interface FunnelConfig {

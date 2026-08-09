@@ -21,7 +21,7 @@ import { describe, expect, it } from "vitest";
 import {
   canonicalizeGeneratedMarkdownText,
   formatGeneratedMarkdownListItem,
-} from "@warpgogol/share/semantic";
+} from "@warpgogol/werkstatt-site/share/semantic";
 
 describe("RFC-0316 public surface hygiene fixtures", () => {
   it("normalizes default-language same-site URLs, slash dates, and br tags", () => {

@@ -13,7 +13,7 @@ packages/ontology/blueprints, and reads a site's declared blueprint opt-ins from
 
 import { join } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
-import { parseBlueprint, type Blueprint } from "@warpgogol/surface";
+import { parseBlueprint, type Blueprint } from "@warpgogol/werkstatt-site/surface";
 
 const BLUEPRINTS_DIR = join("packages", "ontology", "blueprints");
 

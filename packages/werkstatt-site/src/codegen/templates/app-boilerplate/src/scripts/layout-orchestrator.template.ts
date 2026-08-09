@@ -28,7 +28,7 @@ void (async () => {
     "a[href], lord-icon, .js-inline-number, [data-motion-reveal], [data-parallax-speed], [data-motion-stagger], [data-live-photo], video[data-video-player]";
   if (!document.querySelector(ORCHESTRATED_SELECTOR)) return;
 
-  const { runStandardLayoutOrchestration } = await import("@warpgogol/share/scripts");
+  const { runStandardLayoutOrchestration } = await import("@warpgogol/werkstatt-site/share/scripts");
 
   // Read orchestrator config from site context (injected by server)
   const siteConfig = (window as any).__SITE_CONFIG ?? {};

@@ -21,7 +21,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import { failResult, passResult } from "../result-helpers.ts";
 import { ARTIFACT_FILE } from "./shared.ts";
 

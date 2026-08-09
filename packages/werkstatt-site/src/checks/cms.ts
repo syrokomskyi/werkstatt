@@ -38,7 +38,7 @@ import {
   inferFields,
   mergeSamples,
   type DecapCollection,
-} from "@warpgogol/content-source/cms-git";
+} from "@warpgogol/werkstatt-site/content-source/cms-git";
 import { passResult, failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 

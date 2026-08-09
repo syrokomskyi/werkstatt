@@ -7,7 +7,7 @@
 </purpose>
 <non-goals>
   <item>Do not read content through Astro runtime or astro:content.</item>
-  <item>Do not duplicate formatting logic — delegate to @warpgogol/share/semantic buildAiTxt.</item>
+  <item>Do not duplicate formatting logic — delegate to @warpgogol/werkstatt-site/share/semantic buildAiTxt.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -28,8 +28,8 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { buildAiTxt } from "@warpgogol/share/semantic";
-import type { AiPolicy } from "@warpgogol/share/semantic";
+import { buildAiTxt } from "@warpgogol/werkstatt-site/share/semantic";
+import type { AiPolicy } from "@warpgogol/werkstatt-site/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 

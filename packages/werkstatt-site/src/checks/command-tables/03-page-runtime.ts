@@ -72,7 +72,7 @@ export const PAGE_RUNTIME_COMMANDS: CheckCommandEntry[] = [
   {
     name: "page.pipeline.contract",
     description:
-      "Verify buildPage(entry, ctx) from @warpgogol/share returns a valid ResolvedPage shape and that visibility filtering works correctly (DNA-25, RFC-0026).",
+      "Verify buildPage(entry, ctx) from @warpgogol/werkstatt-site/share returns a valid ResolvedPage shape and that visibility filtering works correctly (DNA-25, RFC-0026).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,

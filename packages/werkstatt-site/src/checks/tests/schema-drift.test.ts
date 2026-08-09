@@ -16,8 +16,8 @@ import { makeTestSiteContext } from "./helpers.ts";
 </MODULE_CONTRACT>
 */
 
-const PROXY_FILE = `export * from "@warpgogol/share/schemas/page";
-export { pageSchema } from "@warpgogol/share/schemas/page";
+const PROXY_FILE = `export * from "@warpgogol/werkstatt-site/share/schemas/page";
+export { pageSchema } from "@warpgogol/werkstatt-site/share/schemas/page";
 `;
 
 const ZOD_DEFINITION_FILE = `import { z } from "zod";

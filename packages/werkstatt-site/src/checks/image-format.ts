@@ -18,7 +18,7 @@ Validates actual file format via magic bytes, not just file extensions.
 import { join, relative } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import { fileTypeFromBuffer } from "file-type";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

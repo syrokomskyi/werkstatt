@@ -62,7 +62,7 @@ interface ParsedPage {
 async function collectPageFiles(pagesDir: string): Promise<string[]> {
   const files: string[] = [];
   // fs.walk.lint: allow — intentionally bounded to 2 levels (pages/<lang>/<file>.md),
-  // not a general recursive collector; @warpgogol/share/fs collectFiles has no depth limit.
+  // not a general recursive collector; @warpgogol/werkstatt-site/share/fs collectFiles has no depth limit.
   async function walk(dir: string): Promise<void> {
     let entries: string[];
     try {

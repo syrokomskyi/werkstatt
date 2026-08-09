@@ -20,8 +20,8 @@ emits RFC-0203 Diagnostics, and writes the per-app authored Freshness Ledger
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
-import { recordClaimsSchema } from "@warpgogol/share/schemas";
-import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
+import { recordClaimsSchema } from "@warpgogol/werkstatt-site/share/schemas";
+import { resolveFieldPath } from "@warpgogol/werkstatt-site/share/content/resolve-field-path";
 import {
   evaluateFreshness,
   emptyFreshnessSummary,
@@ -29,7 +29,7 @@ import {
   type FreshnessCriticality,
   type FreshnessLedgerEntry,
   type FreshnessState,
-} from "@warpgogol/share/knowledge/freshness";
+} from "@warpgogol/werkstatt-site/share/knowledge/freshness";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {
   CheckResult,

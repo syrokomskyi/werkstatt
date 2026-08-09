@@ -175,7 +175,7 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
   // RFC-0303: shared fs/text helper dedup + oversized-file guard rails.
   "WALK-01": rule(
     "WALK-01",
-    "Nested recursive readdir walker declared outside the canonical @warpgogol/share/fs module",
+    "Nested recursive readdir walker declared outside the canonical @warpgogol/werkstatt-site/share/fs module",
     "fs.walk.lint",
   ),
   "DEDUP-01": rule(

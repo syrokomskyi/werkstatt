@@ -16,7 +16,7 @@ scripts (RFC-0011); (2) src/content/glob.client.ts — bounded feature-scoped en
 
 import { join, relative, dirname, basename } from "node:path";
 import { readFile } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

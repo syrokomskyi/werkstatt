@@ -14,9 +14,9 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { recordClaimsSchema } from "@warpgogol/share/schemas";
-import { addDuration } from "@warpgogol/share/knowledge/freshness";
-import { parseNdjson, type ClaimEvent } from "@warpgogol/share/knowledge/ledger";
+import { recordClaimsSchema } from "@warpgogol/werkstatt-site/share/schemas";
+import { addDuration } from "@warpgogol/werkstatt-site/share/knowledge/freshness";
+import { parseNdjson, type ClaimEvent } from "@warpgogol/werkstatt-site/share/knowledge/ledger";
 import type {
   CheckResult,
   Diagnostic,

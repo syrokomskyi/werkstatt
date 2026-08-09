@@ -14,13 +14,13 @@ archetype catalog command set.</purpose>
 import { readFile } from "node:fs/promises";
 import { join, relative, basename, dirname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 import {
   sectionArchetypeSchema,
   manifestSchema,
   type SectionArchetypeContract,
   type Manifest,
-} from "@warpgogol/ontology";
+} from "@warpgogol/werkstatt-site/ontology";
 
 export const ARCHETYPE_REGISTRY_FILENAME = "packages/ontology/archetypes/index.yaml";
 
@@ -69,7 +69,7 @@ export interface ArchetypeRegistry {
   totalCount: number;
   entries: ArchetypeRegistryEntry[];
   // RFC-0084: derived sets of semanticRole values per layer. Replace the
-  // closed SemanticRoleValues enum in @warpgogol/ontology — manifests'
+  // closed SemanticRoleValues enum in @warpgogol/werkstatt-site/ontology — manifests'
   // `role` field is now cross-checked against the set matching the manifest's
   // layer. Adding a new archetype with a novel semanticRole no longer
   // requires editing enums.ts.
@@ -164,7 +164,7 @@ export async function loadUiManifestFiles(workspaceRoot: string) {
 // moonImportPaths from all UI manifests. Sections + non-shell components feed
 // planetImportPaths; shell components (archetype ID starting with "shell.")
 // feed moonImportPaths so the shell-block table is also content-derived rather
-// than hand-maintained in @warpgogol/share/page.ts.
+// than hand-maintained in @warpgogol/werkstatt-site/share/page.ts.
 export function isShellArchetype(archetypeId: string): boolean {
   return archetypeId.startsWith("shell.");
 }
@@ -193,7 +193,7 @@ export async function deriveImportPathMaps(workspaceRoot: string): Promise<{
   for (const { filePath, manifest } of sorted) {
     const folderSlug = basename(dirname(filePath));
     const layerPath = manifest.layer === "section" ? "sections" : "components";
-    const importPath = `@warpgogol/ui/${layerPath}/${folderSlug}`;
+    const importPath = `@warpgogol/werkstatt-site/ui/${layerPath}/${folderSlug}`;
     const isShell = manifest.layer === "component" && isShellArchetype(manifest.archetype);
 
     // RFC-0263: propagate the manifest's own authored `role` field (distinct

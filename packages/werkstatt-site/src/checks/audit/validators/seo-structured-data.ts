@@ -19,8 +19,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { jsonldTypes, type JsonldSurfacePolicyEntry } from "@warpgogol/ontology/external-surfaces";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
+import { jsonldTypes, type JsonldSurfacePolicyEntry } from "@warpgogol/werkstatt-site/ontology/external-surfaces";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import { parse as yamlParse } from "yaml";
 import { buildAuditResult, getAuditPageInfo, loadAuditAppContext } from "../helpers.ts";
 import type { AuditFinding } from "../types.ts";

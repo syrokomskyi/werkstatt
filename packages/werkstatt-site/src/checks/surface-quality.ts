@@ -37,13 +37,13 @@ import {
   type SurfaceArtifact,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@warpgogol/surface";
+} from "@warpgogol/werkstatt-site/surface";
 import {
   collectMarkdownFiles,
   loadSystemManifest,
   parseMarkdownFrontmatter,
 } from "@warpgogol/werkstatt-site/content";
-import { toKebabCase } from "@warpgogol/share/string-utils";
+import { toKebabCase } from "@warpgogol/werkstatt-site/share/string-utils";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceBlueprints } from "./surface-expand.ts";
 import { loadApprovedNarrativesBulk } from "./surface-enrich.ts";

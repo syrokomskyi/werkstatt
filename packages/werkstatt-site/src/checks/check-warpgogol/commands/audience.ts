@@ -12,7 +12,7 @@
 
 import { join } from "node:path";
 import YAML from "yaml";
-import { parseAudienceProfile, parseAudienceReview } from "@warpgogol/check-core";
+import { parseAudienceProfile, parseAudienceReview } from "@warpgogol/werkstatt-site/check-core";
 import type {
   CheckResult,
   KernelCommandInput,

@@ -14,7 +14,7 @@
 
 import { access, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { featurePolicySchema } from "@warpgogol/share/schemas/features";
+import { featurePolicySchema } from "@warpgogol/werkstatt-site/share/schemas/features";
 import type {
   KernelCommandInput,
   KernelCommandResult,

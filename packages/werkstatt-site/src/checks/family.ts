@@ -19,7 +19,7 @@ import { access, readdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import YAML from "yaml";
-import { SiteFamilyContract, biomeSchema, constellationSchema } from "@warpgogol/ontology";
+import { SiteFamilyContract, biomeSchema, constellationSchema } from "@warpgogol/werkstatt-site/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,

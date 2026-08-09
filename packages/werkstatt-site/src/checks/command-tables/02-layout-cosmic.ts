@@ -104,7 +104,7 @@ export const LAYOUT_COSMIC_COMMANDS: CheckCommandEntry[] = [
   {
     name: "cosmic.literals.lint",
     description:
-      "Fail when any Star/Planet/Moon cosmic-catalog name appears as a string literal in packages/share/src — cosmic-name-keyed dispatch behavior must derive from @warpgogol/ontology/archetypes instead (RFC-0263).",
+      "Fail when any Star/Planet/Moon cosmic-catalog name appears as a string literal in packages/share/src — cosmic-name-keyed dispatch behavior must derive from @warpgogol/werkstatt-site/ontology/archetypes instead (RFC-0263).",
     scope: "workspace",
     supportsAllSites: true,
     flags: {},

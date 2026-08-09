@@ -15,7 +15,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { parse as parseYaml } from "yaml";
-import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
 import type {
   KernelCommandInput,
   KernelCommandResult,

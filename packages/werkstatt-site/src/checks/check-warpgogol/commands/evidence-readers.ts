@@ -19,7 +19,7 @@ import {
   makeRunArtifact,
   parseEvidenceGraph,
   type SiteEvidenceGraph,
-} from "@warpgogol/check-core";
+} from "@warpgogol/werkstatt-site/check-core";
 import type {
   CheckResult,
   Diagnostic,

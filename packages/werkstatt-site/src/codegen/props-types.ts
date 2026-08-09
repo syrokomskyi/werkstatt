@@ -23,7 +23,7 @@ import { createHash } from "node:crypto";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { composeManifestPropsSchema } from "@warpgogol/ontology/shared-section-props";
+import { composeManifestPropsSchema } from "@warpgogol/werkstatt-site/ontology/shared-section-props";
 import type {
   KernelCommandInput,
   KernelCommandResult,

@@ -39,19 +39,19 @@ ${pages
 `;
 
 const INDEX_ASTRO = `---
-import { resolvePageRoute } from "@warpgogol/share/route";
+import { resolvePageRoute } from "@warpgogol/werkstatt-site/share/route";
 ---
 <resolvePageRoute />
 `;
 
 const SLUG_ASTRO = `---
-import { getStaticPathsForDefaultLang } from "@warpgogol/share/route";
+import { getStaticPathsForDefaultLang } from "@warpgogol/werkstatt-site/share/route";
 ---
 <getStaticPathsForDefaultLang />
 `;
 
 const PREFIXED_ASTRO = `---
-import { getStaticPathsForPrefixedLangs, getStaticPathsForDefaultLangRedirects } from "@warpgogol/share/route";
+import { getStaticPathsForPrefixedLangs, getStaticPathsForDefaultLangRedirects } from "@warpgogol/werkstatt-site/share/route";
 ---
 <getStaticPathsForPrefixedLangs />
 <getStaticPathsForDefaultLangRedirects />

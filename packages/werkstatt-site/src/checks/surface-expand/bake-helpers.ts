@@ -12,7 +12,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { BlueprintPillar, VirtualRouteEntry } from "@warpgogol/surface";
+import type { BlueprintPillar, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import type { BakeCtx } from "./bake.ts";
 
 interface SectionLike {

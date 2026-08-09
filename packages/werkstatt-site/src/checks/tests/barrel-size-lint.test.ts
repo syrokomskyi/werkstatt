@@ -47,11 +47,11 @@ async function fixtureWorkspace(): Promise<{ root: string; pkgDir: string }> {
 }
 
 describe("barrel.size.lint (RFC-0264)", () => {
-  it("BARREL-01: fails (error) when @warpgogol/share's root barrel exceeds the threshold", async () => {
+  it("BARREL-01: fails (error) when @warpgogol/werkstatt-site/share's root barrel exceeds the threshold", async () => {
     const { root, pkgDir } = await fixtureWorkspace();
     await writeFile(
       join(pkgDir, "package.json"),
-      JSON.stringify({ name: "@warpgogol/share" }),
+      JSON.stringify({ name: "@warpgogol/werkstatt-site/share" }),
       "utf8",
     );
     const lines = Array.from({ length: 130 }, (_, i) => `export const sym${i} = ${i};`).join("\n");
@@ -68,7 +68,7 @@ describe("barrel.size.lint (RFC-0264)", () => {
     const { root, pkgDir } = await fixtureWorkspace();
     await writeFile(
       join(pkgDir, "package.json"),
-      JSON.stringify({ name: "@warpgogol/share" }),
+      JSON.stringify({ name: "@warpgogol/werkstatt-site/share" }),
       "utf8",
     );
     await writeFile(join(pkgDir, "src", "page.ts"), "export function buildPage() {}\n", "utf8");
@@ -90,7 +90,7 @@ describe("barrel.size.lint (RFC-0264)", () => {
     const { root, pkgDir } = await fixtureWorkspace();
     await writeFile(
       join(pkgDir, "package.json"),
-      JSON.stringify({ name: "@warpgogol/share" }),
+      JSON.stringify({ name: "@warpgogol/werkstatt-site/share" }),
       "utf8",
     );
     await writeFile(join(pkgDir, "src", "page.ts"), "export function buildPage() {}\n", "utf8");

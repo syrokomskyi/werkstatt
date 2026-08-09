@@ -20,8 +20,8 @@ Content Knowledge Lifecycle (RFC-0211).
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { recordClaimsSchema, type ClaimAnnotation } from "@warpgogol/share/schemas";
-import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
+import { recordClaimsSchema, type ClaimAnnotation } from "@warpgogol/werkstatt-site/share/schemas";
+import { resolveFieldPath } from "@warpgogol/werkstatt-site/share/content/resolve-field-path";
 import type {
   CheckResult,
   Diagnostic,

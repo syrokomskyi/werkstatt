@@ -66,7 +66,7 @@ export async function runDispatcherSyncValidation(
   // --- Components dispatcher ---
   // Post-RFC-0023: the components dispatcher is OPTIONAL — uni.registry.yaml
   // (built by uni.registry.build) is now the canonical content-schema lookup.
-  // Apps that promoted all components to @warpgogol/ui no longer need a local
+  // Apps that promoted all components to @warpgogol/werkstatt-site/ui no longer need a local
   // schemas/components-dispatcher.ts. Apps that still maintain one are still
   // validated below (consistency with content/components/{lang}/*.md).
   let componentDispatcherSource: string | null = null;

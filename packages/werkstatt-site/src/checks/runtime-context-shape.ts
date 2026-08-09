@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-runtime.context.shape — validates that RuntimeContext in @warpgogol/share has
+runtime.context.shape — validates that RuntimeContext in @warpgogol/werkstatt-site/share has
 exactly three fields (locale, segment, flags) and that no workspace code
 constructs a RuntimeContext with non-null segment or non-empty flags at MVP
 (DNA-26, RFC-0026).
@@ -24,7 +24,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { resultFromViolations, failResult } from "./result-helpers.ts";
-import { EMPTY_RUNTIME_CONTEXT, type RuntimeContext } from "@warpgogol/share/runtime-context";
+import { EMPTY_RUNTIME_CONTEXT, type RuntimeContext } from "@warpgogol/werkstatt-site/share/runtime-context";
 
 // ---------------------------------------------------------------------------
 // Patterns that indicate a manually constructed RuntimeContext

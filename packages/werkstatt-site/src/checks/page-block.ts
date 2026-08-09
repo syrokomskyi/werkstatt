@@ -34,12 +34,12 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { resultFromViolations } from "./result-helpers.ts";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { PageEntrySchema } from "@warpgogol/ontology";
-import { getSectionPropsSchema } from "@warpgogol/ontology/schemas/manifest-resolver";
-import { systemManifestSchema } from "@warpgogol/ontology";
+import { PageEntrySchema } from "@warpgogol/werkstatt-site/ontology";
+import { getSectionPropsSchema } from "@warpgogol/werkstatt-site/ontology/schemas/manifest-resolver";
+import { systemManifestSchema } from "@warpgogol/werkstatt-site/ontology";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { normalizeBlockType } from "@warpgogol/share/page";
-import { resolveSharedContextProps } from "@warpgogol/share/shared-context";
+import { normalizeBlockType } from "@warpgogol/werkstatt-site/share/page";
+import { resolveSharedContextProps } from "@warpgogol/werkstatt-site/share/shared-context";
 import { readScopeFiles, outOfScope } from "./scope.ts";
 
 /**
@@ -208,7 +208,7 @@ export async function runPageBlockValidate(
       string,
       {
         rel: string;
-        entry: import("@warpgogol/ontology").PageEntry;
+        entry: import("@warpgogol/werkstatt-site/ontology").PageEntry;
       }
     >();
 

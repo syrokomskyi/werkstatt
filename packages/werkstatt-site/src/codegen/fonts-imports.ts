@@ -23,7 +23,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { biomeSchema, systemManifestSchema } from "@warpgogol/ontology/schemas";
+import { biomeSchema, systemManifestSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {
   KernelCommandInput,

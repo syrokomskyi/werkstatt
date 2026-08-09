@@ -13,7 +13,7 @@
 
 import { join, relative } from "node:path";
 import { readdir } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { collectMarkdownFiles } from "@warpgogol/werkstatt-site/content";
 
 // @ai-invariant The CONTENT_COMPONENTS_SUBPATH and SCHEMAS_COMPONENTS_SUBPATH constants define

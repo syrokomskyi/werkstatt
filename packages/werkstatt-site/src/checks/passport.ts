@@ -13,7 +13,7 @@ Cosmic Passport pipeline (DNA-31..34, RFC-0028).
 <CHANGE_SUMMARY>
   <item>Wave 1 (RFC-0028): Initial creation.</item>
   <item>Fix (RFC-0029 review): Wrap return values in canonical { data, exitCode, summary } shape so non-zero exits propagate to CI.</item>
-  <item>Use collectNebulaInputs from @warpgogol/nebula/collect for full 4-pillar input collection.</item>
+  <item>Use collectNebulaInputs from @warpgogol/werkstatt-site/nebula/collect for full 4-pillar input collection.</item>
   <item>RFC-0605: Added runPassportKeyEnsure — idempotent key creation, no-op if key exists, never prints private key to stdout, supports --private-key-out flag with 0600 permissions.</item>
   <item>Fix (review A-1): Replaced raw writeFile with writeFileIfChanged for cosmic-passport-key.json to avoid git churn on every regeneration cycle.</item>
 </CHANGE_SUMMARY>
@@ -30,15 +30,15 @@ import type {
 import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { optionalEnv } from "@warpgogol/site-kernel-integrity";
-import { emitPassport } from "@warpgogol/passport/emit";
-import { verifyPassport } from "@warpgogol/passport/verify";
-import { rotateKey } from "@warpgogol/passport/key-rotate";
-import { generateKeypair } from "@warpgogol/passport/sign";
-import { PassportPublicKeyFileSchema } from "@warpgogol/passport/schema";
-import type { PassportPublicKeyFile } from "@warpgogol/passport/schema";
-import { manifestToStarMapInput, emitStarMap } from "@warpgogol/star-map/render";
-import { computeNebulaScore } from "@warpgogol/nebula/compute";
-import { collectNebulaInputs } from "@warpgogol/nebula/collect";
+import { emitPassport } from "@warpgogol/werkstatt-site/passport/emit";
+import { verifyPassport } from "@warpgogol/werkstatt-site/passport/verify";
+import { rotateKey } from "@warpgogol/werkstatt-site/passport/key-rotate";
+import { generateKeypair } from "@warpgogol/werkstatt-site/passport/sign";
+import { PassportPublicKeyFileSchema } from "@warpgogol/werkstatt-site/passport/schema";
+import type { PassportPublicKeyFile } from "@warpgogol/werkstatt-site/passport/schema";
+import { manifestToStarMapInput, emitStarMap } from "@warpgogol/werkstatt-site/star-map/render";
+import { computeNebulaScore } from "@warpgogol/werkstatt-site/nebula/compute";
+import { collectNebulaInputs } from "@warpgogol/werkstatt-site/nebula/collect";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type { SystemManifest } from "@warpgogol/werkstatt-site/content";
 

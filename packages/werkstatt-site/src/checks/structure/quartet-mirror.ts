@@ -14,7 +14,7 @@ alignment for page routes (RFC-0014).</purpose>
 
 import { basename, dirname, join, relative } from "node:path";
 import { readFile } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

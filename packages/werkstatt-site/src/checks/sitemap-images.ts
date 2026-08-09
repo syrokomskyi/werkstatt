@@ -20,7 +20,7 @@
 
 import { join, dirname } from "node:path";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -32,7 +32,7 @@ import {
   isHtmlRedirectPage,
   generateImageSitemapXml,
   type SitemapImageEntry,
-} from "@warpgogol/share/semantic";
+} from "@warpgogol/werkstatt-site/share/semantic";
 import { passResult, failResult, resultFromViolations } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import {

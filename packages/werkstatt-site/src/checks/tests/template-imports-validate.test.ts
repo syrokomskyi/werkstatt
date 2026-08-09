@@ -83,14 +83,14 @@ describe("extractWorkspaceImports", () => {
   it("extracts both static and dynamic imports from the same file", () => {
     const source = [
       `import { foo } from "@warpgogol/site-kernel";`,
-      `const bar = await import("@warpgogol/share/fs");`,
+      `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
       `import { baz } from "@warpgogol/forge";`,
     ].join("\n");
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(3);
     expect(imports.map((i) => i.package)).toEqual([
       "@warpgogol/site-kernel",
-      "@warpgogol/share",
+      "@warpgogol/werkstatt-site/share",
       "@warpgogol/forge",
     ]);
   });
@@ -117,7 +117,7 @@ describe("extractWorkspaceImports", () => {
       `// line 1: comment`,
       `import { foo } from "@warpgogol/site-kernel";`,
       `// line 3: comment`,
-      `const bar = await import("@warpgogol/share/fs");`,
+      `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
     ].join("\n");
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(2);
@@ -192,7 +192,7 @@ describe("runTemplateImportsValidate", () => {
         name: "test-workspace",
         devDependencies: {
           "@warpgogol/site-kernel": "workspace:*",
-          "@warpgogol/share": "workspace:*",
+          "@warpgogol/werkstatt-site/share": "workspace:*",
         },
       }),
     );
@@ -203,7 +203,7 @@ describe("runTemplateImportsValidate", () => {
       join(pkgDir, "kernel.config.template.ts"),
       [
         `import { foo } from "@warpgogol/site-kernel";`,
-        `const bar = await import("@warpgogol/share/fs");`,
+        `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
       ].join("\n"),
     );
     await writeFile(

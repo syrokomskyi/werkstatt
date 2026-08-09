@@ -30,9 +30,9 @@ import {
   stableEventId,
   type ClaimEvent,
   type ClaimEventKind,
-} from "@warpgogol/share/knowledge/ledger";
-import type { ClaimProvenanceKind } from "@warpgogol/share/knowledge/claim";
-import { hashSourceValue } from "@warpgogol/share/knowledge/derivation";
+} from "@warpgogol/werkstatt-site/share/knowledge/ledger";
+import type { ClaimProvenanceKind } from "@warpgogol/werkstatt-site/share/knowledge/claim";
+import { hashSourceValue } from "@warpgogol/werkstatt-site/share/knowledge/derivation";
 import type {
   CheckResult,
   Diagnostic,

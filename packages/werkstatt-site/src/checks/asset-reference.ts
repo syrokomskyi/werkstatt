@@ -14,7 +14,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0248: delegate candidate generation and token syntax checks to @warpgogol/content-source.</item>
+  <item>RFC-0248: delegate candidate generation and token syntax checks to @warpgogol/werkstatt-site/content-source.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,12 +22,12 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import {
   describeContentAssetResolution,
   type ContentAssetDomain,
   type ContentAssetResolutionContract,
-} from "@warpgogol/content-source";
+} from "@warpgogol/werkstatt-site/content-source";
 import type {
   CheckResult,
   Diagnostic,

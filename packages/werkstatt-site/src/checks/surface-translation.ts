@@ -30,8 +30,8 @@ import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
 } from "@warpgogol/werkstatt-site/content";
-import { toKebabCase } from "@warpgogol/share/string-utils";
-import type { SurfaceModuleContext } from "@warpgogol/surface";
+import { toKebabCase } from "@warpgogol/werkstatt-site/share/string-utils";
+import type { SurfaceModuleContext } from "@warpgogol/werkstatt-site/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceModuleContexts } from "./pseo/pseo-module-context.ts";
 

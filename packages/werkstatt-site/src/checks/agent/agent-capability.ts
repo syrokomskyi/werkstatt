@@ -32,8 +32,8 @@ import {
   collectMarkdownFiles,
   parseMarkdownFrontmatter,
 } from "@warpgogol/werkstatt-site/content";
-import { capabilityRecordSchema, type CapabilityRecord } from "@warpgogol/ontology";
-import { resolveActiveCapabilities } from "@warpgogol/share/agent";
+import { capabilityRecordSchema, type CapabilityRecord } from "@warpgogol/werkstatt-site/ontology";
+import { resolveActiveCapabilities } from "@warpgogol/werkstatt-site/share/agent";
 import { readEntitledFeatures } from "../lib/entitlements.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 

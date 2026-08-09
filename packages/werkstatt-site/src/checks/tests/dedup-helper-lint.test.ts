@@ -52,13 +52,13 @@ describe("findLocalReservedDeclarations (RFC-0303)", () => {
   });
 
   it("green fixture: importing the canonical helper is not flagged", () => {
-    const source = 'import { fileExists, collectFiles } from "@warpgogol/share/fs";\n';
+    const source = 'import { fileExists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";\n';
     expect(findLocalReservedDeclarations(source)).toEqual([]);
   });
 
   it("green fixture: a differently-named local wrapper is not flagged", () => {
     const source =
-      'import { fileExists as pathExists } from "@warpgogol/share/fs";\n' +
+      'import { fileExists as pathExists } from "@warpgogol/werkstatt-site/share/fs";\n' +
       "async function checkPath(p: string) { return pathExists(p); }\n";
     expect(findLocalReservedDeclarations(source)).toEqual([]);
   });
@@ -85,7 +85,7 @@ describe("runDedupHelperLint (RFC-0303, command-level)", () => {
     const { root, context } = await fixtureWorkspace();
     await writeFile(
       join(root, "packages", "some-pkg", "src", "clean.ts"),
-      'import { fileExists } from "@warpgogol/share/fs";\nexport async function run() { return fileExists("."); }\n',
+      'import { fileExists } from "@warpgogol/werkstatt-site/share/fs";\nexport async function run() { return fileExists("."); }\n',
       "utf8",
     );
     const result = await runDedupHelperLint(input(), context);

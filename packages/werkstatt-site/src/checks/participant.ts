@@ -10,7 +10,7 @@
 <non-goals>
   <item>Do not resolve the photo asset to a hashed URL — that is the render layer's job.</item>
   <item>Do not read content via the Astro runtime — disk only, like the predecessor people.validate.</item>
-  <item>Do not define the schema — that lives in @warpgogol/share/schemas/participant.ts.</item>
+  <item>Do not define the schema — that lives in @warpgogol/werkstatt-site/share/schemas/participant.ts.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -33,7 +33,7 @@ import {
   PARTICIPANT_STATUSES,
   PARTICIPANT_RELATIONSHIPS,
   CONSENT_APPROVED_FIELDS,
-} from "@warpgogol/share/schemas";
+} from "@warpgogol/werkstatt-site/share/schemas";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 const VALID_TYPES = new Set<string>(PARTICIPANT_TYPES);

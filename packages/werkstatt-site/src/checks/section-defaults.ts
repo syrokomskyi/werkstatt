@@ -25,7 +25,7 @@ import type {
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { diagnosticsResult } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 const APP_SPECIFIC_DEFAULTS = [
   {

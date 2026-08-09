@@ -29,9 +29,9 @@ import {
   type DemandSignal,
   type VirtualRouteEntry,
   type WerkRecord,
-} from "@warpgogol/surface";
+} from "@warpgogol/werkstatt-site/surface";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { toKebabCase } from "@warpgogol/share/string-utils";
+import { toKebabCase } from "@warpgogol/werkstatt-site/share/string-utils";
 import { stringify as stringifyYaml, parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type { ZodType } from "zod";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";

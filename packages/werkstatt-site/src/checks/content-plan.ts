@@ -23,9 +23,9 @@ plan.gate.red consumed by APPS_CHECK (Phase 3).
 import { readFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
-import { recordClaimsSchema } from "@warpgogol/share/schemas";
-import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
-import { derivedState } from "@warpgogol/share/knowledge/derivation";
+import { recordClaimsSchema } from "@warpgogol/werkstatt-site/share/schemas";
+import { resolveFieldPath } from "@warpgogol/werkstatt-site/share/content/resolve-field-path";
+import { derivedState } from "@warpgogol/werkstatt-site/share/knowledge/derivation";
 import {
   stableTaskId,
   computeDueAt,
@@ -35,12 +35,12 @@ import {
   type MaintenancePlan,
   type Criticality,
   type MaintenanceTrigger,
-} from "@warpgogol/share/knowledge/plan";
+} from "@warpgogol/werkstatt-site/share/knowledge/plan";
 import type {
   AuthoredFreshnessLedger,
   FreshnessCriticality,
-} from "@warpgogol/share/knowledge/freshness";
-import type { DivergenceRecord } from "@warpgogol/share/knowledge/source";
+} from "@warpgogol/werkstatt-site/share/knowledge/freshness";
+import type { DivergenceRecord } from "@warpgogol/werkstatt-site/share/knowledge/source";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {
   CheckResult,

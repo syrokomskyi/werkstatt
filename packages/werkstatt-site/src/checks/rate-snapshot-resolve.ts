@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Implements RFC-0741 rate-snapshot.resolve command — reads RatePolicy entities, resolves applicable rates, and creates RateSnapshot content files.</purpose>
 <non-goals>
-  <item>Does not define RatePolicy or RateSnapshot types — those are RFC-0737/RFC-0738 in @warpgogol/pbp.</item>
+  <item>Does not define RatePolicy or RateSnapshot types — those are RFC-0737/RFC-0738 in @warpgogol/werkstatt-site/pbp.</item>
   <item>Does not implement the Rate Fetcher Service — that is RFC-0744. External mode delegates to it.</item>
   <item>Does not materialize derived prices — that is derived-prices.materialize (RFC-0740).</item>
 </non-goals>
@@ -26,9 +26,9 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { compilePbpProfile } from "@warpgogol/pbp/compiler";
-import type { PbpCompilerResult } from "@warpgogol/pbp/compiler";
-import type { PbpRateScheduleEntry } from "@warpgogol/pbp";
+import { compilePbpProfile } from "@warpgogol/werkstatt-site/pbp/compiler";
+import type { PbpCompilerResult } from "@warpgogol/werkstatt-site/pbp/compiler";
+import type { PbpRateScheduleEntry } from "@warpgogol/werkstatt-site/pbp";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";

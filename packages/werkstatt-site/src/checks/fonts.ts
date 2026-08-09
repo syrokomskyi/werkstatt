@@ -26,7 +26,7 @@ import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import { createRequire } from "node:module";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import {
   runSeoTechnicalRuntimeInstrument,
   type SeoRuntimeState,

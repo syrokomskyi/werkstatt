@@ -24,7 +24,7 @@
 import { join, relative, basename, dirname } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   CheckResult,
   Diagnostic,
@@ -38,8 +38,8 @@ import {
   materialTargetKey,
   type MaterialTargetDomain,
   type MaterialTarget,
-} from "@warpgogol/share/schemas/material-credit";
-import type { MaterialCredit } from "@warpgogol/share/schemas/material-credit";
+} from "@warpgogol/werkstatt-site/share/schemas/material-credit";
+import type { MaterialCredit } from "@warpgogol/werkstatt-site/share/schemas/material-credit";
 import { diagnosticsResult, passResult, resultFromViolations } from "./result-helpers.ts";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
 import {
@@ -591,7 +591,7 @@ export async function runMaterialCreditsDriftValidate(
       continue;
     }
     const localizedRecords = selectLocalizedCreditRecords(
-      state.records as import("@warpgogol/share/material-credits").MaterialCreditRecord[],
+      state.records as import("@warpgogol/werkstatt-site/share/material-credits").MaterialCreditRecord[],
       lang,
       state.defaultLanguage,
     );

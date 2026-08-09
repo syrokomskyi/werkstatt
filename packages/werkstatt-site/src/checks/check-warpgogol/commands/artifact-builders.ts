@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
   Report, action pack, audience review, and hints artifact builders for check-warpgogol OS commands.
-  Re-exports makeCheckReport, makeAgentAction, makeAgentActionPack, renderReportHtml from @warpgogol/check-core.
+  Re-exports makeCheckReport, makeAgentAction, makeAgentActionPack, renderReportHtml from @warpgogol/werkstatt-site/check-core.
   Also provides shared utility helpers (numberFlag) and audience/hints builders.
 </purpose>
 <non-goals>
@@ -18,8 +18,8 @@ import {
   type AudienceProfile,
   type AudienceReview,
   type SiteEvidenceGraph,
-} from "@warpgogol/check-core";
-import type { WarpgogolCheckHints } from "@warpgogol/share/check-hints";
+} from "@warpgogol/werkstatt-site/check-core";
+import type { WarpgogolCheckHints } from "@warpgogol/werkstatt-site/share/check-hints";
 import type { KernelCommandInput } from "@warpgogol/site-kernel";
 
 export {
@@ -27,7 +27,7 @@ export {
   makeAgentActionPack,
   makeCheckReport,
   renderReportHtml,
-} from "@warpgogol/check-core";
+} from "@warpgogol/werkstatt-site/check-core";
 
 export function numberFlag(input: KernelCommandInput, name: string, fallback: number): number {
   const value = input.flags[name];

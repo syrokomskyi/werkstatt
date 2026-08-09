@@ -30,7 +30,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { fileExists } from "./lib/file-exists.ts";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 // ---------------------------------------------------------------------------
 // Helpers

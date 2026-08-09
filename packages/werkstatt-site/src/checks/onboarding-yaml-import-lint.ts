@@ -3,7 +3,7 @@
 <purpose>
 RFC-0082 enforcement: prevent regression to direct `yaml`-package parsing in
 kernel onboarding/audit/content-discipline modules. Every onboarding-artifact
-read MUST go through `@warpgogol/share/onboarding-yaml` so the "first doc is
+read MUST go through `@warpgogol/werkstatt-site/share/onboarding-yaml` so the "first doc is
 the RFC-0076 metadata header, last doc is the payload" rule has exactly one
 owner.
 </purpose>
@@ -13,7 +13,7 @@ owner.
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0082: Introduce the import-lint guard preventing direct YAML.parse of onboarding artifacts outside @warpgogol/share/onboarding-yaml.</item>
+  <item>RFC-0082: Introduce the import-lint guard preventing direct YAML.parse of onboarding artifacts outside @warpgogol/werkstatt-site/share/onboarding-yaml.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -51,7 +51,7 @@ const FORBIDDEN_PATTERNS: Array<{ pattern: RegExp; message: string }> = [
   {
     pattern: /from\s+["']yaml["']/,
     message:
-      'RFC-0082: direct `from "yaml"` import in an RFC-0076 onboarding-artifact reader. Use `@warpgogol/share/onboarding-yaml` instead.',
+      'RFC-0082: direct `from "yaml"` import in an RFC-0076 onboarding-artifact reader. Use `@warpgogol/werkstatt-site/share/onboarding-yaml` instead.',
   },
   {
     pattern: /YAML\.parse(?:AllDocuments)?\s*\(/,
@@ -61,7 +61,7 @@ const FORBIDDEN_PATTERNS: Array<{ pattern: RegExp; message: string }> = [
   {
     pattern: /^\s*import\s+(?:\{\s*parse\s+as\s+parseYaml\s*\}|.*\bparse\s*as\s*parseYaml\b)/,
     message:
-      "RFC-0082: aliased `parse as parseYaml` import from the `yaml` package in an RFC-0076 onboarding-artifact reader. Use `@warpgogol/share/onboarding-yaml`.",
+      "RFC-0082: aliased `parse as parseYaml` import from the `yaml` package in an RFC-0076 onboarding-artifact reader. Use `@warpgogol/werkstatt-site/share/onboarding-yaml`.",
   },
 ];
 

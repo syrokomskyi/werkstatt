@@ -53,7 +53,7 @@ export async function runSectionHeaderContractValidate(
         file: rel,
         rule: "HEAD-01",
         message: `Raw <${node.name} class="${cls}"> outside <SectionHeader> is forbidden; use <SectionHeader>.`,
-        fix: 'import SectionHeader from "@warpgogol/ui/components/section-header.astro"; render via <SectionHeader heading=... />',
+        fix: 'import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro"; render via <SectionHeader heading=... />',
       });
     });
   }

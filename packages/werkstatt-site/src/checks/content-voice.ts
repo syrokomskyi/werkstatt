@@ -30,7 +30,7 @@ import {
   parseVoiceProfileFile,
   stripAllowedQuoteBlocks,
   type VoiceProfile,
-} from "@warpgogol/share/content-discipline";
+} from "@warpgogol/werkstatt-site/share/content-discipline";
 import type {
   KernelCommandInput,
   KernelCommandResult,

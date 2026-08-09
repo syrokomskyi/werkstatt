@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0235 egress text normalization commands. The build's "find all of them"
-adapter over public output, layered on the @warpgogol/share normalizer:
+adapter over public output, layered on the @warpgogol/werkstatt-site/share normalizer:
   - text.normalize.apply (app, dist mutator): rewrite every text-bearing artifact
     under dist/client through the per-site normalizer. Runs in build.post after all
     dist generation/mutation and before the postbuild validators.
@@ -25,7 +25,7 @@ adapter over public output, layered on the @warpgogol/share normalizer:
 
 import { access, readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   CheckResult,
   Diagnostic,
@@ -41,7 +41,7 @@ import {
   detectResidual,
   type NormalizeConfig,
   type NormalizableKind,
-} from "@warpgogol/share/text-normalize";
+} from "@warpgogol/werkstatt-site/share/text-normalize";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { diagnosticsResult, passResult, failResult } from "./result-helpers.ts";
 

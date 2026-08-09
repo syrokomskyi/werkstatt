@@ -33,7 +33,7 @@
 import { join, basename, extname, dirname } from "node:path";
 import { readdir, readFile, writeFile, mkdir, stat, copyFile, unlink } from "node:fs/promises";
 import { execFile } from "node:child_process";
-import { fileExists, collectFiles } from "@warpgogol/share/fs";
+import { fileExists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { byteHash } from "@warpgogol/fingerprint";
 import { promisify } from "node:util";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
@@ -47,7 +47,7 @@ import type {
   VideoManifest,
   VideoManifestEntry,
   MediaProfile,
-} from "@warpgogol/share/schemas/media";
+} from "@warpgogol/werkstatt-site/share/schemas/media";
 import { readDefaultLanguageCode } from "../lib/i18n.ts";
 
 const execFileAsync = promisify(execFile);

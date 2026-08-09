@@ -25,11 +25,11 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
-import { markdownCollectionLoader } from "@warpgogol/share/astro/loaders";
-import { fsDataCollectionLoader } from "@warpgogol/content-source";
-import { pbpCollections } from "@warpgogol/pbp/astro";
-import { createFaqCollection } from "@warpgogol/faq/astro";
-import { toDataEntryId } from "@warpgogol/share/content";
+import { markdownCollectionLoader } from "@warpgogol/werkstatt-site/share/astro/loaders";
+import { fsDataCollectionLoader } from "@warpgogol/werkstatt-site/content-source";
+import { pbpCollections } from "@warpgogol/werkstatt-site/pbp/astro";
+import { createFaqCollection } from "@warpgogol/werkstatt-site/faq/astro";
+import { toDataEntryId } from "@warpgogol/werkstatt-site/share/content";
 
 const system = defineCollection({
   loader: glob({
@@ -65,7 +65,7 @@ const navigation = defineCollection({
 });
 
 // Loads person records from src/content/people/{lang}/ as the "people" collection (RFC-0200).
-// Used by the data-driven People section (@warpgogol/share/astro/people.ts).
+// Used by the data-driven People section (@warpgogol/werkstatt-site/share/astro/people.ts).
 const people = defineCollection({
   loader: fsDataCollectionLoader({
     base: "src/content/people",
@@ -91,5 +91,5 @@ export const collections = {
   // topics,
 };
 
-// Page-data and component-content types are exported from @warpgogol/ui and
-// @warpgogol/share. Apps must not re-declare them here.
+// Page-data and component-content types are exported from @warpgogol/werkstatt-site/ui and
+// @warpgogol/werkstatt-site/share. Apps must not re-declare them here.

@@ -18,8 +18,8 @@ that enforce the Uni UI Ontology manifest contract (DNA-17, RFC-0023) in package
 import { readFile } from "node:fs/promises";
 import { join, relative, basename, extname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { manifestSchema } from "@warpgogol/ontology";
-import { fileExists as exists, collectFiles as collectFilesShared } from "@warpgogol/share/fs";
+import { manifestSchema } from "@warpgogol/werkstatt-site/ontology";
+import { fileExists as exists, collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -80,7 +80,7 @@ function getScanRoots(workspaceRoot: string): string[] {
 
 /**
  * Validates every *.manifest.yaml file found under packages/ui/src/{sections,components,pages}/:
- *   1. Parses and validates against @warpgogol/ontology manifestSchema (Zod).
+ *   1. Parses and validates against @warpgogol/werkstatt-site/ontology manifestSchema (Zod).
  *   2. Checks that a colocated .astro file of the same stem exists.
  */
 export async function runManifestContractValidate(

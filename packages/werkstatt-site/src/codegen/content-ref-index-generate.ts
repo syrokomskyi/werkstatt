@@ -2,9 +2,9 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0527 content.ref-index.generate — scans src/content/ for .md and .yaml files, parses
 frontmatter (.md) or full content (.yaml), and writes a unified content-ref-index.generated.yaml
-index file for the index-based resolver in @warpgogol/share/content-reference.</purpose>
+index file for the index-based resolver in @warpgogol/werkstatt-site/share/content-reference.</purpose>
 <non-goals>
-  <item>Do not resolve references — that is the resolver in @warpgogol/share/content-reference.</item>
+  <item>Do not resolve references — that is the resolver in @warpgogol/werkstatt-site/share/content-reference.</item>
   <item>Do not validate references — that is content.references.validate in @warpgogol/site-kernel-checks.</item>
   <item>Do not index markdown body content — only frontmatter is indexed for .md files.</item>
 </non-goals>
@@ -19,14 +19,14 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname, relative, sep } from "node:path";
 import { stringify, parse as parseYaml } from "yaml";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import type { ContentRefIndex } from "@warpgogol/share/content-reference";
+import type { ContentRefIndex } from "@warpgogol/werkstatt-site/share/content-reference";
 
 const INDEX_OUTPUT_PATH = "src/content-ref-index.generated.yaml";
 const HEADER_COMMENT =

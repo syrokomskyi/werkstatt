@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { TOKEN_NAME_SET } from "@warpgogol/tokens";
+import { TOKEN_NAME_SET } from "@warpgogol/werkstatt-site/tokens";
 import { runHardcodedColorLint } from "../checks/tokens.ts";
 import { makeTestSiteContext, testInput } from "./helpers.ts";
 

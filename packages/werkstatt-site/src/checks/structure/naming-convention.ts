@@ -15,7 +15,7 @@ uses kebab-case (lowercase letters, digits, hyphens only), with documented exemp
 import { basename, join, relative } from "node:path";
 import { readFile } from "node:fs/promises";
 import { readdirSync, type Dirent } from "node:fs";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

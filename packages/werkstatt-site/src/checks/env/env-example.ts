@@ -3,7 +3,7 @@
 <purpose>RFC-0168 (Session C): generate apps/<id>/.env.example from the app's GENERATED env schema
 (src/env.schema.generated.mjs — the canonical secret union written by api.routes.generate), plus
 STRIPE_SECRET_KEY when the app participates in entitlements (RFC-0169). Comments are grouped per
-Integration Port adapter (single source of truth: @warpgogol/share/integration) and personalized for
+Integration Port adapter (single source of truth: @warpgogol/werkstatt-site/share/integration) and personalized for
 the concrete site (its domain). env.example.validate guards that every value stays EMPTY, so a real
 secret can never leak into the repo through the tracked example file.</purpose>
 <non-goals>
@@ -38,7 +38,7 @@ import {
   CRM_ADAPTERS,
   UPSTASH_QSTASH_SECRETS,
   UPSTASH_REDIS_SECRETS,
-} from "@warpgogol/integration";
+} from "@warpgogol/werkstatt-site/integration";
 import { passResult, failResult, resultFromViolations } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";

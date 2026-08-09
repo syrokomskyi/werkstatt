@@ -31,7 +31,7 @@ import {
   resolvePseoBudget,
   STRIPE_FEATURE_LOOKUP_MAP,
   type EntitledFeature,
-} from "@warpgogol/share/entitlement";
+} from "@warpgogol/werkstatt-site/share/entitlement";
 import { failResult } from "./result-helpers.ts";
 
 const GENERATED_FILE = "src/entitlements.generated.yaml";

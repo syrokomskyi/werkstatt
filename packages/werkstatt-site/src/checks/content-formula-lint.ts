@@ -26,7 +26,7 @@ import {
   readMarkdownDocument,
 } from "./content-discipline.ts";
 import { readScopeFiles, outOfScope } from "./scope.ts";
-import { scanFormulas } from "@warpgogol/share/formula-eval";
+import { scanFormulas } from "@warpgogol/werkstatt-site/share/formula-eval";
 
 // Detect patterns like: <ref> + <ref> = <number> or <ref> + <ref> × <number>
 // where <ref> is a braceless content reference (collection.file.field)

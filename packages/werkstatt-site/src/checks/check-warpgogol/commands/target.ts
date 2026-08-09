@@ -10,8 +10,8 @@
 </CHANGE_SUMMARY>
 */
 
-import { getCheckRunnerInfo } from "@warpgogol/check-runner-node";
-import { validateTargetSafety } from "@warpgogol/check-core";
+import { getCheckRunnerInfo } from "@warpgogol/werkstatt-site/check-runner";
+import { validateTargetSafety } from "@warpgogol/werkstatt-site/check-core";
 import type {
   CheckResult,
   KernelCommandInput,

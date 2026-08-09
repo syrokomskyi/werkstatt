@@ -3,7 +3,7 @@
 <purpose>
 fs.walk.lint — RFC-0303: fails when a source file under packages/** declares
 its own nested recursive `readdir` walker instead of importing the canonical
-`collectFiles` from @warpgogol/share/fs. Prevents the ~52-copy duplication class
+`collectFiles` from @warpgogol/werkstatt-site/share/fs. Prevents the ~52-copy duplication class
 RFC-0303 cleaned up from silently regenerating.
 </purpose>
 <non-goals>
@@ -25,7 +25,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const SCAN_ROOT = join("packages");
@@ -79,9 +79,9 @@ export async function runFsWalkLint(
         file: relFile,
         line,
         message:
-          "Nested recursive readdir walker declared outside the canonical @warpgogol/share/fs module.",
+          "Nested recursive readdir walker declared outside the canonical @warpgogol/werkstatt-site/share/fs module.",
         fixHint:
-          'Import { collectFiles } from "@warpgogol/share/fs" instead of declaring a local walk() function. If this walker has a genuinely different contract, add a "fs.walk.lint: allow — <reason>" comment directly above the declaration.',
+          'Import { collectFiles } from "@warpgogol/werkstatt-site/share/fs" instead of declaring a local walk() function. If this walker has a genuinely different contract, add a "fs.walk.lint: allow — <reason>" comment directly above the declaration.',
       });
     }
   }

@@ -28,11 +28,11 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { KNOWN_ADAPTER_IDS } from "@warpgogol/growth/adapter";
+import { KNOWN_ADAPTER_IDS } from "@warpgogol/werkstatt-site/growth/adapter";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------
-// Known adapter ids — imported from @warpgogol/growth (single source of truth)
+// Known adapter ids — imported from @warpgogol/werkstatt-site/growth (single source of truth)
 // ---------------------------------------------------------------------------
 
 const KNOWN_ADAPTER_SET = new Set<string>(KNOWN_ADAPTER_IDS);
@@ -72,7 +72,7 @@ export async function runGrowthAdapterContract(
 
       // Skip directories without a package.json — they are leftover artifacts,
       // not real adapter packages (e.g. growth-adapter-null was inlined into
-      // @warpgogol/growth, growth-adapter-plausible was never created).
+      // @warpgogol/werkstatt-site/growth, growth-adapter-plausible was never created).
       const pkgJsonPath = join(pkgDir, "package.json");
       let pkgJson: Record<string, unknown>;
       try {
@@ -82,14 +82,14 @@ export async function runGrowthAdapterContract(
         continue;
       }
 
-      // Must have @warpgogol/growth as dependency
+      // Must have @warpgogol/werkstatt-site/growth as dependency
       const deps = {
         ...(pkgJson["dependencies"] as Record<string, string> | undefined),
         ...(pkgJson["peerDependencies"] as Record<string, string> | undefined),
       };
-      if (!deps["@warpgogol/growth"]) {
+      if (!deps["@warpgogol/werkstatt-site/growth"]) {
         violations.push(
-          `GAC-02: ${rel}/package.json: adapter must declare "@warpgogol/growth" as a dependency or peerDependency`,
+          `GAC-02: ${rel}/package.json: adapter must declare "@warpgogol/werkstatt-site/growth" as a dependency or peerDependency`,
         );
       }
 

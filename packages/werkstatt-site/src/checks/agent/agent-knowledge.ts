@@ -31,8 +31,8 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { isAgentKnowledgeDomain, type AgentKnowledgeEnvelope } from "@warpgogol/share/agent";
-import { BUSINESS_DOMAIN_VISIBILITY } from "@warpgogol/share/semantic";
+import { isAgentKnowledgeDomain, type AgentKnowledgeEnvelope } from "@warpgogol/werkstatt-site/share/agent";
+import { BUSINESS_DOMAIN_VISIBILITY } from "@warpgogol/werkstatt-site/share/semantic";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { computeKnowledgeEnvelopes } from "./agent-knowledge-compute.ts";

@@ -15,7 +15,7 @@ Generates 1200x630 social preview images with brand-aware design tokens.</purpos
 */
 
 import sharp from "sharp";
-import { normalizeText, type NormalizeConfig } from "@warpgogol/share/text-normalize";
+import { normalizeText, type NormalizeConfig } from "@warpgogol/werkstatt-site/share/text-normalize";
 
 export interface PreviewTemplateInput {
   pageTitle: string;

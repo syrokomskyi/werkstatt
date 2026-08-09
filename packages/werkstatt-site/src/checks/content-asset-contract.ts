@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
   [RFC-0248] Focused content asset contract validator. It verifies that authored asset
-  tokens are checked through the shared @warpgogol/content-source candidate-generation contract
+  tokens are checked through the shared @warpgogol/werkstatt-site/content-source candidate-generation contract
   before downstream material-credit validation runs.
 </purpose>
 <non-goals>

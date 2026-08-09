@@ -27,7 +27,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { localizeUrl } from "@warpgogol/share/url-policy";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
 import {
   collectMarkdownFilesSafe,
   flattenStringValues,

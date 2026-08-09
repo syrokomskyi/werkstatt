@@ -18,7 +18,7 @@ amend commands and audit.delta.run by name via executeKernelCommand.</purpose>
 
 import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parseOnboardingArtifactHeader } from "@warpgogol/share/onboarding-yaml";
+import { parseOnboardingArtifactHeader } from "@warpgogol/werkstatt-site/share/onboarding-yaml";
 import { executeKernelCommand } from "@warpgogol/site-kernel";
 import type {
   KernelCommandInput,

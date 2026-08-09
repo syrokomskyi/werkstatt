@@ -12,7 +12,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { localizeUrl } from "@warpgogol/share/url-policy";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
 import { defaultLanguageFromManifest } from "../../lib/i18n.ts";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {

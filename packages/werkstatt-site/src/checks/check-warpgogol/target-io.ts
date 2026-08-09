@@ -12,7 +12,7 @@
 
 import { isAbsolute, join } from "node:path";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import { parseCheckTarget, type CheckTarget } from "@warpgogol/check-core";
+import { parseCheckTarget, type CheckTarget } from "@warpgogol/werkstatt-site/check-core";
 
 export function getStringFlag(input: KernelCommandInput, name: string): string | undefined {
   const value = input.flags[name];

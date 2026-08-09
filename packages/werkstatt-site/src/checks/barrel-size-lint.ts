@@ -1,8 +1,8 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-barrel.size.lint — RFC-0264: guards the end state of the @warpgogol/share barrel
-split. BARREL-01 fails (error for @warpgogol/share, warning for every other
+barrel.size.lint — RFC-0264: guards the end state of the @warpgogol/werkstatt-site/share barrel
+split. BARREL-01 fails (error for @warpgogol/werkstatt-site/share, warning for every other
 workspace package) when a root `src/index.ts` exceeds the export-line
 threshold (default 120) — the root barrel must stay a thin, deprecated
 compatibility surface, not the package's real entry point. BARREL-02 fails
@@ -30,11 +30,11 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { discoverWorkspacePackages } from "@warpgogol/site-kernel";
-import { fileExists } from "@warpgogol/share/fs";
+import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const DEFAULT_THRESHOLD = 120;
-const ERROR_PACKAGE = "@warpgogol/share";
+const ERROR_PACKAGE = "@warpgogol/werkstatt-site/share";
 
 /**
  * Count physical lines that are part of an `export` statement, ignoring
@@ -97,7 +97,7 @@ function extractNamedExports(text: string): Set<string> {
  * re-export block is deleted for good.
  */
 const COMPLETED_WAVE_SUBPATHS: Record<string, string[]> = {
-  "@warpgogol/share": ["src/page.ts", "src/i18n/localization.ts"],
+  "@warpgogol/werkstatt-site/share": ["src/page.ts", "src/i18n/localization.ts"],
 };
 
 export async function runBarrelSizeLint(

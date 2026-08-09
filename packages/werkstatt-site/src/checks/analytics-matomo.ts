@@ -14,7 +14,7 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { fileExists } from "@warpgogol/share/fs";
+import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
 import { parse as parseYaml } from "yaml";
 import type {
   CheckResult,

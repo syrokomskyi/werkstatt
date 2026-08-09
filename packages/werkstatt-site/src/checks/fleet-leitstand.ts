@@ -31,7 +31,7 @@ import {
   type FleetJob,
   type FleetPlan,
   type FleetSiteStatus,
-} from "@warpgogol/surface";
+} from "@warpgogol/werkstatt-site/surface";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const _FLEET_DIR = "fleet";

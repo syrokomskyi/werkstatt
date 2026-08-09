@@ -22,7 +22,7 @@ import { promisify } from "node:util";
 
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 import type {
   KernelCommandInput,

@@ -20,7 +20,7 @@ import type {
   Diagnostic,
   CheckResult,
 } from "@warpgogol/site-kernel";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const WHITELISTED_FILES = new Set([

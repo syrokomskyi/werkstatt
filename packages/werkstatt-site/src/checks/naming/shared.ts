@@ -11,7 +11,7 @@
 */
 
 import { basename } from "node:path";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 export async function collectAllAstroFiles(dir: string): Promise<string[]> {
   return collectFiles(dir, { extensions: [".astro"], ignore: () => false });

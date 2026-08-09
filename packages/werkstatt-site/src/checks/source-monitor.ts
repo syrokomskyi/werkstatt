@@ -21,14 +21,14 @@ explicitly enabled. The monitor never mutates content; it reports.
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
-import { recordClaimsSchema } from "@warpgogol/share/schemas";
-import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
+import { recordClaimsSchema } from "@warpgogol/werkstatt-site/share/schemas";
+import { resolveFieldPath } from "@warpgogol/werkstatt-site/share/content/resolve-field-path";
 import {
   compareValues,
   extractJsonPath,
   type DivergenceRecord,
   type SourceDescriptor,
-} from "@warpgogol/share/knowledge/source";
+} from "@warpgogol/werkstatt-site/share/knowledge/source";
 import type {
   CheckResult,
   KernelCommandInput,

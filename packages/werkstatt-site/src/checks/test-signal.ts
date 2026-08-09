@@ -75,9 +75,9 @@ const NOOP_PATTERNS = [
 const TIER_0_PACKAGES = new Set([
   "@warpgogol/site-kernel",
   "@warpgogol/site-kernel-checks",
-  "@warpgogol/share",
-  "@warpgogol/integration-adapter-stripe",
-  "@warpgogol/integration-adapter-supabase-crm",
+  "@warpgogol/werkstatt-site/share",
+  "@warpgogol/werkstatt-site/integration-adapter-stripe",
+  "@warpgogol/werkstatt-site/integration-adapter-supabase-crm",
 ]);
 
 const TIER_1_PATTERNS = [
@@ -103,7 +103,7 @@ function isExpiredIsoDate(value: string | undefined): boolean {
 function classifyTier(signal: PackageTestSignal): TestSignalTier {
   if (TIER_0_PACKAGES.has(signal.packageName)) return 0;
   if (signal.directory.startsWith("apps/")) return 3;
-  if (signal.directory === "packages/ui" || signal.packageName === "@warpgogol/ontology") return 2;
+  if (signal.directory === "packages/ui" || signal.packageName === "@warpgogol/werkstatt-site/ontology") return 2;
   if (TIER_1_PATTERNS.some((pattern) => pattern.test(signal.packageName))) return 1;
   if (signal.directory.startsWith("packages/os/")) return 1;
   return 2;

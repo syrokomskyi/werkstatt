@@ -20,7 +20,7 @@ import { fileURLToPath } from "node:url";
 import { sequence } from "astro:middleware";
 import languageRedirectMiddleware from "./middleware/language-redirect";
 import tombstoneMiddleware from "./middleware/retired-tombstones";
-import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/share/text-normalize";
+import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/werkstatt-site/share/text-normalize";
 import { loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

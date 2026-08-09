@@ -14,7 +14,7 @@
 */
 
 import { relative, join } from "node:path";
-import { pbpSchemaById } from "@warpgogol/pbp/schemas";
+import { pbpSchemaById } from "@warpgogol/werkstatt-site/pbp/schemas";
 import type {
   KernelCommandInput,
   KernelCommandResult,

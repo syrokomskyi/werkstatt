@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Implements RFC-0740 derived-prices.materialize command — compiles PBP profile, materializes derived prices, writes generated JSON.</purpose>
 <non-goals>
-  <item>Does not implement materialization logic — that is in @warpgogol/pbp/compiler/materialize.ts.</item>
+  <item>Does not implement materialization logic — that is in @warpgogol/werkstatt-site/pbp/compiler/materialize.ts.</item>
   <item>Does not integrate into the build pipeline — that is RFC-0741.</item>
   <item>Does not define entitlement gating — that is RFC-0741.</item>
 </non-goals>
@@ -22,9 +22,9 @@ import type {
 import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { compilePbpProfile } from "@warpgogol/pbp/compiler";
-import type { PbpCompilerResult } from "@warpgogol/pbp/compiler";
-import { materializeDerivedPrices } from "@warpgogol/pbp/compiler";
+import { compilePbpProfile } from "@warpgogol/werkstatt-site/pbp/compiler";
+import type { PbpCompilerResult } from "@warpgogol/werkstatt-site/pbp/compiler";
+import { materializeDerivedPrices } from "@warpgogol/werkstatt-site/pbp/compiler";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
 import { flagString, findCurrencyPricingPolicy } from "./lib/pbp-helpers.ts";

@@ -14,7 +14,7 @@
 
 import { join, relative } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { runSemanticMirrorValidation } from "./semantic-mirror.ts";
 import { runFeaturePolicyValidate } from "./feature-policy.ts";
 import type {

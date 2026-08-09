@@ -13,8 +13,8 @@ builds and validates packages/ontology/archetypes/index.yaml from archetype YAML
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fileExists as pathExists } from "@warpgogol/share/fs";
-import { PlanetCatalog, MoonCatalog } from "@warpgogol/ontology";
+import { fileExists as pathExists } from "@warpgogol/werkstatt-site/share/fs";
+import { PlanetCatalog, MoonCatalog } from "@warpgogol/werkstatt-site/ontology";
 import { writeFileAtomic } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {

@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  RFC-0230 workspace validator for UI-facing helpers in `@warpgogol/share`.
+  RFC-0230 workspace validator for UI-facing helpers in `@warpgogol/werkstatt-site/share`.
   The command scans a small target registry rather than the whole package, so
   public copy surfaces are governed without flagging schema/protocol constants.
 </purpose>
@@ -22,7 +22,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 type ShareI18nRule = "SHARE-I18N-01" | "SHARE-I18N-02" | "SHARE-I18N-03";
 type ShareI18nSeverity = "error" | "warning";
@@ -214,8 +214,8 @@ export function scanShareI18nSource(
       severity,
       message:
         rule === "SHARE-I18N-02"
-          ? "Hardcoded localized label map in @warpgogol/share must be extracted or explicitly allowed."
-          : "Human-readable string literal in a UI-facing @warpgogol/share helper must be extracted or explicitly allowed.",
+          ? "Hardcoded localized label map in @warpgogol/werkstatt-site/share must be extracted or explicitly allowed."
+          : "Human-readable string literal in a UI-facing @warpgogol/werkstatt-site/share helper must be extracted or explicitly allowed.",
       excerpt: content.slice(0, 80),
       fixHint:
         "Move visible text to an approved localization surface, or add a narrow reviewed allowlist entry with a reason.",

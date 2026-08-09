@@ -32,7 +32,7 @@ import { readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { readFile } from "node:fs/promises";
-import { systemManifestSchema } from "@warpgogol/ontology/schemas";
+import { systemManifestSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
 import type {
   KernelCommandInput,
   KernelCommandResult,

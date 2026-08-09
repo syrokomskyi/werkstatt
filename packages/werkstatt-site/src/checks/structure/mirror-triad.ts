@@ -72,7 +72,7 @@ export async function runMirrorTriadValidation(
     schemaPaths.add(parts.join("/"));
   }
 
-  // Post-RFC-0023: components live in @warpgogol/ui with colocated *.types.ts.
+  // Post-RFC-0023: components live in @warpgogol/werkstatt-site/ui with colocated *.types.ts.
   // A component-content file in the app is satisfied by either:
   //   a) a local schemas/components/<name>.ts (legacy app-resident schema), OR
   //   b) a packages/ui/src/components/<name>/<name>-component.types.ts (canonical post-migration).

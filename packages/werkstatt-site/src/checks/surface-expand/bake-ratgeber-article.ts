@@ -21,7 +21,7 @@ articles (same category), context-specific closing CTA based on articleType (RFC
 </CHANGE_SUMMARY>
 */
 
-import type { VirtualRouteEntry } from "@warpgogol/surface";
+import type { VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import type { Block } from "./bake-blocks.ts";
 import { md, linkedCardGrid, ctaBlock, articleHeader, changelogBlock } from "./bake-blocks.ts";
 import type { BakeCtx } from "./bake.ts";

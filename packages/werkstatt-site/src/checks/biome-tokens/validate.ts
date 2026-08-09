@@ -14,7 +14,7 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { TOKEN_NAME_SET } from "@warpgogol/tokens";
+import { TOKEN_NAME_SET } from "@warpgogol/werkstatt-site/tokens";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
 import type {
@@ -273,7 +273,7 @@ export async function runBiomeTokensValidate(
               token,
               biomeId,
               message: `Biome ${biomeId} maps to unknown token ${token}.`,
-              fixHint: "Verify the token name exists in @warpgogol/tokens.",
+              fixHint: "Verify the token name exists in @warpgogol/werkstatt-site/tokens.",
             });
           }
         }

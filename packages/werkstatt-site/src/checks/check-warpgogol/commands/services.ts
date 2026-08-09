@@ -210,7 +210,7 @@ export async function runCheckWarpgogolRunnerValidate(
     const pkg = JSON.parse(await context.io.readFile(packagePath)) as {
       dependencies?: Record<string, string>;
     };
-    for (const dep of ["@warpgogol/check-core", "@warpgogol/check-runner-node"]) {
+    for (const dep of ["@warpgogol/werkstatt-site/check-core", "@warpgogol/werkstatt-site/check-runner"]) {
       if (!pkg.dependencies?.[dep]) {
         diagnostics.push({
           ruleId: "CW-RUNNER-02",
@@ -240,13 +240,13 @@ export async function runCheckWarpgogolRunnerValidate(
   const workerPath = join(context.workspaceRoot, "services/check-warpgogol-runner/src/worker.ts");
   if (await context.io.exists(workerPath)) {
     const worker = await context.io.readFile(workerPath);
-    if (!worker.includes("@warpgogol/check-core") && !worker.includes("./run-once.ts")) {
+    if (!worker.includes("@warpgogol/werkstatt-site/check-core") && !worker.includes("./run-once.ts")) {
       diagnostics.push({
         ruleId: "CW-RUNNER-04",
         severity: "error",
         file: "services/check-warpgogol-runner/src/worker.ts",
         message: "Runner worker does not use shared Check Warpgogol run contracts.",
-        fixHint: "Import run contracts from @warpgogol/check-core directly or through run-once.ts.",
+        fixHint: "Import run contracts from @warpgogol/werkstatt-site/check-core directly or through run-once.ts.",
       });
     }
   }
@@ -260,7 +260,7 @@ export async function runCheckWarpgogolRunnerValidate(
     const text = await context.io.readFile(path);
     if (
       text.includes("playwright") ||
-      text.includes("@warpgogol/check-runner-node") ||
+      text.includes("@warpgogol/werkstatt-site/check-runner") ||
       text.includes("services/")
     ) {
       diagnostics.push({

@@ -36,7 +36,7 @@ import {
   buildFleetAgentCatalog,
   type FleetAgentCatalog,
   type FleetAgentCatalogSiteInput,
-} from "@warpgogol/share/agent";
+} from "@warpgogol/werkstatt-site/share/agent";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const CATALOG_FILE = "fleet/agent-catalog.generated.yaml";

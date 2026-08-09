@@ -19,7 +19,7 @@ human-readable strings and non-trivial `resolveLabel` fallbacks.
 
 import { readFile } from "node:fs/promises";
 import { join, relative, basename } from "node:path";
-import { collectFiles } from "@warpgogol/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
