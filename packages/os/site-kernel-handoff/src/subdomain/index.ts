@@ -14,10 +14,7 @@ RFC-0752: Barrel re-exports for the subdomain command family.
 
 export { createSubdomainModule } from "./subdomain.module.ts";
 export { runSubdomainRegister } from "./subdomain-register.ts";
-export type {
-  SubdomainRegisterResult,
-  SubdomainRecord,
-} from "./subdomain-register.ts";
+export type { SubdomainRegisterResult, SubdomainRecord } from "./subdomain-register.ts";
 export { runSubdomainValidate } from "./subdomain-validate.ts";
 export type { SubdomainValidateResult } from "./subdomain-validate.ts";
 export { runSubdomainList } from "./subdomain-list.ts";

@@ -72,15 +72,13 @@ test("resolveActor returns env actorId when --actor-from-auth is set and env var
 });
 
 test("resolveActor throws actor-required error when --actor-from-auth is set but env vars are missing", () => {
-  expect(() => resolveActor(makeInput({ "actor-from-auth": true }))).toThrow(
-    /actor-required/,
-  );
+  expect(() => resolveActor(makeInput({ "actor-from-auth": true }))).toThrow(/actor-required/);
 });
 
 test("resolveActor: --actor-from-auth takes precedence over --actor", () => {
   process.env["WERKSTATT_ACTOR_ID"] = "did:key:z6Mktest";
   process.env["WERKSTATT_ACTOR_SITE"] = "warpgogol-com";
-  expect(
-    resolveActor(makeInput({ "actor-from-auth": true, actor: "human:alice" })),
-  ).toBe("did:key:z6Mktest");
+  expect(resolveActor(makeInput({ "actor-from-auth": true, actor: "human:alice" }))).toBe(
+    "did:key:z6Mktest",
+  );
 });

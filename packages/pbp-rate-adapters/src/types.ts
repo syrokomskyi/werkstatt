@@ -22,8 +22,5 @@ export interface RateFetchResult {
 
 export interface RateSourceAdapter {
   sourceContractRef: PbpEntityRef;
-  fetchRate(pair: {
-    sourceCurrency: string;
-    targetCurrency: string;
-  }): Promise<RateFetchResult>;
+  fetchRate(pair: { sourceCurrency: string; targetCurrency: string }): Promise<RateFetchResult>;
 }

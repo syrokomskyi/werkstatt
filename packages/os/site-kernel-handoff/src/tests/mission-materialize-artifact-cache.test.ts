@@ -12,11 +12,7 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import {
-  createMaterializeWorkspace,
-  gitInit,
-  gitCommit,
-} from "./helpers/materialize-fixture.ts";
+import { createMaterializeWorkspace, gitInit, gitCommit } from "./helpers/materialize-fixture.ts";
 
 const mockPipeline = vi.hoisted(() => ({
   forceUsed: undefined as boolean | undefined,

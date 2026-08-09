@@ -100,10 +100,7 @@ function entryIdentity(entry: GenomeLogEntry): string {
   return `${entry.workshopId}|${entry.event}|${entry.timestamp}|${entry.source}`;
 }
 
-export function mergeGenomeLogs(
-  local: GenomeLogEntry[],
-  peer: GenomeLogEntry[],
-): GenomeLogEntry[] {
+export function mergeGenomeLogs(local: GenomeLogEntry[], peer: GenomeLogEntry[]): GenomeLogEntry[] {
   const seen = new Set<string>();
   const result: GenomeLogEntry[] = [];
   for (const entry of [...local, ...peer]) {

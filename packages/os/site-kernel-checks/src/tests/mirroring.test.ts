@@ -58,7 +58,7 @@ describe("mirroring.validate (RFC-0576)", () => {
     await writeFile(join(pagesDir, "en", "home.md"), "---\ntitle: Home\n---\n# Home\n");
     await writeFile(join(pagesDir, "uk", "home.md"), "---\ntitle: Home\n---\n# Home\n");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runMirroringValidation(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -74,7 +74,7 @@ describe("mirroring.validate (RFC-0576)", () => {
     await writeFile(join(pagesDir, "en", "home.md"), "---\ntitle: Home\n---\n# Home\n");
     // uk missing — non-default language → warning
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runMirroringValidation(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -97,7 +97,7 @@ describe("mirroring.validate (RFC-0576)", () => {
     await writeFile(join(pagesDir, "en", "about.md"), "---\ntitle: About\n---\n# About\n");
     await writeFile(join(pagesDir, "uk", "about.md"), "---\ntitle: About\n---\n# About\n");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runMirroringValidation(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -118,7 +118,7 @@ describe("mirroring.validate (RFC-0576)", () => {
     await writeFile(join(pagesDir, "de", "home.md"), "---\ntitle: Home\n---\n# Home\n");
     // en and uk missing (non-default) → warnings, exitCode 0
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runMirroringValidation(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -137,7 +137,7 @@ describe("mirroring.validate (RFC-0576)", () => {
     await writeFile(join(pagesDir, "de", "contact.md"), "---\ntitle: Contact\n---\n# Contact\n");
     await writeFile(join(pagesDir, "en", "contact.md"), "---\ntitle: Contact\n---\n# Contact\n");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runMirroringValidation(
       input,
       makeTestSiteContext(workspaceRoot, appDir),

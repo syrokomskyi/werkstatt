@@ -17,10 +17,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type {
-  KernelCommandInput,
-  KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { createDefaultIO } from "@warpgogol/site-kernel";
 
 // Mock resolveCachePath to return our temp dir

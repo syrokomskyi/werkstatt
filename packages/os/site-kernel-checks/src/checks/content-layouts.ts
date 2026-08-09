@@ -58,7 +58,8 @@ export async function runContentLayoutsValidation(
     return {
       data: { violations: 0, checkedFiles: 0 },
       exitCode: 0,
-      summary: "[content.layouts.validate] skipped — registry-only mode (using @warpgogol/ui layout)",
+      summary:
+        "[content.layouts.validate] skipped — registry-only mode (using @warpgogol/ui layout)",
     };
   }
 

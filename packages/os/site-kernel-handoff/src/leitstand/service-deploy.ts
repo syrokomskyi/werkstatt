@@ -47,15 +47,11 @@ async function runWranglerDeploy(
   env: Record<string, string>,
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
   return new Promise((resolve) => {
-    const child = spawn(
-      "npx",
-      ["--yes", "wrangler", "deploy", "--config", "wrangler.jsonc"],
-      {
-        cwd: serviceDir,
-        env: { ...process.env, ...env },
-        stdio: ["pipe", "pipe", "pipe"],
-      },
-    );
+    const child = spawn("npx", ["--yes", "wrangler", "deploy", "--config", "wrangler.jsonc"], {
+      cwd: serviceDir,
+      env: { ...process.env, ...env },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (d) => {
@@ -119,9 +115,7 @@ export async function runLeitstandServiceDeploy(
 
   const serviceDir = path.join(workspaceRoot, "services", serviceId);
   if (!existsSync(serviceDir)) {
-    throw new Error(
-      `[leitstand.service.deploy] services/${serviceId}/ does not exist`,
-    );
+    throw new Error(`[leitstand.service.deploy] services/${serviceId}/ does not exist`);
   }
 
   const wranglerPath = path.join(serviceDir, "wrangler.jsonc");
@@ -218,7 +212,10 @@ export async function runLeitstandServiceDeploy(
       const eqIdx = trimmed.indexOf("=");
       if (eqIdx === -1) continue;
       const key = trimmed.slice(0, eqIdx).trim();
-      const value = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, "");
+      const value = trimmed
+        .slice(eqIdx + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
       if (value !== "") deployEnv[key] = value;
     }
   }
@@ -237,7 +234,8 @@ export async function runLeitstandServiceDeploy(
       serviceId,
       workerName: serviceEntry.workerName,
       deployState: "failed",
-      workersDevUrl: extractWorkersDevUrl(wranglerResult.stdout) ?? serviceEntry.workersDevUrl ?? "",
+      workersDevUrl:
+        extractWorkersDevUrl(wranglerResult.stdout) ?? serviceEntry.workersDevUrl ?? "",
       healthState: "unknown",
       startedAt,
       completedAt: new Date().toISOString(),

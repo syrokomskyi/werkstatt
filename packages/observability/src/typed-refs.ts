@@ -85,24 +85,32 @@ export const METRIC_REFS = {
     "site_id",
     "route",
   ] as const),
-  warpgogol_probe_http_status_class_total: defineCounter("warpgogol_probe_http_status_class_total", [
+  warpgogol_probe_http_status_class_total: defineCounter(
+    "warpgogol_probe_http_status_class_total",
+    ["site_id", "route", "status_class"] as const,
+  ),
+  warpgogol_probe_content_ok: defineGauge("warpgogol_probe_content_ok", [
     "site_id",
     "route",
-    "status_class",
   ] as const),
-  warpgogol_probe_content_ok: defineGauge("warpgogol_probe_content_ok", ["site_id", "route"] as const),
-  warpgogol_probe_cert_expiry_days: defineGauge("warpgogol_probe_cert_expiry_days", ["site_id"] as const),
+  warpgogol_probe_cert_expiry_days: defineGauge("warpgogol_probe_cert_expiry_days", [
+    "site_id",
+  ] as const),
   warpgogol_probe_deep_ok: defineGauge("warpgogol_probe_deep_ok", ["site_id"] as const),
   warpgogol_delivery_requests_total: defineCounter("warpgogol_delivery_requests_total", [
     "site_id",
     "cache_status",
     "status_class",
   ] as const),
-  warpgogol_delivery_bytes_total: defineCounter("warpgogol_delivery_bytes_total", ["site_id"] as const),
+  warpgogol_delivery_bytes_total: defineCounter("warpgogol_delivery_bytes_total", [
+    "site_id",
+  ] as const),
   warpgogol_workers_requests_total: defineCounter("warpgogol_workers_requests_total", [
     "site_id",
   ] as const),
-  warpgogol_workers_errors_total: defineCounter("warpgogol_workers_errors_total", ["site_id"] as const),
+  warpgogol_workers_errors_total: defineCounter("warpgogol_workers_errors_total", [
+    "site_id",
+  ] as const),
 } as const;
 
 // Compile-time assertion: every METRIC_REFS key must be a declared registry metric name.

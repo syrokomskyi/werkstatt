@@ -21,7 +21,10 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { calculateOfferCapacityState, type OfferCapacityPolicy } from "@warpgogol/share/offer-capacity";
+import {
+  calculateOfferCapacityState,
+  type OfferCapacityPolicy,
+} from "@warpgogol/share/offer-capacity";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const COMMAND = "offer.capacity.validate";

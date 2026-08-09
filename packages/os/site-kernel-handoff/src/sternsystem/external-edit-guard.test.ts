@@ -26,9 +26,7 @@ test("empty Bordbuch, empty git log → verdict: pass", () => {
 test("Bordbuch has reconcile SHA, git log matches → verdict: pass", () => {
   const result = evaluateExternalEditGate({
     systemId,
-    bordbuchEntries: [
-      { type: "mission-reconcile", metadata: { commitSha: "abc123" } },
-    ],
+    bordbuchEntries: [{ type: "mission-reconcile", metadata: { commitSha: "abc123" } }],
     gitLogShas: ["abc123"],
     rangeShas: [],
   });
@@ -38,9 +36,7 @@ test("Bordbuch has reconcile SHA, git log matches → verdict: pass", () => {
 test("git log has SHA not in Bordbuch → verdict: fail, rule: external-edit-detected", () => {
   const result = evaluateExternalEditGate({
     systemId,
-    bordbuchEntries: [
-      { type: "mission-reconcile", metadata: { commitSha: "abc123" } },
-    ],
+    bordbuchEntries: [{ type: "mission-reconcile", metadata: { commitSha: "abc123" } }],
     gitLogShas: ["abc123", "def456"],
     rangeShas: [],
   });

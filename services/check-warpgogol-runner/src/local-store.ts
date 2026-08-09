@@ -12,7 +12,11 @@
 
 import { mkdir, readFile, rename, readdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parseCheckRunRequest, type CheckRunRequest, type CheckRunStatus } from "@warpgogol/check-core";
+import {
+  parseCheckRunRequest,
+  type CheckRunRequest,
+  type CheckRunStatus,
+} from "@warpgogol/check-core";
 import type { RunnerConfig } from "./config.ts";
 
 export async function ensureStore(config: RunnerConfig): Promise<void> {

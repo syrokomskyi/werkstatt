@@ -129,16 +129,10 @@ export async function gitRevListCount(
   return parseInt(output, 10);
 }
 
-export async function gitLogSignatureStatus(
-  range: string,
-  cwd: string,
-): Promise<CommitInfo[]> {
+export async function gitLogSignatureStatus(range: string, cwd: string): Promise<CommitInfo[]> {
   const RECORD_SEP = "\x1e";
   const FIELD_SEP = "\x1f";
-  const output = await git(
-    ["log", range, `--format=%H${FIELD_SEP}%G?${RECORD_SEP}`],
-    cwd,
-  );
+  const output = await git(["log", range, `--format=%H${FIELD_SEP}%G?${RECORD_SEP}`], cwd);
 
   return output
     .split(RECORD_SEP)

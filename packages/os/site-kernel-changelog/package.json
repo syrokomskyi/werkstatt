@@ -11,10 +11,7 @@
       "default": "./src/index.ts"
     }
   },
-  "files": [
-    "src",
-    "prompts"
-  ],
+  "files": ["src", "prompts"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",

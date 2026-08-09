@@ -25,9 +25,7 @@ test("normalizeTxtContent: collapses internal whitespace", () => {
 });
 
 test("normalizeTxtContent: unescapes quoted special chars", () => {
-  expect(normalizeTxtContent('"v=DKIM1\\; k=rsa\\; p=MIGfMA0"')).toBe(
-    "v=DKIM1; k=rsa; p=MIGfMA0",
-  );
+  expect(normalizeTxtContent('"v=DKIM1\\; k=rsa\\; p=MIGfMA0"')).toBe("v=DKIM1; k=rsa; p=MIGfMA0");
 });
 
 test("normalizeTxtContent: handles empty string", () => {

@@ -145,9 +145,7 @@ function detectCycles(scheduled: ScheduledStep[]): void {
     for (let i = 0; i < n; i++) {
       if (inDegree[i]! > 0) inCycle.push(scheduled[i]!.step.command);
     }
-    throw new ScheduleError(
-      `Circular dependency detected involving: ${inCycle.join(" → ")}`,
-    );
+    throw new ScheduleError(`Circular dependency detected involving: ${inCycle.join(" → ")}`);
   }
 }
 
@@ -198,9 +196,7 @@ export async function executeScheduledSteps(
     effectiveSchedule = scheduled.map((s, i) => ({
       step: s.step,
       stepIndex: s.stepIndex,
-      dependencies: new Set<number>(
-        i > 0 && !s.step.skip ? [scheduled[i - 1]!.stepIndex] : [],
-      ),
+      dependencies: new Set<number>(i > 0 && !s.step.skip ? [scheduled[i - 1]!.stepIndex] : []),
     }));
   }
 
@@ -211,7 +207,12 @@ export async function executeScheduledSteps(
 
   function updateReady(): void {
     for (const s of effectiveSchedule) {
-      if (completed.has(s.stepIndex) || failed.has(s.stepIndex) || skippedDueToFailure.has(s.stepIndex)) continue;
+      if (
+        completed.has(s.stepIndex) ||
+        failed.has(s.stepIndex) ||
+        skippedDueToFailure.has(s.stepIndex)
+      )
+        continue;
       if (inFlight.has(s.stepIndex)) continue;
       if (readyQueue.includes(s.stepIndex)) continue;
 
@@ -243,7 +244,12 @@ export async function executeScheduledSteps(
     skippedDueToFailure.add(stepIndex);
     // Cascade to dependents.
     for (const s of effectiveSchedule) {
-      if (s.dependencies.has(stepIndex) && !skippedDueToFailure.has(s.stepIndex) && !completed.has(s.stepIndex) && !failed.has(s.stepIndex)) {
+      if (
+        s.dependencies.has(stepIndex) &&
+        !skippedDueToFailure.has(s.stepIndex) &&
+        !completed.has(s.stepIndex) &&
+        !failed.has(s.stepIndex)
+      ) {
         markSkippedDueToFailure(s.stepIndex);
       }
     }
@@ -277,7 +283,10 @@ export async function executeScheduledSteps(
     updateReady();
     // Add skipped-due-to-failure steps to results.
     for (const s of effectiveSchedule) {
-      if (skippedDueToFailure.has(s.stepIndex) && !results.some((r) => r.stepIndex === s.stepIndex)) {
+      if (
+        skippedDueToFailure.has(s.stepIndex) &&
+        !results.some((r) => r.stepIndex === s.stepIndex)
+      ) {
         results.push({
           stepIndex: s.stepIndex,
           report: {

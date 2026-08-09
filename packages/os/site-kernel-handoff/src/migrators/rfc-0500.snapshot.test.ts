@@ -47,8 +47,18 @@ test("rfc-0500 snapshot: moves topics to articles and transforms frontmatter", a
     const articlesDir = path.join(dir, "src", "content", "surface", "articles");
     const topicsDir = path.join(dir, "src", "content", "surface", "topics");
 
-    expect(await fs.stat(articlesDir).then(() => true).catch(() => false)).toBe(true);
-    expect(await fs.stat(topicsDir).then(() => true).catch(() => false)).toBe(false);
+    expect(
+      await fs
+        .stat(articlesDir)
+        .then(() => true)
+        .catch(() => false),
+    ).toBe(true);
+    expect(
+      await fs
+        .stat(topicsDir)
+        .then(() => true)
+        .catch(() => false),
+    ).toBe(false);
 
     const articlePath = path.join(articlesDir, "de", "website-kosten.md");
     const content = await fs.readFile(articlePath, "utf8");
@@ -59,7 +69,12 @@ test("rfc-0500 snapshot: moves topics to articles and transforms frontmatter", a
     expect(content).not.toContain("sections:");
 
     const faqOnlyPath = path.join(articlesDir, "de", "faq-only.md");
-    expect(await fs.stat(faqOnlyPath).then(() => true).catch(() => false)).toBe(false);
+    expect(
+      await fs
+        .stat(faqOnlyPath)
+        .then(() => true)
+        .catch(() => false),
+    ).toBe(false);
 
     const prosePath = path.join(dir, "src", "content", "prose", "ratgeber-de-website-kosten.md");
     const proseContent = await fs.readFile(prosePath, "utf8");

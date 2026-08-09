@@ -29,7 +29,6 @@ import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";
 
-
 function parseEnvFile(raw: string): Map<string, string> {
   const result = new Map<string, string>();
   for (const line of raw.split(/\r?\n/)) {

@@ -48,7 +48,7 @@ describe("parseMarkdownTwinFrontmatter — null handling (RFC-0613)", () => {
     expect(parsed!.frontmatter.lastModified).toBeNull();
   });
 
-  it("parses quoted YAML \"null\" as JS null (parser strips quotes before null check)", () => {
+  it('parses quoted YAML "null" as JS null (parser strips quotes before null check)', () => {
     const content = `---\nlastModified: "null"\ncanonical: "https://example.com/"\n---\n\nbody`;
     const parsed = parseMarkdownTwinFrontmatter(content);
     expect(parsed).not.toBeNull();
@@ -89,7 +89,9 @@ describe("round-trip: build → parse (RFC-0613)", () => {
   it("null lastModified survives build → parse round-trip as JS null", () => {
     const provenance: MarkdownTwinProvenance = { ...baseProvenance, lastModified: null };
     const fm = buildMarkdownTwinFrontmatter(provenance, "sha256:abc");
-    const parsed = parseMarkdownTwinFrontmatter(`${fm}## Summary\n\nTest.\n\n## Business context\n\nTest.`);
+    const parsed = parseMarkdownTwinFrontmatter(
+      `${fm}## Summary\n\nTest.\n\n## Business context\n\nTest.`,
+    );
     expect(parsed).not.toBeNull();
     expect(parsed!.frontmatter.lastModified).toBeNull();
   });
@@ -97,7 +99,9 @@ describe("round-trip: build → parse (RFC-0613)", () => {
   it("date string lastModified survives build → parse round-trip as string", () => {
     const provenance: MarkdownTwinProvenance = { ...baseProvenance, lastModified: "2026-07-30" };
     const fm = buildMarkdownTwinFrontmatter(provenance, "sha256:abc");
-    const parsed = parseMarkdownTwinFrontmatter(`${fm}## Summary\n\nTest.\n\n## Business context\n\nTest.`);
+    const parsed = parseMarkdownTwinFrontmatter(
+      `${fm}## Summary\n\nTest.\n\n## Business context\n\nTest.`,
+    );
     expect(parsed).not.toBeNull();
     expect(parsed!.frontmatter.lastModified).toBe("2026-07-30");
   });

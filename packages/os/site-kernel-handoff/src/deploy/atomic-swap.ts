@@ -61,7 +61,9 @@ export async function runDeployAtomicSwap(
   );
 
   if (!verifyResult.data?.verified) {
-    throw new Error(`[deploy.atomic.swap] artifact ${hash} hash verification failed (hash-mismatch)`);
+    throw new Error(
+      `[deploy.atomic.swap] artifact ${hash} hash verification failed (hash-mismatch)`,
+    );
   }
 
   const currentPath = currentSymlinkPath(workspaceRoot);

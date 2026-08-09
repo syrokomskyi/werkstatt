@@ -28,11 +28,7 @@ import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werksta
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { migratorsToApply } from "../migrators/registry.ts";
-import type {
-  SternsystemData,
-  MigrationContext,
-  MigrationViolation,
-} from "../migrators/types.ts";
+import type { SternsystemData, MigrationContext, MigrationViolation } from "../migrators/types.ts";
 import { MigrationError } from "../migrators/types.ts";
 
 export interface MissionMigrateData {

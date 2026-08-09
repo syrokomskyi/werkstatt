@@ -64,11 +64,7 @@ import {
   ensureChromium,
 } from "@warpgogol/site-kernel-checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import {
-  acquireLock,
-  releaseLock,
-  commitWerkstattSideEffects,
-} from "../werkstatt/index.ts";
+import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";

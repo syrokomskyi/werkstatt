@@ -19,10 +19,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { readRegistry } from "../sternsystem/registry-io.ts";
-import {
-  listDnsRecords,
-  listWorkersRoutes,
-} from "../leitstand/adapters/cloudflare-api.ts";
+import { listDnsRecords, listWorkersRoutes } from "../leitstand/adapters/cloudflare-api.ts";
 import { flagString, resolveZoneId, resolveSubdomainEnv } from "./subdomain-helpers.ts";
 
 export interface SubdomainListEntry {

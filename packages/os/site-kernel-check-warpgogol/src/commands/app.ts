@@ -51,7 +51,8 @@ export async function runCheckWarpgogolAppValidate(
         ruleId: "CW-APP-02",
         severity: "warning",
         file: "apps/check-warpgogol-com/src/content/pages/de/home.md",
-        message: "Operator home page does not clearly describe Check Warpgogol and its action pack.",
+        message:
+          "Operator home page does not clearly describe Check Warpgogol and its action pack.",
         fixHint: "Update the home page copy to describe the product workflow and output.",
       });
     }

@@ -37,38 +37,34 @@ function makeData(rootPath: string): SternsystemData {
 
 test("rfc-0548 migrator is idempotent — f(f(x)) == f(x)", async () => {
   await fc.assert(
-    fc.asyncProperty(
-      fc.boolean(),
-      fc.boolean(),
-      async (hasAgentsMd, hasGeneratedMarker) => {
-        const dir = makeTempDir();
-        try {
-          if (hasAgentsMd) {
-            const content = hasGeneratedMarker
-              ? "<!-- generated-by: forge.agents.generate -->\n# Agent Guide\n"
-              : "# Hand-written Agent Guide\n";
-            fs.writeFileSync(path.join(dir, "AGENTS.md"), content, "utf8");
-          }
-
-          const data = makeData(dir);
-          const ctx = makeCtx();
-
-          const first = await rfc0548Migrator.transform(data, ctx);
-          const second = await rfc0548Migrator.transform(first, ctx);
-
-          // Both transforms should return the same data
-          expect(second.rootPath).toBe(first.rootPath);
-          expect(second.dataPaths).toEqual(first.dataPaths);
-
-          // Backup should exist if AGENTS.md existed
-          if (hasAgentsMd) {
-            expect(fs.existsSync(path.join(dir, "AGENTS.md.bak"))).toBe(true);
-          }
-        } finally {
-          fs.rmSync(dir, { recursive: true, force: true });
+    fc.asyncProperty(fc.boolean(), fc.boolean(), async (hasAgentsMd, hasGeneratedMarker) => {
+      const dir = makeTempDir();
+      try {
+        if (hasAgentsMd) {
+          const content = hasGeneratedMarker
+            ? "<!-- generated-by: forge.agents.generate -->\n# Agent Guide\n"
+            : "# Hand-written Agent Guide\n";
+          fs.writeFileSync(path.join(dir, "AGENTS.md"), content, "utf8");
         }
-      },
-    ),
+
+        const data = makeData(dir);
+        const ctx = makeCtx();
+
+        const first = await rfc0548Migrator.transform(data, ctx);
+        const second = await rfc0548Migrator.transform(first, ctx);
+
+        // Both transforms should return the same data
+        expect(second.rootPath).toBe(first.rootPath);
+        expect(second.dataPaths).toEqual(first.dataPaths);
+
+        // Backup should exist if AGENTS.md existed
+        if (hasAgentsMd) {
+          expect(fs.existsSync(path.join(dir, "AGENTS.md.bak"))).toBe(true);
+        }
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    }),
     { numRuns: 50 },
   );
 });

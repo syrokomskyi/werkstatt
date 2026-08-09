@@ -13,9 +13,7 @@
     },
     "./tokens.css": "./src/tokens.css"
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "echo 'No build step required — TypeScript sources and CSS consumed directly'",
     "build:check": "tsc --noEmit",

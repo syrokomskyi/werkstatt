@@ -31,14 +31,11 @@ const label = ariaLabel ?? "Back to top";
 ---
 
 <button class="scroll-to-top" data-scroll-to-top aria-label={label} type="button">
-  {ArrowUpHoverIcon && (
-    <ArrowUpHoverIcon
-      class="scroll-to-top__icon"
-      size={28}
-      trigger="hover"
-      aria-hidden="true"
-    />
-  )}
+  {
+    ArrowUpHoverIcon && (
+      <ArrowUpHoverIcon class="scroll-to-top__icon" size={28} trigger="hover" aria-hidden="true" />
+    )
+  }
 </button>
 
 <script>

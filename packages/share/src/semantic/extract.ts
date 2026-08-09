@@ -10,10 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type {
-  SemanticPerson,
-  SemanticPostalAddress,
-} from "./models.ts";
+import type { SemanticPerson, SemanticPostalAddress } from "./models.ts";
 
 export function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, " ").trim();

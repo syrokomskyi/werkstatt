@@ -16,9 +16,7 @@
       "default": "./src/astro.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",

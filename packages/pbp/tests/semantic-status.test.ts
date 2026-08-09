@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  PBP_SEMANTIC_STATUSES,
-  isPbpSemanticStatus,
-} from "../src/semantic-status.js";
+import { PBP_SEMANTIC_STATUSES, isPbpSemanticStatus } from "../src/semantic-status.js";
 
 describe("PbpSemanticStatus", () => {
   it("exports the 8-value closed vocabulary", () => {

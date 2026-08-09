@@ -34,7 +34,7 @@ describe("need.markers.validate", () => {
   it("passes when no NEED_THIS_ markers in HTML", async () => {
     await writeFile(join(distDir, "index.html"), "<html><body>Hello</body></html>");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runNeedMarkersValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -46,7 +46,7 @@ describe("need.markers.validate", () => {
       "<html><body>NEED_THIS_TITLE placeholder</body></html>",
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runNeedMarkersValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(1);
@@ -55,7 +55,7 @@ describe("need.markers.validate", () => {
   it("passes when dist/ does not exist", async () => {
     await rm(distDir, { recursive: true, force: true });
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runNeedMarkersValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -67,7 +67,7 @@ describe("need.markers.validate", () => {
       "<html><body>NEED_THIS_TITLE and NEED_THIS_HEADING</body></html>",
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runNeedMarkersValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(1);
@@ -81,7 +81,7 @@ describe("need.markers.validate", () => {
     await writeFile(join(distDir, "_astro", "bundle.html"), "<html>NEED_THIS_TITLE</html>");
     await writeFile(join(distDir, "index.html"), "<html>clean</html>");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runNeedMarkersValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);

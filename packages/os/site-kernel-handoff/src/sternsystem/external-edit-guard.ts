@@ -30,9 +30,7 @@ export interface ExternalEditGuardResult extends GuardResult {
   };
 }
 
-export function evaluateExternalEditGate(
-  input: ExternalEditGuardInput,
-): ExternalEditGuardResult {
+export function evaluateExternalEditGate(input: ExternalEditGuardInput): ExternalEditGuardResult {
   const { systemId, bordbuchEntries, gitLogShas, rangeShas } = input;
 
   const expectedShas = new Set<string>();

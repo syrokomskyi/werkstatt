@@ -13,7 +13,11 @@
 */
 
 import type { BordbuchEntry, BordbuchEntryKind } from "@warpgogol/ontology/operations";
-import { appendBordbuchEntry, commitAndPushBordbuch, type CommitAndPushResult } from "./bordbuch-io.ts";
+import {
+  appendBordbuchEntry,
+  commitAndPushBordbuch,
+  type CommitAndPushResult,
+} from "./bordbuch-io.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
 export interface AppendAndCommitResult {
@@ -51,14 +55,7 @@ export async function appendAndCommitBordbuch(
   options?: AppendBordbuchOptions,
   commitMessage?: string,
 ): Promise<AppendAndCommitResult> {
-  const entry = await appendBordbuchEntry(
-    workspaceRoot,
-    systemId,
-    kind,
-    summary,
-    actor,
-    options,
-  );
+  const entry = await appendBordbuchEntry(workspaceRoot, systemId, kind, summary, actor, options);
 
   const systemDir = await resolveCachePath(workspaceRoot, systemId);
   const message = commitMessage ?? `Bordbuch: ${kind} ${systemId}`;

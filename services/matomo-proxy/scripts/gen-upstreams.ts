@@ -10,7 +10,16 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const REGISTRY_PATH = join(__dirname, "..", "..", "..", "packages", "ontology", "analytics", "matomo-fleet.registry.yaml");
+const REGISTRY_PATH = join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "packages",
+  "ontology",
+  "analytics",
+  "matomo-fleet.registry.yaml",
+);
 const OUTPUT_PATH = join(__dirname, "..", "src", "upstreams.generated.ts");
 
 interface FleetRegistrySite {
@@ -55,7 +64,10 @@ function parseFleetRegistry(raw: string): FleetRegistry {
     }
 
     if (currentSite && trimmed.startsWith("    matomoCloudHost:")) {
-      currentSite.matomoCloudHost = trimmed.slice("    matomoCloudHost:".length).trim().replace(/["']/g, "");
+      currentSite.matomoCloudHost = trimmed
+        .slice("    matomoCloudHost:".length)
+        .trim()
+        .replace(/["']/g, "");
       continue;
     }
 
@@ -86,4 +98,6 @@ export const UPSTREAMS: Record<string, string> = ${JSON.stringify(upstreams, nul
 `;
 
 writeFileSync(OUTPUT_PATH, content, "utf8");
-console.log(`[gen:upstreams] Generated ${OUTPUT_PATH} with ${Object.keys(upstreams).length} upstream(s)`);
+console.log(
+  `[gen:upstreams] Generated ${OUTPUT_PATH} with ${Object.keys(upstreams).length} upstream(s)`,
+);

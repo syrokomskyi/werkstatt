@@ -81,10 +81,7 @@ export async function hashArtifactDir(dir: string): Promise<{
   return { treeHash, files, totalSize };
 }
 
-export async function readManifest(
-  workspaceRoot: string,
-  hash: string,
-): Promise<ArtifactManifest> {
+export async function readManifest(workspaceRoot: string, hash: string): Promise<ArtifactManifest> {
   const mp = manifestPath(workspaceRoot, hash);
   if (!existsSync(mp)) {
     throw new Error(`[deploy] manifest not found for artifact ${hash}: ${mp}`);
@@ -118,10 +115,7 @@ export function readSymlinkBasename(symlinkPath: string): string | null {
   return path.basename(target);
 }
 
-export async function atomicSymlinkSwap(
-  symlinkPath: string,
-  targetDir: string,
-): Promise<void> {
+export async function atomicSymlinkSwap(symlinkPath: string, targetDir: string): Promise<void> {
   const tmpPath = `${symlinkPath}.tmp-${process.pid}-${Date.now()}`;
   symlinkSync(targetDir, tmpPath);
   try {

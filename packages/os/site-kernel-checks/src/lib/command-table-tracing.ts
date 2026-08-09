@@ -18,13 +18,7 @@ and file-discovery logic.
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-const DEFAULT_IGNORED_DIRS = new Set([
-  ".astro",
-  ".turbo",
-  "coverage",
-  "dist",
-  "node_modules",
-]);
+const DEFAULT_IGNORED_DIRS = new Set([".astro", ".turbo", "coverage", "dist", "node_modules"]);
 
 export function toPosixPath(path: string): string {
   return path.replace(/\\/g, "/");

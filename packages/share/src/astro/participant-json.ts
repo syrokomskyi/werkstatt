@@ -74,10 +74,7 @@ function _hasConsentField(p: ParticipantView, field: string): boolean {
  * RFC-0512: Strip private fields and apply consent gating before generating
  * JSON endpoints or JSON-LD. Never serialize the raw Participant record.
  */
-export function filterPublicParticipant(
-  p: ParticipantView,
-  _lang: string,
-): PublicParticipantJson {
+export function filterPublicParticipant(p: ParticipantView, _lang: string): PublicParticipantJson {
   const consent = p.consent;
   const approved = new Set(consent?.approvedFields ?? []);
 
@@ -95,9 +92,7 @@ export function filterPublicParticipant(
       ...base,
       ...(p.role ? { role: p.role } : {}),
       ...(p.responsibility ? { responsibilities: [p.responsibility.summary] } : {}),
-      ...(p.authority?.canSignFor?.length
-        ? { decisionAuthority: p.authority.canSignFor }
-        : {}),
+      ...(p.authority?.canSignFor?.length ? { decisionAuthority: p.authority.canSignFor } : {}),
       ...(p.capabilities?.length ? { capabilities: p.capabilities } : {}),
       ...(p.evidence?.claims?.length
         ? {
@@ -170,11 +165,7 @@ export function filterPublicParticipant(
  * Replaces the Person node from buildPersonNode in the @graph for profile pages.
  * Excludes birthDate (even with consent). Address is consent-gated.
  */
-export function buildPersonJsonLd(
-  p: ParticipantView,
-  siteUrl: string,
-  _lang: string,
-): JsonLdNode {
+export function buildPersonJsonLd(p: ParticipantView, siteUrl: string, _lang: string): JsonLdNode {
   const profileUrl = `${siteUrl}/team/${p.slug}/`;
   const consent = p.consent;
   const approved = new Set(consent?.approvedFields ?? []);

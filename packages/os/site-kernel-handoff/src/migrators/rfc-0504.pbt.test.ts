@@ -79,25 +79,13 @@ test("rfc-0504 migrator is idempotent — f(f(x)) == f(x)", async () => {
 
     // First run
     await rfc0504Migrator.transform(data, ctx);
-    const articleAfter1 = await fs.readFile(
-      path.join(articleDir, "test-article.md"),
-      "utf-8",
-    );
-    const proseAfter1 = await fs.readFile(
-      path.join(proseDir, "ratgeber-test-article.md"),
-      "utf-8",
-    );
+    const articleAfter1 = await fs.readFile(path.join(articleDir, "test-article.md"), "utf-8");
+    const proseAfter1 = await fs.readFile(path.join(proseDir, "ratgeber-test-article.md"), "utf-8");
 
     // Second run
     await rfc0504Migrator.transform(data, ctx);
-    const articleAfter2 = await fs.readFile(
-      path.join(articleDir, "test-article.md"),
-      "utf-8",
-    );
-    const proseAfter2 = await fs.readFile(
-      path.join(proseDir, "ratgeber-test-article.md"),
-      "utf-8",
-    );
+    const articleAfter2 = await fs.readFile(path.join(articleDir, "test-article.md"), "utf-8");
+    const proseAfter2 = await fs.readFile(path.join(proseDir, "ratgeber-test-article.md"), "utf-8");
 
     expect(articleAfter1).toBe(articleAfter2);
     expect(proseAfter1).toBe(proseAfter2);
@@ -145,10 +133,7 @@ test("rfc-0504 migrator strips H1 that duplicates article title", async () => {
 
     await rfc0504Migrator.transform(data, ctx);
 
-    const prose = await fs.readFile(
-      path.join(proseDir, "ratgeber-test-article.md"),
-      "utf-8",
-    );
+    const prose = await fs.readFile(path.join(proseDir, "ratgeber-test-article.md"), "utf-8");
     expect(prose).not.toMatch(/^#\s+Test Article/m);
     expect(prose).toMatch(/^## Einleitung/m);
   } finally {
@@ -175,10 +160,7 @@ test("rfc-0504 migrator converts unique H1 to H2", async () => {
 
     await rfc0504Migrator.transform(data, ctx);
 
-    const prose = await fs.readFile(
-      path.join(proseDir, "ratgeber-test-article.md"),
-      "utf-8",
-    );
+    const prose = await fs.readFile(path.join(proseDir, "ratgeber-test-article.md"), "utf-8");
     expect(prose).not.toMatch(/^#\s+Unique Heading/m);
     expect(prose).toMatch(/^## Unique Heading/m);
   } finally {
@@ -203,18 +185,11 @@ test("rfc-0504 migrator removes H1 when duplicate H2 exists", async () => {
 
 Content.
 `;
-    await fs.writeFile(
-      path.join(proseDir, "ratgeber-test-article.md"),
-      proseWithDupH2,
-      "utf-8",
-    );
+    await fs.writeFile(path.join(proseDir, "ratgeber-test-article.md"), proseWithDupH2, "utf-8");
 
     await rfc0504Migrator.transform(data, ctx);
 
-    const prose = await fs.readFile(
-      path.join(proseDir, "ratgeber-test-article.md"),
-      "utf-8",
-    );
+    const prose = await fs.readFile(path.join(proseDir, "ratgeber-test-article.md"), "utf-8");
     // H1 should be removed (not converted to H2) because H2 with same text exists
     const h1Matches = prose.match(/^#\s+Einleitung/gm);
     expect(h1Matches).toBeNull();
@@ -252,10 +227,7 @@ Content.
 
     await rfc0504Migrator.transform(data, ctx);
 
-    const prose = await fs.readFile(
-      path.join(proseDir, "ratgeber-test-article.md"),
-      "utf-8",
-    );
+    const prose = await fs.readFile(path.join(proseDir, "ratgeber-test-article.md"), "utf-8");
     expect(prose).toContain("# Not a real heading");
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true });

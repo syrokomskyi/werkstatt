@@ -31,10 +31,10 @@ bindChatLauncher(launcherEl, loaders);
 
 ## Adapter catalog
 
-| Adapter | Package                                   | Required options          | Vendor origins |
-| ------- | ----------------------------------------- | ------------------------- | -------------- |
-| `uchat` | `@warpgogol/chat-adapter-uchat`               | `widgetId` \| `scriptUrl` | `uchat.com.au` |
-| `null`  | `@warpgogol/chat-adapter-null` (safe default) | —                         | —              |
+| Adapter | Package | Required options | Vendor origins |
+| --- | --- | --- | --- |
+| `uchat` | `@warpgogol/chat-adapter-uchat` | `widgetId` \| `scriptUrl` | `uchat.com.au` |
+| `null` | `@warpgogol/chat-adapter-null` (safe default) | — | — |
 
 ## Validation
 

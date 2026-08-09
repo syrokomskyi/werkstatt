@@ -23,7 +23,10 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { listRegisteredKernelCommands, listRegisteredKernelPipelines } from "@warpgogol/site-kernel";
+import {
+  listRegisteredKernelCommands,
+  listRegisteredKernelPipelines,
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult, failResult } from "./result-helpers.ts";
 import { collectFiles } from "@warpgogol/share/fs";
 

@@ -26,9 +26,7 @@ interface FrankfurterRateResponse {
   rate: number;
 }
 
-export function parseFrankfurterResponse(
-  json: string,
-): FrankfurterRateResponse {
+export function parseFrankfurterResponse(json: string): FrankfurterRateResponse {
   const parsed = JSON.parse(json) as Partial<FrankfurterRateResponse>;
   if (
     typeof parsed.date !== "string" ||
@@ -72,9 +70,7 @@ export function createFrankfurterAdapter(
 async function defaultFetch(url: string): Promise<string> {
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(
-      `Frankfurter fetch failed: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Frankfurter fetch failed: ${response.status} ${response.statusText}`);
   }
   return response.text();
 }

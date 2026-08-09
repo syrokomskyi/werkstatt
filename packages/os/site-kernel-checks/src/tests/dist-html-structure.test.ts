@@ -38,7 +38,18 @@ function extractViolations(result: { data?: unknown }): Array<{
   closeCount: number;
   message: string;
 }> {
-  const data = result.data as { violations?: Array<{ file: string; rule: string; tag: string; openCount: number; closeCount: number; message: string }> } | undefined;
+  const data = result.data as
+    | {
+        violations?: Array<{
+          file: string;
+          rule: string;
+          tag: string;
+          openCount: number;
+          closeCount: number;
+          message: string;
+        }>;
+      }
+    | undefined;
   return data?.violations ?? [];
 }
 
@@ -69,7 +80,7 @@ describe("checkHtmlStructure (pure function)", () => {
   });
 
   it("void elements are ignored — not in structural tag list", () => {
-    const html = "<html><body><br><img src=\"x\"><input type=\"text\"></body></html>";
+    const html = '<html><body><br><img src="x"><input type="text"></body></html>';
     const violations = checkHtmlStructure(html);
     expect(violations).toHaveLength(0);
   });
@@ -81,7 +92,8 @@ describe("checkHtmlStructure (pure function)", () => {
   });
 
   it("multiple structural tags checked simultaneously", () => {
-    const html = "<html><head></head><body><header><nav></nav></header><main></main><footer></footer></body></html>";
+    const html =
+      "<html><head></head><body><header><nav></nav></header><main></main><footer></footer></body></html>";
     const violations = checkHtmlStructure(html);
     expect(violations).toHaveLength(0);
   });
@@ -149,10 +161,7 @@ describe("runDistHtmlStructureValidate (kernel handler)", () => {
   it("violations detected — imbalanced HTML files", async () => {
     const distClient = join(tmpDir, "dist", "client");
     mkdirSync(distClient, { recursive: true });
-    writeFileSync(
-      join(distClient, "broken.html"),
-      "<html><body></main></body></html>",
-    );
+    writeFileSync(join(distClient, "broken.html"), "<html><body></main></body></html>");
 
     const result = await runDistHtmlStructureValidate(
       makeInput({ site: "test-app" }),
@@ -177,7 +186,12 @@ describe("runDistHtmlStructureValidate (kernel handler)", () => {
       makeInput({ site: "test-app" }),
       makeContext(tmpDir, tmpDir),
     );
-    const data = result.data as { command: string; status: string; filesScanned: number; violations?: unknown[] };
+    const data = result.data as {
+      command: string;
+      status: string;
+      filesScanned: number;
+      violations?: unknown[];
+    };
     expect(data.command).toBe("dist.html-structure.validate");
     expect(data.status).toBe("pass");
     expect(typeof data.filesScanned).toBe("number");

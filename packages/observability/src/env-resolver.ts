@@ -47,7 +47,9 @@ export function resolvePusherEnv(env?: MetricsPusherEnv): { endpoint?: string; t
 
 export function detectEnvironment(): WarpgogolEnvironment {
   const proc = getGlobalProcess();
-  const raw = proc?.env ? (proc.env["WARPGOGOL_DEPLOYMENT_ENV"] ?? proc.env["NODE_ENV"]) : undefined;
+  const raw = proc?.env
+    ? (proc.env["WARPGOGOL_DEPLOYMENT_ENV"] ?? proc.env["NODE_ENV"])
+    : undefined;
   if (raw === "production") return "production";
   if (raw === "preview") return "preview";
   if (raw === "ci") return "ci";

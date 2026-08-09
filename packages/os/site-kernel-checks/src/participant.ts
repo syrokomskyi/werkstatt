@@ -102,10 +102,7 @@ export async function runParticipantValidate(
   const records = await collectParticipants(paths.appDirectory);
 
   if (records.length === 0) {
-    return passResult(
-      "participant.validate",
-      "participant.validate: OK — no Participant records",
-    );
+    return passResult("participant.validate", "participant.validate: OK — no Participant records");
   }
 
   const violations: string[] = [];
@@ -227,10 +224,7 @@ export async function runParticipantValidate(
         ) {
           violations.push(`[missing-consentRecordId] ${id}: consent.consentRecordId required`);
         }
-        if (
-          typeof consent["consentDate"] !== "string" ||
-          consent["consentDate"].trim() === ""
-        ) {
+        if (typeof consent["consentDate"] !== "string" || consent["consentDate"].trim() === "") {
           violations.push(`[missing-consentDate] ${id}: consent.consentDate required`);
         }
         if (

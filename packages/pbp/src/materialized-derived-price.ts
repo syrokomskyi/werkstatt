@@ -38,9 +38,7 @@ export function isPbpPriceKind(value: string): value is PbpPriceKind {
  */
 export type PbpCommercialMeaning = "derived-price";
 
-export const PBP_COMMERCIAL_MEANINGS: readonly PbpCommercialMeaning[] = [
-  "derived-price",
-] as const;
+export const PBP_COMMERCIAL_MEANINGS: readonly PbpCommercialMeaning[] = ["derived-price"] as const;
 
 export function isPbpCommercialMeaning(value: string): value is PbpCommercialMeaning {
   return PBP_COMMERCIAL_MEANINGS.includes(value as PbpCommercialMeaning);

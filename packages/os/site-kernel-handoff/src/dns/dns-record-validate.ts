@@ -54,9 +54,7 @@ export async function runDnsRecordValidate(
 
   const declaration = await loadDnsRecordFile(workspaceRoot, systemId);
   if (!declaration) {
-    throw new Error(
-      `[dns.record.validate] No dns-records.yaml found for system '${systemId}'.`,
-    );
+    throw new Error(`[dns.record.validate] No dns-records.yaml found for system '${systemId}'.`);
   }
 
   const registry = await readRegistry(workspaceRoot);
@@ -81,9 +79,7 @@ export async function runDnsRecordValidate(
 
   for (const declared of declaration.records) {
     const identity = `${declared.type}:${declared.name}`;
-    const live = liveRecords.find(
-      (r) => r.type === declared.type && r.name === declared.name,
-    );
+    const live = liveRecords.find((r) => r.type === declared.type && r.name === declared.name);
 
     if (!live) {
       missing++;
@@ -115,9 +111,7 @@ export async function runDnsRecordValidate(
     }
   }
 
-  const declaredIdentities = new Set(
-    declaration.records.map((r) => `${r.type}:${r.name}`),
-  );
+  const declaredIdentities = new Set(declaration.records.map((r) => `${r.type}:${r.name}`));
   for (const live of liveRecords) {
     const identity = `${live.type}:${live.name}`;
     if (!declaredIdentities.has(identity)) {

@@ -54,10 +54,7 @@ export function createEvidenceModule(): KernelModule {
           },
           json: { kind: "boolean", description: "Output JSON result." },
         },
-        reads: [
-          "missions/{mission}/evidence/axiom/**",
-          "systems/registry.yaml",
-        ],
+        reads: ["missions/{mission}/evidence/axiom/**", "systems/registry.yaml"],
         writes: [],
         execute: runEvidenceSync,
       });
@@ -81,7 +78,8 @@ export function createEvidenceModule(): KernelModule {
           },
           "run-timestamp": {
             kind: "string",
-            description: "Run timestamp to fetch (YYYY-MM-DDTHH-MM-SS-mmmZ). Required unless --list.",
+            description:
+              "Run timestamp to fetch (YYYY-MM-DDTHH-MM-SS-mmmZ). Required unless --list.",
           },
           "output-dir": {
             kind: "string",

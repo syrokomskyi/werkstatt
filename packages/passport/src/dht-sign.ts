@@ -53,10 +53,7 @@ export function dhtEntryBytes(entry: DHTEntryData): Uint8Array {
  * @param privateKeyHex  — 32-byte Ed25519 private key as hex (from env secret)
  * @returns multibase base58btc signature string
  */
-export async function signDhtEntry(
-  entry: DHTEntryData,
-  privateKeyHex: string,
-): Promise<string> {
+export async function signDhtEntry(entry: DHTEntryData, privateKeyHex: string): Promise<string> {
   return signBytes(privateKeyHex, dhtEntryBytes(entry));
 }
 

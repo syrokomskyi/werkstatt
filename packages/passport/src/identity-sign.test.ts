@@ -14,10 +14,7 @@ import {
   signIdentityCredential,
   verifyIdentityCredential,
 } from "./identity-sign.ts";
-import type {
-  SiteOwnershipCredentialSubject,
-  ActorDelegationCredentialSubject,
-} from "./schema.ts";
+import type { SiteOwnershipCredentialSubject, ActorDelegationCredentialSubject } from "./schema.ts";
 
 describe("identityCredentialBytes", () => {
   it("produces deterministic bytes for SiteOwnershipCredentialSubject", () => {

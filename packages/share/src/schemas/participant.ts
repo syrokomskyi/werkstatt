@@ -220,7 +220,10 @@ export const participantSchema = z
     stats: z.array(z.object({ label: z.string(), value: z.string() }).strict()).optional(),
     cta: z.object({ label: z.string(), target: z.string() }).strict().optional(),
     sameAs: z.array(z.string().url()).optional(),
-    page: z.object({ enabled: z.boolean().default(false) }).strict().optional(),
+    page: z
+      .object({ enabled: z.boolean().default(false) })
+      .strict()
+      .optional(),
     location: z.string().optional(),
     live: z
       .object({

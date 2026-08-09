@@ -107,7 +107,11 @@ test("no claim records → pass", async () => {
 });
 
 test("RG-CLAIM-02: duplicate claimId → error", async () => {
-  await writeFile(appDir, "src/content/surface/articles/de/test-article.md", `---\nslug: test-article\n---\n`);
+  await writeFile(
+    appDir,
+    "src/content/surface/articles/de/test-article.md",
+    `---\nslug: test-article\n---\n`,
+  );
   await writeFile(appDir, "src/content/surface/claims/de/claim-a.md", validClaimRecord());
   await writeFile(appDir, "src/content/surface/claims/de/claim-b.md", validClaimRecord());
 
@@ -134,7 +138,11 @@ test("RG-CLAIM-03: articleId not found → error", async () => {
 });
 
 test("RG-CLAIM-04: factual claim with no sourceRefs → error", async () => {
-  await writeFile(appDir, "src/content/surface/articles/de/test-article.md", `---\nslug: test-article\n---\n`);
+  await writeFile(
+    appDir,
+    "src/content/surface/articles/de/test-article.md",
+    `---\nslug: test-article\n---\n`,
+  );
   await writeFile(
     appDir,
     "src/content/surface/claims/de/test-claim.md",
@@ -149,7 +157,11 @@ test("RG-CLAIM-04: factual claim with no sourceRefs → error", async () => {
 });
 
 test("RG-CLAIM-05: calculation claim with no calculationInputs → error", async () => {
-  await writeFile(appDir, "src/content/surface/articles/de/test-article.md", `---\nslug: test-article\n---\n`);
+  await writeFile(
+    appDir,
+    "src/content/surface/articles/de/test-article.md",
+    `---\nslug: test-article\n---\n`,
+  );
   await writeFile(
     appDir,
     "src/content/surface/claims/de/test-claim.md",
@@ -168,7 +180,11 @@ test("RG-CLAIM-05: calculation claim with no calculationInputs → error", async
 });
 
 test("RG-CLAIM-07: expired claim → warning", async () => {
-  await writeFile(appDir, "src/content/surface/articles/de/test-article.md", `---\nslug: test-article\n---\n`);
+  await writeFile(
+    appDir,
+    "src/content/surface/articles/de/test-article.md",
+    `---\nslug: test-article\n---\n`,
+  );
   await writeFile(
     appDir,
     "src/content/surface/claims/de/test-claim.md",
@@ -183,7 +199,11 @@ test("RG-CLAIM-07: expired claim → warning", async () => {
 });
 
 test("RG-CLAIM-08: disputed claim → warning", async () => {
-  await writeFile(appDir, "src/content/surface/articles/de/test-article.md", `---\nslug: test-article\n---\n`);
+  await writeFile(
+    appDir,
+    "src/content/surface/articles/de/test-article.md",
+    `---\nslug: test-article\n---\n`,
+  );
   await writeFile(
     appDir,
     "src/content/surface/claims/de/test-claim.md",
@@ -198,7 +218,11 @@ test("RG-CLAIM-08: disputed claim → warning", async () => {
 });
 
 test("valid claim record → pass", async () => {
-  await writeFile(appDir, "src/content/surface/articles/de/test-article.md", `---\nslug: test-article\n---\n`);
+  await writeFile(
+    appDir,
+    "src/content/surface/articles/de/test-article.md",
+    `---\nslug: test-article\n---\n`,
+  );
   await writeFile(appDir, "src/content/surface/claims/de/test-claim.md", validClaimRecord());
 
   const result = await runRatgeberClaimValidate(EMPTY_INPUT, makeContext(tmpDir, appDir));

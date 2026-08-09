@@ -21,9 +21,7 @@ import type { KernelCommandDefinition } from "../types.ts";
 </MODULE_CONTRACT>
 */
 
-function makeCommand(
-  overrides: Partial<KernelCommandDefinition> = {},
-): KernelCommandDefinition {
+function makeCommand(overrides: Partial<KernelCommandDefinition> = {}): KernelCommandDefinition {
   return {
     name: "test.validate",
     description: "Test validator",
@@ -241,10 +239,7 @@ describe("RFC-0687: persistCacheHits", () => {
 
     await persistCacheHits(tempDir, "build.check", new Set(["check.validator"]));
 
-    const raw = await readFile(
-      join(tempDir, ".cache", "pipeline-cache-hits.json"),
-      "utf8",
-    );
+    const raw = await readFile(join(tempDir, ".cache", "pipeline-cache-hits.json"), "utf8");
     const data = JSON.parse(raw);
     expect(data.pipelines["build.prepare"].commands).toContain("prep.generator");
     expect(data.pipelines["build.check"].commands).toContain("check.validator");
@@ -253,10 +248,7 @@ describe("RFC-0687: persistCacheHits", () => {
   test("persistCacheHits creates file when missing", async () => {
     await persistCacheHits(tempDir, "build.check", new Set(["new.command"]));
 
-    const raw = await readFile(
-      join(tempDir, ".cache", "pipeline-cache-hits.json"),
-      "utf8",
-    );
+    const raw = await readFile(join(tempDir, ".cache", "pipeline-cache-hits.json"), "utf8");
     const data = JSON.parse(raw);
     expect(data.pipelines["build.check"].commands).toContain("new.command");
   });
@@ -279,10 +271,7 @@ describe("RFC-0687: persistCacheHits", () => {
 
     await persistCacheHits(tempDir, "build.check", new Set(["new.command"]));
 
-    const raw = await readFile(
-      join(tempDir, ".cache", "pipeline-cache-hits.json"),
-      "utf8",
-    );
+    const raw = await readFile(join(tempDir, ".cache", "pipeline-cache-hits.json"), "utf8");
     const data = JSON.parse(raw);
     expect(data.pipelines["build.check"].commands).toEqual(["new.command"]);
   });
@@ -321,10 +310,7 @@ describe("RFC-0687: clearPipelineCacheHits", () => {
 
     await clearPipelineCacheHits(tempDir);
 
-    const raw = await readFile(
-      join(tempDir, ".cache", "pipeline-cache-hits.json"),
-      "utf8",
-    );
+    const raw = await readFile(join(tempDir, ".cache", "pipeline-cache-hits.json"), "utf8");
     const data = JSON.parse(raw);
     expect(Object.keys(data.pipelines)).toHaveLength(0);
   });
@@ -332,10 +318,7 @@ describe("RFC-0687: clearPipelineCacheHits", () => {
   test("clear creates empty file when missing", async () => {
     await clearPipelineCacheHits(tempDir);
 
-    const raw = await readFile(
-      join(tempDir, ".cache", "pipeline-cache-hits.json"),
-      "utf8",
-    );
+    const raw = await readFile(join(tempDir, ".cache", "pipeline-cache-hits.json"), "utf8");
     const data = JSON.parse(raw);
     expect(data.pipelines).toEqual({});
   });

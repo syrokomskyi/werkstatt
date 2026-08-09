@@ -52,8 +52,7 @@ export function createDeployModule(): KernelModule {
 
       registry.registerCommand({
         name: "deploy.artifact.verify",
-        description:
-          "Verify an artifact's content hash and signature (RFC-0566). Flags: --hash.",
+        description: "Verify an artifact's content hash and signature (RFC-0566). Flags: --hash.",
         scope: "workspace",
         supportsAllSites: false,
         flags: {
@@ -66,8 +65,7 @@ export function createDeployModule(): KernelModule {
 
       registry.registerCommand({
         name: "deploy.atomic.swap",
-        description:
-          "Atomic symlink swap to deploy a new artifact (RFC-0566). Flags: --hash.",
+        description: "Atomic symlink swap to deploy a new artifact (RFC-0566). Flags: --hash.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -88,7 +86,10 @@ export function createDeployModule(): KernelModule {
         supportsAllSites: false,
         mutatesState: true,
         writes: [".werkstatt/artifacts/platform/current"],
-        reads: [".werkstatt/artifacts/platform/previous", ".werkstatt/artifacts/platform/{hash}/**"],
+        reads: [
+          ".werkstatt/artifacts/platform/previous",
+          ".werkstatt/artifacts/platform/{hash}/**",
+        ],
         cacheable: false,
         execute: runDeployAtomicRollback,
       });

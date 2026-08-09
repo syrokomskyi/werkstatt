@@ -18,7 +18,10 @@
 </CHANGE_SUMMARY>
 */
 
-import { createBuildPortableProvider, setDefaultImageProvider } from "@warpgogol/share/image-provider";
+import {
+  createBuildPortableProvider,
+  setDefaultImageProvider,
+} from "@warpgogol/share/image-provider";
 import type { ImageVariantManifest } from "@warpgogol/share/image-provider";
 import { loadGeneratedManifest } from "./generated-manifest-loader.ts";
 

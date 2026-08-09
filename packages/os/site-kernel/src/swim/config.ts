@@ -71,10 +71,7 @@ export async function loadSwimConfig(workspaceRoot: string): Promise<SwimConfig>
   return parsed;
 }
 
-export async function createSwimConfig(
-  workspaceRoot: string,
-  seed: string,
-): Promise<SwimConfig> {
+export async function createSwimConfig(workspaceRoot: string, seed: string): Promise<SwimConfig> {
   const config: SwimConfig = {
     workshopId: uuidv7(),
     bindAddr: DEFAULT_BIND_ADDR,

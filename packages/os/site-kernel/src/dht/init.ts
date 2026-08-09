@@ -45,7 +45,9 @@ export async function runDhtNodeInit(
       data: {
         created: false,
         config: existing,
-        diagnostics: [`dht.node.init: ${CONFIG_FILENAME} already exists — use --force to overwrite`],
+        diagnostics: [
+          `dht.node.init: ${CONFIG_FILENAME} already exists — use --force to overwrite`,
+        ],
       },
       exitCode: 0,
       summary: `dht.node.init: config already exists at ${CONFIG_FILENAME}`,

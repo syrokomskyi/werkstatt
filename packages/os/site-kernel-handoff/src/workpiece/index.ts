@@ -13,6 +13,10 @@ and the shared DNA-22 path validation checker.
 </CHANGE_SUMMARY>
 */
 
-export { isClientEditable, createClientEditableChecker, type ClientEditableChecker } from "./dna-22-checker.ts";
+export {
+  isClientEditable,
+  createClientEditableChecker,
+  type ClientEditableChecker,
+} from "./dna-22-checker.ts";
 export { runWorkpieceRead, type WorkpieceReadResult } from "./workpiece-read.ts";
 export { runWorkpieceWrite, type WorkpieceWriteResult } from "./workpiece-write.ts";

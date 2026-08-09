@@ -58,9 +58,7 @@ export async function runDeployAtomicRollback(
 
   const dir = artifactDir(workspaceRoot, previousHash);
   if (!existsSync(dir)) {
-    logger.error(
-      `[deploy.atomic.rollback] previous artifact ${previousHash} directory missing`,
-    );
+    logger.error(`[deploy.atomic.rollback] previous artifact ${previousHash} directory missing`);
     return {
       data: {
         swapped: false,

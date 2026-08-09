@@ -13,4 +13,7 @@ re-exports it for backward-compatible imports from @warpgogol/site-kernel-handof
 </CHANGE_SUMMARY>
 */
 
-export { runWerkstattLockStatus, type WerkstattLockStatusData } from "@warpgogol/forge/os/werkstatt";
+export {
+  runWerkstattLockStatus,
+  type WerkstattLockStatusData,
+} from "@warpgogol/forge/os/werkstatt";

@@ -101,7 +101,8 @@ export async function runObservabilityAlertsApply(
         ruleId: "OBS-ALR-APPLY-ENV",
         severity: "error",
         file: "",
-        message: "WARPGOGOL_SIGNOZ_API_URL and WARPGOGOL_SIGNOZ_API_TOKEN must be set to apply alerts.",
+        message:
+          "WARPGOGOL_SIGNOZ_API_URL and WARPGOGOL_SIGNOZ_API_TOKEN must be set to apply alerts.",
         fixHint:
           "Set both env vars: WARPGOGOL_SIGNOZ_API_URL=https://observe.warpgogol.com WARPGOGOL_SIGNOZ_API_TOKEN=<key>",
       },

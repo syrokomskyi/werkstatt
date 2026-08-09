@@ -110,11 +110,15 @@ export async function runParticipantJsonValidate(
     }
 
     if (!hasField(profilesData, "participants")) {
-      violations.push("[missing-participants] dist/team/profiles.json missing 'participants' array");
+      violations.push(
+        "[missing-participants] dist/team/profiles.json missing 'participants' array",
+      );
     } else {
       const participants = getField(profilesData, "participants");
       if (!Array.isArray(participants)) {
-        violations.push("[invalid-participants] dist/team/profiles.json 'participants' is not an array");
+        violations.push(
+          "[invalid-participants] dist/team/profiles.json 'participants' is not an array",
+        );
       } else {
         for (let i = 0; i < participants.length; i++) {
           const entry = participants[i] as Record<string, unknown>;
@@ -122,7 +126,9 @@ export async function runParticipantJsonValidate(
             violations.push(`[missing-slug] profiles.json[${i}]: missing slug`);
           }
           if (!hasField(entry, "participantType")) {
-            violations.push(`[missing-participantType] profiles.json[${i}]: missing participantType`);
+            violations.push(
+              `[missing-participantType] profiles.json[${i}]: missing participantType`,
+            );
           }
           if (!hasField(entry, "publicName")) {
             violations.push(`[missing-publicName] profiles.json[${i}]: missing publicName`);
@@ -145,17 +151,15 @@ export async function runParticipantJsonValidate(
   }
 
   // Validate individual profile.json files
-  const checkProfileJson = async (
-    dir: string,
-    slug: string,
-    isAiAgent: boolean,
-  ): Promise<void> => {
+  const checkProfileJson = async (dir: string, slug: string, isAiAgent: boolean): Promise<void> => {
     const filePath = join(dir, slug, "profile.json");
     let raw: string;
     try {
       raw = await readFile(filePath, "utf-8");
     } catch {
-      violations.push(`[missing-profile-json] ${isAiAgent ? "ki-agenten" : "team"}/${slug}/profile.json not found`);
+      violations.push(
+        `[missing-profile-json] ${isAiAgent ? "ki-agenten" : "team"}/${slug}/profile.json not found`,
+      );
       return;
     }
 
@@ -163,7 +167,9 @@ export async function runParticipantJsonValidate(
     try {
       data = JSON.parse(raw) as Record<string, unknown>;
     } catch {
-      violations.push(`[invalid-json] ${isAiAgent ? "ki-agenten" : "team"}/${slug}/profile.json is not valid JSON`);
+      violations.push(
+        `[invalid-json] ${isAiAgent ? "ki-agenten" : "team"}/${slug}/profile.json is not valid JSON`,
+      );
       return;
     }
 
@@ -185,7 +191,9 @@ export async function runParticipantJsonValidate(
 
     // Check for birthDate in human profiles (must be excluded per RFC-0512)
     if (!isAiAgent && hasField(data, "birthDate")) {
-      violations.push(`[birthdate-leak] ${slug}/profile.json: birthDate must not appear in public JSON`);
+      violations.push(
+        `[birthdate-leak] ${slug}/profile.json: birthDate must not appear in public JSON`,
+      );
     }
 
     // Check for consent-gated fields without consent
@@ -193,10 +201,14 @@ export async function runParticipantJsonValidate(
       const hasConsent = hasField(data, "hasConsent") && getField(data, "hasConsent") === true;
       if (!hasConsent) {
         if (hasField(data, "location")) {
-          violations.push(`[consent-gate-violation] ${slug}/profile.json: location present without consent`);
+          violations.push(
+            `[consent-gate-violation] ${slug}/profile.json: location present without consent`,
+          );
         }
         if (hasField(data, "sameAs")) {
-          violations.push(`[consent-gate-violation] ${slug}/profile.json: sameAs present without consent`);
+          violations.push(
+            `[consent-gate-violation] ${slug}/profile.json: sameAs present without consent`,
+          );
         }
       }
     }

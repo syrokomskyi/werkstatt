@@ -67,7 +67,11 @@ export function recordCommandTelemetry(pusher: MetricsPusher, report: KernelExec
     const durationSeconds = (report.timing?.durationMs ?? 0) / 1000;
     const histLabels: Record<string, string> = { command };
     if (siteId) histLabels["site_id"] = siteId;
-    METRIC_REFS.warpgogol_factory_command_duration_seconds.record(pusher, durationSeconds, histLabels);
+    METRIC_REFS.warpgogol_factory_command_duration_seconds.record(
+      pusher,
+      durationSeconds,
+      histLabels,
+    );
 
     // warpgogol_factory_diagnostics_total{command, severity, site_id}
     for (const { severity, count } of countDiagnostics(report)) {

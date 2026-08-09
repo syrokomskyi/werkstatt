@@ -12,10 +12,7 @@
       "default": "./dist/index.js"
     }
   },
-  "files": [
-    "src",
-    "dist"
-  ],
+  "files": ["src", "dist"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",

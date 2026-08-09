@@ -29,9 +29,7 @@ const contentArbitrary = fc.oneof(
   fc.constant(
     "---\ntitle: Test\nbrandName: {business.legal.companyName}\n---\nWelcome to {business.legal.companyName}.\n",
   ),
-  fc.constant(
-    "---\ntitle: Kontakt\n---\nCall us at {business.contact.phone}.\n",
-  ),
+  fc.constant("---\ntitle: Kontakt\n---\nCall us at {business.contact.phone}.\n"),
   fc.constant("---\ntitle: Home\n---\nNo references here.\n"),
   fc.constant("label: {business.legal.companyName}\nvalue: {business.contact.email}\n"),
 );

@@ -38,9 +38,10 @@ async function loadIdentityConfig(workspaceRoot: string): Promise<WerkstattIdent
  * Select the best workshop from a list of capacity entries using least-loaded strategy.
  * Filters out workshops with 0 available slots or invalid signatures.
  */
-function selectLeastLoaded(
-  capacities: WorkshopCapacity[],
-): { winner: WorkshopCapacity | null; reason: DHTPlacementReason } {
+function selectLeastLoaded(capacities: WorkshopCapacity[]): {
+  winner: WorkshopCapacity | null;
+  reason: DHTPlacementReason;
+} {
   const available = capacities.filter((c) => c.availableSlots > 0);
   if (available.length === 0) {
     return { winner: null, reason: "local-fallback" };
@@ -130,9 +131,7 @@ export async function runDhtPlacement(
         assignedWorkshop: "",
         reason: "local-fallback" as DHTPlacementReason,
         capacity: null,
-        diagnostics: [
-          `dht.placement: --workshops flag is required (comma-separated or repeated)`,
-        ],
+        diagnostics: [`dht.placement: --workshops flag is required (comma-separated or repeated)`],
       } as DHTPlacementResult,
       exitCode: 1,
       summary: `dht.placement: no workshops specified`,

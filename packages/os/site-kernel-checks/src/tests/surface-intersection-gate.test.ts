@@ -35,7 +35,11 @@ describe("applyIntersectionGate", () => {
   it("drops all depth-5 entries when intersections list is empty", () => {
     const entries = [
       makeEntry(DEPTH_5, { industry: "friseur", city: "stuttgart", demand: "haarschnitt" }),
-      makeEntry(DEPTH_5, { industry: "elektriker", city: "karlsruhe", demand: "elektroinstallation" }),
+      makeEntry(DEPTH_5, {
+        industry: "elektriker",
+        city: "karlsruhe",
+        demand: "elektroinstallation",
+      }),
       makeEntry(4, { industry: "friseur", city: "stuttgart" }),
     ];
     const result = applyIntersectionGate(entries, [], DEPTH_5);
@@ -46,7 +50,11 @@ describe("applyIntersectionGate", () => {
   it("keeps depth-5 entries that have an approved intersection record", () => {
     const entries = [
       makeEntry(DEPTH_5, { industry: "friseur", city: "stuttgart", demand: "haarschnitt" }),
-      makeEntry(DEPTH_5, { industry: "elektriker", city: "karlsruhe", demand: "elektroinstallation" }),
+      makeEntry(DEPTH_5, {
+        industry: "elektriker",
+        city: "karlsruhe",
+        demand: "elektroinstallation",
+      }),
     ];
     const intersections: IntersectionRecord[] = [
       {
@@ -65,7 +73,11 @@ describe("applyIntersectionGate", () => {
   it("drops depth-5 entries with rejected or pending intersection records", () => {
     const entries = [
       makeEntry(DEPTH_5, { industry: "friseur", city: "stuttgart", demand: "haarschnitt" }),
-      makeEntry(DEPTH_5, { industry: "elektriker", city: "karlsruhe", demand: "elektroinstallation" }),
+      makeEntry(DEPTH_5, {
+        industry: "elektriker",
+        city: "karlsruhe",
+        demand: "elektroinstallation",
+      }),
     ];
     const intersections: IntersectionRecord[] = [
       {
@@ -129,7 +141,11 @@ describe("applyIntersectionGate", () => {
   it("handles multiple approved intersections correctly", () => {
     const entries = [
       makeEntry(DEPTH_5, { industry: "friseur", city: "stuttgart", demand: "haarschnitt" }),
-      makeEntry(DEPTH_5, { industry: "elektriker", city: "karlsruhe", demand: "elektroinstallation" }),
+      makeEntry(DEPTH_5, {
+        industry: "elektriker",
+        city: "karlsruhe",
+        demand: "elektroinstallation",
+      }),
       makeEntry(DEPTH_5, { industry: "friseur", city: "karlsruhe", demand: "balayage" }),
     ];
     const intersections: IntersectionRecord[] = [

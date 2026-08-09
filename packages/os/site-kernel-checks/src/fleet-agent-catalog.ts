@@ -31,10 +31,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import {
-  buildGeneratedHeader,
-  stripGeneratedMarker,
-} from "@warpgogol/site-kernel";
+import { buildGeneratedHeader, stripGeneratedMarker } from "@warpgogol/site-kernel";
 import {
   buildFleetAgentCatalog,
   type FleetAgentCatalog,

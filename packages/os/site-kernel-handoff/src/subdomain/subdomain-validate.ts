@@ -22,10 +22,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { readRegistry } from "../sternsystem/registry-io.ts";
-import {
-  listDnsRecords,
-  listWorkersRoutes,
-} from "../leitstand/adapters/cloudflare-api.ts";
+import { listDnsRecords, listWorkersRoutes } from "../leitstand/adapters/cloudflare-api.ts";
 import {
   flagString,
   resolveService,
@@ -106,8 +103,7 @@ export async function runSubdomainValidate(
   const matchingRoute = existingRoutes.find((r) => r.pattern === expectedRoutePattern);
 
   const routeExists = !!matchingRoute;
-  const routeCorrect =
-    routeExists && matchingRoute!.script === service.workerName;
+  const routeCorrect = routeExists && matchingRoute!.script === service.workerName;
 
   const state: SubdomainValidateResult["state"] =
     dnsCorrect && routeCorrect

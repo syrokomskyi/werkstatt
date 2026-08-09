@@ -32,10 +32,7 @@
       "default": "./src/tenant-registry.ts"
     }
   },
-  "files": [
-    "src",
-    "migrations"
-  ],
+  "files": ["src", "migrations"],
   "scripts": {
     "build": "echo 'No build step required — TypeScript sources consumed directly'",
     "build:check": "tsc --noEmit",

@@ -6,7 +6,7 @@ import { createDefaultIO } from "@warpgogol/site-kernel";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { extractVendorOrigins, runChatMetadataDriftValidate } from "../chat-metadata-drift.ts";
 
-const input = { flags: {},  } as unknown as KernelCommandInput;
+const input = { flags: {} } as unknown as KernelCommandInput;
 
 function ctx(root: string): KernelRuntimeContext {
   return {

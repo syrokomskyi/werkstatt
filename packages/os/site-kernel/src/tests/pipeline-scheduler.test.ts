@@ -110,18 +110,13 @@ describe("buildSchedule", () => {
   });
 
   test("missing dependency throws ScheduleError", () => {
-    const steps: KernelPipelineStep[] = [
-      { command: "cmd.a", dependsOn: ["cmd.nonexistent"] },
-    ];
+    const steps: KernelPipelineStep[] = [{ command: "cmd.a", dependsOn: ["cmd.nonexistent"] }];
     expect(() => buildSchedule(steps)).toThrow(ScheduleError);
     expect(() => buildSchedule(steps)).toThrow(/not in the pipeline/i);
   });
 
   test("duplicate command names throw ScheduleError", () => {
-    const steps: KernelPipelineStep[] = [
-      { command: "cmd.a" },
-      { command: "cmd.a" },
-    ];
+    const steps: KernelPipelineStep[] = [{ command: "cmd.a" }, { command: "cmd.a" }];
     expect(() => buildSchedule(steps)).toThrow(ScheduleError);
     expect(() => buildSchedule(steps)).toThrow(/duplicate command name/i);
   });

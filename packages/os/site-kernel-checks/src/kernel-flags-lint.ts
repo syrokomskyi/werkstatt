@@ -26,10 +26,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import {
-  KERNEL_UNIVERSAL_FLAGS,
-  listRegisteredKernelCommands,
-} from "@warpgogol/site-kernel";
+import { KERNEL_UNIVERSAL_FLAGS, listRegisteredKernelCommands } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 import {

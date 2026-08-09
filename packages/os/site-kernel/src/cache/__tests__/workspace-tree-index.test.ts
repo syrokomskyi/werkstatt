@@ -123,11 +123,7 @@ describe("filterTreeIndex", () => {
     await fs.writeFile(path.join(ws, "b.md"), "b");
     const index = await buildWorkspaceTreeIndex(ws);
     const matched = filterTreeIndex(index, ["*.md"], ws, ws);
-    expect(matched).toEqual([
-      path.join(ws, "a.md"),
-      path.join(ws, "b.md"),
-      path.join(ws, "c.md"),
-    ]);
+    expect(matched).toEqual([path.join(ws, "a.md"), path.join(ws, "b.md"), path.join(ws, "c.md")]);
   });
 
   test("returns empty array for no matches", async () => {

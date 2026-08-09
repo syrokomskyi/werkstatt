@@ -45,7 +45,11 @@ export interface OtlpKeyValue {
   value: { stringValue: string };
 }
 
-const LAYERS_REQUIRING_SITE_ID: ReadonlySet<WarpgogolLayer> = new Set(["site", "probe", "delivery"]);
+const LAYERS_REQUIRING_SITE_ID: ReadonlySet<WarpgogolLayer> = new Set([
+  "site",
+  "probe",
+  "delivery",
+]);
 
 export function buildResourceAttributes(input: WarpgogolResourceInput): OtlpKeyValue[] {
   if (!input.serviceName) {

@@ -54,7 +54,6 @@ interface CacheRow {
   updated_at: number;
 }
 
-
 interface NamespaceCountRow {
   namespace: string;
   entries: number;

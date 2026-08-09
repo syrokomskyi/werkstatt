@@ -13,7 +13,11 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "nod
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import { runWorkpieceWrite } from "../workpiece/workpiece-write.ts";
-import type { KernelCommandInput, KernelRuntimeContext, KernelFlagValue } from "@warpgogol/site-kernel";
+import type {
+  KernelCommandInput,
+  KernelRuntimeContext,
+  KernelFlagValue,
+} from "@warpgogol/site-kernel";
 
 let tmpDir: string;
 let workpieceDir: string;

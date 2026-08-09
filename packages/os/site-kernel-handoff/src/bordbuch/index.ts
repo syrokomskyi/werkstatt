@@ -12,7 +12,6 @@
 </CHANGE_SUMMARY>
 */
 
-
 export { runBordbuchAppend, type BordbuchAppendData } from "./bordbuch-append.ts";
 export { runBordbuchValidate, type BordbuchValidateData } from "./bordbuch-validate.ts";
 export { runBordbuchStatus, type BordbuchStatusData } from "./bordbuch-status.ts";

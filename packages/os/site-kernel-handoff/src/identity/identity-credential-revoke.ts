@@ -12,8 +12,17 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import { readIdentityConfig, writeIdentityConfig, findCredential, isRevoked } from "./identity-io.ts";
+import type {
+  KernelCommandInput,
+  KernelCommandResult,
+  KernelRuntimeContext,
+} from "@warpgogol/site-kernel";
+import {
+  readIdentityConfig,
+  writeIdentityConfig,
+  findCredential,
+  isRevoked,
+} from "./identity-io.ts";
 
 export interface IdentityCredentialRevokeData {
   credentialId: string;

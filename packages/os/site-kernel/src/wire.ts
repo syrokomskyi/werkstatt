@@ -323,7 +323,9 @@ export async function runKernelWire(
     },
     {
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "client-export.ts"),
-      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-deploy", ["runClientExport"]),
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-deploy", [
+        "runClientExport",
+      ]),
     },
   ];
 

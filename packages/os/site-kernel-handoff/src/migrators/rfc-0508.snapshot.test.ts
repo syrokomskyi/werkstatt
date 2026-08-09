@@ -62,7 +62,11 @@ test("rfc-0508 migrator snapshot — public person after migration", async () =>
   try {
     const peopleDir = path.join(tmpDir, "src", "content", "people", "de");
     await fs.mkdir(peopleDir, { recursive: true });
-    await fs.writeFile(path.join(peopleDir, "andrii-syrokomskyi.md"), SAMPLE_PERSON_PUBLIC, "utf-8");
+    await fs.writeFile(
+      path.join(peopleDir, "andrii-syrokomskyi.md"),
+      SAMPLE_PERSON_PUBLIC,
+      "utf-8",
+    );
 
     await rfc0508Migrator.transform(data, ctx);
     const content = await fs.readFile(path.join(peopleDir, "andrii-syrokomskyi.md"), "utf-8");

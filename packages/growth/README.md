@@ -66,10 +66,10 @@ const MyAdapter: GrowthAdapter = {
 
 ## Related packages
 
-| Package                        | Role                                                         |
-| ------------------------------ | ------------------------------------------------------------ |
+| Package | Role |
+| --- | --- |
 | `@warpgogol/growth-adapter-matomo` | Matomo adapter for RFC-0305 Messkanon over first-party proxy |
-| `@warpgogol/ontology`              | Closed event catalog (`packages/ontology/growth/events/`)    |
+| `@warpgogol/ontology` | Closed event catalog (`packages/ontology/growth/events/`) |
 
 ## Validation
 

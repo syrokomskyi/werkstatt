@@ -66,13 +66,13 @@ pnpm --filter @warpgogol/site-kernel test
 
 ## Related packages
 
-| Package                         | Role                                                          |
-| ------------------------------- | ------------------------------------------------------------- |
-| `@warpgogol/site-kernel-astro`      | Astro-specific path helpers                                   |
-| `@warpgogol/site-kernel-content`    | Markdown file discovery and frontmatter parsing               |
-| `@warpgogol/site-kernel-checks`     | Shared validation commands for all Astro apps                 |
-| `@warpgogol/site-kernel-integrity`  | File hash tracking, build provenance, Ed25519 signing         |
-| `@warpgogol/site-kernel-codegen`    | Code generation (icons, Compass skeleton backfill, biome CSS) |
-| `@warpgogol/site-kernel-changelog`  | AI-powered changelog generation                               |
-| `@warpgogol/site-kernel-deploy`     | Client workspace export                                       |
-| `@warpgogol/site-kernel-onboarding` | New-app scaffold and readiness checklist                      |
+| Package | Role |
+| --- | --- |
+| `@warpgogol/site-kernel-astro` | Astro-specific path helpers |
+| `@warpgogol/site-kernel-content` | Markdown file discovery and frontmatter parsing |
+| `@warpgogol/site-kernel-checks` | Shared validation commands for all Astro apps |
+| `@warpgogol/site-kernel-integrity` | File hash tracking, build provenance, Ed25519 signing |
+| `@warpgogol/site-kernel-codegen` | Code generation (icons, Compass skeleton backfill, biome CSS) |
+| `@warpgogol/site-kernel-changelog` | AI-powered changelog generation |
+| `@warpgogol/site-kernel-deploy` | Client workspace export |
+| `@warpgogol/site-kernel-onboarding` | New-app scaffold and readiness checklist |

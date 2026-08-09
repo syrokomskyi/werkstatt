@@ -8,8 +8,8 @@ All `--ds-*` custom properties are defined here. Apps and components must use th
 
 ## Entry points
 
-| Import                     | What it provides                                            |
-| -------------------------- | ----------------------------------------------------------- |
+| Import                         | What it provides                                            |
+| ------------------------------ | ----------------------------------------------------------- |
 | `@warpgogol/tokens`            | TypeScript token name constants and type helpers            |
 | `@warpgogol/tokens/tokens.css` | Raw CSS file with all `--ds-*` custom property declarations |
 

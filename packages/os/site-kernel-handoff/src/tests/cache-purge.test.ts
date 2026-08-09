@@ -9,7 +9,11 @@
 */
 
 import { test, expect, vi } from "vitest";
-import { collectPurgeUrls, purgeCacheByUrls, skippedPurgeResult } from "../leitstand/cache-purge.ts";
+import {
+  collectPurgeUrls,
+  purgeCacheByUrls,
+  skippedPurgeResult,
+} from "../leitstand/cache-purge.ts";
 import type { RouteFact } from "@warpgogol/ontology/operations";
 
 test("collectPurgeUrls maps routes to full URLs and appends build-identity", () => {
@@ -85,9 +89,7 @@ test("purgeCacheByUrls returns failure on 500 response (non-blocking)", async ()
   });
   vi.stubGlobal("fetch", fetchMock);
 
-  const result = await purgeCacheByUrls("zone123", "token456", [
-    "https://example.com/",
-  ]);
+  const result = await purgeCacheByUrls("zone123", "token456", ["https://example.com/"]);
 
   expect(result.success).toBe(false);
   expect(result.purgedUrls).toBe(0);
@@ -105,9 +107,7 @@ test("purgeCacheByUrls returns failure on 4xx auth error (non-blocking)", async 
   });
   vi.stubGlobal("fetch", fetchMock);
 
-  const result = await purgeCacheByUrls("zone123", "bad-token", [
-    "https://example.com/",
-  ]);
+  const result = await purgeCacheByUrls("zone123", "bad-token", ["https://example.com/"]);
 
   expect(result.success).toBe(false);
   expect(result.error).toContain("401");
@@ -120,9 +120,7 @@ test("purgeCacheByUrls returns failure on network error (non-blocking)", async (
   fetchMock.mockRejectedValue(new Error("Network timeout"));
   vi.stubGlobal("fetch", fetchMock);
 
-  const result = await purgeCacheByUrls("zone123", "token456", [
-    "https://example.com/",
-  ]);
+  const result = await purgeCacheByUrls("zone123", "token456", ["https://example.com/"]);
 
   expect(result.success).toBe(false);
   expect(result.purgedUrls).toBe(0);

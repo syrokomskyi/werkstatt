@@ -40,14 +40,7 @@ async function withTempWorkpiece(fn: (dir: string) => Promise<void>): Promise<vo
 test("rfc-0512 snapshot: no-op migrator leaves all files unchanged", async () => {
   await withTempWorkpiece(async (dir) => {
     const data: SternsystemData = { rootPath: dir, dataPaths: [] };
-    const filePath = path.join(
-      dir,
-      "src",
-      "content",
-      "people",
-      "de",
-      "test-participant.md",
-    );
+    const filePath = path.join(dir, "src", "content", "people", "de", "test-participant.md");
     const before = await fs.readFile(filePath, "utf8");
 
     await rfc0512Migrator.transform(data, ctx);
@@ -60,14 +53,7 @@ test("rfc-0512 snapshot: no-op migrator leaves all files unchanged", async () =>
 test("rfc-0512 snapshot: no-op migrator is idempotent on real content", async () => {
   await withTempWorkpiece(async (dir) => {
     const data: SternsystemData = { rootPath: dir, dataPaths: [] };
-    const filePath = path.join(
-      dir,
-      "src",
-      "content",
-      "people",
-      "de",
-      "test-participant.md",
-    );
+    const filePath = path.join(dir, "src", "content", "people", "de", "test-participant.md");
 
     const once = await rfc0512Migrator.transform(data, ctx);
     const content1 = await fs.readFile(filePath, "utf8");

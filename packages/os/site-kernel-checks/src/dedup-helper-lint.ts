@@ -40,10 +40,22 @@ const INLINE_ALLOWLIST = new Set<string>(["packages/forge/src/utils/fs.ts"]);
 
 /** Reserved shared-helper identifiers and the single file allowed to declare each. */
 export const RESERVED_HELPERS: Record<string, { importPath: string; canonicalFile: string }> = {
-  fileExists: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
-  collectFiles: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
-  readJsonFile: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
-  readYamlFile: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
+  fileExists: {
+    importPath: "@warpgogol/share/fs",
+    canonicalFile: "packages/share/src/fs/index.ts",
+  },
+  collectFiles: {
+    importPath: "@warpgogol/share/fs",
+    canonicalFile: "packages/share/src/fs/index.ts",
+  },
+  readJsonFile: {
+    importPath: "@warpgogol/share/fs",
+    canonicalFile: "packages/share/src/fs/index.ts",
+  },
+  readYamlFile: {
+    importPath: "@warpgogol/share/fs",
+    canonicalFile: "packages/share/src/fs/index.ts",
+  },
   getLineColumn: {
     importPath: "@warpgogol/share/text-position",
     canonicalFile: "packages/share/src/text-position.ts",

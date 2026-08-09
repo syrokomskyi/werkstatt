@@ -15,7 +15,10 @@ async function makeWorkspace(): Promise<string> {
 async function writeApp(wsRoot: string, id: string): Promise<void> {
   const appDir = path.join(wsRoot, "apps", id);
   await fs.mkdir(appDir, { recursive: true });
-  await fs.writeFile(path.join(appDir, "package.json"), JSON.stringify({ name: `@warpgogol/${id}` }));
+  await fs.writeFile(
+    path.join(appDir, "package.json"),
+    JSON.stringify({ name: `@warpgogol/${id}` }),
+  );
 }
 
 async function writeWorkpiece(wsRoot: string, missionId: string, siteId: string): Promise<void> {

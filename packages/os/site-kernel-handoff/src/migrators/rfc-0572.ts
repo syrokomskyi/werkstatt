@@ -63,12 +63,18 @@ async function migrateFile(filePath: string, lang: string, ctx: MigrationContext
 
     if (emailFieldMatch.test(newBody)) {
       newBody = newBody.replace(/\n\s*emailField:\n(\s+)[^\n]*\n/g, "");
-      newBody = newBody.replace(/\n\s*emailField:\n\s+enabled:[^\n]*\n\s+required:[^\n]*\n(\s+(?:label|placeholder):[^\n]*\n)*/g, "");
+      newBody = newBody.replace(
+        /\n\s*emailField:\n\s+enabled:[^\n]*\n\s+required:[^\n]*\n(\s+(?:label|placeholder):[^\n]*\n)*/g,
+        "",
+      );
       modified = true;
     }
 
     if (phoneFieldMatch.test(newBody)) {
-      newBody = newBody.replace(/\n\s*phoneField:\n\s+enabled:[^\n]*\n\s+required:[^\n]*\n(\s+(?:label|placeholder):[^\n]*\n)*/g, "");
+      newBody = newBody.replace(
+        /\n\s*phoneField:\n\s+enabled:[^\n]*\n\s+required:[^\n]*\n(\s+(?:label|placeholder):[^\n]*\n)*/g,
+        "",
+      );
       modified = true;
     }
 

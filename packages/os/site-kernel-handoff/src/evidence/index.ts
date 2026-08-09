@@ -15,10 +15,7 @@
 */
 
 export { createEvidenceModule } from "./evidence-module.ts";
-export {
-  runEvidenceSync,
-  type EvidenceSyncResult,
-} from "./evidence-sync.ts";
+export { runEvidenceSync, type EvidenceSyncResult } from "./evidence-sync.ts";
 export {
   runEvidenceFetch,
   type EvidenceFetchResult,

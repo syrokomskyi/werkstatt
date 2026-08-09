@@ -24,7 +24,12 @@ export function resolveActorFromEnv(): ActorIdentity | null {
   const siteId = process.env["WERKSTATT_ACTOR_SITE"];
   if (!actorId || !siteId) return null;
   const scopesRaw = process.env["WERKSTATT_ACTOR_SCOPES"];
-  const scopes = scopesRaw ? scopesRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
+  const scopes = scopesRaw
+    ? scopesRaw
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
   return { actorId, siteId, scopes };
 }
 

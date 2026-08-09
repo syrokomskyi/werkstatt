@@ -29,12 +29,9 @@ export const AUTH_ERROR_CODES: Record<string, { code: number; message: string }>
 };
 
 const HINTS: Record<number, string> = {
-  [-32001]:
-    "Provide a valid VC credential in _meta.identity or X-Werkstatt-Credential header",
-  [-32005]:
-    "werkstatt.identity.json not found. Run identity.bootstrap (RFC-0558) to create it.",
-  [-32006]:
-    "werkstatt.identity.json is not valid JSON or is missing required fields.",
+  [-32001]: "Provide a valid VC credential in _meta.identity or X-Werkstatt-Credential header",
+  [-32005]: "werkstatt.identity.json not found. Run identity.bootstrap (RFC-0558) to create it.",
+  [-32006]: "werkstatt.identity.json is not valid JSON or is missing required fields.",
   [-32007]: "_meta.system is required in enforced mode for site-scoping",
 };
 

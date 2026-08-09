@@ -23,7 +23,13 @@ export const STERNSYSTEM_ID_POLICY = {
   charset: "ASCII lowercase letters (a-z), digits (0-9), hyphens (-)",
   description: "kebab-case, lowercase, latin-only",
   examples: ["warpgogol-com", "nicaragua-projekt"],
-  counterExamples: ["Warpgogol-Com", "nicaragüa-projekt", "warpgogol--com", "-warpgogol", "warpgogol-"],
+  counterExamples: [
+    "Warpgogol-Com",
+    "nicaragüa-projekt",
+    "warpgogol--com",
+    "-warpgogol",
+    "warpgogol-",
+  ],
 } as const;
 
 export const MISSION_ID_POLICY = {

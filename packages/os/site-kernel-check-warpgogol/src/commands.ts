@@ -52,6 +52,9 @@ export {
 
 export { runServicesCheckRun } from "./commands/services-check.ts";
 
-export { runWarpgogolCheckHintsGenerate, runWarpgogolCheckHintsValidate } from "./commands/hints.ts";
+export {
+  runWarpgogolCheckHintsGenerate,
+  runWarpgogolCheckHintsValidate,
+} from "./commands/hints.ts";
 
 export { runCheckWarpgogolAppValidate } from "./commands/app.ts";

@@ -1,6 +1,9 @@
 import { test, expect } from "vitest";
 import type { SystemManifest } from "@warpgogol/site-kernel-content";
-import { buildRetiredPageRoutesBlock, buildRetiredTombstoneSlugs } from "../app-boilerplate-helpers.ts";
+import {
+  buildRetiredPageRoutesBlock,
+  buildRetiredTombstoneSlugs,
+} from "../app-boilerplate-helpers.ts";
 
 /*
 <MODULE_CONTRACT>
@@ -27,7 +30,9 @@ import { buildRetiredPageRoutesBlock, buildRetiredTombstoneSlugs } from "../app-
 </CHANGE_SUMMARY>
 */
 
-function makeManifest(retiredRoutes: Array<{ slug: string; status: 301 | 410; to?: string }>): SystemManifest {
+function makeManifest(
+  retiredRoutes: Array<{ slug: string; status: 301 | 410; to?: string }>,
+): SystemManifest {
   return {
     app: "warpgogol-com",
     i18n: { default: "de", supported: { de: {} } },
@@ -73,9 +78,7 @@ test("buildRetiredTombstoneSlugs returns sorted slugs for 410 entries", () => {
 });
 
 test("buildRetiredTombstoneSlugs returns empty array when no 410 routes", () => {
-  const manifest = makeManifest([
-    { slug: "/old-service", status: 301, to: "/leistungen" },
-  ]);
+  const manifest = makeManifest([{ slug: "/old-service", status: 301, to: "/leistungen" }]);
   expect(buildRetiredTombstoneSlugs(manifest)).toEqual([]);
 });
 
@@ -85,8 +88,6 @@ test("buildRetiredTombstoneSlugs returns empty array for empty retiredRoutes", (
 });
 
 test("buildRetiredTombstoneSlugs strips leading/trailing slashes", () => {
-  const manifest = makeManifest([
-    { slug: "//widerruf/", status: 410 },
-  ]);
+  const manifest = makeManifest([{ slug: "//widerruf/", status: 410 }]);
   expect(buildRetiredTombstoneSlugs(manifest)).toEqual(["widerruf"]);
 });

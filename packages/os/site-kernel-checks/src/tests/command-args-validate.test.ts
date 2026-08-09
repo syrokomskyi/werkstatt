@@ -128,7 +128,7 @@ describe("command.args.validate (RFC-0610)", () => {
     await rm(root, { recursive: true, force: true });
   });
 
-  it("string-literal exclusion: \"input.args\" in string is not flagged", async () => {
+  it('string-literal exclusion: "input.args" in string is not flagged', async () => {
     const { root, relFile } = await setupFixtureFile(
       `export async function runFixture(input, context) {
         const msg = "input.args is removed";

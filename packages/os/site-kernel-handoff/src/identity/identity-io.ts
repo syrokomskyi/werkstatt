@@ -52,9 +52,6 @@ export function findCredential(
   return config.issuedCredentials.find((c) => c.credentialId === credentialId);
 }
 
-export function isRevoked(
-  config: WerkstattIdentityConfig,
-  credentialId: string,
-): boolean {
+export function isRevoked(config: WerkstattIdentityConfig, credentialId: string): boolean {
   return config.revokedCredentialIds.includes(credentialId);
 }

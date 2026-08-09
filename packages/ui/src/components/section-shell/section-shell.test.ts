@@ -12,10 +12,7 @@ import { join } from "node:path";
  * concatenate sectionNumber with sectionId.
  */
 describe("section-shell anchor id invariant", () => {
-  const astroSource = readFileSync(
-    join(import.meta.dirname, "section-shell.astro"),
-    "utf8",
-  );
+  const astroSource = readFileSync(join(import.meta.dirname, "section-shell.astro"), "utf8");
 
   test("section id must not be prefixed with sectionNumber", () => {
     // The id attribute line should use sectionId directly, not `${sectionNumber}-${sectionId}`
@@ -30,10 +27,9 @@ describe("section-shell anchor id invariant", () => {
     ).not.toContain("sectionNumber");
 
     // Must reference sectionId
-    expect(
-      idExpression,
-      `section id must reference sectionId — got: "${idExpression}"`,
-    ).toContain("sectionId");
+    expect(idExpression, `section id must reference sectionId — got: "${idExpression}"`).toContain(
+      "sectionId",
+    );
   });
 
   test("aria-labelledby may use sectionNumber prefix (heading uniqueness)", () => {

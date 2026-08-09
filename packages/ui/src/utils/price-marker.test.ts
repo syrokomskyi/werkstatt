@@ -36,7 +36,12 @@ describe("renderPriceDisplayHtml", () => {
   });
 
   it("returns empty string when offeringId not found", () => {
-    const result = renderPriceDisplayHtml("nonexistent", "monthlySubscription", "de", SAMPLE_DERIVED);
+    const result = renderPriceDisplayHtml(
+      "nonexistent",
+      "monthlySubscription",
+      "de",
+      SAMPLE_DERIVED,
+    );
     expect(result).toBe("");
   });
 
@@ -48,7 +53,7 @@ describe("renderPriceDisplayHtml", () => {
   it("generates span-based HTML with correct classes and data attributes", () => {
     const result = renderPriceDisplayHtml("main", "monthlySubscription", "de", SAMPLE_DERIVED);
     expect(result).toContain('class="currency-aware-price-display"');
-    expect(result).toContain('data-currency-price-display');
+    expect(result).toContain("data-currency-price-display");
     expect(result).toContain('aria-live="polite"');
     expect(result).toContain('class="currency-aware-price-display__variant"');
     expect(result).toContain('class="currency-aware-price-display__amount"');

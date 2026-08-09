@@ -112,10 +112,10 @@ node_modules/.bin/site-kernel        ← POSIX shell script
 
 **Invoking the bin:**
 
-| Context                                  | Command                                  |
-| ---------------------------------------- | ---------------------------------------- |
-| POSIX shells (bash, zsh) — monorepo root | `site-kernel run <command>`              |
-| Explicit `pnpm exec` (works everywhere)  | `pnpm exec site-kernel run <command>`    |
+| Context                                  | Command                                      |
+| ---------------------------------------- | -------------------------------------------- |
+| POSIX shells (bash, zsh) — monorepo root | `site-kernel run <command>`                  |
+| Explicit `pnpm exec` (works everywhere)  | `pnpm exec site-kernel run <command>`        |
 | Via npm script alias                     | `pnpm --filter @warpgogol/main site-os:apps` |
 
 ---

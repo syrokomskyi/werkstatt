@@ -29,9 +29,7 @@ export function resolveRef(ref: unknown): string {
   return "";
 }
 
-export function isCurrencyPricingPolicy(
-  entity: PbpEntity,
-): entity is PbpCurrencyPricingPolicy {
+export function isCurrencyPricingPolicy(entity: PbpEntity): entity is PbpCurrencyPricingPolicy {
   return entity.type === "currency-pricing-policy";
 }
 

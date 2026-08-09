@@ -192,9 +192,7 @@ test("RG-HUB-02: hub with unexpected block type → error", async () => {
   );
   const result = await runRatgeberHubValidate(EMPTY_INPUT, makeContext(tmpDir, appDir));
   const diags = result.data?.diagnostics ?? [];
-  const hub02 = diags.filter(
-    (d) => d.ruleId === "RG-HUB-02" && d.message.includes("unexpected"),
-  );
+  const hub02 = diags.filter((d) => d.ruleId === "RG-HUB-02" && d.message.includes("unexpected"));
   expect(hub02.length).toBe(1);
   expect(hub02[0]!.severity).toBe("error");
   expect(hub02[0]!.message).toContain("unknown-block");
@@ -268,10 +266,7 @@ test("RG-HUB-08: article missing article metadata → error", async () => {
   await writeFile(
     appDir,
     "src/surface.generated.yaml",
-    artifactYaml([
-      hubEntry(),
-      articleEntry("ratgeber:test", "test", { article: undefined }),
-    ]),
+    artifactYaml([hubEntry(), articleEntry("ratgeber:test", "test", { article: undefined })]),
   );
   const result = await runRatgeberHubValidate(EMPTY_INPUT, makeContext(tmpDir, appDir));
   const diags = result.data?.diagnostics ?? [];

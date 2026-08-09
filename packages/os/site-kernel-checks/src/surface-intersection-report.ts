@@ -55,18 +55,12 @@ export async function runSurfaceIntersectionReport(
   const blueprints = await loadSurfaceBlueprints(context.workspaceRoot);
   const websiteLocalBp = blueprints.find((b) => b.id === "website-local");
   if (!websiteLocalBp) {
-    return passResult(
-      "surface.intersection.report",
-      "skipped (no website-local blueprint found)",
-    );
+    return passResult("surface.intersection.report", "skipped (no website-local blueprint found)");
   }
 
   const records = await loadIntersectionRecords(intersectionsDir);
   if (records.length === 0) {
-    return passResult(
-      "surface.intersection.report",
-      "skipped (no intersection records found)",
-    );
+    return passResult("surface.intersection.report", "skipped (no intersection records found)");
   }
 
   const diagnostics: Diagnostic[] = [];

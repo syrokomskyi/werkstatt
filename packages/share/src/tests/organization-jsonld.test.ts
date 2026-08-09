@@ -51,9 +51,7 @@ describe("RFC-0745: buildOrganizationNode makesOffer priceCurrency", () => {
   });
 
   it("omits priceCurrency when SemanticPrice has no currency", () => {
-    const org = makeOrgWithPrices([
-      { id: "monthly", label: "Monthly", amount: "70.00" },
-    ]);
+    const org = makeOrgWithPrices([{ id: "monthly", label: "Monthly", amount: "70.00" }]);
     const context = createJsonLdContext(makeModel(org));
     const node = buildOrganizationNode(context);
     const makesOffer = node.makesOffer as Array<Record<string, unknown>>;

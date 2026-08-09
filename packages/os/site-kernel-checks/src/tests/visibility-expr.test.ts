@@ -34,7 +34,7 @@ describe("visibility.expr.validate", () => {
   it("passes when no visibility fields are present", async () => {
     await writeFile(join(pagesDir, "de", "home.md"), "---\ntitle: Home\n---\n# Home\n");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runVisibilityExprValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -49,7 +49,7 @@ describe("visibility.expr.validate", () => {
       "---\ntitle: Home\nvisibility:\n  feature: blog\n---\n# Home\n",
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runVisibilityExprValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -64,7 +64,7 @@ describe("visibility.expr.validate", () => {
       "---\ntitle: Home\nvisibility: 123\n---\n# Home\n",
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runVisibilityExprValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -76,7 +76,7 @@ describe("visibility.expr.validate", () => {
   it("passes when pages dir does not exist", async () => {
     await rm(join(appDir, "src", "content", "pages"), { recursive: true, force: true });
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runVisibilityExprValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -89,7 +89,7 @@ describe("visibility.expr.validate", () => {
     const ctx = makeTestSiteContext(workspaceRoot, appDir);
     ctx.site = undefined;
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runVisibilityExprValidate(input, ctx);
 
     expect(result.exitCode).toBe(1);

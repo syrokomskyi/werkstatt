@@ -124,9 +124,7 @@ test("mission.close refuses when validation fails", async () => {
       missionId: "test-system-m000001",
       contractFull: {
         passed: false,
-        validators: [
-          { name: "semantic.targets.validate", status: "fail", exitCode: 1 },
-        ],
+        validators: [{ name: "semantic.targets.validate", status: "fail", exitCode: 1 }],
       },
       build: { succeeded: false, routeCount: 0, sitemapHash: "", error: "build failed" },
     },

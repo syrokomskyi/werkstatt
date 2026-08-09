@@ -87,7 +87,7 @@ describe("page.blocks.mirror.validate", () => {
       pageFrontmatter([{ type: "hero", props: { title: "Welcome" } }]),
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runPageBlocksMirrorValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -110,7 +110,7 @@ describe("page.blocks.mirror.validate", () => {
       pageFrontmatter([{ type: "hero", props: { title: "EN" } }]),
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runPageBlocksMirrorValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -130,7 +130,7 @@ describe("page.blocks.mirror.validate", () => {
       pageFrontmatter([{ type: "cta", props: { title: "EN" } }]),
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runPageBlocksMirrorValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -150,7 +150,7 @@ describe("page.blocks.mirror.validate", () => {
       pageFrontmatter([{ type: "hero", props: { title: "EN" } }]),
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runPageBlocksMirrorValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -176,7 +176,7 @@ describe("page.blocks.mirror.validate", () => {
       pageFrontmatter([{ type: "hero", props: { labels: { ok: "OK" } } }]),
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runPageBlocksMirrorValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -198,7 +198,7 @@ describe("page.blocks.mirror.validate", () => {
       pageFrontmatter([{ type: "hero", props: { title: "DE" } }]),
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runPageBlocksMirrorValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),

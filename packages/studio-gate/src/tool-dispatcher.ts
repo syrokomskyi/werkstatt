@@ -64,14 +64,10 @@ export async function dispatchTool(options: DispatchOptions): Promise<{
   }
 
   const exec = () =>
-    executeCommand(
-      "pnpm",
-      ["exec", "site-kernel", "run", options.toolName, ...cliArgs, "--json"],
-      {
-        cwd: options.werkstattRoot,
-        stdin,
-      },
-    );
+    executeCommand("pnpm", ["exec", "site-kernel", "run", options.toolName, ...cliArgs, "--json"], {
+      cwd: options.werkstattRoot,
+      stdin,
+    });
 
   const result = isBuildTriggeringTool(options.toolName)
     ? await options.buildQueue.run(exec)

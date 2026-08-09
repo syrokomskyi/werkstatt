@@ -83,11 +83,7 @@ function stripH1FromMarkdown(markdown: string, articleTitle: string): string {
   return result.join("\n");
 }
 
-function addFieldToFrontmatter(
-  content: string,
-  fieldName: string,
-  fieldValue: string,
-): string {
+function addFieldToFrontmatter(content: string, fieldName: string, fieldValue: string): string {
   // Check if the field already exists in frontmatter
   const frontmatterMatch = /^---\n([\s\S]*?)\n---/.exec(content);
   if (!frontmatterMatch) return content;

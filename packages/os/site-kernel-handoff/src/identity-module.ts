@@ -21,15 +21,12 @@ export function createIdentityModule(): KernelModule {
     version: "0.1.0",
     async register(registry) {
       const { runIdentityBootstrap } = await import("./identity/identity-bootstrap.ts");
-      const { runIdentityCredentialIssue } = await import(
-        "./identity/identity-credential-issue.ts"
-      );
-      const { runIdentityCredentialVerify } = await import(
-        "./identity/identity-credential-verify.ts"
-      );
-      const { runIdentityCredentialRevoke } = await import(
-        "./identity/identity-credential-revoke.ts"
-      );
+      const { runIdentityCredentialIssue } =
+        await import("./identity/identity-credential-issue.ts");
+      const { runIdentityCredentialVerify } =
+        await import("./identity/identity-credential-verify.ts");
+      const { runIdentityCredentialRevoke } =
+        await import("./identity/identity-credential-revoke.ts");
 
       registry.registerCommand({
         name: "identity.bootstrap",
@@ -57,8 +54,7 @@ export function createIdentityModule(): KernelModule {
 
       registry.registerCommand({
         name: "identity.credential.issue",
-        description:
-          "Issue a SiteOwnershipCredential or ActorDelegationCredential (RFC-0558).",
+        description: "Issue a SiteOwnershipCredential or ActorDelegationCredential (RFC-0558).",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -95,8 +91,7 @@ export function createIdentityModule(): KernelModule {
 
       registry.registerCommand({
         name: "identity.credential.verify",
-        description:
-          "Verify a credential's signature, revocation status, and expiry (RFC-0558).",
+        description: "Verify a credential's signature, revocation status, and expiry (RFC-0558).",
         scope: "workspace",
         supportsAllSites: false,
         flags: {

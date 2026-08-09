@@ -65,10 +65,7 @@ export async function createSignedCommit(
   git(workpieceDir, `commit -m ${JSON.stringify(message)}`);
   const preAmendSha = git(workpieceDir, "rev-parse HEAD");
 
-  const signature = await signBytes(
-    privateKeyHex,
-    new TextEncoder().encode(preAmendSha),
-  );
+  const signature = await signBytes(privateKeyHex, new TextEncoder().encode(preAmendSha));
 
   const amendedMessage = `${message}\n\nWerkstatt-Actor: ${actorId}\nWerkstatt-Signature: ${signature}`;
   git(workpieceDir, `commit --amend -m ${JSON.stringify(amendedMessage)}`);

@@ -33,8 +33,7 @@ import type {
 } from "./schema.ts";
 
 export type IdentityCredentialSubject =
-  | SiteOwnershipCredentialSubject
-  | ActorDelegationCredentialSubject;
+  SiteOwnershipCredentialSubject | ActorDelegationCredentialSubject;
 
 /**
  * Produce canonical UTF-8 bytes from an identity credential subject.

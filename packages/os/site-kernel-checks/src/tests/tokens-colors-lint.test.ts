@@ -61,19 +61,14 @@ describe("tokens.colors.lint (RFC-0725)", () => {
     const definedToken = [...TOKEN_NAME_SET][0];
     const sectionsDir = join(packagesUiSrc, "sections", "test");
     await mkdir(sectionsDir, { recursive: true });
-    await writeFile(
-      join(sectionsDir, "test.css"),
-      `.foo { color: var(${definedToken}); }\n`,
-    );
+    await writeFile(join(sectionsDir, "test.css"), `.foo { color: var(${definedToken}); }\n`);
 
     const result = await runHardcodedColorLint(
       testInput(),
       makeTestSiteContext(workspaceRoot, appDir),
     );
 
-    const undefinedFinding = result.data!.violations.find(
-      (v) => v.reason === "undefined-token",
-    );
+    const undefinedFinding = result.data!.violations.find((v) => v.reason === "undefined-token");
     expect(undefinedFinding).toBeUndefined();
   });
 
@@ -132,10 +127,7 @@ describe("tokens.colors.lint (RFC-0725)", () => {
   it("returns data with findings count and violations array", async () => {
     const sectionsDir = join(packagesUiSrc, "sections", "test");
     await mkdir(sectionsDir, { recursive: true });
-    await writeFile(
-      join(sectionsDir, "test.css"),
-      ".foo { color: var(--ds-nonexistent); }\n",
-    );
+    await writeFile(join(sectionsDir, "test.css"), ".foo { color: var(--ds-nonexistent); }\n");
     await writeFile(join(stylesDir, "test.css"), ".bar { color: #abc; }\n");
 
     const result = await runHardcodedColorLint(

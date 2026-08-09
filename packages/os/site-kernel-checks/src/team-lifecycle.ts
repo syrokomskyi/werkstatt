@@ -107,8 +107,7 @@ export async function runTeamLifecycleValidate(
   const diagnostics: Diagnostic[] = [];
 
   for (const { file, data } of defaultLangRecords) {
-    const slug =
-      typeof data["slug"] === "string" && data["slug"] ? (data["slug"] as string) : file;
+    const slug = typeof data["slug"] === "string" && data["slug"] ? (data["slug"] as string) : file;
     const id = `${defaultLang}/${slug}`;
     const status = typeof data["status"] === "string" ? data["status"] : undefined;
     const visibility = typeof data["visibility"] === "string" ? data["visibility"] : undefined;

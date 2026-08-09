@@ -11,10 +11,7 @@ import type { RateSourceAdapter } from "./types.js";
 
 const adapters = new Map<string, RateSourceAdapter>();
 
-export function registerRateSourceAdapter(
-  name: string,
-  adapter: RateSourceAdapter,
-): void {
+export function registerRateSourceAdapter(name: string, adapter: RateSourceAdapter): void {
   adapters.set(name, adapter);
 }
 

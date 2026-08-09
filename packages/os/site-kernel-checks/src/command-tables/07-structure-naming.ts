@@ -20,10 +20,7 @@ import {
 } from "../structure.ts";
 // werkstatt.operation.validate migrated to @warpgogol/forge — see packages/forge/os/werkstatt/
 import { runNamingPolicyValidate } from "../structure/naming-policy.ts";
-import {
-  runRouteSlimValidation,
-  runFeatureVisibilityValidation,
-} from "../semantic.ts";
+import { runRouteSlimValidation, runFeatureVisibilityValidation } from "../semantic.ts";
 import {
   runFeatureGraphValidate,
   runFeatureLinksValidate,

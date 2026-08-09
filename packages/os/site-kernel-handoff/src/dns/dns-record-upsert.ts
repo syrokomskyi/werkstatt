@@ -94,9 +94,7 @@ export async function runDnsRecordUpsert(
 
   for (const declared of declaration.records) {
     const identity = `${declared.type}:${declared.name}`;
-    const matching = liveRecords.find(
-      (r) => r.type === declared.type && r.name === declared.name,
-    );
+    const matching = liveRecords.find((r) => r.type === declared.type && r.name === declared.name);
 
     if (matching && recordsMatch(declared, matching)) {
       skipped++;
@@ -154,9 +152,7 @@ function toApiRecord(declared: DnsRecordDeclaration): {
   return {
     type: declared.type,
     name: declared.name,
-    content: declared.type === "TXT"
-      ? normalizeTxtContent(declared.content)
-      : declared.content,
+    content: declared.type === "TXT" ? normalizeTxtContent(declared.content) : declared.content,
     proxied: declared.proxied ?? false,
     ...(declared.priority !== undefined ? { priority: declared.priority } : {}),
     ...(declared.comment ? { comment: declared.comment } : {}),

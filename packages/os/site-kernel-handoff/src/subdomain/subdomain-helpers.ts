@@ -51,10 +51,7 @@ export function resolveZoneId(registry: FleetRegistry, zoneDomain: string): stri
   );
 }
 
-export function resolveService(
-  registry: FleetRegistry,
-  serviceId: string,
-): ServiceEntry {
+export function resolveService(registry: FleetRegistry, serviceId: string): ServiceEntry {
   const service = registry.services?.find((s) => s.id === serviceId);
   if (!service) {
     const available = registry.services?.map((s) => s.id).join(", ") ?? "(none)";

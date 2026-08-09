@@ -116,10 +116,7 @@ export async function runParticipantProfileValidate(
     const visibility = data["visibility"];
     if (visibility === "private") continue;
 
-    const slug =
-      typeof data["slug"] === "string" && data["slug"]
-        ? (data["slug"] as string)
-        : file;
+    const slug = typeof data["slug"] === "string" && data["slug"] ? (data["slug"] as string) : file;
 
     const id = `${lang}/${slug}`;
 
@@ -141,9 +138,7 @@ export async function runParticipantProfileValidate(
 
     // Personal prose file must exist when consent.approvedFields includes bio
     const consent = data["consent"];
-    const approvedFields = isObject(consent)
-      ? (consent["approvedFields"] as unknown[])
-      : undefined;
+    const approvedFields = isObject(consent) ? (consent["approvedFields"] as unknown[]) : undefined;
     const hasBioConsent = Array.isArray(approvedFields) && approvedFields.includes("bio");
 
     if (hasBioConsent) {

@@ -55,7 +55,7 @@ describe("text.normalize.apply", () => {
     const ctx = makeTestSiteContext(workspaceRoot, appDir);
     // Override site to undefined to test the no-app path
     ctx.site = undefined;
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runTextNormalizeApply(input, ctx);
     expect(result.exitCode).toBe(1);
   });
@@ -63,7 +63,7 @@ describe("text.normalize.apply", () => {
   it("passes and scans files when dist/client exists", async () => {
     await writeFile(join(distClient, "index.html"), "<html><body>Hello World</body></html>");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runTextNormalizeApply(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -77,7 +77,7 @@ describe("text.normalize.apply", () => {
     await writeFile(join(distClient, ".well-known", "cosmic-passport.json"), '{"key":"value"}');
     await writeFile(join(distClient, "index.html"), "<html>clean</html>");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runTextNormalizeApply(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -107,7 +107,7 @@ describe("text.normalize.validate", () => {
   it("always exits 0 (warn-only, never gates)", async () => {
     await writeFile(join(distClient, "index.html"), "<html><body>Hello</body></html>");
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runTextNormalizeValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -119,7 +119,7 @@ describe("text.normalize.validate", () => {
   it("warns when dist/client is missing", async () => {
     await rm(distClient, { recursive: true, force: true });
 
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const result = await runTextNormalizeValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -133,7 +133,7 @@ describe("text.normalize.validate", () => {
 
 describe("text.normalize.rules.list", () => {
   it("enumerates the signal registry and exits 0", async () => {
-    const input: KernelCommandInput = { flags: {}, argv: [],  };
+    const input: KernelCommandInput = { flags: {}, argv: [] };
     const ctx = makeTestContext("/tmp");
 
     const result = await runTextNormalizeRulesList(input, ctx);

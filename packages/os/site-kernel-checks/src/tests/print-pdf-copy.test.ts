@@ -76,9 +76,24 @@ describe("print.pdf.copy (RFC-0653)", () => {
       join(cacheBaseDir, "manifest.json"),
       JSON.stringify({
         entries: [
-          { lang: "de", routeSlug: "impressum", cacheDir: ".cache/pdf/abc123", pdfFile: "impressum.pdf" },
-          { lang: "de", routeSlug: "datenschutz", cacheDir: ".cache/pdf/abc123", pdfFile: "datenschutz.pdf" },
-          { lang: "en", routeSlug: "imprint", cacheDir: ".cache/pdf/abc123", pdfFile: "imprint.pdf" },
+          {
+            lang: "de",
+            routeSlug: "impressum",
+            cacheDir: ".cache/pdf/abc123",
+            pdfFile: "impressum.pdf",
+          },
+          {
+            lang: "de",
+            routeSlug: "datenschutz",
+            cacheDir: ".cache/pdf/abc123",
+            pdfFile: "datenschutz.pdf",
+          },
+          {
+            lang: "en",
+            routeSlug: "imprint",
+            cacheDir: ".cache/pdf/abc123",
+            pdfFile: "imprint.pdf",
+          },
         ],
       }) + "\n",
     );
@@ -89,7 +104,9 @@ describe("print.pdf.copy (RFC-0653)", () => {
     expect(data?.copied).toBe(3);
 
     expect(existsSync(join(tmpDir, "dist", "client", "_print", "de", "impressum.pdf"))).toBe(true);
-    expect(existsSync(join(tmpDir, "dist", "client", "_print", "de", "datenschutz.pdf"))).toBe(true);
+    expect(existsSync(join(tmpDir, "dist", "client", "_print", "de", "datenschutz.pdf"))).toBe(
+      true,
+    );
     expect(existsSync(join(tmpDir, "dist", "client", "_print", "en", "imprint.pdf"))).toBe(true);
 
     const copiedContent = readFileSync(
@@ -109,8 +126,18 @@ describe("print.pdf.copy (RFC-0653)", () => {
       join(cacheBaseDir, "manifest.json"),
       JSON.stringify({
         entries: [
-          { lang: "de", routeSlug: "impressum", cacheDir: ".cache/pdf/abc123", pdfFile: "impressum.pdf" },
-          { lang: "de", routeSlug: "datenschutz", cacheDir: ".cache/pdf/abc123", pdfFile: "datenschutz.pdf" },
+          {
+            lang: "de",
+            routeSlug: "impressum",
+            cacheDir: ".cache/pdf/abc123",
+            pdfFile: "impressum.pdf",
+          },
+          {
+            lang: "de",
+            routeSlug: "datenschutz",
+            cacheDir: ".cache/pdf/abc123",
+            pdfFile: "datenschutz.pdf",
+          },
         ],
       }) + "\n",
     );

@@ -17,21 +17,24 @@ import { describe, it, expect } from "vitest";
 import { GENERATOR_OWNERSHIP_MAP } from "../generator-ownership.ts";
 
 describe("GENERATOR_OWNERSHIP_MAP: bordbuch projection entries", () => {
-  const bordbuchPaths = GENERATOR_OWNERSHIP_MAP.filter((e) =>
-    e.command === "bordbuch.generate" || e.module?.includes("bordbuch"),
+  const bordbuchPaths = GENERATOR_OWNERSHIP_MAP.filter(
+    (e) => e.command === "bordbuch.generate" || e.module?.includes("bordbuch"),
   ).map((e) => e.path);
 
   it("registers public/.well-known/bordbuch.json (site-relative)", () => {
-    const hasEntry = bordbuchPaths.some((p) =>
-      p.endsWith("public/.well-known/bordbuch.json"),
+    const hasEntry = bordbuchPaths.some((p) => p.endsWith("public/.well-known/bordbuch.json"));
+    expect(hasEntry, "public/.well-known/bordbuch.json must be in GENERATOR_OWNERSHIP_MAP").toBe(
+      true,
     );
-    expect(hasEntry, "public/.well-known/bordbuch.json must be in GENERATOR_OWNERSHIP_MAP").toBe(true);
   });
 
   it("registers public/.well-known/bordbuch/index.html (site-relative)", () => {
     const hasEntry = bordbuchPaths.some((p) =>
       p.endsWith("public/.well-known/bordbuch/index.html"),
     );
-    expect(hasEntry, "public/.well-known/bordbuch/index.html must be in GENERATOR_OWNERSHIP_MAP").toBe(true);
+    expect(
+      hasEntry,
+      "public/.well-known/bordbuch/index.html must be in GENERATOR_OWNERSHIP_MAP",
+    ).toBe(true);
   });
 });

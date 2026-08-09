@@ -41,7 +41,9 @@ describe("swim config", () => {
     it("should create a valid config with seed and UUID v7 workshopId", async () => {
       const config = await createSwimConfig(tempDir, "10.0.0.1:7946");
 
-      expect(config.workshopId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+      expect(config.workshopId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      );
       expect(config.bindAddr).toBe("0.0.0.0:7946");
       expect(config.seedNodes).toEqual(["10.0.0.1:7946"]);
       expect(config.probeIntervalMs).toBeGreaterThan(0);
@@ -66,11 +68,7 @@ describe("swim config", () => {
         suspicionTimeoutMs: 15000,
         indirectChecks: 3,
       };
-      await writeFile(
-        join(tempDir, CONFIG_FILENAME),
-        JSON.stringify(config, null, 2),
-        "utf8",
-      );
+      await writeFile(join(tempDir, CONFIG_FILENAME), JSON.stringify(config, null, 2), "utf8");
 
       const loaded = await loadSwimConfig(tempDir);
       expect(loaded.workshopId).toBe(config.workshopId);

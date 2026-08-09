@@ -14,8 +14,7 @@
 import type { PbpEntityRef } from "@warpgogol/pbp";
 import type { RateFetchResult, RateSourceAdapter } from "../types.js";
 
-const ECB_DAILY_XML_URL =
-  "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+const ECB_DAILY_XML_URL = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
 
 interface EcbRate {
   currency: string;
@@ -110,11 +109,7 @@ export function createEcbAdapter(
         rateMap.set(r.currency, r.rate);
       }
 
-      const value = computeCrossRate(
-        pair.sourceCurrency,
-        pair.targetCurrency,
-        rateMap,
-      );
+      const value = computeCrossRate(pair.sourceCurrency, pair.targetCurrency, rateMap);
 
       if (value === null) {
         throw new Error(

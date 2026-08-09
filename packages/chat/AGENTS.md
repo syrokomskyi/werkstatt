@@ -48,8 +48,8 @@ interface ChatWidgetAdapter {
 
 ## Related packages
 
-| Package                           | Role                             |
-| --------------------------------- | -------------------------------- |
+| Package                               | Role                             |
+| ------------------------------------- | -------------------------------- |
 | `@warpgogol/chat-adapter-uchat`       | UChat implementation             |
 | `@warpgogol/chat-adapter-null`        | No-op adapter (safe default)     |
 | `@warpgogol/ui` (chat-widget section) | Renders the first-party launcher |

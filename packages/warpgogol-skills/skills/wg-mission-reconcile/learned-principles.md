@@ -14,6 +14,7 @@ Concrete principles distilled from past runs. Each principle has a condition and
 -->
 
 ## Bordbuch events are always dirty after mission.migrate
+
 - **Condition:** Cache clone has uncommitted `bordbuch/events.ndjson` after `mission.migrate` ran
 - **Action:** Commit it with `git add bordbuch/events.ndjson && git commit -m "bordbuch: record <event>"` before attempting reconcile
 - **Pattern:** C
@@ -22,6 +23,7 @@ Concrete principles distilled from past runs. Each principle has a condition and
 - **Confirmations:** 1
 
 ## Generated files always conflict add/add when cache clone diverged
+
 - **Condition:** Cache clone has accumulated changes from previous missions; workpiece was materialized fresh from pin
 - **Action:** Resolve with `git checkout --theirs . && git add -A && git am --continue` — workpiece version is authoritative
 - **Pattern:** B
@@ -30,6 +32,7 @@ Concrete principles distilled from past runs. Each principle has a condition and
 - **Confirmations:** 1
 
 ## mission.validate generates files that need committing
+
 - **Condition:** `mission.validate` ran astro build as part of validation
 - **Action:** Check workpiece for dirty files after validation and commit them before reconcile
 - **Pattern:** D

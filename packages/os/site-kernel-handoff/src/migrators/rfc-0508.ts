@@ -29,11 +29,7 @@ const AFFILIATION_TO_RELATIONSHIP: Record<string, string> = {
   author: "author",
 };
 
-function addFieldToFrontmatter(
-  content: string,
-  fieldName: string,
-  fieldValue: string,
-): string {
+function addFieldToFrontmatter(content: string, fieldName: string, fieldValue: string): string {
   const frontmatterMatch = /^---\n([\s\S]*?)\n---/.exec(content);
   if (!frontmatterMatch) return content;
   const frontmatter = frontmatterMatch[1]!;
@@ -115,7 +111,11 @@ export const rfc0508Migrator: Migrator = {
         // Add visibility based on page.enabled
         if (!/^visibility:/m.test(updated)) {
           const pageEnabled = extractPageEnabled(updated);
-          updated = addFieldToFrontmatter(updated, "visibility", pageEnabled ? "public" : "private");
+          updated = addFieldToFrontmatter(
+            updated,
+            "visibility",
+            pageEnabled ? "public" : "private",
+          );
           modified = true;
         }
 
@@ -123,8 +123,7 @@ export const rfc0508Migrator: Migrator = {
         if (!/^relationshipType:/m.test(updated)) {
           const affiliations = extractAffiliations(updated);
           const primaryAffiliation = affiliations[0] ?? "team";
-          const relationship =
-            AFFILIATION_TO_RELATIONSHIP[primaryAffiliation] ?? "team";
+          const relationship = AFFILIATION_TO_RELATIONSHIP[primaryAffiliation] ?? "team";
           updated = addFieldToFrontmatter(updated, "relationshipType", relationship);
           modified = true;
         }
@@ -137,10 +136,7 @@ export const rfc0508Migrator: Migrator = {
             const consentYaml = `consent:\n  consentRecordId: "consent-${slug}"\n  approvedFields: ["lifespan.born", "location", "bio", "photo", "sameAs"]\n  consentDate: "2026-07-24"\n  profileReviewer: "${slug}"`;
             const frontmatterMatch = /^---\n([\s\S]*?)\n---/.exec(updated);
             if (frontmatterMatch) {
-              updated = updated.replace(
-                /^---\n([\s\S]*?)\n---/,
-                `---\n$1\n${consentYaml}\n---`,
-              );
+              updated = updated.replace(/^---\n([\s\S]*?)\n---/, `---\n$1\n${consentYaml}\n---`);
               modified = true;
             }
           }

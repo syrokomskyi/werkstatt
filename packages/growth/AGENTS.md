@@ -62,10 +62,10 @@ The optional `accepts` field is an allow-list of event names the adapter handles
 
 ## Related packages
 
-| Package                        | Role                                                         |
-| ------------------------------ | ------------------------------------------------------------ |
+| Package | Role |
+| --- | --- |
 | `@warpgogol/growth-adapter-matomo` | Matomo adapter for RFC-0305 Messkanon over first-party proxy |
-| `@warpgogol/ontology`              | Closed event catalog                                         |
+| `@warpgogol/ontology` | Closed event catalog |
 
 ## Validation
 
