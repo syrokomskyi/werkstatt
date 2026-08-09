@@ -13,6 +13,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0052: Initial implementation.</item>
   <item>RFC-0267: robots.generate routed through context.io (WorkspaceIO port) — pilot migration; universal --dry-run works via the executor's recording adapter, replacing the hand-rolled dryRun guard.</item>
+  <item>RFC-0784: Pass contentSignal from manifest robots block (or default) to buildRobotsTxt. Add PUBTXT-CS validation rule for Content-Signal directive.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -68,8 +69,17 @@ export async function runRobotsGenerate(
         crawlerAllowlist: robotsRaw.crawlerAllowlist as string[] | undefined,
         sitemap: (robotsRaw.sitemap as string | undefined) ?? defaultSitemap,
         customRules: robotsRaw.customRules as RobotsPolicy["customRules"],
+        contentSignal: (robotsRaw.contentSignal as string[] | undefined) ?? [
+          "text/html",
+          "text/markdown",
+          "application/ld+json",
+          "text/plain",
+        ],
       }
-    : { sitemap: defaultSitemap };
+    : {
+        sitemap: defaultSitemap,
+        contentSignal: ["text/html", "text/markdown", "application/ld+json", "text/plain"],
+      };
 
   const robotsTxt = buildRobotsTxt(policy);
   const robotsPath = join(paths.publicDirectory, "robots.txt");
@@ -137,6 +147,7 @@ export async function runRobotsValidate(
 
   const violations: string[] = [];
   const warnings: string[] = [];
+  const diagnostics: Diagnostic[] = [];
   let content: string | undefined;
 
   try {
@@ -160,6 +171,17 @@ export async function runRobotsValidate(
 
     if (!/^(Allow|Disallow):/im.test(content)) {
       violations.push("robots.txt does not contain any Allow or Disallow directive.");
+    }
+
+    // RFC-0784: Content-Signal directive must be present.
+    if (!/^Content-Signal:/im.test(content)) {
+      diagnostics.push({
+        ruleId: "PUBTXT-CS",
+        severity: "error",
+        file: "public/robots.txt",
+        message: "robots.txt does not contain a Content-Signal directive.",
+        fixHint: "Run robots.generate.",
+      });
     }
 
     if (content.length < 20) {
@@ -190,7 +212,7 @@ export async function runRobotsValidate(
     }
   }
 
-  const diagnostics: Diagnostic[] = [
+  diagnostics.push(
     ...violations.map((message) => ({
       ruleId: "robots.validate",
       severity: "error" as const,
@@ -207,7 +229,7 @@ export async function runRobotsValidate(
       fixHint:
         "Review robots.txt size and sitemap references, then regenerate source-controlled crawl policy if needed.",
     })),
-  ];
+  );
 
   return diagnosticsResult("robots.validate", diagnostics);
 }
