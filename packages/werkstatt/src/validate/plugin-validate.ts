@@ -20,11 +20,11 @@ import { pathToFileURL } from "node:url";
 import { parse as parseYaml } from "yaml";
 import { tsImport } from "tsx/esm/api";
 import type { KernelAppConfig, KernelModule } from "../kernel/types.ts";
+import { discoverSystems } from "../sternsystem/registry-io.ts";
 
 const PLUGIN_SCHEMA = "werkstatt/plugin@1";
 const KERNEL_CONFIG_REL = "tools/kernel.config.ts";
 const FORGE_YAML_REL = "forge.yaml";
-const REGISTRY_YAML_REL = "systems/registry.yaml";
 
 export type PluginValidateStatus = "pass" | "warn" | "fail";
 
@@ -245,15 +245,10 @@ async function readForgeProfile(workspaceRoot: string): Promise<string | null> {
 
 async function readRegistryDeployAdapters(workspaceRoot: string): Promise<string[]> {
   try {
-    const content = await readFile(join(workspaceRoot, REGISTRY_YAML_REL), "utf8");
-    const parsed = parseYaml(content) as Record<string, unknown>;
-    const systems = parsed?.systems;
-    if (!Array.isArray(systems)) return [];
+    const { systems } = await discoverSystems(workspaceRoot);
     const adapters = new Set<string>();
     for (const system of systems) {
-      const sys = system as Record<string, unknown>;
-      const deployment = sys.deployment as Record<string, unknown> | undefined;
-      const adapter = deployment?.adapter;
+      const adapter = system.deployment?.adapter;
       if (typeof adapter === "string" && adapter.length > 0) {
         adapters.add(adapter);
       }

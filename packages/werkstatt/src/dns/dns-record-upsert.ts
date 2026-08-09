@@ -20,7 +20,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readRegistry } from "../sternsystem/registry-io.ts";
+import { discoverSystems } from "../sternsystem/registry-io.ts";
 import {
   listDnsRecords,
   createDnsRecord,
@@ -72,8 +72,8 @@ export async function runDnsRecordUpsert(
     );
   }
 
-  const registry = await readRegistry(workspaceRoot);
-  const zoneId = resolveDnsZoneId(registry, declaration.zone);
+  const { systems } = await discoverSystems(workspaceRoot);
+  const zoneId = resolveDnsZoneId(systems, declaration.zone);
 
   const env = await resolveDnsEnv();
   const apiToken = env["CLOUDFLARE_API_TOKEN"];

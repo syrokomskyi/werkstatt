@@ -18,7 +18,7 @@ import {
   commitAndPushBordbuch,
   type CommitAndPushResult,
 } from "./bordbuch-io.ts";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 export interface AppendAndCommitResult {
   entry: BordbuchEntry;
@@ -57,7 +57,7 @@ export async function appendAndCommitBordbuch(
 ): Promise<AppendAndCommitResult> {
   const entry = await appendBordbuchEntry(workspaceRoot, systemId, kind, summary, actor, options);
 
-  const systemDir = await resolveCachePath(workspaceRoot, systemId);
+  const systemDir = await resolveCacheClonePath(workspaceRoot, systemId);
   const message = commitMessage ?? `Bordbuch: ${kind} ${systemId}`;
   const commitResult = await commitAndPushBordbuch(systemDir, message);
 
@@ -84,7 +84,7 @@ export async function appendBatchAndCommitBordbuch(
     appended.push(entry);
   }
 
-  const systemDir = await resolveCachePath(workspaceRoot, systemId);
+  const systemDir = await resolveCacheClonePath(workspaceRoot, systemId);
   const commitResult = await commitAndPushBordbuch(systemDir, commitMessage);
 
   return { entries: appended, commitResult };

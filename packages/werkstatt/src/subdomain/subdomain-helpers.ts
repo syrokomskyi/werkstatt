@@ -13,7 +13,7 @@ account subdomain derivation, and environment variable resolution.
 </CHANGE_SUMMARY>
 */
 
-import type { FleetRegistry, ServiceEntry } from "@warpgogol/werkstatt/schemas";
+import type { SystemConfig, ServiceEntry, ServicesRegistry } from "@warpgogol/werkstatt/schemas";
 import { filterEnv, sourceDotenv } from "../leitstand/adapters/cloudflare-workers.ts";
 
 export function flagString(
@@ -33,30 +33,30 @@ function extractDomainFromUrl(url: string): string | null {
   }
 }
 
-export function resolveZoneId(registry: FleetRegistry, zoneDomain: string): string {
-  for (const system of registry.systems) {
+export function resolveZoneId(systems: SystemConfig[], zoneDomain: string): string {
+  for (const system of systems) {
     if (!system.deployment) continue;
     const mainDomain = extractDomainFromUrl(system.deployment.channels.main.url);
     if (mainDomain === zoneDomain) {
       if (!system.cloudflareZoneId) {
         throw new Error(
-          `[subdomain] System '${system.id}' matches zone '${zoneDomain}' but has no cloudflareZoneId. Add it to systems/registry.yaml.`,
+          `[subdomain] System '${system.id}' matches zone '${zoneDomain}' but has no cloudflareZoneId. Add it to system-config.yaml.`,
         );
       }
       return system.cloudflareZoneId;
     }
   }
   throw new Error(
-    `[subdomain] No system found matching zone '${zoneDomain}' in systems/registry.yaml.`,
+    `[subdomain] No system found matching zone '${zoneDomain}' in system-config.yaml files.`,
   );
 }
 
-export function resolveService(registry: FleetRegistry, serviceId: string): ServiceEntry {
-  const service = registry.services?.find((s) => s.id === serviceId);
+export function resolveService(registry: ServicesRegistry, serviceId: string): ServiceEntry {
+  const service = registry.services.find((s: ServiceEntry) => s.id === serviceId);
   if (!service) {
-    const available = registry.services?.map((s) => s.id).join(", ") ?? "(none)";
+    const available = registry.services.map((s: ServiceEntry) => s.id).join(", ");
     throw new Error(
-      `[subdomain] Service '${serviceId}' not found in registry. Available services: ${available}`,
+      `[subdomain] Service '${serviceId}' not found in services registry. Available services: ${available}`,
     );
   }
   return service;

@@ -29,7 +29,7 @@ import { parse as yamlParse } from "yaml";
 import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 const NACHWEIS_BUCKET = "nachweis";
 
@@ -192,7 +192,7 @@ export async function resolveNachweisCachePath(
   workspaceRoot: string,
   systemId: string,
 ): Promise<string> {
-  return resolveCachePath(workspaceRoot, systemId);
+  return resolveCacheClonePath(workspaceRoot, systemId);
 }
 
 export async function resolveDefaultLang(cachePath: string): Promise<string> {

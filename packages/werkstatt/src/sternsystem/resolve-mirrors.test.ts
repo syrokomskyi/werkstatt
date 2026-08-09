@@ -15,20 +15,19 @@ import {
   inferMirrorProtocol,
   isGitAccessible,
 } from "./registry-io.ts";
-import type { FleetRegistryEntry } from "@warpgogol/werkstatt/schemas";
+import type { SystemConfig } from "@warpgogol/werkstatt/schemas";
 import { join } from "node:path";
 
 function makeEntry(
   mirrors: Array<{ path: string; storageType: "non-bare" | "bare" | "bundle" }>,
-): FleetRegistryEntry {
+): SystemConfig {
   return {
+    schemaVersion: "system-config/v1",
     id: "test-site",
     cosmicStar: "Vega",
     mirrors,
     pinnedPlatform: "4.5.0",
-    currentMission: null,
-    lastRelease: null,
-    status: "registered",
+    status: "active",
     registeredAt: "2026-01-01T00:00:00Z",
     notes: "",
   };

@@ -144,19 +144,15 @@ test("recordsMatch: mismatched type", () => {
 });
 
 test("resolveZoneDomainForSystem: extracts hostname from main URL", () => {
-  const registry = {
-    systems: [
-      {
-        id: "warpgogol-com",
-        deployment: { channels: { main: { url: "https://warpgogol.com" } } },
-      },
-    ],
-  };
-  expect(resolveZoneDomainForSystem(registry, "warpgogol-com")).toBe("warpgogol.com");
+  const systems = [
+    {
+      id: "warpgogol-com",
+      deployment: { channels: { main: { url: "https://warpgogol.com" } } },
+    },
+  ];
+  expect(resolveZoneDomainForSystem(systems, "warpgogol-com")).toBe("warpgogol.com");
 });
 
 test("resolveZoneDomainForSystem: throws for unknown system", () => {
-  expect(() => resolveZoneDomainForSystem({ systems: [] }, "unknown")).toThrow(
-    "Could not resolve zone domain",
-  );
+  expect(() => resolveZoneDomainForSystem([], "unknown")).toThrow("Could not resolve zone domain");
 });

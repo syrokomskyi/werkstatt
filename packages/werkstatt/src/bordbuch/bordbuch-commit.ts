@@ -20,7 +20,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { gitExecWithRetry, type RetryOptions } from "../werkstatt/git-exec.ts";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 const BORDBUCH_PROJECTION_PATHS = [
   "bordbuch/events.ndjson",
@@ -52,7 +52,7 @@ export async function commitBordbuchProjections(
 ): Promise<BordbuchCommitResult> {
   let cachePath: string;
   try {
-    cachePath = await resolveCachePath(workspaceRoot, systemId);
+    cachePath = await resolveCacheClonePath(workspaceRoot, systemId);
   } catch {
     return { committed: false, commitSha: null, systemId, filesCommitted: [] };
   }

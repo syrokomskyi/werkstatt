@@ -30,7 +30,7 @@ import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { notausgangManifestSchema, type NotausgangManifest } from "@warpgogol/werkstatt/schemas";
 import { generateOperationId } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile } from "../werkstatt/atomic.ts";
-import { readRegistry, findEntry, resolveCachePath } from "../sternsystem/registry-io.ts";
+import { readSystemConfig, resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -158,12 +158,8 @@ export async function runNotausgangExport(
     );
   }
 
-  // Read registry for cosmic star and resolve the runnable site workspace.
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, systemId);
-  if (!entry) {
-    throw new Error(`[notausgang.export] system '${systemId}' not found in registry`);
-  }
+  // Read system config for cosmic star and resolve the runnable site workspace.
+  const config = await readSystemConfig(workspaceRoot, systemId);
   const siteWorkspace = await resolveSiteWorkspace(workspaceRoot, systemId);
 
   const operationId = generateOperationId();
@@ -202,7 +198,7 @@ export async function runNotausgangExport(
     }
 
     // Copy Bordbuch
-    const cacheDir = await resolveCachePath(workspaceRoot, systemId);
+    const cacheDir = resolveCacheClonePath(workspaceRoot, systemId);
     const bordbuchPath = path.join(cacheDir, "bordbuch", "events.ndjson");
     if (existsSync(bordbuchPath)) {
       await fs.mkdir(path.join(stagingDir, "bordbuch"), { recursive: true });
@@ -284,7 +280,7 @@ The \`bordbuch/events.ndjson\` file contains the complete mission and release hi
     const manifest = {
       schemaVersion: "1.0.0",
       systemId,
-      cosmicStar: entry.cosmicStar,
+      cosmicStar: config.cosmicStar,
       releaseId,
       exportedAt: new Date().toISOString(),
       platformVersion: releaseManifest.platformVersion ?? "unknown",

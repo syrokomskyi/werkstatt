@@ -21,8 +21,12 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { urlSchema, jsonldTypes, sitemapShape } from "@warpgogol/werkstatt-site/ontology/external-surfaces";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import {
+  urlSchema,
+  jsonldTypes,
+  sitemapShape,
+} from "@warpgogol/werkstatt-site/ontology/external-surfaces";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 export interface SurfaceContractValidateData {
   systemId: string | null;
@@ -48,7 +52,7 @@ export async function runSurfaceContractValidate(
   // Determine the site directory to validate
   let siteDir: string;
   if (systemId) {
-    siteDir = await resolveCachePath(workspaceRoot, systemId);
+    siteDir = await resolveCacheClonePath(workspaceRoot, systemId);
   } else {
     // Default: validate the first active system or the workspace root
     siteDir = workspaceRoot;

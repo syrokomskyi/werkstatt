@@ -20,7 +20,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readRegistry } from "../sternsystem/registry-io.ts";
+import { readServicesRegistry, discoverSystems } from "../sternsystem/registry-io.ts";
 import {
   listDnsRecords,
   createDnsRecord,
@@ -71,7 +71,7 @@ export async function runSubdomainRegister(
   const serviceId = flagString(input, "service");
   if (!serviceId) throw new Error("[subdomain.register] --service is required");
 
-  const registry = await readRegistry(workspaceRoot);
+  const registry = await readServicesRegistry(workspaceRoot);
   const service = resolveService(registry, serviceId);
 
   if (service.subdomains.length === 0) {
@@ -93,7 +93,8 @@ export async function runSubdomainRegister(
   const account = resolveAccountSubdomain(service, env);
 
   const subdomain = service.subdomains[0];
-  const zoneId = resolveZoneId(registry, subdomain.zone);
+  const { systems } = await discoverSystems(workspaceRoot);
+  const zoneId = resolveZoneId(systems, subdomain.zone);
   const expectedCnameContent = buildCnameContent(service.workerName, account);
   const expectedRoutePattern = buildRoutePattern(subdomain.domain);
 

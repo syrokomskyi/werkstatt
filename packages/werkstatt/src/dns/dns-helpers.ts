@@ -16,7 +16,10 @@ zone ID resolution, environment variable resolution, and record identity.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { dnsRecordFileSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
-import type { DnsRecordDeclaration, DnsRecordFile } from "@warpgogol/werkstatt-site/ontology/schemas";
+import type {
+  DnsRecordDeclaration,
+  DnsRecordFile,
+} from "@warpgogol/werkstatt-site/ontology/schemas";
 import { filterEnv, sourceDotenv } from "../leitstand/adapters/cloudflare-workers.ts";
 import { resolveZoneId } from "../subdomain/subdomain-helpers.ts";
 
@@ -60,12 +63,10 @@ export async function resolveDnsEnv(secretsFilePath?: string): Promise<Record<st
 }
 
 export function resolveZoneDomainForSystem(
-  registry: {
-    systems: Array<{ id: string; deployment?: { channels: { main: { url: string } } } }>;
-  },
+  systems: Array<{ id: string; deployment?: { channels: { main: { url: string } } } }>,
   systemId: string,
 ): string {
-  for (const system of registry.systems) {
+  for (const system of systems) {
     if (system.id !== systemId) continue;
     if (!system.deployment) continue;
     try {
