@@ -69,28 +69,6 @@ function makeEntryWithDeprecatedKind(
   return { ...base, hash };
 }
 
-async function writeRegistry(): Promise<void> {
-  const registryDir = path.join(tmpDir, "systems");
-  if (!existsSync(registryDir)) mkdirSync(registryDir, { recursive: true });
-  const yaml =
-    [
-      `schemaVersion: "1.0.0"`,
-      `systems:`,
-      `  - id: "${systemId}"`,
-      `    cosmicStar: Sirius`,
-      `    mirrors:`,
-      `      - path: "./cache/${systemId}"`,
-      `        storageType: non-bare`,
-      `    pinnedPlatform: "1.0.0"`,
-      `    currentMission: null`,
-      `    lastRelease: null`,
-      `    status: active`,
-      `    registeredAt: "2026-08-06T10:00:00.000Z"`,
-      `    notes: ""`,
-    ].join("\n") + "\n";
-  await fs.writeFile(path.join(registryDir, "registry.yaml"), yaml, "utf8");
-}
-
 async function writeBordbuch(entries: BordbuchEntry[]): Promise<void> {
   const cacheDir = path.join(tmpDir, "cache", systemId);
   const bordbuchDir = path.join(cacheDir, "bordbuch");
@@ -101,7 +79,6 @@ async function writeBordbuch(entries: BordbuchEntry[]): Promise<void> {
 
 beforeEach(async () => {
   tmpDir = mkdtempSync(path.join(os.tmpdir(), "tmp-bordbuch-migration-"));
-  await writeRegistry();
 });
 
 afterEach(async () => {

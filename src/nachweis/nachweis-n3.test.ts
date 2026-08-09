@@ -85,28 +85,6 @@ async function readBordbuchFile(): Promise<BordbuchEntry[]> {
   return lines.map((l) => JSON.parse(l) as BordbuchEntry);
 }
 
-async function writeRegistry(): Promise<void> {
-  const registryDir = path.join(tmpDir, "systems");
-  if (!existsSync(registryDir)) mkdirSync(registryDir, { recursive: true });
-  const yaml =
-    [
-      `schemaVersion: "1.0.0"`,
-      `systems:`,
-      `  - id: "${systemId}"`,
-      `    cosmicStar: Sirius`,
-      `    mirrors:`,
-      `      - path: "./cache/${systemId}"`,
-      `        storageType: non-bare`,
-      `    pinnedPlatform: "1.0.0"`,
-      `    currentMission: null`,
-      `    lastRelease: null`,
-      `    status: active`,
-      `    registeredAt: "2026-07-28T10:00:00.000Z"`,
-      `    notes: ""`,
-    ].join("\n") + "\n";
-  await fs.writeFile(path.join(registryDir, "registry.yaml"), yaml, "utf8");
-}
-
 async function writeEntitlements(): Promise<void> {
   const cacheDir = path.join(tmpDir, "cache", systemId);
   const srcDir = path.join(cacheDir, "src");
@@ -160,7 +138,6 @@ async function writeSystemMd(): Promise<void> {
 
 beforeEach(async () => {
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "nachweis-n3-test-"));
-  await writeRegistry();
   await writeEntitlements();
   await writeSystemMd();
 });

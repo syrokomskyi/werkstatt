@@ -36,19 +36,14 @@ vi.mock("../mission/mission-io.ts", () => ({
   ),
 }));
 
-// Mock registry-io — resolveCachePath returns the temp workspace's systems dir
+// Mock registry-io — provide system state for release commands
 vi.mock("../sternsystem/registry-io.ts", () => ({
-  resolveCachePath: vi.fn(async (_workspaceRoot: string, systemId: string) =>
-    join(mockWorkspace.value, "systems", systemId),
-  ),
-  readRegistry: vi.fn(async () => ({
-    systems: [{ id: "test-sys", lastRelease: "test-sys-r000001" }],
+  readSystemState: vi.fn(async (_workspaceRoot: string, _systemId: string) => ({
+    schemaVersion: "system-state/v1",
+    systemId: "test-sys",
+    lastRelease: "test-sys-r000001",
   })),
-  findEntry: vi.fn(
-    (registry: { systems: Array<{ id: string; lastRelease?: string }> }, id: string) =>
-      registry.systems.find((s) => s.id === id),
-  ),
-  writeRegistry: vi.fn(),
+  writeSystemState: vi.fn(),
 }));
 
 import { runReleaseStateValidate } from "../release/release-commands.ts";

@@ -137,47 +137,8 @@ async function readBordbuchFile(): Promise<BordbuchEntry[]> {
   return lines.map((l) => JSON.parse(l) as BordbuchEntry);
 }
 
-async function writeRegistry(): Promise<void> {
-  const registryDir = path.join(tmpDir, "systems");
-  if (!existsSync(registryDir)) mkdirSync(registryDir, { recursive: true });
-  const registry = {
-    schemaVersion: "1.0.0",
-    systems: [
-      {
-        id: systemId,
-        cosmicStar: "Sirius",
-        mirrors: [{ path: `./cache/${systemId}`, storageType: "non-bare" }],
-        pinnedPlatform: "1.0.0",
-        currentMission: null,
-        lastRelease: null,
-        status: "active",
-        registeredAt: "2026-07-28T10:00:00.000Z",
-        notes: "",
-      },
-    ],
-  };
-  const yaml =
-    [
-      `schemaVersion: "${registry.schemaVersion}"`,
-      `systems:`,
-      `  - id: "${systemId}"`,
-      `    cosmicStar: Sirius`,
-      `    mirrors:`,
-      `      - path: "./cache/${systemId}"`,
-      `        storageType: non-bare`,
-      `    pinnedPlatform: "1.0.0"`,
-      `    currentMission: null`,
-      `    lastRelease: null`,
-      `    status: active`,
-      `    registeredAt: "2026-07-28T10:00:00.000Z"`,
-      `    notes: ""`,
-    ].join("\n") + "\n";
-  await fs.writeFile(path.join(registryDir, "registry.yaml"), yaml, "utf8");
-}
-
 beforeEach(async () => {
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "bordbuch-repair-test-"));
-  await writeRegistry();
 });
 
 afterEach(async () => {
