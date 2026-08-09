@@ -35,6 +35,14 @@ import { diagnosticsResult } from "./result-helpers.ts";
 // RFC-0375: robots.txt is a Category B (registry-only) file.
 // No GENERATED_MARKER is emitted in the output.
 
+// RFC-0784: default Content-Signal directive — all Werkstatt sites have markdown twins.
+const DEFAULT_CONTENT_SIGNAL: string[] = [
+  "text/html",
+  "text/markdown",
+  "application/ld+json",
+  "text/plain",
+];
+
 // ---------------------------------------------------------------------------
 // robots.generate
 // ---------------------------------------------------------------------------
@@ -69,16 +77,11 @@ export async function runRobotsGenerate(
         crawlerAllowlist: robotsRaw.crawlerAllowlist as string[] | undefined,
         sitemap: (robotsRaw.sitemap as string | undefined) ?? defaultSitemap,
         customRules: robotsRaw.customRules as RobotsPolicy["customRules"],
-        contentSignal: (robotsRaw.contentSignal as string[] | undefined) ?? [
-          "text/html",
-          "text/markdown",
-          "application/ld+json",
-          "text/plain",
-        ],
+        contentSignal: (robotsRaw.contentSignal as string[] | undefined) ?? DEFAULT_CONTENT_SIGNAL,
       }
     : {
         sitemap: defaultSitemap,
-        contentSignal: ["text/html", "text/markdown", "application/ld+json", "text/plain"],
+        contentSignal: DEFAULT_CONTENT_SIGNAL,
       };
 
   const robotsTxt = buildRobotsTxt(policy);
