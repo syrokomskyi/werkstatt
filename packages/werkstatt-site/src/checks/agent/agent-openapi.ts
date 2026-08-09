@@ -1,4 +1,3 @@
-import { parse as yamlParse } from "yaml";
 /*
 <MODULE_CONTRACT>
 <purpose>
@@ -13,6 +12,7 @@ bijection (AGO-01..04).
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0289: initial OpenAPI generator + validator.</item>
+  <item>RFC-0783: extract shared helpers to agent-shared.ts.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,45 +28,14 @@ import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import {
   formatAgentOpenApi,
-  type AgentSurfaceManifest,
   type OpenApiDocument,
   type CapabilitySchemaInput,
 } from "@warpgogol/werkstatt-site/share/agent";
 import { loadCapabilityCatalog } from "./agent-capability.ts";
+import { loadInternalManifest, readAgentBlock } from "./agent-shared.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 
-const INTERNAL_MANIFEST_FILE = "src/agent-surface.generated.yaml";
 const OPENAPI_FILE = "public/.well-known/agent.openapi.json";
-
-interface AgentSystemBlock {
-  enabled?: boolean;
-}
-
-function readAgentBlock(manifest: unknown): AgentSystemBlock {
-  return ((manifest as Record<string, unknown>).agent as AgentSystemBlock | undefined) ?? {};
-}
-
-async function loadInternalManifest(
-  context: KernelRuntimeContext,
-  appDirectory: string,
-): Promise<AgentSurfaceManifest | null> {
-  const path = join(appDirectory, INTERNAL_MANIFEST_FILE);
-  if (!(await context.io.exists(path))) return null;
-  try {
-    const {
-      generatedMarker: _m,
-      doNotEdit: _d,
-      ownerCommand: _o,
-      editInstead: _e,
-      regenerateCommand: _r,
-      ...rest
-    } = yamlParse(await context.io.readFile(path)) as Record<string, unknown> &
-      AgentSurfaceManifest;
-    return rest as AgentSurfaceManifest;
-  } catch {
-    return null;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // agent.openapi.generate

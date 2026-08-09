@@ -12,11 +12,11 @@ agent.mcp-card.validate enforces well-formedness and manifest↔card bijection
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0783: initial MCP Server Card generator + validator.</item>
+  <item>RFC-0783: use shared helpers from agent-shared.ts.</item>
 </CHANGE_SUMMARY>
 */
 
 import { join } from "node:path";
-import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
   Diagnostic,
@@ -26,45 +26,11 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import {
-  buildMcpServerCard,
-  type AgentSurfaceManifest,
-  type McpServerCard,
-} from "@warpgogol/werkstatt-site/share/agent";
+import { buildMcpServerCard, type McpServerCard } from "@warpgogol/werkstatt-site/share/agent";
+import { loadInternalManifest, readAgentBlock } from "./agent-shared.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 
-const INTERNAL_MANIFEST_FILE = "src/agent-surface.generated.yaml";
 const MCP_CARD_FILE = "public/.well-known/mcp/server-card.json";
-
-interface AgentSystemBlock {
-  enabled?: boolean;
-}
-
-function readAgentBlock(manifest: unknown): AgentSystemBlock {
-  return ((manifest as Record<string, unknown>).agent as AgentSystemBlock | undefined) ?? {};
-}
-
-async function loadInternalManifest(
-  context: KernelRuntimeContext,
-  appDirectory: string,
-): Promise<AgentSurfaceManifest | null> {
-  const path = join(appDirectory, INTERNAL_MANIFEST_FILE);
-  if (!(await context.io.exists(path))) return null;
-  try {
-    const {
-      generatedMarker: _m,
-      doNotEdit: _d,
-      ownerCommand: _o,
-      editInstead: _e,
-      regenerateCommand: _r,
-      ...rest
-    } = yamlParse(await context.io.readFile(path)) as Record<string, unknown> &
-      AgentSurfaceManifest;
-    return rest as AgentSurfaceManifest;
-  } catch {
-    return null;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // agent.mcp-card.generate
