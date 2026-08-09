@@ -50,6 +50,7 @@ commands:
     - video.composition.validate
     - video.render.validate
     - video.assets.validate
+    - video.secret.scan
   added: []
   changed: []
   removed: []
@@ -300,7 +301,7 @@ The `video.render.validate` command renders the composition twice and compares s
 
 - [ ] `packages/werkstatt-video` exists with `profileId: "editframe"`
 - [ ] Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate`
-- [ ] `video.composition.validate`, `video.render.validate`, `video.assets.validate` registered
+- [ ] `video.composition.validate`, `video.render.validate`, `video.assets.validate`, `video.secret.scan` registered
 - [ ] `local-render` deploy adapter works (verified with a test composition)
 - [ ] `hooks.scaffoldProject` creates a valid Editframe composition that renders
 - [ ] WV-01..09 invariants formalized and enforced
