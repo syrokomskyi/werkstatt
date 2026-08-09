@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -46,7 +47,8 @@ commands:
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
-packagesImpacted: []
+packagesImpacted:
+  - packages/werkstatt  # engine package created by RFC-0772
 successSignals:
   - "werkstatt.plugin.validate passes in this workshop with the site plugin registered"
   - "Engine package typechecks with zero plugin imports"
@@ -54,6 +56,7 @@ nonGoals:
   - "No physical package consolidation — that is RFC-0772"
   - "No plugin implementations — those are RFC-0774..0778"
   - "No multi-plugin workshops"
+  - "No Compass XML sync — docs/*.xml synchronization is handled by RFC-0772 when the engine package is created"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -88,7 +91,7 @@ There is no contract answering: what exactly must a stack plugin provide, how do
 
 ## Decision
 
-The engine gains a **plugin contract** (`werkstatt/plugin@1`): a typed interface that a stack plugin implements and registers, plus a **profile binding** rule: `forge.yaml` `project.stack` resolves to a forge stack profile id, and the workshop's `tools/kernel.config.ts` composes the engine with the plugin whose `profileId` matches.
+The engine gains a **plugin contract** (`werkstatt/plugin@1`): a typed interface that a stack plugin implements and registers, plus a **profile binding** rule: `forge.yaml` `profile` field (RFC-0643) resolves to a forge stack profile id, and the workshop's `tools/kernel.config.ts` composes the engine with the plugin whose `profileId` matches.
 
 Key properties:
 
@@ -99,7 +102,8 @@ Key properties:
 
 ## Architectural fit
 
-- **DNA-64 (engine/plugin/workshop boundary, RFC-0769)** — this RFC is the contract that makes the boundary enforceable.
+- **DNA-1 (monorepo boundary)** — the plugin contract extends the packages boundary: the engine package (`@warpgogol/werkstatt`) is shared reusable logic in `packages/*`, and the plugin contract ensures it never imports site-specific code, preserving the separation that DNA-1 establishes.
+- **DNA-64 (engine/plugin/workshop boundary, RFC-0769)** — this RFC is the contract that makes the boundary enforceable. DNA-64 is not yet in `satisfies[]` because RFC-0769 is still `draft` and the invariant has not been appended to `docs/architecture-dna.md`. Once RFC-0769 is accepted and DNA-64 is registered, this RFC's `satisfies[]` must be amended to include DNA-64.
 - **DNA-46..49 (missions, materialization, releases, Leitstand)** — their commands become plugin-hook consumers; semantics unchanged.
 - **DNA-54 (forge bindings)** — same philosophy: stack values are data (profile + plugin), not engine code.
 - **Site OS operator model** — plugins register modules through the same `defineKernelConfig`/`moduleLoaders` machinery that `tools/kernel.config.ts` uses today; no parallel registration path.
@@ -148,16 +152,20 @@ export interface PluginRegistry {
 }
 ```
 
-Exact `KernelModule`, `KernelPipelineStep`, `DeployAdapterFactory` shapes are the existing kernel types, re-homed into the engine by RFC-0771/0772. The hook list above is the normative minimum; RFC-0772 may add hooks discovered during inversion of `mission-materialize.ts` and `leitstand-commands.ts`, provided each addition is recorded in this RFC's amendment or the implementation notes.
+Exact `KernelModule`, `KernelPipelineStep`, `DeployAdapterFactory` shapes are the existing kernel types, re-homed into the engine by RFC-0771/0772. The hook list is **closed at five hooks** (materialize, build, checkGate, releaseEvidence, scaffoldProject). Adding a new hook requires a superseding RFC, not an amendment. If RFC-0772's inversion of `mission-materialize.ts` and `leitstand-commands.ts` reveals a missing hook, a superseding RFC must be created.
+
+The `pipelines?` field is retained because plugins may need to contribute or extend workspace-level pipelines (e.g. `build.prepare` steps, `packages.check` extensions). The current `tools/kernel.config.ts` has only two workspace pipelines (`icons.generate`, `packages.check`), but the site plugin's build/check pipeline steps are currently hardcoded in engine commands — the inversion in RFC-0772 will move them into plugin-contributed pipeline steps.
 
 ### Profile binding
 
 | Layer | Key | Checked by |
 | --- | --- | --- |
-| `forge.yaml` `project.stack` | resolves to profile id | `forge.doctor` (existing) |
+| `forge.yaml` `profile` field (RFC-0643) | resolves to profile id | `forge.doctor` (existing) |
 | forge profile YAML | `id` (e.g. `phaser-turborepo`) | `profile.validate` (existing) |
 | plugin package | `profileId` | new `werkstatt.plugin.validate` |
 | workshop `tools/kernel.config.ts` | imports engine + one plugin | new `werkstatt.plugin.validate` |
+
+Note: `forge.yaml` `project.stack` is a technology array (e.g. `[typescript, astro, turborepo]`), not a profile id. Profile loading uses the separate `profile` field introduced by RFC-0643. The current workshop `forge.yaml` does not yet have a `profile` field — it will be added during the wave 4 migration (RFC-0776).
 
 ### CLI surface
 
@@ -180,16 +188,24 @@ Workspace scope. Verifies: exactly one plugin registered; plugin `profileId` mat
 
 ### Failure modes
 
-- Zero or multiple stack plugins registered → exit 1, `PLUGIN-01`.
-- `profileId` mismatch with `forge.yaml` stack → exit 1, `PLUGIN-02`.
-- Unresolvable module loader → exit 1, `PLUGIN-03`.
-- Deploy adapter referenced in registry but not provided → exit 1, `PLUGIN-04`.
+- Zero or multiple stack plugins registered → `PLUGIN-01`.
+- `profileId` mismatch with `forge.yaml` `profile` field → `PLUGIN-02`.
+- Unresolvable module loader → `PLUGIN-03`.
+- Deploy adapter referenced in registry but not provided → `PLUGIN-04`.
+- `tools/kernel.config.ts` not found → `PLUGIN-05`.
+
+**Transition behavior:** Until the workshop migrates to the engine+plugin model (wave 4, RFC-0776), `PLUGIN-01` (zero plugins) emits a **warning**, not an error. This allows `werkstatt.plugin.validate` to join `packages.check` immediately without breaking CI. After wave 4, all failure modes are enforce (exit 1).
 
 ## Rollout
 
 - The contract types land in the engine package (RFC-0772) before any plugin exists; the site plugin (RFC-0774/0775) is the first implementer and validates the contract shape.
-- `werkstatt.plugin.validate` joins `packages.check` and mission preflight once the site plugin is live.
+- `werkstatt.plugin.validate` joins `packages.check` immediately in **warn-only** mode: `PLUGIN-01` (zero plugins) is a warning, not an error. This workshop has no plugin until wave 4 (RFC-0776).
+- After wave 4 migration (RFC-0776), the validator switches to **enforce** mode: all failure modes return exit 1. The `forge.yaml` `profile` field is set during migration.
 - Game/video plugins (RFC-0777/0778) implement the same contract; any contract gap found there is fixed forward (no versioned `@2` unless breaking).
+
+### Performance notes
+
+`werkstatt.plugin.validate` performs: (1) dynamic import of each registered module loader (O(n) where n = module count, typically ~30), (2) one `forge.yaml` read + profile lookup, (3) one `systems/registry.yaml` read for deploy adapter cross-check. Expected duration: < 500ms for a workshop with 30 modules and a single registry entry. No recursive file scans.
 
 ## Alternatives considered
 
@@ -199,15 +215,17 @@ Workspace scope. Verifies: exactly one plugin registered; plugin `profileId` mat
 
 ## Risks
 
-- **Hook granularity.** Too coarse → plugins reimplement engine logic inside hooks; too fine → contract churn. Mitigation: hooks are derived from the actual call sites in `mission-materialize.ts`, `leitstand-commands.ts`, `release-commands.ts` during RFC-0772.
+- **Hook granularity.** Too coarse → plugins reimplement engine logic inside hooks; too fine → contract churn. Mitigation: the hook list is closed at five; if RFC-0772's inversion reveals a missing hook, a superseding RFC is required — this prevents silent contract drift.
 - **Hidden site assumptions.** Engine code may retain Astro-isms (e.g. `dist/client` layout). RFC-0772 must sweep for such literals and move them into `StackPathConventions`.
+- **Missing `tools/kernel.config.ts`.** A new consumer workshop may not have this file before `onboarding.scaffold` runs. `PLUGIN-05` handles this case with a clear error message directing the operator to run onboarding first.
 
 ## Acceptance criteria
 
-- [ ] `WerkstattPlugin`, `WerkstattPluginHooks`, `PluginRegistry` types defined in the engine package
+- [ ] `WerkstattPlugin`, `WerkstattPluginHooks`, `PluginRegistry` types defined in the engine package (`packages/werkstatt`)
 - [ ] `werkstatt.plugin.validate` registered (workspace scope) with documented `--json` output
-- [ ] PLUGIN-01..04 failure modes covered by unit tests
-- [ ] Profile binding cross-check implemented (plugin `profileId` ↔ forge stack profile)
+- [ ] PLUGIN-01..05 failure modes covered by unit tests
+- [ ] Profile binding cross-check implemented (plugin `profileId` ↔ `forge.yaml` `profile` field)
+- [ ] Warn-only behavior for PLUGIN-01 implemented and tested (transition period)
 - [ ] Root `AGENTS.md` documents the plugin contract for agents
 - [ ] `rfc.validate` passes on this file before merging
 
