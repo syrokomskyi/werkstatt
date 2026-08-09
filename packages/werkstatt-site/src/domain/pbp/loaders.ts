@@ -13,9 +13,14 @@
 
 import { getCollection, getEntry } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "@warpgogol/werkstatt-site/share/content";
+import {
+  getEntryLanguage,
+  stripEntryLanguage,
+  toDataEntryId,
+} from "@warpgogol/werkstatt-site/share/content";
 import { pbpSchemaById } from "./schemas/index.js";
 import { validateSchemaId } from "./schema-id.js";
+import { deepMerge } from "./utils/deep-merge.js";
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -41,27 +46,6 @@ export type PbpRepeatableEntry<TData> = {
 
 const entityCache = new Map<string, Promise<unknown>>();
 const collectionCache = new Map<string, Promise<PbpRepeatableEntry<unknown>[]>>();
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function deepMerge<T>(base: T, overlay: Partial<T>): T {
-  if (!isPlainObject(base) || !isPlainObject(overlay)) {
-    return (overlay ?? base) as T;
-  }
-  const result: Record<string, unknown> = { ...base };
-  for (const key of Object.keys(overlay)) {
-    const baseVal = (base as Record<string, unknown>)[key];
-    const overlayVal = (overlay as Record<string, unknown>)[key];
-    if (isPlainObject(baseVal) && isPlainObject(overlayVal)) {
-      result[key] = deepMerge(baseVal, overlayVal);
-    } else if (overlayVal !== undefined) {
-      result[key] = overlayVal;
-    }
-  }
-  return result as T;
-}
 
 function parseEntityData(schemaId: string, data: unknown): unknown {
   const schema = pbpSchemaById[schemaId];
