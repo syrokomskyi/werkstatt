@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,6 +25,7 @@ amendedBy: []
 related:
   - DNA-34
   - DNA-35
+  - DNA-58
   - RFC-0286
   - RFC-0289
   - RFC-0290
@@ -56,7 +58,6 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - packages/werkstatt-site
-  - packages/werkstatt
 successSignals:
   - isitagentready.com reports API Catalog present for warpgogol.com
   - isitagentready.com reports MCP Server Card present for warpgogol.com
@@ -129,6 +130,8 @@ pnpm exec werkstatt run agent.mcp-card.validate --site warpgogol-com
 
 All four commands are `scope: app`, `supportsAllSites: true`. No custom flags. They follow the same `agent.enabled` skip pattern as `agent.openapi.generate` — when `agent.enabled: false` in `system.md`, generate commands remove stale artifacts and validate commands are silent.
 
+**`mcp: null` edge case**: When `manifest.interfaces.mcp` is `null` (the agent surface has no MCP endpoint), `agent.mcp-card.generate` skips and removes any stale `server-card.json` file — same as the `agent.enabled: false` skip pattern. `agent.mcp-card.validate` is silent in this case.
+
 ### TypeScript contracts
 
 ```ts
@@ -189,6 +192,10 @@ function buildMcpServerCard(manifest: AgentSurfaceManifest): McpServerCard;
 | `packages/werkstatt-site/src/domain/share/agent/api-catalog.ts` | New module — `buildApiCatalog` pure projection |
 | `packages/werkstatt-site/src/domain/share/agent/mcp-card.ts` | New module — `buildMcpServerCard` pure projection |
 | `packages/werkstatt-site/src/checks/command-tables/29-agent-surface.ts` | Amended — four new command entries |
+| `packages/werkstatt-site/src/checks/generator-ownership.ts` | Amended — two new entries in `GENERATOR_OWNERSHIP_MAP` for `generated.drift.validate` coverage (DNA-58) |
+| `packages/werkstatt-site/src/codegen/templates/app-boilerplate/public/_headers.template` | Amended — add `Content-Type: application/linkset+json` block for `/.well-known/api-catalog` |
+| `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | Amended — two new generate commands after `agent.openapi.generate` |
+| `packages/werkstatt-site/src/checks/pipelines/sites-check-author.ts` | Amended — two new validate commands alongside `agent.openapi.validate` |
 
 ### Output format
 
@@ -252,7 +259,7 @@ Both validators exit non-zero on any error. `--json` output follows the standard
 - **Existing apps**: All apps with `agent.enabled !== false` (currently warpgogol-com) get the new files on their next `build.prepare` run. No flag day, no migration — the files are additive.
 - **New apps**: Onboarding scaffold already runs `agent.manifest.generate` + `agent.openapi.generate`; the new generators run automatically in the same pipeline step.
 - **`agent.enabled: false` apps**: Generate commands remove stale artifacts (same skip pattern as `agent.openapi.generate`).
-- **Signing**: Both files are candidates for `agent.surface.sign` in a follow-up amendment. For now, they ship unsigned — same as `agent.openapi.json` which is also not yet signed.
+- **Signing**: Both files are candidates for `agent.surface.sign` in a follow-up amendment. The existing `AgentProofArtifactKind` type (`"manifest" | "knowledge" | "openapi"`) would need extending to include `"api-catalog"` and `"mcp-card"`. For now, they ship unsigned — `agent.openapi.json` is already signable via `agent.surface.sign` when `PASSPORT_SIGNING_KEY` is set; the new files will get the same treatment in a follow-up.
 
 ## Alternatives considered
 
@@ -280,8 +287,12 @@ Both validators exit non-zero on any error. `--json` output follows the standard
 - [ ] `agent.enabled: false` skip pattern works (stale artifacts removed)
 - [ ] `/.well-known/api-catalog` served with `Content-Type: application/linkset+json` (via `_headers`)
 - [ ] `/.well-known/mcp/server-card.json` served with `Content-Type: application/json`
-- [ ] `isitagentready.com` reports both endpoints present for warpgogol.com after deploy
 - [ ] `rfc.validate` passes on this file before merging
+
+**Post-deploy success signals** (tracked in `successSignals`, not implementation acceptance criteria):
+
+- isitagentready.com reports API Catalog present for warpgogol.com
+- isitagentready.com reports MCP Server Card present for warpgogol.com
 
 ## Implementation notes for agents
 
