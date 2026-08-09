@@ -262,8 +262,8 @@ apps/*/public/api/agent/
 apps/*/src/agent-capabilities.generated.yaml
 
 # RFC-0354: Sternsystem cache clones, missions, releases, agents, and werkstatt state
-systems/*
-!systems/registry.yaml
+# RFC-0790: systems-cache/ is outside the monorepo (../systems-cache/{id}/), never committed
+systems-cache/
 !systems/methodologies.md
 !systems/axiom-suppressions.yaml
 missions/
