@@ -1,6 +1,0 @@
-urlEntry:
-  required: [loc]
-  optional: [lastmod, changefreq, priority, alternates]
-alternates:
-  required: [hreflang, href]
-  optional: []

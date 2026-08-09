@@ -1,6 +1,0 @@
-family: handwerk-trust-engineering
-version: 1.0.0
-rules:
-  - Prefer concrete business German over slogan language.
-  - Ban ROI guarantees and lead-count promises.
-  - Use direct, written-condition phrasing near CTAs and pricing.
