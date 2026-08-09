@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted AI policy, security.txt, and headers commands from public-surface.ts into public-surface/security.ts.</item>
   <item>RFC-0315: hardened headers.security.validate with HDR-01..04 rules (CSP wildcard, required directives, Markdown content-type, .well-known/agent freshness, hashed assets) and headers.runtime.probe with HDR-01..06 runtime checks.</item>
+  <item>RFC-0784: Add HDR-07 rule for agent discovery Link header presence in /* block.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -337,6 +338,24 @@ export async function runHeadersSecurityValidate(
         "Hashed assets (/_astro/*) must have Cache-Control: public, max-age=31536000, immutable.",
       fixHint: "Add the /_astro/* section with immutable caching to _headers.",
     });
+  }
+
+  // RFC-0784: HDR-07 — agent discovery Link headers must be present when agent.enabled !== false
+  const agentBlock = (app.manifest as unknown as Record<string, unknown>).agent as
+    { enabled?: boolean } | undefined;
+  const agentEnabled = agentBlock?.enabled !== false;
+  if (agentEnabled) {
+    const rootSection = extractHeadersSection(body, "/*");
+    if (!rootSection || !/Link:.*\.well-known\/agent\.json/i.test(rootSection)) {
+      msgs.push({
+        ruleId: "HDR-07",
+        severity: "error",
+        file: rel,
+        message:
+          "_headers /* block must contain Link header pointing to /.well-known/agent.json when agent.enabled !== false.",
+        fixHint: "Rerun public.infrastructure.generate.",
+      });
+    }
   }
 
   return diagnosticsResult("headers.security.validate", msgs);
