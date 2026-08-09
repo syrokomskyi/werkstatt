@@ -251,7 +251,7 @@ Accept: text/html
 
 - **No markdown twin exists**: The middleware calls `next()` and the static HTML is served. This is correct behavior — not all pages have twins (e.g. pages with `llms.depth: "off"`).
 - **Middleware fetch errors**: If the `fetch()` for the `.md` twin fails (network error, 404), the middleware falls through to `next()`. The user never sees an error page from the negotiation logic.
-- **`agent.enabled: false`**: The generator skips writing the middleware, removes any stale one, and unchains it from `index.ts` — same skip pattern as other agent surface generators.
+- **`agent.enabled: false`**: The generator writes a no-op pass-through middleware (so the root `middleware.ts` import always resolves) — same skip pattern as other agent surface generators, adapted for statically-imported middleware.
 - **`Vary: Accept` header**: Always set on negotiated responses to prevent cache poisoning (a cached markdown response being served to a browser requesting HTML).
 - **Non-page routes**: `resolveMarkdownTwinPath` returns `null` for `/api/*`, `/.well-known/*`, and static asset extensions, so the middleware passes through to `next()`.
 
@@ -260,7 +260,7 @@ Accept: text/html
 - **Pipeline integration**: `agent.markdown-negotiation.generate` runs in `build.prepare` after `page.markdown.generate`.
 - **Existing apps**: All apps with `agent.enabled !== false` get the middleware on their next `build.prepare` run. The middleware is additive — it only intercepts requests with `Accept: text/markdown`, all other requests pass through unchanged.
 - **New apps**: Onboarding scaffold runs `page.markdown.generate` and `agent.markdown-negotiation.generate` in the same pipeline step.
-- **`agent.enabled: false` apps**: Generator removes stale middleware and unchains it from `index.ts` (same skip pattern as `agent.openapi.generate`).
+- **`agent.enabled: false` apps**: Generator writes a no-op pass-through middleware so the root `middleware.ts` import always resolves (adapted skip pattern for statically-imported middleware).
 - **Dev mode**: The middleware runs in `astro dev`, so content negotiation can be tested locally with `curl -H "Accept: text/markdown" http://localhost:4321/about/`.
 - **CDN caching**: The `Vary: Accept` response header ensures the Cloudflare CDN caches separate responses for `Accept: text/markdown` and `Accept: text/html` requests. The `Cache-Control: public, max-age=300` header allows short-term CDN caching of negotiated markdown responses.
 
@@ -284,17 +284,17 @@ Accept: text/html
 
 ## Acceptance criteria
 
-- [ ] `agent.markdown-negotiation.generate` registered in command table `29-agent-surface.ts`
-- [ ] Middleware template created in `packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/middleware/markdown-negotiation.template.ts`
-- [ ] Middleware index template amended to chain `markdownNegotiationMiddleware`
-- [ ] `agent.markdown-negotiation.generate` integrated into `build.prepare` pipeline after `page.markdown.generate`
-- [ ] `agent.enabled: false` skip pattern works (stale middleware removed, unchained from index)
-- [ ] `curl -H "Accept: text/markdown" https://warpgogol.com/about/` returns `.md` twin with `Content-Type: text/markdown; charset=utf-8`
-- [ ] `curl -H "Accept: text/html" https://warpgogol.com/about/` returns HTML (unchanged behavior)
-- [ ] `Vary: Accept` header present on negotiated markdown responses
+- [x] `agent.markdown-negotiation.generate` registered in command table `29-agent-surface.ts` (evidence: packages/werkstatt-site/src/checks/command-tables/29-agent-surface.ts:189-200)
+- [x] Middleware template created in `packages/werkstatt-site/src/codegen/templates/service/src/middleware/markdown-negotiation.ts.template` (evidence: template file exists, follows `language-redirect.ts.template` pattern)
+- [x] Middleware index template amended to chain `markdownNegotiationMiddleware` (evidence: packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/middleware.template.ts:25,37-38)
+- [x] `agent.markdown-negotiation.generate` integrated into `build.prepare` pipeline after `page.markdown.generate` (evidence: packages/werkstatt-site/src/checks/pipelines/build-prepare.ts:112-113,215-216)
+- [x] `agent.enabled: false` skip pattern works — no-op pass-through middleware written so root import always resolves (evidence: packages/werkstatt-site/src/checks/agent/agent-markdown-negotiation.ts:64-76)
+- [ ] `curl -H "Accept: text/markdown" https://warpgogol.com/about/` returns `.md` twin with `Content-Type: text/markdown; charset=utf-8` (requires deploy)
+- [ ] `curl -H "Accept: text/html" https://warpgogol.com/about/` returns HTML (unchanged behavior) (requires deploy)
+- [ ] `Vary: Accept` header present on negotiated markdown responses (requires deploy)
 - [ ] `isitagentready.com` reports markdown content negotiation supported for warpgogol.com after deploy
-- [ ] Unit tests for `resolveMarkdownTwinPath` covering: root path, i18n paths, trailing slash, non-page routes, static assets
-- [ ] `rfc.validate` passes on this file before merging
+- [x] Unit tests for `resolveMarkdownTwinPath` covering: root path, i18n paths, trailing slash, non-page routes, static assets (evidence: packages/werkstatt-site/src/checks/agent/agent-markdown-negotiation.test.ts, 17 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0785` exits 0)
 
 ## Implementation notes for agents
 
