@@ -233,7 +233,7 @@ describe("genome-log", () => {
 
   describe("signGenomeEntry + verifyGenomeEntry", () => {
     it("should sign and verify an entry with a real Ed25519 keypair", async () => {
-      const { generateKeypair } = await import("@warpgogol/passport/sign");
+      const { generateKeypair } = await import("@warpgogol/werkstatt-site/passport/sign");
       const { privateKeyHex, publicKeyMultibase } = await generateKeypair();
 
       const entry = {
@@ -249,7 +249,7 @@ describe("genome-log", () => {
     });
 
     it("should fail verification with wrong public key", async () => {
-      const { generateKeypair } = await import("@warpgogol/passport/sign");
+      const { generateKeypair } = await import("@warpgogol/werkstatt-site/passport/sign");
       const keypair1 = await generateKeypair();
       const keypair2 = await generateKeypair();
 

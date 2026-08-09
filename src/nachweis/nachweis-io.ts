@@ -27,7 +27,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { parse as yamlParse } from "yaml";
 import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
-import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 

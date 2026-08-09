@@ -17,7 +17,7 @@ import {
   SITES_BUILD_PREPARE_DEV_PIPELINE,
   SITES_BUILD_CHECK_PIPELINE,
   SITES_BUILD_POST_PIPELINE,
-} from "@warpgogol/site-kernel-checks/pipelines";
+} from "@warpgogol/werkstatt-site/checks/pipelines";
 import { STANDARD_INTEGRITY_PIPELINE } from "@warpgogol/werkstatt/integrity";
 
 // moduleLoaders: each module is loaded lazily via dynamic import(), so that
@@ -42,11 +42,11 @@ export default defineKernelConfig({
     lagebild: async () => (await import("@warpgogol/werkstatt/kernel")).lagebildModule,
     "change-impact": async () => (await import("@warpgogol/werkstatt/kernel")).changeImpactModule,
     bordbuch: async () =>
-      (await import("@warpgogol/site-kernel-handoff")).createBordbuchModule(),
+      (await import("@warpgogol/werkstatt/handoff")).createBordbuchModule(),
     nachweis: async () =>
-      (await import("@warpgogol/site-kernel-handoff")).createNachweisModule(),
+      (await import("@warpgogol/werkstatt/handoff")).createNachweisModule(),
     onboarding: async () =>
-      (await import("@warpgogol/site-kernel-onboarding")).createOnboardingModule(),
+      (await import("@warpgogol/werkstatt-site/onboarding")).createOnboardingModule(),
   },
   pipelines: {
     "build.prepare": [...SITES_BUILD_PREPARE_PIPELINE],

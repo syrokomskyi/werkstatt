@@ -194,21 +194,21 @@ function buildValidateNextSteps(
   return dirtyCheck.dirty
     ? [
         {
-          action: `Commit uncommitted changes: pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"`,
+          action: `Commit uncommitted changes: pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"`,
           kind: "required",
         },
         {
-          action: `Then run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+          action: `Then run: pnpm exec werkstatt run mission.reconcile --mission ${missionId}`,
           kind: "optional",
         },
       ]
     : [
         {
-          action: `Run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+          action: `Run: pnpm exec werkstatt run mission.reconcile --mission ${missionId}`,
           kind: "optional",
         },
         {
-          action: `Then run: pnpm exec site-kernel run mission.close --mission ${missionId}`,
+          action: `Then run: pnpm exec werkstatt run mission.close --mission ${missionId}`,
           kind: "optional",
         },
       ];
@@ -610,7 +610,7 @@ export async function runMissionValidate(
       : "astro build failed";
     const failNextSteps: KernelNextStep[] = [
       {
-        action: `Fix the failing validators above, then re-run: pnpm exec site-kernel run mission.validate --mission ${missionId}`,
+        action: `Fix the failing validators above, then re-run: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
         kind: "required",
       },
     ];

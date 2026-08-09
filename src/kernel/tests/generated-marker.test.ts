@@ -41,7 +41,7 @@ test("buildGeneratedHeader: .ts uses line-slash comments", () => {
   expect(header.startsWith(`// ${GENERATED_MARKER}\n`)).toBeTruthy();
   expect(header).toMatch(/^\/\/ Owner command: kernel\.wire$/m);
   expect(header).toMatch(
-    /^\/\/ Regenerate:   pnpm exec site-kernel run kernel\.wire --site warpgogol-com$/m,
+    /^\/\/ Regenerate:   pnpm exec werkstatt run kernel\.wire --site warpgogol-com$/m,
   );
   expect(hasGeneratedMarker(header)).toBeTruthy();
 });
@@ -52,7 +52,7 @@ test("buildGeneratedHeader: .txt uses line-hash comments", () => {
     ownerCommand: "robots.generate",
   });
   expect(header.startsWith(`# ${GENERATED_MARKER}\n`)).toBeTruthy();
-  expect(header).toMatch(/^# Regenerate:   pnpm exec site-kernel run robots\.generate$/m);
+  expect(header).toMatch(/^# Regenerate:   pnpm exec werkstatt run robots\.generate$/m);
 });
 
 test("buildGeneratedHeader: .gitattributes uses line-hash comments", () => {
@@ -81,11 +81,11 @@ test("buildGeneratedHeader: .css uses one block comment", () => {
   const header = buildGeneratedHeader({
     filePath: "src/styles/biome.generated.css",
     ownerCommand: "biome.css.generate",
-    templatePath: "packages/os/site-kernel-codegen/src/biome-css.ts",
+    templatePath: "packages/werkstatt-site/src/codegen/biome-css.ts",
   });
   expect(header.startsWith("/*\n")).toBeTruthy();
   expect(header.trimEnd().endsWith("*/")).toBeTruthy();
-  expect(header).toMatch(/Edit instead: packages\/os\/site-kernel-codegen\/src\/biome-css\.ts/);
+  expect(header).toMatch(/Edit instead: packages\/werkstatt-site\/src\/codegen\/biome-css\.ts/);
 });
 
 test("stripGeneratedMarker removes the full line-comment advisory block", () => {

@@ -29,7 +29,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import {
   isNachweisEntitled,

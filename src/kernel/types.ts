@@ -168,7 +168,7 @@ export interface KernelCommandResult<TData = unknown> {
 // The single shape every static check uses to report a finding. Promoted from
 // the RFC-0074 audit finding (`auditFindingSchema`) and graduated into the
 // kernel so the contract lives next to KernelCommandResult and the failure
-// renderer (formatFailureDiagnostics). `@warpgogol/site-kernel-checks` provides the
+// renderer (formatFailureDiagnostics). `@warpgogol/werkstatt-site/checks` provides the
 // zod realization (`diagnosticSchema`).
 
 export type DiagnosticSeverity = "error" | "warning" | "info";

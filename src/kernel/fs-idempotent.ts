@@ -3,7 +3,7 @@
 <purpose>
   RFC-0345: idempotent file-write primitive. Canonical implementation now lives
   in @warpgogol/forge/src/utils/fs-idempotent.ts (RFC-0556 dependency inversion).
-  This file re-exports it for backward-compatible imports from @warpgogol/site-kernel.
+  This file re-exports it for imports from @warpgogol/werkstatt/kernel.
 </purpose>
 <non-goals>
   <item>Do not duplicate the implementation — always re-export from forge.</item>

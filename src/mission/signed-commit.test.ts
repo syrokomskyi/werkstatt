@@ -14,7 +14,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { createSignedCommit } from "./signed-commit.ts";
-import { generateKeypair } from "@warpgogol/passport/sign";
+import { generateKeypair } from "@warpgogol/werkstatt-site/passport/sign";
 
 function git(cwd: string, args: string): string {
   return execSync(`git ${args}`, {

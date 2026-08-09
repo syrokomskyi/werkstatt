@@ -25,7 +25,7 @@ import type {
   KernelFlagValue,
 } from "@warpgogol/werkstatt/kernel";
 import { StarCatalog, type StarName } from "@warpgogol/werkstatt-site/ontology/cosmic";
-import { parseBriefFrontmatter } from "@warpgogol/site-kernel-onboarding";
+import { parseBriefFrontmatter } from "@warpgogol/werkstatt-site/onboarding";
 import {
   readRegistry,
   writeRegistry,

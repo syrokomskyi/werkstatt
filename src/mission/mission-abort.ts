@@ -91,14 +91,14 @@ export async function runMissionAbort(
     const dirtyCheck = isWorkpieceDirty(workpieceDir);
     if (dirtyCheck.dirty) {
       throw new Error(
-        `[mission.abort] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run abort.`,
+        `[mission.abort] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run abort.`,
       );
     }
 
     const operatorCommits = countOperatorCommits(workpieceDir, manifest.migratedAt);
     if (operatorCommits.hasOperatorCommits && !manifest.reconciledAt) {
       throw new Error(
-        `[mission.abort] workpiece has ${operatorCommits.commitCount} unreconciled operator commit(s). These changes will be LOST on abort. Either:\n  1. Run \`pnpm exec site-kernel run mission.reconcile --mission ${missionId}\` then \`mission.close\` to preserve changes, OR\n  2. Manually revert the operator commits if the changes are not needed:\n${operatorCommits.commits.map((c) => `     ${c}`).join("\n")}`,
+        `[mission.abort] workpiece has ${operatorCommits.commitCount} unreconciled operator commit(s). These changes will be LOST on abort. Either:\n  1. Run \`pnpm exec werkstatt run mission.reconcile --mission ${missionId}\` then \`mission.close\` to preserve changes, OR\n  2. Manually revert the operator commits if the changes are not needed:\n${operatorCommits.commits.map((c) => `     ${c}`).join("\n")}`,
       );
     }
 

@@ -54,15 +54,15 @@ import {
   runGenerateScriptsOrchestrator,
   runFontsImportsGenerate,
   runBiomeCssGenerate,
-} from "@warpgogol/site-kernel-codegen";
-import { applyTokens, readTemplate, readRuntimeTemplate } from "@warpgogol/site-kernel-onboarding";
+} from "@warpgogol/werkstatt-site/codegen";
+import { applyTokens, readTemplate, readRuntimeTemplate } from "@warpgogol/werkstatt-site/onboarding";
 import {
   runEnvExampleGenerate,
   MISSION_PREFLIGHT_CRITICAL,
   MISSION_PREFLIGHT_WARNING,
   GENERATOR_OWNERSHIP_MAP,
   ensureChromium,
-} from "@warpgogol/site-kernel-checks";
+} from "@warpgogol/werkstatt-site/checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";

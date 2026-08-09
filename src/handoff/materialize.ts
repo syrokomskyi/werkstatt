@@ -97,7 +97,7 @@ export async function injectAuthoredSet(targetDir: string, loaded: LoadedBundle)
 
 function runKernel(workspaceRoot: string, args: string[]): Promise<number> {
   return new Promise((resolve) => {
-    const bin = path.join(workspaceRoot, "packages", "os", "site-kernel", "bin", "site-kernel.mjs");
+    const bin = path.join(workspaceRoot, "packages", "os", "site-kernel", "bin", "werkstatt.mjs");
     const child = spawn(process.execPath, [bin, ...args], {
       cwd: workspaceRoot,
       stdio: "inherit",

@@ -114,7 +114,7 @@ export async function runLagebildTenantAdd(
       `Tenant ${tenant.tenant_id} for site ${site} created (enabled: false).`,
       `Run the following commands to set secrets:`,
       ...commandsToRun,
-      `Then enable: pnpm exec site-kernel run lagebild.tenant.enable --site ${site}`,
+      `Then enable: pnpm exec werkstatt run lagebild.tenant.enable --site ${site}`,
     ].join("\n");
 
     return {

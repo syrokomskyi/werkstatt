@@ -13,4 +13,4 @@ export {
   runGenerateIcons,
   runCleanIcons,
   runGenerateOpenSourcePage,
-} from "@warpgogol/site-kernel-codegen";
+} from "@warpgogol/werkstatt-site/codegen";

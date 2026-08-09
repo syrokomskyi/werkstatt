@@ -23,7 +23,7 @@ describe("buildFailureDiagnostics", () => {
   });
 
   it("matches module-not-found pattern", () => {
-    const error = "Error: Cannot find module '@warpgogol/share' from '/path/to/file.ts'";
+    const error = "Error: Cannot find module '@warpgogol/werkstatt-site/share' from '/path/to/file.ts'";
     const diags = buildFailureDiagnostics(error);
     expect(diags[0].data?.patternId).toBe("module-not-found");
     expect(diags[0].fixHint).toContain("pnpm install");

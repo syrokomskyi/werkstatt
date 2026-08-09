@@ -160,8 +160,8 @@ function commentStyleForPath(filePath: string): GeneratedHeaderCommentStyle {
 export function buildGeneratedHeader(input: GeneratedHeaderInput): string {
   const style = commentStyleForPath(input.filePath);
   const regenerateCommand = input.site
-    ? `pnpm exec site-kernel run ${input.ownerCommand} --site ${input.site}`
-    : `pnpm exec site-kernel run ${input.ownerCommand}`;
+    ? `pnpm exec werkstatt run ${input.ownerCommand} --site ${input.site}`
+    : `pnpm exec werkstatt run ${input.ownerCommand}`;
   const editInstead = input.templatePath
     ? `Edit instead: ${input.templatePath}`
     : `Edit instead: the ${input.ownerCommand} generator source (not this file).`;

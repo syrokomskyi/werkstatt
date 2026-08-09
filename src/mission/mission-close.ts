@@ -246,7 +246,7 @@ export async function runMissionClose(
     const dirtyCheck = isWorkpieceDirty(workpieceDir);
     if (dirtyCheck.dirty) {
       throw new Error(
-        `[mission.close] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run close.`,
+        `[mission.close] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run close.`,
       );
     }
 
@@ -696,7 +696,7 @@ export async function runMissionClose(
             }
             if (!hasValidApplyResult) {
               throw new Error(
-                `[mission.close] CREG-05: Content drift exists but no review.yaml has been processed. Run: pnpm exec site-kernel run content.regression.review.generate --site ${manifest.systemId}`,
+                `[mission.close] CREG-05: Content drift exists but no review.yaml has been processed. Run: pnpm exec werkstatt run content.regression.review.generate --site ${manifest.systemId}`,
               );
             }
           }

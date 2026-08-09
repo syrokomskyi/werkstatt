@@ -161,7 +161,7 @@ test("runPipelineBudgetGenerate: empty history is a no-op (exit 0, writes nothin
 test("runPipelineBudgetGenerate: aggregates a real history file into the committed budgets file", async () => {
   const root = await mkdtemp(join(tmpdir(), "pipeline-budgets-"));
   try {
-    const historyDir = join(root, "node_modules", ".cache", "site-kernel", "telemetry");
+    const historyDir = join(root, "node_modules", ".cache", "werkstatt", "telemetry");
     await mkdir(historyDir, { recursive: true });
     const lines = Array.from({ length: 5 }, (_, i) =>
       JSON.stringify(record({ durationMs: (i + 1) * 1000 })),
@@ -193,7 +193,7 @@ test("appendStepTelemetry: writes a record retrievable via parseTelemetryHistory
     await appendStepTelemetry(root, record({ command: "x" }));
     await appendStepTelemetry(root, record({ command: "y" }));
     const raw = await readFile(
-      join(root, "node_modules", ".cache", "site-kernel", "telemetry", "steps.ndjson"),
+      join(root, "node_modules", ".cache", "werkstatt", "telemetry", "steps.ndjson"),
       "utf8",
     );
     const { records, skipped } = parseTelemetryHistory(raw);
