@@ -15,6 +15,14 @@ import type { KernelCommandInput, KernelRuntimeContext } from "../kernel/types.t
 
 let tmpDir: string;
 
+function resolveCacheDir(systemId: string): string {
+  return join(tmpDir, "..", "systems-cache", systemId);
+}
+
+function resolveDnsPath(systemId: string): string {
+  return join(resolveCacheDir(systemId), "dns-records.yaml");
+}
+
 beforeEach(() => {
   tmpDir = mkdtempSync(join(process.cwd(), "tmp-dns-schema-validate-"));
 });
@@ -31,9 +39,9 @@ function makeInput(flags: Record<string, unknown>): {
 }
 
 test("schema.validate: valid declaration file passes", async () => {
-  mkdirSync(join(tmpDir, "..", "systems-cache", "test-system"), { recursive: true });
+  mkdirSync(resolveCacheDir("test-system"), { recursive: true });
   writeFileSync(
-    join(tmpDir, "..", "systems-cache", "test-system", "dns-records.yaml"),
+    resolveDnsPath("test-system"),
     `kind: dns-records
 schemaVersion: 1
 zone: example.com
@@ -58,9 +66,9 @@ records:
 });
 
 test("schema.validate: invalid record type fails", async () => {
-  mkdirSync(join(tmpDir, "..", "systems-cache", "test-system"), { recursive: true });
+  mkdirSync(resolveCacheDir("test-system"), { recursive: true });
   writeFileSync(
-    join(tmpDir, "..", "systems-cache", "test-system", "dns-records.yaml"),
+    resolveDnsPath("test-system"),
     `kind: dns-records
 schemaVersion: 1
 zone: example.com
@@ -94,9 +102,8 @@ test("schema.validate: missing file is skipped (not an error)", async () => {
 });
 
 test("schema.validate: no --system scans all systems", async () => {
-  const cacheRoot = join(tmpDir, "..", "systems-cache");
   for (const id of ["sys-a", "sys-b"]) {
-    const cacheDir = join(cacheRoot, id);
+    const cacheDir = resolveCacheDir(id);
     mkdirSync(cacheDir, { recursive: true });
     writeFileSync(
       join(cacheDir, "system-config.yaml"),
@@ -114,7 +121,7 @@ notes: ""
     );
   }
   writeFileSync(
-    join(cacheRoot, "sys-a", "dns-records.yaml"),
+    resolveDnsPath("sys-a"),
     `kind: dns-records
 schemaVersion: 1
 zone: a.example.com
@@ -123,7 +130,7 @@ records: []
 `,
   );
   writeFileSync(
-    join(cacheRoot, "sys-b", "dns-records.yaml"),
+    resolveDnsPath("sys-b"),
     `kind: dns-records
 schemaVersion: 1
 zone: b.example.com
@@ -142,9 +149,9 @@ records: []
 });
 
 test("schema.validate: invalid schemaVersion fails", async () => {
-  mkdirSync(join(tmpDir, "..", "systems-cache", "test-system"), { recursive: true });
+  mkdirSync(resolveCacheDir("test-system"), { recursive: true });
   writeFileSync(
-    join(tmpDir, "..", "systems-cache", "test-system", "dns-records.yaml"),
+    resolveDnsPath("test-system"),
     `kind: dns-records
 schemaVersion: 2
 zone: example.com

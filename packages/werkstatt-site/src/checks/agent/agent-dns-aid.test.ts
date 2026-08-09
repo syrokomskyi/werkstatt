@@ -18,6 +18,10 @@ import { createDefaultIO } from "@warpgogol/werkstatt/kernel";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { runAgentDnsAidGenerate, runAgentDnsAidValidate } from "./agent-dns-aid.ts";
 
+function resolveDnsPath(context: KernelRuntimeContext): string {
+  return join(context.workspaceRoot, "..", "systems-cache", "test-site", "dns-records.yaml");
+}
+
 const SYSTEM_MD = `---
 app: test-site
 agent:
@@ -92,13 +96,7 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
       const result = await runAgentDnsAidGenerate(makeInput(), context);
       expect(result.exitCode).toBe(0);
       expect((result.data as Record<string, unknown>)?.action).toBe("created");
-      const dnsPath = join(
-        context.workspaceRoot,
-        "..",
-        "systems-cache",
-        "test-site",
-        "dns-records.yaml",
-      );
+      const dnsPath = resolveDnsPath(context);
       const content = await readFile(dnsPath, "utf8");
       expect(content).toContain("# BEGIN dns-aid");
       expect(content).toContain("# END dns-aid");
@@ -114,13 +112,7 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
     const { context, cleanup } = await fixture();
     try {
       await runAgentDnsAidGenerate(makeInput(), context);
-      const dnsPath = join(
-        context.workspaceRoot,
-        "..",
-        "systems-cache",
-        "test-site",
-        "dns-records.yaml",
-      );
+      const dnsPath = resolveDnsPath(context);
       const firstRun = await readFile(dnsPath, "utf8");
       const result = await runAgentDnsAidGenerate(makeInput(), context);
       expect((result.data as Record<string, unknown>)?.action).toBe("unchanged");
@@ -143,13 +135,7 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
       );
       const result = await runAgentDnsAidGenerate(makeInput(), context);
       expect((result.data as Record<string, unknown>)?.action).toBe("updated");
-      const dnsPath = join(
-        context.workspaceRoot,
-        "..",
-        "systems-cache",
-        "test-site",
-        "dns-records.yaml",
-      );
+      const dnsPath = resolveDnsPath(context);
       const content = await readFile(dnsPath, "utf8");
       expect(content).toContain("_agent.new-domain.com");
       expect(content).toContain("https://new-domain.com/.well-known/agent.json");
@@ -169,13 +155,7 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
       const systemMdPath = join(context.site!.directory, "src", "content", "system.md");
       await writeFile(systemMdPath, SYSTEM_MD);
       await runAgentDnsAidGenerate(makeInput(), context);
-      const dnsPath = join(
-        context.workspaceRoot,
-        "..",
-        "systems-cache",
-        "test-site",
-        "dns-records.yaml",
-      );
+      const dnsPath = resolveDnsPath(context);
       let content = await readFile(dnsPath, "utf8");
       expect(content).toContain("# BEGIN dns-aid");
 
@@ -230,13 +210,7 @@ describe("agent.dns-aid.validate (RFC-0786)", () => {
   it("reports AGD-01 when marked section is missing", async () => {
     const { context, cleanup } = await fixture();
     try {
-      const dnsPath = join(
-        context.workspaceRoot,
-        "..",
-        "systems-cache",
-        "test-site",
-        "dns-records.yaml",
-      );
+      const dnsPath = resolveDnsPath(context);
       await mkdir(join(context.workspaceRoot, "..", "systems-cache", "test-site"), {
         recursive: true,
       });
@@ -259,13 +233,7 @@ describe("agent.dns-aid.validate (RFC-0786)", () => {
       // Generate first
       await runAgentDnsAidGenerate(makeInput(), context);
       // Corrupt the content
-      const dnsPath = join(
-        context.workspaceRoot,
-        "..",
-        "systems-cache",
-        "test-site",
-        "dns-records.yaml",
-      );
+      const dnsPath = resolveDnsPath(context);
       let content = await readFile(dnsPath, "utf8");
       content = content.replace(
         "https://test-site.example.com/.well-known/agent.json",

@@ -289,7 +289,7 @@ ${stackSpecific}
 `;
 }
 
-function registryYaml(): string {
+function systemsCacheGitkeep(): string {
   return `# Sternsystem cache directory (RFC-0790)
 # Per-system config and state files live in systems-cache/<id>/
 systems-cache/.gitkeep
@@ -382,7 +382,7 @@ export function getWorkshopFiles(vars: WorkshopTemplateVars): WorkshopFile[] {
     },
     { path: "hooks/pre-commit", content: preCommit() },
     { path: ".github/workflows/ci.yml", content: ciYml(vars) },
-    { path: "systems-cache/.gitkeep", content: registryYaml() },
+    { path: "systems-cache/.gitkeep", content: systemsCacheGitkeep() },
     { path: "missions/.gitkeep", content: "" },
     { path: ".forge/pinned.yaml", content: pinnedYaml() },
     { path: "README.md", content: readmeMd(vars) },
