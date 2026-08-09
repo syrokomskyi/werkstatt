@@ -5,7 +5,7 @@ title: "Agent readiness discovery surface architecture"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-09
@@ -68,3 +68,8 @@ The agent readiness discovery surface is a multi-layer architecture with the Age
 - **MCP protocol evolution**: If the MCP Server Card spec (SEP-1649) changes, update `agent.mcp-card.generate` and re-run `build.prepare`.
 - **DNS-AID adoption**: If DNS-AID becomes a widely adopted standard, consider promoting the TXT record to a more structured DNS record type (e.g. SVCB).
 - **Implementation**: This ADR will be stamped `implemented` when RFC-0783 through RFC-0789 are all `implemented`. Reference commits will be listed at that time.
+- **Code-trace (2026-08-09)**: Verified architecture matches codebase for implemented RFCs:
+  - RFC-0783: `buildApiCatalog` in `packages/werkstatt-site/src/domain/share/agent/api-catalog.ts`, `buildMcpServerCard` in `packages/werkstatt-site/src/domain/share/agent/mcp-card.ts`, handlers in `packages/werkstatt-site/src/checks/agent/agent-api-catalog.ts` and `agent-mcp-card.ts`, command table entries in `29-agent-surface.ts`.
+  - RFC-0787: Pipeline wiring confirmed in `build-prepare.ts` (agent generators before `agent.surface.sign`) and `sites-check-author.ts` (validators after `agent.surface.validate`).
+  - RFC-0788: `markdownTwins`/`markdownAlternates` in `sitemap-helpers.ts` and `sitemap.ts`.
+  - Pending: RFC-0784, RFC-0785, RFC-0786, RFC-0789 (all `accepted`, not yet implemented).
