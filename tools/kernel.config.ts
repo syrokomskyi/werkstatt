@@ -155,6 +155,8 @@ export default defineKernelConfig({
       (await import("@warpgogol/werkstatt/os/werkstatt-plugin-module")).forgeWerkstattPluginModule,
     "werkstatt-autonomy": async () =>
       (await import("@warpgogol/werkstatt/os/werkstatt-autonomy-module")).werkstattAutonomyModule,
+    workshop: async () =>
+      (await import("@warpgogol/werkstatt/workshop-module")).createWorkshopModule(),
   },
   pipelines: {
     // Workspace-level pipelines
