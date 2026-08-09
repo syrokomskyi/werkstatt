@@ -5,7 +5,7 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 ## Monorepo layout
 
 - This repository is a Turborepo + pnpm-workspace monorepo on Astro 6 + TypeScript strict.
-- Deployable sites live as Sternsystemen registered in `systems/registry.yaml`. Each Sternsystem declares a `mirrors[]` array (RFC-0574): `mirrors[0]` is the non-bare cache clone (outside the monorepo), `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors. A pin file lives at `mirrors[0].path/system.pin.json`, and an active mission workpiece at `missions/<missionId>/workpiece/` when a mission is in progress. The `apps/*` directory is retired (RFC-0381); shared site composition conventions now live in `docs/authoring/site-composition.md`.
+- Deployable sites live as Sternsystemen discovered via convention-based per-system files in `systems-cache/{id}/` (RFC-0790): `system-config.yaml` (static config) and `system-state.yaml` (mutable state). Each Sternsystem declares a `mirrors[]` array (RFC-0574): `mirrors[0]` is the non-bare cache clone (outside the monorepo), `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors. A pin file lives at `mirrors[0].path/system.pin.json`, and an active mission workpiece at `missions/<missionId>/workpiece/` when a mission is in progress. The `apps/*` directory is retired (RFC-0381); shared site composition conventions now live in `docs/authoring/site-composition.md`.
 - Deployable backend runtime compositions live in `services/*`. Treat them as the backend analogue of site workspaces: thin wiring, runtime entrypoints, environment/store/queue selection, deployment config, and health checks only.
 - Shared and reusable libraries live in `packages/*` (`werkstatt` engine, `werkstatt-site` site plugin, `forge` governance, `warpgogol-skills` skill pack). The old `packages/os/*` and standalone domain packages are deleted (RFC-0776).
 - New sites must be created via `onboarding.scaffold`, not by copying an existing site.
@@ -15,7 +15,7 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 
 ## External mirror sync (RFC-0472, RFC-0574)
 
-- Each Sternsystem declares a `mirrors[]` array in `systems/registry.yaml`. `mirrors[0]` is the non-bare cache clone, `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors (git remotes, backup endpoints).
+- Each Sternsystem declares a `mirrors[]` array in `systems-cache/{id}/system-config.yaml` (RFC-0790). `mirrors[0]` is the non-bare cache clone, `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors (git remotes, backup endpoints).
 - `sternsystem.sync --id <id>` synchronizes all mirrors via star topology through `mirrors[0]` (cache clone). It pushes from cache to bare, then from bare to external git mirrors. Per-mirror failures are non-fatal. It is an **automatic pipeline step** — `mission.reconcile` calls it automatically after pushing to the bare repo when external mirrors are configured (RFC-0705).
 - `mission.reconcile` enforces `sternsystem.sync` automatically (RFC-0705): after `git push origin` to the bare repo, reconcile calls `sternsystem.sync --id <id>` via `executeKernelCommand` when `mirrors[2+]` exist. Sync failure is non-fatal (`logger.warn`). `mission.close` blocks before state transition if external mirrors are out of sync (`mirrorInSync === false` and `mirrors.length > 2`). The manual `sternsystem.sync` invocation remains available for ad-hoc sync needs.
 - `mission.close` also calls `sternsystem.sync` automatically (RFC-0762): after all cache clone commits (werkstatt, pin, bordbuch) and before writing `.materialization-state.json`, close invokes `sternsystem.sync --id <id>` when `mirrors[2+]` exist. This propagates close-created commits to external mirrors. Sync failure is non-fatal (`logger.warn`) — the mission is already closed (irreversible), the operator can retry manually. The `closeReport.mirror.synced` and `closeReport.mirror.syncError` fields track the sync result.
@@ -335,9 +335,9 @@ Rules:
 
 ### Service deployment (RFC-0751)
 
-Shared Cloudflare Worker services in `services/*` are deployed via `leitstand.service.deploy --service <id>`. This command runs preflight checks, subdomain validation (RFC-0752), `wrangler deploy`, health checks, and records deployment state atomically in `systems/registry.yaml`.
+Shared Cloudflare Worker services in `services/*` are deployed via `leitstand.service.deploy --service <id>`. This command runs preflight checks, subdomain validation (RFC-0752), `wrangler deploy`, health checks, and records deployment state atomically in `services/registry.yaml`.
 
-- Services MUST be registered in the `services:` key of `systems/registry.yaml`.
+- Services MUST be registered in `services/registry.yaml`.
 - Worker names MUST match the service id (directory name, `package.json` name, `wrangler.jsonc` name).
 - Per-service `deploy` scripts in `package.json` are removed — deployment is centralized.
 - `service.registry.validate` and `service.naming.validate` enforce registry integrity and naming conventions.
@@ -347,7 +347,7 @@ Avoid double `mission.open` calls:
 
 - Check the command output for `[OK]` before considering the mission opened.
 - If the command returns `already has open mission`, the first call succeeded — do not retry.
-- When in doubt, verify `systems/registry.yaml` (`currentMission` field) before attempting `mission.open` again.
+- When in doubt, verify `systems-cache/{id}/system-state.yaml` (`currentMission` field) before attempting `mission.open` again.
 
 ## Session-end discipline (RFC-0581)
 
@@ -676,8 +676,8 @@ The Werkstatt engine is a family of private npm packages developed in this monor
 
 - **Engine** — `@warpgogol/werkstatt`: stack-agnostic lifecycle platform (kernel runtime, missions, mirrors, releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, consistency primitives, fingerprint, integrity, observability).
 - **Plugin** — `@warpgogol/werkstatt-<stack>`: stack-specific package implementing the plugin contract (path conventions, validators, codegen, content handling, onboarding templates, deploy adapters, stack invariants). Plugins: `werkstatt-site` (Astro), `werkstatt-game` (Phaser), `werkstatt-video` (Editframe).
-- **Workshop** — consumer monorepo (pnpm + Turborepo) that installs the engine + exactly one plugin from npm. Contains `forge.yaml`, `tools/kernel.config.ts`, `systems/registry.yaml`, `missions/`, `docs/`, `.agents/`, hooks, CI.
-- **Project** — a Sternsystem registered in the workshop's `systems/registry.yaml`, living outside the workshop in mirrors per RFC-0574.
+- **Workshop** — consumer monorepo (pnpm + Turborepo) that installs the engine + exactly one plugin from npm. Contains `forge.yaml`, `tools/kernel.config.ts`, `systems-cache/`, `missions/`, `docs/`, `.agents/`, hooks, CI.
+- **Project** — a Sternsystem discovered via `systems-cache/{id}/system-config.yaml` in the workshop, living outside the workshop in mirrors per RFC-0574.
 - **Stack profile** — a forge profile YAML declaring the workshop's stack. The profile id binds forge, the engine, and the plugin.
 
 ### Package taxonomy
