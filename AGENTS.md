@@ -646,3 +646,47 @@ Standard five-role vocabulary: needs-triage, needs-info, ready-for-agent, ready-
 ### Domain docs
 
 Multi-context layout: `CONTEXT-MAP.md` at root points to per-context `CONTEXT.md` files. See `docs/agents/domain.md`.
+
+## Werkstatt engine program (RFC-0769, DNA-64)
+
+The Werkstatt engine is a family of private npm packages developed in this monorepo and published via `@warpgogol/repo-extract`. The program extracts the stack-agnostic lifecycle platform from `packages/os/*` into a consolidated engine package, with stack-specific logic in plugin packages.
+
+### Terminology (normative for all downstream RFCs)
+
+- **Engine** — `@warpgogol/werkstatt`: stack-agnostic lifecycle platform (kernel runtime, missions, mirrors, releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, consistency primitives, fingerprint, integrity, observability).
+- **Plugin** — `@warpgogol/werkstatt-<stack>`: stack-specific package implementing the plugin contract (path conventions, validators, codegen, content handling, onboarding templates, deploy adapters, stack invariants). Plugins: `werkstatt-site` (Astro), `werkstatt-game` (Phaser), `werkstatt-video` (Editframe).
+- **Workshop** — consumer monorepo (pnpm + Turborepo) that installs the engine + exactly one plugin from npm. Contains `forge.yaml`, `tools/kernel.config.ts`, `systems/registry.yaml`, `missions/`, `docs/`, `.agents/`, hooks, CI.
+- **Project** — a Sternsystem registered in the workshop's `systems/registry.yaml`, living outside the workshop in mirrors per RFC-0574.
+- **Stack profile** — a forge profile YAML declaring the workshop's stack. The profile id binds forge, the engine, and the plugin.
+
+### Package taxonomy
+
+| npm package | Contents | Source |
+| --- | --- | --- |
+| `@warpgogol/werkstatt` | Engine (one consolidated package) | `packages/werkstatt` |
+| `@warpgogol/werkstatt-site` | Site plugin: Astro engine modules + full site domain layer | `packages/werkstatt-site` |
+| `@warpgogol/werkstatt-game` | Game plugin (phaser-turborepo profile) | `packages/werkstatt-game` |
+| `@warpgogol/werkstatt-video` | Video plugin (editframe profile) | `packages/werkstatt-video` |
+| `@warpgogol/forge` | Governance (unchanged, already published) | `packages/forge` |
+| `@warpgogol/repo-extract` | Extraction tool (unchanged, external) | external repo |
+
+### Program principles
+
+1. **Dependency inversion** — the engine never imports a plugin. Plugins import engine contracts and register through the plugin registry (RFC-0770). Enforced by an autonomy guard.
+2. **Dogfooding** — this monorepo remains the site workshop and consumes engine + site plugin as `workspace:*` during development; external workshops consume the same code from npm.
+3. **No legacy** — no compatibility shims, no re-export stubs, no backward-compatible migrators. Retired packages are deleted after consolidation.
+4. **Publication via repo-extract** — each published package carries an `extract.config.yaml`; publication happens from an external extraction folder (RFC-0773).
+5. **Workshop layout is stable** — the workshop directory contract (registry, missions, docs, hooks, tools, environment) does not change shape; only where the engine code comes from changes.
+
+### Wave plan
+
+| Wave | RFCs | Content |
+| --- | --- | --- |
+| 0 | RFC-0769 | Charter (this program) |
+| 1 | RFC-0770, RFC-0771 | Plugin contract; engine core composition |
+| 2 | RFC-0772, RFC-0773 | Physical consolidation + plugin registry; publication pipeline |
+| 3 | RFC-0774, RFC-0775 | Site plugin: engine modules; domain layer |
+| 4 | RFC-0776 | Migrate this workshop to consolidated packages |
+| 5 | RFC-0777, RFC-0778, RFC-0779 | Game plugin; video plugin; consumer workshop scaffolding |
+
+Waves execute sequentially; RFCs inside a wave may proceed in parallel. Implementation happens in separate sessions, one RFC at a time.
