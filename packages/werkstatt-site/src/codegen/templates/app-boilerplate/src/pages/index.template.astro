@@ -18,15 +18,15 @@
 </CHANGE_SUMMARY>
 */
 
-import { getRouteRegistry } from "@warpgogol/share";
-import { resolvePageRoute } from "@warpgogol/share/astro/page-handler";
-import type { SemanticPageType } from "@warpgogol/share/semantic";
-import { buildPageSemanticModel, buildPbpSemanticProfile, loadTargetCurrencies } from "@warpgogol/pbp/semantic-profile";
-import BaseLayout from "@warpgogol/ui/components/layout";
-import BlocksRenderer from "@warpgogol/ui/blocks-renderer.astro";
-import GrowthProvider from "@warpgogol/growth/provider.astro";
-import Header from "@warpgogol/ui/components/header";
-import Footer from "@warpgogol/ui/components/footer";
+import { getRouteRegistry } from "@warpgogol/werkstatt-site/share";
+import { resolvePageRoute } from "@warpgogol/werkstatt-site/share/astro/page-handler";
+import type { SemanticPageType } from "@warpgogol/werkstatt-site/share/semantic";
+import { buildPageSemanticModel, buildPbpSemanticProfile, loadTargetCurrencies } from "@warpgogol/werkstatt-site/pbp/semantic-profile";
+import BaseLayout from "@warpgogol/werkstatt-site/ui/components/layout";
+import BlocksRenderer from "@warpgogol/werkstatt-site/ui/blocks-renderer.astro";
+import GrowthProvider from "@warpgogol/werkstatt-site/growth/provider.astro";
+import Header from "@warpgogol/werkstatt-site/ui/components/header";
+import Footer from "@warpgogol/werkstatt-site/ui/components/footer";
 import globalStylesheetUrl from "@styles/global.css?url";
 
 const siteUrl = Astro.site?.toString() ?? Astro.url.origin;

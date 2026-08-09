@@ -22,7 +22,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   // RFC-0571: regenerate root config files from templates before any validation or codegen

@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { diagnosticsResult } from "./result-helpers.ts";

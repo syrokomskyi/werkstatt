@@ -15,13 +15,13 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileExists as pathExists } from "@warpgogol/werkstatt-site/share/fs";
 import { PlanetCatalog, MoonCatalog } from "@warpgogol/werkstatt-site/ontology";
-import { writeFileAtomic } from "@warpgogol/site-kernel";
+import { writeFileAtomic } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   ARCHETYPE_REGISTRY_FILENAME,
   FRAMEWORK_INTERNAL_ARCHETYPES,

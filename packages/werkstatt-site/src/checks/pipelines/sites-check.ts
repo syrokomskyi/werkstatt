@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 import { SITES_CHECK_AUTHOR_PIPELINE } from "./sites-check-author.ts";
 import { SITES_CHECK_POSTBUILD_PIPELINE } from "./sites-check-postbuild.ts";
 

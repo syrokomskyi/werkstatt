@@ -20,7 +20,7 @@ async function createWorkspace(): Promise<string> {
     "apps/site",
     "services/worker",
     "packages/share",
-    "packages/os/site-kernel",
+    "packages/werkstatt",
     "packages/ignored",
     "packages/-draft",
   ]) {
@@ -31,9 +31,11 @@ async function createWorkspace(): Promise<string> {
   await writeJson(join(root, "services/worker/package.json"), {
     name: "@warpgogol/worker",
   });
-  await writeJson(join(root, "packages/share/package.json"), { name: "@warpgogol/share" });
-  await writeJson(join(root, "packages/os/site-kernel/package.json"), {
-    name: "@warpgogol/werkstatt/kernel",
+  await writeJson(join(root, "packages/share/package.json"), {
+    name: "@warpgogol/werkstatt-site/share",
+  });
+  await writeJson(join(root, "packages/werkstatt/package.json"), {
+    name: "@warpgogol/werkstatt",
   });
   await writeJson(join(root, "packages/ignored/package.json"), { name: "@warpgogol/ignored" });
   await writeJson(join(root, "packages/-draft/package.json"), { name: "@warpgogol/draft" });
@@ -47,8 +49,8 @@ test("discoverWorkspacePackages expands and classifies supported workspace globs
     expect(result.packageGlobs).toEqual(["apps/*", "packages/*", "packages/os/*", "services/*"]);
     expect(result.packages.map((pkg) => [pkg.directory, pkg.workspacePattern, pkg.kind])).toEqual([
       ["apps/site", "apps/*", "app"],
-      ["packages/os/site-kernel", "packages/os/*", "os-package"],
       ["packages/share", "packages/*", "package"],
+      ["packages/werkstatt", "packages/*", "package"],
       ["services/worker", "services/*", "service"],
     ]);
     expect(result.diagnostics.length).toBe(0);

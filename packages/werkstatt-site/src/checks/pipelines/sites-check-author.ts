@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   // Wave 0 (RFC-0023): Uni UI Ontology manifest contract + registry freshness

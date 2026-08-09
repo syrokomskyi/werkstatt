@@ -24,12 +24,12 @@
 import { join, relative, basename, extname } from "node:path";
 import { readFile, writeFile, mkdir, stat, rm } from "node:fs/promises";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import type { ImageVariantEntry, ImageVariantManifest } from "@warpgogol/werkstatt-site/share/image-provider";

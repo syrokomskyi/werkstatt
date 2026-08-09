@@ -30,7 +30,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import {
@@ -120,7 +120,7 @@ const HOW_TO_OBTAIN: Readonly<Record<string, string>> = {
     "Generate a random secret: openssl rand -hex 32. Used to verify QStash webhook signatures.",
   SUPABASE_BUFFER_URL: "Supabase Dashboard → Settings → General → Project URL.",
   SUPABASE_BUFFER_SERVICE_KEY: "Supabase Dashboard → Settings → API → service_role key.",
-  SUPABASE_BUFFER_TENANT_ID: "Run: pnpm exec site-kernel run lagebild.tenant.add --site <name>.",
+  SUPABASE_BUFFER_TENANT_ID: "Run: pnpm exec werkstatt run lagebild.tenant.add --site <name>.",
   UPSTASH_QSTASH_URL: "Upstash Console → QStash → EU Region → Overview → Quickstart → QSTASH_URL.",
   UPSTASH_QSTASH_TOKEN: "Upstash Console → QStash → COPY/DELETE tokens section.",
   UPSTASH_QSTASH_CURRENT_SIGNING_KEY: "Upstash Console → QStash → Settings → Current signing key.",

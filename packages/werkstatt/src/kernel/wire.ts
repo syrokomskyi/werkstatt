@@ -16,7 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "./types.ts";
 import { discoverSiteWorkspaces } from "./discovery.ts";
-import { loadSystemManifestSync } from "@warpgogol/site-kernel-content";
+import { loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";
 import { buildGeneratedHeader, hasGeneratedMarker } from "./generated-marker.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -49,7 +49,7 @@ type ModuleDecision = {
 
 // RFC-0336: repo-relative root for wire template files, used to build the
 // "Edit instead:" line of the advisory header — never hand-roll the marker here.
-const WIRE_TEMPLATES_REPO_RELATIVE = "packages/os/site-kernel/src/templates/wire";
+const WIRE_TEMPLATES_REPO_RELATIVE = "packages/werkstatt/src/kernel/templates/wire";
 
 function wireContent(templateRelPath: string, siteName: string, content: string): string {
   const header = buildGeneratedHeader({
@@ -133,7 +133,7 @@ function buildModuleDecisions(
     },
     {
       key: "onboarding",
-      include: hasPackage(packageJson, "@warpgogol/site-kernel-onboarding"),
+      include: hasPackage(packageJson, "@warpgogol/werkstatt-site/onboarding"),
       reason: "onboarding package not installed",
     },
     {
@@ -315,7 +315,7 @@ export async function runKernelWire(
     },
     {
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "service.ts"),
-      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-codegen", [
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/werkstatt-site/codegen", [
         "runGenerateIcons",
         "runCleanIcons",
         "runGenerateOpenSourcePage",
@@ -323,7 +323,7 @@ export async function runKernelWire(
     },
     {
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "client-export.ts"),
-      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-deploy", [
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/werkstatt-site/deploy", [
         "runClientExport",
       ]),
     },

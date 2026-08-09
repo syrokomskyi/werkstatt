@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { ok, fail, type Violation, type CheckResult } from "./shared.ts";
 
 const UI_DIRS = [

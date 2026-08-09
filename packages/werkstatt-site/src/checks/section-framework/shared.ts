@@ -14,7 +14,7 @@ section-framework validator suite (RFC-0111).</purpose>
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { parseAstroFile, type AstroParseHandle } from "../lib/astro-parse.ts";
 import type { TagLikeNode } from "@astrojs/compiler/types";
 

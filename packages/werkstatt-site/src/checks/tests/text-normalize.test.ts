@@ -7,7 +7,7 @@ import {
   runTextNormalizeValidate,
   runTextNormalizeRulesList,
 } from "../text-normalize.ts";
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { makeTestContext, makeTestSiteContext } from "./helpers.ts";
 
 /*

@@ -17,7 +17,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
 import {
   createSignozApiClient,
   type SignozAlertRule,

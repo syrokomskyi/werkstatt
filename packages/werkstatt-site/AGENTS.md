@@ -37,8 +37,8 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - This package owns the Werkstatt site plugin: Astro path conventions, content validation, codegen, onboarding, audit, check-warpgogol, changelog renderers, and deploy adapter.
 - The plugin implements `werkstatt/plugin@1` (RFC-0770) with `profileId: "astro-typescript-turborepo"`.
 - The plugin registers site-stack engine modules via `moduleLoaders` and provides deploy adapters.
-- Re-export shims in old packages (`packages/os/site-kernel-*`) preserve backward-compatible import paths during the transition period (RFC-0774 → RFC-0776).
-- Full inversion of engine→stack imports through plugin hooks is deferred to RFC-0776.
+- RFC-0776 completed the migration: old packages (`packages/os/site-kernel-*`) are deleted. All imports now go through `@warpgogol/werkstatt-site` subpath exports.
+- Engine→stack imports are inverted through plugin hooks (RFC-0774/0775).
 
 ## Module layout
 
@@ -94,7 +94,7 @@ Domain modules import from each other via subpath exports: `@warpgogol/werkstatt
 
 ### Workshop-wide rewrite
 
-Other packages that still import from the old `@warpgogol/<name>` packages will break until RFC-0776 rewrites those imports. This is expected during the transition wave.
+RFC-0776 completed the import sweep. All packages and services now import from `@warpgogol/werkstatt` and `@warpgogol/werkstatt-site` subpath exports. Old `@warpgogol/<name>` packages are deleted.
 
 ### Consolidation gotchas (RFC-0775)
 

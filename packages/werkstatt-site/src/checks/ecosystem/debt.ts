@@ -11,19 +11,19 @@
 </CHANGE_SUMMARY>
 */
 
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import {
   discoverSiteWorkspaces,
   executeKernelCommand,
   listRegisteredKernelCommands,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { ADVISORY_APP_COMMANDS, type MaintenanceDebtReport } from "./types.ts";
 
 const HASH_PREFIX = "sha" + "256:";

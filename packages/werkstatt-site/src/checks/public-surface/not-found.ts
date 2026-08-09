@@ -16,7 +16,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
 import { diagnostics, loadPublicContext, readTextIfExists, workspaceRel } from "./shared.ts";
 import { passResult } from "../result-helpers.ts";

@@ -25,7 +25,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
@@ -65,7 +65,7 @@ export const RESERVED_HELPERS: Record<string, { importPath: string; canonicalFil
     canonicalFile: "packages/os/site-kernel-content/src/content-files.ts",
   },
   discoverWorkspacePackages: {
-    importPath: "@warpgogol/site-kernel",
+    importPath: "@warpgogol/werkstatt/kernel",
     canonicalFile: "packages/os/site-kernel/src/workspace-discovery.ts",
   },
 };

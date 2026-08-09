@@ -15,7 +15,7 @@ import { readFile, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 export interface ContentDisciplinePaths {
   appDirectory: string;

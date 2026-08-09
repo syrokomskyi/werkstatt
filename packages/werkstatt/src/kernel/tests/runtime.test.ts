@@ -54,7 +54,7 @@ test("parseKernelArgv separates args and flags", () => {
 });
 
 test("discoverSiteWorkspaces finds configured apps", async () => {
-  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "site-kernel-workspace-"));
+  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "werkstatt-workspace-"));
   const appRoot = path.join(workspaceRoot, "apps", "demo");
   const toolsRoot = path.join(appRoot, "tools");
 
@@ -85,7 +85,7 @@ test("discoverSiteWorkspaces finds configured apps", async () => {
 });
 
 test("findWorkspaceRoot walks upward to the pnpm workspace", async () => {
-  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "site-kernel-root-"));
+  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "werkstatt-root-"));
   const nestedDirectory = path.join(workspaceRoot, "apps", "demo", "src");
 
   await fs.mkdir(nestedDirectory, { recursive: true });
@@ -101,7 +101,7 @@ test("findWorkspaceRoot walks upward to the pnpm workspace", async () => {
 });
 
 test("executeKernelPipeline runs workspace pipelines without an app target", async () => {
-  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "site-kernel-pipeline-"));
+  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "werkstatt-pipeline-"));
   const toolsRoot = path.join(workspaceRoot, "tools");
 
   await fs.mkdir(toolsRoot, { recursive: true });

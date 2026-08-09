@@ -26,7 +26,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 interface TsconfigViolation {

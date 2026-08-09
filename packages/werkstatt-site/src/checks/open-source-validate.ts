@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadI18nConfigSync, loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";
 import { diagnosticsResult } from "./result-helpers.ts";

@@ -36,8 +36,8 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { byteHash, stableJsonHash } from "@warpgogol/fingerprint";
+} from "@warpgogol/werkstatt/kernel";
+import { byteHash, stableJsonHash } from "@warpgogol/werkstatt/fingerprint";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type { SemanticBlock, SemanticFaqEntry, SemanticPageModel } from "@warpgogol/werkstatt-site/share/semantic";
@@ -360,7 +360,7 @@ function diffToDiagnostics(diff: ContentRegressionDiff): Diagnostic[] {
       severity: "error",
       message: `Route '${route}' exists in current snapshot but not in golden.`,
       fixHint:
-        "New route detected. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>",
+        "New route detected. Run: pnpm exec werkstatt run content.regression.review.generate --site <systemId>",
     });
   }
   for (const route of diff.removedRoutes) {
@@ -369,7 +369,7 @@ function diffToDiagnostics(diff: ContentRegressionDiff): Diagnostic[] {
       severity: "error",
       message: `Route '${route}' exists in golden snapshot but not in current.`,
       fixHint:
-        "Removed route detected. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>",
+        "Removed route detected. Run: pnpm exec werkstatt run content.regression.review.generate --site <systemId>",
     });
   }
   for (const changed of diff.changedRoutes) {
@@ -382,7 +382,7 @@ function diffToDiagnostics(diff: ContentRegressionDiff): Diagnostic[] {
         faqChanged: changed.faqChanged,
       },
       fixHint:
-        "Review the content diff. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>",
+        "Review the content diff. Run: pnpm exec werkstatt run content.regression.review.generate --site <systemId>",
     });
   }
   return diagnostics;
@@ -751,7 +751,7 @@ function reviewToYaml(
 #   3. For "fix": set fixValue to the desired text
 #   4. For "accept": no further action — golden will be updated
 #   5. For "reject": agent must revert the source content to match golden
-#   6. Run: pnpm exec site-kernel run content.regression.apply --site ${systemId} --review <this-file>
+#   6. Run: pnpm exec werkstatt run content.regression.apply --site ${systemId} --review <this-file>
 #
 # Instructions for AI agent (copy to agent after operator fills decisions):
 #   - Read this file

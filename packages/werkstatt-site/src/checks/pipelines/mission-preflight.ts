@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 export const MISSION_PREFLIGHT_CRITICAL: KernelPipelineStep[] = [
   { command: "content-types.validate" },

@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import {
   METHODOLOGIES_CONFIG_PATH,

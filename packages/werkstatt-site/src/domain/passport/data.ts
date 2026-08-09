@@ -26,7 +26,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { emitPipelineLogEvent } from "@warpgogol/site-kernel-content";
+import { emitPipelineLogEvent } from "@warpgogol/werkstatt-site/content";
 import { PassportSchema } from "./schema.ts";
 import type { PassportJson } from "./schema.ts";
 

@@ -13,7 +13,7 @@
 import { existsSync } from "node:fs";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { writeFileIfChanged, executeKernelCommand } from "@warpgogol/site-kernel";
+import { writeFileIfChanged, executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   CheckResult,
@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   breakerVerdictSchema,
   surfaceStateSchema,

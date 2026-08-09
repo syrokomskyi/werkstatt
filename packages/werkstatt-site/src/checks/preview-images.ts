@@ -14,8 +14,8 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { mkdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";

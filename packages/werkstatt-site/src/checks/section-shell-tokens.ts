@@ -24,7 +24,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { TOKEN_NAME_SET } from "@warpgogol/werkstatt-site/tokens";
 import {
   collectFilesByExtensions,

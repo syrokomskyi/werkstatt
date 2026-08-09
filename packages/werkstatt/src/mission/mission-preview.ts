@@ -21,7 +21,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { runContentRefIndexGenerate } from "@warpgogol/site-kernel-codegen";
+import { runContentRefIndexGenerate } from "@warpgogol/werkstatt-site/codegen";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 
 export interface MissionPreviewData {

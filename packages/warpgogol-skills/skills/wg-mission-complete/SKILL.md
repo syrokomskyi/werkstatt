@@ -22,7 +22,7 @@ Complete a mission end-to-end: validate → reconcile → release.prepare → cl
 
 ### 1. Identify the mission
 
-Determine the mission ID from the operator's request or the current workspace state. If no mission ID is provided, run `pnpm exec site-kernel run mission.status --mission <id>` for the most recent open mission, or check `systems/registry.yaml` for `currentMission`.
+Determine the mission ID from the operator's request or the current workspace state. If no mission ID is provided, run `pnpm exec werkstatt run mission.status --mission <id>` for the most recent open mission, or check `systems/registry.yaml` for `currentMission`.
 
 ### 2. Stop dev server
 
@@ -40,7 +40,7 @@ Before running any kernel commands, check for dirty state:
 
 1. **Workpiece dirty?** — Run `git status --short` in `missions/<id>/workpiece/`. If dirty:
    - Check MC-01 and EC-04 in the error catalog.
-   - If only generated files (`.generated.yaml`, `.generated.json`, `.env.example`) — commit via `pnpm exec site-kernel run mission.git.commit --mission <id> --message "chore: regenerate artifacts from build.prepare"`.
+   - If only generated files (`.generated.yaml`, `.generated.json`, `.env.example`) — commit via `pnpm exec werkstatt run mission.git.commit --mission <id> --message "chore: regenerate artifacts from build.prepare"`.
    - If operator edits are uncommitted — ask the operator for a commit message.
    - If the operator says "just commit everything" — commit with a descriptive message.
 
@@ -53,7 +53,7 @@ Before running any kernel commands, check for dirty state:
 
 ### 4. Validate
 
-Run `pnpm exec site-kernel run mission.validate --mission <id>`.
+Run `pnpm exec werkstatt run mission.validate --mission <id>`.
 
 - If validation **passes** — proceed to step 5.
 - If validation **fails** — examine the error. Check the error catalog (`fix-patterns.md`) for a matching entry. If found and `auto-resolvable: yes` with `confirmations >= 3` — apply the resolution automatically. Otherwise — present the error to the operator with a suggested resolution.
@@ -64,7 +64,7 @@ Run `pnpm exec site-kernel run mission.validate --mission <id>`.
 
 ### 5. Reconcile
 
-Run `pnpm exec site-kernel run mission.reconcile --mission <id>`.
+Run `pnpm exec werkstatt run mission.reconcile --mission <id>`.
 
 - If reconcile **passes** — proceed to step 6.
 - If reconcile **fails** — check the error catalog (`fix-patterns.md`):
@@ -78,7 +78,7 @@ Run `pnpm exec site-kernel run mission.reconcile --mission <id>`.
 
 ### 6. Release prepare
 
-Run `pnpm exec site-kernel run release.prepare --mission <id>`.
+Run `pnpm exec werkstatt run release.prepare --mission <id>`.
 
 - If release.prepare **passes** — proceed to step 7.
 - If release.prepare **fails** — check EC-05 (mission not validated). If the error is about C-surface regression — present to operator, this requires domain knowledge.
@@ -88,7 +88,7 @@ Run `pnpm exec site-kernel run release.prepare --mission <id>`.
 
 ### 7. Close
 
-Run `pnpm exec site-kernel run mission.close --mission <id>`.
+Run `pnpm exec werkstatt run mission.close --mission <id>`.
 
 - If close **passes** — mission is complete. Proceed to step 8.
 - If close **fails** — check the error. `mission.close` refuses if `reconciledAt` is null — return to step 5.

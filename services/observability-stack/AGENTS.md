@@ -18,8 +18,8 @@ This is a **service** workspace. Runtime composition only. Shared schemas and va
 
 | Script | Command |
 | --- | --- |
-| `build:check` | `node ../../packages/os/site-kernel/bin/site-kernel.mjs run observability.stack.validate` |
-| `check` | `node ../../packages/os/site-kernel/bin/site-kernel.mjs run observability.stack.validate` |
-| `health` | `node ../../packages/os/site-kernel/bin/site-kernel.mjs run observability.stack.health` |
+| `build:check` | `node ../../packages/werkstatt/bin/werkstatt.mjs run observability.stack.validate` |
+| `check` | `node ../../packages/werkstatt/bin/werkstatt.mjs run observability.stack.validate` |
+| `health` | `node ../../packages/werkstatt/bin/werkstatt.mjs run observability.stack.health` |
 
 See the root `AGENTS.md` for project-wide rules, skills, and capabilities.

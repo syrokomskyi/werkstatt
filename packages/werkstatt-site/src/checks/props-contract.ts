@@ -25,8 +25,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { hasGeneratedMarker } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { hasGeneratedMarker } from "@warpgogol/werkstatt/kernel";
 import { discoverManifestPropsInfo, propsSchemaSourceHash } from "@warpgogol/werkstatt-site/codegen";
 import { diagnosticsResult } from "./result-helpers.ts";
 
@@ -152,7 +152,7 @@ export async function runPropsContractValidate(
         severity: "error",
         file: relGenerated,
         message: `Generated types file is missing for ${info.id}.`,
-        fixHint: "Run: pnpm exec site-kernel run props.types.generate",
+        fixHint: "Run: pnpm exec werkstatt run props.types.generate",
         data: { manifest: info.id },
       });
     } else if (!hasGeneratedMarker(content)) {
@@ -174,7 +174,7 @@ export async function runPropsContractValidate(
           severity: "error",
           file: relGenerated,
           message: `Generated types file for ${info.id} is stale: declared sourceHash does not match the current manifest propsSchema.`,
-          fixHint: "Run: pnpm exec site-kernel run props.types.generate",
+          fixHint: "Run: pnpm exec werkstatt run props.types.generate",
           data: { manifest: info.id, declaredHash, expectedHash },
         });
       }

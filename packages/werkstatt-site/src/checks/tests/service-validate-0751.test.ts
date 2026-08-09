@@ -7,7 +7,7 @@ import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { runServiceNamingValidate } from "../services/service-naming-validate.ts";
 import { runServiceRegistryValidate } from "../services/service-registry-validate.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 function makeInput(): KernelCommandInput {
   return { flags: {}, argv: [] };

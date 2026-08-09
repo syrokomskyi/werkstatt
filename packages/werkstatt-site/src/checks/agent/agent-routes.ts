@@ -8,7 +8,7 @@ records with full schemas — YAML cannot be imported directly by Vite, so
 this is the bridge from the ontology catalog into the Astro bundle).
 </purpose>
 <non-goals>
-  <item>Do not implement gate logic here — the files are thin re-exports into @warpgogol/agent-gate/astro.</item>
+  <item>Do not implement gate logic here — the files are thin re-exports into @warpgogol/werkstatt/agent-gate/astro.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { buildGeneratedHeader } from "@warpgogol/werkstatt-site/codegen";
@@ -41,7 +41,7 @@ const MCP_ROUTE_CONTENT = `${buildGeneratedHeader({ ownerCommand: "agent.routes.
 export const prerender = false;
 import agentSurfaceManifest from "../../../agent-surface.generated.json";
 import agentCapabilities from "../../../agent-capabilities.generated.json";
-import { createAgentMcpRoute } from "@warpgogol/agent-gate/astro";
+import { createAgentMcpRoute } from "@warpgogol/werkstatt/agent-gate/astro";
 
 const route = createAgentMcpRoute(agentSurfaceManifest as never, agentCapabilities as never);
 export const GET = route.GET;
@@ -55,7 +55,7 @@ const ACTION_ROUTE_CONTENT = `${buildGeneratedHeader({ ownerCommand: "agent.rout
 export const prerender = false;
 import agentSurfaceManifest from "../../../../agent-surface.generated.json";
 import agentCapabilities from "../../../../agent-capabilities.generated.json";
-import { createAgentActionRoute } from "@warpgogol/agent-gate/astro";
+import { createAgentActionRoute } from "@warpgogol/werkstatt/agent-gate/astro";
 
 const route = createAgentActionRoute(agentSurfaceManifest as never, agentCapabilities as never);
 export const POST = route.POST;

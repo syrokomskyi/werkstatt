@@ -23,8 +23,8 @@ import type {
   KernelRuntimeContext,
   Diagnostic,
   CheckResult,
-} from "@warpgogol/site-kernel";
-import { discoverSiteWorkspaces } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { discoverSiteWorkspaces } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";

@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
 import {
   asString,
@@ -300,7 +300,7 @@ export async function runPublicSurfaceLint(
             file,
             message: `PUBTXT-07 same-site generated link target is not locally known: ${target}`,
             fixHint: proseSource
-              ? `Fix the source file ${proseSource}, then re-run: pnpm exec site-kernel pipeline build.prepare --site <id>.`
+              ? `Fix the source file ${proseSource}, then re-run: pnpm exec werkstatt pipeline build.prepare --site <id>.`
               : "Use a canonical generated route/public file or add the target to the owning route/declaration set.",
           });
         }

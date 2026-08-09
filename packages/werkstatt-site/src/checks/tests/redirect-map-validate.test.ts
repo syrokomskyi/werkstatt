@@ -3,7 +3,7 @@ import { mkdtemp, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { resolveDeploymentAdapter } from "../public-surface/managed-public.ts";
-import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>

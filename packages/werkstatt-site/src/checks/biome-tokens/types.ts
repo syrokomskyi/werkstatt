@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { CheckResult } from "@warpgogol/site-kernel";
+import type { CheckResult } from "@warpgogol/werkstatt/kernel";
 
 export interface CssTokenUse {
   file: string;

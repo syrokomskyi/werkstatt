@@ -11,7 +11,7 @@
 */
 
 import { readFileSync } from "node:fs";
-import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import type { PbpSourceInventoryReport } from "../compiler-pipeline.js";
 
 export interface ParsedEntity {

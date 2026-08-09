@@ -19,14 +19,14 @@ import type {
   KernelRuntimeContext,
   Diagnostic,
   CheckResult,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import {
   fingerprintFile,
   fingerprintTree,
   type FingerprintResult,
   type FingerprintOptions,
-} from "@warpgogol/fingerprint/semantic";
+} from "@warpgogol/werkstatt/fingerprint/semantic";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 
 // ─── fingerprint.calculate ─────────────────────────────────────────────────

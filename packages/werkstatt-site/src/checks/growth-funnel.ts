@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { EVENT_NAMES } from "@warpgogol/werkstatt-site/growth/adapter";
 import { resultFromViolations } from "./result-helpers.ts";

@@ -17,7 +17,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { passResult } from "./result-helpers.ts";
 import {
   collectMarkdownFilesSafe,

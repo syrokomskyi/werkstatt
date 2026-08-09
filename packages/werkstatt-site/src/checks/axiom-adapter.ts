@@ -24,7 +24,7 @@ import {
   type KernelCommandResult,
   type KernelRuntimeContext,
   type KernelNextStep,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 
 import {
   runAxiomCheck,

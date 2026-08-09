@@ -14,7 +14,7 @@ length-preserving strippers used by the token/color lints.</purpose>
 
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { getLineColumn } from "@warpgogol/werkstatt-site/share/text-position";
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 export { getLineColumn };
 
 const IGNORED_DIRECTORY_NAMES = new Set([

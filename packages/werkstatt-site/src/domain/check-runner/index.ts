@@ -19,7 +19,7 @@ import {
   type PageEvidence,
   type SiteEvidenceGraph,
 } from "@warpgogol/werkstatt-site/check-core";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type { BrowserCapturePort, CapturedPage } from "./browser-capture-port.ts";
 import { PlaywrightCaptureAdapter } from "./playwright-adapter.ts";
 

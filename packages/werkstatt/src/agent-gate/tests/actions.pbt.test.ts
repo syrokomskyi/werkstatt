@@ -16,7 +16,7 @@
 import { test, expect } from "vitest";
 import fc from "fast-check";
 import { validateAgainstCapabilitySchema } from "../actions.ts";
-import type { CapabilityInputOutputSchema } from "@warpgogol/ontology";
+import type { CapabilityInputOutputSchema } from "@warpgogol/werkstatt-site/ontology";
 
 const stringSchema: CapabilityInputOutputSchema = {
   type: "object",

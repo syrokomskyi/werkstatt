@@ -29,7 +29,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import { jsonldTypes, type MediaLeakagePolicy } from "@warpgogol/werkstatt-site/ontology/external-surfaces";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";

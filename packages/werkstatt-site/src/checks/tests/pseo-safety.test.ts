@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pageText, type PageEntry } from "@warpgogol/werkstatt-site/surface";
 import { runDemandModifierLint } from "../demand-modifier.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>

@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { ok, fail, walkArchetypeYamls, type CheckResult, type Violation } from "./shared.ts";
 
 export async function runSectionBodyContractValidate(

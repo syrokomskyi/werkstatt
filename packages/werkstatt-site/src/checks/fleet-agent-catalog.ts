@@ -30,8 +30,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { buildGeneratedHeader, stripGeneratedMarker } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { buildGeneratedHeader, stripGeneratedMarker } from "@warpgogol/werkstatt/kernel";
 import {
   buildFleetAgentCatalog,
   type FleetAgentCatalog,
@@ -163,7 +163,7 @@ export async function runFleetAgentCatalogValidate(
       severity: "error",
       file: CATALOG_FILE,
       message: "Fleet agent catalog not found. Run fleet.agent.catalog.generate first.",
-      fixHint: "Run: pnpm exec site-kernel run fleet.agent.catalog.generate",
+      fixHint: "Run: pnpm exec werkstatt run fleet.agent.catalog.generate",
     });
     return diagnosticsResult("fleet.agent.catalog.validate", diagnostics);
   }
@@ -204,7 +204,7 @@ export async function runFleetAgentCatalogValidate(
       file: CATALOG_FILE,
       message:
         "Catalog is stale: regeneration produces different bytes (edited or apps rebuilt without regenerating).",
-      fixHint: "Run: pnpm exec site-kernel run fleet.agent.catalog.generate",
+      fixHint: "Run: pnpm exec werkstatt run fleet.agent.catalog.generate",
     });
   }
 

@@ -7,7 +7,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "bin": {
-    "site-kernel": "./bin/site-kernel.mjs"
+    "werkstatt": "./bin/werkstatt.mjs"
   },
   "exports": {
     ".": {
@@ -280,11 +280,7 @@
       "default": "./src/schemas/index.ts"
     }
   },
-  "files": [
-    "src",
-    "bin",
-    "os"
-  ],
+  "files": ["src", "bin", "os"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -298,14 +294,7 @@
     "@libp2p/ping": "^3.1.11",
     "@libp2p/tcp": "^11.0.26",
     "@multiformats/multiaddr": "^13.0.3",
-    "@warpgogol/fingerprint": "workspace:*",
     "@warpgogol/forge": "workspace:*",
-    "@warpgogol/site-kernel-content": "workspace:*",
-    "@warpgogol/site-kernel-astro": "workspace:*",
-    "@warpgogol/site-kernel-checks": "workspace:*",
-    "@warpgogol/site-kernel-codegen": "workspace:*",
-    "@warpgogol/site-kernel-integrity": "workspace:*",
-    "@warpgogol/site-kernel-onboarding": "workspace:*",
     "@aws-sdk/client-s3": "^3.1101.0",
     "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
     "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study",

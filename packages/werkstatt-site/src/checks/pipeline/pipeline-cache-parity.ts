@@ -22,14 +22,14 @@ because there is no cache to diverge from.
 import { spawn } from "node:child_process";
 import { readFile, readdir, rm, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { diagnosticsResult } from "../result-helpers.ts";
 

@@ -18,7 +18,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
 import { stringify as yamlStringify } from "yaml";
 import { ALERT_RULES, NOTIFICATION_CHANNELS } from "../alert-rules.ts";
 

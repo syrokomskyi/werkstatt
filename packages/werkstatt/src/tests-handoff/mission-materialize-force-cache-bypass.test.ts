@@ -38,7 +38,7 @@ vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
   };
 });
 
-vi.mock("@warpgogol/site-kernel-codegen", () => ({
+vi.mock("@warpgogol/werkstatt-site/codegen", () => ({
   runGenerateAgentsDocs: vi.fn(async () => []),
   runGenerateApiRoutes: vi.fn(async () => []),
   runGenerateGlobalStyles: vi.fn(async () => []),
@@ -51,13 +51,13 @@ vi.mock("@warpgogol/site-kernel-codegen", () => ({
   runBiomeCssGenerate: vi.fn(async () => []),
 }));
 
-vi.mock("@warpgogol/site-kernel-onboarding", () => ({
+vi.mock("@warpgogol/werkstatt-site/onboarding", () => ({
   applyTokens: vi.fn((s: string) => s),
   readTemplate: vi.fn(() => ""),
   readRuntimeTemplate: vi.fn(() => ""),
 }));
 
-vi.mock("@warpgogol/site-kernel-checks", () => ({
+vi.mock("@warpgogol/werkstatt-site/checks", () => ({
   runEnvExampleGenerate: vi.fn(async () => []),
   MISSION_PREFLIGHT_CRITICAL: [],
   MISSION_PREFLIGHT_WARNING: [],

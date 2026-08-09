@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { CI_LOCAL_CHECKED_COMMANDS, runCiLocalValidate } from "../ci-local.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 const logger = {
   section() {},
@@ -45,9 +45,9 @@ async function setupWorkspace(workflow: string): Promise<string> {
 function passingRunBlock(): string {
   return [
     "corepack enable",
-    "pnpm exec site-kernel run ci.local.validate --json",
+    "pnpm exec werkstatt run ci.local.validate --json",
     ...CI_LOCAL_CHECKED_COMMANDS,
-    "pnpm exec site-kernel run sites-check.author --site site --json",
+    "pnpm exec werkstatt run sites-check.author --site site --json",
   ].join("\n");
 }
 

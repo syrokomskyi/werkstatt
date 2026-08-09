@@ -17,4 +17,4 @@ export {
   buildGeneratedHeader,
   type StripGeneratedMarkerResult,
   type GeneratedHeaderInput,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";

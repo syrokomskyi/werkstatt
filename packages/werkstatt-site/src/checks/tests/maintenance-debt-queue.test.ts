@@ -43,7 +43,7 @@ function queue(overrides?: Partial<DebtQueue>): DebtQueue {
       push: false,
     },
     acceptance: {
-      commands: ["pnpm exec site-kernel run example.validate --json"],
+      commands: ["pnpm exec werkstatt run example.validate --json"],
     },
     ...overrides,
   };

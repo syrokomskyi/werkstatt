@@ -15,7 +15,7 @@ import {
   checkSubscriptionTriggerBijection,
   generateFunnelStatechartDocument,
 } from "../funnel-statechart.ts";
-import { hasGeneratedMarker } from "@warpgogol/site-kernel";
+import { hasGeneratedMarker } from "@warpgogol/werkstatt/kernel";
 
 /**
  * RFC-0219: prove the trigger overlay bijection invariants and that the generator

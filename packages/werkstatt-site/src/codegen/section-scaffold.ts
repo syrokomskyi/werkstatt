@@ -30,7 +30,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { runPropsTypesGenerate } from "./props-types.ts";
 
 interface SectionScaffoldResult {

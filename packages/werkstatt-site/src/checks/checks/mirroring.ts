@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";

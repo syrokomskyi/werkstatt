@@ -18,9 +18,9 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
 import { parse as yamlParse } from "yaml";
-import { readAstroSiteUrl } from "@warpgogol/site-kernel-checks/lib/astro-site-url";
+import { readAstroSiteUrl } from "@warpgogol/werkstatt-site/checks/lib/astro-site-url";
 
 interface ProbeTarget {
   siteId: string;
@@ -111,7 +111,7 @@ export async function runFleetProbeValidate(
       severity: "error",
       file: "services/fleet-probe-runner/targets.generated.yaml",
       message: "targets.generated.yaml does not exist — run fleet.probe.targets.generate.",
-      fixHint: "Run: pnpm exec site-kernel run fleet.probe.targets.generate",
+      fixHint: "Run: pnpm exec werkstatt run fleet.probe.targets.generate",
     });
     return diagnosticsResult("fleet.probe.validate", diagnostics);
   }
@@ -126,7 +126,7 @@ export async function runFleetProbeValidate(
       severity: "error",
       file: "services/fleet-probe-runner/targets.generated.yaml",
       message: "targets.generated.yaml is not valid YAML.",
-      fixHint: "Regenerate: pnpm exec site-kernel run fleet.probe.targets.generate",
+      fixHint: "Regenerate: pnpm exec werkstatt run fleet.probe.targets.generate",
     });
     return diagnosticsResult("fleet.probe.validate", diagnostics);
   }

@@ -30,8 +30,8 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { createDefaultIO, buildGeneratedHeader } from "@warpgogol/site-kernel";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { createDefaultIO, buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { runGeneratedEditGuard } from "../generated-edit-guard.ts";
 
 const logger = {

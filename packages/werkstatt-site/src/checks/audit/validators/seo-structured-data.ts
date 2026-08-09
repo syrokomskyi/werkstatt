@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { jsonldTypes, type JsonldSurfacePolicyEntry } from "@warpgogol/werkstatt-site/ontology/external-surfaces";
 import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import { parse as yamlParse } from "yaml";

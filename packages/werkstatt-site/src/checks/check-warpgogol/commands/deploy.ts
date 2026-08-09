@@ -26,7 +26,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "../result.ts";
 import { getStringFlag, readTargetFromFlag, resolveWorkspacePath } from "../target-io.ts";
 import { makeRunArtifact, numberFlag } from "./helpers.ts";

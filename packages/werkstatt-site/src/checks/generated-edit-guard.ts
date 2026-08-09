@@ -27,7 +27,7 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 
@@ -224,7 +224,7 @@ export async function runGeneratedEditGuard(
         severity: "error",
         file: relPath,
         message: `Category B generated file "${relPath}" changed, but its owning module "${entry.module}" did not change in this range.`,
-        fixHint: `Edit the owning generator at ${entry.module}, then run \`pnpm exec site-kernel run ${entry.command}\` to regenerate. Never hand-edit generated files.`,
+        fixHint: `Edit the owning generator at ${entry.module}, then run \`pnpm exec werkstatt run ${entry.command}\` to regenerate. Never hand-edit generated files.`,
       });
       continue;
     }

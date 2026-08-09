@@ -29,10 +29,10 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
-import { isGeneratedMarkerTextCandidate } from "@warpgogol/site-kernel";
+import { isGeneratedMarkerTextCandidate } from "@warpgogol/werkstatt/kernel";
 
 const BEGIN_SENTINEL =
   "# BEGIN generated-artifacts (managed by gitattributes.generate — RFC-0336; do not edit by hand)";
@@ -359,7 +359,7 @@ export async function runGitattributesValidate(
       severity: "error",
       file: GITATTRIBUTES_RELATIVE,
       message: ".gitattributes is missing.",
-      fixHint: "Run: pnpm exec site-kernel run gitattributes.generate",
+      fixHint: "Run: pnpm exec werkstatt run gitattributes.generate",
     });
     return diagnosticsResult("gitattributes.validate", diagnostics);
   }
@@ -371,7 +371,7 @@ export async function runGitattributesValidate(
       severity: "error",
       file: GITATTRIBUTES_RELATIVE,
       message: "Managed generated-artifacts block is missing.",
-      fixHint: "Run: pnpm exec site-kernel run gitattributes.generate",
+      fixHint: "Run: pnpm exec werkstatt run gitattributes.generate",
     });
   } else if (actualBlock !== expectedBlock) {
     const actualLines = new Set(actualBlock.split("\n"));
@@ -386,7 +386,7 @@ export async function runGitattributesValidate(
       message: sameContentDifferentOrder
         ? "Managed generated-artifacts block has the right patterns but is unsorted/non-normalized."
         : "Managed generated-artifacts block is stale vs the live command manifest + ownership map.",
-      fixHint: "Run: pnpm exec site-kernel run gitattributes.generate",
+      fixHint: "Run: pnpm exec werkstatt run gitattributes.generate",
     });
   }
 

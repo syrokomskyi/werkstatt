@@ -17,7 +17,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { generateLanguageDetectionMiddleware } from "@warpgogol/werkstatt-site/content";
 
 const MIDDLEWARE_FILENAME = "language-detect.ts";

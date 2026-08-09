@@ -12,7 +12,7 @@
 */
 
 import { z } from "zod";
-import { byteHash, stableStringify } from "@warpgogol/fingerprint";
+import { byteHash, stableStringify } from "@warpgogol/werkstatt/fingerprint";
 
 export const viewportEvidenceSchema = z.object({
   name: z.enum(["desktop", "mobile"]),

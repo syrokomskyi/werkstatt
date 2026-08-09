@@ -30,8 +30,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { listRegisteredKernelCommands } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { listRegisteredKernelCommands } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import {
   collectTsFiles,

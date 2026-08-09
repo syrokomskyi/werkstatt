@@ -15,12 +15,12 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 import { PlanetCatalog, MoonCatalog } from "@warpgogol/werkstatt-site/ontology";
-import { hasGeneratedMarker } from "@warpgogol/site-kernel";
+import { hasGeneratedMarker } from "@warpgogol/werkstatt/kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { loadArchetypeFiles, loadUiManifestFiles, type ArchetypeLayer } from "./shared.ts";
 
 interface CosmicPickResult {

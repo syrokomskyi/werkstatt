@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { buildCommandManifest, buildGeneratedHeader } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { buildCommandManifest, buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
 
 function escapeCell(value: string): string {
   return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
@@ -56,8 +56,8 @@ async function renderCommandsMarkdown(workspaceRoot: string): Promise<string> {
     "# Site OS Commands",
     "",
     "This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the single machine-readable",
-    "command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then",
-    "`pnpm exec site-kernel run docs.commands.generate`.",
+    "command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then",
+    "`pnpm exec werkstatt run docs.commands.generate`.",
     "",
     `Generated command rows: ${rows.length}. Raw manifest entries: ${commands.length}.`,
     "",

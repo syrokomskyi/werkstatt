@@ -28,7 +28,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";

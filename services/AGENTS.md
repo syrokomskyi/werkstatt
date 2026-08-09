@@ -31,11 +31,11 @@ Current services:
 
 - `services/check-warpgogol-runner` is the Node/Playwright runner for the Check Warpgogol site.
 - It consumes `.check-warpgogol/queue/*.request.json` and writes `.check-warpgogol/runs/<runId>/` artifacts.
-- The site/service boundary is `@warpgogol/check-core`; do not bypass it with direct site-to-service imports.
-- `findWorkspaceRoot` in `@warpgogol/check-core` is Node-only (uses `node:fs`). Cloudflare Workers API routes in the Check Warpgogol site must read `CHECK_WEBGOGOL_WORKSPACE_ROOT` from the environment directly.
-- `services/rate-fetcher-worker` is the Cloudflare Worker for RFC-0744 Rate Fetcher Service. Daily cron fetches exchange rates from external sources (ECB) via `@warpgogol/pbp-rate-adapters` and stores observations in Supabase. The site/service boundary is `@warpgogol/pbp-rate-adapters`; do not bypass it with direct adapter calls from sites.
+- The site/service boundary is `@warpgogol/werkstatt-site/check-core`; do not bypass it with direct site-to-service imports.
+- `findWorkspaceRoot` in `@warpgogol/werkstatt-site/check-core` is Node-only (uses `node:fs`). Cloudflare Workers API routes in the Check Warpgogol site must read `CHECK_WEBGOGOL_WORKSPACE_ROOT` from the environment directly.
+- `services/rate-fetcher-worker` is the Cloudflare Worker for RFC-0744 Rate Fetcher Service. Daily cron fetches exchange rates from external sources (ECB) via `@warpgogol/werkstatt-site/pbp-rate-adapters` and stores observations in Supabase. The site/service boundary is `@warpgogol/werkstatt-site/pbp-rate-adapters`; do not bypass it with direct adapter calls from sites.
 
 Validation:
 
-- Run `pnpm exec site-kernel run check-warpgogol.runner.validate` after changing the runner or the app API boundary.
-- Run `pnpm exec site-kernel run services.check.run` after changing `services/*`, `pnpm-workspace.yaml`, or service import rules.
+- Run `pnpm exec werkstatt run check-warpgogol.runner.validate` after changing the runner or the app API boundary.
+- Run `pnpm exec werkstatt run services.check.run` after changing `services/*`, `pnpm-workspace.yaml`, or service import rules.

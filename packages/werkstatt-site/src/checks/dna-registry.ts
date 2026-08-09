@@ -22,11 +22,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   listRegisteredKernelCommands,
   listRegisteredKernelPipelines,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult, failResult } from "./result-helpers.ts";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 

@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "../result.ts";
 import { runServicesWorkspaceValidate, runCheckWarpgogolRunnerValidate } from "./services.ts";
 
@@ -32,7 +32,7 @@ export async function runServicesCheckRun(
   // RFC-0751: Run service.naming.validate via executeKernelCommand (avoids circular dependency)
   let namingDiagnostics: Diagnostic[] = [];
   try {
-    const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+    const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
     const namingResult = (await executeKernelCommand({
       workspaceRoot: context.workspaceRoot,
       commandName: "service.naming.validate",

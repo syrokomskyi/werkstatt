@@ -27,14 +27,14 @@ import type {
   KernelPipelineStep,
   KernelRuntimeContext,
   PipelineStepTiming,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { performance } from "node:perf_hooks";
 import {
   executeKernelCommand,
   appendStepTelemetry,
   loadPipelineBudgets,
   lookupExpectedDurationMs,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { access } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -185,7 +185,7 @@ async function runCommandSequence(
   const subResults: PipelineDriverData["subResults"] = [];
   const stepTimings: PipelineStepTiming[] = [];
   // RFC-0270: this driver executes steps via executeKernelCommand (a separate
-  // path from @warpgogol/site-kernel's executePipelineForApp/executePipelineForWorkspace),
+  // path from @warpgogol/werkstatt/kernel's executePipelineForApp/executePipelineForWorkspace),
   // so it needs its own telemetry-append + budget-preference wiring.
   const budgets = await loadPipelineBudgets(context.workspaceRoot);
 

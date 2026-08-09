@@ -24,7 +24,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { TEMPLATES_DIR, RUNTIME_TEMPLATES_DIR } from "./templates.ts";
 
 async function pathExists(target: string): Promise<boolean> {

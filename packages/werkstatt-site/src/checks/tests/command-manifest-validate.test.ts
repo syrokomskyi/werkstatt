@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { collectOwnershipDiagnostics } from "../command-manifest-validate.ts";
-import type { CommandManifestEntry } from "@warpgogol/site-kernel";
+import type { CommandManifestEntry } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>

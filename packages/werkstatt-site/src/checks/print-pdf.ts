@@ -17,15 +17,15 @@ print.pdf.validate verifies that all expected PDFs exist and are non-empty.
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import { readFile, copyFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { createServer } from "node:http";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
-import { stableJsonHash, byteHash } from "@warpgogol/fingerprint";
+import { stableJsonHash, byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type { PrintPdfGenerateResult } from "@warpgogol/werkstatt-site/share/schemas/print";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 

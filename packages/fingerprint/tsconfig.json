@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig/node-lib.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "noEmit": true
-  },
-  "include": ["src/**/*.ts"]
-}

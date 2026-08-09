@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 
 type ShareI18nRule = "SHARE-I18N-01" | "SHARE-I18N-02" | "SHARE-I18N-03";

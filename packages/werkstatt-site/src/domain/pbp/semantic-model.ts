@@ -37,7 +37,7 @@ import {
   EMPTY_CONTENT_REF_INDEX,
 } from "@warpgogol/werkstatt-site/share/content-reference";
 import { parseMaterialCreditMap, materialCreditAtId } from "@warpgogol/werkstatt-site/share/material-credits";
-import { emitPipelineLogEvent } from "@warpgogol/site-kernel-content";
+import { emitPipelineLogEvent } from "@warpgogol/werkstatt-site/content";
 
 const DEFAULT_LANGUAGE_CODE = "de";
 

@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 
 // @ai-invariant The exception rules below are the canonical source for naming.convention.lint.
 // Update naming-conventions.md (packages/site-kernel/docs/) when these rules change.

@@ -22,23 +22,23 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { listSiteWorkspaces } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { listSiteWorkspaces } from "@warpgogol/werkstatt/kernel";
 import { parse } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 export const CI_LOCAL_CHECKED_COMMANDS = [
   "pnpm lint:packages",
-  "pnpm exec site-kernel run packages-check.run --json",
-  "pnpm exec site-kernel run rfc.validate",
-  "pnpm exec site-kernel run rfc.command-lifecycle.validate --json",
+  "pnpm exec werkstatt run packages-check.run --json",
+  "pnpm exec werkstatt run rfc.validate",
+  "pnpm exec werkstatt run rfc.command-lifecycle.validate --json",
   "pnpm test",
-  "pnpm exec site-kernel run test.signal.validate --json",
-  "pnpm exec site-kernel run test.signal.policy.validate --json",
-  "pnpm exec site-kernel run maintenance.debt.baseline.validate --json",
-  "pnpm exec site-kernel run github.branch-protection.validate --json",
-  "pnpm exec site-kernel run platform.consistency.validate --check --json",
-  "pnpm exec site-kernel run platform.commit.discipline.validate --base origin/main --json",
+  "pnpm exec werkstatt run test.signal.validate --json",
+  "pnpm exec werkstatt run test.signal.policy.validate --json",
+  "pnpm exec werkstatt run maintenance.debt.baseline.validate --json",
+  "pnpm exec werkstatt run github.branch-protection.validate --json",
+  "pnpm exec werkstatt run platform.consistency.validate --check --json",
+  "pnpm exec werkstatt run platform.commit.discipline.validate --base origin/main --json",
 ] as const;
 
 const GENERAL_CI_WORKFLOW = ".github/workflows/ci.yml";
@@ -282,7 +282,7 @@ export async function runCiLocalValidate(
       .map((app) => app.name)
       .sort((a, b) => a.localeCompare(b));
     for (const app of apps) {
-      const command = `pnpm exec site-kernel run sites-check.author --site ${app} --json`;
+      const command = `pnpm exec werkstatt run sites-check.author --site ${app} --json`;
       if (!workflowRunsCommand(ciWorkflow, command)) {
         diagnostics.push({
           ruleId: workflowSourceMentionsCommand(ciWorkflow, command)
@@ -352,7 +352,7 @@ export async function runCiLocalValidate(
         ...(ciWorkflow
           ? (await listSiteWorkspaces(context.workspaceRoot)).sites
               .map(
-                (app) => `pnpm exec site-kernel run sites-check.author --site ${app.name} --json`,
+                (app) => `pnpm exec werkstatt run sites-check.author --site ${app.name} --json`,
               )
               .sort((a, b) => a.localeCompare(b))
           : []),

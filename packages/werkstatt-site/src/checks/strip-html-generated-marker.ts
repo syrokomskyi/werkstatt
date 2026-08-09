@@ -25,7 +25,7 @@
 */
 
 import { parse, serialize, type DefaultTreeAdapterMap } from "parse5";
-import { GENERATED_MARKER } from "@warpgogol/site-kernel";
+import { GENERATED_MARKER } from "@warpgogol/werkstatt/kernel";
 
 type TreeNode = DefaultTreeAdapterMap["node"];
 type TreeParentNode = DefaultTreeAdapterMap["parentNode"];

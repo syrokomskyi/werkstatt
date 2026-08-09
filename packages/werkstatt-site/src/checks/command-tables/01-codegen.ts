@@ -27,7 +27,7 @@ import {
   runPropsTypesGenerate,
   runFontsImportsGenerate,
 } from "@warpgogol/werkstatt-site/codegen";
-import { runKernelWire } from "@warpgogol/site-kernel";
+import { runKernelWire } from "@warpgogol/werkstatt/kernel";
 import { runManifestContractValidate, runMirrorQuintetValidate } from "../manifest.ts";
 import { runUniRegistryBuild, runUniRegistryValidate } from "../registry.ts";
 import {

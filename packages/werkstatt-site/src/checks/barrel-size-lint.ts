@@ -28,8 +28,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { discoverWorkspacePackages } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { discoverWorkspacePackages } from "@warpgogol/werkstatt/kernel";
 import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 

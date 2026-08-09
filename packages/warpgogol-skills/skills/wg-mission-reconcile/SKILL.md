@@ -49,7 +49,7 @@ Run all checks before attempting reconcile. Each check is deterministic and prev
 
 Run `git status --porcelain` in the workpiece directory.
 
-- **Dirty** → commit via `pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "<descriptive message>"`. Re-run the check.
+- **Dirty** → commit via `pnpm exec werkstatt run mission.git.commit --mission <missionId> --message "<descriptive message>"`. Re-run the check.
 - **Clean** → proceed.
 
 #### 2.2 Cache clone dirty check
@@ -63,7 +63,7 @@ Run `git status --porcelain` in the cache clone directory.
 
 Check if `missions/<missionId>/evidence/validation-report.json` exists and contains `contractFull.passed: true`.
 
-- **Missing or not passed** → run `pnpm exec site-kernel run mission.validate --mission <missionId>`. After validation, re-run pre-flight checks 2.1 and 2.2 (validation may generate files).
+- **Missing or not passed** → run `pnpm exec werkstatt run mission.validate --mission <missionId>`. After validation, re-run pre-flight checks 2.1 and 2.2 (validation may generate files).
 - **Passed** → proceed.
 
 #### 2.4 Cache clone divergence check
@@ -81,7 +81,7 @@ If trees differ significantly (more than bordbuch and generated files), warn the
 ### 3. Run mission.reconcile
 
 ```sh
-pnpm exec site-kernel run mission.reconcile --mission <missionId>
+pnpm exec werkstatt run mission.reconcile --mission <missionId>
 ```
 
 - **Success** → skip to step 5 (post-flight verification).
@@ -254,9 +254,9 @@ Output a structured report:
 
 After successful reconcile, the mission is still `open`. Present the operator with two options:
 
-1. **Release** — run `pnpm exec site-kernel run release.prepare --mission <missionId>` to prepare a release. This associates a `releaseId` with the mission and enables `release.publish`. After release.prepare, run `mission.close` to close the mission with the release associated.
+1. **Release** — run `pnpm exec werkstatt run release.prepare --mission <missionId>` to prepare a release. This associates a `releaseId` with the mission and enables `release.publish`. After release.prepare, run `mission.close` to close the mission with the release associated.
 
-2. **Close without release** — run `pnpm exec site-kernel run mission.close --mission <missionId>` to close the mission immediately. This is valid for verification-only missions (no content changes to publish). The close report will contain a `missing-release-id` warning — this is expected.
+2. **Close without release** — run `pnpm exec werkstatt run mission.close --mission <missionId>` to close the mission immediately. This is valid for verification-only missions (no content changes to publish). The close report will contain a `missing-release-id` warning — this is expected.
 
 Ask the operator which path they want. If the operator chooses release, run `release.prepare` first, then `mission.close`. If the operator chooses close, run `mission.close` directly.
 

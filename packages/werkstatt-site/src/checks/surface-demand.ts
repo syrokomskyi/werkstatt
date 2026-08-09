@@ -14,14 +14,14 @@
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   demandSignalSchema,
   werkRecordSchema,

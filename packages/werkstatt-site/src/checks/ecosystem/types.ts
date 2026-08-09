@@ -12,7 +12,7 @@
 */
 
 import type { PackageTestSignal } from "../test-signal.ts";
-import type { GateMetadata } from "@warpgogol/site-kernel";
+import type { GateMetadata } from "@warpgogol/werkstatt/kernel";
 
 export interface EcosystemManifest {
   meta: {

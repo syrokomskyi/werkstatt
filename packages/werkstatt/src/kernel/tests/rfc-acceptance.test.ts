@@ -11,7 +11,7 @@ import type { CommandRegistry } from "@warpgogol/forge";
   RFC-0268: unit tests for the acceptance probe schema validator and runner,
   written before the RFC's own probes are added. Each probe kind gets a red
   and a green fixture; malformed probe shapes produce validation issues; the
-  "run" probe rejects any command not prefixed with "site-kernel ".
+  "run" probe rejects any command not prefixed with "werkstatt "..
 </purpose>
 </MODULE_CONTRACT>
 */
@@ -31,16 +31,16 @@ test("validateAcceptanceShape: unknown probe kind is flagged", () => {
   expect(issues[0]!.message).toMatch(/unknown probe kind/);
 });
 
-test("validateAcceptanceShape: run probe rejects a non-site-kernel command string", () => {
+test("validateAcceptanceShape: run probe rejects a non-werkstatt command string", () => {
   const issues = validateAcceptanceShape([
     { probe: "run", command: "rm -rf /", expect: { exitCode: 0 } },
   ]);
-  expect(issues.some((i) => i.message.includes("site-kernel "))).toBeTruthy();
+  expect(issues.some((i) => i.message.includes("werkstatt "))).toBeTruthy();
 });
 
 test("validateAcceptanceShape: well-formed probes of every kind pass with zero issues", () => {
   const probes: AcceptanceProbe[] = [
-    { probe: "run", command: "site-kernel run rfc.validate", expect: { exitCode: 0 } },
+    { probe: "run", command: "werkstatt run rfc.validate", expect: { exitCode: 0 } },
     { probe: "file-exists", path: "AGENTS.md" },
     { probe: "file-contains", path: "AGENTS.md", pattern: "Commit message contract" },
     { probe: "command-registered", name: "rfc.validate" },
@@ -142,7 +142,7 @@ export default {
   }
 });
 
-test('runProbe: run — a command not prefixed with "site-kernel " is rejected without executing', async () => {
+test('runProbe: run — a command not prefixed with "werkstatt " is rejected without executing', async () => {
   const result = await runProbe(
     { probe: "run", command: "rm -rf /", expect: { exitCode: 0 } },
     "/tmp",
@@ -156,7 +156,7 @@ test("runProbe: run — end-to-end against the real repo, exitCode matches expec
   const result = await runProbe(
     {
       probe: "run",
-      command: "site-kernel run rfc.validate --id rfc-0268",
+      command: "werkstatt run rfc.validate --id rfc-0268",
       expect: { exitCode: 0 },
     },
     workspaceRoot,

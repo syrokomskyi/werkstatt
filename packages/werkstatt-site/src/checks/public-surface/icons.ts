@@ -18,11 +18,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
 import sharp from "sharp";
 import { diagnosticsResult } from "../result-helpers.ts";
-import type { Diagnostic } from "@warpgogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 import {
   type AppPublicContext,
   appRel,

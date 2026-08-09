@@ -23,7 +23,7 @@ export { runSemanticDriftValidation } from "./checks/semantic-drift.ts";
 export { runCompassInventory, runCompassValidation } from "./compass.ts";
 export * from "./compass-change-summary.ts";
 export * from "./compass-audit.ts";
-export { createCompassInventoryEntries, type CompassInventoryEntry } from "@warpgogol/site-kernel";
+export { createCompassInventoryEntries, type CompassInventoryEntry } from "@warpgogol/werkstatt/kernel";
 
 export * from "./structure.ts";
 

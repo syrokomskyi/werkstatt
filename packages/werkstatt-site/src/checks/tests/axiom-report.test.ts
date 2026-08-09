@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { runAxiomReport, renderAxiomReportHtml } from "../axiom-adapter.ts";
 import type { EvidenceMetadata } from "../axiom-adapter.ts";
 import { makeTestContext } from "./helpers.ts";
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 import type { StudyRun, Finding, ObservationBundle } from "@syrokomskyi/axiom-study";
 import type { StagedCapsule } from "@syrokomskyi/axiom-capture";

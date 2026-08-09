@@ -12,7 +12,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { discoverWorkspacePackages, writeFileAtomic } from "@warpgogol/site-kernel";
+import { discoverWorkspacePackages, writeFileAtomic } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
@@ -20,8 +20,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import type { WorkspacePackageInfo } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import type { WorkspacePackageInfo } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "../result-helpers.ts";
 import { validateFleetSitesDrift } from "../fleet-sites-generate.ts";
 import type { EcosystemManifest } from "./types.ts";
@@ -223,7 +223,7 @@ export async function runWorkspaceSurfaceValidate(
       severity: "error",
       file: "fleet/fleet.sites.yaml",
       message: "fleet/fleet.sites.yaml has drifted from workspace site discovery.",
-      fixHint: "Run pnpm exec site-kernel run fleet.sites.generate to regenerate.",
+      fixHint: "Run pnpm exec werkstatt run fleet.sites.generate to regenerate.",
     });
   }
 

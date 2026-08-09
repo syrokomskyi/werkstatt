@@ -21,7 +21,7 @@ import { readFile, stat } from "node:fs/promises";
 import { join, relative, basename, dirname } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
 import { manifestSchema } from "@warpgogol/werkstatt-site/ontology";
-import { discoverSiteWorkspaces, writeFileIfChanged } from "@warpgogol/site-kernel";
+import { discoverSiteWorkspaces, writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
 import type {
   CheckResult,
@@ -29,7 +29,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------

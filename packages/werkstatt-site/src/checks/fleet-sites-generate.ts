@@ -23,13 +23,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   buildGeneratedHeader,
   discoverSiteWorkspaces,
   stripGeneratedMarker,
   writeFileAtomic,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 
 const FLEET_SITES_FILE = "fleet/fleet.sites.yaml";
 

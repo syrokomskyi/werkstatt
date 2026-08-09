@@ -85,7 +85,7 @@ import {
   mergeSuppressions,
   applySuppressions,
   type SuppressedFinding,
-} from "@warpgogol/site-kernel-checks/suppressions-config";
+} from "@warpgogol/werkstatt-site/checks/suppressions-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 

@@ -37,7 +37,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import type { VideoManifest, LiveVideoManifest } from "@warpgogol/werkstatt-site/share/schemas/media";
 import { fileExists } from "../lib/file-exists.ts";

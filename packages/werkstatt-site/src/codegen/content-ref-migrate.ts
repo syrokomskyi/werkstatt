@@ -22,7 +22,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 
 const BRACE_REF_PATTERN = /\{([a-z][a-z-]*[./][a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;

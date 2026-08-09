@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 import { getContentDisciplinePaths } from "./content-discipline.ts";
 

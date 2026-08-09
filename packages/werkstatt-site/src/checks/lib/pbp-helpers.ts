@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import type { PbpEntity } from "@warpgogol/werkstatt-site/pbp";
 import type { PbpCurrencyPricingPolicy } from "@warpgogol/werkstatt-site/pbp";
 import type { PbpRatePolicy, PbpRateSchedule } from "@warpgogol/werkstatt-site/pbp";

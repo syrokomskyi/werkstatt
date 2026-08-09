@@ -39,8 +39,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { stringify as yamlStringify } from "yaml";
 import { diagnosticsResult, failResult, passResult } from "./result-helpers.ts";
 import { pathExists } from "./content-discipline.ts";

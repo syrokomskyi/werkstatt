@@ -14,7 +14,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { createGeoService, citySlug } from "@warpgogol/werkstatt-site/geo";
 import { passResult, failResult } from "./result-helpers.ts";
 

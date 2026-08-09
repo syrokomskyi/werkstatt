@@ -18,15 +18,15 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import { readJsonFile } from "@warpgogol/werkstatt-site/share/fs";
 import {
   listSiteWorkspaces,
   listRegisteredKernelCommands,
   loadWorkspaceConfig,
   discoverWorkspacePackages,
-} from "@warpgogol/site-kernel";
-import type { WorkspacePackageInfo } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import type { WorkspacePackageInfo } from "@warpgogol/werkstatt/kernel";
 import { parse, parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { GENERATOR_OWNERSHIP_MAP } from "../generator-ownership.ts";
 import { collectPackageTestSignals } from "../test-signal.ts";

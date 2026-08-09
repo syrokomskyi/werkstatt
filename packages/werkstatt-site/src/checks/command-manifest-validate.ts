@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-RFC-0266: registers command.manifest.validate. Wraps @warpgogol/site-kernel's core
+RFC-0266: registers command.manifest.validate. Wraps @warpgogol/werkstatt/kernel's core
 validator (CMD-MAN-01 stale manifest, CMD-MAN-02 mutatesState with no writes)
 and adds CMD-MAN-03 — cross-checking that every GENERATOR_OWNERSHIP_MAP
 output appears in its owning command's declared `writes`. Lives in this
@@ -28,7 +28,7 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 
 interface OwnershipEntryForValidation {

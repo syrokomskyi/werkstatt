@@ -19,7 +19,7 @@
 */
 
 import type { WerkstattPlugin } from "@warpgogol/werkstatt/plugin";
-import type { KernelModule } from "@warpgogol/site-kernel";
+import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 
 export const werkstattSitePlugin: WerkstattPlugin = {
   schema: "werkstatt/plugin@1",

@@ -32,11 +32,11 @@ import { join, relative } from "node:path";
  * - @warpgogol/werkstatt-site/surface: surface contracts (not a stack plugin)
  *
  * Stack-specific packages that SHOULD be flagged (not exempt):
- * - @warpgogol/site-kernel-astro, site-kernel-checks, site-kernel-codegen,
- *   site-kernel-content, site-kernel-onboarding, site-kernel-audit
+ * - @warpgogol/werkstatt-site (except shared schema subpaths above)
  *
- * These will be inverted through plugin hooks in RFC-0774/0775.
- * Until then, they are also exempt to allow the re-export scaffold period.
+ * RFC-0776 completed the migration: old @warpgogol/site-kernel-* packages
+ * are deleted. The engine now imports from @warpgogol/werkstatt-site/*
+ * subpaths for shared schemas only, and through plugin hooks for stack logic.
  */
 const EXEMPT_PREFIXES = [
   "@warpgogol/werkstatt",
@@ -48,14 +48,6 @@ const EXEMPT_PREFIXES = [
   "@warpgogol/werkstatt-site/integration",
   "@warpgogol/werkstatt-site/integration-adapter-supabase-crm",
   "@warpgogol/werkstatt-site/surface",
-  // Temporary: stack-specific packages exempt during re-export scaffold period
-  // (RFC-0774/0775 will invert these through plugin hooks)
-  "@warpgogol/site-kernel-astro",
-  "@warpgogol/site-kernel-checks",
-  "@warpgogol/site-kernel-codegen",
-  "@warpgogol/site-kernel-content",
-  "@warpgogol/site-kernel-onboarding",
-  "@warpgogol/site-kernel-audit",
 ];
 
 /**

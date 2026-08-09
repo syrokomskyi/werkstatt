@@ -522,7 +522,7 @@ export function detectResidual(
  * ensuring dev/prod parity with the post-build dist sweep.
  *
  * Server-only. The caller loads the NormalizeConfig from `system.md` via
- * `loadSystemManifest()` from `@warpgogol/site-kernel-content` and passes it in.
+ * `loadSystemManifest()` from `@warpgogol/werkstatt-site/content` and passes it in.
  */
 export function createDevNormalizeMiddleware(config: NormalizeConfig): MiddlewareHandler {
   return async (_context, next) => {

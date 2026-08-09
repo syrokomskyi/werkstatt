@@ -18,7 +18,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
 import { WARPGOGOL_METRIC_REGISTRY } from "@warpgogol/werkstatt-site/observability";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { ALERT_RULES, NOTIFICATION_CHANNELS } from "../alert-rules.ts";
@@ -40,7 +40,7 @@ export async function runObservabilityAlertsValidate(
       severity: "error",
       file: "docs/observability/alerts.generated.yaml",
       message: "alerts.generated.yaml does not exist — run observability.alerts.generate.",
-      fixHint: "Run: pnpm exec site-kernel run observability.alerts.generate",
+      fixHint: "Run: pnpm exec werkstatt run observability.alerts.generate",
     });
     return diagnosticsResult("observability.alerts.validate", diagnostics);
   }
@@ -65,7 +65,7 @@ export async function runObservabilityAlertsValidate(
       severity: "error",
       file: "docs/observability/alerts.generated.yaml",
       message: "alerts.generated.yaml is not valid YAML.",
-      fixHint: "Regenerate: pnpm exec site-kernel run observability.alerts.generate",
+      fixHint: "Regenerate: pnpm exec werkstatt run observability.alerts.generate",
     });
     return diagnosticsResult("observability.alerts.validate", diagnostics);
   }
@@ -84,7 +84,7 @@ export async function runObservabilityAlertsValidate(
       severity: "error",
       file: "docs/observability/alerts.generated.yaml",
       message: "alerts.generated.yaml is stale — source rules/channels differ from projection.",
-      fixHint: "Regenerate: pnpm exec site-kernel run observability.alerts.generate",
+      fixHint: "Regenerate: pnpm exec werkstatt run observability.alerts.generate",
     });
   }
 

@@ -34,7 +34,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { GENERATED_MARKER } from "./generated-marker.ts";
 import { normalizeCssValue } from "@warpgogol/werkstatt-site/share/css-value-normalize";
 

@@ -143,12 +143,12 @@ function consumeCommonFlags(argv: string[]) {
 }
 
 function printUsage() {
-  console.log("site-kernel sites list [--json]");
+  console.log("werkstatt sites list [--json]");
   console.log(
-    "site-kernel run <command> [--site <name>] [--all] [--dry-run] [--no-registry-cache] [--json] [-- ...args]",
+    "werkstatt run <command> [--site <name>] [--all] [--dry-run] [--no-registry-cache] [--json] [-- ...args]",
   );
   console.log(
-    "site-kernel pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--no-registry-cache] [--concurrency N] [--json]",
+    "werkstatt pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--no-registry-cache] [--concurrency N] [--json]",
   );
 }
 
@@ -180,7 +180,7 @@ function printTopLevelError(error: unknown): void {
     console.log(
       JSON.stringify(
         {
-          commandName: process.argv[3] ?? process.argv[2] ?? "site-kernel",
+          commandName: process.argv[3] ?? process.argv[2] ?? "werkstatt",
           exitCode: 1,
           ok: false,
           summary: message,

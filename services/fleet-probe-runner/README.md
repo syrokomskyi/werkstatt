@@ -24,7 +24,7 @@ See [.env.example](./.env.example) for all required and optional environment var
 The target list is a **generated artifact** (`targets.generated.json`). To regenerate:
 
 ```sh
-pnpm exec site-kernel run fleet.probe.targets.generate
+pnpm exec werkstatt run fleet.probe.targets.generate
 ```
 
 Authored overrides live in `targets.overrides.jsonc` (routes, sentinels, origin, or `"exclude": true`).

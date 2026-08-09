@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { Diagnostic } from "@warpgogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 import {
   makeAgentAction,
   makeCheckReport,

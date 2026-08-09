@@ -17,8 +17,8 @@ import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { createDefaultIO } from "@warpgogol/site-kernel";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { createDefaultIO } from "@warpgogol/werkstatt/kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import {
   extractWorkspaceImports,
   runTemplateImportsValidate,
@@ -52,10 +52,10 @@ function makeInput(flags: Record<string, unknown> = {}): KernelCommandInput {
 
 describe("extractWorkspaceImports", () => {
   it("extracts static @warpgogol imports", () => {
-    const source = `import { foo } from "@warpgogol/site-kernel";`;
+    const source = `import { foo } from "@warpgogol/werkstatt/kernel";`;
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@warpgogol/site-kernel");
+    expect(imports[0].package).toBe("@warpgogol/werkstatt/kernel");
     expect(imports[0].line).toBe(1);
   });
 
@@ -67,10 +67,10 @@ describe("extractWorkspaceImports", () => {
   });
 
   it("extracts dynamic import() specifiers", () => {
-    const source = `const mod = await import("@warpgogol/site-kernel-integrity");`;
+    const source = `const mod = await import("@warpgogol/werkstatt/integrity");`;
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@warpgogol/site-kernel-integrity");
+    expect(imports[0].package).toBe("@warpgogol/werkstatt/integrity");
   });
 
   it("extracts dynamic @warpgogol import() specifiers", () => {
@@ -82,14 +82,14 @@ describe("extractWorkspaceImports", () => {
 
   it("extracts both static and dynamic imports from the same file", () => {
     const source = [
-      `import { foo } from "@warpgogol/site-kernel";`,
+      `import { foo } from "@warpgogol/werkstatt/kernel";`,
       `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
       `import { baz } from "@warpgogol/forge";`,
     ].join("\n");
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(3);
     expect(imports.map((i) => i.package)).toEqual([
-      "@warpgogol/site-kernel",
+      "@warpgogol/werkstatt/kernel",
       "@warpgogol/werkstatt-site/share",
       "@warpgogol/forge",
     ]);
@@ -106,16 +106,16 @@ describe("extractWorkspaceImports", () => {
   });
 
   it("does not break on {{TOKEN}} placeholders", () => {
-    const source = `import { {{COMPONENT_NAME}} } from "@warpgogol/site-kernel";`;
+    const source = `import { {{COMPONENT_NAME}} } from "@warpgogol/werkstatt/kernel";`;
     const imports = extractWorkspaceImports(source, "test.template.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@warpgogol/site-kernel");
+    expect(imports[0].package).toBe("@warpgogol/werkstatt/kernel");
   });
 
   it("reports correct line numbers", () => {
     const source = [
       `// line 1: comment`,
-      `import { foo } from "@warpgogol/site-kernel";`,
+      `import { foo } from "@warpgogol/werkstatt/kernel";`,
       `// line 3: comment`,
       `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
     ].join("\n");
@@ -155,7 +155,7 @@ describe("runTemplateImportsValidate", () => {
       join(tempDir, "package.json"),
       JSON.stringify({
         name: "test-workspace",
-        devDependencies: { "@warpgogol/site-kernel": "workspace:*" },
+        devDependencies: { "@warpgogol/werkstatt/kernel": "workspace:*" },
       }),
     );
     await writeFile(join(tempDir, "pnpm-workspace.yaml"), "packages:\n  - packages/*\n");
@@ -164,7 +164,7 @@ describe("runTemplateImportsValidate", () => {
     await writeFile(
       join(pkgDir, "kernel.config.template.ts"),
       [
-        `import { foo } from "@warpgogol/site-kernel";`,
+        `import { foo } from "@warpgogol/werkstatt/kernel";`,
         `import { bar } from "@warpgogol/missing-package";`,
       ].join("\n"),
     );
@@ -191,7 +191,7 @@ describe("runTemplateImportsValidate", () => {
       JSON.stringify({
         name: "test-workspace",
         devDependencies: {
-          "@warpgogol/site-kernel": "workspace:*",
+          "@warpgogol/werkstatt/kernel": "workspace:*",
           "@warpgogol/werkstatt-site/share": "workspace:*",
         },
       }),
@@ -202,7 +202,7 @@ describe("runTemplateImportsValidate", () => {
     await writeFile(
       join(pkgDir, "kernel.config.template.ts"),
       [
-        `import { foo } from "@warpgogol/site-kernel";`,
+        `import { foo } from "@warpgogol/werkstatt/kernel";`,
         `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
       ].join("\n"),
     );

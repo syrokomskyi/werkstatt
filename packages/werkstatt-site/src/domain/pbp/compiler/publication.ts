@@ -19,7 +19,7 @@ import type {
   PartialCompilerResult,
 } from "./types.js";
 import type { PbpEntity } from "../envelope.js";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 
 export async function publish(
   partial: PartialCompilerResult,

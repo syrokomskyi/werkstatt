@@ -15,7 +15,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
 import type { AuditFinding } from "../types.ts";
 import { pathExists } from "../../content-discipline.ts";

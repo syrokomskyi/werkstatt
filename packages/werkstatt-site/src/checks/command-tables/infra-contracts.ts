@@ -37,7 +37,7 @@ import { runSuppressionsValidate } from "../suppressions-validate.ts";
 import { runBordbuchCommitParityLint } from "../bordbuch-commit-parity-lint.ts";
 
 // Note: evidence.sync and evidence.fetch are registered by createEvidenceModule
-// in @warpgogol/site-kernel-handoff/src/evidence/evidence-module.ts (RFC-0651).
+// in @warpgogol/werkstatt/src/evidence/evidence-module.ts (RFC-0651).
 // They are NOT included in INFRA_CONTRACTS_COMMANDS to avoid duplicate registration.
 // RFC-0652: evidence.sync is invoked by mission.close (mandatory, via executeKernelCommand)
 // and leitstand.dev-deploy (best-effort, via executeKernelCommand after axiom.report).

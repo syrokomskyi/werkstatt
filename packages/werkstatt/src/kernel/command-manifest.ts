@@ -75,7 +75,7 @@ export function collectCommandManifestDiagnostics(
       severity: "error",
       file: MANIFEST_RELATIVE_PATH.replace(/\\/g, "/"),
       message: "docs/command-manifest.generated.yaml is missing.",
-      fixHint: "Run: pnpm exec site-kernel run command.manifest.generate",
+      fixHint: "Run: pnpm exec werkstatt run command.manifest.generate",
     });
     return diagnostics;
   }
@@ -89,7 +89,7 @@ export function collectCommandManifestDiagnostics(
       severity: "error",
       file: MANIFEST_RELATIVE_PATH.replace(/\\/g, "/"),
       message: "docs/command-manifest.generated.yaml is not valid YAML.",
-      fixHint: "Run: pnpm exec site-kernel run command.manifest.generate",
+      fixHint: "Run: pnpm exec werkstatt run command.manifest.generate",
     });
     return diagnostics;
   }
@@ -100,7 +100,7 @@ export function collectCommandManifestDiagnostics(
       severity: "error",
       file: MANIFEST_RELATIVE_PATH.replace(/\\/g, "/"),
       message: "docs/command-manifest.generated.yaml is stale vs the live command registry.",
-      fixHint: "Run: pnpm exec site-kernel run command.manifest.generate",
+      fixHint: "Run: pnpm exec werkstatt run command.manifest.generate",
     });
   }
 

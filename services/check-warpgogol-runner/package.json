@@ -7,10 +7,9 @@
     "dev": "tsx src/worker.ts",
     "run:once": "tsx src/run-once.ts",
     "build:check": "tsc --noEmit",
-    "check": "site-kernel run check-warpgogol.runner.validate"
+    "check": "werkstatt run check-warpgogol.runner.validate"
   },
   "dependencies": {
-    "@warpgogol/site-kernel-check-warpgogol": "workspace:*",
     "@warpgogol/werkstatt-site": "workspace:*"
   },
   "devDependencies": {

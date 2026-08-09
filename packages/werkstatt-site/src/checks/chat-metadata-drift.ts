@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { CHAT_ADAPTER_IDS, getChatAdapterMetadata } from "@warpgogol/werkstatt-site/chat";
 import { diagnosticsResult } from "./result-helpers.ts";
 

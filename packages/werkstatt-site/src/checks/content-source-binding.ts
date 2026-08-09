@@ -31,7 +31,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { getContentDisciplinePaths, pathExists } from "./content-discipline.ts";
 import { collectClaimSidecars, keyLine, toPosix } from "./content-claims.ts";

@@ -8,7 +8,7 @@ fields, lifecycle statuses, consent records for humans, and public/private visib
 </purpose>
 <non-goals>
   <item>Do not define route generation or page rendering logic — that lives in @warpgogol/werkstatt-site/share/astro.</item>
-  <item>Do not define validation rules — that lives in @warpgogol/site-kernel-checks/src/participant.ts.</item>
+  <item>Do not define validation rules — that lives in @warpgogol/werkstatt-site/checks/src/participant.ts.</item>
   <item>Do not remove PERSON_AFFILIATIONS from person.ts — it is retained for human governance JSON-LD.</item>
 </non-goals>
 </MODULE_CONTRACT>

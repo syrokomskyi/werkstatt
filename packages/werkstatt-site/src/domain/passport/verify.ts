@@ -26,7 +26,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { PassportSchema, PassportPublicKeyFileSchema } from "./schema.ts";
 import { verifyCredential, type CredentialSubjectDigest } from "./sign.ts";
 

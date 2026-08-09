@@ -30,8 +30,8 @@ import type {
   KernelCommandInput,
   KernelRuntimeContext,
   KernelExecutionReport,
-} from "@warpgogol/site-kernel";
-import { createDefaultIO } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { createDefaultIO } from "@warpgogol/werkstatt/kernel";
 
 const execFileAsync = promisify(execFile);
 
@@ -39,8 +39,8 @@ const mockState = vi.hoisted(() => ({
   renderedFiles: {} as Record<string, string> | undefined,
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     executeKernelCommand: vi.fn(

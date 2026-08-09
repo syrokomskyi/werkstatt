@@ -9,7 +9,7 @@ import {
   discoverManifestPropsInfo,
   runPropsTypesGenerate,
 } from "../props-types.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>

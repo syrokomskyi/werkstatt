@@ -34,14 +34,14 @@ import { join, basename, extname, dirname } from "node:path";
 import { readdir, readFile, writeFile, mkdir, stat, copyFile, unlink } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { fileExists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import { promisify } from "node:util";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import type {
   VideoManifest,

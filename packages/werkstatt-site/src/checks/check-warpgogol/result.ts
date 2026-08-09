@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { CheckResult, Diagnostic, KernelCommandResult } from "@warpgogol/site-kernel";
+import type { CheckResult, Diagnostic, KernelCommandResult } from "@warpgogol/werkstatt/kernel";
 
 export function diagnosticsResult(
   command: string,

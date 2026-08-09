@@ -15,7 +15,7 @@ import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, rm, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import {
   includeInLlms,
   includeInTwins,

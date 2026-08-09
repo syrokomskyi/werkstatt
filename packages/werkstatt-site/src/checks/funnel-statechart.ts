@@ -19,8 +19,8 @@ trigger↔graph bijection invariant for both layers. Node-safe: file I/O + pure 
 
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
-import { writeFileAtomic, buildGeneratedHeader } from "@warpgogol/site-kernel";
-import type { KernelCommandInput, KernelCommandResult } from "@warpgogol/site-kernel";
+import { writeFileAtomic, buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
+import type { KernelCommandInput, KernelCommandResult } from "@warpgogol/werkstatt/kernel";
 import {
   FUNNEL_SYSTEM_TRIGGERS,
   FUNNEL_TRANSITION_TRIGGERS,

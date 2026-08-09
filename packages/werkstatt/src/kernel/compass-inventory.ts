@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Compass inventory scanning logic. Canonical implementation now lives
 in @warpgogol/forge/os/compass/handlers/compass-inventory.ts (RFC-0556 dependency inversion).
-This file re-exports it for backward-compatible imports from @warpgogol/site-kernel.</purpose>
+This file re-exports it for imports from @warpgogol/werkstatt/kernel.</purpose>
 <non-goals>
   <item>Do not duplicate the implementation — always re-export from forge.</item>
 </non-goals>

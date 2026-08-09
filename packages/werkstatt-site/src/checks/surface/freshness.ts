@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type { SurfaceArtifact } from "@warpgogol/werkstatt-site/surface";
 import { failResult, passResult } from "../result-helpers.ts";
 import { ARTIFACT_FILE } from "./shared.ts";

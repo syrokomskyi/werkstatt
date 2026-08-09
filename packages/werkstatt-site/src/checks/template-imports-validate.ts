@@ -24,14 +24,14 @@ import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { promisify } from "node:util";
 import { collectFiles, fileExists } from "@warpgogol/werkstatt-site/share/fs";
-import { discoverWorkspacePackages } from "@warpgogol/site-kernel";
+import { discoverWorkspacePackages } from "@warpgogol/werkstatt/kernel";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const execFileAsync = promisify(execFile);

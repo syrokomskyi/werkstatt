@@ -21,14 +21,14 @@ This is a **service** workspace. Runtime composition only. Shared schemas and va
 | `dev`         | `tsx src/worker.ts`                               |
 | `run:once`    | `tsx src/run-once.ts`                             |
 | `build:check` | `tsc --noEmit`                                    |
-| `check`       | `site-kernel run check-warpgogol.runner.validate` |
+| `check`       | `werkstatt run check-warpgogol.runner.validate` |
 
 ## Dependencies
 
 **Workspace:**
 
-- `@warpgogol/check-core`
-- `@warpgogol/check-runner-node`
-- `@warpgogol/site-kernel-check-warpgogol`
+- `@warpgogol/werkstatt-site/check-core`
+- `@warpgogol/werkstatt-site/check-runner`
+- `@warpgogol/werkstatt-site/checks/check-warpgogol`
 
 See the root `AGENTS.md` for project-wide rules, skills, and capabilities.

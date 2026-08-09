@@ -24,7 +24,7 @@ import {
   type KernelRuntimeContext,
   type CheckResult,
   type Diagnostic,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "../result-helpers.ts";
 import {
   SITES_BUILD_CHECK_PIPELINE,

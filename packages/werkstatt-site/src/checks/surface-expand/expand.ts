@@ -17,7 +17,7 @@ VirtualRouteEntry.</purpose>
 */
 
 import { join } from "node:path";
-import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import {
   buildAxisFieldMap,
   generateEntries,

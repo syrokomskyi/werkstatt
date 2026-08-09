@@ -33,7 +33,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import type { SystemManifest } from "@warpgogol/werkstatt-site/ontology/schemas";
-import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { collectNebulaInputs } from "@warpgogol/werkstatt-site/nebula/collect";
 import type { NebulaInputs } from "@warpgogol/werkstatt-site/nebula";
 import { manifestToStarMapInput, emitStarMap } from "@warpgogol/werkstatt-site/star-map/render";

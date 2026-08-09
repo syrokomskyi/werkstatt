@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { failResult, resultFromViolations } from "../result-helpers.ts";
 import { buildPage, type ResolvedPage, type PageEntry } from "@warpgogol/werkstatt-site/share/page";
 import { EMPTY_RUNTIME_CONTEXT } from "@warpgogol/werkstatt-site/share/runtime-context";

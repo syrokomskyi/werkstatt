@@ -29,7 +29,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import {
@@ -41,7 +41,7 @@ import {
   type AgentSurfaceManifest,
 } from "@warpgogol/werkstatt-site/share/agent";
 import { BUSINESS_DOMAIN_VISIBILITY } from "@warpgogol/werkstatt-site/share/semantic";
-import { PINNED_MCP_PROTOCOL_VERSION } from "@warpgogol/agent-gate";
+import { PINNED_MCP_PROTOCOL_VERSION } from "@warpgogol/werkstatt/agent-gate";
 import { verifyBytes } from "@warpgogol/werkstatt-site/passport/sign";
 import { PassportPublicKeyFileSchema } from "@warpgogol/werkstatt-site/passport/schema";
 import { readAstroSiteUrl } from "../lib/astro-site-url.ts";
@@ -223,7 +223,7 @@ export async function runAgentSurfaceValidate(
       severity: "error",
       file: INTERNAL_MANIFEST_FILE,
       message: "Agent Surface Manifest not found. Run agent.manifest.generate first.",
-      fixHint: "Run: pnpm exec site-kernel run agent.manifest.generate --site <app>",
+      fixHint: "Run: pnpm exec werkstatt run agent.manifest.generate --site <app>",
     });
     return diagnosticsResult("agent.surface.validate", diagnostics);
   }

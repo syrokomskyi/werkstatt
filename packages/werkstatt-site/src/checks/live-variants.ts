@@ -30,7 +30,7 @@
 import { join } from "node:path";
 import { readFile, writeFile, mkdir, copyFile } from "node:fs/promises";
 import { fileExists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
@@ -38,7 +38,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import type { LiveVideoManifest, LiveVideoManifestEntry } from "@warpgogol/werkstatt-site/share/schemas/media";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";

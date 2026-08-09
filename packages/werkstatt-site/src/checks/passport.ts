@@ -26,10 +26,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { optionalEnv } from "@warpgogol/site-kernel-integrity";
+import { optionalEnv } from "@warpgogol/werkstatt/integrity";
 import { emitPassport } from "@warpgogol/werkstatt-site/passport/emit";
 import { verifyPassport } from "@warpgogol/werkstatt-site/passport/verify";
 import { rotateKey } from "@warpgogol/werkstatt-site/passport/key-rotate";

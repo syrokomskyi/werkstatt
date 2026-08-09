@@ -27,9 +27,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { optionalEnv } from "@warpgogol/site-kernel-integrity";
+import { optionalEnv } from "@warpgogol/werkstatt/integrity";
 import { signBytes, verifyBytes } from "@warpgogol/werkstatt-site/passport/sign";
 import { PassportPublicKeyFileSchema } from "@warpgogol/werkstatt-site/passport/schema";
 import {
@@ -183,7 +183,7 @@ export async function runAgentSurfaceSign(
       severity: "error",
       file: INTERNAL_MANIFEST_FILE,
       message: "Agent Surface Manifest not found. Run agent.manifest.generate first.",
-      fixHint: "Run: pnpm exec site-kernel run agent.manifest.generate --site <app>",
+      fixHint: "Run: pnpm exec werkstatt run agent.manifest.generate --site <app>",
     });
   } else {
     try {

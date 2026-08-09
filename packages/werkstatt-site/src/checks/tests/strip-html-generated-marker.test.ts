@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { stripHtmlGeneratedMarker } from "../strip-html-generated-marker.ts";
-import { GENERATED_MARKER, buildGeneratedHeader } from "@warpgogol/site-kernel";
+import { GENERATED_MARKER, buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>

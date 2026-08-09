@@ -28,7 +28,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";
 import { loadSurfaceModuleContexts } from "./pseo-module-context.ts";

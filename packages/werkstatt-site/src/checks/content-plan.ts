@@ -47,8 +47,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { passResult } from "./result-helpers.ts";
 import { pathExists, readMarkdownDocument } from "./content-discipline.ts";
 import { collectClaimSidecars, recordPathForSidecar, toPosix } from "./content-claims.ts";

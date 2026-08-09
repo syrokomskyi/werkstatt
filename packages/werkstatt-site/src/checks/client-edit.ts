@@ -37,7 +37,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { fileExists } from "./lib/file-exists.ts";
 
 // ---------------------------------------------------------------------------

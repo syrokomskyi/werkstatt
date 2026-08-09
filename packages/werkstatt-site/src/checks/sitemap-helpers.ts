@@ -12,7 +12,7 @@ import { parse as yamlParse } from "yaml";
 */
 
 import { join, dirname } from "node:path";
-import type { WorkspaceIO, DirEntry } from "@warpgogol/site-kernel";
+import type { WorkspaceIO, DirEntry } from "@warpgogol/werkstatt/kernel";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { resolvePageOutput, type RawPageOutput } from "@warpgogol/werkstatt-site/share/semantic";
 import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";

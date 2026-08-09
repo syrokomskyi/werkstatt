@@ -25,7 +25,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
   WorkspaceIO,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { parse as yamlParse } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
@@ -256,7 +256,7 @@ export async function runGeneratedFilesValidate(
               severity: "error",
               file: toPosix(relative(context.workspaceRoot, resolvedPath)),
               message: `Registry-declared generated file for system "${sid}" (owner: ${entry.command}) does not exist on disk at ${resolvedPath}.`,
-              fixHint: `Run \`pnpm exec site-kernel run ${entry.command} --system ${sid}\` to regenerate it.`,
+              fixHint: `Run \`pnpm exec werkstatt run ${entry.command} --system ${sid}\` to regenerate it.`,
             });
           }
         }
@@ -282,7 +282,7 @@ export async function runGeneratedFilesValidate(
             severity: "error",
             file: `systems/${systemId}/${restAfterSystemId}`,
             message: `Registry-declared generated file "systems/${systemId}/${restAfterSystemId}" (owner: ${entry.command}) does not exist on disk.`,
-            fixHint: `Run \`pnpm exec site-kernel run ${entry.command} --system ${systemId}\` to regenerate it.`,
+            fixHint: `Run \`pnpm exec werkstatt run ${entry.command} --system ${systemId}\` to regenerate it.`,
           });
         }
         continue;
@@ -328,7 +328,7 @@ export async function runGeneratedFilesValidate(
           severity: "error",
           file: relPath,
           message: `Registry-declared generated file "${relPath}" (owner: ${entry.command}) does not exist on disk.`,
-          fixHint: `Run \`pnpm exec site-kernel run ${entry.command}${app ? ` --site ${app}` : ""}\` to regenerate it.`,
+          fixHint: `Run \`pnpm exec werkstatt run ${entry.command}${app ? ` --site ${app}` : ""}\` to regenerate it.`,
         });
       }
     }

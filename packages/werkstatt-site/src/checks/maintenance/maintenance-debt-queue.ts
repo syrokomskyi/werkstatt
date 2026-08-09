@@ -14,7 +14,7 @@
 
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import {
   listSiteWorkspaces,
   listRegisteredKernelCommands,
@@ -24,7 +24,7 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
 import { z } from "zod";
 import {
@@ -203,9 +203,9 @@ const INITIAL_QUEUE_TEMPLATES: Record<string, string> = {
     "  push: false",
     "acceptance:",
     "  commands:",
-    '    - "pnpm exec site-kernel run maintenance.debt.queue.validate --queue prose-credit-sidecars --json"',
-    '    - "pnpm exec site-kernel run material.credits.validate --site <app> --json"',
-    '    - "pnpm exec site-kernel run maintenance.debt.baseline.validate --json"',
+    '    - "pnpm exec werkstatt run maintenance.debt.queue.validate --queue prose-credit-sidecars --json"',
+    '    - "pnpm exec werkstatt run material.credits.validate --site <app> --json"',
+    '    - "pnpm exec werkstatt run maintenance.debt.baseline.validate --json"',
     "notes:",
     '  - "Do not invent authorship. Use NEED_THIS-style placeholders or documented asserted ownership only where policy allows."',
     "",
@@ -238,11 +238,11 @@ const INITIAL_QUEUE_TEMPLATES: Record<string, string> = {
     "  push: false",
     "acceptance:",
     "  commands:",
-    '    - "pnpm exec site-kernel run maintenance.debt.queue.validate --queue surface-substance-assets-and-narratives --json"',
-    '    - "pnpm exec site-kernel run surface.validate --site <app> --json"',
-    '    - "pnpm exec site-kernel run asset.reference.validate --site <app> --json"',
-    '    - "pnpm exec site-kernel run material.credits.validate --site <app> --json"',
-    '    - "pnpm exec site-kernel run maintenance.debt.baseline.validate --json"',
+    '    - "pnpm exec werkstatt run maintenance.debt.queue.validate --queue surface-substance-assets-and-narratives --json"',
+    '    - "pnpm exec werkstatt run surface.validate --site <app> --json"',
+    '    - "pnpm exec werkstatt run asset.reference.validate --site <app> --json"',
+    '    - "pnpm exec werkstatt run material.credits.validate --site <app> --json"',
+    '    - "pnpm exec werkstatt run maintenance.debt.baseline.validate --json"',
     "notes:",
     '  - "Prefer improving authored source records over editing generated surface output."',
     '  - "Preserve bare image tokens and add material credits when introducing new material."',
@@ -276,9 +276,9 @@ const INITIAL_QUEUE_TEMPLATES: Record<string, string> = {
     "  push: false",
     "acceptance:",
     "  commands:",
-    '    - "pnpm exec site-kernel run maintenance.debt.queue.validate --queue demand-slug-overrides --json"',
-    '    - "pnpm exec site-kernel run demands.hierarchy.validate --site <app> --json"',
-    '    - "pnpm exec site-kernel run maintenance.debt.baseline.validate --json"',
+    '    - "pnpm exec werkstatt run maintenance.debt.queue.validate --queue demand-slug-overrides --json"',
+    '    - "pnpm exec werkstatt run demands.hierarchy.validate --site <app> --json"',
+    '    - "pnpm exec werkstatt run maintenance.debt.baseline.validate --json"',
     "notes:",
     '  - "Treat URL changes as high-risk; handle redirects, canonical URLs, sitemap effects, and localized pairs together."',
     '  - "Represent intentional overrides with first-class metadata rather than warning strings."',

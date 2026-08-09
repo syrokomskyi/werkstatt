@@ -27,7 +27,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 import { SITES_CHECK_AUTHOR_PIPELINE } from "./pipelines/sites-check-author.ts";
@@ -208,7 +208,7 @@ export function runWsWrite01(
 // ---------------------------------------------------------------------------
 
 // RFC-0270: a module that itself lives inside packages/os/site-kernel/src (the
-// package that defines writeFileAtomic) cannot import it via the "@warpgogol/site-kernel"
+// package that defines writeFileAtomic) cannot import it via the "@warpgogol/werkstatt/kernel"
 // package specifier — it imports the sibling ./fs-atomic.ts source file directly.
 // RFC-0345: writeFileIfChanged is also accepted because it delegates the actual
 // write to writeFileAtomic while avoiding unchanged-file churn.
@@ -249,7 +249,7 @@ export async function runWsWrite02(
         severity: "error",
         message: `Allowlisted module \`${entry.module}\` (command \`${entry.command}\`) does not import writeFileAtomic or writeFileIfChanged from @warpgogol/site-kernel.`,
         file: entry.module,
-        fixHint: `Import writeFileAtomic or writeFileIfChanged from "@warpgogol/site-kernel" in ${entry.module} and use it for the workspace-shared write (RFC-0258/RFC-0345).`,
+        fixHint: `Import writeFileAtomic or writeFileIfChanged from "@warpgogol/werkstatt/kernel" in ${entry.module} and use it for the workspace-shared write (RFC-0258/RFC-0345).`,
       });
     }
 

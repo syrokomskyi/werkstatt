@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 
 export interface FileLookupResult {
@@ -166,7 +166,7 @@ function buildLookupResult(
 
   const isRegistryOnly = entry.markerPolicy === "registry-only";
   const category = isRegistryOnly ? "B" : "A";
-  const regenerateCommand = `pnpm exec site-kernel run ${entry.command}`;
+  const regenerateCommand = `pnpm exec werkstatt run ${entry.command}`;
 
   return {
     path: relPath,

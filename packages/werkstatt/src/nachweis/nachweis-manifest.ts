@@ -28,7 +28,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
-import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import {
   isNachweisEntitled,
   makeSkipResult,

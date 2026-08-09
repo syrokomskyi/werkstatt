@@ -15,7 +15,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { runPrintPdfCopy } from "../print-pdf.ts";
-import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 function makeContext(appDir: string): KernelRuntimeContext {
   return {

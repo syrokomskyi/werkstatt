@@ -22,7 +22,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // Pattern that matches a direct Zod schema definition (not a re-export proxy).

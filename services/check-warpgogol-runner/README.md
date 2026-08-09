@@ -16,6 +16,6 @@ The reusable contracts and browser capture live in packages. This backend only w
 Validate the backend layer from the workspace root:
 
 ```sh
-pnpm exec site-kernel run check-warpgogol.runner.validate
-pnpm exec site-kernel run services.check.run
+pnpm exec werkstatt run check-warpgogol.runner.validate
+pnpm exec werkstatt run services.check.run
 ```

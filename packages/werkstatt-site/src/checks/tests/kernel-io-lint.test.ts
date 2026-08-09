@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { findForbiddenIoImports, runKernelIoLint } from "../kernel-io-lint.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>
@@ -60,7 +60,7 @@ describe("findForbiddenIoImports (RFC-0267)", () => {
 
   it("green fixture: a module using context.io only has no forbidden imports", () => {
     const source = `
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 export async function run(_input: KernelCommandInput, context: KernelRuntimeContext) {
   const content = await context.io.readFile("some/path");
   return { exitCode: 0, data: { content } };
@@ -96,7 +96,7 @@ describe("runKernelIoLint (RFC-0267, command-level)", () => {
     const { root, context } = await fixtureWorkspace();
     await writeFile(
       join(root, SCAN_DIR, "clean.ts"),
-      'import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";\nexport async function run(_i: KernelCommandInput, context: KernelRuntimeContext) { return context.io.readFile("x"); }\n',
+      'import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";\nexport async function run(_i: KernelCommandInput, context: KernelRuntimeContext) { return context.io.readFile("x"); }\n',
       "utf8",
     );
     const result = await runKernelIoLint(input(), context);

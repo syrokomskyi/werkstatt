@@ -14,7 +14,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { join } from "node:path";
-import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import type { AppPublicContext } from "../public-surface/shared.ts";
 
 // Mock readTextIfExists so we can control which source SVGs "exist"

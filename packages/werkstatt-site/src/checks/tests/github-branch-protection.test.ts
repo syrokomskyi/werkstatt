@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runGithubBranchProtectionValidate } from "../github-branch-protection.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 const logger = {
   section() {},
@@ -33,7 +33,7 @@ const VALID_POLICY = `protectedBranch:
 requiredCheck:
   name: "Package quality and author checks"
 requiredWorkflowSteps:
-  - "pnpm exec site-kernel run rfc.validate"
+  - "pnpm exec werkstatt run rfc.validate"
 `;
 
 const VALID_WORKFLOW = `name: Autonomous quality gate
@@ -45,7 +45,7 @@ jobs:
     name: Package quality and author checks
     steps:
       - name: RFC validation
-        run: pnpm exec site-kernel run rfc.validate
+        run: pnpm exec werkstatt run rfc.validate
 `;
 
 async function setupWorkspace(policy: string, workflow: string): Promise<string> {

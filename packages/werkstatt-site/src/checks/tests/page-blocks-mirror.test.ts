@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runPageBlocksMirrorValidate } from "../page-blocks-mirror.ts";
-import type { CheckResult, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { CheckResult, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { makeTestSiteContext } from "./helpers.ts";
 
 /*

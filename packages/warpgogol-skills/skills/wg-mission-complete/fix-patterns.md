@@ -49,7 +49,7 @@ Error→resolution mappings for `wg-mission-complete`. Entries are reactive — 
 - **Command:** mission.reconcile
 - **Trigger:** "workpiece has N uncommitted file(s)"
 - **Root cause:** Generated artifacts from build.prepare (content-ref-index, entitlements, env.example) or operator edits not committed
-- **Resolution:** Commit via `pnpm exec site-kernel run mission.git.commit --mission <id> --message "<msg>"`. If only generated files are dirty — commit with "chore: regenerate artifacts from build.prepare"
+- **Resolution:** Commit via `pnpm exec werkstatt run mission.git.commit --mission <id> --message "<msg>"`. If only generated files are dirty — commit with "chore: regenerate artifacts from build.prepare"
 - **Auto-resolvable:** yes
 - **Encountered:** 2026-07-26
 - **Confirmations:** 1
@@ -59,7 +59,7 @@ Error→resolution mappings for `wg-mission-complete`. Entries are reactive — 
 - **Command:** release.prepare
 - **Trigger:** "mission '<id>' has not passed validation"
 - **Root cause:** mission.validate was not run or failed
-- **Resolution:** Run `pnpm exec site-kernel run mission.validate --mission <id>` first. If it fails — fix the reported errors, commit, re-validate
+- **Resolution:** Run `pnpm exec werkstatt run mission.validate --mission <id>` first. If it fails — fix the reported errors, commit, re-validate
 - **Auto-resolvable:** yes
 - **Encountered:** 2026-07-26
 - **Confirmations:** 1

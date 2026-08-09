@@ -78,7 +78,7 @@ See root AGENTS.md §Build verification discipline for the full policy.
 When this workspace is a mission workpiece, agents MUST use `mission.git.commit` to commit edits — not direct `git commit`:
 
 ```sh
-pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "<descriptive message>"
+pnpm exec werkstatt run mission.git.commit --mission <missionId> --message "<descriptive message>"
 ```
 
 - Agents MUST commit after completing a batch of edits, before ending the session.
@@ -278,7 +278,7 @@ See `docs/authoring/site-composition.md §Build prepare pipeline` for the cross-
 | `src/styles/biome.generated.css` | (auto via `build.prepare`) | After changing brand colors |
 | `src/content/pages/*/open-source.md` | `pnpm open-source:gen` | After updating production dependencies |
 | `src/content/prose/*/credits.md` | `material.credits.generate` | After editing any `*.credits.yaml` sidecar |
-| `AGENTS.md` | `pnpm exec site-kernel run agents.generate --site {{APP_ID}}` | After shared AGENTS.md patterns change (RFC-0079) |
+| `AGENTS.md` | `pnpm exec werkstatt run agents.generate --site {{APP_ID}}` | After shared AGENTS.md patterns change (RFC-0079) |
 
 All run automatically in `pnpm build`. Deployment is a single **Cloudflare Workers** target via the `@astrojs/cloudflare` adapter (RFC-0149): the site stays `output: "static"` (SSG by default) and only routes declaring `export const prerender = false` (section API endpoints under `src/pages/api/`) render on demand in the Worker. Section endpoints are portable Astro `APIRoute`s reading secrets via `astro:env/server` — never Cloudflare Pages Functions or `onRequest*` handlers. Language detection is currently client-side via `src/pages/index.astro` → `RootRedirectContent` (the language entry remains prerendered); request-time detection is available by opting that route into `prerender = false`.
 

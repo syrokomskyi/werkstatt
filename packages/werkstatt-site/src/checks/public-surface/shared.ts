@@ -19,7 +19,7 @@ import type {
   Diagnostic,
   KernelRuntimeContext,
   KernelCommandResult,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
@@ -390,7 +390,7 @@ export function buildHumansTxt(app: AppPublicContext): string {
     `Last update: ${TODAY}`,
     "",
     "/* TECHNOLOGY */",
-    "Astro 6, TypeScript, Turborepo, pnpm, @warpgogol/site-kernel",
+    "Astro 6, TypeScript, Turborepo, pnpm, @warpgogol/werkstatt/kernel",
     "",
   ];
   return lines.join("\n");

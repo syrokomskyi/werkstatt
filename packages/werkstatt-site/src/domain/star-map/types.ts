@@ -112,7 +112,7 @@ export interface NodePosition {
 
 /**
  * Structural subset of SystemManifest that `manifestToStarMapInput` consumes.
- * Both `@warpgogol/werkstatt-site/ontology/schemas` SystemManifest and `@warpgogol/site-kernel-content`
+ * Both `@warpgogol/werkstatt-site/ontology/schemas` SystemManifest and `@warpgogol/werkstatt-site/content`
  * SystemManifest satisfy this interface, eliminating the need for type casts.
  */
 export interface StarMapManifestSubset {

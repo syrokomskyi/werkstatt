@@ -1,7 +1,7 @@
 import { test, expect, describe } from "vitest";
-import { buildSchedule, ScheduleError } from "@warpgogol/site-kernel";
+import { buildSchedule, ScheduleError } from "@warpgogol/werkstatt/kernel";
 import { runPipelineDependenciesValidate } from "../pipeline/pipeline-dependencies-validate.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>

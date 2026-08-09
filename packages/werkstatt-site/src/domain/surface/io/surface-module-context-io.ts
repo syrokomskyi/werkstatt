@@ -18,7 +18,7 @@
 
 import { join } from "node:path";
 import { normalizeSurfaceModules, type SurfaceModules } from "../index.ts";
-import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 
 export interface LoadedModuleContexts {
   modules: SurfaceModules;

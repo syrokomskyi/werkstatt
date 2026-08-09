@@ -48,7 +48,7 @@ For amend mode: read `onboarding/<system-id>/.input/amend-<N>/` for the amend-sp
 
 ### 3. Synthesize
 
-Run the deterministic synthesis command: `pnpm exec site-kernel run onboarding.synthesize --system <system-id> --json`.
+Run the deterministic synthesis command: `pnpm exec werkstatt run onboarding.synthesize --system <system-id> --json`.
 
 Parse the result. If `status` is `fail`, report the diagnostics and stop. If `status` is `noop` (no `.input/` directory), ask the operator to provide materials first.
 
@@ -70,13 +70,13 @@ Commit synthesis artifacts: `git add onboarding/<system-id>/.output/ && git comm
 
 Derive the cosmic star from the blueprint synthesis. If the operator has not specified a star, propose one based on the client's industry and archetype.
 
-Run `pnpm exec site-kernel run sternsystem.register --id <system-id> --cosmicStar <star> --repo <repo-url> --json`.
+Run `pnpm exec werkstatt run sternsystem.register --id <system-id> --cosmicStar <star> --repo <repo-url> --json`.
 
 The command creates the registry entry, pin file, content stubs, opens the first mission (`<system-id>-m000001`), and triggers materialization. If it fails, the command rolls back atomically — report the error and stop.
 
 **Amend:**
 
-Run `pnpm exec site-kernel run sternsystem.register --id <system-id> --amend --amend-id <N> --json`.
+Run `pnpm exec werkstatt run sternsystem.register --id <system-id> --amend --amend-id <N> --json`.
 
 The command updates the pin file, opens an amend mission, and triggers materialization.
 

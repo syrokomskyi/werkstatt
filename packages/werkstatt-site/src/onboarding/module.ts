@@ -16,7 +16,7 @@ config sync, and amend lifecycle commands with the site-kernel registry (DNA-36,
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@warpgogol/site-kernel";
+import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 
 export function createOnboardingModule(): KernelModule {
   return {

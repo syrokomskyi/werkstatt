@@ -50,7 +50,7 @@ jobs:
         run: pnpm --filter {{CLIENT_ID}} build.prepare
 
       - name: Contract full check
-        run: node packages/os/site-kernel/bin/site-kernel.mjs run app.contract.full --site {{CLIENT_ID}}
+        run: node packages/werkstatt/bin/werkstatt.mjs run app.contract.full --site {{CLIENT_ID}}
         env:
           PASSPORT_SIGNING_KEY: ${{ secrets.PASSPORT_SIGNING_KEY }}
 

@@ -17,7 +17,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { validateI18nConfigApp } from "@warpgogol/werkstatt-site/content";
 
 export interface I18nValidationResult {

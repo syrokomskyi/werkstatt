@@ -30,7 +30,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { EVENT_NAMES } from "@warpgogol/werkstatt-site/growth/adapter";
 import { resultFromViolations } from "./result-helpers.ts";
 

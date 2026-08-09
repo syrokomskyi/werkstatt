@@ -18,12 +18,12 @@
 import { join } from "node:path";
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { compilePbpProfile } from "@warpgogol/werkstatt-site/pbp/compiler";

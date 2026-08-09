@@ -34,7 +34,7 @@ import {
   type KernelCommandResult,
   type KernelRuntimeContext,
   buildGeneratedHeader,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { diagnosticsResult } from "./result-helpers.ts";
@@ -407,7 +407,7 @@ export async function runBehaviorSnapshotValidate(
         file: relative(context.workspaceRoot, snapshotPath(appDirectory)).replace(/\\/g, "/"),
         message: "No committed behavior.snapshot.generated.yaml exists for this app.",
         fixHint:
-          "Run: pnpm exec site-kernel run behavior.snapshot.generate --site <app>, then commit the file.",
+          "Run: pnpm exec werkstatt run behavior.snapshot.generate --site <app>, then commit the file.",
       },
     ]);
   }

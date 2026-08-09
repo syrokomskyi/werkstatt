@@ -23,12 +23,12 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   hasGeneratedMarker,
   stripGeneratedMarker,
   isGeneratedMarkerTextCandidate,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { stripHtmlGeneratedMarker } from "./strip-html-generated-marker.ts";

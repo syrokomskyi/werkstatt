@@ -15,7 +15,7 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { checkHtmlStructure, runDistHtmlStructureValidate } from "../dist-html-structure.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 function makeContext(workspaceRoot: string, siteDir?: string): KernelRuntimeContext {
   return {

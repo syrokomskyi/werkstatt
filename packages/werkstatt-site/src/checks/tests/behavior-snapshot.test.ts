@@ -8,8 +8,8 @@ import {
   buildBehaviorSnapshot,
   runBehaviorSnapshotValidate,
 } from "../behavior-snapshot.ts";
-import { buildGeneratedHeader } from "@warpgogol/site-kernel";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { stringify as yamlStringify } from "yaml";
 
 /*

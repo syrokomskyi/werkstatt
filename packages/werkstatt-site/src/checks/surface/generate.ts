@@ -22,7 +22,7 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { stringify as yamlStringify } from "yaml";
 import {
   type Blueprint,

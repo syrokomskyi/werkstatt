@@ -19,7 +19,7 @@ import {
   extractBlockHeadings,
   runSurfaceHeadingUniquenessValidate,
 } from "../surface-heading-uniqueness.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 function makeContext(workspaceRoot: string, siteDir?: string): KernelRuntimeContext {
   return {

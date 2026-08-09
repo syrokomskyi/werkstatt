@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 import { SITES_CHECK_AUTHOR_PIPELINE } from "./sites-check-author.ts";
 
 // Note: codegen commands (open-source.generate, icons.generate) live in

@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { collectDnaEnforcerDiagnostics, runDnaRegistryValidate } from "../dna-registry.ts";
-import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 /** RFC-0158: dna.registry.validate keeps the DNA registry and the establishing RFCs in sync. */
 

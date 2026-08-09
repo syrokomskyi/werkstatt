@@ -31,7 +31,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";

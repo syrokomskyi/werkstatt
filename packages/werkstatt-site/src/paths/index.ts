@@ -14,7 +14,7 @@
 ***************************************************************/
 
 import path from "node:path";
-import type { DiscoveredSiteWorkspace, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { DiscoveredSiteWorkspace, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 export interface AstroSitePaths {
   appDirectory: string;
   srcDirectory: string;

@@ -23,10 +23,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { optionalEnv } from "@warpgogol/site-kernel-integrity";
+import { optionalEnv } from "@warpgogol/werkstatt/integrity";
 import { failResult } from "./result-helpers.ts";
 
 /** Cloudflare Regional Services API response shape (tolerant). */

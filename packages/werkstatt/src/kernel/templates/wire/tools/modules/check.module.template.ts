@@ -14,7 +14,7 @@ import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 import {
   createStandardCheckModule,
   runSemanticMirrorValidate,
-} from "@warpgogol/site-kernel-checks";
+} from "@warpgogol/werkstatt-site/checks";
 // compass.* handlers migrated to @warpgogol/forge — see packages/forge/os/compass/
 
 export const checkModule: KernelModule = createStandardCheckModule({
@@ -26,7 +26,7 @@ export const checkModule: KernelModule = createStandardCheckModule({
       scope: "app",
       supportsAllSites: true,
       flags: {},
-      reads: ["<app>/src/content/**/*.md", "packages/os/site-kernel/src/semantic/**"],
+      reads: ["<app>/src/content/**/*.md", "packages/werkstatt/src/kernel/semantic/**"],
       execute: runSemanticMirrorValidate,
     },
   ],

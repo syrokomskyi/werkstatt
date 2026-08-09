@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { readScopeFiles, outOfScope } from "../scope.ts";
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 function input(flags: Record<string, unknown> = {}): KernelCommandInput {
   return { flags } as unknown as KernelCommandInput;

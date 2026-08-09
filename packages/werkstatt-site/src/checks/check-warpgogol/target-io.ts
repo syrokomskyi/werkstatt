@@ -11,7 +11,7 @@
 */
 
 import { isAbsolute, join } from "node:path";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { parseCheckTarget, type CheckTarget } from "@warpgogol/werkstatt-site/check-core";
 
 export function getStringFlag(input: KernelCommandInput, name: string): string | undefined {
@@ -26,7 +26,7 @@ export function resolveWorkspacePath(context: KernelRuntimeContext, path: string
 export async function readTargetFromFlag(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
-): Promise<{ target?: CheckTarget; diagnostics: import("@warpgogol/site-kernel").Diagnostic[] }> {
+): Promise<{ target?: CheckTarget; diagnostics: import("@warpgogol/werkstatt/kernel").Diagnostic[] }> {
   const targetFile = getStringFlag(input, "target");
   if (!targetFile) {
     return {

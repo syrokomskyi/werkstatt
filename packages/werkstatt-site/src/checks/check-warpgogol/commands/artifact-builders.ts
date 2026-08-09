@@ -20,7 +20,7 @@ import {
   type SiteEvidenceGraph,
 } from "@warpgogol/werkstatt-site/check-core";
 import type { WarpgogolCheckHints } from "@warpgogol/werkstatt-site/share/check-hints";
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 
 export {
   makeAgentAction,

@@ -17,7 +17,7 @@
 import { dirname, join } from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { byteHash } from "@warpgogol/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import type {
   CheckResult,
@@ -25,7 +25,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
@@ -396,7 +396,7 @@ function glossaryDiagnostics(
       severity: "error",
       file,
       message: `Missing translation glossary for ${module.id}/${target}.`,
-      fixHint: `Run: pnpm exec site-kernel run surface.translation.glossary.generate --module ${module.id} --target ${target} to create the glossary, then approve it.`,
+      fixHint: `Run: pnpm exec werkstatt run surface.translation.glossary.generate --module ${module.id} --target ${target} to create the glossary, then approve it.`,
     });
     return diagnostics;
   }
@@ -408,7 +408,7 @@ function glossaryDiagnostics(
       severity: "error",
       file,
       message: `Glossary ${module.id}/${target} is missing approval or has a stale moduleContextHash.`,
-      fixHint: `Run: pnpm exec site-kernel run surface.translation.glossary.generate --module ${module.id} --target ${target}. Then re-run validation.`,
+      fixHint: `Run: pnpm exec werkstatt run surface.translation.glossary.generate --module ${module.id} --target ${target}. Then re-run validation.`,
     });
   }
   if (data.id !== module.localization?.glossaryRefs?.[target]) {

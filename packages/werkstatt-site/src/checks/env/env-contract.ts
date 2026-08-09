@@ -28,8 +28,8 @@ import type {
   KernelRuntimeContext,
   Diagnostic,
   CheckResult,
-} from "@warpgogol/site-kernel";
-import { discoverSiteWorkspaces } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { discoverSiteWorkspaces } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";
@@ -279,7 +279,7 @@ export async function runEnvContractValidate(
         severity: "error",
         file: `${site.name}/${ENV_EXAMPLE}`,
         message: `${site.name} has no .env.example. All sites must ship a .env.example (RFC-0388 Rule 1).`,
-        fixHint: "Run: pnpm exec site-kernel run env.example.generate --site " + site.name,
+        fixHint: "Run: pnpm exec werkstatt run env.example.generate --site " + site.name,
       });
       continue;
     }

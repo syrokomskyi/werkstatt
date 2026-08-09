@@ -50,16 +50,15 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - The package is stack-agnostic (DNA-64). It MUST NOT import stack plugins.
 - The plugin contract (`werkstatt/plugin@1`) and registry are in `src/plugin-contract.ts` and `src/plugin-registry.ts`.
 - The `werkstatt.autonomy.validate` command (DNA-64 enforcement) scans `src/**` for forbidden `@warpgogol/*` imports.
-- Re-export shims in old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) preserve backward-compatible import paths during the transition period (RFC-0772 → RFC-0776).
+- RFC-0776 completed the migration: old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) are deleted. All imports now go through `@warpgogol/werkstatt` subpath exports.
 
 ## Autonomy guard
 
 The `werkstatt.autonomy.validate` command enforces DNA-64. It scans `packages/werkstatt/src/**` for `@warpgogol/*` import specifiers. Exemptions:
 
 - `@warpgogol/werkstatt` (self-imports)
-- `@warpgogol/ontology`, `@warpgogol/share` (shared schema packages)
+- `@warpgogol/werkstatt-site/ontology`, `@warpgogol/werkstatt-site/share` (shared schema subpaths)
 - `@warpgogol/forge` (governance)
-- `@warpgogol/passport`, `@warpgogol/observability`, `@warpgogol/integration`, `@warpgogol/surface` (shared infrastructure)
-- `@warpgogol/site-kernel-*` (temporary exemption during re-export scaffold period — will be inverted through plugin hooks in RFC-0774/0775)
+- `@warpgogol/werkstatt-site/passport`, `@warpgogol/werkstatt-site/observability`, `@warpgogol/werkstatt-site/integration`, `@warpgogol/werkstatt-site/surface` (shared infrastructure subpaths)
 
 Excludes: `node_modules/`, `tests/`, `tests-handoff/`, `*.test.ts`, `*.spec.ts`.

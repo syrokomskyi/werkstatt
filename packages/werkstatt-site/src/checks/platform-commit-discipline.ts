@@ -19,8 +19,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { hasPlatformScopeFiles, hasTrailer } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { hasPlatformScopeFiles, hasTrailer } from "@warpgogol/werkstatt/kernel";
 
 export interface PlatformCommitDisciplineResult extends CheckResult {
   command: "platform.commit.discipline.validate";

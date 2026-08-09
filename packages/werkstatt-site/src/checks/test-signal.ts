@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { discoverWorkspacePackages } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { discoverWorkspacePackages } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 export type TestSignalKind = "real" | "noop" | "absent" | "skipped";
@@ -73,8 +73,8 @@ const NOOP_PATTERNS = [
 ];
 
 const TIER_0_PACKAGES = new Set([
-  "@warpgogol/site-kernel",
-  "@warpgogol/site-kernel-checks",
+  "@warpgogol/werkstatt/kernel",
+  "@warpgogol/werkstatt-site/checks",
   "@warpgogol/werkstatt-site/share",
   "@warpgogol/werkstatt-site/integration-adapter-stripe",
   "@warpgogol/werkstatt-site/integration-adapter-supabase-crm",

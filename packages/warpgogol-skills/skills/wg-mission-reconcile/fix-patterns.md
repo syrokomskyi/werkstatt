@@ -75,7 +75,7 @@ git commit -m "bordbuch: record <event description>"
 **Action:** Commit via:
 
 ```sh
-pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "build: astro build output and regenerated artifacts from mission.validate"
+pnpm exec werkstatt run mission.git.commit --mission <missionId> --message "build: astro build output and regenerated artifacts from mission.validate"
 ```
 
 ## Decision tree

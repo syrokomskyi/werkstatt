@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandDefinition } from "@warpgogol/site-kernel";
+import type { KernelCommandDefinition } from "@warpgogol/werkstatt/kernel";
 
 /**
  * A single check command entry ready for bulk registration.

@@ -29,7 +29,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "manifest.contract.validate" },

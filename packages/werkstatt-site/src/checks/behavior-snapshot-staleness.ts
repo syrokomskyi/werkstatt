@@ -28,8 +28,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import type { CheckResult, Diagnostic } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import type { CheckResult, Diagnostic } from "@warpgogol/werkstatt/kernel";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { diagnosticsResult } from "./result-helpers.ts";
@@ -85,7 +85,7 @@ export async function runBehaviorSnapshotStalenessCheck(
         severity: "warning",
         message: `Route "${route}" is declared in system.md but absent from behavior.snapshot.generated.yaml`,
         fixHint:
-          "Run: pnpm exec site-kernel run behavior.snapshot.generate --site <app>, then commit the updated snapshot",
+          "Run: pnpm exec werkstatt run behavior.snapshot.generate --site <app>, then commit the updated snapshot",
       });
     }
   }

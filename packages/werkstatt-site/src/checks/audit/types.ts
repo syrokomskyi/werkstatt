@@ -12,7 +12,7 @@
 */
 
 import { z } from "zod";
-import type { Diagnostic } from "@warpgogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 
 // RFC-0203: canonical severity vocabulary. Folds the legacy audit "warn" spelling
 // into "warning"; `auditSeveritySchema` is retained as a migration alias.

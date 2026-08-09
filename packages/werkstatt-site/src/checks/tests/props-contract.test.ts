@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runPropsContractValidate, validateExampleAgainstSchema } from "../props-contract.ts";
 import { runPropsTypesGenerate } from "@warpgogol/werkstatt-site/codegen";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 /*
 <MODULE_CONTRACT>

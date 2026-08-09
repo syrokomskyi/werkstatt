@@ -19,7 +19,7 @@ import type {
   KernelRuntimeContext,
   Diagnostic,
   CheckResult,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 

@@ -16,12 +16,12 @@ site-kernel-checks imports and registers the handler in its check module.</purpo
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 
 interface Finding {
   ruleId: string;

@@ -33,7 +33,7 @@ import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
-} from "@warpgogol/site-kernel-content";
+} from "@warpgogol/werkstatt-site/content";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {

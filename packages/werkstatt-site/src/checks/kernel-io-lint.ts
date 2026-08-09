@@ -28,7 +28,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";

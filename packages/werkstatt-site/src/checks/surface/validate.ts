@@ -23,7 +23,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import { diagnosticsResult, failResult, passResult } from "../result-helpers.ts";
 import { loadSurfaceBlueprints } from "../surface-expand.ts";

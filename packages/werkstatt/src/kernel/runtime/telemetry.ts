@@ -20,7 +20,7 @@ let pusher: MetricsPusher | null | undefined;
 function getOrCreatePusher(): MetricsPusher | null {
   if (pusher !== undefined) return pusher;
   pusher = createMetricsPusher({
-    serviceName: "site-kernel",
+    serviceName: "werkstatt",
     layer: "factory",
     environment: undefined, // auto-detect from env (CI → ci, else development)
   });

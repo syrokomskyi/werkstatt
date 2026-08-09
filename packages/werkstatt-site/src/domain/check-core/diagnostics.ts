@@ -14,7 +14,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { Diagnostic } from "@warpgogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 import type { SiteEvidenceGraph, PageEvidence } from "./evidence.ts";
 
 export function makeDiagnostic(

@@ -19,12 +19,12 @@ amend commands and audit.delta.run by name via executeKernelCommand.</purpose>
 import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parseOnboardingArtifactHeader } from "@warpgogol/werkstatt-site/share/onboarding-yaml";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 
 const AMEND_PHASES = ["a0-intake", "a2-compose", "a3-author", "a4-audit"] as const;
 type AmendPhase = (typeof AMEND_PHASES)[number];

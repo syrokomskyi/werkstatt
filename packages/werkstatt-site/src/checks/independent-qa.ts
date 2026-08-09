@@ -28,8 +28,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { RFC_DIR } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { RFC_DIR } from "@warpgogol/werkstatt/kernel";
 import {
   runRuntimeFunctionalHealthInstrument,
   type RuntimeHealthState,

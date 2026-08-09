@@ -15,12 +15,12 @@ with no articles still emits a valid, empty-but-conformant feed.</purpose>
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { writeFileAtomic } from "@warpgogol/site-kernel";
+import { writeFileAtomic } from "@warpgogol/werkstatt/kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";

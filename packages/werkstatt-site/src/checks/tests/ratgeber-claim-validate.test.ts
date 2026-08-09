@@ -15,7 +15,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { runRatgeberClaimValidate } from "../ratgeber-claim-validate.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 async function writeFile(dir: string, rel: string, content: string): Promise<void> {
   const full = path.join(dir, rel);

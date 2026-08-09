@@ -11,7 +11,7 @@
 */
 
 import { z } from "zod";
-import type { Diagnostic } from "@warpgogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 
 export const checkDiagnosticSchema = z.custom<Diagnostic>();
 

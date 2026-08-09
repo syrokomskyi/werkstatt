@@ -17,8 +17,8 @@ import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { createDefaultIO } from "@warpgogol/site-kernel";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { createDefaultIO } from "@warpgogol/werkstatt/kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { runWorkpieceImportsValidate } from "../workpiece-imports-validate.ts";
 
 const logger = {
@@ -102,7 +102,7 @@ describe("runWorkpieceImportsValidate", () => {
     await writeFile(
       join(srcDir, "index.ts"),
       [
-        `import { foo } from "@warpgogol/site-kernel";`,
+        `import { foo } from "@warpgogol/werkstatt/kernel";`,
         `import { bar } from "@warpgogol/missing-package";`,
       ].join("\n"),
     );
@@ -113,7 +113,7 @@ describe("runWorkpieceImportsValidate", () => {
     await mkdir(join(nodeModulesDir, "site-kernel"));
     await writeFile(
       join(nodeModulesDir, "site-kernel", "package.json"),
-      '{"name":"@warpgogol/site-kernel"}',
+      '{"name":"@warpgogol/werkstatt/kernel"}',
     );
 
     const result = await runWorkpieceImportsValidate(
@@ -135,7 +135,7 @@ describe("runWorkpieceImportsValidate", () => {
     await writeFile(
       join(srcDir, "index.ts"),
       [
-        `import { foo } from "@warpgogol/site-kernel";`,
+        `import { foo } from "@warpgogol/werkstatt/kernel";`,
         `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
       ].join("\n"),
     );
@@ -146,7 +146,7 @@ describe("runWorkpieceImportsValidate", () => {
     await mkdir(join(wgDir, "site-kernel"));
     await writeFile(
       join(wgDir, "site-kernel", "package.json"),
-      '{"name":"@warpgogol/site-kernel"}',
+      '{"name":"@warpgogol/werkstatt/kernel"}',
     );
     await mkdir(join(wgDir, "share"));
     await writeFile(join(wgDir, "share", "package.json"), '{"name":"@warpgogol/werkstatt-site/share"}');

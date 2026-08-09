@@ -19,13 +19,13 @@ stable and would pass even if every run mutated authored content identically.
 
 import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { SITES_BUILD_PREPARE_PIPELINE } from "./module.ts";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 

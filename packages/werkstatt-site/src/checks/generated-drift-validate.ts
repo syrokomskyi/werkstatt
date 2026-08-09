@@ -26,8 +26,8 @@ import type {
   KernelCommandResult,
   KernelExecutionReport,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 import {
@@ -211,7 +211,7 @@ export async function runGeneratedDriftValidate(
           severity: "error",
           file: relPath,
           message: `Committed file "${relPath}" differs from generator "${entry.command}" output.`,
-          fixHint: `Re-run: pnpm exec site-kernel run ${entry.command} --site ${siteName}`,
+          fixHint: `Re-run: pnpm exec werkstatt run ${entry.command} --site ${siteName}`,
           data: { generator: entry.command },
         });
       }

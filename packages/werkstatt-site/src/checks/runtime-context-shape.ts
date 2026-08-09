@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { resultFromViolations, failResult } from "./result-helpers.ts";
 import { EMPTY_RUNTIME_CONTEXT, type RuntimeContext } from "@warpgogol/werkstatt-site/share/runtime-context";

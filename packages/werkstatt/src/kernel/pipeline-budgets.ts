@@ -62,7 +62,7 @@ export interface PipelineBudgetsFile {
 const TELEMETRY_RELATIVE_PATH = join(
   "node_modules",
   ".cache",
-  "site-kernel",
+  "werkstatt",
   "telemetry",
   "steps.ndjson",
 );
