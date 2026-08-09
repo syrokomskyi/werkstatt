@@ -54,10 +54,14 @@ export async function validateRaw(
       }
       if (strictness === "migration") {
         // In migration mode, still attempt to use the data
-        entities.push(entry.data as unknown as PbpEntity);
+        const entity = entry.data as unknown as PbpEntity;
+        entity.locale = entry.locale;
+        entities.push(entity);
       }
     } else {
-      entities.push(result.data as unknown as PbpEntity);
+      const entity = result.data as unknown as PbpEntity;
+      entity.locale = entry.locale;
+      entities.push(entity);
     }
   }
 

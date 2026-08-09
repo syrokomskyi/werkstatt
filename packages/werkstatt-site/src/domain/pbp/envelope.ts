@@ -35,4 +35,5 @@ export interface PbpEntity {
   name?: string;
   summary?: string;
   governance?: PbpGovernance;
+  locale?: string;
 }

@@ -61,6 +61,7 @@ export interface PbpValidationError {
   code: string;
   severity: PbpValidationSeverity;
   entityId?: string;
+  locale?: string;
   path?: string;
   message: string;
 }
