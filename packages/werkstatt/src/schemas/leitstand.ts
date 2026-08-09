@@ -44,22 +44,6 @@ export const lastPropagatedChannelSchema = z.object({
   purgeResult: purgeResultSchema.optional(),
 });
 
-export const deploymentConfigSchema = z.object({
-  adapter: deploymentAdapterNameSchema,
-  channels: z.object({
-    dev: deploymentChannelSchema,
-    alt: deploymentChannelSchema,
-    main: deploymentChannelSchema,
-  }),
-  lastPropagated: z
-    .object({
-      dev: lastPropagatedChannelSchema.optional(),
-      alt: lastPropagatedChannelSchema.optional(),
-      main: lastPropagatedChannelSchema.optional(),
-    })
-    .default({}),
-});
-
 export const healthCheckSchema = z.object({
   name: z.string(),
   url: z.string(),
@@ -99,8 +83,7 @@ export const deploymentStaticConfigSchema = z.object({
   }),
 });
 
-export type DeploymentConfig = z.infer<typeof deploymentConfigSchema>;
+export type DeploymentStaticConfig = z.infer<typeof deploymentStaticConfigSchema>;
 export type HealthCheck = z.infer<typeof healthCheckSchema>;
 export type PropagationResult = z.infer<typeof propagationResultSchema>;
-export type DeploymentStaticConfig = z.infer<typeof deploymentStaticConfigSchema>;
 export type RouteFact = z.infer<typeof routeFactSchema>;

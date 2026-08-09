@@ -27,6 +27,29 @@ export { runSternsystemExtract, type SternsystemExtractData } from "./sternsyste
 export { runSternsystemSync, type SternsystemSyncData } from "./sternsystem-sync.ts";
 export { runSternsystemStatus, type SternsystemStatusData } from "./sternsystem-status.ts";
 
+// RFC-0790: Convention-based discovery IO helpers
+export {
+  resolveCacheClonePath,
+  resolveWorkpiecePath,
+  readSystemConfig,
+  readSystemConfigFromWorkpiece,
+  readSystemState,
+  readSystemStateFromWorkpiece,
+  writeSystemState,
+  writeSystemStateToWorkpiece,
+  discoverSystems,
+  type DiscoveryResult,
+  readServicesRegistry,
+  findServiceEntry,
+  hasAppsCollision,
+  type MirrorProtocol,
+  inferMirrorProtocol,
+  isGitAccessible,
+  resolveMirrorPath,
+  type MirrorResolution,
+  resolveMirrors,
+} from "./registry-io.ts";
+
 export function createSternsystemModule(): KernelModule {
   return {
     name: "sternsystem",
@@ -35,7 +58,7 @@ export function createSternsystemModule(): KernelModule {
       registry.registerCommand({
         name: "sternsystem.register",
         description:
-          "Register a new Sternsystem in systems/registry.yaml (RFC-0354, RFC-0532, RFC-0574). Flags: --id, --cosmicStar, --mirrors, [--platform], [--owner], [--amend], [--amend-id].",
+          "Register a new Sternsystem — creates cache clone directory and system-config.yaml (RFC-0790). Flags: --id, --cosmicStar, --mirrors, [--platform], [--owner], [--amend], [--amend-id].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -54,7 +77,7 @@ export function createSternsystemModule(): KernelModule {
               "VC subject id (did:web:<domain>#<key-version>) for site owner (RFC-0561).",
           },
         },
-        writes: ["systems/registry.yaml"],
+        writes: ["../systems-cache/{id}/system-config.yaml"],
         execute: runSternsystemRegister,
       });
       registry.registerCommand({
@@ -88,7 +111,10 @@ export function createSternsystemModule(): KernelModule {
           id: { kind: "string", required: true, description: "Sternsystem id." },
           platform: { kind: "string", description: "Pinned platform version." },
         },
-        writes: ["systems/{id}/system.pin.json", "systems/registry.yaml"],
+        writes: [
+          "../systems-cache/{id}/system.pin.json",
+          "../systems-cache/{id}/system-config.yaml",
+        ],
         execute: runSternsystemPin,
       });
       registry.registerCommand({
@@ -105,7 +131,7 @@ export function createSternsystemModule(): KernelModule {
             description: "Comma-separated mirror paths (first=cache, second=bare, rest=external).",
           },
         },
-        writes: ["systems/{site}/**", "systems/registry.yaml"],
+        writes: ["../systems-cache/{site}/**", "../systems-cache/{site}/system-config.yaml"],
         execute: runSternsystemExtract,
       });
       registry.registerCommand({
@@ -141,8 +167,8 @@ export function createSternsystemModule(): KernelModule {
           all: { kind: "boolean", description: "Show status for all registered systems." },
         },
         reads: [
-          "systems/registry.yaml",
-          "systems/{id}/bordbuch/events.ndjson",
+          "../systems-cache/{id}/system-config.yaml",
+          "../systems-cache/{id}/bordbuch/events.ndjson",
           "missions/*/mission.yaml",
         ],
         execute: runSternsystemStatus,
