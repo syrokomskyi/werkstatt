@@ -189,7 +189,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Operator workflow change | Step 3 (AGENTS.md) documents the new workflow; error message in Step 1 directs to `mission.close` |
 | Agent misinterpretation | Error message in Step 1 explicitly directs to `mission.close` |
 | False positive rate | Zero — simple state comparison, no heuristic (Step 1) |

@@ -266,7 +266,7 @@ No configuration or data files affected. The command reads `GENERATOR_OWNERSHIP_
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positives for static assets | Step 1+2: reuse `STATIC_ASSET_EXEMPT_DIRS` from `generated-stale-validate.ts` |
 | Placeholder expansion gaps | Step 2: use same `expandGlob` + placeholder expansion as `generated.files.validate` |
 | Performance | Step 2: O(n×m) scan with ~400 files × ~60 entries — no optimization needed |

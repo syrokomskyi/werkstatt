@@ -27,6 +27,7 @@ Implement `forge.determinism.check` — a profile-driven command that verifies a
 ### Step 1: Update `editframe-html.yaml` profile
 
 Update `determinism.inputs` from human-readable labels to glob patterns:
+
 - `"composition files"` → `"compositions/**/*.html"`
 - `"assets"` → `"assets/**"`
 - Remove `"editframe version"` (not a file glob; tool-version invalidation is handled by cache key)
@@ -36,6 +37,7 @@ Validation: `pnpm --filter @warpgogol/forge run build:check`
 ### Step 2: Create `determinism-check.ts` handler
 
 Create `packages/forge/os/core/handlers/determinism-check.ts` with:
+
 - `DeterminismCheckResult` and `ForgeDeterminismCheckResult` interfaces
 - `runDeterminismCheck` function that:
   - Resolves active profile via `resolveActiveProfile`
@@ -62,6 +64,7 @@ Validation: `pnpm --filter @warpgogol/forge run build:check`
 ### Step 4: Write unit tests
 
 Add tests to `lifecycle-handlers.test.ts`:
+
 - `runDeterminismCheck --dry-run` prints resolved inputs without executing
 - `runDeterminismCheck --artifact composition` filters to single artifact
 - `runDeterminismCheck --artifact unknown` returns exit 1

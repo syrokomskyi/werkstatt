@@ -29,6 +29,7 @@ No issues. `satisfies: [DNA-46]` is correct — DNA-46 (Mission lifecycle) defin
 ## Axis C — Ecosystem fit
 
 **Finding C-1: Module placement inconsistency.** The Architectural fit section (line 117) states: "`mission.archive` is registered in the `forgeCoreModule` (alongside `docs.archive`)." But the existing pattern for archive commands is:
+
 - `plan.archive` is registered in `forgePlanModule` (`packages/forge/os/plan/plan.module.ts`)
 - `audit.archive` is registered in `forgeAuditModule` (`packages/forge/os/audit/audit.module.ts`)
 - `session.archive` is registered in `forgeSessionModule` (`packages/forge/os/session/session.module.ts`)

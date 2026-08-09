@@ -22,27 +22,21 @@ The RFC is well-structured and pragmatically scoped, but has a critical gap: it 
 
 ## Axis A — Structural completeness
 
-**A-1 (fail): Incorrect file path in file system responsibilities table.**
-The table lists `packages/ui/src/sections/hero-decision-card/hero-decision-card-section.types.ts` but the actual file is `hero-decision-card-section.types.generated.ts` — auto-generated from the manifest by `props.types.generate` (RFC-0262). The table should either correct the path and note it is regenerated, or remove it since it is auto-generated from the manifest.
+**A-1 (fail): Incorrect file path in file system responsibilities table.** The table lists `packages/ui/src/sections/hero-decision-card/hero-decision-card-section.types.ts` but the actual file is `hero-decision-card-section.types.generated.ts` — auto-generated from the manifest by `props.types.generate` (RFC-0262). The table should either correct the path and note it is regenerated, or remove it since it is auto-generated from the manifest.
 
-**A-2 (fail): Missing file — `packages/share/src/schemas/section-header.ts`.**
-The `<SectionHeader>` Astro component's TypeScript prop type `SectionHeaderProps` is defined in `packages/share/src/schemas/section-header.ts:47` as a `.strict()` Zod schema. Adding `eyebrow` to `SECTION_HEADER_FRAGMENT` in ontology is not sufficient — `SectionHeaderProps` must also gain `eyebrow: z.string().optional()` for the hero-decision-card template to pass it type-safely. This file is absent from the responsibilities table.
+**A-2 (fail): Missing file — `packages/share/src/schemas/section-header.ts`.** The `<SectionHeader>` Astro component's TypeScript prop type `SectionHeaderProps` is defined in `packages/share/src/schemas/section-header.ts:47` as a `.strict()` Zod schema. Adding `eyebrow` to `SECTION_HEADER_FRAGMENT` in ontology is not sufficient — `SectionHeaderProps` must also gain `eyebrow: z.string().optional()` for the hero-decision-card template to pass it type-safely. This file is absent from the responsibilities table.
 
-**A-3 (fail): Missing acceptance criterion for `SectionHeaderProps` update.**
-The acceptance criteria include "`eyebrow` rendered above `heading` in `<SectionHeader>` Astro component" but do not include a criterion for updating the `SectionHeaderProps` Zod schema in `@warpgogol/share`. Without this, the rendering criterion cannot be fulfilled in a type-safe manner.
+**A-3 (fail): Missing acceptance criterion for `SectionHeaderProps` update.** The acceptance criteria include "`eyebrow` rendered above `heading` in `<SectionHeader>` Astro component" but do not include a criterion for updating the `SectionHeaderProps` Zod schema in `@warpgogol/share`. Without this, the rendering criterion cannot be fulfilled in a type-safe manner.
 
 ## Axis B — DNA alignment
 
-**B-1 (fail): `SectionHeaderProps` schema gap breaks DNA-17 Mirror Quintet sync.**
-DNA-17 requires manifests, types, and `.astro` templates to be updated in sync. The RFC states "Manifests, types, and `.astro` templates are updated in sync" but does not include the `SectionHeaderProps` type in `@warpgogol/share` — the canonical type contract for the `<SectionHeader>` component. The Mirror Quintet for the `section-header` component is: `.astro` + `manifest.yaml` + `SectionHeaderProps` (share) + `.css` + content template. The RFC addresses the `.astro` and `.css` but not the share-side type.
+**B-1 (fail): `SectionHeaderProps` schema gap breaks DNA-17 Mirror Quintet sync.** DNA-17 requires manifests, types, and `.astro` templates to be updated in sync. The RFC states "Manifests, types, and `.astro` templates are updated in sync" but does not include the `SectionHeaderProps` type in `@warpgogol/share` — the canonical type contract for the `<SectionHeader>` component. The Mirror Quintet for the `section-header` component is: `.astro` + `manifest.yaml` + `SectionHeaderProps` (share) + `.css` + content template. The RFC addresses the `.astro` and `.css` but not the share-side type.
 
 ## Axis C — Ecosystem fit
 
-**C-1 (fail): `@warpgogol/share` missing from `packagesImpacted`.**
-`packagesImpacted` lists `@warpgogol/ontology`, `@warpgogol/ui`, `@warpgogol/faq` but not `@warpgogol/share`. The `sectionHeaderSchema` and `SectionHeaderProps` type live in `packages/share/src/schemas/section-header.ts`. This package must be updated and listed.
+**C-1 (fail): `@warpgogol/share` missing from `packagesImpacted`.** `packagesImpacted` lists `@warpgogol/ontology`, `@warpgogol/ui`, `@warpgogol/faq` but not `@warpgogol/share`. The `sectionHeaderSchema` and `SectionHeaderProps` type live in `packages/share/src/schemas/section-header.ts`. This package must be updated and listed.
 
-**C-2 (minor): `packages/faq/AGENTS.md` not mentioned for update.**
-The `packages/faq/AGENTS.md` API surface table documents `getFaqEntriesByTags(lang, tags)` as "Filter entries by tags" and the Validation section lists optional field types as `order` (number), `tags` (string[]). After adding `orderTags`, the AGENTS.md should document: (1) `orderTags` in the optional field types, (2) the per-tag ordering behavior of `getFaqEntriesByTags`. The RFC's file system responsibilities table does not mention this documentation update.
+**C-2 (minor): `packages/faq/AGENTS.md` not mentioned for update.** The `packages/faq/AGENTS.md` API surface table documents `getFaqEntriesByTags(lang, tags)` as "Filter entries by tags" and the Validation section lists optional field types as `order` (number), `tags` (string[]). After adding `orderTags`, the AGENTS.md should document: (1) `orderTags` in the optional field types, (2) the per-tag ordering behavior of `getFaqEntriesByTags`. The RFC's file system responsibilities table does not mention this documentation update.
 
 ## Axis D — Forward-only compliance
 
@@ -54,8 +48,7 @@ No issues. Status gate is correct ("Agents MAY implement code changes ONLY when 
 
 ## Axis F — Pragmatism
 
-**F-1 (minor): `tags[0]` primary-tag assumption undocumented.**
-The `getFaqEntriesByTags` sort logic uses `const tag = tags[0]` as the "primary queried tag" for `orderTags` lookup. If an entry matches multiple queried tags, only the first tag's order is used. This is a reasonable design choice (caller passes tags in priority order), but the RFC does not document this assumption — it should state that the first tag in the `tags` array is the primary sort context.
+**F-1 (minor): `tags[0]` primary-tag assumption undocumented.** The `getFaqEntriesByTags` sort logic uses `const tag = tags[0]` as the "primary queried tag" for `orderTags` lookup. If an entry matches multiple queried tags, only the first tag's order is used. This is a reasonable design choice (caller passes tags in priority order), but the RFC does not document this assumption — it should state that the first tag in the `tags` array is the primary sort context.
 
 ## Axis G — Blind spots
 

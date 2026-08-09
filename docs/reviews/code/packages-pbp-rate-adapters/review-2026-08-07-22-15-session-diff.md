@@ -1,22 +1,21 @@
 # Code Review — Session 2026-08-07
 
-**Scope**: `git diff b51068fa...HEAD` (2 commits, 25 files, +1153/-46)
-**Fixed point**: `b51068fa` (mission.close warpgogol-com-m000036)
-**Commits reviewed**:
+**Scope**: `git diff b51068fa...HEAD` (2 commits, 25 files, +1153/-46) **Fixed point**: `b51068fa` (mission.close warpgogol-com-m000036) **Commits reviewed**:
+
 - `898a0fec` feat: multi-currency UI integration (RFC-0735, mission warpgogol-com-m000036)
 - `3bbaf696` feat: add Frankfurter rate source adapter (RFC-0744)
 
 ## Mechanical floor
 
-| Package | `build:check` | Tests |
-|---|---|---|
-| `@warpgogol/pbp-rate-adapters` | PASS | 15/15 PASS |
-| `@warpgogol/pbp` | PASS | — |
-| `@warpgogol/share` | PASS | — |
-| `@warpgogol/ui` | PASS | — |
-| `@warpgogol/site-kernel-checks` | PASS | — |
-| `@warpgogol/site-kernel-codegen` | PASS | — |
-| `@warpgogol/site-kernel-onboarding` | PASS | — |
+| Package                             | `build:check` | Tests      |
+| ----------------------------------- | ------------- | ---------- |
+| `@warpgogol/pbp-rate-adapters`      | PASS          | 15/15 PASS |
+| `@warpgogol/pbp`                    | PASS          | —          |
+| `@warpgogol/share`                  | PASS          | —          |
+| `@warpgogol/ui`                     | PASS          | —          |
+| `@warpgogol/site-kernel-checks`     | PASS          | —          |
+| `@warpgogol/site-kernel-codegen`    | PASS          | —          |
+| `@warpgogol/site-kernel-onboarding` | PASS          | —          |
 
 All affected packages pass typecheck. No mechanical failures.
 
@@ -26,8 +25,7 @@ All affected packages pass typecheck. No mechanical failures.
 
 ### A-1 · FAIL · `NOTE_TEMPLATES` hardcoded in shared package component
 
-**File**: `packages/ui/src/sections/price-card/price-card-section.astro:96-99`
-**Severity**: Medium
+**File**: `packages/ui/src/sections/price-card/price-card-section.astro:96-99` **Severity**: Medium
 
 ```ts
 const NOTE_TEMPLATES: Record<string, string> = {
@@ -42,8 +40,7 @@ User-visible copy is hardcoded in a shared UI component. Only `de` and `uk` are 
 
 ### A-2 · FAIL · `offeringRef` accessed via untyped cast instead of `props`
 
-**File**: `packages/ui/src/sections/price-card/price-card-section.astro:112`
-**Severity**: Low
+**File**: `packages/ui/src/sections/price-card/price-card-section.astro:112` **Severity**: Low
 
 ```ts
 const offeringRef = (pageOverride as Record<string, unknown>).offeringRef as string | undefined;
@@ -57,8 +54,7 @@ const offeringRef = props.offeringRef;
 
 ### A-3 · FAIL · `DerivedPriceEntry` duplicates `PbpMaterializedDerivedPrice`
 
-**File**: `packages/ui/src/sections/price-card/price-card-section.astro:86-94`
-**Severity**: Low
+**File**: `packages/ui/src/sections/price-card/price-card-section.astro:86-94` **Severity**: Low
 
 The `DerivedPriceEntry` interface is a hand-written subset of `PbpMaterializedDerivedPrice` from `@warpgogol/pbp` (RFC-0740). The two types will diverge over time. Import the canonical type instead.
 
@@ -128,8 +124,7 @@ PBP used as canonical business layer. `loadTargetCurrencies` correctly reads fro
 
 ### C-1 · FAIL · `packages/ui` reads app-specific generated file from `process.cwd()`
 
-**File**: `packages/ui/src/sections/price-card/price-card-section.astro:103`
-**Severity**: Medium
+**File**: `packages/ui/src/sections/price-card/price-card-section.astro:103` **Severity**: Medium
 
 ```ts
 const filePath = join(process.cwd(), "src", "derived-prices.generated.json");
@@ -173,8 +168,7 @@ Rate snapshots, derived prices, and content-ref-index added to both the gitignor
 
 ### E-1 · FAIL · `loadTargetCurrencies` silently swallows compiler errors
 
-**File**: `packages/pbp/src/semantic-profile.ts:59-61`
-**Severity**: Medium
+**File**: `packages/pbp/src/semantic-profile.ts:59-61` **Severity**: Medium
 
 ```ts
   } catch {
@@ -188,8 +182,7 @@ The catch block comment says "No CurrencyPricingPolicy found" but actually catch
 
 ### E-2 · FAIL · `loadDerivedPrices` silently swallows all errors
 
-**File**: `packages/ui/src/sections/price-card/price-card-section.astro:101-108`
-**Severity**: Low
+**File**: `packages/ui/src/sections/price-card/price-card-section.astro:101-108` **Severity**: Low
 
 ```ts
 function loadDerivedPrices(): Record<string, DerivedPriceEntry[]> | null {
@@ -251,15 +244,15 @@ Two new functions with non-trivial logic (file I/O, JSON parsing, price formatti
 
 ## Summary
 
-| Axis | Findings |
-|---|---|
-| A — Structural | 3 FAIL (A-1, A-2, A-3), 6 PASS |
-| B — DNA | 1 FAIL (B-1/DNA-4), 4 PASS |
-| C — Ecosystem | 1 FAIL (C-1), 2 PASS |
-| D — Forward-only | 3 PASS |
-| E — Agent clarity | 2 FAIL (E-1, E-2), 1 PASS |
-| F — Pragmatism | 1 WARN (F-1), 1 PASS |
-| G — Tests | 1 PASS, 2 WARN (G-2, G-3) |
+| Axis              | Findings                       |
+| ----------------- | ------------------------------ |
+| A — Structural    | 3 FAIL (A-1, A-2, A-3), 6 PASS |
+| B — DNA           | 1 FAIL (B-1/DNA-4), 4 PASS     |
+| C — Ecosystem     | 1 FAIL (C-1), 2 PASS           |
+| D — Forward-only  | 3 PASS                         |
+| E — Agent clarity | 2 FAIL (E-1, E-2), 1 PASS      |
+| F — Pragmatism    | 1 WARN (F-1), 1 PASS           |
+| G — Tests         | 1 PASS, 2 WARN (G-2, G-3)      |
 
 **Total**: 6 FAIL, 2 WARN, 13 PASS
 

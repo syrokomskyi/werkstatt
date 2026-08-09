@@ -17,6 +17,7 @@ The RFC correctly identifies a real gap in bordbuch conflict auto-resolution and
 ## Mechanical validation (rfc.validate)
 
 Pass with 1 warning:
+
 - **V-19** (warning): `RFC-0614.amends` includes `RFC-0584`, but `RFC-0584.amendedBy` does not include `RFC-0614`. Expected for a draft amending an implemented RFC — the `amendedBy` field on RFC-0584 must be updated during implementation.
 
 ## Axis A — Structural completeness
@@ -47,16 +48,20 @@ No issues. No self-authorizing language. Implementation notes are explicit behav
 ## Axis G — Blind spots
 
 - **Hardcoded `git checkout --ours` path list is not robust.** The RFC proposes (line 134):
+
   ```ts
   execSync("git checkout --ours bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/", { cwd: systemDir, ... });
   execSync("git add bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/", { cwd: systemDir, ... });
   ```
+
   This hardcodes all three paths. If only a subset is conflicted (e.g., `bordbuch/events.ndjson` is conflicted but `public/.well-known/bordbuch.json` does not exist because `bordbuch.generate` has not been run yet), `git checkout --ours` will error on the non-conflicted/non-existent path. The RFC should use the `conflictedPaths` array to dynamically construct the checkout/add commands:
+
   ```ts
   const pathArgs = conflictedPaths.map((p) => JSON.stringify(p)).join(" ");
   execSync(`git checkout --ours -- ${pathArgs}`, { cwd: systemDir, ... });
   execSync(`git add -- ${pathArgs}`, { cwd: systemDir, ... });
   ```
+
   This ensures only actually-conflicted paths are checked out and added.
 
 - **Test file naming inconsistency.** The RFC's file system responsibilities table (line 143) names the test file `mission-reconcile.test.ts`, but no such file exists. The existing test naming convention is either `rfc-NNNN-*.test.ts` (e.g., `release-0585-dist-guard.test.ts`, `leitstand-0608-promote.test.ts`) or `feature-*.test.ts` (e.g., `mission-open-bordbuch-gate.test.ts`). The RFC should use a consistent name like `rfc-0614-public-well-known-bordbuch-conflict.test.ts`.

@@ -259,7 +259,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent misinterpretation — agents may create R2 bucket automatically | Step 4 documents operator-only policy in AGENTS.md |
 | Performance impact on mission.check | Step 1 adds a single string field — negligible |
 | Key collision — two runs with same timestamp | Step 1 generates timestamp with millisecond precision; collision handling deferred to RFC-0651 |

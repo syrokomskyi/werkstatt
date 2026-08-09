@@ -261,7 +261,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | PBP Claim field proliferation | Step 3 adds only one optional field; monitor per ADR-0028 Evolution |
 | EvidenceSource items complexity (url/retrievedAt optional) | Step 6 explicitly audits all consumers before stamping |
 | Open vocabularies on Consent | Accepted as MVP; deferred to future RFC if inconsistent authoring emerges |

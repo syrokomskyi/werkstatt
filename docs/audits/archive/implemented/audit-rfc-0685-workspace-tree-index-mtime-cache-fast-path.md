@@ -43,8 +43,7 @@ Pass — `rfc.validate --id RFC-0685` прошёл с нулём нарушен�
 - **F-13 (CacheLayer interface incompatibility):** RFC утверждает в разделе "mtime-based fast path": "The sidecar is stored in the same SQLite cache namespace, keyed by the same cache key, in a separate column." Однако текущий `CacheLayer` interface (`packages/os/site-kernel/src/cache/cache-layer.ts:45-58`) не поддерживает дополнительные колонки — метод `set` принимает только `(namespace, key, data, mtime, contentHash)`. SQLite schema (`sqlite-cache-layer.ts:27-46`) имеет фиксированный набор колонок: `namespace, key, data, mtime, content_hash, schema_version, updated_at`. Для `inputsMetadata` sidecar потребуется либо:
   - (a) Расширить `CacheLayer` interface и SQLite schema новой колонкой `inputs_metadata TEXT` — это меняет интерфейс пакета,
   - (b) Хранить `inputsMetadata` внутри поля `data` (JSON-объект с `report` и `inputsMetadata`), или
-  - (c) Использовать отдельный namespace (например `command_results_metadata`).
-  RFC не уточняет какой подход выбран. Это **блокирующий finding** — реализация не может начаться без решения этого дизайнерского вопроса.
+  - (c) Использовать отдельный namespace (например `command_results_metadata`). RFC не уточняет какой подход выбран. Это **блокирующий finding** — реализация не может начаться без решения этого дизайнерского вопроса.
 - **F-14 (Package boundaries):** Все изменения внутри `packages/os/site-kernel/` — корректно. `packagesImpacted: ["@warpgogol/site-kernel"]` — единственный пакет. Импорты не пересекают границы.
 - **F-15 (Pipeline placement):** RFC не добавляет новых pipeline steps — изменения внутренние. Корректно.
 - **F-16 (Compass sync):** RFC не упоминает необходимость обновления `docs/*.xml` файлов. Поскольку RFC меняет внутреннюю реализацию cache layer (не архитектурные требования), это N/A. Но если `inputsMetadata` требует schema change в SQLite, стоит упомянуть.

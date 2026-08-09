@@ -1,8 +1,6 @@
 # Axiom Phase 2 — Expert Specification
 
-**Date:** 2026-08-03
-**Author:** Werkstatt session
-**Status:** Draft — for Axiom team
+**Date:** 2026-08-03 **Author:** Werkstatt session **Status:** Draft — for Axiom team
 
 ## Context
 
@@ -85,7 +83,7 @@ export async function runActiveMethodologies(
 Each instrument needs to declare which evidence roles it consumes. Suggested approach: add an `evidenceRoles` field to the instrument definition or methodology package.
 
 | Instrument | Evidence roles consumed |
-|---|---|
+| --- | --- |
 | `accessibility` | `axe-raw-result`, `cdp-accessibility-tree`, `rendered-html` |
 | `multilingual-content-consistency` | `rendered-html`, `cdp-dom-snapshot` |
 | `runtime-functional-health` | `console-errors`, `page-errors`, `network-requests` |

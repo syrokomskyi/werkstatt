@@ -52,6 +52,7 @@ No code changes. No new Site OS commands. This is a skill-text-only policy chang
 **Goal:** Add the §Step-level context checkpoint during implementation section after the §Context checkpoint between batch items section.
 
 **Agent actions:**
+
 - Read `packages/forge/skills/_shared/fo-pipeline-conventions.md`.
 - Append the new section after the RFC-0669 checkpoint section. Content from RFC-0670 §Design → Step checkpoint directive.
 
@@ -64,6 +65,7 @@ No code changes. No new Site OS commands. This is a skill-text-only policy chang
 **Goal:** Add step-level checkpoint reference to step 4 (Implement) of the orchestrator skill.
 
 **Agent actions:**
+
 - Read `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md`.
 - In step 4 (Implement), after the existing `fo-idea-implement` text, add the step-level checkpoint reference from RFC-0670 §Design → Orchestrator skill reference.
 
@@ -76,6 +78,7 @@ No code changes. No new Site OS commands. This is a skill-text-only policy chang
 **Goal:** Copy updated skill files to `.agents/skills/`.
 
 **Agent actions:**
+
 - Copy both source files to their `.agents/skills/` counterparts.
 - Commit all 4 files in a single commit.
 
@@ -88,6 +91,7 @@ No code changes. No new Site OS commands. This is a skill-text-only policy chang
 **Goal:** Run all validation commands.
 
 **Agent actions:**
+
 - Run `forge.doctor`, `forge.skill.validate`, `rfc.validate --id RFC-0670`.
 
 **Completion criterion:** All three commands pass.
@@ -99,6 +103,7 @@ No code changes. No new Site OS commands. This is a skill-text-only policy chang
 **Goal:** Verify all acceptance criteria, run code review, stamp as implemented.
 
 **Agent actions:**
+
 - Mark all 8 acceptance criteria with `[x]` and inline evidence.
 - Run `fo-review` on session changes.
 - Run `fo-fix` if findings.

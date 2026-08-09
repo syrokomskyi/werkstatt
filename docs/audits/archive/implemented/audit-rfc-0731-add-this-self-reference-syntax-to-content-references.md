@@ -39,6 +39,7 @@ Pass — zero violations.
   - `packages/os/site-kernel-codegen/src/material-metadata-write.ts`
 
   The implementation notes (line 257) correctly say "Agents MUST update all call sites", but the file system responsibilities table must enumerate them so the implementer knows the full scope.
+
 - **Validator file-context mapping gap**: The `content-references.ts` validator currently has no mechanism to map a file path (e.g. `src/content/business-profile/uk/offerings/digital-foundation.md`) to its `collection.file` key in the `ContentRefIndex`. The RFC says "expand via file context" but doesn't explain how this mapping is derived. The validator iterates files from `collectMarkdownFilesSafe` and has `doc.relativeFile` — it needs a path-to-context derivation step that the RFC should specify.
 - **Package boundaries**: Correct. `@warpgogol/share` owns the resolver, `@warpgogol/site-kernel-content` owns the loader call sites, `@warpgogol/site-kernel-checks` owns the validator. No boundary violations.
 

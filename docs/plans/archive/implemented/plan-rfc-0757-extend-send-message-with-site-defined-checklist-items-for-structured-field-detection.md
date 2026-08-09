@@ -257,7 +257,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Closed rule set extensibility | Step 1, 4: `keyword-match` with `keywords[]` covers many cases; new rule types via follow-up RFC |
 | Checklist bypass (client-side only) | Step 4: server-side validation (RFC-0572 regex) remains unchanged — checklist is UX gate, not security |
 | Agent misinterpretation of individual label props | Step 7: `AGENTS.md` update clarifies `checklistItems[]` is the generalizable mechanism |

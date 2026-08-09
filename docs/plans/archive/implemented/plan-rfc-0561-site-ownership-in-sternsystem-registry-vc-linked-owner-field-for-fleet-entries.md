@@ -248,7 +248,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Owner field not backfilled — operators forget | Step 3 adds notice-level warnings to `sternsystem.validate` making the gap visible |
 | Owner mismatch between registry and VC after key rotation | Step 2 `--amend --owner` path allows updating the field; documented in RFC risks |
 | No transfer mechanism | Out of scope (nonGoals); pilot accepts manual update via `--amend` |

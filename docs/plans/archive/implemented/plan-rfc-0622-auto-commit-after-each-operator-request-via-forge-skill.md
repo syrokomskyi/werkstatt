@@ -197,7 +197,7 @@ No configuration or data files affected.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent misinterpretation — "commit after every tool call" vs "after every request" | Step 1: skill body explicitly says "after every standalone operator request" |
 | Staging wrong files | Step 1: skill body explicitly forbids `git add -A` / `git add .` |
 | Commit message quality | Step 1: skill body instructs conventional commit format with descriptive summary |

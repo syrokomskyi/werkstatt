@@ -264,7 +264,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Flash of source currency (FOUC) | Step 3: pre-render all variants with `hidden`; client script un-hides correct variant immediately on `DOMContentLoaded` |
 | SEO impact | No mitigation needed — SEO sees default currency, Schema.org emits business-declared prices (RFC-0745) |
 | Component maintenance | Steps 2-3: components are small and focused; client scripts are thin |

@@ -257,7 +257,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Schema complexity — six type-specific shapes in one flat schema | Step 1: flat schema with `.strict()` + `participant.validate` enforces type-specific required fields |
 | Consent placeholder during migration — self-reviewed | Step 4: migrator adds placeholder with `profileReviewer = slug`; Step 5: operator reviews after migration |
 | AI-agent accountability enforcement — missing `accountableHumanId` | Step 2: `participant.validate` fails on missing `accountableHumanId` for AI-agent public records |

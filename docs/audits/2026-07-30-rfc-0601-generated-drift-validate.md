@@ -37,26 +37,26 @@ RFC-0601 proposes a general-purpose content drift validator for text-based gener
 
 ## Axis 2: DNA alignment — ⚠️ Tenuous claim
 
-| Check | Result |
-| --- | --- |
+| Check                                                   | Result           |
+| ------------------------------------------------------- | ---------------- |
 | `satisfies` entries exist in `docs/architecture-dna.md` | ✅ DNA-18 exists |
-| DNA invariant semantics match RFC scope | ⚠️ See finding |
+| DNA invariant semantics match RFC scope                 | ⚠️ See finding   |
 
 ### Findings
 
-- **[D-1] DNA-18 claim is a stretch.** DNA-18 states: "Uni registry is the single UI index — `uni.registry.yaml` is deterministically generated, validated by `uni.registry.validate`, and drift between registry and manifests fails `build.check`." RFC-0601 extends the *spirit* of this invariant (deterministic generation + drift detection) to all generated files, not just the Uni registry. The RFC's architectural fit section acknowledges this ("Extends the determinism principle"), but strictly speaking, DNA-18 is about the registry index, not general file drift. Consider: (a) acknowledging in the architectural fit section that this RFC extends the *pattern* of DNA-18 without strictly satisfying it, or (b) proposing a new DNA invariant for generated-file determinism in a separate RFC.
+- **[D-1] DNA-18 claim is a stretch.** DNA-18 states: "Uni registry is the single UI index — `uni.registry.yaml` is deterministically generated, validated by `uni.registry.validate`, and drift between registry and manifests fails `build.check`." RFC-0601 extends the _spirit_ of this invariant (deterministic generation + drift detection) to all generated files, not just the Uni registry. The RFC's architectural fit section acknowledges this ("Extends the determinism principle"), but strictly speaking, DNA-18 is about the registry index, not general file drift. Consider: (a) acknowledging in the architectural fit section that this RFC extends the _pattern_ of DNA-18 without strictly satisfying it, or (b) proposing a new DNA invariant for generated-file determinism in a separate RFC.
 
 ---
 
 ## Axis 3: Ecosystem fit — 🔴 Critical issues
 
-| Check | Result |
-| --- | --- |
-| TypeScript contracts match canonical types | 🔴 `rule` vs `ruleId` |
-| Output format matches `CheckResult` | 🔴 `violations[]`/`notices[]` vs `diagnostics[]` |
-| Rule IDs registered in diagnostics registry | 🔴 DRIFT-01, DRIFT-02 not registered |
-| Referenced patterns accurately described | 🔴 RFC-0236 dryRun claim is inaccurate |
-| Pipeline integration specified | ⚠️ Position in `build.check` not specified |
+| Check                                       | Result                                           |
+| ------------------------------------------- | ------------------------------------------------ |
+| TypeScript contracts match canonical types  | 🔴 `rule` vs `ruleId`                            |
+| Output format matches `CheckResult`         | 🔴 `violations[]`/`notices[]` vs `diagnostics[]` |
+| Rule IDs registered in diagnostics registry | 🔴 DRIFT-01, DRIFT-02 not registered             |
+| Referenced patterns accurately described    | 🔴 RFC-0236 dryRun claim is inaccurate           |
+| Pipeline integration specified              | ⚠️ Position in `build.check` not specified       |
 
 ### Findings
 
@@ -76,11 +76,11 @@ RFC-0601 proposes a general-purpose content drift validator for text-based gener
 
 ## Axis 4: Forward-only compliance — ✅ Clean
 
-| Check | Result |
-| --- | --- |
-| No supersedes/amends | ✅ New command |
+| Check                     | Result                                          |
+| ------------------------- | ----------------------------------------------- |
+| No supersedes/amends      | ✅ New command                                  |
 | `versionBump` appropriate | ✅ `patch` — new validator, no breaking changes |
-| No DNA invariant changes | ✅ Satisfies existing DNA-18 (tenuously) |
+| No DNA invariant changes  | ✅ Satisfies existing DNA-18 (tenuously)        |
 
 ### Findings
 
@@ -90,11 +90,11 @@ RFC-0601 proposes a general-purpose content drift validator for text-based gener
 
 ## Axis 5: Agent-facing policy — ⚠️ Unclear mechanism
 
-| Check | Result |
-| --- | --- |
-| Implementation notes present | ✅ Clear "MAY/MUST" rules |
-| Status gate enforced | ✅ "MAY implement ONLY when status: accepted" |
-| dryRun opt-in default | ✅ "MUST be opt-in (default `false`)" |
+| Check                        | Result                                        |
+| ---------------------------- | --------------------------------------------- |
+| Implementation notes present | ✅ Clear "MAY/MUST" rules                     |
+| Status gate enforced         | ✅ "MAY implement ONLY when status: accepted" |
+| dryRun opt-in default        | ✅ "MUST be opt-in (default `false`)"         |
 
 ### Findings
 
@@ -106,12 +106,12 @@ RFC-0601 proposes a general-purpose content drift validator for text-based gener
 
 ## Axis 6: Pragmatism — ⚠️ Missing implementation details
 
-| Check | Result |
-| --- | --- |
-| Binary file detection mechanism | ⚠️ Not specified |
-| Git-tracking detection mechanism | ⚠️ Not specified |
-| Performance estimate | ⚠️ Not quantified |
-| Generator render function separability | ⚠️ Not addressed |
+| Check                                  | Result            |
+| -------------------------------------- | ----------------- |
+| Binary file detection mechanism        | ⚠️ Not specified  |
+| Git-tracking detection mechanism       | ⚠️ Not specified  |
+| Performance estimate                   | ⚠️ Not quantified |
+| Generator render function separability | ⚠️ Not addressed  |
 
 ### Findings
 
@@ -155,15 +155,15 @@ RFC-0601 proposes a general-purpose content drift validator for text-based gener
 
 ## Summary table
 
-| Axis | Severity | Count |
-| --- | --- | --- |
-| 1. Structural completeness | Minor | 3 |
-| 2. DNA alignment | Minor | 1 |
-| 3. Ecosystem fit | **Critical** | 6 |
-| 4. Forward-only compliance | Clean | 1 |
-| 5. Agent-facing policy | Minor | 2 |
-| 6. Pragmatism | Minor | 4 |
-| 7. Blind spots | **Critical** | 5 |
+| Axis                       | Severity     | Count |
+| -------------------------- | ------------ | ----- |
+| 1. Structural completeness | Minor        | 3     |
+| 2. DNA alignment           | Minor        | 1     |
+| 3. Ecosystem fit           | **Critical** | 6     |
+| 4. Forward-only compliance | Clean        | 1     |
+| 5. Agent-facing policy     | Minor        | 2     |
+| 6. Pragmatism              | Minor        | 4     |
+| 7. Blind spots             | **Critical** | 5     |
 
 **Total findings: 22** (6 critical, 16 minor)
 

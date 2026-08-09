@@ -40,7 +40,7 @@ No issues. No compatibility shims, no dual paths, no legacy maintenance. All thr
 
 ## Axis E — Agent-facing policy
 
-**E1 — Factual error about `mission.close`.** The RFC states "No bordbuch validation in `mission.close`" (line 93) and that "`mission.close` does not [validate bordbuch]". However, `mission.close` already runs `runInlineValidate(missionId, context)` at `mission-close.ts:183`, which calls `runMissionValidate`, which runs the `build.prepare` pipeline. If `bordbuch.validate` is added to `build.prepare`, then `mission.close` already validates bordbuch transitively via the inline validation gate (RFC-0593). The RFC's proposal to add a *separate* `validateBordbuch` call in `mission.close` (lines 132–134) is potentially redundant. The RFC should either (a) justify the separate call — e.g., to cover the distribution-reuse skip path in RFC-0635 where `build.prepare` is skipped — or (b) remove it and rely on the pipeline step.
+**E1 — Factual error about `mission.close`.** The RFC states "No bordbuch validation in `mission.close`" (line 93) and that "`mission.close` does not [validate bordbuch]". However, `mission.close` already runs `runInlineValidate(missionId, context)` at `mission-close.ts:183`, which calls `runMissionValidate`, which runs the `build.prepare` pipeline. If `bordbuch.validate` is added to `build.prepare`, then `mission.close` already validates bordbuch transitively via the inline validation gate (RFC-0593). The RFC's proposal to add a _separate_ `validateBordbuch` call in `mission.close` (lines 132–134) is potentially redundant. The RFC should either (a) justify the separate call — e.g., to cover the distribution-reuse skip path in RFC-0635 where `build.prepare` is skipped — or (b) remove it and rely on the pipeline step.
 
 ## Axis F — Pragmatism
 
@@ -56,7 +56,7 @@ No issues. No compatibility shims, no dual paths, no legacy maintenance. All thr
 
 ## Questions for the author
 
-1. If `bordbuch.validate` is added to `build.prepare`, and `mission.close` already runs `mission.validate` (which runs `build.prepare`), why is a *separate* `validateBordbuch` call needed in `mission.close`? Is it to cover the distribution-reuse skip path (RFC-0635) where `build.prepare` is skipped? If so, state this explicitly.
+1. If `bordbuch.validate` is added to `build.prepare`, and `mission.close` already runs `mission.validate` (which runs `build.prepare`), why is a _separate_ `validateBordbuch` call needed in `mission.close`? Is it to cover the distribution-reuse skip path (RFC-0635) where `build.prepare` is skipped? If so, state this explicitly.
 
 2. Should `bordbuch.validate` be added to `SITES_BUILD_PREPARE_DEV_PIPELINE` as well, or only to `SITES_BUILD_PREPARE_PIPELINE`? The dev pipeline currently excludes `bordbuch.generate` and `bordbuch.commit` — should `bordbuch.validate` follow the same pattern?
 

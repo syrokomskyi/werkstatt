@@ -21,6 +21,7 @@ The RFC has a clear architectural fit (DNA-54, RFC-0638) but contains a fundamen
 The RFC's algorithm (line 159) says: "Compute the input hash: hash all files matching `determinism.inputs` glob patterns, sorted by path."
 
 But the actual `editframe-html.yaml` profile declares:
+
 ```yaml
 determinism:
   hashable: true
@@ -31,6 +32,7 @@ determinism:
 ```
 
 These are human-readable labels, not glob patterns. The algorithm cannot hash files matching "composition files" — that's not a glob. The RFC must either:
+
 - Change the profile schema to require glob patterns in `inputs`, or
 - Define a mapping from labels to file resolution logic, or
 - Change the algorithm to hash all files in the workspace (not just `inputs`)
@@ -50,6 +52,7 @@ But `extensions` for the composition artifact is `[".html", ".tsx"]` — these a
 The RFC algorithm (line 160) says: "Run `forge.build --artifact <id>` (first build)."
 
 But `forge.build` (RFC-0674) does not have an `--artifact` flag — it builds all artifacts. Only `forge.validate` got `--artifact` in RFC-0677. The RFC must either:
+
 - Add `--artifact` to `forge.build` first (as a prerequisite or part of this RFC), or
 - Execute the `produce.command` directly instead of calling `forge.build`
 

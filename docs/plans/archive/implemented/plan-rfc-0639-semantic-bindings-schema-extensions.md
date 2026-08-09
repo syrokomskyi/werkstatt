@@ -299,7 +299,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Key proliferation — 5 new keys increase schema surface | Step 6 tests verify all keys are optional with `null` defaults; existing forge.yaml compatibility test confirms no breakage |
 | Skill confusion — skills might reference both `typecheck` and `validate` | Out of scope for this RFC — RFC-0642 handles skill migration. This RFC only adds the schema keys. |
 | Terminology resolution overhead — three-tier chain | Step 6 tests verify the chain is a simple object key lookup; no performance concern. |

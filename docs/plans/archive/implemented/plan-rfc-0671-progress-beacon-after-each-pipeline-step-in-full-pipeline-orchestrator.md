@@ -77,11 +77,11 @@ No code changes. Skill-text-only policy change.
 
 ## 5. Risks and mitigation
 
-| Risk | Mitigation |
-| --- | --- |
-| Beacon noise in batch | Step 1: directive notes 30 beacons for 5×6 is acceptable |
-| Beacon during fix cycles | Step 1: directive specifies ✗ then ✓ |
-| Wrong language | Step 1: directive requires `aiLanguage` |
+| Risk                     | Mitigation                                               |
+| ------------------------ | -------------------------------------------------------- |
+| Beacon noise in batch    | Step 1: directive notes 30 beacons for 5×6 is acceptable |
+| Beacon during fix cycles | Step 1: directive specifies ✗ then ✓                     |
+| Wrong language           | Step 1: directive requires `aiLanguage`                  |
 
 ## 6. Escalation triggers
 

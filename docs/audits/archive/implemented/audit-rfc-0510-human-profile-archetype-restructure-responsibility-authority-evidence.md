@@ -46,9 +46,11 @@ Pass (with 2 warnings):
   The RFC's `buildHumanProfileBlocks` TypeScript contract (lines 361-442) and the Andrii YAML example (lines 296-332) will not compile/validate against the real schema. The proposed YAML `responsibilities: ["..."]` would fail `participant.validate` because the schema expects `responsibility: { summary: "..." }`.
 
 - **FAIL — `controlled-responsibility-block` props mismatch (critical).** The RFC proposes (lines 133-147):
+
   ```ts
   { type: "controlled-responsibility-block", props: { items: [{ label: r, kind: "responsibility" }] } }
   ```
+
   The actual archetype at `packages/ui/src/sections/controlled-responsibility-block/` uses a `body-split-list` compose with `body.primaryItems` / `body.secondaryItems` (each a `StandardListItem` with `text` and `icon` fields). There is no `items` prop, no `kind` discriminator, and no `label` field. The manifest requires `header` and `body` (not `items`). The RFC's Block 2 contract is fabricated.
 
 - **FAIL — `contentRef` fragment anchors do not exist.** The RFC proposes `contentRef: prose/${slug}#beruflich`, `prose/${slug}#nachweise`, `prose/${slug}#persoenlich`. The current `resolve-route.ts` uses `contentRef: prose/${personSlug}` (no fragment). The `content.references.validate` command validates `{collection.file.fieldPath}` brace references, not markdown `#fragment` anchors. There is no mechanism in the page handler or content reference system to extract a specific `##` section from a prose file by fragment. This is a new feature that the RFC does not design.

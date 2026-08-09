@@ -337,7 +337,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Key loss | Step 1: `werkstatt.identity.json` stores only public key; private key in env var |
 | VC token theft | Step 4: short expiry for delegation credentials; revocation list in config |
 | Agent misinterpretation | Step 6: Studio Gate returns clear error messages with required credential format |

@@ -415,7 +415,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Registry drift | Step 4 (`service.registry.validate`) cross-checks registry with `service.config.yaml` |
 | Health check false negatives | Step 1 adds `healthCheckPath` field; Step 3 uses it with `/` default |
 | Worker renaming disruption | Step 8 renames Workers; operator manually deletes old Workers after verification |

@@ -1,9 +1,6 @@
 # Code Review: UK→DE Translation Session (warpgogol-com-m000021)
 
-**Date:** 2026-07-30
-**Reviewer:** Cascade (fo-review skill)
-**Scope:** `git diff eb292ff...HEAD` — 193 files changed, 4221 insertions(+), 2366 deletions(-)
-**Commits:** 8 commits (4f562e4 → 7f5b24d)
+**Date:** 2026-07-30 **Reviewer:** Cascade (fo-review skill) **Scope:** `git diff eb292ff...HEAD` — 193 files changed, 4221 insertions(+), 2366 deletions(-) **Commits:** 8 commits (4f562e4 → 7f5b24d)
 
 ## Summary
 
@@ -70,6 +67,7 @@ Full translation of Ukrainian content to German across all content collections i
 ### FINDING-1 — Field name mismatch in offerings (severity: medium)
 
 **Files:**
+
 - `src/content/business-profile/de/offerings/visibility.md`
 - `src/content/business-profile/de/offerings/booking.md`
 - `src/content/business-profile/de/offerings/reputation.md`
@@ -79,6 +77,7 @@ Full translation of Ukrainian content to German across all content collections i
 **Issue:** UK offerings use `description:` as the field name for the offering summary text. DE offerings were translated using `summary:` instead. The translated content is correct, but the field name is wrong — this may cause the offering description to not render or be skipped by the PBP semantic profile builder.
 
 **Evidence:**
+
 - UK: `description: "Мережа сторінок для більшої видимості..."`
 - DE: `summary: "Seitennetzwerk für mehr Sichtbarkeit..."`
 
@@ -87,6 +86,7 @@ Full translation of Ukrainian content to German across all content collections i
 ### FINDING-2 — Surface demand slug divergence (severity: low, intentional)
 
 **Files:**
+
 - UK: `demands/uk/friseur/karlsruhe/balayazh.md` → DE: `demands/de/friseur/karlsruhe/balayage.md`
 - UK: `demands/uk/friseur/karlsruhe/strizhka.md` → DE: `demands/de/friseur/karlsruhe/haarschnitt.md`
 - UK: `demands/uk/friseur/karlsruhe/vechirnya-zachiska.md` → DE: `demands/de/friseur/karlsruhe/hochsteckfrisur.md`

@@ -37,6 +37,7 @@ Pass — zero violations.
   3. Use a pipeline post-hook or a different mechanism that doesn't require a command registration.
 
   Option 1 is the cleanest: register `bordbuch.commit` as a command, add it to `commands.added`, and note in the RFC that while it is callable by operators, it is primarily intended as a pipeline step. The RFC's `commands` frontmatter already has `bordbuch.generate` in `changed` — `bordbuch.commit` should be in `added`.
+
 - **`commands.changed` lists `bordbuch.generate`** but the RFC explicitly says "Do not change the bordbuch.generate command handler itself" (nonGoals, line 67) and "bordbuch-generate.ts: Unchanged" (file system responsibilities, line 272). `bordbuch.generate` should not be in `changed` — it is not modified by this RFC. Only `generated.timestamp.validate` is changed.
 - **Package boundary**: `commitBordbuchProjections` in `site-kernel-handoff` is correct — it follows the existing `commitAndPushBordbuch` and `commitWerkstattSideEffects` pattern in the same package.
 

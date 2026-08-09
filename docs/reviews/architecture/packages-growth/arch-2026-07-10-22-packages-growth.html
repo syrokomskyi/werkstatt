@@ -153,8 +153,9 @@
               <strong>Solution.</strong> Deepen: one <code>OntologyCatalogValidator</code> module
               that owns the readdir → parseYaml → validate → cross-reference pipeline. Each catalog
               (events, funnels, experiments) contributes a small entry-validator. The module imports
-              <code>EVENT_NAMES</code> from <code>@warpgogol/growth</code> and reads system config via
-              <code>loadSystemManifest</code> — like <code>growth-adapter.ts</code> already does.
+              <code>EVENT_NAMES</code> from <code>@warpgogol/growth</code> and reads system config
+              via <code>loadSystemManifest</code> — like <code>growth-adapter.ts</code> already
+              does.
             </p>
           </div>
 

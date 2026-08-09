@@ -123,10 +123,8 @@ scope:
 **Agent actions:**
 
 - Edit `.github/workflows/ci.yml`:
-  - Add step `Platform commit discipline validate` in `autonomous-quality` job:
-    `pnpm exec site-kernel run platform.commit.discipline.validate --base origin/introduce-axiom-system --json`
-  - Add step `Platform consistency validate` (fixing audit C-2):
-    `pnpm exec site-kernel run platform.consistency.validate --check --json`
+  - Add step `Platform commit discipline validate` in `autonomous-quality` job: `pnpm exec site-kernel run platform.commit.discipline.validate --base origin/introduce-axiom-system --json`
+  - Add step `Platform consistency validate` (fixing audit C-2): `pnpm exec site-kernel run platform.consistency.validate --check --json`
 - Edit `packages/os/site-kernel-checks/src/ci-local.ts`:
   - Add `"pnpm exec site-kernel run platform.commit.discipline.validate --base origin/introduce-axiom-system --json"` to `CI_LOCAL_CHECKED_COMMANDS`
   - Add `CHANGE_SUMMARY` entry for RFC-0703

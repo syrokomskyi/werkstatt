@@ -204,7 +204,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Operator confusion — two sets of R2 env vars | Step 3 adds clear `.env.example` comments with separate sections |
 | Migration — operators who set `R2_*` for nachweis need `R2_NACHWEIS_*` | Nachweis is not yet in production; no migration needed |
 

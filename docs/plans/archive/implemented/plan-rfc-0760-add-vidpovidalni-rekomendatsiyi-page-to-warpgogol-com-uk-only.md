@@ -39,9 +39,7 @@ No code changes. No new Site OS commands. This RFC is pure content composition �
 
 ### 2.3 Documentation and specs
 
-No `AGENTS.md` updates needed — no new commands, packages, or governance rules.
-No `docs/*.xml` Compass sync needed — no repository-wide semantic changes.
-No `docs/architecture-dna.md` changes — no new DNA invariant.
+No `AGENTS.md` updates needed — no new commands, packages, or governance rules. No `docs/*.xml` Compass sync needed — no repository-wide semantic changes. No `docs/architecture-dna.md` changes — no new DNA invariant.
 
 ### 2.4 Validation and pipelines
 
@@ -296,7 +294,7 @@ No `docs/architecture-dna.md` changes — no new DNA invariant.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Dependency chain — RFC-0757, 0758, 0759 must be implemented first | Step 1 verifies archetype registration before adding page entry |
 | UK-only precedent — first UK-only page, route registry must handle correctly | Step 6 verifies UK-only routing and DE sitemap exclusion |
 | Content volume — ~23 blocks, more than typical | Step 5 validates each block independently via `page.block.validate` |

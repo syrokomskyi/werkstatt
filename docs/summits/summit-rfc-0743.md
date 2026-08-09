@@ -90,4 +90,4 @@ No findings block RFC acceptance. The RFC is architecturally sound after enhance
 
 ---
 
-*No findings does not mean no issues — it means no issues were found from these five perspectives.*
+_No findings does not mean no issues — it means no issues were found from these five perspectives._

@@ -51,10 +51,12 @@ No issues. The change is a single-line condition update — maximally minimal. N
 **Finding G1 — Workflow conflict with RFC-0522 `mission.close` releaseId warning:** RFC-0522 added a `missing-release-id` warning to `mission.close` when `releaseId` is null, with the message "Run `release.prepare` before close to associate a release" (`packages/os/site-kernel-handoff/src/mission/mission-close.ts:253-260`). RFC-0522 also made `release.prepare` write `releaseId` back to `mission.yaml` after preparation (`release-commands.ts:401-404`). The intended workflow was: `release.prepare` (on open mission) → `mission.close` (with `releaseId` set, no warning).
 
 RFC-0590 reverses this workflow: `mission.close` first → `release.prepare` on closed mission. This creates a conflict:
+
 1. Operator runs `mission.close` → gets `missing-release-id` warning (because `release.prepare` hasn't run yet)
 2. Operator runs `release.prepare` on closed mission → writes `releaseId` to `mission.yaml` (now closed)
 
 The warning in step 1 is now always expected and cannot be satisfied — `release.prepare` cannot run before close under the new contract. The RFC does not address this conflict. It should either:
+
 - Amend RFC-0522 to remove or reword the `missing-release-id` warning (since the workflow is reversed), OR
 - Explain that the warning is now expected behavior and operators should ignore it, AND clarify that writing `releaseId` to a closed mission's `mission.yaml` is valid
 

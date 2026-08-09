@@ -9,9 +9,15 @@
       mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
     </script>
     <style>
-      .seam { stroke-dasharray: 4 4; }
-      .leak { stroke: #dc2626; }
-      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
     </style>
   </head>
   <body class="bg-stone-50 text-slate-900 font-sans">
@@ -24,19 +30,37 @@
           <span>warpgogol monorepo</span>
         </div>
         <div class="flex items-center gap-6 text-xs text-slate-400">
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span
+          >
         </div>
       </header>
 
       <section id="candidates" class="space-y-10">
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Generate TOKEN_NAMES from tokens.css instead of hand-maintaining a 450-line tuple</h2>
+          <h2 class="text-xl font-semibold">
+            Generate TOKEN_NAMES from tokens.css instead of hand-maintaining a 450-line tuple
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">local-substitutable</span>
+            <span
+              class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5"
+              >Strong</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >local-substitutable</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/tokens/src/index.ts:24-472</div>
@@ -73,8 +97,18 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>TOKEN_NAMES</code> is a 450-entry hand-typed tuple that must stay in sync with <code>tokens.css</code> — the <code>tokens.catalog.sync</code> command exists solely to catch drift between two copies of the same information.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Add a build step that parses <code>tokens.css</code> <code>:root</code> declarations and generates <code>TOKEN_NAMES</code>, <code>DesignToken</code>, and <code>TOKEN_CATEGORIES</code> automatically; the sync command becomes unnecessary.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>TOKEN_NAMES</code> is a
+              450-entry hand-typed tuple that must stay in sync with <code>tokens.css</code> — the
+              <code>tokens.catalog.sync</code> command exists solely to catch drift between two
+              copies of the same information.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Add a build step that parses
+              <code>tokens.css</code> <code>:root</code> declarations and generates
+              <code>TOKEN_NAMES</code>, <code>DesignToken</code>, and
+              <code>TOKEN_CATEGORIES</code> automatically; the sync command becomes unnecessary.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> token names defined in one source</li>
@@ -86,7 +120,11 @@
 
       <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
         <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
-        <p class="text-sm text-slate-300">Generate <code>TOKEN_NAMES</code> from CSS — the 450-line hand-maintained tuple is the textbook case of duplicated information that a codegen step eliminates. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+        <p class="text-sm text-slate-300">
+          Generate <code>TOKEN_NAMES</code> from CSS — the 450-line hand-maintained tuple is the
+          textbook case of duplicated information that a codegen step eliminates.
+          <a href="#" class="text-emerald-400 underline">Jump to card →</a>
+        </p>
       </section>
     </main>
   </body>

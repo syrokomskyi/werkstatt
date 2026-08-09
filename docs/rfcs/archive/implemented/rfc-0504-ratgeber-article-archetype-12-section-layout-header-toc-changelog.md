@@ -146,16 +146,16 @@ Valid section names: `direct-answer`, `definitions`, `analysis`, `example`, `che
 
 Each slot name maps to a mandatory H2 heading from RFC-0501 (except `warpgogol-connection`, which is optional):
 
-| Slot                  | DE heading                     | UK heading                | Optional? |
-| --------------------- | ------------------------------ | ------------------------- | --------- |
-| `direct-answer`       | `## Kernfrage`                 | `## Ключове питання`      | No        |
-| `definitions`         | `## Wissensbasis`              | `## База знань`           | No        |
-| `analysis`            | `## Häufige Missverständnisse` | `## Поширені помилки`     | No        |
-| `example`             | `## Praxisbezug`               | `## Практична частина`    | No        |
-| `checklist`           | `## Checkliste`                | `## Контрольний список`   | No        |
-| `limitations`         | `## Kosten und Trade-offs`     | `## Витрати і компроміси` | No        |
-| `sources`             | `## Quellen`                   | `## Джерела`              | No        |
-| `warpgogol-connection` | `## Warpgogol-Bezug`            | `## Зв'язок із Warpgogol`  | Yes       |
+| Slot                   | DE heading                     | UK heading                | Optional? |
+| ---------------------- | ------------------------------ | ------------------------- | --------- |
+| `direct-answer`        | `## Kernfrage`                 | `## Ключове питання`      | No        |
+| `definitions`          | `## Wissensbasis`              | `## База знань`           | No        |
+| `analysis`             | `## Häufige Missverständnisse` | `## Поширені помилки`     | No        |
+| `example`              | `## Praxisbezug`               | `## Практична частина`    | No        |
+| `checklist`            | `## Checkliste`                | `## Контрольний список`   | No        |
+| `limitations`          | `## Kosten und Trade-offs`     | `## Витрати і компроміси` | No        |
+| `sources`              | `## Quellen`                   | `## Джерела`              | No        |
+| `warpgogol-connection` | `## Warpgogol-Bezug`           | `## Зв'язок із Warpgogol` | Yes       |
 
 The `warpgogol-connection` slot is an optional H2 heading. When present, it must appear after `## Zusammenfassung` / `## Підсумок` and before `## Quellen` / `## Джерела` in the heading order. `ratgeber.article.validate` does not require its presence but accepts it if present.
 

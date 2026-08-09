@@ -22,8 +22,8 @@
 
 ## Mechanical floor
 
-| Package        | Command                                  | Result |
-| -------------- | ---------------------------------------- | ------ |
+| Package            | Command                                      | Result |
+| ------------------ | -------------------------------------------- | ------ |
 | `@warpgogol/pbp`   | `pnpm --filter @warpgogol/pbp build:check`   | PASS   |
 | `@warpgogol/share` | `pnpm --filter @warpgogol/share build:check` | PASS   |
 | `@warpgogol/ui`    | `pnpm --filter @warpgogol/ui build:check`    | PASS   |

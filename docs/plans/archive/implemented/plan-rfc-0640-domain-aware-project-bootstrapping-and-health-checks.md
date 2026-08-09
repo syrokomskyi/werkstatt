@@ -312,7 +312,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Command complexity — extending three commands increases complexity | Step 4-6: domain-aware logic guarded by profile field presence — absent fields trigger fallback |
 | Profile validation gaps — `forge.profile.validate` might miss edge cases | Step 2: uses the same Zod schema as the profile loader, ensuring schema-level consistency |
 | workspaceTypes detection false positives — non-software markers might match unrelated files | Step 6: detection markers are profile-specific and can be refined per profile; fallback to hardcoded detection when `workspaceTypes` absent |

@@ -292,7 +292,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | JSON endpoints expose too much | Step 2 (`filterPublicParticipant` strips private fields) + Step 5 (`participant.json.validate` checks for private field absence) |
 | Consent-gated fields in JSON vs HTML mismatch | Step 2 (same `consent.approvedFields` gate in `filterPublicParticipant`) + Step 5 (validator checks consistency) |
 | CollectionPage `hasPart` grows large | Not a concern for 1–20 participants; noted in RFC non-goals for future paginated endpoint |

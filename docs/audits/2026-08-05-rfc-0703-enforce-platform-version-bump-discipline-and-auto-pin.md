@@ -52,7 +52,7 @@ The `satisfies` field correctly lists DNA-44, DNA-46, DNA-47.
 
 **[C-1] `ci.local.validate` has no "pipeline" — it has `CI_LOCAL_CHECKED_COMMANDS`**
 
-The RFC says "Command added to `ci.local.validate` pipeline". But `ci.local.validate` (`packages/os/site-kernel-checks/src/ci-local.ts`) doesn't have a pipeline — it has a `CI_LOCAL_CHECKED_COMMANDS` array that checks for command *presence* in `ci.yml`. The correct integration is adding the new command string to this array. The RFC's wording is imprecise and could mislead the implementer.
+The RFC says "Command added to `ci.local.validate` pipeline". But `ci.local.validate` (`packages/os/site-kernel-checks/src/ci-local.ts`) doesn't have a pipeline — it has a `CI_LOCAL_CHECKED_COMMANDS` array that checks for command _presence_ in `ci.yml`. The correct integration is adding the new command string to this array. The RFC's wording is imprecise and could mislead the implementer.
 
 **[C-2] `ci.yml` is already out of sync with `CI_LOCAL_CHECKED_COMMANDS`**
 
@@ -105,10 +105,12 @@ The acceptance criterion says "AGENTS.md updated with platform-scope commit disc
 The RFC's nonGoals says: "Validating X-Platform-Bump trailer values (patch/minor/major) — that is `platform.consistency.validate`'s job." But PC-04 checks trailer **presence**, not values. PC-01/02/03 check semantic correctness (hash drift, version bump correspondence). The RFC creates a false distinction to justify a separate command.
 
 The real difference is:
+
 - PC-04: checks all commits since a fixed cutoff SHA (cumulative, includes merged branches)
 - Proposed command: checks only `--base..HEAD` range (per-PR isolation)
 
 This is a meaningful difference — per-PR isolation is better for CI because it attributes violations to the specific PR, not to historical commits. But the RFC doesn't make this argument. It should either:
+
 - (a) Extend `platform.consistency.validate` with a `--base` flag that switches from cutoff-based to range-based checking, or
 - (b) Explicitly justify why a separate command is needed (per-PR isolation, standalone CI step, different output format with `violations[].files`).
 

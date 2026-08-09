@@ -212,7 +212,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Violation parsing fragility (regex) | Step 2: `outputFormat: "json"` is recommended; `violationPattern` is fallback only |
 | Command execution time | Step 2: `--artifact` flag allows validating single artifact |
 | False negatives (exit 0 with warnings) | Step 2: violations array populated regardless of exit code |

@@ -173,7 +173,7 @@ No configuration changes. The `declaredOutputPaths` array is internal to the fun
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Performance: N `fs.access` calls before short-circuit | Step 1 uses `Promise.all` for parallel `fs.access` — sub-millisecond total cost |
 | False positives: site without `openSource` page | Existing `hasSystemPage` guard at line 756 returns early before fingerprint check — no false positive |
 | Maintenance: `declaredOutputPaths` must stay in sync with generator outputs | Step 1 adds a comment linking to `GENERATOR_OWNERSHIP_MAP` (lines 159-180) — the ownership map is the source of truth |

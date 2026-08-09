@@ -83,7 +83,7 @@ scope:
 
 - In `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts`, after `resolveCachePath` (line 611) and before workpiece staging (line 710), call `installBordbuchPreCommitHook(systemDir, manifest.systemId)`
 - Import `installBordbuchPreCommitHook` from `../bordbuch/bordbuch-hook.ts`
-- Log the installation: `logger.info(\`  Installed bordbuch pre-commit hook in cache clone\`)`
+- Log the installation: `logger.info(\` Installed bordbuch pre-commit hook in cache clone\`)`
 - Make hook installation non-fatal: wrap in try/catch, log `logger.warn` on failure (cache clone without `.git` is valid for non-git Sternsystems)
 - Add `bordbuchHookInstalled: boolean` to `MissionMaterializeData` interface
 
@@ -236,7 +236,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Pre-commit hook missing on old cache clones | Step 3 (pipeline) + Step 4 (mission.close) provide defense-in-depth; hook installed on next materialize (Step 2) |
 | False positive on legitimate bordbuch reset | Hook message directs to `bordbuch.repair`; `bordbuch.repair` is the sanctioned override path |
 | Pipeline `bordbuch.validate` adds latency to `build.prepare` | `validateBordbuch` reads a single NDJSON file — O(n) in event count, typically <100 events; negligible vs. 30+ existing steps |

@@ -17,6 +17,7 @@ The RFC is well-structured and addresses a real production problem (MP4 files ex
 ## Mechanical validation (rfc.validate)
 
 Pass with 2 V-19 warnings:
+
 - `RFC-0591.amends includes RFC-0210, but RFC-0210.amendedBy does not include RFC-0591`
 - `RFC-0591.amends includes RFC-0525, but RFC-0525.amendedBy does not include RFC-0591`
 

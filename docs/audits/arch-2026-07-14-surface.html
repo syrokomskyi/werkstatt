@@ -9,9 +9,15 @@
       mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
     </script>
     <style>
-      .seam { stroke-dasharray: 4 4; }
-      .leak { stroke: #dc2626; }
-      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
     </style>
   </head>
   <body class="bg-stone-50 text-slate-900 font-sans">
@@ -24,19 +30,37 @@
           <span>warpgogol monorepo</span>
         </div>
         <div class="flex items-center gap-6 text-xs text-slate-400">
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span
+          >
         </div>
       </header>
 
       <section id="candidates" class="space-y-10">
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Replace export * from governance barrel with explicit re-exports</h2>
+          <h2 class="text-xl font-semibold">
+            Replace export * from governance barrel with explicit re-exports
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5"
+              >Strong</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/surface/src/index.ts:95</div>
@@ -69,8 +93,17 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>index.ts</code> uses <code>export * from "./governance/index.ts"</code> — a wildcard re-export that makes the barrel's public surface opaque and risks name collisions with the other explicit exports in the same file.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Replace the wildcard with explicit named exports from the governance barrel, matching the pattern already used for the other modules in <code>index.ts</code>.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>index.ts</code> uses
+              <code>export * from "./governance/index.ts"</code> — a wildcard re-export that makes
+              the barrel's public surface opaque and risks name collisions with the other explicit
+              exports in the same file.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Replace the wildcard with explicit
+              named exports from the governance barrel, matching the pattern already used for the
+              other modules in <code>index.ts</code>.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> barrel surface is explicit and auditable</li>
@@ -80,10 +113,18 @@
         </article>
 
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Deepen blueprint.ts by extracting type definitions into a dedicated types sub-module</h2>
+          <h2 class="text-xl font-semibold">
+            Deepen blueprint.ts by extracting type definitions into a dedicated types sub-module
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5"
+              >Worth exploring</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/surface/src/blueprint.ts:1-560</div>
@@ -120,8 +161,19 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>blueprint.ts</code> is 560 lines mixing 30+ interface/type definitions with helper functions (<code>buildEligibilityMatrix</code>, <code>assembleEntries</code>, <code>generateEntries</code>, <code>resolveSlug</code>) — the type surface and the logic are coupled in one module.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Extract the Blueprint type definitions into a dedicated <code>blueprint-types.ts</code> module; <code>blueprint.ts</code> imports from it and keeps only the helper functions; consumers that only need types import from <code>blueprint-types.ts</code>.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>blueprint.ts</code> is 560
+              lines mixing 30+ interface/type definitions with helper functions
+              (<code>buildEligibilityMatrix</code>, <code>assembleEntries</code>,
+              <code>generateEntries</code>, <code>resolveSlug</code>) — the type surface and the
+              logic are coupled in one module.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Extract the Blueprint type
+              definitions into a dedicated <code>blueprint-types.ts</code> module;
+              <code>blueprint.ts</code> imports from it and keeps only the helper functions;
+              consumers that only need types import from <code>blueprint-types.ts</code>.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> type defs in one module, logic in another</li>
@@ -133,7 +185,11 @@
 
       <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
         <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
-        <p class="text-sm text-slate-300">Replace <code>export *</code> with explicit re-exports — the wildcard is the only one in the barrel and breaks the explicit-surface pattern used everywhere else in the file. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+        <p class="text-sm text-slate-300">
+          Replace <code>export *</code> with explicit re-exports — the wildcard is the only one in
+          the barrel and breaks the explicit-surface pattern used everywhere else in the file.
+          <a href="#" class="text-emerald-400 underline">Jump to card →</a>
+        </p>
       </section>
     </main>
   </body>

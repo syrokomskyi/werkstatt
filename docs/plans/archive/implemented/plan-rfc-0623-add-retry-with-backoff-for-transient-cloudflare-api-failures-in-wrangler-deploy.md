@@ -202,7 +202,7 @@ None — retry parameters are hardcoded constants, not configurable.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | False positive on stderr pattern matching | Step 4 tests verify non-transient errors (auth, syntax) are not retried |
 | Increased wall-clock time on failure (90s worst case) | Step 4 tests use `vi.useFakeTimers()` to verify retry timing without real delays |
 | Cloudflare API outage longer than 90s | Step 4 test "all retries exhausted" verifies correct failure behavior |

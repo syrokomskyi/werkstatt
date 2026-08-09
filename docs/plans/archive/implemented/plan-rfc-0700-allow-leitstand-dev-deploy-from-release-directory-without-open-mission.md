@@ -220,7 +220,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Agent misinterpretation: using `--release` during active development | Step 5: AGENTS.md documents that `--release` is for re-deploying existing releases, not for skipping build |
 | No axiom verification in release path | By design — release was already validated during `release.prepare`. Step 3 sets `axiom.status: "not-run"` explicitly |
 | Wrangler binary not found in release dir | Step 3: resolve from workspace root `node_modules/.bin/` with PATH fallback |

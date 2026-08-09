@@ -23,7 +23,7 @@ Pass — `rfc.validate RFC-0598` проходит без нарушений.
 - **A-1 (серьёзный)**: Context (строка 86) утверждает, что `ownership-block` и `trust-strip` «were found with colocated `.css` files containing real CSS rules but **no `import` statement**». Однако оба `.astro`-файла уже содержат импорты:
   - `@/packages/ui/src/sections/ownership-block/ownership-block-section.astro:21` — `import "./ownership-block-section.css";`
   - `@/packages/ui/src/sections/trust-strip/trust-strip-section.astro:24` — `import "./trust-strip-section.css";`
-  
+
   Это означает, что либо RFC написан на основе устаревшей информации, либо баг был исправлен после создания RFC, но до аудита. Разделы Context, Rollout (строка 181), Acceptance criteria (строка 207) и Implementation notes (строка 219) все ссылаются на эти «нарушения» и требуют обновления.
 
 ## Axis B — DNA alignment

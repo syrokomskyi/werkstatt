@@ -159,11 +159,7 @@ No configuration or data files affected. The structural tag list is a `const rea
   6. **Multiple structural tags checked**: `<header><nav></nav></header><main></main>` → no violations
   7. **Self-closing variant counted as opening**: `<main />` → `openCount: 1` (browsers treat as opening)
   8. **Multiple violations in one file**: missing `<main>` and missing `</header>` → 2 violations
-- Test cases for kernel handler `runDistHtmlStructureValidate`:
-  9. **No dist/client directory**: returns pass result with skip message
-  10. **Clean build passes**: temp dir with balanced HTML files → `status: "pass"`, `filesScanned > 0`
-  11. **Violations detected**: temp dir with imbalanced HTML → `exitCode: 1`, `violations[]` populated
-  12. **--json output shape**: result `data` matches `HtmlStructureValidateResult` interface
+- Test cases for kernel handler `runDistHtmlStructureValidate`: 9. **No dist/client directory**: returns pass result with skip message 10. **Clean build passes**: temp dir with balanced HTML files → `status: "pass"`, `filesScanned > 0` 11. **Violations detected**: temp dir with imbalanced HTML → `exitCode: 1`, `violations[]` populated 12. **--json output shape**: result `data` matches `HtmlStructureValidateResult` interface
 - Use `vi.mock` or temp directories for handler tests (follow existing test patterns in `src/tests/`)
 - Test helper for extracting violations from result data: accept `unknown` and cast internally (per established pattern)
 
@@ -266,7 +262,7 @@ No configuration or data files affected. The structural tag list is a `const rea
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | False positives from HTML comments | Step 1: comment stripping regex `<!--[\s\S]*?-->` before counting; Step 4: test case 5 verifies |
 | False positives from attribute values | Step 4: test case 7 documents the trade-off; accepted as unlikely per RFC Risks section |
 | Performance (1518 files) | Step 1: O(n) regex per file, ~14 tags; Step 5: verify <1s on real site |

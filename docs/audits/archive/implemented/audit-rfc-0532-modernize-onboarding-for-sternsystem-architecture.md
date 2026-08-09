@@ -35,14 +35,14 @@ Pass with 2 warnings (V-12): `RFC-0532.supersedes` includes RFC-0070 and RFC-007
   - Lives in `@gogol/site-kernel-handoff`, not `@gogol/site-kernel` as the RFC states.
   - Uses flags `--id`, `--cosmicStar`, `--repo`, `--platform`, `--mirror`.
   - Only writes the registry entry — does NOT create a pin file, open a mission, trigger materialization, or create content stubs.
-  
+
   The RFC proposes flags `--system`, `--cosmic-star`, `--amend`, `--amend-id` and adds mission opening + materialization. The RFC's `commands.added` lists `sternsystem.register` as new, but it should be `commands.changed`. The RFC must acknowledge the existing implementation and specify whether it extends or replaces it. The flag rename (`--id` → `--system`, `--cosmicStar` → `--cosmic-star`) is a breaking interface change.
 
 - **11 unaddressed commands.** `packages/os/site-kernel-onboarding/src/module.ts` registers 16 commands. The RFC's `commands.removed` lists 5. The remaining 11 are unaddressed:
   - Amend lifecycle: `amend.input.validate`, `amend.system.merge`, `amend.delta.files`, `content.coverage.delta`, `amend.atoms.merge`, `amend.provenance.append`, `amend.provenance.validate`
   - Biome: `biome.tokens.derive`, `biome.site-background.derive`
   - Config: `config.regenerate`, `config.template.sync`
-  
+
   The RFC must state whether these are kept, removed, or migrated. The amend commands reference `onboarding/.input/{batch}/` and `onboarding/.output/{batch}/` paths that the RFC's new per-system layout changes. The `config.regenerate` and `config.template.sync` commands reference `apps/<id>/` paths that are retired.
 
 - **`packagesImpacted` issues.** Lists `@gogol/forge` but no changes to that package are described (the `fo-onboard` skill lives in `.agents/skills/`, not `packages/forge/`). Does not list `@gogol/site-kernel-handoff`, which is where `sternsystem.register` currently lives and would be impacted if the command is moved or its flags change.

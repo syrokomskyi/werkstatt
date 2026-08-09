@@ -65,8 +65,7 @@ No issues. No backward compatibility layers, shims, or dual-paths proposed. The 
 - **FAIL — Generator locale-awareness not addressed.** The generator (`runGenerateOverlayPages`) currently has no locale-awareness in title/description generation — it loops over `langs` but uses the same `passportTitle`/`passportDescription` for all locales (lines 82–89, 103–123 of `app-boilerplate.ts`). The RFC must specify how the generator will produce locale-specific metadata. Options include:
   - A localization map in the generator (hardcoded Ukrainian/English cosmic page descriptions), or
   - A new `system.md` field (e.g., `identity.cosmicPageTitles` per locale), or
-  - Reading from `site/{lang}/labels.md`.
-  The RFC does not address this design decision.
+  - Reading from `site/{lang}/labels.md`. The RFC does not address this design decision.
 
 - **Minor — False positive risk for proper nouns.** The RFC acknowledges (line 175) that "Cosmic Passport" is a proper noun and the check targets the full tagline string. But the tagline "Website, die gefunden wird und Ihrem Betrieb gehört" contains common German words ("Website", "die", "und", "Ihrem") that could appear in legitimate UK descriptions. The RFC should specify exact-match (full tagline string) vs. substring-match behavior.
 

@@ -235,7 +235,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Archetype proliferation | Step 1 — archetype is general-purpose (page-level metadata footer), not site-specific |
 | Date format inconsistency | Step 3 — `.astro` renders date strings as-is; no parsing/validation (per RFC Decision) |
 | Cosmic name collision | Step 3 — `cosmic.name.pick` selects a free `PlanetName` automatically |

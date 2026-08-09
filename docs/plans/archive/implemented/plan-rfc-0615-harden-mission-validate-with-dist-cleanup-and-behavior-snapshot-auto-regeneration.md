@@ -329,7 +329,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | dist/ cleanup on network filesystems | Step 1 uses `fs.rm` with `force: true` — logs and continues on failure |
 | Auto-regeneration masking real issues | Step 4 re-runs `build.post` after regeneration — persistent SNAP-01 is reported as failure |
 | Commit churn | Step 4 only commits when workpiece was clean (Step 2 dirty check) — deterministic single-file commit |

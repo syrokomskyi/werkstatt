@@ -21,6 +21,7 @@ The RFC has a clear architectural fit (DNA-54, RFC-0638) and introduces two usef
 The RFC (line 250) says: "Hash mismatches require a stored hash file (`.asset-hashes.json`) — if no hash file exists, this check is skipped."
 
 But the RFC does not define:
+
 - The schema of `.asset-hashes.json`
 - Who writes it (a separate command? `forge.assets.check --update-hashes`?)
 - Where it lives (workspace root? `assets/`? `dist/`?)
@@ -31,6 +32,7 @@ But the RFC does not define:
 ### A-2 (Major): `referencePattern` is a regex but the RFC doesn't define how composition files are discovered
 
 The RFC says `referencePattern` extracts asset references from composition files, but doesn't specify:
+
 - Which files are scanned for references (all files matching `artifacts[].extensions`? A separate `compositions` glob?)
 - How `referencedBy` paths are resolved (relative to workspace root? relative to the composition file?)
 

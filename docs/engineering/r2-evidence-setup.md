@@ -1,9 +1,6 @@
 # R2 Evidence Setup Guide
 
-**Bucket:** `axiom-evidence`
-**Region:** EU Central
-**S3 Endpoint:** `https://4300b51226d758c9c8aff76fc9557565.r2.cloudflarestorage.com`
-**RFC:** RFC-0651 (evidence sync)
+**Bucket:** `axiom-evidence` **Region:** EU Central **S3 Endpoint:** `https://4300b51226d758c9c8aff76fc9557565.r2.cloudflarestorage.com` **RFC:** RFC-0651 (evidence sync)
 
 This guide explains how to create and configure Cloudflare R2 credentials for Axiom evidence archiving. Both human operators and AI agents should follow these steps when setting up a new workshop or rotating credentials.
 
@@ -94,7 +91,7 @@ Cloudflare R2 supports Iceberg-compatible Data Catalog. This is **not required**
 ## Environment variables reference
 
 | Variable | Purpose | Source |
-|---|---|---|
+| --- | --- | --- |
 | `R2_ACCOUNT_ID` | R2 account identifier (same as `CLOUDFLARE_ACCOUNT_ID`) | Cloudflare Dashboard → R2 → Overview |
 | `R2_ACCESS_KEY_ID` | S3-compatible access key | R2 API Token creation page |
 | `R2_SECRET_ACCESS_KEY` | S3-compatible secret key | R2 API Token creation page (shown once) |

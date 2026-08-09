@@ -201,7 +201,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Operator loses custom pack skills silently | Step 1+2: conflict detection skips pack skills; Step 4: reports skipped skills |
 | Skill commit includes unrelated files | Step 4: SKILL.md specifies `git add .agents/skills/` only, not `git add -A` |
 | Agent misinterpretation — agents overwrite pack skills | Step 1+2: programmatic enforcement in `init.ts` and `upgrade.ts` |

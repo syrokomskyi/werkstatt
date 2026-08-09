@@ -7,11 +7,11 @@
 
 ## Mechanical floor
 
-| Check | Result |
-| --- | --- |
-| `tsc --noEmit` (site-kernel-handoff) | ✓ pass |
-| `tsc --noEmit` (ontology) | ✓ pass |
-| `tsc --noEmit` (share) | ✓ pass |
+| Check                                          | Result       |
+| ---------------------------------------------- | ------------ |
+| `tsc --noEmit` (site-kernel-handoff)           | ✓ pass       |
+| `tsc --noEmit` (ontology)                      | ✓ pass       |
+| `tsc --noEmit` (share)                         | ✓ pass       |
 | `vitest run` (nachweis-commands + nachweis-n3) | ✓ 48/48 pass |
 
 ## Axis A — Structural correctness
@@ -19,9 +19,9 @@
 | Item | Result | Evidence |
 | --- | --- | --- |
 | Strict typing | ✓ pass | All interfaces typed, no `any` |
-| No magic numbers | ✓ pass | |
+| No magic numbers | ✓ pass |  |
 | Minimalism | **FAIL** — Duplicated Code | `flagString`/`flagBool` duplicated across 6 files (nachweis-key-ensure, nachweis-sign, nachweis-timestamp, nachweis-verify-signature, nachweis-approve, nachweis-publish). Should be extracted to a shared helper. |
-| Dead code | ✓ pass | |
+| Dead code | ✓ pass |  |
 | Error handling | ✓ pass | All catch blocks have context |
 | Fowler: Duplicated Code | **FAIL** | `createCustomTsaAdapter` in `nachweis-timestamp.ts:182-201` duplicates `FreeTsaAdapter.timestamp` logic — both do `encodeTimestampReq` → `fetch` → `arrayBuffer`. Should be a single `HttpTsaAdapter` class. |
 | Fowler: Shotgun Surgery | **FAIL** | `flagString`/`flagBool` are copy-pasted to every new command file. Adding a new flag helper requires editing all files. |
@@ -48,22 +48,22 @@
 | Item | Result | Evidence |
 | --- | --- | --- |
 | No backward compatibility layers | ✓ pass | `--pilot-n2-exception` removed, not kept behind a flag |
-| No dual-path | ✓ pass | |
+| No dual-path | ✓ pass |  |
 
 ## Axis E — RFC contract alignment
 
-| Item | Result | Evidence |
-| --- | --- | --- |
+| Item                         | Result | Evidence                                          |
+| ---------------------------- | ------ | ------------------------------------------------- |
 | RFC-0715 acceptance criteria | ✓ pass | All 16 criteria checked with evidence annotations |
-| RFC-0715 N3 gate | ✓ pass | Implemented in nachweis-approve.ts:117-142 |
+| RFC-0715 N3 gate             | ✓ pass | Implemented in nachweis-approve.ts:117-142        |
 
 ## Axis F — Agent clarity
 
-| Item | Result | Evidence |
-| --- | --- | --- |
-| AGENTS.md rules | ✓ pass | Nachweis N3 workflow rules added |
-| MODULE_CONTRACT headers | ✓ pass | All 5 new files have MODULE_CONTRACT + CHANGE_SUMMARY |
-| Command descriptions | ✓ pass | All 4 new commands have descriptions in module registration |
+| Item                    | Result | Evidence                                                    |
+| ----------------------- | ------ | ----------------------------------------------------------- |
+| AGENTS.md rules         | ✓ pass | Nachweis N3 workflow rules added                            |
+| MODULE_CONTRACT headers | ✓ pass | All 5 new files have MODULE_CONTRACT + CHANGE_SUMMARY       |
+| Command descriptions    | ✓ pass | All 4 new commands have descriptions in module registration |
 
 ## Axis G — Test coverage
 

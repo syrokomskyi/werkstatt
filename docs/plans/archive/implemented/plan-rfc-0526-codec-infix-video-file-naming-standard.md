@@ -175,7 +175,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Cache invalidation | Step 1/2 verify `ENCODER_SETTINGS_VERSION = "3"` which forces clean re-encode |
 | Stale files in `public/_video/` | Documented in RFC Risks — operators should remove `public/_video/` and `.cache/video/` before first generate. Not a code change. |
 | No external impact | RFC Architectural fit confirms Layer C unaffected — no mitigation needed |

@@ -211,7 +211,7 @@ None. No new commands, no manifest changes, no ontology catalog changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Code block false positives | Step 2: `resolvePriceMarkersInHtml` splits HTML on `<code>`/`<pre>` segments |
 | Performance | Step 2: `hasPriceMarkers` is a fast pre-check; full scan only runs when markers detected |
 | HTML structure drift | Step 1: `renderPriceDisplayHtml` uses same CSS classes as `CurrencyAwarePriceDisplay` |

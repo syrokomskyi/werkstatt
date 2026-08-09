@@ -268,7 +268,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Verification level gaming — `nachweis.approve` accepts any level | Step 6: AGENTS.md documents that `approve` is operator-invoked only; Bordbuch entry records the actor |
 | Public derivative content — operator responsible for no private data | Step 6: AGENTS.md documents operator responsibility; command does not redact |
 | Bordbuch growth — each action adds an entry | Low risk — Nachweis records are low-volume; no mitigation needed |

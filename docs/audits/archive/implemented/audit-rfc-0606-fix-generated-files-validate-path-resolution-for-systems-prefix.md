@@ -65,6 +65,7 @@ const hasWildcards = (p: string): boolean => p.includes("*");
 Since `systems/{system}/public/.well-known/bordbuch.json` contains no `*`, `hasWildcards` returns `false`, and `expandGlob` returns `[join(basePath, posixPattern)]` — the literal path with `{system}` unexpanded (line 87-89). No filesystem scan is performed. `files.length` is 1, so the `files.length === 0` check (line 192) does not trigger. No error is reported.
 
 This means:
+
 1. **Before the fix**: `isWorkspaceAbsolute` → false → basePath is `siteDirectory` or `apps/<app>/` → `expandGlob` returns literal path → `files.length` = 1 → no error. The validator silently passes.
 2. **After the fix**: `isWorkspaceAbsolute` → true → basePath is `workspaceRoot` → `expandGlob` returns literal path → `files.length` = 1 → no error. The validator silently passes.
 
@@ -75,6 +76,7 @@ The outcome is identical. The RFC's claim that the fix eliminates "false-positiv
 **Pre-existing issue**: The same problem affects `packages/ui/src/sections/{id}/{id}.types.generated.ts` and `packages/ui/src/components/{id}/{id}.types.generated.ts` entries (lines 298, 302). These use `{id}` and are workspace-absolute (prefix `packages/`), but `{id}` is never expanded. The validator silently passes for these too.
 
 **What the RFC should do**:
+
 1. Keep the `"systems/"` addition to `WORKSPACE_ABSOLUTE_PREFIXES` — it is necessary for `resolveEntryPath` correctness in the non-glob branch.
 2. Additionally fix `expandGlob` to handle `{placeholder}` brace expansion — either by resolving `{system}` to the actual system ID from the `--site` flag, or by expanding `{system}` to all directories under `systems/`.
 3. Or alternatively: make the glob branch verify file existence for returned paths when no `*` wildcards are present (treat non-wildcard glob results as candidates that need existence checks).

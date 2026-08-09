@@ -31,7 +31,7 @@ Pass — 3 V-19 warnings (amendedBy backreferences missing on RFC-0547/0548/0549
 
 ## Axis B — DNA alignment
 
-- **DNA-54 (Forge bindings contract)** — listed in `satisfies[]`. DNA-54 requires that canonical forge skill bodies must not contain hardcoded project-specific literals. The RFC adds capability showcase text to the SKILL.md and policy text to behavioral layer files. The capability text ("Describe an idea and watch it come to life…") is generic Forge capability description, not project-specific literals — so it does not violate DNA-54. However, the RFC does not *enforce, protect, or extend* DNA-54; it operates within its constraints. The `satisfies: [DNA-54]` entry is decorative rather than substantive — the RFC amends RFCs that satisfy DNA-54, but does not itself change the bindings contract. **Minor.**
+- **DNA-54 (Forge bindings contract)** — listed in `satisfies[]`. DNA-54 requires that canonical forge skill bodies must not contain hardcoded project-specific literals. The RFC adds capability showcase text to the SKILL.md and policy text to behavioral layer files. The capability text ("Describe an idea and watch it come to life…") is generic Forge capability description, not project-specific literals — so it does not violate DNA-54. However, the RFC does not _enforce, protect, or extend_ DNA-54; it operates within its constraints. The `satisfies: [DNA-54]` entry is decorative rather than substantive — the RFC amends RFCs that satisfy DNA-54, but does not itself change the bindings contract. **Minor.**
 - No conflicts with other DNA invariants.
 
 ## Axis C — Ecosystem fit
@@ -54,8 +54,7 @@ Pass — 3 V-19 warnings (amendedBy backreferences missing on RFC-0547/0548/0549
   - How auto-commit interacts with the requirement for separate implementation commit and RFC stamp commit (PREFERENCES.md §RFC implementation completion rules).
   - How auto-commit interacts with mission workpiece commits (which must use `mission.git.commit`, not direct `git commit`).
   - Whether "after each completed action" means after each file edit, after each logical step, or after each task — the granularity is unspecified.
-  - How the verify-before-commit step applies in creative register (does the agent still typecheck before auto-committing?).
-  **Fail** — the auto-commit policy is under-specified relative to existing commit discipline.
+  - How the verify-before-commit step applies in creative register (does the agent still typecheck before auto-committing?). **Fail** — the auto-commit policy is under-specified relative to existing commit discipline.
 
 ## Axis F — Pragmatism
 

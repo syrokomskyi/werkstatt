@@ -55,15 +55,15 @@ No issues. TOCTOU for `preflightBordbuch` is documented in AGENTS.md and in code
 
 ### Spec compliance
 
-| Requirement from RFC-0593 | Status | Evidence |
-| --- | --- | --- |
-| bordbuch.validate before mission.open | Done | mission-open.ts:83-96 |
-| mission.validate before mission.close | Done | mission-close.ts:148-154 |
-| No --force bypass flag | Done | No flag added |
-| State re-check inside lock | Done | mission-close.ts:173-180 |
-| AGENTS.md documentation | Done | AGENTS.md:118-124 |
-| Unit tests for both gates | Done | 2 test files, 4 tests |
-| Lock re-check test | Done | mission-close-validate-gate.test.ts:140-170 |
+| Requirement from RFC-0593             | Status | Evidence                                    |
+| ------------------------------------- | ------ | ------------------------------------------- |
+| bordbuch.validate before mission.open | Done   | mission-open.ts:83-96                       |
+| mission.validate before mission.close | Done   | mission-close.ts:148-154                    |
+| No --force bypass flag                | Done   | No flag added                               |
+| State re-check inside lock            | Done   | mission-close.ts:173-180                    |
+| AGENTS.md documentation               | Done   | AGENTS.md:118-124                           |
+| Unit tests for both gates             | Done   | 2 test files, 4 tests                       |
+| Lock re-check test                    | Done   | mission-close-validate-gate.test.ts:140-170 |
 
 ### Questions for the author
 

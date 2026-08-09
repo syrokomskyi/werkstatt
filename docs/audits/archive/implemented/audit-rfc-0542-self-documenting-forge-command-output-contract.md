@@ -31,18 +31,18 @@ Pass — no violations targeting RFC-0542.
 - **Risks** includes agent misinterpretation risk ✓
 - **Acceptance criteria** are mostly checkable, but see Axis C for phantom-command criteria ✓/✗
 - **Implementation notes** are explicit behavioral rules ✓
-- Minor: The `printHelp` section says "the hand-maintained command list in `bin/cli.ts` is removed" but the current `printHelp` (`bin/cli.ts:172-220`) already has a partially generated section — "Registered commands" at the bottom from `registry.listCommandNames()`. The RFC should acknowledge the current hybrid state and specify that the *entire* help body becomes registry-driven, not just "the command list".
+- Minor: The `printHelp` section says "the hand-maintained command list in `bin/cli.ts` is removed" but the current `printHelp` (`bin/cli.ts:172-220`) already has a partially generated section — "Registered commands" at the bottom from `registry.listCommandNames()`. The RFC should acknowledge the current hybrid state and specify that the _entire_ help body becomes registry-driven, not just "the command list".
 
 ## Axis B — DNA alignment
 
-- **FAIL (minor)**: `satisfies: [DNA-54]` — DNA-54 states: "Canonical forge skill bodies (`packages/forge/skills/**/*.md`) must not contain hardcoded project-specific literals in instruction lines." The RFC's `nextSteps` field is described as "the machine-readable analogue of bindings" (Architectural fit section), but DNA-54 is specifically about skill body *literals*, not command output shape. The `nextSteps` field doesn't enforce, protect, or extend the DNA-54 invariant — it's a separate concept operating on a different surface (command results vs. skill instruction lines). The RFC should either:
+- **FAIL (minor)**: `satisfies: [DNA-54]` — DNA-54 states: "Canonical forge skill bodies (`packages/forge/skills/**/*.md`) must not contain hardcoded project-specific literals in instruction lines." The RFC's `nextSteps` field is described as "the machine-readable analogue of bindings" (Architectural fit section), but DNA-54 is specifically about skill body _literals_, not command output shape. The `nextSteps` field doesn't enforce, protect, or extend the DNA-54 invariant — it's a separate concept operating on a different surface (command results vs. skill instruction lines). The RFC should either:
   - Remove DNA-54 from `satisfies[]` and reference it in `related[]` instead (it's related, not satisfied), or
   - Add a new DNA invariant for command output contracts and reference that, or
   - Substantially strengthen the "how" explanation to argue that `nextSteps` extends the de-hardcoding principle of DNA-54 from skill bodies to command output — but this is a stretch.
 
 ## Axis C — Ecosystem fit
 
-- **FAIL**: `commands.changed` lists `forge.create` and `forge.upgrade` — these commands do not exist in the codebase. `forge.create` is proposed by RFC-0544 (status: draft) and `forge.upgrade` is proposed by RFC-0543 (status: draft). `commands.changed` must list *existing registered commands* that this RFC modifies. Non-existent commands cannot be "changed" — they would be "added" by their own introducing RFCs. These entries should be removed from `commands.changed`. The RFC body may note that when RFC-0543/0544 are implemented, their commands must conform to the `nextSteps` contract from day one.
+- **FAIL**: `commands.changed` lists `forge.create` and `forge.upgrade` — these commands do not exist in the codebase. `forge.create` is proposed by RFC-0544 (status: draft) and `forge.upgrade` is proposed by RFC-0543 (status: draft). `commands.changed` must list _existing registered commands_ that this RFC modifies. Non-existent commands cannot be "changed" — they would be "added" by their own introducing RFCs. These entries should be removed from `commands.changed`. The RFC body may note that when RFC-0543/0544 are implemented, their commands must conform to the `nextSteps` contract from day one.
 - **FAIL**: Acceptance criteria items 2 and 3 reference `forge.create` and `forge.upgrade` which don't exist. These criteria are not checkable until those RFCs are implemented. They should be removed or conditioned on the existence of those commands.
 - Package boundaries: `packagesImpacted: [forge]` is correct — all changes are in `packages/forge/` ✓
 - Pipeline placement: N/A (no new pipeline checks) ✓

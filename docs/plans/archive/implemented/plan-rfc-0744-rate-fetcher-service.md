@@ -315,7 +315,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | External API changes | Step 2: each adapter is isolated and independently updateable |
 | API rate limits | Step 4: daily cron is well within free API limits |
 | Supabase availability | Step 5: `allowLastKnownValue` + `maximumAge` policy ensures build proceeds with stale snapshots |

@@ -450,11 +450,11 @@ Legacy source files covered:
 
 All entity IDs use HTTPS URIs (blueprint convention):
 
-| Entity            | ID                                                          |
-| ----------------- | ----------------------------------------------------------- |
-| Business          | `https://warpgogol.com/id/business/warpgogol`                 |
-| Brand             | `https://warpgogol.com/id/brand/warpgogol`                    |
-| LegalIdentity     | `https://warpgogol.com/id/legal-identity/warpgogol`           |
+| Entity            | ID                                                           |
+| ----------------- | ------------------------------------------------------------ |
+| Business          | `https://warpgogol.com/id/business/warpgogol`                |
+| Brand             | `https://warpgogol.com/id/brand/warpgogol`                   |
+| LegalIdentity     | `https://warpgogol.com/id/legal-identity/warpgogol`          |
 | Place             | `https://warpgogol.com/id/place/backnang`                    |
 | ContactPoint      | `https://warpgogol.com/id/contact-point/general-email`       |
 | WebPresence       | `https://warpgogol.com/id/web-presence/primary`              |

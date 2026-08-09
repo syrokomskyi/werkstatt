@@ -236,7 +236,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positives in REF-04 promotion | Step 1 — only promote for known collections; unknown patterns remain warnings |
 | Migration scope (315 instances, 22 files) | Step 6 — idempotent migrator, operator reviews diff before commit |
 | Agent misinterpretation of `=(ref)` | Step 4 — AGENTS.md rule explicitly states scope |

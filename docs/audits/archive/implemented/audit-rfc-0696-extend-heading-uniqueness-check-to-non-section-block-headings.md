@@ -72,7 +72,7 @@ Pass с одним warning:
 - **Nested block double-counting (критический):** `findFirstDescendantByTag` (строка 76) выполняет depth-first search. Если `<section>` содержит `<div aria-labelledby="x">`, и внутри div находится `<h2>Heading</h2>`, то:
   1. Section's first h2 descendant = "Heading" (найден внутри div)
   2. Div's first h2 descendant = "Heading" (тот же элемент)
-  
+
   Heading "Heading" считается дважды — false positive HEADING-UNIQ-01. RFC описывает nested blocks в failure modes, но говорит "If they share the same text, HEADING-UNIQ-01 fires" — упуская что это тот же самый heading-элемент, а не разные элементы с одинаковым текстом. Решение: не рекурсировать в уже найденные block elements, или исключать child blocks которые являются descendants уже найденных blocks.
 
 - **Performance** — "O(n) where n is the number of elements. Negligible impact." — корректно. OK.

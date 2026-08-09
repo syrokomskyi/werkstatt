@@ -275,7 +275,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Validator false positives (public participant not on hub) | Step 2: `hub-missing-participant` is a warning when participant has `visibility: public` but is not in any hub `select` |
 | Stale review dates | Step 1: warnings only, not errors — operator responsibility |
 | Behavior snapshot drift from tagline badge | Step 5: `breaksC: false` declared; behavior snapshot must be regenerated after deployment |

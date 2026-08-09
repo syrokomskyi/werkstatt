@@ -12,7 +12,7 @@ verdict: needs-revision
 
 ## Verdict: Needs revision
 
-RFC-0595 proposes marking redirect routes with `contentHash: null` + `redirectTarget` in the behavior snapshot, but conflicts with the concurrently drafted RFC-0592 which proposes *excluding* meta-refresh redirect stubs entirely. The RFC also claims `RouteFact` lives in `@warpgogol/ontology` when it is actually a local interface in two `site-kernel-handoff` files, and misidentifies the `behavior.snapshot.generate` source file path. These issues must be resolved before implementation.
+RFC-0595 proposes marking redirect routes with `contentHash: null` + `redirectTarget` in the behavior snapshot, but conflicts with the concurrently drafted RFC-0592 which proposes _excluding_ meta-refresh redirect stubs entirely. The RFC also claims `RouteFact` lives in `@warpgogol/ontology` when it is actually a local interface in two `site-kernel-handoff` files, and misidentifies the `behavior.snapshot.generate` source file path. These issues must be resolved before implementation.
 
 ## Mechanical validation (rfc.validate)
 

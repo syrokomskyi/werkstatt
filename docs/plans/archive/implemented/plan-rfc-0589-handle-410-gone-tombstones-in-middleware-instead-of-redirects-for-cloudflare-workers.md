@@ -301,7 +301,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Middleware performance | Step 2: template uses `Map<string, true>` prefix matching, not regex |
 | Middleware ordering | Step 3: root middleware template chains tombstone first via `sequence()` |
 | Validator false positives | Step 6: validator resolves adapter from `systems/registry.yaml`, safe default rejects 410 |

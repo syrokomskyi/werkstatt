@@ -216,14 +216,14 @@ The manifest `id` MUST equal the directory name. The `entry` field MUST point to
 
 Move every existing `backs/*` project to `services/*`:
 
-| From                          | To                               |
-| ----------------------------- | -------------------------------- |
-| `backs/cf-analytics-poller`   | `services/cf-analytics-poller`   |
+| From                           | To                                |
+| ------------------------------ | --------------------------------- |
+| `backs/cf-analytics-poller`    | `services/cf-analytics-poller`    |
 | `backs/check-warpgogol-runner` | `services/check-warpgogol-runner` |
-| `backs/fleet-probe-runner`    | `services/fleet-probe-runner`    |
-| `backs/matomo-proxy`          | `services/matomo-proxy`          |
-| `backs/observability-stack`   | `services/observability-stack`   |
-| `backs/telegram-alert-bridge` | `services/telegram-alert-bridge` |
+| `backs/fleet-probe-runner`     | `services/fleet-probe-runner`     |
+| `backs/matomo-proxy`           | `services/matomo-proxy`           |
+| `backs/observability-stack`    | `services/observability-stack`    |
+| `backs/telegram-alert-bridge`  | `services/telegram-alert-bridge`  |
 
 Move the older deployable integration worker:
 

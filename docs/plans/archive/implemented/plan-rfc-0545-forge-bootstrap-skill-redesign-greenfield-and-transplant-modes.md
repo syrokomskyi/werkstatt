@@ -196,7 +196,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Skill drift from forge.yaml schema | Step 1 writes binding keys (`typecheck`, `test`, `scopedBuild`) that match `forgeConfigSchema`; Step 4 runs `forge.skill.validate` |
 | Transplant false positives | Step 1 includes a "Propose" step where the operator confirms detected stack before writing |
 | Agent misinterpretation (running outside forge project, modifying source) | Step 1 includes explicit guardrails and MUST NOTs in the skill body |

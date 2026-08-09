@@ -97,4 +97,4 @@ The summit findings will be incorporated into the plan as additional steps and a
 
 ---
 
-*No findings does not mean no issues — it means no issues were found from these five perspectives.*
+_No findings does not mean no issues — it means no issues were found from these five perspectives._

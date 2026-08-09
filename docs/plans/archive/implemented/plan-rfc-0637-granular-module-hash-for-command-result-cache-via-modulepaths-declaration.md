@@ -106,7 +106,7 @@ No `docs/*.xml` Compass files need updates (no repository-wide semantics change)
 **Agent actions:**
 
 - Open `packages/os/site-kernel/src/runtime/execute-pipeline.ts`
-- In `tryCacheRead`: change `moduleHashCache.get(moduleSrcDir)` to `moduleHashCache.get(cacheKey)` where `cacheKey = \`${moduleSrcDir}:${command.modulePaths?.join(",") ?? ""}\``; pass `command.modulePaths` to `computeModuleHash`
+- In `tryCacheRead`: change `moduleHashCache.get(moduleSrcDir)` to `moduleHashCache.get(cacheKey)` where `cacheKey = \`${moduleSrcDir}:${command.modulePaths?.join(",") ?? ""}\``; pass `command.modulePaths`to`computeModuleHash`
 - In `tryCacheWrite`: same change — use `modulePaths`-aware cache key and pass `command.modulePaths` to `computeModuleHash`
 - In `executePipelineForSite`: no change needed (calls `tryCacheRead`/`tryCacheWrite` which now handle `modulePaths` internally)
 - In `executePipelineForWorkspace`: same — no change needed (calls `tryCacheRead`/`tryCacheWrite`)
@@ -204,7 +204,7 @@ No `docs/*.xml` Compass files need updates (no repository-wide semantics change)
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | False cache hits from incomplete `modulePaths` | Step 4 tests verify granular hashing correctness; Phase 2 migration (not in this RFC) is incremental |
 | Maintenance burden | Step 5 documents `modulePaths` in AGENTS.md; Phase 3 validation (future) will warn on missing paths |
 | Agent confusion | Step 5 AGENTS.md update documents the fallback behavior; new commands without `modulePaths` are safe |

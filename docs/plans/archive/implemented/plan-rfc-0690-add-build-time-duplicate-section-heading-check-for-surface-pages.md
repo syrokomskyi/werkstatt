@@ -277,7 +277,7 @@ No configuration or data files are affected. The command is read-only and requir
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positives from intentionally repeated headings | Step 2: only checks first `<h2>`/`<h3>` child of `<section>` on surface pages (identified by surface artifact); Step 4: edge case tests for sections without headings |
 | Performance (~150 HTML files with parse5) | Step 2: parse5 is already a dependency; ~2-3 seconds estimated; Step 4: no performance test needed at this scale |
 | parse5 parse errors on malformed HTML | Step 2: try/catch per file following `strip-html-generated-marker.ts` pattern; `dist.html-structure.validate` runs earlier and catches structural issues |

@@ -24,7 +24,7 @@ Pass — zero violations.
 
 ## Axis B — DNA alignment
 
-- **`satisfies: [DNA-1]` is semantically incorrect.** The RFC body at line 111 states: "DNA-1 (Monorepo boundary): SWIM membership is per-workshop, not per-site. The monorepo boundary is unaffected." The `satisfies` field requires the RFC to *enforce, protect, or extend* the invariant. Stating the invariant is "unaffected" means the RFC does not satisfy it — it's merely compatible with it. Either remove DNA-1 from `satisfies` (keep it in `related`), or reframe the architectural fit to explain how per-workshop membership *protects* the monorepo boundary (e.g., "SWIM membership operates outside the monorepo boundary, ensuring platform code replication (Layer 1) can verify peer identity without coupling site content to membership state").
+- **`satisfies: [DNA-1]` is semantically incorrect.** The RFC body at line 111 states: "DNA-1 (Monorepo boundary): SWIM membership is per-workshop, not per-site. The monorepo boundary is unaffected." The `satisfies` field requires the RFC to _enforce, protect, or extend_ the invariant. Stating the invariant is "unaffected" means the RFC does not satisfy it — it's merely compatible with it. Either remove DNA-1 from `satisfies` (keep it in `related`), or reframe the architectural fit to explain how per-workshop membership _protects_ the monorepo boundary (e.g., "SWIM membership operates outside the monorepo boundary, ensuring platform code replication (Layer 1) can verify peer identity without coupling site content to membership state").
 
 ## Axis C — Ecosystem fit
 

@@ -9,25 +9,43 @@
       mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
     </script>
     <style>
-      .seam { stroke-dasharray: 4 4; }
-      .leak { stroke: #dc2626; }
-      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
     </style>
   </head>
   <body class="bg-stone-50 text-slate-900 font-sans">
     <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
       <header class="space-y-4">
-        <h1 class="text-3xl font-bold tracking-tight">Architecture review — @warpgogol/agent-gate</h1>
+        <h1 class="text-3xl font-bold tracking-tight">
+          Architecture review — @warpgogol/agent-gate
+        </h1>
         <div class="flex items-center gap-4 text-sm text-slate-500">
           <span>2026-07-14</span>
           <span>·</span>
           <span>warpgogol monorepo</span>
         </div>
         <div class="flex items-center gap-6 text-xs text-slate-400">
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span
+          >
         </div>
       </header>
 
@@ -35,8 +53,14 @@
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
           <h2 class="text-xl font-semibold">Deepen the action handler behind a request pipeline</h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5"
+              >Strong</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/agent-gate/src/index.ts</div>
@@ -75,8 +99,17 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> The action handler in <code>index.ts</code> inlines request parsing, schema validation, rate limiting, event building, and response formatting — each concern is a shallow step inside one function, untestable in isolation.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Extract an <code>ActionPipeline</code> that composes ordered middleware (rate limit, schema validate, dispatch); the handler becomes a thin delegate that wires the pipeline.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> The action handler in
+              <code>index.ts</code> inlines request parsing, schema validation, rate limiting, event
+              building, and response formatting — each concern is a shallow step inside one
+              function, untestable in isolation.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Extract an
+              <code>ActionPipeline</code> that composes ordered middleware (rate limit, schema
+              validate, dispatch); the handler becomes a thin delegate that wires the pipeline.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> each middleware in its own module</li>
@@ -86,10 +119,18 @@
         </article>
 
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Extract rate limiting behind a generic LimitStore port</h2>
+          <h2 class="text-xl font-semibold">
+            Extract rate limiting behind a generic LimitStore port
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">ports &amp; adapters</span>
+            <span
+              class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5"
+              >Worth exploring</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >ports &amp; adapters</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/agent-gate/src/limits.ts</div>
@@ -122,8 +163,19 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>limits.ts</code> uses a module-level <code>Map</code> for rate-limit state — the fixed-window logic and the storage are coupled, making it impossible to use a shared store (e.g. Redis) in multi-instance deployments.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Extract a <code>LimitStore</code> interface (<code>get(key): number</code>, <code>increment(key): void</code>, <code>reset(key): void</code>); <code>InMemoryLimitStore</code> is the default; <code>checkLimit</code> becomes a pure function over the store.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>limits.ts</code> uses a
+              module-level <code>Map</code> for rate-limit state — the fixed-window logic and the
+              storage are coupled, making it impossible to use a shared store (e.g. Redis) in
+              multi-instance deployments.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Extract a
+              <code>LimitStore</code> interface (<code>get(key): number</code>,
+              <code>increment(key): void</code>, <code>reset(key): void</code>);
+              <code>InMemoryLimitStore</code> is the default; <code>checkLimit</code> becomes a pure
+              function over the store.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> storage in one adapter</li>
@@ -135,7 +187,11 @@
 
       <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
         <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
-        <p class="text-sm text-slate-300">Extract an <code>ActionPipeline</code> — the action handler inlines five concerns in one function; a pipeline makes each testable and reorderable. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+        <p class="text-sm text-slate-300">
+          Extract an <code>ActionPipeline</code> — the action handler inlines five concerns in one
+          function; a pipeline makes each testable and reorderable.
+          <a href="#" class="text-emerald-400 underline">Jump to card →</a>
+        </p>
       </section>
     </main>
   </body>

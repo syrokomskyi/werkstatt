@@ -69,9 +69,11 @@ Pass with 1 warning:
 ## Axis G — Blind spots
 
 - **G-1 (Blocking — wrong file path):** The proposed `readFileSync` path in the open-source page component (RFC line 204) is:
+
   ```ts
   const wellKnownPath = fileURLToPath(new URL("../../public/.well-known/build-identity.json", import.meta.url));
   ```
+
   The component lives at `packages/ui/src/sections/open-source-registry/open-source-registry-section.astro`. Relative to this file, `../../public/` resolves to `packages/ui/src/public/` — which does not exist. The `public/` directory is in the workpiece root (e.g., `missions/<id>/workpiece/public/`), not in the UI package. The path resolution is wrong and the code will throw `ENOENT` at build time. The RFC must specify a different path resolution strategy (e.g., `process.cwd() + "/public/.well-known/build-identity.json"` or an Astro-specific mechanism).
 
 - **G-2 (Blocking — commitSha mismatch):** `dev-deploy` captures `commitSha` from the workpiece git repo (`git rev-parse HEAD` at `workpiecePath`, `leitstand-commands.ts:462`). `release.prepare` captures `commitSha` from the monorepo git repo via `resolveCurrentEcosystem(workspaceRoot)` which calls `git rev-parse HEAD` at `workspaceRoot` (`bundle-io.ts:72`). The workpiece is a separate git repository (clone of the cache clone). The monorepo HEAD and workpiece HEAD are different commits from different repos. The RFC's `leitstand.propagate` verification step (RFC line 228: "Verify `commitSha` matches the release manifest's `commitSha`") would always fail because the dev build-identity has the workpiece HEAD while the release manifest has the monorepo HEAD. The RFC must reconcile this — either by making `release.prepare` use the workpiece HEAD (changing existing behavior) or by making `dev-deploy` use the monorepo HEAD (which may not reflect the workpiece content).

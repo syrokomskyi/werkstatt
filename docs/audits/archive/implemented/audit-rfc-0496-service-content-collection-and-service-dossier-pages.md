@@ -58,6 +58,7 @@ No new DNA invariant is established. No conflict with existing invariants.
 3. **C-contract update missing.** `breaksC: true` is declared. The RFC introduces new URL patterns (`/website/{industry}/{service}/` and `/sait/{industry}/{service}/`). Per RFC-0480, the declarative C-contract at `packages/ontology/src/external-surfaces/url-schema.yaml` must be updated in the same RFC. The RFC does not mention `url-schema.yaml` or `surface.contract.validate`.
 
 **Passing items:**
+
 - Package boundaries: all `packagesImpacted` entries (`@gogol/surface`, `@gogol/ontology`, `@gogol/site-kernel-checks`, `@gogol/share`) are packages. No app-to-app imports.
 - Command lifecycle: `proposed: [surface.service.validate]` → `added: [surface.service.validate]` is internally consistent. `changed: [surface.generate, surface.validate]` are existing registered commands.
 - Pipeline placement: not specified — the RFC does not state which pipeline `surface.service.validate` runs in.
@@ -78,6 +79,7 @@ No new DNA invariant is established. No conflict with existing invariants.
 2. **Anti-fabrication gap.** Implementation plan step 8 says "Create initial service records for `friseur/strizhka` and `elektriker/elektroinstallation`." Service records carry 24 structured fields including `serviceVariants`, `pricePresentationModels`, `bookingRequirements`, `faq` — these require authored trade-specific expertise, not LLM-generated content. The RFC must distinguish between code changes an agent can make (blueprint, baker, validator) and content that requires human authoring (service records). Compare RFC-0492's explicit rule: "Agents MUST NOT fill dossier fields with LLM-generated content."
 
 **Passing items:**
+
 - Status gate: `status: draft`, no self-authorizing language.
 - Storage policy: no persistence changes, no cookies.
 

@@ -234,7 +234,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Layer C declarative accuracy | Step 4 includes comprehensive `optional` list covering all `buildOrganizationNode` emitted properties |
 | Projection URL construction | Step 3 uses verbatim `schemeRef + value` concatenation; future `wikidata.validate` (RFC-0531) will check URL validity |
 | Agent misinterpretation (Product externalIdentifiers) | Step 6 updates AGENTS.md to clarify only Business externalIdentifiers are projected; Product remains catalog-only |

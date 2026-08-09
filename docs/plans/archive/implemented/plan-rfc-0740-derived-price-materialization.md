@@ -328,7 +328,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Performance — materializing for every Charge × currency could be slow | Step 3: current site has ~48 derivations — trivial. Future parallelization noted in RFC. |
 | Generated file size — full traces could be large | Step 5: traces included for current scale. Future optimization to omit traces noted in RFC. |
 | Stale materialized prices — rates change without rebuild | Out of scope for this RFC. RFC-0744 (Rate Fetcher Service) triggers rebuilds. |

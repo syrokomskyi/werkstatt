@@ -253,7 +253,7 @@ For each call site: if the entity context (collection + file slug) is available,
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent misinterpretation — `this.` in cross-file contexts | Step 4: validator derives `sourceRef` from file path, not author intent; REF-13 catches field-not-found |
 | Pattern collision — `this` as English word | Step 1: `this.` only recognized when followed by dotted field path pattern; prose "this" unaffected |
 | Call site coverage — missed call sites produce REF-12 | Step 5: all 12 call sites across 7 files enumerated and updated; REF-12 is fail-safe |

@@ -247,7 +247,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Split-commit atomicity: platform commit succeeds but non-platform fails | Step 3: error message includes platform commit SHA and pending files list for manual recovery |
 | Agent misinterpretation: agents may still try `git commit` for platform files | Step 7: AGENTS.md update + pre-commit guard remains as safety net |
 | RFC-0704 regression: skipPlatformBump path accidentally broken | Step 5: explicit test verifying `.md`-only and `independentVersionPackages` skip-bump still works within platform subset |

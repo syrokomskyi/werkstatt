@@ -21,6 +21,7 @@ Pass — 0 нарушений.
 ## Axis A — Structural completeness
 
 No issues. Все разделы содержат конкретный контент:
+
 - Decision — одна чёткая решение в настоящем времени.
 - TypeScript contracts — минимальный before/after diff.
 - File system responsibilities — конкретные пути.
@@ -30,7 +31,7 @@ No issues. Все разделы содержат конкретный конт�
 
 ## Axis B — DNA alignment
 
-Finding B1: `satisfies: [DNA-55]` — слабая связь. DNA-55 описывает контракт вторинга спецификаций (immutable snapshots, integrity manifests, amendment mechanism). RFC уважает DNA-55 (ссылается на `pbp-specification-package/ADR-012` без копирования контента), но не объясняет, как он *enforces, protects, or extends* сам контракт уторинга. Связь косвенная: RFC применяет решение спецификации (ADR-012) к runtime-схеме, делая спецификацию binding. Но DNA-55 — про механизм уторинга, не про применение контента спецификации. RFC следует либо объяснить связь явно ("применяя решение ADR-012 к runtime-схеме, RFC делает vendored spec единственным source of truth для charge-данных, усиливая DNA-55"), либо убрать DNA-55 из `satisfies[]`.
+Finding B1: `satisfies: [DNA-55]` — слабая связь. DNA-55 описывает контракт вторинга спецификаций (immutable snapshots, integrity manifests, amendment mechanism). RFC уважает DNA-55 (ссылается на `pbp-specification-package/ADR-012` без копирования контента), но не объясняет, как он _enforces, protects, or extends_ сам контракт уторинга. Связь косвенная: RFC применяет решение спецификации (ADR-012) к runtime-схеме, делая спецификацию binding. Но DNA-55 — про механизм уторинга, не про применение контента спецификации. RFC следует либо объяснить связь явно ("применяя решение ADR-012 к runtime-схеме, RFC делает vendored spec единственным source of truth для charge-данных, усиливая DNA-55"), либо убрать DNA-55 из `satisfies[]`.
 
 ## Axis C — Ecosystem fit
 
@@ -51,8 +52,9 @@ No issues. Изменение — одна строка (`z.unknown()` → `pbpC
 ## Axis G — Blind spots
 
 Finding G1 (major): **DE offering files игнорируются.** В mission workpiece существуют 6 DE offering файлов (`missions/warpgogol-com-m000035/workpiece/src/content/business-profile/de/offerings/*.md`) с идентичными нарушениями: `digital-foundation.md` (DE) имеет unquoted decimals (`value: 70.00`, `700.00`, `200.00`, `unitValue: 15.00`), нет `model`, нет `purpose`; `booking.md`, `visibility.md`, `reputation.md`, `multilingual.md` (DE) имеют quoted decimals, но нет `model` и `purpose`; `automation.md` (DE) имеет `model: range`, но нет `purpose`. Схема `z.record(z.string(), pbpChargeSchema)` применяется к обеим языковым версиям — DE-файлы также сломают `astro build`. RFC должен:
-  - Либо включить DE-файлы в scope (acceptance criteria + file system responsibilities)
-  - Либо явно задокументировать в `nonGoals`, что DE-файлы отложены (но тогда `astro build` сломается для DE-коллекции)
+
+- Либо включить DE-файлы в scope (acceptance criteria + file system responsibilities)
+- Либо явно задокументировать в `nonGoals`, что DE-файлы отложены (но тогда `astro build` сломается для DE-коллекции)
 
 Finding G2 (minor): File system responsibilities table указывает только UK path (`.../uk/offerings/*.md`). Если DE-файлы включены в scope, таблица должна включать `.../de/offerings/*.md` тоже.
 

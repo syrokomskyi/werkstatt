@@ -299,7 +299,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Performance: scroll listener on every scroll event | Step 3: `requestAnimationFrame` throttling and `{ passive: true }` in client script |
 | Z-index conflicts | Step 7: document `z-index: 100` in `packages/ui/AGENTS.md` |
 | Accessibility: keyboard access, aria-label | Step 3: `<button>` element, `aria-label` with i18n fallback, LordIcon `aria-hidden="true"` |

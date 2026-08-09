@@ -328,7 +328,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Dynamic route complexity | Step 3 creates `getNachweisRoutes()` following the established `getParticipantProfileRoutes()` pattern; `[...slug].astro` catch-all serves all routes |
 | Empty state UX | Step 4 includes `emptyMessage` prop in the `nachweis-list` block configuration |
 | Component reusability | Step 2 components accept `verifiedByLabel` prop from block config; Step 4 page entries pass the site name via props |

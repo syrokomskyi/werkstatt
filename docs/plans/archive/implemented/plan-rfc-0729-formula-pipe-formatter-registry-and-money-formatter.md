@@ -254,11 +254,11 @@ No pipeline changes. The existing `content.references.validate` validator alread
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
-| `|` character in content reference values misinterpreted as pipe | Step 3: split on first `|` only; content reference values are decimal strings/URIs/enums that don't contain `|` |
+| --- | --- |
+| ` | ` character in content reference values misinterpreted as pipe | Step 3: split on first ` | `only; content reference values are decimal strings/URIs/enums that don't contain` | ` |
 | `Intl.NumberFormat` locale data availability | Steps 2, 4: Node.js and Cloudflare Workers both support `Intl.NumberFormat` natively — no polyfill |
 | Formatter registry is global state | Step 2: registration at module init (top-level side effect), not runtime; `money` is the only default formatter |
-| Pipe syntax confusion with bitwise OR | Step 4: test that `expr-eval` does not support `|` as bitwise OR — `|` is unambiguous inside `=(…)` |
+| Pipe syntax confusion with bitwise OR | Step 4: test that `expr-eval` does not support ` | `as bitwise OR —` | `is unambiguous inside`=(…)` |
 
 ## 6. Escalation triggers
 

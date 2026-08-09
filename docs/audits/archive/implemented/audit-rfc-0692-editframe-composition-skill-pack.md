@@ -28,7 +28,7 @@ Pass — 0 violations.
 
 - **B1 (строка 90):** RFC заявляет: «Skills use semantic binding keys (`validate`, `produce`, `verify`) per SKILL-18». Однако примеры тел skill'ов (строки 136–139) показывают прямые CLI-команды (`forge validate`, `forge build`, `forge determinism check`), а не `ref(forge.yaml bindings.commands.validate)` ссылки. Skill'ы вообще не используют binding-key ссылки. SKILL-18 запрещает только software-specific ключи (`typecheck`, `scopedBuild`, `test`) — прямые CLI-команды forge не нарушают SKILL-18. Но заявка о «semantic binding keys» вводит в заблуждение: RFC должен либо (a) использовать `ref(forge.yaml bindings.commands.validate)` в телах skill'ов, либо (b) убрать заявку о semantic binding keys и прямо указать, что skill'ы используют forge CLI-команды напрямую.
 
-- **B2:** `satisfies: [DNA-54]` формально корректно — DNA-54 требует отсутствия hardcoded project-specific literals в canonical skill bodies. Создаваемые skill'ы не содержат таких литералов. Но DNA-54 не является invariant, который RFC *устанавливает* или *расширяет* — он уже соблюдён. `satisfies` здесь означает «соответствует», что допустно, но не добавляет новой инвариантной силы. Это замечание не блокирующее.
+- **B2:** `satisfies: [DNA-54]` формально корректно — DNA-54 требует отсутствия hardcoded project-specific literals в canonical skill bodies. Создаваемые skill'ы не содержат таких литералов. Но DNA-54 не является invariant, который RFC _устанавливает_ или _расширяет_ — он уже соблюдён. `satisfies` здесь означает «соответствует», что допустно, но не добавляет новой инвариантной силы. Это замечание не блокирующее.
 
 ## Axis C — Ecosystem fit
 

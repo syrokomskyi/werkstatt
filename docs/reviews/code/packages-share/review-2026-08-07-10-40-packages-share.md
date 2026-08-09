@@ -92,7 +92,7 @@ No issues.
 | Export `registerPipeFormatter`, `getPipeFormatter`, `PipeFormatter`, `PipeFormatterContext` | Done | `formula-eval.ts:35-54` |
 | `money` formatter registered by default | Done | `formula-eval.ts:56-75`, test passes |
 | `resolveFormula` handles pipe syntax | Done | `formula-eval.ts:199-306`, tests pass |
-| Expressions without `|` unchanged | Done | Tests "preserves existing behavior" and "preserves RFC-0723 single-ref" pass |
+| Expressions without ` | ` unchanged | Done | Tests "preserves existing behavior" and "preserves RFC-0723 single-ref" pass |
 | `=(ref \| money currency=EUR locale=de)` → `70 €` | Done | Test passes (`70\u00A0€` with non-breaking space) |
 | `=(ref \| money ... targetCurrency=UAH rate=45)` → `3.150 UAH` | Done | Test passes (`3.150\u00A0UAH`) |
 | Unknown formatter → REF-10 | Done | Tests for unknown and empty formatter name pass |

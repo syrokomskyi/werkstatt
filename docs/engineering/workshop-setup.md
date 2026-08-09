@@ -1,18 +1,17 @@
 # Workshop Setup Guide — First Start
 
-> Complete guide for setting up a Warpgogol workshop (development environment) from scratch.
-> Covers: prerequisites, clone, Cloudflare token, `.env`, DNS, cache rules, and first deploy verification.
+> Complete guide for setting up a Warpgogol workshop (development environment) from scratch. Covers: prerequisites, clone, Cloudflare token, `.env`, DNS, cache rules, and first deploy verification.
 
 ---
 
 ## 1. Prerequisites
 
-| Requirement | Version | Check |
-| --- | --- | --- |
-| Node.js | >= 22 | `node --version` |
-| pnpm | 11.10.0 (pinned in `packageManager`) | `pnpm --version` |
-| Git LFS | latest | `git lfs version` |
-| OS | Linux (Ubuntu) | `uname -a` |
+| Requirement | Version                              | Check             |
+| ----------- | ------------------------------------ | ----------------- |
+| Node.js     | >= 22                                | `node --version`  |
+| pnpm        | 11.10.0 (pinned in `packageManager`) | `pnpm --version`  |
+| Git LFS     | latest                               | `git lfs version` |
+| OS          | Linux (Ubuntu)                       | `uname -a`        |
 
 Install pnpm if missing:
 
@@ -50,6 +49,7 @@ If you cloned without running onboarding, invoke the `setup-ecosystem` skill to 
 ## 3. Cloudflare API token
 
 The workshop needs a Cloudflare API token for:
+
 - **CDN cache purge** after deploy (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`)
 - **wrangler deploy** (deploying Workers to Cloudflare)
 - **subdomain.register** (creating DNS records and Workers routes)
@@ -57,9 +57,7 @@ The workshop needs a Cloudflare API token for:
 
 ### 3.1 Create a User API Token
 
-> **IMPORTANT:** Create a **User API Token**, NOT an Account API Token.
-> Account API Tokens are for account-scoped endpoints only and cannot combine zone- and account-scoped permissions.
-> User API Tokens can carry both zone- and account-scoped permissions simultaneously.
+> **IMPORTANT:** Create a **User API Token**, NOT an Account API Token. Account API Tokens are for account-scoped endpoints only and cannot combine zone- and account-scoped permissions. User API Tokens can carry both zone- and account-scoped permissions simultaneously.
 
 1. Go to **Cloudflare Dashboard** → **My Profile** → **API Tokens**
 2. Click **Create Token** → **Create Custom Token**
@@ -67,13 +65,13 @@ The workshop needs a Cloudflare API token for:
 
 ### 3.2 Permissions
 
-| Permission | Scope | Level | Purpose |
-| --- | --- | --- | --- |
-| **Zone → Cache Purge** | Zone | Purge | CDN cache purge after deploy (RFC-0624) |
-| **Account → Workers Scripts** | Account | Edit | `wrangler deploy` (deploy Workers) |
-| **Zone → Workers Routes** | Zone | Edit | Workers route management |
-| **Zone → DNS** | Zone | Edit | `subdomain.register` (RFC-0752) |
-| **Zone → Page Rules** | Zone | Edit | Dev channel cache bypass rule |
+| Permission                    | Scope   | Level | Purpose                                 |
+| ----------------------------- | ------- | ----- | --------------------------------------- |
+| **Zone → Cache Purge**        | Zone    | Purge | CDN cache purge after deploy (RFC-0624) |
+| **Account → Workers Scripts** | Account | Edit  | `wrangler deploy` (deploy Workers)      |
+| **Zone → Workers Routes**     | Zone    | Edit  | Workers route management                |
+| **Zone → DNS**                | Zone    | Edit  | `subdomain.register` (RFC-0752)         |
+| **Zone → Page Rules**         | Zone    | Edit  | Dev channel cache bypass rule           |
 
 ### 3.3 Resource restrictions (least-privilege)
 
@@ -85,6 +83,7 @@ Do NOT use `All zones` or `All accounts` — scope to exactly what the workshop 
 ### 3.4 Save the token
 
 Cloudflare shows the secret **only once**. Copy it immediately to:
+
 - `.env` file (local development)
 - CI secrets (GitHub Actions / deployment pipeline)
 - Password manager
@@ -113,12 +112,12 @@ rtk cp .env.example .env
 
 ### Optional variables (depending on features)
 
-| Variable | Purpose | When needed |
-| --- | --- | --- |
-| `OPENAI_API_KEY` | Changelog AI generation | When using AI-powered changelog |
-| `R2_AXIOM_*` | Evidence sync to R2 | When using `evidence.sync` |
-| `R2_NACHWEIS_*` | Nachweis ingest to R2 | When using `nachweis.ingest` |
-| `WARPGOGOL_OTLP_*` | OTLP observability | When using observability services |
+| Variable           | Purpose                 | When needed                       |
+| ------------------ | ----------------------- | --------------------------------- |
+| `OPENAI_API_KEY`   | Changelog AI generation | When using AI-powered changelog   |
+| `R2_AXIOM_*`       | Evidence sync to R2     | When using `evidence.sync`        |
+| `R2_NACHWEIS_*`    | Nachweis ingest to R2   | When using `nachweis.ingest`      |
+| `WARPGOGOL_OTLP_*` | OTLP observability      | When using observability services |
 
 See `.env.example` for the full list with `# How to obtain:` instructions per key.
 
@@ -138,11 +137,11 @@ Each Sternsystem deploys to three channels. See [deployment-channels.md](./deplo
 
 Each channel needs a DNS record pointing to its Worker via Workers custom domain:
 
-| Channel | DNS type | Content | Proxied |
-| --- | --- | --- | --- |
-| `dev.<domain>` | AAAA | `100::` (Workers custom domain) | Yes |
-| `alt.<domain>` | AAAA | `100::` (Workers custom domain) | Yes |
-| `<domain>` | AAAA | `100::` (Workers custom domain) | Yes |
+| Channel        | DNS type | Content                         | Proxied |
+| -------------- | -------- | ------------------------------- | ------- |
+| `dev.<domain>` | AAAA     | `100::` (Workers custom domain) | Yes     |
+| `alt.<domain>` | AAAA     | `100::` (Workers custom domain) | Yes     |
+| `<domain>`     | AAAA     | `100::` (Workers custom domain) | Yes     |
 
 The `100::` address is Cloudflare's reserved IPv6 for Workers custom domains. The DNS record is automatically created when you enable the Workers custom domain in the dashboard or via `wrangler` / API.
 
@@ -179,6 +178,7 @@ rtk pnpm exec site-kernel run leitstand.dev-deploy --site <system-id> --release 
 ```
 
 The pre-flight check will log:
+
 - `[leitstand] Cloudflare API token verified` — token is valid
 - `[leitstand] Cloudflare API token invalid: ...` — token is invalid, update `.env`
 - `[leitstand] CLOUDFLARE_API_TOKEN not set — CDN cache purge will be skipped` — `.env` not configured

@@ -157,7 +157,7 @@ None. No YAML/JSON/manifest changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent non-compliance | Step 1 adds NON-NEGOTIABLE rule to AGENTS.md with documented signal vocabulary |
 | Operator closes chat without signaling | Step 1 rule text explicitly states this is a soft guard; RFC-0575 pre-flight is the fallback |
 | Skill drift | Step 1 AGENTS.md rule is primary enforcement; Step 2 skill step is convenience |

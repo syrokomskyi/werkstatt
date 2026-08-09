@@ -133,7 +133,7 @@ No configuration or data changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Documentation drift | Step 1-2 reference RFC IDs in the section text so agents can trace back to authoritative sources |
 | Agent non-compliance | Step 1 includes explicit "do not migrate" rule in the section |
 | No automated enforcement | Acknowledged in RFC nonGoals — no validator added, documentation is the primary defense |

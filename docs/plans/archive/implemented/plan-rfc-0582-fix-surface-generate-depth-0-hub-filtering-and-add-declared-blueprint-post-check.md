@@ -167,7 +167,7 @@ None. No blueprint YAML, system.md, or ontology catalog changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | False positive for SURFACE-GEN-01 | Step 1: check uses `surfaces.filter((s) => s.generated === 0)` which only fires for blueprints that passed entitlement + declaration filter but produced zero entries |
 | Stale cache entries | Step 3: run `kernel.cache.clear --namespace command_results` |
 | Agent misinterpretation of SURFACE-GEN-01 | Error message says "check expandBlueprint logs" — guides agents to config, not empty directories |

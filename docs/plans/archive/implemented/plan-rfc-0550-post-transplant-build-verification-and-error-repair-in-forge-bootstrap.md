@@ -167,7 +167,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positive error detection | Step 1: skill text specifies parsing TypeScript error codes precisely (TS2xxx), not free-text matching |
 | Fix introduces regressions | Step 1: skill text specifies re-run build after each fix, up to 3 rounds |
 | Build timeout (large projects >300s) | Step 1: skill text sets 300s configurable timeout with report-and-continue on timeout |

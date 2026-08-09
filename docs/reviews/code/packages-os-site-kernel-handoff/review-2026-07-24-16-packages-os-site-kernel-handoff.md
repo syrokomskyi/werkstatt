@@ -33,11 +33,9 @@ Pass — `build:check` (tsc --noEmit) exit 0, `rfc.validate` pass, 13/13 new tes
 
 ### Axis A — Structural correctness
 
-**Finding A-1 (minor): Unused imports in `sternsystem-validate.ts`.**
-`execSync`, `fs`, `existsSync`, and `path` are still imported and used elsewhere in the file (mirror remote check, pin file validation, bundle contract check). No issue — all imports are still needed. No action required.
+**Finding A-1 (minor): Unused imports in `sternsystem-validate.ts`.** `execSync`, `fs`, `existsSync`, and `path` are still imported and used elsewhere in the file (mirror remote check, pin file validation, bundle contract check). No issue — all imports are still needed. No action required.
 
-**Finding A-2 (minor): `CSurfaceGuardResult` re-declares `metadata` with a narrower type.**
-`GuardResult.metadata` is `Record<string, unknown>`. `CSurfaceGuardResult` narrows it to `{ surfaceSummary?: string; rfcId?: string | null; breaksC?: boolean }`. This is valid TypeScript and provides better type narrowing for consumers. No action required.
+**Finding A-2 (minor): `CSurfaceGuardResult` re-declares `metadata` with a narrower type.** `GuardResult.metadata` is `Record<string, unknown>`. `CSurfaceGuardResult` narrows it to `{ surfaceSummary?: string; rfcId?: string | null; breaksC?: boolean }`. This is valid TypeScript and provides better type narrowing for consumers. No action required.
 
 No other structural issues. No `any`, no magic numbers, no dead code. Error handling preserves existing patterns.
 
@@ -66,15 +64,19 @@ No issues. No new commands. `GuardResult` is minimal. Extraction follows the pat
 **Finding G-1 (must fix): Behavioral regression in `release-commands.ts` — `exitCode ?? 0` changes semantics for `undefined`.**
 
 `KernelCommandResult.exitCode` is typed as `exitCode?: number` (optional). The original code:
+
 ```ts
 cSurfaceVerdict = surfaceResult.exitCode === 0 ? "pass" : "fail";
 ```
+
 When `exitCode` is `undefined`: `undefined === 0` → `false` → `"fail"`.
 
 The new code:
+
 ```ts
 surfaceValidateResult: { exitCode: surfaceResult.exitCode ?? 0, ... }
 ```
+
 When `exitCode` is `undefined`: `undefined ?? 0` → `0` → guard sees `0` → `"pass"`.
 
 This is a behavioral regression. When `surface.contract.validate` returns without an `exitCode` (which is valid per the type), the original code treated it as a failure; the new code treats it as a pass.
@@ -86,15 +88,19 @@ File: `packages/os/site-kernel-handoff/src/release/release-commands.ts:250`
 **Finding G-2 (minor): Log message indentation lost.**
 
 Original:
+
 ```ts
 logger.info(`  C-surface regression detected but breaksC: true declared in RFC ${rfcId}`);
 ```
+
 (two leading spaces for indentation)
 
 New:
+
 ```ts
 logger.info(guardResult.summary);
 ```
+
 Guard summary: `C-surface regression detected but breaksC: true declared in RFC ${rfcId}` (no leading spaces)
 
 This is a cosmetic regression — the log line loses its indentation. No behavioral impact.

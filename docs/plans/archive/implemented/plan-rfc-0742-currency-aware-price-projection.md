@@ -246,7 +246,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Localization of disclosure notes | Step 1 defines UK and DE note templates in the projection builder; Step 5 tests both locales |
 | Projection size (Offering × currency × locale) | Step 4 only attaches projections when derived prices exist; Step 5 verifies the output shape |
 | `Intl.NumberFormat` non-breaking space in formatted output | Step 1 handles fallback; Step 5 tests for U+00A0 presence |

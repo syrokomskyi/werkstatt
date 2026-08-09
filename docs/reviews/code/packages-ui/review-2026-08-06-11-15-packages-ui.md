@@ -47,6 +47,7 @@ Pass — `tsc --noEmit` (packages/ui), `astro check` (workpiece), `rfc.validate 
 **A1 — Duplicated Code (Fowler).** `getNachweisRoutes()` and `getNachweisVerifyRoutes()` in `packages/share/src/astro/nachweis-routes.ts:75-113` and `:120-160` share ~90% identical logic: system loading, i18n extraction, collection filtering by `defaultLang`, `type === "evidence-source"`, `NACHWEIS_EVIDENCE_KINDS.has(data.kind)`, and `status !== "published"` guard. Extract a shared `loadPublishedNachweisEntries()` helper that returns the filtered default-language entries; both functions consume it and build their route shapes from the result.
 
 **A2 — Incomplete interface propagation.** `verifiedDate` was added to `nachweis-card-component.astro` Props (line 41) but is missing from:
+
 - `NachweisRecord` interface in `nachweis-list-component.astro:27-41` — records passed via `{...record}` spread won't type-check if they include `verifiedDate`.
 - `Props` interface in `nachweis-detail-component.astro:37-52` — the detail component passes props to `NachweisCard` explicitly (lines 75-89), not via spread, so `verifiedDate` is silently dropped. Add `verifiedDate?: string` to both interfaces and forward it in the detail component.
 

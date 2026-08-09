@@ -56,16 +56,16 @@ No issues. The RFC documents edge cases: forge not installed (skip version check
 
 ### Spec compliance
 
-| Requirement from RFC-0554 | Status | Evidence |
-| --- | --- | --- |
-| Step 0 in forge-bootstrap | Done | SKILL.md:45-55 |
-| Silent — no operator-facing text | Done | SKILL.md:40,55, guardrails |
-| Reuse runUpgrade | Done | SKILL.md:53, runUpgrade unchanged |
-| forge.upgrade CLI remains | Done | AGENTS.md:16, forgeCoreModule |
-| forge.syncedVersion (not forgeVersion) | Done | RFC frontmatter, SKILL.md:49 |
-| Amends RFC-0543 | Done | RFC amends field, RFC-0543 amendedBy |
-| Silent failure + retry | Done | SKILL.md:54 |
-| No migration adapters reuse | Done | RFC nonGoals, Architectural fit |
+| Requirement from RFC-0554              | Status | Evidence                             |
+| -------------------------------------- | ------ | ------------------------------------ |
+| Step 0 in forge-bootstrap              | Done   | SKILL.md:45-55                       |
+| Silent — no operator-facing text       | Done   | SKILL.md:40,55, guardrails           |
+| Reuse runUpgrade                       | Done   | SKILL.md:53, runUpgrade unchanged    |
+| forge.upgrade CLI remains              | Done   | AGENTS.md:16, forgeCoreModule        |
+| forge.syncedVersion (not forgeVersion) | Done   | RFC frontmatter, SKILL.md:49         |
+| Amends RFC-0543                        | Done   | RFC amends field, RFC-0543 amendedBy |
+| Silent failure + retry                 | Done   | SKILL.md:54                          |
+| No migration adapters reuse            | Done   | RFC nonGoals, Architectural fit      |
 
 ### Questions for the author
 

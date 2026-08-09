@@ -23,7 +23,7 @@ Pass — `rfc.validate RFC-0571 --json` returns 0 violations.
 - **Error messages not addressed:** `config-regenerate.ts` lines 119 and 128 contain error messages referencing `apps/`:
   - Line 119: `"config.regenerate: apps/" + app + " does not exist"`
   - Line 128: `"config.regenerate: unable to read apps/" + app + "/src/content/system.md"`
-  
+
   After the path resolution change, these messages would be misleading (the path is no longer under `apps/`). The RFC's Design section shows the before/after for the path resolution line but does not mention these error messages. The implementation notes say "The path resolution change is a two-line edit" — with error message updates, it is a 4-5 line edit.
 
 ## Axis B — DNA alignment

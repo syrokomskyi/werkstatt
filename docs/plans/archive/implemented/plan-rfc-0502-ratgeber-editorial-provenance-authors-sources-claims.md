@@ -316,7 +316,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Migrator creates author record that operators may want to edit | Step 2: migrator is idempotent — operator edits after `mission.migrate`, re-run is no-op |
 | Claim sidecar collection path mismatch with existing CKL scanners | Step 6: `source.binding.validate` updated to scan both paths; Step 3: validator loads article sidecars directly |
 | Quellen section false positives from sourceId renaming | Step 3: RG-PROV-04 uses full string match; validator flags both old (RG-PROV-02) and new (RG-PROV-04) sourceIds |

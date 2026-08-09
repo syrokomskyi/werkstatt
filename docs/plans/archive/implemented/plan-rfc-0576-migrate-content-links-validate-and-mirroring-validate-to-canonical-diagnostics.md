@@ -291,7 +291,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positive reduction from trailing slash normalization | Step 2 implements `parseUrl` normalization; Step 6 adds tests verifying `/uk/tsina/` resolves correctly |
 | Agent misinterpretation of new data shape | Step 8 updates AGENTS.md documenting the canonical Diagnostic output; Step 6 tests verify the new shape |
 | diagnostic.shape.lint enforcement | Step 7 runs `diagnostic.shape.lint` to verify DSL-02 compliance; Step 5 removes `content-links.ts` from DSL-04 baseline |

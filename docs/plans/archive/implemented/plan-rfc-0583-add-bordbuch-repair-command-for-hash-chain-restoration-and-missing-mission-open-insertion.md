@@ -253,7 +253,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Fabricated mission-open events | Step 2: `summary` field is "Mission opened (auto-repaired)" — clearly marks synthetic events |
 | Agent misuse (proactive repair) | Step 5: AGENTS.md documents on-demand-only policy; implementation notes in RFC prohibit proactive use |
 | Hash-chain trust after repair | Step 2: post-repair `validateBordbuch` (step 7 of algorithm) confirms internal consistency before writing |

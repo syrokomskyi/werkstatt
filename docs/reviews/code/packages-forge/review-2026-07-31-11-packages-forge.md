@@ -51,10 +51,10 @@ No issues.
 
 ## Spec compliance
 
-| Requirement | Status | Evidence |
-| --- | --- | --- |
-| C-1 fix: remove hardcoded command name | Done | `SKILL.md:38` uses generic reference |
-| E-1 fix: add git diff verification | Done | `SKILL.md:34` step 2 |
+| Requirement                            | Status | Evidence                             |
+| -------------------------------------- | ------ | ------------------------------------ |
+| C-1 fix: remove hardcoded command name | Done   | `SKILL.md:38` uses generic reference |
+| E-1 fix: add git diff verification     | Done   | `SKILL.md:34` step 2                 |
 
 ## Questions for the author
 

@@ -21,6 +21,7 @@ Pass — zero violations.
 ## Axis A — Structural completeness
 
 - **FAIL — Import extraction regex is insufficient for dynamic imports.** The RFC states (line 307): "Import extraction MUST use a regex-based static analysis approach (matching `from "@warpgogol/..."` and `from "@warpgogol/..."` patterns)". However, `packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts:36-40` uses dynamic `import()`:
+
   ```ts
   rfc: async () => (await import("@warpgogol/forge")).forgeRfcModule,
   workflow: async () => (await import("@warpgogol/forge")).forgeWorkflowModule,
@@ -28,6 +29,7 @@ Pass — zero violations.
   naming: async () => (await import("@warpgogol/forge")).forgeNamingModule,
   werkstatt: async () => (await import("@warpgogol/forge")).forgeWerkstattModule,
   ```
+
   These are `import("@warpgogol/forge")` patterns, not `from "@warpgogol/forge"`. The RFC's regex would produce a false negative on the exact file that caused the original `ERR_MODULE_NOT_FOUND` failure. The regex must also match `import("@warpgogol/...")` and `import("@warpgogol/...")` dynamic import specifiers.
 
 - **FAIL — "Read-only validators" claim is inaccurate.** Line 189 states: "Neither command writes or modifies any file. Both are read-only validators." However, `template.imports.validate` runs `pnpm install --frozen-lockfile` (line 103), which can modify `node_modules/` if packages are missing. While `--frozen-lockfile` prevents lockfile changes, it does install missing packages to satisfy the lockfile. The RFC should clarify that `template.imports.validate` is read-only with respect to source files but may modify `node_modules/` via the subprocess, or restrict the claim to `workpiece.imports.validate` only.

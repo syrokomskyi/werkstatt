@@ -31,6 +31,7 @@ No issues. `satisfies: [DNA-46, DNA-51]` — both are real DNA invariants in `do
 ## Axis C — Ecosystem fit
 
 **Finding C1 — "Same pattern" claim is incorrect.** The "Architectural fit" section states: "RFC-0644 — established the `commitWorkpieceIfDirty` pattern for `mission.reconcile`. This RFC applies the same pattern to `leitstand.dev-deploy`." However, the RFC proposes using `mission.git.commit` via `executeKernelCommand`, which is a **different mechanism** than `commitWorkpieceIfDirty`. The existing `commitWorkpieceIfDirty` (`packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:286-315`) uses direct `execSync("git add -A")` + `execSync("git commit --no-verify")` — no PASSPORT signing, no pre-commit validation, bypasses hooks with `--no-verify`. The RFC's proposed `mission.git.commit` via `executeKernelCommand` includes PASSPORT signing (RFC-0560), pre-commit content validation (RFC-0594), and does **not** use `--no-verify`. The RFC is internally consistent (alternative 3 explicitly rejects the direct approach citing PASSPORT signing), but the "same pattern" claim is misleading. The Architectural fit section must either:
+
 - (a) Use `commitWorkpieceIfDirty` directly (matching RFC-0644's actual pattern), or
 - (b) Explicitly state that this RFC intentionally diverges from RFC-0644's pattern by using `mission.git.commit` for PASSPORT signing and pre-commit validation, and explain why the divergence is justified.
 

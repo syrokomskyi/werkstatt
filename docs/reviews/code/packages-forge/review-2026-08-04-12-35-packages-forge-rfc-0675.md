@@ -14,6 +14,7 @@ findings: 3
 Diff range: `a259142a` (plan commit) → `92ff774e` (stamp commit)
 
 Files reviewed:
+
 - `packages/forge/src/profiles/profile-schema.ts` — schema extension
 - `packages/forge/src/onboarding/invariant-engine.ts` — invariant engine (new)
 - `packages/forge/src/onboarding/doctor.ts` — doctor integration
@@ -25,8 +26,7 @@ Files reviewed:
 
 ### A-1: `collectFiles` scans entire workspace tree for each invariant (performance)
 
-**Severity**: medium
-**Location**: `packages/forge/src/onboarding/invariant-engine.ts:84-85,131-132,183-184`
+**Severity**: medium **Location**: `packages/forge/src/onboarding/invariant-engine.ts:84-85,131-132,183-184`
 
 Each of the three check functions (`checkFilenamePattern`, `checkFileContains`, `checkFileNotContains`) independently calls `collectFiles(workspaceRoot, workspaceRoot, allFiles)` which recursively walks the entire workspace. For a profile with N invariants, the workspace is scanned N times. On a large project, this is O(N × total_files).
 
@@ -34,10 +34,10 @@ Each of the three check functions (`checkFilenamePattern`, `checkFileContains`, 
 
 ### A-2: `collectFiles` does not skip `node_modules` or `.git`
 
-**Severity**: medium
-**Location**: `packages/forge/src/onboarding/invariant-engine.ts:62-73`
+**Severity**: medium **Location**: `packages/forge/src/onboarding/invariant-engine.ts:62-73`
 
 `collectFiles` recursively walks all directories including `node_modules` and `.git`. This causes:
+
 1. Performance degradation on large projects (thousands of files in `node_modules`)
 2. False positive violations from files in `node_modules` matching composition globs
 
@@ -45,8 +45,7 @@ Each of the three check functions (`checkFilenamePattern`, `checkFileContains`, 
 
 ### A-3: Duplicated file collection and regex compilation across check functions
 
-**Severity**: low
-**Location**: `packages/forge/src/onboarding/invariant-engine.ts:75-224`
+**Severity**: low **Location**: `packages/forge/src/onboarding/invariant-engine.ts:75-224`
 
 The three check functions (`checkFilenamePattern`, `checkFileContains`, `checkFileNotContains`) share identical boilerplate: collect files, filter by glob, compile regex with try/catch, iterate files. The only difference is the check logic (filename test, content contains, content not-contains).
 

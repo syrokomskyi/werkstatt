@@ -33,6 +33,7 @@ scope:
 - [ ] O8 — Non-breaking: existing apps without `=(...)` pass unchanged — maps to acceptance criterion 10
 
 **Critical correction:** The RFC proposed REF-04..07 for formula errors, but the existing validator already uses REF-04 (ambiguous braceless pattern, `content-references.ts:146`) and REF-05 (residual brace token, `content-references.ts:187`). Formula error codes must be renumbered to **REF-06..09**:
+
 - `REF-06`: Formula reference unresolved
 - `REF-07`: Formula operand is not numeric
 - `REF-08`: Formula syntax error
@@ -186,7 +187,7 @@ scope:
   - Export `runContentFormulaLint(input, context): Promise<KernelCommandResult>`
   - Scan `src/content/**/*.md` files (same directories as `content.references.validate`)
   - For each file, detect patterns like: `<braceless-ref> + <braceless-ref> × <number> = <number>` or `<braceless-ref> + <braceless-ref> = <number>` — i.e., arithmetic operators between content references followed by `=` and a literal number
-  - Use `scanFormulas` from `@warpgogol/share/formula-eval` for shared scanning infrastructure (the detection pattern is a superset of formula scanning — it looks for arithmetic *without* `=(` prefix)
+  - Use `scanFormulas` from `@warpgogol/share/formula-eval` for shared scanning infrastructure (the detection pattern is a superset of formula scanning — it looks for arithmetic _without_ `=(` prefix)
   - Output warnings with file, line, pattern, and suggestion (the `=(...)` replacement)
   - Always returns `passResult` (warn-level — never fails the build)
 - Register in `packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts`:

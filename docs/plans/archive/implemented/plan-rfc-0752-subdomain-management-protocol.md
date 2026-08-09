@@ -120,11 +120,7 @@ scope:
 - Create `packages/os/site-kernel-handoff/src/subdomain/subdomain-register.ts`
 - Implement `runSubdomainRegister(input, context)`:
   1. Read `--service` flag, resolve service entry from `systems/registry.yaml` `services[]`
-  2. For each subdomain in `service.subdomains[]`:
-     a. Resolve zone ID from `systems[]` entry matching `subdomain.zone` → `cloudflareZoneId`
-     b. Resolve `<account>` fallback: `workersDevUrl` from service entry → `CLOUDFLARE_ACCOUNT_ID` env → error
-     c. Check existing DNS record via `listDnsRecords(zoneId, token, name)` — skip if correct, error if wrong, create if missing
-     d. Check existing Workers route via `listWorkersRoutes(zoneId, token)` + client-side filter — skip if correct, error if wrong, create if missing
+  2. For each subdomain in `service.subdomains[]`: a. Resolve zone ID from `systems[]` entry matching `subdomain.zone` → `cloudflareZoneId` b. Resolve `<account>` fallback: `workersDevUrl` from service entry → `CLOUDFLARE_ACCOUNT_ID` env → error c. Check existing DNS record via `listDnsRecords(zoneId, token, name)` — skip if correct, error if wrong, create if missing d. Check existing Workers route via `listWorkersRoutes(zoneId, token)` + client-side filter — skip if correct, error if wrong, create if missing
   3. Return `SubdomainRegisterResult` with `state: "registered" | "already-registered" | "failed"`
 - Use `readRegistry` from `../sternsystem/registry-io.ts`
 - Use `sourceDotenv` + `filterEnv` from `../leitstand/adapters/cloudflare-workers.ts` for env resolution

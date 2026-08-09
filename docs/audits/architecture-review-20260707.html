@@ -612,8 +612,8 @@
             re-exports) and an <code>orchestration.ts</code> module containing the registries,
             <code>deliverLead</code>, <code>routeEvent</code>, <code>deliverEvent</code>,
             <code>authenticateInbound</code>, and the legacy queue/KV types. Consumers who need
-            orchestration import from <code>@warpgogol/share/integration/orchestration</code>; consumers
-            who only need types import from <code>@warpgogol/share/integration</code>.
+            orchestration import from <code>@warpgogol/share/integration/orchestration</code>;
+            consumers who only need types import from <code>@warpgogol/share/integration</code>.
           </p>
         </div>
         <div class="mt-4">
@@ -1135,8 +1135,9 @@
           <p class="text-sm text-gray-400 leading-relaxed">
             Evaluate which shims still have external consumers. For shims re-exporting from
             <code>@warpgogol/content-source</code> (a separate package), update consumers to import
-            directly from <code>@warpgogol/content-source</code> and delete the shim. For internal split
-            shims (<code>page-handler.ts</code>, <code>routes.ts</code>), update the package.json
+            directly from <code>@warpgogol/content-source</code> and delete the shim. For internal
+            split shims (<code>page-handler.ts</code>, <code>routes.ts</code>), update the
+            package.json
             <code>exports</code>
             map to point directly at the sub-module and delete the shim. If any shim still has many
             consumers, keep it but mark with a deprecation JSDoc and a target removal date.

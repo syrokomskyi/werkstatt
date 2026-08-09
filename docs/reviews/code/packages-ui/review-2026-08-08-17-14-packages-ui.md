@@ -39,7 +39,7 @@ Pass — `pnpm --filter @warpgogol/ontology build:check`, `pnpm --filter @warpgo
 
 3. **Double evaluation in submit handler** — `send-message-section.client.ts:285-287` calls `checklistItems.find((item) => !evaluateRule(item.rule, message, item))` to find the first failing item, but `updateChecklist` (line 181-189) already evaluated all items and found `firstFailingItem`. The first failing item's rule could be returned from `updateChecklist` alongside `firstFailingItem` to avoid re-evaluating all rules. This is a performance issue (N regex tests on every submit) and a DRY violation.
 
-4. **Dead data attributes on form element** — `send-message-section.astro:143-144` still sets `data-checklist-length-label` and `data-checklist-contact-label` on the form, but the client script no longer reads them (the labels now come from the `checklistItems` JSON). These are harmless but add unnecessary DOM weight. Note: the RFC explicitly requires keeping the *props* in the schema as fallback defaults, but the *data attributes* on the form are redundant since the client gets labels from `checklistItems` JSON.
+4. **Dead data attributes on form element** — `send-message-section.astro:143-144` still sets `data-checklist-length-label` and `data-checklist-contact-label` on the form, but the client script no longer reads them (the labels now come from the `checklistItems` JSON). These are harmless but add unnecessary DOM weight. Note: the RFC explicitly requires keeping the _props_ in the schema as fallback defaults, but the _data attributes_ on the form are redundant since the client gets labels from `checklistItems` JSON.
 
 ### Axis B — DNA alignment
 

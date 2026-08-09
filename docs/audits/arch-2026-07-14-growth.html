@@ -9,9 +9,15 @@
       mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
     </script>
     <style>
-      .seam { stroke-dasharray: 4 4; }
-      .leak { stroke: #dc2626; }
-      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
     </style>
   </head>
   <body class="bg-stone-50 text-slate-900 font-sans">
@@ -24,19 +30,37 @@
           <span>warpgogol monorepo</span>
         </div>
         <div class="flex items-center gap-6 text-xs text-slate-400">
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span
+          >
         </div>
       </header>
 
       <section id="candidates" class="space-y-10">
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Move EVENT_NAMES and EventPayloadMap to the ontology package</h2>
+          <h2 class="text-xl font-semibold">
+            Move EVENT_NAMES and EventPayloadMap to the ontology package
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">ports &amp; adapters</span>
+            <span
+              class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5"
+              >Strong</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >ports &amp; adapters</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/growth/src/adapter.ts:39-174</div>
@@ -73,8 +97,18 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> The closed event catalog (<code>EVENT_NAMES</code>, <code>EventPayloadMap</code>) is hand-maintained in <code>adapter.ts</code> while the ontology YAML files are the declared source of truth — two places that must stay in sync, validated only by an external command.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Generate <code>EVENT_NAMES</code> and <code>EventPayloadMap</code> from the ontology YAML catalog; <code>adapter.ts</code> imports the generated types and keeps only the <code>GrowthAdapter</code> interface.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> The closed event catalog
+              (<code>EVENT_NAMES</code>, <code>EventPayloadMap</code>) is hand-maintained in
+              <code>adapter.ts</code> while the ontology YAML files are the declared source of truth
+              — two places that must stay in sync, validated only by an external command.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Generate
+              <code>EVENT_NAMES</code> and <code>EventPayloadMap</code> from the ontology YAML
+              catalog; <code>adapter.ts</code> imports the generated types and keeps only the
+              <code>GrowthAdapter</code> interface.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> event catalog in one source</li>
@@ -84,10 +118,18 @@
         </article>
 
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Extract the window-bridge setup into a dedicated bootstrap module</h2>
+          <h2 class="text-xl font-semibold">
+            Extract the window-bridge setup into a dedicated bootstrap module
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5"
+              >Worth exploring</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/growth/src/emit.ts:187-199</div>
@@ -123,8 +165,18 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>emit.ts</code> mixes the pure queue factory, the singleton, the <code>emit()</code> function, and side-effecting <code>window</code> bridge setup at module scope — importing <code>emit.ts</code> in a non-browser environment triggers <code>typeof window</code> checks at load time.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Move the <code>window.__warpgogol_emit__</code> bridge setup and teardown into a separate <code>bridge.ts</code> module; <code>emit.ts</code> stays pure and importable anywhere.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>emit.ts</code> mixes the pure
+              queue factory, the singleton, the <code>emit()</code> function, and side-effecting
+              <code>window</code> bridge setup at module scope — importing <code>emit.ts</code> in a
+              non-browser environment triggers <code>typeof window</code> checks at load time.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Move the
+              <code>window.__warpgogol_emit__</code> bridge setup and teardown into a separate
+              <code>bridge.ts</code> module; <code>emit.ts</code> stays pure and importable
+              anywhere.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> DOM side-effects in one module</li>
@@ -136,7 +188,11 @@
 
       <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
         <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
-        <p class="text-sm text-slate-300">Generate <code>EVENT_NAMES</code> from ontology — the hand-maintained array is a drift hazard against the YAML catalog that is supposed to be the single source of truth. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+        <p class="text-sm text-slate-300">
+          Generate <code>EVENT_NAMES</code> from ontology — the hand-maintained array is a drift
+          hazard against the YAML catalog that is supposed to be the single source of truth.
+          <a href="#" class="text-emerald-400 underline">Jump to card →</a>
+        </p>
       </section>
     </main>
   </body>

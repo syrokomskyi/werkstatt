@@ -239,7 +239,7 @@ No configuration or data changes. The `BORDBUCH_RETRY_OPTIONS` constant is code,
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Pipeline latency (72s worst case) | Step 3 uses fake timers to verify backoff without real delays; production latency is acceptable per RFC analysis |
 | Retry storms | Step 2 scopes `gitExecWithRetry` to `bordbuch.commit` only — no other pipeline step uses it |
 | False positive retry | Step 1 implements conservative `isTransientError` classification — only timeout and lock-file errors are retried |

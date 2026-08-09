@@ -32,6 +32,7 @@ Pass — `pnpm --filter @warpgogol/pbp run build:check` exits 0. 20 compiler-pip
 ### Axis A — Structural correctness
 
 No issues. Previous findings resolved:
+
 1. `priceCurrency` validation — `validateSchemaOrgPrices` now accepts `canonicalCurrencies: Set<string>` and checks `priceCurrency` field (projection.ts:151-162).
 2. Deterministic charge selection — `extractCanonicalPrice` sorts charge keys (`Object.keys(charges).sort()`, projection.ts:98) before selecting the first fixed-model charge.
 3. Typed access — `generateSchemaOrg` and `buildCanonicalPriceSet` now use `offering.pricing` directly (projection.ts:82, 112) instead of `as unknown as Record<string, unknown>` casts. `extractCanonicalPrice` accepts `PbpPricing | undefined` instead of `Record<string, unknown> | undefined`.

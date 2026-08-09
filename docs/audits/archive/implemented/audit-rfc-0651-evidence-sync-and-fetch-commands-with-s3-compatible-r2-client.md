@@ -17,6 +17,7 @@ Two factual errors in the file system responsibilities and dependency claims, pl
 ## Mechanical validation (rfc.validate)
 
 Pass with one warning:
+
 - **V-18** (warning): `related "DNA-59" is not defined in docs/architecture-dna.md`. DNA-59 is established by RFC-0650 (still draft) and has not yet been appended to the invariants file. The warning will persist until RFC-0650 is accepted.
 
 ## Axis A — Structural completeness

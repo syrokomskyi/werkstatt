@@ -33,7 +33,7 @@
 ## Axis D — Forward-only discipline
 
 - **PASS** — No backwards-incompatible changes to existing behavior. Archive search is additive. `--bump` is optional. V-29 extension is additive (accepted RFCs that previously passed still pass if they have versionBump).
-- **FINDING D-1 (medium):** V-29 rule extended to require `versionBump` for `status: accepted` RFCs, but RFC-0478 (the governing RFC) explicitly scopes V-29 to `status: implemented` only. The RFC text at line 122 says: *"Required for RFCs with `status: implemented` and `createdAt >= 2026-07-21`"*. Extending to `accepted` is a semantic change to the rule contract that should be documented via an amending RFC (or at minimum an ADR), not a silent code change. This is not a code bug — it's a governance gap.
+- **FINDING D-1 (medium):** V-29 rule extended to require `versionBump` for `status: accepted` RFCs, but RFC-0478 (the governing RFC) explicitly scopes V-29 to `status: implemented` only. The RFC text at line 122 says: _"Required for RFCs with `status: implemented` and `createdAt >= 2026-07-21`"_. Extending to `accepted` is a semantic change to the rule contract that should be documented via an amending RFC (or at minimum an ADR), not a silent code change. This is not a code bug — it's a governance gap.
 
 ## Axis E — RFC contract alignment
 

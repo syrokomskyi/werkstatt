@@ -76,6 +76,7 @@ uniqueFindings: 3
 2. Fix the example code (lines 102-104) to show the `derivedPrices` parameter being passed.
 
 Additionally, update the plan's Step 6 to add:
+
 - Integration test for `buildSemanticPageModelWith` with mock reader returning derived prices fixture
 - Unit test for malformed JSON throwing behavior
 
@@ -83,4 +84,4 @@ No findings require `fo-explore` — all issues have clear resolutions.
 
 ---
 
-*No findings does not mean no issues — it means no issues were found from these five perspectives.*
+_No findings does not mean no issues — it means no issues were found from these five perspectives._

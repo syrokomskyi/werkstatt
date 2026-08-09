@@ -34,6 +34,7 @@ scope:
 ### 2.1 Code and commands
 
 **`@gogol/site-kernel-onboarding`:**
+
 - `src/module.ts` — remove registrations for `brief.validate`, `onboarding.input.validate`, `onboarding.phase.validate`, `onboarding.scaffold`, `onboarding.checklist`; add registration for `onboarding.synthesize`
 - `src/phase-contract.ts` — **delete** (extract hashing/classification logic to `synthesize.ts` first)
 - `src/scaffold.ts` — **delete** (but preserve `applyTokens`, `readTemplate`, `readRuntimeTemplate` exports — these are used by `mission.materialize` in `@gogol/site-kernel-handoff`; move them to `templates.ts` if not already there)
@@ -44,10 +45,12 @@ scope:
 - `src/templates.ts` — verify `applyTokens`, `readTemplate`, `readRuntimeTemplate` are exported here (they already are per `index.ts`); if they were re-exported from `scaffold.ts`, ensure they remain accessible after `scaffold.ts` deletion
 
 **`@gogol/site-kernel-handoff`:**
+
 - `src/sternsystem/sternsystem-register.ts` — extend with: pin creation (delegate to `sternsystem.pin`), content stub creation, `mission.open` call, `mission.materialize` trigger, `--amend`/`--amend-id` flags, atomic rollback on failure
 - `src/sternsystem/sternsystem.module.ts` — update command registration with new flags (`amend`, `amend-id`)
 
 **Site OS commands:**
+
 - `onboarding.synthesize` — new, workspace scope, `@gogol/site-kernel-onboarding`
 - `sternsystem.register` — changed, workspace scope, `@gogol/site-kernel-handoff`
 - `brief.validate` — removed
@@ -88,12 +91,14 @@ scope:
 **Goal:** Preserve the reusable hashing and file-classification logic before deleting `phase-contract.ts`.
 
 **Agent actions:**
+
 - Read `packages/os/site-kernel-onboarding/src/phase-contract.ts` and identify the hashing logic (SHA-256 per file + aggregate `inputHash`) and file classification logic
 - Create `packages/os/site-kernel-onboarding/src/synthesize.ts` with the extracted logic, adapted for the per-system path layout (`onboarding/<system-id>/.input/` instead of `onboarding/.input/`)
 - Implement `runOnboardingSynthesize` function: reads `onboarding/<system-id>/.input/`, validates `00-brief.md` via `BriefFrontmatter` schema, classifies files, computes hashes, writes `onboarding/<system-id>/.output/input-manifest.json`
 - Handle noop case: return `{ status: "noop" }` (exit 0) if `.input/` directory does not exist
 
 **Validation:**
+
 - `pnpm --filter @gogol/site-kernel-onboarding build:check`
 
 **Completion criterion:** `synthesize.ts` exists, exports `runOnboardingSynthesize`, and passes typecheck.
@@ -107,11 +112,13 @@ scope:
 **Goal:** Wire the new command into the kernel module and public API.
 
 **Agent actions:**
+
 - In `src/module.ts`: add `onboarding.synthesize` command registration with `--system` flag, workspace scope, reads `onboarding/<system>/.input/**`, writes `onboarding/<system>/.output/input-manifest.json`
 - In `src/index.ts`: add `export { runOnboardingSynthesize } from "./synthesize.ts"` and remove exports of `runOnboardingInputValidate`, `runOnboardingPhaseValidate` and their types
 - Write unit tests for `onboarding.synthesize` in `src/tests/synthesize.test.ts`: test pass case (valid brief + files), test fail case (missing brief), test noop case (no .input/ directory)
 
 **Validation:**
+
 - `pnpm --filter @gogol/site-kernel-onboarding build:check`
 - `pnpm --filter @gogol/site-kernel-onboarding test`
 
@@ -126,6 +133,7 @@ scope:
 **Goal:** Delete the five retired commands and their source files.
 
 **Agent actions:**
+
 - In `src/module.ts`: remove registrations for `brief.validate`, `onboarding.input.validate`, `onboarding.phase.validate`, `onboarding.scaffold`, `onboarding.checklist` and their dynamic imports
 - Delete `src/phase-contract.ts`
 - Delete `src/scaffold.ts` — but first verify that `applyTokens`, `readTemplate`, `readRuntimeTemplate` are defined in `src/templates.ts` (not in `scaffold.ts`). If any are defined in `scaffold.ts`, move them to `templates.ts` before deletion
@@ -134,6 +142,7 @@ scope:
 - Update or remove tests that reference deleted commands
 
 **Validation:**
+
 - `pnpm --filter @gogol/site-kernel-onboarding build:check`
 - `pnpm --filter @gogol/site-kernel-onboarding test`
 
@@ -148,12 +157,14 @@ scope:
 **Goal:** Update the brief validation logic for the per-system directory layout.
 
 **Agent actions:**
+
 - In `src/brief.ts`: change path references from `onboarding/.input/00-brief.md` to `onboarding/<system-id>/.input/00-brief.md`
 - Remove the `apps/<id>/src/content/system.md` cross-check
 - Add a `systems/registry.yaml` check: if the system-id already exists in the registry, `brief.validate` should warn (for amend scenarios) or pass (for new onboarding, the system doesn't exist yet)
 - Update `runBriefValidate` to accept a `--system` flag for the system-id
 
 **Validation:**
+
 - `pnpm --filter @gogol/site-kernel-onboarding build:check`
 - `pnpm --filter @gogol/site-kernel-onboarding test`
 
@@ -168,6 +179,7 @@ scope:
 **Goal:** Add pin creation, content stubs, mission opening, materialization, and amend flags to the existing command.
 
 **Agent actions:**
+
 - In `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-register.ts`:
   - After existing registry entry creation, add: call `sternsystem.pin` to create `systems/<id>/system.pin.json`
   - Create initial content stub: `systems/<id>/content/system.md` with identity and i18n blocks derived from the brief (read from `onboarding/<id>/.input/00-brief.md`)
@@ -179,6 +191,7 @@ scope:
 - Write unit tests for the extended behavior: test successful full flow, test rollback on `mission.open` failure, test rollback on `mission.materialize` failure, test amend mode
 
 **Validation:**
+
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 
@@ -193,6 +206,7 @@ scope:
 **Goal:** Scaffold the forge skill that orchestrates the full onboarding pipeline.
 
 **Agent actions:**
+
 - Run `pnpm exec site-kernel run forge.port.scaffold --skill fo-onboard` (RFC-0393) to create `.agents/skills/fo-onboard/` with forge-compliant structure
 - Write `SKILL.md` with the orchestration steps: Prepare (read brief, validate) → Synthesize (run `onboarding.synthesize`, then AI synthesis) → Register (run `sternsystem.register`) → Handoff (report results)
 - Write `learned-principles.md` (empty, for cumulative knowledge)
@@ -200,6 +214,7 @@ scope:
 - Document `--amend` mode in the skill
 
 **Validation:**
+
 - `pnpm exec site-kernel run forge.skill.validate --skill fo-onboard` (if available)
 - Verify `.agents/skills/fo-onboard/SKILL.md` exists and references `onboarding.synthesize` and `sternsystem.register`
 
@@ -214,12 +229,14 @@ scope:
 **Goal:** Remove the retired workflow files and historical onboarding content.
 
 **Agent actions:**
+
 - Delete `.agents/workflows/00-prepare.md` through `06-handoff.md`
 - Delete `.agents/workflows-amend/` (entire directory)
 - Delete `onboarding/.input/` (entire directory, 95 files)
 - Delete `onboarding/.output/` (entire directory, 27 files)
 
 **Validation:**
+
 - `git status` shows only deletions
 - No code references the deleted paths (verify with grep)
 
@@ -234,6 +251,7 @@ scope:
 **Goal:** Synchronize all documentation artifacts with the new command surface.
 
 **Agent actions:**
+
 - Update `packages/os/site-kernel-onboarding/AGENTS.md`: rewrite commands table (remove 5 old commands, add `onboarding.synthesize`), update brief contract paths, remove phase contract section, update rules
 - Update `packages/os/site-kernel-handoff/AGENTS.md`: document extended `sternsystem.register` with pin, mission, materialization, and amend flags
 - Update root `AGENTS.md`: update any onboarding references
@@ -241,6 +259,7 @@ scope:
 - Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
 
 **Validation:**
+
 - `git diff` shows documentation changes only
 - `pnpm exec site-kernel run ecosystem.manifest.validate` (if available)
 
@@ -255,6 +274,7 @@ scope:
 **Goal:** Verify all acceptance criteria, run validation suite, and stamp the RFC as implemented.
 
 **Agent actions:**
+
 - Verify every acceptance criterion in RFC-0532 against the implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0532`
 - Run `pnpm --filter @gogol/site-kernel-onboarding build:check`
@@ -265,6 +285,7 @@ scope:
 - Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0532 --implementation-commit <sha>`
 
 **Validation:**
+
 - `git status` — no uncommitted changes from the current session
 - `pnpm exec site-kernel run rfc.validate --id RFC-0532` — zero errors
 - All build:check and test commands pass
@@ -293,7 +314,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Loss of onboarding history for warpgogol-com | Step 7 deletes only after all code is updated; Sternsystem + Bordbuch remain authoritative |
 | fo-onboard skill complexity | Step 6 delegates deterministic work to commands; skill focuses on orchestration |
 | Agent confusion during transition | Step 8 updates all AGENTS.md files with new command surface |

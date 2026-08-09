@@ -299,7 +299,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | CDN propagation delay — single freshness fetch may fail even though purge succeeded | Step 6: test covers freshness fetch failure; operator re-runs `leitstand.dev-deploy` after brief wait (documented in RFC Risks) |
 | Cloudflare API downtime — all dev deploys fail during outage | Step 3: purge fatal check correctly fails; Step 6: test covers purge API failure scenario |
 | Agent misinterpretation — agents may set dummy `CLOUDFLARE_ZONE_ID` | Step 3: purge API call fails with auth error, still fatal; no bypass path |

@@ -258,7 +258,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positive on generic example ids | Step 3 replaces all specific platform RFC references with generic descriptions or `RFC-XXXX` placeholders; after cleanup, remaining `RFC-\d{4}` patterns are genuine violations |
 | False positive on file paths | Step 1 uses `\bADR-\d{4}\b` (case-sensitive, word-boundary) which does not match lowercase `adr-0000-template.md` |
 | Binding key names contain "Rfc" | Step 1 uses `RFC-\d{4}` (hyphen + 4 digits) which does not match camelCase `validateRfc` |

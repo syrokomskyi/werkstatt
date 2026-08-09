@@ -23,12 +23,12 @@ Pass — `rfc.validate RFC-0576 --json` exits 0 with zero violations.
 - **LINK-01/LINK-02 rule titles are semantically wrong.** The RFC proposes (line 140–141):
   - `LINK-01: "External URL is missing or malformed"`
   - `LINK-02: "Anchor link target not found"`
-  
+
   But the actual code in `content-links.ts` uses these codes differently:
   - LINK-01 (lines 328–329, 392–393): anchor not found on a page — used for unresolved `#anchor` references, not external URLs.
   - LINK-02 (lines 345–346, 362–363): same-page anchor must not carry a path prefix — a style/canonical-form violation, not a missing target.
   - LINK-03 (lines 373–378): internal path does not resolve — matches the RFC's description.
-  
+
   The registry titles must match the actual check semantics or agents relying on `DIAGNOSTIC_RULES[ruleId].title` for remediation guidance will be misled.
 
 - **fixHints for LINK-01 and LINK-02 are missing from the Design section.** The RFC only specifies a fixHint for LINK-03 (line 183). The acceptance criteria (line 294) require "LINK-01..03 ruleIds and fixHints" — LINK-01 and LINK-02 fixHints must be specified in the Design section.

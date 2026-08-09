@@ -225,7 +225,7 @@ scope:
 
 - Create `packages/studio-gate/package.json`:
   - `name: "@warpgogol/studio-gate"`, `private: true`, `type: "module"`
-  - `dependencies`: `@modelcontextprotocol/sdk` (>=1.0.0), `@warpgogol/site-kernel-handoff` (workspace:*), `@warpgogol/site-kernel-content` (workspace:*)
+  - `dependencies`: `@modelcontextprotocol/sdk` (>=1.0.0), `@warpgogol/site-kernel-handoff` (workspace:_), `@warpgogol/site-kernel-content` (workspace:_)
   - `devDependencies`: `vitest`, `fast-check`, `typescript`
   - `scripts`: `build`, `build:check`, `test`, `start` (entrypoint)
 - Create `packages/studio-gate/tsconfig.json` (extend `tsconfig/base.json`)
@@ -380,7 +380,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | DNA-22 path validation false positives | Step 1 uses `loadSystemManifest` (system.md) and shares glob logic with `client.edit.validate` |
 | LLM confusion from tool count (12 tools) | Step 7 skill provides process layer as `serverInfo.instructions` |
 | Command execution latency | Acceptable for content editing; no hot-path optimization needed |

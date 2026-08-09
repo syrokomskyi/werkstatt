@@ -226,7 +226,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Schema bloat — six optional fields increase complexity | Step 1: all fields are optional in Zod, existing profiles pay no cost (verified in Step 4, test case 2) |
 | Terminology key drift — skills reference keys profiles don't declare | Step 1: `TERMINOLOGY_DEFAULTS` provides fallback for all universal keys; Step 4 test case 4 verifies unknown keys are accepted |
 | Invariant id collisions — domain invariants vs DNA invariants | Step 1: `profileInvariantSchema` enforces `^[A-Z]+-\d+$` format; DNA invariants use `DNA-` prefix, domain invariants use domain prefixes (`VIDEO-`, `BOOK-`, etc.) — no collision possible |

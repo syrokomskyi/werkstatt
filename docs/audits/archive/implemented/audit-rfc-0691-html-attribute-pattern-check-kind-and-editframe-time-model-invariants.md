@@ -55,7 +55,7 @@ No issues. RFC additive — новый check kind и новые invariants не 
 
 - **Performance**: `html-attribute-pattern` читает каждый файл matching glob и запускает 2 regex operations per file (element extraction + attribute extraction). Для типичного Editframe проекта (1-10 compositions) это тривиально. Но RFC не оценивает cost — нужно добавить "Cost: O(n_files × n_elements_per_file) regex matches, negligible for typical Editframe projects (<100 files)".
 - **Edge case — self-closing elements**: `<ef-timegroup duration="5s"/>` — regex `<ef-timegroup[^>]*>` матчит включая `/>`. Это корректно, но не задокументировано.
-- **Edge case — multiple elements on one line**: `<ef-timegroup duration="5s"><ef-timegroup duration="3s"></ef-timegroup></ef-timegroup>` — regex `new RegExp(\`<${element}[^>]*>\`, "gi")` с флагом `g` найдёт оба. Корректно, но стоит упомянуть.
+- **Edge case — multiple elements on one line**: `<ef-timegroup duration="5s"><ef-timegroup duration="3s"></ef-timegroup></ef-timegroup>` — regex `new RegExp(\`<${element}[^>]*>\`, "gi")`с флагом`g` найдёт оба. Корректно, но стоит упомянуть.
 - **VIDEO-08 regex**: `negatedPattern: "<ef-timegroup[^>]*loop[^>]*>[\\s\\S]*<ef-timegroup[^>]*loop"` — использует `file-not-contains` с `[\s\S]*` между двумя loop-атрибутами. Это матчит любой файл где 2+ ef-timegroup с loop. Но `[\s\S]*` жадный — может перематчить через несколько файлов если content большой. На практике compositions короткие, но стоит отметить в Risks.
 - **Migration path**: Новые projects получают 9 invariants автоматически. Существующие editframe-html projects (если есть) получат 6 новых invariants при следующем `forge.doctor` — это может вызвать новые violations. RFC не описывает это.
 

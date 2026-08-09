@@ -23,6 +23,7 @@ Pass with 1 warning:
 ## Axis A — Structural completeness
 
 - **A-1 (TypeScript contracts — `CloseReportMirror` conflict)**: The RFC proposes (lines 97–101):
+
   ```ts
   interface CloseReportMirror {
     synced: boolean;
@@ -30,7 +31,9 @@ Pass with 1 warning:
     mirrorSha: string | null;
   }
   ```
+
   But the existing interface in `@/packages/os/site-kernel-handoff/src/mission/mission-close.ts:81-86` is:
+
   ```ts
   export interface CloseReportMirror {
     originSha: string | null;
@@ -39,9 +42,11 @@ Pass with 1 warning:
     recommendation: string | null;
   }
   ```
+
   The RFC does not mention it is replacing an existing interface. Removing `originSha`, `inSync`, and `recommendation` would break the RFC-0705 blocking check (lines 302–320) which reads `mirrorInSync` and `recommendation`. The RFC must clarify: is it extending the interface (adding `synced`/`syncError` alongside existing fields) or replacing it? If extending, the contracts section should show the full interface with both old and new fields.
 
 - **A-2 (TypeScript contracts — `executeKernelCommand` signature)**: The RFC shows (lines 104–108):
+
   ```ts
   const syncResult = await executeKernelCommand(
     "sternsystem.sync",
@@ -49,7 +54,9 @@ Pass with 1 warning:
     context,
   );
   ```
+
   The actual API in the codebase (mission-close.ts:438–446, mission-materialization-commands.ts:1241–1245) uses an object parameter:
+
   ```ts
   const syncResult = await executeKernelCommand({
     workspaceRoot,
@@ -57,6 +64,7 @@ Pass with 1 warning:
     argv: [`--id=${manifest.systemId}`],
   });
   ```
+
   The call signature in the RFC does not match the real API. This will mislead the implementing agent.
 
 - **A-3 (Output format — incomplete)**: The output format section (lines 133–142) shows only `mirror.synced`, `mirror.syncError`, and `mirror.mirrorSha`. It omits the existing `mirror.originSha`, `mirror.inSync`, and `mirror.recommendation` fields. The implementing agent needs to see the full output shape to avoid accidentally dropping fields.

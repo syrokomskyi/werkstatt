@@ -306,7 +306,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Intent routing misinterpretation | Step 3: routing table generated from `triggers` fields with natural-language phrases; Step 2: triggers are descriptive enough for agent to match |
 | Auto-grilling friction | Step 3: behavioral layer includes calibration examples (significant vs. minor) |
 | Behavioral layer drift | Step 3: routing table generated from skill frontmatter, updates automatically when skills are re-synced |

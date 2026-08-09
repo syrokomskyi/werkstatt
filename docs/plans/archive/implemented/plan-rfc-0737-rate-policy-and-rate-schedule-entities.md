@@ -48,6 +48,7 @@ No configuration or data files affected. No CLI commands. Library-only.
 ### 2.4 Validation and pipelines
 
 No pipeline changes. No new commands. Existing validation commands apply:
+
 - `pnpm --filter @warpgogol/pbp build:check`
 - `pnpm --filter @warpgogol/pbp test`
 
@@ -267,7 +268,7 @@ No pipeline changes. No new commands. Existing validation commands apply:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Stale rates — business-fixed schedule not updated | Step 2: `governance.reviewEvery` is inherited from `PbpEntity` — the schema validates it via `pbpGovernanceSchema` in `pbpEntitySchema` |
 | External source unavailability | Step 1-2: `sources.fallback` and `freshness.allowLastKnownValue` are schema-validated fields — downstream consumption is RFC-0744's responsibility |
 | Schema registry drift | Step 3: `pbpSchemaById` and `pbpEntityDiscriminatedUnion` updated in same step; Step 5: golden-fixtures test asserts count = 27 |

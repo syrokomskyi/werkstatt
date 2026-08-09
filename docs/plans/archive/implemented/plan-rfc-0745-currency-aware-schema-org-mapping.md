@@ -242,7 +242,7 @@ function validateSchemaOrgPrices(
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | SEO impact of multi-currency display | Step 1 ensures only canonical source-currency price is emitted in Schema.org |
 | Rich result price mismatch | Step 1-2 ensure `price` and `priceCurrency` are canonical source values |
 | False-positive rate | Step 3 builds canonical price set from the same graph; Step 5 tests edge cases (no pricing, non-fixed charges) |

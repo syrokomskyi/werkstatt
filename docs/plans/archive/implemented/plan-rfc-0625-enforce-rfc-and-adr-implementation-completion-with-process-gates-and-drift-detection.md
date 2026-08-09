@@ -238,7 +238,7 @@ No configuration or data files affected.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | V-32/AV-16 false positive during in-progress implementation | Warning severity — does not block validation (Step 1, 2) |
 | V-32/AV-16 false negative from squash merges | Accepted — safety net only; plan template and skill gates are primary defense (Step 4, 5) |
 | ADR validate function signature change (sync → async) | Step 2 calls out the signature change explicitly; call site updated in same step |

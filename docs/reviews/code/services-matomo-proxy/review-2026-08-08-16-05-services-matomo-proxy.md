@@ -52,7 +52,7 @@ No issues. The diff is minimal — it removes dead code, updates documentation, 
 
 ### Axis G — Blind spots
 
-1. **Validator violation message mismatch** — `analytics-matomo.ts:403` still says "routes must include /_wg/analytics/*" but the check now accepts any route starting with `/_wg/analytics/`. The violation message should reflect the actual check, e.g., "routes must include a /_wg/analytics/ pattern". This is a minor diagnostic accuracy issue — the message is shown when the check fails, and it would confuse an operator who sees "must include /_wg/analytics/*" when they have `/_wg/analytics/*/matomo.js`.
+1. **Validator violation message mismatch** — `analytics-matomo.ts:403` still says "routes must include /_wg/analytics/_" but the check now accepts any route starting with `/_wg/analytics/`. The violation message should reflect the actual check, e.g., "routes must include a /\_wg/analytics/ pattern". This is a minor diagnostic accuracy issue — the message is shown when the check fails, and it would confuse an operator who sees "must include /\_wg/analytics/_" when they have `/_wg/analytics/*/matomo.js`.
 
 ### Spec compliance
 

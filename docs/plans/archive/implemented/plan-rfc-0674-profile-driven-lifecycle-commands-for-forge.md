@@ -306,7 +306,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Command injection via profile commands | Step 2: profiles are trusted files, `--dry-run` lets operator inspect commands before execution |
 | Profile staleness (command renamed) | Steps 3-5: error messages include the resolved command and profile path for diagnosis |
 | Long-running `forge dev` blocks | Step 3: SIGINT handling with exit code 130; `--dry-run` provides structured output without starting server |

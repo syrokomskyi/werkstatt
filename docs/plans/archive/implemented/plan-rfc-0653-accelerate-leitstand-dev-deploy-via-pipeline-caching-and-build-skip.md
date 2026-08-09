@@ -262,7 +262,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Stale `dist/` on skip-build | Step 5: `--force-build` flag; Axiom gate + CDN freshness check still run after deploy |
 | `preview.images.generate` cache hit with deleted PNGs | Step 1: `reads = content only` pattern; `--force` on pipeline regenerates |
 | `print.pdf.generate` cache hit with deleted `.cache/pdf/` | Step 2: `.done` marker check; `--force` on pipeline regenerates |

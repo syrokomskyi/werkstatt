@@ -277,7 +277,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False negative — redirect page not detected | Step 3 reuses existing `isHtmlRedirectPage` which is already tested and used in 6+ validators |
 | Redirect target mismatch (CDN rewrites) | Step 4 verifies `Location` header only when `redirectTarget` is known; falls back to status-only check for `"unknown"` |
 | Schema change — `contentHash` becomes `string \| null` | Step 1 moves `RouteFact` to ontology with the new shape; Steps 3–4 update both consumers in the same wave |

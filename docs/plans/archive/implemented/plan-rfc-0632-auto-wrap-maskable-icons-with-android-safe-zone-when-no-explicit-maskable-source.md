@@ -213,7 +213,7 @@ No configuration or data files affected. No ontology catalogs, no system.md chan
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Auto-wrap heuristic failure (regex-based parsing) | Step 1: fallback to `#ffffff` background and original-SVG-as-is; Step 4: tests cover fallback paths |
 | 80% safe zone insufficient for some designs | Step 3: ICON-SRC-04 warning prompts visual verification |
 | Background color extraction failure | Step 1: `#ffffff` fallback; Step 3: ICON-SRC-04 warning |

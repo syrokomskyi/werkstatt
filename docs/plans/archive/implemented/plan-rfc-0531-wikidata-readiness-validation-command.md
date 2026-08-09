@@ -236,7 +236,7 @@ No configuration or data files change. The command reads existing PBP content an
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positives on URL validation | Step 1: URL check validates `schemeRef + value` starts with `https://` and is parseable by `new URL()` — non-URL identifiers are out of scope for `sameAs` projection |
 | Dependency on RFC-0530 | Step 1: validator reads `externalIdentifiers` field from PBP content — if RFC-0530 is not yet implemented, the field will be absent and the validator will report missing QIDs (warnings) |
 | Stale dist/ HTML | Step 2: parity check only runs when dist/ HTML exists; if no dist/, skip parity check and report only content findings (mirrors `jsonld.parity` behavior) |

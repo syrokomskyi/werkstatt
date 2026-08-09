@@ -25,19 +25,23 @@ Pass — zero violations.
 2. **Problem section is factually wrong.** The RFC states: _"bordbuch/status.generated.yaml is generated during mission.validate but not committed to the cache clone."_ It IS committed — by `bordbuch.commit` (RFC-0626), which runs inside `build.prepare` at step 129. The CHANGE_SUMMARY in `build-prepare.ts` line 17 explicitly records: _"RFC-0626: added bordbuch.commit after bordbuch.generate to auto-commit bordbuch projections."_
 
 3. **TypeScript contracts section has wrong API signature.** The RFC proposes:
+
    ```ts
    await commitAndPushBordbuch(cacheCloneDir, systemId, {
      message: `mission.validate: update bordbuch status for ${missionId}`,
      push: true,
    });
    ```
+
    The actual API (`bordbuch-io.ts:321-324`) is:
+
    ```ts
    export async function commitAndPushBordbuch(
      systemDir: string,
      message: string,
    ): Promise<CommitAndPushResult>
    ```
+
    There is no options object, no `systemId` parameter, and no `push` flag. Push is always attempted.
 
 4. **File system responsibilities table has wrong paths.** The RFC lists `missions/<id>/workpiece/bordbuch/status.generated.yaml` as the file being committed. The actual file is in the cache clone at `<cache-clone>/bordbuch/status.generated.yaml` (see `bordbuch-generate.ts:204`: `const statusPath = join(cachePath, "bordbuch", "status.generated.yaml")`). The workpiece does not have a `bordbuch/` directory.

@@ -189,7 +189,7 @@ No configuration or data changes. No new YAML/JSON/NDJSON files. No ontology cat
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Complexity — five layers is significantly more complex | Step 1 verifies each layer is described with its dedicated RFC, ensuring the complexity is decomposed into per-layer RFCs |
 | Agent misinterpretation — LLM agents may attempt to implement P2P layers | Step 1 verifies the RFC explicitly states implementation is deferred; implementation notes section is checked |
 | Byzantine resistance untested | Step 1 verifies the rollout section defines pilot scope at Phase 1–2 (trusted workshops only) |

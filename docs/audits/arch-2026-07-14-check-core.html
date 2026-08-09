@@ -9,34 +9,60 @@
       mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
     </script>
     <style>
-      .seam { stroke-dasharray: 4 4; }
-      .leak { stroke: #dc2626; }
-      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
     </style>
   </head>
   <body class="bg-stone-50 text-slate-900 font-sans">
     <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
       <header class="space-y-4">
-        <h1 class="text-3xl font-bold tracking-tight">Architecture review — @warpgogol/check-core</h1>
+        <h1 class="text-3xl font-bold tracking-tight">
+          Architecture review — @warpgogol/check-core
+        </h1>
         <div class="flex items-center gap-4 text-sm text-slate-500">
           <span>2026-07-14</span>
           <span>·</span>
           <span>warpgogol monorepo</span>
         </div>
         <div class="flex items-center gap-6 text-xs text-slate-400">
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span
+          >
         </div>
       </header>
 
       <section id="candidates" class="space-y-10">
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Extract findWorkspaceRoot into a dedicated FS-aware module</h2>
+          <h2 class="text-xl font-semibold">
+            Extract findWorkspaceRoot into a dedicated FS-aware module
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5"
+              >Strong</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/check-core/src/run-paths.ts:39-48</div>
@@ -73,8 +99,17 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>findWorkspaceRoot</code> does FS I/O via <code>node:fs</code> and <code>process.cwd()</code> inside a package whose stated purpose is schemas and pure logic.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Move <code>findWorkspaceRoot</code> into a separate <code>workspace-resolver.ts</code> module (or into <code>check-runner-node</code>), keeping <code>run-paths.ts</code> as pure posix path construction.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>findWorkspaceRoot</code> does
+              FS I/O via <code>node:fs</code> and <code>process.cwd()</code> inside a package whose
+              stated purpose is schemas and pure logic.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Move
+              <code>findWorkspaceRoot</code> into a separate
+              <code>workspace-resolver.ts</code> module (or into <code>check-runner-node</code>),
+              keeping <code>run-paths.ts</code> as pure posix path construction.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> FS concerns concentrate in one module</li>
@@ -86,8 +121,14 @@
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
           <h2 class="text-xl font-semibold">Deepen diagnostic collectors behind a rule registry</h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5"
+              >Worth exploring</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/check-core/src/diagnostics.ts:30-144</div>
@@ -96,31 +137,46 @@
             <div>
               <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
               <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
-                <div class="text-xs text-slate-500">5 shallow collector functions, each iterating pages independently</div>
+                <div class="text-xs text-slate-500">
+                  5 shallow collector functions, each iterating pages independently
+                </div>
                 <div class="flex flex-col gap-1 text-xs">
                   <div class="rounded border border-slate-200 px-2 py-1">collectTechnical</div>
                   <div class="rounded border border-slate-200 px-2 py-1">collectLocalization</div>
                   <div class="rounded border border-slate-200 px-2 py-1">collectAccessibility</div>
                   <div class="rounded border border-slate-200 px-2 py-1">collectContentSurface</div>
-                  <div class="rounded border border-slate-200 px-2 py-1">collectDeterministic (concat)</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">
+                    collectDeterministic (concat)
+                  </div>
                 </div>
               </div>
             </div>
             <div>
               <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
               <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
-                <div class="text-xs text-slate-500">One registry, one pass, rules declare their own checks</div>
+                <div class="text-xs text-slate-500">
+                  One registry, one pass, rules declare their own checks
+                </div>
                 <div class="rounded deep text-slate-100 px-3 py-2 text-xs">
-                  DiagnosticRuleRegistry<br/>
-                  <span class="text-slate-400">→ rules: DiagnosticRule[]</span><br/>
+                  DiagnosticRuleRegistry<br />
+                  <span class="text-slate-400">→ rules: DiagnosticRule[]</span><br />
                   <span class="text-slate-400">→ collect(graph): Diagnostic[]</span>
                 </div>
               </div>
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> Five collector functions each iterate the evidence graph independently — adding a rule means editing a function, and the graph is traversed N times.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Introduce a <code>DiagnosticRule</code> interface and a registry; <code>collectDeterministicDiagnostics</code> becomes a single-pass dispatcher over registered rules.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> Five collector functions each iterate
+              the evidence graph independently — adding a rule means editing a function, and the
+              graph is traversed N times.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Introduce a
+              <code>DiagnosticRule</code> interface and a registry;
+              <code>collectDeterministicDiagnostics</code> becomes a single-pass dispatcher over
+              registered rules.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> each rule lives in its own module</li>
@@ -132,7 +188,11 @@
 
       <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
         <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
-        <p class="text-sm text-slate-300">Extract <code>findWorkspaceRoot</code> — it is the clearest seam violation: FS I/O inside a schema-and-logic package. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+        <p class="text-sm text-slate-300">
+          Extract <code>findWorkspaceRoot</code> — it is the clearest seam violation: FS I/O inside
+          a schema-and-logic package.
+          <a href="#" class="text-emerald-400 underline">Jump to card →</a>
+        </p>
       </section>
     </main>
   </body>

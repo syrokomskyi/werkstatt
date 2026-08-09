@@ -27,6 +27,7 @@ No issues. All required sections contain real content. Decision is present-tense
 **Finding B-1: DNA-60 referenced in body but absent from `satisfies[]` and from the DNA registry.**
 
 The RFC body (line 108) states: "DNA-60 (proposed by this series): this RFC is the 'audited promotion' clause." However:
+
 - `satisfies: []` is empty in the frontmatter.
 - `docs/architecture-dna.md` has no DNA-60 entry (last entry is DNA-59, line 251).
 
@@ -37,6 +38,7 @@ RFC-0660 (line 112) says: "The implementing change adds DNA-60 to `docs/architec
 **Finding C-1: `forge.create` sync mechanism for the shared layer is unspecified.**
 
 The RFC (line 114) states: "synced by `forge.create` to `.agents/skills/shared-knowledge/learned-principles.md` for npm consumers." The shared layer lives at `packages/forge/skills/shared/knowledge/learned-principles.md` — a non-skill directory (no `SKILL.md`). `forge.create` currently syncs skill directories (each containing a `SKILL.md`). The RFC does not explain how `forge.create` will discover and sync a knowledge-only file outside a skill directory. Two possibilities:
+
 1. `forge.create` already syncs all files under `packages/forge/skills/` recursively — in which case no change to `forge.create` is needed and it should not be listed in `commands.changed`.
 2. `forge.create` needs new logic to sync non-skill knowledge files — in which case the RFC should describe the change.
 

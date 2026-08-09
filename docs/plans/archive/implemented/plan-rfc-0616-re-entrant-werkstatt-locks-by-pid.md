@@ -168,7 +168,7 @@ None — the lock schema and handler implementation are already applied (commit 
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent confusion — agents assume acquireLock always throws on existing lock | Step 1 adds AGENTS.md rule documenting re-entrant behavior |
 | Unbalanced release — crash leaves depth > 1 | Not mitigated by this plan; stale detection handles it (RFC documents this) |
 | Concurrent re-entrant acquisition race | Not mitigated; pipeline phases run sequentially (RFC documents this) |

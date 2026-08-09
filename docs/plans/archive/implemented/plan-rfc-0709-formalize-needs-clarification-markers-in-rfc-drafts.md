@@ -173,12 +173,15 @@ No `AGENTS.md` or `docs/*.xml` updates needed — this RFC extends validation ru
 **Agent actions:**
 
 - **`fo-idea-create-rfc/SKILL.md`** — in step 5 (Fill every section), add after the bullet list:
+
   > When a section cannot be filled with confidence, insert `> NEEDS CLARIFICATION: <question>` instead of guessing. Do not leave sections empty or fill them with speculative content. Markers are resolved during the enhance step.
 
 - **`fo-idea-audit/SKILL.md`** — in axis E (Agent-facing policy), add a new check item:
+
   > **NEEDS CLARIFICATION markers**: List all unresolved `NEEDS CLARIFICATION` markers with line numbers. If none are found, state "No unresolved markers." Markers in `draft` status are informational; markers in `reviewing`+ status are a blocking finding.
 
 - **`fo-idea-enhance/SKILL.md`** — in step 4 (Classify findings), add a new category after "Out of scope":
+
   > **NC (Needs Clarification)** — Unresolved `NEEDS CLARIFICATION` markers in the RFC body. Resolution: ask the operator the question, replace the marker line with the operator's answer in the RFC body. If the operator defers, the marker remains and the RFC cannot transition to `reviewing`.
 
 - Sync all three skills from `packages/forge/skills/` to `.agents/skills/` (copy identical content)

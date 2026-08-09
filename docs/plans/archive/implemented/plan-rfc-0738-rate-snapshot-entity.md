@@ -236,7 +236,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Snapshot proliferation (~365/year per pair) | Out of scope — RFC-0744 handles pruning. This RFC only defines the entity. |
 | Digest algorithm portability | Step 2 uses `@warpgogol/fingerprint` (`byteHash`) which wraps SHA-256. The `algorithm` field allows future changes. Step 5 tests digest stability. |
 

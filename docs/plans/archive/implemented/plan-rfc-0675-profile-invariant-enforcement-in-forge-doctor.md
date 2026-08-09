@@ -93,12 +93,12 @@ Upgrade `forge.doctor`'s `domain-invariants` check from advisory-only to active 
 
 ## Validation suite
 
-| Check | Command | Expected |
-| --- | --- | --- |
-| TypeScript | `pnpm --filter @warpgogol/forge run build:check` | Pass |
-| Unit tests | `pnpm --filter @warpgogol/forge run test` | All pass |
-| RFC validation | `rfc.validate --id RFC-0675` | 0 violations |
-| Profile validation | `forge.profile.validate --id editframe-html` | Valid |
+| Check              | Command                                          | Expected     |
+| ------------------ | ------------------------------------------------ | ------------ |
+| TypeScript         | `pnpm --filter @warpgogol/forge run build:check` | Pass         |
+| Unit tests         | `pnpm --filter @warpgogol/forge run test`        | All pass     |
+| RFC validation     | `rfc.validate --id RFC-0675`                     | 0 violations |
+| Profile validation | `forge.profile.validate --id editframe-html`     | Valid        |
 
 ## Risks
 

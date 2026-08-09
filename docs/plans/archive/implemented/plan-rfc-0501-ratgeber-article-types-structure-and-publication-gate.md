@@ -282,7 +282,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Existing articles fail the gate | Step 5: migrator sets existing articles to `review-required` before the gate is enforced |
 | Section heading false positives | Step 1: heading matching is trimmed and documented; Step 6: test cases cover edge cases |
 | Type-specific detection heuristics too strict | Step 1: detection rules use explicit regex patterns; Step 6: positive and negative test cases per type |

@@ -90,4 +90,4 @@ uniqueFindings: 4
 
 Route through `fo-idea-enhance` to fix D1 (contradiction), A1+Q2 (commands.changed + test step), A2 (amendedBy rollout step), S1 (not-a-regression note), and P1 (quantify risk).
 
-*No findings does not mean no issues — it means no issues were found from these five perspectives.*
+_No findings does not mean no issues — it means no issues were found from these five perspectives._

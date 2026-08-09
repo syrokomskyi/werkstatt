@@ -242,7 +242,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Migration risk: existing repos use `master` | Step 7 validation will catch violations; operator must rename branches before `sternsystem.validate` passes |
 | Agent misinterpretation: agents may rename branches automatically | Step 6 AGENTS.md rule explicitly states agents MUST NOT rename branches |
 | False positive rate: low | `branch-convention` rule only checks repos with `.git` directory and resolvable HEAD — skip conditions match existing `checkBundleContract` pattern |

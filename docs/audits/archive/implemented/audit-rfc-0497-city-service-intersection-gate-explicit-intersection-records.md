@@ -35,6 +35,7 @@ The RFC addresses a real and well-identified problem (Cartesian depth-5 generati
 The **Decision** section contains substantive content but is structured as a specification, not as a single present-tense decision statement. The **Implementation plan** section lists 8 steps but is not a substitute for the Design section (which requires CLI surface, TypeScript contracts, file system responsibilities, output format, and failure modes).
 
 **Acceptance criteria** exist (8 items) but:
+
 - Some are not agent-checkable without runtime probing: "Old URLs for non-existent intersections return 301 or 410, never 200" requires live HTTP probing, which the ecosystem does not do (RFC-0495 explicitly rejected runtime HTTP probing).
 - "No new city×service pages are generated automatically without an explicit intersection record" is checkable via `surface.generate` output inspection.
 

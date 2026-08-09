@@ -21,6 +21,7 @@ Pass — 0 violations.
 ## Axis A — Structural completeness
 
 **Finding A-1: nonGoals have incorrect RFC cross-references.** The nonGoals section at line 65-67 states:
+
 - "Determinism verification (deferred to RFC-0677)" — should be **RFC-0678** (RFC-0677 is artifact validation, not determinism).
 - "Asset management (deferred to RFC-0678)" — should be **RFC-0679** (RFC-0678 is determinism, not asset management).
 - "Release lifecycle (deferred to RFC-0679)" — should be **RFC-0680** (RFC-0679 is asset management, not release lifecycle).

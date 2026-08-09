@@ -33,7 +33,8 @@ No issues. Шаблон следует паттерну `dynamic-status-block`: 
 
 ### Axis B — DNA alignment
 
-No issues. 
+No issues.
+
 - DNA-5 (Mirror Quintet): `.astro` + `.manifest.yaml` + `.types.generated.ts` + `.css` + `.story.md` — все файлы присутствуют.
 - DNA-6 (kebab-case): все имена файлов в kebab-case.
 - DNA-10 (no hardcoded tokens): CSS использует только `--ds-*`.
@@ -42,7 +43,8 @@ No issues.
 
 ### Axis C — Ecosystem fit
 
-No issues. 
+No issues.
+
 - Границы пакетов: `ontology` → `ui`, корректный поток.
 - `archetype.registry.build` выполнен — `index.yaml` и `index.json` регенерированы.
 - `section.scaffold` использован (не ручное копирование).
@@ -60,6 +62,7 @@ No issues. Чистое добавление, без удаления, без с
 `@/home/syrokomskyi/projects/warpgogol/werkstatt/packages/ui/src/sections/service-metadata-block/service-metadata-block-section.astro:54-68`
 
 Шаблон хардкодит структурные метки на английском:
+
 ```astro
 <dt class="service-metadata-block__meta-label">Version</dt>
 <dt class="service-metadata-block__meta-label">Effective date</dt>
@@ -71,6 +74,7 @@ No issues. Чистое добавление, без удаления, без с
 Секция shared — используется на сайтах с разными языками (de, uk). Метки пользовательски видимые. Платформа передаёт `lang` проп через `SectionProps`, но он не используется для локализации меток.
 
 Варианты исправления:
+
 1. Локализация через `lang` проп (lookup-таблица `de`/`uk` меток)
 2. Опциональные пропсы для меток (`versionLabel?`, `effectiveDateLabel?`, `nextReviewDateLabel?`)
 3. Убрать метки совсем (рендерить только значения)
@@ -81,7 +85,8 @@ No issues. Минимальное изменение: один архетип YA
 
 ### Axis G — Blind spots
 
-No issues. 
+No issues.
+
 - Edge case "all fields absent" обрабатывается: условные рендеры `{props.version && ...}` — если все поля отсутствуют, секция рендерит пустой muted блок (как указано в RFC Failure modes).
 - Edge case "links absent or empty" обрабатляется: `{props.links && props.links.length > 0 && ...}`.
 - Нет performance-концернов (статический SSG).

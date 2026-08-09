@@ -202,7 +202,7 @@ No AGENTS.md changes needed — the block-declarative pattern is already documen
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Empty Nachweisregister page | Step 2/3: CTA links to `/nachweise/` which has RFC-0708 empty-state design — no mitigation needed, by design |
 | Projection staleness | Step 2/3: text is generic enough to remain valid across concept evolution |
 | CTA link breakage if entitlement removed | Step 4: `page.block.validate` confirms block structure; entitlement removal is out of scope |

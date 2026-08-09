@@ -58,8 +58,7 @@ No issues. Skill аддитивен, не удаляет и не заменяе�
 
 - **E2 (строки 276–277):** Implementation notes содержат два правила:
   - «Agents MUST install editframe skills from the official source» — OK.
-  - «Agents MUST NOT skip the discovery step» — OK.
-  Но отсутствует правило о порядке: skill должен быть вызван ДО создания проекта (он является onboarding-скиллом). Это не блокирующее.
+  - «Agents MUST NOT skip the discovery step» — OK. Но отсутствует правило о порядке: skill должен быть вызван ДО создания проекта (он является onboarding-скиллом). Это не блокирующее.
 
 ## Axis F — Pragmatism
 

@@ -17,10 +17,10 @@
 
 ## Mechanical floor
 
-| Check | Result |
-| --- | --- |
-| `tsc --noEmit` (site-kernel-handoff) | ✓ pass |
-| `tsc --noEmit` (share) | ✓ pass |
+| Check                                          | Result       |
+| ---------------------------------------------- | ------------ |
+| `tsc --noEmit` (site-kernel-handoff)           | ✓ pass       |
+| `tsc --noEmit` (share)                         | ✓ pass       |
 | `vitest run` (nachweis-commands + nachweis-n3) | ✓ 48/48 pass |
 
 ## Axis A — Structural correctness
@@ -36,11 +36,11 @@
 
 ## Axis B — DNA alignment
 
-| Invariant | Result |
-| --- | --- |
-| DNA-6 (kebab-case filenames) | ✓ N/A — no filename changes |
-| DNA-53 (stableJsonHash for hashing) | ✓ N/A — no hashing changes |
-| No relevant DNA invariants touch this diff | ✓ pass |
+| Invariant                                  | Result                      |
+| ------------------------------------------ | --------------------------- |
+| DNA-6 (kebab-case filenames)               | ✓ N/A — no filename changes |
+| DNA-53 (stableJsonHash for hashing)        | ✓ N/A — no hashing changes  |
+| No relevant DNA invariants touch this diff | ✓ pass                      |
 
 ## Axis C — Ecosystem fit
 
@@ -53,11 +53,11 @@
 
 ## Axis D — Forward-only discipline
 
-| Item | Result |
-| --- | --- |
+| Item                             | Result                                                    |
+| -------------------------------- | --------------------------------------------------------- |
 | No backward compatibility layers | ✓ pass — `JSON.parse` is replaced, not kept behind a flag |
-| No dual-path | ✓ pass — single YAML parse path |
-| No deprecated fallback | ✓ pass |
+| No dual-path                     | ✓ pass — single YAML parse path                           |
+| No deprecated fallback           | ✓ pass                                                    |
 
 ## Axis E — RFC contract alignment
 

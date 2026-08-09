@@ -209,7 +209,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Wrong commit auto-detected (earlier doc/plan commit references RFC ID) | Step 1 uses `--no-merges` and `--fixed-strings`; Step 3 tests verify the correct commit is picked when only one matches; RFC-IMP-03 reachability check still applies |
 | Multiple commits found | Step 2 handles via RFC-IMP-03 violation listing candidates; Step 3 tests verify the error path |
 | Auto-detect vs RFC-IMP-03 asymmetry (file-name-only refs) | Documented in RFC-0756 Failure modes section; auto-detect is convenience, not replacement for explicit flag |

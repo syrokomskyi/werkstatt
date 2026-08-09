@@ -173,7 +173,7 @@ No configuration or data changes. The `GENERATOR_OWNERSHIP_MAP` entry for `build
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent misinterpretation — agents adding new conditional entries may not realize conditional entries cover files on disk | Step 1 adds the rule to AGENTS.md; docstring on `OwnershipEntry.conditional` already references RFC-0636 |
 | No automated cross-validator consistency check | Step 2 verifies the regression test is in place; the test prevents reintroduction of the skip in `generated.stale.validate` |
 | False negatives in stale detection from overly broad conditional paths | Not introduced by this RFC — same risk exists for non-conditional entries. No mitigation needed. |

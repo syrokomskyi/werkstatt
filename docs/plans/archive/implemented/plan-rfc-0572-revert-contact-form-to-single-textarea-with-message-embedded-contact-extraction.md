@@ -340,7 +340,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Regex fragility — false positives from permissive `PHONE_EXTRACT_REGEX` | Step 4 adds `contactRequirementMessage` hint so visitor can verify before submit; Step 5 server-side extraction is the same pattern |
 | Data quality — trailing punctuation in extracted values | Step 5 `extractContact()` trims extracted values before placing into `IntegrationEvent.contact` |
 | Migrator failure on edge-case configurations | Step 8 migrator is idempotent and only touches `emailField`/`phoneField`/`contactRequirementMessage`; PBT test verifies idempotency |

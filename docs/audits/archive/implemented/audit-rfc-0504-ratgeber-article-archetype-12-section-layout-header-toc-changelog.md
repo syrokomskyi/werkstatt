@@ -102,8 +102,7 @@ No issues. The RFC is forward-only:
 
 3. **RG-ART-07 false positives.** The rule checks `^# ` lines in prose body. This could false-positive on:
    - Markdown comments (`# comment` inside HTML comment blocks)
-   - Code blocks (fenced ``` blocks containing `# ` lines — e.g., shell commands)
-   The RFC should specify that the check skips fenced code blocks and HTML comments.
+   - Code blocks (fenced ``` blocks containing `# ` lines — e.g., shell commands) The RFC should specify that the check skips fenced code blocks and HTML comments.
 
 4. **H1 stripping migrator risk.** The migrator converts unique H1 headings to H2. If the prose body already has an H2 with the same text, this creates a duplicate H2 heading. The RFC should specify how to handle this (e.g., skip conversion if an H2 with the same text already exists, or append a suffix).
 

@@ -190,7 +190,7 @@ Before starting the fix workflow, check the working tree for foreign uncommitted
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent non-compliance — soft guard depends on agent discipline | Step 1 puts the rule in AGENTS.md as NON-NEGOTIABLE; fo-review checks session commits for foreign file contamination |
 | False sense of safety — operators may assume full contamination prevention | Step 1 rule text is explicit about what the agent MUST and MUST NOT do |
 | Skill drift — pre-flight step lost if SKILL.md is regenerated | Step 1 AGENTS.md rule is the primary enforcement surface; skill steps are reinforcing |

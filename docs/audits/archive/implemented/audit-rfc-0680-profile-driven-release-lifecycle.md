@@ -19,6 +19,7 @@ The RFC fills a clear gap (no release lifecycle for non-site projects) and fits 
 ### A-1 (Major): R2/S3 client attribution is wrong
 
 The RFC (line 211) says "upload files to R2 using `@warpgogol/fingerprint` R2 client". `@warpgogol/fingerprint` is a hashing package — it has no R2 client. The R2 upload logic needs to either:
+
 - Use the Cloudflare R2 REST API directly via `fetch`
 - Use `@aws-sdk/client-s3` (R2 is S3-compatible)
 - Use the existing R2 upload code from `packages/os/site-kernel-integrity` if it exists
@@ -28,6 +29,7 @@ The RFC (line 211) says "upload files to R2 using `@warpgogol/fingerprint` R2 cl
 ### A-2 (Major): `version` field in manifest is unsourced
 
 The `ReleaseManifest` interface has a `version: string` field, but the profile schema has no `version` field. Where does the version come from? Options:
+
 - From `package.json` `version` field
 - From a new `release.version` profile field
 - From a `--version` CLI flag
@@ -54,7 +56,7 @@ The RFC (line 199) says "Run `forge.validate.artifacts` (RFC-0677)". The actual 
 
 ### A-6 (Minor): `includeArtifacts` semantics unclear
 
-`includeArtifacts` is `z.array(z.string()).optional()`. The algorithm says "or all artifacts if not declared". What are "all artifacts"? All artifacts with `produce` commands? All artifacts with `determinism`? 
+`includeArtifacts` is `z.array(z.string()).optional()`. The algorithm says "or all artifacts if not declared". What are "all artifacts"? All artifacts with `produce` commands? All artifacts with `determinism`?
 
 **Recommendation:** Clarify: "When `includeArtifacts` is omitted, all artifacts with `produce.output` declared are included. When present, only artifacts whose `id` matches an entry in `includeArtifacts` are included."
 

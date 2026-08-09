@@ -21,11 +21,14 @@ Pass — zero violations.
 ## Axis A — Structural completeness
 
 1. **Post-generation check logic is incorrect.** The RFC proposes:
+
    ```ts
    const generatedBlueprintIds = new Set(surfaces.map((s) => s.surfaceId));
    const missingBlueprints = blueprints.filter((bp) => !generatedBlueprintIds.has(bp.id));
    ```
+
    But in `generate.ts:152`, `surfaces.push(countFor(blueprint.id, entries))` runs for **every** blueprint in the loop, regardless of whether `entries` is empty. `countFor` (`shared.ts:200`) always returns `{ surfaceId, generated: entries.length, ... }` — `surfaceId` is always set to `blueprint.id`. Therefore `generatedBlueprintIds` will always contain every blueprint ID, and `missingBlueprints` will always be `[]`. **The check will never fire.** The correct approach is to check `s.generated === 0`:
+
    ```ts
    const emptyBlueprints = surfaces.filter((s) => s.generated === 0);
    if (emptyBlueprints.length > 0) { ... }

@@ -209,7 +209,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | False positives for short ruleIds | Step 1 uses `includes` per RFC decision; ruleIds use dotted names making accidental matches unlikely |
 | Agent confusion | Step 1 includes `fixHint` in the diagnostic message explaining the issue |
 

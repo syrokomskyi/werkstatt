@@ -260,7 +260,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Dev middleware performance (~1-5ms + ~1ms config load) | Step 1 uses try/catch and per-request config loading; Step 6 verifies dev parity without measuring performance (dev render times are 100-500ms, overhead is noise) |
 | Dev/prod drift | Step 1 reuses `normalizeHtml()` from the same module; Step 6 verifies both dev and dist output match |
 | `smartypants: false` changes dev rendering | Step 4 gates it by `isAstroDev` (dev-only); Step 6 confirms production keeps default behavior |

@@ -146,7 +146,7 @@ None.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Wildcard over-matching risk | Step 2 tests verify `/agb` does NOT match `/de/*` — non-matching is preserved |
 | Existing test breakage | Step 2 explicitly updates the test asserting old behavior |
 | Snapshot diff noise | Not a code risk — operators review snapshot diffs at release time |

@@ -18,6 +18,7 @@ The RFC addresses real operational gaps with a well-structured incident report a
 ## Mechanical validation (rfc.validate)
 
 Pass with 2 warnings:
+
 - **V-13:** Missing required section "## Implementation notes for agents"
 - **V-19:** RFC-0522.amends includes RFC-0480, but RFC-0480.amendedBy does not include RFC-0522
 

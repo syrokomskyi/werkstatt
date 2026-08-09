@@ -17,6 +17,7 @@ The RFC correctly identifies the presentation duplication problem and proposes a
 ## Mechanical validation (rfc.validate)
 
 Pass with 1 warning:
+
 - **V-12 (warning)**: `RFC-0730.supersedes` includes `RFC-0482`, but `RFC-0482.supersededBy` is empty (expected `RFC-0730`). This will be resolved when RFC-0730 is accepted — the `supersededBy` field on RFC-0482 must be set to `RFC-0730` during the transition.
 
 ## Axis A — Structural completeness
@@ -51,11 +52,14 @@ Pass with 1 warning:
 2. **`presentation` remains in `offeringSchema` — contradicts the goal.** The RFC says "The `offeringSchema` field remains in the Zod schema as `z.record(z.string(), z.unknown()).optional()` for backward compatibility with non-offering entities that still use it" (line 88). But non-offering entities (legal-identity, web-presence, public-document, business) have their own schemas — keeping `presentation` in `offeringSchema` does not provide backward compatibility for them. It only means offerings can still include `presentation`. The RFC should remove `presentation` from `offeringSchema` entirely. The other entity schemas already have their own `presentation` fields.
 
 3. **Content reference syntax in structured props is incorrect.** The RFC's example (lines 137–140) shows:
+
    ```yaml
    monthly:
      amount: business-profile.offerings/digital-foundation.pricing.charges.monthlySubscription.amount.value
    ```
+
    This is a bare path string, not a content reference. Content references use `=(...)` formula syntax or `{collection.file.field}` brace syntax. The bare path would be interpreted as a literal string. The example should use:
+
    ```yaml
    monthly:
      amount: =(business-profile.offerings/digital-foundation.pricing.charges.monthlySubscription.amount.value)

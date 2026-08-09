@@ -17,6 +17,7 @@ The RFC describes three code fixes (parser null handling, MDMETA-02, MDMETA-04) 
 ## Mechanical validation (rfc.validate)
 
 Pass with 1 warning:
+
 - **V-19** (warning): `RFC-0613.amends` includes RFC-0320, but RFC-0320.amendedBy does not include RFC-0613. The implementation must add RFC-0613 to RFC-0320's `amendedBy` list (RFC-0320 already has `amendedBy: [RFC-0377]`, so the field is editable on archived RFCs).
 
 ## Axis A — Structural completeness
@@ -24,8 +25,7 @@ Pass with 1 warning:
 - **Context/Problem inaccuracy**: The Context states "page.markdown.validate reported MDMETA-04 errors for all generated markdown twins" and the Problem section says "Two bugs prevent mission.validate from passing." However, all three described fixes are already applied in the code:
   - `parseMarkdownTwinFrontmatter` null handling: `packages/share/src/semantic/markdown-twin-provenance.ts:224` — `frontmatter[key] = stripped === "null" ? null : stripped;` (already present)
   - MDMETA-02 exclusion: `packages/os/site-kernel-checks/src/page-markdown.ts:560` — `frontmatter[field] == null && field !== "lastModified"` (already present)
-  - MDMETA-04 null acceptance: `packages/os/site-kernel-checks/src/page-markdown.ts:572-577` — `lastModified != null && typeof lastModified === "string"` guard (already present)
-  The RFC should acknowledge that the code fixes were applied during RFC-0602 implementation and reframe itself as: (1) formally amending RFC-0320 to accept `null`, and (2) adding regression tests to prevent future reversal.
+  - MDMETA-04 null acceptance: `packages/os/site-kernel-checks/src/page-markdown.ts:572-577` — `lastModified != null && typeof lastModified === "string"` guard (already present) The RFC should acknowledge that the code fixes were applied during RFC-0602 implementation and reframe itself as: (1) formally amending RFC-0320 to accept `null`, and (2) adding regression tests to prevent future reversal.
 
 - **TypeScript contract mismatch**: The RFC proposes a `MarkdownTwinFrontmatter` interface with `lastModified: string | null` and `[key: string]: string | null`. This interface does not exist in the code. The actual return type of `parseMarkdownTwinFrontmatter` is `Record<string, unknown>`. The proposed interface is unnecessary — the actual type already handles null correctly. This section should describe the actual types (`MarkdownTwinProvenance.lastModified: string | null` and `parseMarkdownTwinFrontmatter` return type `Record<string, unknown>` with null values).
 

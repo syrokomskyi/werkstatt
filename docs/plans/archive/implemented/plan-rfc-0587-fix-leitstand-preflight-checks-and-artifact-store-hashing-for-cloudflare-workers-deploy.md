@@ -299,7 +299,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | tar.gz archive disk space | Step 4 creates one archive per `put`; `artifact.store.gc` handles retention by age (existing command, no changes needed) |
 | Idempotent put data loss | Step 5 operates within the existing `release:${releaseId}` lock scope (DNA-51); concurrent puts for the same release are already serialized |
 | Adapter limits maintenance | Step 2 declares limits in one place (`getLimits()` per adapter); updating Cloudflare limits requires changing only `cloudflare-workers.ts` |

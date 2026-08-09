@@ -194,7 +194,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Implicit loading magic | Step 2 derives collection name from provider name (`geo.cities` → `cities`), documented in code comments and this plan |
 | Slug mismatch between geo and content | Step 2 silently skips non-matching slugs; doorway-risk report (existing) flags missing fields — no new mitigation needed |
 | Content authoring burden | Out of scope for implementation — operator authors city records incrementally |

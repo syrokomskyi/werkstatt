@@ -278,7 +278,7 @@ scope:
 | --- | --- |
 | Skill drift (source vs `.agents/skills/`) | Step 2 commits both files together; `forge.doctor` detects drift |
 | Editframe skills installation failure | Step 1 skill body includes fallback to online documentation |
-| Two sources of skills confusion | Step 4 template "Skills" section clearly distinguishes forge skills (ef-*) from Editframe skills (editframe-*) |
+| Two sources of skills confusion | Step 4 template "Skills" section clearly distinguishes forge skills (ef-_) from Editframe skills (editframe-_) |
 | React template gap | Step 1 skill body explicitly states profile targets HTML only; React requires manual install |
 
 ## 6. Escalation triggers

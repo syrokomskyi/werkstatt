@@ -142,7 +142,7 @@ None — no YAML/JSON/NDJSON changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Invariant proliferation | Step 1 verifies DNA-58 is a natural extension, no overlap |
 | Dependency chain (RFC-0601 depends on RFC-0607) | Step 2 verifies RFC-0601 satisfies field |
 | Agent confusion (DNA-58 vs DNA-18) | Step 1 verifies text explicitly states DNA-18 remains unchanged |

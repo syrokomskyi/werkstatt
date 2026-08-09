@@ -35,11 +35,9 @@ Pass — `build:check` and `test` (181 tests, 22 files) all green.
 
 ### Axis A — Structural correctness
 
-**Finding A-1 (minor): Dead import in `handlers.ts`.**
-`GENOME_LOG_FILENAME` is imported from `./genome-log.ts` at `handlers.ts:35` but never referenced in the handler code. The handlers use `appendGenomeEntry` and `readGenomeLog` which internally use the constant. Remove the unused import.
+**Finding A-1 (minor): Dead import in `handlers.ts`.** `GENOME_LOG_FILENAME` is imported from `./genome-log.ts` at `handlers.ts:35` but never referenced in the handler code. The handlers use `appendGenomeEntry` and `readGenomeLog` which internally use the constant. Remove the unused import.
 
-**Finding A-2 (minor): Redundant dynamic imports in `swim-module.ts`.**
-`swim-module.ts:24-27` performs four separate `await import("./handlers.ts")` calls — one per handler. A single `const handlers = await import("./handlers.ts")` would suffice. The gitmesh module (`gitmesh-module.ts:24-27`) has the same pattern, so this is consistent with the codebase, but it's still a smell.
+**Finding A-2 (minor): Redundant dynamic imports in `swim-module.ts`.** `swim-module.ts:24-27` performs four separate `await import("./handlers.ts")` calls — one per handler. A single `const handlers = await import("./handlers.ts")` would suffice. The gitmesh module (`gitmesh-module.ts:24-27`) has the same pattern, so this is consistent with the codebase, but it's still a smell.
 
 ### Axis B — DNA alignment
 
@@ -73,19 +71,15 @@ No issues.
 
 ### Axis F — Pragmatism
 
-**Finding F-1 (observation): `SwimMembersResult` duplicates `SwimMembershipView` shape.**
-`handlers.ts:293-300` defines `SwimMembersResult` with the same fields as `SwimMembershipView` plus `diagnostics`. Could use `SwimMembershipView & { diagnostics?: string[] }`. However, this keeps the result type independent of the domain type, which is a valid design choice.
+**Finding F-1 (observation): `SwimMembersResult` duplicates `SwimMembershipView` shape.** `handlers.ts:293-300` defines `SwimMembersResult` with the same fields as `SwimMembershipView` plus `diagnostics`. Could use `SwimMembershipView & { diagnostics?: string[] }`. However, this keeps the result type independent of the domain type, which is a valid design choice.
 
-**Finding F-2 (observation): UDP probe instead of SWIM protocol.**
-The `probeSeedNode` function (`handlers.ts:71-99`) sends a random UDP packet and waits for any response. This is a liveness check, not a SWIM protocol probe. This is justified — the `swim` npm package's native dependencies (`farmhash`, `msgpack`) failed to compile, and the plan's escalation trigger covers this case. The ephemeral per-command lifecycle (Phase 1) doesn't need real gossip. This should be documented in the handler's MODULE_CONTRACT as a known limitation.
+**Finding F-2 (observation): UDP probe instead of SWIM protocol.** The `probeSeedNode` function (`handlers.ts:71-99`) sends a random UDP packet and waits for any response. This is a liveness check, not a SWIM protocol probe. This is justified — the `swim` npm package's native dependencies (`farmhash`, `msgpack`) failed to compile, and the plan's escalation trigger covers this case. The ephemeral per-command lifecycle (Phase 1) doesn't need real gossip. This should be documented in the handler's MODULE_CONTRACT as a known limitation.
 
 ### Axis G — Blind spots
 
-**Finding G-1 (observation): `readGenomeLog` reads entire file into memory.**
-`genome-log.ts:73-93` reads the entire `werkstatt.genome.log` file into memory and splits by newline. For a 10MB+ log, this could be ~10MB in memory. The 10MB threshold warning is already implemented in `getGenomeLogSize` and `isGenomeLogSizeWarning`. For Phase 1 with a small number of workshops, this is acceptable. A streaming reader could be added in a future RFC if scale demands it.
+**Finding G-1 (observation): `readGenomeLog` reads entire file into memory.** `genome-log.ts:73-93` reads the entire `werkstatt.genome.log` file into memory and splits by newline. For a 10MB+ log, this could be ~10MB in memory. The 10MB threshold warning is already implemented in `getGenomeLogSize` and `isGenomeLogSizeWarning`. For Phase 1 with a small number of workshops, this is acceptable. A streaming reader could be added in a future RFC if scale demands it.
 
-**Finding G-2 (observation): `deriveMembershipView` returns empty `endpoint` and `operatorVC`.**
-`genome-log.ts:122-127` creates `SwimMember` objects with empty `endpoint` and `operatorVC` fields. The genome log entries don't store these — they come from SWIM membership metadata during gossip. Since the ephemeral implementation doesn't run real SWIM gossip, these fields remain empty. This is a known limitation of the Phase 1 approach.
+**Finding G-2 (observation): `deriveMembershipView` returns empty `endpoint` and `operatorVC`.** `genome-log.ts:122-127` creates `SwimMember` objects with empty `endpoint` and `operatorVC` fields. The genome log entries don't store these — they come from SWIM membership metadata during gossip. Since the ephemeral implementation doesn't run real SWIM gossip, these fields remain empty. This is a known limitation of the Phase 1 approach.
 
 ### Spec compliance
 

@@ -51,11 +51,13 @@ No issues. `MODULE_CONTRACT` and `CHANGE_SUMMARY` scaffolding updated in `prose-
 ### Axis G — Blind spots
 
 - **CSS `display: block` breaks inline rendering in prose.** `markdown-section.astro:17` imports `currency-aware-price-display-component.css`, which sets `display: block` on `.currency-aware-price-display`, `.currency-aware-price-display__variant`, and `.currency-aware-price-display__amount` (lines 14, 18, 30). In prose context, price markers appear inline inside `<p>` elements (e.g. "The price is {price:main:monthly} per month"). With `display: block`, the `<span>` elements will force line breaks, producing:
+
   ```
   The price is
   [price display]
   per month.
   ```
+
   instead of inline rendering. The `packages/ui/AGENTS.md` explicitly warns: "Add `display: inline` rules for `.currency-aware-price-display` and its children within the component's colocated CSS to prevent line breaks inside formatted prices." Fix: add CSS overrides in `markdown-section.css` scoped to `.markdown-section__content .currency-aware-price-display` to set `display: inline` on the container, variants, and amounts.
 
 - **Code block regex doesn't match `<code>` with attributes.** `CODE_PRE_SPLIT_RE` at `prose-pipeline.ts:81` matches `<code>` without attributes. Micromark's GFM output for fenced code blocks wraps `<code class="language-ts">` inside `<pre>`, which is matched by the `<pre>` alternative. However, raw HTML `<code class="...">` without a `<pre>` wrapper (possible with `allowDangerousHtml: true`) would not be skipped, and markers inside would be replaced. This is an edge case but could affect prose files that include raw HTML code snippets with price marker syntax.

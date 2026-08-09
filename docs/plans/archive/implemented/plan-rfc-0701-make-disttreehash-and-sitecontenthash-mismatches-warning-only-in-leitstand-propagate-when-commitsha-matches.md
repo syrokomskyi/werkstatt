@@ -169,7 +169,7 @@ No configuration or data changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Silent content drift — `distTreeHash` mismatch could indicate real content differences | Step 2 test case 5 verifies warning message includes both hash values, making drift visible |
 | Agent complacency — agents might ignore warnings | Warning message includes `(commitSha matches)` note and both hash values; test verifies message format |
 | False sense of security — `commitSha` match does not guarantee identical dist | Step 2 test case 4 verifies `commitSha` mismatch still throws (hard error unchanged) |

@@ -214,10 +214,8 @@ scope:
 
 **Agent actions:**
 
-- In `packages/os/site-kernel-checks/AGENTS.md`, add a row for `src/axiom-report.ts` to the "What lives here" table:
-  `| src/axiom-report.ts | RFC-0633 runAxiomReport — reads Axiom evidence JSON (study-run.json, staged-capsule.json, observation-bundle.json, evidence-metadata.json) and writes self-contained HTML triage report to missions/{mission}/evidence/axiom/report.html. Pure renderAxiomReportHtml function with HTML escaping. Supports --dry-run (RFC-0601). Exit 0 on success regardless of finding severity (renderer, not gate). Failure modes: AXIOM-REPORT-01..05. |`
-- In `packages/os/site-kernel-handoff/AGENTS.md`, update the `leitstand.dev-deploy` description to note the `axiom.report` auto-invocation:
-  Add note that `leitstand.dev-deploy` auto-invokes `axiom.report` after `mission.check` (best-effort, non-blocking) per RFC-0633.
+- In `packages/os/site-kernel-checks/AGENTS.md`, add a row for `src/axiom-report.ts` to the "What lives here" table: `| src/axiom-report.ts | RFC-0633 runAxiomReport — reads Axiom evidence JSON (study-run.json, staged-capsule.json, observation-bundle.json, evidence-metadata.json) and writes self-contained HTML triage report to missions/{mission}/evidence/axiom/report.html. Pure renderAxiomReportHtml function with HTML escaping. Supports --dry-run (RFC-0601). Exit 0 on success regardless of finding severity (renderer, not gate). Failure modes: AXIOM-REPORT-01..05. |`
+- In `packages/os/site-kernel-handoff/AGENTS.md`, update the `leitstand.dev-deploy` description to note the `axiom.report` auto-invocation: Add note that `leitstand.dev-deploy` auto-invokes `axiom.report` after `mission.check` (best-effort, non-blocking) per RFC-0633.
 
 **Validation:**
 

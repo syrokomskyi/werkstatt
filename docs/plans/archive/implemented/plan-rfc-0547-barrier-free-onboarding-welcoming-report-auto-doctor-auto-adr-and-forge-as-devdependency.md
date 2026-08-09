@@ -267,7 +267,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Auto-doctor false positives | Step 2: SKILL.md instructs agent to translate doctor results into human language |
 | Auto-ADR content quality | Step 2: SKILL.md instructs agent to ask operator's reason for adopting Forge and include in ADR |
 | Recommendation quality | Step 2: SKILL.md specifies creator-facing recommendations, not technical refactors |

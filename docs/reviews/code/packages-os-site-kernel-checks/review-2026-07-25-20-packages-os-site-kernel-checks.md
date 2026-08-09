@@ -28,7 +28,7 @@ FAIL  detects context-aware prohibited string Gemini inside figcaption
 AssertionError: expected 0 to be greater than 0
 ```
 
-The test encodes the old inverted behavior (flag patterns *inside* credit context). The fix correctly inverts the logic, but the test was not updated.
+The test encodes the old inverted behavior (flag patterns _inside_ credit context). The fix correctly inverts the logic, but the test was not updated.
 
 ### Axis A — Structural correctness
 

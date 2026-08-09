@@ -1,7 +1,7 @@
 # Code Review — Fix Session 2026-08-07
 
-**Scope**: `git diff 3bbaf696...HEAD` (2 commits, 9 files, +732/-94)
-**Commits reviewed**:
+**Scope**: `git diff 3bbaf696...HEAD` (2 commits, 9 files, +732/-94) **Commits reviewed**:
+
 - `366c6e9e` fix(pbp,ui): review fixes for multi-currency pricing session
 - `7498f692` compass: update headers for changed files
 
@@ -9,11 +9,11 @@
 
 ## Mechanical floor
 
-| Package | `build:check` | Tests |
-| --- | --- | --- |
-| `@warpgogol/ui` | PASS | 51/51 PASS |
-| `@warpgogol/pbp` | PASS | 263/263 PASS |
-| `@warpgogol/pbp-rate-adapters` | PASS | — |
+| Package                        | `build:check` | Tests        |
+| ------------------------------ | ------------- | ------------ |
+| `@warpgogol/ui`                | PASS          | 51/51 PASS   |
+| `@warpgogol/pbp`               | PASS          | 263/263 PASS |
+| `@warpgogol/pbp-rate-adapters` | PASS          | —            |
 
 All affected packages pass. No mechanical failures.
 
@@ -167,15 +167,15 @@ The `loadDerivedPrices` function has non-trivial error handling (ENOENT → null
 
 ## Summary
 
-| Axis | Findings |
-| --- | --- |
-| A — Structural | 0 FAIL, 1 WARN (A-1), 6 PASS |
-| B — DNA | 4 PASS |
-| C — Ecosystem | 3 PASS |
-| D — Forward-only | 2 PASS |
-| E — Agent clarity | 4 PASS |
-| F — Pragmatism | 2 PASS |
-| G — Tests | 2 PASS, 1 WARN (G-3) |
+| Axis              | Findings                     |
+| ----------------- | ---------------------------- |
+| A — Structural    | 0 FAIL, 1 WARN (A-1), 6 PASS |
+| B — DNA           | 4 PASS                       |
+| C — Ecosystem     | 3 PASS                       |
+| D — Forward-only  | 2 PASS                       |
+| E — Agent clarity | 4 PASS                       |
+| F — Pragmatism    | 2 PASS                       |
+| G — Tests         | 2 PASS, 1 WARN (G-3)         |
 
 **Total**: 0 FAIL, 2 WARN, 21 PASS
 

@@ -53,12 +53,12 @@ No issues. Изменение не вводит новых команд — perf
 
 ### Spec compliance
 
-| Requirement from RFC-0728 | Status | Evidence |
-| --- | --- | --- |
-| `charges` uses `pbpChargeSchema` | Done | `offering.ts:43` |
-| All 12 offering files updated | Done | committed via `mission.git.commit` in workpiece |
-| `build:check` passes | Done | tsc --noEmit exit 0 |
-| `rfc.validate` passes | Done | 0 violations |
+| Requirement from RFC-0728        | Status | Evidence                                        |
+| -------------------------------- | ------ | ----------------------------------------------- |
+| `charges` uses `pbpChargeSchema` | Done   | `offering.ts:43`                                |
+| All 12 offering files updated    | Done   | committed via `mission.git.commit` in workpiece |
+| `build:check` passes             | Done   | tsc --noEmit exit 0                             |
+| `rfc.validate` passes            | Done   | 0 violations                                    |
 
 ### Questions for the author
 

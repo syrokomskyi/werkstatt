@@ -89,8 +89,7 @@ scope:
   - `import type { KernelPipelineStep } from "@gogol/site-kernel"`
   - `export const MISSION_PREFLIGHT_CRITICAL: KernelPipelineStep[]` with 4 critical validators
   - `export const MISSION_PREFLIGHT_WARNING: KernelPipelineStep[]` with 7 warning validators
-- Add re-export to `packages/os/site-kernel-checks/src/pipelines/index.ts`:
-  `export { MISSION_PREFLIGHT_CRITICAL, MISSION_PREFLIGHT_WARNING } from "./mission-preflight.ts";`
+- Add re-export to `packages/os/site-kernel-checks/src/pipelines/index.ts`: `export { MISSION_PREFLIGHT_CRITICAL, MISSION_PREFLIGHT_WARNING } from "./mission-preflight.ts";`
 
 **Validation:**
 

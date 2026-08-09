@@ -17,6 +17,7 @@ The RFC contains a factual error in its core problem statement (problem 1 — gi
 ## Mechanical validation (rfc.validate)
 
 Pass with 2 V-19 warnings:
+
 - `RFC-0552.amends includes RFC-0545, but RFC-0545.amendedBy does not include RFC-0552`
 - `RFC-0552.amends includes RFC-0546, but RFC-0546.amendedBy does not include RFC-0552`
 
@@ -31,6 +32,7 @@ No structural issues. All required sections are present with real content. Decis
 **FAIL.** `satisfies: [DNA-54]` is incorrect. DNA-54 is the Forge bindings contract: "Canonical forge skill bodies must not contain hardcoded project-specific literals." This RFC does not change the bindings contract — it adds git init, skill commit, and conflict reporting. The RFC body says "DNA-54 (Forge bindings contract) — extends forge-bootstrap and forge.init behavior" but this is not about bindings; it is about git and skill conflict handling.
 
 No existing DNA invariant is a natural fit for this RFC. Options:
+
 - Drop `satisfies` entirely (the RFC is a hardening/bugfix, not all RFCs must satisfy a DNA invariant).
 - If the operator wants a DNA reference, the closest is DNA-54 only if the RFC also adds a binding key for the skill commit behavior — but that would be over-engineering.
 

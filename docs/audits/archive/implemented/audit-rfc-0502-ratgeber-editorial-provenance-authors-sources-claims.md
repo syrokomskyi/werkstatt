@@ -41,6 +41,7 @@ Pass with 6 warnings:
 ## Axis C — Ecosystem fit
 
 - **Claim sidecar example does not conform to `recordClaimsSchema`.** The RFC's claim sidecar example (lines 129–140) shows:
+
   ```yaml
   pricing-setup-fee:
     value: "ab 490 €"
@@ -48,6 +49,7 @@ Pass with 6 warnings:
     confidence: high
     validUntil: 2026-12-31
   ```
+
   But the actual `recordClaimsSchema` (`packages/share/src/schemas/claims.ts`) requires `provenance` (enum: `external | derived | asserted | generated`) and `asOf` (ISO date) as **required** fields. The example is missing both. The RFC states "This reuses the existing `recordClaimsSchema` from `@gogol/share/schemas` — no new schema is introduced" (line 142), but the example contradicts this. Either fix the example to match the schema, or declare a new schema and explain why extension is needed.
 
 - **`sourceId` vs `sourceRef` naming inconsistency.** The existing CKL system uses `sourceRef` in claim sidecars to reference source descriptors (RFC-0214). The RFC introduces `sourceId` in the article record's `sources` field (line 113). This is a different field name for the same concept. The RFC should either reuse `sourceRef` or explain the naming divergence.

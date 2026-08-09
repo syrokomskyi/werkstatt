@@ -1372,4 +1372,3 @@ entries:
     siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/women/women-section.manifest.yaml
     astroFile: packages/ui/src/sections/women/women-section.astro
-

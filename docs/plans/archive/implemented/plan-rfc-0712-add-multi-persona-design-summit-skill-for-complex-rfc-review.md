@@ -254,7 +254,7 @@ None — the summit skill is a markdown-only skill with no code, no schemas, no 
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Persona caricature — shallow persona findings | Step 1: skill instructions include persona-specific review checklists and example findings |
 | Summit report rot — stale reports after RFC amendment | Step 1: summit report includes RFC status at summit time; new summit may be run after amendment |
 | False confidence — clean summit creates false sense of security | Step 1: summit report explicitly states "no findings does not mean no issues" |

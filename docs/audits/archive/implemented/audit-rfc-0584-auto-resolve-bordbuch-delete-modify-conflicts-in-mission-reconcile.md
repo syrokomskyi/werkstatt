@@ -27,9 +27,11 @@ Pass — zero violations.
 3. **Missing `MissionReconcileData` interface update.** The current interface at `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:525-531` has fields `missionId`, `systemId`, `commitSha`, `preReconcileSha`, `reconciledAt`. The RFC's TypeScript contract shows the merge logic but does not show the interface change needed to add `autoResolvedPaths?: string[]` to `MissionReconcileData`. Without this, the `--json` output cannot include the field.
 
 4. **Summary format change not shown in code.** The output example (line 195) shows a summary with ", 1 bordbuch conflict auto-resolved" appended, but the RFC does not show the code change to the summary string. The actual summary at line 825 is:
+
    ```ts
    summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"})`,
    ```
+
    The RFC should show how the summary is extended when `autoResolvedPaths` is non-empty.
 
 5. **Reconciliation evidence report not mentioned.** The current code writes `evidence/reconciliation-report.json` (lines 789-805) with fields `schemaVersion`, `missionId`, `systemId`, `commitSha`, `preReconcileSha`, `reconciledAt`, `mergeCommitSha`, `transferredCommits`, `message`, `copiedPaths`. The RFC does not mention whether `autoResolvedPaths` should be included in this evidence report for auditability.

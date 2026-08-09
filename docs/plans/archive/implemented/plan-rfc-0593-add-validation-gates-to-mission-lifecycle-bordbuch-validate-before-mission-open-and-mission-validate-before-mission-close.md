@@ -212,7 +212,7 @@ No configuration or data file changes. No ontology catalog changes. No schema ch
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Performance: `mission.close` runs 2+ minute build | Step 2: validation runs before `acquireLock`, so locks are not held during build |
 | False positives: validator bug blocks close | Step 4: tests verify gate behavior; validator bugs would also block standalone `mission.validate` |
 | Agent confusion: direct `mission.yaml` edits | Step 3: AGENTS.md documents gates; `mission.yaml` is auto-committed (RFC-0580) |

@@ -1,8 +1,6 @@
 # Code Review: Nachweis Validation Fixes
 
-**Date:** 2026-08-06
-**Scope:** `8cb2dfa3..HEAD` (3 commits, 19 files, +144/-32 lines)
-**Reviewer:** fo-review (automated)
+**Date:** 2026-08-06 **Scope:** `8cb2dfa3..HEAD` (3 commits, 19 files, +144/-32 lines) **Reviewer:** fo-review (automated)
 
 ## Commits
 
@@ -19,7 +17,7 @@
 ## Axis A — Structural Correctness
 
 | Item | Verdict | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Strict typing | **PASS** | `resolveDefaultLang` returns `Promise<string>`, throws on missing `i18n.default`. No `any` introduced. |
 | Magic numbers/strings | **PASS** | No new magic values. |
 | Minimalism | **PASS** | `resolveDefaultLang` is a small focused helper, reused across 10 call sites. |
@@ -31,7 +29,7 @@
 ## Axis B — DNA Alignment
 
 | Invariant | Verdict | Notes |
-|---|---|---|
+| --- | --- | --- |
 | DNA-4 (Canonical content in `src/content/`) | **PASS** | `resolveDefaultLang` reads `system.md` from `src/content/` — the canonical location for site configuration. Removes hardcoded `lang = "de"` that violated DNA-4. |
 | DNA-10 (No hardcoded design tokens) | **PASS** | CSS fixes replace non-existent `--ds-font-size-*` tokens with valid `--ds-text-*` tokens. Also fixes `--ds-color-warning` → `--ds-color-warning-strong`, `--ds-color-text-tertiary` → `--ds-color-text-quiet`, `--ds-color-focus` → `--ds-color-accent-focus`. All replacements use existing tokens from `tokens.css`. |
 | DNA-24 (Block-declarative pages) | **PASS** | `transparency` blocks changed from `body.kind: paragraphs` to `body.kind: list` — the `transparency` section archetype dispatches to `SectionList` which requires `body.items`, not `body.paragraphs`. |
@@ -41,7 +39,7 @@
 ## Axis C — Ecosystem Fit
 
 | Item | Verdict | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Package boundaries | **PASS** | `site-kernel-handoff` imports from `site-kernel-content` (`loadSystemManifest`) — both are `packages/os/*`, valid dependency direction. |
 | Ownership map module paths | **PASS** | All 4 new `GENERATOR_OWNERSHIP_MAP` entries point to correct modules: `bordbuch-io.ts`, `bordbuch-generate.ts`, `nachweis-key-ensure.ts`, `nachweis-manifest.ts`. |
 | `markerPolicy: "registry-only"` | **PASS** | All 4 entries use `registry-only` — these are generated files tracked in git without generated markers. Consistent with existing entries. |
@@ -49,21 +47,21 @@
 ## Axis D — Forward-Only Discipline
 
 | Item | Verdict | Notes |
-|---|---|---|
+| --- | --- | --- |
 | No downgrade path | **PASS** | `resolveDefaultLang` is a pure addition; old `lang = "de"` is replaced, not paralleled. |
 | No speculative generality | **PASS** | `resolveDefaultLang` serves an immediate need (10 call sites). No unused parameters. |
 
 ## Axis E — Agent Clarity
 
 | Item | Verdict | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Compass headers | **N/A** | No new source files with Compass headers added. Modified files retain existing headers. |
 | Error messages | **PASS** | `resolveDefaultLang` error: `[nachweis] system.md i18n.default is required to resolve PBP entity language.` — clear, actionable, prefixed with module name. |
 
 ## Axis F — Test Coverage
 
 | Item | Verdict | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Existing tests pass | **PASS** | 30/30 nachweis-commands tests pass after fixture fix. |
 | Test fixture fix | **FINDING F-1** | `writeEntitlements` helper was modified to also write `system.md` via `writeSystemManifest`. This is correct — every test that creates a `cachePath` with `writeEntitlements` now needs `system.md` for `resolveDefaultLang`. The fix is minimal and coupled. |
 | No new test for `resolveDefaultLang` | **FINDING F-2 (advisory)** | `resolveDefaultLang` has no dedicated unit test. It is exercised indirectly through 30 nachweis command tests. A direct test for the missing-`i18n.default` error path would be valuable but is not blocking. |
@@ -72,7 +70,7 @@
 ## Axis G — CSS Token Correctness
 
 | Item | Verdict | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `--ds-font-size-sm` → `--ds-text-sm` | **PASS** | `--ds-text-sm: 0.9rem` exists in `tokens.css:140`. |
 | `--ds-font-size-xs` → `--ds-text-xs` | **PASS** | `--ds-text-xs: 0.64rem` exists in `tokens.css:147`. |
 | `--ds-font-size-base` → `--ds-text-2` | **PASS** | `--ds-text-2: 1rem` exists in `tokens.css:116`. |
@@ -84,7 +82,7 @@
 ## Findings Summary
 
 | ID | Severity | Description | Action |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | F-1 | **fixed** | Test fixtures missing `system.md` for `resolveDefaultLang` | Fixed: `writeEntitlements` now writes `system.md` |
 | F-2 | advisory | No dedicated unit test for `resolveDefaultLang` error path | Non-blocking — indirectly covered |
 | F-3 | advisory | No dedicated test for consent `c.id` fallback | Non-blocking — verified end-to-end in production |

@@ -250,7 +250,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Metadata drift — `gate` field describes behavior but does not enforce it | Step 6 verifies drift detection via `ecosystem.manifest.validate`; RFC-0519's `gate.catalog.validate` will cross-check (out of scope for this RFC) |
 | Incomplete population — only ~10 commands have `gate` initially | Step 2-4 populate exactly the initial set from the RFC; remaining commands backfilled incrementally |
 | Phase mismatch — declared phase might not match pipeline placement | Out of scope for RFC-0518; RFC-0519 GATE-CAT-04 cross-checks |

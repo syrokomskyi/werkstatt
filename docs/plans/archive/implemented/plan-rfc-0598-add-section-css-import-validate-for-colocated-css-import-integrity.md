@@ -173,8 +173,7 @@ None — no YAML/JSON/manifest changes.
 
 **Agent actions:**
 
-- In `packages/os/site-kernel-checks/AGENTS.md`, add row to the module table:
-  `| src/section-framework/css-import.ts | runSectionCssImportValidate — CSS-IMPORT-01 (unimported .css) + CSS-NAME-01 (filename mismatch) |`
+- In `packages/os/site-kernel-checks/AGENTS.md`, add row to the module table: `| src/section-framework/css-import.ts | runSectionCssImportValidate — CSS-IMPORT-01 (unimported .css) + CSS-NAME-01 (filename mismatch) |`
 - Run `pnpm exec site-kernel run docs.commands.generate` to regenerate `docs/COMMANDS.md`
 - Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
 - Run `pnpm exec site-kernel run gate.catalog.generate` to regenerate gate catalog
@@ -268,7 +267,7 @@ None — no YAML/JSON/manifest changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent adds `import "./section.css"` to fix CSS-IMPORT-01 without checking CSS content | Step 4 test case 2 verifies the validator catches the violation; agents fixing violations is the intended workflow |
 | Naming convention drift (not formally DNA-level) | CSS-NAME-01 enforces naming without elevating to DNA — Step 4 tests verify enforcement |
 | Performance (<50ms for ~60 files) | Validator reads raw text, not AST — negligible I/O; Step 6 smoke test confirms timing |

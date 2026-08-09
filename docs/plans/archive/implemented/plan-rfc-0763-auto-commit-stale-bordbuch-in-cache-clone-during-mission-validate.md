@@ -62,6 +62,7 @@ No configuration or data changes.
 
 - In `mission-materialization-commands.ts`, locate the `build.prepare` failure return block (lines 340-376). The return is at line 371 after `atomicWriteFile(validation-report.json)` at line 367-370.
 - Insert the cleanup call between the `atomicWriteFile` and the `return`:
+
 ```ts
     // RFC-0763: clean bordbuch projections on build.prepare failure path
     try {
@@ -77,6 +78,7 @@ No configuration or data changes.
       );
     }
 ```
+
 - Add `RFC-0763` entry to the CHANGE_SUMMARY block at the top of the file: `<item>RFC-0763: add commitBordbuchProjections cleanup on build.prepare failure and validation failure paths to clean bordbuch projections from cache clone on all exit paths.</item>`
 
 **Validation:**
@@ -97,6 +99,7 @@ No configuration or data changes.
 
 - In `mission-materialization-commands.ts`, locate the `if (!passed)` block (lines 577-593). The return is at line 587.
 - Insert the cleanup call inside the `if (!passed)` block, before the `return`:
+
 ```ts
     // RFC-0763: clean bordbuch projections on validation failure path
     try {

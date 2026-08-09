@@ -54,6 +54,7 @@ Pass — `rfc.validate RFC-0538 --json` exits 0, zero violations.
 ## Axis D — Forward-only compliance
 
 No issues. The RFC is explicitly forward-only:
+
 - Removed commands have no deprecation period (line 345).
 - No backward compatibility shims (line 155, line 371).
 - Legacy code paths are deleted, not maintained behind a flag.
@@ -61,6 +62,7 @@ No issues. The RFC is explicitly forward-only:
 ## Axis E — Agent-facing policy
 
 No issues.
+
 - **Status gate**: The RFC is `draft` and does not contain self-authorizing language. Implementation notes correctly state "Agents MAY implement code changes ONLY when this RFC has status: accepted" (line 402).
 - **Governance references**: Implementation notes reference RFC-0224 (accepted→implemented), RFC-0334 (supersede escalation), RFC-0330 (verification evidence) correctly (lines 403–406).
 - **Storage policy**: No persistence changes, no cookies introduced.

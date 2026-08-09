@@ -56,20 +56,20 @@ No issues. The command earns its existence — it performs a specialized repair 
 
 ### Spec compliance
 
-| Requirement from RFC-0583 | Status | Evidence |
-| --- | --- | --- |
-| Command registered in bordbuch.module.ts | Done | `bordbuch.module.ts:108-129` |
-| runBordbuchRepair exported from index.ts | Done | `index.ts:19-24` |
-| computeEntryHash exported | Done | `bordbuch-io.ts:70` |
-| Detects orphan-mission-close | Done | `bordbuch-repair.ts:120` |
-| Auto-derives metadata | Done | `bordbuch-repair.ts:134-137` |
-| --metadata overrides | Done | `bordbuch-repair.ts:130-133` |
-| Recomputes hash chain and event-id | Done | `bordbuch-repair.ts:183-195` |
-| bordbuch.validate passes after repair | Done | `bordbuch-repair.ts:207` |
-| --dry-run shows planned repairs | Done | `bordbuch-repair.ts:218-230` |
-| Post-repair validate fails if still invalid | Done | `bordbuch-repair.ts:209-216` |
-| Unit test covers repair scenario | Done | `bordbuch-repair.test.ts` (6 tests) |
-| AGENTS.md updated | Done | `AGENTS.md:90-99` |
+| Requirement from RFC-0583                   | Status | Evidence                            |
+| ------------------------------------------- | ------ | ----------------------------------- |
+| Command registered in bordbuch.module.ts    | Done   | `bordbuch.module.ts:108-129`        |
+| runBordbuchRepair exported from index.ts    | Done   | `index.ts:19-24`                    |
+| computeEntryHash exported                   | Done   | `bordbuch-io.ts:70`                 |
+| Detects orphan-mission-close                | Done   | `bordbuch-repair.ts:120`            |
+| Auto-derives metadata                       | Done   | `bordbuch-repair.ts:134-137`        |
+| --metadata overrides                        | Done   | `bordbuch-repair.ts:130-133`        |
+| Recomputes hash chain and event-id          | Done   | `bordbuch-repair.ts:183-195`        |
+| bordbuch.validate passes after repair       | Done   | `bordbuch-repair.ts:207`            |
+| --dry-run shows planned repairs             | Done   | `bordbuch-repair.ts:218-230`        |
+| Post-repair validate fails if still invalid | Done   | `bordbuch-repair.ts:209-216`        |
+| Unit test covers repair scenario            | Done   | `bordbuch-repair.test.ts` (6 tests) |
+| AGENTS.md updated                           | Done   | `AGENTS.md:90-99`                   |
 
 ### Questions for the author
 

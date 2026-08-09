@@ -17,6 +17,7 @@ The RFC fills a real gap in the Nachweis publication workflow (conditions 3–6 
 ## Mechanical validation (rfc.validate)
 
 Pass with 1 warning:
+
 - **V-19** (warning): `RFC-0714.amends` includes RFC-0707, but RFC-0707.amendedBy does not include RFC-0714. Expected for a draft amending an implemented RFC — the `amendedBy` backreference on RFC-0707 should be added during enhance or implementation.
 
 ## Axis A — Structural completeness

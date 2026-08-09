@@ -17,6 +17,7 @@ RFC корректно диагностирует мёртвую архитек�
 ## Mechanical validation (rfc.validate)
 
 **Pass** с 1 предупреждением:
+
 - V-19: `RFC-0761.amends` includes RFC-0388, but `RFC-0388.amendedBy` does not include RFC-0761. Ожидаемо — будет исправлено при реализации (update `amendedBy` в RFC-0388 frontmatter).
 
 ## Axis A — Structural completeness

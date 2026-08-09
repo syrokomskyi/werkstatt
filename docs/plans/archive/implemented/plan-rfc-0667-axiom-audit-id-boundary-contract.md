@@ -129,7 +129,7 @@ No configuration changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Agent confusion: agents reading check modules might wonder why `auditId` is used instead of `missionId` | Step 1 + Step 2 document the boundary pattern in AGENTS.md files |
 | Test fixture drift: agents write new tests with `missionId` instead of `auditId` | Step 1 documents the rule in AGENTS.md; RFC implementation notes already cover this |
 | Silent fallback on external `auditId` rename | Step 1 documents the fallback chain in AGENTS.md; RFC failure mode #4 covers this |

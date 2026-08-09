@@ -273,7 +273,7 @@ None — no YAML/JSON config changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Stale next steps — handler's `nextSteps` hardcode guidance that drifts | Step 3: steps are short imperative sentences referencing command names; Step 6: AGENTS.md documents the contract for contributors |
 | Help generator gaps — module fails to register in autonomous mode | Step 2: `generateHelp` iterates the live registry, so help is always honest about available commands |
 | Agent misinterpretation — agent treats `optional` next steps as required | Step 1: `kind` field is explicit in the type; Step 6: AGENTS.md documents that `kind` must be respected |

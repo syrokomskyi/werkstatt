@@ -185,12 +185,7 @@ scope:
   1. Load semantic site model (Step 3)
   2. Load and resolve all `.credits.yaml` sidecars (Step 4)
   3. Load variant manifests and collect manifest files (Step 2)
-  4. For each manifest file:
-     a. Extract token from manifest entry
-     b. Look up `MaterialCredit` by `target.kind + target.id` in resolved credits map
-     c. If found: build metadata tags from credit fields
-     d. If not found: build fallback tags from `SemanticSiteProfile`
-     e. Call `writeIptcXmp` with the tags (Step 5)
+  4. For each manifest file: a. Extract token from manifest entry b. Look up `MaterialCredit` by `target.kind + target.id` in resolved credits map c. If found: build metadata tags from credit fields d. If not found: build fallback tags from `SemanticSiteProfile` e. Call `writeIptcXmp` with the tags (Step 5)
   5. Report results: written count, skipped count, fallback count
 - Handle empty manifests: report pass with zero files (not a skip)
 - Preserve exiftool-unavailable graceful skip
@@ -316,7 +311,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | exiftool availability | Step 6 preserves graceful skip; Step 7 preserves graceful skip |
 | Manifest staleness | Step 1 positions `material.metadata.write` after variant generators; `generated.files.validate` (line 108) catches missing files |
 | WebP metadata support | No mitigation needed — metadata is present in the file regardless of reader support |

@@ -230,7 +230,7 @@ None — no YAML/JSON/NDJSON changes, no ontology catalogs, no manifests.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | CDN edge variability — different edges propagate at different speeds | Step 2: retry loop polls from the running machine; 5 attempts with 45s total covers normal propagation |
 | Rate limiting — 5 HTTP GETs to same URL | Step 2: exponential backoff (3s, 6s, 12s, 24s) spaces requests sufficiently |
 | Test timing — retry loop adds real-time delays in tests | Step 4: `vi.useFakeTimers()` and `vi.advanceTimersByTime()` avoid real-time delays |

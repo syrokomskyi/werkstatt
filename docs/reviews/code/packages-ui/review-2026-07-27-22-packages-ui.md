@@ -111,7 +111,7 @@ The expert file (file 13) described the content structure but did not explicitly
 Expert files 1–16.1 from `/home/syrokomskyi/projects/obsidian/WGogolDocObsidian/Tech/Site/!Research/2026-07-20 Страницы сайта - Улучшения/output/enhance-site-pages`.
 
 | Requirement | Status | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | RFC-0567 eyebrow prop on all hero blocks | Done | All page hero blocks updated with `header.eyebrow` |
 | RFC-0567 ctaNote on hero-decision-card | Done | All hero-decision-card blocks updated with `ctaNote` |
 | RFC-0567 orderTags on FAQ entries | Done | All FAQ entries tagged with per-page orderTags |

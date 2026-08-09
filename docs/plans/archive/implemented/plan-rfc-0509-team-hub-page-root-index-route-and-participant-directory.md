@@ -268,7 +268,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Redirect from `/gruender/` may break existing links | Step 2 emits a 301 redirect in `_redirects`; Step 6 validates the redirect is registered |
 | Empty AI-agent section renders heading with no content | Step 3 adds empty-list guard to `people-section.astro` |
 | Navigation change confuses returning visitors | Step 4 replaces nav entry; 301 redirect softens the transition |

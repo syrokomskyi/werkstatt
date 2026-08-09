@@ -31,11 +31,9 @@ Pass — `pnpm --filter @warpgogol/site-kernel run build:check` and `pnpm --filt
 
 ## Axis A — Structural correctness
 
-**Finding A-1: Data contract mismatch in distribution reuse path.**
-`mission-materialization-commands.ts:214-226` reads `routeCount` and `sitemapHash` from `distribution/build-manifest.json`, but `runMissionBuild` (line 695-702) writes only `builtAt`, `missionId`, `systemId`, `succeeded`, and optionally `error` to that file — `routeCount` and `sitemapHash` are never written. The fallback values (`0`, `"sha256:reused"`) mask the missing fields, but the code suggests a data contract that doesn't exist. Either add `routeCount` and `sitemapHash` to the `build-manifest.json` writer in `runMissionBuild`, or remove the read attempt and use the fallback values directly.
+**Finding A-1: Data contract mismatch in distribution reuse path.** `mission-materialization-commands.ts:214-226` reads `routeCount` and `sitemapHash` from `distribution/build-manifest.json`, but `runMissionBuild` (line 695-702) writes only `builtAt`, `missionId`, `systemId`, `succeeded`, and optionally `error` to that file — `routeCount` and `sitemapHash` are never written. The fallback values (`0`, `"sha256:reused"`) mask the missing fields, but the code suggests a data contract that doesn't exist. Either add `routeCount` and `sitemapHash` to the `build-manifest.json` writer in `runMissionBuild`, or remove the read attempt and use the fallback values directly.
 
-**Finding A-2: Duplicated dirty-check + nextSteps pattern.**
-The `dirtyCheck` + `nextSteps` construction is duplicated between the reuse path (lines 248-275) and the normal path (lines 547-567). Both blocks construct the same `KernelNextStep[]` based on `dirtyCheck.dirty`. Extract a helper like `buildValidateNextSteps(missionId, dirtyCheck)` to eliminate the duplication.
+**Finding A-2: Duplicated dirty-check + nextSteps pattern.** The `dirtyCheck` + `nextSteps` construction is duplicated between the reuse path (lines 248-275) and the normal path (lines 547-567). Both blocks construct the same `KernelNextStep[]` based on `dirtyCheck.dirty`. Extract a helper like `buildValidateNextSteps(missionId, dirtyCheck)` to eliminate the duplication.
 
 ## Axis B — DNA alignment
 
@@ -59,8 +57,7 @@ No issues. The `--force` flag delivery via `KernelRuntimeContext` is minimal and
 
 ## Axis G — Blind spots
 
-**Finding G-1: Empty `distribution/dist/` edge case.**
-`existsSync(distributionDistDir)` returns `true` for an empty directory. If `distribution/dist/` exists but is empty (e.g., from a partially failed `mission.build` that wrote the hash but not the dist), the reuse path would copy an empty directory to `workpiece/dist/`. In practice, `mission.build` only writes `build-input-hash.json` when `buildSucceeded` is true, and a successful build always produces a non-empty `dist/`. This is a low-risk edge case but worth documenting.
+**Finding G-1: Empty `distribution/dist/` edge case.** `existsSync(distributionDistDir)` returns `true` for an empty directory. If `distribution/dist/` exists but is empty (e.g., from a partially failed `mission.build` that wrote the hash but not the dist), the reuse path would copy an empty directory to `workpiece/dist/`. In practice, `mission.build` only writes `build-input-hash.json` when `buildSucceeded` is true, and a successful build always produces a non-empty `dist/`. This is a low-risk edge case but worth documenting.
 
 ## Spec compliance
 

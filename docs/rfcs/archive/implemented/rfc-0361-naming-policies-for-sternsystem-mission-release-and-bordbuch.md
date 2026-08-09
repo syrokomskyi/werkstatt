@@ -89,12 +89,12 @@ Introduce `naming.policy.validate` as the consolidated naming policy validator f
 
 | Rule                | Pattern                       | Example                        |
 | ------------------- | ----------------------------- | ------------------------------ |
-| Format              | kebab-case                    | `warpgogol-com`                 |
-| Case                | lowercase only                | `Warpgogol-Com` is invalid      |
+| Format              | kebab-case                    | `warpgogol-com`                |
+| Case                | lowercase only                | `Warpgogol-Com` is invalid     |
 | Character set       | Latin-only (a-z, 0-9, hyphen) | `nicaragüa-projekt` is invalid |
-| Start               | letter or digit               | `-warpgogol` is invalid         |
-| End                 | letter or digit               | `warpgogol-` is invalid         |
-| Consecutive hyphens | not allowed                   | `warpgogol--com` is invalid     |
+| Start               | letter or digit               | `-warpgogol` is invalid        |
+| End                 | letter or digit               | `warpgogol-` is invalid        |
+| Consecutive hyphens | not allowed                   | `warpgogol--com` is invalid    |
 | Regex               | `^[a-z0-9]+(-[a-z0-9]+)*$`    |                                |
 
 **Latin-only clarification**: The regex `^[a-z0-9]+(-[a-z0-9]+)*$` uses the ASCII character class `[a-z0-9]`. Non-ASCII lowercase letters (ä, ñ, я) are NOT in this class and will fail. The policy is explicit: **only ASCII lowercase letters (a-z), digits (0-9), and hyphens (-) are permitted**.

@@ -17,6 +17,7 @@ The RFC correctly identifies two improvement opportunities in the RFC-0689 imple
 ## Mechanical validation (rfc.validate)
 
 Pass with 1 warning:
+
 - **V-19 (warning):** `RFC-0697.amends` includes `RFC-0689`, but `RFC-0689.amendedBy` does not include `RFC-0697`. Expected for a draft amending RFC — the backreference on RFC-0689 will be added when RFC-0697 is accepted. No action needed now.
 
 ## Axis A — Structural completeness

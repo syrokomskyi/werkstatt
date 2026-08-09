@@ -9,34 +9,60 @@
       mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
     </script>
     <style>
-      .seam { stroke-dasharray: 4 4; }
-      .leak { stroke: #dc2626; }
-      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
     </style>
   </head>
   <body class="bg-stone-50 text-slate-900 font-sans">
     <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
       <header class="space-y-4">
-        <h1 class="text-3xl font-bold tracking-tight">Architecture review — @warpgogol/integration</h1>
+        <h1 class="text-3xl font-bold tracking-tight">
+          Architecture review — @warpgogol/integration
+        </h1>
         <div class="flex items-center gap-4 text-sm text-slate-500">
           <span>2026-07-14</span>
           <span>·</span>
           <span>warpgogol monorepo</span>
         </div>
         <div class="flex items-center gap-6 text-xs text-slate-400">
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span
+          >
         </div>
       </header>
 
       <section id="candidates" class="space-y-10">
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Consolidate LeadMessage / Lead / IntegrationEvent into one normalized event shape</h2>
+          <h2 class="text-xl font-semibold">
+            Consolidate LeadMessage / Lead / IntegrationEvent into one normalized event shape
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5"
+              >Strong</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/integration/src/port.ts:22-143</div>
@@ -74,8 +100,18 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> Three overlapping shapes (<code>LeadMessage</code>, <code>Lead</code>, <code>IntegrationEvent</code>) represent the same concept with two adapter mapping functions — consumers must learn which shape to use when, and the mappings are pure boilerplate.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Make <code>IntegrationEvent</code> the single normalized shape; <code>DestinationAdapter</code> implementations extract fields directly; deprecate <code>LeadMessage</code>, <code>Lead</code>, and the mapping functions.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> Three overlapping shapes
+              (<code>LeadMessage</code>, <code>Lead</code>, <code>IntegrationEvent</code>) represent
+              the same concept with two adapter mapping functions — consumers must learn which shape
+              to use when, and the mappings are pure boilerplate.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Make
+              <code>IntegrationEvent</code> the single normalized shape;
+              <code>DestinationAdapter</code> implementations extract fields directly; deprecate
+              <code>LeadMessage</code>, <code>Lead</code>, and the mapping functions.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> one event shape, one place to learn</li>
@@ -85,10 +121,18 @@
         </article>
 
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Split the index.ts barrel into focused sub-barrels by RFC concern</h2>
+          <h2 class="text-xl font-semibold">
+            Split the index.ts barrel into focused sub-barrels by RFC concern
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5"
+              >Worth exploring</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/integration/src/index.ts:22-40</div>
@@ -97,7 +141,9 @@
             <div>
               <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
               <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
-                <div class="text-xs text-slate-500">One barrel re-exports 8 modules via export *</div>
+                <div class="text-xs text-slate-500">
+                  One barrel re-exports 8 modules via export *
+                </div>
                 <div class="flex flex-col gap-1 text-xs">
                   <div class="rounded border border-slate-200 px-2 py-1">port.ts</div>
                   <div class="rounded border border-slate-200 px-2 py-1">crm-buffer.ts</div>
@@ -117,16 +163,31 @@
                 <div class="text-xs text-slate-500">Focused sub-barrels by concern</div>
                 <div class="flex flex-col gap-1 text-xs">
                   <div class="rounded deep text-slate-100 px-2 py-1">/port → contracts</div>
-                  <div class="rounded deep text-slate-100 px-2 py-1">/delivery → sharding + dispatch + qstash</div>
-                  <div class="rounded deep text-slate-100 px-2 py-1">/crm → crm-buffer + funnel + lifecycle</div>
-                  <div class="rounded deep text-slate-100 px-2 py-1">/runtime → orchestration + delivery-handler</div>
+                  <div class="rounded deep text-slate-100 px-2 py-1">
+                    /delivery → sharding + dispatch + qstash
+                  </div>
+                  <div class="rounded deep text-slate-100 px-2 py-1">
+                    /crm → crm-buffer + funnel + lifecycle
+                  </div>
+                  <div class="rounded deep text-slate-100 px-2 py-1">
+                    /runtime → orchestration + delivery-handler
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>index.ts</code> re-exports 8 modules via <code>export *</code> — consumers import the entire surface even when they only need the port contracts; name collisions across modules are possible.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Add focused sub-barrels (<code>/port</code>, <code>/delivery</code>, <code>/crm</code>, <code>/runtime</code>); <code>index.ts</code> re-exports only the port contracts; runtime consumers import from the specific sub-barrel.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>index.ts</code> re-exports 8
+              modules via <code>export *</code> — consumers import the entire surface even when they
+              only need the port contracts; name collisions across modules are possible.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Add focused sub-barrels
+              (<code>/port</code>, <code>/delivery</code>, <code>/crm</code>,
+              <code>/runtime</code>); <code>index.ts</code> re-exports only the port contracts;
+              runtime consumers import from the specific sub-barrel.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> each concern's exports in one barrel</li>
@@ -138,7 +199,11 @@
 
       <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
         <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
-        <p class="text-sm text-slate-300">Consolidate event shapes — three overlapping types for the same concept is the clearest shallow-module smell and the mapping functions are pure boilerplate. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+        <p class="text-sm text-slate-300">
+          Consolidate event shapes — three overlapping types for the same concept is the clearest
+          shallow-module smell and the mapping functions are pure boilerplate.
+          <a href="#" class="text-emerald-400 underline">Jump to card →</a>
+        </p>
       </section>
     </main>
   </body>

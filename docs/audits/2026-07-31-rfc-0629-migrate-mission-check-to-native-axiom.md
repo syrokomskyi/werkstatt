@@ -39,11 +39,11 @@ RFC-0629 proposes rewriting `mission.check` to use native Axiom components (`Pla
 
 ## Axis 2: DNA alignment — ✅ Clean
 
-| Check | Result |
-| --- | --- |
-| `satisfies` entries exist in `docs/architecture-dna.md` | ✅ DNA-48 and DNA-49 exist |
-| DNA invariant semantics match RFC scope | ✅ RFC strengthens the gate |
-| No DNA invariant changes | ✅ No new/modified invariants |
+| Check                                                   | Result                        |
+| ------------------------------------------------------- | ----------------------------- |
+| `satisfies` entries exist in `docs/architecture-dna.md` | ✅ DNA-48 and DNA-49 exist    |
+| DNA invariant semantics match RFC scope                 | ✅ RFC strengthens the gate   |
+| No DNA invariant changes                                | ✅ No new/modified invariants |
 
 ### Findings
 
@@ -75,11 +75,11 @@ No issues. The RFC claims to satisfy DNA-48 (Release discipline) and DNA-49 (Fle
 
 ## Axis 4: Forward-only compliance — 🔴 Critical issues
 
-| Check | Result |
-| --- | --- |
-| No supersedes/amends | ⚠️ Should `amends: [RFC-0628]` — see [S-1] |
-| `versionBump` appropriate | 🔴 `patch` incorrect for breaking changes |
-| No DNA invariant changes | ✅ No invariant changes |
+| Check                       | Result                                         |
+| --------------------------- | ---------------------------------------------- |
+| No supersedes/amends        | ⚠️ Should `amends: [RFC-0628]` — see [S-1]     |
+| `versionBump` appropriate   | 🔴 `patch` incorrect for breaking changes      |
+| No DNA invariant changes    | ✅ No invariant changes                        |
 | Breaking changes identified | 🔴 Local mode removal + evidence format change |
 
 ### Findings
@@ -92,12 +92,12 @@ No issues. The RFC claims to satisfy DNA-48 (Release discipline) and DNA-49 (Fle
 
 ## Axis 5: Agent-facing policy — ⚠️ Issues
 
-| Check | Result |
-| --- | --- |
-| Implementation notes present | ✅ Clear "MAY/MUST" rules |
-| Status gate enforced | ✅ "MAY implement ONLY when status: accepted" |
-| Removal instructions safe | 🔴 Removing `check-runner-node` files is unsafe — see [Q-1] |
-| Dependency additions mentioned | ⚠️ `axiom-methodology` not mentioned — see [Q-2] |
+| Check                          | Result                                                      |
+| ------------------------------ | ----------------------------------------------------------- |
+| Implementation notes present   | ✅ Clear "MAY/MUST" rules                                   |
+| Status gate enforced           | ✅ "MAY implement ONLY when status: accepted"               |
+| Removal instructions safe      | 🔴 Removing `check-runner-node` files is unsafe — see [Q-1] |
+| Dependency additions mentioned | ⚠️ `axiom-methodology` not mentioned — see [Q-2]            |
 
 ### Findings
 
@@ -154,15 +154,15 @@ No issues. The RFC claims to satisfy DNA-48 (Release discipline) and DNA-49 (Fle
 
 ## Summary table
 
-| Axis | Severity | Count |
-| --- | --- | --- |
-| 1. Structural completeness | Minor | 3 |
-| 2. DNA alignment | Clean | 0 |
-| 3. Ecosystem fit | **Critical** | 4 |
-| 4. Forward-only compliance | **Critical** | 2 |
-| 5. Agent-facing policy | **Critical** | 2 |
-| 6. Pragmatism | Minor | 2 |
-| 7. Blind spots | **Critical** | 5 |
+| Axis                       | Severity     | Count |
+| -------------------------- | ------------ | ----- |
+| 1. Structural completeness | Minor        | 3     |
+| 2. DNA alignment           | Clean        | 0     |
+| 3. Ecosystem fit           | **Critical** | 4     |
+| 4. Forward-only compliance | **Critical** | 2     |
+| 5. Agent-facing policy     | **Critical** | 2     |
+| 6. Pragmatism              | Minor        | 2     |
+| 7. Blind spots             | **Critical** | 5     |
 
 **Total findings: 18** (8 critical, 10 minor)
 

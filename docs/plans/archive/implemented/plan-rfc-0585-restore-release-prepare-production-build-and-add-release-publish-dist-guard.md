@@ -244,7 +244,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Build time in release.prepare (30–120s) | Step 1 includes reuse logic: when `distribution/dist` exists and build input hash matches, build is skipped |
 | Build environment dependency | Step 1 reuses the same `execSync("pnpm exec astro build")` pattern already used in `mission.validate` — no new environment requirements |
 | Behavior snapshot capture complexity | Step 1 calls existing `runBehaviorSnapshotCapture` in-process — no new infrastructure |

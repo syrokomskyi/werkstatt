@@ -187,7 +187,7 @@ No configuration or data files changed.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Pre-commit hook blocks | Step 1: fatal error with descriptive message directs operator to resolve hook failure |
 | Commit noise | Step 1: `mission.git.commit` is idempotent — no commit when clean |
 | Agent confusion | Step 1: `commitSha` in `DevDeployResult` reflects post-commit HEAD; log clearly states auto-commit |

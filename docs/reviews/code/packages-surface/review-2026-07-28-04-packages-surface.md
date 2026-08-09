@@ -31,6 +31,7 @@ The diff contains four clean extraction/refactor tasks (star-map, studio-gate, s
 ### Mechanical floor
 
 **Pass** — all four affected packages pass `build:check` and tests:
+
 - `@warpgogol/star-map`: 11 tests pass
 - `@warpgogol/studio-gate`: 39 tests pass
 - `@warpgogol/surface`: 47 tests pass

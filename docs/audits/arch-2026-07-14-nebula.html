@@ -9,9 +9,15 @@
       mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
     </script>
     <style>
-      .seam { stroke-dasharray: 4 4; }
-      .leak { stroke: #dc2626; }
-      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
     </style>
   </head>
   <body class="bg-stone-50 text-slate-900 font-sans">
@@ -24,19 +30,37 @@
           <span>warpgogol monorepo</span>
         </div>
         <div class="flex items-center gap-6 text-xs text-slate-400">
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
-          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span
+          >
         </div>
       </header>
 
       <section id="candidates" class="space-y-10">
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Deepen collectNebulaInputs behind an artifact-reader seam</h2>
+          <h2 class="text-xl font-semibold">
+            Deepen collectNebulaInputs behind an artifact-reader seam
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">mock</span>
+            <span
+              class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5"
+              >Worth exploring</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >mock</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/nebula/src/collect.ts:61-103</div>
@@ -71,8 +95,18 @@
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>collectNebulaInputs</code> does FS I/O via <code>readJsonSafe</code> with hardcoded filenames — untestable without real files on disk, and the four artifact paths are baked into the function body.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Introduce an <code>ArtifactReader</code> interface (<code>read(kind): Promise&lt;T&gt;</code>); a <code>FilesystemArtifactReader</code> implements it; <code>collectNebulaInputs</code> takes the reader as a parameter and becomes pure orchestration.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong> <code>collectNebulaInputs</code> does
+              FS I/O via <code>readJsonSafe</code> with hardcoded filenames — untestable without
+              real files on disk, and the four artifact paths are baked into the function body.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Introduce an
+              <code>ArtifactReader</code> interface (<code>read(kind): Promise&lt;T&gt;</code>); a
+              <code>FilesystemArtifactReader</code> implements it;
+              <code>collectNebulaInputs</code> takes the reader as a parameter and becomes pure
+              orchestration.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> FS I/O in one adapter</li>
@@ -82,10 +116,18 @@
         </article>
 
         <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <h2 class="text-xl font-semibold">Extract pillar derive functions into a strategy registry</h2>
+          <h2 class="text-xl font-semibold">
+            Extract pillar derive functions into a strategy registry
+          </h2>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">Speculative</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >Speculative</span
+            >
+            <span
+              class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5"
+              >in-process</span
+            >
           </div>
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/nebula/src/compute.ts:110-145</div>
@@ -94,12 +136,22 @@
             <div>
               <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
               <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
-                <div class="text-xs text-slate-500">4 hardcoded derive calls in computeNebulaScore</div>
+                <div class="text-xs text-slate-500">
+                  4 hardcoded derive calls in computeNebulaScore
+                </div>
                 <div class="flex flex-col gap-1 text-xs">
-                  <div class="rounded border border-slate-200 px-2 py-1">derivePerformanceScore</div>
-                  <div class="rounded border border-slate-200 px-2 py-1">deriveAccessibilityScore</div>
-                  <div class="rounded border border-slate-200 px-2 py-1">deriveContentHealthScore</div>
-                  <div class="rounded border border-slate-200 px-2 py-1">deriveArchitecturalComplianceScore</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">
+                    derivePerformanceScore
+                  </div>
+                  <div class="rounded border border-slate-200 px-2 py-1">
+                    deriveAccessibilityScore
+                  </div>
+                  <div class="rounded border border-slate-200 px-2 py-1">
+                    deriveContentHealthScore
+                  </div>
+                  <div class="rounded border border-slate-200 px-2 py-1">
+                    deriveArchitecturalComplianceScore
+                  </div>
                 </div>
               </div>
             </div>
@@ -107,13 +159,26 @@
               <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
               <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
                 <div class="text-xs text-slate-500">Registry-driven pillar computation</div>
-                <div class="rounded deep text-slate-100 px-3 py-2 text-xs">PillarRegistry<br/><span class="text-slate-400">→ pillars: PillarStrategy[]</span><br/><span class="text-slate-400">→ compute(inputs): NebulaScore</span></div>
+                <div class="rounded deep text-slate-100 px-3 py-2 text-xs">
+                  PillarRegistry<br /><span class="text-slate-400">→ pillars: PillarStrategy[]</span
+                  ><br /><span class="text-slate-400">→ compute(inputs): NebulaScore</span>
+                </div>
               </div>
             </div>
           </div>
           <div class="space-y-1">
-            <p><strong class="text-slate-700">Problem:</strong> <code>computeNebulaScore</code> hardcodes four derive calls and a <code>pillarRawScores</code> object — adding or replacing a pillar requires editing the function body and the weights module in lockstep.</p>
-            <p><strong class="text-slate-700">Solution:</strong> Introduce a <code>PillarStrategy</code> interface (key, derive, weight); <code>computeNebulaScore</code> iterates a registry; weights and derive logic live together in each strategy.</p>
+            <p>
+              <strong class="text-slate-700">Problem:</strong>
+              <code>computeNebulaScore</code> hardcodes four derive calls and a
+              <code>pillarRawScores</code> object — adding or replacing a pillar requires editing
+              the function body and the weights module in lockstep.
+            </p>
+            <p>
+              <strong class="text-slate-700">Solution:</strong> Introduce a
+              <code>PillarStrategy</code> interface (key, derive, weight);
+              <code>computeNebulaScore</code> iterates a registry; weights and derive logic live
+              together in each strategy.
+            </p>
           </div>
           <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
             <li><strong>locality:</strong> each pillar in one module</li>
@@ -124,7 +189,11 @@
 
       <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
         <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
-        <p class="text-sm text-slate-300">Extract an <code>ArtifactReader</code> seam — it makes the collector testable without fixture files and removes the last FS I/O from a pure-logic package. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+        <p class="text-sm text-slate-300">
+          Extract an <code>ArtifactReader</code> seam — it makes the collector testable without
+          fixture files and removes the last FS I/O from a pure-logic package.
+          <a href="#" class="text-emerald-400 underline">Jump to card →</a>
+        </p>
       </section>
     </main>
   </body>

@@ -187,13 +187,13 @@ For every page:
 
 ### File System Responsibilities
 
-| Path                                               | Role                                      |
-| -------------------------------------------------- | ----------------------------------------- |
+| Path                                                | Role                                      |
+| --------------------------------------------------- | ----------------------------------------- |
 | `.check-warpgogol/runs/<runId>/evidence.graph.json` | Captured graph, gitignored.               |
 | `.check-warpgogol/runs/<runId>/screenshots/**.png`  | Screenshot evidence, gitignored.          |
 | `.check-warpgogol/runs/<runId>/capture.log.jsonl`   | Structured capture log, secrets redacted. |
-| `packages/check-core/src/evidence.ts`              | Evidence graph schemas and hash helpers.  |
-| `packages/check-runner-node/src/capture.ts`        | Playwright capture implementation.        |
+| `packages/check-core/src/evidence.ts`               | Evidence graph schemas and hash helpers.  |
+| `packages/check-runner-node/src/capture.ts`         | Playwright capture implementation.        |
 
 ### Validation Rules
 

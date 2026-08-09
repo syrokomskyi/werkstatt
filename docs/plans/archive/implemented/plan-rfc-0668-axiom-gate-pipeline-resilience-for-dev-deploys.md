@@ -248,7 +248,7 @@ No configuration or data files changed. All changes are internal to command hand
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | 15-minute timeout too short for very large sites | Step 2: timeout is per-attempt, configurable via constant; `--max-duration` passed to Axiom CLI |
 | Retry masks recurring infrastructure issues | Step 2: error message after retry exhaustion clearly indicates infrastructure issues |
 | Exit code 2 semantics not enforced by external Axiom CLI | Step 2: wrapper treats any non-0/non-1 as infrastructure error, not just exit 2 |

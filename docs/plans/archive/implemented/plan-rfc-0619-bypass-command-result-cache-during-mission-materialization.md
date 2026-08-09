@@ -152,7 +152,7 @@ None.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Regression risk: future refactor removes `force: true` | Step 2 regression test catches removal |
 | Agent confusion: `SKIP (cached)` disappears from output | No mitigation needed — behavior is transparent and documented in code comment |
 | Performance impact: ~5-10s per materialization | No mitigation needed — materialization is infrequent, correctness > speed |

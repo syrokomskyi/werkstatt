@@ -1,9 +1,6 @@
 # Multi-Currency Pricing Module — Architectural Integration Plan
 
-> **Status:** Exploration — prepared for RFC drafting
-> **Date:** 2026-08-07
-> **Source research:** `obsidian/.../6 Prices and Currencies - Chat GPT 5.6 Sol High.md`
-> **Scope:** All sites created via Werkstatt; pluggable paid module
+> **Status:** Exploration — prepared for RFC drafting **Date:** 2026-08-07 **Source research:** `obsidian/.../6 Prices and Currencies - Chat GPT 5.6 Sol High.md` **Scope:** All sites created via Werkstatt; pluggable paid module
 
 ---
 
@@ -20,7 +17,7 @@ This plan adapts the expert's proposals to our actual system, mapping each conce
 ### 2.1 What Already Exists in PBP
 
 | Expert's concept | Our existing construct | Location |
-|---|---|---|
+| --- | --- | --- |
 | Source PriceModel (fixed price) | `PbpCharge` + `PbpChargeAmount` | `packages/pbp/src/entities/pricing.ts` |
 | Canonical currency | `PbpPricing.currency` | `packages/pbp/src/entities/offering.ts:67-73` |
 | Derivation Contract | `PbpDerivationContract` + derivation engine | `packages/pbp/src/derivation.ts`, `packages/pbp/src/compiler/derivations.ts` |
@@ -35,7 +32,7 @@ This plan adapts the expert's proposals to our actual system, mapping each conce
 ### 2.2 What Is Genuinely New
 
 | Expert's concept | Our adaptation | Why it's new |
-|---|---|---|
+| --- | --- | --- |
 | CurrencyPricingPolicy | New PBP entity at business level | No business-level currency strategy exists |
 | RatePolicy + RateSchedule | New PBP entities | No exchange rate model exists |
 | PriceDerivationModel | New derivation contract type | Existing derivations don't do currency conversion |
@@ -207,6 +204,7 @@ A specialized `PbpDerivationContract` that takes a source amount, applies a Rate
 ```
 
 Parameters per target currency:
+
 - `ratePolicyRef` — which rate to use
 - `percentageAdjustment` — markup/discount before rounding
 - `fixedAdjustment` — fixed add-on after percentage
@@ -284,7 +282,7 @@ This is a key simplification: the expert proposed changing `amount` to `amounts`
 New spec nodes to add to `forge-spec.yaml`:
 
 | Node ID | Title | Depends on | Wave |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | RFC-PBP-036a | CurrencyPricingPolicy | RFC-PBP-030, RFC-PBP-040 | 5 |
 | RFC-PBP-036b | RatePolicy and RateSchedule | RFC-PBP-036a | 5 |
 | RFC-PBP-036c | RateSnapshot | RFC-PBP-036b | 5 |
@@ -346,6 +344,7 @@ if (multiCurrencyEntitled) {
 #### 3.4.1 Currency Selector Component
 
 A UI component (`packages/ui/src/components/currency-selector/`) that:
+
 - Reads available target currencies from the compiled CurrencyPricingPolicy projection
 - Persists user selection (localStorage, cookie, or URL param)
 - Triggers re-render of price displays
@@ -355,6 +354,7 @@ The component is only compiled when the `multi-currency` entitlement is resolved
 #### 3.4.2 Price Display Component
 
 Extension of existing price display components to:
+
 - Read the Price Projection (see §3.5) for the selected currency
 - Render formatted amount with locale-aware formatting
 - Show disclosure note for derived prices:
@@ -367,6 +367,7 @@ Extension of existing price display components to:
 #### 3.4.3 Schema.org Output
 
 Schema.org structured data (`packages/share/src/astro/seo/`) must:
+
 - Emit business-declared prices only (source currency)
 - NOT emit derived/indicative prices in structured data
 - This preserves SEO correctness — search engines see canonical prices
@@ -398,6 +399,7 @@ The Website Projection (RFC-PBP-080 / RFC-0455) is extended to include a currenc
 ```
 
 The UI receives this projection and does NOT:
+
 - compute the amount
 - round
 - select a rate
@@ -455,6 +457,7 @@ Per decision #35, the AI agent gets full calculation trace access.
 New service workspace: `services/rate-fetcher-worker/`
 
 Responsibilities:
+
 1. Fetch exchange rates from configured external sources (primary + fallback)
 2. Create RateSnapshot records
 3. Store snapshots in the site's content directory (or a shared rate store)
@@ -482,6 +485,7 @@ Steps 3-5 are new pipeline steps in the build-prepare pipeline (`packages/os/sit
 ### 3.9 Rematerialization Triggers
 
 Derived prices are rematerialized when:
+
 - `source-price-model.published` — Offering pricing changes
 - `rate-snapshot.accepted` — New rate snapshot available
 - `price-derivation-model.activated` — PriceDerivationModel version activated
@@ -568,7 +572,7 @@ All 35 design decisions from the research document's "Решения для ок
 These are Werkstatt platform RFCs that implement the multi-currency module using PBP constructs:
 
 | RFC | Title | Kind | Satisfies |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | RFC-XXXX | Multi-Currency Pricing Module — Program Charter | architecture | DNA-49 (modular composition) |
 | RFC-XXXX | CurrencyPricingPolicy Entity | architecture | DNA-20 (PBP business layer) |
 | RFC-XXXX | RatePolicy and RateSchedule Entities | architecture | DNA-20 |
@@ -591,7 +595,7 @@ New nodes added to `docs/specs/pbp-specification-package/forge-spec.yaml` as ame
 ## 7. Package Impact
 
 | Package | Change type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `packages/pbp` | New entities + schemas | CurrencyPricingPolicy, RatePolicy, RateSchedule, RateSnapshot schemas, entities, and compiler extensions |
 | `packages/pbp` | New derivation | `currency-conversion` derivation contract + `aggregate-then-convert` |
 | `packages/pbp` | Compiler extension | Materialize derived prices into compiled graph |

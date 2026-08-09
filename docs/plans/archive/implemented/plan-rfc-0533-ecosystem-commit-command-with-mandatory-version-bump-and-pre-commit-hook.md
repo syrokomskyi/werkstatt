@@ -305,7 +305,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Semantic hash computation latency | Step 1: hash computed in single pass after `git add`; acceptable for low-frequency platform commits |
 | Env var bypass | Step 4: PC-04 in CI catches bypasses via trailer check in git history |
 | Hook not activated | Step 7: AGENTS.md documents `git config core.hooksPath hooks/`; RFC-0534 handles onboarding automation |

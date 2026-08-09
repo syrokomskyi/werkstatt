@@ -1,8 +1,6 @@
 # Code Review: forge.upgrade --update-npm + RTK onboarding integration
 
-**Date:** 2026-08-03
-**Diff scope:** `HEAD~2..HEAD` (commits `2b98600`, `b980280`)
-**Files reviewed:** 8 files, +408/-5
+**Date:** 2026-08-03 **Diff scope:** `HEAD~2..HEAD` (commits `2b98600`, `b980280`) **Files reviewed:** 8 files, +408/-5
 
 ## Mechanical floor
 
@@ -27,10 +25,10 @@ The npm consumer test setup (creating `node_modules/@warpgogol/forge/` with skil
 
 ## Axis B — DNA alignment
 
-| Invariant | Status | Notes |
-| --- | --- | --- |
-| DNA-2 (pnpm workspace) | PASS | `PM_INSTALL_MAP` correctly maps pnpm to `pnpm add`. |
-| DNA-6 (kebab-case) | PASS | `--update-npm` flag uses kebab-case. |
+| Invariant              | Status | Notes                                               |
+| ---------------------- | ------ | --------------------------------------------------- |
+| DNA-2 (pnpm workspace) | PASS   | `PM_INSTALL_MAP` correctly maps pnpm to `pnpm add`. |
+| DNA-6 (kebab-case)     | PASS   | `--update-npm` flag uses kebab-case.                |
 
 No other DNA invariants are directly touched by this diff.
 
@@ -93,15 +91,15 @@ The `catch` block in `updateNpmPackage` returns `{ updated: false, skipped: "ins
 
 ## Summary
 
-| Axis | Findings | Severity |
-| --- | --- | --- |
-| A — Structural | A1: test fixture duplication | low |
-| B — DNA | none | — |
-| C — Ecosystem | C1: AGENTS.md § Silent upgrade trigger not updated | medium |
-| D — Forward-only | none | — |
-| E — Agent clarity | none | — |
-| F — Test coverage | F1: missing npm install failure test | low |
-| G — Security | none | — |
+| Axis              | Findings                                           | Severity |
+| ----------------- | -------------------------------------------------- | -------- |
+| A — Structural    | A1: test fixture duplication                       | low      |
+| B — DNA           | none                                               | —        |
+| C — Ecosystem     | C1: AGENTS.md § Silent upgrade trigger not updated | medium   |
+| D — Forward-only  | none                                               | —        |
+| E — Agent clarity | none                                               | —        |
+| F — Test coverage | F1: missing npm install failure test               | low      |
+| G — Security      | none                                               | —        |
 
 **Verdict: PASS with 1 medium finding (C1) and 2 low findings (A1, F1)**
 

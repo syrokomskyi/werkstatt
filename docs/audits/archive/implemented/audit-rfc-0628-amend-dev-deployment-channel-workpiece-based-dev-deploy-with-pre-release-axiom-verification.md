@@ -34,6 +34,7 @@ No issues. Все required sections присутствуют с реальным
 **Finding C1:** Rollout не включает шаг для обновления `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section. Risks section явно говорит: "The `AGENTS.md` leitstand section must be updated to reflect the new command and state machine." Но в Rollout этого шага нет. Текущий AGENTS.md описывает `leitstand.deploy` с `--release` flag и `dev-deployed` state — это нужно заменить на `leitstand.dev-deploy` с `--system` flag и workpiece-based flow.
 
 **Finding C2:** `packagesImpacted` не включает `@warpgogol/site-kernel-checks`, но RFC предлагает добавить `commitSha` в `evidence-capsule.yaml`. Этот файл пишется `mission.check` в `packages/os/site-kernel-checks/src/mission-check.ts` (line 496-515). Текущая capsule не содержит `commitSha`. Либо:
+
 - RFC должен уточнить, что `leitstand.dev-deploy` post-processes capsule после `mission.check` (тогда изменение остаётся в `site-kernel-handoff`), ИЛИ
 - `@warpgogol/site-kernel-checks` должно быть добавлено в `packagesImpacted` если `mission.check` модифицируется.
 

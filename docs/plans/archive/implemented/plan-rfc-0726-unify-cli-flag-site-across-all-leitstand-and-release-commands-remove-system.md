@@ -208,7 +208,7 @@ No configuration or data files affected. The `--system` flag is a CLI surface on
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Existing scripts break | Clean break — no backward compat. Step 1-2 remove `--system` entirely. |
 | Agent confusion during transition | Step 4 updates AGENTS.md in the same commit. |
 | Test fixtures break | Step 3 updates all affected test fixtures in the same commit. |

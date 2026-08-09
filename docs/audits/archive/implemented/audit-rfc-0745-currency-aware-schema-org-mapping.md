@@ -32,7 +32,7 @@ Pass — zero violations.
 
 ## Axis B — DNA alignment
 
-1. **DNA-16 satisfaction is thin.** The RFC's `satisfies: [DNA-16]` claims alignment with "Semantic layer shares topology with navigation." The Architectural fit section says "Schema.org output is derived from the same page topology" but doesn't explain how this RFC *enforces* or *protects* DNA-16 — it constrains price output, which is tangential to topology sharing. The `related: [DNA-16]` would be more accurate than `satisfies: [DNA-16]` unless the RFC explains the enforcement mechanism.
+1. **DNA-16 satisfaction is thin.** The RFC's `satisfies: [DNA-16]` claims alignment with "Semantic layer shares topology with navigation." The Architectural fit section says "Schema.org output is derived from the same page topology" but doesn't explain how this RFC _enforces_ or _protects_ DNA-16 — it constrains price output, which is tangential to topology sharing. The `related: [DNA-16]` would be more accurate than `satisfies: [DNA-16]` unless the RFC explains the enforcement mechanism.
 
 ## Axis C — Ecosystem fit
 

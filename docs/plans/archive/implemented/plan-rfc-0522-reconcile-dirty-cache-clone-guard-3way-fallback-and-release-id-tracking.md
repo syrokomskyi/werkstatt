@@ -113,7 +113,7 @@ No configuration or data file changes. The `missionManifestSchema` in `@gogol/on
     1. Try plain `git am <patch>`
     2. On failure: `git am --abort`, then `git am --3way <patch>`
     3. On 3-way failure: `git am --abort`, throw with conflict details
-  - Log fallback: `logger.info(\`  Applied ${patchFile} via 3-way merge fallback\`)`
+  - Log fallback: `logger.info(\` Applied ${patchFile} via 3-way merge fallback\`)`
 
 **Validation:**
 

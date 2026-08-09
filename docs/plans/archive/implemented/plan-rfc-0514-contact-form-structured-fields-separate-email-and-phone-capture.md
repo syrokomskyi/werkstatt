@@ -300,7 +300,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Increased form complexity | Step 2: email is the only required structured field; phone is optional — rendered conditionally |
 | Client-side validation bypass | Step 3: client validates email format; Step 4: server validates email format independently |
 | Migrator failure on edge-case configurations | Step 6: migrator is idempotent (RFC-0479); Step 5: `contact.form.validate` catches missing `emailField` after migration |

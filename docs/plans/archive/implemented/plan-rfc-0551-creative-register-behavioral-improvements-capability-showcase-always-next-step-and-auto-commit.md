@@ -210,7 +210,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Agent misinterprets auto-commit and applies it in business register | Step 3: policy text explicitly states "In the business register, the agent asks before committing" |
 | Always-next-step feels pushy | Step 2: policy text includes "If the agent cannot think of a useful next step, it asks the operator what they feel inspired to do next" |
 | Capability showcase becomes stale | Step 1: capability list maintained in SKILL.md, updated with each Forge release; forge.doctor warns on version mismatch |

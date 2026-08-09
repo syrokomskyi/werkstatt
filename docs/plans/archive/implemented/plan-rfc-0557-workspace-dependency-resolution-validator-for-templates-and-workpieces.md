@@ -291,7 +291,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positives from unused template imports | Step 5 tests verify that all extracted imports are checked regardless of usage — the invariant is resolvability, not usage |
 | Performance of `pnpm install --frozen-lockfile` (~3-5s) | Step 1 runs the subprocess once per pipeline invocation, not per-file; `--no-frozen-lockfile` flag allows skipping |
 | Auto-discovery false positives | Step 5 tests verify that template files with `{{TOKEN}}` placeholders do not break the regex |

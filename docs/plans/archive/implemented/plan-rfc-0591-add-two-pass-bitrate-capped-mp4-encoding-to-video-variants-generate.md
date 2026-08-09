@@ -228,7 +228,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Quality reduction for long content | Step 2 — two-pass with calculated bitrate; AV1/WebM stay CRF-based for quality |
 | Two-pass encoding is slower | Step 2 — encoding is cached; only runs once per source change |
 | Very long videos produce very low quality MP4 | Step 2 — warning logged at < 200 kbps; operator can adjust `maxSizeMb` |

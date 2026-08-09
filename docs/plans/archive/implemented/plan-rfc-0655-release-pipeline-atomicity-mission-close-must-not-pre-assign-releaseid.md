@@ -227,7 +227,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | False positives for re-opened missions | Step 4: test case for re-opened mission validates latest bordbuch entry only |
 | Re-opened mission + release.prepare race | Step 4: test case for release.prepare after close validates close-time state semantics |
 | Missing close-report.json | Step 2: warn and skip; Step 3: check 2 skips with warning; Step 4: test case for missing file |

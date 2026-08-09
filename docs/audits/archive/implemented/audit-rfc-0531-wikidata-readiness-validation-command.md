@@ -29,6 +29,7 @@ However, `auditStatusSchema` in `@/packages/os/site-kernel-checks/src/audit/type
 **Finding A-2: `reads` field omits `<app>/src/content/system.md`.**
 
 The command table entry (line 150-153) declares:
+
 ```ts
 reads: [
   "<app>/src/content/business-profile/**/*.md",
@@ -56,6 +57,7 @@ No issues.
 The AGENTS.md "What lives here" table lists every module in the package with its exports. A new file `audit/validators/wikidata.ts` exporting `runWikidataValidate` should be documented there. The RFC's file system responsibilities table (line 175-181) lists the file but does not mention the AGENTS.md update.
 
 Other items pass:
+
 - Package boundaries: command lives in `@gogol/site-kernel-checks` — correct for validation commands. No import violations.
 - Pipeline placement: standalone (not in `build.check` or `sites-check`) — justified by the non-goal and rollout section.
 - Compass sync: no `docs/*.xml` changes needed — the RFC adds a command, not a repository-wide requirement.

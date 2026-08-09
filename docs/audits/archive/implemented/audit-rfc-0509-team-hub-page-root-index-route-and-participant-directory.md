@@ -17,6 +17,7 @@ The RFC has solid architectural instincts (authored block-declarative hub, found
 ## Mechanical validation (rfc.validate)
 
 Pass with 1 warning:
+
 - **V-19 (warning):** `RFC-0509.amends` includes `RFC-0200`, but `RFC-0200.amendedBy` does not include `RFC-0509`. This is expected — RFC-0200 is in `docs/rfcs/archive/implemented/` and its `amendedBy` field will be updated during implementation. No action needed at draft stage.
 
 ## Axis A — Structural completeness

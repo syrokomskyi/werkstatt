@@ -179,7 +179,7 @@ None — no config or schema changes.
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | `readdirSync` performance on large caches | Step 2: cache is cleared every deploy, should not accumulate thousands of files; non-fatal try/catch |
 | Shared helper API stability | Step 1: interface uses dependency injection (`validateFn`, optional `rebuildFn`), flexible for different callers |
 | Refactoring breaks existing tests | Steps 2-3: run existing tests after each refactoring step; fix before proceeding |

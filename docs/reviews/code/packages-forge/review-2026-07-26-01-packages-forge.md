@@ -62,7 +62,7 @@ No issues. The `postSetup` duplication is a pragmatic trade-off (adapters are in
 
 ### Axis G — Blind spots
 
-1. **Security — command injection risk** — `postSetup` uses `execSync` with string interpolation: `` execSync(`git -C "${sourceDir}" format-patch --all -o "${patchDir}"`) ``. If `sourceDir` or `targetDir` contains shell metacharacters (e.g. `$(...)` or backticks), this is a command injection vector. Use `execFileSync` with array arguments instead: `execFileSync("git", ["-C", sourceDir, "format-patch", "--all", "-o", patchDir])`. This eliminates the shell entirely.
+1. **Security — command injection risk** — `postSetup` uses `execSync` with string interpolation: ``execSync(`git -C "${sourceDir}" format-patch --all -o "${patchDir}"`)``. If `sourceDir` or `targetDir` contains shell metacharacters (e.g. `$(...)` or backticks), this is a command injection vector. Use `execFileSync` with array arguments instead: `execFileSync("git", ["-C", sourceDir, "format-patch", "--all", "-o", patchDir])`. This eliminates the shell entirely.
 
 2. **Privacy** — `operator-profile.md` is in `.gitignore` in all scaffold profiles. Gender is optional. The SKILL.md informs the operator that `operator-profile.md` is local and private. Properly handled.
 

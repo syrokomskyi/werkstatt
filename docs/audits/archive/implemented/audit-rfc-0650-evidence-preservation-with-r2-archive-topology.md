@@ -41,6 +41,7 @@ No issues.
 ## Axis F — Pragmatism
 
 **Finding F1**: `successSignals` contains four entries, but only one is directly verifiable from RFC-0650's code changes:
+
 - Signal 3 ("evidence-metadata.json includes runTimestamp field") — directly verifiable from `mission-check.ts` write path. ✓
 - Signal 1 ("R2 bucket axiom-evidence contains timestamped run objects for every mission.check execution") — depends on `evidence.sync` (RFC-0651) and operator R2 bucket creation. Not achievable by RFC-0650 alone.
 - Signal 2 ("R2 Data Catalog table axiom_evidence_runs is queryable via R2 SQL") — depends on `evidence.sync` (RFC-0651) and operator Data Catalog enablement. Not achievable by RFC-0650 alone.

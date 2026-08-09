@@ -28,7 +28,7 @@ Pass — `rfc.validate --id RFC-0741` reported 0 violations.
 
 ## Axis B — DNA alignment
 
-1. **`satisfies: [DNA-49]` декоративно (строки 24, 180).** DNA-49 описывает fleet propagation (Leitstand deployment). Обоснование в Architectural fit: «Entitlement gating is part of the build pipeline, which feeds into the fleet propagation chain» — это верно для любого шага `build-prepare`. RFC не объясняет, как он *конкретно* защищает или расширяет DNA-49. Если связь с DNA-49 существенна, нужно описать механизм. Если нет — убрать из `satisfies`.
+1. **`satisfies: [DNA-49]` декоративно (строки 24, 180).** DNA-49 описывает fleet propagation (Leitstand deployment). Обоснование в Architectural fit: «Entitlement gating is part of the build pipeline, which feeds into the fleet propagation chain» — это верно для любого шага `build-prepare`. RFC не объясняет, как он _конкретно_ защищает или расширяет DNA-49. Если связь с DNA-49 существенна, нужно описать механизм. Если нет — убрать из `satisfies`.
 
 ## Axis C — Ecosystem fit
 

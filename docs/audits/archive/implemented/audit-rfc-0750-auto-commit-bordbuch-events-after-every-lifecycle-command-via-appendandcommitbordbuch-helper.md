@@ -25,6 +25,7 @@ Pass — 0 нарушений.
 ## Ось B — Выравнивание DNA
 
 No issues. Каждый `satisfies[]` entry — реальный DNA-инвариант:
+
 - DNA-46: mission lifecycle events теперь коммитятся во всех командах, включая `mission.materialize` и `mission.migrate`. ✓
 - DNA-48: `release.ready` и `release.rollback` bordbuch events коммитятся. ✓
 - DNA-49: leitstand events коммитятся. ✓

@@ -17,6 +17,7 @@ The core architectural decision (inline + dependency inversion) is sound and con
 ## Mechanical validation (rfc.validate)
 
 **Pass** with 1 warning:
+
 - V-19 (warning): `RFC-0556.amends` includes `RFC-0374`, but `RFC-0374.amendedBy` does not include `RFC-0556`. Expected — the `amendedBy` entry will be added during enhance/implementation.
 
 ## Axis A — Structural completeness

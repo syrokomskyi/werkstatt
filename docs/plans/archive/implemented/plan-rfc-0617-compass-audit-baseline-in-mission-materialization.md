@@ -204,7 +204,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
+| --- | --- |
 | Performance — baseline scans workpiece directory | Step 2: workpiece is small (tens to hundreds of files), scan is < 1s |
 | Ledger churn — stale entries from aborted missions | Step 2: benign, `compass.audit.validate` only checks files that still exist |
 | Agent confusion — `--workpiece` scope unclear | Step 4: AGENTS.md documents the flag and its purpose |
