@@ -170,7 +170,6 @@ function buildDnsAidRecord(manifest: AgentSurfaceManifest): DnsAidRecord {
 | `packages/werkstatt-site/src/checks/agent/agent-dns-aid.ts` | New module — generate + validate handlers |
 | `packages/werkstatt-site/src/checks/command-tables/29-agent-surface.ts` | Amended — new command entries |
 | `packages/werkstatt-site/src/domain/ontology/schemas/dns-records.ts` | Amended — `ttl?: number` field added to `dnsRecordDeclarationSchema` |
-| `packages/werkstatt-site/src/checks/generator-ownership.ts` | Amended — `agent.dns-aid.generate` registered as owner of the DNS-AID section in `dns-records.yaml` |
 | `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | Amended — `agent.dns-aid.generate` added after `agent.manifest.generate` |
 | `packages/werkstatt-site/src/checks/pipelines/sites-check-author.ts` | Amended — `agent.dns-aid.validate` added alongside other agent surface validators |
 
@@ -293,7 +292,6 @@ _agent.warpgogol.com. 3600 IN TXT "https://warpgogol.com/.well-known/agent.json"
 - [ ] Generator writes DNS-AID TXT record to `dns-records.yaml` in marked section
 - [ ] Generator is idempotent — regenerating produces byte-identical output (DNA-58)
 - [ ] `ttl?: number` field added to `dnsRecordDeclarationSchema` in `packages/werkstatt-site/src/domain/ontology/schemas/dns-records.ts`
-- [ ] `agent.dns-aid.generate` registered in `GENERATOR_OWNERSHIP_MAP` for `generated.drift.validate` coverage (DNA-58)
 - [ ] `agent.dns-aid.validate` emits `AGD-01..04` diagnostics with correct severity (error for AGD-01..03, warning for AGD-04)
 - [ ] `agent.dns-aid.validate` is advisory (exit 0 with diagnostics), consistent with `dns.record.validate`
 - [ ] `dig TXT _agent.warpgogol.com` returns the agent.json URL after `dns.record.upsert`
