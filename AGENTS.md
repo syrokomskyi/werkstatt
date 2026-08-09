@@ -33,6 +33,14 @@ The Werkstatt engine is stack-agnostic. Stack-specific logic (Astro, Phaser, vid
 - **Warn-only transition:** Until `forge.yaml` has a `profile` field, PLUGIN-01 is a warning, not an error. This allows workshops to operate without a plugin during the transition period (RFC-0776).
 - **Package:** `@warpgogol/werkstatt` (`packages/werkstatt/`) owns the contract types, plugin registry, and the `werkstatt.plugin.validate` command. The module is registered in `tools/kernel.config.ts` as `werkstatt-plugin`.
 
+## Publication policy (RFC-0773)
+
+- Agents MUST NOT trigger `npm publish` without an explicit operator command. Publication is operator-triggered, never automated.
+- Extraction configs (`extract.config.yaml`) are pinned in `.forge/pinned.yaml` (protect mode) and MUST NOT be deleted or modified without operator approval.
+- All extraction configs MUST include `excludePathSegments: [".npmrc"]` to prevent npm token leakage.
+- The publication runbook lives at `docs/authoring/publication-runbook.md` — agents MUST follow it when assisting with publication.
+- A fixture workshop for tarball smoke testing is maintained at `packages/werkstatt/test-fixtures/fixture-workshop/`.
+
 ## Repository setup (Git LFS)
 
 This repository uses **Git LFS** for media files. Ensure `git lfs install` has been run once in the repo before working with it, otherwise video/image files will appear as LFS pointers instead of real content. CI templates (`github-deploy.template.yml`) already include `lfs: true` in the checkout step.

@@ -167,20 +167,20 @@ If `npm publish` succeeds but the published package is broken: `npm deprecate <p
 
 ## Acceptance criteria
 
-**Agent-executable:**
+- [x] `extract.config.yaml` exists for `packages/werkstatt` (and plugin packages as they land) with `excludePathSegments: [".npmrc"]` (evidence: `packages/werkstatt/extract.config.yaml:22`, `pinned.validate` pass)
+- [x] Versioning policy (independent SemVer + engine peerDependency ranges + breaking-major-all-plugins-republished rule) documented in engine README (evidence: `packages/werkstatt/README.md:17-23`)
+- [x] Publication runbook written at `docs/authoring/publication-runbook.md` (dry-run → extract → build → pack → fixture install → publish) (evidence: `docs/authoring/publication-runbook.md:1-95`)
+- [x] Fixture workshop created in engine package test fixtures (evidence: `packages/werkstatt/test-fixtures/fixture-workshop/` — `forge.yaml`, `tools/kernel.config.ts`, `systems/registry.yaml`, `missions/.gitkeep`, `package.json`)
+- [x] Extraction configs pinned in `.forge/pinned.yaml` (protect mode) (evidence: `.forge/pinned.yaml:80-82`, `pinned.validate` pass)
+- [x] `docs/technology.xml` updated with publication pipeline entry (evidence: `docs/technology.xml:251-267`)
+- [x] Root `AGENTS.md` updated with agent publication rule (evidence: `AGENTS.md:36-42`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0773` → "All 1 RFC(s) passed validation")
 
-- [ ] `extract.config.yaml` exists for `packages/werkstatt` (and plugin packages as they land) with `excludePathSegments: [".npmrc"]`
-- [ ] Versioning policy (independent SemVer + engine peerDependency ranges + breaking-major-all-plugins-republished rule) documented in engine README
-- [ ] Publication runbook written at `docs/authoring/publication-runbook.md` (dry-run → extract → build → pack → fixture install → publish)
-- [ ] Fixture workshop created in engine package test fixtures
-- [ ] Extraction configs pinned in `.forge/pinned.yaml` (protect mode)
-- [ ] `docs/technology.xml` updated with publication pipeline entry
-- [ ] Root `AGENTS.md` updated with agent publication rule
-- [ ] `rfc.validate` passes on this file before merging
+## Deferred work
 
 **Operator-executable (requires npm token, registry access):**
 
-- [ ] Publication runbook verified end-to-end once (dry-run → extract → build → pack → fixture install → `npm publish`)
+- [ ] Publication runbook verified end-to-end once (dry-run → extract → build → pack → fixture install → `npm publish`) — deferred to operator; requires npm token and `@warpgogol` scope registry access.
 
 ## Implementation notes for agents
 

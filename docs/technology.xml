@@ -248,6 +248,24 @@
     </rules>
   </Compass-automation>
 
+  <publication-pipeline rfc="RFC-0773">
+    <tool>repo-extract</tool>
+    <registry>npm (private scoped)</registry>
+    <scope>@warpgogol</scope>
+    <access>restricted</access>
+    <trigger>operator-triggered</trigger>
+    <config>extract.config.yaml</config>
+    <config-pinned>.forge/pinned.yaml (protect mode)</config-pinned>
+    <fixture-workshop>packages/werkstatt/test-fixtures/fixture-workshop/</fixture-workshop>
+    <runbook>docs/authoring/publication-runbook.md</runbook>
+    <rules>
+      <rule>Agents MUST NOT trigger npm publish without an explicit operator command.</rule>
+      <rule>Publication is operator-triggered, never automated.</rule>
+      <rule>All extraction configs MUST include excludePathSegments: [".npmrc"] to prevent token leakage.</rule>
+      <rule>Breaking engine major requires all plugin packages to be republished simultaneously.</rule>
+    </rules>
+  </publication-pipeline>
+
   <p2p-topology>
     <layer id="git-mesh" rfc="RFC-0563">
       <path>`packages/os/site-kernel/src/gitmesh/`</path>

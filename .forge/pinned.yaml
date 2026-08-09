@@ -77,3 +77,6 @@ pinned:
   - path: docs/COMMANDS.md
     mode: protect
     reason: Command reference documentation
+  - path: packages/werkstatt/extract.config.yaml
+    mode: protect
+    reason: Engine extraction config — required for npm publication (RFC-0773)
