@@ -1,7 +1,7 @@
 ---
 id: RFC-0780
 title: "Workshop v5.0.0 major version bump"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
 enhancedAt: 2026-08-09
-implementedAt:
+implementedAt: 2026-08-09
 closedAt:
 supersedes: []
 supersededBy:
