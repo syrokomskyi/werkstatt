@@ -12,7 +12,7 @@ that a stack plugin implements and registers with the engine (RFC-0770).</purpos
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule, KernelPipelineStep } from "@warpgogol/site-kernel/types";
+import type { KernelModule, KernelPipelineStep } from "./kernel/types.ts";
 
 /**
  * Placeholder type for deploy adapter factories.

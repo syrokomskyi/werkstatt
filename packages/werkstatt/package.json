@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Werkstatt engine plugin contract and validation (RFC-0770).",
+  "description": "Werkstatt engine — stack-agnostic lifecycle platform (RFC-0769/0772).",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "bin": {
+    "site-kernel": "./bin/site-kernel.mjs"
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -18,20 +21,151 @@
     "./os/werkstatt-plugin-module": {
       "types": "./os/werkstatt-plugin.module.ts",
       "default": "./os/werkstatt-plugin.module.ts"
+    },
+    "./package.json": "./package.json",
+    "./kernel": {
+      "types": "./src/kernel/index.ts",
+      "default": "./src/kernel/index.ts"
+    },
+    "./kernel/icons": {
+      "types": "./src/kernel/icons/icons.module.ts",
+      "default": "./src/kernel/icons/icons.module.ts"
+    },
+    "./kernel/adr": {
+      "types": "./src/kernel/adr/index.ts",
+      "default": "./src/kernel/adr/index.ts"
+    },
+    "./kernel/change-impact": {
+      "types": "./src/kernel/change-impact.ts",
+      "default": "./src/kernel/change-impact.ts"
+    },
+    "./kernel/change-impact-module": {
+      "types": "./src/kernel/change-impact.module.ts",
+      "default": "./src/kernel/change-impact.module.ts"
+    },
+    "./kernel/cli": {
+      "types": "./src/kernel/cli/index.ts",
+      "default": "./src/kernel/cli/index.ts"
+    },
+    "./kernel/commit-message": {
+      "types": "./src/kernel/commit-message.module.ts",
+      "default": "./src/kernel/commit-message.module.ts"
+    },
+    "./kernel/command-manifest": {
+      "types": "./src/kernel/command-manifest.ts",
+      "default": "./src/kernel/command-manifest.ts"
+    },
+    "./kernel/command-manifest-module": {
+      "types": "./src/kernel/command-manifest.module.ts",
+      "default": "./src/kernel/command-manifest.module.ts"
+    },
+    "./kernel/cache-module": {
+      "types": "./src/kernel/cache/cache-module.ts",
+      "default": "./src/kernel/cache/cache-module.ts"
+    },
+    "./kernel/discovery": {
+      "types": "./src/kernel/discovery.ts",
+      "default": "./src/kernel/discovery.ts"
+    },
+    "./kernel/generated-marker": {
+      "types": "./src/kernel/generated-marker.ts",
+      "default": "./src/kernel/generated-marker.ts"
+    },
+    "./kernel/gitmesh-module": {
+      "types": "./src/kernel/gitmesh/gitmesh-module.ts",
+      "default": "./src/kernel/gitmesh/gitmesh-module.ts"
+    },
+    "./kernel/swim-module": {
+      "types": "./src/kernel/swim/swim-module.ts",
+      "default": "./src/kernel/swim/swim-module.ts"
+    },
+    "./kernel/lagebild": {
+      "types": "./src/kernel/lagebild/index.ts",
+      "default": "./src/kernel/lagebild/index.ts"
+    },
+    "./kernel/lagebild-module": {
+      "types": "./src/kernel/lagebild/lagebild.module.ts",
+      "default": "./src/kernel/lagebild/lagebild.module.ts"
+    },
+    "./kernel/pipeline-budget": {
+      "types": "./src/kernel/pipeline-budget.module.ts",
+      "default": "./src/kernel/pipeline-budget.module.ts"
+    },
+    "./kernel/pipeline-budgets": {
+      "types": "./src/kernel/pipeline-budgets.ts",
+      "default": "./src/kernel/pipeline-budgets.ts"
+    },
+    "./kernel/semantic": {
+      "types": "./src/kernel/semantic/semantic.module.ts",
+      "default": "./src/kernel/semantic/semantic.module.ts"
+    },
+    "./kernel/runtime": {
+      "types": "./src/kernel/runtime.ts",
+      "default": "./src/kernel/runtime.ts"
+    },
+    "./kernel/types": {
+      "types": "./src/kernel/types.ts",
+      "default": "./src/kernel/types.ts"
+    },
+    "./kernel/workspace-discovery": {
+      "types": "./src/kernel/workspace-discovery.ts",
+      "default": "./src/kernel/workspace-discovery.ts"
+    },
+    "./kernel/workspace-io": {
+      "types": "./src/kernel/workspace-io.ts",
+      "default": "./src/kernel/workspace-io.ts"
+    },
+    "./kernel/workflow": {
+      "types": "./src/kernel/workflow/index.ts",
+      "default": "./src/kernel/workflow/index.ts"
+    },
+    "./kernel/dht": {
+      "types": "./src/kernel/dht/types.ts",
+      "default": "./src/kernel/dht/types.ts"
+    },
+    "./kernel/dht-module": {
+      "types": "./src/kernel/dht/dht-module.ts",
+      "default": "./src/kernel/dht/dht-module.ts"
     }
   },
+  "files": ["src", "bin", "os"],
   "scripts": {
-    "build:check": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@warpgogol/site-kernel": "workspace:*",
-    "tsx": "^4.20.0",
+    "@libp2p/identify": "^4.1.12",
+    "@libp2p/kad-dht": "^16.4.2",
+    "@libp2p/peer-id": "^6.0.14",
+    "@libp2p/ping": "^3.1.11",
+    "@libp2p/tcp": "^11.0.26",
+    "@multiformats/multiaddr": "^13.0.3",
+    "@warpgogol/fingerprint": "workspace:*",
+    "@warpgogol/forge": "workspace:*",
+    "@warpgogol/integration-adapter-supabase-crm": "workspace:*",
+    "@warpgogol/observability": "workspace:*",
+    "@warpgogol/ontology": "workspace:*",
+    "@warpgogol/passport": "workspace:*",
+    "@warpgogol/share": "workspace:*",
+    "@warpgogol/site-kernel-content": "workspace:*",
+    "dotenv": "^17.4.2",
+    "libp2p": "^3.3.8",
+    "picomatch": "^4.0.5",
+    "tsx": "^4.23.1",
+    "uuid": "^14.0.1",
     "yaml": "^2.9.0"
   },
+  "optionalDependencies": {
+    "better-sqlite3": "^13.0.2"
+  },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^26.1.2",
+    "@types/picomatch": "^4.0.3",
+    "@types/uuid": "^11.0.0",
+    "fast-check": "^4.9.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }

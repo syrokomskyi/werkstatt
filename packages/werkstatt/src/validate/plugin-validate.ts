@@ -19,7 +19,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parse as parseYaml } from "yaml";
 import { tsImport } from "tsx/esm/api";
-import type { KernelAppConfig, KernelModule } from "@warpgogol/site-kernel/types";
+import type { KernelAppConfig, KernelModule } from "../kernel/types.ts";
 
 const PLUGIN_SCHEMA = "werkstatt/plugin@1";
 const KERNEL_CONFIG_REL = "tools/kernel.config.ts";

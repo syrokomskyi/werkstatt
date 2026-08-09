@@ -15,7 +15,7 @@ import type {
   KernelCommandResult,
   KernelModule,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel/types";
+} from "../src/kernel/types.ts";
 import { validatePlugin, type PluginValidateData } from "../src/validate/plugin-validate.ts";
 
 export const forgeWerkstattPluginModule: KernelModule = {
