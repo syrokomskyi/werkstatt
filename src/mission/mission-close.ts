@@ -37,10 +37,10 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import {
-  readRegistry,
-  writeRegistry,
-  findEntry,
-  resolveCachePath,
+  readSystemConfig,
+  readSystemState,
+  writeSystemState,
+  resolveCacheClonePath,
   resolveMirrorPath,
 } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
@@ -270,11 +270,10 @@ export async function runMissionClose(
     let mirrorInSync = false;
     let recommendation: string | null = null;
 
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, manifest.systemId);
+    const config = await readSystemConfig(workspaceRoot, manifest.systemId);
 
-    if (entry && entry.mirrors.length > 1) {
-      const bareMirror = entry.mirrors[1];
+    if (config && config.mirrors.length > 1) {
+      const bareMirror = config.mirrors[1];
       const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
       if (existsSync(bareRepoPath)) {
         try {
@@ -289,7 +288,7 @@ export async function runMissionClose(
           } catch {
             originSha = null;
           }
-          if (entry.mirrors.length > 2) {
+          if (config.mirrors.length > 2) {
             try {
               mirrorSha = gitExec(bareRepoPath, `rev-parse refs/mirror/${branch}`);
             } catch {
@@ -307,7 +306,7 @@ export async function runMissionClose(
       recommendation = `Mirror is behind origin. Run: sternsystem.sync --id ${manifest.systemId}`;
     } else if (originSha && mirrorSha && originSha === mirrorSha) {
       mirrorInSync = true;
-    } else if (entry && entry.mirrors.length > 2 && !mirrorSha) {
+    } else if (config && config.mirrors.length > 2 && !mirrorSha) {
       mirrorInSync = false;
       recommendation = `Mirror ref not found in bare repo. Run: sternsystem.sync --id ${manifest.systemId}`;
     } else {
@@ -315,7 +314,7 @@ export async function runMissionClose(
     }
 
     // RFC-0705: Block close if external mirrors are configured and out of sync.
-    if (entry && entry.mirrors.length > 2 && !mirrorInSync) {
+    if (config && config.mirrors.length > 2 && !mirrorInSync) {
       throw new Error(
         `[mission.close] external mirrors are out of sync for system '${manifest.systemId}'. ` +
           `${recommendation ?? "Run: sternsystem.sync --id " + manifest.systemId}`,
@@ -357,7 +356,7 @@ export async function runMissionClose(
       `Bordbuch: mission-close ${missionId}`,
     );
 
-    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+    const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
 
     // Gather dirty files (excluding bordbuch which was just committed)
     let dirtyFiles: string[] = [];
@@ -476,16 +475,17 @@ export async function runMissionClose(
     const evidencePath = path.join(missionDir, "evidence", "close-report.json");
     await atomicWriteFile(evidencePath, JSON.stringify(closeReport, null, 2) + "\n");
 
-    if (entry && entry.currentMission === missionId) {
-      entry.currentMission = null;
-      await writeRegistry(workspaceRoot, registry);
+    const closeState = await readSystemState(workspaceRoot, manifest.systemId);
+    if (closeState.currentMission === missionId) {
+      closeState.currentMission = null;
+      await writeSystemState(workspaceRoot, manifest.systemId, closeState);
     }
 
     // RFC-0703: Auto-pin platform version on mission close.
     // Called within the existing lock scope (registry, system, mission locks held).
-    // sternsystem.pin reads/writes the registry without acquiring locks — safe here.
-    // Pin's writeRegistry overwrites the registry with both currentMission: null AND pinnedPlatform updated.
-    // commitWerkstattSideEffects then commits the combined registry change in one commit.
+    // sternsystem.pin reads/writes the config without acquiring locks — safe here.
+    // Pin's writeSystemConfig updates pinnedPlatform.
+    // commitWerkstattSideEffects then commits the combined change in one commit.
     try {
       const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
       const pinResult = (await executeKernelCommand({
@@ -511,7 +511,7 @@ export async function runMissionClose(
 
     // RFC-0703: Commit system.pin.json to cache clone after pin
     try {
-      const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+      const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
       gitExec(systemDir, "add system.pin.json");
       gitExec(
         systemDir,
@@ -527,7 +527,7 @@ export async function runMissionClose(
     // RFC-0580: auto-commit werkstatt side-effects
     await commitWerkstattSideEffects(
       workspaceRoot,
-      [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
+      [path.join("missions", missionId, "mission.yaml")],
       `werkstatt: mission.close ${missionId}`,
     );
 
@@ -536,7 +536,7 @@ export async function runMissionClose(
     // so the state file must be written AFTER the sync to capture the final HEAD.
     // Non-fatal: sync failure logs a warning but does not block close — the mission
     // is already closed (irreversible). The operator can retry sternsystem.sync manually.
-    if (entry && entry.mirrors.length > 2) {
+    if (config && config.mirrors.length > 2) {
       try {
         const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
         logger.info(`  Syncing external mirrors via sternsystem.sync…`);
@@ -575,7 +575,7 @@ export async function runMissionClose(
     // bordbuch committed, state transitioned to closed). If close failed midway, no state
     // file is written — next materialization runs full preflight (safe fallback).
     try {
-      const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+      const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
       // Get current cache clone HEAD
       let cacheCloneHead: string | null = null;
       try {

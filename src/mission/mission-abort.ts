@@ -25,7 +25,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import { readSystemState, writeSystemState } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty, countOperatorCommits } from "./mission-git-commit.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
@@ -136,17 +136,16 @@ export async function runMissionAbort(
       `Bordbuch: mission-abort ${missionId}`,
     );
 
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, manifest.systemId);
-    if (entry && entry.currentMission === missionId) {
-      entry.currentMission = null;
-      await writeRegistry(workspaceRoot, registry);
+    const state = await readSystemState(workspaceRoot, manifest.systemId);
+    if (state.currentMission === missionId) {
+      state.currentMission = null;
+      await writeSystemState(workspaceRoot, manifest.systemId, state);
     }
 
     // RFC-0580: auto-commit werkstatt side-effects
     await commitWerkstattSideEffects(
       workspaceRoot,
-      [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
+      [path.join("missions", missionId, "mission.yaml")],
       `werkstatt: mission.abort ${missionId}`,
     );
 
