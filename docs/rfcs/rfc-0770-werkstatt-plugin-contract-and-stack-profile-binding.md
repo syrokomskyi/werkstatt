@@ -222,13 +222,13 @@ Workspace scope. Verifies: exactly one plugin registered; plugin `profileId` mat
 
 ## Acceptance criteria
 
-- [x] `WerkstattPlugin`, `WerkstattPluginHooks`, `PluginRegistry` types defined in the engine package (`packages/werkstatt`)
-- [x] `werkstatt.plugin.validate` registered (workspace scope) with documented `--json` output
-- [x] PLUGIN-01..05 failure modes covered by unit tests
-- [x] Profile binding cross-check implemented (plugin `profileId` ↔ `forge.yaml` `profile` field)
-- [x] Warn-only behavior for PLUGIN-01 implemented and tested (transition period)
-- [x] Root `AGENTS.md` documents the plugin contract for agents
-- [x] `rfc.validate` passes on this file before merging
+- [x] `WerkstattPlugin`, `WerkstattPluginHooks`, `PluginRegistry` types defined in the engine package (`packages/werkstatt`) (evidence: `packages/werkstatt/src/plugin-contract.ts`, `packages/werkstatt/src/plugin-registry.ts`)
+- [x] `werkstatt.plugin.validate` registered (workspace scope) with documented `--json` output (evidence: `packages/werkstatt/os/werkstatt-plugin.module.ts`, `tools/kernel.config.ts` line 153-154, `docs/command-manifest.generated.yaml` entry `werkstatt.plugin.validate`)
+- [x] PLUGIN-01..05 failure modes covered by unit tests (evidence: `packages/werkstatt/src/validate/plugin-validate.test.ts` — 9 tests, all passing)
+- [x] Profile binding cross-check implemented (plugin `profileId` ↔ `forge.yaml` `profile` field) (evidence: `packages/werkstatt/src/validate/plugin-validate.ts` PLUGIN-02 check, `readForgeProfile` function)
+- [x] Warn-only behavior for PLUGIN-01 implemented and tested (transition period) (evidence: `packages/werkstatt/src/validate/plugin-validate.ts` lines 88-98, test `PLUGIN-01 (warn-only)` — exit 0, severity warning)
+- [x] Root `AGENTS.md` documents the plugin contract for agents (evidence: `AGENTS.md` section `Werkstatt plugin contract (RFC-0770)` lines 24-34)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0770` — exit 0, `All 1 RFC(s) passed validation`)
 
 ## Implementation notes for agents
 
