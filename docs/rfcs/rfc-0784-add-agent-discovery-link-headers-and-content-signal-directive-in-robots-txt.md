@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -105,6 +106,7 @@ The `public.infrastructure.generate` command adds RFC 8288 `Link:` headers to th
 - **RFC-0286** (agent surface) — Link headers point to the agent surface endpoints (`agent.json`, `agent.openapi.json`).
 - **RFC-0783** (API Catalog + MCP Server Card) — Link headers also point to `/.well-known/api-catalog` and `/.well-known/mcp/server-card.json` once those generators are implemented.
 - **Site OS operator model** — both changes are in existing generators, no new commands, no new pipeline steps.
+- **Compass sync** — no `docs/*.xml` files require synchronization. The changes are additive output in existing generators; no new contracts, no new commands, no new shared package APIs.
 
 ## Design
 
@@ -146,9 +148,12 @@ export interface RobotsPolicy {
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/codegen/templates/app-boilerplate/public/_headers.template` | Amended — add `Link:` headers to `/*` block |
+| `packages/werkstatt-site/src/codegen/templates/app-boilerplate/public/_headers.template` | Amended — add `{{AGENT_LINK_HEADERS}}` token to `/*` block |
+| `packages/werkstatt-site/src/codegen/app-boilerplate.ts` | Amended — resolve `AGENT_LINK_HEADERS` token: Link header lines when `agent.enabled !== false`, empty string otherwise |
 | `packages/werkstatt-site/src/domain/share/semantic/robots.ts` | Amended — add `contentSignal` field to `RobotsPolicy` and `Content-Signal:` output to `buildRobotsTxt()` |
-| `packages/werkstatt-site/src/checks/robots.ts` | Amended — pass `contentSignal` from `system.md` robots block |
+| `packages/werkstatt-site/src/checks/robots.ts` | Amended — pass `contentSignal` from `system.md` robots block, or default `["text/html", "text/markdown", "application/ld+json", "text/plain"]` when absent |
+| `packages/werkstatt-site/src/checks/public-surface/security.ts` | Amended — add HDR-05 rule: verify `Link:` headers present in `/*` block when `agent.enabled !== false` |
+| `packages/werkstatt-site/src/checks/robots.ts` | Amended — add PUBTXT rule: verify `Content-Signal:` directive present in `robots.txt` |
 | `public/_headers` | Generated output — gains `Link:` headers |
 | `public/robots.txt` | Generated output — gains `Content-Signal:` line |
 
@@ -181,16 +186,25 @@ Content-Signal: text/html, text/markdown, application/ld+json, text/plain
 
 ### Failure modes
 
-No new failure modes. Both changes are additive output in existing generators. The existing validators (`headers.security.validate` HDR-01, `robots.validate` PUBTXT-*) continue to check the files they already check.
+**`headers.security.validate`** — new rule `HDR-05`:
 
-If `Content-Signal:` is absent from `system.md` robots block, `buildRobotsTxt()` omits the line silently — it is optional, not required. The default `contentSignal` value is `["text/html", "text/markdown", "application/ld+json", "text/plain"]` when the site has markdown twins (which all Werkstatt sites do).
+- `HDR-05`: `Link:` header pointing to `/.well-known/agent.json` absent from `/*` block when `agent.enabled !== false` → error, fixHint: rerun `public.infrastructure.generate`.
+- When `agent.enabled: false`, `HDR-05` is silent — Link headers are expected to be absent.
+
+**`robots.validate`** — new rule `PUBTXT-CS`:
+
+- `PUBTXT-CS`: `Content-Signal:` directive absent from `robots.txt` → error, fixHint: rerun `robots.generate`.
+
+Both validators exit non-zero on any error. `--json` output follows the standard `CheckResult` shape with `diagnostics[]`.
+
+**Default `contentSignal` resolution**: `robots.generate` sets `contentSignal` to the value from `system.md` robots block. When absent, `robots.generate` passes the default `["text/html", "text/markdown", "application/ld+json", "text/plain"]` (all Werkstatt sites have markdown twins). `buildRobotsTxt()` outputs the `Content-Signal:` line when `contentSignal` is present in the `RobotsPolicy` — it has no fallback logic of its own.
 
 ## Rollout
 
 - **Existing apps**: All apps get the new `Link:` headers and `Content-Signal:` directive on their next `build.prepare` run. No flag day, no migration — both changes are additive to generated output.
 - **New apps**: Onboarding scaffold already runs `public.infrastructure.generate` and `robots.generate`; the new output is automatic.
-- **`agent.enabled: false` apps**: Link headers pointing to `/.well-known/api-catalog` and `/.well-known/mcp/server-card.json` are still emitted — the endpoints may not exist, but the `Link:` header is a hint, not a guarantee. Agents that follow the link get a 404, which is correct behavior for a disabled agent surface. Alternatively, `public.infrastructure.generate` can conditionally omit agent-surface Link headers when `agent.enabled: false` — this is an implementation decision.
-- **Template vs generator**: The `_headers.template` is a static template with `{{TOKEN}}` substitution. The Link headers are static (site-relative paths, not domain-specific), so they can be hardcoded in the template. No new tokens needed.
+- **`agent.enabled: false` apps**: `public.infrastructure.generate` omits all agent-surface `Link:` headers when `agent.enabled: false` in `system.md`. The template uses a `{{AGENT_LINK_HEADERS}}` token that resolves to the Link header lines when `agent.enabled !== false` and to an empty string otherwise. This avoids emitting discovery hints for endpoints that do not exist.
+- **Template vs generator**: The `_headers.template` uses `{{TOKEN}}` substitution. The Link headers are site-relative paths, not domain-specific, but their presence depends on `agent.enabled`. A new `{{AGENT_LINK_HEADERS}}` token is resolved by `public.infrastructure.generate` based on the manifest's `agent.enabled` flag.
 
 ## Alternatives considered
 
@@ -214,8 +228,11 @@ If `Content-Signal:` is absent from `system.md` robots block, `buildRobotsTxt()`
 - [ ] `robots.generate` passes `contentSignal` from `system.md` robots block (or default)
 - [ ] `_headers.template` includes `Link:` headers in `/*` block pointing to all 5 agent discovery endpoints
 - [ ] `public.infrastructure.generate` output (`_headers`) contains the Link headers
-- [ ] `headers.security.validate` still passes (HDR-01..03 unchanged)
-- [ ] `robots.validate` still passes (PUBTXT rules unchanged)
+- [ ] `headers.security.validate` includes new `HDR-05` rule: `Link:` headers present in `/*` block when `agent.enabled !== false`
+- [ ] `robots.validate` includes new `PUBTXT-CS` rule: `Content-Signal:` directive present in `robots.txt`
+- [ ] `HDR-05` is silent when `agent.enabled: false` (Link headers absent, no error)
+- [ ] `headers.security.validate` still passes (HDR-01..04 unchanged)
+- [ ] `robots.validate` still passes (existing PUBTXT rules unchanged)
 - [ ] `isitagentready.com` reports Link headers present for warpgogol.com after deploy
 - [ ] `isitagentready.com` reports Content-Signal directive present for warpgogol.com after deploy
 - [ ] `rfc.validate` passes on this file before merging
@@ -227,6 +244,6 @@ If `Content-Signal:` is absent from `system.md` robots block, `buildRobotsTxt()`
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0784` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0784 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The `_headers.template` is a static file with `{{TOKEN}}` substitution — Link headers are site-relative paths, not domain-specific, so they can be hardcoded in the template without new tokens.
+- The `_headers.template` uses a `{{AGENT_LINK_HEADERS}}` token — `public.infrastructure.generate` resolves it to the Link header lines when `agent.enabled !== false` and to an empty string otherwise.
 - The `Content-Signal:` directive in `buildRobotsTxt()` MUST be placed after the header comment and before the `User-agent: *` block.
 - If RFC-0783 is not yet implemented, the Link headers pointing to `/.well-known/api-catalog` and `/.well-known/mcp/server-card.json` will produce 404s. This is acceptable — the Link header is a discovery hint, not a guarantee. Implementation order: RFC-0783 first, then RFC-0784.
