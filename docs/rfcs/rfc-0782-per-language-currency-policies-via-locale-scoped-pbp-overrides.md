@@ -1,7 +1,7 @@
 ---
 id: RFC-0782
 title: "Per-language currency policies via locale-scoped PBP overrides"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
 enhancedAt: 2026-08-09
-implementedAt:
+implementedAt: 2026-08-09
 closedAt:
 supersedes: []
 supersededBy:
