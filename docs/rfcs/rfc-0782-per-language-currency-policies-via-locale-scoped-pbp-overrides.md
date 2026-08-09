@@ -6,9 +6,11 @@ kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -34,7 +36,7 @@ appsImpacted:
 packagesImpacted:
   - werkstatt-site
 successSignals:
-  - "DE locale shows EUR-only pricing (no currency selector)"
+  - "DE locale shows no currency selector (EUR default, selector hidden by activeLang !== defaultLang)"
   - "UK locale shows EUR + UAH currency selector with per-language currency policy"
   - "localStorage key wg-currency:{lang} isolates currency choice per language"
   - "loadTargetCurrencies returns locale-specific currency list after deep-merge"
@@ -65,6 +67,7 @@ The warpgogol-com site supports two languages: German (`de`, default) and Ukrain
 **Problem**: The PBP compiler (before RFC-0781) cannot handle per-language currency policies. If a `currency-pricing-policy/default.md` exists in both `de/` and `uk/` with the same entity ID, the compiler flags the second as a fatal duplicate. This means the site cannot have different currency policies per language — German visitors always see the same currency list as Ukrainian visitors.
 
 **Desired behavior**: German visitors see EUR-only pricing (no currency selector needed). Ukrainian visitors see EUR + UAH with the currency selector. This requires:
+
 1. A `currency-pricing-policy/default.md` in `de/` with only EUR (base currency, no target currencies)
 2. A `currency-pricing-policy/default.md` in `uk/` with EUR base + UAH target
 3. The PBP compiler (fixed by RFC-0781) deep-merges the UK overlay onto the DE base
@@ -97,9 +100,9 @@ The site gains per-language currency policies through locale-scoped PBP override
 
 A `uk/currency-pricing-policies/default.md` file is created with the same entity ID as the DE version. It declares EUR as base currency and UAH as a target currency. After RFC-0781's deep-merge, the UK locale gets the merged policy with both EUR and UAH.
 
-### Part 2: DE currency-pricing-policy — EUR-only base
+### Part 2: Currency selector visibility — unchanged
 
-The existing `de/currency-pricing-policies/default.md` keeps EUR as base currency and UAH as target. The currency selector visibility logic changes: instead of `activeLang !== defaultLang`, the selector is shown when `currencies.length > 1` (more than just the base currency).
+The existing visibility condition `currencies.length > 0 && activeLang !== defaultLang` in `header-component.astro:111` is kept unchanged. DE (default language) never shows the selector. UK (non-default) shows it when currencies are available. The DE policy keeps `targetCurrencies.uah` for schema compliance (the schema requires at least one target entry). DE visitors see EUR prices by default — UAH price variants exist in the HTML but are hidden because `data-wg-currency` is set to EUR by the inline script.
 
 ### Part 3: Locale-scoped localStorage key
 
@@ -163,22 +166,6 @@ governance:
 
 This is structurally identical to the DE version. The deep-merge (RFC-0781) will produce the same result for UK. If in the future the UK policy should differ (e.g. different rounding), the overlay can override specific fields.
 
-### Part 2: Currency selector visibility
-
-`header-component.astro:111` changes from:
-
-```astro
-currencies.length > 0 && activeLang !== defaultLang
-```
-
-to:
-
-```astro
-currencies.length > 1
-```
-
-This shows the selector only when there are multiple currencies available, regardless of language. DE (EUR-only) won't show the selector. UK (EUR + UAH) will show it.
-
 ### Part 3: Locale-scoped localStorage key
 
 `currency-selector-component.client.ts` changes:
@@ -231,7 +218,9 @@ The inline script in `currency-selector-component.astro` and `header-component.a
 
 ### Part 5: Inline scripts — locale-scoped key
 
-The inline script in `header-component.astro:122-130` changes:
+Three inline scripts read `localStorage.getItem("wg-currency")` and must be updated to use the locale-scoped key:
+
+1. `header-component.astro:122-130` — adds `lang` to `define:vars`:
 
 ```html
 <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR", lang: activeLang }}>
@@ -246,17 +235,44 @@ The inline script in `header-component.astro:122-130` changes:
 </script>
 ```
 
-The inline script in `currency-selector-component.astro:56-75` changes similarly to use the locale-scoped key.
+2. `currency-selector-component.astro:56-75` — adds `lang` to `define:vars` (already available from component props):
+
+```html
+<script is:inline define:vars={{ currencyCodes, lang }}>
+  try {
+    var c = document.documentElement.getAttribute("data-wg-currency");
+    if (!c) {
+      c = localStorage.getItem("wg-currency:" + lang);
+    }
+    // ... rest unchanged
+  } catch {}
+</script>
+```
+
+3. `currency-aware-price-display-component.astro:50-57` — adds `lang` to `define:vars` (received from component props):
+
+```html
+<script is:inline define:vars={{ variantCurrencies, lang }}>
+  try {
+    var c = document.documentElement.getAttribute("data-wg-currency");
+    if (!c) {
+      c = localStorage.getItem("wg-currency:" + lang);
+    }
+    // ... rest unchanged
+  } catch {}
+</script>
+```
 
 ### File system responsibilities
 
 | Path | Role |
-|------|------|
+| --- | --- |
 | `missions/.../src/content/business-profile/uk/currency-pricing-policies/default.md` | Created: UK currency policy overlay |
 | `packages/werkstatt-site/src/domain/ui/components/currency-selector/currency-selector-component.client.ts` | Modified: locale-scoped localStorage key |
 | `packages/werkstatt-site/src/domain/ui/components/currency-selector/currency-selector-component.astro` | Modified: pass `lang` to `initCurrencySelector`, update inline script |
-| `packages/werkstatt-site/src/domain/ui/components/header/header-component.astro` | Modified: selector visibility `currencies.length > 1`, inline script locale-scoped key |
+| `packages/werkstatt-site/src/domain/ui/components/header/header-component.astro` | Modified: inline script uses locale-scoped localStorage key (visibility condition unchanged) |
 | `packages/werkstatt-site/src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.client.ts` | Modified: `getSelectedCurrency` now requires `lang` parameter |
+| `packages/werkstatt-site/src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro` | Modified: inline script uses locale-scoped localStorage key |
 | `packages/werkstatt-site/src/domain/pbp/__tests__/load-target-currencies.test.ts` | Modified: add locale-aware currency list test |
 
 ### Failure modes
@@ -283,56 +299,24 @@ The inline script in `currency-selector-component.astro:56-75` changes similarly
 
 ## Risks
 
-- **RFC-0781 dependency**: If RFC-0781 is not implemented first, the UK currency-pricing-policy overlay will cause a `PBP-ID-DUPLICATE` fatal error. Implementation order is enforced by the RFC dependency.
-- **Inline script duplication**: The inline script in `header-component.astro` and `currency-selector-component.astro` both read localStorage. They must use the same locale-scoped key. Risk of divergence if one is updated and the other is not. Mitigation: both read from `getCurrencyStorageKey(lang)` pattern — the inline scripts are kept minimal and mirror each other.
-- **`getSelectedCurrency` API change**: The function now requires a `lang` parameter. All callers must be updated. Audit: `currency-selector-component.client.ts`, `currency-aware-price-display-component.client.ts`, and the inline scripts. All have access to `lang` via props or `data-lang` attribute.
-- **DE currency-pricing-policy has UAH target**: The existing DE policy already has `targetCurrencies.uah`. After this RFC, DE visitors should not see UAH. The visibility change (`currencies.length > 1`) handles this — but `loadTargetCurrencies` for DE will still return `[EUR, UAH]`. The selector won't be shown (length > 1 is true, but the condition is `currencies.length > 1` which would show it). **Correction**: The DE policy must be changed to remove `targetCurrencies` so `loadTargetCurrencies` returns `[EUR]` only. This is Part 2b.
-
-### Part 2b: DE currency-pricing-policy — remove UAH target
-
-The existing `de/currency-pricing-policies/default.md` has `targetCurrencies.uah`. This must be removed so that DE visitors get `[EUR]` only (no currency selector). The UK overlay adds UAH back via deep-merge.
-
-```yaml
-# de/currency-pricing-policies/default.md (modified)
----
-schema: "pbp/currency-pricing-policy@1"
-id: "https://warpgogol.com/id/currency-pricing-policy/default"
-type: "currency-pricing-policy"
-status: "published"
-name: "Multi-Currency Pricing Policy"
-businessRef:
-  ref: "https://warpgogol.com/id/business"
-  expectedType: "business"
-baseCurrency: "EUR"
-targetCurrencies: {}
-governance:
-  authorityRef: "https://warpgogol.com/id/business"
-  effectiveFrom: "2026-08-07"
-  reviewEvery: "P1M"
-  maintenanceOwnerRef: "https://warpgogol.com/id/business"
----
-```
-
-Wait — the `pbpCurrencyPricingPolicySchema` requires `targetCurrencies` to have at least one entry (`.refine((val) => Object.keys(val).length >= 1)`). An empty `targetCurrencies: {}` will fail validation.
-
-**Revised approach**: The DE policy keeps `targetCurrencies.uah` (for schema compliance). The currency selector visibility is controlled by the header component: `currencies.length > 1 && activeLang !== defaultLang`. This preserves the current visibility logic — DE never shows the selector, UK does. The locale-scoped localStorage key still prevents cross-language leakage.
-
-Actually, the simplest approach is to keep the current visibility condition (`activeLang !== defaultLang`) and only add the locale-scoped localStorage key + UK overlay. This minimizes changes.
-
-**Final decision**: Keep `activeLang !== defaultLang` visibility condition. Add UK overlay + locale-scoped localStorage. DE visitors never see the selector. UK visitors see it. The locale-scoped key prevents leakage.
+- **RFC-0781 dependency**: If RFC-0781 is not implemented first, the UK currency-pricing-policy overlay will cause a fatal `PBP-ID-DUPLICATE` error. Implementation order is enforced by the RFC dependency. RFC-0781 is now `implemented`.
+- **Inline script divergence**: Three inline scripts (`header-component.astro`, `currency-selector-component.astro`, `currency-aware-price-display-component.astro`) read localStorage. They must all use the same locale-scoped key pattern. Risk of divergence if one is updated and the others are not. Mitigation: all three use `"wg-currency:" + lang` with `lang` passed via `define:vars`.
+- **`getSelectedCurrency` API change**: The function now requires a `lang` parameter. All callers must be updated. Callers: `currency-selector-component.client.ts`, `currency-aware-price-display-component.client.ts`, and the three inline scripts. All have access to `lang` via props or `define:vars`.
+- **DE policy retains UAH target**: The `pbpCurrencyPricingPolicySchema` requires `targetCurrencies` to have at least one entry. The DE policy keeps `targetCurrencies.uah` for schema compliance. DE visitors never see the currency selector (hidden by `activeLang !== defaultLang`), and `data-wg-currency` defaults to EUR. UAH price variants exist in the HTML but are hidden.
 
 ## Acceptance criteria
 
 - [ ] `uk/currency-pricing-policies/default.md` created with EUR base + UAH target
 - [ ] UK currency-pricing-policy passes Zod validation
 - [ ] `loadTargetCurrencies` returns `[EUR, UAH]` for UK locale after RFC-0781 deep-merge
-- [ ] `loadTargetCurrencies` returns `[EUR, UAH]` for DE locale (unchanged — DE policy already has UAH)
+- [ ] `loadTargetCurrencies` returns `[EUR, UAH]` for DE locale (unchanged — DE policy retains UAH for schema compliance, selector hidden by `activeLang !== defaultLang`)
 - [ ] `CURRENCY_STORAGE_KEY` changed from `wg-currency` to `wg-currency:{lang}` pattern
 - [ ] `getSelectedCurrency(lang)` and `setSelectedCurrency(currency, lang)` accept `lang` parameter
 - [ ] `initCurrencySelector` accepts `lang` parameter
 - [ ] `currency-selector-component.astro` passes `lang` to `initCurrencySelector`
 - [ ] `header-component.astro` inline script uses locale-scoped localStorage key
 - [ ] `currency-selector-component.astro` inline script uses locale-scoped localStorage key
+- [ ] `currency-aware-price-display-component.astro` inline script uses locale-scoped localStorage key
 - [ ] `currency-aware-price-display-component.client.ts` uses `getSelectedCurrency(lang)`
 - [ ] Unit test: `loadTargetCurrencies` returns locale-specific currency list
 - [ ] Unit test: `getCurrencyStorageKey` produces `wg-currency:de` for `de`, `wg-currency:uk` for `uk`
