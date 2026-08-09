@@ -15,7 +15,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readRegistry } from "./registry-io.ts";
+import { discoverSystems, readSystemState } from "./registry-io.ts";
 
 export interface SternsystemListData {
   systems: Array<{
@@ -36,18 +36,23 @@ export async function runSternsystemList(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<SternsystemListData>> {
   const { workspaceRoot, logger } = context;
-  const registry = await readRegistry(workspaceRoot);
+  const { systems: configs } = await discoverSystems(workspaceRoot);
 
-  const systems = registry.systems.map((s) => ({
-    id: s.id,
-    cosmicStar: s.cosmicStar,
-    mirrors: s.mirrors,
-    pinnedPlatform: s.pinnedPlatform,
-    currentMission: s.currentMission,
-    lastRelease: s.lastRelease,
-    status: s.status,
-    registeredAt: s.registeredAt,
-  }));
+  const systems = await Promise.all(
+    configs.map(async (c) => {
+      const state = await readSystemState(workspaceRoot, c.id);
+      return {
+        id: c.id,
+        cosmicStar: c.cosmicStar,
+        mirrors: c.mirrors,
+        pinnedPlatform: c.pinnedPlatform,
+        currentMission: state.currentMission,
+        lastRelease: state.lastRelease,
+        status: c.status,
+        registeredAt: c.registeredAt,
+      };
+    }),
+  );
 
   for (const s of systems) {
     logger.info(

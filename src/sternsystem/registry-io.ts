@@ -50,7 +50,10 @@ export function resolveWorkpiecePath(workspaceRoot: string, missionId: string): 
 
 // --- RFC-0790: Per-system config/state IO (cache clone — OUTSIDE mission) ---
 
-export async function readSystemConfig(workspaceRoot: string, systemId: string): Promise<SystemConfig> {
+export async function readSystemConfig(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<SystemConfig> {
   const cacheClone = resolveCacheClonePath(workspaceRoot, systemId);
   const filePath = path.join(cacheClone, "system-config.yaml");
   const raw = await readFile(filePath, "utf8");
@@ -65,7 +68,22 @@ export async function readSystemConfigFromWorkpiece(workpieceDir: string): Promi
   return systemConfigSchema.parse(parsed);
 }
 
-export async function readSystemState(workspaceRoot: string, systemId: string): Promise<SystemState> {
+export async function writeSystemConfig(
+  workspaceRoot: string,
+  systemId: string,
+  config: SystemConfig,
+): Promise<void> {
+  const cacheClone = resolveCacheClonePath(workspaceRoot, systemId);
+  const filePath = path.join(cacheClone, "system-config.yaml");
+  await mkdir(path.dirname(filePath), { recursive: true });
+  const yaml = stringifyYaml(config);
+  await atomicWriteFile(filePath, yaml + "\n");
+}
+
+export async function readSystemState(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<SystemState> {
   const cacheClone = resolveCacheClonePath(workspaceRoot, systemId);
   const filePath = path.join(cacheClone, "system-state.yaml");
   if (!existsSync(filePath)) {
@@ -85,7 +103,9 @@ export async function readSystemState(workspaceRoot: string, systemId: string): 
 export async function readSystemStateFromWorkpiece(workpieceDir: string): Promise<SystemState> {
   const filePath = path.join(workpieceDir, "system-state.yaml");
   if (!existsSync(filePath)) {
-    throw new Error(`[readSystemStateFromWorkpiece] system-state.yaml not found in workpiece ${workpieceDir}`);
+    throw new Error(
+      `[readSystemStateFromWorkpiece] system-state.yaml not found in workpiece ${workpieceDir}`,
+    );
   }
   const raw = await readFile(filePath, "utf8");
   const parsed = parseYaml(raw);

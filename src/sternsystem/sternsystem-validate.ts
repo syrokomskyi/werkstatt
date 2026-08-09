@@ -27,7 +27,7 @@ import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { StarCatalog } from "@warpgogol/werkstatt-site/ontology/cosmic";
 import { systemPinSchema } from "@warpgogol/werkstatt/schemas";
 import {
-  readRegistry,
+  discoverSystems,
   hasAppsCollision,
   resolveMirrors,
   resolveMirrorPath,
@@ -121,15 +121,27 @@ export async function runSternsystemValidate(
   const { workspaceRoot, logger } = context;
   const filterId = flagString(input, "id");
 
-  const registry = await readRegistry(workspaceRoot);
-  const systems = filterId ? registry.systems.filter((s) => s.id === filterId) : registry.systems;
-
-  if (filterId && systems.length === 0) {
-    throw new Error(`[sternsystem.validate] id '${filterId}' not found in registry`);
-  }
+  const { systems: allSystems, errors: discoveryErrors } = await discoverSystems(workspaceRoot);
 
   const violations: Array<{ systemId: string; rule: string; message: string }> = [];
   const warnings: Array<{ systemId: string; field: string; message: string }> = [];
+
+  if (discoveryErrors.length > 0) {
+    for (const err of discoveryErrors) {
+      violations.push({
+        systemId: err.id,
+        rule: "discovery-error",
+        message: `Failed to read system-config.yaml for '${err.id}': ${err.error}`,
+      });
+    }
+  }
+
+  const systems = filterId ? allSystems.filter((s) => s.id === filterId) : allSystems;
+
+  if (filterId && systems.length === 0) {
+    throw new Error(`[sternsystem.validate] id '${filterId}' not found in ../systems-cache/`);
+  }
+
   const seenIds = new Set<string>();
   const seenStars = new Set<string>();
   let withOwner = 0;

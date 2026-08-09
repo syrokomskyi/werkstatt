@@ -22,7 +22,13 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
-import { readRegistry, findEntry, resolveMirrors, resolveMirrorPath } from "./registry-io.ts";
+import {
+  readSystemConfig,
+  resolveMirrors,
+  resolveMirrorPath,
+  resolveCacheClonePath,
+  discoverSystems,
+} from "./registry-io.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { readMissionManifest } from "../mission/mission-io.ts";
 
@@ -85,11 +91,15 @@ async function statusForSystem(
   workspaceRoot: string,
   systemId: string,
 ): Promise<SternsystemStatusData> {
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, systemId);
-  const systemDir = entry
-    ? resolveMirrors(workspaceRoot, entry).cachePath
-    : path.join(workspaceRoot, "systems", systemId);
+  let config: Awaited<ReturnType<typeof readSystemConfig>> | null = null;
+  try {
+    config = await readSystemConfig(workspaceRoot, systemId);
+  } catch {
+    config = null;
+  }
+  const systemDir = config
+    ? resolveMirrors(workspaceRoot, config).cachePath
+    : resolveCacheClonePath(workspaceRoot, systemId);
 
   // Git SHAs
   let headSha: string | null = null;
@@ -113,8 +123,8 @@ async function statusForSystem(
     }
   }
 
-  if (entry && entry.mirrors.length > 1) {
-    const bareMirror = entry.mirrors[1];
+  if (config && config.mirrors.length > 1) {
+    const bareMirror = config.mirrors[1];
     const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
     if (existsSync(bareRepoPath)) {
       let branch: string;
@@ -128,7 +138,7 @@ async function statusForSystem(
       } catch {
         originSha = null;
       }
-      if (entry.mirrors.length > 2) {
+      if (config.mirrors.length > 2) {
         try {
           mirrorSha = gitExec(bareRepoPath, `rev-parse refs/mirror/${branch}`);
         } catch {
@@ -205,15 +215,15 @@ export async function runSternsystemStatus(
   }
 
   if (all) {
-    const registry = await readRegistry(workspaceRoot);
+    const { systems: configs } = await discoverSystems(workspaceRoot);
     const results: SternsystemStatusData[] = [];
-    for (const entry of registry.systems) {
+    for (const config of configs) {
       try {
-        const status = await statusForSystem(workspaceRoot, entry.id);
+        const status = await statusForSystem(workspaceRoot, config.id);
         results.push(status);
       } catch {
         results.push({
-          systemId: entry.id,
+          systemId: config.id,
           git: {
             headSha: null,
             originSha: null,
