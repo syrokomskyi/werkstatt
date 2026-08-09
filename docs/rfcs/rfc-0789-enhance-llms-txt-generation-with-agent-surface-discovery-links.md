@@ -5,7 +5,7 @@ status: draft
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
-scope: workspace
+scope: app
 owners:
   - architecture
 # Set by the deciding human together with the status change (RFC-0335).
@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -22,15 +23,15 @@ supersededBy:
 amends: []
 amendedBy: []
 related:
-  - DNA-34
+  - RFC-0028
   - RFC-0050
   - RFC-0286
   - RFC-0783
+  - RFC-0787
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies:
-  - DNA-34
+satisfies: []
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -55,6 +56,8 @@ nonGoals:
   - New commands — this RFC amends the existing llms.generate command
   - API Catalog or MCP Server Card generation — covered by RFC-0783
   - llms.txt content format — already established by RFC-0050 and RFC-0184
+  - llms.validate amendment — the existing validator checks for llms-full.txt link but not agent discovery links; the new links are advisory, not mandatory
+  - generator-ownership.ts — no change needed, llms.generate is already registered as owner of public/llms.txt
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -97,10 +100,11 @@ The `buildLlmsIndex` function in `packages/werkstatt-site/src/domain/share/seman
 
 ## Architectural fit
 
-- **DNA-34** (`.well-known/` discovery) — `llms.txt` is the prose entry point for agents; cross-referencing structured discovery endpoints strengthens the discovery surface.
+- **RFC-0028** (`.well-known/` discovery feature) — `llms.txt` is the prose entry point for agents; cross-referencing structured discovery endpoints strengthens the discovery surface. DNA-34 was reclassified from binding invariant to feature by RFC-0161; the governing RFC is RFC-0028.
 - **RFC-0050** (llms.txt) — this RFC amends the existing `buildLlmsIndex` function, not creating a new command.
 - **RFC-0286** (agent surface) — the links point to the agent surface manifest and its projections.
 - **RFC-0783** (API Catalog + MCP Server Card) — the links reference the new endpoints introduced by that RFC.
+- **RFC-0787** (pipeline wiring) — `llms.generate` runs after `agent.api-catalog.generate` and `agent.mcp-card.generate` in `build.prepare`, so the endpoints exist when `llms.txt` is generated.
 - **Site OS operator model** — `scope: app`, `supportsAllSites: true`. The amendment is in the existing `llms.ts` domain module.
 
 ## Design
@@ -136,37 +140,65 @@ The new links are only included when `agent.enabled !== false`. When `agent.enab
 
 ### TypeScript contracts
 
+`SemanticSiteModel` gains an optional `agent` field so `buildLlmsIndex` can check `agent.enabled` without changing its function signature. The semantic loader (`loadSemanticSiteModel`) reads the `agent` block from `system.md` and populates it, following the same pattern as `readAgentBlock` in `agent-shared.ts`.
+
+```ts
+// packages/werkstatt-site/src/domain/share/semantic/models.ts — amended
+
+export type SemanticSiteModel = {
+  baseUrl: string;
+  lang: string;
+  defaultLanguage?: string;
+  organization: SemanticOrganization;
+  pages: SemanticPageModel[];
+  // RFC-0789: agent block from system.md, populated by the semantic loader.
+  // Absent when system.md has no agent block (defaults to enabled).
+  agent?: { enabled?: boolean };
+};
+```
+
 ```ts
 // packages/werkstatt-site/src/domain/share/semantic/llms.ts — amended
 
 export function buildLlmsIndex(site: SemanticSiteModel): string {
   // Existing code...
-  const agentJsonUrl = canonicalStaticUrl("/.well-known/agent.json", { baseUrl: site.baseUrl });
-  // New: API Catalog, MCP Server Card, OpenAPI
-  const apiCatalogUrl = canonicalStaticUrl("/.well-known/api-catalog", { baseUrl: site.baseUrl });
-  const mcpCardUrl = canonicalStaticUrl("/.well-known/mcp/server-card.json", { baseUrl: site.baseUrl });
-  const openapiUrl = canonicalStaticUrl("/.well-known/agent.openapi.json", { baseUrl: site.baseUrl });
+  const llmsFullUrl = canonicalStaticUrl("/llms-full.txt", { baseUrl: site.baseUrl });
+  const siteDescription = site.organization.description ?? "";
+
+  // RFC-0789: agent discovery links — omitted when agent.enabled is false.
+  const agentEnabled = site.agent?.enabled !== false;
+  const agentLinks = agentEnabled
+    ? [
+        `> Machine-readable Agent Surface (structured knowledge + capabilities): [agent.json](${canonicalStaticUrl("/.well-known/agent.json", { baseUrl: site.baseUrl })}).`,
+        `> API discovery catalog (RFC 9727): [api-catalog](${canonicalStaticUrl("/.well-known/api-catalog", { baseUrl: site.baseUrl })}).`,
+        `> MCP Server Card (SEP-1649): [server-card.json](${canonicalStaticUrl("/.well-known/mcp/server-card.json", { baseUrl: site.baseUrl })}).`,
+        `> OpenAPI 3.1 specification: [agent.openapi.json](${canonicalStaticUrl("/.well-known/agent.openapi.json", { baseUrl: site.baseUrl })}).`,
+      ]
+    : [];
 
   return [
     `# ${site.organization.name}`,
     ...(siteDescription ? [`> ${siteDescription}`] : []),
     `> For complete documentation in a single file, see [llms-full.txt](${llmsFullUrl}).`,
-    `> Machine-readable Agent Surface (structured knowledge + capabilities): [agent.json](${agentJsonUrl}).`,
-    `> API discovery catalog (RFC 9727): [api-catalog](${apiCatalogUrl}).`,
-    `> MCP Server Card (SEP-1649): [server-card.json](${mcpCardUrl}).`,
-    `> OpenAPI 3.1 specification: [agent.openapi.json](${openapiUrl}).`,
+    ...agentLinks,
+    "",
+    "## Primary sources",
+    ...primarySources,
     // ... rest unchanged
   ].join("\n");
 }
 ```
 
-The function signature does not change — the URLs are derived from `site.baseUrl` which is already available.
+The function signature does not change — `SemanticSiteModel` already carries `baseUrl`, and the new `agent` field is optional. The `agent.enabled` check is performed inside `buildLlmsIndex` via `site.agent?.enabled !== false`, following the same pattern as `readAgentBlock` in `agent-shared.ts`. The semantic loader populates `site.agent` from `system.md`'s `agent` block.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/domain/share/semantic/llms.ts` | Amended — `buildLlmsIndex` adds 3 new discovery links |
+| `packages/werkstatt-site/src/domain/share/semantic/models.ts` | Amended — `SemanticSiteModel` gains optional `agent` field |
+| `packages/werkstatt-site/src/domain/share/semantic/llms.ts` | Amended — `buildLlmsIndex` adds 3 new discovery links, conditional on `agent.enabled` |
+| `packages/werkstatt-site/src/content/semantic-loader.ts` | Amended — `loadSemanticSiteModel` populates `agent` from `system.md` |
+| `packages/werkstatt-site/src/checks/semantic-parity.ts` | No change needed — calls `buildLlmsIndex` via the same loader, stays in sync automatically |
 | `public/llms.txt` | Output — amended content with new links |
 
 ### Output format
@@ -175,8 +207,10 @@ No new output format. The `llms.txt` content is amended with additional blockquo
 
 ### Failure modes
 
-- **`agent.enabled: false`**: The generator omits all agent discovery links (agent.json, api-catalog, mcp-card, openapi) from `llms.txt`. The existing `llms.generate` does not currently check `agent.enabled` — it always includes the `agent.json` link. This RFC amends the generator to check `agent.enabled` and omit all agent links when disabled.
+- **`agent.enabled: false`**: The generator omits all agent discovery links (agent.json, api-catalog, mcp-card, openapi) from `llms.txt`. The existing `llms.generate` does not currently check `agent.enabled` — it always includes the `agent.json` link. This RFC amends `buildLlmsIndex` to check `site.agent?.enabled !== false` and omit all agent links when disabled. The check is performed inside `buildLlmsIndex` (not the handler) via the `agent` field on `SemanticSiteModel`, which is populated by the semantic loader from `system.md`'s `agent` block.
 - **Discovery endpoints not generated**: If `agent.api-catalog.generate` or `agent.mcp-card.generate` have not run, the links in `llms.txt` will point to non-existent files. Mitigation: `llms.generate` runs after these generators in `build.prepare` (per RFC-0787 pipeline wiring).
+- **No agent surface manifest**: If `agent.manifest.generate` has not run (no `agent-surface.generated.yaml`), the agent links in `llms.txt` will point to endpoints that do not exist. Mitigation: `agent.manifest.generate` runs before `llms.generate` in `build.prepare`. When `agent.enabled: false`, the manifest generator skips and `buildLlmsIndex` omits the links.
+- **`semantic.parity` drift**: `semantic.parity` (RFC-0146) rebuilds `llms.txt` in memory from the semantic model and compares byte-for-byte. Since `buildLlmsIndex` is amended, `semantic.parity` automatically produces matching output — it calls the same function via the same loader. No separate update needed.
 
 ## Rollout
 
@@ -214,5 +248,5 @@ No new output format. The `llms.txt` content is amended with additional blockquo
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0789 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - The discovery links MUST use `canonicalStaticUrl` to generate absolute URLs — relative URLs are rejected by `llms.validate` (RFC-0184).
-- The `agent.enabled: false` check MUST read the agent block from `system.md` (same pattern as `agent.manifest.generate`).
+- The `agent.enabled: false` check MUST read the agent block from `system.md` via the `agent` field on `SemanticSiteModel`, populated by the semantic loader (same pattern as `readAgentBlock` in `agent-shared.ts`).
 - This RFC MUST be implemented after RFC-0783 — the links reference endpoints created by that RFC.
