@@ -21,6 +21,12 @@
   X-Content-Type-Options: nosniff
   Cache-Control: public, max-age=300
 
+# RFC-0783: API Catalog — application/linkset+json content type
+/.well-known/api-catalog
+  Content-Type: application/linkset+json; charset=utf-8
+  X-Content-Type-Options: nosniff
+  Cache-Control: public, max-age=300
+
 # RFC-0315: /api/agent/v1/* — short freshness, nosniff
 /api/agent/v1/*
   X-Content-Type-Options: nosniff
