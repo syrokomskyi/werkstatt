@@ -476,6 +476,22 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-checks/src/agent-openapi.ts",
   },
 
+  // RFC-0783: API Catalog linkset+json (RFC 9727).
+  {
+    path: "public/.well-known/api-catalog",
+    command: "agent.api-catalog.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-api-catalog.ts",
+  },
+
+  // RFC-0783: MCP Server Card (SEP-1649).
+  {
+    path: "public/.well-known/mcp/server-card.json",
+    command: "agent.mcp-card.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-mcp-card.ts",
+  },
+
   // RFC-0287: Agent Knowledge files.
   {
     path: "public/api/agent/v1/*.json",

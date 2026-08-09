@@ -128,6 +128,26 @@ export const KERNEL_FLAG_SCHEMA_SOURCES: KernelFlagSchemaSourceEntry[] = [
     functionName: "runAgentOpenApiValidate",
   },
   {
+    command: "agent.api-catalog.generate",
+    file: "packages/werkstatt-site/src/checks/agent/agent-api-catalog.ts",
+    functionName: "runAgentApiCatalogGenerate",
+  },
+  {
+    command: "agent.api-catalog.validate",
+    file: "packages/werkstatt-site/src/checks/agent/agent-api-catalog.ts",
+    functionName: "runAgentApiCatalogValidate",
+  },
+  {
+    command: "agent.mcp-card.generate",
+    file: "packages/werkstatt-site/src/checks/agent/agent-mcp-card.ts",
+    functionName: "runAgentMcpCardGenerate",
+  },
+  {
+    command: "agent.mcp-card.validate",
+    file: "packages/werkstatt-site/src/checks/agent/agent-mcp-card.ts",
+    functionName: "runAgentMcpCardValidate",
+  },
+  {
     command: "agent.routes.generate",
     file: "packages/os/site-kernel-checks/src/agent-routes.ts",
     functionName: "runAgentRoutesGenerate",
