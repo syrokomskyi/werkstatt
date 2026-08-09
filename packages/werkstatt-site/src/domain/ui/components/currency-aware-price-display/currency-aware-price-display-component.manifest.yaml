@@ -1,0 +1,39 @@
+id: currency-aware-price-display-component
+uniName: currency-aware-price-display-component
+layer: component
+semanticId: currency-aware-price-display
+archetype: currency-aware-price-display
+
+cosmicName: Rosalind
+role: price-display
+version: 1.0.0
+intent:
+  - pricing
+  - trust
+industryFit: []
+contentSchemaKey: currency-aware-price-display-component
+contentTypesPath: ./currency-aware-price-display-component.types.generated.ts
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - priceVariants
+  properties:
+    priceVariants:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - currency
+          - formatted
+        properties:
+          currency:
+            type: string
+          formatted:
+            type: string
+          note:
+            type:
+              - "string"
+              - "null"

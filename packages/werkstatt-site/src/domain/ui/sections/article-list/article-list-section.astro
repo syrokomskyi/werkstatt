@@ -1,0 +1,90 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Article list — composite section that auto-enumerates the site's article pages
+(system.md pages[].article) and renders them as a card grid (title, date, summary, tags)
+via SectionShell + SectionHeader. RFC-0167.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0167: initial implementation — sellable blog list archetype.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { cast, need, resolveSectionAnchor, getArticleSummaries } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import type { ArticleListSectionContent } from "./article-list-section.types.generated.ts";
+import "./article-list-section.css";
+
+const { lang, pageOverride, sectionNumber } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "article-list");
+const props = cast<ArticleListSectionContent>(pageOverride);
+
+const all = await getArticleSummaries(lang);
+const filtered = props.tag ? all.filter((a) => a.tags.includes(props.tag!)) : all;
+const articles = typeof props.limit === "number" ? filtered.slice(0, props.limit) : filtered;
+
+const dateFormatter = new Intl.DateTimeFormat(lang, {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+const formatDate = (iso: string): string => {
+  const t = Date.parse(iso);
+  return Number.isNaN(t) ? iso : dateFormatter.format(new Date(t));
+};
+---
+
+<SectionShell
+  slug="article-list"
+  sectionId={sectionId}
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="article-list-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="article-list-title"
+    lang={lang}
+  />
+
+  {
+    articles.length === 0 ? (
+      <p class="article-list-section__empty">{props.emptyLabel}</p>
+    ) : (
+      <ul class="article-list-section__items" role="list">
+        {articles.map((article) => (
+          <li class="article-list-section__item">
+            <a class="article-list-section__card" href={article.href}>
+              <time class="article-list-section__date" datetime={article.publishedAt}>
+                {formatDate(article.publishedAt)}
+              </time>
+              <h3 class="article-list-section__card-title">{article.title}</h3>
+              {article.summary && <p class="article-list-section__summary">{article.summary}</p>}
+              {article.tags.length > 0 && (
+                <ul class="article-list-section__tags" role="list">
+                  {article.tags.map((tag) => (
+                    <li class="article-list-section__tag">{tag}</li>
+                  ))}
+                </ul>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</SectionShell>

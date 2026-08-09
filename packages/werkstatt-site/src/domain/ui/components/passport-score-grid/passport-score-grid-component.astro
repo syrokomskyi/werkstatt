@@ -1,0 +1,130 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the display of the Nebula Score and its component pillars, enhancing user understanding of performance metrics.</purpose>
+<non-goals>
+  <item>Do not manage data fetching beyond the initial load of passport data.</item>
+  <item>Do not perform any score calculations outside of rendering logic.</item>
+  <item>Do not handle user interactions or events beyond display purposes.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/**
+ * PassportScoreGrid (Klarissa) — Nebula Score display moon
+ *
+ * Renders the composite Nebula Score (0-100) alongside the four pillar
+ * breakdowns: Performance, Accessibility, Content Health, Architectural
+ * Compliance. Reads passport.json at build time via @warpgogol/werkstatt-site/passport/data.
+ *
+ * RFC-0028 / DNA-33 / Klarissa (Neptune moon)
+ */
+
+import { loadPassportData } from "@warpgogol/werkstatt-site/passport/data";
+import "./passport-score-grid-component.css";
+
+interface Props {
+  pillarLabels?: {
+    performance?: string;
+    accessibility?: string;
+    contentHealth?: string;
+    architecturalCompliance?: string;
+  };
+}
+
+const { pillarLabels } = Astro.props;
+
+const passport = await loadPassportData();
+const score = passport?.nebulaScore;
+
+function gradeModifier(value: number): string {
+  if (value >= 90) return "excellent";
+  if (value >= 75) return "good";
+  if (value >= 60) return "fair";
+  return "poor";
+}
+
+const pillars = score
+  ? [
+      {
+        key: "performance",
+        label: pillarLabels?.performance ?? "",
+        weight: "30%",
+        value: score.pillars.performance.score,
+      },
+      {
+        key: "accessibility",
+        label: pillarLabels?.accessibility ?? "",
+        weight: "30%",
+        value: score.pillars.accessibility.score,
+      },
+      {
+        key: "contentHealth",
+        label: pillarLabels?.contentHealth ?? "",
+        weight: "20%",
+        value: score.pillars.contentHealth.score,
+      },
+      {
+        key: "architecturalCompliance",
+        label: pillarLabels?.architecturalCompliance ?? "",
+        weight: "20%",
+        value: score.pillars.architecturalCompliance.score,
+      },
+    ]
+  : [];
+---
+
+<section class="passport-score-grid" data-component="passport-score-grid">
+  <h2 class="passport-score-grid__heading">Nebula Score</h2>
+
+  {
+    score ? (
+      <>
+        <div
+          class={`passport-score-grid__composite passport-score-grid__composite--${gradeModifier(score.composite)}`}
+          aria-label={`Composite score: ${score.composite} out of 100`}
+        >
+          <span class="passport-score-grid__composite-value">{score.composite}</span>
+          <span class="passport-score-grid__composite-label">{gradeLabel(score.composite)}</span>
+        </div>
+
+        <ul class="passport-score-grid__pillars" role="list">
+          {pillars.map((p) => (
+            <li class="passport-score-grid__pillar">
+              <div class="passport-score-grid__pillar-header">
+                <span class="passport-score-grid__pillar-name">{p.label}</span>
+                <span class="passport-score-grid__pillar-weight">{p.weight}</span>
+              </div>
+              <div
+                class="passport-score-grid__bar-track"
+                role="meter"
+                aria-valuenow={p.value}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${p.label}: ${p.value}`}
+              >
+                <div
+                  class={`passport-score-grid__bar-fill passport-score-grid__bar-fill--${gradeModifier(p.value)}`}
+                  style={`width: ${p.value}%`}
+                />
+              </div>
+              <span class="passport-score-grid__pillar-value">{p.value}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p class="passport-score-grid__version">
+          Weights v{score.weightsVersion} &middot; computed{" "}
+          {new Date(score.computedAt).toLocaleDateString()}
+        </p>
+      </>
+    ) : (
+      <p class="passport-score-grid__unavailable">
+        Nebula Score unavailable — run nebula.score.compute first.
+      </p>
+    )
+  }
+</section>

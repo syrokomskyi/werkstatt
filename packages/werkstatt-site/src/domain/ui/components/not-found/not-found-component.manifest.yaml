@@ -1,0 +1,42 @@
+id: not-found-component
+uniName: not-found-component
+layer: component
+semanticId: not-found
+archetype: layout.not-found
+
+cosmicName: Cressida
+role: layout-shell
+version: 0.1.0
+intent:
+  - guide-lost-visitors
+  - preserve-site-navigation
+industryFit: []
+contentSchemaKey: not-found-component
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - lang
+    - title
+    - intro
+    - homeLabel
+    - homeHref
+  properties:
+    lang:
+      type: string
+    title:
+      type: string
+    intro:
+      type: string
+    homeLabel:
+      type: string
+    homeHref:
+      type: string
+    primaryLabel:
+      type: string
+    primaryHref:
+      type: string
+    contactLabel:
+      type: string
+    contactHref:
+      type: string

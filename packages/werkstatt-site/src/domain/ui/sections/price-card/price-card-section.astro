@@ -1,0 +1,195 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Price card composite — price tiers + included features list via SectionShell + SectionHeader.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0134 replaces legacy surface and glass props with composable effects.</item>
+  <item>RFC-0743: currency-aware price display via offeringRef + derived-prices.generated.json.</item>
+  <item>Review fix: extracted buildPriceVariants to price-variants.ts, moved noteTemplate to content layer (DNA-4), typed props.offeringRef, ENOENT-only catch in loadDerivedPrices.</item>
+  <item>Review fix A-1/G-3: removed duplicate formatPrice and loadDerivedPrices — now imported from price-variants.ts.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import {
+  cast,
+  getSiteSectionLabels,
+  need,
+  resolveEffectsForTarget,
+  resolveSectionAnchor,
+} from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import EffectHost from "../../components/effects/effect-host.astro";
+import CurrencyAwarePriceDisplay from "../../components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import { loadVendorIcon } from "../../icons/icon-resolver.ts";
+import { buildPriceVariants, formatPrice, loadDerivedPrices } from "./price-variants.ts";
+import type { PriceCardSectionContent } from "./price-card-section.types.generated.ts";
+import "./price-card-section.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "price-card");
+const props = cast<PriceCardSectionContent>(pageOverride);
+const panelEffects = resolveEffectsForTarget(props.effects, "panel");
+const siteLabels = await getSiteSectionLabels<Record<string, unknown>>(
+  lang,
+  Astro.props.defaultLanguageCode,
+  "priceCard",
+);
+const monthlyLabel = need(
+  "sections.priceCard.monthly",
+  typeof siteLabels?.monthly === "string" ? siteLabels.monthly : undefined,
+);
+const yearlyLabel = need(
+  "sections.priceCard.yearly",
+  typeof siteLabels?.yearly === "string" ? siteLabels.yearly : undefined,
+);
+const setupLabel = need(
+  "sections.priceCard.setup",
+  typeof siteLabels?.setup === "string" ? siteLabels.setup : undefined,
+);
+const includesHeading = need(
+  "sections.priceCard.includesHeading",
+  typeof siteLabels?.includesHeading === "string" ? siteLabels.includesHeading : undefined,
+);
+
+const resolvedIncludes = await Promise.all(
+  (props.includes ?? []).map(async (item) => {
+    const Icon = await loadVendorIcon(item.icon);
+    return { text: item.text, Icon, iconConfig: item.icon };
+  }),
+);
+
+const derivedPrices = loadDerivedPrices();
+const offeringRef = props.offeringRef;
+const noteTemplate =
+  typeof siteLabels?.noteTemplate === "string" ? siteLabels.noteTemplate : undefined;
+
+const monthlyPrice = formatPrice(props.monthly, lang);
+const yearlyPrice = formatPrice(props.yearly, lang);
+const setupPrice = formatPrice(props.setup, lang);
+
+const monthlyVariants = buildPriceVariants(
+  props.monthly,
+  "monthlySubscription",
+  lang,
+  offeringRef,
+  derivedPrices,
+  noteTemplate,
+);
+const yearlyVariants = buildPriceVariants(
+  props.yearly,
+  "yearlySubscription",
+  lang,
+  offeringRef,
+  derivedPrices,
+  noteTemplate,
+);
+const setupVariants = buildPriceVariants(
+  props.setup,
+  "activation",
+  lang,
+  offeringRef,
+  derivedPrices,
+  noteTemplate,
+);
+---
+
+<SectionShell
+  slug="price-card"
+  sectionId={sectionId}
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="price-card-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="price-card-title"
+    lang={lang}
+  />
+
+  <EffectHost as="div" effects={panelEffects} class="price-card__panel price-card__panel-surface">
+    <dl class="price-card__prices">
+      {
+        monthlyPrice && (
+          <>
+            <dt>{monthlyLabel}</dt>
+            <dd>
+              {monthlyVariants ? (
+                <CurrencyAwarePriceDisplay priceVariants={monthlyVariants} />
+              ) : (
+                monthlyPrice
+              )}
+            </dd>
+          </>
+        )
+      }
+      {
+        yearlyPrice && (
+          <>
+            <dt>{yearlyLabel}</dt>
+            <dd>
+              {yearlyVariants ? (
+                <CurrencyAwarePriceDisplay priceVariants={yearlyVariants} />
+              ) : (
+                yearlyPrice
+              )}
+            </dd>
+          </>
+        )
+      }
+      {
+        setupPrice && (
+          <>
+            <dt>{setupLabel}</dt>
+            <dd>
+              {setupVariants ? (
+                <CurrencyAwarePriceDisplay priceVariants={setupVariants} />
+              ) : (
+                setupPrice
+              )}
+            </dd>
+          </>
+        )
+      }
+    </dl>
+    {
+      props.includes && (
+        <div class="price-card__includes">
+          <h3>{includesHeading}</h3>
+          <ul>
+            {resolvedIncludes.map(({ text, Icon, iconConfig }) => (
+              <li>
+                {Icon ? (
+                  <Icon
+                    size={iconConfig?.size ?? 24}
+                    color="success"
+                    trigger="hover"
+                    aria-label=""
+                  />
+                ) : (
+                  <span class="price-card__marker" aria-hidden="true" />
+                )}
+                <span>{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </EffectHost>
+</SectionShell>

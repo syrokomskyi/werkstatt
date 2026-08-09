@@ -1,0 +1,39 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines visual styles for the ownership block section, contributing to overall UI aesthetics.</purpose>
+<non-goals>
+  <item>Do not define styles for content-specific elements; rendering is handled by SectionList.</item>
+  <item>Do not manage user interactions or dynamic content behavior.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Clarify CSS responsibilities and delineate boundaries for styling in the ownership block.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: ownership-block has no content-specific CSS — list rendering owned by SectionList. */
+@layer components {
+  .section-shell--density-compact .section-header {
+    margin-bottom: var(--ds-space-3);
+  }
+  .section-shell[data-slug="ownership-block"].section-shell--density-compact {
+    padding-block-end: var(--ds-space-3);
+  }
+}
+
+.section-list__text .currency-aware-price-display,
+.section-list__text .currency-aware-price-display__variant {
+  display: inline;
+}
+
+.section-list__text .currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+.section-list__text .currency-aware-price-display__amount {
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  white-space: nowrap;
+}

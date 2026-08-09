@@ -1,0 +1,14 @@
+id: responsive-image-component
+uniName: responsive-image-component
+layer: component
+semanticId: responsive-image
+archetype: responsive-image
+cosmicName: Belinda
+role: section-image
+version: 1.0.0
+intent:
+  - render-responsive-image
+  - adapt-image-provider-output
+  - preserve-authored-image-fidelity
+industryFit: []
+contentSchemaKey: null

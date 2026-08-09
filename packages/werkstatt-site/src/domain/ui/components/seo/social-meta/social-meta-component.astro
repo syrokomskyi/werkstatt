@@ -1,0 +1,63 @@
+---
+/*
+<MODULE_CONTRACT>
+  <purpose>[RFC-0162] Emits Open Graph and Twitter Card meta tags for a page, derived entirely
+  from the SemanticPageModel. Gives social platforms and LLM browse tools the rich link-preview
+  ("widget") data the bare title/description head lacked.</purpose>
+      <non-goals>
+    <item>Do not generate preview images — that is the RFC-0150 preview.images pipeline.</item>
+    <item>Do not read content collections — everything comes from the SemanticPageModel prop.</item>
+  </non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0162: initial implementation — wires social/OG meta into the shared layout.</item>
+  <item>RFC-0172: emit `x-content-image` head signal for authored content images (output.image) so the image-sitemap harvester has a single source.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SemanticPageModel } from "@warpgogol/werkstatt-site/share/semantic";
+
+interface Props {
+  page: SemanticPageModel;
+  canonicalUrl: string;
+  siteName: string;
+}
+
+const { page, canonicalUrl, siteName } = Astro.props;
+
+const ogType = page.ogType ?? "website";
+const ogTitle = page.title;
+const ogDescription = page.description;
+const image = page.primaryImage;
+const twitterCard = image ? "summary_large_image" : "summary";
+---
+
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={ogTitle} />
+{ogDescription && <meta property="og:description" content={ogDescription} />}
+<meta property="og:url" content={canonicalUrl} />
+{siteName && <meta property="og:site_name" content={siteName} />}
+{page.ogLocale && <meta property="og:locale" content={page.ogLocale} />}
+{page.ogLocaleAlternates?.map((locale) => <meta property="og:locale:alternate" content={locale} />)}
+{
+  image && (
+    <>
+      <meta property="og:image" content={image.url} />
+      {image.width && <meta property="og:image:width" content={String(image.width)} />}
+      {image.height && <meta property="og:image:height" content={String(image.height)} />}
+      {image.alt && <meta property="og:image:alt" content={image.alt} />}
+    </>
+  )
+}
+
+<meta name="twitter:card" content={twitterCard} />
+<meta name="twitter:title" content={ogTitle} />
+{ogDescription && <meta name="twitter:description" content={ogDescription} />}
+{image && <meta name="twitter:image" content={image.url} />}
+
+{
+  /* RFC-0172: authored content image (output.image, contentImage:true) — the
+    image-sitemap harvester reads this head signal. Synthetic fallbacks (RFC-0150
+    preview screenshot, logo) carry no contentImage flag and emit nothing here. */
+}
+{image?.contentImage && <meta name="x-content-image" content={image.url} />}

@@ -1,0 +1,263 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Hero with side decision card — composite layout via SectionShell + SectionHeader + EffectHost for the side card.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0134 replaces decision-card glass config with composable effects.</item>
+  <item>RFC-0167: add optional leadImage to hero-decision-card, rendered as data-content-image for image-sitemap harvest.</item>
+  <item>Hero decision card sections never render a section number above the heading.</item>
+</CHANGE_SUMMARY>
+*/
+
+import {
+  getSiteSectionLabels,
+  resolveEffectsForTarget,
+  resolveImage,
+  resolveSemanticTarget,
+  cast,
+  need,
+} from "@warpgogol/werkstatt-site/share";
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import ResponsiveImage from "@warpgogol/werkstatt-site/ui/components/responsive-image.astro";
+import type { HeroDecisionCardSectionContent } from "./hero-decision-card-section.types.generated.ts";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import EffectHost from "@warpgogol/werkstatt-site/ui/components/effects/effect-host.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/werkstatt-site/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../price-card/price-variants.ts";
+import "./hero-decision-card-section.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const props = cast<HeroDecisionCardSectionContent>(pageOverride);
+
+let primaryCtaHref: string | null = null;
+let secondaryCtaHref: string | null = null;
+
+if (props.primaryCta?.target) {
+  if (props.primaryCta.target.startsWith("#")) {
+    primaryCtaHref = props.primaryCta.target;
+  } else {
+    primaryCtaHref = await resolveSemanticTarget(
+      { kind: "internal", pageId: props.primaryCta.target },
+      lang,
+    );
+  }
+}
+
+if (props.secondaryCta?.target) {
+  if (props.secondaryCta.target.startsWith("#")) {
+    secondaryCtaHref = props.secondaryCta.target;
+  } else {
+    secondaryCtaHref = await resolveSemanticTarget(
+      { kind: "internal", pageId: props.secondaryCta.target },
+      lang,
+    );
+  }
+}
+
+import { contentAssetImages } from "../../content-assets.ts";
+const images = contentAssetImages;
+const bgImage = props.backgroundImage
+  ? resolveImage(images, props.backgroundImage, { lang })
+  : null;
+const leadImage = props.leadImage ? resolveImage(images, props.leadImage.src, { lang }) : null;
+const cardEffects = resolveEffectsForTarget(props.decisionCard?.effects, "panel");
+const headingEffects = resolveEffectsForTarget(props.effects, "heading");
+const subheadingEffects = resolveEffectsForTarget(props.effects, "subheading");
+const siteLabels = await getSiteSectionLabels<Record<string, unknown>>(
+  lang,
+  Astro.props.defaultLanguageCode,
+  "heroDecisionCard",
+);
+const decisionCardAriaLabel = need(
+  "sections.heroDecisionCard.decisionCardAriaLabel",
+  typeof siteLabels?.decisionCardAriaLabel === "string"
+    ? siteLabels.decisionCardAriaLabel
+    : undefined,
+);
+
+const derivedPrices = loadDerivedPrices();
+const offeringRef = props.offeringRef;
+const noteTemplate =
+  typeof siteLabels?.noteTemplate === "string" ? siteLabels.noteTemplate : undefined;
+
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type TextOrPrice = TextPart | PricePart;
+
+function parsePriceMarkers(text: string): TextOrPrice[] {
+  const parts: TextOrPrice[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: text.slice(lastIndex, match.index) });
+    }
+    const offeringId = match[1]!;
+    const chargeRef = match[2]!;
+    const ref = offeringUriPrefix + offeringId;
+    const entries = derivedPrices?.[ref];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(sourceProp, chargeRef, lang, ref, derivedPrices, undefined);
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ kind: "text", value: text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: text });
+  return parts;
+}
+---
+
+<SectionShell
+  slug="hero-decision-card"
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="hero-decision-card-title"
+  background={props.background ?? { kind: "transparent" }}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  {
+    bgImage && (
+      <div class="hero-decision-card__bg" aria-hidden="true">
+        <ResponsiveImage
+          image={bgImage}
+          alt=""
+          class="hero-decision-card__bg-image"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    )
+  }
+
+  <div class="hero-decision-card__grid">
+    <div
+      class="hero-decision-card__text"
+      class:list={{ "hero-decision-card__text--center": props.header?.align === "center" }}
+    >
+      {
+        leadImage && (
+          <div class="hero-decision-card__lead">
+            <ResponsiveImage
+              image={leadImage}
+              alt={props.leadImage!.alt}
+              class:list={[
+                "hero-decision-card__lead-image",
+                { "hero-decision-card__lead-image--hidden": props.leadImageVisible === false },
+              ]}
+              quality="max"
+              loading="eager"
+              fetchpriority="high"
+              data-content-image={true}
+            />
+          </div>
+        )
+      }
+      <SectionHeader
+        sectionNumber={sectionNumber}
+        heading={need("header.heading", props.header?.heading)}
+        eyebrow={props.header?.eyebrow}
+        subheading={props.header?.subheading ?? props.tagline}
+        align={props.header?.align ?? "left"}
+        level={props.header?.level ?? 1}
+        hideSectionNumber={true}
+        id="hero-decision-card-title"
+        lang={lang}
+        headingEffects={headingEffects}
+        subheadingEffects={subheadingEffects}
+      />
+      <div
+        class="hero-decision-card__ctas"
+        class:list={{ "hero-decision-card__ctas--center": props.header?.align === "center" }}
+      >
+        {
+          props.primaryCta && (
+            <a class="btn btn--primary" href={primaryCtaHref}>
+              {props.primaryCta.label}
+            </a>
+          )
+        }
+        {
+          props.secondaryCta && (
+            <a class="btn btn--secondary" href={secondaryCtaHref}>
+              {props.secondaryCta.label}
+            </a>
+          )
+        }
+      </div>
+      {props.ctaNote && <p class="hero-decision-card__cta-note">{props.ctaNote}</p>}
+    </div>
+
+    {
+      props.decisionCard?.items && props.decisionCard.items.length > 0 && (
+        <EffectHost
+          as="aside"
+          effects={cardEffects}
+          class="hero-decision-card__panel"
+          aria-label={decisionCardAriaLabel}
+        >
+          <dl class="hero-decision-card__list">
+            {props.decisionCard.items.map((it) => {
+              const ref = offeringRef;
+              const entries = ref ? derivedPrices?.[ref] : undefined;
+              const matching = entries?.filter((e) => e.chargeRef === it.chargeRef) ?? [];
+              const sourceAmount = matching[0]?.trace?.source?.amount;
+              const sourceProp: SourcePriceProp | undefined =
+                ref && it.chargeRef && sourceAmount
+                  ? { amount: sourceAmount, currency: "EUR" }
+                  : undefined;
+              const variants =
+                ref && it.chargeRef
+                  ? buildPriceVariants(
+                      sourceProp,
+                      it.chargeRef,
+                      lang,
+                      ref,
+                      derivedPrices,
+                      noteTemplate,
+                    )
+                  : null;
+              return (
+                <div class="hero-decision-card__row">
+                  <dt>{it.label}</dt>
+                  <dd>
+                    {variants ? (
+                      <CurrencyAwarePriceDisplay priceVariants={variants} />
+                    ) : (
+                      parsePriceMarkers(it.value).map((part) =>
+                        part.kind === "text" ? (
+                          part.value
+                        ) : part.variants ? (
+                          <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                        ) : null,
+                      )
+                    )}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        </EffectHost>
+      )
+    }
+  </div>
+</SectionShell>

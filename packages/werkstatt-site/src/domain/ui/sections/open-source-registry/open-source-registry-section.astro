@@ -1,0 +1,245 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Renders the open-source SBOM registry: component table, summary, deployment metadata, and download buttons from structured JSON data.</purpose>
+<non-goals>
+  <item>Do not fetch or generate SBOM data — data is passed via dataRef from generated JSON.</item>
+  <item>Do not handle license normalization or classification — that lives in site-kernel-codegen.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0489: New UI section for deployment-specific SBOM registry with semantic HTML and accessibility.</item>
+  <item>Fix: resolve dataRef at build time — load registry JSON via import.meta.glob and merge with openSource labels from the site collection.</item>
+  <item>RFC-0608: fetch /.well-known/build-identity.json at request time (SSR) for deployment metadata display.</item>
+  <item>RFC-0634: replace runtime fetch with local readFileSync from public/.well-known/build-identity.json for per-channel build-time metadata embedding.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import { getEntry } from "astro:content";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import type { OpenSourceRegistrySectionContent } from "./open-source-registry-section.types.ts";
+import "./open-source-registry-section.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "open-source-registry");
+const props = cast<OpenSourceRegistrySectionContent>(pageOverride);
+
+const registryFiles = import.meta.glob<string>("/src/content/data/*/open-source-registry.json", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+});
+
+function resolveRegistryData(
+  dataRef: string,
+  language: string,
+): Record<string, unknown> | undefined {
+  const slug = dataRef.replace(/^data\//, "");
+  const langKey = `/src/content/data/${language}/${slug}.json`;
+  const defaultKey = `/src/content/data/de/${slug}.json`;
+  const raw = registryFiles[langKey] ?? registryFiles[defaultKey];
+  if (!raw) return undefined;
+  const stripped = raw.replace(/^\/\/[^\n]*\n/gm, "");
+  return JSON.parse(stripped) as Record<string, unknown>;
+}
+
+const labelsEntry = await getEntry("site", `${lang}/labels`);
+const openSourceLabels = (labelsEntry?.data as Record<string, unknown>)?.openSource as
+  Record<string, unknown> | undefined;
+
+const registryJson = props.dataRef ? resolveRegistryData(props.dataRef, lang) : undefined;
+
+// RFC-0634: Read build-identity.json locally from public/.well-known/ at build time
+// This ensures each channel's prerendered HTML embeds its own metadata, not the
+// main domain's. The path is resolved via process.cwd() which points to the
+// workpiece root during pnpm build.
+let deploymentMetadata = {
+  deploymentId: "—",
+  buildTimestamp: "—",
+  commitSha: "—",
+};
+try {
+  const wellKnownPath = join(process.cwd(), "public", ".well-known", "build-identity.json");
+  const raw = readFileSync(wellKnownPath, "utf8");
+  const buildIdentity = JSON.parse(raw) as {
+    releaseId?: string;
+    buildTimestamp?: string;
+    commitSha?: string;
+  };
+  deploymentMetadata = {
+    deploymentId: buildIdentity.releaseId ?? "—",
+    buildTimestamp: buildIdentity.buildTimestamp ?? "—",
+    commitSha: buildIdentity.commitSha ?? "—",
+  };
+} catch {
+  // File not found (e.g., local dev before any deploy) — keep placeholders
+}
+
+const data = {
+  ...(openSourceLabels ?? {}),
+  ...(registryJson ?? {}),
+  ...(props.data ?? {}),
+} as OpenSourceRegistrySectionContent["data"];
+---
+
+<SectionShell
+  slug="open-source-registry"
+  sectionId={sectionId}
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="open-source-registry-title"
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={props.header?.heading ?? data.summaryHeading ?? ""}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="open-source-registry-title"
+    lang={lang}
+  />
+
+  <div class="open-source-registry__body">
+    {/* Summary */}
+    <section class="open-source-registry__summary" aria-label={data.summaryHeading}>
+      <h3>{data.summaryHeading}</h3>
+      <dl class="open-source-registry__summary-grid">
+        <div class="open-source-registry__summary-item">
+          <dt>{data.componentsTotalLabel}</dt>
+          <dd>{data.summary.componentsTotal}</dd>
+        </div>
+        <div class="open-source-registry__summary-item">
+          <dt>{data.directDependenciesLabel}</dt>
+          <dd>{data.summary.directDependencies}</dd>
+        </div>
+        <div class="open-source-registry__summary-item">
+          <dt>{data.transitiveDependenciesLabel}</dt>
+          <dd>{data.summary.transitiveDependencies}</dd>
+        </div>
+        <div class="open-source-registry__summary-item">
+          <dt>{data.licensesTotalLabel}</dt>
+          <dd>{data.summary.licensesTotal}</dd>
+        </div>
+        <div class="open-source-registry__summary-item">
+          <dt>{data.componentsWithNoticeLabel}</dt>
+          <dd>{data.summary.componentsWithNotice}</dd>
+        </div>
+      </dl>
+    </section>
+
+    {/* License distribution */}
+    {
+      data.summary.licenseDistribution.length > 0 && (
+        <section
+          class="open-source-registry__license-distribution"
+          aria-label={data.licenseDistributionHeading}
+        >
+          <h3>{data.licenseDistributionHeading}</h3>
+          <ul class="open-source-registry__license-list">
+            {data.summary.licenseDistribution.map((item) => (
+              <li class="open-source-registry__license-item">
+                <span class="open-source-registry__license-name">{item.license}</span>
+                <span class="open-source-registry__license-count">{item.count}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {/* Deployment metadata */}
+    <section class="open-source-registry__deployment" aria-label={data.deploymentMetadataHeading}>
+      <h3>{data.deploymentMetadataHeading}</h3>
+      <dl class="open-source-registry__deployment-grid">
+        <div class="open-source-registry__deployment-item">
+          <dt>{data.deploymentIdLabel}</dt>
+          <dd>{deploymentMetadata.deploymentId}</dd>
+        </div>
+        <div class="open-source-registry__deployment-item">
+          <dt>{data.buildTimestampLabel}</dt>
+          <dd>{deploymentMetadata.buildTimestamp}</dd>
+        </div>
+        <div class="open-source-registry__deployment-item">
+          <dt>{data.commitShaLabel}</dt>
+          <dd>{deploymentMetadata.commitSha}</dd>
+        </div>
+      </dl>
+    </section>
+
+    {/* Component table */}
+    <section class="open-source-registry__components" aria-label={data.componentTableHeading}>
+      <details>
+        <summary>
+          <h3>{data.componentTableHeading}</h3>
+        </summary>
+        <div
+          class="open-source-registry__table-wrap"
+          role="region"
+          tabindex="0"
+          aria-label={data.componentTableHeading}
+        >
+          <table class="open-source-registry__table">
+            <caption class="open-source-registry__table-caption">
+              {data.componentTableHeading}
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Package</th>
+                <th scope="col">License</th>
+                <th scope="col">Scope</th>
+                <th scope="col">Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                data.components.map((component) => (
+                  <tr>
+                    <td>
+                      <code>{component.name}</code>
+                    </td>
+                    <td>{component.license}</td>
+                    <td>{component.scope}</td>
+                    <td>
+                      {component.source ? (
+                        <a href={component.source} target="_blank" rel="noopener noreferrer">
+                          link
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    {/* Downloads */}
+    <section class="open-source-registry__downloads" aria-label={data.downloadsHeading}>
+      <h3>{data.downloadsHeading}</h3>
+      <ul class="open-source-registry__download-list">
+        {
+          data.downloads.map((download) => (
+            <li class="open-source-registry__download-item">
+              <a
+                href={download.url}
+                download={download.filename}
+                class="open-source-registry__download-link"
+              >
+                {download.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</SectionShell>

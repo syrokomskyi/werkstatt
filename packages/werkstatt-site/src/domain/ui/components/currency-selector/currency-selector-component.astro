@@ -1,0 +1,86 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+Currency selector dropdown component (RFC-0743). Renders a select element
+with available target currencies. Persists selection in localStorage and
+dispatches wg-currency-change events.
+</purpose>
+<non-goals>
+  <item>Do not display prices — that is currency-aware-price-display.</item>
+  <item>Do not fetch projection data — currencies are passed as props.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0743: Initial creation of currency selector component.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { getResolvedComponentContent } from "@warpgogol/werkstatt-site/share";
+import type { CurrencySelectorComponentContent } from "@warpgogol/werkstatt-site/ui/components/currency-selector/types";
+import "./currency-selector-component.css";
+
+interface Props {
+  lang: string;
+  defaultLanguage: string;
+  currencies: Array<{ code: string; label: string }>;
+  pageOverride?: Partial<CurrencySelectorComponentContent>;
+}
+
+const { lang, defaultLanguage, currencies, pageOverride } = Astro.props as Props;
+
+const content = await getResolvedComponentContent<CurrencySelectorComponentContent>({
+  componentPath: "currency-selector",
+  languageCode: lang,
+  defaultLanguageCode: defaultLanguage,
+  pageOverride,
+});
+
+const currencyCodes = currencies.map((c) => c.code);
+---
+
+<div class="currency-selector" data-currency-selector role="group" aria-label={content.label}>
+  {
+    currencies.map((c) => (
+      <button
+        type="button"
+        class="currency-selector__option"
+        data-currency-option={c.code}
+        aria-pressed={c.code === currencies[0]?.code}
+      >
+        {c.label}
+      </button>
+    ))
+  }
+</div>
+<script is:inline define:vars={{ currencyCodes }}>
+  try {
+    var c = document.documentElement.getAttribute("data-wg-currency");
+    if (!c) {
+      c = localStorage.getItem("wg-currency");
+    }
+    if (c && currencyCodes.indexOf(c) !== -1) {
+      var selectors = document.querySelectorAll("[data-currency-selector]");
+      for (var si = 0; si < selectors.length; si++) {
+        var btns = selectors[si].querySelectorAll("[data-currency-option]");
+        for (var bi = 0; bi < btns.length; bi++) {
+          btns[bi].setAttribute(
+            "aria-pressed",
+            String(btns[bi].getAttribute("data-currency-option") === c),
+          );
+        }
+      }
+    }
+  } catch {}
+</script>
+
+<script>
+  import { initCurrencySelector } from "./currency-selector-component.client.ts";
+  const container = document.querySelector<HTMLElement>("[data-currency-selector]");
+  if (container) {
+    const codes = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("[data-currency-option]"),
+    ).map((btn) => btn.getAttribute("data-currency-option") ?? "");
+    initCurrencySelector(container, codes);
+  }
+</script>

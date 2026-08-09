@@ -1,0 +1,62 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Acts as a dispatcher for rendering a controlled responsibility block within a section.</purpose>
+<non-goals>
+  <item>Do not manage data fetching or state persistence.</item>
+  <item>Do not perform content parsing or validation.</item>
+  <item>Do not define global styles or layout rules.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Added Compass scaffolding to clarify architectural intent and responsibilities.</item>
+  <item>Pass surface prop from body to SectionSplitList for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: controlled-responsibility-block thin dispatcher — split-list body. */
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { cast, need, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import SectionSplitList from "@warpgogol/werkstatt-site/ui/components/section-body/split-list.astro";
+import type { ControlledResponsibilityBlockSectionContent } from "./controlled-responsibility-block-section.types.generated.ts";
+import "./controlled-responsibility-block-section.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "controlled-responsibility");
+const props = cast<ControlledResponsibilityBlockSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="controlled-responsibility-block"
+  sectionId={sectionId}
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="controlled-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="controlled-title"
+    lang={lang}
+  />
+  <SectionSplitList
+    primaryItems={body.primaryItems}
+    secondaryItems={body.secondaryItems}
+    labels={body.labels ?? { primary: "", secondary: "" }}
+    iconColors={body.iconColors}
+    align={body.align}
+    effects={body.effects}
+  />
+</SectionShell>

@@ -1,0 +1,29 @@
+id: video-section
+uniName: video-section
+layer: section
+semanticId: video
+archetype: video-section
+cosmicName: Quaoar
+role: video-feature
+version: 1.0.0
+intent:
+  - demonstrate-expertise
+  - orient-visitor
+  - build-trust
+industryFit: []
+contentSchemaKey: null
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - media
+  properties:
+    media:
+      type: object
+    contentRef:
+      type: string

@@ -1,0 +1,45 @@
+id: transparency-section
+uniName: transparency-section
+layer: section
+semanticId: transparency
+archetype: transparency
+cosmicName: Tethys
+role: transparency
+version: 1.3.0
+intent:
+  - signal-transparency
+  - build-trust
+  - capture-lead
+industryFit: []
+contentSchemaKey: transparency-section
+contentTypesPath: ./transparency-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-list
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body
+  properties:
+    reportLinkLabel:
+      type: string
+    reportLinkHref:
+      type: string
+    cta:
+      type: object
+      additionalProperties: false
+      required:
+        - label
+        - target
+      properties:
+        label:
+          type: string
+          minLength: 1
+        target:
+          type: string
+          minLength: 1

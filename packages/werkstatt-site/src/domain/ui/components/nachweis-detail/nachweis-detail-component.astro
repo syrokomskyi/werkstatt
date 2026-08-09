@@ -1,0 +1,161 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  NachweisDetail (Kerberos) — Full detail page component for a single Nachweis
+  record. Renders a nachweis-card plus a Sichtpass section with hashes,
+  verification level, timestamp, and signature. RFC-0708.
+</purpose>
+<non-goals>
+  <item>Does not fetch data — receives all data via props from the page block.</item>
+  <item>Does not handle routing.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0708: initial implementation.</item>
+</CHANGE_SUMMARY>
+*/
+
+/**
+ * NachweisDetail (Kerberos) — trust detail component
+ * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
+ */
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { cast } from "@warpgogol/werkstatt-site/share";
+import NachweisCard from "../nachweis-card/nachweis-card-component.astro";
+import "./nachweis-detail-component.css";
+
+interface Sichtpass {
+  sourceSha256: string;
+  publicDerivativeSha256?: string;
+  recordPayloadSha256?: string;
+  envelopeSha256?: string;
+  operatorSignature?: string;
+  qualifiedTimestamp?: string;
+  verificationLevel?: string;
+}
+
+interface NachweisDetailContent {
+  slug: string;
+  title: string;
+  result: string;
+  scope?: string;
+  context?: string;
+  limitations?: string;
+  quote?: string;
+  quoteLang?: string;
+  source?: string;
+  verifiedScope?: string;
+  notVerifiedScope?: string;
+  status: "draft" | "preview" | "published" | "withdrawn";
+  verifiedByLabel?: string;
+  verifiedDate?: string;
+  sichtpass?: Sichtpass;
+}
+
+const { pageOverride } = Astro.props as SectionProps;
+const {
+  slug,
+  title,
+  result,
+  scope,
+  context,
+  limitations,
+  quote,
+  quoteLang,
+  source,
+  verifiedScope,
+  notVerifiedScope,
+  status,
+  verifiedByLabel,
+  verifiedDate,
+  sichtpass,
+} = cast<NachweisDetailContent>(pageOverride);
+
+const sichtpassHeadingId = `nachweis-detail-${slug}-sichtpass`;
+---
+
+<article class="nachweis-detail" data-component="nachweis-detail">
+  <NachweisCard
+    slug={slug}
+    title={title}
+    result={result}
+    scope={scope}
+    context={context}
+    limitations={limitations}
+    quote={quote}
+    quoteLang={quoteLang}
+    source={source}
+    verifiedScope={verifiedScope}
+    notVerifiedScope={notVerifiedScope}
+    status={status}
+    verifiedByLabel={verifiedByLabel}
+    verifiedDate={verifiedDate}
+  />
+
+  {
+    sichtpass && (
+      <section class="nachweis-detail__sichtpass" aria-labelledby={sichtpassHeadingId}>
+        <h2 id={sichtpassHeadingId} class="nachweis-detail__sichtpass-title">
+          Sichtpass
+        </h2>
+
+        <dl class="nachweis-detail__hashes">
+          <div class="nachweis-detail__entry">
+            <dt>Quell-Hash (SHA-256)</dt>
+            <dd>
+              <code class="nachweis-detail__hash">{sichtpass.sourceSha256}</code>
+            </dd>
+          </div>
+          {sichtpass.publicDerivativeSha256 && (
+            <div class="nachweis-detail__entry">
+              <dt>Öffentliche Ableitung (SHA-256)</dt>
+              <dd>
+                <code class="nachweis-detail__hash">{sichtpass.publicDerivativeSha256}</code>
+              </dd>
+            </div>
+          )}
+          {sichtpass.recordPayloadSha256 && (
+            <div class="nachweis-detail__entry">
+              <dt>Datensatz-Hash (SHA-256)</dt>
+              <dd>
+                <code class="nachweis-detail__hash">{sichtpass.recordPayloadSha256}</code>
+              </dd>
+            </div>
+          )}
+          {sichtpass.envelopeSha256 && (
+            <div class="nachweis-detail__entry">
+              <dt>Umschlag-Hash (SHA-256)</dt>
+              <dd>
+                <code class="nachweis-detail__hash">{sichtpass.envelopeSha256}</code>
+              </dd>
+            </div>
+          )}
+          {sichtpass.verificationLevel && (
+            <div class="nachweis-detail__entry">
+              <dt>Prüfungsniveau</dt>
+              <dd>{sichtpass.verificationLevel}</dd>
+            </div>
+          )}
+          {sichtpass.qualifiedTimestamp && (
+            <div class="nachweis-detail__entry">
+              <dt>Qualifizierter Zeitstempel</dt>
+              <dd>
+                <time datetime={sichtpass.qualifiedTimestamp}>{sichtpass.qualifiedTimestamp}</time>
+              </dd>
+            </div>
+          )}
+          {sichtpass.operatorSignature && (
+            <div class="nachweis-detail__entry">
+              <dt>Operator-Signatur</dt>
+              <dd>
+                <code class="nachweis-detail__hash">{sichtpass.operatorSignature}</code>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </section>
+    )
+  }
+</article>

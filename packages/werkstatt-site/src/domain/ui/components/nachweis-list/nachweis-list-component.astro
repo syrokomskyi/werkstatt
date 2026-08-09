@@ -1,0 +1,71 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  NachweisList (Hydra) — List of nachweis-card components for the Nachweis
+  index page. Renders published records only. Shows an empty state message
+  when no published records exist. RFC-0708.
+</purpose>
+<non-goals>
+  <item>Does not fetch data — receives records via props from the page block.</item>
+  <item>Does not handle routing to detail pages.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0708: initial implementation.</item>
+</CHANGE_SUMMARY>
+*/
+
+/**
+ * NachweisList (Hydra) — trust list component
+ * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
+ */
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { cast } from "@warpgogol/werkstatt-site/share";
+import NachweisCard from "../nachweis-card/nachweis-card-component.astro";
+import "./nachweis-list-component.css";
+
+interface NachweisRecord {
+  slug: string;
+  title: string;
+  result: string;
+  scope?: string;
+  context?: string;
+  limitations?: string;
+  quote?: string;
+  quoteLang?: string;
+  source?: string;
+  verifiedScope?: string;
+  notVerifiedScope?: string;
+  status: "draft" | "preview" | "published" | "withdrawn";
+  verifiedByLabel?: string;
+  verifiedDate?: string;
+}
+
+interface NachweisListContent {
+  records?: NachweisRecord[];
+  emptyMessage?: string;
+}
+
+const { pageOverride } = Astro.props as SectionProps;
+const props = cast<NachweisListContent>(pageOverride);
+const records = props.records ?? [];
+const emptyMessage = props.emptyMessage ?? "Weitere Nachweise werden derzeit vorbereitet.";
+---
+
+<section class="nachweis-list" data-component="nachweis-list">
+  {
+    records.length === 0 ? (
+      <p class="nachweis-list__empty">{emptyMessage}</p>
+    ) : (
+      <ul class="nachweis-list__items" role="list">
+        {records.map((record) => (
+          <li class="nachweis-list__item">
+            <NachweisCard {...record} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>

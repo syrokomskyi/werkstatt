@@ -1,0 +1,190 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0103 + RFC-0134] Canonical body component for body.kind: "cards". Renders a grid (or
+  list) of StandardCard with optional image, icon, badge, href, and per-card effects.
+</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0134 replaces legacy surface prop with composable card effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { creditByTarget, resolveEffectsForTarget, resolveImage } from "@warpgogol/werkstatt-site/share";
+import type { StandardCard, HorizontalAlign, EffectAssignment } from "@warpgogol/werkstatt-site/share";
+import EffectHost from "../../../components/effects/effect-host.astro";
+import ResponsiveImage from "@warpgogol/werkstatt-site/ui/components/responsive-image.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/werkstatt-site/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import { loadVendorIcon } from "../../../icons/icon-resolver.ts";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../../../sections/price-card/price-variants.ts";
+import "./section-card-grid.css";
+
+interface Props {
+  cards: StandardCard[];
+  layout?: "grid" | "list";
+  columns?: 2 | 3 | 4;
+  align?: HorizontalAlign;
+  lang?: string;
+  defaultLanguageCode?: string;
+  effects?: EffectAssignment[];
+}
+
+const {
+  cards,
+  layout = "grid",
+  columns = 3,
+  align = "left",
+  lang,
+  defaultLanguageCode,
+  effects,
+} = Astro.props as Props;
+const activeLang = lang ?? defaultLanguageCode;
+if (!activeLang || !defaultLanguageCode) {
+  throw new Error("[section-card-grid] lang and defaultLanguageCode are required.");
+}
+const langCode: string = activeLang;
+
+const cardEffects = resolveEffectsForTarget(effects, "card");
+
+const derivedPrices = loadDerivedPrices();
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type TextOrPrice = TextPart | PricePart;
+
+function parsePriceMarkers(text: string): TextOrPrice[] {
+  const parts: TextOrPrice[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: text.slice(lastIndex, match.index) });
+    }
+    const offeringId = match[1]!;
+    const chargeRef = match[2]!;
+    const offeringRef = offeringUriPrefix + offeringId;
+    const entries = derivedPrices?.[offeringRef];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      langCode,
+      offeringRef,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ kind: "text", value: text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: text });
+  return parts;
+}
+
+import { contentAssetCredits, contentAssetImages } from "../../../content-assets.ts";
+const images = contentAssetImages;
+
+const resolved = await Promise.all(
+  cards.map(async (card) => {
+    const imageMeta = card.image ? resolveImage(images, card.image, { lang: activeLang }) : null;
+    const imageCredit = card.image
+      ? creditByTarget(
+          contentAssetCredits,
+          { kind: "image", id: card.image, domain: "pages" },
+          activeLang,
+          defaultLanguageCode,
+        )
+      : null;
+    const Icon = card.icon ? await loadVendorIcon(card.icon) : null;
+    return { card, imageMeta, imageCredit, Icon };
+  }),
+);
+---
+
+<div
+  class:list={[
+    "section-card-grid",
+    `section-card-grid--${layout}`,
+    `section-card-grid--cols-${columns}`,
+    `section-card-grid--align-${align}`,
+  ]}
+>
+  {
+    resolved.map(({ card, imageMeta, imageCredit, Icon }) => {
+      const inner = (
+        <>
+          {imageMeta && (
+            <div class="section-card-grid__image-wrap">
+              <ResponsiveImage
+                image={imageMeta}
+                alt={card.imageAlt ?? ""}
+                class="section-card-grid__image"
+                loading="lazy"
+                credit={imageCredit}
+                lang={activeLang}
+                defaultLanguageCode={defaultLanguageCode}
+              />
+            </div>
+          )}
+          <div class="section-card-grid__body">
+            {card.number && <span class="section-card-grid__number">{card.number}</span>}
+            {Icon && (
+              <Icon size={card.icon?.size ?? 32} color="accent" trigger="hover" aria-label="" />
+            )}
+            {card.badge && (
+              <span class="section-card-grid__badge">
+                {parsePriceMarkers(card.badge).map((part) =>
+                  part.kind === "text" ? (
+                    part.value
+                  ) : part.variants ? (
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  ) : null,
+                )}
+              </span>
+            )}
+            {card.title && <h3 class="section-card-grid__title">{card.title}</h3>}
+            {card.description && (
+              <p class="section-card-grid__description">
+                {parsePriceMarkers(card.description).map((part) =>
+                  part.kind === "text" ? (
+                    part.value
+                  ) : part.variants ? (
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  ) : null,
+                )}
+              </p>
+            )}
+          </div>
+        </>
+      );
+      const cardClass = "section-card-grid__card";
+      const cardClassLink = `${cardClass} ${cardClass}--link`;
+
+      return card.href ? (
+        <EffectHost as="a" effects={cardEffects} class={cardClassLink} href={card.href}>
+          {inner}
+        </EffectHost>
+      ) : (
+        <EffectHost as="article" effects={cardEffects} class={cardClass}>
+          {inner}
+        </EffectHost>
+      );
+    })
+  }
+</div>

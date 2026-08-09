@@ -1,0 +1,72 @@
+/***************************************************************
+<MODULE_CONTRACT>
+<purpose>Defines styles for the transparency section's link elements, ensuring consistent presentation within the UI.</purpose>
+<non-goals>
+  <item>Do not include styles for non-link elements.</item>
+  <item>Do not manage layout outside the transparency section.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+***************************************************************/
+
+/* RFC-0103: transparency content CSS — only the report link wrapping. */
+@layer components {
+  .transparency-section__link-wrap {
+    max-width: var(--ds-size-container-narrow);
+    margin: var(--ds-space-5) 0 0;
+  }
+  .transparency-section__link {
+    color: var(--ds-color-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .transparency-section__link:hover,
+  .transparency-section__link:focus-visible {
+    color: var(--ds-color-text);
+  }
+  .transparency-section__cta-wrap {
+    margin-top: var(--ds-space-5);
+  }
+  .transparency-section__cta-wrap--align-left {
+    text-align: left;
+  }
+  .transparency-section__cta-wrap--align-center {
+    text-align: center;
+  }
+  .transparency-section__cta-wrap--align-right {
+    text-align: right;
+  }
+  .transparency-section__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--ds-space-3) var(--ds-space-5);
+    background: var(--ds-color-accent);
+    color: var(--ds-color-accent-contrast);
+    border-radius: var(--ds-radius-md);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .transparency-section__cta:hover {
+    background: var(--ds-color-secondary);
+  }
+}
+
+.section-list__text .currency-aware-price-display,
+.section-list__text .currency-aware-price-display__variant {
+  display: inline;
+}
+
+.section-list__text .currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+.section-list__text .currency-aware-price-display__amount {
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  white-space: nowrap;
+}

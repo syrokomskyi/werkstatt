@@ -1,0 +1,168 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0102] Canonical header component for every shared section. Owns the
+  section-number + heading + optional subheading markup, supports tone-segmented
+  headings from the biome palette, and aligns the whole block independently of
+  the section body.
+</purpose>
+<non-goals>
+  <item>Do not own background, glass, density, or tone — those live on <SectionShell>.</item>
+  <item>Do not own body content — that flows through RFC-0103 body components.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Initial creation per RFC-0102 step 1 — additive landing of the header primitive.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionHeaderProps } from "@warpgogol/werkstatt-site/share";
+import { composeEffectPresentation, effectVarsToStyle } from "../effects/registry.ts";
+import CurrencyAwarePriceDisplay from "../currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../../sections/price-card/price-variants.ts";
+import "../effects/effect-text.css";
+import "./section-header.css";
+
+const {
+  sectionNumber,
+  hideSectionNumber = false,
+  heading,
+  eyebrow,
+  subheading,
+  align = "left",
+  level = 2,
+  id,
+  headingEffects,
+  subheadingEffects,
+  lang,
+} = Astro.props as SectionHeaderProps & { lang?: string };
+
+const derivedPrices = loadDerivedPrices();
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type TextOrPrice = TextPart | PricePart;
+
+function parsePriceMarkers(text: string): TextOrPrice[] {
+  const parts: TextOrPrice[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: text.slice(lastIndex, match.index) });
+    }
+    const offeringId = match[1]!;
+    const chargeRef = match[2]!;
+    const ref = offeringUriPrefix + offeringId;
+    const entries = derivedPrices?.[ref];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      lang ?? "de",
+      ref,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ kind: "text", value: text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: text });
+  return parts;
+}
+
+// RFC-0151: typographic effects apply directly to the heading element (no
+// wrapper, no clipping), composed through the shared effect-kind registry.
+const headingPresentation = composeEffectPresentation(headingEffects, "text");
+const headingEffectStyle = effectVarsToStyle(headingPresentation.vars);
+
+const subheadingPresentation = composeEffectPresentation(subheadingEffects, "text");
+const subheadingEffectStyle = effectVarsToStyle(subheadingPresentation.vars);
+
+const showNumber = !hideSectionNumber && Boolean(sectionNumber);
+const segments: Array<{ text: string; tone: string }> = Array.isArray(heading)
+  ? heading.map((s) => ({ text: s.text, tone: s.tone ?? "default" }))
+  : [{ text: heading as string, tone: "default" }];
+
+const HeadingTag = `h${level}` as "h1" | "h2";
+const uniqueId = id && sectionNumber ? `${sectionNumber}-${id}` : id;
+---
+
+<header
+  class:list={[
+    "section-header",
+    `section-header--align-${align}`,
+    { "section-header--with-number": showNumber },
+  ]}
+>
+  {eyebrow && <p class="section-header__eyebrow">{eyebrow}</p>}
+  <div class="section-header__main">
+    {
+      showNumber && (
+        <span class="section-header__number" aria-hidden="true">
+          {sectionNumber}
+        </span>
+      )
+    }
+    <HeadingTag
+      class:list={["section-header__title", "effect-text", ...headingPresentation.classes]}
+      id={uniqueId}
+      style={headingEffectStyle}
+    >
+      {
+        segments.map((s) => {
+          const parts = parsePriceMarkers(s.text);
+          return (
+            <span
+              class:list={[
+                "section-header__title-segment",
+                `section-header__title-segment--${s.tone}`,
+              ]}
+            >
+              {parts.map((part) =>
+                part.kind === "text" ? (
+                  part.value
+                ) : part.variants ? (
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                ) : null,
+              )}
+            </span>
+          );
+        })
+      }
+    </HeadingTag>
+  </div>
+  {
+    subheading && (
+      <p
+        class:list={[
+          "section-header__subheading",
+          "effect-text",
+          ...subheadingPresentation.classes,
+        ]}
+        style={subheadingEffectStyle}
+      >
+        {parsePriceMarkers(subheading).map((part) =>
+          part.kind === "text" ? (
+            part.value
+          ) : part.variants ? (
+            <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+          ) : null,
+        )}
+      </p>
+    )
+  }
+</header>

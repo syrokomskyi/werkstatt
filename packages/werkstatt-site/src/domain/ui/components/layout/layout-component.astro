@@ -1,0 +1,230 @@
+---
+/*
+<MODULE_CONTRACT>
+  <purpose>Shared base HTML layout shell for all Warpgogol apps. Owns DOCTYPE, SEO metadata injection,
+  structured data (JSON-LD), hreflang alternate links, clip-path SVG defs, and slot-based
+  content rendering. App-specific data (CSS, content strings, biome) are injected via props.</purpose>
+      <non-goals>
+    <item>Do not load app-specific content or config — those are provided as props/by the proxy layout.</item>
+    <item>Do not manage routing, navigation, or page composition logic.</item>
+  </non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>App-specific data (CSS URL, skipLinkLabel, biome) moved to props.</item>
+  <item>App-specific scripts injected by proxy via default slot.</item>
+  <item>Perf: add preload hint for globalStylesheetUrl to reduce render-blocking latency.</item>
+  <item>RFC-0209: resolve the hero leadImage token to the page primaryImage (og:image / JSON-LD) in this asset-aware layer.</item>
+  <item>RFC-0312: expose generated humans.txt via the shared head author link for every site.</item>
+  <item>RFC-0309: expose generated installable icon and webmanifest links in the shared head.</item>
+  <item>RFC-0485: remove stale font preload for /fonts/inter-400.woff2 (404 fix).</item>
+</CHANGE_SUMMARY>
+*/
+
+import StructuredData from "@warpgogol/werkstatt-site/ui/components/seo/structured-data";
+import SocialMeta from "@warpgogol/werkstatt-site/ui/components/seo/social-meta";
+import { buildJsonLd, markdownTwinUrlPath } from "@warpgogol/werkstatt-site/share/semantic";
+import { resolveImage } from "@warpgogol/werkstatt-site/share";
+import type { SemanticPageModel } from "@warpgogol/werkstatt-site/share/semantic";
+import type { OrchestratorConfig } from "@warpgogol/werkstatt-site/share/astro/page-handler";
+import { contentAssetImages } from "../../content-assets.ts";
+import ScrollToTop from "../scroll-to-top/scroll-to-top-component.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  lang: string;
+  biome: string;
+  robots?: string;
+  class?: string;
+  semanticPage?: SemanticPageModel;
+  alternateLinks?: Array<{ lang: string; href: string }>;
+  skipLinkLabel: string;
+  globalStylesheetUrl: string;
+  /** RFC-0106 / RFC-0108 §LAY: per-page orchestrator opt-in flags. */
+  orchestratorConfig?: OrchestratorConfig;
+  /**
+   * RFC-0159: explicit canonical URL override. When set, this value is emitted
+   * as <link rel="canonical"> instead of the request URL. The root entry page
+   * (`/`) uses this to canonicalize to the default-language home (`/<lang>/`),
+   * preventing duplicate-content ambiguity while still serving full HTML at `/`.
+   */
+  canonicalUrl?: string;
+  /** RFC-0257: print mode flag (from ?print query param). */
+  printMode?: boolean;
+  /** RFC-0257: root-relative URL to the generated PDF, when output.printPdf is enabled. */
+  pdfUrl?: string;
+  /** RFC-0257: URL to the shared print stylesheet. */
+  printStylesheetUrl?: string;
+}
+
+const {
+  title,
+  description,
+  lang,
+  biome,
+  robots,
+  class: className,
+  semanticPage,
+  alternateLinks,
+  skipLinkLabel,
+  globalStylesheetUrl,
+  orchestratorConfig,
+  canonicalUrl: canonicalUrlOverride,
+  pdfUrl,
+  printStylesheetUrl,
+} = Astro.props;
+
+const canonicalUrl = canonicalUrlOverride ?? Astro.url.toString();
+const supportedLangs = Array.from(
+  new Set([
+    lang,
+    ...(alternateLinks ?? []).map((link) => link.lang).filter((code) => code !== "x-default"),
+  ]),
+);
+
+// RFC-0209: project the hero `leadImage` as the page primaryImage (og:image /
+// twitter:image / JSON-LD primaryImageOfPage). The framework-free page handler
+// cannot resolve a content-asset token to a URL, so it ships the raw
+// `leadImageToken` (only when the page declares a hero leadImage and no explicit
+// output.image). This is the asset-aware layer: resolve the token through the
+// Image Provider Port seam, make it absolute against the page origin, and
+// promote it ahead of the RFC-0150 preview-screenshot fallback. An unresolvable
+// token keeps the screenshot, so og:image is never empty. Precedence:
+// output.image → resolved hero leadImage → preview screenshot.
+if (semanticPage?.leadImageToken && !semanticPage.output?.image) {
+  const meta = resolveImage(contentAssetImages, semanticPage.leadImageToken.src, {
+    lang: semanticPage.lang,
+  });
+  if (meta) {
+    // NB: no `contentImage: true` here. The hero already renders the lead image
+    // as an `<img data-content-image>` in the body, which is the RFC-0172 harvest
+    // source for the image sitemap. Flagging this og:image as a content image too
+    // would emit a second `x-content-image` head signal for the same photo and
+    // trip the IMGSITEMAP-01 one-per-page contract. og:image still emits
+    // unconditionally; head and sitemap point at the same lead image.
+    semanticPage.primaryImage = {
+      url: new URL(meta.src, new URL(canonicalUrl).origin).toString(),
+      width: meta.width,
+      height: meta.height,
+      alt: semanticPage.leadImageToken.alt,
+    };
+  }
+}
+
+const schema = semanticPage ? buildJsonLd(semanticPage) : null;
+
+// RFC-0165: per-page robots directive. An explicit `robots` prop wins; otherwise
+// derive from the resolved output projection. index+follow (the default) emits nothing.
+const robotsFromOutput = (() => {
+  const directive = semanticPage?.output?.robots;
+  if (!directive || (directive.index && directive.follow)) return undefined;
+  return `${directive.index ? "index" : "noindex"},${directive.follow ? "follow" : "nofollow"}`;
+})();
+const robotsContent = robots ?? robotsFromOutput;
+---
+
+<!doctype html>
+<html lang={lang} data-biome={biome}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="preload" as="style" href={globalStylesheetUrl} fetchpriority="high" />
+    <link rel="stylesheet" href={globalStylesheetUrl} />
+    {description && <meta name="description" content={description} />}
+    {robotsContent && <meta name="robots" content={robotsContent} />}
+    <link rel="canonical" href={canonicalUrl} />
+    {
+      alternateLinks?.map(({ lang: hrefLang, href }) => (
+        <link rel="alternate" hreflang={hrefLang} href={href} />
+      ))
+    }
+    {
+      semanticPage && (
+        <SocialMeta
+          page={semanticPage}
+          canonicalUrl={canonicalUrl}
+          siteName={semanticPage.organization.name}
+        />
+      )
+    }
+    {
+      /* RFC-0166: agent/LLM content negotiation — point at the build-time Markdown twin,
+         but only for pages that actually have one (llms depth full/summary). */
+      semanticPage && ["full", "summary"].includes(semanticPage.output?.llms?.depth ?? "full") && (
+        <link
+          rel="alternate"
+          type="text/markdown"
+          href={markdownTwinUrlPath(new URL(canonicalUrl).pathname, { supportedLangs })}
+        />
+      )
+    }
+    {
+      /* RFC-0165: RSS autodiscovery (feed.xml is always generated, empty-but-valid if no articles). */
+    }
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+    <link type="text/plain" rel="author" href="/humans.txt" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#111111" />
+    <meta name="generator" content={Astro.generator} />
+
+    {/* RFC-0257: inject shared print stylesheet as media="print" */}
+    {printStylesheetUrl && <link rel="stylesheet" href={printStylesheetUrl} media="print" />}
+
+    {/* RFC-0257: PDF alternate link for search engines and document crawlers */}
+    {pdfUrl && <link rel="alternate" type="application/pdf" href={pdfUrl} />}
+
+    {schema && <StructuredData schema={schema} />}
+
+    {/* RFC-0106: Inject site config for orchestrator and other client-side features */}
+    {
+      orchestratorConfig && (
+        <script
+          type="application/json"
+          id="site-config"
+          set:html={JSON.stringify({ orchestrator: orchestratorConfig })}
+        />
+      )
+    }
+    {
+      orchestratorConfig && (
+        <script is:inline>
+          window.__SITE_CONFIG = JSON.parse(document.getElementById("site-config").textContent);
+        </script>
+      )
+    }
+    {/* RFC-0257: inline print-mode detection script — runs before paint to avoid FOUC */}
+    <script is:inline>
+      if (new URL(window.location.href).searchParams.has("print")) {
+        document.documentElement.setAttribute("data-print", "");
+      }
+    </script>
+  </head>
+  <body class={className}>
+    <a href="#main-content" class="sr-only">{skipLinkLabel}</a>
+
+    <svg class="clip-path-svg" width="0" height="0" aria-hidden="true">
+      <defs>
+        <clipPath id="section-curve" clipPathUnits="objectBoundingBox">
+          <path
+            d="M 0 0.018 C 0.16 0.032 0.34 0.04 0.52 0.036 C 0.7 0.032 0.86 0.02 1 0.008 L 1 0.982 C 0.84 0.968 0.66 0.96 0.48 0.964 C 0.3 0.968 0.14 0.98 0 0.992 Z"
+          ></path>
+        </clipPath>
+        <clipPath id="section-curve-flat-top" clipPathUnits="objectBoundingBox">
+          <path
+            d="M 0 0 L 1 0 L 1 0.982 C 0.84 0.968 0.66 0.96 0.48 0.964 C 0.3 0.968 0.14 0.98 0 0.992 Z"
+          ></path>
+        </clipPath>
+        <clipPath id="section-curve-flat" clipPathUnits="objectBoundingBox">
+          <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+
+    <slot />
+    <ScrollToTop />
+  </body>
+</html>

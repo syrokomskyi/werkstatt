@@ -1,0 +1,26 @@
+id: open-source-registry-section
+uniName: open-source-registry-section
+layer: section
+semanticId: open-source-registry
+archetype: open-source-registry
+cosmicName: Orcus
+role: open-source-registry
+version: 1.0.0
+intent:
+  - fulfill-legal-requirement
+  - signal-transparency
+industryFit: []
+contentSchemaKey: open-source-registry-section
+contentTypesPath: ./open-source-registry-section.types.ts
+
+propsSchemaCompose:
+  - section-visual
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    heading:
+      type: string
+    dataRef:
+      type: string

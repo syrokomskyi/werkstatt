@@ -1,0 +1,69 @@
+id: markdown-section
+uniName: markdown-section
+layer: section
+semanticId: markdown
+archetype: markdown
+cosmicName: Hyperion
+role: markdown
+version: 1.5.0
+intent:
+  - surface-content
+  - fulfill-legal-requirement
+  - orient-visitor
+industryFit: []
+contentSchemaKey: null
+
+propsSchemaCompose:
+  - section-visual
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    contentRef:
+      type: string
+    heading:
+      type: string
+    eyebrow:
+      type: string
+      minLength: 1
+    lead:
+      type: string
+    body:
+      type: string
+    hideSectionNumber:
+      type: boolean
+    variant:
+      type: string
+      enum:
+        - default
+        - open-source
+    pageId:
+      type: string
+    languages:
+      type: array
+      items:
+        type: string
+    showLanguageLabels:
+      type: boolean
+    animateNumbers:
+      type: boolean
+    animateYears:
+      type: boolean
+    numberDuration:
+      type: number
+      minimum: 0.3
+    # RFC-0104 + RFC-0126 follow-up: flat imageFade* keys nested into a single
+    # defaultImageFade object (mirrors team-section.manifest.yaml).
+    defaultImageFade:
+      type: object
+      additionalProperties: false
+      properties:
+        top:
+          type: boolean
+        bottom:
+          type: boolean
+        left:
+          type: boolean
+        right:
+          type: boolean

@@ -1,0 +1,80 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for the Passport Provenance component, ensuring a consistent visual presentation across the UI.</purpose>
+<non-goals>
+  <item>Do not include JavaScript logic or interactivity.</item>
+  <item>Do not manage state or data fetching.</item>
+  <item>Do not handle responsive design beyond defined styles.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* PassportProvenance (Bianca) — RFC-0028 */
+
+.passport-provenance {
+  padding: var(--ds-space-6);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-color-surface);
+}
+
+.passport-provenance__heading {
+  font-size: var(--ds-font-size-xl, 1.25rem);
+  font-weight: 600;
+  color: var(--ds-color-text-primary);
+  margin: 0 0 var(--ds-space-4);
+}
+
+.passport-provenance__list {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+}
+
+.passport-provenance__entry {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: var(--ds-space-2);
+}
+
+.passport-provenance__entry dt {
+  font-weight: 500;
+  color: var(--ds-color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.passport-provenance__entry dd {
+  color: var(--ds-color-text-primary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.passport-provenance__sha {
+  font-family: ui-monospace, monospace;
+  background: var(--ds-color-surface-elevated);
+  padding: 0.125em 0.375em;
+  border-radius: var(--ds-radius-sm);
+}
+
+.passport-provenance__entry--vc {
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr;
+}
+
+.passport-provenance__vc-pre {
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  background: var(--ds-color-surface-elevated);
+  padding: var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  margin-top: var(--ds-space-2);
+}
+
+.passport-provenance__unavailable {
+  color: var(--ds-color-text-secondary);
+  font-style: italic;
+}

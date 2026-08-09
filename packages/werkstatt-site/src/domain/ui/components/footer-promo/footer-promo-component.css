@@ -1,0 +1,81 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Styles for the footer-promo component — a promotional band with a text tagline and a captioned photo card grid.</purpose>
+<non-goals>
+  <item>Do not define footer navigation or legal link styles — those belong to footer.css.</item>
+  <item>Do not use hardcoded color values — use --ds-* design tokens only.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Initial implementation: footer-promo responsive grid and card caption styles.</item>
+</CHANGE_SUMMARY>
+*/
+
+.footer-promo {
+  padding: var(--ds-space-10) 0 var(--ds-space-6);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.footer-promo__container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ds-space-8);
+  align-items: start;
+}
+
+@media (min-width: 640px) {
+  .footer-promo__container {
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--ds-space-12);
+  }
+}
+
+.footer-promo__text {
+  font-size: var(--ds-text-1);
+  line-height: 1.6;
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+  margin: 0;
+}
+
+.footer-promo__cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ds-space-6);
+}
+
+.footer-promo__card {
+  margin: 0;
+  position: relative;
+  border-radius: var(--ds-radius-sm);
+  overflow: hidden;
+  display: flex;
+}
+
+.footer-promo__card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center;
+}
+
+.footer-promo__card-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--ds-space-4) var(--ds-space-5);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ds-color-footer-bg) 40%, transparent) 30%,
+    color-mix(in srgb, var(--ds-color-footer-bg) 80%, transparent) 65%,
+    var(--ds-color-footer-bg) 100%
+  );
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+  font-family: var(--ds-font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}

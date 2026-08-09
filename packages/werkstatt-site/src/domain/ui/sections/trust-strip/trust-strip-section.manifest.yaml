@@ -1,0 +1,43 @@
+id: trust-strip-section
+uniName: trust-strip-section
+layer: section
+semanticId: trust-strip
+archetype: trust-strip
+cosmicName: Deimos
+role: trust-evidence-row
+version: 1.2.0
+intent:
+  - trust
+  - proof
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+  - non-profit
+contentSchemaKey: trust-strip-section
+contentTypesPath: ./trust-strip-section.types.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-list
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - body
+  properties:
+    cta:
+      type: object
+      additionalProperties: false
+      required:
+        - label
+        - target
+      properties:
+        label:
+          type: string
+          minLength: 1
+        target:
+          type: string
+          minLength: 1

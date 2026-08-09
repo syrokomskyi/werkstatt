@@ -1,0 +1,29 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/sections/video-section/video-section.css as an authored ui authored module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0210: introduced video-section presentation.</item>
+</CHANGE_SUMMARY>
+*/
+
+@layer components {
+  .video-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-4, 1rem);
+  }
+
+  .video-section__media {
+    inline-size: 100%;
+  }
+
+  .video-section__body {
+    max-inline-size: 65ch;
+    margin-inline: auto;
+    color: var(--ds-color-text, inherit);
+  }
+}

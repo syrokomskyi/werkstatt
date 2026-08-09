@@ -1,0 +1,11 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/sections/navigation/navigation-section.css as an authored ui authored module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not style breadcrumbs here; breadcrumb visuals remain owned by the breadcrumb component.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Add dedicated stylesheet placeholder so the navigation section satisfies RFC-0072 structure without moving breadcrumb component styles.</item>
+</CHANGE_SUMMARY>
+*/

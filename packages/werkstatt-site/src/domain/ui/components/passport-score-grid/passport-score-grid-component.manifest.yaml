@@ -1,0 +1,15 @@
+id: passport-score-grid-component
+uniName: passport-score-grid-component
+layer: component
+semanticId: passport-score-grid
+archetype: passport-score-grid
+
+cosmicName: Klarissa
+role: person-profile
+version: 1.0.0
+intent:
+  - display-nebula-score
+  - show-pillar-breakdown
+  - show-composite-score
+industryFit: []
+contentSchemaKey: null

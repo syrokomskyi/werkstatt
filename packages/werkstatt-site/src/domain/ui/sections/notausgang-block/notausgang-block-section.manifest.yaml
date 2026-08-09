@@ -1,0 +1,44 @@
+id: notausgang-block-section
+uniName: notausgang-block-section
+layer: section
+semanticId: notausgang-block
+archetype: notausgang-block
+cosmicName: Telesto
+role: exit-clause-disclosure
+version: 1.2.0
+intent:
+  - trust
+  - legal-clarity
+  - de-risk
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+contentSchemaKey: notausgang-block-section
+contentTypesPath: ./notausgang-block-section.types.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-list
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body
+  properties:
+    cta:
+      type: object
+      additionalProperties: false
+      required:
+        - label
+        - target
+      properties:
+        label:
+          type: string
+          minLength: 1
+        target:
+          type: string
+          minLength: 1

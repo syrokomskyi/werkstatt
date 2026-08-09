@@ -1,0 +1,35 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Reserved navigation section component per RFC-0019. Wraps page-local navigation aids (breadcrumbs) inside the formal page-body section hierarchy.</purpose>
+<non-goals>
+  <item>Do not handle routing or URL resolution beyond passing items to Breadcrumbs.</item>
+  <item>Do not own breadcrumb content — content stays in the canonical component content layer.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Implement RFC-0019: navigation section wrapper for breadcrumb UI.</item>
+</CHANGE_SUMMARY>
+*/
+
+import Breadcrumbs from "../../components/breadcrumbs/breadcrumbs-component.astro";
+import type { SemanticBreadcrumb } from "@warpgogol/werkstatt-site/share";
+import type { BreadcrumbsComponentContent } from "../../components/breadcrumbs/breadcrumbs-component.types.generated.ts";
+import "./navigation-section.css";
+
+interface Props {
+  lang: string;
+  defaultLanguageCode: string;
+  items: SemanticBreadcrumb[];
+  pageOverride?: Partial<BreadcrumbsComponentContent>;
+}
+
+const { lang, defaultLanguageCode, items, pageOverride } = Astro.props as Props;
+---
+
+<Breadcrumbs
+  lang={lang}
+  defaultLanguageCode={defaultLanguageCode}
+  items={items}
+  pageOverride={pageOverride}
+/>

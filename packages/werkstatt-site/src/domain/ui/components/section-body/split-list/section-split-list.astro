@@ -1,0 +1,122 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0103 + RFC-0134] Canonical body component for body.kind: "split-list". Renders two
+  side-by-side columns of StandardListItem with per-column labels, icon colors,
+  and column-level effects.
+</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0134 replaces legacy surface prop with composable column effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { resolveEffectsForTarget } from "@warpgogol/werkstatt-site/share";
+import type {
+  StandardListItem,
+  IconColor,
+  HorizontalAlign,
+  EffectAssignment,
+} from "@warpgogol/werkstatt-site/share";
+import EffectHost from "../../../components/effects/effect-host.astro";
+import { loadVendorIcon } from "../../../icons/icon-resolver.ts";
+import "./section-split-list.css";
+
+interface Props {
+  primaryItems: StandardListItem[];
+  secondaryItems?: StandardListItem[];
+  labels?: { primary: string; secondary: string };
+  iconColors?: { primary?: IconColor; secondary?: IconColor };
+  align?: HorizontalAlign;
+  effects?: EffectAssignment[];
+}
+
+const {
+  primaryItems,
+  secondaryItems,
+  labels,
+  iconColors,
+  align = "left",
+  effects,
+} = Astro.props as Props;
+
+const primaryColor: IconColor = iconColors?.primary ?? "primary";
+const secondaryColor: IconColor = iconColors?.secondary ?? "primary";
+const columnEffects = resolveEffectsForTarget(effects, "column");
+
+async function resolveAll(items: StandardListItem[]) {
+  return Promise.all(
+    items.map(async (item) => {
+      const Icon = await loadVendorIcon(item.icon);
+      return { text: item.text, Icon, iconConfig: item.icon };
+    }),
+  );
+}
+
+const primaryResolved = await resolveAll(primaryItems);
+const secondaryResolved = secondaryItems ? await resolveAll(secondaryItems) : [];
+---
+
+<div class:list={["section-split-list", `section-split-list--align-${align}`]}>
+  <EffectHost
+    as="div"
+    effects={columnEffects}
+    class="section-split-list__column section-split-list__column--primary"
+    data-line-color={primaryColor}
+  >
+    {labels?.primary && <h3 class="section-split-list__label">{labels.primary}</h3>}
+    <ul role="list">
+      {
+        primaryResolved.map(({ text, Icon, iconConfig }) => (
+          <li>
+            {Icon ? (
+              <Icon
+                size={iconConfig?.size ?? 24}
+                color={primaryColor}
+                trigger="hover"
+                aria-label=""
+              />
+            ) : (
+              <span class="section-split-list__marker" aria-hidden="true" />
+            )}
+            <span>{text}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </EffectHost>
+  {
+    secondaryResolved.length > 0 && (
+      <EffectHost
+        as="div"
+        effects={columnEffects}
+        class="section-split-list__column section-split-list__column--secondary"
+        data-line-color={secondaryColor}
+      >
+        {labels?.secondary && <h3 class="section-split-list__label">{labels.secondary}</h3>}
+        <ul role="list">
+          {secondaryResolved.map(({ text, Icon, iconConfig }) => (
+            <li>
+              {Icon ? (
+                <Icon
+                  size={iconConfig?.size ?? 24}
+                  color={secondaryColor}
+                  trigger="hover"
+                  aria-label=""
+                />
+              ) : (
+                <span class="section-split-list__marker" aria-hidden="true" />
+              )}
+              <span>{text}</span>
+            </li>
+          ))}
+        </ul>
+      </EffectHost>
+    )
+  }
+</div>

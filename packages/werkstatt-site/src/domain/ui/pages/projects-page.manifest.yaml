@@ -1,0 +1,13 @@
+id: projects-page
+uniName: projects-page
+layer: page
+semanticId: projects
+archetype: projects
+
+cosmicName: Altair
+version: 1.0.0
+intent:
+  - showcase-work
+  - demonstrate-expertise
+industryFit: [non-profit]
+contentSchemaKey: null

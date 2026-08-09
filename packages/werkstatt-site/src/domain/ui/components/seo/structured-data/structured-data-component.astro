@@ -1,0 +1,26 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the integration of structured data in JSON-LD format to enhance SEO capabilities within the application.</purpose>
+<non-goals>
+  <item>Do not perform schema validation or modification.</item>
+  <item>Do not handle data fetching or external API calls.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Added Compass scaffolding to define the structured data component's role and responsibilities.</item>
+</CHANGE_SUMMARY>
+*/
+
+interface Props {
+  schema: unknown;
+}
+
+const { schema } = Astro.props;
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(schema).replace(/</g, "\\u003c")}
+  is:inline
+/>

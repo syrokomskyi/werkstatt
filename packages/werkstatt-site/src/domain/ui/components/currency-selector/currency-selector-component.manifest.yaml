@@ -1,0 +1,38 @@
+id: currency-selector-component
+uniName: currency-selector-component
+layer: component
+semanticId: currency-selector
+archetype: currency-selector
+
+cosmicName: Portia
+role: currency-selector
+version: 1.0.0
+intent:
+  - orient-visitor
+  - guide-navigation
+industryFit: []
+contentSchemaKey: currency-selector-component
+contentTypesPath: ./currency-selector-component.types.generated.ts
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - label
+    - currencies
+  properties:
+    label:
+      type: string
+    currencies:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - code
+          - label
+        properties:
+          code:
+            type: string
+          label:
+            type: string

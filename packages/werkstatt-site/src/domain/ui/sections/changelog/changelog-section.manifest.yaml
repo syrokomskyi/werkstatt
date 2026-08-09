@@ -1,0 +1,35 @@
+id: changelog-section
+uniName: changelog-section
+layer: section
+semanticId: changelog
+archetype: changelog
+cosmicName: Prometheus
+role: changelog-history
+version: 1.0.0
+intent:
+  - surface-content
+  - orient-visitor
+industryFit: []
+contentSchemaKey: null
+
+propsSchemaCompose:
+  - section-visual
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    entries:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        properties:
+          date:
+            type: string
+          summary:
+            type: string
+          authorId:
+            type: string
+    hideSectionNumber:
+      type: boolean

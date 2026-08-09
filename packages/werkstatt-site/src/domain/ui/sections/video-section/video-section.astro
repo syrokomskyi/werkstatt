@@ -1,0 +1,102 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0210] Video section. Renders a section header (number + heading + subheading), the unified
+  <Media feature> primitive (poster + lazy Plyr/hls.js player resolved from the GENERATED video
+  manifest), and an optional markdown body beneath the video (contentRef → prose domain). The
+  player ships zero JS until in view (data-video-player); the poster is the LCP element.
+</purpose>
+<non-goals>
+  <item>Do not resolve or transcode media — that is <Media> + the kernel command.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0210: introduced the video section.</item>
+</CHANGE_SUMMARY>
+*/
+
+import "./video-section.css";
+import { render } from "astro:content";
+import type {
+  SectionBackground,
+  EffectAssignment,
+  SectionDensity,
+  SectionTone,
+  Media,
+} from "@warpgogol/werkstatt-site/share";
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { getProseContentEntry } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import MediaComponent from "@warpgogol/werkstatt-site/ui/components/media.astro";
+
+interface VideoSectionOverride {
+  header?: {
+    heading?: string;
+    subheading?: string;
+    hideSectionNumber?: boolean;
+  };
+  media: Media;
+  /** Markdown rendered beneath the video (prose domain reference). */
+  contentRef?: string;
+  background?: SectionBackground;
+  effects?: EffectAssignment[];
+  density?: SectionDensity;
+  tone?: SectionTone;
+}
+
+const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const { header, media, contentRef, background, effects, density, tone } =
+  pageOverride as VideoSectionOverride;
+
+const proseEntry = contentRef
+  ? await getProseContentEntry(contentRef, lang, defaultLanguageCode)
+  : null;
+let ProseContent = null;
+if (proseEntry) {
+  const rendered = await render(proseEntry);
+  ProseContent = rendered?.Content ?? null;
+}
+---
+
+<SectionShell
+  slug="video"
+  sectionNumber={sectionNumber}
+  ariaLabelledBy={header?.heading ? "video-section-title" : undefined}
+  background={background ?? { kind: "transparent" }}
+  effects={effects}
+  density={density}
+  tone={tone}
+  containerVariant="narrow"
+  lang={lang}
+>
+  <div class="video-section">
+    {
+      header?.heading && (
+        <SectionHeader
+          heading={header.heading}
+          subheading={header.subheading}
+          level={2}
+          align="center"
+          id="video-section-title"
+          sectionNumber={sectionNumber}
+          hideSectionNumber={header.hideSectionNumber ?? false}
+        />
+      )
+    }
+    <MediaComponent
+      media={media}
+      lang={lang}
+      defaultLanguageCode={defaultLanguageCode}
+      class="video-section__media"
+    />
+    {
+      ProseContent && (
+        <div class="video-section__body">
+          <ProseContent />
+        </div>
+      )
+    }
+  </div>
+</SectionShell>

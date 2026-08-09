@@ -1,0 +1,33 @@
+id: article-list-section
+uniName: article-list-section
+layer: section
+semanticId: article-list
+archetype: article-list
+cosmicName: Io
+role: approach
+version: 1.0.0
+intent:
+  - explain-approach
+  - build-trust
+  - answer-questions
+industryFit: []
+contentSchemaKey: article-list-section
+contentTypesPath: ./article-list-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+  properties:
+    tag:
+      type: string
+    limit:
+      type: number
+      minimum: 1
+    emptyLabel:
+      type: string

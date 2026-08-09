@@ -1,0 +1,128 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Ownership disclosure — RFC-0103 thin dispatcher: SectionShell + SectionHeader + SectionList.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>Pass surface prop from body to SectionList for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { cast, need, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/werkstatt-site/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../price-card/price-variants.ts";
+import type { OwnershipBlockSectionContent } from "./ownership-block-section.types.generated.ts";
+import "../../components/section-body/list/section-list.css";
+import "./ownership-block-section.css";
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type ItemPart = TextPart | PricePart;
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "ownership");
+const props = cast<OwnershipBlockSectionContent>(pageOverride);
+const body = props.body;
+
+const derivedPrices = loadDerivedPrices();
+const offeringRef = props.offeringRef;
+const align = body.align ?? "left";
+const itemAlign = body.itemAlign ?? "left";
+const iconColor = body.iconColor ?? "accent";
+const hideMarkers = body.hideMarkers ?? false;
+
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+)\}/g;
+
+const renderedItems = body.items.map((it) => {
+  if (!offeringRef) return { ...it, parts: [{ kind: "text", value: it.text }] as ItemPart[] };
+  const parts: ItemPart[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(it.text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: it.text.slice(lastIndex, match.index) });
+    }
+    const chargeRef = match[1]!;
+    const entries = derivedPrices?.[offeringRef];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      lang,
+      offeringRef,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < it.text.length) {
+    parts.push({ kind: "text", value: it.text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: it.text });
+  return { ...it, parts };
+});
+---
+
+<SectionShell
+  slug="ownership-block"
+  sectionId={sectionId}
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="ownership-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="ownership-title"
+    lang={lang}
+  />
+  <div
+    class:list={["section-list-wrap", `section-list-wrap--align-${align}`]}
+    data-icon-color={iconColor}
+  >
+    <ul class:list={["section-list", `section-list--item-${itemAlign}`]} role="list">
+      {
+        renderedItems.map((it) => (
+          <li>
+            <div class="section-list__item section-list__item-surface">
+              {!hideMarkers && <span class="section-list__marker" aria-hidden="true" />}
+              <span class="section-list__text">
+                {it.parts.map((part) =>
+                  part.kind === "text" ? (
+                    part.value
+                  ) : part.variants ? (
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  ) : null,
+                )}
+              </span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    {body.note && <p class="section-list__note">{body.note}</p>}
+  </div>
+</SectionShell>

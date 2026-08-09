@@ -1,0 +1,75 @@
+/*
+<MODULE_CONTRACT>
+  <purpose>Defines styles for the SectionRich component, focusing on typography and layout for long-form content.</purpose>
+      <non-goals>
+    <item>Do not include JavaScript behavior or interactivity.</item>
+    <item>Do not manage global styles or theme configurations.</item>
+    <item>Do not handle raw content parsing or data fetching.</item>
+  </non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: SectionRich — long-form prose body. */
+@layer components {
+  .section-rich {
+    max-width: var(--ds-size-container-narrow);
+    color: var(--ds-color-text);
+    line-height: var(--ds-line-height-xl);
+  }
+  .section-rich--align-left {
+    margin-inline: 0 auto;
+    text-align: left;
+  }
+  .section-rich--align-center {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .section-rich--align-right {
+    margin-inline: auto 0;
+    text-align: right;
+  }
+
+  .section-rich p {
+    margin: 0 0 var(--ds-space-4);
+  }
+  .section-rich h2,
+  .section-rich h3,
+  .section-rich h4 {
+    font-family: var(--ds-font-heading);
+    color: var(--ds-color-text);
+    margin: var(--ds-space-6) 0 var(--ds-space-3);
+    line-height: var(--ds-line-height-heading);
+  }
+  .section-rich h2 {
+    font-size: var(--ds-text-3xl);
+  }
+  .section-rich h3 {
+    font-size: var(--ds-text-2xl);
+  }
+  .section-rich h4 {
+    font-size: var(--ds-text-3);
+  }
+  .section-rich a {
+    color: var(--ds-color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .section-rich ul,
+  .section-rich ol {
+    margin: 0 0 var(--ds-space-4);
+    padding-left: var(--ds-space-5);
+  }
+  .section-rich li + li {
+    margin-top: var(--ds-space-2);
+  }
+  .section-rich code {
+    background: var(--ds-color-surface);
+    padding: 0.1em 0.3em;
+    border-radius: var(--ds-radius-sm);
+    font-family: var(--ds-font-mono);
+    font-size: 0.95em;
+  }
+}

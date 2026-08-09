@@ -1,0 +1,289 @@
+id: footer-component
+uniName: footer-component
+layer: component
+semanticId: footer
+archetype: shell.footer
+
+cosmicName: Titania
+role: footer
+version: 1.1.0
+intent:
+  - guide-navigation
+  - fulfill-legal-requirement
+  - display-compliance
+industryFit: []
+contentSchemaKey: footer-component
+contentTypesPath: ./footer-component.types.generated.ts
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    texture:
+      type: boolean
+      default: false
+      description: Apply noise texture overlay to the footer background
+    lang:
+      type: string
+    defaultLang:
+      type: string
+    pageOverride:
+      type: object
+      additionalProperties: false
+      properties:
+        portraitAlt:
+          type: string
+        logoFirstSegment:
+          type: string
+        logoSecondSegment:
+          type: string
+        qrAlt:
+          type: string
+        taglineLines:
+          type: array
+          items:
+            type: string
+        motto:
+          type: string
+        pulseUrl:
+          type: string
+        texture:
+          type: boolean
+        backgroundImage:
+          type: string
+        navAriaLabel:
+          type: string
+        navGroups:
+          type: object
+          additionalProperties: false
+          properties:
+            navigationTitle:
+              type: string
+            legalTitle:
+              type: string
+            contactTitle:
+              type: string
+            transparencyTitle:
+              type: string
+            trustTitle:
+              type: string
+        navigationLinks:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - label
+            properties:
+              label:
+                type: string
+              href:
+                type: string
+              external:
+                type: boolean
+              featureFlag:
+                type: string
+              semanticTarget:
+                type: object
+                additionalProperties: false
+                required:
+                  - kind
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                      - internal
+                      - external
+                  pageId:
+                    type: string
+                  anchor:
+                    type: string
+                  href:
+                    type: string
+        legalLinks:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - label
+            properties:
+              label:
+                type: string
+              href:
+                type: string
+              external:
+                type: boolean
+              featureFlag:
+                type: string
+              semanticTarget:
+                type: object
+                additionalProperties: false
+                required:
+                  - kind
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                      - internal
+                      - external
+                  pageId:
+                    type: string
+                  anchor:
+                    type: string
+                  href:
+                    type: string
+        transparencyIds:
+          type: array
+          items:
+            type: string
+        transparencyLinks:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - label
+            properties:
+              label:
+                type: string
+              href:
+                type: string
+              external:
+                type: boolean
+              featureFlag:
+                type: string
+              semanticTarget:
+                type: object
+                additionalProperties: false
+                required:
+                  - kind
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                      - internal
+                      - external
+                  pageId:
+                    type: string
+                  anchor:
+                    type: string
+                  href:
+                    type: string
+        trustIds:
+          type: array
+          items:
+            type: string
+        trustLinks:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - label
+            properties:
+              label:
+                type: string
+              href:
+                type: string
+              external:
+                type: boolean
+              featureFlag:
+                type: string
+              semanticTarget:
+                type: object
+                additionalProperties: false
+                required:
+                  - kind
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                      - internal
+                      - external
+                  pageId:
+                    type: string
+                  anchor:
+                    type: string
+                  href:
+                    type: string
+        whatsappLabel:
+          type: string
+        whatsappHref:
+          type: string
+        telegramLabel:
+          type: string
+        telegramHref:
+          type: string
+        disabledContactHref:
+          type: string
+        copyEmailAriaLabel:
+          type: string
+        copyEmailTitle:
+          type: string
+        contact:
+          type: object
+          additionalProperties: false
+          properties:
+            email:
+              type: string
+            city:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                postalCode:
+                  type: string
+                url:
+                  type: string
+            region:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+            country:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+        contactIds:
+          type: array
+          items:
+            type: string
+        copyrightSuffix:
+          type: string
+        photo:
+          type: object
+          additionalProperties: false
+          required:
+            - position
+            - src
+            - alt
+          properties:
+            position:
+              type: string
+              enum:
+                - before
+                - behind
+            src:
+              type: string
+            alt:
+              type: string
+        statusLinkTitleSuffix:
+          type: string
+        statusLinkAriaLabelSuffix:
+          type: string
+        statusIconAriaLabel:
+          type: string

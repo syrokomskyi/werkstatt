@@ -1,0 +1,164 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of a transparency section with a header, list, and optional report link.</purpose>
+<non-goals>
+  <item>Do not handle data fetching or state management for content.</item>
+  <item>Do not parse raw content or manage content validation here.</item>
+  <item>Do not implement navigation or routing logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Pass surface prop from body to SectionList for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: transparency thin dispatcher — list body + optional report link. */
+
+import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import { cast, need, resolveSectionAnchor, resolveSemanticTarget } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/werkstatt-site/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../price-card/price-variants.ts";
+import type { TransparencySectionContent } from "./transparency-section.types.generated.ts";
+import "./transparency-section.css";
+import "../../components/section-body/list/section-list.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "transparency");
+const props = cast<TransparencySectionContent>(pageOverride);
+const body = need("body", props.body);
+if (typeof body === "string" || body.kind !== "list") {
+  throw new Error("transparency-section: body must be kind: list");
+}
+const ctaAlign = props.header?.align ?? "left";
+
+const derivedPrices = loadDerivedPrices();
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+
+type ItemPart =
+  | { kind: "text"; value: string }
+  | { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+
+const renderedItems = body.items.map((it) => {
+  const parts: ItemPart[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(it.text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: it.text.slice(lastIndex, match.index) });
+    }
+    const offeringId = match[1]!;
+    const chargeRef = match[2]!;
+    const offeringRef = offeringUriPrefix + offeringId;
+    const entries = derivedPrices?.[offeringRef];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      lang,
+      offeringRef,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < it.text.length) {
+    parts.push({ kind: "text", value: it.text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: it.text });
+  return { ...it, parts };
+});
+
+let ctaHref: string | null = null;
+if (props.cta?.target) {
+  if (props.cta.target.startsWith("#")) {
+    ctaHref = props.cta.target;
+  } else {
+    ctaHref = await resolveSemanticTarget({ kind: "internal", pageId: props.cta.target }, lang);
+  }
+}
+---
+
+<SectionShell
+  slug="transparency"
+  sectionId={sectionId}
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="transparency-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="transparency-title"
+    lang={lang}
+  />
+  <div
+    class:list={["section-list-wrap", `section-list-wrap--align-${body.align ?? "left"}`]}
+    data-icon-color={body.iconColor ?? "accent"}
+  >
+    <ul class:list={["section-list", `section-list--item-${body.align ?? "left"}`]} role="list">
+      {
+        renderedItems.map((it) => (
+          <li>
+            <div class="section-list__item section-list__item-surface">
+              <span class="section-list__marker" aria-hidden="true" />
+              <span class="section-list__text">
+                {it.parts.map((part) =>
+                  part.kind === "text" ? (
+                    part.value
+                  ) : part.variants ? (
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  ) : null,
+                )}
+              </span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    {body.note && <p class="section-list__note">{body.note}</p>}
+  </div>
+  {
+    props.reportLinkLabel && props.reportLinkHref && (
+      <p class="transparency-section__link-wrap">
+        <a href={props.reportLinkHref} class="transparency-section__link">
+          {props.reportLinkLabel}
+        </a>
+      </p>
+    )
+  }
+  {
+    props.cta && ctaHref && (
+      <div
+        class:list={[
+          "transparency-section__cta-wrap",
+          `transparency-section__cta-wrap--align-${ctaAlign}`,
+        ]}
+      >
+        <a class="transparency-section__cta" href={ctaHref}>
+          {props.cta.label}
+        </a>
+      </div>
+    )
+  }
+</SectionShell>

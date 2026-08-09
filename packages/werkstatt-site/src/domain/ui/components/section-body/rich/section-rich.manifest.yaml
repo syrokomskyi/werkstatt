@@ -1,0 +1,14 @@
+id: section-rich-component
+uniName: section-rich-component
+layer: component
+semanticId: section-rich
+archetype: section-body-rich
+cosmicName: Kalyke
+role: section-body
+version: 1.0.0
+intent:
+  - render-prose-content
+  - bridge-gsap-inline-number
+  - support-body-kind-rich
+industryFit: []
+contentSchemaKey: null

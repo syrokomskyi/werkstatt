@@ -1,0 +1,13 @@
+id: about-page
+uniName: about-page
+layer: page
+semanticId: about
+archetype: about
+
+cosmicName: Sirius
+version: 1.0.0
+intent:
+  - introduce-team
+  - humanise-brand
+industryFit: [non-profit]
+contentSchemaKey: null

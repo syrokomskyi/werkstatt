@@ -1,0 +1,17 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines visual styles for the donation card section, contributing to the overall UI aesthetics.</purpose>
+<non-goals>
+  <item>Do not include layout definitions for the donation card.</item>
+  <item>Do not manage styles for other components or sections.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* Content-only CSS for donation-card-section. Visual modifiers in section-shell.css. */
+@layer components {
+  /* nothing section-specific — the inner DonationCard component owns its layout. */
+}

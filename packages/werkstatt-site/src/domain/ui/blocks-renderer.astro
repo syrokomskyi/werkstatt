@@ -1,0 +1,131 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [DNA-25][RFC-0026][RFC-0035] Universal block renderer for all Warpgogol apps.
+  Dynamically dispatches ResolvedBlock[] to section components via
+  import.meta.glob(). Zero hand-assembled composition — new sections
+  registered in packages/ui automatically become available to all apps.
+  All sections receive unified SectionProps per RFC-0035.
+</purpose>
+<non-goals>
+  <item>Do not filter blocks by visibility — buildPage() already did that.</item>
+  <item>Do not validate props — page.block.validate already did that.</item>
+  <item>Do not import section components statically — breaks dynamic extensibility.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0035: Implemented universal SectionProps contract — all sections receive identical props shape.</item>
+  <item>RFC-0036: Added shell block support — shell blocks receive props directly, not wrapped in SectionProps.</item>
+  <item>Read section numbering metadata from manifests instead of hardcoded sets.</item>
+</CHANGE_SUMMARY>
+*/
+import type { ResolvedBlock, SectionProps } from "@warpgogol/werkstatt-site/share/page";
+
+interface Props {
+  blocks: readonly ResolvedBlock[];
+  lang: string;
+  defaultLanguageCode: string;
+  linkRegistry?: SectionProps["linkRegistry"];
+  /** RFC-0048: Stable pageId for localized anchor resolution */ pageId?: string;
+}
+
+const { blocks, lang, defaultLanguageCode, linkRegistry, pageId } = Astro.props;
+
+// Discover section manifests and build a set of planet names that should not be numbered.
+// Adding `numbered: false` to any section manifest automatically opts it out — no renderer edit needed.
+const manifestModules = import.meta.glob("./sections/*/*.manifest.yaml", {
+  eager: true,
+  query: "?raw",
+}) as Record<string, { default: string }>;
+
+const UNNUMBERED_SECTION_PLANETS = new Set<string>();
+for (const [, mod] of Object.entries(manifestModules)) {
+  const raw = mod.default;
+  // Match top-level `numbered: false` (handles unquoted, quoted, and trailing comments).
+  const numberedMatch = raw.match(/^numbered:\s*(?:false|"false"|'false')\s*(?:#.*)?$/m);
+  if (!numberedMatch) continue;
+  // Extract the cosmicName value (handles unquoted and quoted forms).
+  const cosmicMatch = raw.match(/^cosmicName:\s*(?:"([^"]+)"|'([^']+)'|(\S+))\s*$/m);
+  const cosmicName = cosmicMatch?.[1] ?? cosmicMatch?.[2] ?? cosmicMatch?.[3];
+  if (cosmicName) UNNUMBERED_SECTION_PLANETS.add(cosmicName);
+}
+
+function shouldNumberSection(block: ResolvedBlock): boolean {
+  if (block.layer === "shell") return false;
+  if (block.props?.hideSectionNumber) return false;
+  if (block.props?.header?.hideSectionNumber) return false;
+  if (UNNUMBERED_SECTION_PLANETS.has(block.planetName)) return false;
+  return true;
+}
+
+let numberedSectionIndex = 0;
+
+// Dynamic discovery of all section components at build time
+const sectionModules = import.meta.glob("./sections/*/*.astro", { eager: true });
+const componentModules = import.meta.glob("./components/*/*.astro", { eager: true });
+
+// Build lookup table: import path -> component
+type AstroComponentModule = { default: (props: Record<string, unknown>) => unknown };
+const componentRegistry = new Map<
+  string,
+  ((props: Record<string, unknown>) => unknown) | undefined
+>();
+
+for (const [path, mod] of Object.entries(sectionModules)) {
+  // Extract the section name from path: ./sections/hero/hero-section.astro -> @warpgogol/werkstatt-site/ui/sections/hero
+  const match = path.match(/\.\/sections\/([^/]+)/);
+  if (match) {
+    const sectionName = match[1];
+    const importPath = `@warpgogol/werkstatt-site/ui/sections/${sectionName}`;
+    componentRegistry.set(importPath, (mod as AstroComponentModule).default);
+  }
+}
+
+for (const [path, mod] of Object.entries(componentModules)) {
+  // Extract the component name from path: ./components/header/header-component.astro -> @warpgogol/werkstatt-site/ui/components/header
+  const match = path.match(/\.\/components\/([^/]+)/);
+  if (match) {
+    const componentName = match[1];
+    const importPath = `@warpgogol/werkstatt-site/ui/components/${componentName}`;
+    componentRegistry.set(importPath, (mod as AstroComponentModule).default);
+  }
+}
+---
+
+{
+  blocks.map((block) => {
+    const Component = componentRegistry.get(block.componentImportPath);
+    if (!Component) {
+      // Dev mode: warn about missing component
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[BlocksRenderer] No component found for import path: ${block.componentImportPath} (planet: ${block.planetName})`,
+        );
+      }
+      return null;
+    }
+    // RFC-0036 + RFC-0105: Shell blocks receive props directly (Background,
+    // SiteBackground). `lang` is passed alongside the authored props so
+    // shells that resolve language-keyed assets (image backgrounds) pick
+    // the right locale.
+    if (block.layer === "shell") {
+      return <Component lang={lang} {...block.props} />;
+    }
+    // RFC-0035: Section blocks receive universal SectionProps contract
+    // RFC-0048: pageId enables localized anchor resolution per section
+    const sectionNumber = shouldNumberSection(block)
+      ? String(++numberedSectionIndex).padStart(2, "0")
+      : "";
+    return (
+      <Component
+        lang={lang}
+        defaultLanguageCode={defaultLanguageCode}
+        sectionNumber={sectionNumber}
+        linkRegistry={linkRegistry}
+        pageOverride={block.props}
+        pageId={pageId}
+      />
+    );
+  })
+}

@@ -1,0 +1,64 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Currency-aware price display component styles (RFC-0743). Uses --ds-* tokens only.</purpose>
+<non-goals>
+  <item>Do not define component behavior or JavaScript logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0743: Initial creation of currency-aware price display styles.</item>
+</CHANGE_SUMMARY>
+*/
+
+.currency-aware-price-display {
+  display: block;
+}
+
+.currency-aware-price-display__variant {
+  display: block;
+}
+
+.currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+/* RFC-0766: prose pipeline generates <span> elements — keep them inline */
+span.currency-aware-price-display {
+  display: inline;
+}
+
+span.currency-aware-price-display__variant {
+  display: inline;
+}
+
+span.currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+span.currency-aware-price-display__amount {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+span.currency-aware-price-display__note {
+  display: inline;
+  margin: 0 0 0 0.25em;
+}
+
+.currency-aware-price-display__amount {
+  font-family: var(--ds-font-heading);
+  font-size: var(--ds-text-lg);
+  font-weight: 700;
+  color: var(--ds-color-text);
+  display: block;
+}
+
+.currency-aware-price-display__note {
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-sm);
+  font-weight: 400;
+  color: var(--ds-color-text-muted);
+  margin: 0.25em 0 0;
+  line-height: 1.4;
+}

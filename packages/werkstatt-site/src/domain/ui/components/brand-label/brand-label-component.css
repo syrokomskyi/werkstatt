@@ -1,0 +1,49 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/components/brand-label/brand-label-component.css as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not define component behavior or JavaScript logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Extract brand styles from header.css into standalone brand-label component.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* Brand Label Component Styles */
+.brand-label {
+  text-decoration: none;
+  color: var(--ds-color-text);
+  background-color: inherit;
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.brand-label:has(.brand-label__image) {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-label__text {
+  font-family: var(--ds-font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  line-height: 1.1;
+  width: fit-content;
+}
+
+.brand-label__image {
+  height: 2rem;
+  width: auto;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .brand-label {
+    max-width: 100%;
+  }
+}

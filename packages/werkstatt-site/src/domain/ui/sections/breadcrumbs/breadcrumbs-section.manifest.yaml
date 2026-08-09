@@ -1,0 +1,34 @@
+id: breadcrumbs-section
+uniName: breadcrumbs-section
+layer: section
+semanticId: breadcrumbs
+archetype: breadcrumbs
+cosmicName: Thebe
+role: navigation
+version: 1.0.0
+numbered: false
+intent:
+  - orient-visitor
+  - surface-content
+  - fulfill-legal-requirement
+industryFit: []
+contentSchemaKey: null
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    hideSectionNumber:
+      type: boolean
+    items:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - name
+          - url
+        properties:
+          name:
+            type: string
+          url:
+            type: string

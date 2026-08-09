@@ -1,0 +1,44 @@
+.changelog-section {
+  padding-block: var(--ds-space-4);
+}
+
+.changelog-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+.changelog-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--ds-space-2);
+  align-items: baseline;
+  padding: var(--ds-space-2) 0;
+  border-bottom: 1px solid var(--ds-color-border-subtle);
+}
+
+.changelog-item:last-child {
+  border-bottom: none;
+}
+
+.changelog-date {
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-color-text-muted, inherit);
+  white-space: nowrap;
+}
+
+.changelog-summary {
+  font-size: var(--ds-text-sm);
+  line-height: 1.4;
+  color: var(--ds-color-text-primary, inherit);
+}
+
+.changelog-author {
+  font-size: var(--ds-text-1);
+  color: var(--ds-color-text-muted, inherit);
+  white-space: nowrap;
+}

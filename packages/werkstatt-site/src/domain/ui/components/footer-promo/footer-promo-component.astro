@@ -1,0 +1,85 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Renders a promotional footer band with a tagline text and a grid of captioned photo cards.</purpose>
+<non-goals>
+  <item>Do not own footer navigation or legal links — those belong to footer.astro.</item>
+  <item>Do not manage feature flag visibility — callers control whether this component is rendered.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Initial implementation: content-driven footer promo band with card grid.</item>
+</CHANGE_SUMMARY>
+*/
+import type { ImageMetadata } from "astro";
+import { creditByTarget, getResolvedComponentContent } from "@warpgogol/werkstatt-site/share";
+import ResponsiveImage from "@warpgogol/werkstatt-site/ui/components/responsive-image.astro";
+import type { FooterPromoComponentContent } from "@warpgogol/werkstatt-site/ui/components/footer-promo/types";
+import "./footer-promo-component.css";
+
+interface Props {
+  lang?: string;
+  defaultLanguageCode?: string;
+  pageOverride?: Partial<FooterPromoComponentContent>;
+}
+
+const { lang, defaultLanguageCode, pageOverride } = Astro.props as Props;
+const activeLang = lang ?? defaultLanguageCode;
+if (!activeLang || !defaultLanguageCode) {
+  throw new Error("[footer-promo] lang and defaultLanguageCode are required.");
+}
+
+const content = await getResolvedComponentContent<FooterPromoComponentContent>({
+  componentPath: "footer-promo",
+  languageCode: activeLang,
+  defaultLanguageCode,
+  pageOverride,
+});
+
+// [RFC-0053][RFC-0141] Shared content-asset map (single import.meta.glob in @warpgogol/werkstatt-site/ui).
+import { contentAssetCredits, contentAssetImages } from "../../content-assets.ts";
+const images = contentAssetImages;
+---
+
+<div class="footer-promo">
+  <div class="footer-promo__container container">
+    <p class="footer-promo__text">{content.text}</p>
+    <div class="footer-promo__cards">
+      {
+        content.cards.map((card) => {
+          const name = card?.image;
+          const token = name?.replace(/\.(webp|jpe?g|png)$/i, "");
+          const filename = name?.includes(".") ? name : name ? `${name}.webp` : undefined;
+          const imgSrc: ImageMetadata | null = filename
+            ? (Object.entries(images).find(([p]) => p.endsWith(`/${filename}`))?.[1].default ??
+              null)
+            : null;
+          const credit = token
+            ? creditByTarget(
+                contentAssetCredits,
+                { kind: "image", id: token, domain: "site" },
+                activeLang,
+                defaultLanguageCode,
+              )
+            : null;
+          return (
+            imgSrc && (
+              <figure class="footer-promo__card">
+                <ResponsiveImage
+                  image={imgSrc}
+                  alt={card.imageAlt}
+                  class="footer-promo__card-image"
+                  loading="lazy"
+                  credit={credit}
+                  lang={activeLang}
+                  defaultLanguageCode={defaultLanguageCode}
+                />
+                <figcaption class="footer-promo__card-caption">{card.title}</figcaption>
+              </figure>
+            )
+          );
+        })
+      }
+    </div>
+  </div>
+</div>

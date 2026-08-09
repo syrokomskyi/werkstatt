@@ -1,0 +1,18 @@
+id: structured-data-component
+uniName: structured-data-component
+layer: component
+semanticId: structured-data
+archetype: structured-data
+
+cosmicName: Triton
+# Provisional: no dedicated SEO/meta role exists in ComponentRole (DNA-19).
+# Using 'header' because this component is injected alongside the page <head>.
+# A future RFC may introduce 'seo-meta' to ComponentRole.
+role: header
+version: 1.1.0
+standalone: true
+intent:
+  - fulfill-legal-requirement
+  - orient-visitor
+industryFit: []
+contentSchemaKey: null

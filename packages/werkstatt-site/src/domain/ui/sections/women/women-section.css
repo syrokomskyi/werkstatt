@@ -1,0 +1,56 @@
+/*******************************************************************************  
+<MODULE_CONTRACT>  
+<purpose>Defines styling for the women section, ensuring responsive layout and visual consistency.</purpose>  
+  
+  
+<non-goals>  
+  <item>Do not include JavaScript behavior or interactivity.</item>  
+  <item>Do not manage global styles or themes outside this section.</item>  
+  <item>Do not handle raw content parsing or data fetching.</item>  
+</non-goals>  
+</MODULE_CONTRACT>  
+  
+<CHANGE_SUMMARY>
+  <item>Backfill CSS definitions for the women section following RFC-0101/0102.</item>
+</CHANGE_SUMMARY>  
+*******************************************************************************/
+
+/* Content-only CSS for women-section after RFC-0101/0102. */
+@layer components {
+  .women-section__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-6);
+    align-items: start;
+  }
+  @media (min-width: 720px) {
+    .women-section__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .women-section__image-wrap {
+    overflow: hidden;
+    border-radius: var(--ds-radius-2);
+  }
+  .women-section__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--ds-radius-2);
+  }
+  .women-section__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-4);
+  }
+  .women-section__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-3);
+  }
+  .women-section__text p {
+    margin: 0;
+    color: var(--ds-color-text);
+    line-height: var(--ds-line-height-xl);
+  }
+}

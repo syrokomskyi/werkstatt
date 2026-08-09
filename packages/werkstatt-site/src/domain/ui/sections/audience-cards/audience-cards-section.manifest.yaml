@@ -1,0 +1,29 @@
+id: audience-cards-section
+uniName: audience-cards-section
+layer: section
+semanticId: audience-cards
+archetype: audience-cards
+cosmicName: Epimetheus
+role: audience-self-identification
+version: 1.2.0
+intent:
+  - segmentation
+  - clarify-positioning
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+contentSchemaKey: audience-cards-section
+contentTypesPath: ./audience-cards-section.types.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-cards
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body

@@ -1,0 +1,41 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Provides styling for the notausgang-block component, focusing on the call-to-action (CTA) element and its interactive states.</purpose>
+<non-goals>
+  <item>Do not include styles for other components or sections beyond the notausgang-block.</item>
+  <item>Do not handle responsive design or media queries in this file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Enhance CSS definitions for the notausgang-block CTA to ensure visual consistency and interactivity.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: notausgang-block content CSS — only the inline CTA; list owned by SectionList. */
+@layer components {
+  .notausgang-block__cta-wrap {
+    margin-top: var(--ds-space-5);
+  }
+  .notausgang-block__cta-wrap--align-left {
+    text-align: left;
+  }
+  .notausgang-block__cta-wrap--align-center {
+    text-align: center;
+  }
+  .notausgang-block__cta-wrap--align-right {
+    text-align: right;
+  }
+  .notausgang-block__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--ds-space-3) var(--ds-space-5);
+    background: var(--ds-color-primary);
+    color: var(--ds-color-text-inverse);
+    border-radius: var(--ds-radius-sm);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .notausgang-block__cta:hover {
+    background: var(--ds-color-secondary);
+  }
+}

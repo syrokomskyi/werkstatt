@@ -1,0 +1,35 @@
+id: toc-section
+uniName: toc-section
+layer: section
+semanticId: toc
+archetype: toc
+cosmicName: Metis
+role: table-of-contents
+version: 1.0.0
+numbered: false
+intent:
+  - orient-visitor
+  - surface-content
+industryFit: []
+contentSchemaKey: null
+
+propsSchemaCompose:
+  - section-visual
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    entries:
+      type: array
+      items:
+        type: object
+        properties:
+          text:
+            type: string
+          anchor:
+            type: string
+    sourceContentRef:
+      type: string
+    hideSectionNumber:
+      type: boolean

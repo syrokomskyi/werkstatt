@@ -1,0 +1,84 @@
+id: ownership-block-section
+uniName: ownership-block-section
+layer: section
+semanticId: ownership-block
+archetype: ownership-block
+cosmicName: Helene
+role: client-ownership-disclosure
+version: 1.2.0
+intent:
+  - trust
+  - legal-clarity
+  - de-risk
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+contentSchemaKey: ownership-block-section
+contentTypesPath: ./ownership-block-section.types.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-list
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body
+  properties:
+    offeringRef:
+      type: string
+    body:
+      type: object
+      additionalProperties: false
+      required:
+        - kind
+        - items
+      properties:
+        kind:
+          const: list
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - text
+            properties:
+              text:
+                type: string
+                minLength: 1
+              chargeRef:
+                type: string
+              icon:
+                type: object
+                additionalProperties: false
+                required:
+                  - vendor
+                  - collection
+                  - name
+                properties:
+                  vendor:
+                    type: string
+                  collection:
+                    type: string
+                  name:
+                    type: string
+                  size:
+                    type: number
+        note:
+          type: string
+        iconColor:
+          enum: [primary, accent, success, warning, error, muted]
+        align:
+          enum: [left, center, right]
+        itemAlign:
+          enum: [left, center, right]
+        hideMarkers:
+          type: boolean
+        effects:
+          type: array

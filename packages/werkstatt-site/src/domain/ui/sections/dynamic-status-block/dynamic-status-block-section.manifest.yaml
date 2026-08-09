@@ -1,0 +1,49 @@
+id: dynamic-status-block-section
+uniName: dynamic-status-block-section
+layer: section
+semanticId: dynamic-status-block
+archetype: dynamic-status-block
+cosmicName: Elara
+role: data-driven-status-indicator
+version: "1.0.0"
+intent:
+  - build-trust
+  - establish-identity
+  - clarify-positioning
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+  - non-profit
+contentSchemaKey: dynamic-status-block-section
+contentTypesPath: "./dynamic-status-block-section.types.generated.ts"
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - value
+    - label
+  properties:
+    value:
+      oneOf:
+        - type: string
+        - type: number
+    label:
+      type: string
+      minLength: 1
+    contextText:
+      type: string
+    valuePrefix:
+      type: string
+    valueSuffix:
+      type: string
+    valueTone:
+      enum: [default, success, warning, muted]
+    animated:
+      type: boolean

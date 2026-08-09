@@ -1,0 +1,70 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Renders the site brand label as a styled link to the homepage.</purpose>
+<non-goals>
+  <item>Do not manage navigation links or menu logic.</item>
+  <item>Do not include the language switcher — that is a sibling component.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Extract brand label from header into standalone three-way mirrored component.</item>
+</CHANGE_SUMMARY>
+*/
+
+import {
+  getResolvedComponentContent,
+  resolveImage,
+  getRouteRegistry,
+  localizeUrl,
+} from "@warpgogol/werkstatt-site/share";
+import ResponsiveImage from "@warpgogol/werkstatt-site/ui/components/responsive-image.astro";
+import type { BrandLabelComponentContent } from "@warpgogol/werkstatt-site/ui/components/brand-label/types";
+import "./brand-label-component.css";
+
+interface Props {
+  lang?: string;
+  defaultLanguageCode?: string;
+  pageOverride?: Partial<BrandLabelComponentContent>;
+}
+
+const { lang, defaultLanguageCode, pageOverride } = Astro.props as Props;
+const activeLang = lang ?? defaultLanguageCode;
+if (!activeLang || !defaultLanguageCode) {
+  throw new Error("[brand-label] lang and defaultLanguageCode are required.");
+}
+
+const content = await getResolvedComponentContent<BrandLabelComponentContent>({
+  componentPath: "brand-label",
+  languageCode: activeLang,
+  defaultLanguageCode,
+  pageOverride,
+});
+
+import { contentAssetImages } from "../../content-assets.ts";
+const imageMap = contentAssetImages;
+
+const brandImage = content.brandImage
+  ? resolveImage(imageMap, content.brandImage, { lang: activeLang })
+  : null;
+
+// RFC-0160: home link is unprefixed for the default language, prefixed otherwise.
+const { defaultLanguage } = await getRouteRegistry();
+const homeHref = localizeUrl(activeLang, "", { defaultLanguage });
+---
+
+<a href={homeHref} class="brand-label" aria-label={content.brandAriaLabel}>
+  {
+    brandImage ? (
+      <ResponsiveImage
+        image={brandImage}
+        alt={content.brandLabel}
+        class="brand-label__image"
+        lang={activeLang}
+        defaultLanguageCode={defaultLanguageCode}
+      />
+    ) : (
+      <span class="brand-label__text">{content.brandLabel}</span>
+    )
+  }
+</a>

@@ -1,0 +1,40 @@
+/***************************************************************
+<MODULE_CONTRACT>
+<purpose>Defines the visual structure and alignment for section paragraphs, facilitating a consistent presentation of long-form text.</purpose>
+<non-goals>
+  <item>Do not handle dynamic content or interactive elements.</item>
+  <item>Do not define global styles or theme settings.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Enhance documentation for styling responsibilities and architectural clarity.</item>
+</CHANGE_SUMMARY>
+***************************************************************/
+
+/* RFC-0103: SectionParagraphs — long-form text stack. */
+@layer components {
+  .section-paragraphs {
+    max-width: var(--ds-size-container-narrow);
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-4);
+  }
+  .section-paragraphs--align-left {
+    margin-inline: 0 auto;
+    text-align: left;
+  }
+  .section-paragraphs--align-center {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .section-paragraphs--align-right {
+    margin-inline: auto 0;
+    text-align: right;
+  }
+  .section-paragraphs__text {
+    margin: 0;
+    color: var(--ds-color-text);
+    font-size: var(--ds-text-base-plus);
+    line-height: var(--ds-line-height-xl);
+  }
+}

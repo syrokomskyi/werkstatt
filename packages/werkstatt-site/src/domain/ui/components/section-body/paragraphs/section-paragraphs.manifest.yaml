@@ -1,0 +1,13 @@
+id: section-paragraphs-component
+uniName: section-paragraphs-component
+layer: component
+semanticId: section-paragraphs
+archetype: section-body-paragraphs
+cosmicName: Aoede
+role: section-body
+version: 1.0.0
+intent:
+  - render-paragraph-stack
+  - support-body-kind-paragraphs
+industryFit: []
+contentSchemaKey: null

@@ -1,0 +1,27 @@
+id: problem-section
+uniName: problem-section
+layer: section
+semanticId: problem
+archetype: problem
+cosmicName: Callisto
+role: problem
+version: 1.4.0
+intent:
+  - articulate-problem
+  - build-trust
+  - clarify-positioning
+industryFit: []
+contentSchemaKey: problem-section
+contentTypesPath: ./problem-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-paragraphs
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body

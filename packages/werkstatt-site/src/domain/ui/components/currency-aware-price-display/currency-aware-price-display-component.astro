@@ -1,0 +1,85 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+Currency-aware price display component (RFC-0743). Pre-renders all currency
+variants server-side with data-currency attributes. Client script toggles
+visibility based on the selected currency.
+</purpose>
+<non-goals>
+  <item>Do not manage currency selection — that is currency-selector.</item>
+  <item>Do not show source EUR price alongside derived price (decision #31).</item>
+  <item>Do not use ≈ in disclosure notes (decision #33).</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0743: Initial creation of currency-aware price display component.</item>
+</CHANGE_SUMMARY>
+*/
+
+import "./currency-aware-price-display-component.css";
+
+interface Props {
+  priceVariants: Array<{
+    currency: string;
+    formatted: string;
+    note: string | null;
+  }>;
+}
+
+const { priceVariants } = Astro.props as Props;
+
+const variantCurrencies = priceVariants.map((v) => v.currency);
+---
+
+<span class="currency-aware-price-display" data-currency-price-display aria-live="polite">
+  {
+    priceVariants.map((variant, index) => (
+      <span
+        class="currency-aware-price-display__variant"
+        data-currency={variant.currency}
+        hidden={index !== 0}
+        aria-label={variant.formatted}
+      >
+        <span class="currency-aware-price-display__amount">{variant.formatted}</span>
+        {variant.note && <span class="currency-aware-price-display__note">{variant.note}</span>}
+      </span>
+    ))
+  }
+</span>
+<script is:inline define:vars={{ variantCurrencies }}>
+  try {
+    var c = document.documentElement.getAttribute("data-wg-currency");
+    if (!c) {
+      c = localStorage.getItem("wg-currency");
+    }
+    if (c && variantCurrencies.indexOf(c) !== -1) {
+      var containers = document.querySelectorAll("[data-currency-price-display]");
+      for (var ci = 0; ci < containers.length; ci++) {
+        var variants = containers[ci].querySelectorAll("[data-currency]");
+        var matched = false;
+        for (var vi = 0; vi < variants.length; vi++) {
+          if (variants[vi].getAttribute("data-currency") === c) {
+            variants[vi].removeAttribute("hidden");
+            matched = true;
+          } else {
+            variants[vi].setAttribute("hidden", "");
+          }
+        }
+        if (!matched) {
+          for (var vi = 0; vi < variants.length; vi++) {
+            variants[vi].removeAttribute("hidden");
+          }
+        }
+      }
+    }
+  } catch {}
+</script>
+
+<script>
+  import { initCurrencyAwarePriceDisplay } from "./currency-aware-price-display-component.client.ts";
+  const containers = document.querySelectorAll<HTMLElement>("[data-currency-price-display]");
+  for (const container of containers) {
+    initCurrencyAwarePriceDisplay(container);
+  }
+</script>

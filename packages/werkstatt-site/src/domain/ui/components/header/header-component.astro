@@ -1,0 +1,535 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Renders the fixed site header with navigation, CTA, language switcher, mobile menu, and scroll-based hide/show behaviour.</purpose>
+<non-goals>
+  <item>Do not manage global application state or routing logic.</item>
+  <item>Do not handle raw content parsing or data fetching outside of header-specific content.</item>
+  <item>Do not implement styling or layout beyond the header component's scope.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Replace desktop label truncation with adaptive overflow navigation that moves excess links into a localized disclosure menu.</item>
+  <item>Reserve a safety buffer between desktop navigation overflow and the primary CTA.</item>
+  <item>Measure available desktop navigation width against the actual CTA boundary, so wider screens keep more links visible.</item>
+</CHANGE_SUMMARY>
+*/
+
+import BrandLabel from "@warpgogol/werkstatt-site/ui/components/brand-label";
+import LangSwitcher from "@warpgogol/werkstatt-site/ui/components/lang-switcher";
+import CurrencySelector from "@warpgogol/werkstatt-site/ui/components/currency-selector";
+import { getResolvedComponentContent, resolveSemanticTarget, type LinkTargetRef } from "@warpgogol/werkstatt-site/share";
+import { getFeaturePolicyResolver } from "@warpgogol/werkstatt-site/share/astro/feature-policy";
+import { getRouteRegistry } from "@warpgogol/werkstatt-site/share";
+import type { HeaderComponentContent } from "@warpgogol/werkstatt-site/ui/components/header/types";
+import "./header-component.css";
+
+interface Props {
+  lang?: string;
+  currentPath?: string;
+  ctaTarget?: string | null;
+  supportedLangs?: string[];
+  localizedSiblingPath?: string;
+  getLocalizedUrl?: (path: string, lang: string) => string;
+  /** RFC-0048: Function to get localized sibling path for language switching */
+  getLocalizedSiblingPath?: (path: string, lang: string) => Promise<string> | string;
+  defaultLanguage?: string;
+  pageOverride?: Partial<HeaderComponentContent>;
+  /** RFC-0743: Available target currencies for the currency selector. When empty or absent, the selector is not rendered. */
+  currencies?: Array<{ code: string; label: string }>;
+}
+
+const {
+  lang,
+  currentPath = Astro.url.pathname,
+  ctaTarget,
+  supportedLangs = [],
+  localizedSiblingPath,
+  getLocalizedUrl,
+  getLocalizedSiblingPath,
+  defaultLanguage,
+  pageOverride,
+  currencies = [],
+} = Astro.props as Props;
+const defaultLang = defaultLanguage ?? (await getRouteRegistry()).defaultLanguage;
+const activeLang = lang ?? defaultLang;
+
+const resolver = await getFeaturePolicyResolver(activeLang, defaultLang);
+const langSwitcherVisible = resolver.isEnabled({
+  kind: "item",
+  componentId: "header",
+  itemId: "langSwitcher",
+  lang: activeLang,
+});
+
+const content = await getResolvedComponentContent<HeaderComponentContent>({
+  componentPath: "header",
+  languageCode: activeLang,
+  defaultLanguageCode: defaultLang,
+  pageOverride,
+});
+
+const navLinks = await Promise.all(
+  content.navLinks.map(async (link) => {
+    const semTarget = link.semanticTarget as LinkTargetRef;
+    // RFC-0048: Only use semanticTarget for navigation resolution
+    // link.target (legacy id) should NOT be used as pageId
+    const href = semTarget ? await resolveSemanticTarget(semTarget, activeLang) : null;
+    return { ...link, href };
+  }),
+);
+
+const filteredNavLinks = navLinks.filter(
+  (link): link is { label: string; href: string } => link.href !== null && link.href !== undefined,
+);
+
+const ctaHref = ctaTarget
+  ? await resolveSemanticTarget({ kind: "internal", pageId: ctaTarget }, activeLang)
+  : null;
+---
+
+<header class:list={["site-header", { "site-header--textured": content.texture }]} id="site-header">
+  <div class="container site-header__container">
+    <div class="site-header__brand-stack">
+      <div class="site-header__brand-group">
+        <BrandLabel lang={activeLang} defaultLanguageCode={defaultLang} />
+        {
+          langSwitcherVisible &&
+            (localizedSiblingPath || getLocalizedUrl || getLocalizedSiblingPath) && (
+              <LangSwitcher
+                lang={activeLang}
+                currentPath={currentPath}
+                supportedLangs={supportedLangs}
+                localizedSiblingPath={localizedSiblingPath}
+                getLocalizedUrl={getLocalizedUrl}
+                getLocalizedSiblingPath={getLocalizedSiblingPath}
+                defaultLanguage={defaultLang}
+              />
+            )
+        }
+        {
+          currencies.length > 0 && activeLang !== defaultLang && (
+            <CurrencySelector
+              lang={activeLang}
+              defaultLanguage={defaultLang}
+              currencies={currencies}
+            />
+          )
+        }
+      </div>
+      {content.motto && <span class="site-header__motto">{content.motto}</span>}
+      {currencies.length > 0 && (
+        <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR" }}>
+          try {
+            var c = localStorage.getItem("wg-currency");
+            if (!c) { c = defaultCurrency; localStorage.setItem("wg-currency", c); }
+            document.documentElement.setAttribute("data-wg-currency", c);
+          } catch {
+            document.documentElement.setAttribute("data-wg-currency", defaultCurrency);
+          }
+        </script>
+      )}
+    </div>
+
+    <nav
+      class="site-header__nav site-header__nav--layout-pending"
+      aria-label={content.navAriaLabel}
+      data-header-nav
+    >
+      <ul class="site-header__nav-list" role="list" data-header-nav-list>
+        {
+          filteredNavLinks.map((link, index) => (
+            <li data-header-nav-item data-header-nav-index={index}>
+              <a href={link.href} class="site-header__nav-link">
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+        <li class="site-header__nav-overflow" data-header-nav-overflow hidden>
+          <button
+            class="site-header__nav-overflow-button"
+            type="button"
+            aria-label={content.overflowMenuAriaLabel}
+            aria-expanded="false"
+            aria-controls="site-header-overflow-menu"
+            data-header-nav-overflow-toggle
+          >
+            <span class="site-header__nav-overflow-label">{content.overflowMenuLabel}</span>
+          </button>
+          <ul
+            class="site-header__nav-overflow-menu"
+            id="site-header-overflow-menu"
+            role="list"
+            data-header-nav-overflow-menu
+            hidden
+          >
+            {
+              filteredNavLinks.map((link, index) => (
+                <li data-header-nav-overflow-item data-header-nav-index={index} hidden>
+                  <a href={link.href} class="site-header__nav-overflow-link">
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    {
+      ctaHref && (
+        <a href={ctaHref} class="btn btn--primary site-header__cta" data-header-cta>
+          {content.ctaLabel}
+        </a>
+      )
+    }
+
+    <button
+      class="site-header__burger"
+      aria-label={content.menuButtonAriaLabel}
+      aria-expanded="false"
+      aria-controls="mobile-nav"
+      id="mobile-menu-toggle"
+    >
+      <span class="site-header__burger-line"></span>
+      <span class="site-header__burger-line"></span>
+      <span class="site-header__burger-line"></span>
+    </button>
+  </div>
+
+  <nav
+    class="site-header__mobile-nav"
+    id="mobile-nav"
+    aria-label={content.mobileNavAriaLabel}
+    hidden
+  >
+    <ul class="site-header__mobile-list" role="list">
+      {
+        filteredNavLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="site-header__mobile-link"
+              data-is-anchor={link.href.includes("#")}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+      {
+        ctaHref && (
+          <li>
+            <a href={ctaHref} class="btn btn--primary site-header__mobile-cta">
+              {content.ctaLabel}
+            </a>
+          </li>
+        )
+      }
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const nav = document.getElementById("mobile-nav");
+  if (toggle && nav) {
+    toggle.addEventListener("click", () => {
+      const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!isOpen));
+      nav.hidden = isOpen;
+    });
+    // Close on link click
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        const href = link.getAttribute("href");
+        const isAnchor = link.getAttribute("data-is-anchor") === "true";
+
+        if (href && isAnchor) {
+          const targetUrl = new URL(href, window.location.href);
+          const anchorId = targetUrl.hash.replace("#", "");
+          const isSamePage = targetUrl.pathname === window.location.pathname;
+
+          if (anchorId) {
+            if (isSamePage) {
+              e.preventDefault();
+              toggle.setAttribute("aria-expanded", "false");
+              nav.hidden = true;
+              // Use Lenis if available for consistent smooth scrolling
+              const lenis = (window as Window & { wgLenis?: { scrollTo: (el: Element, opts: { offset: number }) => void } }).wgLenis;
+              if (lenis) {
+                const targetElement = document.getElementById(anchorId);
+                if (targetElement) {
+                  lenis.scrollTo(targetElement, { offset: -80 });
+                }
+              } else {
+                setTimeout(() => {
+                  const targetElement = document.getElementById(anchorId);
+                  if (targetElement) {
+                    targetElement.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                }, 120);
+              }
+            } else {
+              // For cross-page anchors, close the menu and navigate with hash intact.
+              // The lenis.ts page-load handler or native scroll + scroll-margin-top CSS
+              // will handle scrolling on the new page.
+              toggle.setAttribute("aria-expanded", "false");
+              nav.hidden = true;
+              // Allow default navigation with hash
+            }
+          }
+        } else {
+          // For regular navigation, close immediately and allow default behavior
+          toggle.setAttribute("aria-expanded", "false");
+          nav.hidden = true;
+        }
+      });
+    });
+  }
+
+  // Handle anchor scrolling after page load for mobile navigation
+  document.addEventListener("DOMContentLoaded", () => {
+    // Check sessionStorage (legacy cross-page anchor storage)
+    const mobileAnchorTarget = sessionStorage.getItem("mobileAnchorTarget");
+    const hashTarget = mobileAnchorTarget || window.location.hash?.replace("#", "");
+
+    if (hashTarget) {
+      sessionStorage.removeItem("mobileAnchorTarget");
+
+      setTimeout(() => {
+        const targetElement = document.getElementById(hashTarget);
+        if (targetElement) {
+          const lenis = (window as Window & { wgLenis?: { scrollTo: (el: Element, opts: { offset: number }) => void } }).wgLenis;
+          if (lenis) {
+            lenis.scrollTo(targetElement, { offset: -80 });
+          } else {
+            targetElement.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }
+      }, 300);
+    }
+  });
+
+  // Desktop navigation overflow: keep labels readable and move excess links into a disclosure menu.
+  const desktopNav = document.querySelector("[data-header-nav]");
+  const desktopNavList = document.querySelector("[data-header-nav-list]");
+  const desktopCta = document.querySelector("[data-header-cta]");
+  const desktopNavItems = Array.from(document.querySelectorAll("[data-header-nav-item]"));
+  const overflowItem = document.querySelector("[data-header-nav-overflow]");
+  const overflowToggle = document.querySelector("[data-header-nav-overflow-toggle]");
+  const overflowMenu = document.querySelector("[data-header-nav-overflow-menu]");
+  const overflowMenuItems = Array.from(
+    document.querySelectorAll("[data-header-nav-overflow-item]"),
+  );
+
+  const closeOverflowMenu = () => {
+    if (!(overflowToggle instanceof HTMLButtonElement) || !(overflowMenu instanceof HTMLElement)) {
+      return;
+    }
+    overflowToggle.setAttribute("aria-expanded", "false");
+    overflowMenu.hidden = true;
+  };
+
+  const setOverflowMenuOpen = (open) => {
+    if (!(overflowToggle instanceof HTMLButtonElement) || !(overflowMenu instanceof HTMLElement)) {
+      return;
+    }
+    overflowToggle.setAttribute("aria-expanded", String(open));
+    overflowMenu.hidden = !open;
+  };
+
+  const syncOverflowMenuItems = (hiddenIndexes) => {
+    overflowMenuItems.forEach((item) => {
+      const index = Number(item.getAttribute("data-header-nav-index"));
+      item.hidden = !hiddenIndexes.has(index);
+    });
+  };
+
+  const layoutDesktopNav = () => {
+    if (
+      !(desktopNav instanceof HTMLElement) ||
+      !(desktopNavList instanceof HTMLElement) ||
+      !(overflowItem instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    desktopNavItems.forEach((item) => {
+      if (item instanceof HTMLElement) item.hidden = false;
+    });
+    overflowItem.hidden = false;
+    closeOverflowMenu();
+
+    const visibleDisplay = window.getComputedStyle(desktopNav).display !== "none";
+    if (!visibleDisplay || desktopNavItems.length === 0) {
+      overflowItem.hidden = true;
+      desktopNav.classList.remove("site-header__nav--layout-pending");
+      desktopNav.classList.add("site-header__nav--layout-ready");
+      return;
+    }
+
+    const navStyle = window.getComputedStyle(desktopNav);
+    const gap = Number.parseFloat(window.getComputedStyle(desktopNavList).columnGap || "0") || 0;
+    const navPaddingRight = Number.parseFloat(navStyle.paddingRight || "0") || 0;
+    const CTA_SAFETY_BUFFER = 24;
+    const navRect = desktopNav.getBoundingClientRect();
+    const navListRect = desktopNavList.getBoundingClientRect();
+    const ctaBoundary =
+      desktopCta instanceof HTMLElement ? desktopCta.getBoundingClientRect().left : navRect.right;
+    const widthUntilCta = Math.max(0, ctaBoundary - navListRect.left - CTA_SAFETY_BUFFER);
+    const flexAvailableWidth = Math.max(0, desktopNav.clientWidth - navPaddingRight);
+    const navWidth = Math.min(widthUntilCta, flexAvailableWidth);
+    const itemWidths = desktopNavItems.map((item) =>
+      item instanceof HTMLElement ? item.getBoundingClientRect().width : 0,
+    );
+    const overflowWidth = overflowItem.getBoundingClientRect().width;
+    const totalWidth =
+      itemWidths.reduce((sum, width) => sum + width, 0) + gap * Math.max(0, itemWidths.length - 1);
+
+    if (totalWidth <= navWidth) {
+      overflowItem.hidden = true;
+      syncOverflowMenuItems(new Set());
+      desktopNav.classList.remove("site-header__nav--layout-pending");
+      desktopNav.classList.add("site-header__nav--layout-ready");
+      return;
+    }
+
+    let usedWidth = overflowWidth;
+    const hiddenIndexes = new Set();
+
+    itemWidths.forEach((width, index) => {
+      const nextWidth = usedWidth === overflowWidth ? width + gap : width + gap;
+      if (usedWidth + nextWidth <= navWidth) {
+        usedWidth += nextWidth;
+        return;
+      }
+
+      hiddenIndexes.add(index);
+      const item = desktopNavItems[index];
+      if (item instanceof HTMLElement) item.hidden = true;
+    });
+
+    syncOverflowMenuItems(hiddenIndexes);
+    if (hiddenIndexes.size === 0) overflowItem.hidden = true;
+    desktopNav.classList.remove("site-header__nav--layout-pending");
+    desktopNav.classList.add("site-header__nav--layout-ready");
+  };
+
+  if (overflowToggle instanceof HTMLButtonElement) {
+    overflowToggle.addEventListener("click", () => {
+      const isOpen = overflowToggle.getAttribute("aria-expanded") === "true";
+      setOverflowMenuOpen(!isOpen);
+    });
+  }
+
+  if (overflowMenu instanceof HTMLElement) {
+    overflowMenu.addEventListener("click", (event) => {
+      if (event.target instanceof Element && event.target.closest("a")) closeOverflowMenu();
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    if (
+      overflowItem instanceof HTMLElement &&
+      event.target instanceof Node &&
+      !overflowItem.contains(event.target)
+    ) {
+      closeOverflowMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeOverflowMenu();
+  });
+
+  if (desktopNav instanceof HTMLElement) {
+    if ("ResizeObserver" in window) {
+      const resizeObserver = new ResizeObserver(layoutDesktopNav);
+      resizeObserver.observe(desktopNav);
+      if (desktopNavList instanceof HTMLElement) resizeObserver.observe(desktopNavList);
+    } else {
+      window.addEventListener("resize", layoutDesktopNav);
+    }
+    window.addEventListener("load", layoutDesktopNav);
+    layoutDesktopNav();
+    requestAnimationFrame(layoutDesktopNav);
+  }
+
+  // Scroll-based hide/show
+  const header = document.getElementById("site-header");
+  if (header) {
+    const SCROLL_THRESHOLD = 80;
+    const SCROLL_TOLERANCE = 80;
+    let lastScrollY = window.scrollY;
+    let lastEvaluatedScrollY = window.scrollY;
+    let latestScrollY = window.scrollY;
+    let rafPending = false;
+
+    const playLangSwitcherIcon = () => {
+      const langIcon = header.querySelector(".lang-switcher__nav-icon");
+      type LordIconElement = Element & {
+        ready?: boolean;
+        readyPromise?: Promise<void>;
+        playerInstance?: { playFromStart: () => void; playing: boolean };
+      };
+      const lordIcon = langIcon as LordIconElement | null;
+      if (!lordIcon) return;
+      const play = () => {
+        const player = lordIcon.playerInstance;
+        if (player && !player.playing) {
+          player.playFromStart();
+        }
+      };
+      if (lordIcon.ready) {
+        play();
+      } else if (lordIcon.readyPromise) {
+        lordIcon.readyPromise.then(play);
+      }
+    };
+
+    const applyScrollState = () => {
+      rafPending = false;
+      const currentScrollY = latestScrollY;
+      if (Math.abs(currentScrollY - lastEvaluatedScrollY) < SCROLL_TOLERANCE) return;
+
+      if (currentScrollY > lastScrollY && currentScrollY > SCROLL_THRESHOLD) {
+        header.classList.add("site-header--hidden");
+        closeOverflowMenu();
+      } else {
+        const wasHidden = header.classList.contains("site-header--hidden");
+        header.classList.remove("site-header--hidden");
+        if (wasHidden) {
+          playLangSwitcherIcon();
+        }
+      }
+
+      lastScrollY = currentScrollY;
+      lastEvaluatedScrollY = currentScrollY;
+    };
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        latestScrollY = window.scrollY;
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(applyScrollState);
+      },
+      { passive: true },
+    );
+
+    // Play lang-switcher icon on initial page load (after lord-icon is defined)
+    customElements.whenDefined("lord-icon").then(() => {
+      playLangSwitcherIcon();
+    });
+  }
+</script>

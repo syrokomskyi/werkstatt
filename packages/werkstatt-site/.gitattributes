@@ -1,0 +1,4 @@
+src/domain/ui/src/components/**/*.types.generated.ts                                 linguist-generated=true
+src/domain/ui/src/sections/**/*.types.generated.ts                                   linguist-generated=true
+src/domain/ui/src/sections/{section-id}/**                                           linguist-generated=true
+src/domain/ui/src/{sections,components}/**/*.{yaml,yml,md}                           linguist-generated=true

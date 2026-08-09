@@ -1,0 +1,14 @@
+id: nachweis-detail-component
+uniName: nachweis-detail-component
+layer: component
+semanticId: nachweis-detail
+archetype: nachweis-detail
+
+cosmicName: Kerberos
+role: section-body
+version: 1.0.0
+intent:
+  - verify
+industryFit:
+  - non-profit
+contentSchemaKey: null

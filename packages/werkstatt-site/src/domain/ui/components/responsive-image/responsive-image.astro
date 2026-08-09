@@ -1,0 +1,113 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0152] Provider-agnostic responsive image primitive. Takes a resolved image
+  descriptor ({ src, width?, height? } — Astro ImageMetadata is assignable) plus
+  presentation props, and asks the active Image Provider (@warpgogol/werkstatt-site/share) to build the
+  src + srcset. Renders a plain <img>; it owns NO optimization logic, so the backend
+  (Cloudflare runtime today, CMS/DAM or build-time later) swaps via provider/config
+  without touching this component or any section. Replaces direct <Image>/<img> use
+  for authored images across the UI.
+</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0152: introduced as the canonical responsive image primitive.</item>
+  <item>RFC-0172: add `data-content-image` pass-through marking the page's lead/content illustration for the image-sitemap harvester.</item>
+  <item>RFC-0204: use sources.width/height from provider when set so the rendered img width attribute reflects the variant size, not the intrinsic source size.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { buildImageSources } from "@warpgogol/werkstatt-site/share";
+import type {
+  AttributionDisplay,
+  ImageDescriptor,
+  ImageQualityPreset,
+  MaterialCredit,
+} from "@warpgogol/werkstatt-site/share";
+import MaterialCreditDisclosure from "@warpgogol/werkstatt-site/ui/components/material-credit";
+
+interface Props {
+  /** Resolved image (Astro ImageMetadata is assignable). */
+  image: ImageDescriptor;
+  alt: string;
+  class?: string;
+  style?: string;
+  loading?: "lazy" | "eager";
+  decoding?: "async" | "sync" | "auto";
+  fetchpriority?: "high" | "low" | "auto";
+  /** <img sizes>; defaults to "100vw" via the provider. */
+  sizes?: string;
+  /** Override the responsive width ladder. */
+  widths?: number[];
+  /** Quality preset or numeric (1..100). Defaults to "max" to preserve source fidelity. */
+  quality?: number | ImageQualityPreset;
+  /** RFC-0220: optional visible credit disclosure for non-decorative content images. */
+  credit?: MaterialCredit | null;
+  /** RFC-0231: per-placement visibility override for the credit disclosure. */
+  creditDisplay?: AttributionDisplay;
+  lang?: string;
+  defaultLanguageCode?: string;
+  /** Pass-through hook for RFC-0106 parallax / data attributes. */
+  "data-parallax-speed"?: string;
+  /**
+   * RFC-0172: marks this <img> as the page's lead/content illustration. The
+   * post-build image-sitemap harvester reads the rendered (provider-resolved)
+   * src from elements carrying this attribute. At most one per page.
+   */
+  "data-content-image"?: boolean;
+}
+
+const {
+  image,
+  alt,
+  class: className,
+  style,
+  loading = "lazy",
+  decoding = "async",
+  fetchpriority,
+  sizes,
+  widths,
+  quality = "max",
+  credit,
+  creditDisplay,
+  lang,
+  defaultLanguageCode,
+  "data-parallax-speed": parallaxSpeed,
+  "data-content-image": contentImage,
+} = Astro.props as Props;
+
+const sources = buildImageSources(image, { widths, sizes, quality });
+---
+
+<>
+  <img
+    src={sources.src}
+    srcset={sources.srcset}
+    sizes={sources.sizes}
+    alt={alt}
+    class={className}
+    style={style}
+    width={sources.width ?? image.width}
+    height={sources.height ?? image.height}
+    loading={loading}
+    decoding={decoding}
+    fetchpriority={fetchpriority}
+    data-parallax-speed={parallaxSpeed}
+    data-content-image={contentImage ? "" : undefined}
+  />
+  {
+    credit && (
+      <MaterialCreditDisclosure
+        credit={credit}
+        display={creditDisplay}
+        lang={lang}
+        defaultLanguageCode={defaultLanguageCode}
+        contentUrl={sources.src}
+      />
+    )
+  }
+</>

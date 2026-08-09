@@ -1,0 +1,128 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0103 + RFC-0041] Canonical body component for body.kind: "rich". Loads
+  prose Markdown via contentRef (RFC-0045 reference substitution preserved) and
+  optionally wraps inline numbers in js-inline-number spans so the existing
+  gsap-inline-number script picks them up.
+</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { render } from "astro:content";
+import type { HorizontalAlign } from "@warpgogol/werkstatt-site/share";
+import { getProseContentEntry, wrapInlineNumbers } from "@warpgogol/werkstatt-site/share";
+import {
+  getContentRefIndex,
+  resolveReferencesInString,
+  EMPTY_CONTENT_REF_INDEX,
+} from "@warpgogol/werkstatt-site/share/content-reference";
+import { micromark } from "micromark";
+import { gfm, gfmHtml } from "micromark-extension-gfm";
+import "./section-rich.css";
+
+/** Render markdown to HTML with GFM (tables etc.), matching markdown-section.astro. */
+function renderMarkdownGfm(text: string, allowDangerousHtml: boolean): string {
+  return micromark(text, {
+    allowDangerousHtml,
+    extensions: [gfm()],
+    htmlExtensions: [gfmHtml()],
+  });
+}
+
+interface Props {
+  contentRef: string;
+  animateNumbers?: boolean;
+  /** RFC-0041: also animate 4-digit year numbers. Default true. */
+  animateYears?: boolean;
+  /** RFC-0041: GSAP count-up duration in seconds. Default 3.0. */
+  numberDuration?: number;
+  align?: HorizontalAlign;
+  lang?: string;
+  defaultLanguageCode?: string;
+}
+
+const {
+  contentRef,
+  animateNumbers = false,
+  animateYears = true,
+  numberDuration = 3.0,
+  align = "left",
+  lang,
+  defaultLanguageCode,
+} = Astro.props as Props;
+const activeLang = lang ?? defaultLanguageCode;
+if (!activeLang || !defaultLanguageCode) {
+  throw new Error("[section-rich] lang and defaultLanguageCode are required.");
+}
+
+const proseEntry = await getProseContentEntry(contentRef, activeLang, defaultLanguageCode);
+
+let proseBody = "";
+let hasReferences = false;
+if (proseEntry) {
+  const body = (proseEntry as Record<string, unknown> & { body?: string }).body;
+  if (body && typeof body === "string") {
+    const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
+    proseBody = resolveReferencesInString(
+      index,
+      body,
+      activeLang,
+      defaultLanguageCode,
+      contentRef ? { collection: "prose", file: contentRef } : undefined,
+    );
+    hasReferences = proseBody !== body;
+  }
+}
+
+let ProseContent: (() => unknown) | null = null;
+let proseHtml: string | null = null;
+if (hasReferences && proseBody) {
+  proseHtml = renderMarkdownGfm(proseBody, true);
+} else if (proseEntry) {
+  const proseRendered = await render(proseEntry);
+  ProseContent = proseRendered?.Content ?? null;
+}
+
+let animatedProseHtml: string | null = null;
+if (animateNumbers && proseEntry) {
+  const entryRenderedHtml = (
+    proseEntry as Record<string, unknown> & { rendered?: { html?: string } }
+  ).rendered?.html;
+  let rawHtml: string;
+  if (entryRenderedHtml) {
+    rawHtml = entryRenderedHtml;
+  } else {
+    const body = (proseEntry as Record<string, unknown> & { body?: string }).body;
+    if (body) {
+      rawHtml = renderMarkdownGfm(body, false);
+    } else {
+      rawHtml = "";
+    }
+  }
+  if (rawHtml) {
+    animatedProseHtml = wrapInlineNumbers(rawHtml, { animateYears, duration: numberDuration });
+  }
+}
+---
+
+<div class:list={["section-rich", `section-rich--align-${align}`]}>
+  {
+    animatedProseHtml ? (
+      <Fragment set:html={animatedProseHtml} />
+    ) : proseHtml ? (
+      <Fragment set:html={proseHtml} />
+    ) : ProseContent ? (
+      <ProseContent />
+    ) : (
+      <slot />
+    )
+  }
+</div>

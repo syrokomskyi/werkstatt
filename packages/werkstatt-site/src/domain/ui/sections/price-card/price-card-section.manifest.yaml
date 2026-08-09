@@ -1,0 +1,89 @@
+id: price-card-section
+uniName: price-card-section
+layer: section
+semanticId: price-card
+archetype: price-card
+cosmicName: Pan
+role: pricing-disclosure
+version: 1.1.0
+intent:
+  - pricing
+  - trust
+  - clarify-positioning
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+contentSchemaKey: price-card-section
+contentTypesPath: ./price-card-section.types.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+  properties:
+    offeringRef:
+      type: string
+      description: "PBP offering URI for currency-aware price display (RFC-0743)."
+    monthly:
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        recurrence:
+          type: string
+    yearly:
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        recurrence:
+          type: string
+    setup:
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        recurrence:
+          type: string
+    includes:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - text
+        properties:
+          text:
+            type: string
+            minLength: 1
+          icon:
+            type: object
+            additionalProperties: false
+            required:
+              - vendor
+              - collection
+              - name
+            properties:
+              vendor:
+                type: string
+              collection:
+                type: string
+              name:
+                type: string
+              size:
+                type: number
