@@ -12,6 +12,7 @@ here (knowledge, capability, openapi, proof) and re-export them from this barrel
 <CHANGE_SUMMARY>
   <item>RFC-0286: initial barrel exporting the manifest module.</item>
   <item>RFC-0292: re-export fleet-catalog module.</item>
+  <item>RFC-0783: re-export api-catalog and mcp-card modules.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,3 +23,5 @@ export * from "./openapi.ts";
 export * from "./omit-empty.ts";
 export * from "./proof.ts";
 export * from "./fleet-catalog.ts";
+export * from "./api-catalog.ts";
+export * from "./mcp-card.ts";
