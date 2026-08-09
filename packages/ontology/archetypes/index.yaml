@@ -672,6 +672,7 @@ planetImportPaths:
   Miranda: "@warpgogol/ui/components/person-profile"
   Despina: "@warpgogol/ui/components/pulsar"
   Belinda: "@warpgogol/ui/components/responsive-image"
+  Daphnis: "@warpgogol/ui/components/scroll-to-top"
   Praxidike: "@warpgogol/ui/components/cards"
   Aitne: "@warpgogol/ui/components/comparison"
   Sinope: "@warpgogol/ui/components/list"
@@ -745,6 +746,7 @@ blockTypeToCosmicName:
   person-profile: Miranda
   pulsar: Despina
   responsive-image: Belinda
+  scroll-to-top: Daphnis
   section-body-cards: Praxidike
   section-body-comparison: Aitne
   section-body-list: Sinope
@@ -826,6 +828,7 @@ roleByCosmicName:
   Miranda: person-profile
   Despina: lang-switcher
   Belinda: section-image
+  Daphnis: scroll-to-top
   Praxidike: section-body
   Aitne: section-body
   Sinope: section-body

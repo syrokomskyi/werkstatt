@@ -71,6 +71,7 @@ import {
   collectPurgeUrls,
   purgeCacheByUrls,
   skippedPurgeResult,
+  verifyCloudflareToken,
   BUILD_IDENTITY_PATH,
 } from "./cache-purge.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
@@ -379,6 +380,30 @@ async function runPurgeStep(
   return result;
 }
 
+async function earlyCloudflareTokenCheck(
+  secretsFilePath: string | undefined,
+  logger: { info: (m: string) => void; warn: (m: string) => void },
+): Promise<void> {
+  const secretsEnv = secretsFilePath ? await sourceDotenv(secretsFilePath) : {};
+  const env = { ...filterEnv(process.env), ...secretsEnv };
+  const zoneId = env["CLOUDFLARE_ZONE_ID"];
+  const apiToken = env["CLOUDFLARE_API_TOKEN"];
+  if (!zoneId || !apiToken) {
+    logger.warn(
+      `[leitstand] ${!zoneId ? "CLOUDFLARE_ZONE_ID" : "CLOUDFLARE_API_TOKEN"} not set — CDN cache purge will be skipped and health checks may report unhealthy due to stale cache`,
+    );
+    return;
+  }
+  const tokenCheck = await verifyCloudflareToken(zoneId, apiToken);
+  if (!tokenCheck.valid) {
+    logger.warn(
+      `[leitstand] Cloudflare API token invalid: ${tokenCheck.error}. CDN cache purge will fail. Health checks will report unhealthy due to stale cache. Update CLOUDFLARE_API_TOKEN in .env before deploying.`,
+    );
+  } else {
+    logger.info("[leitstand] Cloudflare API token verified");
+  }
+}
+
 interface PreflightCheck {
   name: string;
   passed: boolean;
@@ -467,6 +492,31 @@ async function runPreflight(
       name: "dist-size-limit",
       passed: sizeCheck.withinLimit,
       detail: sizeCheck.detail,
+    });
+  }
+
+  // 7. Cloudflare API token valid (pre-flight check to avoid stale CDN after deploy)
+  const secretsFilePath = basePath ? resolveConventionSecretsPath(basePath) : undefined;
+  const secretsEnv = secretsFilePath ? await sourceDotenv(secretsFilePath) : {};
+  const env = { ...filterEnv(process.env), ...secretsEnv };
+  const zoneId = env["CLOUDFLARE_ZONE_ID"];
+  const apiToken = env["CLOUDFLARE_API_TOKEN"];
+  if (!zoneId || !apiToken) {
+    checks.push({
+      name: "cloudflare-token",
+      passed: true, // info-level — deploy can proceed without purge
+      detail: !zoneId
+        ? "CLOUDFLARE_ZONE_ID not set — CDN purge will be skipped"
+        : "CLOUDFLARE_API_TOKEN not set — CDN purge will be skipped",
+    });
+  } else {
+    const tokenCheck = await verifyCloudflareToken(zoneId, apiToken);
+    checks.push({
+      name: "cloudflare-token",
+      passed: tokenCheck.valid,
+      detail: tokenCheck.valid
+        ? "Cloudflare API token valid"
+        : `Cloudflare API token invalid: ${tokenCheck.error}`,
     });
   }
 
@@ -682,6 +732,9 @@ export async function runLeitstandDevDeploy(
     const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
     const secretsFilePath = resolveConventionSecretsPath(releaseDir);
 
+    // Pre-flight: verify Cloudflare API token before starting deploy
+    await earlyCloudflareTokenCheck(secretsFilePath, logger);
+
     // Resolve wrangler binary from workspace root node_modules/.bin (release dir has no node_modules)
     const workspaceBin = path.join(workspaceRoot, "node_modules", ".bin");
     const nodeModulesBinPath = existsSync(workspaceBin) ? workspaceBin : undefined;
@@ -827,6 +880,9 @@ export async function runLeitstandDevDeploy(
   }
 
   const secretsFilePath = resolveConventionSecretsPath(workpiecePath);
+
+  // Pre-flight: verify Cloudflare API token before starting build+deploy
+  await earlyCloudflareTokenCheck(secretsFilePath, logger);
 
   // RFC-0665: Pre-flight — validate methodologies config before building, so
   // invalid configs fail fast instead of after a long build+deploy cycle.
@@ -2052,6 +2108,12 @@ export async function runLeitstandPromote(
     const altConfig = getChannelConfig(dep, "alt");
     const mainConfig = getChannelConfig(dep, "main");
     const adapter = resolveAdapter(dep.adapter);
+
+    // Pre-flight: verify Cloudflare API token before starting promote
+    const promoteSecretsFilePath = resolveConventionSecretsPath(
+      path.join(workspaceRoot, "releases", releaseId),
+    );
+    await earlyCloudflareTokenCheck(promoteSecretsFilePath, logger);
 
     // RFC-0724: Use verifyFreshness retry loop (5 attempts, exponential backoff 3s/6s/12s/24s)
     // to confirm CDN is serving the expected distTreeHash before promoting.

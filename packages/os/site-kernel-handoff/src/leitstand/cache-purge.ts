@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0624: initial cache-purge helpers — collectPurgeUrls, purgeCacheByUrls with internal batching (max 30 per API call).</item>
+  <item>Pre-flight token check — verifyCloudflareToken validates the Cloudflare API token via GET /zones/{zone_id} before deploy starts, preventing stale CDN cache from invalid health checks.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -72,6 +73,40 @@ export async function purgeCacheByUrls(
   }
 
   return { success: true, purgedUrls: totalPurged };
+}
+
+export async function verifyCloudflareToken(
+  zoneId: string,
+  apiToken: string,
+): Promise<{ valid: boolean; error?: string }> {
+  try {
+    const response = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+      },
+    });
+    if (response.status === 401 || response.status === 403) {
+      const body = await response.text().catch(() => `HTTP ${response.status}`);
+      return {
+        valid: false,
+        error: `Token invalid or expired (HTTP ${response.status}): ${body}`,
+      };
+    }
+    if (!response.ok) {
+      return {
+        valid: false,
+        error: `Unexpected response (HTTP ${response.status})`,
+      };
+    }
+    return { valid: true };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    return {
+      valid: false,
+      error: `Network error during token verification: ${error}`,
+    };
+  }
 }
 
 export function skippedPurgeResult(reason: string): PurgeResult {
