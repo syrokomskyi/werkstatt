@@ -122,13 +122,17 @@ globalThis.CustomEvent = class CustomEvent<T = unknown> {
 };
 
 const {
-  CURRENCY_STORAGE_KEY,
+  CURRENCY_STORAGE_KEY_PREFIX,
+  getCurrencyStorageKey,
   CURRENCY_CHANGE_EVENT,
   getSelectedCurrency,
   setSelectedCurrency,
   dispatchCurrencyChange,
   initCurrencySelector,
 } = await import("./currency-selector-component.client.ts");
+
+const testLang = "de";
+const CURRENCY_STORAGE_KEY = getCurrencyStorageKey(testLang);
 
 describe("currency-selector client", () => {
   beforeEach(() => {
@@ -143,26 +147,32 @@ describe("currency-selector client", () => {
 
   describe("getSelectedCurrency", () => {
     test("returns null when localStorage is empty", () => {
-      expect(getSelectedCurrency()).toBe(null);
+      expect(getSelectedCurrency(testLang)).toBe(null);
     });
 
     test("returns stored currency", () => {
       mockLocalStorage.setItem(CURRENCY_STORAGE_KEY, "UAH");
-      expect(getSelectedCurrency()).toBe("UAH");
+      expect(getSelectedCurrency(testLang)).toBe("UAH");
     });
 
     test("returns null when localStorage throws", () => {
       const spy = vi.spyOn(mockLocalStorage, "getItem").mockImplementation(() => {
         throw new Error("localStorage unavailable");
       });
-      expect(getSelectedCurrency()).toBe(null);
+      expect(getSelectedCurrency(testLang)).toBe(null);
       spy.mockRestore();
+    });
+
+    test("uses locale-scoped key (wg-currency:de)", () => {
+      mockLocalStorage.setItem(getCurrencyStorageKey("uk"), "UAH");
+      expect(getSelectedCurrency("de")).toBe(null);
+      expect(getSelectedCurrency("uk")).toBe("UAH");
     });
   });
 
   describe("setSelectedCurrency", () => {
-    test("writes currency to localStorage", () => {
-      setSelectedCurrency("USD");
+    test("writes currency to locale-scoped localStorage key", () => {
+      setSelectedCurrency("USD", testLang);
       expect(mockLocalStorage.getItem(CURRENCY_STORAGE_KEY)).toBe("USD");
     });
 
@@ -170,7 +180,7 @@ describe("currency-selector client", () => {
       const spy = vi.spyOn(mockLocalStorage, "setItem").mockImplementation(() => {
         throw new Error("localStorage unavailable");
       });
-      expect(() => setSelectedCurrency("USD")).not.toThrow();
+      expect(() => setSelectedCurrency("USD", testLang)).not.toThrow();
       spy.mockRestore();
     });
   });
@@ -194,7 +204,7 @@ describe("currency-selector client", () => {
     test("sets aria-pressed from localStorage on init", () => {
       mockLocalStorage.setItem(CURRENCY_STORAGE_KEY, "UAH");
       const container = createContainer(["EUR", "UAH", "USD"]);
-      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"], testLang);
       const buttons = container.querySelectorAll("[data-currency-option]");
       expect(buttons[0]!.getAttribute("aria-pressed")).toBe("false");
       expect(buttons[1]!.getAttribute("aria-pressed")).toBe("true");
@@ -205,7 +215,7 @@ describe("currency-selector client", () => {
     test("defaults to first currency when localStorage has unknown currency", () => {
       mockLocalStorage.setItem(CURRENCY_STORAGE_KEY, "GBP");
       const container = createContainer(["EUR", "UAH", "USD"]);
-      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"], testLang);
       const buttons = container.querySelectorAll("[data-currency-option]");
       expect(buttons[0]!.getAttribute("aria-pressed")).toBe("true");
       expect(mockDocumentElement.setAttribute).toHaveBeenCalledWith("data-wg-currency", "EUR");
@@ -213,7 +223,7 @@ describe("currency-selector client", () => {
 
     test("defaults to first currency when localStorage is empty", () => {
       const container = createContainer(["EUR", "UAH", "USD"]);
-      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"], testLang);
       const buttons = container.querySelectorAll("[data-currency-option]");
       expect(buttons[0]!.getAttribute("aria-pressed")).toBe("true");
       expect(mockDocumentElement.setAttribute).toHaveBeenCalledWith("data-wg-currency", "EUR");
@@ -221,7 +231,7 @@ describe("currency-selector client", () => {
 
     test("writes to localStorage, sets aria-pressed, and dispatches event on click", () => {
       const container = createContainer(["EUR", "UAH", "USD"]);
-      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"], testLang);
       const handler = vi.fn();
       mockWindow.addEventListener(CURRENCY_CHANGE_EVENT, handler);
 
@@ -239,7 +249,7 @@ describe("currency-selector client", () => {
 
     test("syncs aria-pressed when wg-currency-change event fires", () => {
       const container = createContainer(["EUR", "UAH", "USD"]);
-      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"], testLang);
 
       mockWindow.dispatchEvent(
         new CustomEvent(CURRENCY_CHANGE_EVENT, { detail: { currency: "USD" } }),

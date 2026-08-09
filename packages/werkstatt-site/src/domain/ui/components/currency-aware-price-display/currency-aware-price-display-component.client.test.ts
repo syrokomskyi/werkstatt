@@ -113,8 +113,11 @@ globalThis.CustomEvent = class CustomEvent<T = unknown> {
 
 const { initCurrencyAwarePriceDisplay } =
   await import("./currency-aware-price-display-component.client.ts");
-const { CURRENCY_CHANGE_EVENT, CURRENCY_STORAGE_KEY } =
+const { CURRENCY_CHANGE_EVENT, getCurrencyStorageKey } =
   await import("../currency-selector/currency-selector-component.client.ts");
+
+const testLang = "de";
+const CURRENCY_STORAGE_KEY = getCurrencyStorageKey(testLang);
 
 describe("currency-aware-price-display client", () => {
   beforeEach(() => {
@@ -131,7 +134,7 @@ describe("currency-aware-price-display client", () => {
     mockLocalStorage.setItem(CURRENCY_STORAGE_KEY, "UAH");
     const container = new MockContainer(["EUR", "UAH", "USD"]);
 
-    initCurrencyAwarePriceDisplay(container as unknown as HTMLElement);
+    initCurrencyAwarePriceDisplay(container as unknown as HTMLElement, testLang);
 
     const variants = container.querySelectorAll("[data-currency]");
     expect(variants[0]!.hasAttribute("hidden")).toBe(true);
@@ -143,7 +146,7 @@ describe("currency-aware-price-display client", () => {
   test("toggles visibility on wg-currency-change event", () => {
     const container = new MockContainer(["EUR", "UAH", "USD"]);
 
-    initCurrencyAwarePriceDisplay(container as unknown as HTMLElement);
+    initCurrencyAwarePriceDisplay(container as unknown as HTMLElement, testLang);
 
     mockWindow.dispatchEvent(
       new CustomEvent(CURRENCY_CHANGE_EVENT, { detail: { currency: "USD" } }),
@@ -158,7 +161,7 @@ describe("currency-aware-price-display client", () => {
   test("shows all variants when currency does not match any", () => {
     const container = new MockContainer(["EUR", "UAH"]);
 
-    initCurrencyAwarePriceDisplay(container as unknown as HTMLElement);
+    initCurrencyAwarePriceDisplay(container as unknown as HTMLElement, testLang);
 
     mockWindow.dispatchEvent(
       new CustomEvent(CURRENCY_CHANGE_EVENT, { detail: { currency: "GBP" } }),
@@ -172,6 +175,8 @@ describe("currency-aware-price-display client", () => {
   test("does nothing when container has no variants", () => {
     const container = new MockContainer([]);
 
-    expect(() => initCurrencyAwarePriceDisplay(container as unknown as HTMLElement)).not.toThrow();
+    expect(() =>
+      initCurrencyAwarePriceDisplay(container as unknown as HTMLElement, testLang),
+    ).not.toThrow();
   });
 });
