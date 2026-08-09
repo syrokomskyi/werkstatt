@@ -565,4 +565,101 @@ describe("PBP Compiler Pipeline", () => {
     // Sorted key order: "monthly" < "yearly", so monthly (70.00) is canonical
     expect(offer!.price).toBe("70.00");
   });
+
+  it("RFC-0781: accepts same entity ID across different locales", async () => {
+    writeEntity("de", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol",
+    });
+    writeEntity("uk", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol UK",
+    });
+
+    const input: PbpCompilerInput = {
+      sourceDirectory: testDir,
+      locale: "uk",
+      defaultLocale: "de",
+      strictness: "production",
+    };
+
+    const result = await compilePbpProfile(input);
+
+    const dupErrors = result.validationErrors.filter(
+      (e: { code: string }) => e.code === "PBP-ID-LOCALE-DUPLICATE",
+    );
+    expect(dupErrors.length).toBe(0);
+    expect(result.entityIndex.size).toBe(1);
+    const entity = result.entityIndex.values().next().value as unknown as Record<string, unknown>;
+    expect(entity.name).toBe("Warpgogol UK");
+  });
+
+  it("RFC-0781: detects same-locale duplicate as fatal", async () => {
+    writeEntity("de", "business-a.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol",
+    });
+    writeEntity("de", "business-b.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol Duplicate",
+    });
+
+    const input: PbpCompilerInput = {
+      sourceDirectory: testDir,
+      locale: "de",
+      defaultLocale: "de",
+      strictness: "production",
+    };
+
+    const result = await compilePbpProfile(input);
+
+    const dupErrors = result.validationErrors.filter(
+      (e: { code: string }) => e.code === "PBP-ID-LOCALE-DUPLICATE",
+    );
+    expect(dupErrors.length).toBeGreaterThan(0);
+  });
+
+  it("RFC-0781: locale resolution deep-merges overlay onto base", async () => {
+    writeEntity("de", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol",
+      summary: "German summary",
+    });
+    writeEntity("uk", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol UK",
+    });
+
+    const input: PbpCompilerInput = {
+      sourceDirectory: testDir,
+      locale: "uk",
+      defaultLocale: "de",
+      strictness: "production",
+    };
+
+    const result = await compilePbpProfile(input);
+
+    const entity = result.entityIndex.values().next().value as unknown as Record<string, unknown>;
+    expect(entity.name).toBe("Warpgogol UK");
+    expect(entity.summary).toBe("German summary");
+    expect(result.fallbackReport.fallbacks.length).toBeGreaterThan(0);
+  });
 });
