@@ -17,7 +17,6 @@ reviewers:
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
 enhancedAt: 2026-08-09
-acceptedAt: 2026-08-09
 implementedAt: 2026-08-09
 closedAt:
 supersedes: []
@@ -44,11 +43,10 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - workshop.scaffold
-  added: []
-  changed:
-    - onboarding.scaffold
+  changed: []
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
