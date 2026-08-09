@@ -2,6 +2,17 @@
 
 All notable changes to the `werkstatt` project are documented here.
 
+## 2026-08-09 — v5.0.0 (major)
+
+### Changed
+
+- Bump platform version from 4.90.16 to 5.0.0 (RFC-0780), marking the completion of the Werkstatt Engine Program (RFC-0769..0779).
+- Update root package.json scripts from `site-kernel` binary to `werkstatt` binary (5 scripts: registry:build, upgrade-packages, compass:validate, compass:validate:main, compass:validate:ref, compass:inventory).
+
+### Removed
+
+- All legacy `@warpgogol/site-kernel*` package references from active code, templates, and documentation.
+
 ## 2026-07-30 — 2026-08-05
 
 ### Added
