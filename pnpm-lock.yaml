@@ -60,6 +60,9 @@ importers:
       '@warpgogol/site-kernel-onboarding':
         specifier: workspace:*
         version: link:packages/os/site-kernel-onboarding
+      '@warpgogol/werkstatt':
+        specifier: workspace:*
+        version: link:packages/werkstatt
       eslint:
         specifier: ^10.8.0
         version: 10.8.0
@@ -1396,6 +1399,9 @@ importers:
       '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../os/site-kernel
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.1
       yaml:
         specifier: ^2.9.0
         version: 2.9.0

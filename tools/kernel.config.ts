@@ -41,6 +41,7 @@
   <entry key="dns.*">Registers workspace DNS record commands: dns.record.upsert, dns.record.validate, dns.record.list, dns.record.delete, dns.records.schema.validate (RFC-0753).</entry>
   <entry key="nachweis.*">Registers workspace nachweis commands: nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw (RFC-0707).</entry>
   <entry key="exploration.*">Registers workspace exploration note commands: exploration.list, exploration.show, exploration.archive (RFC-0710).</entry>
+  <entry key="werkstatt.plugin.validate">Registers workspace plugin contract validation command (RFC-0770).</entry>
 </MODULE_MAP>
 <CHANGE_SUMMARY>
   <item>Initial workspace-level kernel configuration.</item>
@@ -69,6 +70,7 @@
   <item>RFC-0710: Register forgeExplorationModule for exploration.list, exploration.show, exploration.archive.</item>
   <item>RFC-0752: Register subdomainModule for subdomain.register, subdomain.validate, subdomain.list.</item>
   <item>RFC-0753: Register dnsModule for dns.record.upsert, dns.record.validate, dns.record.list, dns.record.delete, dns.records.schema.validate.</item>
+  <item>RFC-0770: Register werkstatt-plugin module for werkstatt.plugin.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -150,6 +152,8 @@ export default defineKernelConfig({
       (await import("@warpgogol/site-kernel-handoff/nachweis-module")).createNachweisModule(),
     "forge-exploration": async () =>
       (await import("@warpgogol/forge/os/exploration")).forgeExplorationModule,
+    "werkstatt-plugin": async () =>
+      (await import("@warpgogol/werkstatt/os/werkstatt-plugin-module")).forgeWerkstattPluginModule,
   },
   pipelines: {
     // Workspace-level pipelines
