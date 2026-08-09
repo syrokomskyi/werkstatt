@@ -1,7 +1,7 @@
 ---
 id: RFC-0775
 title: "Werkstatt site plugin domain layer consolidation"
-status: implemented
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
 enhancedAt: 2026-08-09
-implementedAt: 2026-08-09
+implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
