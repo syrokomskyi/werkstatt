@@ -21,8 +21,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import type { MissionManifest } from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/kernel";
+import type { MissionManifest } from "@warpgogol/werkstatt/schemas";
 import {
   readRegistry,
   writeRegistry,

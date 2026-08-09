@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { GuardResult } from "../guards.ts";
+import type { GuardResult } from "../handoff/guards.ts";
 
 export interface CSurfaceGuardInput {
   systemId: string;

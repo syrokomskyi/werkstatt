@@ -13,4 +13,4 @@ export {
   runChangelogGenerate,
   runChangelogRebuildIndex,
   runChangelogBackfill,
-} from "@warpgogol/site-kernel-changelog";
+} from "@warpgogol/werkstatt/changelog";

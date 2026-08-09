@@ -35,7 +35,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   readRegistry,
   writeRegistry,
@@ -440,7 +440,7 @@ export async function runMissionClose(
       const metadataPath = path.join(axiomEvidenceDir, "evidence-metadata.json");
       if (existsSync(axiomEvidenceDir) && existsSync(metadataPath)) {
         try {
-          const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+          const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
           const syncResult = (await executeKernelCommand({
             workspaceRoot,
             commandName: "evidence.sync",
@@ -487,7 +487,7 @@ export async function runMissionClose(
     // Pin's writeRegistry overwrites the registry with both currentMission: null AND pinnedPlatform updated.
     // commitWerkstattSideEffects then commits the combined registry change in one commit.
     try {
-      const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+      const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
       const pinResult = (await executeKernelCommand({
         workspaceRoot,
         commandName: "sternsystem.pin",
@@ -538,7 +538,7 @@ export async function runMissionClose(
     // is already closed (irreversible). The operator can retry sternsystem.sync manually.
     if (entry && entry.mirrors.length > 2) {
       try {
-        const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+        const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
         logger.info(`  Syncing external mirrors via sternsystem.sync…`);
         const syncResult = (await executeKernelCommand({
           workspaceRoot,

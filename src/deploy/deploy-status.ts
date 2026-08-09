@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type { DeployStatus } from "./types.ts";
 import {
   currentSymlinkPath,

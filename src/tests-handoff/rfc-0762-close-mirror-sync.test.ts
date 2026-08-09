@@ -16,7 +16,7 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 // --- Mocks ---
@@ -36,8 +36,8 @@ const mockSync = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     executeKernelCommand: vi.fn(async () => mockSync.executeKernelCommandResult),
@@ -227,7 +227,7 @@ test("close with external mirrors calls sternsystem.sync and sets mirror.synced=
   setupCloseWorkspace({ externalMirrors: true });
 
   const { runMissionClose } = await import("../mission/mission-close.ts");
-  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
 
   const input = {
     flags: { mission: "test-system-m000001", actor: "test-agent", "skip-evidence-sync": true },
@@ -253,7 +253,7 @@ test("close with external mirrors calls sternsystem.sync and sets mirror.synced=
 test("close with sync failure does not block close and sets mirror.synced=false", async () => {
   setupCloseWorkspace({ externalMirrors: true });
 
-  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
   vi.mocked(executeKernelCommand).mockImplementation(async (opts: { commandName?: string }) => {
     if (opts.commandName === "sternsystem.sync") {
       return {
@@ -286,7 +286,7 @@ test("close without external mirrors does not call sternsystem.sync", async () =
   setupCloseWorkspace({ externalMirrors: false });
 
   const { runMissionClose } = await import("../mission/mission-close.ts");
-  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
 
   // Reset call history
   vi.mocked(executeKernelCommand).mockClear();

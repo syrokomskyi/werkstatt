@@ -21,7 +21,7 @@ import {
 import { join } from "node:path";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import { runReleaseReady, runReleaseValidate } from "../release/release-commands.ts";
-import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 function makeContext(workspaceRoot: string): KernelRuntimeContext {

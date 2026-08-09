@@ -49,7 +49,7 @@ import {
 import type { CacheLayer } from "../cache/cache-layer.ts";
 import { buildWorkspaceTreeIndex, filterTreeIndex } from "../cache/workspace-tree-index.ts";
 import type { WorkspaceTreeIndex } from "../cache/workspace-tree-index.ts";
-import { stableJsonHash } from "@warpgogol/fingerprint";
+import { stableJsonHash } from "@warpgogol/werkstatt/fingerprint";
 import type {
   DiscoveredSiteWorkspace,
   ExecuteKernelPipelineOptions,

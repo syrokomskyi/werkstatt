@@ -13,7 +13,7 @@ subdomain.register, subdomain.validate, subdomain.list.
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@warpgogol/site-kernel";
+import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 
 export function createSubdomainModule(): KernelModule {
   return {

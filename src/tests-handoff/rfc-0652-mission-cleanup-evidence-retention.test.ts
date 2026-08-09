@@ -11,7 +11,7 @@
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 let tmpDir: string;
 

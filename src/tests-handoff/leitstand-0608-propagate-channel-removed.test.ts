@@ -15,7 +15,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "nod
 import { join } from "node:path";
 import { runLeitstandPropagate } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
-import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 vi.mock("node:child_process", () => ({

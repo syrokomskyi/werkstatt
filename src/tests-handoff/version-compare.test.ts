@@ -9,7 +9,7 @@ and the packages-drift flag.</purpose>
 */
 
 import { test, expect } from "vitest";
-import { compareEcosystem } from "../version-compare.ts";
+import { compareEcosystem } from "../handoff/version-compare.ts";
 
 const H_A = `sha256:${"a".repeat(64)}`;
 const H_B = `sha256:${"b".repeat(64)}`;

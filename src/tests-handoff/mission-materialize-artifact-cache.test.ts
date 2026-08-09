@@ -11,7 +11,7 @@
 import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createMaterializeWorkspace, gitInit, gitCommit } from "./helpers/materialize-fixture.ts";
 
 const mockPipeline = vi.hoisted(() => ({
@@ -20,8 +20,8 @@ const mockPipeline = vi.hoisted(() => ({
   callCount: 0,
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     executeKernelPipeline: vi.fn(async (opts: { pipelineName: string; force?: boolean }) => {
@@ -41,8 +41,8 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
   };
 });
 
-vi.mock("../bundle-io.ts", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../bundle-io.ts")>();
+vi.mock("../handoff/bundle-io.ts", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../handoff/bundle-io.ts")>();
   return {
     ...actual,
     resolveCurrentEcosystem: vi.fn(async () => ({

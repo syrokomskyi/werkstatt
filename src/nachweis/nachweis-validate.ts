@@ -29,8 +29,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import {
@@ -144,7 +144,7 @@ export async function runNachweisValidate(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<NachweisValidateResult>> {
-  const { workspaceRoot, _logger } = context;
+  const { workspaceRoot, logger } = context;
   const systemId = flagString(input, "system") ?? context.site?.name;
   if (!systemId) throw new Error("[nachweis.validate] --system is required");
 

@@ -14,7 +14,7 @@ import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runSternsystemSync } from "./sternsystem-sync.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 function git(cwd: string, args: string): string {
   return execSync(`git ${args}`, {
@@ -32,7 +32,7 @@ let externalDir: string;
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
-    flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
+    flags: flags as Record<string, import("@warpgogol/werkstatt/kernel").KernelFlagValue>,
     argv: [],
   };
 }

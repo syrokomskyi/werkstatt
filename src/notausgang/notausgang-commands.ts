@@ -23,11 +23,11 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/share/fs";
-import { fingerprintTree, fingerprintFile } from "@warpgogol/fingerprint/semantic";
-import { byteHashFile } from "@warpgogol/fingerprint";
-import { notausgangManifestSchema, type NotausgangManifest } from "@warpgogol/ontology/operations";
+import { fingerprintTree, fingerprintFile } from "@warpgogol/werkstatt/fingerprint/semantic";
+import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
+import { notausgangManifestSchema, type NotausgangManifest } from "@warpgogol/werkstatt/schemas";
 import { generateOperationId } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile } from "../werkstatt/atomic.ts";
 import { readRegistry, findEntry, resolveCachePath } from "../sternsystem/registry-io.ts";

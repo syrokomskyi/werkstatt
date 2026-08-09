@@ -9,7 +9,7 @@ all other platform operations.
 <non-goals>
   <item>Do not implement command handlers — those live in lookup.ts, register.ts, placement.ts, etc.</item>
   <item>Do not implement DHT routing — that lives in node.ts.</item>
-  <item>Do not define Zod schemas — those live in @warpgogol/ontology/operations/dht.ts.</item>
+  <item>Do not define Zod schemas — those live in @warpgogol/werkstatt/schemas/dht.ts.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -25,7 +25,7 @@ export type {
   WorkshopCapacity,
   DHTPlacementResult,
   DHTCacheEntry,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";
 
 export {
   dhtSiteEntrySchema,
@@ -35,4 +35,4 @@ export {
   workshopCapacitySchema,
   dhtPlacementResultSchema,
   dhtCacheEntrySchema,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";

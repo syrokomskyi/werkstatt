@@ -14,7 +14,7 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 
 export interface BordbuchHookResult {
   installed: boolean;

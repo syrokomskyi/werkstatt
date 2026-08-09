@@ -15,7 +15,7 @@
 
 import { test, expect } from "vitest";
 import fc from "fast-check";
-import { compareSemver, parseSemver } from "../semver.ts";
+import { compareSemver, parseSemver } from "../handoff/semver.ts";
 
 const semverArbitrary = fc
   .tuple(fc.nat({ max: 999 }), fc.nat({ max: 999 }), fc.nat({ max: 999 }))

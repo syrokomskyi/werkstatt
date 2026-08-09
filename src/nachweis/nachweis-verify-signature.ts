@@ -28,7 +28,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import {

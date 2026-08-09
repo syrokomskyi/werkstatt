@@ -9,7 +9,7 @@
 
 import { test, expect } from "vitest";
 import { verifyRedirectRoute } from "./cloudflare-workers.ts";
-import type { RouteFact } from "@warpgogol/ontology/operations";
+import type { RouteFact } from "@warpgogol/werkstatt/schemas";
 
 test("verifyRedirectRoute: 307 with matching Location passes", () => {
   const route: RouteFact = { path: "/de", contentHash: null, redirectTarget: "/" };

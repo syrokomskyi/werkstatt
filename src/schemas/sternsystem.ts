@@ -25,7 +25,7 @@ RFC-0751: extend serviceEntrySchema with deployment fields (kind, url, publicEnd
 */
 
 import { z } from "zod";
-import { starNameSchema } from "../cosmic/index.ts";
+import { starNameSchema } from "@warpgogol/ontology/cosmic";
 import { deploymentConfigSchema } from "./leitstand.ts";
 
 const semverRe = /^\d+\.\d+\.\d+$/;

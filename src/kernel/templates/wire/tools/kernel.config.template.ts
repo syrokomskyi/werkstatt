@@ -18,7 +18,7 @@ import {
   SITES_BUILD_CHECK_PIPELINE,
   SITES_BUILD_POST_PIPELINE,
 } from "@warpgogol/site-kernel-checks/pipelines";
-import { STANDARD_INTEGRITY_PIPELINE } from "@warpgogol/site-kernel-integrity";
+import { STANDARD_INTEGRITY_PIPELINE } from "@warpgogol/werkstatt/integrity";
 
 // moduleLoaders: each module is loaded lazily via dynamic import(), so that
 // tsImport of this config file does not transitively import all module

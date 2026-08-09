@@ -33,8 +33,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { runKernelWire, executeKernelCommand, executeKernelPipeline } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { runKernelWire, executeKernelCommand, executeKernelPipeline } from "@warpgogol/werkstatt/kernel";
 import {
   readRegistry,
   findEntry,
@@ -67,9 +67,9 @@ import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
-import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
-import { byteHash } from "@warpgogol/fingerprint";
-import type { KernelPipelineStep } from "@warpgogol/site-kernel";
+import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../handoff/bundle-io.ts";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 export interface MissionMaterializeData {
   missionId: string;

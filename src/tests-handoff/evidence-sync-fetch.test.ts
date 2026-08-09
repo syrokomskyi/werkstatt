@@ -20,8 +20,8 @@ import type {
   KernelCommandInput,
   KernelRuntimeContext,
   KernelFlagValue,
-} from "@warpgogol/site-kernel";
-import { createDefaultIO, createKernelLogger } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { createDefaultIO, createKernelLogger } from "@warpgogol/werkstatt/kernel";
 import type {
   EvidenceSyncResult,
   EvidenceFetchResult,

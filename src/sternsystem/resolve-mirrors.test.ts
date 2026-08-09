@@ -15,7 +15,7 @@ import {
   inferMirrorProtocol,
   isGitAccessible,
 } from "./registry-io.ts";
-import type { FleetRegistryEntry } from "@warpgogol/ontology/operations";
+import type { FleetRegistryEntry } from "@warpgogol/werkstatt/schemas";
 import { join } from "node:path";
 
 function makeEntry(

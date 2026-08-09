@@ -18,10 +18,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { stringify as yamlStringify } from "yaml";
-import type { BordbuchEntry } from "@warpgogol/ontology/operations";
+import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import { readBordbuch } from "./bordbuch-io.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 import { loadSurfaceModuleContexts, readVisibilityOutcomes } from "@warpgogol/surface/io";

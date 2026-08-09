@@ -18,4 +18,4 @@ export {
   runIntegrityVerifyRelease,
   runIntegrityGenerateSigningKeypair,
   runIntegrityBackfillRevisions,
-} from "@warpgogol/site-kernel-integrity";
+} from "@warpgogol/werkstatt/integrity";

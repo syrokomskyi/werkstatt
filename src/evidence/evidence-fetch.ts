@@ -24,7 +24,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { readRegistry } from "../sternsystem/registry-io.ts";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "./r2-client.ts";
 

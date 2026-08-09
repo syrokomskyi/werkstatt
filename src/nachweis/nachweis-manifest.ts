@@ -26,8 +26,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import {
   isNachweisEntitled,

@@ -12,7 +12,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { RouteFact, PurgeResult } from "@warpgogol/ontology/operations";
+import type { RouteFact, PurgeResult } from "@warpgogol/werkstatt/schemas";
 
 export const BUILD_IDENTITY_PATH = "/.well-known/build-identity.json";
 const MAX_URLS_PER_BATCH = 30;

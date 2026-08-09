@@ -14,14 +14,14 @@ import { join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
-import { runPlatformConsistencyValidate } from "../platform-consistency.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { runPlatformConsistencyValidate } from "../handoff/platform-consistency.ts";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 const execFileAsync = promisify(execFile);
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
-    flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
+    flags: flags as Record<string, import("@warpgogol/werkstatt/kernel").KernelFlagValue>,
     argv: [],
   };
 }

@@ -14,9 +14,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { listMissionDirs, readMissionManifest } from "./mission-io.ts";
-import type { MissionManifest } from "@warpgogol/ontology/operations";
+import type { MissionManifest } from "@warpgogol/werkstatt/schemas";
 
 export interface MissionListData {
   missions: Array<{

@@ -25,13 +25,13 @@ import fs from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import * as ed from "@noble/ed25519";
-import { byteHash } from "@warpgogol/fingerprint";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { flagString, flagBool } from "./nachweis-n3-types.ts";
 
 export interface NachweisKeyEnsureResult {

@@ -12,7 +12,7 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 const mockState = vi.hoisted(() => ({
   prepareResult: { ok: true, steps: [{ ok: true, commandName: "config.regenerate", exitCode: 0 }] },
@@ -50,8 +50,8 @@ const mockState = vi.hoisted(() => ({
   dirty: false,
 }));
 
-vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@warpgogol/site-kernel")>();
+vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     executeKernelPipeline: vi.fn(async (opts: { pipelineName: string }) => {

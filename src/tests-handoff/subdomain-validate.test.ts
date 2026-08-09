@@ -13,7 +13,7 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runSubdomainValidate } from "../subdomain/subdomain-validate.ts";
-import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
+import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import {
   setupCloudflareApiMock,
   dnsListResponse,

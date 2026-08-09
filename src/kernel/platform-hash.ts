@@ -12,8 +12,8 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { byteHash } from "@warpgogol/fingerprint";
-import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 
 /**
  * RFC-0364: Semantic fingerprint of the recipient's platform tree.

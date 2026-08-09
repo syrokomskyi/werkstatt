@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import type { Dirent } from "node:fs";

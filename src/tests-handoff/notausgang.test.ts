@@ -18,14 +18,14 @@ import { join } from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { runNotausgangExport } from "../notausgang/notausgang-commands.ts";
 import { runNotausgangValidate } from "../notausgang/notausgang-commands.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let workspaceRoot: string;
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
-    flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
+    flags: flags as Record<string, import("@warpgogol/werkstatt/kernel").KernelFlagValue>,
     argv: [],
   };
 }
@@ -191,7 +191,7 @@ test("export writes YAML artifacts (not JSON)", async () => {
   expect(existsSync(join(outputDir, "artifact-manifest.json"))).toBe(false);
 });
 
-test("export hashes use sha256: prefix from @warpgogol/fingerprint", async () => {
+test("export hashes use sha256: prefix from @warpgogol/werkstatt/fingerprint", async () => {
   const result = await runNotausgangExport(
     makeInput({
       system: "test-site",

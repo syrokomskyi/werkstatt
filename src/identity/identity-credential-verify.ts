@@ -16,7 +16,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { verifyIdentityCredential } from "@warpgogol/passport/identity-sign";
 import { readIdentityConfig, findCredential, isRevoked } from "./identity-io.ts";
 

@@ -23,7 +23,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type { AtomicSwapResult } from "./types.ts";
 import {
   artifactDir,

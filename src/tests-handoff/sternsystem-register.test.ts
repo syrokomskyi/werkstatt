@@ -13,14 +13,14 @@ import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runSternsystemRegister, createContentStub } from "../sternsystem/sternsystem-register.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let workspaceRoot: string;
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
-    flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
+    flags: flags as Record<string, import("@warpgogol/werkstatt/kernel").KernelFlagValue>,
     argv: [],
   };
 }

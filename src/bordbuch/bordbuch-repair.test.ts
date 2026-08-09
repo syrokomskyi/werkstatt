@@ -12,8 +12,8 @@ import fs from "node:fs/promises";
 import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import type { BordbuchEntry } from "@warpgogol/ontology/operations";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import { computeEntryHash } from "./bordbuch-io.ts";
 import { runBordbuchRepair } from "./bordbuch-repair.ts";
 

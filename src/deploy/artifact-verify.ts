@@ -21,8 +21,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { verifyJsonSignature, requireEnv } from "@warpgogol/site-kernel-integrity";
+} from "@warpgogol/werkstatt/kernel";
+import { verifyJsonSignature, requireEnv } from "@warpgogol/werkstatt/integrity";
 import type { ArtifactVerifyResult } from "./types.ts";
 import { artifactDir, distPath, hashArtifactDir, readManifest } from "./deploy-utils.ts";
 

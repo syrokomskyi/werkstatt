@@ -26,7 +26,7 @@ vi.mock("../sternsystem/registry-io.ts", () => ({
 import { appendAndCommitBordbuch, appendBatchAndCommitBordbuch } from "./bordbuch-commit-helper.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "./bordbuch-io.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
-import type { BordbuchEntry } from "@warpgogol/ontology/operations";
+import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 
 const mockAppendBordbuchEntry = vi.mocked(appendBordbuchEntry);
 const mockCommitAndPushBordbuch = vi.mocked(commitAndPushBordbuch);

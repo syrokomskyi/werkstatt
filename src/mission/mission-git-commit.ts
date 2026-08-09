@@ -24,8 +24,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { executeKernelCommand } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { createSignedCommit } from "./signed-commit.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";

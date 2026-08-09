@@ -13,7 +13,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@warpgogol/site-kernel";
+import type { KernelModule } from "@warpgogol/werkstatt/kernel";
 
 export function createBordbuchModule(): KernelModule {
   return {

@@ -22,13 +22,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import type { ArtifactGcResult } from "./types.ts";
 import {
   artifactDir,
   currentSymlinkPath,
   listArtifactHashes,
-  _platformArtifactsBase,
+  platformArtifactsBase,
   previousSymlinkPath,
   readSymlinkBasename,
 } from "./deploy-utils.ts";

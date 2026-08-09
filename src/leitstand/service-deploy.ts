@@ -20,8 +20,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import type { ServiceEntry } from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/kernel";
+import type { ServiceEntry } from "@warpgogol/werkstatt/schemas";
 import { readRegistry, writeRegistry, findServiceEntry } from "../sternsystem/registry-io.ts";
 import { generateOperationId } from "../werkstatt/index.ts";
 
@@ -127,7 +127,7 @@ export async function runLeitstandServiceDeploy(
 
   // 2. Run deploy.preflight
   logger.info(`[leitstand.service.deploy] running deploy.preflight for ${serviceId}…`);
-  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
   const preflightResult = (await executeKernelCommand({
     workspaceRoot,
     commandName: "deploy.preflight",

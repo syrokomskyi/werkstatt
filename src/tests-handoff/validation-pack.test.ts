@@ -8,7 +8,7 @@
 */
 
 import { test, expect } from "vitest";
-import { diffValidationPacks, type ValidationPack } from "../validation-pack.ts";
+import { diffValidationPacks, type ValidationPack } from "../handoff/validation-pack.ts";
 
 function pack(over: Partial<ValidationPack> = {}): ValidationPack {
   return {

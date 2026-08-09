@@ -13,7 +13,7 @@ account subdomain derivation, and environment variable resolution.
 </CHANGE_SUMMARY>
 */
 
-import type { FleetRegistry, ServiceEntry } from "@warpgogol/ontology/operations";
+import type { FleetRegistry, ServiceEntry } from "@warpgogol/werkstatt/schemas";
 import { filterEnv, sourceDotenv } from "../leitstand/adapters/cloudflare-workers.ts";
 
 export function flagString(

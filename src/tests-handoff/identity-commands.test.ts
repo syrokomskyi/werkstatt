@@ -11,7 +11,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { runIdentityBootstrap } from "../identity/identity-bootstrap.ts";
 import { runIdentityCredentialIssue } from "../identity/identity-credential-issue.ts";
 import { runIdentityCredentialVerify } from "../identity/identity-credential-verify.ts";

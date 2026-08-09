@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { runContentRefIndexGenerate } from "@warpgogol/site-kernel-codegen";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 

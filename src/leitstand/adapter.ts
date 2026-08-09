@@ -14,7 +14,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { PropagationResult, HealthCheck } from "@warpgogol/ontology/operations";
+import type { PropagationResult, HealthCheck } from "@warpgogol/werkstatt/schemas";
 
 export type CommandRunner = (
   cmd: string,
