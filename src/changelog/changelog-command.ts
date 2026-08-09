@@ -16,7 +16,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { buildChangelogCtx, readFlag } from "./changelog/context.ts";
 import type { ChangelogCtx } from "./changelog/context.ts";
 import type { SystemState } from "./changelog/types.ts";

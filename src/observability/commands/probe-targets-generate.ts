@@ -16,8 +16,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
-import { buildGeneratedHeader } from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
+import { buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { readAstroSiteUrl } from "@warpgogol/site-kernel-checks/lib/astro-site-url";

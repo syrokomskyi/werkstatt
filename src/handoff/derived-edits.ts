@@ -14,7 +14,7 @@ decision record instead of silently regenerating, so hand edits are not lost wit
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { HandoffManifest } from "@warpgogol/ontology/operations";
+import type { HandoffManifest } from "@warpgogol/werkstatt/schemas";
 import { sha256OfBytes } from "./bundle-io.ts";
 
 export interface DerivedEditMismatch {

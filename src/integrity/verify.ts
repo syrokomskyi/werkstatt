@@ -18,7 +18,7 @@
  */
 
 import path from "node:path";
-import { byteHashFile } from "@warpgogol/fingerprint";
+import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { discoverManagedDirectories, discoverManagedFiles } from "./discover.ts";
 import { pathExists } from "./fs.ts";
 import { getManifestFileName, loadDirectoryManifest } from "./manifests.ts";

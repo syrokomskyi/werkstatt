@@ -17,7 +17,7 @@
  */
 
 import path from "node:path";
-import { byteHashFile } from "@warpgogol/fingerprint";
+import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { discoverManagedFiles } from "./discover.ts";
 import { getChangedPaths, getFileHistory } from "./git.ts";
 import { readJsonFile, writeJsonFile } from "./json.ts";

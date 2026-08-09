@@ -17,4 +17,4 @@ export {
   gtSemver,
   eqSemver,
   inOpenClosedRange,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";

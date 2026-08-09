@@ -18,7 +18,7 @@
  */
 
 import path from "node:path";
-import { byteHashFile } from "@warpgogol/fingerprint";
+import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { loadEntitiesById } from "./registry.ts";
 import type { MoveCandidate } from "./types.ts";
 

@@ -21,19 +21,19 @@ import {
   handoffManifestSchema,
   type HandoffCapability,
   type HandoffManifestEntry,
-} from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt/schemas";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import {
   hashFile,
   resolveCurrentEcosystem,
   resolvePackagesHash,
   resolvePlatformSemanticHash,
 } from "./bundle-io.ts";
-import { allMigratorIds } from "./migrators/registry.ts";
+import { allMigratorIds } from "../migrators/registry.ts";
 import { resolveAuthoredFiles } from "./authored-set.ts";
 import { buildValidationPack } from "./validation-pack.ts";
 

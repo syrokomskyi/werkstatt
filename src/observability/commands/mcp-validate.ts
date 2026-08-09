@@ -17,7 +17,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 
 const SIGNOZ_KEY_PATTERN = /[a-f0-9]{32,}/gi;

@@ -21,7 +21,7 @@ import {
   hasGeneratedMarker,
   isGeneratedMarkerTextCandidate,
   type KernelCommandInput,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";
 
 /** Code extensions Compass itself scans — for these we defer to the Compass inventory. */
 const CODE_EXT = new Set([".ts", ".tsx", ".astro", ".js", ".jsx", ".mjs", ".mts", ".css"]);

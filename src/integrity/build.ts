@@ -18,7 +18,7 @@
  */
 
 import path from "node:path";
-import { byteHash, byteHashFile } from "@warpgogol/fingerprint";
+import { byteHash, byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { discoverManagedFiles } from "./discover.ts";
 import { discoverDistFiles } from "./internal-dist.ts";
 import { getHeadSha, getRepoUrl } from "./git.ts";

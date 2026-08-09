@@ -16,4 +16,4 @@ export {
   hasPlatformScopeFiles,
   extractTrailer,
   hasTrailer,
-} from "@warpgogol/site-kernel";
+} from "@warpgogol/werkstatt/kernel";

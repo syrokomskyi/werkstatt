@@ -15,11 +15,11 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import * as fs from "node:fs/promises";
-import type { DiscoveredSiteWorkspace, KernelPipelineReport } from "@warpgogol/site-kernel";
-import { executeKernelPipeline } from "@warpgogol/site-kernel";
-import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
-import { byteHash } from "@warpgogol/fingerprint";
-import { atomicWriteFile } from "./werkstatt/atomic.ts";
+import type { DiscoveredSiteWorkspace, KernelPipelineReport } from "@warpgogol/werkstatt/kernel";
+import { executeKernelPipeline } from "@warpgogol/werkstatt/kernel";
+import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "./bundle-io.ts";
 
 /**
