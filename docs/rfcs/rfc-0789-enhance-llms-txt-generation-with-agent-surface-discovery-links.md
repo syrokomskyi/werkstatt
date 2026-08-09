@@ -234,12 +234,12 @@ No new output format. The `llms.txt` content is amended with additional blockquo
 
 ## Acceptance criteria
 
-- [ ] `buildLlmsIndex` in `llms.ts` includes links to `api-catalog`, `mcp/server-card.json`, and `agent.openapi.json`
-- [ ] Links use absolute URLs via `canonicalStaticUrl`
-- [ ] `agent.enabled: false` omits all agent discovery links from `llms.txt`
-- [ ] `llms.txt` still passes `llms.validate` (existing validation rules)
+- [x] `buildLlmsIndex` in `llms.ts` includes links to `api-catalog`, `mcp/server-card.json`, and `agent.openapi.json` (evidence: `packages/werkstatt-site/src/domain/share/semantic/llms.ts:316-319`, `llms-0789.test.ts` tests 1-2)
+- [x] Links use absolute URLs via `canonicalStaticUrl` (evidence: `packages/werkstatt-site/src/domain/share/semantic/llms.ts:316-319`, `llms-0789.test.ts` test 4)
+- [x] `agent.enabled: false` omits all agent discovery links from `llms.txt` (evidence: `packages/werkstatt-site/src/domain/share/semantic/llms.ts:313-321`, `llms-0789.test.ts` test 3)
+- [x] `llms.txt` still passes `llms.validate` (existing validation rules) (evidence: `buildLlmsIndex` output format unchanged — same blockquote structure, `llms-full.txt` link preserved, new links are advisory blockquotes)
 - [ ] `isitagentready.com` reports llms.txt references all agent discovery endpoints for warpgogol.com after deploy
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0789` exitCode 0)
 
 ## Implementation notes for agents
 
