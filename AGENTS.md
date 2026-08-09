@@ -21,6 +21,18 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 - `sternsystem.validate` enforces mirror topology rules: `mirrors[0]` must be non-bare, mirror paths must exist, `bundle` storageType must not use git protocols, and no embedded credentials.
 - Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces.
 
+## Werkstatt plugin contract (RFC-0770)
+
+The Werkstatt engine is stack-agnostic. Stack-specific logic (Astro, Phaser, video rendering) is contributed by a **plugin** — an npm package implementing the `werkstatt/plugin@1` contract. The engine and plugin together form a **workshop** (a consumer monorepo).
+
+- **Plugin contract:** `WerkstattPlugin` interface in `packages/werkstatt/src/plugin-contract.ts`. A plugin declares `schema: "werkstatt/plugin@1"`, an `id`, a `profileId` (matching a Forge stack profile), `moduleLoaders`, optional `pipelines`, `deployAdapters`, `hooks`, `paths`, and `invariants`.
+- **One plugin per workshop:** The engine refuses to start with zero or multiple plugins. `PluginRegistry.resolve()` throws if the count is not exactly one.
+- **Profile binding:** The plugin's `profileId` must match the `profile` field in `forge.yaml`. This is the single source of truth for stack identity.
+- **Hook list is closed:** Five hooks — `materialize`, `build`, `checkGate`, `releaseEvidence`, `scaffoldProject`. Adding a new hook requires a superseding RFC, not an amendment.
+- **Validation:** `werkstatt.plugin.validate` checks plugin registration, profile binding, module loader resolution, and deploy adapter presence. Failure modes: PLUGIN-01 (zero/multiple plugins), PLUGIN-02 (profileId mismatch), PLUGIN-03 (module loader failure), PLUGIN-04 (missing deploy adapter), PLUGIN-05 (missing kernel.config.ts).
+- **Warn-only transition:** Until `forge.yaml` has a `profile` field, PLUGIN-01 is a warning, not an error. This allows workshops to operate without a plugin during the transition period (RFC-0776).
+- **Package:** `@warpgogol/werkstatt` (`packages/werkstatt/`) owns the contract types, plugin registry, and the `werkstatt.plugin.validate` command. The module is registered in `tools/kernel.config.ts` as `werkstatt-plugin`.
+
 ## Repository setup (Git LFS)
 
 This repository uses **Git LFS** for media files. Ensure `git lfs install` has been run once in the repo before working with it, otherwise video/image files will appear as LFS pointers instead of real content. CI templates (`github-deploy.template.yml`) already include `lfs: true` in the checkout step.
