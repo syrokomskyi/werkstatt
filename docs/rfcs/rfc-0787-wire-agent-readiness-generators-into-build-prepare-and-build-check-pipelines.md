@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -22,7 +23,7 @@ supersededBy:
 amends: []
 amendedBy: []
 related:
-  - DNA-34
+  - RFC-0028
   - RFC-0783
   - RFC-0784
   - RFC-0785
@@ -31,7 +32,7 @@ related:
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
-  - DNA-34
+  - DNA-58
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -43,10 +44,7 @@ versionBump: patch
 commands:
   proposed: []
   added: []
-  changed:
-    - SITES_BUILD_PREPARE_PIPELINE
-    - SITES_BUILD_PREPARE_DEV_PIPELINE
-    - SITES_BUILD_CHECK_PIPELINE
+  changed: []
   removed: []
 appsImpacted: []
 packagesImpacted:
@@ -79,9 +77,9 @@ nonGoals:
 
 ## Context
 
-RFC-0783 through RFC-0786 introduce new agent readiness generators: `agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.markdown-negotiation.generate`, and `agent.dns-aid.generate`. Each RFC specifies pipeline integration individually. This RFC coordinates the wiring — it amends the `SITES_BUILD_PREPARE_PIPELINE`, `SITES_BUILD_PREPARE_DEV_PIPELINE`, and `SITES_BUILD_CHECK_PIPELINE` arrays in `packages/werkstatt-site/src/checks/pipelines/` to include all new generators and validators in the correct order with correct dependencies.
+RFC-0783 through RFC-0786 introduce new agent readiness generators: `agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.markdown-negotiation.generate`, and `agent.dns-aid.generate`. During implementation of those RFCs, the generators and validators were wired into the pipeline arrays individually. This RFC coordinates the final wiring state — it documents the canonical ordering in `SITES_BUILD_PREPARE_PIPELINE` and `SITES_CHECK_AUTHOR_PIPELINE`, and adjusts `SITES_BUILD_PREPARE_DEV_PIPELINE` to exclude `public/`-producing generators that are not needed for `astro dev`.
 
-The existing pipeline already runs `agent.manifest.generate` → `agent.openapi.generate` → `agent.routes.generate` → `agent.surface.sign` in `build.prepare`. The new generators must slot into this sequence.
+The existing production pipeline already runs `agent.manifest.generate` → `agent.dns-aid.generate` → `agent.openapi.generate` → `agent.api-catalog.generate` → `agent.mcp-card.generate` → `agent.routes.generate` → `agent.surface.sign` in `build.prepare`. The validators run inside `SITES_CHECK_AUTHOR_PIPELINE` (spread into `SITES_BUILD_CHECK_PIPELINE`). The dev pipeline currently includes `agent.api-catalog.generate` and `agent.mcp-card.generate` — this RFC removes them from the dev pipeline since they produce `public/.well-known/` artifacts not needed for `astro dev`.
 
 ## Problem
 
@@ -89,14 +87,14 @@ Without coordinated pipeline wiring, the new generators from RFC-0783 through RF
 
 ## Decision
 
-The `SITES_BUILD_PREPARE_PIPELINE` and `SITES_BUILD_PREPARE_DEV_PIPELINE` arrays are amended to include the new agent readiness generators after `agent.surface.sign` and before `public.infrastructure.generate`. The `SITES_BUILD_CHECK_PIPELINE` is amended to include the new validators after `agent.surface.validate` (which already runs in `SITES_CHECK_AUTHOR_PIPELINE`).
+The `SITES_BUILD_PREPARE_PIPELINE` already includes all new agent readiness generators before `agent.surface.sign` (manifest → dns-aid → openapi → api-catalog → mcp-card → routes → sign). This ordering is correct: all generators run before signing so the signed manifest is the authoritative artifact. The `SITES_CHECK_AUTHOR_PIPELINE` already includes the new validators (`agent.dns-aid.validate`, `agent.api-catalog.validate`, `agent.mcp-card.validate`) after `agent.surface.validate`. This RFC adjusts `SITES_BUILD_PREPARE_DEV_PIPELINE` to remove `agent.api-catalog.generate` and `agent.mcp-card.generate` (they produce `public/.well-known/` artifacts not needed for `astro dev`) and documents the canonical production pipeline state.
 
 ## Architectural fit
 
-- **DNA-34** (`.well-known/` discovery) — pipeline wiring ensures all discovery artifacts are generated and validated automatically.
-- **DNA-58** (generated-file determinism) — pipeline runs generators in deterministic order, ensuring reproducible builds.
+- **DNA-58** (generated-file determinism) — pipeline runs generators in deterministic order, ensuring reproducible builds. The linear pipeline array enforces a single canonical ordering for all agent readiness generators.
+- **RFC-0028** (`.well-known/` discovery) — pipeline wiring ensures all discovery artifacts are generated and validated automatically. DNA-34 was reclassified to feature by RFC-0161; the governing RFC is RFC-0028.
 - **Site OS operator model** — pipeline amendments are in `packages/werkstatt-site/src/checks/pipelines/`, the canonical location for pipeline definitions.
-- **Dependency ordering** — generators that read the manifest (`agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.dns-aid.generate`) must run after `agent.manifest.generate`. `agent.markdown-negotiation.generate` must run after `page.markdown.generate`. `public.infrastructure.generate` (which emits Link headers per RFC-0784) must run after the agent generators so Link headers can reference all endpoints.
+- **Dependency ordering** — generators that read the manifest (`agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.dns-aid.generate`) must run after `agent.manifest.generate`. `agent.markdown-negotiation.generate` must run after `page.markdown.generate` (it depends on twins existing). `public.infrastructure.generate` (which emits Link headers per RFC-0784) must run after the agent generators so Link headers can reference all endpoints. All agent generators run before `agent.surface.sign` so the signed manifest is authoritative.
 
 ## Design
 
@@ -106,36 +104,62 @@ No new commands. This RFC amends pipeline arrays only.
 
 ### Pipeline amendments
 
-**`SITES_BUILD_PREPARE_PIPELINE`** (and `SITES_BUILD_PREPARE_DEV_PIPELINE` where applicable):
+**`SITES_BUILD_PREPARE_PIPELINE`** (in `build-prepare.ts`) — existing canonical ordering:
 
 ```ts
-// After agent.surface.sign (line ~77 in build-prepare.ts):
-  { command: "agent.surface.sign" },
-  // RFC-0783: API Catalog + MCP Server Card generators (read manifest)
+  { command: "agent.manifest.generate" },
+  // RFC-0786: DNS-AID declaration (reads manifest)
+  { command: "agent.dns-aid.generate" },
+  // RFC-0289: OpenAPI projection
+  { command: "agent.openapi.generate" },
+  // RFC-0783: API Catalog + MCP Server Card (read manifest)
   { command: "agent.api-catalog.generate" },
   { command: "agent.mcp-card.generate" },
-  // RFC-0786: DNS-AID declaration generator (reads manifest)
-  { command: "agent.dns-aid.generate" },
-  // ... existing generators continue ...
+  // RFC-0290: Agent Gate route re-exports
+  { command: "agent.routes.generate" },
+  // RFC-0308: sign manifest, knowledge, OpenAPI (after all generators)
+  { command: "agent.surface.sign" },
+  // ... non-agent generators continue ...
   { command: "public.infrastructure.generate" }, // RFC-0784: Link headers
-  // ... existing generators continue ...
+  // ... later in pipeline ...
   { command: "page.markdown.generate" },
-  // RFC-0785: Markdown content negotiation Pages Function (after twins exist)
+  // RFC-0785: markdown content negotiation middleware (after twins exist)
   { command: "agent.markdown-negotiation.generate" },
 ```
 
-**`SITES_BUILD_CHECK_PIPELINE`**:
+All agent generators run before `agent.surface.sign` so the signed manifest is authoritative. No changes needed to the production pipeline ordering.
+
+**`SITES_CHECK_AUTHOR_PIPELINE`** (in `sites-check-author.ts`) — validators already included:
 
 ```ts
-// After SITES_CHECK_AUTHOR_PIPELINE (which includes agent.surface.validate):
-  ...SITES_CHECK_AUTHOR_PIPELINE,
-  // RFC-0783: validate API Catalog + MCP Server Card
+  { command: "agent.surface.validate" },
+  { command: "agent.openapi.validate" },
+  // RFC-0786: DNS-AID TXT record validation
+  { command: "agent.dns-aid.validate" },
+  // RFC-0783: API Catalog + MCP Server Card validation
   { command: "agent.api-catalog.validate" },
   { command: "agent.mcp-card.validate" },
-  // RFC-0786: validate DNS-AID declaration
-  { command: "agent.dns-aid.validate" },
-  // ... existing checks continue ...
+  { command: "agent.surface.verify" },
 ```
+
+These validators are spread into `SITES_BUILD_CHECK_PIPELINE` via `...SITES_CHECK_AUTHOR_PIPELINE`. No changes needed.
+
+**`SITES_BUILD_PREPARE_DEV_PIPELINE`** (in `build-prepare.ts`) — this RFC removes two steps:
+
+```ts
+  { command: "agent.manifest.generate" },
+  { command: "agent.openapi.generate" },
+  // RFC-0783: REMOVE from dev pipeline — produces public/.well-known/ artifacts
+  // { command: "agent.api-catalog.generate" },  ← remove
+  // { command: "agent.mcp-card.generate" },      ← remove
+  { command: "agent.routes.generate" },
+  { command: "agent.surface.sign" },
+  // ... src/-producing generators continue ...
+  // RFC-0785: markdown negotiation middleware (src/ artifact, needed in dev for testing)
+  { command: "agent.markdown-negotiation.generate" },
+```
+
+`agent.dns-aid.generate` is already absent from the dev pipeline (it writes to `systems/<id>/dns-records.yaml`, a workspace-level file not needed for `astro dev`). `agent.markdown-negotiation.generate` writes to `src/middleware/markdown-negotiation.ts` — a `src/` artifact needed in dev for testing content negotiation, so it stays.
 
 ### TypeScript contracts
 
@@ -145,10 +169,11 @@ No new types. The pipeline arrays are `KernelPipelineStep[]` — the amendment i
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | Amended — add 4 new generator steps |
-| `packages/werkstatt-site/src/checks/pipelines/build-check.ts` | Amended — add 3 new validator steps |
+| `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | Amended — remove `agent.api-catalog.generate` and `agent.mcp-card.generate` from `SITES_BUILD_PREPARE_DEV_PIPELINE` |
+| `packages/werkstatt-site/src/checks/pipelines/sites-check-author.ts` | No changes — validators already present |
+| `packages/werkstatt-site/src/checks/pipelines/build-check.ts` | No changes — validators spread from `SITES_CHECK_AUTHOR_PIPELINE` |
 
-No new files. No changes to `build-prepare-dev.ts` — it imports from `build-prepare.ts`.
+No new files. Both `SITES_BUILD_PREPARE_PIPELINE` and `SITES_BUILD_PREPARE_DEV_PIPELINE` are defined in `build-prepare.ts`.
 
 ### Output format
 
@@ -158,13 +183,13 @@ No new output format. Pipeline steps produce the same `KernelCommandResult` as w
 
 - **Generator fails in pipeline**: Pipeline aborts with non-zero exit code, same as any pipeline step failure. The operator sees which command failed and the error message.
 - **`agent.enabled: false`**: All agent generators skip (return `status: "skip"`), pipeline continues. This is already the pattern for `agent.manifest.generate` and `agent.openapi.generate`.
-- **Dev pipeline**: `SITES_BUILD_PREPARE_DEV_PIPELINE` includes the agent generators that produce `src/` artifacts (manifest, openapi, routes, sign) but excludes generators that produce `public/` artifacts (api-catalog, mcp-card, dns-aid, markdown-negotiation) since those are not needed for `astro dev`.
+- **Dev pipeline**: `SITES_BUILD_PREPARE_DEV_PIPELINE` includes agent generators that produce `src/` artifacts (manifest, openapi, routes, sign, markdown-negotiation) but excludes generators that produce `public/` artifacts (api-catalog, mcp-card) since those are not needed for `astro dev`. `agent.dns-aid.generate` is excluded because it writes to `systems/<id>/dns-records.yaml` (workspace-level, not needed for dev). `agent.markdown-negotiation.generate` is included because it writes to `src/middleware/markdown-negotiation.ts` (needed for testing in dev).
 
 ## Rollout
 
 - **Adoption**: Pipeline amendments take effect on the next `build.prepare` run. All existing apps automatically get the new generators.
 - **No flag day**: The new generators are additive — they produce new files without modifying existing output. Existing builds continue to work.
-- **Dev pipeline**: The dev pipeline includes only `src/`-producing agent generators (manifest, openapi, routes, sign). The `public/`-producing generators (api-catalog, mcp-card, dns-aid, markdown-negotiation) are excluded from dev — they are only needed for production builds.
+- **Dev pipeline**: The dev pipeline includes `src/`-producing agent generators (manifest, openapi, routes, sign, markdown-negotiation). The `public/`-producing generators (api-catalog, mcp-card) are excluded from dev — they are only needed for production builds. `agent.dns-aid.generate` is excluded because it writes to a workspace-level file, not a `src/` or `public/` artifact.
 - **Dependency**: This RFC must be implemented after RFC-0783 through RFC-0786. The pipeline steps reference commands that must already be registered.
 
 ## Alternatives considered
@@ -181,10 +206,11 @@ No new output format. Pipeline steps produce the same `KernelCommandResult` as w
 
 ## Acceptance criteria
 
-- [ ] `SITES_BUILD_PREPARE_PIPELINE` includes `agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.dns-aid.generate` after `agent.surface.sign`
+- [ ] `SITES_BUILD_PREPARE_PIPELINE` includes `agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.dns-aid.generate` before `agent.surface.sign` and after `agent.manifest.generate`
 - [ ] `SITES_BUILD_PREPARE_PIPELINE` includes `agent.markdown-negotiation.generate` after `page.markdown.generate`
-- [ ] `SITES_BUILD_CHECK_PIPELINE` includes `agent.api-catalog.validate`, `agent.mcp-card.validate`, `agent.dns-aid.validate`
-- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` includes only `src/`-producing agent generators (no `public/` generators)
+- [ ] `SITES_CHECK_AUTHOR_PIPELINE` includes `agent.api-catalog.validate`, `agent.mcp-card.validate`, `agent.dns-aid.validate` after `agent.surface.validate`
+- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` excludes `agent.api-catalog.generate` and `agent.mcp-card.generate` (public/ producers not needed for dev)
+- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` includes `agent.markdown-negotiation.generate` (src/ producer needed for dev testing)
 - [ ] `build.prepare` runs all new generators in correct order without manual intervention
 - [ ] `build.check` validates all new artifacts and reports drift
 - [ ] `agent.enabled: false` sites skip all new generators without errors
@@ -198,5 +224,5 @@ No new output format. Pipeline steps produce the same `KernelCommandResult` as w
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0787 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - This RFC MUST be implemented after RFC-0783 through RFC-0786 — the pipeline steps reference commands registered by those RFCs.
-- The dev pipeline (`SITES_BUILD_PREPARE_DEV_PIPELINE`) MUST NOT include `public/`-producing generators (api-catalog, mcp-card, dns-aid, markdown-negotiation) — they are not needed for `astro dev` and would slow startup.
-- Pipeline step ordering: `agent.api-catalog.generate` and `agent.mcp-card.generate` MUST run after `agent.manifest.generate` (they read the manifest). `agent.dns-aid.generate` MUST also run after `agent.manifest.generate`. `agent.markdown-negotiation.generate` MUST run after `page.markdown.generate` (it depends on twins existing).
+- The dev pipeline (`SITES_BUILD_PREPARE_DEV_PIPELINE`) MUST NOT include `public/`-producing generators (api-catalog, mcp-card) — they are not needed for `astro dev` and would slow startup. `agent.dns-aid.generate` is also excluded (writes to workspace-level `systems/<id>/dns-records.yaml`). `agent.markdown-negotiation.generate` IS included (writes to `src/middleware/markdown-negotiation.ts`, needed for dev testing).
+- Pipeline step ordering: `agent.api-catalog.generate` and `agent.mcp-card.generate` MUST run after `agent.manifest.generate` (they read the manifest). `agent.dns-aid.generate` MUST also run after `agent.manifest.generate`. `agent.markdown-negotiation.generate` MUST run after `page.markdown.generate` (it depends on twins existing). All agent generators MUST run before `agent.surface.sign` so the signed manifest is authoritative.
