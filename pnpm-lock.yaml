@@ -738,6 +738,9 @@ importers:
       '@warpgogol/tokens':
         specifier: workspace:*
         version: link:../../tokens
+      '@warpgogol/werkstatt-site':
+        specifier: workspace:*
+        version: link:../../werkstatt-site
       ai:
         specifier: ^7.0.47
         version: 7.0.47(zod@4.4.3)
@@ -1407,14 +1410,14 @@ importers:
         specifier: ^1.14.0
         version: 1.14.0
       '@syrokomskyi/axiom-capture':
-        specifier: link:../../../../pipelines/packages/axiom/axiom-capture
-        version: link:../../../../pipelines/packages/axiom/axiom-capture
+        specifier: link:../../../pipelines/packages/axiom/axiom-capture
+        version: link:../../../pipelines/packages/axiom/axiom-capture
       '@syrokomskyi/axiom-factory-app':
-        specifier: link:../../../../pipelines/apps/axiom/factory
-        version: link:../../../../pipelines/apps/axiom/factory
+        specifier: link:../../../pipelines/apps/axiom/factory
+        version: link:../../../pipelines/apps/axiom/factory
       '@syrokomskyi/axiom-study':
-        specifier: link:../../../../pipelines/packages/axiom/axiom-study
-        version: link:../../../../pipelines/packages/axiom/axiom-study
+        specifier: link:../../../pipelines/packages/axiom/axiom-study
+        version: link:../../../pipelines/packages/axiom/axiom-study
       '@warpgogol/agent-gate':
         specifier: workspace:*
         version: link:../agent-gate
