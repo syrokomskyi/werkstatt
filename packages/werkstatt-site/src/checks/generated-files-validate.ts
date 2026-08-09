@@ -14,10 +14,10 @@
 <CHANGE_SUMMARY>
   <item>RFC-0375: initial implementation.</item>
   <item>RFC-0612: extract expandOwnershipPlaceholders as shared utility for reuse by ownership.sync.validate and generated.stale.validate.</item>
+  <item>RFC-0790: replace systems/registry.yaml IO with convention-based discoverSystems + resolveCacheClonePath from @warpgogol/werkstatt/sternsystem.</item>
 </CHANGE_SUMMARY>
 */
-import { join, relative, resolve } from "node:path";
-import { readFile } from "node:fs/promises";
+import { join, relative } from "node:path";
 import type {
   CheckResult,
   Diagnostic,
@@ -26,8 +26,11 @@ import type {
   KernelRuntimeContext,
   WorkspaceIO,
 } from "@warpgogol/werkstatt/kernel";
+import {
+  resolveCacheClonePath as resolveCacheClonePathSync,
+  discoverSystems,
+} from "@warpgogol/werkstatt/sternsystem";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import { parse as yamlParse } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 
@@ -91,49 +94,11 @@ async function checkFileExists(io: WorkspaceIO, filePath: string): Promise<boole
   return io.exists(filePath);
 }
 
-interface RegistryMirror {
-  path: string;
-  storageType?: string;
-}
-
-interface RegistrySystem {
-  id: string;
-  mirrors?: RegistryMirror[];
-}
-
-interface RegistryFile {
-  systems?: RegistrySystem[];
-}
-
-async function resolveCacheClonePath(
-  workspaceRoot: string,
-  systemId: string,
-): Promise<string | null> {
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  try {
-    const raw = await readFile(registryPath, "utf8");
-    const registry = yamlParse(raw) as RegistryFile;
-    const entry = registry.systems?.find((s) => s.id === systemId);
-    if (!entry?.mirrors?.[0]?.path) return null;
-    return resolve(workspaceRoot, entry.mirrors[0].path);
-  } catch {
-    return null;
-  }
-}
-
 async function resolveAllCacheClonePaths(workspaceRoot: string): Promise<Map<string, string>> {
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   const result = new Map<string, string>();
-  try {
-    const raw = await readFile(registryPath, "utf8");
-    const registry = yamlParse(raw) as RegistryFile;
-    for (const entry of registry.systems ?? []) {
-      if (entry.mirrors?.[0]?.path) {
-        result.set(entry.id, resolve(workspaceRoot, entry.mirrors[0].path));
-      }
-    }
-  } catch {
-    // no registry — return empty map
+  const { systems } = await discoverSystems(workspaceRoot);
+  for (const sys of systems) {
+    result.set(sys.id, resolveCacheClonePathSync(workspaceRoot, sys.id));
   }
   return result;
 }
@@ -271,8 +236,7 @@ export async function runGeneratedFilesValidate(
       }
 
       const cachePath =
-        allCacheClones.get(systemId) ??
-        (await resolveCacheClonePath(context.workspaceRoot, systemId));
+        allCacheClones.get(systemId) ?? resolveCacheClonePathSync(context.workspaceRoot, systemId);
       if (cachePath) {
         const resolvedPath = join(cachePath, restAfterSystemId);
         const exists = await checkFileExists(context.io, resolvedPath);
