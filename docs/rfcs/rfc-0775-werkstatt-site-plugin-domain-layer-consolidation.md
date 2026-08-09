@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,7 +25,10 @@ amendedBy: []
 related:
   - RFC-0769
   - RFC-0770
+  - RFC-0771
+  - RFC-0773
   - RFC-0774
+  - RFC-0776
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -45,7 +49,34 @@ commands:
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
-packagesImpacted: []
+packagesImpacted:
+  - packages/ui
+  - packages/pbp
+  - packages/pbp-rate-adapters
+  - packages/ontology
+  - packages/tokens
+  - packages/share
+  - packages/growth
+  - packages/growth-adapter-matomo
+  - packages/growth-adapter-null
+  - packages/growth-adapter-plausible
+  - packages/integration
+  - packages/integration-adapter-stripe
+  - packages/integration-adapter-supabase-crm
+  - packages/chat
+  - packages/chat-adapter-null
+  - packages/chat-adapter-uchat
+  - packages/surface
+  - packages/geo
+  - packages/faq
+  - packages/passport
+  - packages/content-source
+  - packages/studio-gate
+  - packages/check-core
+  - packages/check-runner-node
+  - packages/observability
+  - packages/nebula
+  - packages/star-map
 successSignals:
   - "All site domain packages consolidated into packages/werkstatt-site"
   - "warpgogol-com builds and deploys end-to-end using the consolidated plugin"
@@ -53,6 +84,7 @@ nonGoals:
   - "No engine modules — that is RFC-0774"
   - "No workshop migration — RFC-0776"
   - "No new domain features"
+  - "No warpgogol-skills consolidation — RFC-0771 (implemented) places warpgogol-skills in workshop-local, never published"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -75,7 +107,7 @@ nonGoals:
 
 ## Context
 
-RFC-0774 composes the engine half of `@warpgogol/werkstatt-site`. This RFC composes the **domain half**: the business-specific packages that make a site workshop produce real Astro sites — UI components, PBP entities, ontology, tokens, share utilities, growth adapters, integration adapters, chat, surface, geo, FAQ, passport, content-source, studio-gate, check-core, check-runner-node, and warpgogol-skills. Per operator decision, all site domain packages consolidate into the one site plugin package.
+RFC-0774 composes the engine half of `@warpgogol/werkstatt-site`. This RFC composes the **domain half**: the business-specific packages that make a site workshop produce real Astro sites — UI components, PBP entities, ontology, tokens, share utilities, growth adapters, integration adapters, chat, surface, geo, FAQ, passport, content-source, studio-gate, check-core, check-runner-node, observability, nebula, and star-map. Per operator decision, all site domain packages consolidate into the one site plugin package. `warpgogol-skills` is explicitly excluded — RFC-0771 (implemented) places it in workshop-local.
 
 ## Problem
 
@@ -106,24 +138,35 @@ All site domain packages fold into `packages/werkstatt-site/src/domain/`:
 | `domain/observability/` | `packages/observability` |
 | `domain/nebula/` | `packages/nebula` |
 | `domain/star-map/` | `packages/star-map` |
-| `domain/skills/` | `packages/warpgogol-skills` |
 
 ### Subpath exports
 
-The plugin re-exports domain packages under `@warpgogol/werkstatt-site/<name>` (e.g. `@warpgogol/werkstatt-site/ui`, `@warpgogol/werkstatt-site/pbp`) so existing import specifiers in workpiece code map mechanically: `@warpgogol/ui` → `@warpgogol/werkstatt-site/ui`, etc. The RFC-0776 migration sweep performs this rewrite.
+The plugin re-exports domain packages under `@warpgogol/werkstatt-site/<name>` so existing import specifiers in workpiece code map mechanically. Each source package gets its own subpath export — including adapter sub-packages:
+
+| Old specifier                           | New specifier                                          |
+| --------------------------------------- | ------------------------------------------------------ |
+| `@warpgogol/ui`                         | `@warpgogol/werkstatt-site/ui`                         |
+| `@warpgogol/pbp`                        | `@warpgogol/werkstatt-site/pbp`                        |
+| `@warpgogol/growth`                     | `@warpgogol/werkstatt-site/growth`                     |
+| `@warpgogol/growth-adapter-matomo`      | `@warpgogol/werkstatt-site/growth-adapter-matomo`      |
+| `@warpgogol/integration-adapter-stripe` | `@warpgogol/werkstatt-site/integration-adapter-stripe` |
+| `@warpgogol/chat-adapter-uchat`         | `@warpgogol/werkstatt-site/chat-adapter-uchat`         |
+
+Multi-package domain modules (growth, integration, chat) keep each adapter as a distinct subpath export so consumers can tree-shake unused adapters. The RFC-0776 migration sweep performs the mechanical rewrite.
 
 ### Cross-cutting rules
 
 1. **Intra-plugin imports only.** Domain modules may import each other and the engine (`@warpgogol/werkstatt`); they must not import `@warpgogol/forge` or workshop-local packages.
 2. **LFS assets travel with the plugin.** `packages/ui` has LFS-tracked LordIcon JSON and PNG assets; these move into `domain/ui/` and the plugin's `.gitattributes` covers them. RFC-0773 verification gate catches LFS pointer issues.
-3. **Skill packs.** `warpgogol-skills` becomes `domain/skills/` and is still discovered via `forge.yaml` `skillPacks` — the pack prefix `wg` and dir path change to point inside the plugin.
+3. **`checks/` vs `domain/check-core/` boundary.** RFC-0774 places site validators (from `site-kernel-checks`) in `checks/`. This RFC places `packages/check-core` and `packages/check-runner-node` in `domain/check-core/` and `domain/check-runner/`. The distinction: `checks/` contains site-specific validators registered through the plugin's `moduleLoaders`; `domain/check-core/` contains the generic check framework that `checks/` builds on. `checks/` imports from `domain/check-core/`, not the reverse.
+4. **`domain/observability/` vs engine `observability/`.** RFC-0771 sends `packages/os/site-kernel-observability` to the engine as `observability/`. This RFC sends `packages/observability` (a separate package) to `domain/observability/`. They are distinct: the engine module is the observability framework; the domain module is the site-specific observability configuration and adapters.
 
 ## Architectural fit
 
-- **DNA-5, 17 (Mirror Quintet)** — UI sections/components keep their `.astro` + `.manifest.yaml` + `.css` + content `.md` + schema quintet; the plugin is the new home, the contract is unchanged.
-- **DNA-20 (superseded by RFC-0471, PBP)** — PBP lives in `domain/pbp/`; the `pbp/*@1` namespace is preserved as `@warpgogol/werkstatt-site/pbp`.
-- **DNA-56 (Studio Gate)** — `domain/studio-gate/` is the MCP server; it imports engine mission commands through the plugin's `moduleLoaders`, not through static engine imports.
-- **DNA-64** — domain modules are inside the plugin, not the engine; the autonomy guard (RFC-0772) does not scan them.
+- **DNA-5, 17 (Mirror Quintet)** — UI sections/components keep their `.astro` + `.manifest.yaml` + `.css` + content `.md` + schema quintet; the plugin is the new home, the contract is unchanged. These invariants are preserved, not extended.
+- **DNA-20 (superseded by RFC-0471, PBP)** — PBP lives in `domain/pbp/`; the `pbp/*@1` namespace is preserved as `@warpgogol/werkstatt-site/pbp`. Preserved, not extended.
+- **DNA-56 (Studio Gate)** — `domain/studio-gate/` is the MCP server; it imports engine mission commands through the plugin's `moduleLoaders`, not through static engine imports. Preserved, not extended.
+- **DNA-64 (engine/plugin/workshop boundary, RFC-0769)** — domain modules are inside the plugin, not the engine; the autonomy guard (RFC-0772) does not scan them. DNA-64 is not yet in `satisfies[]` because RFC-0769 is still `draft`; once RFC-0769 is accepted and DNA-64 is appended to `docs/architecture-dna.md`, this RFC should add DNA-64 to `satisfies[]`.
 
 ## Design
 
@@ -138,7 +181,7 @@ packages/werkstatt-site/
 │       ├── ui/  pbp/  ontology/  tokens/  share/  growth/
 │       ├── integration/  chat/  surface/  geo/  faq/  passport/
 │       ├── content-source/  studio-gate/  check-core/  check-runner/
-│       ├── observability/  nebula/  star-map/  skills/
+│       ├── observability/  nebula/  star-map/
 │       └── index.ts          ← barrel re-exporting subpath exports
 ├── extract.config.yaml       ← RFC-0773
 └── package.json
@@ -146,14 +189,18 @@ packages/werkstatt-site/
 
 ### File system responsibilities
 
-| Path | Role |
-|---|---|
-| `packages/werkstatt-site/src/domain/**` | Consolidated domain modules |
-| old `packages/{ui,pbp,ontology,tokens,share,growth,...}` | Deleted after move |
+| Path                                                     | Role                        |
+| -------------------------------------------------------- | --------------------------- |
+| `packages/werkstatt-site/src/domain/**`                  | Consolidated domain modules |
+| old `packages/{ui,pbp,ontology,tokens,share,growth,...}` | Deleted after move          |
 
 ### Failure modes
 
-No new failure modes beyond those of the individual packages. The consolidation is mechanical: imports change, behavior does not.
+The consolidation is mechanical: imports change, behavior does not. However, three new failure surfaces emerge from the physical reorganization:
+
+1. **Misconfigured subpath exports** — if `package.json` `exports` map is incomplete or points to wrong paths, workpiece imports fail at resolution time. Mitigation: the acceptance criterion on subpath exports (below) and `imports.validate` in the RFC-0776 sweep.
+2. **LFS pointer files in extraction** — if `packages/ui` LFS assets are not properly materialized during `repo-extract`, the published tarball contains pointer files instead of real content. Mitigation: RFC-0773 dry-run verification gate (step 3).
+3. **Circular imports between `domain/share/` and engine `src/schemas/`** — if the share/ontology split boundary is not clean, the plugin and engine form an import cycle. Mitigation: the split follows RFC-0771's rule (operations schemas → engine; UI taxonomy → site plugin); `werkstatt.autonomy.validate` (RFC-0772) scans engine modules for `@warpgogol/*` imports, and TypeScript project references detect cycles at build time.
 
 ## Rollout
 
@@ -169,17 +216,22 @@ No new failure modes beyond those of the individual packages. The consolidation 
 ## Risks
 
 - **Package size.** `packages/ui` alone is the largest package in the monorepo (2683 items). The consolidated plugin will be very large. Mitigation: subpath exports keep tree-shaking effective; consumers only pull what they import.
+- **TypeScript resolution speed.** Consolidating ~27 packages into one `tsconfig.json` project may slow down TypeScript project resolution. Mitigation: subpath exports with explicit `types` fields allow consumers to resolve types without scanning the entire package.
 - **LFS binary assets.** LordIcon JSON files, PNGs. RFC-0773 verification gate (step 3) catches pointer files.
-- **`share`/`ontology` split boundary.** RFC-0771 sends operations schemas to the engine; the site-facing remainder comes here. The split must be clean — no circular imports between `domain/share/` and engine `src/schemas/`.
+- **`share`/`ontology` split boundary.** RFC-0771 sends operations schemas to the engine; the site-facing remainder comes here. The split must be clean — no circular imports between `domain/share/` and engine `src/schemas/`. The boundary is defined by RFC-0771's rule: operations schemas (mission, release, leitstand, sternsystem, werkstatt, artifact-store, naming-policy) → engine; UI taxonomy, page/content schemas → site plugin. `werkstatt.autonomy.validate` (RFC-0772) enforces no `@warpgogol/*` imports in engine; TypeScript project references detect cycles.
+- **Test fixture paths.** Many tests build temp workspaces referencing old package names (`@warpgogol/ui`, `@warpgogol/pbp`, etc.). The consolidation must update all fixture import paths. Budget explicit time for fixture repair in the implementation plan.
 
 ## Acceptance criteria
 
 - [ ] All site domain packages moved into `packages/werkstatt-site/src/domain/`
-- [ ] Subpath exports `@warpgogol/werkstatt-site/<name>` work for each domain module
+- [ ] Subpath exports `@warpgogol/werkstatt-site/<name>` work for each domain module, including adapter sub-packages
+- [ ] Existing test suites pass without assertion changes after the move
+- [ ] No dangling imports to old `@warpgogol/<name>` specifiers remain in the plugin or workpiece
 - [ ] `packages/ui` sections and components build and render correctly in warpgogol-com
 - [ ] LFS assets materialize correctly in extraction dry-run (RFC-0773)
 - [ ] Old domain package directories deleted
 - [ ] `rfc.validate` passes on this file before merging
+
 ## Implementation notes for agents
 
 <!-- Rules that govern how AI agents interact with this RFC.
