@@ -31,9 +31,9 @@ batchPolicy:
   push: false
 acceptance:
   commands:
-    - pnpm exec site-kernel run diagnostic.shape.lint --json
-    - pnpm exec site-kernel run diagnostic.shape.lint --write-baseline --json
-    - pnpm exec site-kernel run check.fixture.lint --json
+    - pnpm exec werkstatt run diagnostic.shape.lint --json
+    - pnpm exec werkstatt run diagnostic.shape.lint --write-baseline --json
+    - pnpm exec werkstatt run check.fixture.lint --json
 notes:
   - "Suggested batch order: growth-*, integration, consent, funnel modules first — their diagnostics are what agents see most."
   - "Write the red fixture first, then migrate to diagnosticsResult with fine-grained ruleIds and file:line locators."

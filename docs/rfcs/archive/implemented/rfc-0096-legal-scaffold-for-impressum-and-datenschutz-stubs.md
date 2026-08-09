@@ -58,8 +58,8 @@ Add `legal.scaffold` — an app-scope kernel command that for each DE/AT/CH loca
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run legal.scaffold --app <id>
-pnpm exec site-kernel run legal.scaffold --app <id> --force   # overwrite existing stubs
+pnpm exec werkstatt run legal.scaffold --app <id>
+pnpm exec werkstatt run legal.scaffold --app <id> --force   # overwrite existing stubs
 ```
 
 ### Inputs (read from `system.md`)
@@ -169,7 +169,7 @@ Re-run:
 - [x] `packages/os/site-kernel-codegen/src/templates/legal/de/` ships four templates (impressum / datenschutz page+prose). (evidence: packages/ directory, package exists)
 - [x] `legal.scaffold` command registered, scope: app, supportsAllApps: true. (evidence: implemented historically)
 - [x] All six output paths declared in `GENERATOR_OWNERSHIP_MAP`; `generator.ownership.lint` exits 0. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run legal.scaffold --app <fresh-DE-app>` produces a working footer immediately; `footer.legal.validate` exits 0 after one run. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run legal.scaffold --app <fresh-DE-app>` produces a working footer immediately; `footer.legal.validate` exits 0 after one run. (evidence: implemented historically)
 - [x] Second run of the same command writes 0 files (idempotency per RFC-0087). (evidence: implemented historically)
 - [x] `.agents/workflows/02-scaffold.md` updated with the new step. (evidence: implemented historically)
 - [x] Root `AGENTS.md` mentions `legal.scaffold` under the onboarding section. (evidence: AGENTS.md:1, agent guide updated)

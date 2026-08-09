@@ -66,7 +66,7 @@ nonGoals:
   - "Do not implement actor identity for non-mission git operations (platform code commits in packages/*) — that is IDE workflow, governed by git config."
   - "Do not implement delegation chains for commit signing — only the direct actor signs."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -118,13 +118,13 @@ The `actor` field in mission manifests and Bordbuch entries becomes a VC subject
 
 ```sh
 # Mission open with actor from auth context (Studio Gate sets WERKSTATT_ACTOR_ID)
-pnpm exec site-kernel run mission.open --system warpgogol-com --brief "Update homepage" --actor-from-auth --json
+pnpm exec werkstatt run mission.open --system warpgogol-com --brief "Update homepage" --actor-from-auth --json
 
 # Mission open with explicit actor (CLI direct access, backwards compatible)
-pnpm exec site-kernel run mission.open --system warpgogol-com --brief "Update homepage" --actor did:web:warpgogol.com#operator-v1 --json
+pnpm exec werkstatt run mission.open --system warpgogol-com --brief "Update homepage" --actor did:web:warpgogol.com#operator-v1 --json
 
 # Git commit with Ed25519 signature (uses PASSPORT_SIGNING_KEY)
-pnpm exec site-kernel run mission.git.commit --mission warpgogol-com-m000015 --message "Update hero section" --json
+pnpm exec werkstatt run mission.git.commit --mission warpgogol-com-m000015 --message "Update hero section" --json
 ```
 
 The `--actor-from-auth` flag reads `WERKSTATT_ACTOR_ID` and `WERKSTATT_ACTOR_SITE` env vars set by Studio Gate auth middleware. If both `--actor` and `--actor-from-auth` are provided, `--actor-from-auth` takes precedence.

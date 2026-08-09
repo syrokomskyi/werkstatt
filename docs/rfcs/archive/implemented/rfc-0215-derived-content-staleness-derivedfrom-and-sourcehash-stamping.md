@@ -98,10 +98,10 @@ While a derivative is `outdated`, policy (per `system.md`) chooses: report only,
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.derived.validate --app warpgogol-com
-pnpm exec site-kernel run content.derived.validate --app warpgogol-com --json
+pnpm exec werkstatt run content.derived.validate --app warpgogol-com
+pnpm exec werkstatt run content.derived.validate --app warpgogol-com --json
 # Re-stamp after updating a derivative (records current source hash + bumps asOf)
-pnpm exec site-kernel run content.derived.stamp --app warpgogol-com \
+pnpm exec werkstatt run content.derived.stamp --app warpgogol-com \
   --subject "business/uk/offer#priceDescription"
 ```
 

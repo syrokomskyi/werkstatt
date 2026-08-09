@@ -49,7 +49,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0585`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0585`
 
 ## 3. Step sequence
 
@@ -210,18 +210,18 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0585` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0585` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test` — must pass.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0585 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0585 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0585`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0585`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -232,7 +232,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0585`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0585`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -253,5 +253,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48/52/53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0585 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48/52/53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0585 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `behavior.snapshot.capture` or `behavior.snapshot.diff` cannot be called in-process from `release.prepare` (e.g., due to circular import), escalate to the operator — do not duplicate the logic.

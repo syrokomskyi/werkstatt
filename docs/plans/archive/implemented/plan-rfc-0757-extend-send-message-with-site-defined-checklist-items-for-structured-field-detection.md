@@ -57,12 +57,12 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run props.types.generate` — regenerate types
+- `pnpm exec werkstatt run props.types.generate` — regenerate types
 - `pnpm --filter @warpgogol/ontology build:check` — typecheck ontology
 - `pnpm --filter @warpgogol/ui build:check` — typecheck UI
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck handoff
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — run migrator tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0757` — validate RFC
+- `pnpm exec werkstatt run rfc.validate --id RFC-0757` — validate RFC
 
 ## 3. Step sequence
 
@@ -82,7 +82,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0757`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0757`
 - `pnpm --filter @warpgogol/ontology build:check`
 
 **Completion criterion:** Both YAML files have `checklistItems` in their `propsSchema` with the correct item shape; versions bumped to 1.3.0; typecheck passes.
@@ -97,7 +97,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run props.types.generate`
+- Run `pnpm exec werkstatt run props.types.generate`
 - Verify `packages/ui/src/sections/send-message/send-message-section.types.generated.ts` contains `checklistItems?: ChecklistItem[]` (or equivalent generated type)
 
 **Validation:**
@@ -225,12 +225,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0757 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0757 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0757`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0757`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -242,12 +242,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0757`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0757`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/ui build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0757` (if acceptance probes declared — currently commented out, so this will be a no-op)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0757` (if acceptance probes declared — currently commented out, so this will be a no-op)
 
 ### 4.2 Evidence artifacts
 
@@ -265,4 +265,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-17, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0757 --reason "..." --invariant "DNA-17"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-17, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0757 --reason "..." --invariant "DNA-17"` instead of working around it (RFC-0334).

@@ -23,7 +23,7 @@ Pass с одним warning:
 ## Axis A — Structural completeness
 
 - **Decision** — present tense, одно решение. OK.
-- **CLI surface** — точная команда `pnpm exec site-kernel run suppressions.validate --json`. OK.
+- **CLI surface** — точная команда `pnpm exec werkstatt run suppressions.validate --json`. OK.
 - **TypeScript contracts** — минимальная сигнатура `titlePatternContainsRuleId`. OK.
 - **File system responsibilities** — см. Axis C (расхождение с `content-surface.ts`).
 - **Output format** — JSON-пример корректен и соответствует формату `CheckResult`.

@@ -252,10 +252,10 @@ The industry page (depth-1 of `website-local`) gains a service catalog block tha
 
 ```sh
 # Validate service records against the publication gate + claim policy
-pnpm exec site-kernel run surface.service.validate --site warpgogol-com
+pnpm exec werkstatt run surface.service.validate --site warpgogol-com
 
 # Accepts --json for machine-readable output
-pnpm exec site-kernel run surface.service.validate --site warpgogol-com --json
+pnpm exec werkstatt run surface.service.validate --site warpgogol-com --json
 ```
 
 `surface.service.validate` is `scope: workspace` (operates on a specific site's surface content). It is integrated into `build.check` as a blocking check (warn mode initially, fail mode after grace period — same pattern as RFC-0492's `surface.industry.validate`).

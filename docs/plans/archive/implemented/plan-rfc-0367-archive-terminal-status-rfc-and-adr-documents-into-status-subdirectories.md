@@ -79,8 +79,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` passes (all RFCs still found)
-- `pnpm exec site-kernel run rfc.list --json` returns the same count as before
+- `pnpm exec werkstatt run rfc.validate --json` passes (all RFCs still found)
+- `pnpm exec werkstatt run rfc.list --json` returns the same count as before
 
 **Completion criterion:** `listRfcFiles` returns files from subdirectories when they exist, and all existing root-level files are still discovered.
 
@@ -100,7 +100,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run adr.validate --json` passes
+- `pnpm exec werkstatt run adr.validate --json` passes
 
 **Completion criterion:** `listAdrFiles` returns files from subdirectories when they exist.
 
@@ -120,8 +120,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.list --json` — verify `file` paths are correct
-- `pnpm exec site-kernel run rfc.create --title "Test" --kind command --scope workspace` — verify next ID is correct (then delete the test file)
+- `pnpm exec werkstatt run rfc.list --json` — verify `file` paths are correct
+- `pnpm exec werkstatt run rfc.create --title "Test" --kind command --scope workspace` — verify next ID is correct (then delete the test file)
 
 **Completion criterion:** `rfc.list` shows correct paths; `rfc.create` assigns the correct next ID even when files are in subdirectories.
 
@@ -141,8 +141,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run adr.list --json` — verify `file` paths are correct
-- `pnpm exec site-kernel run adr.create --title "Test" --scope package` — verify next ID is correct (then delete the test file)
+- `pnpm exec werkstatt run adr.list --json` — verify `file` paths are correct
+- `pnpm exec werkstatt run adr.create --title "Test" --scope package` — verify next ID is correct (then delete the test file)
 
 **Completion criterion:** `adr.list` shows correct paths; `adr.create` assigns the correct next ID.
 
@@ -186,7 +186,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run adr.validate --json` — passes with no warnings on the template
+- `pnpm exec werkstatt run adr.validate --json` — passes with no warnings on the template
 
 **Completion criterion:** `adr.validate` accepts ADRs with `implemented` and `reviewing` statuses and the new frontmatter keys.
 
@@ -206,7 +206,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run adr.validate --json` — template still passes (it's `adr-0000` so excluded from validation, but good to check no regressions)
+- `pnpm exec werkstatt run adr.validate --json` — template still passes (it's `adr-0000` so excluded from validation, but good to check no regressions)
 
 **Completion criterion:** Template has the new fields and lifecycle diagram.
 
@@ -239,7 +239,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run rfc.archive --dry-run --json` — preview works, no files moved
+- `pnpm exec werkstatt run rfc.archive --dry-run --json` — preview works, no files moved
 
 **Completion criterion:** `rfc.archive --dry-run` produces correct preview output listing all terminal-status RFCs that would be moved.
 
@@ -262,7 +262,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run adr.archive --dry-run --json` — preview works
+- `pnpm exec werkstatt run adr.archive --dry-run --json` — preview works
 
 **Completion criterion:** `adr.archive --dry-run` produces correct preview output.
 
@@ -283,8 +283,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.archive --dry-run --json` — command is found and runs
-- `pnpm exec site-kernel run adr.archive --dry-run --json` — command is found and runs
+- `pnpm exec werkstatt run rfc.archive --dry-run --json` — command is found and runs
+- `pnpm exec werkstatt run adr.archive --dry-run --json` — command is found and runs
 
 **Completion criterion:** Both commands are registered and callable.
 
@@ -303,7 +303,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0367 --json` — V-12 warning is resolved
+- `pnpm exec werkstatt run rfc.validate RFC-0367 --json` — V-12 warning is resolved
 
 **Completion criterion:** `rfc.validate RFC-0367` passes with zero warnings.
 
@@ -317,15 +317,15 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.archive --json` — moves all terminal-status RFCs
-- Run `pnpm exec site-kernel run adr.archive --json` — moves all terminal-status ADRs (likely none yet, but command should succeed)
+- Run `pnpm exec werkstatt run rfc.archive --json` — moves all terminal-status RFCs
+- Run `pnpm exec werkstatt run adr.archive --json` — moves all terminal-status ADRs (likely none yet, but command should succeed)
 - Verify files are in correct subdirectories
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — all RFCs still validate (root + subdirectories)
-- `pnpm exec site-kernel run adr.validate --json` — all ADRs still validate
-- `pnpm exec site-kernel run rfc.list --json` — correct count, correct file paths
+- `pnpm exec werkstatt run rfc.validate --json` — all RFCs still validate (root + subdirectories)
+- `pnpm exec werkstatt run adr.validate --json` — all ADRs still validate
+- `pnpm exec werkstatt run rfc.list --json` — correct count, correct file paths
 
 **Completion criterion:** All terminal-status RFC files are in `docs/rfcs/archive/<status>/` subdirectories; `rfc.validate` and `rfc.list` work correctly.
 
@@ -346,7 +346,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0367 --json` — still passes
+- `pnpm exec werkstatt run rfc.validate RFC-0367 --json` — still passes
 
 **Completion criterion:** AGENTS.md has the new sections.
 
@@ -366,7 +366,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — passes
+- `pnpm exec werkstatt run rfc.validate --json` — passes
 
 **Completion criterion:** Compass files are either updated or confirmed to not reference ADR statuses/file paths.
 
@@ -378,13 +378,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --json` — all RFCs pass
-- `pnpm exec site-kernel run adr.validate --json` — all ADRs pass
+- `pnpm exec werkstatt run rfc.validate --json` — all RFCs pass
+- `pnpm exec werkstatt run adr.validate --json` — all ADRs pass
 - `pnpm --filter @gogol/site-kernel run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run rfc.archive --dry-run --json` — preview works
-- `pnpm exec site-kernel run adr.archive --dry-run --json` — preview works
-- `pnpm exec site-kernel run rfc.list --json` — correct count and file paths
-- `pnpm exec site-kernel run adr.list --json` — correct count and file paths
+- `pnpm exec werkstatt run rfc.archive --dry-run --json` — preview works
+- `pnpm exec werkstatt run adr.archive --dry-run --json` — preview works
+- `pnpm exec werkstatt run rfc.list --json` — correct count and file paths
+- `pnpm exec werkstatt run adr.list --json` — correct count and file paths
 
 ### 4.2 Evidence artifacts
 
@@ -404,5 +404,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-35, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0367 --reason "..." --invariant "DNA-35"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-35, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0367 --reason "..." --invariant "DNA-35"` instead of working around it.
 - If making `listRfcFiles` recursive breaks any existing handler in a way that cannot be fixed by updating path handling, escalate via `rfc.supersede.propose` rather than maintaining a non-recursive fallback.

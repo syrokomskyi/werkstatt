@@ -125,11 +125,11 @@ This RFC ships **only** the port, the fs adapter, the asset decoupling, and the 
 
 ```sh
 # Every asset token in content resolves through the active provider (fail-hard).
-pnpm exec site-kernel run asset.reference.validate --app warpgogol-com
-pnpm exec site-kernel run asset.reference.validate --all --json
+pnpm exec werkstatt run asset.reference.validate --app warpgogol-com
+pnpm exec werkstatt run asset.reference.validate --all --json
 
 # Migration guard: fs provider output must equal legacy astro:content output.
-pnpm exec site-kernel run content.source.parity --app warpgogol-com --json
+pnpm exec werkstatt run content.source.parity --app warpgogol-com --json
 ```
 
 `asset.reference.validate` is workspace-scoped, runs per app, and joins `APPS_CHECK_PIPELINE`. `content.source.parity` is a migration-time guard intended to run during the refactor and in CI until the legacy direct-access paths are removed.

@@ -61,7 +61,7 @@ nonGoals:
   - "Does not add a new pipeline command — the dependency graph is a metadata field on existing step definitions"
   - "Does not change pipeline step order for steps without explicit dependsOn — they retain sequential behavior via implicit dependency on the previous non-skipped step"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

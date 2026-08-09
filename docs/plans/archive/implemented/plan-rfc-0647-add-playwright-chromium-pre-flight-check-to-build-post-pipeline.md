@@ -193,13 +193,13 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate` — updates `docs/command-manifest.generated.yaml` with `playwright.chromium.ensure`
+- Run `pnpm exec werkstatt run command.manifest.generate` — updates `docs/command-manifest.generated.yaml` with `playwright.chromium.ensure`
 - Edit `packages/os/site-kernel-checks/AGENTS.md` — add entry for `src/playwright-chromium-ensure.ts` to the module table: `| src/playwright-chromium-ensure.ts | RFC-0647 runPlaywrightChromiumEnsure — checks for Playwright Chromium and auto-installs if missing. Used by build.post pipeline and mission.materialize. |`
 
 **Validation:**
 
 - `git diff docs/command-manifest.generated.yaml` — shows `playwright.chromium.ensure` added
-- `pnpm exec site-kernel run rfc.validate --id RFC-0647` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0647` — passes
 
 **Completion criterion:** Command manifest includes `playwright.chromium.ensure`; AGENTS.md module table has new entry.
 
@@ -213,7 +213,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0647`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0647`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test`
@@ -257,13 +257,13 @@ scope:
 **Agent actions:**
 
 - Commit all implementation changes (code, tests, manifest, AGENTS.md) with commit message referencing `RFC-0647`
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0647 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0647 --implementation-commit <sha>`
 - The stamp command validates: status is `accepted`, all acceptance criteria checked, working tree clean, commit reachable
 - Commit the stamp transition
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0647` — passes (status: implemented)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0647` — passes (status: implemented)
 - `git status` — clean working tree
 
 **Completion criterion:** RFC-0647 status is `implemented` with `implementedAt` set.
@@ -274,7 +274,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0647`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0647`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
@@ -296,4 +296,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0647 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0647 --reason "..." --invariant "DNA-N"` instead of working around it.

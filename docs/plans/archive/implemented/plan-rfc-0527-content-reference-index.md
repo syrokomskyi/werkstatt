@@ -63,7 +63,7 @@ scope:
 
 - `build-prepare` pipeline — new step after `yaml.parse.validate`
 - `sites-check-author` pipeline — existing step, updated validation logic
-- `pnpm exec site-kernel run rfc.validate --id RFC-0527`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0527`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
@@ -130,7 +130,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` — typecheck passes
-- Manual smoke: `pnpm exec site-kernel run content.ref-index.generate --site <test-site> --json` produces valid YAML
+- Manual smoke: `pnpm exec werkstatt run content.ref-index.generate --site <test-site> --json` produces valid YAML
 
 **Completion criterion:** Command is registered, produces valid index YAML with GENERATED marker, idempotent on re-run.
 
@@ -174,7 +174,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run build.prepare --site <test-site>` — index is generated before downstream generators
+- `pnpm exec werkstatt run build.prepare --site <test-site>` — index is generated before downstream generators
 
 **Completion criterion:** `content.ref-index.generate` runs immediately after `yaml.parse.validate` in `build-prepare`; index YAML exists before `material.credits.generate` runs.
 
@@ -214,12 +214,12 @@ scope:
 - Update `packages/os/site-kernel-content/AGENTS.md` — note legacy filesystem resolver status (preserved for RFC-0529 migration, then removed)
 - Update `docs/source-markup.xml` — update `MODULE_CONTRACT` for `packages/share/src/content-reference.ts` (new purpose, non-goals)
 - Update `docs/technology.xml` — update `@gogol/share` package contract (remove Astro dependency for content references, add index-based API)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surface changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surface changed
 
 **Validation:**
 
 - `git diff` — verify all scope.docs files are updated or documented as not-applicable
-- `pnpm exec site-kernel run workspace.surface.validate` — no drift
+- `pnpm exec werkstatt run workspace.surface.validate` — no drift
 
 **Completion criterion:** All files in `scope.docs` are updated; `workspace.surface.validate` passes.
 
@@ -234,15 +234,15 @@ scope:
 **Agent actions:**
 
 - Verify each acceptance criterion in the RFC against implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0527` — passes
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0527` (if acceptance probes declared)
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0527` (RFC-0330)
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0527 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0527` — passes
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0527` (if acceptance probes declared)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0527` (RFC-0330)
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0527 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0527`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0527`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 
 **Completion criterion:** All acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -253,15 +253,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0527`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0527`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/share run test`
 - `pnpm --filter @gogol/site-kernel-codegen run test`
 - `pnpm --filter @gogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0527` (if acceptance probes declared)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0527` (RFC-0330)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0527` (if acceptance probes declared)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0527` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -280,5 +280,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-4 or DNA-22, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0527 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-4 or DNA-22, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0527 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If the braceless parsing regex proves ambiguous for file names containing dots, escalate to a new RFC — do not patch the regex inline.

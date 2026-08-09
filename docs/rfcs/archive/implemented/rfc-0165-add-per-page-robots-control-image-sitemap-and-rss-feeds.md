@@ -81,10 +81,10 @@ A per-page `output.robots` projection is added to the closed `output` schema (RF
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run dist.sitemap.images.generate --app nicaragua-projekt
-pnpm exec site-kernel run feed.generate --app warpgogol-com
-pnpm exec site-kernel run feed.validate --all --json
-pnpm exec site-kernel run robots.page.validate --all
+pnpm exec werkstatt run dist.sitemap.images.generate --app nicaragua-projekt
+pnpm exec werkstatt run feed.generate --app warpgogol-com
+pnpm exec werkstatt run feed.validate --all --json
+pnpm exec werkstatt run robots.page.validate --all
 ```
 
 ### TypeScript contracts

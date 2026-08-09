@@ -35,7 +35,7 @@ The RFC addresses a real gap (parse validation, quoting style, duplicate keys) a
 
 Additionally:
 
-- **CLI surface** is partially documented (command name and flags shown) but does not show exact `pnpm exec site-kernel run yaml.parse.validate --json` invocations.
+- **CLI surface** is partially documented (command name and flags shown) but does not show exact `pnpm exec werkstatt run yaml.parse.validate --json` invocations.
 - **File system responsibilities** table is missing — the implementation plan lists files but not in a formal table.
 - **Output format** is missing — no `--json` shape documented for `yaml.parse.validate`.
 - **Failure modes** are missing — no exit codes or warn-vs-fail behavior specified.

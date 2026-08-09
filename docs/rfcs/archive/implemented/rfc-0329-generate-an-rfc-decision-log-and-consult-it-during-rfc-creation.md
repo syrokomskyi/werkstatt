@@ -116,10 +116,10 @@ The kernel gains a `rfc.decision-log.generate` command and `rfc.create` gains a 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rfc.decision-log.generate            # write both projections
-pnpm exec site-kernel run rfc.decision-log.generate --check    # drift check, no write, exit 1 on drift
-pnpm exec site-kernel run rfc.decision-log.generate --json     # structured result
-pnpm exec site-kernel run rfc.create --title "Add foo.validate command"   # now prints prior decisions first
+pnpm exec werkstatt run rfc.decision-log.generate            # write both projections
+pnpm exec werkstatt run rfc.decision-log.generate --check    # drift check, no write, exit 1 on drift
+pnpm exec werkstatt run rfc.decision-log.generate --json     # structured result
+pnpm exec werkstatt run rfc.create --title "Add foo.validate command"   # now prints prior decisions first
 ```
 
 Flags for `rfc.decision-log.generate`: `check` (boolean, optional). No app flag — workspace scope.

@@ -55,8 +55,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — must pass after code changes
 - `pnpm --filter @gogol/ontology build:check` — must pass after schema markup changes
 - `pnpm --filter @gogol/site-kernel-handoff test` — must pass with new notausgang tests
-- `pnpm exec site-kernel run rfc.validate RFC-0380 --json` — must pass
-- `pnpm exec site-kernel run fingerprint.usage.lint` — must pass (DNA-53 compliance)
+- `pnpm exec werkstatt run rfc.validate RFC-0380 --json` — must pass
+- `pnpm exec werkstatt run fingerprint.usage.lint` — must pass (DNA-53 compliance)
 - `notausgang.validate` is not part of any build pipeline (on-demand only)
 
 ## 3. Step sequence
@@ -235,7 +235,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0380 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0380 --json`
 
 **Completion criterion:** `docs/technology.xml` `pkg-kernel-handoff` workspace role mentions Notausgang integrity verification and YAML format.
 
@@ -252,8 +252,8 @@ scope:
 - Run `pnpm --filter @gogol/ontology build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0380 --json`
-- Run `pnpm exec site-kernel run fingerprint.usage.lint` (DNA-53 compliance — no ad hoc hashing)
+- Run `pnpm exec werkstatt run rfc.validate RFC-0380 --json`
+- Run `pnpm exec werkstatt run fingerprint.usage.lint` (DNA-53 compliance — no ad hoc hashing)
 - Verify no `crypto.createHash` calls remain: `grep -r "createHash" packages/os/site-kernel-handoff/src/notausgang/`
 
 **Validation:**
@@ -273,12 +273,12 @@ scope:
 **Agent actions:**
 
 - Set `status: implemented` and `implementedAt: 2026-07-12` in RFC-0380 frontmatter
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0380`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0380`
 - Commit the evidence file alongside the status transition
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0380 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0380 --json`
 
 **Completion criterion:** RFC-0380 has `status: implemented`, `implementedAt` set, verification evidence committed.
 
@@ -290,11 +290,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0380 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0380 --json`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run fingerprint.usage.lint` (DNA-53 compliance)
+- `pnpm exec werkstatt run fingerprint.usage.lint` (DNA-53 compliance)
 - `grep -r "createHash" packages/os/site-kernel-handoff/src/notausgang/` (must return no results)
 
 ### 4.2 Evidence artifacts
@@ -312,5 +312,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-50, DNA-52, or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0380 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-50, DNA-52, or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0380 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `@gogol/fingerprint` lacks a needed hashing mode for Bordbuch NDJSON or behavior snapshots, do not add ad hoc hashing — extend `@gogol/fingerprint` first or escalate via `rfc.supersede.propose`.

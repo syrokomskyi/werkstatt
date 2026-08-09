@@ -65,7 +65,7 @@ nonGoals:
   - "Do not auto-commit workpiece changes from other lifecycle commands (mission.materialize, mission.close) — only leitstand.dev-deploy triggers this auto-commit."
   - "Do not change the build-skip cache logic (RFC-0653) — the cache key remains based on pre-build commitSha and platform semantic hash."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -122,7 +122,7 @@ DNA-46 (Mission lifecycle) requires reliable state transitions. DNA-51 (Werkstat
 No new CLI commands. The change is internal to the existing `leitstand.dev-deploy` handler:
 
 ```sh
-pnpm exec site-kernel run leitstand.dev-deploy --system <systemId>
+pnpm exec werkstatt run leitstand.dev-deploy --system <systemId>
 ```
 
 The handler now auto-commits the workpiece after `pnpm build` completes and before computing `distTreeHash`.

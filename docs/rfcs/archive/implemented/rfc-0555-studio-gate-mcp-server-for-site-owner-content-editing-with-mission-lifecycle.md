@@ -100,7 +100,7 @@ The platform gains a `packages/studio-gate` MCP server (stdio transport, `@model
 #### `workpiece.read`
 
 ```sh
-pnpm exec site-kernel run workpiece.read --mission <missionId> --path <relative-path> --json
+pnpm exec werkstatt run workpiece.read --mission <missionId> --path <relative-path> --json
 ```
 
 Reads a file from the mission workpiece. Flags:
@@ -131,7 +131,7 @@ Output:
 #### `workpiece.write`
 
 ```sh
-echo '<file-content>' | pnpm exec site-kernel run workpiece.write --mission <missionId> --path <relative-path> --stdin --json
+echo '<file-content>' | pnpm exec werkstatt run workpiece.write --mission <missionId> --path <relative-path> --stdin --json
 ```
 
 Writes a file to the mission workpiece. Content is passed via **stdin** (not a CLI flag) to avoid shell argument length limits (~128KB on Linux). Flags:
@@ -190,7 +190,7 @@ Stdio only. The MCP server reads JSON-RPC 2.0 messages from stdin and writes res
 
 #### Command execution
 
-Mission lifecycle commands are executed via `child_process.exec` (or `execa`) as `pnpm exec site-kernel run <command> <flags>`. The MCP server parses the JSON output and returns it as MCP tool result content.
+Mission lifecycle commands are executed via `child_process.exec` (or `execa`) as `pnpm exec werkstatt run <command> <flags>`. The MCP server parses the JSON output and returns it as MCP tool result content.
 
 ### TypeScript contracts
 
@@ -336,7 +336,7 @@ Run `ecosystem.manifest.generate` after implementation to update `docs/ecosystem
 
 - **DNA-22 path validation false positives** — the `clientEditable[]` pattern matching may reject valid paths due to glob resolution edge cases. Mitigation: use the same DNA-22 surface definition as `client.edit.validate` (already battle-tested), but load `clientEditable[]` from `system.md` via `loadSystemManifest()` (`@warpgogol/site-kernel-content`) rather than from legacy `system.yaml`.
 - **LLM confusion from tool count** — 12 MCP tools may overwhelm smaller LLMs. Mitigation: the `wg-site-content-edit` skill in `serverInfo.instructions` provides the process layer, guiding the LLM through the correct tool sequence.
-- **Command execution latency** — each MCP tool call spawns a child process (`pnpm exec site-kernel run`). For rapid multi-file edits, this adds overhead. Mitigation: acceptable for content editing (not a hot path); LLMs typically make 5-15 tool calls per edit session.
+- **Command execution latency** — each MCP tool call spawns a child process (`pnpm exec werkstatt run`). For rapid multi-file edits, this adds overhead. Mitigation: acceptable for content editing (not a hot path); LLMs typically make 5-15 tool calls per edit session.
 - **MCP SDK dependency** — `@modelcontextprotocol/sdk` is an external dependency. Mitigation: it is the official Anthropic SDK, widely adopted, and pinned in `package.json`.
 - **Agent misinterpretation** — LLMs may attempt to use `workpiece.write` without first calling `mission.open` and `mission.materialize`. Mitigation: `workpiece.write` rejects with a clear error ("Workpiece not found. Run mission.materialize first."). The skill instructions explicitly define the sequence.
 - **Path traversal attacks** — LLMs (or prompt injection) may attempt `../../packages/` paths. Mitigation: `workpiece.read`/`write` resolve and verify the path stays within workpiece root before any file I/O.

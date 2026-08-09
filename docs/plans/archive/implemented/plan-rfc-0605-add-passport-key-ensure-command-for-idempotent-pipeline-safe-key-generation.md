@@ -135,7 +135,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks build:check` — typecheck passes
-- `pnpm exec site-kernel run command.manifest.validate --json` — no CMD-MAN-03 warnings for `passport.key.ensure`
+- `pnpm exec werkstatt run command.manifest.validate --json` — no CMD-MAN-03 warnings for `passport.key.ensure`
 
 **Completion criterion:** Command is registered with correct scope, flags, writes, and metadata.
 
@@ -163,8 +163,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run generator.ownership.lint --json` — no multi-owner violations
-- `pnpm exec site-kernel run command.manifest.validate --json` — no CMD-MAN-03 warnings (the `passport.key.ensure` command is registered and its `writes[]` includes the expected path)
+- `pnpm exec werkstatt run generator.ownership.lint --json` — no multi-owner violations
+- `pnpm exec werkstatt run command.manifest.validate --json` — no CMD-MAN-03 warnings (the `passport.key.ensure` command is registered and its `writes[]` includes the expected path)
 
 **Completion criterion:** `generator.ownership.lint` passes with zero violations; `command.manifest.validate` has no warnings for the passport key entry.
 
@@ -208,7 +208,7 @@ scope:
 
 - Update `packages/passport/AGENTS.md` — add `generateKeypair` to the exports table row for `@warpgogol/passport/sign` or add a new row if needed
 - Update `docs/COMMANDS.md` — add `passport.key.ensure` to the command inventory (if the file maintains a command list; check first)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new command registered)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new command registered)
 
 **Validation:**
 
@@ -229,16 +229,16 @@ scope:
 
 - Update affected `AGENTS.md` files with new modules, commands, or ownership changes (done in Step 6).
 - Update affected `docs/*.xml` Compass files if repository-wide semantics changed (no Compass XML changes expected — this is a package-internal command addition).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (done in Step 6).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (done in Step 6).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0605 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0605 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0605`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0605`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -250,13 +250,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0605`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0605`
 - `pnpm --filter @warpgogol/passport build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks test`
-- `pnpm exec site-kernel run generator.ownership.lint --json`
-- `pnpm exec site-kernel run command.manifest.validate --json`
-- `pnpm exec site-kernel run kernel.flags.lint --json` (if available — verifies flag declarations match handler reads)
+- `pnpm exec werkstatt run generator.ownership.lint --json`
+- `pnpm exec werkstatt run command.manifest.validate --json`
+- `pnpm exec werkstatt run kernel.flags.lint --json` (if available — verifies flag declarations match handler reads)
 
 ### 4.2 Evidence artifacts
 
@@ -272,5 +272,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-34, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0605 --reason "..." --invariant "DNA-34"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-34, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0605 --reason "..." --invariant "DNA-34"` instead of working around it.
 - If `generateKeypair` cannot be exported from `@warpgogol/passport` (e.g. due to a workspace cycle), escalate to the operator — do not duplicate the keypair generation logic in `site-kernel-checks`.

@@ -141,7 +141,7 @@ This plan assumes RFC-0527 (content reference index) is already implemented. The
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** Migrator registered, `migrator.registry.validate` passes, idempotency test passes
 
@@ -359,18 +359,18 @@ This plan assumes RFC-0527 (content reference index) is already implemented. The
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0529`
-- Run `pnpm exec site-kernel run content.references.validate` on all sites — confirm zero unresolved references and zero residual braces
-- Run `pnpm exec site-kernel run migrator.registry.validate`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0529`
+- Run `pnpm exec werkstatt run content.references.validate` on all sites — confirm zero unresolved references and zero residual braces
+- Run `pnpm exec werkstatt run migrator.registry.validate`
 - Run full monorepo `pnpm run build:check`
 - Check off every acceptance criterion in the RFC with inline `(evidence: <file:line>, <test-or-command>)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0529 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0529 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
 - Run `fo-doc-audit` to sync documentation surfaces
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0529`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0529`
 - All acceptance criteria verified with evidence
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; documentation synced
@@ -381,7 +381,7 @@ This plan assumes RFC-0527 (content reference index) is already implemented. The
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0529`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0529`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-content run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
@@ -389,9 +389,9 @@ This plan assumes RFC-0527 (content reference index) is already implemented. The
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/pbp run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run content.references.validate` (on all sites)
-- `pnpm exec site-kernel run dist.content-references.validate` (on all sites with dist/)
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run content.references.validate` (on all sites)
+- `pnpm exec werkstatt run dist.content-references.validate` (on all sites with dist/)
 
 ### 4.2 Evidence artifacts
 
@@ -412,6 +412,6 @@ This plan assumes RFC-0527 (content reference index) is already implemented. The
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0529 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0529 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If RFC-0527 is not yet implemented, stop and implement it first — this plan cannot proceed without the index-based resolver.
 - If RFC-0528 is not yet implemented, Step 7 (material-metadata-write.ts) blocks stamping RFC-0529 as `implemented`. All three RFCs (0527, 0528, 0529) are designed as a block — RFC-0529 cannot be stamped `implemented` until Step 7 is complete.

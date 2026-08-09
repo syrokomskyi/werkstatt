@@ -17,11 +17,11 @@ paths:
 bindings:
   schema: forge/bindings@1
   commands:
-    validateRfc: pnpm exec site-kernel run rfc.validate --id {id} --json
-    validateAdr: pnpm exec site-kernel run adr.validate --id {id} --json
-    implementStamp: pnpm exec site-kernel run rfc.implement.stamp --id {id}
+    validateRfc: pnpm exec werkstatt run rfc.validate --id {id} --json
+    validateAdr: pnpm exec werkstatt run adr.validate --id {id} --json
+    implementStamp: pnpm exec werkstatt run rfc.implement.stamp --id {id}
       --implementation-commit {commit}
-    adrImplementStamp: pnpm exec site-kernel run adr.implement.stamp --id {id}
+    adrImplementStamp: pnpm exec werkstatt run adr.implement.stamp --id {id}
       --implementation-commit {commit}
     typecheck: pnpm --filter {workspace} run build:check
     test: pnpm --filter {workspace} run test
@@ -29,9 +29,9 @@ bindings:
     validate: pnpm --filter {workspace} run build:check
     produce: pnpm --filter {workspace} run build
     verify: pnpm --filter {workspace} run test
-    specValidate: pnpm exec site-kernel run spec.validate --spec={id} --json
-    sessionSave: pnpm exec site-kernel run session.save --json
-    manifestGenerate: pnpm exec site-kernel run command.manifest.generate
+    specValidate: pnpm exec werkstatt run spec.validate --spec={id} --json
+    sessionSave: pnpm exec werkstatt run session.save --json
+    manifestGenerate: pnpm exec werkstatt run command.manifest.generate
   paths:
     invariantsFile: docs/architecture-dna.md
     compassDocs:

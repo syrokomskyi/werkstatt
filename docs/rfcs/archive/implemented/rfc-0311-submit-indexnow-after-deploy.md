@@ -150,9 +150,9 @@ Scope: app, networked deploy/postdeploy command.
 Inputs:
 
 ```sh
-pnpm exec site-kernel run indexnow.submit --app <app> --base-url <https-url> --json
-pnpm exec site-kernel run indexnow.submit --app <app> --base-url <https-url> --all --json
-pnpm exec site-kernel run indexnow.submit --app <app> --urls changed-urls.json --json
+pnpm exec werkstatt run indexnow.submit --app <app> --base-url <https-url> --json
+pnpm exec werkstatt run indexnow.submit --app <app> --base-url <https-url> --all --json
+pnpm exec werkstatt run indexnow.submit --app <app> --urls changed-urls.json --json
 ```
 
 Behavior:

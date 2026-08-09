@@ -58,7 +58,7 @@ scope:
 - `pnpm --filter @warpgogol/share run build:check` — typecheck share package
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck checks package
 - `pnpm --filter @warpgogol/site-kernel-checks run test` — run PBT tests
-- `pnpm exec site-kernel run rfc.validate RFC-0591` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0591` — RFC validation
 
 ## 3. Step sequence
 
@@ -190,19 +190,19 @@ scope:
 - Run `pnpm --filter @warpgogol/share run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0591`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0591`
 - Commit implementation changes with `RFC-0591` in commit subject
 - Run `fo-review` on all session code changes
 - Run `fo-fix` if review has findings (max 3 iterations)
 - Check off all acceptance criteria with inline `(evidence: ...)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0591 --implementation-commit <sha> --dry-run` then without `--dry-run`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0591 --implementation-commit <sha> --dry-run` then without `--dry-run`
 - Commit the stamped RFC separately
 - Run `fo-doc-audit` to sync documentation surfaces
 
 **Validation:**
 
 - `git status` clean (no uncommitted changes from this session)
-- `pnpm exec site-kernel run rfc.validate RFC-0591` passes with zero violations
+- `pnpm exec werkstatt run rfc.validate RFC-0591` passes with zero violations
 - Review report exists in `docs/reviews/code/` for this session
 - All acceptance criteria marked `[x]` with evidence
 
@@ -214,7 +214,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0591`
+- `pnpm exec werkstatt run rfc.validate RFC-0591`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
@@ -241,4 +241,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0591 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0591 --reason "..." --invariant "DNA-N"` instead of working around it.

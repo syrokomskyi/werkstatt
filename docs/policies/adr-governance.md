@@ -42,7 +42,7 @@ Only the named `decider` (usually `architecture`) may change ADR status. Agents 
 When an agent identifies a local technical decision not covered by an existing accepted RFC or ADR:
 
 ```sh
-rtk pnpm exec site-kernel run adr.create --title="Short imperative title" --scope=package
+rtk pnpm exec werkstatt run adr.create --title="Short imperative title" --scope=package
 ```
 
 After creation:

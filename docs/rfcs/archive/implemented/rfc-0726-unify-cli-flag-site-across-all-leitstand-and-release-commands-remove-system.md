@@ -102,20 +102,20 @@ Commands that do not currently accept a system identifier flag (`leitstand.propa
 
 ```sh
 # Before (--system on 6 commands):
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --release warpgogol-com-r000013
-pnpm exec site-kernel run leitstand.status --system warpgogol-com
-pnpm exec site-kernel run leitstand.rollback --system warpgogol-com
-pnpm exec site-kernel run leitstand.health --system warpgogol-com
-pnpm exec site-kernel run release.list --system warpgogol-com
-pnpm exec site-kernel run release.state.validate --system warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com --release warpgogol-com-r000013
+pnpm exec werkstatt run leitstand.status --system warpgogol-com
+pnpm exec werkstatt run leitstand.rollback --system warpgogol-com
+pnpm exec werkstatt run leitstand.health --system warpgogol-com
+pnpm exec werkstatt run release.list --system warpgogol-com
+pnpm exec werkstatt run release.state.validate --system warpgogol-com
 
 # After (unified --site):
-pnpm exec site-kernel run leitstand.dev-deploy --site warpgogol-com --release warpgogol-com-r000013
-pnpm exec site-kernel run leitstand.status --site warpgogol-com
-pnpm exec site-kernel run leitstand.rollback --site warpgogol-com
-pnpm exec site-kernel run leitstand.health --site warpgogol-com
-pnpm exec site-kernel run release.list --site warpgogol-com
-pnpm exec site-kernel run release.state.validate --site warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --site warpgogol-com --release warpgogol-com-r000013
+pnpm exec werkstatt run leitstand.status --site warpgogol-com
+pnpm exec werkstatt run leitstand.rollback --site warpgogol-com
+pnpm exec werkstatt run leitstand.health --site warpgogol-com
+pnpm exec werkstatt run release.list --site warpgogol-com
+pnpm exec werkstatt run release.state.validate --site warpgogol-com
 ```
 
 ### TypeScript contracts

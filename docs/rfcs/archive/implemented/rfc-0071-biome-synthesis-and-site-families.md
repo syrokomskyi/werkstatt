@@ -254,7 +254,7 @@ Given a YAML axes input (or directly a biome YAML's `axes:` block), produce a pa
 
 ```sh
 # Derive from a standalone axes file (the agent typically wrote this during scaffold)
-pnpm exec site-kernel run biome.tokens.derive \
+pnpm exec werkstatt run biome.tokens.derive \
   --axes onboarding/.output/02-scaffold/axes.yaml \
   --out packages/ontology/biomes/handwerk-material-warm.yaml
 ```
@@ -325,7 +325,7 @@ Validates every `packages/ontology/site-families/<id>/family.yaml`:
 ### `family.list` — utility
 
 ```sh
-pnpm exec site-kernel run family.list --json
+pnpm exec werkstatt run family.list --json
 ```
 
 Prints all site families with their detection signals. Used by the agent in the synthesize phase to pick a family suggestion.

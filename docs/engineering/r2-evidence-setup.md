@@ -65,7 +65,7 @@ R2_SECRET_ACCESS_KEY=<Secret Access Key from step 2>
 ## Step 4: Verify
 
 ```bash
-rtk pnpm exec site-kernel run evidence.sync --mission <mission-id> --dry-run
+rtk pnpm exec werkstatt run evidence.sync --mission <mission-id> --dry-run
 ```
 
 If credentials are correct, the dry-run reports files that would be uploaded. If credentials are missing or invalid, the command returns `MISSING_ENV` or `R2_UPLOAD_ERROR`.

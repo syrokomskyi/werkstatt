@@ -66,7 +66,7 @@ nonGoals:
   - Does not introduce a new .env.dev file — dev and alt share .env.alt.
   - Does not change DNA-40 deploy-script contracts for per-app package.json scripts.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

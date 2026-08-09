@@ -235,16 +235,16 @@ No pipeline changes. No new commands. Existing validation commands apply:
 - No `docs/*.xml` Compass files need updates (additive to `pbp/*@1`, no repository-wide semantic changes).
 - No `docs/architecture-dna.md` changes (no new DNA invariant).
 - Run `pnpm --filter @warpgogol/pbp build:check` — confirms `tsc --noEmit` and `vitest run` pass.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0737` — confirms RFC is valid.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0737` — confirms RFC is valid.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations (RFC-IMP-02). For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0737 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0737 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0737`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0737`
 - `pnpm --filter @warpgogol/pbp build:check`
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -256,7 +256,7 @@ No pipeline changes. No new commands. Existing validation commands apply:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0737`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0737`
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/pbp run test`
 
@@ -275,5 +275,5 @@ No pipeline changes. No new commands. Existing validation commands apply:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `pbpEntitySchema.extend().strict()` conflicts with the `schema` literal type (discriminated union key), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0737 --reason "schema literal conflict with discriminated union" --invariant "DNA-55"` instead of working around it.
+- If implementation reveals that `pbpEntitySchema.extend().strict()` conflicts with the `schema` literal type (discriminated union key), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0737 --reason "schema literal conflict with discriminated union" --invariant "DNA-55"` instead of working around it.
 - If `decimalString` regex is insufficient for rate values (e.g. needs to support negative rates), do not weaken the regex — create a new RFC to extend the primitive.

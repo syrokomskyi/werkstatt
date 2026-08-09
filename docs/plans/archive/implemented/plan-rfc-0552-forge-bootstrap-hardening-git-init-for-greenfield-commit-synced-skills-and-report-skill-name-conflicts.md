@@ -47,7 +47,7 @@ scope:
 
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck
 - `pnpm --filter @warpgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0552` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0552` — RFC validation
 
 ## 3. Step sequence
 
@@ -129,7 +129,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0552` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0552` passes
 - SKILL.md is well-formed (no validation errors)
 
 **Completion criterion:** SKILL.md includes greenfield git init step, skill commit step, and skipped-skills reporting in welcoming report.
@@ -168,11 +168,11 @@ scope:
 
 - Run `pnpm --filter @warpgogol/forge run build:check` — typecheck
 - Run `pnpm --filter @warpgogol/forge run test` — all tests pass
-- Run `pnpm exec site-kernel run rfc.validate RFC-0552` — zero errors
+- Run `pnpm exec werkstatt run rfc.validate RFC-0552` — zero errors
 - Check off acceptance criteria: verify each criterion against implemented code, mark `[x]` with `(evidence: ...)` annotations
 - Run `fo-review` on all session code changes
 - Run `fo-fix` if review findings
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0552 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0552 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -189,7 +189,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0552`
+- `pnpm exec werkstatt run rfc.validate RFC-0552`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -209,4 +209,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0552 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0552 --reason "..." --invariant "DNA-N"` instead of working around it.

@@ -137,9 +137,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel-leitstand run build:check` — typecheck and tests
 - `pnpm --filter @gogol/ontology run build:check` — schema validation
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — no regression
-- `pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --json` — pilot
-- `pnpm exec site-kernel run leitstand.health --system warpgogol-com --json` — pilot
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0358` — evidence artifact (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
+- `pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000001 --json` — pilot
+- `pnpm exec werkstatt run leitstand.health --system warpgogol-com --json` — pilot
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0358` — evidence artifact (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
 - No new pipeline steps required at this stage; propagation is operator-driven, not part of `apps-check` or `apps-check-postbuild`
 
 ## 3. Step sequence
@@ -155,12 +155,12 @@ scope:
   - Add `RFC-0358` to `related` if not already present
 - Edit `docs/rfcs/rfc-0354-establish-the-sternsystem-bundle-contract-and-fleet-registry.md` frontmatter:
   - Add `RFC-0358` to `amendedBy`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0354 RFC-0358 --json` and fix any violations
+- Run `pnpm exec werkstatt run rfc.validate RFC-0354 RFC-0358 --json` and fix any violations
 - Commit both RFC files with a governance-reference commit
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0354 RFC-0358 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0354 RFC-0358 --json` passes
 
 **Completion criterion:** Both RFC files have consistent `amends`/`amendedBy` references and pass `rfc.validate`.
 
@@ -185,7 +185,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-leitstand run build:check` passes (empty package should still typecheck)
-- `pnpm exec site-kernel run command.manifest.generate` includes no Leitstand commands yet (they are added in step 6)
+- `pnpm exec werkstatt run command.manifest.generate` includes no Leitstand commands yet (they are added in step 6)
 
 **Completion criterion:** The package exists, is installable, and has a green empty build:check.
 
@@ -214,7 +214,7 @@ scope:
 
 - `pnpm --filter @gogol/ontology run build:check` passes
 - `pnpm --filter @gogol/ontology test` (if available) passes the new schema fixtures
-- `pnpm exec site-kernel run sternsystem.validate` (or a new dedicated registry validator) accepts a registry with a deployment block and rejects literal credentials
+- `pnpm exec werkstatt run sternsystem.validate` (or a new dedicated registry validator) accepts a registry with a deployment block and rejects literal credentials
 
 **Completion criterion:** `@gogol/ontology` exports the schemas, the registry schema accepts the deployment block, and invalid deployment configs fail parse.
 
@@ -299,8 +299,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run command.manifest.generate` and `pnpm exec site-kernel run command.manifest.validate` include the four commands with correct metadata
-- `pnpm exec site-kernel run leitstand.status --system warpgogol-com --json` returns a pass/fail envelope (will fail because no deployment block exists yet; verify the error message is correct)
+- `pnpm exec werkstatt run command.manifest.generate` and `pnpm exec werkstatt run command.manifest.validate` include the four commands with correct metadata
+- `pnpm exec werkstatt run leitstand.status --system warpgogol-com --json` returns a pass/fail envelope (will fail because no deployment block exists yet; verify the error message is correct)
 - `pnpm --filter @gogol/site-kernel-leitstand run build:check` passes
 - Unit tests for handlers pass
 
@@ -349,8 +349,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.audit.validate` (or equivalent Compass lint) passes
-- `pnpm exec site-kernel run docs.links.validate` (if exists) passes
+- `pnpm exec werkstatt run compass.audit.validate` (or equivalent Compass lint) passes
+- `pnpm exec werkstatt run docs.links.validate` (if exists) passes
 - Manual review: every new command, schema, and package is referenced in at least one AGENTS.md or XML file
 
 **Completion criterion:** All affected AGENTS.md and XML files reflect the new package, commands, and DNA-49.
@@ -404,12 +404,12 @@ scope:
   - `healthUrl: https://warpgogol.com/health`
   - `credentials: { accountIdRef: env:CF_ACCOUNT_ID, apiTokenRef: env:CF_API_TOKEN }`
   - `lastPropagatedRelease: null` initially
-- Validate the registry with `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json` (or the new Leitstand registry validator)
+- Validate the registry with `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com --json` (or the new Leitstand registry validator)
 - Commit the registry change separately
 
 **Validation:**
 
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json` passes (or equivalent registry validator)
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com --json` passes (or equivalent registry validator)
 - The registry file parses and the deployment block is schema-valid
 
 **Completion criterion:** `systems/registry.yaml` has a valid deployment block for `warpgogol-com` with secret references only.
@@ -426,8 +426,8 @@ scope:
 
 - Ensure the pilot release `warpgogol-com-r000001` is prepared/published via RFC-0357 (prerequisite)
 - Set environment variables `CF_ACCOUNT_ID` and `CF_API_TOKEN` in the operator environment or CI
-- Run `pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --json`
-- Run `pnpm exec site-kernel run leitstand.health --system warpgogol-com --json`
+- Run `pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000001 --json`
+- Run `pnpm exec werkstatt run leitstand.health --system warpgogol-com --json`
 - Verify the deployment URL serves the release marker and the registry is updated with `lastPropagatedRelease`
 - If health checks fail, use `leitstand.rollback --system warpgogol-com` to revert and capture the failure log
 - Append the pilot result to the Bordbuch as a `deployment` event
@@ -450,11 +450,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0358 --json`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0358 --json`
 - Run `pnpm --filter @gogol/site-kernel-leitstand run build:check`
 - Run `pnpm --filter @gogol/ontology run build:check`
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0358` (if acceptance probes are declared)
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0358` to produce `docs/rfcs/verification/rfc-0358.generated.json`
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0358` (if acceptance probes are declared)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0358` to produce `docs/rfcs/verification/rfc-0358.generated.json`
 - Review the evidence file and commit it
 - Run a full workspace `pnpm run build:check` to verify no regression
 
@@ -484,7 +484,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0358 --json` passes after status change
+- `pnpm exec werkstatt run rfc.validate --id RFC-0358 --json` passes after status change
 
 **Completion criterion:** RFC-0358 is marked `implemented` with a valid date and passes `rfc.validate`.
 
@@ -494,16 +494,16 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0358`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0354` (after frontmatter amendment)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0358`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0354` (after frontmatter amendment)
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-leitstand run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` (regression check)
 - `pnpm --filter @gogol/site-kernel run build:check` (regression check)
 - `pnpm --filter @gogol/site-kernel-leitstand test`
-- `pnpm exec site-kernel run command.manifest.validate` (if available) or `pnpm exec site-kernel run command.manifest.generate` to verify command metadata
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0358` (if acceptance probes declared)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0358` (RFC-0330 evidence artifact)
+- `pnpm exec werkstatt run command.manifest.validate` (if available) or `pnpm exec werkstatt run command.manifest.generate` to verify command metadata
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0358` (if acceptance probes declared)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0358` (RFC-0330 evidence artifact)
 
 ### 4.2 Evidence artifacts
 
@@ -527,7 +527,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `FleetRegistryEntrySchema` cannot be extended without breaking RFC-0354 accepted invariants, run: `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0358 --reason "FleetRegistryEntrySchema extension conflicts with DNA-45" --invariant "DNA-45"`
-- If the `cloudflare-pages` adapter requires behavior that cannot be expressed through the `DeploymentAdapter` interface without vendor-specific leakage into command handlers, run: `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0358 --reason "Adapter interface too narrow for safe propagation" --invariant "DNA-49"`
-- If secret reference resolution reveals a need to store secrets in the registry, run: `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0358 --reason "Secret references cannot cover production credential models" --invariant "DNA-49"`
-- If RFC-0284 (fleet Leitstand) and RFC-0358 (deployment Leitstand) must merge or rename to avoid operator confusion, run: `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0358 --reason "Leitstand namespace collision with RFC-0284" --invariant "DNA-45"`
+- If implementation reveals that `FleetRegistryEntrySchema` cannot be extended without breaking RFC-0354 accepted invariants, run: `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0358 --reason "FleetRegistryEntrySchema extension conflicts with DNA-45" --invariant "DNA-45"`
+- If the `cloudflare-pages` adapter requires behavior that cannot be expressed through the `DeploymentAdapter` interface without vendor-specific leakage into command handlers, run: `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0358 --reason "Adapter interface too narrow for safe propagation" --invariant "DNA-49"`
+- If secret reference resolution reveals a need to store secrets in the registry, run: `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0358 --reason "Secret references cannot cover production credential models" --invariant "DNA-49"`
+- If RFC-0284 (fleet Leitstand) and RFC-0358 (deployment Leitstand) must merge or rename to avoid operator confusion, run: `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0358 --reason "Leitstand namespace collision with RFC-0284" --invariant "DNA-45"`

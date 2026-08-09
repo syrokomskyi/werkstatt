@@ -64,7 +64,7 @@ nonGoals:
   - "Does not add caching to build.check or release.prepare pipelines"
   - "Does not change mission.materialize pipeline selection logic (RFC-0597)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -129,17 +129,17 @@ The dev-deploy pipeline gains three caching optimizations:
 
 ```sh
 # Existing command — now cacheable (no CLI change)
-pnpm exec site-kernel run preview.images.generate --site warpgogol-com
+pnpm exec werkstatt run preview.images.generate --site warpgogol-com
 
 # Existing command – now writes to .cache/pdf/ instead of dist/ (no CLI change)
-pnpm exec site-kernel run print.pdf.generate --site warpgogol-com
+pnpm exec werkstatt run print.pdf.generate --site warpgogol-com
 
 # New command – copies .cache/pdf/ → dist/client/_print/
-pnpm exec site-kernel run print.pdf.copy --site warpgogol-com
+pnpm exec werkstatt run print.pdf.copy --site warpgogol-com
 
 # Existing command – now with --force-build flag
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --force-build
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com --force-build
 ```
 
 ### TypeScript contracts

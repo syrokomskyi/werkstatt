@@ -234,7 +234,7 @@ No new command output. The observable output change is in the rendered JSON-LD `
 - [x] `projectToSemanticSiteProfile` passes `sameAs` array to `buildOrganizationProfile` when Business has `externalIdentifiers` or any social-profile WebPresence has `sameAs` (evidence: packages/pbp/src/semantic-profile.ts:75-89,176, packages/pbp/tests/semantic-profile.test.ts 5/5 pass)
 - [x] `jsonld-types.yaml` declares `Organization` type with `sameAs` in optional properties (evidence: packages/ontology/src/external-surfaces/jsonld-types.yaml:27-30, `pnpm --filter @gogol/ontology run build:check` pass)
 - [x] `surface.contract.validate` passes on a site with Organization JSON-LD nodes after contract update (evidence: `pnpm --filter @gogol/ontology run build:check` pass, surface.contract.validate structural check passes with Organization type declared)
-- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0530 --json` exitCode 0, 0 violations)
+- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec werkstatt run rfc.validate RFC-0530 --json` exitCode 0, 0 violations)
 
 ## Implementation notes for agents
 

@@ -171,7 +171,7 @@ Generators MUST NOT:
 ### CLI surface
 
 ```
-pnpm exec site-kernel run generated.marker.validate --app <app>
+pnpm exec werkstatt run generated.marker.validate --app <app>
 ```
 
 Scans all files in `<app>/` that are known to be generator output (declared by each generator's manifest or by the existing `app.boilerplate.validate` file list). Reports:

@@ -81,9 +81,9 @@ The first reference adapter is **git-based** (Decap/Tina-class): it keeps conten
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run cms.schema.generate --app warpgogol-com
-pnpm exec site-kernel run cms.schema.parity --all --json
-pnpm exec site-kernel run content.preview.serve --app warpgogol-com
+pnpm exec werkstatt run cms.schema.generate --app warpgogol-com
+pnpm exec werkstatt run cms.schema.parity --all --json
+pnpm exec werkstatt run content.preview.serve --app warpgogol-com
 ```
 
 ### TypeScript contracts

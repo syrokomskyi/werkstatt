@@ -81,7 +81,7 @@ nonGoals:
   - "Does not modify the nachweis-card UI component — UI enrichment is a content-level task tracked separately."
   - "Does not implement redacted PDF creation — the public derivative workflow is handled by nachweis.public-derivative (RFC-0714)."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -149,29 +149,29 @@ The Nachweis kernel module gains three new commands — `nachweis.sign`, `nachwe
 
 ```sh
 # Provisioning (one-time per operator)
-pnpm exec site-kernel run nachweis.key.ensure \
+pnpm exec werkstatt run nachweis.key.ensure \
   --key-file ~/.warpgogol/nachweis-signing.key
 
 # Sign a record (after ingest, before approve)
-pnpm exec site-kernel run nachweis.sign \
+pnpm exec werkstatt run nachweis.sign \
   --system warpgogol-com \
   --slug nicaragua-projekt \
   --key-file ~/.warpgogol/nachweis-signing.key
 
 # Timestamp a record (after sign, before approve)
-pnpm exec site-kernel run nachweis.timestamp \
+pnpm exec werkstatt run nachweis.timestamp \
   --system warpgogol-com \
   --slug nicaragua-projekt \
   --tsa-url https://freetsa.org/tsr
 
 # Verify a signature (any time, read-only)
-pnpm exec site-kernel run nachweis.verify-signature \
+pnpm exec werkstatt run nachweis.verify-signature \
   --system warpgogol-com \
   --slug nicaragua-projekt \
   --public-key-file ~/.warpgogol/nachweis-signing.pub
 
 # Approve with N3 gate (amended)
-pnpm exec site-kernel run nachweis.approve \
+pnpm exec werkstatt run nachweis.approve \
   --system warpgogol-com \
   --slug nicaragua-projekt \
   --verification-level N3 \

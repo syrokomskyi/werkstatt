@@ -141,10 +141,10 @@ Disallowed by default:
 ## Verification Commands
 
 ```bash
-pnpm exec site-kernel run compass.inventory
-pnpm exec site-kernel run generator.ownership.lint
-pnpm exec site-kernel run content.surface.validate --app nicaragua-projekt
-pnpm exec site-kernel run content.surface.validate --app warpgogol-com
+pnpm exec werkstatt run compass.inventory
+pnpm exec werkstatt run generator.ownership.lint
+pnpm exec werkstatt run content.surface.validate --app nicaragua-projekt
+pnpm exec werkstatt run content.surface.validate --app warpgogol-com
 ```
 
 ## Conclusion

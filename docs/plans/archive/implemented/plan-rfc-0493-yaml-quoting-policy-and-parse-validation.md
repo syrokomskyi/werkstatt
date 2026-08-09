@@ -113,7 +113,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build` — compiles without errors.
-- `pnpm exec site-kernel run yaml.parse.validate --json` — runs without KERNEL-FLAG errors.
+- `pnpm exec werkstatt run yaml.parse.validate --json` — runs without KERNEL-FLAG errors.
 
 **Completion criterion:** `yaml.parse.validate` command is registered and executable; running it produces a `diagnosticsResult` JSON shape.
 
@@ -158,7 +158,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build` — compiles without errors.
-- `pnpm exec site-kernel run yaml.parse.validate` — exits 0 on current repository (all existing `.yaml` files parse cleanly).
+- `pnpm exec werkstatt run yaml.parse.validate` — exits 0 on current repository (all existing `.yaml` files parse cleanly).
 
 **Completion criterion:** `yaml.parse.validate` appears in both pipeline definitions; running it on the current repo produces zero diagnostics.
 
@@ -178,7 +178,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate` — no Compass drift on edited files.
+- `pnpm exec werkstatt run compass.validate` — no Compass drift on edited files.
 
 **Completion criterion:** `generated-file-governance.md` has the quoting policy section; root `AGENTS.md` references it.
 
@@ -222,7 +222,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0493` — V-19 warning is resolved (0 violations).
+- `pnpm exec werkstatt run rfc.validate RFC-0493` — V-19 warning is resolved (0 violations).
 
 **Completion criterion:** `rfc.validate RFC-0493` reports 0 violations (V-19 backreference fixed).
 
@@ -237,13 +237,13 @@ scope:
 **Agent actions:**
 
 - Update `docs/verification-plan.xml` to include `yaml.parse.validate` in the `SITES_BUILD_PREPARE_PIPELINE` and `PACKAGES_CHECK_PIPELINE` step lists.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - Verify `docs/ecosystem.generated.yaml` reflects the new command.
 
 **Validation:**
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate` — no drift.
-- `pnpm exec site-kernel run workspace.surface.validate` — no drift.
+- `pnpm exec werkstatt run ecosystem.manifest.validate` — no drift.
+- `pnpm exec werkstatt run workspace.surface.validate` — no drift.
 
 **Completion criterion:** `verification-plan.xml` updated; ecosystem manifest regenerated and validated.
 
@@ -260,19 +260,19 @@ scope:
 - Verify root `AGENTS.md` references the YAML quoting policy (Step 5).
 - Verify `docs/verification-plan.xml` includes `yaml.parse.validate` (Step 8).
 - Verify `docs/architecture-dna.md` — no new DNA invariant introduced (no change needed).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if pipeline topology changed.
 - Check off all 13 acceptance criteria in the RFC. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
 - **DO NOT stamp RFC or plan status as `implemented`** — request the human operator to run `rfc.implement.stamp --id RFC-0493 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0493` — 0 violations.
+- `pnpm exec werkstatt run rfc.validate RFC-0493` — 0 violations.
 - `pnpm --filter @gogol/site-kernel-checks build:check` — pipeline passes with new step.
 - `pnpm --filter @gogol/site-kernel-checks test` — all tests pass.
 - `pnpm lint:yaml` — zero violations.
 - `pnpm format:check` — zero formatting drift.
-- `pnpm exec site-kernel run yaml.parse.validate` — zero parse errors.
+- `pnpm exec werkstatt run yaml.parse.validate` — zero parse errors.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 
 **Completion criterion:** All documentation artifacts in scope are updated; all 13 acceptance criteria checked off; agent has requested the human operator to perform the `accepted → implemented` transition.
@@ -283,13 +283,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0493` — 0 violations (V-19 resolved by Step 7)
+- `pnpm exec werkstatt run rfc.validate RFC-0493` — 0 violations (V-19 resolved by Step 7)
 - `pnpm --filter @gogol/site-kernel-checks build:check` — pipeline passes with new `yaml.parse.validate` step
 - `pnpm --filter @gogol/site-kernel-checks test` — all red/green tests pass
 - `pnpm lint:yaml` — zero ESLint violations after auto-fix
 - `pnpm format:check` — zero Prettier drift
-- `pnpm exec site-kernel run yaml.parse.validate` — zero parse errors on current repo
-- `pnpm exec site-kernel run ecosystem.manifest.validate` — no ecosystem drift
+- `pnpm exec werkstatt run yaml.parse.validate` — zero parse errors on current repo
+- `pnpm exec werkstatt run ecosystem.manifest.validate` — no ecosystem drift
 
 ### 4.2 Evidence artifacts
 
@@ -309,4 +309,4 @@ scope:
 
 - If `yaml.parse.validate` surfaces a large number (>20) of parse errors on the current repository, pause and fix all errors before proceeding to Step 4 (pipeline wiring). Do not suppress or skip validation.
 - If `eslint-plugin-yml` is incompatible with ESLint 10.x flat config, use `eslint-plugin-yml/flat` import path instead. If still incompatible, escalate to the operator.
-- If implementation reveals an invariant conflict with any DNA item, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0493 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with any DNA item, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0493 --reason "..." --invariant "DNA-N"` instead of working around it.

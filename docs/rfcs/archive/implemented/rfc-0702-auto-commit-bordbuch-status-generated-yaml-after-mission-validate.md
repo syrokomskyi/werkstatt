@@ -56,7 +56,7 @@ successSignals: []
 nonGoals:
   - "Adding push to bordbuch.commit — bordbuch.commit commits locally only; push is handled by sternsystem.sync and commitAndPushBordbuch in mission lifecycle commands. Push is out of scope for this RFC."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -141,7 +141,7 @@ try {
 No CLI surface changes. The command flags remain the same:
 
 ```sh
-pnpm exec site-kernel run mission.validate --mission <missionId>
+pnpm exec werkstatt run mission.validate --mission <missionId>
 ```
 
 ### TypeScript contracts
@@ -259,7 +259,7 @@ No output format changes. The `--json` output of `mission.validate` remains the 
 - [x] Cache clone is clean after `mission.validate` completes successfully via the reuse path (when dirty state was from bordbuch files) — (evidence: `commitBordbuchProjections` commits dirty bordbuch files, `mission-validate-distribution-reuse.test.ts:341-379` verifies cleanup log)
 - [x] Unit test covers `commitBordbuchProjections` try/catch path (git failure returns error instead of throwing) — (evidence: `bordbuch-commit.test.ts:179-223`, 5 tests covering status/add/commit/rev-parse + does-not-throw)
 - [x] Unit test covers reuse path cleanup call in `mission.validate` — (evidence: `mission-validate-distribution-reuse.test.ts:329-393`, 3 tests covering call, log, and throw-resilience)
-- [x] `rfc.validate` passes on this file before merging — (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0702` exit 0)
+- [x] `rfc.validate` passes on this file before merging — (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0702` exit 0)
 
 ## Implementation notes for agents
 

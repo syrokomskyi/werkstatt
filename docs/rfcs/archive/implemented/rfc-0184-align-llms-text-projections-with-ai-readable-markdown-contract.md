@@ -96,8 +96,8 @@ This RFC does not create new commands. It changes the behavior and validation co
 No new command names are introduced.
 
 ```sh
-pnpm exec site-kernel run llms.generate --app warpgogol-com
-pnpm exec site-kernel run llms.validate --app warpgogol-com --json
+pnpm exec werkstatt run llms.generate --app warpgogol-com
+pnpm exec werkstatt run llms.validate --app warpgogol-com --json
 ```
 
 `llms.generate` continues to write:
@@ -227,7 +227,7 @@ The JSON result should include stable rule IDs:
 - [x] Generated `public/llms.txt` and `public/llms-full.txt` are regenerated for affected apps through `llms.generate`, not hand-edited. (evidence: implemented historically)
 - [x] `pnpm --filter @gogol/share build:check` passes. (evidence: build:check passes, exitCode=0)
 - [x] `pnpm --filter @gogol/site-kernel-checks build:check` passes. (evidence: build:check passes, exitCode=0)
-- [x] `pnpm exec site-kernel run llms.validate --app <site>` passes for affected apps. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run llms.validate --app <site>` passes for affected apps. (evidence: implemented historically)
 - [x] `rfc.validate RFC-0184` passes before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents

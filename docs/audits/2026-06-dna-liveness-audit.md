@@ -1,6 +1,6 @@
 # DNA liveness audit — 2026-06
 
-**Scope:** all 38 entries in the canonical registry `docs/architecture-dna.md`. **Method:** `dna.registry.validate` (RFC-0158, incl. the RFC-0161 DNA-REG-05 enforcement check) + manual review. **Re-run:** `node packages/os/site-kernel/bin/site-kernel.mjs run dna.registry.validate`.
+**Scope:** all 38 entries in the canonical registry `docs/architecture-dna.md`. **Method:** `dna.registry.validate` (RFC-0158, incl. the RFC-0161 DNA-REG-05 enforcement check) + manual review. **Re-run:** `node packages/werkstatt/bin/werkstatt.mjs run dna.registry.validate`.
 
 ## Why
 

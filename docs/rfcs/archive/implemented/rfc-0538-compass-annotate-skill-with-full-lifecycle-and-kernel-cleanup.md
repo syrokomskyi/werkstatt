@@ -242,8 +242,8 @@ fo-compass-annotate --changed
 ### `compass.summary.trim` command
 
 ```sh
-pnpm exec site-kernel run compass.summary.trim --root .
-pnpm exec site-kernel run compass.summary.trim --root . --dry-run
+pnpm exec werkstatt run compass.summary.trim --root .
+pnpm exec werkstatt run compass.summary.trim --root . --dry-run
 ```
 
 ```ts

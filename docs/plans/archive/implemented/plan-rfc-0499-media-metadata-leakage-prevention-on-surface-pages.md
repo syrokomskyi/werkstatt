@@ -86,7 +86,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json` — contract loads without errors
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json` — contract loads without errors
 
 **Completion criterion:** `mediaLeakagePolicy` section present in `jsonld-types.yaml`; Zod schema validates the YAML; `build:check` passes for `@gogol/ontology`.
 
@@ -112,7 +112,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.generate --site warpgogol-com` — baker runs without errors
+- `pnpm exec werkstatt run surface.generate --site warpgogol-com` — baker runs without errors
 - Manual spot-check: inspect a generated surface page artifact for absence of media metadata in block props
 
 **Completion criterion:** No media metadata fields (`author`, `source`, `aiPlatform`, `copyright`, `usageBasis`) appear in readable block props of generated surface pages; `Konzeptillustration` label and `/bildnachweise/#...` link are emitted for AI-generated images; `build:check` passes.
@@ -169,7 +169,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json` — command runs and returns valid result
+- `pnpm exec werkstatt run surface.media-leakage.validate --site warpgogol-com --json` — command runs and returns valid result
 
 **Completion criterion:** `surface.media-leakage.validate` command is registered, runs in `sites-check-postbuild`, scans rendered HTML with context-aware matching, and returns violations in the specified format.
 
@@ -195,8 +195,8 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.validate --site warpgogol-com --json` — passes
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json` — includes media-leakage policy checks
+- `pnpm exec werkstatt run surface.validate --site warpgogol-com --json` — passes
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json` — includes media-leakage policy checks
 
 **Completion criterion:** `surface.validate` includes media-leakage rules; `surface.contract.validate` includes media-leakage policy from Layer C contract; both pass `build:check`.
 
@@ -214,12 +214,12 @@ scope:
 - Update `docs/COMMANDS.md` — add `surface.media-leakage.validate` command documentation
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add `surface.media-leakage.validate` to the check commands table and document `src/surface-media-leakage-validate.ts` in the module table
 - Verify `docs/rfcs/archive/implemented/rfc-0231-unified-attribution-visibility-policy-for-credits-prose-and-copyright.md` has `amendedBy: [RFC-0499]` (already done during enhance)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 
 **Validation:**
 
 - `git diff --name-only` — verify all scope docs are updated
-- `pnpm exec site-kernel run rfc.validate --id RFC-0499` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0499` — passes
 
 **Completion criterion:** All documentation artifacts in scope are updated; `ecosystem.manifest.generate` run if needed.
 
@@ -233,21 +233,21 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0499` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0499` — must pass
 - Run `pnpm --filter @gogol/ontology run build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — must pass
 - Run `pnpm --filter @gogol/ui run build:check` — must pass
 - Run `pnpm --filter @gogol/share run build:check` — must pass
-- Run `pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json` — must pass (0 violations)
-- Run `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json` — must pass
+- Run `pnpm exec werkstatt run surface.media-leakage.validate --site warpgogol-com --json` — must pass (0 violations)
+- Run `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json` — must pass
 - Check off all acceptance criteria in the RFC with inline `(evidence: ...)` annotations
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0499 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0499 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0499` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0499` — passes
 - All acceptance criteria checked off
 
 **Completion criterion:** All validation checks pass; all acceptance criteria verified; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -258,14 +258,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0499`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0499`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/share run build:check`
-- `pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.media-leakage.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -285,5 +285,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0499 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0499 --reason "..." --invariant "DNA-24"` instead of working around it.
 - If the `mediaLeakagePolicy` schema cannot be expressed in the existing `jsonld-types.yaml` format without breaking the Layer C contract structure, escalate to a new RFC amending RFC-0480.

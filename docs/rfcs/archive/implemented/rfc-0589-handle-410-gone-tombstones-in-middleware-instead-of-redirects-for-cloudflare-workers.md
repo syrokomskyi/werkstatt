@@ -68,7 +68,7 @@ nonGoals:
 # RFC-0555: enhancedAt is the persistent marker that enhance has been run.
 enhancedAt: 2026-07-29
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -126,13 +126,13 @@ No new commands. Changed commands:
 
 ```sh
 # routes.generate now generates src/middleware/retired-tombstones.ts and chains it in src/middleware.ts
-pnpm exec site-kernel run routes.generate --site <id>
+pnpm exec werkstatt run routes.generate --site <id>
 
 # public.infrastructure.generate no longer emits 410 entries to _redirects
-pnpm exec site-kernel run public.infrastructure.generate --site <id>
+pnpm exec werkstatt run public.infrastructure.generate --site <id>
 
 # redirect.map.validate now rejects 410 in _redirects for cloudflare-workers adapter sites
-pnpm exec site-kernel run redirect.map.validate --site <id>
+pnpm exec werkstatt run redirect.map.validate --site <id>
 ```
 
 ### TypeScript contracts

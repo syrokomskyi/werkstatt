@@ -113,9 +113,9 @@ The kernel gains a `rfc.verification.emit` command, and `rfc.validate` gains rul
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rfc.verification.emit --id RFC-0330
-pnpm exec site-kernel run rfc.verification.emit --status implemented   # bulk re-emit
-pnpm exec site-kernel run rfc.verification.emit --id RFC-0330 --json
+pnpm exec werkstatt run rfc.verification.emit --id RFC-0330
+pnpm exec werkstatt run rfc.verification.emit --status implemented   # bulk re-emit
+pnpm exec werkstatt run rfc.verification.emit --id RFC-0330 --json
 ```
 
 Flags: `id` (string, optional), `status` (string, optional) — at least one required, same validation message pattern as `rfc.acceptance.run`.

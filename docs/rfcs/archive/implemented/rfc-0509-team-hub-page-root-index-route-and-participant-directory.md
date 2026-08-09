@@ -200,7 +200,7 @@ When a `people` section's `select` matches zero participants (e.g. no AI agents 
 
 ```sh
 # Validate the team hub page structure and participant visibility.
-pnpm exec site-kernel run team.hub.validate --site warpgogol-com --json
+pnpm exec werkstatt run team.hub.validate --site warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -294,9 +294,9 @@ All rules are errors (exit code 1). The `--json` output shape follows the standa
 - [x] `team.hub.validate` passes and is registered in `apps-check.run`. (evidence: packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts:161-175, pipelines/sites-check-author.ts:169-170)
 - [x] `/team/` (DE) and `/komanda/` (UK) render the hub page without 404. (evidence: system.md:560-568 registers team page with routes de: team, uk: komanda; catch-all `[...slug].astro` handles route; `team.hub.validate` passes; build.prepare succeeded — pre-existing ratgeber page.markdown.generate failure is unrelated)
 - [x] `/gruender/` (DE) and `/zasnovnyk/` (UK) redirect to `/team/andrii-syrokomskyi/` and `/komanda/andrii-syrokomskyi/` respectively. (evidence: `public/_redirects` contains `/gruender/* /team/andrii-syrokomskyi 301` and `/zasnovnyk/* /komanda/andrii-syrokomskyi 301`)
-- [x] `surface.contract.validate` passes with the updated C-contract. (evidence: `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` exit code 0, 5 surfaces validated, 0 violations)
+- [x] `surface.contract.validate` passes with the updated C-contract. (evidence: `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com` exit code 0, 5 surfaces validated, 0 violations)
 - [x] `people-section.astro` suppresses empty sections (heading + body) when `selectPeople` returns `[]`. (evidence: packages/ui/src/sections/people/people-section.astro:71,105,222 — hasPeople guard wraps entire SectionShell)
-- [x] `rfc.validate` passes on this file before merging. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0509` exit code 0)
+- [x] `rfc.validate` passes on this file before merging. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0509` exit code 0)
 
 ## Implementation notes for agents
 

@@ -245,23 +245,23 @@ Each prompt opens with the LLM's task description, references the family's rule 
 
 ```sh
 # Deterministic validators
-pnpm exec site-kernel run audit.agent.readiness.validate --app <id>
-pnpm exec site-kernel run seo.technical.validate         --app <id>
-pnpm exec site-kernel run seo.structured-data.validate   --app <id>
-pnpm exec site-kernel run seo.internal-linking.validate  --app <id>
-pnpm exec site-kernel run analytics.config.validate      --app <id>
-pnpm exec site-kernel run first-party-data.validate      --app <id>
-pnpm exec site-kernel run infra.brief.validate           --app <id>
+pnpm exec werkstatt run audit.agent.readiness.validate --app <id>
+pnpm exec werkstatt run seo.technical.validate         --app <id>
+pnpm exec werkstatt run seo.structured-data.validate   --app <id>
+pnpm exec werkstatt run seo.internal-linking.validate  --app <id>
+pnpm exec werkstatt run analytics.config.validate      --app <id>
+pnpm exec werkstatt run first-party-data.validate      --app <id>
+pnpm exec werkstatt run infra.brief.validate           --app <id>
 
 # LLM driver (one command, parameterized)
-pnpm exec site-kernel run audit.llm.run --app <id> --kind cultural
-pnpm exec site-kernel run audit.llm.run --app <id> --kind linguistic
-pnpm exec site-kernel run audit.llm.run --app <id> --kind emotional
-pnpm exec site-kernel run audit.llm.run --app <id> --kind brand-alignment
-pnpm exec site-kernel run audit.llm.run --app <id> --kind archetype-lens --archetype handwerker
+pnpm exec werkstatt run audit.llm.run --app <id> --kind cultural
+pnpm exec werkstatt run audit.llm.run --app <id> --kind linguistic
+pnpm exec werkstatt run audit.llm.run --app <id> --kind emotional
+pnpm exec werkstatt run audit.llm.run --app <id> --kind brand-alignment
+pnpm exec werkstatt run audit.llm.run --app <id> --kind archetype-lens --archetype handwerker
 
 # Aggregator
-pnpm exec site-kernel run app.qa.validate --app <id>
+pnpm exec werkstatt run app.qa.validate --app <id>
 ```
 
 ### TypeScript contracts

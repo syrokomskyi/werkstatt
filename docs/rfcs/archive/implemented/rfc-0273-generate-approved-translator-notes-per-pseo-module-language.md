@@ -151,11 +151,11 @@ The glossary is allowed to be AI-drafted, but it follows the same freeze-review-
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.translation.notes.generate --app warpgogol-com --module pseo --target de
-pnpm exec site-kernel run surface.translation.notes.review --app warpgogol-com --module pseo --target de
-pnpm exec site-kernel run surface.translation.notes.review --app warpgogol-com --module pseo --target de --approve
-pnpm exec site-kernel run surface.translation.notes.validate --app warpgogol-com --module pseo --json
-pnpm exec site-kernel run surface.translation.glossary.validate --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run surface.translation.notes.generate --app warpgogol-com --module pseo --target de
+pnpm exec werkstatt run surface.translation.notes.review --app warpgogol-com --module pseo --target de
+pnpm exec werkstatt run surface.translation.notes.review --app warpgogol-com --module pseo --target de --approve
+pnpm exec werkstatt run surface.translation.notes.validate --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run surface.translation.glossary.validate --app warpgogol-com --module pseo --json
 ```
 
 ### Validation rules

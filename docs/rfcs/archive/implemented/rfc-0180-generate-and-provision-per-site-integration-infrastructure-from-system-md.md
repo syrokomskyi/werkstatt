@@ -84,14 +84,14 @@ Provisioning becomes a **generated, idempotent, kernel-owned** flow, amending RF
 
 ```sh
 # Generate tenant config + shard assignment from content (idempotent, no network).
-pnpm exec site-kernel run integration.infrastructure.generate --app warpgogol-com
-pnpm exec site-kernel run integration.infrastructure.generate --all --json
+pnpm exec werkstatt run integration.infrastructure.generate --app warpgogol-com
+pnpm exec werkstatt run integration.infrastructure.generate --all --json
 
 # Provision shared resources + tenant upload (CD; idempotent; needs CF credentials).
-pnpm exec site-kernel run integration.infrastructure.provision --app warpgogol-com
+pnpm exec werkstatt run integration.infrastructure.provision --app warpgogol-com
 
 # Portability: re-home a site onto the client's own Cloudflare account.
-pnpm exec site-kernel run site.export.account --app warpgogol-com --account <client-cf-account-id>
+pnpm exec werkstatt run site.export.account --app warpgogol-com --account <client-cf-account-id>
 ```
 
 `generate` is pure/offline (safe for any agent, runs in `build.check`). `provision` and `site.export.account` mutate external state (`mutatesState: true`) and require credentials; they are operator/CD commands, not agent commands.

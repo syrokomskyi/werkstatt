@@ -56,7 +56,7 @@ nonGoals:
   - "Does not register new ruleIds — both PSEO-GLOSS-01 and PUBTXT-07 are already registered"
   - "Does not change the set of files scanned by either validator"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -94,7 +94,7 @@ The fixHints violate the RFC-0203 principle: "Imperative remediation a human or 
 
 ## Decision
 
-The `fixHint` for PSEO-GLOSS-01 includes the exact restamping command (`pnpm exec site-kernel run surface.translation.glossary.generate --module <module> --target <lang>`). The `fixHint` for PUBTXT-07 resolves the generated `public/` file to its source `src/content/prose/{lang}/{slug}.md` path and includes the regeneration command (`pnpm exec site-kernel pipeline build.prepare --site <id>`).
+The `fixHint` for PSEO-GLOSS-01 includes the exact restamping command (`pnpm exec werkstatt run surface.translation.glossary.generate --module <module> --target <lang>`). The `fixHint` for PUBTXT-07 resolves the generated `public/` file to its source `src/content/prose/{lang}/{slug}.md` path and includes the regeneration command (`pnpm exec werkstatt pipeline build.prepare --site <id>`).
 
 ## Architectural fit
 
@@ -124,7 +124,7 @@ fixHint: "Review, approve, and restamp the glossary against the current module c
 After:
 
 ```ts
-fixHint: `Run: pnpm exec site-kernel run surface.translation.glossary.generate --module ${module.id} --target ${target}. Then re-run validation.`,
+fixHint: `Run: pnpm exec werkstatt run surface.translation.glossary.generate --module ${module.id} --target ${target}. Then re-run validation.`,
 ```
 
 Current (missing glossary case, line 392-396):
@@ -136,7 +136,7 @@ fixHint: "Create and approve the module target-language glossary.",
 After:
 
 ```ts
-fixHint: `Run: pnpm exec site-kernel run surface.translation.glossary.generate --module ${module.id} --target ${target} to create the glossary, then approve it.`,
+fixHint: `Run: pnpm exec werkstatt run surface.translation.glossary.generate --module ${module.id} --target ${target} to create the glossary, then approve it.`,
 ```
 
 #### PUBTXT-07 source resolution
@@ -157,7 +157,7 @@ After:
 // Resolve generated public/ path to source prose path
 const sourcePath = resolveProseSource(file, appDir);
 fixHint: sourcePath
-  ? `Fix the source file ${sourcePath}, then re-run: pnpm exec site-kernel pipeline build.prepare --site <id>.`
+  ? `Fix the source file ${sourcePath}, then re-run: pnpm exec werkstatt pipeline build.prepare --site <id>.`
   : "Use a canonical generated route/public file or add the target to the owning route/declaration set.",
 ```
 
@@ -192,7 +192,7 @@ After:
   "severity": "error",
   "file": "src/content/enriched/_translation-glossaries/offer-uk.json",
   "message": "Glossary offer/uk is missing approval or has a stale moduleContextHash.",
-  "fixHint": "Run: pnpm exec site-kernel run surface.translation.glossary.generate --module offer --target uk. Then re-run validation."
+  "fixHint": "Run: pnpm exec werkstatt run surface.translation.glossary.generate --module offer --target uk. Then re-run validation."
 }
 ```
 
@@ -214,7 +214,7 @@ After:
   "severity": "error",
   "file": "public/uk/porady/kategorie/kosten.md",
   "message": "PUBTXT-07 same-site generated link target is not locally known: /uk/porady/skilky-koshtuye-sayt/",
-  "fixHint": "Fix the source file src/content/prose/uk/ratgeber-category-kosten.md, then re-run: pnpm exec site-kernel pipeline build.prepare --site <id>."
+  "fixHint": "Fix the source file src/content/prose/uk/ratgeber-category-kosten.md, then re-run: pnpm exec werkstatt pipeline build.prepare --site <id>."
 }
 ```
 
@@ -243,7 +243,7 @@ After:
 
 - **fixHint length.** The enriched fixHints are longer (include full commands). This is intentional — the console output wraps `fix:` on its own line (RFC-0203 `formatDiagnosticItem`), so length does not clutter the summary.
 - **Source resolution accuracy.** `resolveProseSource` maps `public/{lang}/{path}.md` → `src/content/prose/{lang}/{path}.md`. If the generated file does not follow this convention (e.g., non-prose generated files), the fallback fixHint is used. No false-positive source paths.
-- **Command stability.** The fixHint embeds `pnpm exec site-kernel run surface.translation.glossary.generate` — if the command is renamed, the fixHint becomes stale. This is the same risk as any documentation referencing command names. The fix-patterns.md catalog has the same risk.
+- **Command stability.** The fixHint embeds `pnpm exec werkstatt run surface.translation.glossary.generate` — if the command is renamed, the fixHint becomes stale. This is the same risk as any documentation referencing command names. The fix-patterns.md catalog has the same risk.
 - **Agent misinterpretation.** An agent might run the restamping command without reviewing the glossary first. The fixHint says "Run: ... Then re-run validation" — it does not say "review and approve." The approval step is a human action, not an agent action. This is acceptable: the glossary generate command restamps the hash; approval is a separate human step.
 
 ## Acceptance criteria

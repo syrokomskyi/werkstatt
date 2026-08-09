@@ -67,7 +67,7 @@ nonGoals:
   - "Do not fix generated.files.validate path resolution for systems/ prefix — that is RFC-0606."
   - "Do not address the separate-command outputs that are not in build.prepare for other reasons (e.g., release.prepare-only commands)."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -131,7 +131,7 @@ The `build.prepare` pipeline includes `bordbuch.generate` and `passport.key.ensu
 No new commands. The fix is internal to the `build.prepare` pipeline definition:
 
 ```sh
-pnpm exec site-kernel run build.prepare --site warpgogol-com
+pnpm exec werkstatt run build.prepare --site warpgogol-com
 ```
 
 ### Pipeline changes
@@ -209,7 +209,7 @@ The dev-mode subset pipeline (`SITES_BUILD_PREPARE_DEV_PIPELINE`) is NOT extende
 - [x] `passport.key.ensure` is idempotent (no-op if key file already exists, never prints private key to stdout) (evidence: passport-key-ensure.test.ts "no-op when key file already exists" and "never prints private key to stdout")
 - [x] RFC-0605 is accepted and implemented (prerequisite for `passport.key.ensure`) (evidence: docs/rfcs/rfc-0605-*.md status: implemented, stamped via rfc.implement.stamp)
 - [x] RFC-0606 is accepted and implemented (prerequisite for `generated.files.validate` on bordbuch paths) (evidence: docs/rfcs/rfc-0606-*.md status: implemented, stamped via rfc.implement.stamp)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0604 — All 1 RFC(s) passed)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate RFC-0604 — All 1 RFC(s) passed)
 
 ## Implementation notes for agents
 

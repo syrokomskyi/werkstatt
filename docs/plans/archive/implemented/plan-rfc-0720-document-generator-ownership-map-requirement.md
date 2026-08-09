@@ -100,7 +100,7 @@ None.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0720 --json` — must return `exitCode: 0`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0720 --json` — must return `exitCode: 0`
 - Verify all 5 acceptance criteria are met:
   1. `packages/os/site-kernel-checks/AGENTS.md` includes the new section
   2. `packages/os/site-kernel-handoff/AGENTS.md` includes the cross-reference note
@@ -110,11 +110,11 @@ None.
 - Run `fo-review` via the `skill` tool on the session's code changes (the two AGENTS.md edits)
 - Run `fo-fix` if `fo-review` reports findings (max 3 iterations)
 - Commit the AGENTS.md changes with a message referencing RFC-0720
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0720 --implementation-commit <sha>` to transition `accepted → implemented`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0720 --implementation-commit <sha>` to transition `accepted → implemented`
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0720 --json` — `exitCode: 0`, zero violations
+- `pnpm exec werkstatt run rfc.validate --id RFC-0720 --json` — `exitCode: 0`, zero violations
 - `git status` — clean working tree after stamping
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -126,7 +126,7 @@ None.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0720` — must pass with zero errors
+- `pnpm exec werkstatt run rfc.validate --id RFC-0720` — must pass with zero errors
 - No `build:check` needed — no code changes
 - No acceptance probes — RFC-0720 has no `acceptance` frontmatter field
 - No `rfc.verification.emit` needed — RFC-0720 has no acceptance probes (RFC-0330 applies only to probe-bearing RFCs)

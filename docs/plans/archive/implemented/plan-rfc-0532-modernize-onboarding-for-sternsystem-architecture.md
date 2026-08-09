@@ -82,7 +82,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-onboarding test`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0532`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0532`
 
 ## 3. Step sequence
 
@@ -207,7 +207,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.port.scaffold --skill fo-onboard` (RFC-0393) to create `.agents/skills/fo-onboard/` with forge-compliant structure
+- Run `pnpm exec werkstatt run forge.port.scaffold --skill fo-onboard` (RFC-0393) to create `.agents/skills/fo-onboard/` with forge-compliant structure
 - Write `SKILL.md` with the orchestration steps: Prepare (read brief, validate) → Synthesize (run `onboarding.synthesize`, then AI synthesis) → Register (run `sternsystem.register`) → Handoff (report results)
 - Write `learned-principles.md` (empty, for cumulative knowledge)
 - Write `qa-log.md` (empty, for cumulative knowledge)
@@ -215,7 +215,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --skill fo-onboard` (if available)
+- `pnpm exec werkstatt run forge.skill.validate --skill fo-onboard` (if available)
 - Verify `.agents/skills/fo-onboard/SKILL.md` exists and references `onboarding.synthesize` and `sternsystem.register`
 
 **Completion criterion:** `fo-onboard` skill exists at `.agents/skills/fo-onboard/SKILL.md` with orchestration steps documented.
@@ -256,12 +256,12 @@ scope:
 - Update `packages/os/site-kernel-handoff/AGENTS.md`: document extended `sternsystem.register` with pin, mission, materialization, and amend flags
 - Update root `AGENTS.md`: update any onboarding references
 - Update `docs/COMMANDS.md`: remove old commands, add `onboarding.synthesize`, mark `sternsystem.register` as changed
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
 
 **Validation:**
 
 - `git diff` shows documentation changes only
-- `pnpm exec site-kernel run ecosystem.manifest.validate` (if available)
+- `pnpm exec werkstatt run ecosystem.manifest.validate` (if available)
 
 **Completion criterion:** All documentation files in scope are updated. `docs/ecosystem.generated.yaml` is regenerated.
 
@@ -276,18 +276,18 @@ scope:
 **Agent actions:**
 
 - Verify every acceptance criterion in RFC-0532 against the implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0532`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0532`
 - Run `pnpm --filter @gogol/site-kernel-onboarding build:check`
 - Run `pnpm --filter @gogol/site-kernel-onboarding test`
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff test`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0532` and commit the evidence file
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0532 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0532` and commit the evidence file
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0532 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0532` — zero errors
+- `pnpm exec werkstatt run rfc.validate --id RFC-0532` — zero errors
 - All build:check and test commands pass
 
 **Completion criterion:** All acceptance criteria checked off with evidence. RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -298,13 +298,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0532`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0532`
 - `pnpm --filter @gogol/site-kernel-onboarding build:check`
 - `pnpm --filter @gogol/site-kernel-onboarding test`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0532` (RFC-0330)
-- `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0532 --implementation-commit <sha>`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0532` (RFC-0330)
+- `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0532 --implementation-commit <sha>`
 
 ### 4.2 Evidence artifacts
 
@@ -324,6 +324,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44, DNA-45, DNA-46, or DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0532 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44, DNA-45, DNA-46, or DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0532 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `scaffold.ts` deletion breaks `mission.materialize` (which imports `applyTokens` from `@gogol/site-kernel-onboarding`), move the affected exports to `templates.ts` before deletion (Step 3 handles this).
 - If the amend lifecycle commands (7 commands deferred to nonGoals) break due to path changes, create a follow-up RFC to migrate them — do not fix them inline in this RFC's implementation.

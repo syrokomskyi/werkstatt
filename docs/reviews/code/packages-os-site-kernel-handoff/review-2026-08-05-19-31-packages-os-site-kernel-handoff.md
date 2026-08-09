@@ -24,8 +24,8 @@ Pass.
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passed.
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` passed (618 passed, 2 skipped).
-- `pnpm exec site-kernel run rfc.validate --id RFC-0701` passed with 0 violations.
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0701` skipped due to no probes (expected).
+- `pnpm exec werkstatt run rfc.validate --id RFC-0701` passed with 0 violations.
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0701` skipped due to no probes (expected).
 
 ## Axis A — Structural correctness
 

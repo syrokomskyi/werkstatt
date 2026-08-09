@@ -50,7 +50,7 @@ nonGoals:
   - Does not modify RFC-0463's rules or acceptance criteria.
   - Does not introduce new commands, types, or code changes — this is a document-editing operation only.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -105,7 +105,7 @@ This RFC authorizes a batch backfill operation:
 No new commands. The backfill uses existing `rfc.validate --json` to detect violations and standard `edit`/`multi_edit` tools to fix RFC files.
 
 ```sh
-pnpm exec site-kernel run rfc.validate --json
+pnpm exec werkstatt run rfc.validate --json
 ```
 
 ### TypeScript contracts

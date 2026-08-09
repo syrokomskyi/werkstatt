@@ -30,7 +30,7 @@ No issues. The changes are pure content additions (string literals pushed to arr
 
 ### Axis B — DNA alignment
 
-No issues. DNA-54 (Forge bindings contract) is satisfied — the capability showcase text and behavioral layer policy text contain no hardcoded project-specific literals. The capability descriptions are generic Forge capabilities ("describe an idea", "check project health"), not project-specific values. SKILL-11 validation confirms no `pnpm exec site-kernel run` or `docs/architecture-dna.md` literals in skill instruction lines.
+No issues. DNA-54 (Forge bindings contract) is satisfied — the capability showcase text and behavioral layer policy text contain no hardcoded project-specific literals. The capability descriptions are generic Forge capabilities ("describe an idea", "check project health"), not project-specific values. SKILL-11 validation confirms no `pnpm exec werkstatt run` or `docs/architecture-dna.md` literals in skill instruction lines.
 
 ### Axis C — Ecosystem fit
 

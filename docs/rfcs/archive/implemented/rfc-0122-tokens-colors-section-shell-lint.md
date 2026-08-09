@@ -108,11 +108,11 @@ The command is registered in `PACKAGES_CHECK_PIPELINE` alongside the existing `t
 ## CLI surface
 
 ```
-pnpm exec site-kernel run tokens.colors.section-shell.lint
-pnpm exec site-kernel run tokens.colors.section-shell.lint --json
+pnpm exec werkstatt run tokens.colors.section-shell.lint
+pnpm exec werkstatt run tokens.colors.section-shell.lint --json
 ```
 
-Run as part of `pnpm exec site-kernel run packages-check.run`.
+Run as part of `pnpm exec werkstatt run packages-check.run`.
 
 ## Failure modes
 
@@ -124,7 +124,7 @@ Run as part of `pnpm exec site-kernel run packages-check.run`.
 - [x] `packages/os/site-kernel-checks/src/section-shell-tokens.ts` exists and exports `runSectionShellColorTokenLint`. (evidence: packages/ directory, package exists)
 - [x] `tokens.colors.section-shell.lint` is registered in `module.ts` and listed in `PACKAGES_CHECK_PIPELINE`. (evidence: implemented historically)
 - [x] `--json` output is stable (`{ command, status, violations: [...] }`). (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run tokens.colors.section-shell.lint` exits zero on the current workspace. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run tokens.colors.section-shell.lint` exits zero on the current workspace. (evidence: implemented historically)
 - [x] A deliberately introduced `#ff0000` in one of the scoped CSS files makes the validator fail with `SHELL-TOK-01` (verified locally, reverted before commit). (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

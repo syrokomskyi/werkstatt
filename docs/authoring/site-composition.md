@@ -37,7 +37,7 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 
 Every published video or content image in a site must have a material credit sidecar before it is committed. When adding a `media.source.name` video, a living-photo clip (RFC-0202: a `live` block with a `photo` token, or ambient media via `media.source.fromImage`), or a content image token such as `backgroundImage`, `image`, `imageName`, `photo`, `portraitImage`, or `src` under `pages`, `business`, or `site`, add a matching `*.credits.yaml` file in the same `assets/` folder. A living-photo video is a distinct `kind: video` material and requires its own credit sidecar, separate from the still-image credit.
 
-Credit sidecars are the source for inline `Bildnachweis`/localized disclosures and for the generated `/credits` page. Missing credits are not advisory: `material.credits.validate` runs in `sites-check.author` and `build:check`, so uncited material blocks deployment. Validate with `pnpm exec site-kernel run material.credits.validate --site <id>`.
+Credit sidecars are the source for inline `Bildnachweis`/localized disclosures and for the generated `/credits` page. Missing credits are not advisory: `material.credits.validate` runs in `sites-check.author` and `build:check`, so uncited material blocks deployment. Validate with `pnpm exec werkstatt run material.credits.validate --site <id>`.
 
 Use `docs/authoring/material-credits.md` for sidecar templates and rights-notice conventions.
 
@@ -188,7 +188,7 @@ A person is described **once** as a canonical record; the People section, the op
 **1. Author a Person record** at `src/content/people/<lang>/<slug>.md` (default-language anchor required; other languages overlay it per RFC-0008 — typically only `role` + `bio` differ). Scaffold one with `person.create`:
 
 ```sh
-rtk pnpm exec site-kernel run person.create --site <id> --slug andrii-syrokomskyi --name "Andrii Syrokomskyi" --page
+rtk pnpm exec werkstatt run person.create --site <id> --slug andrii-syrokomskyi --name "Andrii Syrokomskyi" --page
 ```
 
 ```yaml
@@ -258,7 +258,7 @@ The growth layer provides vendor-agnostic event tracking, content-declared funne
 2. Set `cosmicName: <Name>` in the new manifest.yaml.
 3. Register the name in `PLANET_IMPORT_PATHS` (sections + passport pages) or `MOON_IMPORT_PATHS` (shell components) in `packages/share/src/page.ts`.
 4. Add the name to `src/content/system.md` `pages[pageId].planets[]` (or `pages[pageId].shell.<slot>.cosmicMoon`) of every site that uses it. There is no longer a `system.yaml` or `src/content/assets/system.md` to update — `src/content/system.md` is the single canonical manifest (RFC-0047).
-5. Run `pnpm exec site-kernel run cosmic.catalog.validate cosmic.name.unique manifest.contract.validate page.block.validate` before merging.
+5. Run `pnpm exec werkstatt run cosmic.catalog.validate cosmic.name.unique manifest.contract.validate page.block.validate` before merging.
 
 Skipping any of steps 2–4 produces silent mismatches that surface only at runtime as `[buildPage] No component import path registered for ...`.
 
@@ -508,7 +508,7 @@ A site's `AGENTS.md`, `src/content/AGENTS.md`, and `src/styles/AGENTS.md` are **
 **Agent rules:**
 
 - **Never edit a generated AGENTS.md file.** Changes made directly to these files will be overwritten the next time `agents.generate` runs (every `pnpm build`).
-- **To change instructions that apply to all sites** — edit the shared template in `packages/os/site-kernel-codegen/src/templates/app-boilerplate/`, then run `pnpm exec site-kernel run agents.generate --site <id>` for every affected site.
+- **To change instructions that apply to all sites** — edit the shared template in `packages/os/site-kernel-codegen/src/templates/app-boilerplate/`, then run `pnpm exec werkstatt run agents.generate --site <id>` for every affected site.
 - **To add site-specific rules** — add them to the `## Site-specific notes` section at the bottom of the site's `AGENTS.md`. The generator preserves this section on every regeneration.
 
 ## Universal authored import/export contract

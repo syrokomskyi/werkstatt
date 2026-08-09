@@ -116,8 +116,8 @@ Today:
 No new commands. The change is a validation rule plus conventions:
 
 ```sh
-pnpm exec site-kernel run rfc.validate          # now includes V-25
-pnpm exec site-kernel run rfc.validate --json
+pnpm exec werkstatt run rfc.validate          # now includes V-25
+pnpm exec werkstatt run rfc.validate --json
 ```
 
 ### TypeScript contracts

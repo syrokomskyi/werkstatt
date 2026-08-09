@@ -68,7 +68,7 @@ nonGoals:
   - "Changing the welcoming report structure beyond Section 4 content — sections 1-3, 5-6 remain as defined in RFC-0547"
   - "Making the creative register non-interactive — the agent still asks questions, but never about git commits"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

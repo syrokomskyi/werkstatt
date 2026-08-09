@@ -84,7 +84,7 @@ scope:
   - Add `emailField` to `propsSchema.required`
   - Remove `contactRequirementMessage` from `propsSchema.required`
   - Bump manifest `version` from `1.0.0` to `1.1.0`
-- Run `pnpm exec site-kernel run props.types.generate` to regenerate `send-message-section.types.generated.ts`
+- Run `pnpm exec werkstatt run props.types.generate` to regenerate `send-message-section.types.generated.ts`
 
 **Validation:**
 
@@ -195,7 +195,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — verify command compiles
-- `pnpm exec site-kernel run contact.form.validate --site warpgogol-com` — verify command runs (may fail if site content not yet migrated — expected at this step)
+- `pnpm exec werkstatt run contact.form.validate --site warpgogol-com` — verify command runs (may fail if site content not yet migrated — expected at this step)
 
 **Completion criterion:** Command is registered, compiles, and runs; it exits non-zero when `emailField` is missing or cross-locale inconsistent.
 
@@ -226,7 +226,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — verify migrator compiles
 - `pnpm --filter @gogol/site-kernel-handoff test` — verify migrator tests pass
-- `pnpm exec site-kernel run migrator.registry.validate` — verify registry correspondence
+- `pnpm exec werkstatt run migrator.registry.validate` — verify registry correspondence
 
 **Completion criterion:** Migrator is registered, compiles, passes tests (including idempotency), and `migrator.registry.validate` passes.
 
@@ -245,7 +245,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run content.voice.lint --site warpgogol-com` — verify labels pass voice lint
+- `pnpm exec werkstatt run content.voice.lint --site warpgogol-com` — verify labels pass voice lint
 
 **Completion criterion:** Labels exist in both DE and UK locales and pass voice lint.
 
@@ -261,19 +261,19 @@ scope:
 
 - Update `packages/ui/AGENTS.md` — document the new `emailField`/`phoneField` props in the send-message section contract notes
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add `src/contact-form.ts` module entry to the "What lives here" table
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml`
-- Run `pnpm exec site-kernel run rfc.validate` — verify RFC-0514 passes
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run rfc.validate` — verify RFC-0514 passes
 - Run `pnpm --filter @gogol/ui run build:check` — full UI package check
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — full checks package check
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — full handoff package check
-- Run `pnpm exec site-kernel run contact.form.validate --site warpgogol-com` — verify command passes after migrator application
+- Run `pnpm exec werkstatt run contact.form.validate --site warpgogol-com` — verify command passes after migrator application
 - Check off acceptance criteria in the RFC
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0514 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0514 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate` — passes for RFC-0514
+- `pnpm exec werkstatt run rfc.validate` — passes for RFC-0514
 - All acceptance criteria checked off with inline `(evidence: ...)` annotations
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria are checked off; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -284,13 +284,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate` — RFC-0514 passes mechanical validation
+- `pnpm exec werkstatt run rfc.validate` — RFC-0514 passes mechanical validation
 - `pnpm --filter @gogol/ui run build:check` — UI package compiles and passes checks
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — checks package compiles and passes
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — handoff package compiles and passes
 - `pnpm --filter @gogol/site-kernel-handoff test` — migrator tests pass (including idempotency)
-- `pnpm exec site-kernel run migrator.registry.validate` — migrator-RFC correspondence verified
-- `pnpm exec site-kernel run contact.form.validate --site warpgogol-com` — command passes after migrator
+- `pnpm exec werkstatt run migrator.registry.validate` — migrator-RFC correspondence verified
+- `pnpm exec werkstatt run contact.form.validate --site warpgogol-com` — command passes after migrator
 
 ### 4.2 Evidence artifacts
 
@@ -308,5 +308,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-17 (Uni manifest contract), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0514 --reason "..." --invariant "DNA-17"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-17 (Uni manifest contract), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0514 --reason "..." --invariant "DNA-17"` instead of working around it.
 - If the migrator cannot handle a site's send-message block configuration, do not patch the migrator to special-case it — raise the issue and let the operator fix the content in the workpiece (RFC-0479 error handling).

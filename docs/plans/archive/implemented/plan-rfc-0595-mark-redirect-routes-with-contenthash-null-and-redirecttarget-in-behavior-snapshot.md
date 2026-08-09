@@ -60,7 +60,7 @@ scope:
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 - `pnpm --filter @warpgogol/site-kernel-checks build:check`
 - `pnpm --filter @warpgogol/share build:check`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0595`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0595`
 - No pipeline wiring changes (`behavior.snapshot.capture` and `behavior.snapshot.generate` already run in their existing pipelines).
 
 ## 3. Step sequence
@@ -240,16 +240,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected for this RFC).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected for this RFC).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0595 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0595 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0595`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0595`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -261,7 +261,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0595`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0595`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
@@ -286,5 +286,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49 or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0595 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49 or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0595 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `isHtmlRedirectPage` is moved to `@warpgogol/share/redirects` by RFC-0592 before this RFC is implemented, update the import path in Steps 3 and 5 from `@warpgogol/share/semantic/image-sitemap` to `@warpgogol/share/redirects`.

@@ -42,7 +42,7 @@ Read `systems/registry.yaml`. If exactly one active system exists, use it. If mu
 
 ### 2. Discovery loop (max 6 iterations)
 
-Run `pnpm exec site-kernel run page.block.validate --site <site-id> --json` from the repository root.
+Run `pnpm exec werkstatt run page.block.validate --site <site-id> --json` from the repository root.
 
 Parse violations. For each violation:
 
@@ -59,7 +59,7 @@ For each fix, classify it as one of three patterns (see `fix-patterns.md`):
 Apply fixes grouped by pattern. After each group:
 
 1. **Verify** — re-run `page.block.validate` for the affected pages.
-2. **Commit** — workpiece content fixes via `pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "fix: <pattern description>"`. Platform manifest fixes via `git add <files> && git commit -m "fix: <pattern description>"`.
+2. **Commit** — workpiece content fixes via `pnpm exec werkstatt run mission.git.commit --mission <missionId> --message "fix: <pattern description>"`. Platform manifest fixes via `git add <files> && git commit -m "fix: <pattern description>"`.
 
 If violations remain after 6 iterations, stop and report what is left for manual intervention.
 

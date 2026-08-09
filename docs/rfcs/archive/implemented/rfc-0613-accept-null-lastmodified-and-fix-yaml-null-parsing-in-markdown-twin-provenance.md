@@ -63,7 +63,7 @@ nonGoals:
   - "Do not remove the lastModified field from required fields — it must be present, just allowed to be null."
   - "Do not replace the hand-rolled YAML parser in parseMarkdownTwinFrontmatter with the yaml package — only fix null handling."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -222,7 +222,7 @@ frontmatter[key] = stripped === "null" ? null : stripped;
 - [x] `page.markdown.validate` still rejects invalid date strings with MDMETA-04 (evidence: `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts:148-165` — `"2026-7-4"` rejected with MDMETA-04, exitCode 1)
 - [x] `pnpm --filter @warpgogol/share test` passes (evidence: 30 test files, 265 tests passed, including 8 new tests in `markdown-twin-provenance.test.ts`)
 - [x] `pnpm --filter @warpgogol/site-kernel-checks test` passes (evidence: 111 test files, 674 tests passed, including 5 new tests in `page-markdown.test.ts`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0613 --json` — status: pass, violations: [], exitCode: 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0613 --json` — status: pass, violations: [], exitCode: 0)
 
 ## Implementation notes for agents
 

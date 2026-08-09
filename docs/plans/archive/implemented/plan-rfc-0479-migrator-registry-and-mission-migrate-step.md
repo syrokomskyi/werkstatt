@@ -73,8 +73,8 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/ontology build:check`
-- `pnpm exec site-kernel run rfc.validate RFC-0479 --json`
-- `pnpm exec site-kernel run migrator.registry.validate` (new command)
+- `pnpm exec werkstatt run rfc.validate RFC-0479 --json`
+- `pnpm exec werkstatt run migrator.registry.validate` (new command)
 
 ## 3. Step sequence
 
@@ -155,7 +155,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run mission.migrate --mission <test-mission>` works on a fixture
+- `pnpm exec werkstatt run mission.migrate --mission <test-mission>` works on a fixture
 
 **Completion criterion:** `mission.migrate` applies migrators, updates cursor, writes evidence, acquires locks, appends Bordbuch entry; all failure modes handled.
 
@@ -243,8 +243,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0479 --json` passes
-- `pnpm exec site-kernel run workspace.surface.validate` passes (if available)
+- `pnpm exec werkstatt run rfc.validate RFC-0479 --json` passes
+- `pnpm exec werkstatt run workspace.surface.validate` passes (if available)
 
 **Completion criterion:** All documentation updated; no references to old `migrator.validate` command.
 
@@ -258,12 +258,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0479 --json` — confirm pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0479 --json` — confirm pass
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check` — confirm pass
 - Run `pnpm --filter @gogol/ontology build:check` — confirm pass
 - Run `pnpm --filter @gogol/site-kernel-handoff test` — confirm pass
-- Run `pnpm exec site-kernel run migrator.registry.validate` — confirm pass
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0479` (RFC-0476) to transition to implemented
+- Run `pnpm exec werkstatt run migrator.registry.validate` — confirm pass
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0479` (RFC-0476) to transition to implemented
 
 **Validation:**
 
@@ -277,11 +277,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0479 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0479 --json`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -300,5 +300,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 (pin schema), DNA-46 (mission lifecycle), or DNA-47 (materialization), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0479 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-44 (pin schema), DNA-46 (mission lifecycle), or DNA-47 (materialization), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0479 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If the `handoffLockSchema` change reveals a conflict with RFC-0221's handoff contract that cannot be resolved by amending, run `rfc.supersede.propose` for RFC-0221.

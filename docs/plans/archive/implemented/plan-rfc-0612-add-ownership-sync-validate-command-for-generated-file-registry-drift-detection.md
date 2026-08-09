@@ -128,7 +128,7 @@ No configuration or data files affected. The command reads `GENERATOR_OWNERSHIP_
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run ownership.sync.validate --site warpgogol-com --json` does not return "unknown command"
+- `pnpm exec werkstatt run ownership.sync.validate --site warpgogol-com --json` does not return "unknown command"
 
 **Completion criterion:** Command is registered and callable via `site-kernel run`
 
@@ -214,7 +214,7 @@ No configuration or data files affected. The command reads `GENERATOR_OWNERSHIP_
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate the ecosystem manifest with the new command
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate the ecosystem manifest with the new command
 
 **Validation:**
 
@@ -233,16 +233,16 @@ No configuration or data files affected. The command reads `GENERATOR_OWNERSHIP_
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0612 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0612 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0612`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0612`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -254,7 +254,7 @@ No configuration or data files affected. The command reads `GENERATOR_OWNERSHIP_
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0612`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0612`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks test -- --run`
 
@@ -275,4 +275,4 @@ No configuration or data files affected. The command reads `GENERATOR_OWNERSHIP_
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0612 --reason "..." --invariant "DNA-58"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0612 --reason "..." --invariant "DNA-58"` instead of working around it.

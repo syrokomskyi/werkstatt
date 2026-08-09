@@ -173,12 +173,12 @@ scope:
 **Agent actions:**
 
 - Add a row to the module table in `packages/os/site-kernel-checks/AGENTS.md`: `| src/behavior-snapshot-staleness.ts | RFC-0721 runBehaviorSnapshotStalenessCheck — advisory pre-build warning when system.md pages[] routes are absent from behavior.snapshot.generated.yaml. Diagnostics: SNAP-STALE-01 (warning). One-directional: only checks newRoutes direction. |`
-- Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`.
+- Run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml`.
 - Verify the new command appears in the manifest with `scope: "app"`.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0721` — passes (RFC-CMD-02 checks command manifest).
+- `pnpm exec werkstatt run rfc.validate --id RFC-0721` — passes (RFC-CMD-02 checks command manifest).
 - `git diff docs/command-manifest.generated.yaml` — shows the new command entry.
 
 **Completion criterion:** AGENTS.md module table has the new entry; `docs/command-manifest.generated.yaml` includes `behavior.snapshot.staleness.check` with `scope: "app"`.
@@ -195,14 +195,14 @@ scope:
 
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — TypeScript compiles.
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test` — all tests pass.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0721` — passes.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0721` — passes.
 - Check off each acceptance criterion in the RFC with inline `(evidence: <file:line>)` annotations.
 - Commit all changes with `RFC-0721` in the commit message.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from this session (except pre-existing modified files not related to RFC-0721).
-- `pnpm exec site-kernel run rfc.validate --id RFC-0721` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0721` — passes.
 
 **Completion criterion:** All validation checks pass; all acceptance criteria are checked off with evidence annotations.
 
@@ -217,16 +217,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-checks/AGENTS.md` is updated with the new module entry.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0721 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0721 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0721` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0721` — passes.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -237,7 +237,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0721`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0721`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 
@@ -256,5 +256,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-39 (route registry merge), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0721 --reason "..." --invariant "DNA-39"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-39 (route registry merge), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0721 --reason "..." --invariant "DNA-39"` instead of working around it.
 - If the staleness check needs to compare against the merged route registry instead of just `system.md pages[]`, this requires a new RFC (the current design is intentionally one-directional to avoid surface route false positives).

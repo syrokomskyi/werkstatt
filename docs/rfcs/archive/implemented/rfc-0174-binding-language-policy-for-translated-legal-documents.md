@@ -137,10 +137,10 @@ The binding-language render itself never gets a notice or indicator (it _is_ the
 
 ```sh
 # Validate every app's legal-translation contract
-pnpm exec site-kernel run legal.translation.validate --all --json
+pnpm exec werkstatt run legal.translation.validate --all --json
 
 # Single app
-pnpm exec site-kernel run legal.translation.validate --app nicaragua-projekt
+pnpm exec werkstatt run legal.translation.validate --app nicaragua-projekt
 ```
 
 ### TypeScript contracts

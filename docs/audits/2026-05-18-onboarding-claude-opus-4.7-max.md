@@ -132,8 +132,8 @@ slots:
 **Исправить:** добавить шаг между 2 и 3:
 
 ```
-2.5. pnpm exec site-kernel run onboarding.scaffold --client <client.id> --domain <client.domain>
-2.6. pnpm exec site-kernel run kernel.wire --app <client.id>       # после реализации 3.1
+2.5. pnpm exec werkstatt run onboarding.scaffold --client <client.id> --domain <client.domain>
+2.6. pnpm exec werkstatt run kernel.wire --app <client.id>       # после реализации 3.1
 ```
 
 Также добавить `onboarding.scaffold` и `kernel.wire` в `runs:` frontmatter.
@@ -329,12 +329,12 @@ const PHASE_ARTIFACTS: Record<OnboardingPhase, PhaseArtifactSpec[]> = {
 
 Прогнать **полностью** workflow-цепочку на `warpgogol-handwerk` (текущий бриф). Шаги:
 
-1. `pnpm exec site-kernel run workflow.lint` → должен пройти.
-2. `pnpm exec site-kernel run brief.validate` → должен пройти после исправления значений в `00-brief.md` человеком (`client.id`, `client.domain` — placeholder values сейчас).
+1. `pnpm exec werkstatt run workflow.lint` → должен пройти.
+2. `pnpm exec werkstatt run brief.validate` → должен пройти после исправления значений в `00-brief.md` человеком (`client.id`, `client.domain` — placeholder values сейчас).
 3. Пройти 00 → 06 workflow с agent autorun.
 4. На handoff: `pnpm --filter warpgogol-handwerk dev` открывается.
-5. `pnpm exec site-kernel run apps-check.run --app warpgogol-handwerk` → exit 0.
-6. `pnpm exec site-kernel run app.contract.full --app warpgogol-handwerk` → exit 0.
+5. `pnpm exec werkstatt run apps-check.run --app warpgogol-handwerk` → exit 0.
+6. `pnpm exec werkstatt run app.contract.full --app warpgogol-handwerk` → exit 0.
 
 Любой из шагов, который не доходит до exit 0, — это новый bug-ticket.
 
@@ -482,8 +482,8 @@ extensible by RFC.
     (сейчас placeholder: your-client-id / example.de) и подтверждение пользователя
     на запуск полной цепочки.
 12. Запустить acceptance-проход (§5.10):
-    pnpm exec site-kernel run workflow.lint        # должен exit 0
-    pnpm exec site-kernel run brief.validate        # exit 0 после заполнения brief
+    pnpm exec werkstatt run workflow.lint        # должен exit 0
+    pnpm exec werkstatt run brief.validate        # exit 0 после заполнения brief
     # потом следовать .agents/workflows/ от 00-prepare.md далее
 13. После handoff — собрать changelist для человеческого ревью.
 ```

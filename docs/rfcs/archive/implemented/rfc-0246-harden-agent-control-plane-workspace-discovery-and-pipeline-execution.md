@@ -43,7 +43,7 @@ packagesImpacted:
   - "@gogol-integrations/lagebild-sync-worker"
 successSignals:
   - "`docs/ecosystem.generated.json` includes every package matched by `pnpm-workspace.yaml`, including `integrations/lagebild-sync-worker`."
-  - "`pnpm exec site-kernel run packages.check --json` and `pnpm exec site-kernel run packages-check.run --json` both execute from the workspace root without requiring a target app."
+  - "`pnpm exec werkstatt run packages.check --json` and `pnpm exec werkstatt run packages-check.run --json` both execute from the workspace root without requiring a target app."
   - "`ecosystem.manifest.validate --json` fails when any workspace package, integration package, root pipeline, or exported pipeline is omitted from the committed Agent Control Plane manifest."
   - "The manifest exposes deterministic metadata without presenting `1970-01-01T00:00:00.000Z` as a real generation time."
 nonGoals:
@@ -60,8 +60,8 @@ RFC-0245 introduced the Agent Control Plane manifest and maintenance debt ledger
 
 Observed failures:
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json` fails because `docs/ecosystem.generated.json` is drifted from live workspace state.
-- `pnpm exec site-kernel run packages-check.run --json` executes and reports the drift, but `pnpm exec site-kernel run packages.check --json` fails with `No target app with a kernel config could be resolved.`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json` fails because `docs/ecosystem.generated.json` is drifted from live workspace state.
+- `pnpm exec werkstatt run packages-check.run --json` executes and reports the drift, but `pnpm exec werkstatt run packages.check --json` fails with `No target app with a kernel config could be resolved.`
 - `pnpm-workspace.yaml` includes `integrations/*`, but `packages/os/site-kernel-checks/src/ecosystem.ts` discovers only `packages` and `packages/os`.
 - `integrations/lagebild-sync-worker/package.json` is a real workspace package and is invisible in the current manifest.
 - The manifest stores `generatedAt: "1970-01-01T00:00:00.000Z"`. The value is deterministic, but an agent may interpret it as stale real time rather than a stable sentinel.
@@ -102,11 +102,11 @@ The runtime change belongs in `@gogol/site-kernel`, because root pipeline execut
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run workspace.surface.validate --json
-pnpm exec site-kernel run ecosystem.manifest.generate
-pnpm exec site-kernel run ecosystem.manifest.validate --json
-pnpm exec site-kernel run packages.check --json
-pnpm exec site-kernel run packages-check.run --json
+pnpm exec werkstatt run workspace.surface.validate --json
+pnpm exec werkstatt run ecosystem.manifest.generate
+pnpm exec werkstatt run ecosystem.manifest.validate --json
+pnpm exec werkstatt run packages.check --json
+pnpm exec werkstatt run packages-check.run --json
 ```
 
 `workspace.surface.validate` is workspace-scoped and read-only. It verifies:
@@ -236,8 +236,8 @@ Manifest schema v2 can break consumers that assume top-level `generatedAt`. The 
 - [x] Workspace package discovery is derived from `pnpm-workspace.yaml`, including `integrations/*`. (evidence: implemented historically)
 - [x] `docs/ecosystem.generated.json` records `integrations/lagebild-sync-worker`. (evidence: docs/ directory, documentation exists)
 - [x] Manifest metadata exposes schema version, deterministic policy, source hash or content hash, and no misleading real timestamp. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run packages.check --json` runs from the repository root without an app target. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run packages-check.run --json` and `packages.check` have documented, test-pinned relationship. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages.check --json` runs from the repository root without an app target. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run --json` and `packages.check` have documented, test-pinned relationship. (evidence: implemented historically)
 - [x] `workspace.surface.validate` is registered as a workspace-scoped command and returns canonical diagnostics. (evidence: implemented historically)
 - [x] `workspace.surface.validate` is included in `PACKAGES_CHECK_PIPELINE`. (evidence: implemented historically)
 - [x] `ecosystem.manifest.validate --json`, `packages-check.run --json`, and `rfc.validate` pass after regeneration. (evidence: implemented historically)

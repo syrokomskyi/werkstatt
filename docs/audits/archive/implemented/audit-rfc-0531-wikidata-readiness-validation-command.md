@@ -16,7 +16,7 @@ The RFC is structurally sound, follows the existing `jsonld.parity` command patt
 
 ## Mechanical validation (rfc.validate)
 
-Pass — `pnpm exec site-kernel run rfc.validate RFC-0531 --json` returned 0 violations.
+Pass — `pnpm exec werkstatt run rfc.validate RFC-0531 --json` returned 0 violations.
 
 ## Axis A — Structural completeness
 

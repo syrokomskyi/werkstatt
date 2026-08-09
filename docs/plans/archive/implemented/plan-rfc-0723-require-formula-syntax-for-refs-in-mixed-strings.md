@@ -157,7 +157,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0723 --json` — V-19 warning resolved
+- `pnpm exec werkstatt run rfc.validate --id RFC-0723 --json` — V-19 warning resolved
 
 **Completion criterion:** `rfc.validate --id RFC-0723` reports zero violations (zero warnings, zero errors).
 
@@ -171,9 +171,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run content.formula.migrate --app warpgogol-com`
+- Run `pnpm exec werkstatt run content.formula.migrate --app warpgogol-com`
 - Review the diff — verify conversions are correct
-- Run `pnpm exec site-kernel run content.references.validate --app warpgogol-com` — verify zero REF-04 warnings remain
+- Run `pnpm exec werkstatt run content.references.validate --app warpgogol-com` — verify zero REF-04 warnings remain
 - Commit the migrated content
 
 **Validation:**
@@ -197,16 +197,16 @@ scope:
 - Run `pnpm --filter @warpgogol/share run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0723`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0723`
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`
 - Check off acceptance criteria: verify each criterion against implemented code, mark `[x]` with `(evidence: ...)` annotations
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0723 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0723 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from this session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0723` — zero violations
+- `pnpm exec werkstatt run rfc.validate --id RFC-0723` — zero violations
 - All affected packages pass `build:check`
 - All new/changed tests pass
 - Review report exists in `docs/reviews/code/`
@@ -219,14 +219,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0723`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0723`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
 - `pnpm --filter @warpgogol/share run test`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 - `pnpm --filter @warpgogol/site-kernel-codegen run test`
-- `pnpm exec site-kernel run content.references.validate --app warpgogol-com` — zero REF-04 warnings
+- `pnpm exec werkstatt run content.references.validate --app warpgogol-com` — zero REF-04 warnings
 
 ### 4.2 Evidence artifacts
 
@@ -244,4 +244,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-4 or DNA-24, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0723 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-4 or DNA-24, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0723 --reason "..." --invariant "DNA-N"` instead of working around it.

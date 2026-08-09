@@ -150,9 +150,9 @@ scope:
 
 - `APPS_BUILD_PREPARE_PIPELINE` — add `yaml.contract.lint`
 - `packages-check` pipeline — remove `json.generated.marker.validate`
-- `pnpm exec site-kernel run rfc.validate RFC-0376 --json`
-- `pnpm exec site-kernel run yaml.contract.lint --json`
-- `pnpm exec site-kernel run packages-check.run --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0376 --json`
+- `pnpm exec werkstatt run yaml.contract.lint --json`
+- `pnpm exec werkstatt run packages-check.run --json`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/share build:check`
 - `pnpm --filter @gogol/ui build:check`
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes
-- `pnpm exec site-kernel run yaml.contract.lint --json` runs (will fail with violations until migration completes — that's expected)
+- `pnpm exec werkstatt run yaml.contract.lint --json` runs (will fail with violations until migration completes — that's expected)
 
 **Completion criterion:** `yaml.contract.lint` command registered and runnable; **not** yet in `APPS_BUILD_PREPARE_PIPELINE`
 
@@ -340,9 +340,9 @@ scope:
 **Agent actions:**
 
 - Delete all `.generated.json` files from the repository
-- Run `pnpm exec site-kernel run command.manifest.generate` to produce `.generated.yaml`
-- Run `pnpm exec site-kernel run gitattributes.generate` to update `.gitattributes`
-- Run `pnpm exec site-kernel run uni.registry.build` to produce `uni.registry.yaml`
+- Run `pnpm exec werkstatt run command.manifest.generate` to produce `.generated.yaml`
+- Run `pnpm exec werkstatt run gitattributes.generate` to update `.gitattributes`
+- Run `pnpm exec werkstatt run uni.registry.build` to produce `uni.registry.yaml`
 
 **Validation:**
 
@@ -386,7 +386,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0376 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0376 --json` passes
 
 **Completion criterion:** DNA-18 text references `uni.registry.yaml`; AGENTS.md documents YAML-only contract
 
@@ -405,11 +405,11 @@ scope:
 - For each RFC in RFC-0376's `amends` list (RFC-0081, RFC-0023, RFC-0336, RFC-0204, RFC-0210, RFC-0234, RFC-0266, RFC-0268, RFC-0329, RFC-0330, RFC-0331):
   - Read the RFC file's frontmatter
   - Add `RFC-0376` to its `amendedBy` list (create the list if absent)
-- Run `pnpm exec site-kernel run rfc.validate RFC-0376 --json` — V-19 warnings should be gone
+- Run `pnpm exec werkstatt run rfc.validate RFC-0376 --json` — V-19 warnings should be gone
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0376 --json` passes with zero V-19 warnings
+- `pnpm exec werkstatt run rfc.validate RFC-0376 --json` passes with zero V-19 warnings
 
 **Completion criterion:** All 11 amended RFCs list `RFC-0376` in `amendedBy`; V-19 warnings eliminated
 
@@ -426,11 +426,11 @@ scope:
 **Agent actions:**
 
 - Add `yaml.contract.lint` to `APPS_BUILD_PREPARE_PIPELINE` in `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts`
-- Verify `pnpm exec site-kernel run yaml.contract.lint --json` passes with zero violations
+- Verify `pnpm exec werkstatt run yaml.contract.lint --json` passes with zero violations
 
 **Validation:**
 
-- `pnpm exec site-kernel run yaml.contract.lint --json` exits with code 0
+- `pnpm exec werkstatt run yaml.contract.lint --json` exits with code 0
 
 **Completion criterion:** `yaml.contract.lint` is in `APPS_BUILD_PREPARE_PIPELINE` and passes with zero violations
 
@@ -477,9 +477,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run yaml.contract.lint --json` — must pass with zero violations
-- Run `pnpm exec site-kernel run packages-check.run --json` — must pass
-- Run `pnpm exec site-kernel run rfc.validate RFC-0376 --json` — must pass (zero V-19 warnings)
+- Run `pnpm exec werkstatt run yaml.contract.lint --json` — must pass with zero violations
+- Run `pnpm exec werkstatt run packages-check.run --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0376 --json` — must pass (zero V-19 warnings)
 - Run `pnpm --filter @gogol/site-kernel-checks test` — must pass
 - Run `pnpm --filter @gogol/share build:check` — must pass
 - Run `pnpm --filter @gogol/ui build:check` — must pass
@@ -502,7 +502,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0376`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0376`
 - Commit the generated evidence file
 
 **Validation:**
@@ -519,15 +519,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0376 --json` (zero V-19 warnings after Step 12)
-- `pnpm exec site-kernel run yaml.contract.lint --json` (zero violations after Step 13)
-- `pnpm exec site-kernel run packages-check.run --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0376 --json` (zero V-19 warnings after Step 12)
+- `pnpm exec werkstatt run yaml.contract.lint --json` (zero violations after Step 13)
+- `pnpm exec werkstatt run packages-check.run --json`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-checks test` (includes new unit tests from Step 14)
 - `pnpm --filter @gogol/share build:check`
 - `pnpm --filter @gogol/share test` (includes new unit tests from Step 14)
 - `pnpm --filter @gogol/ui build:check`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0376`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0376`
 
 ### 4.2 Evidence artifacts
 
@@ -547,5 +547,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that a whitelisted JSON file (e.g., `tsconfig.json`) is actually consumed as Category B/C by a Site OS command, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0376 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals that a whitelisted JSON file (e.g., `tsconfig.json`) is actually consumed as Category B/C by a Site OS command, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0376 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If a generator cannot use `yaml.stringify()` (e.g., produces non-object output like arrays or scalars), escalate before deviating from the RFC's `yaml.stringify()` + `buildGeneratedHeader()` pattern.

@@ -74,9 +74,9 @@ The unprotected invariant is: **what a command may touch must be a checkable pro
 
 ```sh
 # Universal dry-run once a command's module is migrated:
-pnpm exec site-kernel run sitemap.generate --app warpgogol-com --dry-run
+pnpm exec werkstatt run sitemap.generate --app warpgogol-com --dry-run
 # → reports: would write public/sitemap.xml (4.2 KB); no files touched
-pnpm exec site-kernel run kernel.io.lint --json
+pnpm exec werkstatt run kernel.io.lint --json
 ```
 
 ### TypeScript contracts

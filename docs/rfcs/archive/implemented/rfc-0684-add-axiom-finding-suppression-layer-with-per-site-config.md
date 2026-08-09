@@ -71,7 +71,7 @@ nonGoals:
   - "Does not suppress findings from methodologies that are inactive via methodologies config (RFC-0665 handles that)"
   - "Does not introduce a new DNA invariant — satisfies existing DNA-49 and DNA-59"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -136,10 +136,10 @@ The Werkstatt gains a two-level Axiom finding suppression layer: a post-filter i
 
 ```sh
 # Validate suppression config (workshop + per-site if present)
-pnpm exec site-kernel run suppressions.validate --json
+pnpm exec werkstatt run suppressions.validate --json
 
 # mission.check gains --channel flag
-pnpm exec site-kernel run mission.check \
+pnpm exec werkstatt run mission.check \
   --mission warpgogol-com-m000027 \
   --external-preview \
   --base-url https://dev.warpgogol.com \

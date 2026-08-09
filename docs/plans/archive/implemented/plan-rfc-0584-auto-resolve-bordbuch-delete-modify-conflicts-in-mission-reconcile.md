@@ -43,7 +43,7 @@ No configuration or data changes. The `reconciliation-report.json` evidence file
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — unit tests (including new tests)
-- `pnpm exec site-kernel run rfc.validate RFC-0584` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0584` — RFC validation
 
 ## 3. Step sequence
 
@@ -162,17 +162,17 @@ No configuration or data changes. The `reconciliation-report.json` evidence file
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 5)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands — skip)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands — skip)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0584 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0584 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
 - Commit the stamped RFC separately from the implementation commit
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0584` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0584` passes
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
 - `pnpm --filter @warpgogol/site-kernel-handoff test` passes
 - Review report exists in `docs/reviews/code/` for this session
@@ -185,7 +185,7 @@ No configuration or data changes. The `reconciliation-report.json` evidence file
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0584`
+- `pnpm exec werkstatt run rfc.validate RFC-0584`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -206,5 +206,5 @@ No configuration or data changes. The `reconciliation-report.json` evidence file
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 (Mission lifecycle), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0584 --reason "..." --invariant "DNA-46"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 (Mission lifecycle), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0584 --reason "..." --invariant "DNA-46"` instead of working around it.
 - If the bordbuch conflict detection logic needs to handle paths beyond `bordbuch/`, do NOT extend the auto-resolution list without a new RFC — the RFC's implementation notes explicitly forbid this (line 242).

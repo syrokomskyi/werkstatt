@@ -74,7 +74,7 @@ A `pseo.validate` command consolidates the surface's quality checks: substance d
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run pseo.validate --app warpgogol-com --json
+pnpm exec werkstatt run pseo.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

@@ -149,7 +149,7 @@ The deriver writes the result back into the biome YAML in place when called with
 ### New CLI surface
 
 ```sh
-pnpm exec site-kernel run biome.site-background.derive \
+pnpm exec werkstatt run biome.site-background.derive \
   --biome packages/ontology/biomes/<id>.yaml \
   --inplace
 ```
@@ -178,13 +178,13 @@ See `## CLI surface`, `## TypeScript contracts`, and `## File system responsibil
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run biome.tokens.derive \
+pnpm exec werkstatt run biome.tokens.derive \
   --biome packages/ontology/biomes/<id>.yaml \
   --inplace
-pnpm exec site-kernel run biome.site-background.derive \
+pnpm exec werkstatt run biome.site-background.derive \
   --biome packages/ontology/biomes/<id>.yaml \
   --inplace
-pnpm exec site-kernel run biome.contract.validate
+pnpm exec werkstatt run biome.contract.validate
 ```
 
 ## TypeScript contracts

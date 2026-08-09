@@ -158,7 +158,7 @@ No configuration or data file changes. No ontology catalog changes. No schema ch
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0593` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0593` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test` — must pass
 - Check off each acceptance criterion in the RFC against the implemented code
@@ -180,16 +180,16 @@ No configuration or data file changes. No ontology catalog changes. No schema ch
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 3).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `mission.open` and `mission.close` behavior changed — check if manifest needs refresh).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `mission.open` and `mission.close` behavior changed — check if manifest needs refresh).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0593 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0593 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0593`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0593`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -200,7 +200,7 @@ No configuration or data file changes. No ontology catalog changes. No schema ch
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0593`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0593`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -222,5 +222,5 @@ No configuration or data file changes. No ontology catalog changes. No schema ch
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 or DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0593 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 or DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0593 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `runMissionValidate` cannot be called from `mission.close` due to circular import or type incompatibility, investigate the root cause before adding a wrapper or shim — the RFC specifies direct reuse of the existing command.

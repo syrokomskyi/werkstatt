@@ -157,15 +157,15 @@ const biomeFontsSchema = z.array(biomeFontEntrySchema).optional();
 
 ```sh
 # Generate fonts.imports.css from the biome fonts section
-pnpm exec site-kernel run fonts.imports.generate --app warpgogol-com
+pnpm exec werkstatt run fonts.imports.generate --app warpgogol-com
 
 # Validate font contract at author time (no font files in public, at least one import, package deps, licenses)
-pnpm exec site-kernel run fonts.contract.validate --app warpgogol-com
-pnpm exec site-kernel run fonts.contract.validate --all --json
+pnpm exec werkstatt run fonts.contract.validate --app warpgogol-com
+pnpm exec werkstatt run fonts.contract.validate --all --json
 
 # Validate no external font origins in built HTML (post-build)
-pnpm exec site-kernel run fonts.origin.validate --app warpgogol-com
-pnpm exec site-kernel run fonts.origin.validate --all --json
+pnpm exec werkstatt run fonts.origin.validate --app warpgogol-com
+pnpm exec werkstatt run fonts.origin.validate --all --json
 ```
 
 ### Generated file: fonts.imports.css

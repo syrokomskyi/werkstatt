@@ -64,7 +64,7 @@ nonGoals:
   - Do not add Editframe-specific profiles in this RFC — that is RFC-0641
   - Do not modify fo-* skill language in this RFC — that is RFC-0642
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -278,7 +278,7 @@ interface DoctorDomainReport {
 - [x] `forge.profile.validate` `--id` flag filters to a single profile when present (evidence: packages/forge/src/onboarding/profile-validate.ts:40,83)
 - [x] Unit tests for each command's domain-aware and fallback paths (evidence: packages/forge/src/tests/profile-validate.test.ts, packages/forge/src/tests/workspace-discovery-domain.test.ts, packages/forge/src/tests/doctor-domain.test.ts — 16 tests, 405 total pass)
 - [x] `packages/forge/AGENTS.md` updated (evidence: packages/forge/AGENTS.md:16,114-121)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0640` — OK, 1 RFC passed)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0640` — OK, 1 RFC passed)
 
 ## Implementation notes for agents
 

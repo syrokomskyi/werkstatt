@@ -68,7 +68,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — TypeScript compilation
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0560` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0560` — RFC validation
 
 ## 3. Step sequence
 
@@ -142,7 +142,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run mission.open --system <test-system> --brief "test" --actor-from-auth --json` fails with `actor-required` error when env vars not set
+- `pnpm exec werkstatt run mission.open --system <test-system> --brief "test" --actor-from-auth --json` fails with `actor-required` error when env vars not set
 
 **Completion criterion:** `mission.open` accepts `--actor-from-auth` flag, reads `WERKSTATT_ACTOR_ID` env var, and defaults to `"unknown"` when neither `--actor` nor `--actor-from-auth` is provided.
 
@@ -274,7 +274,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0560`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0560`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test`
 - Verify each acceptance criterion in the RFC against the implemented code:
@@ -308,16 +308,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 7).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new flags on existing commands — check if `ecosystem.manifest.validate` requires regeneration).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new flags on existing commands — check if `ecosystem.manifest.validate` requires regeneration).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0560 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0560 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0560`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0560`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -328,7 +328,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0560`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0560`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -352,5 +352,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 (Mission lifecycle), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0560 --reason "..." --invariant "DNA-46"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 (Mission lifecycle), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0560 --reason "..." --invariant "DNA-46"` instead of working around it.
 - If the env-var propagation mechanism conflicts with Studio Gate's architecture (RFC-0555/0559), escalate to a new RFC rather than adding a parallel propagation path.

@@ -62,7 +62,7 @@ nonGoals:
   - Adding new commands
   - Backward compatibility with the retired apps/ directory layout
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -170,14 +170,14 @@ Placing `config.regenerate` first ensures `package.json` and `astro.config.mjs` 
 No new commands, no new flags. The command is invoked the same way:
 
 ```sh
-pnpm exec site-kernel run config.regenerate --site warpgogol-com
-pnpm exec site-kernel run config.regenerate --site warpgogol-com --force
+pnpm exec werkstatt run config.regenerate --site warpgogol-com
+pnpm exec werkstatt run config.regenerate --site warpgogol-com --force
 ```
 
 It also runs automatically as the first step of `build.prepare`:
 
 ```sh
-pnpm exec site-kernel run build.prepare --site warpgogol-com
+pnpm exec werkstatt run build.prepare --site warpgogol-com
 ```
 
 ### File system responsibilities
@@ -235,12 +235,12 @@ The `--json` output shape is unchanged:
 
 - [x] `config.regenerate` uses `requireAstroSitePaths(context).appDirectory` instead of `join(context.workspaceRoot, "apps", app)` in `packages/os/site-kernel-onboarding/src/config-regenerate.ts`. (evidence: packages/os/site-kernel-onboarding/src/config-regenerate.ts:39,107)
 - [x] `config.regenerate` is the first step in `SITES_BUILD_PREPARE_PIPELINE` in `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts`. (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:20-21)
-- [x] Running `config.regenerate --site warpgogol-com` on a mission workpiece succeeds — 4 files generated, 1 skipped (package.json customized). (evidence: `pnpm exec site-kernel run config.regenerate --site warpgogol-com --json` — exitCode: 0, generated: [astro.config.mjs, wrangler.jsonc, .gitignore, postcss.config.cjs], skipped: [package.json])
-- [x] Running `config.regenerate --site <id>` on a mission workpiece succeeds (no `"apps/<id> does not exist"` error). (evidence: `pnpm exec site-kernel run config.regenerate --site warpgogol-com --json` — exitCode: 0)
+- [x] Running `config.regenerate --site warpgogol-com` on a mission workpiece succeeds — 4 files generated, 1 skipped (package.json customized). (evidence: `pnpm exec werkstatt run config.regenerate --site warpgogol-com --json` — exitCode: 0, generated: [astro.config.mjs, wrangler.jsonc, .gitignore, postcss.config.cjs], skipped: [package.json])
+- [x] Running `config.regenerate --site <id>` on a mission workpiece succeeds (no `"apps/<id> does not exist"` error). (evidence: `pnpm exec werkstatt run config.regenerate --site warpgogol-com --json` — exitCode: 0)
 - [x] RFC-0569 acceptance criterion updated: `config.regenerate cannot reach mission workpiece paths` is replaced with `config.regenerate reaches mission workpiece paths via requireAstroSitePaths`. (evidence: docs/rfcs/rfc-0569-dev-prod-egress-parity-apply-text-normalization-in-dev-mode-via-astro-middleware.md:263)
 - [x] `pnpm --filter @warpgogol/site-kernel-onboarding build:check` passes. (evidence: `pnpm --filter @warpgogol/site-kernel-onboarding run build:check` — exit code 0)
 - [x] `pnpm --filter @warpgogol/site-kernel-checks build:check` passes. (evidence: `pnpm --filter @warpgogol/site-kernel-checks run build:check` — exit code 0, after fixing pre-existing import.meta.env.DEV type error in packages/share/src/text-normalize.ts:538)
-- [x] `rfc.validate` passes on this file. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0571 --json` — 0 violations)
+- [x] `rfc.validate` passes on this file. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0571 --json` — 0 violations)
 
 ## Implementation notes for agents
 

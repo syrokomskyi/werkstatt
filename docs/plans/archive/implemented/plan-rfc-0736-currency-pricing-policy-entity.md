@@ -47,7 +47,7 @@ No configuration or data files. Content files are deferred to RFC-0740.
 
 - `pnpm --filter @warpgogol/pbp run build:check` (tsc --noEmit)
 - `pnpm --filter @warpgogol/pbp run test` (vitest run)
-- `pnpm exec site-kernel run rfc.validate --id RFC-0736`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0736`
 
 No new pipeline steps. No CI workflow changes.
 
@@ -188,7 +188,7 @@ No new pipeline steps. No CI workflow changes.
 - Read `packages/pbp/src/astro.ts` — verify the existing `pbpCollections["business-profile"]` collection with `fsDataCollectionLoader({ base: "src/content/business-profile" })` already covers `currency-pricing-policy/{id}.md` files. No change expected.
 - Run `rtk pnpm --filter @warpgogol/pbp run build:check`
 - Run `rtk pnpm --filter @warpgogol/pbp run test`
-- Run `rtk pnpm exec site-kernel run rfc.validate --id RFC-0736 --json`
+- Run `rtk pnpm exec werkstatt run rfc.validate --id RFC-0736 --json`
 
 **Validation:**
 
@@ -231,12 +231,12 @@ No new pipeline steps. No CI workflow changes.
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `rtk pnpm exec site-kernel run rfc.implement.stamp --id RFC-0736 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- Stamp the RFC as implemented: run `rtk pnpm exec werkstatt run rfc.implement.stamp --id RFC-0736 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0736`
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0736`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -248,7 +248,7 @@ No new pipeline steps. No CI workflow changes.
 
 ### 4.1 Required checks
 
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0736`
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0736`
 - `rtk pnpm --filter @warpgogol/pbp run build:check`
 - `rtk pnpm --filter @warpgogol/pbp run test`
 
@@ -265,4 +265,4 @@ No new pipeline steps. No CI workflow changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-55, run `rtk pnpm exec site-kernel run rfc.supersede.propose --id RFC-0736 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 or DNA-55, run `rtk pnpm exec werkstatt run rfc.supersede.propose --id RFC-0736 --reason "..." --invariant "DNA-N"` instead of working around it.

@@ -182,9 +182,9 @@ batchPolicy:
   push: false
 acceptance:
   commands:
-    - pnpm exec site-kernel run maintenance.debt.queue.validate --queue prose-credit-sidecars --json
-    - pnpm exec site-kernel run material.credits.validate --app <app> --json
-    - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+    - pnpm exec werkstatt run maintenance.debt.queue.validate --queue prose-credit-sidecars --json
+    - pnpm exec werkstatt run material.credits.validate --app <app> --json
+    - pnpm exec werkstatt run maintenance.debt.baseline.validate --json
 notes:
   - "Do not invent authorship. Use NEED_THIS-style placeholders or documented asserted ownership only where policy allows."
 ```
@@ -216,18 +216,18 @@ Allowed statuses:
 ### Command surface
 
 ```sh
-pnpm exec site-kernel run maintenance.debt.queue.generate --json
-pnpm exec site-kernel run maintenance.debt.queue.validate --json
-pnpm exec site-kernel run maintenance.debt.queue.report --json
+pnpm exec werkstatt run maintenance.debt.queue.generate --json
+pnpm exec werkstatt run maintenance.debt.queue.validate --json
+pnpm exec werkstatt run maintenance.debt.queue.report --json
 ```
 
 Useful scoped forms:
 
 ```sh
-pnpm exec site-kernel run maintenance.debt.queue.report --queue prose-credit-sidecars --json
-pnpm exec site-kernel run maintenance.debt.queue.report --queue surface-substance --app warpgogol-com --json
-pnpm exec site-kernel run maintenance.debt.queue.validate --queue demand-slug-overrides --json
-pnpm exec site-kernel run maintenance.debt.queue.generate --dry-run --json
+pnpm exec werkstatt run maintenance.debt.queue.report --queue prose-credit-sidecars --json
+pnpm exec werkstatt run maintenance.debt.queue.report --queue surface-substance --app warpgogol-com --json
+pnpm exec werkstatt run maintenance.debt.queue.validate --queue demand-slug-overrides --json
+pnpm exec werkstatt run maintenance.debt.queue.generate --dry-run --json
 ```
 
 ### `maintenance.debt.queue.generate`
@@ -316,8 +316,8 @@ Illustrative JSON shape:
     ]
   },
   "acceptanceCommands": [
-    "pnpm exec site-kernel run maintenance.debt.queue.validate --queue prose-credit-sidecars --json",
-    "pnpm exec site-kernel run maintenance.debt.baseline.validate --json"
+    "pnpm exec werkstatt run maintenance.debt.queue.validate --queue prose-credit-sidecars --json",
+    "pnpm exec werkstatt run maintenance.debt.baseline.validate --json"
   ]
 }
 ```
@@ -488,7 +488,7 @@ Credit work can tempt agents to invent authorship. The prose credit queue must e
 - [x] `maintenance.debt.baseline.validate --json` still passes. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `maintenance.debt.triage.report --json` remains available and is not replaced. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Tests cover queue selection, batch limits, completed queue detection, duplicate ids, and unqueued accepted warning debt. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run packages-check.run --json`, `pnpm exec site-kernel run ci.local.validate --json`, `pnpm test`, and `rfc.validate` pass. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run --json`, `pnpm exec werkstatt run ci.local.validate --json`, `pnpm test`, and `rfc.validate` pass. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

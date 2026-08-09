@@ -113,7 +113,7 @@ None of these pages pass a `heading` prop with the now-removed `markdown-section
 - [x] `markdown-section.astro` imports and uses `<SectionHeader>`; no raw `<h1 class="markdown-section__title">` remains. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `markdown-section.css` no longer declares `.markdown-section__header`, `.markdown-section__title`, or `.markdown-section__lead`. (evidence: implemented historically)
 - [x] `MarkdownPageOverride` declares `hideSectionNumber?: boolean` with default `true` in the destructure. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run section.header.contract.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run section.header.contract.validate` exits zero. (evidence: implemented historically)
 - [x] `pnpm --filter warpgogol-com astro check` exits zero. (evidence: implemented historically)
 - [x] `pnpm --filter nicaragua-projekt astro check` exits zero. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)

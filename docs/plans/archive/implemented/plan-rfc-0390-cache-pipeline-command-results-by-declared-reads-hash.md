@@ -180,7 +180,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run command.reads.validate --json` runs (will fail until commands are annotated, which is expected)
+- `pnpm exec werkstatt run command.reads.validate --json` runs (will fail until commands are annotated, which is expected)
 
 **Completion criterion:** Command registered, runs, produces CRC-01/CRC-02 diagnostics.
 
@@ -217,14 +217,14 @@ scope:
 - For each file, annotate every command that lacks `reads`:
   - If the command reads files deterministically: add `reads: [...]` with appropriate globs
   - If the command depends on external state (network, time, binaries): add `cacheable: false`
-- After each file, run `pnpm exec site-kernel run command.reads.validate --json` to check progress
+- After each file, run `pnpm exec werkstatt run command.reads.validate --json` to check progress
 - Use the command handler's source code to determine which files it reads
 - For workspace-scoped commands, use workspace-root-relative paths
 - For app-scoped commands, use `<app>` token
 
 **Validation:**
 
-- `pnpm exec site-kernel run command.reads.validate --json` passes (0 CRC-01/CRC-02 violations for PACKAGES_CHECK_PIPELINE commands)
+- `pnpm exec werkstatt run command.reads.validate --json` passes (0 CRC-01/CRC-02 violations for PACKAGES_CHECK_PIPELINE commands)
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
 
 **Completion criterion:** `command.reads.validate` reports 0 violations for all `PACKAGES_CHECK_PIPELINE` commands.
@@ -246,7 +246,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run command.reads.validate --json` passes (0 violations for all commands)
+- `pnpm exec werkstatt run command.reads.validate --json` passes (0 violations for all commands)
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
 
 **Completion criterion:** `command.reads.validate` reports 0 violations for all registered commands.
@@ -307,7 +307,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0390 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0390 --json` passes
 - `pnpm --filter @gogol/site-kernel run build:check` passes
 
 **Completion criterion:** All four documentation files updated with RFC-0390 content.
@@ -322,14 +322,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0390 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0390 --json` — must pass
 - Run `pnpm --filter @gogol/site-kernel run build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel run test` — must pass
-- Run `pnpm exec site-kernel run command.reads.validate --json` — must pass (0 violations)
-- Run `pnpm exec site-kernel run kernel.cache.status --json` — verify `command_results` namespace visible
-- Run `pnpm exec site-kernel run kernel.cache.clear --namespace command_results --json` — verify clear works
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0390` — emit evidence file
+- Run `pnpm exec werkstatt run command.reads.validate --json` — must pass (0 violations)
+- Run `pnpm exec werkstatt run kernel.cache.status --json` — verify `command_results` namespace visible
+- Run `pnpm exec werkstatt run kernel.cache.clear --namespace command_results --json` — verify clear works
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0390` — emit evidence file
 - Stamp RFC-0390 as `implemented` with `implementedAt: 2026-07-17`
 - Commit evidence + status stamp
 
@@ -348,14 +348,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0390` — RFC frontmatter validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0390` — RFC frontmatter validation
 - `pnpm --filter @gogol/site-kernel run build:check` — typecheck + lint for site-kernel
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck + lint for site-kernel-checks
 - `pnpm --filter @gogol/site-kernel run test` — unit tests including new cache tests
-- `pnpm exec site-kernel run command.reads.validate --json` — 0 violations
-- `pnpm exec site-kernel run kernel.cache.status --json` — `command_results` namespace visible
-- `pnpm exec site-kernel run kernel.cache.clear --namespace command_results --json` — clears successfully
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0390` — evidence file emitted
+- `pnpm exec werkstatt run command.reads.validate --json` — 0 violations
+- `pnpm exec werkstatt run kernel.cache.status --json` — `command_results` namespace visible
+- `pnpm exec werkstatt run kernel.cache.clear --namespace command_results --json` — clears successfully
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0390` — evidence file emitted
 
 ### 4.2 Evidence artifacts
 
@@ -375,6 +375,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0390 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0390 --reason "..." --invariant "DNA-53"` instead of working around it.
 - If the `cacheable` field placement on `KernelCommandMetadata` conflicts with existing type usage, create a superseding RFC rather than adding a parallel field.
 - If `picomatch` introduces a transitive dependency that violates the zero-dependency preference, evaluate `micromatch` as an alternative via a new RFC.

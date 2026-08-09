@@ -150,10 +150,10 @@ The workspace adopts a single canonical location for shared build-time helpers, 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run fs.walk.lint --json
-pnpm exec site-kernel run dedup.helper.lint --json
-pnpm exec site-kernel run file.size.lint --json
-pnpm exec site-kernel run packages-check          # runs all three in PACKAGES_CHECK_PIPELINE
+pnpm exec werkstatt run fs.walk.lint --json
+pnpm exec werkstatt run dedup.helper.lint --json
+pnpm exec werkstatt run file.size.lint --json
+pnpm exec werkstatt run packages-check          # runs all three in PACKAGES_CHECK_PIPELINE
 ```
 
 All three are `scope: workspace`, read-only, and scan `packages/**/src/**` (excluding `**/tests/**`, `**/*.generated.*`, and each helper's own canonical definition file via an allowlist).
@@ -246,7 +246,7 @@ Standard RFC-0203 `CheckResult`:
 
 ## Rollout
 
-Executed as four independently-green phases. After each phase: `pnpm --filter @gogol/share build:check`, `pnpm exec site-kernel run packages-check`, and `pnpm --filter warpgogol-com build:check` MUST pass before starting the next.
+Executed as four independently-green phases. After each phase: `pnpm --filter @gogol/share build:check`, `pnpm exec werkstatt run packages-check`, and `pnpm --filter warpgogol-com build:check` MUST pass before starting the next.
 
 1. **Phase 1 — Extract + migrate helpers.** Create `@gogol/share/fs` + `@gogol/share/text-position`; rewrite `collectMarkdownFiles` as a wrapper; migrate every duplicate call site (`walk`, `fileExists`, `getLineColumn`, `readJsonFile`, `discoverWorkspacePackages`) and delete the local copies. Purely mechanical; no behavior change.
 2. **Phase 2 — Guard lints + docs.** Land `fs.walk.lint`, `dedup.helper.lint`, `file.size.lint` (warn + ratchet) in `PACKAGES_CHECK_PIPELINE` with red/green fixtures; add the "Shared helpers catalog" to `packages/AGENTS.md`. Flip `fs.walk.lint`/`dedup.helper.lint` to error (Phase 1 drove them to zero).

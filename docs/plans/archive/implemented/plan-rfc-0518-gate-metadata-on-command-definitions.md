@@ -59,9 +59,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run ecosystem.manifest.generate` — regenerate manifest with gate metadata
-- `pnpm exec site-kernel run ecosystem.manifest.validate` — verify manifest is in sync
-- `pnpm exec site-kernel run rfc.validate RFC-0518 --json`
+- `pnpm exec werkstatt run ecosystem.manifest.generate` — regenerate manifest with gate metadata
+- `pnpm exec werkstatt run ecosystem.manifest.validate` — verify manifest is in sync
+- `pnpm exec werkstatt run rfc.validate RFC-0518 --json`
 
 ## 3. Step sequence
 
@@ -186,14 +186,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
 - Verify the generated manifest includes `gate` fields on the populated commands
-- Run `pnpm exec site-kernel run ecosystem.manifest.validate` to verify the manifest is in sync
+- Run `pnpm exec werkstatt run ecosystem.manifest.validate` to verify the manifest is in sync
 - Manually verify: temporarily remove a `gate` field from one command registration, run `ecosystem.manifest.validate`, confirm it reports drift, then restore the field
 
 **Validation:**
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate` passes (exit code 0)
+- `pnpm exec werkstatt run ecosystem.manifest.validate` passes (exit code 0)
 - Generated manifest contains `gate` entries for the 10 populated commands
 
 **Completion criterion:** `docs/ecosystem.generated.yaml` is regenerated with `gate` metadata; `ecosystem.manifest.validate` passes; drift detection confirmed.
@@ -218,14 +218,14 @@ scope:
   - [ ] `pnpm --filter @gogol/site-kernel-checks run build:check` passes
   - [ ] `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
   - [ ] `rfc.validate` passes on this file
-- Run `pnpm exec site-kernel run rfc.validate RFC-0518 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0518 --json`
 - Check off acceptance criteria in the RFC file with `(evidence: ...)` annotations
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0518 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0518 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0518`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0518`
 - All acceptance criteria checked off
 
 **Completion criterion:** All acceptance criteria verified; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -236,11 +236,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0518`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0518`
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
 
 ### 4.2 Evidence artifacts
 

@@ -72,4 +72,4 @@ Revisit this decision if:
 - The city data differs significantly from the old library, causing route slug changes that break existing SEO.
 - A new MIT-licensed geo library with better data coverage or API ergonomics becomes available.
 
-Run `pnpm exec site-kernel run geo.catalog.validate --json` after the migration to verify catalog integrity.
+Run `pnpm exec werkstatt run geo.catalog.validate --json` after the migration to verify catalog integrity.

@@ -49,7 +49,7 @@ scope:
 
 - `pnpm --filter @warpgogol/pbp run build:check` (tsc --noEmit)
 - `pnpm --filter @warpgogol/pbp run test` (vitest run)
-- `pnpm exec site-kernel run rfc.validate --id RFC-0738`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0738`
 
 ## 3. Step sequence
 
@@ -200,13 +200,13 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0738`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0738`
 - Run `pnpm --filter @warpgogol/pbp run build:check` (tsc --noEmit)
 - Run `pnpm --filter @warpgogol/pbp run test` (vitest run)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Max 3 iterations.
 - Check off acceptance criteria: verify each criterion against implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- Stamp: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0738 --implementation-commit <sha>`
+- Stamp: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0738 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -224,7 +224,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0738`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0738`
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/pbp run test`
 
@@ -242,5 +242,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0738 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0738 --reason "..." --invariant "DNA-53"` instead of working around it.
 - If `PbpRateMode` from RFC-0737 is not yet exported when implementation begins, block on RFC-0737 implementation first — do not create a duplicate type.

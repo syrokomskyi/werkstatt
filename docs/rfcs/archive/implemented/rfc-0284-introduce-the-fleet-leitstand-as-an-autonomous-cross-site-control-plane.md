@@ -119,9 +119,9 @@ export interface FleetPlan {
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run fleet.status.collect --sites ./fleet.sites.json --json
-pnpm exec site-kernel run fleet.schedule.plan --sites ./fleet.sites.json --budget ./fleet.budget.json --json
-pnpm exec site-kernel run fleet.killswitch --scope all --reason "provider incident" --json
+pnpm exec werkstatt run fleet.status.collect --sites ./fleet.sites.json --json
+pnpm exec werkstatt run fleet.schedule.plan --sites ./fleet.sites.json --budget ./fleet.budget.json --json
+pnpm exec werkstatt run fleet.killswitch --scope all --reason "provider incident" --json
 ```
 
 ### File system responsibilities

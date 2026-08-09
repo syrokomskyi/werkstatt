@@ -566,7 +566,7 @@ export interface BlockValidationResult {
 ### Phase 3: Activation
 
 1. Remove feature flag
-2. Run `pnpm exec site-kernel run page.markdown.generate --app warpgogol-com`
+2. Run `pnpm exec werkstatt run page.markdown.generate --app warpgogol-com`
 3. Verify twin sizes increase (6 lines → 50-100 lines per page)
 4. Run `page.blocks.validate` to confirm no unhandled text blocks
 

@@ -18,7 +18,7 @@ OUTPUT_FILE="$SESSIONS_RAW_DIR/${TIMESTAMP}-session.atif"
 if command -v devin >/dev/null 2>&1; then
   devin --export "$OUTPUT_FILE"
   echo "Raw session exported to: $OUTPUT_FILE"
-  echo "Run 'pnpm exec site-kernel run session.save' to convert to structured markdown."
+  echo "Run 'pnpm exec werkstatt run session.save' to convert to structured markdown."
 else
   echo "Error: 'devin' CLI not found in PATH." >&2
   echo "Install the Devin CLI or export your session manually to: $OUTPUT_FILE" >&2

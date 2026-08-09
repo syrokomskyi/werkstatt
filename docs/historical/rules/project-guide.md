@@ -243,6 +243,6 @@ A boundary is a place where changing behavior has a large blast radius:
 - Typecheck: `pnpm --filter nicaragua-projekt -s astro check`
 - Tests: `pnpm --filter nicaragua-projekt test` (required for utility/logic changes)
 - Token checks: `pnpm --filter nicaragua-projekt -s tokens:ds:lint`
-- Content surface validation: `pnpm exec site-kernel run content.surface.validate --site nicaragua-projekt`
+- Content surface validation: `pnpm exec werkstatt run content.surface.validate --site nicaragua-projekt`
 
 **CI/CD invariant:** All deployments require `pnpm --filter nicaragua-projekt -s astro check` to pass. Type errors in `.astro` components must not reach production.

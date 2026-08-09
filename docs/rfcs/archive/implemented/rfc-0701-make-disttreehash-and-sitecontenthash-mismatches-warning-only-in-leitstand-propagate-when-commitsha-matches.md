@@ -55,7 +55,7 @@ packagesImpacted:
 successSignals: []
 nonGoals: []
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -113,7 +113,7 @@ The original hard error was introduced in `packages/os/site-kernel-handoff/src/l
 No CLI surface changes. The command flags remain the same:
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate --system warpgogol-com --release warpgogol-com-r000012 --channel alt
+pnpm exec werkstatt run leitstand.propagate --system warpgogol-com --release warpgogol-com-r000012 --channel alt
 ```
 
 ### TypeScript contracts
@@ -188,7 +188,7 @@ No output format changes. Warnings are logged via `logger.warn` and do not appea
 - [x] Warning message includes both manifest and identity hash values — (evidence: `leitstand-commands.ts:1740-1741`, `rfc-0701-propagate-warning-only.test.ts`)
 - [x] Propagation succeeds when only secondary hashes mismatch and `commitSha` matches — (evidence: `rfc-0701-propagate-warning-only.test.ts`)
 - [x] Unit test covers the warning-only path in `leitstand-commands.ts` — (evidence: `rfc-0701-propagate-warning-only.test.ts`)
-- [x] `rfc.validate` passes on this file before merging — (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0701`)
+- [x] `rfc.validate` passes on this file before merging — (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0701`)
 
 ## Implementation notes for agents
 

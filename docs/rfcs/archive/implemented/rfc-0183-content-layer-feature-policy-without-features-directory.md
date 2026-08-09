@@ -216,10 +216,10 @@ Localized content follows the existing content merge semantics. Because arrays r
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run feature.policy.validate --app nicaragua-projekt
-pnpm exec site-kernel run feature.policy.validate --app warpgogol-com
-pnpm exec site-kernel run feature.references.validate --app nicaragua-projekt
-pnpm exec site-kernel run feature.visibility.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.policy.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.policy.validate --app warpgogol-com
+pnpm exec werkstatt run feature.references.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.visibility.validate --app nicaragua-projekt
 ```
 
 Command responsibilities:

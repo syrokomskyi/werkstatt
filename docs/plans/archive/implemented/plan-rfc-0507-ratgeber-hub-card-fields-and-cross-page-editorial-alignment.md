@@ -98,7 +98,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes.
-- `pnpm exec site-kernel run surface.generate --mission warpgogol-com-m000010` — hub page generates without errors.
+- `pnpm exec werkstatt run surface.generate --mission warpgogol-com-m000010` — hub page generates without errors.
 
 **Completion criterion:** Hub page `audience-cards` blocks contain cards with `articleType`, `question`, `reviewedAt`, `readTime` props and no `description` prop.
 
@@ -118,7 +118,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes.
-- `pnpm exec site-kernel run ratgeber.hub.validate --mission warpgogol-com-m000010` — passes (no warnings after Step 2 removes `description`).
+- `pnpm exec werkstatt run ratgeber.hub.validate --mission warpgogol-com-m000010` — passes (no warnings after Step 2 removes `description`).
 
 **Completion criterion:** RG-HUB-09 fires a warning when a hub card contains `description`, and passes cleanly after Step 2.
 
@@ -138,7 +138,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes.
-- `pnpm exec site-kernel run content.voice.lint --mission warpgogol-com-m000010` — passes or warns only on legitimate price tables.
+- `pnpm exec werkstatt run content.voice.lint --mission warpgogol-com-m000010` — passes or warns only on legitimate price tables.
 
 **Completion criterion:** VOICE-CTA-01 fires a warning on ratgeber article pages with 3+ row price tables, and does not fire on articles with inline calculations only.
 
@@ -153,7 +153,7 @@ scope:
 **Agent actions:**
 
 - Edit `packages/ui/src/components/footer/footer-component.manifest.yaml`: add `transparencyIds` to propsSchema (array of strings, optional), add `transparencyLinks` (same shape as `legalLinks`), add `transparencyTitle` to `navGroups`.
-- Run `pnpm exec site-kernel run props.types.generate` to regenerate `footer-component.types.generated.ts`.
+- Run `pnpm exec werkstatt run props.types.generate` to regenerate `footer-component.types.generated.ts`.
 - Edit `packages/ui/src/components/footer/footer-component.astro`:
   - Add `transparencyLinks` resolution (same pattern as `legalLinks`).
   - Add a fourth `<div class="footer__nav-group">` between legal and contact groups, rendering `transparencyLinks` with `content.navGroups.transparencyTitle` as the title.
@@ -162,7 +162,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ui run build:check` — typecheck passes.
-- `pnpm exec site-kernel run props.types.generate` — regenerates types without error.
+- `pnpm exec werkstatt run props.types.generate` — regenerates types without error.
 - Visual check: footer renders four groups when `transparencyIds` is populated.
 
 **Completion criterion:** Footer component renders a Transparenz group with `transparencyIds` links, and the generated types include `transparencyIds`, `transparencyLinks`, and `navGroups.transparencyTitle`.
@@ -186,7 +186,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run footer.legal.validate --mission warpgogol-com-m000010` — passes (impressum + datenschutz still in `legalIds`).
+- `pnpm exec werkstatt run footer.legal.validate --mission warpgogol-com-m000010` — passes (impressum + datenschutz still in `legalIds`).
 - Dev build — footer renders four groups correctly.
 
 **Completion criterion:** Footer labels have `transparencyIds` with the three transparency links, `legalIds` retains only legal-required links, no stale Widerruf links.
@@ -231,7 +231,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.validate --mission warpgogol-com-m000010` — passes.
+- `pnpm exec werkstatt run surface.validate --mission warpgogol-com-m000010` — passes.
 - Dev build — website surface pages render with the ratgeber link.
 
 **Completion criterion:** Website-local surface depth-0 page references the lokale-sichtbarkeit ratgeber article and does not justify mass city-page generation.
@@ -271,16 +271,16 @@ scope:
 
 - Update `docs/verification-plan.xml` — add RG-HUB-09 and VOICE-CTA-01 to the rule inventory.
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add RG-HUB-09 to `ratgeber-hub-validate.ts` entry; add VOICE-CTA-01 to `content-voice.ts` entry.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, only rules added to existing commands — likely not needed, but check).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, only rules added to existing commands — likely not needed, but check).
 - Verify every acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0507`.
-- Run `pnpm exec site-kernel run ratgeber.hub.validate --mission warpgogol-com-m000010` and `content.voice.lint --mission warpgogol-com-m000010` — capture output as evidence.
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0507 --implementation-commit <sha>`.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0507`.
+- Run `pnpm exec werkstatt run ratgeber.hub.validate --mission warpgogol-com-m000010` and `content.voice.lint --mission warpgogol-com-m000010` — capture output as evidence.
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0507 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0507` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0507` — passes.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -291,13 +291,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0507`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0507`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run ratgeber.hub.validate --mission warpgogol-com-m000010`
-- `pnpm exec site-kernel run content.voice.lint --mission warpgogol-com-m000010`
-- `pnpm exec site-kernel run footer.legal.validate --mission warpgogol-com-m000010`
-- `pnpm exec site-kernel run surface.validate --mission warpgogol-com-m000010`
+- `pnpm exec werkstatt run ratgeber.hub.validate --mission warpgogol-com-m000010`
+- `pnpm exec werkstatt run content.voice.lint --mission warpgogol-com-m000010`
+- `pnpm exec werkstatt run footer.legal.validate --mission warpgogol-com-m000010`
+- `pnpm exec werkstatt run surface.validate --mission warpgogol-com-m000010`
 
 ### 4.2 Evidence artifacts
 
@@ -317,6 +317,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16 (semantic layer shares topology with navigation), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0507 --reason "..." --invariant "DNA-16"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16 (semantic layer shares topology with navigation), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0507 --reason "..." --invariant "DNA-16"` instead of working around it.
 - If the footer component change requires a new component manifest cosmic name, escalate to `section.scaffold` rather than hand-editing the manifest.
 - If the website-local blueprint change reveals a surface contract conflict, escalate to a new RFC rather than modifying the blueprint contract.

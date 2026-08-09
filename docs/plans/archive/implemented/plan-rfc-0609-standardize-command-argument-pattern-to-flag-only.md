@@ -200,8 +200,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` — no type errors
-- `pnpm exec site-kernel run rfc.validate --id RFC-0609 --json` — works with `--id` flag
-- `pnpm exec site-kernel run rfc.validate RFC-0609 --json` — fails with KERNEL-ARG-01
+- `pnpm exec werkstatt run rfc.validate --id RFC-0609 --json` — works with `--id` flag
+- `pnpm exec werkstatt run rfc.validate RFC-0609 --json` — fails with KERNEL-ARG-01
 
 **Completion criterion:** All 7 forge commands accept their respective flags and reject positional args with KERNEL-ARG-01.
 
@@ -294,14 +294,14 @@ scope:
 **Agent actions:**
 
 - Edit `forge.yaml`:
-  - `validateRfc`: `pnpm exec site-kernel run rfc.validate {id} --json` → `pnpm exec site-kernel run rfc.validate --id {id} --json`
-  - `validateAdr`: `pnpm exec site-kernel run adr.validate {id} --json` → `pnpm exec site-kernel run adr.validate --id {id} --json`
-  - `specValidate`: `pnpm exec site-kernel run spec.validate --spec={id} --json` → `pnpm exec site-kernel run spec.validate --spec {id} --json`
+  - `validateRfc`: `pnpm exec werkstatt run rfc.validate {id} --json` → `pnpm exec werkstatt run rfc.validate --id {id} --json`
+  - `validateAdr`: `pnpm exec werkstatt run adr.validate {id} --json` → `pnpm exec werkstatt run adr.validate --id {id} --json`
+  - `specValidate`: `pnpm exec werkstatt run spec.validate --spec={id} --json` → `pnpm exec werkstatt run spec.validate --spec {id} --json`
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.doctor` (if available) — verify bindings validation passes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0609 --json` — verify the binding template works
+- `pnpm exec werkstatt run forge.doctor` (if available) — verify bindings validation passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0609 --json` — verify the binding template works
 
 **Completion criterion:** `forge.yaml` binding templates use `--id {id}` and `--spec {id}` format.
 
@@ -322,7 +322,7 @@ scope:
 **Validation:**
 
 - `grep -r "rfc\.validate [A-Z]\|adr\.validate [A-Z]\|session\.validate [A-Z]" .agents/skills/` — zero results (all updated)
-- `pnpm exec site-kernel run forge.skill.validate` (if available) — verify skill files pass validation
+- `pnpm exec werkstatt run forge.skill.validate` (if available) — verify skill files pass validation
 
 **Completion criterion:** No skill file references positional command invocations; AGENTS.md has the flag-only rule.
 
@@ -341,7 +341,7 @@ scope:
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0609 --json`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0609 --json`
 - `grep -r "input\.args" packages/os/ packages/forge/ --include="*.ts" | grep -v dist/ | grep -v node_modules/ | grep -v "\.test\.ts"` — zero results
 
 **Validation:**
@@ -365,16 +365,16 @@ scope:
 - Verify `AGENTS.md` (root) has the flag-only rule.
 - Verify `forge.yaml` bindings are updated.
 - Verify `.agents/skills/_shared/fo-pipeline-conventions.md` is updated.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0609 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0609 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0609`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0609`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -386,7 +386,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0609`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0609`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
@@ -413,6 +413,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0609 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0609 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If more than ~20 additional handlers reading `input.args` are discovered during Step 1 (beyond the 15 identified in the RFC), consider splitting the migration into multiple commits per package to keep the diff reviewable.
 - If `parseKernelArgv` return type change breaks more than 10 test files, consider a phased approach: first migrate `resolveCommandFlags` (schema-carrying commands), then `parseKernelArgv` (schema-less commands) in a separate commit.

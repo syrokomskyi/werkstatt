@@ -44,14 +44,14 @@ None — no YAML/JSON/manifest changes.
 ### 2.3 Documentation and specs
 
 - `packages/os/site-kernel-checks/AGENTS.md` — add module table row for `src/section-framework/css-import.ts`
-- `docs/COMMANDS.md` — regenerate via `pnpm exec site-kernel run docs.commands.generate` (if command docs are generated; otherwise manual entry)
-- `docs/ecosystem.generated.yaml` — regenerate via `pnpm exec site-kernel run ecosystem.manifest.generate` (if command surface changed)
+- `docs/COMMANDS.md` — regenerate via `pnpm exec werkstatt run docs.commands.generate` (if command docs are generated; otherwise manual entry)
+- `docs/ecosystem.generated.yaml` — regenerate via `pnpm exec werkstatt run ecosystem.manifest.generate` (if command surface changed)
 
 ### 2.4 Validation and pipelines
 
 - `PACKAGES_CHECK_PIPELINE` — new entry after `section.shell.contract.validate` (line ~101 in `packages-check.ts`)
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass
-- `pnpm exec site-kernel run rfc.validate RFC-0598` — must pass
+- `pnpm exec werkstatt run rfc.validate RFC-0598` — must pass
 
 ## 3. Step sequence
 
@@ -74,7 +74,7 @@ None — no YAML/JSON/manifest changes.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — TypeScript compiles
-- Manual: `pnpm exec site-kernel run section.css.import.validate --json` — exits 0 (all current CSS files are imported)
+- Manual: `pnpm exec werkstatt run section.css.import.validate --json` — exits 0 (all current CSS files are imported)
 
 **Completion criterion:** Validator module compiles and passes on current codebase.
 
@@ -112,7 +112,7 @@ None — no YAML/JSON/manifest changes.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — compiles
-- `pnpm exec site-kernel run command.manifest.validate` — no manifest drift
+- `pnpm exec werkstatt run command.manifest.validate` — no manifest drift
 
 **Completion criterion:** Command appears in manifest, `command.manifest.validate` passes.
 
@@ -132,7 +132,7 @@ None — no YAML/JSON/manifest changes.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — compiles
-- `pnpm exec site-kernel run workspace.surface.validate` — pipeline surface represented
+- `pnpm exec werkstatt run workspace.surface.validate` — pipeline surface represented
 
 **Completion criterion:** Pipeline entry exists, `workspace.surface.validate` passes.
 
@@ -174,15 +174,15 @@ None — no YAML/JSON/manifest changes.
 **Agent actions:**
 
 - In `packages/os/site-kernel-checks/AGENTS.md`, add row to the module table: `| src/section-framework/css-import.ts | runSectionCssImportValidate — CSS-IMPORT-01 (unimported .css) + CSS-NAME-01 (filename mismatch) |`
-- Run `pnpm exec site-kernel run docs.commands.generate` to regenerate `docs/COMMANDS.md`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
-- Run `pnpm exec site-kernel run gate.catalog.generate` to regenerate gate catalog
+- Run `pnpm exec werkstatt run docs.commands.generate` to regenerate `docs/COMMANDS.md`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run gate.catalog.generate` to regenerate gate catalog
 
 **Validation:**
 
-- `pnpm exec site-kernel run docs.commands.validate` — no drift
-- `pnpm exec site-kernel run ecosystem.manifest.validate` — no drift
-- `pnpm exec site-kernel run gate.catalog.validate` — no drift
+- `pnpm exec werkstatt run docs.commands.validate` — no drift
+- `pnpm exec werkstatt run ecosystem.manifest.validate` — no drift
+- `pnpm exec werkstatt run gate.catalog.validate` — no drift
 
 **Completion criterion:** All generated docs are in sync, validators pass.
 
@@ -196,12 +196,12 @@ None — no YAML/JSON/manifest changes.
 
 **Agent actions:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0598`
+- `pnpm exec werkstatt run rfc.validate RFC-0598`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run section.css.import.validate --json` — manual smoke test
-- `pnpm exec site-kernel run command.reads.validate` — `reads` field declared
-- `pnpm exec site-kernel run yaml.parse.validate` — no YAML errors
+- `pnpm exec werkstatt run section.css.import.validate --json` — manual smoke test
+- `pnpm exec werkstatt run command.reads.validate` — `reads` field declared
+- `pnpm exec werkstatt run yaml.parse.validate` — no YAML errors
 
 **Validation:**
 
@@ -233,13 +233,13 @@ None — no YAML/JSON/manifest changes.
   - [x] Unit test covers both rules + cross-import exemption
   - [x] `rfc.validate` passes
 - Commit acceptance criteria update
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0598 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0598 --implementation-commit <sha>`
 - Commit stamp transition
 
 **Validation:**
 
 - `git status` — clean working tree
-- `pnpm exec site-kernel run rfc.validate RFC-0598` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0598` — passes
 - Review report in `docs/reviews/code/`
 
 **Completion criterion:** RFC stamped as `implemented` via `rfc.implement.stamp`; all acceptance criteria checked off with evidence.
@@ -250,14 +250,14 @@ None — no YAML/JSON/manifest changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0598`
+- `pnpm exec werkstatt run rfc.validate RFC-0598`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run command.manifest.validate`
-- `pnpm exec site-kernel run docs.commands.validate`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
-- `pnpm exec site-kernel run gate.catalog.validate`
-- `pnpm exec site-kernel run command.reads.validate`
+- `pnpm exec werkstatt run command.manifest.validate`
+- `pnpm exec werkstatt run docs.commands.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run gate.catalog.validate`
+- `pnpm exec werkstatt run command.reads.validate`
 
 ### 4.2 Evidence artifacts
 

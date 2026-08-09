@@ -141,8 +141,8 @@ export interface CheckArtifactManifest {
 ### Commands
 
 ```sh
-pnpm exec site-kernel run check.runner.info --json
-pnpm exec site-kernel run check.artifact.validate --run .check-warpgogol/runs/<runId> --json
+pnpm exec werkstatt run check.runner.info --json
+pnpm exec werkstatt run check.artifact.validate --run .check-warpgogol/runs/<runId> --json
 ```
 
 `check.runner.info` prints browser availability, Playwright version, timeout defaults, supported viewport profiles, and whether AI review credentials are configured.

@@ -64,7 +64,7 @@ This class of defect has already shipped twice:
 - The boolean-flag parse bug fixed during the RFC-0229 work (a boolean flag swallowed the following positional).
 - Commit `8b3e62ab`: `app.qa.validate` passed `args:` where `ExecuteKernelCommandOptions` expects `argv:`; an `as any` cast hid it and `--phase=05-audit` silently disappeared.
 
-A live symptom during this audit: `pnpm exec site-kernel run rfc.create -- --title "…"` fails, because `--` triggers the parser's passthrough mode and `--title` becomes a positional argument — while `AGENTS.md` itself documents the `--`-form as the canonical invocation.
+A live symptom during this audit: `pnpm exec werkstatt run rfc.create -- --title "…"` fails, because `--` triggers the parser's passthrough mode and `--title` becomes a positional argument — while `AGENTS.md` itself documents the `--`-form as the canonical invocation.
 
 ## Problem
 
@@ -90,10 +90,10 @@ The unprotected invariant is: **the meaning of a command's flags must be defined
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run kernel.flags.lint
-pnpm exec site-kernel run kernel.flags.lint --json
+pnpm exec werkstatt run kernel.flags.lint
+pnpm exec werkstatt run kernel.flags.lint --json
 # Behavior change example (after migration of rfc.create):
-pnpm exec site-kernel run rfc.create --title "X" --kind policy --bogus-flag
+pnpm exec werkstatt run rfc.create --title "X" --kind policy --bogus-flag
 # → KERNEL-FLAG-01: unknown flag "bogus-flag" for rfc.create. Valid flags: title, kind, app, json, …
 ```
 

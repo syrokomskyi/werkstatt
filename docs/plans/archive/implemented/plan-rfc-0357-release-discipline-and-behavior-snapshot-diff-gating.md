@@ -110,7 +110,7 @@ scope:
 - `pnpm --filter @gogol/ontology run build:check` — schema compilation
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — package compilation
 - `pnpm --filter @gogol/site-kernel-handoff run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0357 --json` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0357 --json` — RFC validation
 
 ## 3. Step sequence
 
@@ -136,7 +136,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` passes
-- `pnpm exec site-kernel run rfc.validate RFC-0357 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0357 --json` passes
 
 **Completion criterion:** `release.ts` exists, all schemas exported from `@gogol/ontology/schemas`, TypeScript compiles, RFC validation passes.
 
@@ -164,7 +164,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
-- `pnpm exec site-kernel run behavior.snapshot.capture --dist <test-dist> --system test --build-kind readable --json` returns a valid `ReleaseBehaviorSnapshot`
+- `pnpm exec werkstatt run behavior.snapshot.capture --dist <test-dist> --system test --build-kind readable --json` returns a valid `ReleaseBehaviorSnapshot`
 
 **Completion criterion:** Command registered, callable via `site-kernel run`, returns valid `--json` envelope with `ReleaseBehaviorSnapshot` shape.
 
@@ -199,8 +199,8 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
 - `pnpm --filter @gogol/site-kernel-handoff run test` passes (diff tests green)
-- `pnpm exec site-kernel run behavior.snapshot.diff --baseline <pass-fixture> --candidate <pass-fixture> --json` returns `verdict: "pass"`
-- `pnpm exec site-kernel run behavior.snapshot.diff --baseline <pass-fixture> --candidate <route-removed-fixture> --json` returns `verdict: "fail"` with differences
+- `pnpm exec werkstatt run behavior.snapshot.diff --baseline <pass-fixture> --candidate <pass-fixture> --json` returns `verdict: "pass"`
+- `pnpm exec werkstatt run behavior.snapshot.diff --baseline <pass-fixture> --candidate <route-removed-fixture> --json` returns `verdict: "fail"` with differences
 
 **Completion criterion:** Diff command registered, all diff test cases pass, `--json` output matches RFC §6.6 format.
 
@@ -378,8 +378,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
-- `pnpm exec site-kernel run release.list --json` returns a valid (possibly empty) list
-- All seven commands appear in `pnpm exec site-kernel run --help` or equivalent command listing
+- `pnpm exec werkstatt run release.list --json` returns a valid (possibly empty) list
+- All seven commands appear in `pnpm exec werkstatt run --help` or equivalent command listing
 
 **Completion criterion:** All seven commands registered and callable via `site-kernel run`.
 
@@ -406,9 +406,9 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate --json` passes
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json` passes
-- `pnpm exec site-kernel run workspace.surface.validate --json` passes
+- `pnpm exec werkstatt run compass.validate --json` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json` passes
+- `pnpm exec werkstatt run workspace.surface.validate --json` passes
 
 **Completion criterion:** All documentation files updated, Compass validation passes, ecosystem manifest is fresh.
 
@@ -422,11 +422,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0357 --json` — verify pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0357 --json` — verify pass
 - Run `pnpm --filter @gogol/ontology run build:check` — verify pass
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — verify pass
 - Run `pnpm --filter @gogol/site-kernel-handoff run test` — verify all tests pass
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0357` (RFC-0330) — emit verification evidence
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0357` (RFC-0330) — emit verification evidence
 - Update RFC-0357 acceptance criteria checkboxes to reflect verified state
 - Verify `releases/` is in `.gitignore`
 
@@ -451,12 +451,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run release.prepare --mission <pilot-mission-id> --semver 1.0.0 --json` — verify a release candidate is produced in `releases/warpgogol-com-r000001/`
+- Run `pnpm exec werkstatt run release.prepare --mission <pilot-mission-id> --semver 1.0.0 --json` — verify a release candidate is produced in `releases/warpgogol-com-r000001/`
 - Verify `release.yaml` has state `prepared`, `snapshotDiffVerdict: "pass"`, and all hash fields populated
-- Run `pnpm exec site-kernel run release.validate --release warpgogol-com-r000001 --json` — verify pass
-- Run `pnpm exec site-kernel run release.publish --release warpgogol-com-r000001 --json` — verify state transitions to `published`, Bordbuch entry appended, registry `lastRelease` updated
-- Run `pnpm exec site-kernel run release.list --system warpgogol-com --json` — verify the release appears
-- Run `pnpm exec site-kernel run release.rollback --release warpgogol-com-r000001 --json` — verify state transitions to `rolled-back` (optional, only if rollback is safe for the pilot)
+- Run `pnpm exec werkstatt run release.validate --release warpgogol-com-r000001 --json` — verify pass
+- Run `pnpm exec werkstatt run release.publish --release warpgogol-com-r000001 --json` — verify state transitions to `published`, Bordbuch entry appended, registry `lastRelease` updated
+- Run `pnpm exec werkstatt run release.list --system warpgogol-com --json` — verify the release appears
+- Run `pnpm exec werkstatt run release.rollback --release warpgogol-com-r000001 --json` — verify state transitions to `rolled-back` (optional, only if rollback is safe for the pilot)
 
 **Validation:**
 
@@ -475,13 +475,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0357 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0357 --json`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run compass.validate --json`
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0357` (RFC-0330)
+- `pnpm exec werkstatt run compass.validate --json`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0357` (RFC-0330)
 - Pilot: `release.prepare` + `release.publish` + `release.validate` + `release.list` for `warpgogol-com` (Step 11)
 
 ### 4.2 Evidence artifacts
@@ -504,7 +504,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0357 --reason "..." --invariant "DNA-48"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0357 --reason "..." --invariant "DNA-48"` instead of working around it.
 - If the RFC-0269 `BehaviorSnapshot` interface cannot be reused as-is (e.g., missing fields needed for release diff), escalate via `rfc.supersede.propose` with `--reason "RFC-0269 behavior snapshot insufficient for release diff"`.
 - If RFC-0362/0363/0364 are not yet implemented and blocking progress, do not stub — wait for the dependency wave to land first (per the sequential decision).
 - If the production build produces a structurally different output by design (e.g., a route intentionally excluded only in production), escalate to update the RFC's allowed-differences list (§3.2) before proceeding.

@@ -167,7 +167,7 @@ howSolved: "…"                   # how the Fundament/module captures it
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run demand.modifier.lint --app warpgogol-com --json
+pnpm exec werkstatt run demand.modifier.lint --app warpgogol-com --json
 ```
 
 `demand.modifier.lint` scans the `demands` collection and the slug universe and fails when a demand slug is an **intent modifier** (a closed, configurable lexicon: price/cheap/cost, urgent/today/24h, near/nearby, best/top/cheapest, plus de/uk equivalents `preis`, `guenstig`, `dringend`, `in-der-naehe`, `ціна`, `терміново`, `поруч`, `найкращий`). Modifiers must be page blocks/FAQ, not records.

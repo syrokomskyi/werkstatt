@@ -108,7 +108,7 @@ rtk cp .env.example .env
 | `CLOUDFLARE_API_TOKEN` | API token (see §3) | Cloudflare Dashboard → My Profile → API Tokens → Create Custom Token |
 | `CLOUDFLARE_ZONE_ID` | Zone ID for CDN cache purge | Cloudflare Dashboard → Overview → Zone ID (right sidebar) |
 | `CLOUDFLARE_ACCOUNT_ID` | Account ID for wrangler deploy | Cloudflare Dashboard → Overview → Account ID (right sidebar) |
-| `PASSPORT_SIGNING_KEY` | Ed25519 signing key for commits | `pnpm exec site-kernel run identity.bootstrap --operator-name "Your Name" --domain warpgogol.com --json` |
+| `PASSPORT_SIGNING_KEY` | Ed25519 signing key for commits | `pnpm exec werkstatt run identity.bootstrap --operator-name "Your Name" --domain warpgogol.com --json` |
 
 ### Optional variables (depending on features)
 
@@ -174,7 +174,7 @@ After completing steps 1-5, verify the workshop can deploy:
 
 ```sh
 # 1. Verify token is valid (pre-flight check runs automatically during deploy)
-rtk pnpm exec site-kernel run leitstand.dev-deploy --site <system-id> --release <release-id>
+rtk pnpm exec werkstatt run leitstand.dev-deploy --site <system-id> --release <release-id>
 ```
 
 The pre-flight check will log:

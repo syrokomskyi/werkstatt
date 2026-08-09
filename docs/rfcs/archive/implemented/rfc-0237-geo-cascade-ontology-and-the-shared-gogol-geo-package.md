@@ -106,11 +106,11 @@ Introduce a new shared, framework-free package **`@gogol/geo`** that owns the ge
 
 ```sh
 # Validate that every geo reference in an app resolves and that slugs do not collide.
-pnpm exec site-kernel run geo.catalog.validate --app warpgogol-com
-pnpm exec site-kernel run geo.catalog.validate --all --json
+pnpm exec werkstatt run geo.catalog.validate --app warpgogol-com
+pnpm exec werkstatt run geo.catalog.validate --all --json
 
 # Developer aid: preview the resolved per-language slug for a city.
-pnpm exec site-kernel run geo.slug.preview -- stuttgart --json
+pnpm exec werkstatt run geo.slug.preview -- stuttgart --json
 ```
 
 `geo.catalog.validate` is workspace/app-scoped and runs in the apps build-check pipeline. `geo.slug.preview` is a standalone developer command (no pipeline).

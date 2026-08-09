@@ -157,22 +157,22 @@ records:
 
 ```sh
 # Create or update DNS records from declaration
-pnpm exec site-kernel run dns.record.upsert --zone warpgogol.com
+pnpm exec werkstatt run dns.record.upsert --zone warpgogol.com
 
 # Dry-run: show what would change without modifying Cloudflare
-pnpm exec site-kernel run dns.record.upsert --zone warpgogol.com --dry-run
+pnpm exec werkstatt run dns.record.upsert --zone warpgogol.com --dry-run
 
 # Validate declared records against Cloudflare
-pnpm exec site-kernel run dns.record.validate --zone warpgogol.com
+pnpm exec werkstatt run dns.record.validate --zone warpgogol.com
 
 # List all DNS records in a zone
-pnpm exec site-kernel run dns.record.list --zone warpgogol.com
+pnpm exec werkstatt run dns.record.list --zone warpgogol.com
 
 # Delete a specific DNS record (single-value type)
-pnpm exec site-kernel run dns.record.delete --zone warpgogol.com --name pulse.warpgogol.com --type CNAME
+pnpm exec werkstatt run dns.record.delete --zone warpgogol.com --name pulse.warpgogol.com --type CNAME
 
 # Delete a specific MX record (multi-value type requires --content)
-pnpm exec site-kernel run dns.record.delete --zone warpgogol.com --name warpgogol.com --type MX --content route1.mx.cloudflare.net
+pnpm exec werkstatt run dns.record.delete --zone warpgogol.com --name warpgogol.com --type MX --content route1.mx.cloudflare.net
 ```
 
 ### TypeScript contracts

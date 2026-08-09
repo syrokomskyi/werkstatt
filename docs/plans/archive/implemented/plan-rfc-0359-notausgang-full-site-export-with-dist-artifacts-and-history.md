@@ -100,7 +100,7 @@ scope:
 - `notausgang.export` and `notausgang.validate` are **not** added to any build pipeline — they are operator-invoked commands, not CI gates
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — TypeScript compilation
 - `pnpm --filter @gogol/site-kernel-handoff test` — Vitest unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0359 --json` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0359 --json` — RFC validation
 
 ## 3. Step sequence
 
@@ -146,7 +146,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run notausgang.export --help` shows the command (or at least does not crash on module load)
+- `pnpm exec werkstatt run notausgang.export --help` shows the command (or at least does not crash on module load)
 
 **Completion criterion:** Module directory exists, stub commands are registered, package compiles
 
@@ -289,8 +289,8 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
 - `pnpm --filter @gogol/site-kernel-handoff test` passes
-- `pnpm exec site-kernel run notausgang.export --help` displays help
-- `pnpm exec site-kernel run notausgang.validate --help` displays help
+- `pnpm exec werkstatt run notausgang.export --help` displays help
+- `pnpm exec werkstatt run notausgang.validate --help` displays help
 
 **Completion criterion:** Both commands are registered, discoverable via CLI, and the full test suite passes
 
@@ -316,7 +316,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0359 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0359 --json` passes
 - Documentation review
 
 **Completion criterion:** All documentation files updated, `rfc.validate` passes
@@ -334,8 +334,8 @@ scope:
 **Agent actions:**
 
 - Ensure `warpgogol-com` has a published release at `r000001`
-- Run `pnpm exec site-kernel run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output ../exports/warpgogol-com-2026-07-09`
-- Run `pnpm exec site-kernel run notausgang.validate --path ../exports/warpgogol-com-2026-07-09`
+- Run `pnpm exec werkstatt run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output ../exports/warpgogol-com-2026-07-09`
+- Run `pnpm exec werkstatt run notausgang.validate --path ../exports/warpgogol-com-2026-07-09`
 - Verify the export package contains all required files
 - Verify `site/` is data-only (no runtime files)
 - Verify integrations are nulled
@@ -359,10 +359,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0359 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0359 --json` — must pass
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-handoff test` — must pass
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0359` (RFC-0330, if RFC-0359 has acceptance probes)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0359` (RFC-0330, if RFC-0359 has acceptance probes)
 - Commit evidence file alongside the `implemented` status transition
 
 **Validation:**
@@ -380,13 +380,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0359` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0359` — RFC mechanical validation
 - `pnpm --filter @gogol/ontology build:check` — schema compilation
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — package compilation
 - `pnpm --filter @gogol/site-kernel-handoff test` — unit and integration tests
-- `pnpm exec site-kernel run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output <path>` — pilot export
-- `pnpm exec site-kernel run notausgang.validate --path <path>` — pilot validation
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0359` (RFC-0330, if acceptance probes declared)
+- `pnpm exec werkstatt run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output <path>` — pilot export
+- `pnpm exec werkstatt run notausgang.validate --path <path>` — pilot validation
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0359` (RFC-0330, if acceptance probes declared)
 
 ### 4.2 Evidence artifacts
 
@@ -408,7 +408,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-50, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0359 --reason "..." --invariant "DNA-50"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-50, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0359 --reason "..." --invariant "DNA-50"` instead of working around it (RFC-0334).
 - If the `IntegrationManifest` location (`src/content/site/integration-manifest.json`) conflicts with an existing content schema or CMS-friendly content surface rule (RFC-0047), escalate via a new RFC rather than moving the file ad-hoc.
 - If the dependency chain (RFC-0355/0357/0363/0364) reveals incompatible contracts during their implementation, do not patch this RFC — file a superseding RFC that reconciles the conflict.
 - If the atomic staging approach is insufficient for Windows (rename fails on existing directory), escalate to a new RFC for cross-platform atomic export — do not silently fall back to non-atomic writes.

@@ -97,7 +97,7 @@ No configuration or data changes.
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0765` — confirms zero violations
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0765` — confirms zero violations
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes. Since this is a documentation-only RFC with no code changes, the review scope is the AGENTS.md edits.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`.
 - Check off acceptance criteria:
@@ -105,12 +105,12 @@ No configuration or data changes.
   - [x] `packages/ui/AGENTS.md` contains a price marker documentation entry (evidence: `packages/ui/AGENTS.md` lines <inserted range>)
   - [x] The section explicitly states that `{price:...}` is NOT a content reference and must not be migrated to `=(...)` (evidence: `AGENTS.md` line <inserted>)
   - [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0765` exit 0)
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0765 --implementation-commit <sha>` (first implementation commit)
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0765 --implementation-commit <sha>` (first implementation commit)
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0765` — zero violations
+- `pnpm exec werkstatt run rfc.validate --id RFC-0765` — zero violations
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -121,7 +121,7 @@ No configuration or data changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0765`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0765`
 - No `build:check` needed (no code changes)
 - No acceptance probes (policy RFC)
 

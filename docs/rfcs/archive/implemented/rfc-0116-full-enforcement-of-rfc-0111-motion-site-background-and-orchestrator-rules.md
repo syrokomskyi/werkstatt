@@ -138,9 +138,9 @@ See `## CLI surface`, `## TypeScript contracts`, and `## Rollout` above for the 
 Unchanged. The validators continue to be invoked through:
 
 ```sh
-pnpm exec site-kernel run section.motion.contract.validate --app <id>
-pnpm exec site-kernel run site.background.contract.validate --app <id>
-pnpm exec site-kernel run layout.orchestrator.lint --app <id>
+pnpm exec werkstatt run section.motion.contract.validate --app <id>
+pnpm exec werkstatt run site.background.contract.validate --app <id>
+pnpm exec werkstatt run layout.orchestrator.lint --app <id>
 ```
 
 `apps-check.author` invokes all three as part of `APPS_CHECK_AUTHOR_PIPELINE`.

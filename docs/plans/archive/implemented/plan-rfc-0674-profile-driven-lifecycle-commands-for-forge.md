@@ -49,10 +49,10 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0674`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0674`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.profile.validate --id editframe-html`
+- `pnpm exec werkstatt run forge.profile.validate --id editframe-html`
 
 ## 3. Step sequence
 
@@ -72,7 +72,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run forge.profile.validate` — existing profiles still validate (devServer is optional)
+- `pnpm exec werkstatt run forge.profile.validate` — existing profiles still validate (devServer is optional)
 
 **Completion criterion:** `profileDevServerSchema` and `ProfileDevServer` exported from `profile-schema.ts`; `devServer` field present in `stackProfileDomainFieldsSchema` and `StackProfile`; `build:check` passes; `forge.profile.validate` passes.
 
@@ -191,7 +191,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0674` — commands.proposed entries match registered commands
+- `pnpm exec werkstatt run rfc.validate --id RFC-0674` — commands.proposed entries match registered commands
 
 **Completion criterion:** All three commands registered in `core.module.ts`; `build:check` passes; `rfc.validate` passes.
 
@@ -214,7 +214,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.profile.validate --id editframe-html`
+- `pnpm exec werkstatt run forge.profile.validate --id editframe-html`
 
 **Completion criterion:** `editframe-html.yaml` has `devServer` section; `forge.profile.validate --id editframe-html` passes.
 
@@ -251,7 +251,7 @@ scope:
 
 - Update `packages/forge/AGENTS.md` OS modules table: add `forge.dev`, `forge.build`, `forge.validate` to `forgeCoreModule` command list
 - Add a new section or paragraph documenting the profile-driven lifecycle commands
-- Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
+- Run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
 
 **Validation:**
 
@@ -271,19 +271,19 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — `packages/forge/AGENTS.md` and `docs/command-manifest.generated.yaml`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0674`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0674`
 - Run `pnpm --filter @warpgogol/forge run build:check`
 - Run `pnpm --filter @warpgogol/forge run test`
-- Run `pnpm exec site-kernel run forge.profile.validate --id editframe-html`
+- Run `pnpm exec werkstatt run forge.profile.validate --id editframe-html`
 - Check off acceptance criteria in the RFC, marking `[x]` with inline `(evidence: ...)` annotations
 - Run code review: invoke `fo-review` on all session code changes
 - Run fix if needed: invoke `fo-fix` if review has findings
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0674 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0674 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0674`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0674`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -294,10 +294,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0674`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0674`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.profile.validate --id editframe-html`
+- `pnpm exec werkstatt run forge.profile.validate --id editframe-html`
 
 ### 4.2 Evidence artifacts
 
@@ -314,4 +314,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0674 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0674 --reason "..." --invariant "DNA-54"` instead of working around it.

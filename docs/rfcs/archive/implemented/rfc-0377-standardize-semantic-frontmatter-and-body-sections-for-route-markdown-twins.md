@@ -63,7 +63,7 @@ nonGoals:
   - "Do not add runtime worker routes or dynamic rendering."
   - "Do not introduce new Site OS commands — only changes existing page.markdown.generate / page.markdown.validate."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -129,10 +129,10 @@ No new commands. The existing commands change behavior:
 
 ```sh
 # Still in build.prepare — now emits semantic frontmatter + structured body
-pnpm exec site-kernel run page.markdown.generate --app warpgogol-com
+pnpm exec werkstatt run page.markdown.generate --app warpgogol-com
 
 # Still in apps-check.postbuild — now validates semantic fields + body sections
-pnpm exec site-kernel run page.markdown.validate --app warpgogol-com
+pnpm exec werkstatt run page.markdown.validate --app warpgogol-com
 ```
 
 ### TypeScript contracts

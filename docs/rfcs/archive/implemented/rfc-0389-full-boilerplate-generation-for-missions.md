@@ -116,7 +116,7 @@ The minimal stub approach violates DNA-47 (Materialization) and RFC-0356 §1.1 s
 No CLI surface changes. `mission.materialize` keeps its existing flags:
 
 ```sh
-pnpm exec site-kernel run mission.materialize \
+pnpm exec werkstatt run mission.materialize \
   --mission <mission-id> \
   [--report-only] \
   [--json]

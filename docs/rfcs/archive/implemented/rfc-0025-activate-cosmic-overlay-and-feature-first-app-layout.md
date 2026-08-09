@@ -404,13 +404,13 @@ Biome tokens generate a CSS file at build time: `packages/tokens/src/biomes/<id>
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run app.layout.validate --app nicaragua-projekt
-pnpm exec site-kernel run client.edit.validate --base HEAD~1 --head HEAD
-pnpm exec site-kernel run cosmic.catalog.validate
-pnpm exec site-kernel run cosmic.name.unique
-pnpm exec site-kernel run system.manifest.validate --app nicaragua-projekt
-pnpm exec site-kernel run constellation.compose.validate --app nicaragua-projekt
-pnpm exec site-kernel run biome.contract.validate
+pnpm exec werkstatt run app.layout.validate --app nicaragua-projekt
+pnpm exec werkstatt run client.edit.validate --base HEAD~1 --head HEAD
+pnpm exec werkstatt run cosmic.catalog.validate
+pnpm exec werkstatt run cosmic.name.unique
+pnpm exec werkstatt run system.manifest.validate --app nicaragua-projekt
+pnpm exec werkstatt run constellation.compose.validate --app nicaragua-projekt
+pnpm exec werkstatt run biome.contract.validate
 ```
 
 | Command | Scope | Responsibility |

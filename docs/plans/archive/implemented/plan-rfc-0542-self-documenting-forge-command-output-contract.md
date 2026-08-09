@@ -48,7 +48,7 @@ None — no YAML/JSON config changes.
 
 - `pnpm --filter @wgogol/forge run build:check` — typecheck
 - `pnpm --filter @wgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate` — RFC validation
+- `pnpm exec werkstatt run rfc.validate` — RFC validation
 
 ## 3. Step sequence
 
@@ -240,16 +240,16 @@ None — no YAML/JSON config changes.
 **Agent actions:**
 
 - Verify every acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate` — zero RFC-0542 violations.
+- Run `pnpm exec werkstatt run rfc.validate` — zero RFC-0542 violations.
 - Run `pnpm --filter @wgogol/forge run build:check` — typecheck passes.
 - Run `pnpm --filter @wgogol/forge run test` — all tests pass.
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0542 --implementation-commit <sha>` (first `--dry-run`, then without).
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0542 --implementation-commit <sha>` (first `--dry-run`, then without).
 - Commit the stamped RFC separately from the implementation commit.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate` — zero RFC-0542 violations.
+- `pnpm exec werkstatt run rfc.validate` — zero RFC-0542 violations.
 - `pnpm --filter @wgogol/forge run build:check` — passes.
 - `pnpm --filter @wgogol/forge run test` — passes.
 
@@ -261,7 +261,7 @@ None — no YAML/JSON config changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate` — zero RFC-0542 violations
+- `pnpm exec werkstatt run rfc.validate` — zero RFC-0542 violations
 - `pnpm --filter @wgogol/forge run build:check` — typecheck passes
 - `pnpm --filter @wgogol/forge run test` — all tests pass
 
@@ -280,4 +280,4 @@ None — no YAML/JSON config changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0542 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0542 --reason "..." --invariant "DNA-54"` instead of working around it.

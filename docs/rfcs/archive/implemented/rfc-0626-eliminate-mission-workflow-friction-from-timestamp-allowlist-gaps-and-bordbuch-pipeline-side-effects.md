@@ -67,7 +67,7 @@ nonGoals:
   - "Do not auto-commit non-bordbuch files in the cache clone — only bordbuch projection files (bordbuch.json, bordbuch/index.html, status.generated.yaml) are auto-committed by the pipeline step."
   - "Do not change the bordbuch.generate command handler itself — it remains single-responsibility (generate projections via writeFileIfChanged). The auto-commit is a separate pipeline step."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -145,7 +145,7 @@ The `generated.timestamp.validate` command gains a Phase 2 allowlist parity chec
 No new CLI commands. The change is internal to the existing `generated.timestamp.validate` command:
 
 ```sh
-pnpm exec site-kernel run generated.timestamp.validate --site warpgogol-com
+pnpm exec werkstatt run generated.timestamp.validate --site warpgogol-com
 ```
 
 The command now performs two phases:
@@ -223,7 +223,7 @@ The parity check runs after Phase 1 scanning, reusing the scan results returned 
 `bordbuch.commit` is a new registered kernel command in the bordbuch module (`@warpgogol/site-kernel-handoff`). It is primarily intended as a pipeline step, but is technically callable by operators (like all registered commands). The command is not added to any CLI documentation surface and is documented as "internal pipeline step" in its MODULE_CONTRACT.
 
 ```sh
-pnpm exec site-kernel run build.prepare --site warpgogol-com
+pnpm exec werkstatt run build.prepare --site warpgogol-com
 ```
 
 The pipeline now includes a `bordbuch.commit` step after `bordbuch.generate`:
@@ -336,13 +336,13 @@ The helper reuses `gitExec` from `packages/os/site-kernel-handoff/src/werkstatt/
 ## Acceptance criteria
 
 - [x] `generated.timestamp.validate` emits `TS-TIME-02` error when a module in `GENERATOR_OWNERSHIP_MAP` uses volatile timestamp patterns but is missing from `TIMESTAMP_ALLOWLIST` (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:259-279`, `packages/os/site-kernel-checks/src/tests/generated-timestamp-validate.test.ts:255-266`)
-- [x] `generated.timestamp.validate` passes with zero violations after all runtime-logic modules are allowlisted (evidence: `pnpm exec site-kernel run generated.timestamp.validate --mode fail --json` exits 0 with zero TS-TIME-02 diagnostics, 2026-07-31)
+- [x] `generated.timestamp.validate` passes with zero violations after all runtime-logic modules are allowlisted (evidence: `pnpm exec werkstatt run generated.timestamp.validate --mode fail --json` exits 0 with zero TS-TIME-02 diagnostics, 2026-07-31)
 - [x] `build.prepare` pipeline includes `bordbuch.commit` step after `bordbuch.generate` (evidence: `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:126`, `packages/os/site-kernel-checks/src/tests/build-prepare-pipeline.test.ts:58-70`)
 - [x] `bordbuch.commit` step is excluded from `SITES_BUILD_PREPARE_DEV_PIPELINE` (evidence: `packages/os/site-kernel-checks/src/tests/build-prepare-pipeline.test.ts:73-75`)
 - [x] After `build.prepare`, cache clone has zero uncommitted bordbuch projection files (evidence: `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts:62-63` stages all three bordbuch paths, `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:91-99` verifies commit on dirty files)
 - [x] `commitBordbuchProjections` helper only stages bordbuch projection paths, never `git add -A` (evidence: `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts:62-63`, `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:113-125`)
 - [x] `mission.validate`, `mission.close`, and `release.prepare` complete without cache-clone dirty warnings for bordbuch files (evidence: `bordbuch.commit` runs in `SITES_BUILD_PREPARE_PIPELINE` before `generated.files.validate`, ensuring bordbuch projections are committed before any mission validation reads cache clone state; `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:123-126`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0626 --json` exits 0, 2026-07-31)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0626 --json` exits 0, 2026-07-31)
 
 ## Implementation notes for agents
 

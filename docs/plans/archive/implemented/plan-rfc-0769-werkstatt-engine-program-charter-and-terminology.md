@@ -59,7 +59,7 @@ None.
 **Validation:**
 
 - `rtk grep "DNA-64" docs/architecture-dna.md` — confirms entry exists.
-- `rtk pnpm exec site-kernel run dna.registry.validate` — confirms registry sync.
+- `rtk pnpm exec werkstatt run dna.registry.validate` — confirms registry sync.
 
 **Completion criterion:** DNA-64 entry exists in `docs/architecture-dna.md` with text matching RFC-0769's invariant description, and `dna.registry.validate` passes.
 
@@ -97,8 +97,8 @@ None.
 **Agent actions:**
 
 - Verify all 10 downstream RFCs (RFC-0770..0779) exist in `docs/rfcs/` with `status: draft` and `related: [RFC-0769]` — already confirmed during audit.
-- Run `rtk pnpm exec site-kernel run rfc.validate --id RFC-0769 --json` — confirm 0 violations.
-- Run `rtk pnpm exec site-kernel run dna.registry.validate` — confirm DNA-64 is registered.
+- Run `rtk pnpm exec werkstatt run rfc.validate --id RFC-0769 --json` — confirm 0 violations.
+- Run `rtk pnpm exec werkstatt run dna.registry.validate` — confirm DNA-64 is registered.
 
 **Validation:**
 
@@ -118,7 +118,7 @@ None.
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check `docs/architecture-dna.md` and `AGENTS.md` against `git diff`.
-- Run `rtk pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (not expected for this charter).
+- Run `rtk pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (not expected for this charter).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0769 against the implemented changes. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
@@ -126,12 +126,12 @@ None.
   - Criterion 2: Root `AGENTS.md` has "Werkstatt engine program" section — `(evidence: AGENTS.md:## Werkstatt engine program)`
   - Criterion 3: All downstream RFCs exist with `related: [RFC-0769]` — `(evidence: docs/rfcs/rfc-0770..0779, rfc.validate exit 0)`
   - Criterion 4: `rfc.validate` passes — `(evidence: rfc.validate --id RFC-0769 exit 0)`
-- **Stamp the RFC as implemented:** run `rtk pnpm exec site-kernel run rfc.implement.stamp --id RFC-0769 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `rtk pnpm exec werkstatt run rfc.implement.stamp --id RFC-0769 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `rtk git status` — no uncommitted changes from the current session.
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0769` — 0 violations.
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0769` — 0 violations.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -142,9 +142,9 @@ None.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0769`
-- `pnpm exec site-kernel run dna.registry.validate`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0769` (RFC-0330 — note: this RFC has commented-out acceptance probes, so verification emit will skip; this is expected)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0769`
+- `pnpm exec werkstatt run dna.registry.validate`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0769` (RFC-0330 — note: this RFC has commented-out acceptance probes, so verification emit will skip; this is expected)
 
 ### 4.2 Evidence artifacts
 
@@ -162,4 +162,4 @@ None.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-2, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0769 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 or DNA-2, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0769 --reason "..." --invariant "DNA-N"` instead of working around it.

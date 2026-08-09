@@ -83,8 +83,8 @@ A build-time generator `page.markdown.generate` emits a same-path Markdown twin 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run page.markdown.generate --app nicaragua-projekt
-pnpm exec site-kernel run page.markdown.validate --all --json
+pnpm exec werkstatt run page.markdown.generate --app nicaragua-projekt
+pnpm exec werkstatt run page.markdown.validate --all --json
 ```
 
 ### TypeScript contracts

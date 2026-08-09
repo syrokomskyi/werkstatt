@@ -49,7 +49,7 @@ nonGoals:
   - "Does not amend repository RFCs — existing amends[]/supersedes[] governance covers those"
   - "Does not auto-accept amendments — each amendment is a decision with a human gate"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -97,8 +97,8 @@ Specs gain a **governed amendment loop**. A point correction is an **amendment f
 No new commands. Existing spec commands gain amendment awareness:
 
 ```sh
-pnpm exec site-kernel run spec.validate --spec=pbp --json   # now also checks amendments/
-pnpm exec site-kernel run spec.status --spec=pbp --json     # shows amendment counts and amended nodes
+pnpm exec werkstatt run spec.validate --spec=pbp --json   # now also checks amendments/
+pnpm exec werkstatt run spec.status --spec=pbp --json     # shows amendment counts and amended nodes
 ```
 
 Amendment files are authored by agents (during fo pipeline work or `fo-spec-ingest` grilling) and accepted by the operator — a judgment flow, not a CLI flow.

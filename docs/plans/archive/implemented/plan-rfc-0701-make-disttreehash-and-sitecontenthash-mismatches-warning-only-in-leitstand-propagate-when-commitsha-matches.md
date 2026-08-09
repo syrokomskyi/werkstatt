@@ -45,7 +45,7 @@ No configuration or data changes.
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0701`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0701`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -128,8 +128,8 @@ No configuration or data changes.
 **Agent actions:**
 
 - Verify no `AGENTS.md` or `docs/*.xml` updates are needed (behavior change within existing command, no new rules).
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0701` — must pass with 0 violations.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0701` (RFC-0330, for probe-bearing RFCs — this RFC has commented-out probes, so this may produce no evidence file; that is expected).
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0701` — must pass with 0 violations.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0701` (RFC-0330, for probe-bearing RFCs — this RFC has commented-out probes, so this may produce no evidence file; that is expected).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: <file:line>, <test-or-command>)` annotations.
@@ -140,13 +140,13 @@ No configuration or data changes.
   - AC5: Propagation succeeds when only secondary hashes mismatch — evidence: test case 1/2 (no throw)
   - AC6: Unit test covers the warning-only path — evidence: `rfc-0701-propagate-warning-only.test.ts`
   - AC7: `rfc.validate` passes — evidence: `rfc.validate --id RFC-0701` output
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0701 --implementation-commit <sha>` (first `--dry-run`, then without). The implementation commit is the SHA from Step 1.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0701 --implementation-commit <sha>` (first `--dry-run`, then without). The implementation commit is the SHA from Step 1.
 - **Commit the stamped RFC separately** — the implementation commit (Step 1) and the stamp commit MUST be separate commits.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from this session (except changes by other agents).
-- `pnpm exec site-kernel run rfc.validate --id RFC-0701` — 0 violations.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0701` — 0 violations.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented`; implementation commit and stamp commit are separate; `git status` clean.
@@ -157,7 +157,7 @@ No configuration or data changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0701`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0701`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -176,4 +176,4 @@ No configuration or data changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0701 --reason "..." --invariant "DNA-49"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0701 --reason "..." --invariant "DNA-49"` instead of working around it (RFC-0334).

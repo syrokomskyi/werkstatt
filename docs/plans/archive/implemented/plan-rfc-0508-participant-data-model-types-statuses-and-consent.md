@@ -74,8 +74,8 @@ scope:
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0508`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0508`
 
 ## 3. Step sequence
 
@@ -163,7 +163,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** Migrator registered, PBT and snapshot tests pass, `migrator.registry.validate` passes.
 
@@ -177,14 +177,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run mission.migrate --mission warpgogol-com-m000010` (or the appropriate mission for the current workpiece)
+- Run `pnpm exec werkstatt run mission.migrate --mission warpgogol-com-m000010` (or the appropriate mission for the current workpiece)
 - Verify `missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md` now has `participantType: human`, `status: active`, `visibility: public`, `relationshipType: founder`, `consent` record
 - Verify `missions/warpgogol-com-m000010/workpiece/src/content/people/uk/andrii-syrokomskyi.md` same
 - Commit workpiece changes via `mission.git.commit`
 
 **Validation:**
 
-- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json` — passes
+- `pnpm exec werkstatt run participant.validate --site warpgogol-com --json` — passes
 
 **Completion criterion:** Both Andrii records have participant fields; `participant.validate` passes.
 
@@ -202,12 +202,12 @@ scope:
 - Update `packages/share/AGENTS.md` — document `participantSchema` in the schemas subpath entry table
 - Update `docs/source-markup.xml` — add Compass scaffolding entries for `participant.ts` (new source files)
 - Update `docs/requirements.xml` and `docs/technology.xml` if semantically significant changes
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0508`
-- `pnpm exec site-kernel run compass.validate` (if available)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0508`
+- `pnpm exec werkstatt run compass.validate` (if available)
 
 **Completion criterion:** All scope docs updated or documented as not-applicable; `rfc.validate` passes.
 
@@ -222,11 +222,11 @@ scope:
 **Agent actions:**
 
 - Run full validation suite: `pnpm --filter @gogol/share run build:check`, `pnpm --filter @gogol/site-kernel-checks run build:check`, `pnpm --filter @gogol/site-kernel-handoff run build:check`, `pnpm --filter @gogol/ui run build:check`
-- Run `pnpm exec site-kernel run participant.validate --site warpgogol-com --json` — passes
-- Run `pnpm exec site-kernel run migrator.registry.validate`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0508`
+- Run `pnpm exec werkstatt run participant.validate --site warpgogol-com --json` — passes
+- Run `pnpm exec werkstatt run migrator.registry.validate`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0508`
 - Check off all acceptance criteria in the RFC with `(evidence: ...)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0508 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0508 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -241,13 +241,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0508`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0508`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run participant.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -264,5 +264,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0508 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0508 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the migrator fails on existing records due to unexpected frontmatter shapes, investigate the specific record structure before modifying the migrator — do not weaken the migrator's idempotency guarantee.

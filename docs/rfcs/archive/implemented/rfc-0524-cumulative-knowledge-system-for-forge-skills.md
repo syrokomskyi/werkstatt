@@ -119,13 +119,13 @@ No new commands. Existing commands gain knowledge-file awareness:
 
 ```sh
 # SKILL-13: validates declared knowledge files exist
-pnpm exec site-kernel run forge.skill.validate --all
+pnpm exec werkstatt run forge.skill.validate --all
 
 # Syncs knowledge files from packages/forge/skills/ to .agents/skills/
-pnpm exec site-kernel run forge.init
+pnpm exec werkstatt run forge.init
 
 # Reports stale knowledge files (source vs .agents/ copy drift)
-pnpm exec site-kernel run forge.doctor
+pnpm exec werkstatt run forge.doctor
 ```
 
 ### TypeScript contracts
@@ -265,8 +265,8 @@ The `knowledge` field is additive and independent of the `concerns` enum change.
 - [x] `grilling` SKILL.md frontmatter includes `knowledge: [qa-log.md, learned-principles.md]` and SKILL.md body updated to use knowledge system (evidence: packages/forge/skills/shared/grilling/SKILL.md:9-11, knowledge frontmatter; SKILL.md:16,28, L2 read and meta-analysis instructions)
 - [x] `grilling` has `qa-log.md` and `learned-principles.md` files in `packages/forge/skills/shared/grilling/` (evidence: packages/forge/skills/shared/grilling/qa-log.md, packages/forge/skills/shared/grilling/learned-principles.md)
 - [x] `skill-create` SKILL.md updated to prompt for knowledge system adoption when `concerns: content-mutation | code-mutation` AND `invocation: user` (evidence: packages/forge/skills/meta/skill-create/SKILL.md:30-32, "Cumulative knowledge prompt" step 1.5)
-- [x] `forge.skill.validate --all` passes with zero violations after adoption (evidence: `pnpm exec site-kernel run forge.skill.validate --json` output: status: pass, violations: [])
-- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0524 --json` output: status: pass, count: 1, violations: [])
+- [x] `forge.skill.validate --all` passes with zero violations after adoption (evidence: `pnpm exec werkstatt run forge.skill.validate --json` output: status: pass, violations: [])
+- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec werkstatt run rfc.validate RFC-0524 --json` output: status: pass, count: 1, violations: [])
 
 ## Implementation notes for agents
 

@@ -59,7 +59,7 @@ nonGoals:
   - Post-commit git status verification or reporting (operator checks manually)
   - Empty commits for audit trail (no changes = no commit)
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -192,11 +192,11 @@ The skill instructs the agent to perform the following after every operator requ
 ## Acceptance criteria
 
 - [x] `fo-step-commit` skill file exists at `packages/forge/skills/fo/fo-step-commit/SKILL.md` with correct frontmatter (evidence: `packages/forge/skills/fo/fo-step-commit/SKILL.md:1-13`, `forge.skill.validate` reports zero violations for fo-step-commit)
-- [x] Skill frontmatter passes `forge.skill.validate` with zero violations (evidence: `pnpm exec site-kernel run forge.skill.validate --json` reports no violations with `"skill": "fo-step-commit"`)
+- [x] Skill frontmatter passes `forge.skill.validate` with zero violations (evidence: `pnpm exec werkstatt run forge.skill.validate --json` reports no violations with `"skill": "fo-step-commit"`)
 - [x] `AGENTS.md` references the auto-commit policy and `fo-step-commit` skill (evidence: `AGENTS.md:75`, auto-commit after each operator request NON-NEGOTIABLE RFC-0622)
 - [x] Skill instruction covers both monorepo and mission workpiece commit paths (evidence: `packages/forge/skills/fo/fo-step-commit/SKILL.md:34-39`, steps 4 and 5 in Behavior section)
 - [x] Skill instruction explicitly states `git add -A` / `git add .` is forbidden (evidence: `packages/forge/skills/fo/fo-step-commit/SKILL.md:31`, step 2 in Behavior section)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0622 --json` returns `"ok": true`)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0622 --json` returns `"ok": true`)
 
 ## Implementation notes for agents
 

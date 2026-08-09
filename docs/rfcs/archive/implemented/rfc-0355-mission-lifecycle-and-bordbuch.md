@@ -287,7 +287,7 @@ Seven new commands in `@gogol/site-kernel-handoff`:
 #### 5.1 `mission.open`
 
 ```sh
-pnpm exec site-kernel run mission.open \
+pnpm exec werkstatt run mission.open \
   --system <system-id> \
   --brief "<text>" \
   [--actor <agent-id-or-handle>]
@@ -311,7 +311,7 @@ Fails if:
 #### 5.2 `mission.status`
 
 ```sh
-pnpm exec site-kernel run mission.status --mission <mission-id> [--json]
+pnpm exec werkstatt run mission.status --mission <mission-id> [--json]
 ```
 
 Prints the mission manifest and Bordbuch entries for the specified mission.
@@ -319,7 +319,7 @@ Prints the mission manifest and Bordbuch entries for the specified mission.
 #### 5.3 `mission.close`
 
 ```sh
-pnpm exec site-kernel run mission.close \
+pnpm exec werkstatt run mission.close \
   --mission <mission-id> \
   [--actor <agent-id-or-handle>] \
   [--release <release-id>]
@@ -344,7 +344,7 @@ Fails if:
 #### 5.4 `mission.abort`
 
 ```sh
-pnpm exec site-kernel run mission.abort \
+pnpm exec werkstatt run mission.abort \
   --mission <mission-id> \
   --reason "<text>" \
   [--actor <agent-id-or-handle>]
@@ -365,7 +365,7 @@ If the Werkstück or Distribution directory deletion is interrupted (filesystem 
 #### 5.5 `mission.list`
 
 ```sh
-pnpm exec site-kernel run mission.list [--system <system-id>] [--json]
+pnpm exec werkstatt run mission.list [--system <system-id>] [--json]
 ```
 
 Lists missions, optionally filtered by system. Prints: missionId, systemId, state, openedAt, closedAt, brief.
@@ -375,7 +375,7 @@ When no missions exist (empty registry or no missions for the specified system),
 #### 5.6 `bordbuch.append`
 
 ```sh
-pnpm exec site-kernel run bordbuch.append \
+pnpm exec werkstatt run bordbuch.append \
   --system <system-id> \
   --kind <kind> \
   --summary "<text>" \
@@ -398,7 +398,7 @@ Fails if:
 #### 5.7 `bordbuch.validate`
 
 ```sh
-pnpm exec site-kernel run bordbuch.validate --system <system-id> [--json]
+pnpm exec werkstatt run bordbuch.validate --system <system-id> [--json]
 ```
 
 Validates the Bordbuch for the specified Sternsystem:
@@ -424,14 +424,14 @@ Validates the Bordbuch for the specified Sternsystem:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run mission.open --system <id> --brief "<text>"
-pnpm exec site-kernel run mission.status --mission <id>
-pnpm exec site-kernel run mission.close --mission <id>
-pnpm exec site-kernel run mission.abort --mission <id> --reason "<text>"
-pnpm exec site-kernel run mission.list
-pnpm exec site-kernel run mission.list --system <id>
-pnpm exec site-kernel run bordbuch.append --system <id> --writer-role operator --kind operator-note --summary "<text>"
-pnpm exec site-kernel run bordbuch.validate --system <id>
+pnpm exec werkstatt run mission.open --system <id> --brief "<text>"
+pnpm exec werkstatt run mission.status --mission <id>
+pnpm exec werkstatt run mission.close --mission <id>
+pnpm exec werkstatt run mission.abort --mission <id> --reason "<text>"
+pnpm exec werkstatt run mission.list
+pnpm exec werkstatt run mission.list --system <id>
+pnpm exec werkstatt run bordbuch.append --system <id> --writer-role operator --kind operator-note --summary "<text>"
+pnpm exec werkstatt run bordbuch.validate --system <id>
 ```
 
 All commands support `--json` output with the standard `{ command, status, data, summary }` envelope.

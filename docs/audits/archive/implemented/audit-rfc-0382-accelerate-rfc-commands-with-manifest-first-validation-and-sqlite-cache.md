@@ -16,7 +16,7 @@ The RFC is architecturally sound and well-structured, but has a concrete omissio
 
 ## Mechanical validation (rfc.validate)
 
-Pass — `pnpm exec site-kernel run rfc.validate RFC-0382 --json` returns 0 violations (validated 2026-07-14).
+Pass — `pnpm exec werkstatt run rfc.validate RFC-0382 --json` returns 0 violations (validated 2026-07-14).
 
 ## Axis A — Structural completeness
 

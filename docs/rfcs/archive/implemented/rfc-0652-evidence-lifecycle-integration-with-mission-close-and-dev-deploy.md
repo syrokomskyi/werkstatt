@@ -72,7 +72,7 @@ nonGoals:
   - "Does not clean non-Axiom evidence artifacts (close-report.json, workpiece.git-bundle) — those are preserved unconditionally by mission.cleanup as permanent audit artifacts"
   - "Does not resolve concurrent evidence.sync from leitstand.dev-deploy and mission.close — R2 PutObject is idempotent (last writer wins); duplicate Iceberg rows are possible but non-fatal"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -134,25 +134,25 @@ No new commands. Three existing commands gain new behavior:
 
 ```sh
 # mission.close — now invokes evidence.sync before writing close-report.json
-pnpm exec site-kernel run mission.close --mission warpgogol-com-m000025
+pnpm exec werkstatt run mission.close --mission warpgogol-com-m000025
 
 # mission.close --skip-evidence-sync — opt-out flag for offline close (NOT recommended)
-pnpm exec site-kernel run mission.close --mission warpgogol-com-m000025 --skip-evidence-sync
+pnpm exec werkstatt run mission.close --mission warpgogol-com-m000025 --skip-evidence-sync
 
 # mission.cleanup — now removes local evidence older than 30 days (default)
-pnpm exec site-kernel run mission.cleanup --mission warpgogol-com-m000025
+pnpm exec werkstatt run mission.cleanup --mission warpgogol-com-m000025
 
 # mission.cleanup with custom retention
-pnpm exec site-kernel run mission.cleanup --mission warpgogol-com-m000025 --evidence-retention-days 7
+pnpm exec werkstatt run mission.cleanup --mission warpgogol-com-m000025 --evidence-retention-days 7
 
 # mission.cleanup — preserve all evidence (current behavior)
-pnpm exec site-kernel run mission.cleanup --mission warpgogol-com-m000025 --evidence-retention-days 0
+pnpm exec werkstatt run mission.cleanup --mission warpgogol-com-m000025 --evidence-retention-days 0
 
 # leitstand.dev-deploy — now auto-syncs evidence after axiom.report (best-effort)
-pnpm exec site-kernel run leitstand.dev-deploy --mission warpgogol-com-m000025
+pnpm exec werkstatt run leitstand.dev-deploy --mission warpgogol-com-m000025
 
 # leitstand.dev-deploy — skip evidence sync
-pnpm exec site-kernel run leitstand.dev-deploy --mission warpgogol-com-m000025 --skip-evidence-sync
+pnpm exec werkstatt run leitstand.dev-deploy --mission warpgogol-com-m000025 --skip-evidence-sync
 ```
 
 ### Integration points

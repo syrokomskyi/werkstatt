@@ -101,7 +101,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` compiles
-- `pnpm exec site-kernel run suppressions.validate --json` (after Step 3 creates the YAML file)
+- `pnpm exec werkstatt run suppressions.validate --json` (after Step 3 creates the YAML file)
 
 **Completion criterion:** `suppressions.validate` command registered, compiles, and passes on the default config file.
 
@@ -120,7 +120,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run suppressions.validate --json` passes with zero errors
+- `pnpm exec werkstatt run suppressions.validate --json` passes with zero errors
 
 **Completion criterion:** `systems/axiom-suppressions.yaml` exists with all 6 default rules. `suppressions.validate` passes.
 
@@ -281,20 +281,20 @@ scope:
 **Agent actions:**
 
 - Update `packages/os/site-kernel-checks/AGENTS.md` with new modules: `suppressions-config.ts`, `suppressions-validate.ts`, `--channel` flag on `mission.check`, suppression layer architecture
-- Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0684`
+- Run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0684`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0684` (RFC-0330 — acceptance probes are commented out, so this will produce no evidence file, which is expected)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0684` (RFC-0330 — acceptance probes are commented out, so this will produce no evidence file, which is expected)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: invoke `fo-fix` if review has findings
 - Check off acceptance criteria: verify each criterion against implemented code
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0684 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0684 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0684`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0684`
 - Review report exists in `docs/reviews/code/` for this session
 - `docs/command-manifest.generated.yaml` contains `suppressions.validate` and `--channel` flag on `mission.check`
 
@@ -306,13 +306,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0684`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0684`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run suppressions.validate --json`
-- `pnpm exec site-kernel run command.manifest.generate`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0684` (no evidence file expected — probes commented out)
+- `pnpm exec werkstatt run suppressions.validate --json`
+- `pnpm exec werkstatt run command.manifest.generate`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0684` (no evidence file expected — probes commented out)
 
 ### 4.2 Evidence artifacts
 
@@ -331,5 +331,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49 or DNA-59, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0684 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49 or DNA-59, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0684 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `renderAxiomReportHtml` from `@syrokomskyi/axiom-factory-app` cannot be extended to support a separate suppressed section (Step 7), post-process the HTML output in `axiom-adapter.ts` — do not modify the external package.

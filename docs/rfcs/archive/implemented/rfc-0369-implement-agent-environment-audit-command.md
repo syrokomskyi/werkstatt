@@ -57,7 +57,7 @@ nonGoals:
   - "Do not gate build pipelines on audit results; it remains an advisory, on-demand command."
   - "Do not implement Linux/macOS-specific detection beyond what naturally works via the same Node APIs."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:
@@ -108,9 +108,9 @@ The Site OS gains the `agent.environment.audit` command. It scans the local envi
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.environment.audit
-pnpm exec site-kernel run agent.environment.audit --json
-pnpm exec site-kernel run agent.environment.audit --emit-prompt
+pnpm exec werkstatt run agent.environment.audit
+pnpm exec werkstatt run agent.environment.audit --json
+pnpm exec werkstatt run agent.environment.audit --emit-prompt
 ```
 
 - `--json`: emit the structured report.

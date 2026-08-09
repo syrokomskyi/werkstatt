@@ -55,7 +55,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — must pass after adding imports.
 - `pnpm --filter @gogol/site-kernel-onboarding run build:check` — must pass after exporting helpers.
-- `pnpm exec site-kernel run rfc.validate RFC-0389 --json` — must pass.
+- `pnpm exec werkstatt run rfc.validate RFC-0389 --json` — must pass.
 - No pipeline changes (`build.prepare`, `build.check` unchanged).
 
 ## 3. Step sequence
@@ -162,7 +162,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0389 --json` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0389 --json` — must pass.
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — must pass.
 - Run `pnpm --filter @gogol/site-kernel-onboarding run build:check` — must pass.
 - Check all acceptance criteria in the RFC.
@@ -182,7 +182,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0389 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0389 --json`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-onboarding run build:check`
 
@@ -203,5 +203,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `resolveWirePaths` or any codegen generator calls `discoverSiteWorkspaces` internally (ignoring `context.site`), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0389 --reason "..." --invariant "DNA-47"` instead of working around it.
+- If implementation reveals that `resolveWirePaths` or any codegen generator calls `discoverSiteWorkspaces` internally (ignoring `context.site`), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0389 --reason "..." --invariant "DNA-47"` instead of working around it.
 - If the `DiscoveredSiteWorkspace` interface needs new fields to support mission-scoped contexts, create a separate RFC for the interface extension rather than modifying it inline.

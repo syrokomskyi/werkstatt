@@ -61,7 +61,7 @@ nonGoals:
   - "No change to <source> ordering — AV1 → WebM → MP4 remains (RFC-0525); MP4 is already the last-resort fallback"
   - "No change to the ambient/live-photo pipeline (RFC-0234)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -131,7 +131,7 @@ WebM (VP9) and AV1 (SVT-AV1) progressive encoding remains CRF-based — they are
 No new command. The existing command behavior changes:
 
 ```sh
-pnpm exec site-kernel run video.variants.generate --site <app>
+pnpm exec werkstatt run video.variants.generate --site <app>
 ```
 
 No new flags. The `maxSizeMb` parameter is read from frontmatter `media:` configs.
@@ -376,7 +376,7 @@ In `runVideoVariantsGenerate`, `ref.maxSizeMb` is resolved as `cfg.maxSizeMb ?? 
 - [x] `runVideoVariantsGenerate` resolves `maxSizeMb` from frontmatter and passes it to `encodeMp4` (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:534,639, `cfg.maxSizeMb ?? DEFAULT_MAX_SIZE_MB` → `encodeMp4(... ref.maxSizeMb, ctx.logger)`)
 - [x] The cache→public copy loop skips `ffmpeg2pass.log*` files alongside `.done` (the pass-log file must not be deployed) (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:658, `if (entry.name.startsWith("ffmpeg2pass.log")) continue;`)
 - [x] `calculateTargetBitrate` is covered by property-based tests (`*.pbt.test.ts`) verifying: `videoBitrate = (maxSizeMb * 1024 * 1024 * 8 / durationSec) - 128000`, monotonicity in `maxSizeMb`, inverse proportionality to `durationSec` (DNA-41) (evidence: packages/os/site-kernel-checks/src/video/video-variants.pbt.test.ts, 6 PBT properties all pass)
-- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0591 --json` → status: pass, 0 violations)
+- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec werkstatt run rfc.validate RFC-0591 --json` → status: pass, 0 violations)
 
 ## Implementation notes for agents
 

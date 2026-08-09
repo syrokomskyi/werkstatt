@@ -179,7 +179,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` — passes with updated contract
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com` — passes with updated contract
 
 **Completion criterion:** `url-schema.yaml` includes both patterns; `surface.contract.validate` passes.
 
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run participant.ai-agent.validate --site warpgogol-com --json` — exits 0 with `count: 0` (no AI-agent participants exist)
+- `pnpm exec werkstatt run participant.ai-agent.validate --site warpgogol-com --json` — exits 0 with `count: 0` (no AI-agent participants exist)
 
 **Completion criterion:** `participant.ai-agent.validate` command exists, typechecks, and passes as a no-op (zero AI-agent participants).
 
@@ -252,7 +252,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run sites-check.author --site warpgogol-com` — pipeline runs with the new step
+- `pnpm exec werkstatt run sites-check.author --site warpgogol-com` — pipeline runs with the new step
 
 **Completion criterion:** Command registered in table; pipeline step added after `participant.profile.validate`; typecheck and pipeline pass.
 
@@ -304,11 +304,11 @@ scope:
   ```
 - Update `docs/technology.xml` — add `/team/ki-agenten/:agentSlug` and `/komanda/ki-agenty/:agentSlug` route patterns to the external surfaces section
 - Update `docs/source-markup.xml` — add `participant-ai-agent.ts` source file entry if it meets the Compass scaffolding threshold
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (it did — new `participant.ai-agent.validate` command)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (it did — new `participant.ai-agent.validate` command)
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0511` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0511` — passes
 - `git diff` shows all scope docs updated or documented as not-applicable
 
 **Completion criterion:** AGENTS.md updated; `docs/technology.xml` updated; `ecosystem.manifest.generate` run if needed; `rfc.validate` passes.
@@ -324,13 +324,13 @@ scope:
 **Agent actions:**
 
 - Run full validation suite:
-  - `pnpm exec site-kernel run rfc.validate --id RFC-0511`
+  - `pnpm exec werkstatt run rfc.validate --id RFC-0511`
   - `pnpm --filter @gogol/share run build:check`
   - `pnpm --filter @gogol/site-kernel-checks run build:check`
-  - `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
-  - `pnpm exec site-kernel run sites-check.author --site warpgogol-com`
+  - `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
+  - `pnpm exec werkstatt run sites-check.author --site warpgogol-com`
 - Check off each acceptance criterion in the RFC with `(evidence: ...)` annotations
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0511 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0511 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -345,12 +345,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0511`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0511`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
-- `pnpm exec site-kernel run sites-check.author --site warpgogol-com`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0511` (if acceptance probes declared)
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run sites-check.author --site warpgogol-com`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0511` (if acceptance probes declared)
 
 ### 4.2 Evidence artifacts
 
@@ -370,5 +370,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages) or DNA-37 (universal section props), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0511 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages) or DNA-37 (universal section props), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0511 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `controlled-responsibility-block` archetype does not support the `body-split-list` body kind used in Block 2, escalate to the UI package owner before modifying the component.

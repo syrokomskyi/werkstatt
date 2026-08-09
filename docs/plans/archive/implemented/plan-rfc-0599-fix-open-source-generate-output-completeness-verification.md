@@ -45,7 +45,7 @@ No configuration changes. The `declaredOutputPaths` array is internal to the fun
 
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-codegen run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0599` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0599` — RFC validation
 
 ## 3. Step sequence
 
@@ -110,7 +110,7 @@ No configuration changes. The `declaredOutputPaths` array is internal to the fun
 
 - Run `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-codegen run test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0599`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0599`
 - Verify each acceptance criterion against the implementation:
   1. Fingerprint cache short-circuit checks all declared output paths — verify by reading the code
   2. After deleting `THIRD_PARTY_LICENSES.txt` and re-running, file is regenerated — verify via unit test
@@ -144,13 +144,13 @@ No configuration changes. The `declaredOutputPaths` array is internal to the fun
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
 - **Commit the acceptance criteria update** as a separate commit: `rfc: RFC-0599 check acceptance criteria with evidence`
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0599 --implementation-commit <sha>` (dry-run first, then without `--dry-run`). The command validates all preconditions (status, criteria, clean tree, commit reachability).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0599 --implementation-commit <sha>` (dry-run first, then without `--dry-run`). The command validates all preconditions (status, criteria, clean tree, commit reachability).
 - **Commit the stamp transition** as a separate commit: `rfc: implement RFC-0599 ...`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0599`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0599`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -161,7 +161,7 @@ No configuration changes. The `declaredOutputPaths` array is internal to the fun
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0599`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0599`
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
 - `pnpm --filter @warpgogol/site-kernel-codegen run test`
 
@@ -180,5 +180,5 @@ No configuration changes. The `declaredOutputPaths` array is internal to the fun
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0599 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0599 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the unit test cannot be written without real `pnpm licenses` execution (e.g., the function is too tightly coupled to `execFileSync`), consider extracting the completeness check into a testable helper function. This does not change the RFC's scope — it's a testability refactor.

@@ -92,7 +92,7 @@ nonGoals:
   - "Does not change bordbuch event schema or hash-chain format"
   - "Does not add push retry logic beyond what commitAndPushBordbuch already does"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -170,11 +170,11 @@ The kernel gains `appendAndCommitBordbuch` (single-entry) and `appendBatchAndCom
 
 ```sh
 # New lint command
-pnpm exec site-kernel run bordbuch.commit.parity.lint
+pnpm exec werkstatt run bordbuch.commit.parity.lint
 
 # Existing commands — no CLI surface change, internal migration only
-pnpm exec site-kernel run release.ready --release <id>
-pnpm exec site-kernel run leitstand.propagate --site <id> --release <id>
+pnpm exec werkstatt run release.ready --release <id>
+pnpm exec werkstatt run leitstand.propagate --site <id> --release <id>
 ```
 
 The lint command takes no flags — it scans `packages/os/site-kernel-handoff/src/**/*.ts` statically.

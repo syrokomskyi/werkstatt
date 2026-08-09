@@ -49,7 +49,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run sternsystem.validate --json` — must pass with existing registry (no `owner` fields)
+- `pnpm exec werkstatt run sternsystem.validate --json` — must pass with existing registry (no `owner` fields)
 - `pnpm --filter @warpgogol/ontology build:check` — typecheck ontology schema changes
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck command changes
 - `pnpm --filter @warpgogol/ontology test` — run existing ontology tests
@@ -126,7 +126,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run sternsystem.validate --json` passes (existing registry has no `owner` fields, produces warnings)
+- `pnpm exec werkstatt run sternsystem.validate --json` passes (existing registry has no `owner` fields, produces warnings)
 - Verify output includes `warnings` array with one entry per existing Sternsystem
 
 **Completion criterion:** `sternsystem.validate` passes with existing registry (no `owner`), produces notice-level warnings for entries without `owner`, and would fail for entries with malformed `owner` format; typecheck passes.
@@ -189,14 +189,14 @@ scope:
 **Agent actions:**
 
 - Update `packages/ontology/AGENTS.md` operations table entry for `sternsystem.ts` to note the optional `owner` field (VC subject id, `did:web` format, RFC-0561)
-- Check `docs/ecosystem.generated.yaml` — if `sternsystem.register` flag surface changed, run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate it
+- Check `docs/ecosystem.generated.yaml` — if `sternsystem.register` flag surface changed, run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate it
 - No `docs/*.xml` Compass files need updates — this RFC does not change repository-wide requirements, technology, or verification plans. It adds a field to an existing schema.
 - No `docs/architecture-dna.md` update needed — DNA-45 already covers the fleet registry; this RFC extends it via amendment, not a new invariant.
 
 **Validation:**
 
 - `git diff packages/ontology/AGENTS.md` shows the update
-- `pnpm exec site-kernel run ecosystem.manifest.validate` passes (if manifest was regenerated)
+- `pnpm exec werkstatt run ecosystem.manifest.validate` passes (if manifest was regenerated)
 
 **Completion criterion:** `packages/ontology/AGENTS.md` documents the `owner` field; ecosystem manifest is in sync if regenerated.
 
@@ -211,16 +211,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (the `--owner` flag was added to `sternsystem.register`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (the `--owner` flag was added to `sternsystem.register`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0561 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). Run `--dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0561 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). Run `--dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0561`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0561`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -232,12 +232,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0561`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0561`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/ontology test`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run sternsystem.validate --json` (existing registry must pass with warnings)
+- `pnpm exec werkstatt run sternsystem.validate --json` (existing registry must pass with warnings)
 - `pnpm --filter @warpgogol/studio-gate build:check` (if Step 4 was executed)
 
 ### 4.2 Evidence artifacts
@@ -256,5 +256,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-45, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0561 --reason "..." --invariant "DNA-45"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-45, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0561 --reason "..." --invariant "DNA-45"` instead of working around it.
 - If the `did:web` format regex rejects valid identifiers from RFC-0558 that don't match the expected pattern, escalate to RFC-0558 to align the format definition before adjusting the regex.

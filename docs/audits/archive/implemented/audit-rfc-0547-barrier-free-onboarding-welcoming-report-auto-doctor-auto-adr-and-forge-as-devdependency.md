@@ -33,7 +33,7 @@ Pass — zero violations.
 ## Axis B — DNA alignment
 
 - **Finding (fail):** `amends: []` in frontmatter is empty, but the body (lines 121–122) explicitly states "this RFC amends the report section" of RFC-0545 and "Git history transfer was specified in RFC-0546 but not implemented; this RFC implements it." RFC-0545 and RFC-0546 are listed in `related[]` but not in `amends[]`. If the RFC amends them, they must be in `amends[]`. If it only builds on them without changing their contracts, the body language should be softened.
-- `satisfies: [DNA-54]` — DNA-54 (Forge bindings contract) is correctly referenced. The RFC states the welcoming report "does not hardcode project-specific literals" and is "generated from the forge.yaml config." The redesigned SKILL.md instruction lines must not introduce hardcoded `pnpm exec site-kernel run` or `docs/architecture-dna.md` — the RFC's "zero CLI commands in user-facing text" rule aligns with this.
+- `satisfies: [DNA-54]` — DNA-54 (Forge bindings contract) is correctly referenced. The RFC states the welcoming report "does not hardcode project-specific literals" and is "generated from the forge.yaml config." The redesigned SKILL.md instruction lines must not introduce hardcoded `pnpm exec werkstatt run` or `docs/architecture-dna.md` — the RFC's "zero CLI commands in user-facing text" rule aligns with this.
 
 ## Axis C — Ecosystem fit
 

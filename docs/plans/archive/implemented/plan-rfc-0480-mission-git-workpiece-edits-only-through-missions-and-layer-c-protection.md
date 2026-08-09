@@ -144,7 +144,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/forge build:check` passes
-- `pnpm exec site-kernel run rfc.validate RFC-0480 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0480 --json` passes
 
 **Completion criterion:** V-30 rule fires on test RFC with `breaksC: true` but no external-surfaces changes
 
@@ -180,7 +180,7 @@ scope:
 
 - Create `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts` with `runMissionGitCommit` handler
 - Register `mission.git.commit` in `mission.module.ts` and `tools/kernel.config.ts`
-- Command: `pnpm exec site-kernel run mission.git.commit --mission <id> --message "..."`
+- Command: `pnpm exec werkstatt run mission.git.commit --mission <id> --message "..."`
 
 **Validation:**
 
@@ -340,7 +340,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run surface.contract.validate` passes on current site
+- `pnpm exec werkstatt run surface.contract.validate` passes on current site
 
 **Completion criterion:** `surface.contract.validate` detects URL pattern mismatch; passes on conforming site
 
@@ -406,8 +406,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0480 --json` passes (V-19 warning resolved by RFC-0472 backreference)
-- `pnpm exec site-kernel run rfc.validate RFC-0472 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0480 --json` passes (V-19 warning resolved by RFC-0472 backreference)
+- `pnpm exec werkstatt run rfc.validate RFC-0472 --json` passes
 
 **Completion criterion:** All documentation surfaces updated; `rfc.validate` clean on both RFC-0480 and RFC-0472
 
@@ -421,12 +421,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0480 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0480 --json`
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @gogol/ontology build:check`
 - Run `pnpm --filter @gogol/forge build:check`
 - Run `pnpm --filter @gogol/share test`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0480` (if acceptance probes declared)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0480` (if acceptance probes declared)
 
 **Validation:**
 
@@ -440,14 +440,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0480 --json`
-- `pnpm exec site-kernel run rfc.validate RFC-0472 --json` (amendedBy backreference)
+- `pnpm exec werkstatt run rfc.validate RFC-0480 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0472 --json` (amendedBy backreference)
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/forge build:check`
 - `pnpm --filter @gogol/share test`
-- `pnpm exec site-kernel run surface.contract.validate`
+- `pnpm exec werkstatt run surface.contract.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -468,6 +468,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle contract) regarding workpiece git, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0480 --reason "..." --invariant "DNA-44"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle contract) regarding workpiece git, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0480 --reason "..." --invariant "DNA-44"` instead of working around it.
 - If the `git am` idempotency mechanism proves unworkable (e.g., cache clone history is rebased externally), escalate via `rfc.supersede.propose` with `--invariant "DNA-47"` — do not add a parallel transfer mechanism.
 - If Layer C protection conflicts with existing behavior snapshot semantics (DNA-48), escalate rather than adding a dual-path snapshot system.

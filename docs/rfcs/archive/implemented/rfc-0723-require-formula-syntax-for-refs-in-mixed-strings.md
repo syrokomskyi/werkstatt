@@ -105,10 +105,10 @@ value: business-profile.offerings/digital-foundation.presentation.price.monthly
 
 ```sh
 # Validator — now promotes REF-04 to error for known collections
-pnpm exec site-kernel run content.references.validate --app warpgogol-com
+pnpm exec werkstatt run content.references.validate --app warpgogol-com
 
 # Migrator — converts bare braceless refs in mixed strings to =(ref) syntax
-pnpm exec site-kernel run content.formula.migrate --app warpgogol-com
+pnpm exec werkstatt run content.formula.migrate --app warpgogol-com
 ```
 
 Both commands are app-scoped (`--app <id>`), matching the existing scope convention. `content.references.validate` runs in the `sites-check-author` pipeline. `content.formula.migrate` is a manual write command (not in any pipeline).

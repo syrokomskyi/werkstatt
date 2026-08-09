@@ -61,7 +61,7 @@ nonGoals:
   - Does not add retry logic for CDN edge propagation delay — a single fetch after sleep is sufficient for dev channel.
   - Does not add a --force bypass for freshness check — the check is mandatory.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -118,8 +118,8 @@ The combination of these gaps means the Axiom gate can produce false positives (
 No CLI surface changes. `leitstand.dev-deploy` is invoked the same way:
 
 ```sh
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --json
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com --json
 ```
 
 The `--json` output gains a `freshness` field in `data.axiom`:
@@ -290,7 +290,7 @@ All fatal modes produce `axiom.status: "not-run"` and `exitCode: 1`. The `--json
 - [x] Freshness hash mismatch produces `exitCode: 1`, `axiom.status: "not-run"`, and `freshness.verified: false` in `--json` output (evidence: unit test `leitstand-0649-freshness.test.ts: freshness hash mismatch`)
 - [x] Missing `CLOUDFLARE_ZONE_ID` produces `exitCode: 1`, `axiom.status: "not-run"`, and descriptive `freshness.error` (evidence: unit test `leitstand-0649-freshness.test.ts: missing CLOUDFLARE_ZONE_ID`)
 - [x] `--json` output includes `freshness` object with `verified`, `cdnDistTreeHash`, `localDistTreeHash`, and optional `error` fields (evidence: `DevDeployResult` type definition `leitstand-commands.ts:406-432`, unit test `leitstand-0649-freshness.test.ts: --json output includes freshness object`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0649 --json` → 0 errors, 0 warnings, 0 notices)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0649 --json` → 0 errors, 0 warnings, 0 notices)
 
 ## Implementation notes for agents
 

@@ -58,7 +58,7 @@ scope:
 
 - `pnpm --filter @warpgogol/ontology build:check` — schema changes compile
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — command handlers compile
-- `pnpm exec site-kernel run rfc.validate --id RFC-0752` — RFC validation passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0752` — RFC validation passes
 - Unit tests for all three commands + Cloudflare API client
 
 ## 3. Step sequence
@@ -202,7 +202,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
-- `pnpm exec site-kernel run command.manifest.generate` (regenerate command manifest)
+- `pnpm exec werkstatt run command.manifest.generate` (regenerate command manifest)
 
 **Completion criterion:** All three commands appear in the command manifest, module loads without error.
 
@@ -257,16 +257,16 @@ scope:
 **Agent actions:**
 
 - Update `packages/os/site-kernel-handoff/AGENTS.md` with subdomain command family documentation and Cloudflare API client note
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0752 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0752 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0752`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0752`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 - Review report exists in `docs/reviews/code/`
@@ -279,7 +279,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0752`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0752`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
@@ -300,5 +300,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0752 --reason "..." --invariant "DNA-40"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0752 --reason "..." --invariant "DNA-40"` instead of working around it.
 - If the Cloudflare API does not support the endpoints described in the RFC, create an amending RFC with `amends: [RFC-0752]` to document the actual API surface.

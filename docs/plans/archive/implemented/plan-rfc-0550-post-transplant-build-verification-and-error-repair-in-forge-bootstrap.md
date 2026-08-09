@@ -46,7 +46,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `forge.skill.validate` — must pass after SKILL.md changes (SKILL-11: no hardcoded `pnpm exec site-kernel run` in instruction lines; SKILL-12: concerns taxonomy; SKILL-13: knowledge files exist).
+- `forge.skill.validate` — must pass after SKILL.md changes (SKILL-11: no hardcoded `pnpm exec werkstatt run` in instruction lines; SKILL-12: concerns taxonomy; SKILL-13: knowledge files exist).
 - `rfc.validate` — must pass on RFC-0550 after implementation.
 - No build pipeline changes — this is a skill file, not compiled TypeScript.
 
@@ -75,7 +75,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --json` — must pass with zero SKILL-11 violations (no hardcoded project literals in instruction lines).
+- `pnpm exec werkstatt run forge.skill.validate --json` — must pass with zero SKILL-11 violations (no hardcoded project literals in instruction lines).
 
 **Completion criterion:** SKILL.md contains sub-step 6.7 with all 8 numbered items from the RFC Design section, using binding references instead of hardcoded commands.
 
@@ -96,7 +96,7 @@ scope:
 **Validation:**
 
 - Visual inspection: sub-step numbering in transplant flow is sequential (1, 2, 3, 4, 5, 6, 6.7, 6.8).
-- `pnpm exec site-kernel run forge.skill.validate --json` — must still pass.
+- `pnpm exec werkstatt run forge.skill.validate --json` — must still pass.
 
 **Completion criterion:** Fill forge.yaml is numbered 6.8; transplant sub-steps are sequentially numbered; top-level step 7 (auto-run doctor) is unchanged.
 
@@ -110,8 +110,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.skill.validate --json` — confirm zero violations.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0550 --json` — confirm zero errors (V-19 warnings for amendedBy back-fill are expected and acceptable).
+- Run `pnpm exec werkstatt run forge.skill.validate --json` — confirm zero violations.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0550 --json` — confirm zero errors (V-19 warnings for amendedBy back-fill are expected and acceptable).
 - If SKILL-11 violations appear (hardcoded `pnpm build` or `pnpm install` in instruction lines), fix by replacing with binding references and re-run.
 
 **Validation:**
@@ -134,17 +134,17 @@ scope:
 - Verify `packages/forge/AGENTS.md` does not need updates (the Output contract section already covers skill reports using `aiLanguage` with zero CLI commands — confirmed in RFC acceptance criteria).
 - Verify no `docs/*.xml` Compass files need synchronization (skill-level process change, not repository-wide semantic change).
 - Verify no `docs/architecture-dna.md` update needed (no new DNA invariant — DNA-54 is existing and referenced, not modified).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` only if command surfaces or pipeline topology changed (they did not — skip).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` only if command surfaces or pipeline topology changed (they did not — skip).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0550 against the implemented SKILL.md changes. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0550 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0550 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0550` — passes with zero errors.
-- `pnpm exec site-kernel run forge.skill.validate` — passes with zero violations.
+- `pnpm exec werkstatt run rfc.validate RFC-0550` — passes with zero errors.
+- `pnpm exec werkstatt run forge.skill.validate` — passes with zero violations.
 - Review report exists for this session.
 
 **Completion criterion:** All acceptance criteria checked off with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; `git status` clean.
@@ -155,8 +155,8 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0550` — RFC mechanical validation
-- `pnpm exec site-kernel run forge.skill.validate` — skill validation (SKILL-11/12/13)
+- `pnpm exec werkstatt run rfc.validate RFC-0550` — RFC mechanical validation
+- `pnpm exec werkstatt run forge.skill.validate` — skill validation (SKILL-11/12/13)
 - `pnpm --filter @warpgogol/forge run build:check` — package typecheck (confirms no TS regressions in forge package, though this RFC is skill-only)
 
 ### 4.2 Evidence artifacts
@@ -177,5 +177,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0550 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0550 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If `forge.skill.validate` reports SKILL-11 violations that cannot be resolved by replacing hardcoded commands with binding references, escalate to the operator — the binding key may need to be added to `forge.yaml` first.

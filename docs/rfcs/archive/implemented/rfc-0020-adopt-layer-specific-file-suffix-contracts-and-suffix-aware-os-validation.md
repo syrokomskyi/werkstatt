@@ -153,11 +153,11 @@ This RFC also clarifies the ownership line between runtime artifacts and instruc
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run naming.suffixes.lint --app nicaragua-projekt
-pnpm exec site-kernel run naming.suffixes.lint --all --json
-pnpm exec site-kernel run mirror.quartet.validate --app nicaragua-projekt
-pnpm exec site-kernel run dispatcher.sync.validate --app nicaragua-projekt
-pnpm exec site-kernel run feature.graph.validate --app nicaragua-projekt
+pnpm exec werkstatt run naming.suffixes.lint --app nicaragua-projekt
+pnpm exec werkstatt run naming.suffixes.lint --all --json
+pnpm exec werkstatt run mirror.quartet.validate --app nicaragua-projekt
+pnpm exec werkstatt run dispatcher.sync.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.graph.validate --app nicaragua-projekt
 ```
 
 Command responsibilities:

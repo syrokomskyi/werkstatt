@@ -203,7 +203,7 @@ The generator discovers gates by:
 #### `gate.catalog.generate`
 
 ```sh
-pnpm exec site-kernel run gate.catalog.generate
+pnpm exec werkstatt run gate.catalog.generate
 ```
 
 Workspace-scoped. Reads live command registrations via `listRegisteredKernelCommands()` from `@gogol/site-kernel` (covers both command-table entries and module-registered commands in `site-kernel-handoff`). Reads pipeline constants from `packages/os/site-kernel-checks/src/pipelines/**`. Writes `docs/gate-catalog.generated.yaml`. Uses `@gogol/fingerprint` for the content hash and source hashes.
@@ -221,7 +221,7 @@ Workspace-scoped. Reads live command registrations via `listRegisteredKernelComm
 #### `gate.catalog.validate`
 
 ```sh
-pnpm exec site-kernel run gate.catalog.validate
+pnpm exec werkstatt run gate.catalog.validate
 ```
 
 Workspace-scoped. Compares the committed `docs/gate-catalog.generated.yaml` against live state. Reports drift as diagnostics.

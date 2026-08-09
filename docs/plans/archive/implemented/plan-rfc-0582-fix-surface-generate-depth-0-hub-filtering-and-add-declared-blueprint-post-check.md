@@ -111,7 +111,7 @@ None. No blueprint YAML, system.md, or ontology catalog changes.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run kernel.cache.clear --namespace command_results` to invalidate stale `surface.generate` cache entries
+- Run `pnpm exec werkstatt run kernel.cache.clear --namespace command_results` to invalidate stale `surface.generate` cache entries
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` to confirm typecheck
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test` to confirm all tests pass
 
@@ -134,16 +134,16 @@ None. No blueprint YAML, system.md, or ontology catalog changes.
 **Agent actions:**
 
 - No AGENTS.md or Compass XML updates needed — no new modules, commands, or ownership changes.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected for this RFC).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected for this RFC).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0582 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0582 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0582`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0582`
 - Every file in `scope.docs` is either updated or documented as not-applicable (none in scope).
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -155,7 +155,7 @@ None. No blueprint YAML, system.md, or ontology catalog changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0582`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0582`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 
@@ -175,4 +175,4 @@ None. No blueprint YAML, system.md, or ontology catalog changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-22 or DNA-39, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0582 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-22 or DNA-39, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0582 --reason "..." --invariant "DNA-N"` instead of working around it.

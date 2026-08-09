@@ -66,7 +66,7 @@ nonGoals:
   - "Do not implement owner field in the pin file (system.pin.json) — ownership lives in the fleet registry only."
   - "Do not implement automatic owner assignment from onboarding — the operator explicitly sets owner during registration or via a separate command."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -118,13 +118,13 @@ This RFC adds an optional `owner` field to `fleetRegistryEntrySchema` in `packag
 
 ```sh
 # Register a new Sternsystem with owner
-pnpm exec site-kernel run sternsystem.register --id my-site --repo https://github.com/org/my-site --owner did:web:my-site.com#operator-v1 --json
+pnpm exec werkstatt run sternsystem.register --id my-site --repo https://github.com/org/my-site --owner did:web:my-site.com#operator-v1 --json
 
 # Validate registry entries (owner field checked if present)
-pnpm exec site-kernel run sternsystem.validate --json
+pnpm exec werkstatt run sternsystem.validate --json
 
 # Register without owner (backwards compatible)
-pnpm exec site-kernel run sternsystem.register --id legacy-site --repo https://github.com/org/legacy-site --json
+pnpm exec werkstatt run sternsystem.register --id legacy-site --repo https://github.com/org/legacy-site --json
 ```
 
 ### TypeScript contracts
@@ -231,12 +231,12 @@ Entries without `owner` produce a notice-level warning, not an error. The `statu
 
 - [x] `fleetRegistryEntrySchema` in `packages/ontology/src/operations/sternsystem.ts` has optional `owner` field validated against `did:web:<domain>#<key-version>` format (evidence: packages/ontology/src/operations/sternsystem.ts:68-72, packages/ontology/src/tests/sternsystem-owner.test.ts:25-30)
 - [x] `sternsystem.register` accepts `--owner` flag (evidence: packages/os/site-kernel-handoff/src/sternsystem/sternsystem-register.ts:148, packages/os/site-kernel-handoff/src/sternsystem/sternsystem.module.ts:51)
-- [x] `sternsystem.validate` passes for entries with and without `owner` field (evidence: pnpm exec site-kernel run sternsystem.validate --json — exitCode 0 with existing registry)
+- [x] `sternsystem.validate` passes for entries with and without `owner` field (evidence: pnpm exec werkstatt run sternsystem.validate --json — exitCode 0 with existing registry)
 - [x] `sternsystem.validate` produces notice-level warning for entries without `owner` (evidence: packages/os/site-kernel-handoff/src/sternsystem/sternsystem-validate.ts:142-151, sternsystem.validate output: `[owner] warpgogol-com: owner field not set`)
 - [x] `sternsystem.validate` fails for entries with `owner` field that does not match `did:web:<domain>#<key-version>` format (evidence: packages/ontology/src/operations/sternsystem.ts:29 didWebRe regex enforced by Zod parse in readRegistry, packages/ontology/src/tests/sternsystem-owner.test.ts:33-38)
 - [x] Studio Gate `verifyOwnership` function reads registry `owner` field (evidence: packages/studio-gate/src/auth.ts:201-249)
-- [x] Existing `systems/registry.yaml` entries without `owner` remain valid (evidence: pnpm exec site-kernel run sternsystem.validate — passes with 0 owner-format violations, 1 missing-owner warning)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0561 — All 1 RFC(s) passed validation)
+- [x] Existing `systems/registry.yaml` entries without `owner` remain valid (evidence: pnpm exec werkstatt run sternsystem.validate — passes with 0 owner-format violations, 1 missing-owner warning)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate RFC-0561 — All 1 RFC(s) passed validation)
 
 ### Owner field format
 

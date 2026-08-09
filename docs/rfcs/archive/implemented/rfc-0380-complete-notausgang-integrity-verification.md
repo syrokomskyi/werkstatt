@@ -61,7 +61,7 @@ nonGoals:
   - "Notausgang does not modify or repair the export package; it only reports violations"
   - "No JSON fallback reader — legacy JSON exports fail validation and must be re-generated (forward-only per RFC-0376)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:
@@ -124,8 +124,8 @@ The following invariants are unprotected:
 The command surface does not change — `notausgang.validate` gains deep verification internally:
 
 ```sh
-pnpm exec site-kernel run notausgang.validate --path ./notausgang-export
-pnpm exec site-kernel run notausgang.validate --path ./notausgang-export --json
+pnpm exec werkstatt run notausgang.validate --path ./notausgang-export
+pnpm exec werkstatt run notausgang.validate --path ./notausgang-export --json
 ```
 
 Flags:

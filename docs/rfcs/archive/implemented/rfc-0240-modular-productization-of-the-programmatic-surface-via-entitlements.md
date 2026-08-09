@@ -132,8 +132,8 @@ export const PSEO_REGIONAL_TIERS = ["feature_pseo_regional", "feature_pseo_pro",
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run entitlement.module.validate --app warpgogol-com --json
-pnpm exec site-kernel run trust.rating.validate --app warpgogol-com --json
+pnpm exec werkstatt run entitlement.module.validate --app warpgogol-com --json
+pnpm exec werkstatt run trust.rating.validate --app warpgogol-com --json
 ```
 
 Both are app-scoped and run in apps build-check.

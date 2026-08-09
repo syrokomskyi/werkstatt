@@ -112,7 +112,7 @@ scope:
   const dirtyCheck = isWorkpieceDirty(workpieceDir);
   if (dirtyCheck.dirty) {
     throw new Error(
-      `[mission.reconcile] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run reconcile.`,
+      `[mission.reconcile] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run reconcile.`,
     );
   }
   ```
@@ -198,16 +198,16 @@ scope:
 - Update affected `AGENTS.md` files — `packages/os/site-kernel-handoff/AGENTS.md` (done in Step 5, verify).
 - No `docs/*.xml` Compass files need synchronization — no repository-wide semantics changed.
 - No `docs/architecture-dna.md` changes — no new DNA invariant.
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed — no new commands, no manifest regeneration needed.
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed — no new commands, no manifest regeneration needed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0644 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0644 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0644`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0644`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
@@ -221,7 +221,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0644`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0644`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -241,4 +241,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 or DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0644 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 or DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0644 --reason "..." --invariant "DNA-N"` instead of working around it.

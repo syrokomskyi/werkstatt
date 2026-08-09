@@ -165,9 +165,9 @@ See `## CLI surface`, `## TypeScript contracts`, and `## File system responsibil
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run shared.section-props.contract.validate
-pnpm exec site-kernel run shared.section-props.changelog.report
-pnpm exec site-kernel run page.block.validate --app <id>
+pnpm exec werkstatt run shared.section-props.contract.validate
+pnpm exec werkstatt run shared.section-props.changelog.report
+pnpm exec werkstatt run page.block.validate --app <id>
 ```
 
 ## TypeScript contracts

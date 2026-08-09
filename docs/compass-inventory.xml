@@ -5,7 +5,7 @@
     <status>generated</status>
     <scope>repository-root</scope>
     <generated-at>null</generated-at>
-    <generator>@warpgogol/site-kernel-checks:compass.inventory</generator>
+    <generator>@warpgogol/werkstatt-site/checks:compass.inventory</generator>
   </meta>
   <summary>
     <scanned-files>1327</scanned-files>

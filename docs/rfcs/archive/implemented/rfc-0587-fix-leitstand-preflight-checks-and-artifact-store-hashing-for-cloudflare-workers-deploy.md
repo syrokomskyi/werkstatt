@@ -60,7 +60,7 @@ nonGoals:
   - "Behavior snapshot route collection (covered by RFC-0588)"
   - "_redirects 410 handling (covered by RFC-0589)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -142,11 +142,11 @@ No new commands. Changed commands:
 
 ```sh
 # Idempotent: overwrites existing manifest for the same release
-pnpm exec site-kernel run artifact.store.put --release <id> --dist <path>
+pnpm exec werkstatt run artifact.store.put --release <id> --dist <path>
 
 # Preflight now uses adapter-declared limits and resolves wrangler from workpiece
-pnpm exec site-kernel run leitstand.propagate --release <id> --channel alt
-pnpm exec site-kernel run leitstand.propagate --release <id> --channel main
+pnpm exec werkstatt run leitstand.propagate --release <id> --channel alt
+pnpm exec werkstatt run leitstand.propagate --release <id> --channel main
 ```
 
 ### TypeScript contracts

@@ -43,7 +43,7 @@ None.
 
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — must pass with updated tests
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — must pass (typecheck)
-- `pnpm exec site-kernel run rfc.validate --id RFC-0592` — must pass
+- `pnpm exec werkstatt run rfc.validate --id RFC-0592` — must pass
 
 ## 3. Step sequence
 
@@ -115,16 +115,16 @@ None.
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated with the wildcard matching fix note.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC — skip).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC — skip).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0592 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0592 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0592`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0592`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -135,7 +135,7 @@ None.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0592`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0592`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -154,4 +154,4 @@ None.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0592 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0592 --reason "..." --invariant "DNA-N"` instead of working around it.

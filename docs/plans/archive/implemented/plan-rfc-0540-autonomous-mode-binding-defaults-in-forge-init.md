@@ -53,7 +53,7 @@ scope:
 
 - `pnpm --filter @wgogol/forge run build:check` — scoped typecheck
 - `pnpm --filter @wgogol/forge run test` — vitest run
-- `pnpm exec site-kernel run rfc.validate RFC-0540 --json` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0540 --json` — RFC validation
 
 ## 3. Step sequence
 
@@ -216,7 +216,7 @@ scope:
 
 - Run `pnpm --filter @wgogol/forge run build:check` — must pass
 - Run `pnpm --filter @wgogol/forge run test` — must pass
-- Run `pnpm exec site-kernel run rfc.validate RFC-0540 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0540 --json` — must pass
 - Verify each acceptance criterion in RFC-0540:
   1. `FORGE_CLI_BINDING_DEFAULTS` exported; `defaultForgeConfig` accepts pm — check export and signature
   2. `forge.init` in clean dir produces correct matrix — verify via test or manual check
@@ -227,12 +227,12 @@ scope:
   7. `packages/forge/AGENTS.md` updated — verify git diff
   8. `rfc.validate` passes — already verified above
 - Mark each criterion `[x]` with inline `(evidence: <file:line>, <test-or-command>)`
-- Stamp the RFC: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0540 --implementation-commit <sha>`
+- Stamp the RFC: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0540 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0540 --json` — pass
+- `pnpm exec werkstatt run rfc.validate RFC-0540 --json` — pass
 - `pnpm --filter @wgogol/forge run build:check` — pass
 - `pnpm --filter @wgogol/forge run test` — pass
 
@@ -244,7 +244,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0540 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0540 --json`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
 
@@ -264,4 +264,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0540 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0540 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).

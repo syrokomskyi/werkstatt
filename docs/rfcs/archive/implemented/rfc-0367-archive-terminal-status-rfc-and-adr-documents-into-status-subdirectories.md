@@ -74,7 +74,7 @@ nonGoals:
   - "Archiving the docs/rfcs/verification/ subdirectory (it contains generated JSON, not RFC documents)"
   - "Changing RFC status semantics or transition rules"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -139,21 +139,21 @@ A status is **terminal** if no further lifecycle transitions are expected from t
 
 ```sh
 # Archive all terminal-status RFCs (moves by default)
-pnpm exec site-kernel run rfc.archive
+pnpm exec werkstatt run rfc.archive
 
 # Preview what would be moved without moving
-pnpm exec site-kernel run rfc.archive --dry-run
+pnpm exec werkstatt run rfc.archive --dry-run
 
 # Archive only one terminal status
-pnpm exec site-kernel run rfc.archive --status implemented
+pnpm exec werkstatt run rfc.archive --status implemented
 
 # JSON output for agent consumption
-pnpm exec site-kernel run rfc.archive --json
+pnpm exec werkstatt run rfc.archive --json
 
 # Same for ADRs
-pnpm exec site-kernel run adr.archive
-pnpm exec site-kernel run adr.archive --dry-run
-pnpm exec site-kernel run adr.archive --status superseded
+pnpm exec werkstatt run adr.archive
+pnpm exec werkstatt run adr.archive --dry-run
+pnpm exec werkstatt run adr.archive --status superseded
 ```
 
 Both commands are workspace-scoped. No `--app` flag. Both move files by default; `--dry-run` produces a preview without touching the filesystem. `--status` filters to a single terminal status. Both commands are bidirectional: terminal-status files in root are moved into `archive/<status>/`, and non-terminal files found inside `archive/` are moved back to root.

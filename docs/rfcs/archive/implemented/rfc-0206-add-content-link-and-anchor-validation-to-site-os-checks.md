@@ -98,13 +98,13 @@ The command runs in `APPS_CHECK_AUTHOR_PIPELINE` because it validates authored s
 
 ```sh
 # Per-app check
-pnpm exec site-kernel run content.links.validate --app nicaragua-projekt
+pnpm exec werkstatt run content.links.validate --app nicaragua-projekt
 
 # Workspace-wide check (all apps)
-pnpm exec site-kernel run content.links.validate --all
+pnpm exec werkstatt run content.links.validate --all
 
 # JSON output for CI
-pnpm exec site-kernel run content.links.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run content.links.validate --app nicaragua-projekt --json
 ```
 
 **Flags:**
@@ -214,7 +214,7 @@ interface ContentLinksValidateResult {
 
 ## Rollout
 
-1. **Phase 1 (draft)**: Command implemented in `site-kernel-checks`, opt-in via `pnpm exec site-kernel run content.links.validate --app <id>`
+1. **Phase 1 (draft)**: Command implemented in `site-kernel-checks`, opt-in via `pnpm exec werkstatt run content.links.validate --app <id>`
 2. **Phase 2 (adoption)**: Wire into `APPS_CHECK_AUTHOR_PIPELINE` as a non-blocking step (warnings only) for one week
 3. **Phase 3 (enforcement)**: Switch to fail-hard in `APPS_CHECK_AUTHOR_PIPELINE` after all existing apps are clean
 4. **New apps**: Comply automatically from day one via pipeline inheritance

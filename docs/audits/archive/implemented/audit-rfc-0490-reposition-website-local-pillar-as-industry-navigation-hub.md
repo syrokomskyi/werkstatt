@@ -16,7 +16,7 @@ The RFC is architecturally sound in its core proposal (blueprint-driven pillar h
 
 ## Mechanical validation (rfc.validate)
 
-Could not run — `pnpm exec site-kernel run rfc.validate` fails due to an environment issue (`ERR_PNPM_IGNORED_BUILDS` for `libxmljs2@0.32.0`). The semantic audit proceeds without the mechanical floor; the operator should run `rfc.validate RFC-0490 --json` manually before architecture review.
+Could not run — `pnpm exec werkstatt run rfc.validate` fails due to an environment issue (`ERR_PNPM_IGNORED_BUILDS` for `libxmljs2@0.32.0`). The semantic audit proceeds without the mechanical floor; the operator should run `rfc.validate RFC-0490 --json` manually before architecture review.
 
 ## Axis A — Structural completeness
 

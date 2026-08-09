@@ -71,9 +71,9 @@ scope:
 
 - `pnpm --filter @warpgogol/ontology build:check` — validate enum and archetype changes
 - `pnpm --filter @warpgogol/ui build:check` — validate component builds
-- `pnpm exec site-kernel run archetype.registry.build` — rebuild archetype index
-- `pnpm exec site-kernel run manifest.contract.validate` — validate manifests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0743` — validate RFC
+- `pnpm exec werkstatt run archetype.registry.build` — rebuild archetype index
+- `pnpm exec werkstatt run manifest.contract.validate` — validate manifests
+- `pnpm exec werkstatt run rfc.validate --id RFC-0743` — validate RFC
 
 ## 3. Step sequence
 
@@ -87,7 +87,7 @@ scope:
 - Create `packages/ontology/archetypes/components/currency-selector.yaml` with `id`, `displayName`, `version`, `semanticRole`, `description`, `expectedIntents` (`orient-visitor`, `guide-navigation`), `expectedIndustryFit: []`, `layoutHint: split`, `propsSchema`, `acceptedCosmicNames` (pick 2-3 non-reserved MoonCatalog names), `constraints: {}`
 - Create `packages/ontology/archetypes/components/currency-aware-price-display.yaml` with `id`, `displayName`, `version`, `semanticRole`, `description`, `expectedIntents` (`pricing`, `trust`), `expectedIndustryFit: []`, `layoutHint: inline`, `propsSchema`, `acceptedCosmicNames` (pick 2-3 non-reserved MoonCatalog names), `constraints: {}`
 - Add both archetypes to `packages/ontology/archetypes/index.yaml` under `components`
-- Run `pnpm exec site-kernel run archetype.registry.build` to regenerate `archetypes/index.json`
+- Run `pnpm exec werkstatt run archetype.registry.build` to regenerate `archetypes/index.json`
 - Run `pnpm --filter @warpgogol/ontology build:check` to validate
 
 **Validation:**
@@ -118,7 +118,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/ui build:check` passes
-- `pnpm exec site-kernel run manifest.contract.validate` passes for the new manifest
+- `pnpm exec werkstatt run manifest.contract.validate` passes for the new manifest
 
 **Completion criterion:** All five Mirror Quintet files exist; manifest validates; component renders a `<select>` with currency options.
 
@@ -143,7 +143,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/ui build:check` passes
-- `pnpm exec site-kernel run manifest.contract.validate` passes for the new manifest
+- `pnpm exec werkstatt run manifest.contract.validate` passes for the new manifest
 
 **Completion criterion:** All five Mirror Quintet files exist; manifest validates; component pre-renders variants with `data-currency` attributes.
 
@@ -224,21 +224,21 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0743`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0743`
 - Run `pnpm --filter @warpgogol/ui build:check`
 - Run `pnpm --filter @warpgogol/ontology build:check`
 - Run `pnpm --filter @warpgogol/share build:check`
 - Run `pnpm --filter @warpgogol/ui vitest run`
-- Run `pnpm exec site-kernel run manifest.contract.validate`
+- Run `pnpm exec werkstatt run manifest.contract.validate`
 - Check off acceptance criteria with inline `(evidence: ...)` annotations
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Max 3 iterations.
-- Stamp: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0743 --implementation-commit <sha>`
+- Stamp: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0743 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0743` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0743` passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All validation passes; code review passed (findings fixed if any); all acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -249,12 +249,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0743`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0743`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/ui build:check`
 - `pnpm --filter @warpgogol/share build:check`
 - `pnpm --filter @warpgogol/ui vitest run`
-- `pnpm exec site-kernel run manifest.contract.validate`
+- `pnpm exec werkstatt run manifest.contract.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -273,5 +273,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-17 (Mirror Quintet) that cannot be resolved by adding the missing files, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0743 --reason "..." --invariant "DNA-17"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-17 (Mirror Quintet) that cannot be resolved by adding the missing files, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0743 --reason "..." --invariant "DNA-17"` instead of working around it.
 - If `ComponentRole` enum extension is rejected by `manifest.contract.validate` for a reason not anticipated, create a superseding RFC proposing a different role assignment mechanism.

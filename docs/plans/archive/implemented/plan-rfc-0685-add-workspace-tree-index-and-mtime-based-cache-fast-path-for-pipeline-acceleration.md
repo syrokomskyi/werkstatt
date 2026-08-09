@@ -50,7 +50,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel run build:check` — TypeScript strict mode
 - `pnpm --filter @warpgogol/site-kernel run test` — vitest unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0685` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0685` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -218,11 +218,11 @@ scope:
 
 - Run `pnpm --filter @warpgogol/site-kernel run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel run test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0685`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0685`
 - Check off acceptance criteria in the RFC file (mark `[x]` with evidence)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Max 3 iterations.
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0685 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0685 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -240,7 +240,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0685`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0685`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel run test`
 
@@ -261,5 +261,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53 or DNA-35, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0685 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53 or DNA-35, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0685 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `computeInputsHash` return type change breaks downstream consumers not identified during planning, stop and assess whether a compatibility wrapper is needed (forward-only: no wrapper, update all consumers).

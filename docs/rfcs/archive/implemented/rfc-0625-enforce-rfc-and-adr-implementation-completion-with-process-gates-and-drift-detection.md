@@ -63,7 +63,7 @@ nonGoals:
   - "Does not add ADR stamping infrastructure — ADRs remain manually transitioned per existing process"
   - "Does not make V-32 an error — in-progress implementations with intermediate commits are legitimate"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -125,9 +125,9 @@ The Forge governance surface gains three layers of defense against incomplete RF
 No new commands. V-32 is emitted by existing commands:
 
 ```sh
-pnpm exec site-kernel run rfc.validate --json
-pnpm exec site-kernel run rfc.validate --id RFC-XXXX --json
-pnpm exec site-kernel run adr.validate --id ADR-XXXX --json
+pnpm exec werkstatt run rfc.validate --json
+pnpm exec werkstatt run rfc.validate --id RFC-XXXX --json
+pnpm exec werkstatt run adr.validate --id ADR-XXXX --json
 ```
 
 V-32 (RFC) and AV-16 (ADR) warnings appear in the `violations` array with `severity: "warning"`.

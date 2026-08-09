@@ -60,7 +60,7 @@ nonGoals:
   - "Does not remove messagePattern or descriptionPattern from the schema — keeps them for forward compatibility if Axiom populates them in future versions"
   - "Does not change suppression matching priority order"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -123,7 +123,7 @@ The suppression schema gains a `titlePattern` field that matches against the alw
 No new CLI commands. `suppressions.validate` gains a new diagnostic (SUPPRESS-VAL-06):
 
 ```sh
-pnpm exec site-kernel run suppressions.validate --json
+pnpm exec werkstatt run suppressions.validate --json
 ```
 
 ### TypeScript contracts

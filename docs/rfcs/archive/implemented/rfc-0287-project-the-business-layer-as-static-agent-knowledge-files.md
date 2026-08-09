@@ -101,8 +101,8 @@ The knowledge tier is the third projection of the same model: plain, typed JSON,
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.knowledge.generate --app warpgogol-com
-pnpm exec site-kernel run agent.knowledge.validate --app warpgogol-com --json
+pnpm exec werkstatt run agent.knowledge.generate --app warpgogol-com
+pnpm exec werkstatt run agent.knowledge.validate --app warpgogol-com --json
 ```
 
 App-scoped. `agent.knowledge.generate` (`mutatesState: true`) runs in `APPS_BUILD_PREPARE_PIPELINE` after `entitlements.resolve` and **before** `agent.manifest.generate`, which consumes the emitted file list. Canonical order: `entitlements.resolve` → `agent.knowledge.generate` → `agent.manifest.generate` → `agent.openapi.generate` (RFC-0289). This refines the RFC-0286 ordering (which pins the manifest after `entitlements.resolve` and `surface.generate`): the knowledge tier slots in before the manifest so `AgentKnowledgeRef`s point at real files. `agent.knowledge.validate` runs in `APPS_CHECK_PIPELINE`.

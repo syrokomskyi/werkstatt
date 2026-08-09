@@ -184,10 +184,10 @@ Examples:
 
 ```sh
 # Validate all copyright entries in an app
-pnpm exec site-kernel run copyright.validate --app nicaragua-projekt
+pnpm exec werkstatt run copyright.validate --app nicaragua-projekt
 
 # Output JSON for CI integration
-pnpm exec site-kernel run copyright.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run copyright.validate --app nicaragua-projekt --json
 ```
 
 ### File system responsibilities

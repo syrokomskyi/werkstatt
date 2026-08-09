@@ -70,7 +70,7 @@ nonGoals:
   - "Does not use Git LFS or any Git-based storage for evidence — Git is not suited for 153 MB binary artifacts per run"
   - "Does not replicate R2 data to a secondary S3-compatible provider — single R2 bucket is sufficient for the current scale"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -139,10 +139,10 @@ No new commands in this RFC. The `mission.check` command gains a `--run-timestam
 
 ```sh
 # mission.check with explicit run timestamp (default: now, ISO 8601 UTC)
-pnpm exec site-kernel run mission.check --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z
+pnpm exec werkstatt run mission.check --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z
 
 # mission.check without --run-timestamp (uses current time)
-pnpm exec site-kernel run mission.check --mission warpgogol-com-m000025
+pnpm exec werkstatt run mission.check --mission warpgogol-com-m000025
 ```
 
 ### R2 bucket layout

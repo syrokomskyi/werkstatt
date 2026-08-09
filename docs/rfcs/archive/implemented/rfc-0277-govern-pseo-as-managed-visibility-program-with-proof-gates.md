@@ -142,9 +142,9 @@ pseoExperiments:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run pseo.experiment.plan --app warpgogol-com --module pseo --json
-pnpm exec site-kernel run pseo.proof.validate --app warpgogol-com --module pseo --json
-pnpm exec site-kernel run pseo.product.validate --app warpgogol-com --json
+pnpm exec werkstatt run pseo.experiment.plan --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run pseo.proof.validate --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run pseo.product.validate --app warpgogol-com --json
 ```
 
 `pseo.product.validate` checks authored product language and module context for forbidden promises:

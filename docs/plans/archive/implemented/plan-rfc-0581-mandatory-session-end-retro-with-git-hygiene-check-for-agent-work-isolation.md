@@ -96,7 +96,7 @@ None. No YAML/JSON/manifest changes.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0581 --json` — confirm zero violations.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0581 --json` — confirm zero violations.
 - Verify acceptance criterion 1: `grep -n "Session-end discipline" AGENTS.md` returns a match.
 - Verify acceptance criterion 2: `grep -n "1.5.*Git hygiene" .agents/skills/fo-session-retro/SKILL.md` returns a match.
 - Verify acceptance criterion 3: `grep -n "werkstatt" .agents/skills/fo-session-retro/SKILL.md` and `grep -n "workpiece" .agents/skills/fo-session-retro/SKILL.md` confirm both repositories are covered.
@@ -107,7 +107,7 @@ None. No YAML/JSON/manifest changes.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0581 --json` — must pass.
+- `pnpm exec werkstatt run rfc.validate RFC-0581 --json` — must pass.
 - `git status` — only AGENTS.md, SKILL.md, and RFC file should be modified.
 
 **Completion criterion:** All 6 acceptance criteria verified and checked off in the RFC file. `rfc.validate` passes.
@@ -128,12 +128,12 @@ None. No YAML/JSON/manifest changes.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented changes. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0581 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0581 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0581` — passes.
+- `pnpm exec werkstatt run rfc.validate RFC-0581` — passes.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -144,7 +144,7 @@ None. No YAML/JSON/manifest changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0581` — mechanical validation.
+- `pnpm exec werkstatt run rfc.validate RFC-0581` — mechanical validation.
 - No build checks needed (no code changes).
 - No acceptance probes (RFC has none declared).
 - No verification evidence needed (no acceptance probes, RFC-0330 not triggered).
@@ -167,4 +167,4 @@ None. No YAML/JSON/manifest changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0581 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0581 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).

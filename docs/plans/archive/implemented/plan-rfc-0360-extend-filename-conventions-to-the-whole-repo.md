@@ -75,7 +75,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0360 --json` passes.
+- `pnpm exec werkstatt run rfc.validate RFC-0360 --json` passes.
 
 **Completion criterion:** `rfc.validate` reports zero violations for RFC-0360.
 
@@ -107,7 +107,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run naming.convention.lint --json` returns successfully.
+- `pnpm exec werkstatt run naming.convention.lint --json` returns successfully.
 - JSON output contains `scannedRoots`, `ephemeralRootsSkipped`, `unknownTopLevelDirs`, and `topologySource: "workspace-topology"`.
 
 **Completion criterion:** The workspace-topology module is created, `naming.convention.lint` imports from it, and the JSON output includes the new scan-plan metadata fields.
@@ -157,8 +157,8 @@ scope:
 
 **Validation:**
 
-- Run `pnpm exec site-kernel run naming.convention.lint --json` and confirm `services/*/Dockerfile` and `services/observability-stack/caddy/Caddyfile` are not flagged.
-- Run `pnpm exec site-kernel run naming.convention.lint --include-ignored --json` (if ephemeral roots exist) and confirm it scans deeper without crashing.
+- Run `pnpm exec werkstatt run naming.convention.lint --json` and confirm `services/*/Dockerfile` and `services/observability-stack/caddy/Caddyfile` are not flagged.
+- Run `pnpm exec werkstatt run naming.convention.lint --include-ignored --json` (if ephemeral roots exist) and confirm it scans deeper without crashing.
 
 **Completion criterion:** `Dockerfile`/`Caddyfile` are not flagged; `--include-ignored` is accepted by the command parser.
 
@@ -181,10 +181,10 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run command.manifest.generate`
-- `pnpm exec site-kernel run docs.commands.generate`
-- `pnpm exec site-kernel run command.manifest.validate --json` passes.
-- `pnpm exec site-kernel run docs.commands.validate --json` passes.
+- `pnpm exec werkstatt run command.manifest.generate`
+- `pnpm exec werkstatt run docs.commands.generate`
+- `pnpm exec werkstatt run command.manifest.validate --json` passes.
+- `pnpm exec werkstatt run docs.commands.validate --json` passes.
 
 **Completion criterion:** Generated command manifest and docs reflect the new description and no validators fail.
 
@@ -198,7 +198,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run naming.convention.lint --json`.
+- Run `pnpm exec werkstatt run naming.convention.lint --json`.
 - If any unexpected violations appear, fix them by renaming files (do not add new exemptions). If a violation is found in a generated or gitignored directory that should be skipped, verify it is covered by an existing exemption or by `--include-ignored` behavior.
 
 **Validation:**
@@ -217,10 +217,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0360 --json`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0360 --json`.
 - Run `pnpm -s run build:check` (or the repository's equivalent root command).
-- Run `pnpm exec site-kernel run packages-check.run --json`.
-- Run `pnpm exec site-kernel run apps-check.author --app warpgogol-com --json` (or another representative app) to confirm the app-scoped pipeline still passes.
+- Run `pnpm exec werkstatt run packages-check.run --json`.
+- Run `pnpm exec werkstatt run apps-check.author --app warpgogol-com --json` (or another representative app) to confirm the app-scoped pipeline still passes.
 
 **Validation:**
 
@@ -238,7 +238,7 @@ scope:
 
 **Agent actions:**
 
-- If RFC-0360 gains acceptance probes before implementation, run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0360` and commit the generated evidence file.
+- If RFC-0360 gains acceptance probes before implementation, run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0360` and commit the generated evidence file.
 - If no probes are present, verify that the acceptance-criteria checkboxes in the RFC are checked (only after the implementation steps above are proven).
 - Transition the RFC frontmatter from `status: accepted` to `status: implemented`, set `implementedAt`, and commit.
 
@@ -254,15 +254,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0360`
-- `pnpm exec site-kernel run naming.convention.lint --json`
-- `pnpm exec site-kernel run naming.convention.lint --include-ignored --json`
-- `pnpm exec site-kernel run command.manifest.validate --json`
-- `pnpm exec site-kernel run docs.commands.validate --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0360`
+- `pnpm exec werkstatt run naming.convention.lint --json`
+- `pnpm exec werkstatt run naming.convention.lint --include-ignored --json`
+- `pnpm exec werkstatt run command.manifest.validate --json`
+- `pnpm exec werkstatt run docs.commands.validate --json`
 - `pnpm -s run build:check`
-- `pnpm exec site-kernel run packages-check.run --json`
-- `pnpm exec site-kernel run apps-check.author --app warpgogol-com --json` (representative app)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0360` (only if acceptance probes are added)
+- `pnpm exec werkstatt run packages-check.run --json`
+- `pnpm exec werkstatt run apps-check.author --app warpgogol-com --json` (representative app)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0360` (only if acceptance probes are added)
 
 ### 4.2 Evidence artifacts
 
@@ -282,6 +282,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that the kebab-case invariant itself (DNA-6) needs to be weakened beyond the documented `Dockerfile`/`Caddyfile` exemption, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0360 --reason "..." --invariant "DNA-6"` instead of adding ad-hoc exemptions.
+- If implementation reveals that the kebab-case invariant itself (DNA-6) needs to be weakened beyond the documented `Dockerfile`/`Caddyfile` exemption, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0360 --reason "..." --invariant "DNA-6"` instead of adding ad-hoc exemptions.
 - If an unknown top-level directory is discovered that is a legitimate new workspace layer (e.g., a new top-level category), register it via the appropriate RFC or command manifest change rather than silently adding it to `naming-convention.ts`.
 - If `--include-ignored` scanning of `missions/` or `releases/` surfaces violations that are not clearly tool-generated, pause and confirm whether the root should be registered as recursive or ephemeral before renaming files.

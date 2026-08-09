@@ -328,7 +328,7 @@ Example `PbpPriceProjection` JSON:
 - [x] Display config follows decisions #29, #31, #32, #33, #34 (evidence: packages/pbp/src/projections/price-projection.ts:63-68 DEFAULT_DISPLAY_CONFIG, price-projection.test.ts:91-95)
 - [x] `tsc --noEmit` passes (evidence: pnpm --filter @warpgogol/pbp run build:check exit 0)
 - [x] `vitest run` passes (evidence: pnpm --filter @warpgogol/pbp exec vitest run src/projections/**tests**/price-projection.test.ts — 10 tests passed)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0742 --json — 0 violations)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0742 --json — 0 violations)
 
 ## Implementation notes for agents
 

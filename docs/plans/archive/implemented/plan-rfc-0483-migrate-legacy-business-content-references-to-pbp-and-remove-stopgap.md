@@ -65,8 +65,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — scoped tsc
 - `pnpm --filter @gogol/site-kernel-handoff test` — vitest including new tests
 - `pnpm --filter @gogol/site-kernel-codegen build:check` — scoped tsc for template change
-- `pnpm exec site-kernel run migrator.registry.validate` — registry validation
-- `pnpm exec site-kernel run rfc.validate RFC-0483` — RFC validation
+- `pnpm exec werkstatt run migrator.registry.validate` — registry validation
+- `pnpm exec werkstatt run rfc.validate RFC-0483` — RFC validation
 
 ## 3. Step sequence
 
@@ -97,7 +97,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run routes.generate --site warpgogol-com`
+- Run `pnpm exec werkstatt run routes.generate --site warpgogol-com`
 - Verify the regenerated file no longer contains `business` collection or `@gogol/business` import
 - Verify it still contains `...pbpCollections`, `system`, `pages`, `prose`, `site`, `navigation`, `people`, `...faq`
 
@@ -166,7 +166,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run migrator.registry.validate` passes
+- `pnpm exec werkstatt run migrator.registry.validate` passes
 
 **Completion criterion:** `migratorRegistry` includes `rfc0483Migrator`, registry validation passes.
 
@@ -280,8 +280,8 @@ scope:
 - Run `pnpm --filter @gogol/site-kernel-codegen build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff test`
-- Run `pnpm exec site-kernel run migrator.registry.validate`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0483`
+- Run `pnpm exec werkstatt run migrator.registry.validate`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0483`
 - Fix any failures
 
 **Validation:**
@@ -302,7 +302,7 @@ scope:
 
 - Set `status: implemented` and `implementedAt: 2026-07-22` in RFC frontmatter
 - Check all acceptance criteria checkboxes with evidence
-- Run `pnpm exec site-kernel run rfc.validate RFC-0483` to confirm
+- Run `pnpm exec werkstatt run rfc.validate RFC-0483` to confirm
 - Commit all files: template edit, migrator, registry edit, tests, RFC status change, site-composition update
 - Commit message: `feat(rfc-0483): implement legacy business content reference migrator and stopgap removal`
 
@@ -320,7 +320,7 @@ scope:
 
 After `mission.reconcile` transfers the workpiece commits to the canonical system (including the deletion of `src/content/business/`), the operator should:
 
-1. Run `pnpm exec site-kernel run agents.generate --site warpgogol-com` to regenerate `systems/warpgogol-com/AGENTS.md` and `systems/warpgogol-com/src/content/AGENTS.md`
+1. Run `pnpm exec werkstatt run agents.generate --site warpgogol-com` to regenerate `systems/warpgogol-com/AGENTS.md` and `systems/warpgogol-com/src/content/AGENTS.md`
 2. Verify no stale `src/content/business/` references remain in GENERATED files
 3. Commit the regenerated AGENTS.md files
 
@@ -333,8 +333,8 @@ These steps cannot be performed during implementation because the canonical `src
 - `pnpm --filter @gogol/site-kernel-codegen build:check` — tsc --noEmit (template change)
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — tsc --noEmit (migrator code)
 - `pnpm --filter @gogol/site-kernel-handoff test` — vitest (PBT + snapshot)
-- `pnpm exec site-kernel run migrator.registry.validate` — registry validation
-- `pnpm exec site-kernel run rfc.validate RFC-0483` — RFC validation
+- `pnpm exec werkstatt run migrator.registry.validate` — registry validation
+- `pnpm exec werkstatt run rfc.validate RFC-0483` — RFC validation
 
 ### 4.2 Evidence artifacts
 
@@ -357,6 +357,6 @@ These steps cannot be performed during implementation because the canonical `src
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0483 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0483 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the content.config.template.ts change reveals that other sites depend on the `business` collection, assess whether a separate RFC is needed for multi-site migration.
 - If the migrator cannot handle the `content.config.ts` GENERATED marker (RFC-0081 regenerate-on-marker semantics), assess whether the template change alone is sufficient and the migrator should skip `content.config.ts` edits.

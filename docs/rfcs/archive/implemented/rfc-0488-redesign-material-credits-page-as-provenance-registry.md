@@ -400,13 +400,13 @@ New validation failure modes (in addition to existing RFC-0220 modes). Fail rule
 
 ```sh
 # Validate credits for a site (exit 1 on fail rules, exit 0 on warn-only)
-pnpm exec site-kernel run material.credits.validate --site <site-id> --json
+pnpm exec werkstatt run material.credits.validate --site <site-id> --json
 
 # Regenerate the credits page (prose fallback + page block)
-pnpm exec site-kernel run material.credits.generate --site <site-id> --json
+pnpm exec werkstatt run material.credits.generate --site <site-id> --json
 
 # Report: dump all credit records and material refs as JSON
-pnpm exec site-kernel run material.credits.report --site <site-id> --json
+pnpm exec werkstatt run material.credits.report --site <site-id> --json
 ```
 
 The `--json` output shape for `material.credits.validate` follows the existing `CheckResult` contract: `{ command, status, count, violations[], diagnostics[] }`.
@@ -466,7 +466,7 @@ New apps get the new validation rules by default — `material.credits.validate`
 - [x] `material.credits.validate --site warpgogol-com` exits 0 after migration and rights audit. (evidence: `material.credits.validate --site warpgogol-com --json` → status: warn, 0 violations; 3 missing-preview assets restored from Git LFS history — elektriker.webp, friseur.webp from surface/assets, promo.webm from pages/de/media)
 - [x] `content.references.validate --site warpgogol-com` exits 0. (evidence: `content.references.validate --site warpgogol-com --json` → status: pass)
 - [x] Dev build of `warpgogol-com` starts without runtime errors on `/bildnachweise/`. (evidence: `astro build` → Complete! in 9.11s; `dist/client/de/bildnachweise/index.html` and `dist/client/bildnachweise/index.html` generated)
-- [x] `rfc.validate RFC-0488` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0488 --json` → status: pass)
+- [x] `rfc.validate RFC-0488` passes. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0488 --json` → status: pass)
 - [x] RFC-0220 `amendedBy` includes RFC-0488; RFC-0232 `amendedBy` includes RFC-0488. (evidence: `docs/rfcs/archive/implemented/rfc-0220-*.md`, `docs/rfcs/archive/implemented/rfc-0232-*.md`)
 
 ## Implementation notes for agents

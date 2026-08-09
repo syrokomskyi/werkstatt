@@ -66,7 +66,7 @@ nonGoals:
   - "Changing the distribution reuse logic in mission.validate (RFC-0635 remains independent)"
   - "Changing the build-skip cache in leitstand.dev-deploy (RFC-0653 remains independent)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -138,16 +138,16 @@ No new commands. The existing `mission.materialize` command is enhanced:
 
 ```sh
 # Normal materialization (uses cache if available)
-pnpm exec site-kernel run mission.materialize --mission <missionId>
+pnpm exec werkstatt run mission.materialize --mission <missionId>
 
 # Force full materialization, bypassing the artifact cache
-pnpm exec site-kernel run mission.materialize --mission <missionId> --force
+pnpm exec werkstatt run mission.materialize --mission <missionId> --force
 
 # Report-only mode (unchanged, does not touch cache)
-pnpm exec site-kernel run mission.materialize --mission <missionId> --report-only
+pnpm exec werkstatt run mission.materialize --mission <missionId> --report-only
 
 # Skip preflight gate (unchanged, RFC-0597)
-pnpm exec site-kernel run mission.materialize --mission <missionId> --skip-preflight
+pnpm exec werkstatt run mission.materialize --mission <missionId> --skip-preflight
 ```
 
 The `--force` flag is **introduced by this RFC** as a new flag on `mission.materialize`. It does not exist in the current command. The existing `force: true` passed to `executeKernelPipeline` for `build.prepare.dev` is hardcoded (RFC-0619 — a fresh workpiece starts empty, so the command-result cache must be bypassed to ensure all generated files are written). This hardcoded `force: true` remains unchanged and is not controlled by the `--force` flag. The new `--force` flag controls **only** the artifact cache bypass: when set, the cache is not read and full materialization runs, refreshing the cache entry after `build.prepare.dev` completes.

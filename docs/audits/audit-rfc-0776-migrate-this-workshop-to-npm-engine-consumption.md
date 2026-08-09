@@ -22,7 +22,7 @@ Pass — 0 violations.
 
 1. **No file system responsibilities table.** The RFC touches `tools/kernel.config.ts`, `pnpm-workspace.yaml`, `forge.yaml`, `hooks/pre-commit`, CI workflows, and ~30+ package directories — but paths are scattered across prose sections (§1, §3, §4, §5, §6) without a consolidated table. RFC-0774 and RFC-0775 both include explicit "File system responsibilities" tables; this RFC should follow the same pattern.
 
-2. **CLI surface incomplete.** The RFC mentions `werkstatt --version` as an execution gate (line 177) but does not show the exact `werkstatt run` command syntax that replaces `pnpm exec site-kernel run`. The `site-kernel` alias creation and removal (§6) are described in prose but not with exact commands. The `forge.yaml` binding rewrite (§5) is mentioned but the before/after binding values are not shown.
+2. **CLI surface incomplete.** The RFC mentions `werkstatt --version` as an execution gate (line 177) but does not show the exact `werkstatt run` command syntax that replaces `pnpm exec werkstatt run`. The `site-kernel` alias creation and removal (§6) are described in prose but not with exact commands. The `forge.yaml` binding rewrite (§5) is mentioned but the before/after binding values are not shown.
 
 ## Axis B — DNA alignment
 

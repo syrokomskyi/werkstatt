@@ -160,25 +160,25 @@ export interface TenantSecretRefs {
 
 ```sh
 # Add a tenant (disabled by default)
-pnpm exec site-kernel run lagebild.tenant.add --site warpgogol-com --tenant-id <uuid-v7> --vendor pipedrive
+pnpm exec werkstatt run lagebild.tenant.add --site warpgogol-com --tenant-id <uuid-v7> --vendor pipedrive
 
 # Enable after secrets are present
-pnpm exec site-kernel run lagebild.tenant.enable --site warpgogol-com
+pnpm exec werkstatt run lagebild.tenant.enable --site warpgogol-com
 
 # Disable without deleting history
-pnpm exec site-kernel run lagebild.tenant.disable --site warpgogol-com
+pnpm exec werkstatt run lagebild.tenant.disable --site warpgogol-com
 
 # Inspect tenant health and missing secrets
-pnpm exec site-kernel run lagebild.tenant.status --site warpgogol-com
+pnpm exec werkstatt run lagebild.tenant.status --site warpgogol-com
 
 # Rotate a secret reference
-pnpm exec site-kernel run lagebild.tenant.rotate-secret --site warpgogol-com --kind pipedrive-token
+pnpm exec werkstatt run lagebild.tenant.rotate-secret --site warpgogol-com --kind pipedrive-token
 
 # Deploy the shared Worker
-pnpm exec site-kernel run lagebild.worker.deploy
+pnpm exec werkstatt run lagebild.worker.deploy
 
 # Validate the entire surface
-pnpm exec site-kernel run lagebild.validate
+pnpm exec werkstatt run lagebild.validate
 ```
 
 ### File system responsibilities

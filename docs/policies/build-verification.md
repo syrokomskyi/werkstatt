@@ -38,5 +38,5 @@ Every console command an agent runs MUST have a 6-minute (360 000 ms) execution 
 
 - The `run_command` tool has no built-in timeout parameter. `WaitMsBeforeAsync` is the only mechanism to regain control after a fixed duration.
 - Abandoning a still-running process is acceptable — the process may complete in the background, but the agent is unblocked and can retry or try an alternative.
-- This covers all command classes: `pnpm exec site-kernel run ...`, `pnpm --filter <pkg> run build:check`, `astro check`, `git`, `pnpm install`, etc.
+- This covers all command classes: `pnpm exec werkstatt run ...`, `pnpm --filter <pkg> run build:check`, `astro check`, `git`, `pnpm install`, etc.
 - Site-kernel commands already have internal `timeoutMs` (RFC-0255), but the agent-side 6-min budget is a safety net for ALL commands, not just site-kernel.

@@ -92,26 +92,26 @@ The three GRACE codegen commands gain a `--packages` flag (and an optional `--pa
 
 ```sh
 # Backfill all packages/ files missing GRACE headers
-pnpm exec site-kernel run grace.backfill --packages
+pnpm exec werkstatt run grace.backfill --packages
 
 # Backfill a single package
-pnpm exec site-kernel run grace.backfill --packages --package site-kernel
+pnpm exec werkstatt run grace.backfill --packages --package site-kernel
 
 # Insert GRACE anchors across all packages/
-pnpm exec site-kernel run grace.anchors --packages
+pnpm exec werkstatt run grace.anchors --packages
 
 # Insert GRACE anchors in a single package
-pnpm exec site-kernel run grace.anchors --packages --package site-kernel-checks
+pnpm exec werkstatt run grace.anchors --packages --package site-kernel-checks
 
 # Clear GRACE markup from all packages/
-pnpm exec site-kernel run grace.clear --packages
+pnpm exec werkstatt run grace.clear --packages
 
 # Existing app-scoped invocations remain unchanged
-pnpm exec site-kernel run grace.backfill --app nicaragua-projekt
-pnpm exec site-kernel run grace.backfill --app main
+pnpm exec werkstatt run grace.backfill --app nicaragua-projekt
+pnpm exec werkstatt run grace.backfill --app main
 
 # Workspace-wide (both apps/ and packages/) — current default when no --app is supplied
-pnpm exec site-kernel run grace.backfill
+pnpm exec werkstatt run grace.backfill
 ```
 
 ### Flag semantics

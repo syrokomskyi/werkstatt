@@ -21,7 +21,7 @@ The diff cleanly implements RFC-0525 — AV1 progressive video encoding via libs
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @warpgogol/share run build:check`, `pnpm --filter @warpgogol/site-kernel-checks run build:check`, `pnpm --filter @warpgogol/ui run build:check`, and `pnpm exec site-kernel run rfc.validate RFC-0525 --json` all exit 0.
+Pass — `pnpm --filter @warpgogol/share run build:check`, `pnpm --filter @warpgogol/site-kernel-checks run build:check`, `pnpm --filter @warpgogol/ui run build:check`, and `pnpm exec werkstatt run rfc.validate RFC-0525 --json` all exit 0.
 
 ### Axis A — Structural correctness
 

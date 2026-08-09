@@ -141,7 +141,7 @@ RFC не описывает механизм предотвращения кон
 
 - **Append-only event log** `systems/events.ndjson` (каждое событие = registration, pin, status change, mission start/end, release)
 - **Snapshot** `systems/registry.generated.json` — материализованная проекция event log'а
-- Генератор snapshot: `pnpm exec site-kernel run sternsystem.registry.build`
+- Генератор snapshot: `pnpm exec werkstatt run sternsystem.registry.build`
 
 Это решает:
 

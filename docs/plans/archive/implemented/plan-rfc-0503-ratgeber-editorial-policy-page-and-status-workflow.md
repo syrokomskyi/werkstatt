@@ -101,7 +101,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.block.validate --site warpgogol-com` — page entries must pass B-01..B-06 checks (frontmatter-only, no markdown body, valid schema)
+- `pnpm exec werkstatt run page.block.validate --site warpgogol-com` — page entries must pass B-01..B-06 checks (frontmatter-only, no markdown body, valid schema)
 
 **Completion criterion:** Both page entries exist, are frontmatter-only (no markdown body), and pass `page.block.validate`.
 
@@ -129,8 +129,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run system.manifest.validate --site warpgogol-com` — manifest must parse and validate
-- `pnpm exec site-kernel run page.block.validate --site warpgogol-com` — pageId must resolve in system.md (B-04)
+- `pnpm exec werkstatt run system.manifest.validate --site warpgogol-com` — manifest must parse and validate
+- `pnpm exec werkstatt run page.block.validate --site warpgogol-com` — pageId must resolve in system.md (B-04)
 
 **Completion criterion:** `system.manifest.validate` passes and the new pageId `ratgeber-redaktion` is declared in `pages[]`.
 
@@ -157,7 +157,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run ratgeber.policy.validate --site warpgogol-com --json` — command executes
+- `pnpm exec werkstatt run ratgeber.policy.validate --site warpgogol-com --json` — command executes
 
 **Completion criterion:** Validator compiles, executes, and produces correct diagnostics for all 5 rules.
 
@@ -192,7 +192,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — TypeScript compiles
-- Command appears in `pnpm exec site-kernel run --list` output
+- Command appears in `pnpm exec werkstatt run --list` output
 
 **Completion criterion:** Command is registered and discoverable via the kernel command list.
 
@@ -215,7 +215,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com` — RG-HUB-02 still passes (no unexpected block types)
+- `pnpm exec werkstatt run ratgeber.hub.validate --site warpgogol-com` — RG-HUB-02 still passes (no unexpected block types)
 
 **Completion criterion:** Hub baker emits a visible link to `/ratgeber/redaktion/` (DE) / `/porady/redaktsiya/` (UK) and RG-HUB-02 still passes.
 
@@ -243,7 +243,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` — YAML parses and validates against the Zod schema
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` — passes with the extended schema
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com` — passes with the extended schema
 
 **Completion criterion:** url-schema.yaml includes the new route pattern and `surface.contract.validate` passes.
 
@@ -261,7 +261,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0503 --json` — V-19 warning is resolved (no more "RFC-0500.amendedBy does not include RFC-0503")
+- `pnpm exec werkstatt run rfc.validate RFC-0503 --json` — V-19 warning is resolved (no more "RFC-0500.amendedBy does not include RFC-0503")
 
 **Completion criterion:** `rfc.validate` on RFC-0503 passes with zero warnings.
 
@@ -281,14 +281,14 @@ scope:
 - Update `docs/requirements.xml` — add new static page and policy validator
 - Update `docs/technology.xml` — add new validator file
 - Update `docs/knowledge-graph.xml` — add RFC-0503 relationships
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (do not hand-edit `docs/ecosystem.generated.yaml`)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (do not hand-edit `docs/ecosystem.generated.yaml`)
 - Check off acceptance criteria: verify each criterion against the implemented code, mark `[x]` with inline `(evidence: ...)` annotations
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0503 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0503 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0503` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0503` — passes
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — passes
 - Every file in `scope.docs` is either updated or documented as not-applicable
 
@@ -300,15 +300,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0503`
-- `pnpm exec site-kernel run rfc.validate RFC-0500` (V-19 resolved)
+- `pnpm exec werkstatt run rfc.validate RFC-0503`
+- `pnpm exec werkstatt run rfc.validate RFC-0500` (V-19 resolved)
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run ratgeber.policy.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com` (RG-HUB-02 still passes after baker update)
-- `pnpm exec site-kernel run page.block.validate --site warpgogol-com` (new page entries pass)
-- `pnpm exec site-kernel run system.manifest.validate --site warpgogol-com` (new page registration passes)
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` (extended url-schema passes)
+- `pnpm exec werkstatt run ratgeber.policy.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run ratgeber.hub.validate --site warpgogol-com` (RG-HUB-02 still passes after baker update)
+- `pnpm exec werkstatt run page.block.validate --site warpgogol-com` (new page entries pass)
+- `pnpm exec werkstatt run system.manifest.validate --site warpgogol-com` (new page registration passes)
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com` (extended url-schema passes)
 
 ### 4.2 Evidence artifacts
 
@@ -326,5 +326,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (page entry structure), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0503 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (page entry structure), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0503 --reason "..." --invariant "DNA-24"` instead of working around it.
 - If the hub baker cannot emit a link without breaking RG-HUB-02, escalate to the plan author — the block type allowed set may need extension via a separate RFC.

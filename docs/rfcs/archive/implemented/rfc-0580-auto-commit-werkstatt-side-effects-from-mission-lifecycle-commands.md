@@ -65,7 +65,7 @@ nonGoals:
   - "Adding bordbuch entry recording to mission.reconcile — reconcile does not call appendBordbuchEntry at all. This is a separate gap in bordbuch audit trail, not a werkstatt commit issue."
   - "Auto-committing werkstatt side-effects from sternsystem.sync — sternsystem.sync may mutate registry.yaml but is not a mission lifecycle command. Track separately if needed."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -122,12 +122,12 @@ Mission lifecycle commands (`mission.open`, `mission.materialize`, `mission.migr
 No new CLI commands. The change is internal to existing lifecycle command handlers:
 
 ```sh
-pnpm exec site-kernel run mission.open --system <id> --brief "..."
-pnpm exec site-kernel run mission.materialize --mission <id>
-pnpm exec site-kernel run mission.migrate --mission <id>
-pnpm exec site-kernel run mission.reconcile --mission <id>
-pnpm exec site-kernel run mission.close --mission <id>
-pnpm exec site-kernel run mission.abort --mission <id>
+pnpm exec werkstatt run mission.open --system <id> --brief "..."
+pnpm exec werkstatt run mission.materialize --mission <id>
+pnpm exec werkstatt run mission.migrate --mission <id>
+pnpm exec werkstatt run mission.reconcile --mission <id>
+pnpm exec werkstatt run mission.close --mission <id>
+pnpm exec werkstatt run mission.abort --mission <id>
 ```
 
 Each command now auto-commits its side-effect files before returning.
@@ -252,7 +252,7 @@ The helper stages **only specific file paths** (never `git add -A` or `git add .
 - [x] Commit message format: `werkstatt: <command> <missionId>` (evidence: test src/tests/werkstatt-commit.test.ts:112)
 - [x] Unit tests for `commitWerkstattSideEffects` (idempotent skip, specific-file staging, throw on failure) (evidence: src/tests/werkstatt-commit.test.ts, 5 tests passing)
 - [x] Integration test: after `mission.open`, `git status` in monorepo is clean (evidence: src/tests/mission-open-clean-tree.test.ts, 1 test passing)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --json, no violations for RFC-0580)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --json, no violations for RFC-0580)
 
 ## Pre-existing gaps (out of scope)
 

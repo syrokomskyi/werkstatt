@@ -115,8 +115,8 @@ Site `wrangler.jsonc` files are GENERATED artifacts (RFC-0081/RFC-0336) owned by
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run observability.workers.validate
-pnpm exec site-kernel run observability.workers.validate --json
+pnpm exec werkstatt run observability.workers.validate
+pnpm exec werkstatt run observability.workers.validate --json
 ```
 
 Scope: workspace, read-only, offline. Wired into `PACKAGES_CHECK_PIPELINE`.

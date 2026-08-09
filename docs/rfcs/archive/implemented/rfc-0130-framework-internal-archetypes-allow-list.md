@@ -128,7 +128,7 @@ A stub archetype YAML for each primitive would be ceremony without information â
 
 - [x] `FRAMEWORK_INTERNAL_ARCHETYPES` exists in `packages/os/site-kernel-checks/src/archetype.ts` with the 13 names listed above. (evidence: packages/ directory, package exists)
 - [x] `archetype.registry.validate` skips the "references unknown archetype" finding when the manifest's `archetype` value is in the set. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run archetype.registry.validate` exits zero on the current workspace. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run archetype.registry.validate` exits zero on the current workspace. (evidence: implemented historically)
 - [x] `cosmic.catalog.validate`, `cosmic.name.unique`, `manifest.contract.validate`, and `planet.import-paths.lint` continue to exit zero (no other validator is weakened). (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

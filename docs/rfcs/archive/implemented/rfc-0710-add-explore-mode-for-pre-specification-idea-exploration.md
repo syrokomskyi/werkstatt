@@ -199,7 +199,7 @@ interface ExplorationArchiveResult {
 #### `exploration.list`
 
 ```sh
-pnpm exec site-kernel run exploration.list --json
+pnpm exec werkstatt run exploration.list --json
 ```
 
 Lists all exploration notes with `id`, `title`, `status`, `createdAt`. Supports `--status <status>` filter.
@@ -207,7 +207,7 @@ Lists all exploration notes with `id`, `title`, `status`, `createdAt`. Supports 
 #### `exploration.show`
 
 ```sh
-pnpm exec site-kernel run exploration.show --id <slug> --json
+pnpm exec werkstatt run exploration.show --id <slug> --json
 ```
 
 Returns the full exploration note content and frontmatter.
@@ -215,7 +215,7 @@ Returns the full exploration note content and frontmatter.
 #### `exploration.archive`
 
 ```sh
-pnpm exec site-kernel run exploration.archive --id <slug>
+pnpm exec werkstatt run exploration.archive --id <slug>
 ```
 
 Transitions an exploration note to `archived` status. Used when the exploration is superseded by an RFC or shelved. Optionally accepts `--rfc <id>` to record which RFC materialized from the exploration (written to `related` field).

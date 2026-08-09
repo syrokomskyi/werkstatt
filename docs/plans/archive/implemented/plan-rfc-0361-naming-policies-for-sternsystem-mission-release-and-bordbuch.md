@@ -71,7 +71,7 @@ scope:
 - **`pnpm --filter @gogol/ontology build:check`** — type-check new schemas.
 - **`pnpm --filter @gogol/site-kernel-checks build:check`** — type-check new command handler.
 - **`pnpm --filter @gogol/site-kernel-checks test`** — vitest unit tests for naming-policy validator.
-- **`pnpm exec site-kernel run rfc.validate RFC-0361`** — RFC validation.
+- **`pnpm exec werkstatt run rfc.validate RFC-0361`** — RFC validation.
 - **`pnpm -s run build:check`** — workspace-level build check (no regression).
 - No new pipeline wiring — `naming.policy.validate` is workspace-scoped and invoked manually; it does not join `build.check` or `build.prepare` at this stage. Future wiring is a follow-up after Werkstatt artifacts exist.
 
@@ -164,7 +164,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes.
-- Manual smoke test: `pnpm exec site-kernel run naming.policy.validate --json` returns `{ status: "pass", validatedSystems: 0, violations: [] }` (empty state).
+- Manual smoke test: `pnpm exec werkstatt run naming.policy.validate --json` returns `{ status: "pass", validatedSystems: 0, violations: [] }` (empty state).
 
 **Completion criterion:** `runNamingPolicyValidate` handles all five scan categories, three corruption classes, `--system` filter, and `--json` output; type-checks; empty-state returns pass with zero violations.
 
@@ -174,7 +174,7 @@ scope:
 
 ### Step 3. Command registration
 
-**Goal:** Wire `naming.policy.validate` into the command table so it is discoverable via `pnpm exec site-kernel run`.
+**Goal:** Wire `naming.policy.validate` into the command table so it is discoverable via `pnpm exec werkstatt run`.
 
 **Agent actions:**
 
@@ -191,11 +191,11 @@ scope:
       execute: runNamingPolicyValidate,
     },
     ```
-- Verify the command appears in `pnpm exec site-kernel run --list` output.
+- Verify the command appears in `pnpm exec werkstatt run --list` output.
 
 **Validation:**
 
-- `pnpm exec site-kernel run naming.policy.validate --json` works from the workspace root.
+- `pnpm exec werkstatt run naming.policy.validate --json` works from the workspace root.
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes.
 
 **Completion criterion:** `naming.policy.validate` is registered, discoverable, and executable from the workspace root.
@@ -263,7 +263,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0361` passes.
+- `pnpm exec werkstatt run rfc.validate RFC-0361` passes.
 - `pnpm -s run build:check` passes (no regression from doc changes).
 
 **Completion criterion:** AGENTS.md has the naming policy section; Compass XML files are synchronized; `rfc.validate` and `build:check` pass.
@@ -278,13 +278,13 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0361 --json` — confirm pass.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0361 --json` — confirm pass.
 - Run `pnpm --filter @gogol/ontology build:check` — confirm pass.
 - Run `pnpm --filter @gogol/site-kernel-checks build:check` — confirm pass.
 - Run `pnpm --filter @gogol/site-kernel-checks test` — confirm all tests pass.
 - Run `pnpm -s run build:check` — confirm workspace-level pass.
-- Run `pnpm exec site-kernel run naming.policy.validate --json` — confirm empty-state pass.
-- (If RFC-0330 is implemented) Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0361` and commit the evidence file.
+- Run `pnpm exec werkstatt run naming.policy.validate --json` — confirm empty-state pass.
+- (If RFC-0330 is implemented) Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0361` and commit the evidence file.
 
 **Validation:**
 
@@ -298,13 +298,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0361`
+- `pnpm exec werkstatt run rfc.validate RFC-0361`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-checks test`
 - `pnpm -s run build:check`
-- `pnpm exec site-kernel run naming.policy.validate --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0361` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07 — if implemented)
+- `pnpm exec werkstatt run naming.policy.validate --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0361` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07 — if implemented)
 
 ### 4.2 Deferred acceptance criteria
 
@@ -329,6 +329,6 @@ The RFC acceptance criterion "Existing Zod schemas updated to import centralized
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-6 (kebab-case filenames) or DNA-23 (cosmic naming), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0361 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-6 (kebab-case filenames) or DNA-23 (cosmic naming), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0361 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If the existing `bordbuchEventSchema` in `@gogol/surface` (which uses `mission-\d{6}` id format) conflicts with RFC-0361's `event-\d{6}` format, note that they are different ledgers: `@gogol/surface` is the site-level Bordbuch (RFC-0276), RFC-0361 validates the Werkstatt-level Bordbuch (RFC-0355). No conflict — do not merge them.
 - If RFC-0354/0355/0357 schema implementations cannot import from `naming-policy.ts` due to a circular dependency, run `rfc.supersede.propose` with `--reason "circular dependency between ontology and site-kernel-checks"` instead of duplicating regexes inline.

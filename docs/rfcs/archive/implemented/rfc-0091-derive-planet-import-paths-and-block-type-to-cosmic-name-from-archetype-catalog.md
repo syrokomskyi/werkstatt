@@ -146,7 +146,7 @@ const BLOCK_TYPE_TO_COSMIC_NAME: Record<string, string> = registry.blockTypeToCo
 ### Lint command
 
 ```sh
-pnpm exec site-kernel run planet.import-paths.lint
+pnpm exec werkstatt run planet.import-paths.lint
 ```
 
 Reports:

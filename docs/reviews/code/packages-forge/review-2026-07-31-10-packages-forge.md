@@ -35,7 +35,7 @@ No issues. No DNA invariants are directly touched by this change. The skill is a
 
 ## Axis C — Ecosystem fit
 
-**Finding C-1: `mission.git.commit` hardcoded in skill body.** The skill body (`packages/forge/skills/fo/fo-step-commit/SKILL.md:37`) says "commit there via `mission.git.commit`". SKILL-11 prohibits hardcoded `pnpm exec site-kernel run` in skill instruction lines, but `mission.git.commit` is a command name, not a CLI invocation. However, the skill should use binding resolution (`ref(forge.yaml bindings.commands...)`) for command references to remain portable across projects. The forge bindings contract (RFC-0393) requires skills to reference bindings by key. The skill should either declare a binding for the mission git commit command or use `<!-- skill-lint-disable SKILL-11 -->` if no binding exists.
+**Finding C-1: `mission.git.commit` hardcoded in skill body.** The skill body (`packages/forge/skills/fo/fo-step-commit/SKILL.md:37`) says "commit there via `mission.git.commit`". SKILL-11 prohibits hardcoded `pnpm exec werkstatt run` in skill instruction lines, but `mission.git.commit` is a command name, not a CLI invocation. However, the skill should use binding resolution (`ref(forge.yaml bindings.commands...)`) for command references to remain portable across projects. The forge bindings contract (RFC-0393) requires skills to reference bindings by key. The skill should either declare a binding for the mission git commit command or use `<!-- skill-lint-disable SKILL-11 -->` if no binding exists.
 
 ## Axis D — Forward-only compliance
 

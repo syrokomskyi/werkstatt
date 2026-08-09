@@ -69,7 +69,7 @@ scope:
 - `pnpm --filter @warpgogol/pbp run build:check` — type-check
 - `pnpm --filter @warpgogol/pbp run test` — unit tests
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — type-check
-- `pnpm exec site-kernel run rfc.validate --id RFC-0740` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0740` — RFC validation
 - Pipeline integration deferred to RFC-0741 (build-prepare, gated by multi-currency entitlement)
 
 ## 3. Step sequence
@@ -293,16 +293,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0740 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0740 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0740`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0740`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -314,11 +314,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0740`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0740`
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/pbp run test`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0740` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0740` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -336,5 +336,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-4, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0740 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 or DNA-4, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0740 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `PbpCurrencyConversionTrace` or `computeCurrencyConversion` from RFC-0739 has a different shape than expected, stop and request RFC-0739 implementation first.

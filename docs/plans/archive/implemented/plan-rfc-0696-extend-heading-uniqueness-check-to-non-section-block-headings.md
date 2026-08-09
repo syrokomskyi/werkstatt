@@ -105,7 +105,7 @@ None.
 **Agent actions:**
 
 - Update `description` for `surface.heading-uniqueness.validate` from `"RFC-0690: scan rendered surface page HTML for duplicate section heading text (first <h2>/<h3> child of each <section>). Fails on duplicates to catch bake function label reuse before the Axiom gate."` to `"RFC-0690, RFC-0696: scan rendered surface page HTML for duplicate block heading text (first <h2>/<h3> of each <section> or <div>/<article>/<aside> with aria-labelledby). Fails on duplicates to catch bake function label reuse before the Axiom gate."`.
-- Run `pnpm exec site-kernel run command.manifest.generate` to regenerate `docs/command-manifest.generated.yaml`.
+- Run `pnpm exec werkstatt run command.manifest.generate` to regenerate `docs/command-manifest.generated.yaml`.
 
 **Validation:**
 
@@ -154,8 +154,8 @@ None.
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck.
 - `pnpm --filter @warpgogol/site-kernel-checks run test` — all tests.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0696 --json` — RFC validation.
-- `pnpm exec site-kernel run command.manifest.generate` — regenerate command manifest if not done in step 3.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0696 --json` — RFC validation.
+- `pnpm exec werkstatt run command.manifest.generate` — regenerate command manifest if not done in step 3.
 
 **Validation:**
 
@@ -178,12 +178,12 @@ None.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0696 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0696 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0696` — passes with 0 violations.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0696` — passes with 0 violations.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; code review passed.
@@ -194,7 +194,7 @@ None.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0696`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0696`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 
@@ -213,4 +213,4 @@ None.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0696 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0696 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).

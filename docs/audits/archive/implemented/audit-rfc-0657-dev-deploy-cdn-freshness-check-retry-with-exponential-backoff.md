@@ -16,7 +16,7 @@ RFC-0657 directly contradicts RFC-0649 (implemented), which explicitly prohibits
 
 ## Mechanical validation (rfc.validate)
 
-Pass — `pnpm exec site-kernel run rfc.validate --id RFC-0657 --json` returns 0 violations. The mechanical validator does not detect semantic contradictions between related RFCs.
+Pass — `pnpm exec werkstatt run rfc.validate --id RFC-0657 --json` returns 0 violations. The mechanical validator does not detect semantic contradictions between related RFCs.
 
 ## Axis A — Structural completeness
 

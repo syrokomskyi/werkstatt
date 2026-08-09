@@ -85,7 +85,7 @@ No issues. The command earns its existence — CSS import integrity is a distinc
 | Added to `PACKAGES_CHECK_PIPELINE` | Done | packages-check.ts:107-108 |
 | `--json` output follows `KernelCommandResult` shape | Done | Uses standard `CheckResult` with `violations[]` (not `diagnostics[]` as RFC aspirational format states — consistent with all other validators) |
 | Unit test at `src/tests/css-import-validate.test.ts` | Done | 7 tests, all pass |
-| `rfc.validate` passes | Done | pnpm exec site-kernel run rfc.validate RFC-0598 — pass |
+| `rfc.validate` passes | Done | pnpm exec werkstatt run rfc.validate RFC-0598 — pass |
 | Validator passes on current codebase | Done | 9 violations found and fixed (7 section CSS + 1 effect-text + 1 print.css out-of-scope) |
 
 ### Questions for the author

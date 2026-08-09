@@ -44,7 +44,7 @@ None.
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck.
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — run regression test.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0619` — RFC validation.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0619` — RFC validation.
 
 ## 3. Step sequence
 
@@ -123,13 +123,13 @@ None.
 - Check acceptance criterion 5: `rfc.validate` passes — run and verify.
 - Run `fo-review` on all session code changes via `skill` tool.
 - Run `fo-fix` if review has findings.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0619 --implementation-commit <sha>`.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0619 --implementation-commit <sha>`.
 - Run `fo-doc-audit` to sync documentation surfaces.
 
 **Validation:**
 
 - `git status` — clean.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0619` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0619` — passes.
 - Review report in `docs/reviews/code/`.
 
 **Completion criterion:** All acceptance criteria checked with evidence; RFC stamped as `implemented`; `git status` clean.
@@ -140,7 +140,7 @@ None.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0619`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0619`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -159,4 +159,4 @@ None.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0619 --reason "..." --invariant "DNA-47"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0619 --reason "..." --invariant "DNA-47"` instead of working around it.

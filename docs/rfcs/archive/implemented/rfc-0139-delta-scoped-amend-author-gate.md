@@ -169,4 +169,4 @@ data.carriedForward[]: {command, count}   # out-of-scope debt (non-blocking)
 
 - Put `amend.delta.files` in `packages/os/site-kernel-onboarding/src/` and export `readBatchDelta` from a shared spot so `site-kernel-audit` and this helper use one copy.
 - The `--scope-files` filter must compare against each validator's _own_ normalized repo-relative path (the same string it prints in findings), to avoid Windows backslash mismatches — reuse the existing `relative(...).replace(/\\/g, "/")` normalization.
-- Remember the turbo/dist cache gotcha: rebuild `site-kernel` after changing handlers, and the owning package after changing a validator, before `pnpm exec site-kernel run …`.
+- Remember the turbo/dist cache gotcha: rebuild `site-kernel` after changing handlers, and the owning package after changing a validator, before `pnpm exec werkstatt run …`.

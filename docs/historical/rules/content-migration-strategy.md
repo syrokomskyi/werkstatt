@@ -156,7 +156,7 @@ When migrating legacy content:
 
 5. **Validate**
    - Run `pnpm --filter nicaragua-projekt -s astro check`
-   - Run `pnpm exec site-kernel run content.surface.validate --site nicaragua-projekt`
+   - Run `pnpm exec werkstatt run content.surface.validate --site nicaragua-projekt`
    - Test affected routes locally
 
 6. **Clean up (separate step)**
@@ -242,7 +242,7 @@ Before completing a content migration:
 - [ ] `pnpm --filter nicaragua-projekt -s astro sync` runs successfully
 - [ ] `pnpm --filter nicaragua-projekt -s astro check` passes
 - [ ] Route pages use `buildPage()` + `BlocksRenderer`
-- [ ] `pnpm exec site-kernel run content.surface.validate --site nicaragua-projekt` passes
+- [ ] `pnpm exec werkstatt run content.surface.validate --site nicaragua-projekt` passes
 - [ ] Local testing confirms routes work
 - [ ] Legacy files are removed (separate step)
 

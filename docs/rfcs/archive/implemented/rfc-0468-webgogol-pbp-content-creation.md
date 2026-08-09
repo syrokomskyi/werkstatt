@@ -66,7 +66,7 @@ nonGoals:
   - "Does not resolve owner decisions — this RFC creates the register and marks draft entities"
   - "Does not create non-German locale files beyond structural stubs — localization is Phase 18"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -555,7 +555,7 @@ N/A — content files.
 - [x] Buyer View assembles for `digital-foundation` offering (evidence: compiler buyer-view phase — 2026-07-20)
 - [x] No legacy keys (`hourlyRate`, `capacity`, `growthModules`, presentation price strings) in PBP content (evidence: verified — 2026-07-20)
 - [x] No `TODO`, `TBD`, or `unknown` in canonical fields — use `not-declared` semantic status (evidence: verified — 2026-07-20)
-- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec site-kernel run rfc.validate RFC-0468, 2026-07-20)
+- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec werkstatt run rfc.validate RFC-0468, 2026-07-20)
 
 ## Implementation notes for agents
 

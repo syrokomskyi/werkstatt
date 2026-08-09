@@ -124,9 +124,9 @@ Combinatorics are bounded by the count of Werke and the axis values they actuall
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run werk.record.validate --app warpgogol-com --json
-pnpm exec site-kernel run surface.evidence.join --app warpgogol-com --blueprint website-local --json
-pnpm exec site-kernel run surface.generate --app warpgogol-com --json
+pnpm exec werkstatt run werk.record.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.evidence.join --app warpgogol-com --blueprint website-local --json
+pnpm exec werkstatt run surface.generate --app warpgogol-com --json
 ```
 
 ### File system responsibilities

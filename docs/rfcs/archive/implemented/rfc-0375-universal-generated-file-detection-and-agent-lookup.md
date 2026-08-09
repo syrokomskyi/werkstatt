@@ -167,15 +167,15 @@ Extend the generated-file governance to cover all file types, remove markers fro
 
 ```sh
 # Agent lookup: is this file generated? who owns it? how to regenerate?
-pnpm exec site-kernel run generated.file.lookup --path apps/warpgogol-com/public/_img/portrait/320.webp --json
-pnpm exec site-kernel run generated.file.lookup --path public/robots.txt --app warpgogol-com --json
+pnpm exec werkstatt run generated.file.lookup --path apps/warpgogol-com/public/_img/portrait/320.webp --json
+pnpm exec werkstatt run generated.file.lookup --path public/robots.txt --app warpgogol-com --json
 
 # Batch lookup: all generated files in the current git diff
-pnpm exec site-kernel run generated.file.lookup --diff --json
+pnpm exec werkstatt run generated.file.lookup --diff --json
 
 # Validate that every registry-declared generated file exists on disk
-pnpm exec site-kernel run generated.files.validate --json
-pnpm exec site-kernel run generated.files.validate --app warpgogol-com --json
+pnpm exec werkstatt run generated.files.validate --json
+pnpm exec werkstatt run generated.files.validate --app warpgogol-com --json
 ```
 
 Scope is `workspace` for both commands. `generated.file.lookup` supports `--app <name>` for app-relative path resolution (e.g. `--path public/robots.txt --app warpgogol-com` resolves to `apps/warpgogol-com/public/robots.txt`). `--app` is **required** when the path does not start with `packages/`, `docs/`, or another workspace-absolute prefix — i.e. app-scoped paths like `public/...` or `src/...` require `--app`. Workspace-absolute paths (e.g. `packages/ui/...`) do not need `--app`.
@@ -236,7 +236,7 @@ Single-path lookup (`--path`):
   "category": "B",
   "markerPolicy": "registry-only",
   "ownerCommand": "image.variants.generate",
-  "regenerateCommand": "pnpm exec site-kernel run image.variants.generate --app warpgogol-com",
+  "regenerateCommand": "pnpm exec werkstatt run image.variants.generate --app warpgogol-com",
   "editInstead": "the image.variants.generate generator source (not this file).",
   "detectionMethod": "registry-pattern-match",
   "markerPresent": false
@@ -265,7 +265,7 @@ Diff mode (`--diff`):
       "generated": true,
       "category": "B",
       "ownerCommand": "robots.generate",
-      "regenerateCommand": "pnpm exec site-kernel run robots.generate --app warpgogol-com",
+      "regenerateCommand": "pnpm exec werkstatt run robots.generate --app warpgogol-com",
       "editInstead": "the robots.generate generator source (not this file)."
     },
     {
@@ -283,7 +283,7 @@ Diff mode (`--diff`):
 | `GEN-FILES-01` | error | A registry-declared generated file (Category A or B) does not exist on disk. |
 | `GEN-FILES-02` | warning | A Category A file exists but does not carry the `GENERATED_MARKER` (delegated from `generated.marker.validate` for unified reporting). |
 
-`GEN-FILES-01` fixHint: `Run the owning generator: pnpm exec site-kernel run <ownerCommand> --app <app>`.
+`GEN-FILES-01` fixHint: `Run the owning generator: pnpm exec werkstatt run <ownerCommand> --app <app>`.
 
 ### `generated.files.validate` performance
 
@@ -392,7 +392,7 @@ Generators that write to `src/` or `docs/` are **not** changed — they keep the
       "severity": "error",
       "file": "apps/warpgogol-com/public/robots.txt",
       "message": "Registry-declared generated file is missing on disk.",
-      "fixHint": "Run: pnpm exec site-kernel run robots.generate --app warpgogol-com"
+      "fixHint": "Run: pnpm exec werkstatt run robots.generate --app warpgogol-com"
     }
   ]
 }

@@ -120,7 +120,7 @@ No configuration or data changes. The `GENERATOR_OWNERSHIP_MAP` entry for `build
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0636 --json`.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0636 --json`.
 
 **Validation:**
 
@@ -139,17 +139,17 @@ No configuration or data changes. The `GENERATOR_OWNERSHIP_MAP` entry for `build
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-checks/AGENTS.md` was updated in Step 1.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no change expected — skip if not needed).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no change expected — skip if not needed).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. All criteria should already be `[x]` from the enhance step. Confirm evidence citations are accurate.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0636 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). Use the first implementation commit that references RFC-0636 in its message.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0636 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). Use the first implementation commit that references RFC-0636 in its message.
 - **Run `fo-doc-audit`** after stamping to sync documentation surfaces.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0636` passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0636` passes.
 - Review report exists in `docs/reviews/code/` for this session.
 - RFC status is `implemented` via `rfc.implement.stamp` (not hand-edited).
 
@@ -161,7 +161,7 @@ No configuration or data changes. The `GENERATOR_OWNERSHIP_MAP` entry for `build
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0636`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0636`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks exec vitest run src/tests/generated-stale-validate.test.ts`
 
@@ -180,4 +180,4 @@ No configuration or data changes. The `GENERATOR_OWNERSHIP_MAP` entry for `build
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0636 --reason "..." --invariant "DNA-58"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0636 --reason "..." --invariant "DNA-58"` instead of working around it.

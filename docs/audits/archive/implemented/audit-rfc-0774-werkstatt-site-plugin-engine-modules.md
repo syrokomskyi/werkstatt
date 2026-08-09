@@ -22,7 +22,7 @@ Pass — 0 violations.
 
 - **A1 — Acceptance criterion "test suites pass unchanged" is ambiguous.** Criterion 2 says "All site kernel commands keep their existing ids and behavior (test suites pass unchanged)". Test suites live in the old packages which are being deleted. The criterion should say "test suites move with their modules and pass from the new location" — otherwise "unchanged" is misleading: the physical paths change.
 
-- **A2 — No CLI surface section.** The RFC references `werkstatt.plugin.validate` (from RFC-0770) in acceptance criteria but doesn't show the command invocation. Since this RFC proposes no new commands, a full CLI surface section is not required, but the acceptance criterion should at least cite the command: `pnpm exec site-kernel run werkstatt.plugin.validate --json`.
+- **A2 — No CLI surface section.** The RFC references `werkstatt.plugin.validate` (from RFC-0770) in acceptance criteria but doesn't show the command invocation. Since this RFC proposes no new commands, a full CLI surface section is not required, but the acceptance criterion should at least cite the command: `pnpm exec werkstatt run werkstatt.plugin.validate --json`.
 
 ## Axis B — DNA alignment
 

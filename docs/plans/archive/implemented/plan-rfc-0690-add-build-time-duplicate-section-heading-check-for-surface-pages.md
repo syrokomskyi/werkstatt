@@ -35,8 +35,8 @@ scope:
 - `packages/os/site-kernel-checks/src/command-tables/09b-build-artifacts-part2.ts` — **Modified**: register `surface.heading-uniqueness.validate` command entry
 - `packages/os/site-kernel-checks/src/pipelines/sites-check-postbuild.ts` — **Modified**: add `{ command: "surface.heading-uniqueness.validate" }` after `surface.media-leakage.validate`
 - `packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts` — **New**: unit tests with pass and fail fixtures
-- `docs/command-manifest.generated.yaml` — **Regenerated**: `pnpm exec site-kernel run command.manifest.generate`
-- `docs/COMMANDS.md` — **Regenerated**: `pnpm exec site-kernel run docs.commands.generate`
+- `docs/command-manifest.generated.yaml` — **Regenerated**: `pnpm exec werkstatt run command.manifest.generate`
+- `docs/COMMANDS.md` — **Regenerated**: `pnpm exec werkstatt run docs.commands.generate`
 
 ### 2.2 Configuration and data
 
@@ -150,8 +150,8 @@ No configuration or data files are affected. The command is read-only and requir
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run command.manifest.generate` — manifest regenerates with the new command
-- `pnpm exec site-kernel run docs.commands.generate` — COMMANDS.md regenerates
+- `pnpm exec werkstatt run command.manifest.generate` — manifest regenerates with the new command
+- `pnpm exec werkstatt run docs.commands.generate` — COMMANDS.md regenerates
 
 **Completion criterion:** Command is registered in `BUILD_ARTIFACT_COMMANDS_PART2`, pipeline step is added to `SITES_CHECK_POSTBUILD_PIPELINE`, manifest and COMMANDS.md are regenerated.
 
@@ -218,11 +218,11 @@ No configuration or data files are affected. The command is read-only and requir
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0690 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0690 --json` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test` — must pass
-- Run `pnpm exec site-kernel run diagnostic.shape.lint` (or the packages-check pipeline that includes it) — must pass (DSL-02 satisfied for `HEADING-UNIQ-01`)
-- Run `pnpm exec site-kernel run command.manifest.generate` and `pnpm exec site-kernel run docs.commands.generate` — regenerate to ensure manifest is current
+- Run `pnpm exec werkstatt run diagnostic.shape.lint` (or the packages-check pipeline that includes it) — must pass (DSL-02 satisfied for `HEADING-UNIQ-01`)
+- Run `pnpm exec werkstatt run command.manifest.generate` and `pnpm exec werkstatt run docs.commands.generate` — regenerate to ensure manifest is current
 - Verify `rfc.validate` RFC-CMD-02 passes: the command is listed in `commands.added` in the RFC frontmatter and the live command is registered in the manifest
 
 **Validation:**
@@ -247,12 +247,12 @@ No configuration or data files are affected. The command is read-only and requir
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0690 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0690 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0690` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0690` — passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -263,11 +263,11 @@ No configuration or data files are affected. The command is read-only and requir
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0690`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0690`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run command.manifest.generate` (regenerate, then verify no diff)
-- `pnpm exec site-kernel run docs.commands.generate` (regenerate, then verify no diff)
+- `pnpm exec werkstatt run command.manifest.generate` (regenerate, then verify no diff)
+- `pnpm exec werkstatt run docs.commands.generate` (regenerate, then verify no diff)
 
 ### 4.2 Evidence artifacts
 
@@ -285,5 +285,5 @@ No configuration or data files are affected. The command is read-only and requir
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with any DNA invariant, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0690 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with any DNA invariant, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0690 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `parse5` AST walking approach proves unreliable for nested `<section>` elements, consider using `@warpgogol/share` HTML utilities or a different parsing strategy — but do not switch to regex-based extraction without justifying the trade-off in a follow-up RFC.

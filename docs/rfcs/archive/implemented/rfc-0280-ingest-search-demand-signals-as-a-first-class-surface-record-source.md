@@ -120,13 +120,13 @@ policy:
 
 ```sh
 # Offline ingestion: read an export (GSC/Keyword Planner) into versioned records.
-pnpm exec site-kernel run demand.signal.import --app warpgogol-com --source gsc --input ./exports/gsc-2026-07.json --json
+pnpm exec werkstatt run demand.signal.import --app warpgogol-com --source gsc --input ./exports/gsc-2026-07.json --json
 
 # Validate signal records: schema, axis resolution, freshness, dedupe.
-pnpm exec site-kernel run demand.signal.validate --app warpgogol-com --json
+pnpm exec werkstatt run demand.signal.validate --app warpgogol-com --json
 
 # Produce the demand map: query → volume → intent by cluster.
-pnpm exec site-kernel run demand.map.report --app warpgogol-com --blueprint website-local --json
+pnpm exec werkstatt run demand.map.report --app warpgogol-com --blueprint website-local --json
 ```
 
 Import is offline: it reads a provided export file or a cached API pull performed outside the deterministic build. The build itself never calls an external API.

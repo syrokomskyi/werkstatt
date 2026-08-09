@@ -97,9 +97,9 @@ Human involvement is governed as a **measured escalation budget** with three rul
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run escalation.queue.report --app warpgogol-com --json
-pnpm exec site-kernel run escalation.route --app warpgogol-com --reason claims-class --artifact <ref> --json
-pnpm exec site-kernel run escalation.budget.validate --app warpgogol-com --json
+pnpm exec werkstatt run escalation.queue.report --app warpgogol-com --json
+pnpm exec werkstatt run escalation.route --app warpgogol-com --reason claims-class --artifact <ref> --json
+pnpm exec werkstatt run escalation.budget.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

@@ -66,7 +66,7 @@ nonGoals:
   - "Does not change the archival logic of any archive command"
   - "Does not add nextSteps to pass-state validators (RFC-0542 allows empty array)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -150,19 +150,19 @@ In `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands
 ```ts
 // On validation failure (static checks or build):
 nextSteps: [
-  { action: "Fix the failing validators above, then re-run: pnpm exec site-kernel run mission.validate --mission <id>", kind: "required" },
+  { action: "Fix the failing validators above, then re-run: pnpm exec werkstatt run mission.validate --mission <id>", kind: "required" },
 ]
 
 // On validation pass with dirty workpiece:
 nextSteps: [
-  { action: "Commit uncommitted changes: pnpm exec site-kernel run mission.git.commit --mission <id> --message \"<msg>\"", kind: "required" },
-  { action: "Then run: pnpm exec site-kernel run mission.reconcile --mission <id>", kind: "optional" },
+  { action: "Commit uncommitted changes: pnpm exec werkstatt run mission.git.commit --mission <id> --message \"<msg>\"", kind: "required" },
+  { action: "Then run: pnpm exec werkstatt run mission.reconcile --mission <id>", kind: "optional" },
 ]
 
 // On validation pass with clean workpiece:
 nextSteps: [
-  { action: "Run: pnpm exec site-kernel run mission.reconcile --mission <id>", kind: "optional" },
-  { action: "Then run: pnpm exec site-kernel run mission.close --mission <id>", kind: "optional" },
+  { action: "Run: pnpm exec werkstatt run mission.reconcile --mission <id>", kind: "optional" },
+  { action: "Then run: pnpm exec werkstatt run mission.close --mission <id>", kind: "optional" },
 ]
 ```
 
@@ -172,22 +172,22 @@ Each archive handler gains:
 
 ```ts
 // rfc.archive
-nextSteps: [{ action: "Run: pnpm exec site-kernel run rfc.list --json to verify archive status", kind: "optional" }]
+nextSteps: [{ action: "Run: pnpm exec werkstatt run rfc.list --json to verify archive status", kind: "optional" }]
 
 // adr.archive
-nextSteps: [{ action: "Run: pnpm exec site-kernel run adr.list --json to verify archive status", kind: "optional" }]
+nextSteps: [{ action: "Run: pnpm exec werkstatt run adr.list --json to verify archive status", kind: "optional" }]
 
 // plan.archive
-nextSteps: [{ action: "Run: pnpm exec site-kernel run plan.list --json to verify archive status", kind: "optional" }]
+nextSteps: [{ action: "Run: pnpm exec werkstatt run plan.list --json to verify archive status", kind: "optional" }]
 
 // audit.archive
-nextSteps: [{ action: "Run: pnpm exec site-kernel run audit.list --json to verify archive status", kind: "optional" }]
+nextSteps: [{ action: "Run: pnpm exec werkstatt run audit.list --json to verify archive status", kind: "optional" }]
 
 // session.archive
-nextSteps: [{ action: "Run: pnpm exec site-kernel run session.list --json to verify archive status", kind: "optional" }]
+nextSteps: [{ action: "Run: pnpm exec werkstatt run session.list --json to verify archive status", kind: "optional" }]
 
 // mission.archive
-nextSteps: [{ action: "Run: pnpm exec site-kernel run mission.list --json to verify active missions", kind: "optional" }]
+nextSteps: [{ action: "Run: pnpm exec werkstatt run mission.list --json to verify active missions", kind: "optional" }]
 ```
 
 #### CLI rendering
@@ -241,8 +241,8 @@ After:
   "data": { "missionId": "...", "contractFull": { "passed": true } },
   "summary": "[mission.validate] warpgogol-com-m000016 validation passed (12 steps, 42 routes built)",
   "nextSteps": [
-    { "action": "Run: pnpm exec site-kernel run mission.reconcile --mission warpgogol-com-m000016", "kind": "optional" },
-    { "action": "Then run: pnpm exec site-kernel run mission.close --mission warpgogol-com-m000016", "kind": "optional" }
+    { "action": "Run: pnpm exec werkstatt run mission.reconcile --mission warpgogol-com-m000016", "kind": "optional" },
+    { "action": "Then run: pnpm exec werkstatt run mission.close --mission warpgogol-com-m000016", "kind": "optional" }
   ]
 }
 ```

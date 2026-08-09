@@ -75,7 +75,7 @@ The unprotected invariant is: **the import path should tell an agent which domai
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run barrel.size.lint --json
+pnpm exec werkstatt run barrel.size.lint --json
 ```
 
 ### TypeScript contracts

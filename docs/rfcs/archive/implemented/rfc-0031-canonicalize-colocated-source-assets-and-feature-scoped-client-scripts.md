@@ -225,7 +225,7 @@ If accepted, the following command contracts change:
 ### Proposed new validator
 
 ```sh
-pnpm exec site-kernel run content.asset.resolve.validate --app nicaragua-projekt
+pnpm exec werkstatt run content.asset.resolve.validate --app nicaragua-projekt
 ```
 
 Responsibility:

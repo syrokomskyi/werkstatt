@@ -56,7 +56,7 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 **Agent actions:**
 
 - Verify workpiece `system.md` is clean: `grep -n "blueprints" missions/warpgogol-com-m000033/workpiece/src/content/system.md` — confirm `surface.modules.nachweis` has no `blueprints` key
-- Run `pnpm exec site-kernel run mission.reconcile --mission warpgogol-com-m000033` to sync the clean workpiece into the cache clone
+- Run `pnpm exec werkstatt run mission.reconcile --mission warpgogol-com-m000033` to sync the clean workpiece into the cache clone
 - Verify cache clone `system.md` is updated: `grep -n "blueprints" systems-cache/warpgogol-com/src/content/system.md` — confirm `surface.modules.nachweis` no longer has a `blueprints` key
 - Verify `surface.modules.nachweis` entry still has `entitlement: nachweis`, `masterLocale: de`, `publishedLocales: [uk]`, and all other fields unchanged
 - Verify `surface.blueprints` list is unchanged (`website-local`, `website-service`, `offer`, `ratgeber`)
@@ -84,12 +84,12 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented change. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <check>)`.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0717 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0717 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0717`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0717`
 - Review report exists for this session.
 
 **Completion criterion:** All acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -100,7 +100,7 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0717`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0717`
 - No `build:check` needed — no package code changes
 - No acceptance probes declared in RFC frontmatter
 
@@ -118,4 +118,4 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0717 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0717 --reason "..." --invariant "DNA-24"` instead of working around it.

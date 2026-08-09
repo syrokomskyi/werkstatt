@@ -82,8 +82,8 @@ The kernel gains a `surface.graph.validate` command that reads the existing `sur
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.graph.validate --app warpgogol-com --json
-pnpm exec site-kernel run surface.graph.validate --app warpgogol-com
+pnpm exec werkstatt run surface.graph.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.graph.validate --app warpgogol-com
 ```
 
 App-scoped: run for a single app. The command reads `src/surface.generated.yaml` (the same artifact `surface.validate` reads). If no artifact exists, it passes with a skip message (same behavior as `surface.validate`).

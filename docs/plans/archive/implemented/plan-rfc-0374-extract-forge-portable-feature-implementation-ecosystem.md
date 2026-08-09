@@ -131,7 +131,7 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `PACKAGES_CHECK_PIPELINE` in `packages/os/site-kernel-checks/src/pipelines/packages-check.ts` — add `forge.skill.validate`
-- `pnpm exec site-kernel run rfc.validate RFC-0374` — must pass
+- `pnpm exec werkstatt run rfc.validate RFC-0374` — must pass
 - `pnpm --filter @gogol/forge run build:check` — must pass
 - `pnpm --filter @gogol/site-kernel run build:check` — must pass after rfc/workflow module removal
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass after ALL_COMMANDS changes
@@ -253,7 +253,7 @@ scope:
 
 - `pnpm --filter @gogol/forge run build:check` passes
 - `pnpm --filter @gogol/site-kernel run build:check` passes (no broken imports)
-- `pnpm exec site-kernel run rfc.validate` still works (command registered from forge)
+- `pnpm exec werkstatt run rfc.validate` still works (command registered from forge)
 
 **Completion criterion:** 15 rfc.* commands register from forgeRfcModule
 
@@ -375,7 +375,7 @@ scope:
 - `pnpm --filter warpgogol-com run build:check` passes
 - `pnpm --filter nicaragua-projekt run build:check` passes
 - `pnpm --filter check-warpgogol-com run build:check` passes
-- `pnpm exec site-kernel run rfc.command-lifecycle.validate` passes (all commands still registered)
+- `pnpm exec werkstatt run rfc.command-lifecycle.validate` passes (all commands still registered)
 
 **Completion criterion:** All kernel.config.ts files import forge modules; all apps build
 
@@ -389,7 +389,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.init`
+- Run `pnpm exec werkstatt run forge.init`
 - Verify `.agents/skills/<name>/SKILL.md` exists for all 20 forge skills
 - Verify `.agents/skills/` still contains 32 third-party skills untouched
 
@@ -435,8 +435,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate` passes
-- `pnpm exec site-kernel run ecosystem.manifest.validate` passes (if available)
+- `pnpm exec werkstatt run compass.validate` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate` passes (if available)
 
 **Completion criterion:** docs/*.xml Compass files updated and validated
 
@@ -454,7 +454,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run packages.check` passes and includes forge.skill.validate
+- `pnpm exec werkstatt run packages.check` passes and includes forge.skill.validate
 
 **Completion criterion:** forge.skill.validate runs in PACKAGES_CHECK_PIPELINE
 
@@ -468,8 +468,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0374`
-- Run `pnpm exec site-kernel run rfc.command-lifecycle.validate`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0374`
+- Run `pnpm exec werkstatt run rfc.command-lifecycle.validate`
 - Run `pnpm --filter @gogol/forge run build:check`
 - Run `pnpm --filter @gogol/site-kernel run build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
@@ -477,8 +477,8 @@ scope:
 - Run `pnpm --filter warpgogol-com run build:check`
 - Run `pnpm --filter nicaragua-projekt run build:check`
 - Run `pnpm --filter check-warpgogol-com run build:check`
-- Run `pnpm exec site-kernel run forge.skill.validate`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0374` (RFC-0330)
+- Run `pnpm exec werkstatt run forge.skill.validate`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0374` (RFC-0330)
 - Commit evidence file
 
 **Validation:**
@@ -496,7 +496,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0374`
+- `pnpm exec werkstatt run rfc.validate RFC-0374`
 - `pnpm --filter @gogol/forge run build:check`
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
@@ -504,9 +504,9 @@ scope:
 - `pnpm --filter warpgogol-com run build:check`
 - `pnpm --filter nicaragua-projekt run build:check`
 - `pnpm --filter check-warpgogol-com run build:check`
-- `pnpm exec site-kernel run rfc.command-lifecycle.validate`
-- `pnpm exec site-kernel run forge.skill.validate`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0374` (RFC-0330)
+- `pnpm exec werkstatt run rfc.command-lifecycle.validate`
+- `pnpm exec werkstatt run forge.skill.validate`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0374` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -527,6 +527,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-2, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0374 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 or DNA-2, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0374 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `workflowModule` or `createWerkstattModule` are found to be imported by code outside `kernel.config.ts` (services, other packages), escalate — the migration plan assumed they were only consumed by kernel.config.ts.
 - If `compass.*` commands are found registered outside `ALL_COMMANDS` and `check.module.template.ts`, escalate — the migration plan assumed these were the only two registration sites.

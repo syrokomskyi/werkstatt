@@ -91,7 +91,7 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `page.blocks.extract.validate` replaces `page.blocks.validate` in `APPS_BUILD_CHECK_PIPELINE`
-- `pnpm exec site-kernel run rfc.validate RFC-0372 --json` — must pass
+- `pnpm exec werkstatt run rfc.validate RFC-0372 --json` — must pass
 - `pnpm --filter @gogol/share run build:check` — must pass after type changes
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass after validator changes
 - `pnpm run build:check` per app — all three apps must build green
@@ -273,9 +273,9 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
-- `pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com` — must pass (all extractors registered)
-- `pnpm exec site-kernel run page.blocks.extract.validate --app nicaragua-projekt` — must pass
-- `pnpm exec site-kernel run page.blocks.extract.validate --app check-warpgogol-com` — must pass
+- `pnpm exec werkstatt run page.blocks.extract.validate --app warpgogol-com` — must pass (all extractors registered)
+- `pnpm exec werkstatt run page.blocks.extract.validate --app nicaragua-projekt` — must pass
+- `pnpm exec werkstatt run page.blocks.extract.validate --app check-warpgogol-com` — must pass
 
 **Completion criterion:** `page.blocks.extract.validate` runs per-app, auto-discovers all block types from frontmatter, fails on missing extractor or missing `id`; old `page.blocks.validate` name is gone; baselines regenerated.
 
@@ -297,7 +297,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
-- `pnpm exec site-kernel run article.depth.validate --app warpgogol-com` — must pass
+- `pnpm exec werkstatt run article.depth.validate --app warpgogol-com` — must pass
 
 **Completion criterion:** `article-depth.ts` reads exclusively from `page.blocks`; `findThinSections` accepts `SemanticBlock[]`.
 
@@ -360,7 +360,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com` — must pass (no `missing-id` violations)
+- `pnpm exec werkstatt run page.blocks.extract.validate --app warpgogol-com` — must pass (no `missing-id` violations)
 - Same for `nicaragua-projekt` and `check-warpgogol-com`
 
 **Completion criterion:** `page.blocks.extract.validate` passes on all three apps with zero `missing-id` violations.
@@ -379,7 +379,7 @@ scope:
 - Run `pnpm run build:check` for `nicaragua-projekt`
 - Run `pnpm run build:check` for `check-warpgogol-com`
 - Verify `apps/warpgogol-com/public/uk/index.md` contains all home page sections: hero, promo, trust-strip, comparison-cards, audience-cards, ownership-block, notausgang-block, controlled-responsibility-block, price-card, founder, faq-list
-- Run `pnpm exec site-kernel run rfc.validate RFC-0372 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0372 --json` — must pass
 
 **Validation:**
 
@@ -397,14 +397,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0372 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0372 --json`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-content run build:check`
-- `pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com`
-- `pnpm exec site-kernel run page.blocks.extract.validate --app nicaragua-projekt`
-- `pnpm exec site-kernel run page.blocks.extract.validate --app check-warpgogol-com`
-- `pnpm exec site-kernel run article.depth.validate --app warpgogol-com`
+- `pnpm exec werkstatt run page.blocks.extract.validate --app warpgogol-com`
+- `pnpm exec werkstatt run page.blocks.extract.validate --app nicaragua-projekt`
+- `pnpm exec werkstatt run page.blocks.extract.validate --app check-warpgogol-com`
+- `pnpm exec werkstatt run article.depth.validate --app warpgogol-com`
 - `pnpm run build:check` (per app, all three)
 - Verify `apps/warpgogol-com/public/uk/index.md` contains all home page sections
 
@@ -428,6 +428,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16 or DNA-25, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0372 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16 or DNA-25, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0372 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `extractPageHeading()` cannot produce a valid heading for some page type (no block with `header.heading` and no frontmatter `title`), escalate to the operator — this indicates a content contract gap that may need a separate RFC.
 - If the `people` block extractor cannot find person data in the expected props path (`body.people` vs `body.cards` vs `people`), escalate — the extractor may need to handle multiple prop shapes, which should be documented in the extractor implementation.

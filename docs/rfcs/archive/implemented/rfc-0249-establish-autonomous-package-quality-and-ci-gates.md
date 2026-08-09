@@ -99,10 +99,10 @@ The commands belong in `@gogol/site-kernel-checks`, because they are workspace g
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run test.signal.validate --json
-pnpm exec site-kernel run ci.local.validate --json
+pnpm exec werkstatt run test.signal.validate --json
+pnpm exec werkstatt run ci.local.validate --json
 pnpm lint:packages
-pnpm exec site-kernel run packages-check.run --json
+pnpm exec werkstatt run packages-check.run --json
 pnpm test
 ```
 

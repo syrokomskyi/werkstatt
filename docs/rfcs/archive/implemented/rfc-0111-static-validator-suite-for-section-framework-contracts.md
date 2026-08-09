@@ -187,15 +187,15 @@ All validators emit the canonical KernelCommandResult envelope (RFC-0030):
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run section.shell.contract.validate
-pnpm exec site-kernel run section.background.contract.validate
-pnpm exec site-kernel run section.header.contract.validate
-pnpm exec site-kernel run section.body.contract.validate
-pnpm exec site-kernel run section.cta.contract.validate
-pnpm exec site-kernel run section.image.contract.validate
-pnpm exec site-kernel run section.motion.contract.validate --app <id>
-pnpm exec site-kernel run site.background.contract.validate --app <id>
-pnpm exec site-kernel run layout.orchestrator.lint --app <id>
+pnpm exec werkstatt run section.shell.contract.validate
+pnpm exec werkstatt run section.background.contract.validate
+pnpm exec werkstatt run section.header.contract.validate
+pnpm exec werkstatt run section.body.contract.validate
+pnpm exec werkstatt run section.cta.contract.validate
+pnpm exec werkstatt run section.image.contract.validate
+pnpm exec werkstatt run section.motion.contract.validate --app <id>
+pnpm exec werkstatt run site.background.contract.validate --app <id>
+pnpm exec werkstatt run layout.orchestrator.lint --app <id>
 ```
 
 All commands accept `--json` for stable machine-readable output.

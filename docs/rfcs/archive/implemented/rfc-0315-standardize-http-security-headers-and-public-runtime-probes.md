@@ -196,7 +196,7 @@ Scope: URL target, networked.
 Inputs:
 
 ```sh
-pnpm exec site-kernel run headers.runtime.probe --app <app> --base-url <https-url> --json
+pnpm exec werkstatt run headers.runtime.probe --app <app> --base-url <https-url> --json
 ```
 
 Checks representative deployed URLs:

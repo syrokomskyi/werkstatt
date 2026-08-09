@@ -105,7 +105,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass after delegation conversion
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — must pass after delegation conversion
 - `pnpm exec forge doctor` — must pass with no autonomy guard failures
-- `pnpm exec site-kernel run rfc.validate --id RFC-0556` — must pass
+- `pnpm exec werkstatt run rfc.validate --id RFC-0556` — must pass
 
 ## 3. Step sequence
 
@@ -359,14 +359,14 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — must pass.
 - Run `pnpm exec forge doctor` — must pass with no autonomy guard failures.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0556` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0556` — must pass.
 - Run `pnpm --filter @warpgogol/forge test` — all tests (moved + new edge-case) must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-checks test` — remaining (non-compass) tests must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test` — existing tests must pass.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0556 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0556 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
@@ -384,7 +384,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0556`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0556`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
@@ -410,6 +410,6 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-42, DNA-43, or DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0556 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-42, DNA-43, or DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0556 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If `forge doctor` reports autonomy guard failures that cannot be resolved by adjusting `FORBIDDEN_IMPORTS`, stop and escalate — the guard may need a more nuanced exemption mechanism.
 - If existing tests in `site-kernel-checks` or `site-kernel-handoff` fail after delegation conversion, investigate whether the forge-inlined implementation produces different output shapes — this would indicate a behavioral regression that must be fixed before stamping implemented.

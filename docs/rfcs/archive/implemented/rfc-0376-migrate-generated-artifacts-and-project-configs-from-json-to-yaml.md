@@ -486,7 +486,7 @@ await writeFile(path, `${header}${yaml.stringify(output)}\n`);
       "severity": "error",
       "file": "docs/command-manifest.generated.json",
       "message": "Generated artifact uses .json extension. Use .generated.yaml instead.",
-      "fixHint": "Run: pnpm exec site-kernel run command.manifest.generate"
+      "fixHint": "Run: pnpm exec werkstatt run command.manifest.generate"
     }
   ]
 }

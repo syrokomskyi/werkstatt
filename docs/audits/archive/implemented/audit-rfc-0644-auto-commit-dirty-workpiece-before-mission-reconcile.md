@@ -26,7 +26,7 @@ Pass — 0 violations.
   const dirtyCheck = isWorkpieceDirty(workpieceDir);
   if (dirtyCheck.dirty) {
     throw new Error(
-      `[mission.reconcile] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run reconcile.`,
+      `[mission.reconcile] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run reconcile.`,
     );
   }
   ```

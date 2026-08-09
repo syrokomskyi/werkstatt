@@ -137,16 +137,16 @@ Record fields for `elektriker`/`friseur` port directly from the fat site. Record
 ```sh
 # Generate (offline, idempotent). Real provider used only when ANTHROPIC_API_KEY is set;
 # otherwise the deterministic stub runs and builds stay green.
-pnpm exec site-kernel run surface.enrich --app warpgogol-com --blueprint website-local
-pnpm exec site-kernel run surface.enrich --app warpgogol-com --regenerate   # overwrite existing
+pnpm exec werkstatt run surface.enrich --app warpgogol-com --blueprint website-local
+pnpm exec werkstatt run surface.enrich --app warpgogol-com --regenerate   # overwrite existing
 
 # Review + batch-approve pending frozen entries.
-pnpm exec site-kernel run surface.enrich.review --app warpgogol-com               # list + diffs
-pnpm exec site-kernel run surface.enrich.review --app warpgogol-com --approve-all
-pnpm exec site-kernel run surface.enrich.review --app warpgogol-com --approve website-local:elektriker:berlin
+pnpm exec werkstatt run surface.enrich.review --app warpgogol-com               # list + diffs
+pnpm exec werkstatt run surface.enrich.review --app warpgogol-com --approve-all
+pnpm exec werkstatt run surface.enrich.review --app warpgogol-com --approve website-local:elektriker:berlin
 
 # Validate (build.check; warn-first, with one uk gate).
-pnpm exec site-kernel run surface.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

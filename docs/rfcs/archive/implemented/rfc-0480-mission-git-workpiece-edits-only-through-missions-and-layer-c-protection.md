@@ -198,7 +198,7 @@ If no changes (all migrators were no-op on already-current data):
 New command for operator edits:
 
 ```sh
-pnpm exec site-kernel run mission.git.commit --mission <id> --message "operator fix: breadcrumb labels"
+pnpm exec werkstatt run mission.git.commit --mission <id> --message "operator fix: breadcrumb labels"
 ```
 
 Commits all changes in the workpiece directory with the provided message. This is the canonical way for operators (and agents on their behalf) to commit edits within a mission.
@@ -236,8 +236,8 @@ This is safe because the cache clone is locked during the mission (DNA-51) and t
 #### `mission.preview` command
 
 ```sh
-pnpm exec site-kernel run mission.preview --mission <id> --port 4321
-pnpm exec site-kernel run mission.preview --mission <id> --port 4321 --production
+pnpm exec werkstatt run mission.preview --mission <id> --port 4321
+pnpm exec werkstatt run mission.preview --mission <id> --port 4321 --production
 ```
 
 Starts a dev server (or production preview with `--production`) for the workpiece. Works for open, closed, or aborted missions. Multiple `mission.preview` commands on different ports enable side-by-side comparison.
@@ -247,8 +247,8 @@ Starts a dev server (or production preview with `--production`) for the workpiec
 #### `mission.cleanup` command
 
 ```sh
-pnpm exec site-kernel run mission.cleanup --mission <id>
-pnpm exec site-kernel run mission.cleanup --older-than 30d
+pnpm exec werkstatt run mission.cleanup --mission <id>
+pnpm exec werkstatt run mission.cleanup --older-than 30d
 ```
 
 Removes the workpiece directory (git bundle in evidence is preserved). `--older-than` cleans workpieces for closed/aborted missions older than the threshold. Active missions are never cleaned.
@@ -345,8 +345,8 @@ alternates:
 #### `surface.contract.validate` command
 
 ```sh
-pnpm exec site-kernel run surface.contract.validate
-pnpm exec site-kernel run surface.contract.validate --app warpgogol-com
+pnpm exec werkstatt run surface.contract.validate
+pnpm exec werkstatt run surface.contract.validate --app warpgogol-com
 ```
 
 Validates that generated C-surfaces match the declarative contract:
@@ -553,7 +553,7 @@ mission.cleanup --older-than 30d
 - [x] `AGENTS.md` documents edits-only-through-missions invariant and Layer C protection (evidence: root AGENTS.md — 2026-07-24)
 - [x] `docs/COMMANDS.md` updated with new commands (evidence: COMMANDS.md — 2026-07-24)
 - [x] RFC-0472 amended with push-only scope for `sternsystem.sync` (pull/both removed) (evidence: sternsystem-sync.ts push-only — 2026-07-24)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0480 — 0 errors, 2 warnings — 2026-07-24)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate RFC-0480 — 0 errors, 2 warnings — 2026-07-24)
 - [x] `pnpm --filter @gogol/site-kernel-handoff build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)
 - [x] `pnpm --filter @gogol/ontology build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)
 - [x] `pnpm --filter @gogol/forge build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)

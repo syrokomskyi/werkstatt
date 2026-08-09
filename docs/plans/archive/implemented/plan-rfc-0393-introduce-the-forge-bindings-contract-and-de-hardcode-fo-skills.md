@@ -41,7 +41,7 @@ status: completed
 - Group B (implement): fo-idea-implement, fo-review, fo-fix
 - Group C (support): fo-doc-audit, fo-architecture, fo-handoff, fo-triage, fo-qa, fo-harvest
 - Group D (meta/orchestrator): fo-idea-status, fo-idea-i-just-want-to-see-the-plan, fo-idea-i-just-want-to-see-the-result, fo-add-tests
-- For each group: replace hardcoded `pnpm exec site-kernel run ...`, `docs/architecture-dna.md`, `@gogol/` with binding refs
+- For each group: replace hardcoded `pnpm exec werkstatt run ...`, `docs/architecture-dna.md`, `@gogol/` with binding refs
 - Add `bindings:` frontmatter to each skill
 - One commit per group
 - Validate after each group: `pnpm --filter @wgogol/forge run build:check`

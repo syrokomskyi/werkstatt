@@ -267,7 +267,7 @@ Two new commands in `@gogol/site-kernel-handoff`:
 #### 5.1 `notausgang.export`
 
 ```sh
-pnpm exec site-kernel run notausgang.export \
+pnpm exec werkstatt run notausgang.export \
   --system <system-id> \
   --release <release-id> \
   --output <path> \
@@ -306,7 +306,7 @@ Progress events are emitted every 500 files or every 100 MB, whichever comes fir
 #### 5.2 `notausgang.validate`
 
 ```sh
-pnpm exec site-kernel run notausgang.validate \
+pnpm exec werkstatt run notausgang.validate \
   --path <export-path> \
   [--json]
 ```
@@ -340,12 +340,12 @@ Validates a Notausgang export package:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run notausgang.export \
+pnpm exec werkstatt run notausgang.export \
   --system warpgogol-com --release warpgogol-com-r000001 \
   --output ../exports/warpgogol-com-2026-07-09 \
   --keep-integration stripe --reason "Client owns Stripe account"
 
-pnpm exec site-kernel run notausgang.validate \
+pnpm exec werkstatt run notausgang.validate \
   --path ../exports/warpgogol-com-2026-07-09
 ```
 

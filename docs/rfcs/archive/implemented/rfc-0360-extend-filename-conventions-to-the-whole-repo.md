@@ -208,8 +208,8 @@ The change is minimal: replace the hard-coded `NAMING_CONVENTION_SCAN_ROOTS` arr
 No new commands. The existing `naming.convention.lint` command is changed to scan the extended roots.
 
 ```sh
-pnpm exec site-kernel run naming.convention.lint
-pnpm exec site-kernel run naming.convention.lint --json
+pnpm exec werkstatt run naming.convention.lint
+pnpm exec werkstatt run naming.convention.lint --json
 ```
 
 ### File system responsibilities

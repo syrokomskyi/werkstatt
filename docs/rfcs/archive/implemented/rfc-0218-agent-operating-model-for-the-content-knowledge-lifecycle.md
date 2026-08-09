@@ -121,9 +121,9 @@ This RFC adds no commands; it governs how agents use the commands from RFC-0212â
 
 ```sh
 # 1. edit the value in the record, then keep the seams in sync:
-pnpm exec site-kernel run content.claim.ledger.append --app <name> --subject "<S>" --value "<V>" --provenance <p> --as-of <date>
-pnpm exec site-kernel run content.derived.stamp       --app <name> --subject "<derivative-of-S>"   # if derivatives exist
-pnpm exec site-kernel run apps-check.author           --app <name>                                  # claims+freshness+derived+source
+pnpm exec werkstatt run content.claim.ledger.append --app <name> --subject "<S>" --value "<V>" --provenance <p> --as-of <date>
+pnpm exec werkstatt run content.derived.stamp       --app <name> --subject "<derivative-of-S>"   # if derivatives exist
+pnpm exec werkstatt run apps-check.author           --app <name>                                  # claims+freshness+derived+source
 ```
 
 ### File system responsibilities

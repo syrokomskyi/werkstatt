@@ -50,7 +50,7 @@ No configuration or data files change. The command reads existing PBP content an
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck
 - `pnpm --filter @gogol/site-kernel-checks run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0531 --json` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0531 --json` — RFC validation
 - No pipeline integration — `wikidata.validate` is standalone (not in `build.check` or `sites-check`)
 
 ## 3. Step sequence
@@ -137,7 +137,7 @@ No configuration or data files change. The command reads existing PBP content an
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- Command appears in `pnpm exec site-kernel run --list` output
+- Command appears in `pnpm exec werkstatt run --list` output
 
 **Completion criterion:** `wikidata.validate` registered in `SEO_AUDIT_COMMANDS`; `build:check` passes; command is discoverable.
 
@@ -202,17 +202,17 @@ No configuration or data files change. The command reads existing PBP content an
 **Agent actions:**
 
 - Verify every acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0531 --json` — must pass with zero violations
+- Run `pnpm exec werkstatt run rfc.validate RFC-0531 --json` — must pass with zero violations
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-checks run test` — all tests pass
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new command added to `SEO_AUDIT_COMMANDS`)
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0531 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new command added to `SEO_AUDIT_COMMANDS`)
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0531 --implementation-commit <sha>`
 - Verify `git status` is clean
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0531 --json` — pass
+- `pnpm exec werkstatt run rfc.validate RFC-0531 --json` — pass
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — pass
 - `pnpm --filter @gogol/site-kernel-checks run test` — pass
 
@@ -224,7 +224,7 @@ No configuration or data files change. The command reads existing PBP content an
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0531 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0531 --json`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
 
@@ -244,5 +244,5 @@ No configuration or data files change. The command reads existing PBP content an
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0531 --reason "..." --invariant "DNA-16"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0531 --reason "..." --invariant "DNA-16"` instead of working around it.
 - If the `externalIdentifiers` schema shape differs from what RFC-0530 specifies (e.g. field names, nesting), do not adapt the validator to a different shape — escalate to the operator to resolve the RFC-0530/RFC-0531 contract mismatch first.

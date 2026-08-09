@@ -126,7 +126,7 @@ The runner must never:
 ### Command
 
 ```sh
-pnpm exec site-kernel run check.safety.validate --target ./check-targets/client.yaml --json
+pnpm exec werkstatt run check.safety.validate --target ./check-targets/client.yaml --json
 ```
 
 `check.run` and `check.evidence.capture` must call the same safety validator internally before doing network work.

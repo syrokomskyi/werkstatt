@@ -55,7 +55,7 @@ packagesImpacted:
 successSignals: []
 nonGoals: []
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -117,7 +117,7 @@ No new commands. `mission.git.commit` gains a pre-commit validation step:
 
 ```sh
 # Normal usage — validators run automatically based on changed files
-pnpm exec site-kernel run mission.git.commit --mission warpgogol-com-m000021 --message "Translate offerings to German"
+pnpm exec werkstatt run mission.git.commit --mission warpgogol-com-m000021 --message "Translate offerings to German"
 # If a validator fails:
 #   [ERROR] [mission.git.commit] pre-commit validation failed — fix issues before committing
 #   [ERROR]   pbp.content.validate: 10 file(s) with schema violations in business-profile/de/offerings/

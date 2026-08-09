@@ -57,7 +57,7 @@ nonGoals:
   - "No auto-commit of uncommitted changes — the agent reports and asks, the operator decides"
   - "No amendment to RFC-0575 — session-start and session-end are separate concerns with separate rules and skill modifications"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -240,7 +240,7 @@ The existing step 2 (Gather session insights) already runs `git diff HEAD` and `
 - [x] The git hygiene check procedure covers both werkstatt root and active mission workpieces (evidence: AGENTS.md:213, .agents/skills/fo-session-retro/SKILL.md:101-102)
 - [x] The rule explicitly states the agent does not auto-commit — the operator decides (evidence: AGENTS.md:219)
 - [x] The session-end trigger vocabulary includes both English and Russian phrases (evidence: AGENTS.md:211 — English "we're done", "that's it", Russian "на этом всё", "мы закончили", German "das war's", "wir sind fertig")
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0581 --json` → status: pass, zero violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate RFC-0581 --json` → status: pass, zero violations)
 
 ## Implementation notes for agents
 

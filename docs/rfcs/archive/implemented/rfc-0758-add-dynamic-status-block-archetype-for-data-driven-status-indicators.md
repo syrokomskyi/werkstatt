@@ -62,7 +62,7 @@ nonGoals:
   - "Does not define the data source contract — the block receives data via props; how the data is fetched or generated is the site's composition responsibility."
   - "Does not add client-side hydration or React islands — the block renders at build time (SSG) or via server-side data injection."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -123,7 +123,7 @@ A new `dynamic-status-block` archetype is added to the shared archetype catalog.
 The section is materialized by the existing `section.scaffold` command:
 
 ```sh
-pnpm exec site-kernel run section.scaffold --name dynamic-status-block --archetype dynamic-status-block
+pnpm exec werkstatt run section.scaffold --name dynamic-status-block --archetype dynamic-status-block
 ```
 
 No new commands. The archetype is registered in the archetype catalog and consumed via standard block-declarative page composition. After scaffolding, run `archetype.registry.build` to regenerate `index.yaml` and `index.json` — `PLANET_IMPORT_PATHS` in `packages/share/src/page.ts` is registry-derived (RFC-0091) and requires no manual edit.

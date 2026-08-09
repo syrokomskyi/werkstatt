@@ -131,28 +131,28 @@ CKL introduces these command groups (defined in detail by the component RFCs):
 
 ```sh
 # RFC-0212 — claims & provenance
-pnpm exec site-kernel run content.claim.validate --app <name>      # provenance/temporal annotation shape
-pnpm exec site-kernel run content.claim.report   --app <name>      # inventory of claims + coverage
+pnpm exec werkstatt run content.claim.validate --app <name>      # provenance/temporal annotation shape
+pnpm exec werkstatt run content.claim.report   --app <name>      # inventory of claims + coverage
 
 # RFC-0213 — freshness
-pnpm exec site-kernel run content.freshness.validate --app <name>  # expired / over-due-for-review facts
-pnpm exec site-kernel run content.freshness.report   --app <name>  # ledger view, never fails
+pnpm exec werkstatt run content.freshness.validate --app <name>  # expired / over-due-for-review facts
+pnpm exec werkstatt run content.freshness.report   --app <name>  # ledger view, never fails
 
 # RFC-0214 — external source binding + monitor
-pnpm exec site-kernel run content.source.validate --app <name>     # source descriptors resolve & shape-check
-pnpm exec site-kernel run source.monitor.run                       # shared worker: re-fetch, diff, enqueue
+pnpm exec werkstatt run content.source.validate --app <name>     # source descriptors resolve & shape-check
+pnpm exec werkstatt run source.monitor.run                       # shared worker: re-fetch, diff, enqueue
 
 # RFC-0215 — derived staleness
-pnpm exec site-kernel run content.derived.validate --app <name>    # derivedFrom + sourceHash currency
-pnpm exec site-kernel run content.derived.stamp    --app <name>    # re-stamp sourceHash after review
+pnpm exec werkstatt run content.derived.validate --app <name>    # derivedFrom + sourceHash currency
+pnpm exec werkstatt run content.derived.stamp    --app <name>    # re-stamp sourceHash after review
 
 # RFC-0216 — planning
-pnpm exec site-kernel run content.plan.build  --app <name>         # emit dated review/maintenance tasks
-pnpm exec site-kernel run content.plan.status --app <name>         # what is due, overdue, blocking
+pnpm exec werkstatt run content.plan.build  --app <name>         # emit dated review/maintenance tasks
+pnpm exec werkstatt run content.plan.status --app <name>         # what is due, overdue, blocking
 
 # RFC-0217 — ledger / temporal KG
-pnpm exec site-kernel run content.claim.ledger.append --app <name> # append fact-change events
-pnpm exec site-kernel run content.claim.ledger.query  --app <name> # "what was claimed about X on date D"
+pnpm exec werkstatt run content.claim.ledger.append --app <name> # append fact-change events
+pnpm exec werkstatt run content.claim.ledger.query  --app <name> # "what was claimed about X on date D"
 ```
 
 ### TypeScript contracts

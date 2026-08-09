@@ -25,9 +25,9 @@ Confirm the RFC documents and plan are valid before implementation begins.
 1. Validate the affected RFCs:
 
 ```sh
-rtk pnpm exec site-kernel run rfc.validate RFC-0074 --json
-rtk pnpm exec site-kernel run rfc.validate RFC-0076 --json
-rtk pnpm exec site-kernel run rfc.validate RFC-0077 --json
+rtk pnpm exec werkstatt run rfc.validate RFC-0074 --json
+rtk pnpm exec werkstatt run rfc.validate RFC-0076 --json
+rtk pnpm exec werkstatt run rfc.validate RFC-0077 --json
 ```
 
 2. Do not change any RFC status field.
@@ -78,8 +78,8 @@ Make the modern CMS-friendly app surface the only active app contract.
 
 ```sh
 rtk pnpm --filter @warpgogol/site-kernel-checks build:check
-rtk pnpm exec site-kernel run apps-check.run --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run app.contract.full --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run apps-check.run --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run app.contract.full --app nicaragua-projekt --json
 ```
 
 ### Exit criteria
@@ -126,8 +126,8 @@ Make `onboarding/.input` and `onboarding/.output/<phase>` a deterministic contra
 
 ```sh
 rtk pnpm --filter @warpgogol/site-kernel-checks build:check
-rtk pnpm exec site-kernel run onboarding.input.validate --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run onboarding.phase.validate --app nicaragua-projekt --phase=05-audit --json
+rtk pnpm exec werkstatt run onboarding.input.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run onboarding.phase.validate --app nicaragua-projekt --phase=05-audit --json
 ```
 
 ### Exit criteria
@@ -174,9 +174,9 @@ Make `audit.llm.run` schema, cache, and aggregator behavior production-grade.
 
 ```sh
 rtk pnpm --filter @warpgogol/site-kernel-checks build:check
-rtk pnpm exec site-kernel run audit.llm.run --app nicaragua-projekt --kind=cultural --json
-rtk pnpm exec site-kernel run audit.llm.run --app nicaragua-projekt --kind=linguistic --json
-rtk pnpm exec site-kernel run app.qa.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run audit.llm.run --app nicaragua-projekt --kind=cultural --json
+rtk pnpm exec werkstatt run audit.llm.run --app nicaragua-projekt --kind=linguistic --json
+rtk pnpm exec werkstatt run app.qa.validate --app nicaragua-projekt --json
 ```
 
 ### Exit criteria
@@ -228,12 +228,12 @@ Move validators from shallow heuristics to schema-aware checks while preserving 
 
 ```sh
 rtk pnpm --filter @warpgogol/site-kernel-checks build:check
-rtk pnpm exec site-kernel run seo.technical.validate --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run seo.structured-data.validate --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run seo.internal-linking.validate --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run first-party-data.validate --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run infra.brief.validate --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run app.qa.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run seo.technical.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run seo.structured-data.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run seo.internal-linking.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run first-party-data.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run infra.brief.validate --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run app.qa.validate --app nicaragua-projekt --json
 ```
 
 ### Exit criteria
@@ -261,11 +261,11 @@ Ensure the ecosystem is coherent for future AI-agent onboarding sessions.
 
 ```sh
 rtk pnpm --filter @warpgogol/site-kernel-checks build:check
-rtk pnpm exec site-kernel run apps-check.run --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run app.contract.full --app nicaragua-projekt --json
-rtk pnpm exec site-kernel run rfc.validate RFC-0074 --json
-rtk pnpm exec site-kernel run rfc.validate RFC-0076 --json
-rtk pnpm exec site-kernel run rfc.validate RFC-0077 --json
+rtk pnpm exec werkstatt run apps-check.run --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run app.contract.full --app nicaragua-projekt --json
+rtk pnpm exec werkstatt run rfc.validate RFC-0074 --json
+rtk pnpm exec werkstatt run rfc.validate RFC-0076 --json
+rtk pnpm exec werkstatt run rfc.validate RFC-0077 --json
 ```
 
 ### Exit criteria

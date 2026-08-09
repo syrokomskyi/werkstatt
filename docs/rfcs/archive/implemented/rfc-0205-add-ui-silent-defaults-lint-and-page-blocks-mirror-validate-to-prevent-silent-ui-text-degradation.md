@@ -230,14 +230,14 @@ This enables `page.block.validate` B-03 to catch missing `labels` or empty strin
 
 ```sh
 # Workspace-level lint for silent empty-string fallbacks
-pnpm exec site-kernel run ui.silent-defaults.lint
+pnpm exec werkstatt run ui.silent-defaults.lint
 
 # App-level block parity check for localized twins
-pnpm exec site-kernel run page.blocks.mirror.validate --app nicaragua-projekt
+pnpm exec werkstatt run page.blocks.mirror.validate --app nicaragua-projekt
 
 # JSON output for CI
-pnpm exec site-kernel run ui.silent-defaults.lint --json
-pnpm exec site-kernel run page.blocks.mirror.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run ui.silent-defaults.lint --json
+pnpm exec werkstatt run page.blocks.mirror.validate --app nicaragua-projekt --json
 ```
 
 Flags:

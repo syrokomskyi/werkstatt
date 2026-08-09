@@ -51,11 +51,11 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0687` — validate the RFC itself
+- `pnpm exec werkstatt run rfc.validate --id RFC-0687` — validate the RFC itself
 - `pnpm --filter @warpgogol/site-kernel run build:check` — build check on site-kernel
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — build check on site-kernel-checks
-- `pnpm exec site-kernel run command.manifest.generate` — regenerate manifest after adding `validatesOutputs` to manifest entries
-- `pnpm exec site-kernel run command.reads.validate` — verify CRC-01/CRC-02 still pass for all commands
+- `pnpm exec werkstatt run command.manifest.generate` — regenerate manifest after adding `validatesOutputs` to manifest entries
+- `pnpm exec werkstatt run command.reads.validate` — verify CRC-01/CRC-02 still pass for all commands
 
 ## 3. Step sequence
 
@@ -91,7 +91,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel run build:check` — TypeScript compiles without errors
-- `pnpm exec site-kernel run command.manifest.generate` — manifest regenerates with `validatesOutputs` field
+- `pnpm exec werkstatt run command.manifest.generate` — manifest regenerates with `validatesOutputs` field
 
 **Completion criterion:** `commandInfo()` propagates `validatesOutputs`; `CommandManifestEntry` includes `validatesOutputs`; `buildCommandManifest` maps it; `build:check` passes.
 
@@ -173,7 +173,7 @@ scope:
   - The safety net: `cacheable: false` validators always run and catch manual edits
   - The constraint: `validatesOutputs` MUST only be set on cacheable read-only validators
   - The infrastructure-only status: no validators are annotated in RFC-0687; annotations will be added when suitable cacheable generator→cacheable validator pairs are identified
-- Run `pnpm exec site-kernel run command.manifest.generate` to regenerate `docs/command-manifest.generated.yaml` with `validatesOutputs` field (empty for all commands since none are annotated)
+- Run `pnpm exec werkstatt run command.manifest.generate` to regenerate `docs/command-manifest.generated.yaml` with `validatesOutputs` field (empty for all commands since none are annotated)
 
 **Validation:**
 
@@ -192,11 +192,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0687` — RFC validation
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0687` — RFC validation
 - Run `pnpm --filter @warpgogol/site-kernel run build:check` — build check
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — build check (no changes expected, but verify no regressions)
-- Run `pnpm exec site-kernel run command.manifest.generate` — manifest is current
-- Run `pnpm exec site-kernel run command.reads.validate` — CRC rules pass
+- Run `pnpm exec werkstatt run command.manifest.generate` — manifest is current
+- Run `pnpm exec werkstatt run command.reads.validate` — CRC rules pass
 - Check off each acceptance criterion in the RFC with inline `(evidence: ...)` annotations
 
 **Validation:**
@@ -218,16 +218,16 @@ scope:
 
 - Verify `packages/os/site-kernel/AGENTS.md` is updated with `validatesOutputs` documentation
 - Verify `docs/command-manifest.generated.yaml` is regenerated
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0687 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0687 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0687`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0687`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -239,11 +239,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0687`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0687`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run command.manifest.generate`
-- `pnpm exec site-kernel run command.reads.validate`
+- `pnpm exec werkstatt run command.manifest.generate`
+- `pnpm exec werkstatt run command.reads.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -263,5 +263,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-35 or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0687 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-35 or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0687 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `shouldTransitiveSkip` is found to be insufficient for a cacheable validator that reads both generated and authored files, do not add a `reads[]` hash check back — instead, remove `validatesOutputs` from that validator and rely on the normal cache check.

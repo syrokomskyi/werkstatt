@@ -236,9 +236,9 @@ export const WerkstattOperationRecordSchema = z.object({
 ### 8. CLI surface
 
 ```sh
-pnpm exec site-kernel run werkstatt.lock.status [--json]
-pnpm exec site-kernel run werkstatt.lock.recover [--scope <scope>] [--purge] [--json]
-pnpm exec site-kernel run werkstatt.operation.validate [--json]
+pnpm exec werkstatt run werkstatt.lock.status [--json]
+pnpm exec werkstatt run werkstatt.lock.recover [--scope <scope>] [--purge] [--json]
+pnpm exec werkstatt run werkstatt.operation.validate [--json]
 ```
 
 All commands support `--json` output with the standard `{ command, status, data, summary }` envelope.

@@ -130,9 +130,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run test` — unit tests
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — contract-full adaptation compilation
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` — generator adaptation compilation
-- `pnpm exec site-kernel run rfc.validate RFC-0356 --json` — RFC validation
-- `pnpm exec site-kernel run mission.materialize --mission <id> --json` — smoke test
-- `pnpm exec site-kernel run mission.validate --mission <id> --json` — smoke test
+- `pnpm exec werkstatt run rfc.validate RFC-0356 --json` — RFC validation
+- `pnpm exec werkstatt run mission.materialize --mission <id> --json` — smoke test
+- `pnpm exec werkstatt run mission.validate --mission <id> --json` — smoke test
 - `pnpm -s run build:check` — workspace-level build check (no `apps/` regression)
 - No new pipeline placement — the commands are workspace-scoped and invoked manually; they do not join `build.check` or `apps-check` pipelines.
 
@@ -439,7 +439,7 @@ scope:
 
 ### Step 11. Register and wire commands
 
-**Goal:** Make all new commands discoverable and executable via `pnpm exec site-kernel run`.
+**Goal:** Make all new commands discoverable and executable via `pnpm exec werkstatt run`.
 
 **Agent actions:**
 
@@ -452,9 +452,9 @@ scope:
 
 **Validation:**
 
-- All new commands appear in `pnpm exec site-kernel run --help` (or equivalent command listing)
-- `pnpm exec site-kernel run mission.list --json` still works (RFC-0355)
-- `pnpm exec site-kernel run sternsystem.list --json` still works (RFC-0354)
+- All new commands appear in `pnpm exec werkstatt run --help` (or equivalent command listing)
+- `pnpm exec werkstatt run mission.list --json` still works (RFC-0355)
+- `pnpm exec werkstatt run sternsystem.list --json` still works (RFC-0354)
 
 **Completion criterion:** All RFC-0356 commands are registered and discoverable.
 
@@ -484,9 +484,9 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate --json` passes
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json` passes
-- `pnpm exec site-kernel run workspace.surface.validate --json` passes
+- `pnpm exec werkstatt run compass.validate --json` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json` passes
+- `pnpm exec werkstatt run workspace.surface.validate --json` passes
 
 **Completion criterion:** Documentation and Compass XML are synchronized.
 
@@ -536,7 +536,7 @@ scope:
 **Agent actions:**
 
 - Run the required checks listed in §4.1.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0356` (RFC-0330) and commit the generated `docs/rfcs/verification/rfc-0356.generated.json`.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0356` (RFC-0330) and commit the generated `docs/rfcs/verification/rfc-0356.generated.json`.
 - Update RFC-0356 acceptance-criteria checkboxes to reflect verified state.
 - If the RFC is accepted, stamp `implementedAt` in the same commit as the evidence file.
 
@@ -585,21 +585,21 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0356 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0356 --json`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
-- `pnpm exec site-kernel run mission.materialize --mission <id> --json` (smoke test)
-- `pnpm exec site-kernel run mission.validate --mission <id> --json` (smoke test)
-- `pnpm exec site-kernel run mission.diff --mission <id> --json` (smoke test)
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json` (pilot)
+- `pnpm exec werkstatt run mission.materialize --mission <id> --json` (smoke test)
+- `pnpm exec werkstatt run mission.validate --mission <id> --json` (smoke test)
+- `pnpm exec werkstatt run mission.diff --mission <id> --json` (smoke test)
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com --json` (pilot)
 - `pnpm -s run build:check`
-- `pnpm exec site-kernel run compass.validate --json`
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json`
-- `pnpm exec site-kernel run workspace.surface.validate --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0356` (RFC-0330)
+- `pnpm exec werkstatt run compass.validate --json`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json`
+- `pnpm exec werkstatt run workspace.surface.validate --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0356` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -621,7 +621,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle contract), DNA-46 (mission lifecycle), DNA-47 (materialization), or DNA-51 (Werkstatt consistency), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0356 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle contract), DNA-46 (mission lifecycle), DNA-47 (materialization), or DNA-51 (Werkstatt consistency), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0356 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If the RFC-0221 `authored-set.ts` classifier cannot be safely narrowed to a data-only Sternsystem set without creating a parallel classifier, escalate rather than duplicating classification logic.
 - If `app.contract.full` cannot be cleanly extended with `--workpiece-dir` without breaking the existing `apps/` pipeline, escalate to propose a dedicated `mission.contract.full` command instead.
 - If the pilot extraction fails to validate and the root cause is incomplete platform templates, escalate to extend the generator templates rather than adding manual workarounds that depend on the source `apps/<app>/` directory.

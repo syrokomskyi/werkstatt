@@ -76,7 +76,7 @@ nonGoals:
   - "Does not preserve the local build+static-server mode (removed in favor of external-preview only)"
   - "Does not remove check-runner-node package — its playwright-adapter.ts and browser-capture-port.ts are consumed by check.run and check.evidence.capture commands and remain intact"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -139,10 +139,10 @@ DNA-49 requires that `leitstand.dev-deploy` runs the Axiom verification gate via
 
 ```sh
 # External-preview mode (required — no local mode)
-pnpm exec site-kernel run mission.check --mission <missionId> --external-preview --base-url https://dev-warpgogol-com.syrokomskyi.workers.dev
+pnpm exec werkstatt run mission.check --mission <missionId> --external-preview --base-url https://dev-warpgogol-com.syrokomskyi.workers.dev
 
 # JSON output for programmatic consumption
-pnpm exec site-kernel run mission.check --mission <missionId> --external-preview --base-url <url> --json
+pnpm exec werkstatt run mission.check --mission <missionId> --external-preview --base-url <url> --json
 ```
 
 Flags:
@@ -326,7 +326,7 @@ On failure:
 - [x] `leitstand.dev-deploy --system warpgogol-com` completes with passing Axiom gate (evidence: vitest run src/tests/leitstand-0628-dev-deploy.test.ts — mocked executeKernelCommand verifies --commit-sha propagation and result parsing; live pilot deferred to post-merge)
 - [x] Existing tests updated for new evidence file names, result interface, and severity model (evidence: vitest run — 9/9 mission-check.test.ts, 16/16 leitstand-0628-dev-deploy.test.ts, 2/2 leitstand-0608-propagate-channel-removed.test.ts, 2/2 leitstand-0608-rollback-state.test.ts)
 - [x] `packages/os/site-kernel-checks/AGENTS.md` updated to reflect new evidence format (evidence: packages/os/site-kernel-checks/AGENTS.md:23, grep -r "evidence-capsule.yaml" packages/os/site-kernel-checks/AGENTS.md returns no results)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0629 --json exit 0, 2026-08-01)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0629 --json exit 0, 2026-08-01)
 
 ## Implementation notes for agents
 

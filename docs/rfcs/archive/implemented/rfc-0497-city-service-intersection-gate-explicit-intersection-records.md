@@ -265,13 +265,13 @@ When an intersection record does not exist or fails the gate, the page is not em
 
 ```sh
 # Validate intersection records against the minimum gate, similarity thresholds, and substance independence test
-pnpm exec site-kernel run surface.intersection.validate --site warpgogol-com
+pnpm exec werkstatt run surface.intersection.validate --site warpgogol-com
 
 # Generate the build-time scaling report
-pnpm exec site-kernel run surface.intersection.report --site warpgogol-com
+pnpm exec werkstatt run surface.intersection.report --site warpgogol-com
 
 # Both accept --json for machine-readable output
-pnpm exec site-kernel run surface.intersection.validate --site warpgogol-com --json
+pnpm exec werkstatt run surface.intersection.validate --site warpgogol-com --json
 ```
 
 Both commands are `scope: workspace` (they operate on a specific site's surface content). `surface.intersection.validate` is integrated into `build.check` as a blocking check (warn mode initially, fail mode after grace period — same pattern as RFC-0492/0496). `surface.intersection.report` is a diagnostic report — it emits warnings in `build.check` but does not block.
@@ -483,8 +483,8 @@ The migrator (`rfc-0497`) is a no-op on authored data — the `intersections` co
 - [x] Old URLs for non-existent intersections return 404 — verified via `surface.generate` output (no route emitted for depth-5 without intersection record). (evidence: packages/os/site-kernel-checks/src/surface-expand/pipeline.ts:140-142, entries without approved record are filtered out)
 - [x] No new city×service pages are generated automatically without an explicit intersection record. (evidence: packages/os/site-kernel-checks/src/surface-expand/pipeline.ts:135-159, applyIntersectionGate drops all depth-5 entries when intersections list is empty)
 - [x] Migrator `rfc-0497` registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts`. (evidence: packages/os/site-kernel-handoff/src/migrators/registry.ts:31,41)
-- [x] `migrator.registry.validate` passes with the new migrator. (evidence: pnpm exec site-kernel run migrator.registry.validate — 8 migrator(s) in registry, only pre-existing rfc-0492.snapshot.test.ts violation remains)
-- [x] `rfc.validate` passes on this file. (evidence: pnpm exec site-kernel run rfc.validate — exit code 0, no RFC-0497 specific errors)
+- [x] `migrator.registry.validate` passes with the new migrator. (evidence: pnpm exec werkstatt run migrator.registry.validate — 8 migrator(s) in registry, only pre-existing rfc-0492.snapshot.test.ts violation remains)
+- [x] `rfc.validate` passes on this file. (evidence: pnpm exec werkstatt run rfc.validate — exit code 0, no RFC-0497 specific errors)
 
 ## Implementation notes for agents
 

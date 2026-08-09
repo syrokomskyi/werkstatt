@@ -93,7 +93,7 @@ No code changes — this is a specification RFC. The `packages/werkstatt` packag
 
 **Validation:**
 
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0771 --json` — passes with zero violations.
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0771 --json` — passes with zero violations.
 
 **Completion criterion:** All 6 acceptance criteria checked off with evidence annotations.
 
@@ -128,14 +128,14 @@ No code changes — this is a specification RFC. The `packages/werkstatt` packag
 
 **Agent actions:**
 
-- Run `rtk pnpm exec site-kernel run rfc.implement.stamp --id RFC-0771 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- Run `rtk pnpm exec werkstatt run rfc.implement.stamp --id RFC-0771 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 - The command validates all preconditions (status, criteria, clean tree, commit reachability).
 - Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
 - `rtk git status` — no uncommitted changes from the current session.
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0771` — passes.
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0771` — passes.
 
 **Completion criterion:** RFC-0771 status is `implemented` via `rfc.implement.stamp`.
 
@@ -145,7 +145,7 @@ No code changes — this is a specification RFC. The `packages/werkstatt` packag
 
 ### 4.1 Required checks
 
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0771 --json` — mechanical validation
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0771 --json` — mechanical validation
 - No build checks (specification RFC, no code changes)
 - No acceptance probes (RFC-0771 does not declare `acceptance` probes)
 - No verification evidence (RFC-0771 does not declare `acceptance` probes, so `rfc.verification.emit` is not required)
@@ -164,7 +164,7 @@ No code changes — this is a specification RFC. The `packages/werkstatt` packag
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-51/52/53, run `rtk pnpm exec site-kernel run rfc.supersede.propose --id RFC-0771 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-51/52/53, run `rtk pnpm exec werkstatt run rfc.supersede.propose --id RFC-0771 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the engine subpath export list reveals a module that doesn't fit any export entry, add it to the RFC-0771 module map via an amending RFC (the RFC is `accepted` and cannot be edited in place).
 
 ## Appendix A. Engine subpath export list

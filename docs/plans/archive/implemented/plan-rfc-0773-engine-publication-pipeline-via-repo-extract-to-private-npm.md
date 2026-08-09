@@ -102,7 +102,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.pinned.validate` — passes with no violations
+- `pnpm exec werkstatt run forge.pinned.validate` — passes with no violations
 
 **Completion criterion:** `packages/werkstatt/extract.config.yaml` is listed in `.forge/pinned.yaml` with `mode: protect`.
 
@@ -244,18 +244,18 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0773 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0773 --json` — must pass
 - Run `pnpm --filter @warpgogol/werkstatt run build:check` — must pass (no code changes, but verify no breakage)
 - Run `forge pinned.validate` — must pass with new entry
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented artifacts. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0773 --implementation-commit <sha>` (dry-run first, then without --dry-run).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0773 --implementation-commit <sha>` (dry-run first, then without --dry-run).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0773` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0773` — passes
 - Review report exists in `docs/reviews/code/` for this session
 - All agent-executable acceptance criteria are checked off with evidence
 
@@ -267,9 +267,9 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0773`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0773`
 - `pnpm --filter @warpgogol/werkstatt run build:check`
-- `pnpm exec site-kernel run forge.pinned.validate`
+- `pnpm exec werkstatt run forge.pinned.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -289,4 +289,4 @@ scope:
 
 - If `repo-extract` lacks LFS support (discovered during dry-run), that is an upstream fix — create an issue/PR against `@warpgogol/repo-extract` before wave 3.
 - If `forge.pinned.validate` rejects the new entry format, check the pinned.yaml schema and adjust the entry to match the existing format.
-- If implementation reveals an invariant conflict with DNA-62, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0773 --reason "..." --invariant "DNA-62"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-62, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0773 --reason "..." --invariant "DNA-62"` instead of working around it.

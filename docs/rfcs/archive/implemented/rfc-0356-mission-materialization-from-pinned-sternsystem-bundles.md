@@ -139,7 +139,7 @@ deployable: true
 ### 1. `mission.materialize`
 
 ```sh
-pnpm exec site-kernel run mission.materialize \
+pnpm exec werkstatt run mission.materialize \
   --mission <mission-id> \
   [--report-only] \
   [--json]
@@ -215,7 +215,7 @@ The difference is the **target and ownership boundary**: `handoff.absorb` writes
 ### 2. `mission.validate`
 
 ```sh
-pnpm exec site-kernel run mission.validate \
+pnpm exec werkstatt run mission.validate \
   --mission <mission-id> \
   [--json]
 ```
@@ -233,7 +233,7 @@ Validates the materialized Werkstück:
 ### 3. `mission.preview`
 
 ```sh
-pnpm exec site-kernel run mission.preview \
+pnpm exec werkstatt run mission.preview \
   --mission <mission-id> \
   [--json]
 ```
@@ -243,7 +243,7 @@ Serves the current Werkstück for local review. It may start a local dev/preview
 ### 4. `mission.build`
 
 ```sh
-pnpm exec site-kernel run mission.build \
+pnpm exec werkstatt run mission.build \
   --mission <mission-id> \
   [--json]
 ```
@@ -261,7 +261,7 @@ The Distribution is immutable after the command completes. A new build replaces 
 ### 5. `mission.diff`
 
 ```sh
-pnpm exec site-kernel run mission.diff \
+pnpm exec werkstatt run mission.diff \
   --mission <mission-id> \
   [--json]
 ```
@@ -279,7 +279,7 @@ This is the **review artifact**: it shows exactly what the mission changed in th
 ### 6. `mission.reconcile`
 
 ```sh
-pnpm exec site-kernel run mission.reconcile \
+pnpm exec werkstatt run mission.reconcile \
   --mission <mission-id> \
   [--message "<commit-message>"] \
   [--json]
@@ -300,7 +300,7 @@ Reconciles the validated Werkstück data changes to the Sternsystem's git repo (
 ### 7. `sternsystem.extract` (pilot extraction)
 
 ```sh
-pnpm exec site-kernel run sternsystem.extract \
+pnpm exec werkstatt run sternsystem.extract \
   --app <app-name> \
   [--repo <git-url>] \
   [--json]
@@ -352,14 +352,14 @@ The pilot extraction of `warpgogol-com` is the first use of `sternsystem.extract
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run mission.materialize --mission <id>
-pnpm exec site-kernel run mission.materialize --mission <id> --report-only
-pnpm exec site-kernel run mission.validate --mission <id>
-pnpm exec site-kernel run mission.preview --mission <id>
-pnpm exec site-kernel run mission.build --mission <id>
-pnpm exec site-kernel run mission.diff --mission <id>
-pnpm exec site-kernel run mission.reconcile --mission <id> --message "<text>"
-pnpm exec site-kernel run sternsystem.extract --app <app-name> --repo <git-url>
+pnpm exec werkstatt run mission.materialize --mission <id>
+pnpm exec werkstatt run mission.materialize --mission <id> --report-only
+pnpm exec werkstatt run mission.validate --mission <id>
+pnpm exec werkstatt run mission.preview --mission <id>
+pnpm exec werkstatt run mission.build --mission <id>
+pnpm exec werkstatt run mission.diff --mission <id>
+pnpm exec werkstatt run mission.reconcile --mission <id> --message "<text>"
+pnpm exec werkstatt run sternsystem.extract --app <app-name> --repo <git-url>
 ```
 
 All commands support `--json` output with the standard `{ command, status, data, summary }` envelope.

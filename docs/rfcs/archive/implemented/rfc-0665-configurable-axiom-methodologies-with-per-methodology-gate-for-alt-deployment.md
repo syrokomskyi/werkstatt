@@ -81,7 +81,7 @@ nonGoals:
   - "Does not change R2 evidence archive topology (RFC-0650)"
   - "Does not add a --methodologies CLI flag to override config at runtime"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -234,14 +234,14 @@ by `mission.check` and do not contribute to the gate decision.
 
 ```sh
 # Validate the methodologies config
-pnpm exec site-kernel run methodologies.validate
+pnpm exec werkstatt run methodologies.validate
 
 # mission.check reads systems/methodologies.md automatically
-pnpm exec site-kernel run mission.check --mission=warpgogol-com-m000027 \
+pnpm exec werkstatt run mission.check --mission=warpgogol-com-m000027 \
   --external-preview --base-url=https://dev.warpgogol.com
 
 # leitstand.propagate reads evidence-metadata.json (which lists active methodologies)
-pnpm exec site-kernel run leitstand.propagate --system=warpgogol-com
+pnpm exec werkstatt run leitstand.propagate --system=warpgogol-com
 ```
 
 ### TypeScript contracts

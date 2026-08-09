@@ -97,8 +97,8 @@ scope:
 - `pnpm --filter @warpgogol/site-kernel build:check` — typecheck after adding DHT module
 - `pnpm --filter @warpgogol/ontology build:check` — typecheck after adding DHT schemas
 - `pnpm --filter @warpgogol/passport test` — unit tests for dht-sign.ts
-- `pnpm exec site-kernel run rfc.validate --id RFC-0565` — RFC validation
-- `pnpm exec site-kernel run ecosystem.manifest.generate` — update command manifest after new commands
+- `pnpm exec werkstatt run rfc.validate --id RFC-0565` — RFC validation
+- `pnpm exec werkstatt run ecosystem.manifest.generate` — update command manifest after new commands
 
 ## 3. Step sequence
 
@@ -165,7 +165,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel build:check`
-- `pnpm exec site-kernel run dht.node.init --bind 0.0.0.0:7947 --json` — creates `werkstatt.dht.json`
+- `pnpm exec werkstatt run dht.node.init --bind 0.0.0.0:7947 --json` — creates `werkstatt.dht.json`
 
 **Completion criterion:** `dht.node.init` command creates a valid `werkstatt.dht.json`, `build:check` passes.
 
@@ -358,7 +358,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel build:check`
-- `pnpm exec site-kernel run dht.status --json` — returns config and cache stats
+- `pnpm exec werkstatt run dht.status --json` — returns config and cache stats
 
 **Completion criterion:** `dht.status` reports DHT config and cache stats without network I/O.
 
@@ -447,12 +447,12 @@ scope:
     - Ephemeral lifecycle: DHT node is created and destroyed within each command invocation — no long-running daemon. Cache consistency via TTL + dead-workshop invalidation (no push invalidation).
 - Update `docs/technology.xml` — add DHT layer (Layer 3) to technology inventory
 - Update `docs/development-plan.xml` — add DHT-related development milestones
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update command manifest
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update command manifest
 
 **Validation:**
 
 - `git diff --name-only` shows all 3 docs updated
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
 
 **Completion criterion:** All 3 docs in `scope.docs` are updated; command manifest is regenerated.
 
@@ -466,19 +466,19 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0565`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0565`
 - Run `pnpm --filter @warpgogol/site-kernel build:check`
 - Run `pnpm --filter @warpgogol/ontology build:check`
 - Run `pnpm --filter @warpgogol/site-kernel test`
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: invoke `fo-fix` if `fo-review` reported findings. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0565 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0565 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0565`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0565`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -490,14 +490,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0565`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0565`
 - `pnpm --filter @warpgogol/site-kernel build:check`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/passport build:check`
 - `pnpm --filter @warpgogol/site-kernel test`
 - `pnpm --filter @warpgogol/passport test`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0565` (RFC-0330)
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0565` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -520,6 +520,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle) or DNA-45 (Fleet registry), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0565 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle) or DNA-45 (Fleet registry), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0565 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `@libp2p/kad-dht` cannot support S/Kademlia hardening (disjoint paths, Sybil-resistant node ids) via wrapper approach, escalate to the operator — a custom implementation or alternative library may be needed.
 - If Ed25519 signing from `@warpgogol/passport/dht-sign` cannot be reused for DHT entry signing (different subject shape), extend the module rather than duplicating crypto code.

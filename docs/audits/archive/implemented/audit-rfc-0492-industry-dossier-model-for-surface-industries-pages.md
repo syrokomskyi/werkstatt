@@ -16,7 +16,7 @@ The RFC is structurally well-formed and addresses a real ecosystem gap (depth-1 
 
 ## Mechanical validation (rfc.validate)
 
-Pass — `pnpm exec site-kernel run rfc.validate RFC-0492 --json` returns `status: "pass"`, 0 violations.
+Pass — `pnpm exec werkstatt run rfc.validate RFC-0492 --json` returns `status: "pass"`, 0 violations.
 
 ## Axis A — Structural completeness
 

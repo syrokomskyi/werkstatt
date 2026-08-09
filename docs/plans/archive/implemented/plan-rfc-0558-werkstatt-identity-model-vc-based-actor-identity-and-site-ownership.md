@@ -66,7 +66,7 @@ scope:
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/studio-gate build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
-- `pnpm exec site-kernel run rfc.validate RFC-0558 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0558 --json`
 
 ## 3. Step sequence
 
@@ -167,11 +167,11 @@ scope:
   identity: async () =>
     (await import("@warpgogol/site-kernel-handoff/identity-module")).createIdentityModule(),
   ```
-- Verify `pnpm exec site-kernel run identity.bootstrap --help` resolves
+- Verify `pnpm exec werkstatt run identity.bootstrap --help` resolves
 
 **Validation:**
 
-- `pnpm exec site-kernel run identity.bootstrap --help` shows command help
+- `pnpm exec werkstatt run identity.bootstrap --help` shows command help
 
 **Completion criterion:** `identity.bootstrap`, `identity.credential.issue`, `identity.credential.verify`, `identity.credential.revoke` are registered and discoverable via `site-kernel run`.
 
@@ -232,13 +232,13 @@ scope:
 - Add to `.env.example`:
   ```
   # PASSPORT_SIGNING_KEY — 32-byte Ed25519 private key as hex string
-  # How to obtain: run `pnpm exec site-kernel run identity.bootstrap --operator-name "Your Name" --domain warpgogol.com --json`
+  # How to obtain: run `pnpm exec werkstatt run identity.bootstrap --operator-name "Your Name" --domain warpgogol.com --json`
   PASSPORT_SIGNING_KEY=
   ```
 
 **Validation:**
 
-- `pnpm exec site-kernel run env.contract.validate` (if available)
+- `pnpm exec werkstatt run env.contract.validate` (if available)
 
 **Completion criterion:** `.env.example` documents `PASSPORT_SIGNING_KEY` with `# How to obtain:` instruction.
 
@@ -297,12 +297,12 @@ scope:
 - Run `fo-review` on all session code changes (`git diff <merge-base>...HEAD`)
 - Run `fo-fix` if review has findings (max 3 iterations)
 - Check off each acceptance criterion in RFC-0558 with inline `(evidence: <file:line>, <test-or-command>)` annotations
-- Run `pnpm exec site-kernel run rfc.validate RFC-0558 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0558 --json` — must pass
 - Run `pnpm --filter @warpgogol/passport build:check`
 - Run `pnpm --filter @warpgogol/ontology build:check`
 - Run `pnpm --filter @warpgogol/studio-gate build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check`
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0558 --implementation-commit <sha> --dry-run` then without `--dry-run`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0558 --implementation-commit <sha> --dry-run` then without `--dry-run`
 - Commit the stamped RFC separately
 
 **Validation:**
@@ -320,7 +320,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0558 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0558 --json`
 - `pnpm --filter @warpgogol/passport build:check`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/studio-gate build:check`
@@ -345,5 +345,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-45 or DNA-56, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0558 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-45 or DNA-56, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0558 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `signIdentityCredential` cannot be implemented without modifying `signCredential` in `sign.ts`, escalate — the RFC explicitly states `sign.ts` has no changes.

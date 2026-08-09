@@ -86,10 +86,10 @@ A build-time command `surface.generate` expands every entitled surface into virt
 
 ```sh
 # Expand all entitled surfaces into src/surface.generated.json (runs in build.prepare)
-pnpm exec site-kernel run surface.generate --app warpgogol-com
+pnpm exec werkstatt run surface.generate --app warpgogol-com
 
 # Structural validation of the generated artifact + provider contracts
-pnpm exec site-kernel run surface.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

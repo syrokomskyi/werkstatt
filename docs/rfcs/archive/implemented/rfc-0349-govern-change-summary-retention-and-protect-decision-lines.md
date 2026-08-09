@@ -130,14 +130,14 @@ Protected items never trigger a violation regardless of count.
 
 ```sh
 # Flag boilerplate + over-cap CHANGE_SUMMARY blocks (fast, read-only)
-pnpm exec site-kernel run grace.changesummary.validate --all
+pnpm exec werkstatt run grace.changesummary.validate --all
 
 # Deterministically tidy every authored file's CHANGE_SUMMARY
-pnpm exec site-kernel run grace.changesummary.tidy --all
+pnpm exec werkstatt run grace.changesummary.tidy --all
 
 # Scope to one app or the packages
-pnpm exec site-kernel run grace.changesummary.tidy --app warpgogol-com
-pnpm exec site-kernel run grace.changesummary.tidy --packages
+pnpm exec werkstatt run grace.changesummary.tidy --app warpgogol-com
+pnpm exec werkstatt run grace.changesummary.tidy --packages
 ```
 
 ### TypeScript contracts

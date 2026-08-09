@@ -270,16 +270,16 @@ Generates a skeleton for a new skill or command in forge. Takes `--name`, `--typ
 
 ```sh
 # Deploy forge into a new project
-pnpm exec site-kernel run forge.init
+pnpm exec werkstatt run forge.init
 
 # Validate all forge skills
-pnpm exec site-kernel run forge.skill.validate
+pnpm exec werkstatt run forge.skill.validate
 
 # Scaffold a new skill in forge
-pnpm exec site-kernel run forge.port.scaffold --name my-new-skill --type skill --category shared
+pnpm exec werkstatt run forge.port.scaffold --name my-new-skill --type skill --category shared
 
 # Validate a ported skill/command
-pnpm exec site-kernel run forge.port.validate --name my-new-skill
+pnpm exec werkstatt run forge.port.validate --name my-new-skill
 ```
 
 ### TypeScript contracts

@@ -86,7 +86,7 @@ The `open-source.generate` fingerprint cache short-circuit checks **all declared
 No new commands. No new flags. The fix is internal to `open-source.generate`:
 
 ```sh
-pnpm exec site-kernel run open-source.generate --site warpgogol-com
+pnpm exec werkstatt run open-source.generate --site warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -179,7 +179,7 @@ No change to `--json` output shape. The command continues to return `KernelComma
 - [x] After deleting `public/open-source/sbom.cdx.json` and re-running `open-source.generate`, the file is regenerated (evidence: packages/os/site-kernel-codegen/src/tests/open-source-fingerprint.test.ts, test "regenerates when sbom.cdx.json is missing but fingerprint matches")
 - [x] `generated.files.validate` passes after `open-source.generate` with no missing-output errors for open-source artifacts (evidence: packages/os/site-kernel-checks/src/generator-ownership.ts:159-180, ownership map already declares all 6 output path patterns for open-source.generate — no new paths added, existing ownership unchanged)
 - [x] Unit test in `packages/os/site-kernel-codegen` covers the missing-output regeneration scenario (evidence: packages/os/site-kernel-codegen/src/tests/open-source-fingerprint.test.ts, 5 tests covering all-outputs-exist and 4 missing-output scenarios — pnpm --filter @warpgogol/site-kernel-codegen run test passes)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0599 --json — status: pass, 0 violations)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate RFC-0599 --json — status: pass, 0 violations)
 
 ## Implementation notes for agents
 

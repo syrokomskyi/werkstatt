@@ -150,13 +150,13 @@ services:
 
 ```sh
 # Deploy a service to production
-pnpm exec site-kernel run leitstand.service.deploy --service matomo-proxy
+pnpm exec werkstatt run leitstand.service.deploy --service matomo-proxy
 
 # Validate the service registry
-pnpm exec site-kernel run service.registry.validate
+pnpm exec werkstatt run service.registry.validate
 
 # Validate naming consistency
-pnpm exec site-kernel run service.naming.validate
+pnpm exec werkstatt run service.naming.validate
 ```
 
 ### TypeScript contracts

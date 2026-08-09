@@ -43,43 +43,43 @@ jobs:
           actionlint -color
 
       - name: Local CI contract
-        run: pnpm exec site-kernel run ci.local.validate --json
+        run: pnpm exec werkstatt run ci.local.validate --json
 
       - name: GitHub branch protection policy
-        run: pnpm exec site-kernel run github.branch-protection.validate --json
+        run: pnpm exec werkstatt run github.branch-protection.validate --json
 
       - name: Package lint
         run: pnpm lint:packages
 
       - name: Package checks
-        run: pnpm exec site-kernel run packages-check.run --json
+        run: pnpm exec werkstatt run packages-check.run --json
 
       - name: RFC validation
-        run: pnpm exec site-kernel run rfc.validate
+        run: pnpm exec werkstatt run rfc.validate
 
       - name: RFC command lifecycle validation
-        run: pnpm exec site-kernel run rfc.command-lifecycle.validate --json
+        run: pnpm exec werkstatt run rfc.command-lifecycle.validate --json
 
       - name: App author checks - nicaragua-projekt
-        run: pnpm exec site-kernel run apps-check.author --app nicaragua-projekt --json
+        run: pnpm exec werkstatt run apps-check.author --app nicaragua-projekt --json
 
       - name: Tests
         run: pnpm test
 
       - name: Test signal validation
-        run: pnpm exec site-kernel run test.signal.validate --json
+        run: pnpm exec werkstatt run test.signal.validate --json
 
       - name: Test signal policy validation
-        run: pnpm exec site-kernel run test.signal.policy.validate --json
+        run: pnpm exec werkstatt run test.signal.policy.validate --json
 
       - name: Maintenance debt baseline validation
-        run: pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+        run: pnpm exec werkstatt run maintenance.debt.baseline.validate --json
 
       - name: Platform consistency validate
-        run: pnpm exec site-kernel run platform.consistency.validate --check --json
+        run: pnpm exec werkstatt run platform.consistency.validate --check --json
 
       - name: Platform commit discipline validate
-        run: pnpm exec site-kernel run platform.commit.discipline.validate --base origin/main --json
+        run: pnpm exec werkstatt run platform.commit.discipline.validate --base origin/main --json
 
   forge-windows:
     runs-on: windows-2022

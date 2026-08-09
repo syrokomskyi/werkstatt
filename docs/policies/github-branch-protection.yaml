@@ -17,4 +17,4 @@ requiredCheck:
 
 requiredWorkflowSteps:
   # The CI workflow must include these commands as real `run:` steps
-  - pnpm exec site-kernel run rfc.validate
+  - pnpm exec werkstatt run rfc.validate

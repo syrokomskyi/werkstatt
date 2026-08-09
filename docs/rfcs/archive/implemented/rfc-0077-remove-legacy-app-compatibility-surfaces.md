@@ -102,9 +102,9 @@ Validators must fail on legacy app surfaces instead of accepting or silently ign
 No new commands are introduced. Existing validators change behavior:
 
 ```sh
-pnpm exec site-kernel run system.manifest.validate --app <id>
-pnpm exec site-kernel run content.surface.validate --app <id>
-pnpm exec site-kernel run apps-check.run --app <id>
+pnpm exec werkstatt run system.manifest.validate --app <id>
+pnpm exec werkstatt run content.surface.validate --app <id>
+pnpm exec werkstatt run apps-check.run --app <id>
 ```
 
 The following command families must stop accepting legacy app structures:

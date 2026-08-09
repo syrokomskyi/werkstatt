@@ -110,8 +110,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run command.manifest.validate`
-- `pnpm exec site-kernel run workspace.write.boundary.lint`
+- `pnpm exec werkstatt run command.manifest.validate`
+- `pnpm exec werkstatt run workspace.write.boundary.lint`
 
 **Completion criterion:** Commands registered, pipeline step added, write boundary entry added, all validations pass.
 
@@ -126,12 +126,12 @@ scope:
 **Agent actions:**
 
 - In `ecosystem/manifest.ts`: add `"docs/gate-catalog.generated.yaml"` to `sourcePaths` in `collectSourceHashes()`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate`
 - Commit updated `docs/ecosystem.generated.yaml`
 
 **Validation:**
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 
 **Completion criterion:** `docs/gate-catalog.generated.yaml` in ecosystem manifest sources, `ecosystem.manifest.validate` passes.
@@ -146,12 +146,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run gate.catalog.generate`
+- Run `pnpm exec werkstatt run gate.catalog.generate`
 - Verify catalog structure: `meta.schemaVersion: 1`, `meta.deterministic: true`, `meta.contentHash` populated, `gates` sorted by command name, `summary.total` > 0, `summary.withoutMetadata` > 0
-- Run `pnpm exec site-kernel run gate.catalog.validate` — should pass with expected GATE-CAT-03 warnings
+- Run `pnpm exec werkstatt run gate.catalog.validate` — should pass with expected GATE-CAT-03 warnings
 - Commit `docs/gate-catalog.generated.yaml`
 
-**Validation:** `pnpm exec site-kernel run gate.catalog.validate` — passes (0 errors, expected warnings)
+**Validation:** `pnpm exec werkstatt run gate.catalog.validate` — passes (0 errors, expected warnings)
 
 **Completion criterion:** Catalog exists, is valid, `gate.catalog.validate` passes.
 
@@ -171,7 +171,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run test.signal.validate`
+- `pnpm exec werkstatt run test.signal.validate`
 
 **Completion criterion:** All tests pass, test signal classified as real.
 
@@ -187,13 +187,13 @@ scope:
 
 - In `packages/os/site-kernel-checks/AGENTS.md`: add module table entry for `src/gate-catalog.ts`
 - In `docs/verification-plan.xml`: add `gate.catalog.validate` to `PACKAGES_CHECK_PIPELINE` verification surface
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Commit documentation changes
 
 **Validation:**
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
-- `pnpm exec site-kernel run workspace.surface.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run workspace.surface.validate`
 
 **Completion criterion:** `AGENTS.md` includes `gate-catalog.ts`, `docs/verification-plan.xml` includes `gate.catalog.validate`, all validations pass.
 
@@ -208,14 +208,14 @@ scope:
 **Agent actions:**
 
 - Verify each RFC acceptance criterion against implemented code
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0519`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0519`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0519 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0519 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0519`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0519`
 - Every file in `scope.docs` is updated or documented as not-applicable
 
 **Completion criterion:** All acceptance criteria checked off, RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -226,12 +226,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0519`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0519`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run gate.catalog.validate`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
-- `pnpm exec site-kernel run workspace.write.boundary.lint`
-- `pnpm exec site-kernel run command.manifest.validate`
+- `pnpm exec werkstatt run gate.catalog.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run workspace.write.boundary.lint`
+- `pnpm exec werkstatt run command.manifest.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -251,5 +251,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0519 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0519 --reason "..." --invariant "DNA-53"` instead of working around it.
 - If `listRegisteredKernelCommands()` does not expose `gate` metadata (RFC-0518 not yet implemented), escalate — RFC-0518 is a hard prerequisite.

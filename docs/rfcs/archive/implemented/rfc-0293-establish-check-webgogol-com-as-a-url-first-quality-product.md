@@ -144,9 +144,9 @@ export interface CheckTargetPolicy {
 ### Commands
 
 ```sh
-pnpm exec site-kernel run check.target.validate --target ./check-targets/warpgogol-alt.yaml --json
-pnpm exec site-kernel run check.run --url https://alt.example.invalid --profile handwerk-de --json
-pnpm exec site-kernel run check.run --target ./check-targets/warpgogol-alt.yaml --json
+pnpm exec werkstatt run check.target.validate --target ./check-targets/warpgogol-alt.yaml --json
+pnpm exec werkstatt run check.run --url https://alt.example.invalid --profile handwerk-de --json
+pnpm exec werkstatt run check.run --target ./check-targets/warpgogol-alt.yaml --json
 ```
 
 `check.run` orchestrates the child commands introduced by RFC-0294 through RFC-0299:

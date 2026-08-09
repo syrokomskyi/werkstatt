@@ -72,7 +72,7 @@ scope:
 - `PACKAGES_CHECK_PIPELINE` — new step `bordbuch.commit.parity.lint` added after `fingerprint.usage.lint`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0750`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0750`
 
 ## 3. Step sequence
 
@@ -273,7 +273,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run bordbuch.commit.parity.lint` — passes with 0 violations
+- `pnpm exec werkstatt run bordbuch.commit.parity.lint` — passes with 0 violations
 
 **Completion criterion:** Lint command registered, passes with zero violations after migration.
 
@@ -294,7 +294,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0750`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0750`
 
 **Completion criterion:** AGENTS.md updated with canonical API rule and ADR-0030 update.
 
@@ -329,15 +329,15 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0750`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0750`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- Run `pnpm exec site-kernel run bordbuch.commit.parity.lint` — zero violations
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run bordbuch.commit.parity.lint` — zero violations
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review`. Max 3 iterations.
 - Check off acceptance criteria in RFC: mark `[x]` for verified criteria
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0750 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0750 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -354,10 +354,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0750`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0750`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run bordbuch.commit.parity.lint`
+- `pnpm exec werkstatt run bordbuch.commit.parity.lint`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
 ### 4.2 Evidence artifacts
@@ -378,5 +378,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46, DNA-48, DNA-49, or DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0750 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46, DNA-48, DNA-49, or DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0750 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `commitAndPushBordbuch` is imported from the barrel by external consumers outside `site-kernel-handoff`, do not break them silently — add a subpath export or direct file import before removing from barrel.

@@ -130,11 +130,11 @@ The change preserves the composition-only app rule. Apps should not patch around
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run section.defaults.validate --json
-pnpm exec site-kernel run semantic.targets.validate --app warpgogol-com --json
-pnpm exec site-kernel run runtime.warnings.lint --json
-pnpm exec site-kernel run apps-check.author --app warpgogol-com --json
-pnpm exec site-kernel run maintenance.debt.report --json
+pnpm exec werkstatt run section.defaults.validate --json
+pnpm exec werkstatt run semantic.targets.validate --app warpgogol-com --json
+pnpm exec werkstatt run runtime.warnings.lint --json
+pnpm exec werkstatt run apps-check.author --app warpgogol-com --json
+pnpm exec werkstatt run maintenance.debt.report --json
 ```
 
 `section.defaults.validate` is workspace-scoped. It scans shared UI source and optional fallback registry data.
@@ -273,9 +273,9 @@ Removing defaults can change visual output if a page relied on implicit portrait
 - [x] Missing section fallback assets and missing semantic targets are canonical diagnostics with registered rule ids. (evidence: implemented historically)
 - [x] `maintenance.debt.report --json` aggregates non-failing warning/info findings from the new validators. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `pnpm build` emits no previous `hero-1` / `donateContact` runtime warnings for `warpgogol-com`. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run apps-check.author --app warpgogol-com --json` passes or reports only intentional warning-mode diagnostics. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run apps-check.author --app nicaragua-projekt --json` passes and preserves intentionally authored `hero-1` / `donateContact` behavior. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `pnpm exec site-kernel run packages-check.run --json`, `pnpm lint:packages`, `pnpm test`, `pnpm build`, and `rfc.validate` pass. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run apps-check.author --app warpgogol-com --json` passes or reports only intentional warning-mode diagnostics. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run apps-check.author --app nicaragua-projekt --json` passes and preserves intentionally authored `hero-1` / `donateContact` behavior. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run --json`, `pnpm lint:packages`, `pnpm test`, `pnpm build`, and `rfc.validate` pass. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

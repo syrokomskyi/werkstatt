@@ -295,16 +295,16 @@ scope:
 - Update affected `docs/*.xml` Compass files (requirements, technology, development-plan, knowledge-graph, verification-plan, source-markup, styling) when repository-wide semantics changed.
 - Update `docs/architecture-dna.md` if a new DNA invariant was introduced.
 - **Verify every file listed in `scope.docs` is updated** — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why (e.g. "requires runtime command blocked by environment").
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0615 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0615 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0615`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0615`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -316,10 +316,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0615`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0615`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test -- --run`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0615` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0615` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
 
 ### 4.2 Evidence artifacts
 
@@ -339,5 +339,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-47 or DNA-58, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0615 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-47 or DNA-58, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0615 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `executeKernelPipeline` does not return step-level diagnostics in the expected shape, investigate the `KernelPipelineReport` type before modifying the pipeline executor.

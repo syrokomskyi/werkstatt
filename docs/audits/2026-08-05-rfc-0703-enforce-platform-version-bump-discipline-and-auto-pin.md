@@ -56,7 +56,7 @@ The RFC says "Command added to `ci.local.validate` pipeline". But `ci.local.vali
 
 **[C-2] `ci.yml` is already out of sync with `CI_LOCAL_CHECKED_COMMANDS`**
 
-`CI_LOCAL_CHECKED_COMMANDS` includes `pnpm exec site-kernel run platform.consistency.validate --check --json` (added per RFC-0478), but `ci.yml` does NOT run this command. This means `ci.local.validate` currently fails with CI-LOCAL-01 in CI. The RFC proposes adding a new command to both `ci.yml` and `CI_LOCAL_CHECKED_COMMANDS` but doesn't notice or fix this pre-existing gap. The implementation should add the missing `platform.consistency.validate --check --json` step to `ci.yml` alongside the new `platform.commit.discipline.validate` step.
+`CI_LOCAL_CHECKED_COMMANDS` includes `pnpm exec werkstatt run platform.consistency.validate --check --json` (added per RFC-0478), but `ci.yml` does NOT run this command. This means `ci.local.validate` currently fails with CI-LOCAL-01 in CI. The RFC proposes adding a new command to both `ci.yml` and `CI_LOCAL_CHECKED_COMMANDS` but doesn't notice or fix this pre-existing gap. The implementation should add the missing `platform.consistency.validate --check --json` step to `ci.yml` alongside the new `platform.commit.discipline.validate` step.
 
 **[C-3] Registry write sequencing in `mission.close` not specified**
 

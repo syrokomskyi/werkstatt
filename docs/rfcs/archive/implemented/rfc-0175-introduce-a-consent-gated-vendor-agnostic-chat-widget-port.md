@@ -87,7 +87,7 @@ A client-side **Chat Widget Port** is introduced in a dedicated package `@gogol/
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run chat.config.validate --app warpgogol-com --json
+pnpm exec werkstatt run chat.config.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

@@ -88,7 +88,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/ontology build:check` — ontology package compiles
-- `pnpm exec site-kernel run archetype.registry.validate` — archetype YAML valid
+- `pnpm exec werkstatt run archetype.registry.validate` — archetype YAML valid
 
 **Completion criterion:** Archetype YAML file exists at `packages/ontology/archetypes/sections/service-metadata-block.yaml` and passes `archetype.registry.validate`.
 
@@ -102,13 +102,13 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run archetype.registry.build`
+- Run `pnpm exec werkstatt run archetype.registry.build`
 - Verify `packages/ontology/archetypes/index.yaml` contains a `service-metadata-block` entry with `layer: section`
 - Verify `totalCount` incremented by 1
 
 **Validation:**
 
-- `pnpm exec site-kernel run archetype.registry.validate` — registry consistent
+- `pnpm exec werkstatt run archetype.registry.validate` — registry consistent
 - `pnpm --filter @warpgogol/ontology build:check` — ontology compiles with new registry
 
 **Completion criterion:** `index.yaml` contains `service-metadata-block` entry; `archetype.registry.validate` passes.
@@ -123,9 +123,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run cosmic.name.pick --archetype service-metadata-block` to select a free `PlanetName`
+- Run `pnpm exec werkstatt run cosmic.name.pick --archetype service-metadata-block` to select a free `PlanetName`
 - Update `acceptedCosmicNames` in the archetype YAML with the picked name (if not already set)
-- Run `pnpm exec site-kernel run section.scaffold --name service-metadata-block --archetype service-metadata-block`
+- Run `pnpm exec werkstatt run section.scaffold --name service-metadata-block --archetype service-metadata-block`
 - Verify the full file set exists in `packages/ui/src/sections/service-metadata-block/`:
   - `service-metadata-block-section.astro`
   - `service-metadata-block-section.manifest.yaml`
@@ -138,10 +138,10 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run manifest.contract.validate` — manifest valid against `manifestSchema`
-- `pnpm exec site-kernel run mirror.quintet.validate` — colocated `.astro` exists
-- `pnpm exec site-kernel run section.contract.validate` — section manifest matches archetype contract
-- `pnpm exec site-kernel run section.placeholder.lint` — no JSON.stringify scaffold stub remaining
+- `pnpm exec werkstatt run manifest.contract.validate` — manifest valid against `manifestSchema`
+- `pnpm exec werkstatt run mirror.quintet.validate` — colocated `.astro` exists
+- `pnpm exec werkstatt run section.contract.validate` — section manifest matches archetype contract
+- `pnpm exec werkstatt run section.placeholder.lint` — no JSON.stringify scaffold stub remaining
 
 **Completion criterion:** Full section file set exists; `.astro` renders content-aware markup (not scaffold stub); `section.contract.validate` passes.
 
@@ -155,7 +155,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run props.types.generate`
+- Run `pnpm exec werkstatt run props.types.generate`
 - Verify `packages/ui/src/sections/service-metadata-block/service-metadata-block-section.types.generated.ts` exists and contains the prop interface matching the archetype `propsSchema`
 
 **Validation:**
@@ -174,7 +174,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run page.block.validate` (workspace-wide) — verify no violations related to `service-metadata-block`
+- Run `pnpm exec werkstatt run page.block.validate` (workspace-wide) — verify no violations related to `service-metadata-block`
 - Run `pnpm --filter @warpgogol/ui run build` — full UI build passes
 - Run `pnpm --filter @warpgogol/ontology run build` — full ontology build passes
 
@@ -197,16 +197,16 @@ scope:
 
 - Verify `packages/ontology/AGENTS.md` — no new rules needed (standard archetype addition, no closed enum changes). Document why no update was needed.
 - Verify `packages/ui/AGENTS.md` — no new rules needed (standard section framework). Document why no update was needed.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected for this RFC).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected for this RFC).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0759 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0759 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0759`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0759`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated or documented as not-applicable; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -217,15 +217,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0759`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0759`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/ui run build:check`
-- `pnpm exec site-kernel run archetype.registry.validate`
-- `pnpm exec site-kernel run section.contract.validate`
-- `pnpm exec site-kernel run page.block.validate`
-- `pnpm exec site-kernel run manifest.contract.validate`
-- `pnpm exec site-kernel run mirror.quintet.validate`
-- `pnpm exec site-kernel run section.placeholder.lint`
+- `pnpm exec werkstatt run archetype.registry.validate`
+- `pnpm exec werkstatt run section.contract.validate`
+- `pnpm exec werkstatt run page.block.validate`
+- `pnpm exec werkstatt run manifest.contract.validate`
+- `pnpm exec werkstatt run mirror.quintet.validate`
+- `pnpm exec werkstatt run section.placeholder.lint`
 
 ### 4.2 Evidence artifacts
 
@@ -244,5 +244,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-17 (Uni manifest contract), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0759 --reason "..." --invariant "DNA-17"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-17 (Uni manifest contract), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0759 --reason "..." --invariant "DNA-17"` instead of working around it (RFC-0334).
 - If `section.scaffold` fails because no free `PlanetName` is available in `acceptedCosmicNames`, add a new `PlanetName` to the `PlanetCatalog` first (requires a superseding RFC per DNA-19/DNA-23).

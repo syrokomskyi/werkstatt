@@ -418,15 +418,15 @@ UK FAQ files use Ukrainian text from legacy `business/uk/faq/` files as the prim
 - [x] `systems/warpgogol-com/src/content/faq/uk/` contains 6 FAQ files with Ukrainian text from legacy UK sources (evidence: systems/warpgogol-com/src/content/faq/uk/ — 6 files recovered from git ce8e6f7ee~1, gitignored under systems/\*)
 - [x] `systems/warpgogol-com/src/content/faq/de/df-start.md` has `governance.fieldClaims.question` block migrated from legacy `df-start.claims.yaml` (evidence: systems/warpgogol-com/src/content/faq/de/df-start.md:11-16)
 - [x] `systems/warpgogol-com/src/content/faq/uk/df-start.md` has `governance.fieldClaims.question` block migrated from legacy `df-start.claims.yaml` (evidence: systems/warpgogol-com/src/content/faq/uk/df-start.md:11-16)
-- [x] `faq.validate` passes on warpgogol-com (evidence: mission warpgogol-com-m000005 materialized; `pnpm exec site-kernel run faq.validate --site warpgogol-com` — [OK] faq.validate: OK — 12 FAQ entry/entries conform; also passes as step 84/177 in build.check pipeline)
-- [x] `pnpm --filter warpgogol-com build` succeeds (evidence: mission warpgogol-com-m000005 materialized; `pnpm exec site-kernel pipeline build.check --site warpgogol-com` — DONE 177/177 steps; FAQ collection syncs correctly with Astro content collections after asOf date quoting fix; pre-existing astro check type errors and missing business/de/offer content reference are unrelated to RFC-0475)
+- [x] `faq.validate` passes on warpgogol-com (evidence: mission warpgogol-com-m000005 materialized; `pnpm exec werkstatt run faq.validate --site warpgogol-com` — [OK] faq.validate: OK — 12 FAQ entry/entries conform; also passes as step 84/177 in build.check pipeline)
+- [x] `pnpm --filter warpgogol-com build` succeeds (evidence: mission warpgogol-com-m000005 materialized; `pnpm exec werkstatt pipeline build.check --site warpgogol-com` — DONE 177/177 steps; FAQ collection syncs correctly with Astro content collections after asOf date quoting fix; pre-existing astro check type errors and missing business/de/offer content reference are unrelated to RFC-0475)
 
 ### Documentation-level
 
 - [x] `docs/requirements.xml` includes FAQ collection requirement (evidence: N/A — Compass XML files operate at workspace/pipeline level, not individual collection level; FAQ is covered by the `sites-check.run` pipeline entry)
 - [x] `docs/technology.xml` includes `@gogol/faq` package (evidence: N/A — technology.xml lists kernel and integration packages; content collection packages like `@gogol/pbp` are not individually listed; `@gogol/faq` follows the same precedent)
 - [x] `docs/verification-plan.xml` includes `faq.validate` in verification flow (evidence: N/A — verification-plan.xml references pipeline-level commands (`sites-check.run`); `faq.validate` is included in the `sites-check-author` pipeline and runs automatically)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --root docs/rfcs/rfc-0475-pluggable-faq-content-module-and-content-recovery.md` — All 462 RFC(s) passed validation)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --root docs/rfcs/rfc-0475-pluggable-faq-content-module-and-content-recovery.md` — All 462 RFC(s) passed validation)
 
 ## Implementation notes for agents
 

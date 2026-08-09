@@ -135,17 +135,17 @@ The `alt-deployed` and `promoted` states are stored in the release manifest (`re
 
 ```sh
 # Deploy to alt (was: leitstand.propagate --channel alt)
-pnpm exec site-kernel run leitstand.propagate --release <release-id>
+pnpm exec werkstatt run leitstand.propagate --release <release-id>
 
 # Promote to main (new command)
-pnpm exec site-kernel run leitstand.promote --release <release-id>
+pnpm exec werkstatt run leitstand.promote --release <release-id>
 
 # Rollback (unchanged, --channel preserved)
-pnpm exec site-kernel run leitstand.rollback --channel main --release <release-id>
-pnpm exec site-kernel run leitstand.rollback --channel alt --release <release-id>
+pnpm exec werkstatt run leitstand.rollback --channel main --release <release-id>
+pnpm exec werkstatt run leitstand.rollback --channel alt --release <release-id>
 
 # Health check (unchanged)
-pnpm exec site-kernel run leitstand.health --channel alt
+pnpm exec werkstatt run leitstand.health --channel alt
 ```
 
 **`leitstand.propagate` changes:**

@@ -87,7 +87,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel run build:check` — type-check passes.
-- Manual: `pnpm exec site-kernel run mission.status --mission <id> --force` should not error (force is silently accepted and injected into flags).
+- Manual: `pnpm exec werkstatt run mission.status --mission <id> --force` should not error (force is silently accepted and injected into flags).
 
 **Completion criterion:** `consumeCommonFlags` destructures `force`, `executeKernelCommand` receives it, and `executeRegisteredCommand` injects it into `input.flags.force`.
 
@@ -188,7 +188,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — type-check passes.
-- `pnpm exec site-kernel run command.reads.validate` — no CRC-01 violation for `mission.validate`.
+- `pnpm exec werkstatt run command.reads.validate` — no CRC-01 violation for `mission.validate`.
 
 **Completion criterion:** `mission.validate` registration includes `cacheable: false`.
 
@@ -256,18 +256,18 @@ scope:
 
 - Run `pnpm --filter @warpgogol/site-kernel run build:check` and `pnpm --filter @warpgogol/site-kernel-handoff run build:check`.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0635`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` (no command surface changes, but verify manifest is still valid).
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0635`.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` (no command surface changes, but verify manifest is still valid).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0635 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0635 --implementation-commit <sha>`.
 - Commit the stamp transition separately.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0635` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0635` — passes.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -278,7 +278,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0635`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0635`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
@@ -301,5 +301,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0635 --reason "..." --invariant "DNA-47"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0635 --reason "..." --invariant "DNA-47"` instead of working around it.
 - If the `--force` CLI wiring change breaks existing command invocations, revert step 2 and use a command-level flag schema in `mission.module.ts` instead (add `force` to the `mission.validate` flags object so it's parsed by the command's own flag resolver).

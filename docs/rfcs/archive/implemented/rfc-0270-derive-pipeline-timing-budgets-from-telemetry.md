@@ -73,9 +73,9 @@ The unprotected invariant is: **an expected-duration signal shown to agents must
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run pipeline.budget.generate            # aggregate local history → budgets file
-pnpm exec site-kernel run pipeline.budget.generate --dry-run
-pnpm exec site-kernel run pipeline.timeout.validate --json    # now includes TIME-01 / TIME-02
+pnpm exec werkstatt run pipeline.budget.generate            # aggregate local history → budgets file
+pnpm exec werkstatt run pipeline.budget.generate --dry-run
+pnpm exec werkstatt run pipeline.timeout.validate --json    # now includes TIME-01 / TIME-02
 ```
 
 ### TypeScript contracts

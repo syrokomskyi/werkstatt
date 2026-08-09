@@ -70,10 +70,10 @@ Removed routes are excluded from auto-accept — they still get `decision: pendi
 
 ```sh
 # Generate review with all changes pre-accepted
-pnpm exec site-kernel run content.regression.review.generate --site warpgogol-com --auto-accept
+pnpm exec werkstatt run content.regression.review.generate --site warpgogol-com --auto-accept
 
 # Then immediately apply (no manual YAML editing)
-pnpm exec site-kernel run content.regression.apply --site warpgogol-com --review missions/<id>/evidence/content-regression/review.yaml
+pnpm exec werkstatt run content.regression.apply --site warpgogol-com --review missions/<id>/evidence/content-regression/review.yaml
 ```
 
 ### TypeScript contracts

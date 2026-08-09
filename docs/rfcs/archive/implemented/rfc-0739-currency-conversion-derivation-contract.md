@@ -502,7 +502,7 @@ The derivation result is a `PbpCurrencyConversionResult` (extends `PbpDerivation
 - [x] Golden test vectors pass for all test cases (evidence: packages/pbp/src/derivations/currency-conversion.test.ts, 16/16 tests pass)
 - [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp exec tsc --noEmit — exit 0)
 - [x] `vitest run` passes for `packages/pbp/` (evidence: 226/245 tests pass — 19 failures are pre-existing in rfc-0468-register-and-coverage.test.ts, unrelated to RFC-0739)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0739 — zero errors)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0739 — zero errors)
 
 ## Implementation notes for agents
 

@@ -213,9 +213,9 @@ export class MigrationError extends Error {
 ### `mission.migrate` command
 
 ```sh
-pnpm exec site-kernel run mission.migrate --mission <mission-id>
-pnpm exec site-kernel run mission.migrate --mission <mission-id> --report-only
-pnpm exec site-kernel run mission.migrate --mission <mission-id> --json
+pnpm exec werkstatt run mission.migrate --mission <mission-id>
+pnpm exec werkstatt run mission.migrate --mission <mission-id> --report-only
+pnpm exec werkstatt run mission.migrate --mission <mission-id> --json
 ```
 
 **Scope:** workspace
@@ -430,7 +430,7 @@ Each migrator MUST have:
 - [x] `AGENTS.md` documents `mission.migrate` step and migrator authoring guidance (evidence: root AGENTS.md — 2026-07-24)
 - [x] `docs/COMMANDS.md` updated with `mission.migrate` and `migrator.registry.validate` (evidence: COMMANDS.md — 2026-07-24)
 - [x] `docs/requirements.xml` and `docs/technology.xml` updated for `migratorCursor` type change (evidence: requirements.xml, technology.xml — 2026-07-24)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0479 — 0 errors, 1 warning — 2026-07-24)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate RFC-0479 — 0 errors, 1 warning — 2026-07-24)
 - [x] `pnpm --filter @gogol/site-kernel-handoff build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)
 - [x] `pnpm --filter @gogol/ontology build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)
 

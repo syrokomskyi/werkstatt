@@ -116,7 +116,7 @@ copyrightNotice: "© 2026 business.legal.companyName"
 `content.ref-index.generate` — scans `src/content/`, parses all `.md` frontmatter and `.yaml` files, builds the index, writes `src/content-ref-index.generated.yaml`.
 
 ```sh
-pnpm exec site-kernel run content.ref-index.generate --site <app-id> [--json]
+pnpm exec werkstatt run content.ref-index.generate --site <app-id> [--json]
 ```
 
 - **Idempotent:** re-running produces identical output.
@@ -132,7 +132,7 @@ pnpm exec site-kernel run content.ref-index.generate --site <app-id> [--json]
 The existing `content.references.validate` command (RFC-0073) is updated to validate braceless references against the index. No new validator command is introduced — `content.references.validate` already runs in `sites-check-author` and is the canonical reference validator.
 
 ```sh
-pnpm exec site-kernel run content.references.validate --site <app-id> [--json]
+pnpm exec werkstatt run content.references.validate --site <app-id> [--json]
 ```
 
 - **Author-time validation:** runs in `sites-check-author` pipeline (existing position, line 263).

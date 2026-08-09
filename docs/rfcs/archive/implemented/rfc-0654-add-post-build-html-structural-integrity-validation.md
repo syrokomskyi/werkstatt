@@ -64,7 +64,7 @@ nonGoals:
   - "Does not detect duplicate structural tags (e.g. two <main> elements) — targets tag imbalance from mutator damage, not tag duplication"
   - "Does not include <html> in the structural tag list — regex mutators operate within page body, not the root element"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -112,8 +112,8 @@ The kernel gains a `dist.html-structure.validate` command that checks tag balanc
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run dist.html-structure.validate --site warpgogol-com
-pnpm exec site-kernel run dist.html-structure.validate --site warpgogol-com --json
+pnpm exec werkstatt run dist.html-structure.validate --site warpgogol-com
+pnpm exec werkstatt run dist.html-structure.validate --site warpgogol-com --json
 ```
 
 Scope: `app`. Flags: `--site` (or `--app`), `--json`, `--dry-run`.

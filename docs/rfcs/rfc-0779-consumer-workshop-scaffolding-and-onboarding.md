@@ -62,7 +62,7 @@ nonGoals:
   - "No first-project creation — that is onboarding.scaffold per stack"
   - "No DNA-64 registration — that is RFC-0769 (charter); this RFC depends on it being accepted first"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

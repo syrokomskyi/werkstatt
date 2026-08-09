@@ -94,7 +94,7 @@ scope:
 
 **Validation:**
 
-- `rtk pnpm exec site-kernel run archetype.registry.build` — archetype index regenerates with the new entry.
+- `rtk pnpm exec werkstatt run archetype.registry.build` — archetype index regenerates with the new entry.
 - Verify `packages/ontology/archetypes/index.yaml` contains the new archetype entry.
 
 **Completion criterion:** Archetype YAML exists and `archetype.registry.build` exits 0 with the new archetype registered.
@@ -155,7 +155,7 @@ scope:
 
 **Agent actions:**
 
-- Run `rtk pnpm exec site-kernel run props.types.generate` — generates `scroll-to-top-component.types.generated.ts`.
+- Run `rtk pnpm exec werkstatt run props.types.generate` — generates `scroll-to-top-component.types.generated.ts`.
 - Edit `packages/ui/package.json`: add three export entries for scroll-to-top (following the currency-selector pattern):
   - `"./components/scroll-to-top"` → `"./src/components/scroll-to-top/scroll-to-top-component.astro"`
   - `"./components/scroll-to-top.astro"` → same
@@ -199,8 +199,8 @@ scope:
 
 **Agent actions:**
 
-- Run `rtk pnpm exec site-kernel run archetype.registry.build` — regenerate `packages/ontology/archetypes/index.yaml` with scroll-to-top entry.
-- Run `rtk pnpm exec site-kernel run props.types.generate` — regenerate types if needed.
+- Run `rtk pnpm exec werkstatt run archetype.registry.build` — regenerate `packages/ontology/archetypes/index.yaml` with scroll-to-top entry.
+- Run `rtk pnpm exec werkstatt run props.types.generate` — regenerate types if needed.
 - Verify `packages/ontology/archetypes/index.yaml` contains `scroll-to-top` archetype with `Daphnis` cosmic name.
 
 **Validation:**
@@ -239,7 +239,7 @@ scope:
 
 **Agent actions:**
 
-- Run `rtk pnpm exec site-kernel run rfc.validate --id RFC-0768 --json` — RFC validation.
+- Run `rtk pnpm exec werkstatt run rfc.validate --id RFC-0768 --json` — RFC validation.
 - Run `rtk pnpm --filter @warpgogol/ontology run build:check` — ontology typecheck.
 - Run `rtk pnpm --filter @warpgogol/ui run build:check` — UI typecheck.
 - Run `rtk pnpm --filter @warpgogol/share run build:check` — share typecheck (impacted via generated archetype index).
@@ -266,13 +266,13 @@ scope:
 - Run `fo-doc-audit` via the `skill` tool to sync documentation surfaces.
 - Run `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - If `fo-review` reported findings, run `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
-- Run `rtk pnpm exec site-kernel run rfc.implement.stamp --id RFC-0768 --implementation-commit <sha>` (dry-run first, then without --dry-run).
+- Run `rtk pnpm exec werkstatt run rfc.implement.stamp --id RFC-0768 --implementation-commit <sha>` (dry-run first, then without --dry-run).
 - Commit the stamped RFC file separately.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from this session.
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0768` — passes with zero errors.
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0768` — passes with zero errors.
 - Review report exists in `docs/reviews/code/`.
 - RFC status is `implemented`.
 
@@ -284,12 +284,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0768`
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0768`
 - `rtk pnpm --filter @warpgogol/ontology run build:check`
 - `rtk pnpm --filter @warpgogol/ui run build:check`
 - `rtk pnpm --filter @warpgogol/share run build:check`
-- `rtk pnpm exec site-kernel run archetype.registry.build`
-- `rtk pnpm exec site-kernel run props.types.generate`
+- `rtk pnpm exec werkstatt run archetype.registry.build`
+- `rtk pnpm exec werkstatt run props.types.generate`
 
 ### 4.2 Evidence artifacts
 
@@ -308,4 +308,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `rtk pnpm exec site-kernel run rfc.supersede.propose --id RFC-0768 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `rtk pnpm exec werkstatt run rfc.supersede.propose --id RFC-0768 --reason "..." --invariant "DNA-N"` instead of working around it.

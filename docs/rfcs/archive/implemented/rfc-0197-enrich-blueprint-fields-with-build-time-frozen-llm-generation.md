@@ -77,7 +77,7 @@ A Blueprint may declare **enriched fields**: named fields whose values are produ
 
 ```sh
 # Explicit, separate, rate-limited generation step — NOT part of build.check
-pnpm exec site-kernel run surface.enrich --app warpgogol-com --blueprint website-local --json
+pnpm exec werkstatt run surface.enrich --app warpgogol-com --blueprint website-local --json
 ```
 
 ### TypeScript contracts

@@ -55,7 +55,7 @@ packagesImpacted:
 successSignals: []
 nonGoals: []
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -110,14 +110,14 @@ No new commands. `release.publish` gains an inline artifact storage step:
 
 ```sh
 # release.publish — now stores artifact automatically before state transition
-pnpm exec site-kernel run release.publish --release warpgogol-com-r000003
+pnpm exec werkstatt run release.publish --release warpgogol-com-r000003
 # Output:
 #   [release.publish] artifact stored: sha256:5350baa5... (tar.gz, 2.3 MB)
 #   [release.publish] artifact URI: local://.werkstatt/artifacts/releases/sha256/53/5350baa5....manifest.json
 #   [release.publish] release warpgogol-com-r000003 published
 
 # leitstand.propagate — now works without manual artifact.store.put
-pnpm exec site-kernel run leitstand.propagate --system warpgogol-com --release warpgogol-com-r000003 --channel alt
+pnpm exec werkstatt run leitstand.propagate --system warpgogol-com --release warpgogol-com-r000003 --channel alt
 # Preflight passes — artifact is in store
 ```
 
@@ -253,7 +253,7 @@ The `artifactUri` and `distVerified` fields already exist in `ReleasePublishData
 - [x] `release.validate` checks that published releases have a non-null `artifact` field (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:667-677, test: packages/os/site-kernel-handoff/src/tests/release-0596-artifact-storage.test.ts "release.validate flags published release without artifact")
 - [x] Existing `systemId` derivation bug in `artifact-store-commands.ts` is fixed (use release manifest's `systemId`, not `releaseId.split("-m")`) (evidence: packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts:187-199, deriveSystemIdFromRelease reads release.yaml, test: "storeArtifactCore uses provided systemId, not releaseId.split")
 - [x] Unit tests cover: publish stores artifact before transition, publish fails on missing dist (remains prepared), artifact storage failure leaves release prepared, re-publish is idempotent, lock-free helper does not deadlock (evidence: packages/os/site-kernel-handoff/src/tests/release-0596-artifact-storage.test.ts, 9 tests all passing)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0596 --json exitCode=0)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate RFC-0596 --json exitCode=0)
 
 ## Implementation notes for agents
 

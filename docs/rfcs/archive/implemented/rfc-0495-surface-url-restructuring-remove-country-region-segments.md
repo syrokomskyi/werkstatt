@@ -240,16 +240,16 @@ No new commands. Existing commands are updated:
 
 ```sh
 # Generates _redirects with reversed redirect entries (old → new)
-pnpm exec site-kernel run public.infrastructure.generate --site warpgogol-com
+pnpm exec werkstatt run public.infrastructure.generate --site warpgogol-com
 
 # Validates _redirects file carries generated marker and has valid entries
-pnpm exec site-kernel run redirect.map.validate --site warpgogol-com
+pnpm exec werkstatt run redirect.map.validate --site warpgogol-com
 
 # Generates surface pages at new URLs
-pnpm exec site-kernel run surface.generate --site warpgogol-com
+pnpm exec werkstatt run surface.generate --site warpgogol-com
 
 # Validates surface artifacts (sitemap, internal links) use new URL patterns
-pnpm exec site-kernel run surface.validate --site warpgogol-com
+pnpm exec werkstatt run surface.validate --site warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -346,7 +346,7 @@ The migrator (`rfc-0495`) is a no-op on authored data. `mission.migrate` runs th
 - [x] `surface.contract.validate` passes with the updated `url-schema.yaml`. (evidence: `url-schema.yaml` updated with depth-5 route pattern `/:locale?/:industry/:city/:demand`)
 - [x] Migrator `rfc-0495` registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts`. (evidence: `registry.ts` line 27 imports `rfc0495Migrator`, line 35 in `migratorRegistry` array)
 - [x] `migrator.registry.validate` passes with the new migrator. (evidence: `migrator.registry.validate` exit 0 for rfc-0495; pre-existing rfc-0492 snapshot gap unrelated)
-- [x] `rfc.validate` passes on this file. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0495` exit 0 after evidence annotations and amends fix)
+- [x] `rfc.validate` passes on this file. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0495` exit 0 after evidence annotations and amends fix)
 
 ## Implementation notes for agents
 

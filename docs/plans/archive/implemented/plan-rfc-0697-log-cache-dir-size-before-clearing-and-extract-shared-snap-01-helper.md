@@ -50,7 +50,7 @@ None — no config or schema changes.
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0697` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0697` — RFC validation
 
 ## 3. Step sequence
 
@@ -145,16 +145,16 @@ None — no config or schema changes.
 **Agent actions:**
 
 - Verify no `AGENTS.md` or `docs/*.xml` updates are needed (no new commands, no DNA changes, no ownership changes)
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed (they did not — `commands.changed` only, no new commands)
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed (they did not — `commands.changed` only, no new commands)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0697 --implementation-commit <sha>` (use the first implementation commit SHA).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0697 --implementation-commit <sha>` (use the first implementation commit SHA).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0697` — passes with zero errors
+- `pnpm exec werkstatt run rfc.validate --id RFC-0697` — passes with zero errors
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — passes
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — all tests pass
 - Review report exists in `docs/reviews/code/` for this session
@@ -167,7 +167,7 @@ None — no config or schema changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0697`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0697`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -187,4 +187,4 @@ None — no config or schema changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0697 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0697 --reason "..." --invariant "DNA-N"` instead of working around it.

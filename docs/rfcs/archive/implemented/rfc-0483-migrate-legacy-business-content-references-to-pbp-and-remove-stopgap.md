@@ -226,7 +226,7 @@ No `docs/*.xml` Compass files reference the `business` content collection — ve
 
 After migration, the following AGENTS.md files need regeneration or manual updates:
 
-- `systems/warpgogol-com/AGENTS.md` — GENERATED file, references `src/content/business/{lang}/` in lines 30, 95, 119. Regenerate with `pnpm exec site-kernel run agents.generate --site warpgogol-com` after the `business/` directory is deleted.
+- `systems/warpgogol-com/AGENTS.md` — GENERATED file, references `src/content/business/{lang}/` in lines 30, 95, 119. Regenerate with `pnpm exec werkstatt run agents.generate --site warpgogol-com` after the `business/` directory is deleted.
 - `systems/warpgogol-com/src/content/AGENTS.md` — GENERATED file, references `business/{lang}/` in the content domain map. Regenerate with `agents.generate`.
 - `docs/authoring/site-composition.md` — hand-maintained, references `src/content/business/` in lines 136, 159, 188, 448. Update manually to reference `src/content/business-profile/` and `src/content/people/` instead.
 

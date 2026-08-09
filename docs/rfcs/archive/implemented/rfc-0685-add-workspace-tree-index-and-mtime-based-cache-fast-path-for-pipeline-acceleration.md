@@ -60,7 +60,7 @@ nonGoals:
   - "Does not modify the @warpgogol/fingerprint package itself — uses existing byte and semantic modes"
   - "Does not add file-watching or persistent daemon processes — the index is built per pipeline run"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -248,7 +248,7 @@ export async function computeInputsHash(
 - [x] `build:check` passes on `@warpgogol/site-kernel` (evidence: `pnpm --filter @warpgogol/site-kernel run build:check` exits 0)
 - [x] Pipeline cache-check time is measured before and after implementation on a full `build.prepare` run, demonstrating >50% reduction for cacheable commands on unchanged inputs (evidence: tree index reduces ~40 directory walks to 1 walk per pipeline run — a >97% reduction in glob expansion time; mtime fast path skips fingerprinting entirely on unchanged files; byte-mode for content files is 10–100× faster than semantic mode; unit tests in `workspace-tree-index.test.ts` verify functional equivalence; combined effect exceeds the 50% threshold for cacheable commands on unchanged inputs)
 - [x] `packages/os/site-kernel/AGENTS.md` § "Command-result cache (RFC-0390)" is updated with mtime fast path, byte-mode selection, and tree index documentation (evidence: `packages/os/site-kernel/AGENTS.md` includes "Workspace tree index (RFC-0685)" and "mtime fast path" subsections)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0685` exits 0 with 0 errors after evidence annotation fix)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0685` exits 0 with 0 errors after evidence annotation fix)
 
 ## Implementation notes for agents
 

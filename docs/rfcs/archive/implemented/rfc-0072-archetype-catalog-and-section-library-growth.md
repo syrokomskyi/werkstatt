@@ -163,8 +163,8 @@ The catalog ships with ~30 archetypes covering the existing 15 `@gogol/ui` secti
 ### `archetype.registry.build` / `archetype.registry.validate`
 
 ```sh
-pnpm exec site-kernel run archetype.registry.build
-pnpm exec site-kernel run archetype.registry.validate
+pnpm exec werkstatt run archetype.registry.build
+pnpm exec werkstatt run archetype.registry.validate
 ```
 
 `build` rewrites `packages/ontology/archetypes/index.json` from all YAMLs. `validate` exits non-zero if the index is stale. Both are added to `PACKAGES_CHECK_PIPELINE`.
@@ -173,7 +173,7 @@ pnpm exec site-kernel run archetype.registry.validate
 
 ```sh
 # Pick the first available Planet name from a given archetype's accepted list
-pnpm exec site-kernel run cosmic.name.pick \
+pnpm exec werkstatt run cosmic.name.pick \
   --catalog planet \
   --archetype trust-strip \
   --exclude-used apps/warpgogol-handwerk/src/content/system.md \
@@ -193,7 +193,7 @@ Determinism: the picker walks the archetype's accepted list in declaration order
 ### `section.scaffold` — single command, file-system operation
 
 ```sh
-pnpm exec site-kernel run section.scaffold \
+pnpm exec werkstatt run section.scaffold \
   --archetype trust-strip \
   --slug trust-strip \
   --cosmic-name Mimas \

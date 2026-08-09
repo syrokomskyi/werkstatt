@@ -114,7 +114,7 @@ No configuration or data changes. No new YAML/JSON/NDJSON files. No ontology cat
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0562 --json`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0562 --json`.
 - Verify zero violations.
 
 **Validation:**
@@ -157,13 +157,13 @@ No configuration or data changes. No new YAML/JSON/NDJSON files. No ontology cat
 - **Code review:** invoke `fo-review` via the `skill` tool on all session changes (`git diff <merge-base-of-session>...HEAD`). Since this RFC produces no code changes, the review will cover only the RFC file edits (status transition, acceptance criteria checkmarks). Wait for the review report in `docs/reviews/code/`.
 - **Fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the RFC body. Mark `[x]` for verified criteria with inline `(evidence: <RFC section>, <line range>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0562 --implementation-commit <sha> --dry-run` first, then without `--dry-run`. The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0562 --implementation-commit <sha> --dry-run` first, then without `--dry-run`. The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields.
 - **Commit the stamped RFC separately** — the implementation commit and the stamp commit MUST be separate commits (per PREFERENCES.md §RFC implementation completion rules).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0562` — passes with zero violations.
+- `pnpm exec werkstatt run rfc.validate RFC-0562` — passes with zero violations.
 - Review report exists in `docs/reviews/code/` for this session.
 - RFC status is `implemented` (set by `rfc.implement.stamp`, not by hand).
 
@@ -175,7 +175,7 @@ No configuration or data changes. No new YAML/JSON/NDJSON files. No ontology cat
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0562` — mechanical validation.
+- `pnpm exec werkstatt run rfc.validate RFC-0562` — mechanical validation.
 - No `build:check` needed — no code changes.
 - No acceptance probes — the RFC has no `acceptance` probes declared.
 - No `rfc.verification.emit` needed — no acceptance probes (RFC-0330 applies only to probe-bearing RFCs).
@@ -197,6 +197,6 @@ No configuration or data changes. No new YAML/JSON/NDJSON files. No ontology cat
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 (Monorepo boundary), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0562 --reason "..." --invariant "DNA-1"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 (Monorepo boundary), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0562 --reason "..." --invariant "DNA-1"` instead of working around it.
 - If the per-layer RFCs (0563–0566) reveal that the umbrella architecture needs to change, create a superseding RFC for RFC-0562 rather than amending it in place.
 - If a future RFC establishes a DNA invariant for P2P topology, update RFC-0562's `satisfies[]` and `related[]` fields via an amending RFC.

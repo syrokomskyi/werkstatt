@@ -63,7 +63,7 @@ nonGoals:
   - "Do not remove the preview image generation pipeline — it is required for social media sharing."
   - "Do not address icon generation (favicon.ico, icon-192.png, etc.) — those are generated from fixed SVG sources and are already deterministic."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -121,7 +121,7 @@ The `preview.images.generate` rendering pipeline is made deterministic by fixing
 No new commands. The fix is internal to `preview.images.generate`:
 
 ```sh
-pnpm exec site-kernel run preview.images.generate --site warpgogol-com
+pnpm exec werkstatt run preview.images.generate --site warpgogol-com
 ```
 
 ### Determinism strategy
@@ -227,7 +227,7 @@ The `--json` output shape is unchanged from the current command. The `data.items
 - [x] Unit test in `src/tests/preview-determinism.test.ts` renders a sample preview image twice and asserts `Buffer.equals()` on the two PNG buffers (evidence: `packages/os/site-kernel-checks/src/tests/preview-determinism.test.ts` — 5 tests, all passing, including byte-identical assertion across 5 consecutive calls)
 - [x] If Phase 1 is insufficient, `@resvg/resvg-js` is added and the same determinism test passes with `resvg` rendering (evidence: Phase 1 is sufficient — E2E determinism verified with sharp, no Phase 2 needed)
 - [x] `--force-normalize` flag still works (re-renders existing cards with deterministic output) (evidence: `packages/os/site-kernel-checks/src/preview-images.ts:210` — `forceNormalize` flag preserved, re-render path at lines 298-318 and 360-395 uses `writeFileIfChanged` with deterministic `generateBrandCardPng`)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --root .` — no RFC-0603-specific errors)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --root .` — no RFC-0603-specific errors)
 
 ## Implementation notes for agents
 

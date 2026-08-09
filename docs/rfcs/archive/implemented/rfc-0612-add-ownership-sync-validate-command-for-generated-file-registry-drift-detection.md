@@ -65,7 +65,7 @@ nonGoals:
   - "Do not auto-add missing entries to GENERATOR_OWNERSHIP_MAP — the command is informational: it reports and exits non-zero."
   - "Do not check authored content files in src/content/ — they are not generated outputs."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -117,8 +117,8 @@ The command runs in the `build.prepare` pipeline before `generated.stale.validat
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ownership.sync.validate --site warpgogol-com
-pnpm exec site-kernel run ownership.sync.validate --site warpgogol-com --json
+pnpm exec werkstatt run ownership.sync.validate --site warpgogol-com
+pnpm exec werkstatt run ownership.sync.validate --site warpgogol-com --json
 ```
 
 Flags: `--site <id>` (required), `--json` (optional). Scope: workspace (runs per-site in pipeline).
@@ -204,7 +204,7 @@ All placeholders in `GENERATOR_OWNERSHIP_MAP` entries (`{system}`, `{app}`, `{la
 - [x] Static assets in `public/` excluded from OWN-01 via reused `STATIC_ASSET_EXEMPT_DIRS` from `generated-stale-validate.ts` (evidence: `packages/os/site-kernel-checks/src/tests/ownership-sync-validate.test.ts:149-160`, test "green: static asset in public/textures/ -> no OWN-01")
 - [x] `conditional: true` entries exempt from OWN-02 when condition not met (evidence: `packages/os/site-kernel-checks/src/tests/ownership-sync-validate.test.ts:162-175`, test "green: conditional entry with no matching file -> no OWN-02")
 - [x] `pnpm --filter @warpgogol/site-kernel-checks test -- --run` passes with new tests (evidence: 669 tests pass, 110 test files, including 7 new ownership-sync-validate tests)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0612 --json` — zero violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0612 --json` — zero violations)
 
 ## Implementation notes for agents
 

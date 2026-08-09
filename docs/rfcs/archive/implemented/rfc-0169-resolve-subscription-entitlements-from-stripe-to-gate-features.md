@@ -78,8 +78,8 @@ Stripe Entitlements is adopted as the single source of truth for paid features. 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run entitlements.resolve --app warpgogol-com
-pnpm exec site-kernel run entitlements.validate --all --json
+pnpm exec werkstatt run entitlements.resolve --app warpgogol-com
+pnpm exec werkstatt run entitlements.validate --all --json
 ```
 
 ### TypeScript contracts

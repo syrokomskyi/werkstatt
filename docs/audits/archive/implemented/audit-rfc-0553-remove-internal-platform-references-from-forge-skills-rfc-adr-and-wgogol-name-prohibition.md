@@ -32,7 +32,7 @@ Pass — zero violations targeting RFC-0553.
 
 ## Axis B — DNA alignment
 
-- **DNA-54 (Forge bindings contract)** — the RFC claims to extend it. DNA-54 says "Canonical forge skill bodies must not contain hardcoded project-specific literals (commands, paths, terminology) in instruction lines." SKILL-17 extends this with a prohibition on specific terms. The extension is plausible but the RFC does not explain how SKILL-17 relates to SKILL-11 — are they complementary or overlapping? SKILL-11 already checks for `pnpm exec site-kernel run` and `docs/architecture-dna.md`. SKILL-17 adds term-based checks. The RFC should clarify the boundary.
+- **DNA-54 (Forge bindings contract)** — the RFC claims to extend it. DNA-54 says "Canonical forge skill bodies must not contain hardcoded project-specific literals (commands, paths, terminology) in instruction lines." SKILL-17 extends this with a prohibition on specific terms. The extension is plausible but the RFC does not explain how SKILL-17 relates to SKILL-11 — are they complementary or overlapping? SKILL-11 already checks for `pnpm exec werkstatt run` and `docs/architecture-dna.md`. SKILL-17 adds term-based checks. The RFC should clarify the boundary.
 - **`satisfies: [DNA-54]`** is correct — the RFC extends the forge bindings contract.
 - No conflict with other DNA invariants.
 

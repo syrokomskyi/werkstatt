@@ -124,12 +124,12 @@ The generated Agent Control Plane should include enough summary data for agents 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run test.signal.validate --json
-pnpm exec site-kernel run test.signal.policy.validate --json
-pnpm exec site-kernel run maintenance.debt.report --json
-pnpm exec site-kernel run maintenance.debt.baseline.write --json
-pnpm exec site-kernel run maintenance.debt.baseline.validate --json
-pnpm exec site-kernel run maintenance.debt.triage.report --json
+pnpm exec werkstatt run test.signal.validate --json
+pnpm exec werkstatt run test.signal.policy.validate --json
+pnpm exec werkstatt run maintenance.debt.report --json
+pnpm exec werkstatt run maintenance.debt.baseline.write --json
+pnpm exec werkstatt run maintenance.debt.baseline.validate --json
+pnpm exec werkstatt run maintenance.debt.triage.report --json
 ```
 
 `test.signal.policy.validate` is workspace-scoped and read-only.
@@ -302,7 +302,7 @@ Generated baseline churn can become noisy if diagnostic keys are unstable. The i
 - [x] `maintenance.debt.triage.report --json` groups current debt by priority and source command. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] The Agent Control Plane projects test signal and debt baseline summaries. (evidence: implemented historically)
 - [x] `ci.local.validate` and the general CI workflow include the accepted policy/baseline commands. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run packages-check.run --json`, `pnpm exec site-kernel run ci.local.validate --json`, `pnpm test`, `pnpm build`, and `rfc.validate` pass. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run --json`, `pnpm exec werkstatt run ci.local.validate --json`, `pnpm test`, `pnpm build`, and `rfc.validate` pass. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

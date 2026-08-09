@@ -160,10 +160,10 @@ The prohibited visible strings and the matching strategy are declared in the Lay
 
 ```sh
 # Validate media leakage on rendered surface pages
-pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json
+pnpm exec werkstatt run surface.media-leakage.validate --site warpgogol-com --json
 
 # Validate Layer C contract (includes media-leakage policy)
-pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json
+pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json
 ```
 
 `surface.media-leakage.validate` is site-scoped and runs in `sites-check-postbuild` (after the production build, because it scans rendered HTML from `dist/client/`). It exits non-zero when any prohibited string is found in visible HTML, or when an AI-generated image lacks the `Konzeptillustration` label or `/bildnachweise/#...` link.

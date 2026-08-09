@@ -100,7 +100,7 @@ nonGoals:
   - "No engine or plugin code changes — this RFC rewrites the workshop composition point only"
   - "No new workshops — RFC-0779"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -200,23 +200,23 @@ Commands referencing `site-kernel run` become `werkstatt run`:
 
 | Binding | Before | After |
 | --- | --- | --- |
-| `validateRfc` | `pnpm exec site-kernel run rfc.validate ...` | `pnpm exec werkstatt run rfc.validate ...` |
-| `validateAdr` | `pnpm exec site-kernel run adr.validate ...` | `pnpm exec werkstatt run adr.validate ...` |
-| `implementStamp` | `pnpm exec site-kernel run rfc.implement.stamp ...` | `pnpm exec werkstatt run rfc.implement.stamp ...` |
+| `validateRfc` | `pnpm exec werkstatt run rfc.validate ...` | `pnpm exec werkstatt run rfc.validate ...` |
+| `validateAdr` | `pnpm exec werkstatt run adr.validate ...` | `pnpm exec werkstatt run adr.validate ...` |
+| `implementStamp` | `pnpm exec werkstatt run rfc.implement.stamp ...` | `pnpm exec werkstatt run rfc.implement.stamp ...` |
 | `typecheck` | `pnpm --filter {workspace} run build:check` | (unchanged) |
-| `specValidate` | `pnpm exec site-kernel run spec.validate ...` | `pnpm exec werkstatt run spec.validate ...` |
-| `sessionSave` | `pnpm exec site-kernel run session.save ...` | `pnpm exec werkstatt run session.save ...` |
-| `manifestGenerate` | `pnpm exec site-kernel run command.manifest.generate` | `pnpm exec werkstatt run command.manifest.generate` |
+| `specValidate` | `pnpm exec werkstatt run spec.validate ...` | `pnpm exec werkstatt run spec.validate ...` |
+| `sessionSave` | `pnpm exec werkstatt run session.save ...` | `pnpm exec werkstatt run session.save ...` |
+| `manifestGenerate` | `pnpm exec werkstatt run command.manifest.generate` | `pnpm exec werkstatt run command.manifest.generate` |
 
 The `skillPacks` dir updates from `packages/warpgogol-skills/skills` to `packages/werkstatt-site/src/domain/skills/skills`.
 
 ### 6. Retire `site-kernel` CLI name
 
-All scripts, hooks, CI workflows, and docs referencing `pnpm exec site-kernel run` switch to `pnpm exec werkstatt run`. The exact CLI syntax:
+All scripts, hooks, CI workflows, and docs referencing `pnpm exec werkstatt run` switch to `pnpm exec werkstatt run`. The exact CLI syntax:
 
 ```sh
 # Before
-pnpm exec site-kernel run rfc.validate --id RFC-XXXX --json
+pnpm exec werkstatt run rfc.validate --id RFC-XXXX --json
 
 # After
 pnpm exec werkstatt run rfc.validate --id RFC-XXXX --json

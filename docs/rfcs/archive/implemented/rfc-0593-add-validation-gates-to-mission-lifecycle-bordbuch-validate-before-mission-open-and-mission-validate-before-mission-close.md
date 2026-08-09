@@ -64,7 +64,7 @@ nonGoals:
   - "Does not cache mission.validate results — each mission.close runs a fresh validation"
   - "Does not add a --force bypass flag — validation gates are hard gates, not warnings"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -125,13 +125,13 @@ No new commands. Two existing commands gain pre-flight gates:
 
 ```sh
 # mission.open — now runs bordbuch.validate first
-pnpm exec site-kernel run mission.open --system warpgogol-com --brief "..."
+pnpm exec werkstatt run mission.open --system warpgogol-com --brief "..."
 # If bordbuch.validate fails:
 #   [ERROR] [mission.open] bordbuch for system 'warpgogol-com' has 1 violation(s) — run bordbuch.repair first
 #   [ERROR]   orphan-mission-close: mission 'warpgogol-com-m000020' has close without open
 
 # mission.close — now runs mission.validate first
-pnpm exec site-kernel run mission.close --mission warpgogol-com-m000021
+pnpm exec werkstatt run mission.close --mission warpgogol-com-m000021
 # If mission.validate fails:
 #   [ERROR] [mission.close] validation failed for mission 'warpgogol-com-m000021' — fix issues and re-run mission.validate
 #   [ERROR]   pbp.content.validate: 10 file(s) with schema violations

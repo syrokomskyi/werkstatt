@@ -152,10 +152,10 @@ This RFC also aligns with existing cross-site documentation:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run structure.hierarchy.validate --app nicaragua-projekt
-pnpm exec site-kernel run navigation.section.validate --app nicaragua-projekt
-pnpm exec site-kernel run structure.hierarchy.validate --all --json
-pnpm exec site-kernel pipeline build.check --app nicaragua-projekt
+pnpm exec werkstatt run structure.hierarchy.validate --app nicaragua-projekt
+pnpm exec werkstatt run navigation.section.validate --app nicaragua-projekt
+pnpm exec werkstatt run structure.hierarchy.validate --all --json
+pnpm exec werkstatt pipeline build.check --app nicaragua-projekt
 ```
 
 Command responsibilities:

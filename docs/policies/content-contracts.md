@@ -95,7 +95,7 @@ Every published material reference in `apps/*` needs an explicit credit record. 
 
 **Content-side rule:** when adding or changing a material token, add a sibling `*.credits.yaml` sidecar in the same content-local `assets/` folder, using the bare token as `target.id` and the matching target domain (`pages`, `business`, or `site`). The public credits page and inline disclosure are generated from these sidecars.
 
-**Do not land uncited material.** `material.credits.validate` runs in `sites-check.author` and `build:check`; missing, duplicate, invalid, or placeholder rights records are deploy-blocking. Run `pnpm exec site-kernel run material.credits.validate --site <app>` after adding video or image assets.
+**Do not land uncited material.** `material.credits.validate` runs in `sites-check.author` and `build:check`; missing, duplicate, invalid, or placeholder rights records are deploy-blocking. Run `pnpm exec werkstatt run material.credits.validate --site <app>` after adding video or image assets.
 
 See [docs/authoring/material-credits.md](../authoring/material-credits.md) for author and agent templates, including owner-provided, commissioned Warpgogol, and AI platform examples.
 

@@ -152,19 +152,19 @@ quality:
 
 ```sh
 # Mark a reviewed source artifact as ready for translation.
-pnpm exec site-kernel run surface.artifact.ready --app warpgogol-com \
+pnpm exec werkstatt run surface.artifact.ready --app warpgogol-com \
   --module pseo \
   --page-id website-local:friseur:deu:bw:karlsruhe:balayage \
   --field narrative
 
 # Generate all missing or outdated target-language drafts from ready source artifacts.
-pnpm exec site-kernel run surface.translation.generate --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run surface.translation.generate --app warpgogol-com --module pseo --json
 
 # Validate lifecycle, source hashes, approval gates, and stale translations.
-pnpm exec site-kernel run surface.translation.validate --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run surface.translation.validate --app warpgogol-com --module pseo --json
 
 # Validate deterministic target-language quality gates.
-pnpm exec site-kernel run surface.translation.qa.validate --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run surface.translation.qa.validate --app warpgogol-com --module pseo --json
 ```
 
 ### Generation rules

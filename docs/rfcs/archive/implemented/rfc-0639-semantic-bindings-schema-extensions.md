@@ -59,7 +59,7 @@ nonGoals:
   - Do not modify fo-* skill language in this RFC — that is RFC-0642
   - Do not remove existing binding keys (typecheck, test, scopedBuild) — they remain as optional software-domain keys
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -264,7 +264,7 @@ No command output — this RFC is a schema extension only. `resolveTerminology()
 - [x] `terminology` schema changed from `.optional()` to `.default({})` in Zod and `ForgeBindings` interface (evidence: packages/forge/src/config/forge-config.ts:56, packages/forge/src/config/forge-config.ts:90)
 - [x] Existing forge.yaml files (software domain) parse without changes (evidence: packages/forge/src/tests/bindings-schema.test.ts:69-92, existing forge.yaml at repo root parses)
 - [x] `packages/forge/AGENTS.md` updated with semantic key and terminology documentation (evidence: packages/forge/AGENTS.md:127-149)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0639 --json` — status: pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0639 --json` — status: pass)
 
 ## Implementation notes for agents
 

@@ -70,7 +70,7 @@ status: draft
 - Use the exact config from RFC-0665 Design section (lines 138-210).
 - 8 instruments, 8 methodologies (visual-regression `active: false`), gate `all-must-pass`.
 
-**Validation**: `pnpm exec site-kernel run methodologies.validate`
+**Validation**: `pnpm exec werkstatt run methodologies.validate`
 
 ### Step 5: Update `leitstand.propagate` gate logic
 
@@ -182,8 +182,8 @@ status: draft
 - Run `pnpm --filter @warpgogol/site-kernel-checks test`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0665`
-- Run `pnpm exec site-kernel pipeline packages-check.run` (verify `methodologies.validate` passes)
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0665`
+- Run `pnpm exec werkstatt pipeline packages-check.run` (verify `methodologies.validate` passes)
 - Commit all changes.
 
 ## Blocked steps (Phase 2 — external package)

@@ -233,11 +233,11 @@ export async function loadI18nConfig(
 
 ```sh
 # Validate i18n configuration for an app
-pnpm exec site-kernel run i18n.config.validate --app nicaragua-projekt
-pnpm exec site-kernel run i18n.config.validate --all --json
+pnpm exec werkstatt run i18n.config.validate --app nicaragua-projekt
+pnpm exec werkstatt run i18n.config.validate --all --json
 
 # Auto-generate visitor detection script for an app
-pnpm exec site-kernel run i18n.detect.implement --app nicaragua-projekt
+pnpm exec werkstatt run i18n.detect.implement --app nicaragua-projekt
 ```
 
 `i18n.detect.implement` generates:

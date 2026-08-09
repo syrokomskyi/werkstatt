@@ -61,7 +61,7 @@ nonGoals:
   - "Do not implement the pre-commit hook script — that is RFC-0533's scope"
   - "Do not add ECOSYSTEM_COMMIT to .env files (persistent runtime config) — it is a transient env var set by ecosystem.commit, not a persistent configuration value. Documenting it in .env.example (documentation template) is in scope; adding it to .env (active config) is not."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

@@ -147,8 +147,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run system.manifest.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run page.block.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run system.manifest.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run page.block.validate --site warpgogol-com --json`
 
 **Completion criterion:** `team.md` exists in both locales with 4 blocks; `founder.md` and `prose/founder.md` are deleted in both locales; `system.md` has `team` page with `semanticType: collection` and `founder` in `retiredRoutes` with `status: 301`; navigation has `team` entry.
 
@@ -168,7 +168,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json`
 
 **Completion criterion:** `url-schema.yaml` includes both patterns; `surface.contract.validate` passes.
 
@@ -197,7 +197,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run team.hub.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run team.hub.validate --site warpgogol-com --json`
 
 **Completion criterion:** `team.hub.validate` passes on warpgogol-com; command is registered and appears in `sites-check-author` pipeline.
 
@@ -213,13 +213,13 @@ scope:
 
 - Update `docs/technology.xml`: add `/team/` route to the route table; document `retiredRoutes` 301 support in the system manifest section
 - Update `docs/knowledge-graph.xml`: add team hub page node; update founder page node to `retired` status
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Update `packages/ontology/AGENTS.md` if the `retiredRoutes` 301 extension needs documentation
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0509`
-- `pnpm exec site-kernel run sites-check.author --site warpgogol-com --json`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0509`
+- `pnpm exec werkstatt run sites-check.author --site warpgogol-com --json`
 
 **Completion criterion:** All scope docs are updated; `rfc.validate` passes; `sites-check.author` passes.
 
@@ -234,13 +234,13 @@ scope:
 **Agent actions:**
 
 - Verify every acceptance criterion in RFC-0509 against the implemented code. Mark `[x]` for verified criteria.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0509 --implementation-commit <sha>` to transition `accepted → implemented`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0509 --implementation-commit <sha>` to transition `accepted → implemented`.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0509`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0509`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 
 **Completion criterion:** All acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -251,14 +251,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0509`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0509`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run sites-check.author --site warpgogol-com --json`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run team.hub.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run sites-check.author --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run team.hub.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -275,5 +275,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages) or DNA-39 (route registry merge), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0509 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages) or DNA-39 (route registry merge), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0509 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `retiredRoutes` 301 extension conflicts with existing `b2b.model.validate` rules (B2B-CONFLICT-01), escalate to a superseding RFC rather than adding a special-case bypass.

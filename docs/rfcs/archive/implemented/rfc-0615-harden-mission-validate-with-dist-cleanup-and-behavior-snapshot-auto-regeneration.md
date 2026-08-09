@@ -66,7 +66,7 @@ nonGoals:
   - "Do not auto-regenerate the snapshot when the workpiece has uncommitted changes — only auto-regenerate from a clean workpiece state."
   - "Do not auto-resolve non-SNAP-01 errors — only SNAP-01 is deterministic."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -252,7 +252,7 @@ The `mission.validate` pipeline gains two pre-flight steps:
 - [x] `mission.validate` does NOT auto-resolve non-SNAP-01 errors (STALE-01, MDMETA-04, GEN-FILES-01) (evidence: packages/os/site-kernel-handoff/src/tests/mission-validate-snapshot-auto-regen.test.ts:272-287)
 - [x] `mission.git.commit` during auto-regeneration stages only the snapshot file (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:280-287 — dirty check before build.post ensures workpiece is clean, so only the regenerated snapshot is staged)
 - [x] `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes with new tests (evidence: 417 tests passed, 98 test files)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0615 --json`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0615 --json`)
 
 ## Implementation notes for agents
 

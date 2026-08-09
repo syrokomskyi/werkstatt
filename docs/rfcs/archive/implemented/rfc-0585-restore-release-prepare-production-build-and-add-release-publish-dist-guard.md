@@ -66,7 +66,7 @@ nonGoals:
   - Changing the release id derivation scheme or the six-digit numbering
   - Migrating existing crypto.createHash usage in behavior-snapshot-commands.ts and artifact-store-commands.ts to @warpgogol/fingerprint — that is a broader DNA-53 conformance concern that predates this RFC and should be addressed in a separate dedicated RFC
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -132,10 +132,10 @@ No new commands. Two existing commands change behavior:
 
 ```sh
 # release.prepare now runs production build and computes real hashes
-pnpm exec site-kernel run release.prepare --mission <mission-id> [--semver <semver>] [--json]
+pnpm exec werkstatt run release.prepare --mission <mission-id> [--semver <semver>] [--json]
 
 # release.publish now refuses releases with pending distTreeHash
-pnpm exec site-kernel run release.publish --release <release-id> [--json]
+pnpm exec werkstatt run release.publish --release <release-id> [--json]
 ```
 
 No new flags. The `--mission` and `--semver` flags on `release.prepare` and the `--release` flag on `release.publish` are unchanged.

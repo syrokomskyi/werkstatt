@@ -120,13 +120,13 @@ license:
 Run the focused validator after adding or changing materials:
 
 ```sh
-rtk pnpm exec site-kernel run material.credits.validate --site <app>
+rtk pnpm exec werkstatt run material.credits.validate --site <app>
 ```
 
 For full app readiness, run the app author gate or build check:
 
 ```sh
-rtk pnpm exec site-kernel run sites-check.author --site <app>
+rtk pnpm exec werkstatt run sites-check.author --site <app>
 rtk pnpm --filter <app> build:check
 ```
 

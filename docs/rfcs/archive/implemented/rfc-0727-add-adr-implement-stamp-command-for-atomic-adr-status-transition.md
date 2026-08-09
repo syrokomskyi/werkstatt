@@ -66,7 +66,7 @@ nonGoals:
   - "Does not add ADR lifecycle transitions beyond accepted/proposed → implemented"
   - "Does not make AV-16 an error — it remains a warning"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -124,10 +124,10 @@ The Forge ADR module gains `adr.implement.stamp` — the exclusive atomic path f
 
 ```sh
 # Dry-run (preview without mutation)
-pnpm exec site-kernel run adr.implement.stamp --id ADR-0003 --implementation-commit <sha> --dry-run
+pnpm exec werkstatt run adr.implement.stamp --id ADR-0003 --implementation-commit <sha> --dry-run
 
 # Atomic stamp
-pnpm exec site-kernel run adr.implement.stamp --id ADR-0003 --implementation-commit <sha>
+pnpm exec werkstatt run adr.implement.stamp --id ADR-0003 --implementation-commit <sha>
 ```
 
 Flags:

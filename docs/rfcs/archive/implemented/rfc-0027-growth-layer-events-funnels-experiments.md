@@ -392,12 +392,12 @@ Adapters that do not support a concern return `capabilities.<concern> === false`
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run growth.events.validate
-pnpm exec site-kernel run growth.funnel.validate
-pnpm exec site-kernel run growth.experiment.validate --app nicaragua-projekt
-pnpm exec site-kernel run growth.experiment.archive --app nicaragua-projekt
-pnpm exec site-kernel run growth.adapter.contract
-pnpm exec site-kernel run growth.vendor.resolve --app nicaragua-projekt
+pnpm exec werkstatt run growth.events.validate
+pnpm exec werkstatt run growth.funnel.validate
+pnpm exec werkstatt run growth.experiment.validate --app nicaragua-projekt
+pnpm exec werkstatt run growth.experiment.archive --app nicaragua-projekt
+pnpm exec werkstatt run growth.adapter.contract
+pnpm exec werkstatt run growth.vendor.resolve --app nicaragua-projekt
 ```
 
 | Command | Scope | Responsibility |

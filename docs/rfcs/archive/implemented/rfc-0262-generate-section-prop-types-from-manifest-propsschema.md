@@ -87,9 +87,9 @@ Unprotected invariants:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run props.types.generate            # all surfaces in packages/ui
-pnpm exec site-kernel run props.types.generate --dry-run
-pnpm exec site-kernel run props.contract.validate --json
+pnpm exec werkstatt run props.types.generate            # all surfaces in packages/ui
+pnpm exec werkstatt run props.types.generate --dry-run
+pnpm exec werkstatt run props.contract.validate --json
 ```
 
 Workspace scope (operates on `packages/ui`); wired into `PACKAGES_CHECK_PIPELINE` (validate) and the packages build/prepare flow (generate).

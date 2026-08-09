@@ -182,9 +182,9 @@ export interface AgentRepairTask {
 ### Commands
 
 ```sh
-pnpm exec site-kernel run check.report.generate --run .check-warpgogol/runs/<runId> --json
-pnpm exec site-kernel run check.action-pack.generate --run .check-warpgogol/runs/<runId> --json
-pnpm exec site-kernel run check.compare --before .check-warpgogol/runs/a --after .check-warpgogol/runs/b --json
+pnpm exec werkstatt run check.report.generate --run .check-warpgogol/runs/<runId> --json
+pnpm exec werkstatt run check.action-pack.generate --run .check-warpgogol/runs/<runId> --json
+pnpm exec werkstatt run check.compare --before .check-warpgogol/runs/a --after .check-warpgogol/runs/b --json
 ```
 
 ### Validation Rules

@@ -136,9 +136,9 @@ RFC-0126 does NOT make that decision; it only removes the noise that hides it.
 
 - [x] `UTILITY_SECTION_SLUGS` exists in `packages/os/site-kernel-checks/src/section-framework.ts` with `breadcrumbs` and `navigation`. (evidence: packages/ directory, package exists)
 - [x] `section.shell.contract.validate` and `section.background.contract.validate` skip files whose slug is in the set. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run section.shell.contract.validate` exits zero. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run section.background.contract.validate` exits zero. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run packages-check.run` produces strictly fewer failures than before this RFC (the 5 utility findings are gone; the 10 composite findings remain visible). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `pnpm exec werkstatt run section.shell.contract.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run section.background.contract.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run` produces strictly fewer failures than before this RFC (the 5 utility findings are gone; the 10 composite findings remain visible). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

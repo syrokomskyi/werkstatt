@@ -43,7 +43,7 @@ None. No YAML/JSON/manifest/ontology catalog changes.
 
 - `pnpm --filter @gogol/ontology build:check` — TypeScript type check
 - `pnpm --filter @gogol/ontology test` — vitest unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0484 --json` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate RFC-0484 --json` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -94,12 +94,12 @@ None. No YAML/JSON/manifest/ontology catalog changes.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0484 --implementation-commit <commit-sha>`.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0484 --implementation-commit <commit-sha>`.
 - Verify RFC status transitions to `implemented`.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0484 --json` passes with status `implemented`.
+- `pnpm exec werkstatt run rfc.validate RFC-0484 --json` passes with status `implemented`.
 
 **Completion criterion:** RFC-0484 frontmatter shows `status: implemented`.
 
@@ -109,7 +109,7 @@ None. No YAML/JSON/manifest/ontology catalog changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0484 --json` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate RFC-0484 --json` — RFC mechanical validation
 - `pnpm --filter @gogol/ontology build:check` — TypeScript type check
 - `pnpm --filter @gogol/ontology test` — vitest unit tests
 
@@ -126,4 +126,4 @@ None. No YAML/JSON/manifest/ontology catalog changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-42, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0484 --reason "..." --invariant "DNA-42"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-42, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0484 --reason "..." --invariant "DNA-42"` instead of working around it.

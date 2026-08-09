@@ -138,13 +138,13 @@ When this directive is present, `mirror.quartet.validate` checks that `public/sc
 
 ```sh
 # Validate the full quartet mirror for one app
-pnpm exec site-kernel run mirror.quartet.validate --app nicaragua-projekt
+pnpm exec werkstatt run mirror.quartet.validate --app nicaragua-projekt
 
 # Machine-readable output for CI
-pnpm exec site-kernel run mirror.quartet.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run mirror.quartet.validate --app nicaragua-projekt --json
 
 # Standalone run (outside pipeline)
-pnpm exec site-kernel run mirror.quartet.validate --app main
+pnpm exec werkstatt run mirror.quartet.validate --app main
 ```
 
 ### Validation rules

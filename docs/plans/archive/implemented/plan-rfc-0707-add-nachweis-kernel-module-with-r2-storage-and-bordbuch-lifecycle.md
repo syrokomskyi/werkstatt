@@ -242,7 +242,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run command.manifest.generate` (verify nachweis commands appear in manifest)
+- `pnpm exec werkstatt run command.manifest.generate` (verify nachweis commands appear in manifest)
 
 **Completion criterion:** Module loads in kernel config, 6 commands registered, pipeline steps added in correct positions, command manifest includes all 6 nachweis commands.
 
@@ -304,7 +304,7 @@ scope:
   - Add rules: entitlement gating pattern (skip result, not error), R2 bucket `nachweise` prerequisite (manual creation in Cloudflare Dashboard), atomicity gap in ingest (upload first, then append; on failure log R2 path for manual cleanup), `--pilot-n2-exception` is temporary and MUST be removed when N3 is implemented
   - Add cross-reference to RFC-0707 and RFC-0706
 - Update `docs/verification-plan.xml` if pipeline verification surface changed (add `nachweis.manifest.generate` and `nachweis.validate` to the pipeline step inventory if applicable)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 
 **Validation:**
 
@@ -323,19 +323,19 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0707`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0707`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0707` (if acceptance probes declared)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0707` (if acceptance probes declared)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: invoke `fo-fix` if review findings exist; re-run `fo-review` (max 3 iterations)
 - Check off all 13 acceptance criteria in the RFC with inline `(evidence: <file:line>)` annotations
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0707 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0707 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from this session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0707` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0707` — passes
 - Review report exists in `docs/reviews/code/`
 - All acceptance criteria checked `[x]` with evidence
 
@@ -347,11 +347,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0707`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0707`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0707` (if acceptance probes declared)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0707` (if acceptance probes declared)
 
 ### 4.2 Evidence artifacts
 
@@ -371,5 +371,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 (Bordbuch), DNA-53 (fingerprint governance), or DNA-59 (R2 evidence storage), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0707 --reason "..." --invariant "DNA-N"` instead of working around it. The supersede escalation protocol is defined in RFC-0158 and RFC-0224.
+- If implementation reveals an invariant conflict with DNA-46 (Bordbuch), DNA-53 (fingerprint governance), or DNA-59 (R2 evidence storage), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0707 --reason "..." --invariant "DNA-N"` instead of working around it. The supersede escalation protocol is defined in RFC-0158 and RFC-0224.
 - If RFC-0706 (schema extensions) is not yet `accepted` when implementation begins, stop and wait for RFC-0706 to reach `accepted` status. RFC-0707 depends on RFC-0706 for `BordbuchEntryKind` enum values (`nachweis-record`, `nachweis-consent`) and `ENTITLED_FEATURES` (`nachweis`).

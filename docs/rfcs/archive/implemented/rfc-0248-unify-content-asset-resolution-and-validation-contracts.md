@@ -102,8 +102,8 @@ This reinforces RFC-0141's single resolver rule and RFC-0204's provider portabil
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.asset.contract.validate --app warpgogol-com --json
-pnpm exec site-kernel run asset.reference.validate --app warpgogol-com --json
+pnpm exec werkstatt run content.asset.contract.validate --app warpgogol-com --json
+pnpm exec werkstatt run asset.reference.validate --app warpgogol-com --json
 ```
 
 `content.asset.contract.validate` is app-scoped and read-only. It verifies:

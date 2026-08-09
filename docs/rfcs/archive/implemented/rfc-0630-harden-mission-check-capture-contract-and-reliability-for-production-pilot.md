@@ -66,7 +66,7 @@ nonGoals:
   - "Does not clean up orphaned Crawlee storage datasets (contract digest includes recordedAt, so storage name is unique per run)"
   - "Does not clean up raw evidence artifacts after capsule staging (operational concern, not a code change)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -131,28 +131,28 @@ Five issues in `packages/os/site-kernel-checks/src/mission-check.ts` would cause
 
 ```sh
 # Default (with i18n auto-detection from mission workpiece)
-pnpm exec site-kernel run mission.check \
+pnpm exec werkstatt run mission.check \
   --mission <missionId> \
   --external-preview \
   --base-url https://dev-warpgogol-com.syrokomskyi.workers.dev \
   --commit-sha <sha>
 
 # Override discovery timeout for large sites
-pnpm exec site-kernel run mission.check \
+pnpm exec werkstatt run mission.check \
   --mission <missionId> \
   --external-preview \
   --base-url https://dev-warpgogol-com.syrokomskyi.workers.dev \
   --max-duration 180000
 
 # Override locales explicitly
-pnpm exec site-kernel run mission.check \
+pnpm exec werkstatt run mission.check \
   --mission <missionId> \
   --external-preview \
   --base-url https://dev-warpgogol-com.syrokomskyi.workers.dev \
   --locales de-DE,uk-UA
 
 # leitstand.dev-deploy (unchanged — mission.check reads i18n from --mission workpiece)
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com
 # internally calls:
 #   mission.check --mission=<id> --external-preview --base-url=<dev-url> --commit-sha=<sha>
 ```

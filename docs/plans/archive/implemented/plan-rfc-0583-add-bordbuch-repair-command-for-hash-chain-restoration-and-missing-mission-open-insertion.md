@@ -50,7 +50,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — scoped typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — unit tests including new repair test
-- `pnpm exec site-kernel run rfc.validate RFC-0583` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate RFC-0583` — RFC mechanical validation
 - No pipeline integration — `bordbuch.repair` is on-demand only, never in any pipeline
 
 ## 3. Step sequence
@@ -218,16 +218,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected — no pipeline integration).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not expected — no pipeline integration).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0583 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0583 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0583`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0583`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
@@ -241,7 +241,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0583`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0583`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -261,5 +261,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-51 (Werkstatt consistency primitives), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0583 --reason "..." --invariant "DNA-51"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-51 (Werkstatt consistency primitives), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0583 --reason "..." --invariant "DNA-51"` instead of working around it (RFC-0334).
 - If the `amends: [RFC-0355]` relationship causes validation issues beyond the V-19 warning (which is expected for archived RFCs), do not remove the `amends` — the V-19 warning is benign and the relationship is architecturally correct.

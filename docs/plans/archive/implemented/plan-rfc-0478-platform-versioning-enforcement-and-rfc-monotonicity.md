@@ -79,7 +79,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @wgogol/forge build:check` passes
-- `pnpm exec site-kernel run rfc.validate RFC-0478 --json` passes (V-20 does not warn on `versionBump`)
+- `pnpm exec werkstatt run rfc.validate RFC-0478 --json` passes (V-20 does not warn on `versionBump`)
 
 **Completion criterion:** `versionBump` is in `RFC_KNOWN_KEYS` and `RfcFrontmatter`; `rfc.validate` passes; `build:check` passes.
 
@@ -154,7 +154,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @wgogol/forge build:check` passes
-- `pnpm exec site-kernel run rfc.validate` passes on all RFCs (existing RFCs without `versionBump` are pre-cutoff, V-29 does not fire)
+- `pnpm exec werkstatt run rfc.validate` passes on all RFCs (existing RFCs without `versionBump` are pre-cutoff, V-29 does not fire)
 
 **Completion criterion:** `rfc-0000-template.md` contains `versionBump: patch`; `rfc.validate` passes.
 
@@ -189,7 +189,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run platform.consistency.validate --json` runs and exits 0 (first run seeds the file)
+- `pnpm exec werkstatt run platform.consistency.validate --json` runs and exits 0 (first run seeds the file)
 
 **Completion criterion:** Command registered and runnable; `--json` output matches `PlatformConsistencyData` shape; first-run seeding works.
 
@@ -203,7 +203,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run platform.consistency.validate` to seed the file
+- Run `pnpm exec werkstatt run platform.consistency.validate` to seed the file
 - Verify the file is not gitignored (check `.gitignore` — no `docs/*.generated.*` pattern)
 - Add the file to git
 
@@ -223,15 +223,15 @@ scope:
 
 **Agent actions:**
 
-- Add `"pnpm exec site-kernel run platform.consistency.validate --check --json"` to `CI_LOCAL_CHECKED_COMMANDS` in `packages/os/site-kernel-checks/src/ci-local.ts` (uses `--check` to avoid writing in CI)
+- Add `"pnpm exec werkstatt run platform.consistency.validate --check --json"` to `CI_LOCAL_CHECKED_COMMANDS` in `packages/os/site-kernel-checks/src/ci-local.ts` (uses `--check` to avoid writing in CI)
 - Add `{ command: "platform.consistency.validate", args: ["--check"] }` to `PACKAGES_CHECK_PIPELINE` in `packages/os/site-kernel-checks/src/pipelines/packages-check.ts` (after `fingerprint.fixtures.validate`, before `chat.metadata.drift.validate`)
 - Verify `.github/workflows/ci.yml` includes the command (enforced by `ci.local.validate`)
 
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes
-- `pnpm exec site-kernel run ci.local.validate --json` passes
-- `pnpm exec site-kernel run packages-check.run --json` passes
+- `pnpm exec werkstatt run ci.local.validate --json` passes
+- `pnpm exec werkstatt run packages-check.run --json` passes
 
 **Completion criterion:** Command appears in `CI_LOCAL_CHECKED_COMMANDS` and `PACKAGES_CHECK_PIPELINE`; `ci.local.validate` and `packages-check.run` pass.
 
@@ -255,8 +255,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run docs.commands.validate --json` passes (command docs in sync)
-- `pnpm exec site-kernel run rfc.validate --json` passes
+- `pnpm exec werkstatt run docs.commands.validate --json` passes (command docs in sync)
+- `pnpm exec werkstatt run rfc.validate --json` passes
 
 **Completion criterion:** All three docs updated; `docs.commands.validate` passes.
 
@@ -270,14 +270,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --json` — all RFCs pass
+- Run `pnpm exec werkstatt run rfc.validate --json` — all RFCs pass
 - Run `pnpm --filter @wgogol/forge build:check` — passes
 - Run `pnpm --filter @wgogol/forge test` — passes (including V-28/V-29 tests)
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check` — passes
 - Run `pnpm --filter @gogol/site-kernel-handoff test` — passes
-- Run `pnpm exec site-kernel run packages-check.run --json` — passes
-- Run `pnpm exec site-kernel run ci.local.validate --json` — passes
-- Run `pnpm exec site-kernel run platform.consistency.validate --json` — passes
+- Run `pnpm exec werkstatt run packages-check.run --json` — passes
+- Run `pnpm exec werkstatt run ci.local.validate --json` — passes
+- Run `pnpm exec werkstatt run platform.consistency.validate --json` — passes
 
 **Validation:**
 
@@ -297,7 +297,7 @@ scope:
 
 - Check all acceptance criteria checkboxes in the RFC body
 - Add `versionBump: patch` to RFC-0478 frontmatter (required by V-29 for post-cutoff implemented RFCs)
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0478`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0478`
 - Verify the stamp sets `status: implemented`, `implementedAt: 2026-07-21`, and records evidence
 
 **Validation:**
@@ -315,14 +315,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0478`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0478`
 - `pnpm --filter @wgogol/forge build:check`
 - `pnpm --filter @wgogol/forge test`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run packages-check.run --json`
-- `pnpm exec site-kernel run ci.local.validate --json`
-- `pnpm exec site-kernel run platform.consistency.validate --json`
+- `pnpm exec werkstatt run packages-check.run --json`
+- `pnpm exec werkstatt run ci.local.validate --json`
+- `pnpm exec werkstatt run platform.consistency.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -342,6 +342,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44/46/48/53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0478 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44/46/48/53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0478 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If V-28 produces false positives on existing RFCs that cannot be resolved by the "strictly earlier" rule, stop and create a superseding RFC — do not weaken V-28 to a warning.
 - If `platform.consistency.validate` cannot be registered in the `platform` module due to kernel constraints, fall back to registering in the `handoff` module and document the deviation.

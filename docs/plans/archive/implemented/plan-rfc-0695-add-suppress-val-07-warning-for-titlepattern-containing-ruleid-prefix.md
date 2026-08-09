@@ -134,7 +134,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run suppressions.validate --json` — verify zero SUPPRESS-VAL-07 warnings in output
+- Run `pnpm exec werkstatt run suppressions.validate --json` — verify zero SUPPRESS-VAL-07 warnings in output
 
 **Validation:**
 
@@ -152,8 +152,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate` — update `docs/command-manifest.generated.yaml` if the command table description changed
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0695` — zero violations
+- Run `pnpm exec werkstatt run command.manifest.generate` — update `docs/command-manifest.generated.yaml` if the command table description changed
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0695` — zero violations
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck passes
 - Run `pnpm --filter @warpgogol/site-kernel-checks exec vitest run src/tests/suppressions-validate.test.ts` — all tests pass
 
@@ -176,16 +176,16 @@ scope:
 **Agent actions:**
 
 - Update affected `AGENTS.md` files with new diagnostic (done in Step 4).
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed (done in Step 6).
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed (done in Step 6).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0695 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0695 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0695`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0695`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -196,10 +196,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0695`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0695`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks exec vitest run src/tests/suppressions-validate.test.ts`
-- `pnpm exec site-kernel run suppressions.validate --json` — verify no SUPPRESS-VAL-07 on default rules
+- `pnpm exec werkstatt run suppressions.validate --json` — verify no SUPPRESS-VAL-07 on default rules
 
 ### 4.2 Evidence artifacts
 
@@ -215,4 +215,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0695 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0695 --reason "..." --invariant "DNA-N"` instead of working around it.

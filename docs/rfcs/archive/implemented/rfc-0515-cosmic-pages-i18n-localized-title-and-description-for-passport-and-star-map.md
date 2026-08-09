@@ -62,7 +62,7 @@ nonGoals:
   - "Does not add new cosmic pages or remove existing ones."
   - "Does not add a build-time validator command — the fix is in the generator, enforced by a generator unit test, not a runtime check on generated output."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -217,7 +217,7 @@ The test uses exact-match (full tagline string) to avoid false positives from co
 - [x] UK cosmic star-map page (generated) does not contain the German tagline in `title` or `description` (evidence: missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/star-map.md:6-7, title="Cosmic Star Map · warpgogol-com")
 - [x] DE cosmic pages remain unchanged (tagline-derived brand retained) (evidence: missions/warpgogol-com-m000010/workpiece/src/content/pages/de/cosmic/passport.md:6-7, title still contains tagline)
 - [x] Generator unit test asserts non-DE output does not contain the German tagline (evidence: packages/os/site-kernel-codegen/src/tests/cosmic-pages-i18n.test.ts, 5 tests pass)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --json, no RFC-0515 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --json, no RFC-0515 violations)
 
 ## Implementation notes for agents
 

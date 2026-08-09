@@ -128,8 +128,8 @@ Optional for existing RFCs, required for RFCs with `status: implemented` and `cr
 ### `platform.consistency.validate` command
 
 ```sh
-pnpm exec site-kernel run platform.consistency.validate
-pnpm exec site-kernel run platform.consistency.validate --json
+pnpm exec werkstatt run platform.consistency.validate
+pnpm exec werkstatt run platform.consistency.validate --json
 ```
 
 **Scope:** workspace

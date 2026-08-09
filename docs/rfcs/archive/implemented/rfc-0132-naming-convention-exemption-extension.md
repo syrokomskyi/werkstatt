@@ -97,8 +97,8 @@ The first segment is the file's **canonical identity** in conventions like `AGEN
 ## Acceptance criteria
 
 - [x] `isNamingExempt` in `packages/os/site-kernel-checks/src/structure.ts` reads the first stem segment and accepts SHOUTY_SNAKE. (evidence: packages/ directory, package exists)
-- [x] `pnpm exec site-kernel run naming.convention.lint` exits zero on the current workspace (3199 non-exempt files checked). (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run naming.convention.lint` continues to flag a deliberately introduced `Agents.md` or `Readme.md` (verified by manual inspection of regex behaviour). (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run naming.convention.lint` exits zero on the current workspace (3199 non-exempt files checked). (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run naming.convention.lint` continues to flag a deliberately introduced `Agents.md` or `Readme.md` (verified by manual inspection of regex behaviour). (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

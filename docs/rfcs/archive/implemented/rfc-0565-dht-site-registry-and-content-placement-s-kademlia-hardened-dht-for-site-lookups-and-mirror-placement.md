@@ -75,7 +75,7 @@ nonGoals:
   - "Do not store site content in the DHT — the DHT stores only site metadata (id, owner, mirrors, workshop endpoint). Site content is in Sternsystem repos (Layer 4)."
   - "Do not store secrets in the DHT — only public site metadata."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -131,19 +131,19 @@ The Werkstatt P2P network uses an **S/Kademlia-hardened DHT** for site registry 
 
 ```sh
 # Look up a site by id in the DHT
-pnpm exec site-kernel run dht.lookup --site warpgogol-com --json
+pnpm exec werkstatt run dht.lookup --site warpgogol-com --json
 
 # Register a site in the DHT (publishes local registry entry)
-pnpm exec site-kernel run dht.register --site warpgogol-com --json
+pnpm exec werkstatt run dht.register --site warpgogol-com --json
 
 # Decide placement for a new site
-pnpm exec site-kernel run dht.placement --site new-site --json
+pnpm exec werkstatt run dht.placement --site new-site --json
 
 # Check DHT node status
-pnpm exec site-kernel run dht.status --json
+pnpm exec werkstatt run dht.status --json
 
 # Initialize DHT config (creates werkstatt.dht.json)
-pnpm exec site-kernel run dht.node.init --bind 0.0.0.0:7947 --bootstrap 10.0.0.1:7947 --json
+pnpm exec werkstatt run dht.node.init --bind 0.0.0.0:7947 --bootstrap 10.0.0.1:7947 --json
 ```
 
 ### TypeScript contracts

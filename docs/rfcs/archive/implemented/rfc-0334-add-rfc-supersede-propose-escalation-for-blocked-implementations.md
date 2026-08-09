@@ -107,10 +107,10 @@ The kernel gains `rfc.supersede.propose` (workspace scope, `mutatesState: true`)
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rfc.supersede.propose --id RFC-0322 \
+pnpm exec werkstatt run rfc.supersede.propose --id RFC-0322 \
   --reason "Live slot counter requires client-side state that violates the static-output contract" \
   --invariant "DNA-16,RFC-0307"
-pnpm exec site-kernel run rfc.supersede.propose --id RFC-0322 --reason "..." --invariant "DNA-16" --title "Replace live slot counter with build-time capacity waves" --json
+pnpm exec werkstatt run rfc.supersede.propose --id RFC-0322 --reason "..." --invariant "DNA-16" --title "Replace live slot counter with build-time capacity waves" --json
 ```
 
 Flags: `id` (string, required), `reason` (string, required), `invariant` (string, required — comma-separated), `title` (string, optional).

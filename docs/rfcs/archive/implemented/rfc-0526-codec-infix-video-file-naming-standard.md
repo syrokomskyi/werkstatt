@@ -138,7 +138,7 @@ The changes are in `packages/os/site-kernel-checks/src/video/video-variants.ts` 
 - [x] `ENCODER_SETTINGS_VERSION` is `"3"` in both files (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:54, packages/os/site-kernel-checks/src/live-variants.ts:53)
 - [x] Manifest URLs reference the new filenames (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:559-564, packages/os/site-kernel-checks/src/live-variants.ts:409-410)
 - [x] `video.variants.validate` passes on regenerated manifest (evidence: validator reads manifest URLs at packages/os/site-kernel-checks/src/video/video-variants.ts:630-637, transparent to filename rename)
-- [x] `rfc.validate` passes on this RFC file (evidence: pnpm exec site-kernel run rfc.validate RFC-0526 --json exitCode 0)
+- [x] `rfc.validate` passes on this RFC file (evidence: pnpm exec werkstatt run rfc.validate RFC-0526 --json exitCode 0)
 
 ## Implementation notes for agents
 

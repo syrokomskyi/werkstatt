@@ -73,7 +73,7 @@ nonGoals:
   - "Do not implement economic models, token staking, or incentive mechanisms — the pilot uses trusted workshops only."
   - "Do not establish a new DNA invariant for P2P topology in this RFC — the invariant will be established by a future RFC when the topology is implemented. This RFC is an architectural frame, not a DNA invariant establishment."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -229,10 +229,10 @@ This RFC does not modify these files — they will be updated when the per-layer
 
 ```sh
 # Check network status (proposed, not implemented in this RFC)
-pnpm exec site-kernel run werkstatt.network.status --json
+pnpm exec werkstatt run werkstatt.network.status --json
 
 # Bootstrap a new workshop into the P2P network (proposed, not implemented in this RFC)
-pnpm exec site-kernel run werkstatt.network.bootstrap --seed <seed-node-address> --json
+pnpm exec werkstatt run werkstatt.network.bootstrap --seed <seed-node-address> --json
 ```
 
 These commands are **proposed names only**. Their implementation is deferred to the per-layer RFCs and future implementation RFCs. Exit codes and warn-vs-fail behavior for these commands will be defined in the implementing RFCs.

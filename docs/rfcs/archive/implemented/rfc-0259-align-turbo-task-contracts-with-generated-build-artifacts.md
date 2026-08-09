@@ -86,8 +86,8 @@ Adopt a two-step contract:
 
 ```sh
 # Full parity proof (expensive — CI scheduled job, not per-PR):
-pnpm exec site-kernel run pipeline.cache.parity --app warpgogol-com
-pnpm exec site-kernel run pipeline.cache.parity --app warpgogol-com --json
+pnpm exec werkstatt run pipeline.cache.parity --app warpgogol-com
+pnpm exec werkstatt run pipeline.cache.parity --app warpgogol-com --json
 ```
 
 App-scoped, mutates nothing outside a scratch snapshot directory, requires no network.

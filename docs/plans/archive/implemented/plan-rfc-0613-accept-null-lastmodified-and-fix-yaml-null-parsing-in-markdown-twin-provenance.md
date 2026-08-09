@@ -113,7 +113,7 @@ No configuration or data files need changes.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0613 --json` — V-19 warning is resolved (0 violations)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0613 --json` — V-19 warning is resolved (0 violations)
 
 **Completion criterion:** AGENTS.md contains the rule; RFC-0320's `amendedBy` includes `RFC-0613`; `rfc.validate` passes with zero warnings.
 
@@ -131,7 +131,7 @@ No configuration or data files need changes.
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck passes
 - Run `pnpm --filter @warpgogol/share test` — all tests pass including new regression tests
 - Run `pnpm --filter @warpgogol/site-kernel-checks test` — all tests pass including new regression tests
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0613 --json` — passes with zero violations
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0613 --json` — passes with zero violations
 
 **Validation:**
 
@@ -153,12 +153,12 @@ No configuration or data files need changes.
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0613 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0613 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0613` — passes with zero violations.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0613` — passes with zero violations.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -170,7 +170,7 @@ No configuration or data files need changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0613`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0613`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/share test`
@@ -192,4 +192,4 @@ No configuration or data files need changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0613 --reason "..." --invariant "DNA-58"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0613 --reason "..." --invariant "DNA-58"` instead of working around it.

@@ -124,7 +124,7 @@ The monorepo has an established home for deployable backend compositions: `backs
 
 ```text
 backs/observability-stack/
-  package.json              # private; "build:check": "pnpm exec site-kernel run observability.stack.validate"
+  package.json              # private; "build:check": "pnpm exec werkstatt run observability.stack.validate"
   back.config.json          # kind: "compose-stack", entry: "casting.yaml", publicEndpoints: true
   turbo.json
   casting.yaml              # Foundry installation declaration (compose flavor, docker mode)

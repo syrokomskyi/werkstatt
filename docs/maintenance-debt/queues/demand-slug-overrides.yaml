@@ -24,9 +24,9 @@ batchPolicy:
   push: false
 acceptance:
   commands:
-    - pnpm exec site-kernel run maintenance.debt.queue.validate --queue demand-slug-overrides --json
-    - pnpm exec site-kernel run demands.hierarchy.validate --site <app> --json
-    - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+    - pnpm exec werkstatt run maintenance.debt.queue.validate --queue demand-slug-overrides --json
+    - pnpm exec werkstatt run demands.hierarchy.validate --site <app> --json
+    - pnpm exec werkstatt run maintenance.debt.baseline.validate --json
 notes:
   - "Treat URL changes as high-risk; handle redirects, canonical URLs, sitemap effects, and localized pairs together."
   - Represent intentional overrides with first-class metadata rather than warning strings.

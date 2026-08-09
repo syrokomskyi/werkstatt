@@ -94,8 +94,8 @@ The Integration Port is generalized (amending RFC-0168) into a **source-agnostic
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run integration.config.validate --app warpgogol-com --json
-pnpm exec site-kernel run integration.secrets.validate --all
+pnpm exec werkstatt run integration.config.validate --app warpgogol-com --json
+pnpm exec werkstatt run integration.secrets.validate --all
 ```
 
 ### TypeScript contracts

@@ -193,10 +193,10 @@ No pipeline changes. Existing `build:check` and `test` validate the implementati
 **Agent actions:**
 
 - Verify all 10 acceptance criteria against code
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0520`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0520`
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff test`
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0520 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0520 --implementation-commit <sha>`
 
 **Completion criterion:** All criteria checked; RFC stamped `implemented`.
 
@@ -206,7 +206,7 @@ No pipeline changes. Existing `build:check` and `test` validate the implementati
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0520`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0520`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 

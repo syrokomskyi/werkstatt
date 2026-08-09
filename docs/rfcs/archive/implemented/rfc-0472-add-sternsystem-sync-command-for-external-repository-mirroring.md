@@ -62,7 +62,7 @@ nonGoals:
   - "Does not use git push --mirror (which deletes remote branches not present locally)"
   - "Does not add retry logic for network failures"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -118,19 +118,19 @@ The kernel gains a `sternsystem.sync` command that synchronizes a Sternsystem's 
 
 ```sh
 # Default: push current branch to mirror
-pnpm exec site-kernel run sternsystem.sync --id warpgogol-com
+pnpm exec werkstatt run sternsystem.sync --id warpgogol-com
 
 # Pull from mirror into local bare repo
-pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --direction pull
+pnpm exec werkstatt run sternsystem.sync --id warpgogol-com --direction pull
 
 # Both directions
-pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --direction both
+pnpm exec werkstatt run sternsystem.sync --id warpgogol-com --direction both
 
 # All branches + tags
-pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --all
+pnpm exec werkstatt run sternsystem.sync --id warpgogol-com --all
 
 # JSON output for agent consumption
-pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --json
+pnpm exec werkstatt run sternsystem.sync --id warpgogol-com --json
 ```
 
 **Scope:** workspace

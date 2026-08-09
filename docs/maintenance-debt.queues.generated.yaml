@@ -74,10 +74,10 @@ queues:
       - 15115743fa558e042ec2883f92a13a77352f106ecf030eca20361ce484e06035
       - 08e9a676d072d89041c7277608b038b59e18b89d8433064e7423ca2f24283925
     acceptanceCommands:
-      - pnpm exec site-kernel run maintenance.debt.queue.validate --queue
+      - pnpm exec werkstatt run maintenance.debt.queue.validate --queue
         prose-credit-sidecars --json
-      - pnpm exec site-kernel run material.credits.validate --site <app> --json
-      - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+      - pnpm exec werkstatt run material.credits.validate --site <app> --json
+      - pnpm exec werkstatt run maintenance.debt.baseline.validate --json
   - id: surface-substance-assets-and-narratives
     title: Improve surface narrative and image substance
     status: paused
@@ -101,12 +101,12 @@ queues:
     matchingItemKeys: []
     nextBatchKeys: []
     acceptanceCommands:
-      - pnpm exec site-kernel run maintenance.debt.queue.validate --queue
+      - pnpm exec werkstatt run maintenance.debt.queue.validate --queue
         surface-substance-assets-and-narratives --json
-      - pnpm exec site-kernel run surface.validate --site <app> --json
-      - pnpm exec site-kernel run asset.reference.validate --site <app> --json
-      - pnpm exec site-kernel run material.credits.validate --site <app> --json
-      - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+      - pnpm exec werkstatt run surface.validate --site <app> --json
+      - pnpm exec werkstatt run asset.reference.validate --site <app> --json
+      - pnpm exec werkstatt run material.credits.validate --site <app> --json
+      - pnpm exec werkstatt run maintenance.debt.baseline.validate --json
   - id: demand-slug-overrides
     title: Review demand hierarchy slug overrides
     status: active
@@ -170,10 +170,10 @@ queues:
       - 1e253e0fb1c66eeec3a2cf6eab76c450d4517284f40f99abb1881efc56c39ab5
       - 23721f0cf3628c977ba29c0c0597dd57772a4f81515e14b497b82b1e563e84f2
     acceptanceCommands:
-      - pnpm exec site-kernel run maintenance.debt.queue.validate --queue
+      - pnpm exec werkstatt run maintenance.debt.queue.validate --queue
         demand-slug-overrides --json
-      - pnpm exec site-kernel run demands.hierarchy.validate --site <app> --json
-      - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+      - pnpm exec werkstatt run demands.hierarchy.validate --site <app> --json
+      - pnpm exec werkstatt run maintenance.debt.baseline.validate --json
   - id: diagnostic-shim-migration
     title: Migrate resultFromViolations/failResult shim modules to diagnosticsResult
     status: paused
@@ -193,9 +193,9 @@ queues:
     matchingItemKeys: []
     nextBatchKeys: []
     acceptanceCommands:
-      - pnpm exec site-kernel run diagnostic.shape.lint --json
-      - pnpm exec site-kernel run diagnostic.shape.lint --write-baseline --json
-      - pnpm exec site-kernel run check.fixture.lint --json
+      - pnpm exec werkstatt run diagnostic.shape.lint --json
+      - pnpm exec werkstatt run diagnostic.shape.lint --write-baseline --json
+      - pnpm exec werkstatt run check.fixture.lint --json
   - id: kernel-io-migration
     title: Migrate command modules from ambient node:fs to the WorkspaceIO port
       (context.io)
@@ -216,6 +216,6 @@ queues:
     matchingItemKeys: []
     nextBatchKeys: []
     acceptanceCommands:
-      - pnpm exec site-kernel run kernel.io.lint --json
-      - pnpm exec site-kernel run kernel.io.lint --write-baseline --json
-      - pnpm exec site-kernel run check.fixture.lint --json
+      - pnpm exec werkstatt run kernel.io.lint --json
+      - pnpm exec werkstatt run kernel.io.lint --write-baseline --json
+      - pnpm exec werkstatt run check.fixture.lint --json

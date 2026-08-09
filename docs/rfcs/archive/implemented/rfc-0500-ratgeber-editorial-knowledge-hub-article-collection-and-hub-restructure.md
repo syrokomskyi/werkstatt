@@ -360,8 +360,8 @@ During `expandBlueprint`, only `status: published` articles are emitted as depth
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json
-pnpm exec site-kernel run surface.validate --site warpgogol-com --json
+pnpm exec werkstatt run ratgeber.hub.validate --site warpgogol-com --json
+pnpm exec werkstatt run surface.validate --site warpgogol-com --json
 ```
 
 `ratgeber.hub.validate` is site-scoped, runs in `build.check`.
@@ -517,7 +517,7 @@ Exit codes: 0 = pass, 1 = any error-level rule triggered, 2 = only warning-level
 - [x] `surface/article-categories/{lang}/*.md` created with initial categories. (evidence: rfc0500Migrator creates kosten.md and sichtbarkeit.md for each language; pending mission.migrate execution)
 - [x] Migrator transforms all existing topic records. (evidence: rfc0500Migrator registered in registry.ts; idempotent; pending mission.migrate execution)
 - [x] No prohibited commercial result claims in any article. (evidence: RG-HUB-07 rule in ratgeber-hub-validate.ts checks commercial claim phrases)
-- [x] `rfc.validate` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0500` exits 0)
+- [x] `rfc.validate` passes. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0500` exits 0)
 
 ## Implementation notes for agents
 

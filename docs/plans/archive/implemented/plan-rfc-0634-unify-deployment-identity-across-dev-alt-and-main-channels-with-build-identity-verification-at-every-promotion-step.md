@@ -51,7 +51,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0634`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0634`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/ui run build:check`
@@ -273,17 +273,17 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0634`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0634`
 - Run `pnpm --filter @warpgogol/ontology run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/ui run build:check`
 - Check off each acceptance criterion in the RFC against the implemented code
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0634 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0634 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0634`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0634`
 - All acceptance criteria checked off
 
 **Completion criterion:** All validation passes, RFC stamped as `implemented`
@@ -302,12 +302,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0634 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0634 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0634`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0634`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -319,7 +319,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0634`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0634`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/ui run build:check`
@@ -344,5 +344,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0634 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0634 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `buildIdentitySchema` regex change breaks existing release build-identity validation, investigate whether the regex is too broad — do not revert without a superseding RFC.

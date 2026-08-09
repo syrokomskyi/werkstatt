@@ -215,8 +215,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0761` passes (V-19 warning resolved)
-- `pnpm exec site-kernel run rfc.validate --id RFC-0388` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0761` passes (V-19 warning resolved)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0388` passes
 
 **Completion criterion:** DNA-40 updated; RFC-0388 `amendedBy` includes RFC-0761; root and services AGENTS.md updated.
 
@@ -255,13 +255,13 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0761` (RFC-0330).
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0761 --implementation-commit <sha>`.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0761` (RFC-0330).
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0761 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0761` passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0761` passes.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed; all acceptance criteria checked off; RFC is stamped as `implemented`.
@@ -272,13 +272,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0761`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0761`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-onboarding run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0761` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0761` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -296,4 +296,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0761 --reason "..." --invariant "DNA-40"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0761 --reason "..." --invariant "DNA-40"` instead of working around it.

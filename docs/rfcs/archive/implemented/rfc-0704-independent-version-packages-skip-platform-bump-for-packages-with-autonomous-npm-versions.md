@@ -61,7 +61,7 @@ nonGoals:
   - "This RFC does not add per-package version bump automation — independent packages manage their own version in their own package.json manually"
   - "This RFC does not change how platform.consistency.validate (PC-02/PC-03) works — the platform version log is only written when a platform bump occurs"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -126,7 +126,7 @@ No new command. The existing `ecosystem.commit` command is modified:
 
 ```sh
 # Same invocation as before — the skip is automatic based on staged files
-pnpm exec site-kernel run ecosystem.commit --message "fix: forge template bug"
+pnpm exec werkstatt run ecosystem.commit --message "fix: forge template bug"
 ```
 
 When all staged platform files are inside `independentVersionPackages` paths, the command:
@@ -225,7 +225,7 @@ No `docs/*.xml` sync needed. This RFC changes `ecosystem.commit` behavior but do
 - [x] `forge.doctor` validates `independentVersionPackages` paths exist (evidence: `packages/forge/src/onboarding/doctor.ts:618-657`, `pnpm --filter @warpgogol/forge run build:check` pass)
 - [x] Root `AGENTS.md` documents the independent version package contract and agent behavior in the "Platform-scope commit discipline" section (evidence: `AGENTS.md:92-99`)
 - [x] Unit tests cover skip-bump, mixed-files, and invalid-path scenarios (evidence: `packages/os/site-kernel-checks/src/tests/ecosystem-commit.test.ts:246-417`, `pnpm --filter @warpgogol/site-kernel-checks run test` — 856 tests pass)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0704 --json` — status: pass, 0 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0704 --json` — status: pass, 0 violations)
 
 ## Implementation notes for agents
 

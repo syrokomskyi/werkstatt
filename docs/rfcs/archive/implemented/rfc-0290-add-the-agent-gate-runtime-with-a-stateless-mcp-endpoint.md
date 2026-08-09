@@ -175,7 +175,7 @@ export { POST } from "@gogol/agent-gate/astro#actions";
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.gate.fixtures.run --json
+pnpm exec werkstatt run agent.gate.fixtures.run --json
 ```
 
 Workspace-scoped; replays every fixture pair through `handleMcp` in-process; any byte-level response mismatch (after volatile-field masking: `eventId`, `occurredAt`) is a failure. Runs in the workspace check pipeline (with `build.check`-adjacent placement like other package-level gates), not per-app.

@@ -229,7 +229,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run surface.hub.validate --site warpgogol-com --json` exits 0.
+- `pnpm exec werkstatt run surface.hub.validate --site warpgogol-com --json` exits 0.
 
 **Completion criterion:** `surface.hub.validate` is registered, runs, and enforces all six rules; it is in `SITES_CHECK_AUTHOR_PIPELINE`.
 
@@ -249,7 +249,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate` passes (if available).
+- `pnpm exec werkstatt run compass.validate` passes (if available).
 
 **Completion criterion:** `docs/technology.xml`, `docs/knowledge-graph.xml`, and `packages/share/AGENTS.md` reflect the new `pillar` field, `"collection"` type, and `surface.hub.validate` command.
 
@@ -263,14 +263,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run surface.generate --site warpgogol-com` to regenerate the surface.
-- Run `pnpm exec site-kernel run surface.hub.validate --site warpgogol-com --json` — confirm exit 0.
-- Run `pnpm exec site-kernel run content.references.validate --site warpgogol-com` — confirm PBP references resolve.
+- Run `pnpm exec werkstatt run surface.generate --site warpgogol-com` to regenerate the surface.
+- Run `pnpm exec werkstatt run surface.hub.validate --site warpgogol-com --json` — confirm exit 0.
+- Run `pnpm exec werkstatt run content.references.validate --site warpgogol-com` — confirm PBP references resolve.
 - Run `pnpm --filter warpgogol-com run build` — confirm no runtime errors.
 - Inspect the rendered `/website/` and `/sait/` pages — confirm the five-block hub layout.
 - Inspect the JSON-LD output — confirm `CollectionPage` + `ItemList`.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0490 --json` — confirm pass.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0490` to collect evidence (RFC-0330).
+- Run `pnpm exec werkstatt run rfc.validate RFC-0490 --json` — confirm pass.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0490` to collect evidence (RFC-0330).
 - Update `amendedBy` on RFC-0238 and RFC-0207 to include `RFC-0490`.
 
 **Validation:**
@@ -292,11 +292,11 @@ scope:
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.generate --site warpgogol-com`
-- `pnpm exec site-kernel run surface.hub.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run content.references.validate --site warpgogol-com`
-- `pnpm exec site-kernel run rfc.validate RFC-0490 --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0490`
+- `pnpm exec werkstatt run surface.generate --site warpgogol-com`
+- `pnpm exec werkstatt run surface.hub.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run content.references.validate --site warpgogol-com`
+- `pnpm exec werkstatt run rfc.validate RFC-0490 --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0490`
 - `pnpm --filter warpgogol-com run build` (dev build, no runtime errors)
 
 ### 4.2 Evidence artifacts
@@ -319,4 +319,4 @@ scope:
 
 - If the `collectionItems` flow cannot be wired through the existing `buildSemanticModel` callback without changing the callback signature, stop and consult the operator — this may require a contract change to `@gogol/pbp/semantic-profile`.
 - If the PBP reference interpolation in `pillar.productPrice.body` does not work at render time, stop and file a separate RFC for markdown-body reference interpolation — this is a render-layer concern outside this RFC's scope.
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0490 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0490 --reason "..." --invariant "DNA-24"` instead of working around it.

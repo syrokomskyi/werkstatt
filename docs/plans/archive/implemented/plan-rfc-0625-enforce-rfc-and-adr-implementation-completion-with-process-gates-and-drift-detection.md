@@ -142,7 +142,7 @@ No configuration or data files affected.
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --json` passes
+- `pnpm exec werkstatt run forge.skill.validate --json` passes
 - `diff packages/forge/skills/fo/fo-idea-plan/SKILL.md .agents/skills/fo/fo-idea-plan/SKILL.md` shows no differences
 
 **Completion criterion:** Step 8 exists in the plan template and synced copy matches.
@@ -188,7 +188,7 @@ No configuration or data files affected.
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --json` passes
+- `pnpm exec werkstatt run forge.skill.validate --json` passes
 - `diff packages/forge/skills/fo/fo-idea-implement/SKILL.md .agents/skills/fo/fo-idea-implement/SKILL.md` shows no differences
 
 **Completion criterion:** Steps 3.11b and 4.10b exist in the implement skill and synced copy matches.
@@ -212,7 +212,7 @@ No configuration or data files affected.
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0625` — passes with zero errors
+- `pnpm exec werkstatt run rfc.validate --id RFC-0625` — passes with zero errors
 - `pnpm --filter @warpgogol/forge run build:check` — passes
 - Review report exists in `docs/reviews/code/`
 
@@ -224,11 +224,11 @@ No configuration or data files affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0625`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0625`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm exec vitest run packages/forge/os/rfc/handlers/validate-rules.test.ts`
 - `pnpm exec vitest run packages/forge/os/adr/handlers/validate.test.ts`
-- `pnpm exec site-kernel run forge.skill.validate --json`
+- `pnpm exec werkstatt run forge.skill.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -247,4 +247,4 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0625 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0625 --reason "..." --invariant "DNA-N"` instead of working around it.

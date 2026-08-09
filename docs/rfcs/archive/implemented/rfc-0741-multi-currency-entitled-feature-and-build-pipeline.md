@@ -111,7 +111,7 @@ export const STRIPE_FEATURE_LOOKUP_MAP: Record<string, EntitledFeature> = {
 #### `rate-snapshot.resolve`
 
 ```sh
-pnpm exec site-kernel run rate-snapshot.resolve --system warpgogol-com
+pnpm exec werkstatt run rate-snapshot.resolve --system warpgogol-com
 ```
 
 Reads all RatePolicy entities for the business. For each `mode: "external"` policy, fetches the latest rate from the configured source (via the Rate Fetcher Service — RFC-0744) and creates a RateSnapshot content file. For `mode: "business-fixed"`, resolves the applicable rate from the RateSchedule and creates a snapshot.
@@ -121,7 +121,7 @@ This command is a thin wrapper — the actual rate fetching logic lives in the R
 #### `currency-pricing.compile`
 
 ```sh
-pnpm exec site-kernel run currency-pricing.compile --system warpgogol-com
+pnpm exec werkstatt run currency-pricing.compile --system warpgogol-com
 ```
 
 Reads the CurrencyPricingPolicy for the business and validates it:
@@ -201,9 +201,9 @@ The route registry (`packages/share/src/astro/routes/registry.ts`) does not add 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rate-snapshot.resolve --system warpgogol-com
-pnpm exec site-kernel run currency-pricing.compile --system warpgogol-com
-pnpm exec site-kernel run derived-prices.materialize --system warpgogol-com
+pnpm exec werkstatt run rate-snapshot.resolve --system warpgogol-com
+pnpm exec werkstatt run currency-pricing.compile --system warpgogol-com
+pnpm exec werkstatt run derived-prices.materialize --system warpgogol-com
 ```
 
 ### TypeScript contracts

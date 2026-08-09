@@ -119,7 +119,7 @@ Five phases, executed in strict order. Each phase is **one commit range** (poten
 A single command that runs every workspace and per-app validator introduced by RFC-0023 through RFC-0028 in dependency order, aggregates results, and exits zero only if all are green. The composite report becomes the single source of truth for "is this app ready to deploy."
 
 ```sh
-pnpm exec site-kernel run app.contract.full --app nicaragua-projekt
+pnpm exec werkstatt run app.contract.full --app nicaragua-projekt
 ```
 
 `app.contract.full` is **not** a new validator — it composes existing validators. Adding a new validator from a future RFC adds it to `app.contract.full`'s composition list automatically (via `@gogol/site-kernel-checks` registry), with no edit to this RFC required.
@@ -295,7 +295,7 @@ E.1 Extract a deterministic scaffold template from the Phase C diff:
 E.2 Implement `onboarding.scaffold --client <id>`:
 
 ```sh
-pnpm exec site-kernel run onboarding.scaffold \
+pnpm exec werkstatt run onboarding.scaffold \
   --client gartenbau-mueller \
   --domain gartenbau-mueller.example.de \
   --biome handwerk-trust \
@@ -326,9 +326,9 @@ E.5 Document:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run app.contract.full --app nicaragua-projekt
-pnpm exec site-kernel run onboarding.scaffold --client <id> --domain <fqdn> --biome <id> --constellation <id>
-pnpm exec site-kernel run onboarding.checklist --client <id>
+pnpm exec werkstatt run app.contract.full --app nicaragua-projekt
+pnpm exec werkstatt run onboarding.scaffold --client <id> --domain <fqdn> --biome <id> --constellation <id>
+pnpm exec werkstatt run onboarding.checklist --client <id>
 ```
 
 | Command | Scope | Responsibility |

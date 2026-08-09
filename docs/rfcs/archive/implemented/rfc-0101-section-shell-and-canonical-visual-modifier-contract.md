@@ -244,11 +244,11 @@ See `## CLI surface`, `## TypeScript contracts`, and `## File system responsibil
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run section.shell.contract.validate
-pnpm exec site-kernel run section.background.contract.validate
-pnpm exec site-kernel run section.contract.validate
-pnpm exec site-kernel run page.block.validate --app warpgogol-com
-pnpm exec site-kernel run section.scaffold --archetype <id> --slug <slug>
+pnpm exec werkstatt run section.shell.contract.validate
+pnpm exec werkstatt run section.background.contract.validate
+pnpm exec werkstatt run section.contract.validate
+pnpm exec werkstatt run page.block.validate --app warpgogol-com
+pnpm exec werkstatt run section.scaffold --archetype <id> --slug <slug>
 ```
 
 Behavior:

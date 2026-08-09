@@ -188,7 +188,7 @@ This runs `config.template.sync --site warpgogol-com` automatically, which blind
 To run the sync manually (e.g. after a selective app-only upgrade):
 
 ```sh
-rtk pnpm exec site-kernel run config.template.sync --site <reference-app>
+rtk pnpm exec werkstatt run config.template.sync --site <reference-app>
 ```
 
 Use `--dry-run` to preview changes without writing. See RFC-0137 for the full contract.
@@ -201,7 +201,7 @@ The scaffold output should always pass `app.contract.full`. The CI smoke test ru
 
 ```bash
 # Run locally:
-rtk node packages/os/site-kernel/bin/site-kernel.mjs run onboarding.scaffold \
+rtk node packages/werkstatt/bin/werkstatt.mjs run onboarding.scaffold \
   --client __scaffold-test__ \
   --domain scaffold-test.example.de \
   --biome nonprofit-trust \
@@ -209,7 +209,7 @@ rtk node packages/os/site-kernel/bin/site-kernel.mjs run onboarding.scaffold \
 
 rtk pnpm install
 rtk pnpm --filter __scaffold-test__ build.prepare
-rtk node packages/os/site-kernel/bin/site-kernel.mjs run app.contract.full \
+rtk node packages/werkstatt/bin/werkstatt.mjs run app.contract.full \
   --site __scaffold-test__
 
 # Inspect results, then clean up:

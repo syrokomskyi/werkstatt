@@ -80,8 +80,8 @@ The unprotected invariant is: **a change to an app's public behavior must be vis
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run behavior.snapshot.generate --app warpgogol-com
-pnpm exec site-kernel run behavior.snapshot.validate --app warpgogol-com --json
+pnpm exec werkstatt run behavior.snapshot.generate --app warpgogol-com
+pnpm exec werkstatt run behavior.snapshot.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

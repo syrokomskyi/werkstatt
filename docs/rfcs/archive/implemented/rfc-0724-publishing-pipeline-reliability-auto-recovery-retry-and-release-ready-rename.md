@@ -173,13 +173,13 @@ Extend `commitBordbuchProjections` cleanup (RFC-0702) from distribution reuse pa
 
 ```sh
 # Renamed command (was release.publish) — uses --release, derives system from manifest
-pnpm exec site-kernel run release.ready --release warpgogol-com-r000013
+pnpm exec werkstatt run release.ready --release warpgogol-com-r000013
 
 # All other commands unchanged in syntax — behavior changes internally
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --release warpgogol-com-r000013
-pnpm exec site-kernel run leitstand.propagate --system warpgogol-com --release warpgogol-com-r000013
-pnpm exec site-kernel run leitstand.promote --system warpgogol-com --release warpgogol-com-r000013
-pnpm exec site-kernel run mission.validate --mission warpgogol-com-m000034
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com --release warpgogol-com-r000013
+pnpm exec werkstatt run leitstand.propagate --system warpgogol-com --release warpgogol-com-r000013
+pnpm exec werkstatt run leitstand.promote --system warpgogol-com --release warpgogol-com-r000013
+pnpm exec werkstatt run mission.validate --mission warpgogol-com-m000034
 ```
 
 ### TypeScript contracts
@@ -271,7 +271,7 @@ interface ReleaseReadyResult {
 - [x] `mission.validate` auto-commits dirty bordbuch files on all paths (not just reuse path) (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:214-227)
 - [x] All references to `release.publish` updated in code, AGENTS.md, CI templates, DNA-56 (evidence: packages/os/site-kernel-handoff/AGENTS.md:44,48,50,61,308; docs/architecture-dna.md:209,225,241; grep -r "release\.publish" AGENTS.md returns 0 active references)
 - [x] `docs/verification-plan.xml` synchronized with release state rename (evidence: docs/verification-plan.xml — no release state "published" references found; only datePublished JSON-LD field and "Published material changes" unrelated to release state)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0724 --json → 0 errors)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0724 --json → 0 errors)
 
 ## Implementation notes for agents
 

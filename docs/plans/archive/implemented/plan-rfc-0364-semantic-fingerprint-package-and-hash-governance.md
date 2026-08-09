@@ -116,8 +116,8 @@ scope:
 
 - `PACKAGES_CHECK_PIPELINE` — gains `fingerprint.usage.lint` (warning mode initially) and `fingerprint.fixtures.validate`
 - `pnpm --filter @gogol/fingerprint run build:check` — TypeScript compilation
-- `pnpm exec site-kernel run rfc.validate RFC-0364 --json` — RFC validation
-- `pnpm exec site-kernel run packages-check.run --json` — workspace package validation (includes new fingerprint commands)
+- `pnpm exec werkstatt run rfc.validate RFC-0364 --json` — RFC validation
+- `pnpm exec werkstatt run packages-check.run --json` — workspace package validation (includes new fingerprint commands)
 
 ## 3. Step sequence
 
@@ -135,7 +135,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/fingerprint run build:check` passes (empty package compiles)
-- `pnpm exec site-kernel run workspace.discovery.validate --json` passes (new package discovered)
+- `pnpm exec werkstatt run workspace.discovery.validate --json` passes (new package discovered)
 
 **Completion criterion:** `packages/fingerprint/` exists, `pnpm install` succeeds, `build:check` passes with zero errors.
 
@@ -246,9 +246,9 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run fingerprint.calculate --path packages/fingerprint/src/index.ts --mode semantic --json` returns a `FingerprintResult`
-- `pnpm exec site-kernel run fingerprint.fixtures.validate --json` passes
-- `pnpm exec site-kernel run fingerprint.usage.lint --mode warning --json` returns diagnostics (existing hash calls are violations during migration)
+- `pnpm exec werkstatt run fingerprint.calculate --path packages/fingerprint/src/index.ts --mode semantic --json` returns a `FingerprintResult`
+- `pnpm exec werkstatt run fingerprint.fixtures.validate --json` passes
+- `pnpm exec werkstatt run fingerprint.usage.lint --mode warning --json` returns diagnostics (existing hash calls are violations during migration)
 
 **Completion criterion:** All three commands registered, callable via `site-kernel run`, and return correct `--json` envelopes.
 
@@ -267,7 +267,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run packages-check.run --json` passes (new steps run in warning mode)
+- `pnpm exec werkstatt run packages-check.run --json` passes (new steps run in warning mode)
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
 
 **Completion criterion:** `PACKAGES_CHECK_PIPELINE` includes both new steps; `packages-check.run` passes with zero failures (warnings allowed for existing hash calls).
@@ -334,7 +334,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run fingerprint.usage.lint --mode warning --json` — violations reduced (migrated call sites no longer flagged)
+- `pnpm exec werkstatt run fingerprint.usage.lint --mode warning --json` — violations reduced (migrated call sites no longer flagged)
 
 **Completion criterion:** `hash.ts` files deleted, all call sites import from `@gogol/fingerprint`, all affected packages compile, `fingerprint.usage.lint` shows reduced violations.
 
@@ -348,14 +348,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run fingerprint.usage.lint --mode warning --json` to identify remaining violations after migration
+- Run `pnpm exec werkstatt run fingerprint.usage.lint --mode warning --json` to identify remaining violations after migration
 - For each remaining violation, determine if it is a legitimate byte-hash use (HMAC, signature, external protocol, artifact integrity)
 - Add entries to `packages/fingerprint/allowlist.json` with `{ "file": "<glob>", "reason": "<why byte hashing is required>" }`
 - Re-run `fingerprint.usage.lint --mode warning` to verify allowlisted entries are suppressed
 
 **Validation:**
 
-- `pnpm exec site-kernel run fingerprint.usage.lint --mode warning --json` — only allowlisted entries remain, all with reasons
+- `pnpm exec werkstatt run fingerprint.usage.lint --mode warning --json` — only allowlisted entries remain, all with reasons
 
 **Completion criterion:** Allowlist covers all legitimate byte-hash uses with documented reasons; unallowlisted violations are zero.
 
@@ -376,9 +376,9 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate --json` passes
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json` passes
-- `pnpm exec site-kernel run workspace.surface.validate --json` passes
+- `pnpm exec werkstatt run compass.validate --json` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json` passes
+- `pnpm exec werkstatt run workspace.surface.validate --json` passes
 
 **Completion criterion:** All documentation files updated, Compass validation passes, ecosystem manifest is fresh.
 
@@ -397,7 +397,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run packages-check.run --json` passes (zero violations, exit 0)
+- `pnpm exec werkstatt run packages-check.run --json` passes (zero violations, exit 0)
 
 **Completion criterion:** `fingerprint.usage.lint` runs in fail mode in `PACKAGES_CHECK_PIPELINE`; `packages-check.run` passes.
 
@@ -423,7 +423,7 @@ scope:
 - `pnpm --filter @gogol/ontology run build:check` passes
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
 - `pnpm --filter @gogol/site-kernel-handoff run test` passes
-- `pnpm exec site-kernel run packages-check.run --json` passes
+- `pnpm exec werkstatt run packages-check.run --json` passes
 
 **Completion criterion:** `packagesHash` fully removed from schemas and code; only `platformSemanticHash` is accepted; all tests pass.
 
@@ -437,10 +437,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0364 --json` — verify pass
-- Run `pnpm exec site-kernel run packages-check.run --json` — verify pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0364 --json` — verify pass
+- Run `pnpm exec werkstatt run packages-check.run --json` — verify pass
 - Run `pnpm run build:check` for each affected package — verify pass
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0364` (RFC-0330) — emit verification evidence
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0364` (RFC-0330) — emit verification evidence
 - Update RFC-0364 acceptance criteria checkboxes to reflect verified state
 
 **Validation:**
@@ -460,7 +460,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0364 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0364 --json`
 - `pnpm --filter @gogol/fingerprint run build:check`
 - `pnpm --filter @gogol/fingerprint run test`
 - `pnpm --filter @gogol/ontology run build:check`
@@ -471,10 +471,10 @@ scope:
 - `pnpm --filter @gogol/check-runner-node run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel run build:check`
-- `pnpm exec site-kernel run packages-check.run --json`
-- `pnpm exec site-kernel run compass.validate --json`
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0364` (RFC-0330)
+- `pnpm exec werkstatt run packages-check.run --json`
+- `pnpm exec werkstatt run compass.validate --json`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0364` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -495,6 +495,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0364 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0364 --reason "..." --invariant "DNA-53"` instead of working around it.
 - If a normalizer cannot be implemented for a file type listed in the RFC (e.g., `@astrojs/compiler` does not expose a usable AST), escalate via `rfc.supersede.propose` with `--reason "Normalizer implementation infeasible for <file type>"`.
 - If the migration of `site-kernel-integrity/src/hash.ts` call sites reveals that semantic hashing is required where byte hashing was previously used (i.e., the existing hash was serving as an implicit semantic hash), escalate to update the RFC before proceeding.

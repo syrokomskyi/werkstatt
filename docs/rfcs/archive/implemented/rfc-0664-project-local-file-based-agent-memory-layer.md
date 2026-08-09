@@ -65,7 +65,7 @@ nonGoals:
   - No changes to AGENTS.md / ADR / DNA / forge-pattern routing — only the Context destination changes
   - No merge with operator-profile.md — private operator knowledge stays in its own git-ignored file
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -191,9 +191,9 @@ No new commands. Changes land in `forge.create`, `forge.upgrade`, `forge.doctor`
 
 ```sh
 # Existing commands, extended behavior
-pnpm exec site-kernel run forge.create        # scaffolds .agents/memory/ idempotently
-pnpm exec site-kernel run forge.upgrade       # adds the layer to existing projects
-pnpm exec site-kernel run forge.doctor --json # memory-layer health checks
+pnpm exec werkstatt run forge.create        # scaffolds .agents/memory/ idempotently
+pnpm exec werkstatt run forge.upgrade       # adds the layer to existing projects
+pnpm exec werkstatt run forge.doctor --json # memory-layer health checks
 ```
 
 ### File system responsibilities

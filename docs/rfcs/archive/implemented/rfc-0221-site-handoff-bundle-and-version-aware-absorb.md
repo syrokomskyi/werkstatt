@@ -187,8 +187,8 @@ interface HandoffLock {
 ### 3. `handoff.pack`
 
 ```sh
-pnpm exec site-kernel run handoff.pack --app warpgogol-com
-pnpm exec site-kernel run handoff.pack --app warpgogol-com --dry-run
+pnpm exec werkstatt run handoff.pack --app warpgogol-com
+pnpm exec werkstatt run handoff.pack --app warpgogol-com --dry-run
 ```
 
 Pipeline:
@@ -203,8 +203,8 @@ Pipeline:
 ### 4. `handoff.absorb` — version-aware ingest
 
 ```sh
-pnpm exec site-kernel run handoff.absorb --bundle ../handoff/warpgogol-com
-pnpm exec site-kernel run handoff.absorb --bundle ../handoff/warpgogol-com --report-only
+pnpm exec werkstatt run handoff.absorb --bundle ../handoff/warpgogol-com
+pnpm exec werkstatt run handoff.absorb --bundle ../handoff/warpgogol-com --report-only
 ```
 
 Pipeline:

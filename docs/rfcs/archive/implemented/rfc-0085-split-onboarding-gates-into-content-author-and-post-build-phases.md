@@ -82,9 +82,9 @@ The workflows are updated accordingly:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run apps-check.author --app <id>
-pnpm exec site-kernel run apps-check.postbuild --app <id>
-pnpm exec site-kernel run apps-check.run --app <id>  # = author + postbuild
+pnpm exec werkstatt run apps-check.author --app <id>
+pnpm exec werkstatt run apps-check.postbuild --app <id>
+pnpm exec werkstatt run apps-check.run --app <id>  # = author + postbuild
 ```
 
 ### Membership

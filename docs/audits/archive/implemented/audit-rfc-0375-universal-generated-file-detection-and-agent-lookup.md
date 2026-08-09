@@ -20,7 +20,7 @@ Pass — 2 V-19 warnings (RFC-0081 and RFC-0336 `amendedBy` not yet synced). Exp
 
 ## Axis A — Structural completeness
 
-No issues. All required sections contain real content. Decision is present tense ("Extend the generated-file governance…"). CLI surface shows exact `pnpm exec site-kernel run` invocations with flags. TypeScript contracts are minimal type signatures. File system responsibilities table names concrete paths. Output format documents `--json` shapes. Failure modes specifies exit codes. Rollout describes adoption path. Alternatives are honest with rejection reasons. Risks includes agent misinterpretation. Acceptance criteria are checkable. Implementation notes are explicit behavioral rules.
+No issues. All required sections contain real content. Decision is present tense ("Extend the generated-file governance…"). CLI surface shows exact `pnpm exec werkstatt run` invocations with flags. TypeScript contracts are minimal type signatures. File system responsibilities table names concrete paths. Output format documents `--json` shapes. Failure modes specifies exit codes. Rollout describes adoption path. Alternatives are honest with rejection reasons. Risks includes agent misinterpretation. Acceptance criteria are checkable. Implementation notes are explicit behavioral rules.
 
 ## Axis B — DNA alignment
 

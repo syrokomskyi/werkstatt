@@ -62,8 +62,8 @@ scope:
 - `pnpm --filter @wgogol/forge run build:check` — scoped typecheck for forge package
 - `pnpm --filter @gogol/site-kernel run build:check` — scoped typecheck for site-kernel after deletion
 - `pnpm --filter @wgogol/forge run test` — vitest unit tests
-- `pnpm exec site-kernel run rfc.validate --json` — verify no new violations
-- `pnpm exec site-kernel run rfc.list --json` — verify RFC commands still register from forge
+- `pnpm exec werkstatt run rfc.validate --json` — verify no new violations
+- `pnpm exec werkstatt run rfc.list --json` — verify RFC commands still register from forge
 
 ## 3. Step sequence
 
@@ -232,8 +232,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run rfc.list --json` returns full command set
-- `pnpm exec site-kernel run rfc.validate --json` still works
+- `pnpm exec werkstatt run rfc.list --json` returns full command set
+- `pnpm exec werkstatt run rfc.validate --json` still works
 
 **Completion criterion:** `packages/os/site-kernel/src/rfc/` deleted, all 6 import sites redirected, `rfc.list` and `rfc.validate` still register from forge.
 
@@ -285,7 +285,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — no new violations
+- `pnpm exec werkstatt run rfc.validate --json` — no new violations
 
 **Completion criterion:** Both AGENTS.md files updated with `forge.yaml` and `forge.agents.generate` documentation.
 
@@ -302,8 +302,8 @@ scope:
 - Run `pnpm --filter @wgogol/forge run build:check`
 - Run `pnpm --filter @wgogol/forge run test`
 - Run `pnpm --filter @gogol/site-kernel run build:check`
-- Run `pnpm exec site-kernel run rfc.validate --json` — verify no violations targeting RFC-0391
-- Run `pnpm exec site-kernel run rfc.list --json` — verify RFC commands still register
+- Run `pnpm exec werkstatt run rfc.validate --json` — verify no violations targeting RFC-0391
+- Run `pnpm exec werkstatt run rfc.list --json` — verify RFC commands still register
 - Run `forge.doctor --json` — verify `forbiddenImports: []` and `forge.yaml: pass`
 
 **Validation:**
@@ -340,8 +340,8 @@ scope:
 - `pnpm --filter @wgogol/forge run build:check` — scoped typecheck for forge
 - `pnpm --filter @gogol/site-kernel run build:check` — scoped typecheck for site-kernel after deletion
 - `pnpm --filter @wgogol/forge run test` — vitest unit tests
-- `pnpm exec site-kernel run rfc.validate --json` — no violations targeting RFC-0391
-- `pnpm exec site-kernel run rfc.list --json` — RFC commands still register from forge
+- `pnpm exec werkstatt run rfc.validate --json` — no violations targeting RFC-0391
+- `pnpm exec werkstatt run rfc.list --json` — RFC commands still register from forge
 
 ### 4.2 Evidence artifacts
 
@@ -359,5 +359,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-2, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0391 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 or DNA-2, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0391 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `@wgogol/forge/os/rfc` does not export a symbol needed by a site-kernel importer, add the export to `packages/forge/os/rfc/index.ts` — do not re-create the file in site-kernel.

@@ -49,7 +49,7 @@ No configuration or data changes. The `BORDBUCH_RETRY_OPTIONS` constant is code,
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0646` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0646` — RFC validation
 - No pipeline changes — `bordbuch.commit` remains at its current position in `build.prepare`
 
 ## 3. Step sequence
@@ -184,7 +184,7 @@ No configuration or data changes. The `BORDBUCH_RETRY_OPTIONS` constant is code,
 
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — typecheck
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test` — all unit tests
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0646 --json` — RFC validation
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0646 --json` — RFC validation
 - Verify no bare `gitExec` calls remain in `bordbuch-commit.ts` (grep check)
 
 **Validation:**
@@ -204,18 +204,18 @@ No configuration or data changes. The `BORDBUCH_RETRY_OPTIONS` constant is code,
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 5)
-- Run `pnpm exec site-kernel run command.manifest.generate` if command metadata changed (it should not — no new flags or IO changes)
+- Run `pnpm exec werkstatt run command.manifest.generate` if command metadata changed (it should not — no new flags or IO changes)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
 - **Commit the implementation** (separate from the stamp commit)
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0646 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0646 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
 - **Commit the stamped RFC** (separate commit from implementation)
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0646` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0646` — passes
 - Review report exists in `docs/reviews/code/` for this session
 - All acceptance criteria marked `[x]` with evidence
 
@@ -227,7 +227,7 @@ No configuration or data changes. The `BORDBUCH_RETRY_OPTIONS` constant is code,
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0646`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0646`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -247,4 +247,4 @@ No configuration or data changes. The `BORDBUCH_RETRY_OPTIONS` constant is code,
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0646 --reason "..." --invariant "DNA-51"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0646 --reason "..." --invariant "DNA-51"` instead of working around it.

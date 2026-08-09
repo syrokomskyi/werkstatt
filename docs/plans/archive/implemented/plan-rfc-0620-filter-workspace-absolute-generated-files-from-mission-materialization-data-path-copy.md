@@ -138,19 +138,19 @@ No configuration or data files affected.
 
 - Verify no `AGENTS.md` updates are needed (RFC explicitly states this)
 - Verify no `docs/*.xml` Compass files need updates (no repository-wide semantics change)
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0620` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0620` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test` — must pass
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0620 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0620 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0620` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0620` passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All acceptance criteria checked off with inline evidence; code review passed; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -161,7 +161,7 @@ No configuration or data files affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0620`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0620`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
@@ -183,5 +183,5 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 or DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0620 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44 or DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0620 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `GENERATOR_OWNERSHIP_MAP` re-export introduces a circular dependency between `site-kernel-checks` and `site-kernel-handoff`, stop and reassess — the import may need to be restructured (e.g., extract the map to a shared package).

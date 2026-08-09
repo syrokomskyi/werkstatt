@@ -59,7 +59,7 @@ nonGoals:
   - "Does not modify bake functions or section-shell.astro"
   - "Does not replace the Axiom landmark-unique check"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -111,7 +111,7 @@ The `surface.heading-uniqueness.validate` command extends its scan to include no
 No new CLI commands. The existing `surface.heading-uniqueness.validate` extends its scan:
 
 ```sh
-pnpm exec site-kernel run surface.heading-uniqueness.validate --app warpgogol-com
+pnpm exec werkstatt run surface.heading-uniqueness.validate --app warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -229,7 +229,7 @@ Same `Diagnostic[]` shape as RFC-0690. The diagnostic message text is updated fr
 - [x] Existing section-based detection continues to work unchanged (evidence: packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts:58-93, all original section tests pass with extractBlockHeadings)
 - [x] Test cases added for non-section block headings (duplicate, unique, no `aria-labelledby`) (evidence: packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts:184-255, 6 new test cases covering div/article/aside with and without aria-labelledby, nested double-counting prevention)
 - [x] No false positives on warpgogol-com surface pages after implementation (evidence: pnpm --filter @warpgogol/site-kernel-checks run build:check passes, 23/23 unit tests pass, aria-labelledby requirement prevents scanning layout divs)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0696 --json → 0 errors, 0 warnings)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0696 --json → 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 

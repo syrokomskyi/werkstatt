@@ -72,7 +72,7 @@ nonGoals:
   - "Does not show deployment status — that is leitstand.status"
   - "Does not perform live network calls to the mirror — sternsystem.status reads local refs only"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -130,20 +130,20 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 Modified commands (no new flags, behavioral change only):
 
 ```sh
-pnpm exec site-kernel run mission.open --system <id> --brief <text>
-pnpm exec site-kernel run mission.close --mission <id>
-pnpm exec site-kernel run mission.abort --mission <id> --reason <text>
-pnpm exec site-kernel run sternsystem.sync --id <id>
+pnpm exec werkstatt run mission.open --system <id> --brief <text>
+pnpm exec werkstatt run mission.close --mission <id>
+pnpm exec werkstatt run mission.abort --mission <id> --reason <text>
+pnpm exec werkstatt run sternsystem.sync --id <id>
 ```
 
 New command:
 
 ```sh
 # Status for a single system (--id required)
-pnpm exec site-kernel run sternsystem.status --id <id>
+pnpm exec werkstatt run sternsystem.status --id <id>
 
 # Status for all systems (--id not required when --all is set)
-pnpm exec site-kernel run sternsystem.status --all
+pnpm exec werkstatt run sternsystem.status --all
 ```
 
 ### TypeScript contracts

@@ -191,7 +191,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0689`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0689`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run full test suite: `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run`
 - Run typecheck: `pnpm --filter @warpgogol/site-kernel-handoff exec tsc --noEmit`
@@ -213,16 +213,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated with RFC-0689 behavior
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `leitstand.dev-deploy` writes changed — check if manifest needs update)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `leitstand.dev-deploy` writes changed — check if manifest needs update)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0689 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0689 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0689`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0689`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed; all acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -233,7 +233,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0689`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0689`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run`
 - `pnpm --filter @warpgogol/site-kernel-handoff exec tsc --noEmit`
@@ -254,5 +254,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0689 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0689 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the shared helper extraction from `mission.validate` reveals that the two paths (`executeKernelPipeline` vs `execSync`) cannot be unified, implement the SNAP-01 detection logic separately in `leitstand-commands.ts` without a shared helper, and document the divergence.

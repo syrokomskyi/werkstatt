@@ -44,7 +44,7 @@ Pass — zero violations.
 
 - **Env-and-deploy contract (RFC-0388 / DNA-40) not addressed.** `services/AGENTS.md` requires every service that reads env vars to ship `.env.example` with `# How to obtain:` lines, deploy scripts prefixed with `deploy.preflight`, and `.env` on disk. The RFC does not mention `.env.example` or the deploy script pattern. The service will need env vars (Git API token, site workspace path, build trigger credentials) — these must be documented.
 
-- **`services.check.run` not mentioned.** Per `services/AGENTS.md`, after adding a new service, `pnpm exec site-kernel run services.check.run` must pass. The RFC should list this in acceptance criteria.
+- **`services.check.run` not mentioned.** Per `services/AGENTS.md`, after adding a new service, `pnpm exec werkstatt run services.check.run` must pass. The RFC should list this in acceptance criteria.
 
 - **`wrangler.toml` format.** The RFC shows a `wrangler.toml` example (line 152). Existing services in this monorepo do not use `wrangler.toml` — check whether the project convention is `wrangler.jsonc` or `wrangler.yaml`. The file extension should match the project standard.
 

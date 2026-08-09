@@ -509,7 +509,7 @@ Build confidence with sincere, outcome-based praise — praise outcomes, not eff
 - [x] `fo-session-retro` SKILL.md routes aesthetic preferences to `operator-profile.md` with Öffentlich tag (evidence: packages/forge/skills/fo/fo-session-retro/SKILL.md:160-161,171,193-195)
 - [x] `agents-generate.test.ts` verifies extended layer is included when register is creative (evidence: packages/forge/src/tests/agents-generate.test.ts:132-170)
 - [x] `agents-generate.test.ts` verifies extended layer is excluded when register is business (evidence: packages/forge/src/tests/agents-generate.test.ts:196-211)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0549 — 0 errors, 0 warnings)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate RFC-0549 — 0 errors, 0 warnings)
 
 ### Behavioral guidelines (SHOULD, not MUST — not machine-checkable)
 

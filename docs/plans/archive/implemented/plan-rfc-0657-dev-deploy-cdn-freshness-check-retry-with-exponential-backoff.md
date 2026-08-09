@@ -173,12 +173,12 @@ None — no YAML/JSON/NDJSON changes, no ontology catalogs, no manifests.
 
 - Update `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section: change the freshness check description from single-fetch to "retries up to 5 times with exponential backoff (3s, 6s, 12s, 24s)"
 - Add `RFC-0657` to RFC-0649's `amendedBy` frontmatter array
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0649 --json` to verify no violations
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0649 --json` to verify no violations
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0649 --json` — passes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0657 --json` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0649 --json` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0657 --json` — passes
 
 **Completion criterion:** AGENTS.md updated; RFC-0649 `amendedBy` includes `RFC-0657`; both RFCs validate.
 
@@ -193,18 +193,18 @@ None — no YAML/JSON/NDJSON changes, no ontology catalogs, no manifests.
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated with retry description
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0657 --json` — passes
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0657 --json` — passes
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — passes
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test` — all tests pass
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0657 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0657 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0657 --json` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0657 --json` — passes
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — passes
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — all tests pass
 - Review report exists for this session
@@ -217,8 +217,8 @@ None — no YAML/JSON/NDJSON changes, no ontology catalogs, no manifests.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0657 --json`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0649 --json` (verify amendedBy doesn't break)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0657 --json`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0649 --json` (verify amendedBy doesn't break)
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -237,5 +237,5 @@ None — no YAML/JSON/NDJSON changes, no ontology catalogs, no manifests.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0657 --reason "..." --invariant "DNA-49"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0657 --reason "..." --invariant "DNA-49"` instead of working around it.
 - If the retry loop causes unexpected test failures that cannot be resolved with `vi.useFakeTimers()`, investigate whether the `sleep` function is mockable — if not, consider extracting a `delay` function that can be mocked.

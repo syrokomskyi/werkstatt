@@ -54,7 +54,7 @@ nonGoals:
   - Does not change the fo-idea-implement skill flow beyond step 3.6 instructions.
   - Does not exempt existing implemented RFCs from compliance — the implementation backfills all non-compliant RFCs in the same wave.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:
@@ -113,8 +113,8 @@ The `fo-idea-implement` skill step 3.6 is strengthened to require semantic verif
 No new commands. The existing `rfc.validate` command gains two new rules (V-26, V-27) in `packages/forge/os/rfc/handlers/validate-rules.ts`.
 
 ```sh
-pnpm exec site-kernel run rfc.validate --json
-pnpm exec site-kernel run rfc.validate RFC-0463 --json
+pnpm exec werkstatt run rfc.validate --json
+pnpm exec werkstatt run rfc.validate RFC-0463 --json
 ```
 
 ### TypeScript contracts

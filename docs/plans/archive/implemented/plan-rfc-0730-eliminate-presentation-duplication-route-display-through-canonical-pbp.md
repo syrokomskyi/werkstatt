@@ -63,8 +63,8 @@ scope:
 - `pnpm --filter @warpgogol/pbp build:check` — TypeScript typecheck
 - `pnpm --filter @warpgogol/pbp test` — unit tests
 - `pnpm --filter warpgogol-com exec astro check` — Astro typecheck
-- `pnpm exec site-kernel run rfc.validate --id RFC-0730` — RFC validation
-- `pnpm exec site-kernel run content.references.validate --site warpgogol-com` — content reference validation (if available)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0730` — RFC validation
+- `pnpm exec werkstatt run content.references.validate --site warpgogol-com` — content reference validation (if available)
 
 ## 3. Step sequence
 
@@ -326,7 +326,7 @@ scope:
   - `pnpm --filter @warpgogol/pbp build:check`
   - `pnpm --filter @warpgogol/pbp test`
   - `pnpm --filter warpgogol-com exec astro check`
-  - `pnpm exec site-kernel run rfc.validate --id RFC-0730`
+  - `pnpm exec werkstatt run rfc.validate --id RFC-0730`
 - Verify all acceptance criteria from the RFC:
   1. `pbpRelatedOfferingSchema` includes `label` and `description`
   2. All 12 offering files have `presentation` removed
@@ -363,16 +363,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/pbp/AGENTS.md` is updated (Step 8)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if pipeline topology changed (unlikely — no new commands)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if pipeline topology changed (unlikely — no new commands)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0730` and commit the evidence file (RFC-0330)
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0730 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0730` and commit the evidence file (RFC-0330)
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0730 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0730` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0730` passes
 - Review report exists in `docs/reviews/code/` for this session
 - Verification evidence file committed
 
@@ -384,12 +384,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0730`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0730`
 - `pnpm --filter @warpgogol/pbp build:check`
 - `pnpm --filter @warpgogol/pbp test`
 - `pnpm --filter warpgogol-com exec astro check`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0730` (RFC-0330)
-- `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0730 --implementation-commit <sha>`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0730` (RFC-0330)
+- `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0730 --implementation-commit <sha>`
 
 ### 4.2 Evidence artifacts
 
@@ -411,6 +411,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0730 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0730 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `offeringSchema.strict()` rejection of `guarantees` reveals a schema design conflict (e.g. `guarantees` conflicts with `policyRefs` semantics), create a follow-up RFC rather than loosening the schema.
 - If the recurrence suffix mapping requires more than 3 variants, consider a follow-up RFC for a `recurrenceFormatter` pipe formatter instead of hardcoding in the component.

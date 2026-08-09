@@ -71,8 +71,8 @@ Without a formal gate:
 Add a deploy gate:
 
 ```sh
-pnpm exec site-kernel run check.deploy-alt.run --app warpgogol-com --json
-pnpm exec site-kernel run check.deploy-main.gate --app warpgogol-com --json
+pnpm exec werkstatt run check.deploy-alt.run --app warpgogol-com --json
+pnpm exec werkstatt run check.deploy-main.gate --app warpgogol-com --json
 ```
 
 `check.deploy-alt.run` discovers or receives the alt URL, runs `check.run`, and writes a check report artifact.

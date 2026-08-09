@@ -33,7 +33,7 @@ The implementation adds an optional `knowledge?: string[]` field to the forge sk
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @warpgogol/forge run build:check` (tsc --noEmit), `pnpm --filter @warpgogol/forge run test` (164 tests, 18 files), `pnpm exec site-kernel run forge.skill.validate` (0 violations), `pnpm exec site-kernel run rfc.validate RFC-0524` (pass).
+Pass — `pnpm --filter @warpgogol/forge run build:check` (tsc --noEmit), `pnpm --filter @warpgogol/forge run test` (164 tests, 18 files), `pnpm exec werkstatt run forge.skill.validate` (0 violations), `pnpm exec werkstatt run rfc.validate RFC-0524` (pass).
 
 ### Axis A — Structural correctness
 

@@ -204,7 +204,7 @@ Existing handlers without `nextSteps` continue to work (additive contract); they
 - [x] All forge CLI natural-language output is English regardless of `PREFERENCES.md` (evidence: packages/forge/src/cli-output.ts — all strings are English; packages/forge/AGENTS.md:95, commit 2e8c9cc98)
 - [x] Unit tests cover `renderNextSteps`, `renderIdeRecommendation`, and `generateHelp` (evidence: packages/forge/src/tests/cli-output.test.ts, 221 tests pass, commit bb4976d3d)
 - [x] `packages/forge/AGENTS.md` updated with the output contract (evidence: packages/forge/AGENTS.md:89-99, commit 2e8c9cc98)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate — zero RFC-0542 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate — zero RFC-0542 violations)
 
 ## Implementation notes for agents
 

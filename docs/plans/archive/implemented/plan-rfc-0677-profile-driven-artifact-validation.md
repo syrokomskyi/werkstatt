@@ -50,7 +50,7 @@ scope:
 
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript type check
 - `pnpm --filter @warpgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0677` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0677` — RFC validation
 
 ## 3. Step sequence
 
@@ -159,8 +159,8 @@ scope:
 **Agent actions:**
 
 - Edit `packages/forge/AGENTS.md` — update the `forge.validate` entry in the OS modules table and/or domain-aware commands section to document `--artifact` flag and violation parsing in `--json`
-- Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
-- Run `pnpm exec site-kernel run docs.commands.generate` to update `docs/COMMANDS.md`
+- Run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
+- Run `pnpm exec werkstatt run docs.commands.generate` to update `docs/COMMANDS.md`
 
 **Validation:**
 
@@ -180,16 +180,16 @@ scope:
 
 - Run `pnpm --filter @warpgogol/forge run build:check` — TypeScript
 - Run `pnpm --filter @warpgogol/forge run test` — all tests
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0677` — RFC validation
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0677` — RFC validation
 - Run `fo-review` on all session code changes
 - Run `fo-fix` if review has findings
 - Check off acceptance criteria with `(evidence: ...)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0677 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0677 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0677` — 0 violations
+- `pnpm exec werkstatt run rfc.validate --id RFC-0677` — 0 violations
 - Review report exists in `docs/reviews/code/`
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented`.
@@ -200,7 +200,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0677`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0677`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -221,4 +221,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0677 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0677 --reason "..." --invariant "DNA-54"` instead of working around it.

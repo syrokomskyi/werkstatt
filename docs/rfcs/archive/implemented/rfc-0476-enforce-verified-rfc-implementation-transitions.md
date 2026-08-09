@@ -60,7 +60,7 @@ nonGoals:
   - "Does not replace human architecture acceptance or reviewer identity governance"
   - "Does not execute arbitrary acceptance commands outside the existing closed probe vocabulary"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -112,10 +112,10 @@ The Forge governance surface also gains `github.branch-protection.validate`. It 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rfc.implement.stamp --id RFC-0476 --implementation-commit <sha>
-pnpm exec site-kernel run rfc.implement.stamp --id RFC-0476 --implementation-commit <sha> --json
-pnpm exec site-kernel run rfc.implement.stamp --id RFC-0476 --implementation-commit <sha> --dry-run
-pnpm exec site-kernel run github.branch-protection.validate --json
+pnpm exec werkstatt run rfc.implement.stamp --id RFC-0476 --implementation-commit <sha>
+pnpm exec werkstatt run rfc.implement.stamp --id RFC-0476 --implementation-commit <sha> --json
+pnpm exec werkstatt run rfc.implement.stamp --id RFC-0476 --implementation-commit <sha> --dry-run
+pnpm exec werkstatt run github.branch-protection.validate --json
 ```
 
 Both commands are workspace-scoped. `rfc.implement.stamp --id` and `--implementation-commit` are required. The commit must resolve locally, be reachable from `HEAD`, and contain the target RFC ID. The stamp command requires a clean working tree, obtains an RFC-specific exclusive lock, and rejects a concurrent operation without writing. `--dry-run` performs every check without changing the RFC or emitting evidence.
@@ -227,7 +227,7 @@ On failure, the command writes no RFC metadata or evidence and exits non-zero wi
 - [x] `fo-idea-implement`, root `AGENTS.md`, and `docs/policies/rfc-governance.md` require separate implementation and stamp commits for all actors (evidence: AGENTS.md:245, docs/policies/rfc-governance.md:51, docs/policies/rfc-governance.md:80)
 - [x] The authored branch-protection policy and offline validator match the stable CI job name; `ci.local.validate` includes the validator (evidence: docs/policies/github-branch-protection.yaml:1, packages/os/site-kernel-checks/src/github-branch-protection.ts:1, packages/os/site-kernel-checks/src/ci-local.ts:37)
 - [x] `.github/workflows/ci.yml` retains full RFC validation and the operator configures the matching GitHub required check (evidence: .github/workflows/ci.yml:42, rfc.validate step retained + github.branch-protection.validate step added)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate, All 462 RFC(s) passed validation)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate, All 462 RFC(s) passed validation)
 
 ## Implementation notes for agents
 

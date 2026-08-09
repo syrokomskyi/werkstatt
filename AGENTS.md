@@ -7,7 +7,7 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 - This repository is a Turborepo + pnpm-workspace monorepo on Astro 6 + TypeScript strict.
 - Deployable sites live as Sternsystemen registered in `systems/registry.yaml`. Each Sternsystem declares a `mirrors[]` array (RFC-0574): `mirrors[0]` is the non-bare cache clone (outside the monorepo), `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors. A pin file lives at `mirrors[0].path/system.pin.json`, and an active mission workpiece at `missions/<missionId>/workpiece/` when a mission is in progress. The `apps/*` directory is retired (RFC-0381); shared site composition conventions now live in `docs/authoring/site-composition.md`.
 - Deployable backend runtime compositions live in `services/*`. Treat them as the backend analogue of site workspaces: thin wiring, runtime entrypoints, environment/store/queue selection, deployment config, and health checks only.
-- Shared and reusable libraries live in `packages/*` (UI, share, ontology, business, growth, growth-adapters, passport, nebula, star-map, tokens, agent-gate, forge) and `packages/os/*` (site-kernel and its sub-modules, including changelog, deploy, integrity, onboarding, and handoff).
+- Shared and reusable libraries live in `packages/*` (`werkstatt` engine, `werkstatt-site` site plugin, `forge` governance, `warpgogol-skills` skill pack). The old `packages/os/*` and standalone domain packages are deleted (RFC-0776).
 - New sites must be created via `onboarding.scaffold`, not by copying an existing site.
 - A site's job is **composition only**: `src/content/system.md` + `src/content/**` + a few thin proxy files. All section, component, runtime, and validator logic lives in `packages/*`. If you find yourself adding logic to a site, ask whether it belongs in a package first.
 - A service workspace's job is **runtime composition only**. Shared schemas, reusable browser capture, check rules, report shapes, adapters, and validators belong in `packages/*`; services must not import from site workspaces, and site workspaces must not import from `services/*`.
@@ -148,7 +148,7 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - **RFC/ADR creation pipeline (NON-NEGOTIABLE):** When a task requires an RFC or ADR (architectural changes, new commands, cross-workspace contracts, DNA invariant changes, AGENTS.md rule changes), the agent MUST use the `fo-idea` skill pipeline: (1) start with `fo-idea` to classify the request as RFC or ADR, (2) `fo-idea` routes to `fo-idea-create-rfc` or `fo-idea-create-adr`, (3) `fo-idea-create-rfc` uses `rfc.create` to assign the RFC number automatically — agents MUST NEVER manually scan `docs/rfcs/` with `ls`/`find`/`grep` to determine the next number (the RFC number space includes archived RFCs under `docs/rfcs/archive/` — a top-level-only scan misses them and produces duplicate IDs), (4) the skill handles grilling, template filling, validation, and commit. This applies to ALL RFC/ADR creation tasks regardless of whether the operator explicitly mentions "RFC" — if the task is architectural, introduces new commands, changes cross-workspace contracts, or modifies DNA invariants, it needs an RFC via the `fo-idea` pipeline.
 - **Commit hygiene (NON-NEGOTIABLE):** When applying review findings or multi-axis fixes, the agent MUST: (1) run `git diff` (not just `git diff --cached`) on every touched file before committing — unstaged changes in already-touched files are easily missed when using `git add -p` or staging specific hunks; (2) run `git status` after every commit — confirm the working tree is clean, and if files remain unstaged, either commit them or explicitly report them to the operator; (3) never leave partial fixes in the working tree — if a review finding was applied to a file, the entire fix for that finding must be in the same commit.
 - **Auto-commit after each operator request (NON-NEGOTIABLE, RFC-0622):** The agent MUST commit file changes after every standalone operator request that produces file changes, via the `fo-step-commit` skill. The skill stages only files the agent changed in that request (never `git add -A` or `git add .`), commits in both the monorepo and the active mission workpiece, and writes conventional commit messages. The operator can opt out per-request by saying "не коммить" or "don't commit". During multi-step skill pipelines, only the parent skill's explicit invocations fire — the default auto-commit behavior is suppressed.
-- **Template-first fixes (NON-NEGOTIABLE):** When fixing a bug or review finding in a generated file (e.g. `apps/*/src/middleware.ts`, `apps/*/src/content.config.ts`), the agent MUST fix the owning template or generator in `packages/os/site-kernel-codegen/src/templates/` first, then re-run the owning command (e.g. `routes.generate`) to propagate the fix to downstream generated files. Fixing only the generated output without fixing the upstream template means the next regeneration overwrites the fix. The `generator.ownership.lint` check enforces single-ownership of generated files — always trace a generated file back to its template.
+- **Template-first fixes (NON-NEGOTIABLE):** When fixing a bug or review finding in a generated file (e.g. `apps/*/src/middleware.ts`, `apps/*/src/content.config.ts`), the agent MUST fix the owning template or generator in `packages/werkstatt-site/src/codegen/templates/` first, then re-run the owning command (e.g. `routes.generate`) to propagate the fix to downstream generated files. Fixing only the generated output without fixing the upstream template means the next regeneration overwrites the fix. The `generator.ownership.lint` check enforces single-ownership of generated files — always trace a generated file back to its template.
 - Windsurf should follow the nearest applicable `AGENTS.md` first.
 - For repository-wide, cross-workspace, architectural, shared-package, or high-risk tasks, read `docs/requirements.xml`, `docs/technology.xml`, `docs/development-plan.xml`, `docs/knowledge-graph.xml`, `docs/verification-plan.xml`, `docs/source-markup.xml`, and `docs/styling.xml` before planning or editing code.
 - Treat the root `docs/*.xml` Compass files as the primary machine-readable semantic layer for AI work in this monorepo.
@@ -255,7 +255,7 @@ Agents **MUST NOT** use name-based `pnpm --filter <name>` for app-level commands
 
 - **Path-based filter:** `pnpm --filter ./systems/<id> exec <cmd>` or `pnpm --filter ./missions/<missionId>/workpiece exec <cmd>`
 - **Direct execution:** `cd <dir> && pnpm exec <cmd>`
-- **Mission dev server:** `pnpm exec site-kernel run mission.preview --mission <missionId> --port <port>` (preferred for mission workpieces)
+- **Mission dev server:** `pnpm exec werkstatt run mission.preview --mission <missionId> --port <port>` (preferred for mission workpieces)
 
 When clearing the pipeline cache to force step re-execution (e.g. after deleting generated output files), agents MUST clear `.cache/pipeline-cache-hits.json` at the **werkstatt root**, not just `missions/*/workpiece/.cache/`. The pipeline cache-hits file lives at the workspace root and persists across builds — clearing only the workpiece `.cache/` directory does not reset the pipeline skip logic, causing steps like `sitemap.generate` to be skipped as `SKIP (cached)` even when their output files have been deleted.
 
@@ -268,19 +268,19 @@ Two commit paths depending on what was edited:
 **Mission workpiece edits** — use `mission.git.commit`, not direct `git commit`:
 
 ```sh
-rtk pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "<descriptive message>"
+rtk pnpm exec werkstatt run mission.git.commit --mission <missionId> --message "<descriptive message>"
 ```
 
 **Platform/package edits** (files under `packages/*`, `docs/*`, root config, etc.) — use `ecosystem.commit` (RFC-0533) for platform-scope changes (`packages/**`, `integrations/**`, `services/**`):
 
 ```sh
-rtk pnpm exec site-kernel run ecosystem.commit --message "<imperative clause>" [--rfc RFC-XXXX] [--dry-run]
+rtk pnpm exec werkstatt run ecosystem.commit --message "<imperative clause>" [--rfc RFC-XXXX] [--dry-run]
 ```
 
 For non-platform changes (`docs/rfcs/**`, `missions/**`, root config files), use `git add <specific files> && git commit`:
 
 ```sh
-rtk git add packages/os/site-kernel-handoff/src/mission/mission-materialize.ts
+rtk git add packages/werkstatt/src/handoff/mission/mission-materialize.ts
 rtk git commit -m "fix: <imperative clause>"
 ```
 
@@ -369,7 +369,7 @@ This rule is complementary to RFC-0480's per-response `git status` verification,
 **RFC implementation is not complete until stamped (NON-NEGOTIABLE):** When a session implements an RFC (writes code, adds tests, updates docs), the session MUST NOT end without completing all of the following:
 
 1. **Mark acceptance criteria** — every `[ ]` must be `[x]` with inline `(evidence: <file:line>)` annotations (V-26/V-27).
-2. **Regenerate command manifest** — if the RFC added or changed commands, run `rtk pnpm exec site-kernel run command.manifest.generate` and commit `docs/command-manifest.generated.yaml`. A stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`.
+2. **Regenerate command manifest** — if the RFC added or changed commands, run `rtk pnpm exec werkstatt run command.manifest.generate` and commit `docs/command-manifest.generated.yaml`. A stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`.
 3. **Stamp implemented** — run `rfc.implement.stamp --id RFC-XXXX` (auto-detects the implementation commit via `git log --grep`, RFC-0756; pass `--implementation-commit <sha>` to override) and commit the stamped RFC file.
 4. **Validate** — run `rfc.validate --id RFC-XXXX` and confirm zero errors.
 5. **Commit** — all changes must be committed before session end.
@@ -459,7 +459,7 @@ Found the bug — `app.qa.validate` passes `args:` incorrectly to the handler
 **05-audit — пройдено (з очікуваними build-deferred блокерами).**
 ```
 
-Merge commits and git-generated reverts are exempt. Run `pnpm exec site-kernel run commit.message.lint` (or `--range <rev-range>`) before pushing if unsure.
+Merge commits and git-generated reverts are exempt. Run `pnpm exec werkstatt run commit.message.lint` (or `--range <rev-range>`) before pushing if unsure.
 
 ## Documentation structure
 
@@ -484,7 +484,7 @@ Merge commits and git-generated reverts are exempt. Run `pnpm exec site-kernel r
 - Register workspace-scoped OS commands in the repository root `tools/kernel.config.ts`; reserve `apps/<site>/tools/kernel.config.ts` for app-scoped modules and pipelines.
 - Use `turbo run ...` when the task intentionally spans multiple workspaces.
 - Validate only the affected workspace unless the change crosses workspace boundaries.
-- **Command discovery (RFC-0266):** `docs/command-manifest.generated.yaml` is the single machine-readable description of every registered command — flags, IO globs (`reads`/`writes`), mutability, timeouts, and pipeline membership. `docs/COMMANDS.md` is generated FROM it, not maintained independently. When adding or changing a command's flags/IO, run `pnpm exec site-kernel run command.manifest.generate` then `pnpm exec site-kernel run docs.commands.generate` — never hand-edit either generated file. `command.manifest.validate` (in `PACKAGES_CHECK_PIPELINE`) fails on drift (`CMD-MAN-01`) and warns when a mutating command has no declared `writes` (`CMD-MAN-02`) or when a `GENERATOR_OWNERSHIP_MAP` output isn't reflected in its owner's `writes` (`CMD-MAN-03`). **When registering a new command in a `*.module.ts` file, the manifest MUST be regenerated before transitioning the corresponding RFC to `implemented`** — `rfc.validate` falls back to the manifest when the command registry is empty (site-kernel mode), and a stale manifest causes `RFC-CMD-02` errors for implemented RFCs listing the command in `commands.added`.
+- **Command discovery (RFC-0266):** `docs/command-manifest.generated.yaml` is the single machine-readable description of every registered command — flags, IO globs (`reads`/`writes`), mutability, timeouts, and pipeline membership. `docs/COMMANDS.md` is generated FROM it, not maintained independently. When adding or changing a command's flags/IO, run `pnpm exec werkstatt run command.manifest.generate` then `pnpm exec werkstatt run docs.commands.generate` — never hand-edit either generated file. `command.manifest.validate` (in `PACKAGES_CHECK_PIPELINE`) fails on drift (`CMD-MAN-01`) and warns when a mutating command has no declared `writes` (`CMD-MAN-02`) or when a `GENERATOR_OWNERSHIP_MAP` output isn't reflected in its owner's `writes` (`CMD-MAN-03`). **When registering a new command in a `*.module.ts` file, the manifest MUST be regenerated before transitioning the corresponding RFC to `implemented`** — `rfc.validate` falls back to the manifest when the command registry is empty (site-kernel mode), and a stale manifest causes `RFC-CMD-02` errors for implemented RFCs listing the command in `commands.added`.
 
 ## RFC governance protocol
 
@@ -521,7 +521,7 @@ These RFCs form the core architectural arc. See [`docs/policies/architectural-ar
 - `docs/authoring/site-composition.md` for shared site rules across all Sternsystemen
 - `packages/AGENTS.md` for shared library rules across `packages/*`
 - `<site>/AGENTS.md` for site-specific rules
-- `packages/os/site-kernel-checks/docs/check-module-guide.md` for check module wiring and troubleshooting duplicate command registration
+- `packages/werkstatt-site/src/checks/docs/check-module-guide.md` for check module wiring and troubleshooting duplicate command registration
 
 ## Uni UI Ontology (RFC-0023)
 
@@ -551,10 +551,10 @@ The manifest `propsSchema` (with `propsSchemaCompose` fragments resolved) is the
 
 ```sh
 # Regenerate every <id>.types.generated.ts next to its manifest (mutates state)
-rtk pnpm exec site-kernel run props.types.generate
+rtk pnpm exec werkstatt run props.types.generate
 
 # Validate every generated file is present, marker-carrying, and fresh (workspace-scoped, part of packages.check)
-rtk pnpm exec site-kernel run props.contract.validate
+rtk pnpm exec werkstatt run props.contract.validate
 ```
 
 - **Agents MUST NOT hand-edit a `*.types.generated.ts` file.** Fix the manifest `propsSchema` and run `props.types.generate` — the file carries the RFC-0081 `GENERATED_MARKER` plus a `sourceHash` line, and `props.contract.validate` (`PROPS-01`) fails on drift or a missing marker.
@@ -568,10 +568,10 @@ The workspace-level `uni.registry.yaml` at the repository root is the machine-re
 
 ```sh
 # Regenerate (mutates state — run after adding/moving manifests)
-rtk pnpm exec site-kernel run uni.registry.build
+rtk pnpm exec werkstatt run uni.registry.build
 
 # Validate freshness (read-only, fails if on-disk manifests differ from registry)
-rtk pnpm exec site-kernel run uni.registry.validate
+rtk pnpm exec werkstatt run uni.registry.validate
 ```
 
 `uni.registry.validate` is a Wave-0 step in `APPS_CHECK_PIPELINE`. The registry is rebuilt automatically by `APPS_BUILD_PREPARE_PIPELINE` before `astro check`. Workspace-scoped contracts (archetypes, biomes, families, constellations) live in `PACKAGES_CHECK_PIPELINE` and are driven by `packages-check.run`.
@@ -649,7 +649,7 @@ See [`docs/policies/integration-hub.md`](docs/policies/integration-hub.md) for t
 
 ## Agent skills
 
-Skills are managed by `@warpgogol/forge` (RFC-0374). The source of truth is `packages/forge/skills/{wg,shared,meta}/`; `.agents/skills/<name>/` contains generated copies for IDE discovery, synced by `forge.create`. Run `pnpm exec site-kernel run forge.skill.validate` to check skill frontmatter and invariants.
+Skills are managed by `@warpgogol/forge` (RFC-0374). The source of truth is `packages/forge/skills/{wg,shared,meta}/`; `.agents/skills/<name>/` contains generated copies for IDE discovery, synced by `forge.create`. Run `pnpm exec werkstatt run forge.skill.validate` to check skill frontmatter and invariants.
 
 ### Windows AI tooling (forge consumers only)
 

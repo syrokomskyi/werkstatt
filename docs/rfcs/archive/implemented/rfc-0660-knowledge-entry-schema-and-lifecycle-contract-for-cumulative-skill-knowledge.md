@@ -64,7 +64,7 @@ nonGoals:
   - No background or scheduled compaction — lifecycle mutations run only via explicit operator-invoked commands (RFC-0662)
   - No changes to the AGENTS.md / ADR / DNA routing targets of fo-session-retro — only the knowledge file entry format is in scope
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -256,9 +256,9 @@ New rules in `packages/forge/src/validators/skill-validate.ts`, applied to every
 
 ```sh
 # Existing commands, extended behavior — no new commands
-pnpm exec site-kernel run forge.skill.validate --all
-pnpm exec site-kernel run forge.skill.validate --skill fo-memory-sync --json
-pnpm exec site-kernel run forge.doctor --json
+pnpm exec werkstatt run forge.skill.validate --all
+pnpm exec werkstatt run forge.skill.validate --skill fo-memory-sync --json
+pnpm exec werkstatt run forge.doctor --json
 ```
 
 ### File system responsibilities

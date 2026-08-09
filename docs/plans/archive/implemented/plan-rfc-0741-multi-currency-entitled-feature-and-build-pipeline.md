@@ -328,16 +328,16 @@ prerequisites:
 - Update affected `AGENTS.md` files (root, `packages/share/`, `packages/os/site-kernel-checks/`) with new feature and commands.
 - Verify no `docs/*.xml` Compass files need updates (catalog addition, not structural change).
 - Verify no `docs/architecture-dna.md` changes needed (no new DNA invariant).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion against implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0741 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0741 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0741`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0741`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run vitest run`
@@ -351,11 +351,11 @@ prerequisites:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0741`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0741`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run vitest run`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0741` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0741` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -374,7 +374,7 @@ prerequisites:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-4, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0741 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 or DNA-4, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0741 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `gate.conditional.entitlement` mechanism does not work for pipeline steps (only command entries), add imperative `readEntitledFeatures()` checks inside command handlers as a fallback. Document the gap and consider a new RFC for pipeline-level conditional gating.
 - If `pbp.compile` command does not exist (prerequisite not met), create a new RFC for `pbp.compile` that exposes the PBP compiler as a site-kernel command. RFC-0741 cannot be implemented without it.
 - If RFC-0740 is not yet implemented, run the full pipeline for RFC-0740 first (audit → enhance → plan → implement). RFC-0741 depends on RFC-0740's types and materialization logic.

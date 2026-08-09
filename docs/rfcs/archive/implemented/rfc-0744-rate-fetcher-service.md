@@ -322,7 +322,7 @@ The `rate-snapshot.resolve` command (RFC-0741) is the build-time entrypoint. It 
 
 ```sh
 # Build-time (called by build-prepare pipeline, RFC-0741)
-pnpm exec site-kernel run rate-snapshot.resolve --system warpgogol-com
+pnpm exec werkstatt run rate-snapshot.resolve --system warpgogol-com
 
 # Runtime (scheduled by Cloudflare Workers Cron)
 # No CLI — the worker's scheduled() handler runs automatically
@@ -503,7 +503,7 @@ export const pbpRateSourceSchema = z.object({
 - [x] `tsc --noEmit` passes for all impacted workspaces (evidence: `pnpm --filter @warpgogol/pbp --filter @warpgogol/pbp-rate-adapters --filter @warpgogol/rate-fetcher-worker --filter @warpgogol/site-kernel-checks run build:check` — all pass)
 - [x] `vitest run` passes for all impacted workspaces (evidence: 9 tests in pbp-rate-adapters, 4 tests in site-kernel-checks/rfc-0744, 11 tests in rfc-0741 — all pass)
 - [x] `services.check.run` passes (evidence: pre-existing `telegram-alert-bridge` YAML parse error unrelated to this RFC; `rate-fetcher-worker` service.config.yaml is valid YAML matching the lagebild pattern)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0744` — all 1 RFC(s) passed validation)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0744` — all 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 

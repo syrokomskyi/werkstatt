@@ -80,10 +80,10 @@ The kernel gains a `platform.commit.discipline.validate` command that checks eve
 
 ```sh
 # CI gate (in ci.yml)
-pnpm exec site-kernel run platform.commit.discipline.validate --base origin/main --json
+pnpm exec werkstatt run platform.commit.discipline.validate --base origin/main --json
 
 # Local pre-push check (in ci.local.validate pipeline)
-pnpm exec site-kernel run platform.commit.discipline.validate --base main --json
+pnpm exec werkstatt run platform.commit.discipline.validate --base main --json
 ```
 
 `--base` is required — no default. The command resolves the base ref via `git rev-parse --verify <base>` and fails hard if the ref does not exist.

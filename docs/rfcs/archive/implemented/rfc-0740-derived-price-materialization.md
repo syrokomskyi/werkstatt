@@ -129,7 +129,7 @@ Keyed by Offering ID. Each Offering has an array of materialized derived prices,
 ### 3. `derived-prices.materialize` command
 
 ```sh
-pnpm exec site-kernel run derived-prices.materialize --system warpgogol-com
+pnpm exec werkstatt run derived-prices.materialize --system warpgogol-com
 ```
 
 This command:
@@ -201,7 +201,7 @@ The `indicative` variant for both unions is reserved for a future RFC when `allo
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run derived-prices.materialize --system warpgogol-com
+pnpm exec werkstatt run derived-prices.materialize --system warpgogol-com
 ```
 
 Flags:

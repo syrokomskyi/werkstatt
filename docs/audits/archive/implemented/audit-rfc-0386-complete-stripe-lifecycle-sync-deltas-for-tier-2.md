@@ -21,7 +21,7 @@ Pass — `rfc.validate RFC-0386 --json` returns 0 violations.
 ## Axis A — Structural completeness
 
 - **Decision** — present tense, single decision. Pass.
-- **CLI surface** — no new commands proposed; `lagebild.validate` listed as changed. The rollout mentions `lagebild.validate`, `billing.config.validate`, `billing.secrets.validate` but does not show exact `pnpm exec site-kernel run …` invocations (these are shown in RFC-0387, not here). Minor — acceptable since this RFC amends RFC-0191 which defines them.
+- **CLI surface** — no new commands proposed; `lagebild.validate` listed as changed. The rollout mentions `lagebild.validate`, `billing.config.validate`, `billing.secrets.validate` but does not show exact `pnpm exec werkstatt run …` invocations (these are shown in RFC-0387, not here). Minor — acceptable since this RFC amends RFC-0191 which defines them.
 - **TypeScript contracts** — minimal signatures, not full implementations. Pass. However, the proposed `PipedriveSyncTarget` interface omits the existing `syncDealStage` method (see Axis C).
 - **File system responsibilities** — concrete paths named. Pass.
 - **Output format** — documents that lifecycle sync produces no new command output and `lagebild.validate` now asserts DDL presence. Pass.

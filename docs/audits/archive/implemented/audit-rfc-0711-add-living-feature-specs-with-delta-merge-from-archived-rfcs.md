@@ -52,7 +52,7 @@ No issues. The `liveSpec` field is opt-in, not a compatibility layer. No legacy 
 ## Axis E — Agent-facing policy
 
 - **Finding E1:** Implementation notes reference governance rules generically as "RFC-XXXX" placeholders (lines 332–333) instead of citing specific RFC numbers. The actual RFC for accepted→implemented transition is RFC-0224 (already cited on line 332). The other references should be concrete: RFC-0476 for stamping, RFC-0331 for `--satisfies` requirement, etc.
-- **Finding E2:** The RFC says `spec.live.merge` is "semi-automatic: the agent proposes deltas, the operator confirms" (line 160, line 337) but the CLI surface (line 171) shows `pnpm exec site-kernel run spec.live.merge --id RFC-0708` with no `--dry-run` or `--confirm` flag. The confirmation mechanism is unspecified — is it an interactive prompt? A `--dry-run` preview? A separate `spec.live.apply` step? This is a contract gap.
+- **Finding E2:** The RFC says `spec.live.merge` is "semi-automatic: the agent proposes deltas, the operator confirms" (line 160, line 337) but the CLI surface (line 171) shows `pnpm exec werkstatt run spec.live.merge --id RFC-0708` with no `--dry-run` or `--confirm` flag. The confirmation mechanism is unspecified — is it an interactive prompt? A `--dry-run` preview? A separate `spec.live.apply` step? This is a contract gap.
 
 ## Axis F — Pragmatism
 

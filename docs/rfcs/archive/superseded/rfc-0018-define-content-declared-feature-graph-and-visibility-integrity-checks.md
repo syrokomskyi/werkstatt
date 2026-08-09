@@ -134,10 +134,10 @@ The existing values in `src/configure/features.ts` are migrated into this new gr
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run feature.graph.validate --app nicaragua-projekt
-pnpm exec site-kernel run feature.links.validate --app nicaragua-projekt
-pnpm exec site-kernel run feature.projections.validate --app nicaragua-projekt
-pnpm exec site-kernel run feature.visibility.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.graph.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.links.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.projections.validate --app nicaragua-projekt
+pnpm exec werkstatt run feature.visibility.validate --app nicaragua-projekt
 ```
 
 Command responsibilities:

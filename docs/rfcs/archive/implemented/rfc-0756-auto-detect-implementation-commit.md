@@ -77,10 +77,10 @@ The `--implementation-commit` flag remains accepted for explicit specification a
 
 ```sh
 # Auto-detect — no --implementation-commit needed
-pnpm exec site-kernel run rfc.implement.stamp --id RFC-0752
+pnpm exec werkstatt run rfc.implement.stamp --id RFC-0752
 
 # Explicit — still supported, overrides auto-detect
-pnpm exec site-kernel run rfc.implement.stamp --id RFC-0752 --implementation-commit abc1234
+pnpm exec werkstatt run rfc.implement.stamp --id RFC-0752 --implementation-commit abc1234
 
 # Multiple candidates — command lists them and asks for explicit flag
 # [ERROR] Multiple commits reference RFC-0752:
@@ -166,7 +166,7 @@ async function autoDetectImplementationCommit(
 - [x] Unit test verifies auto-detect picks the correct commit (evidence: implement-stamp.test.ts:290-308 "auto-detects the implementation commit" test)
 - [x] Unit test verifies multiple-candidate error path (evidence: implement-stamp.test.ts:310-327 "lists multiple candidate commits" test)
 - [x] `docs/command-manifest.generated.yaml` reflects `required: false` for `--implementation-commit` after running `command.manifest.generate` (evidence: docs/command-manifest.generated.yaml:18793 `required: false`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0756` returns zero violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0756` returns zero violations)
 
 ## Implementation notes for agents
 

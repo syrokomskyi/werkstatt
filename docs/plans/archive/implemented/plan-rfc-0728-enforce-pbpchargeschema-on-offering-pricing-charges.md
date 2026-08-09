@@ -57,7 +57,7 @@ scope:
 
 - `pnpm --filter @warpgogol/pbp run build:check` — TypeScript typecheck
 - `pnpm --filter @warpgogol/pbp run test` — Vitest unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0728` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0728` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -154,7 +154,7 @@ Apply the same transformations as Step 2 to the DE versions:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run mission.git.commit --mission warpgogol-com-m000035 --message "RFC-0728: enforce pbpChargeSchema on offering charges — schema + content updates"`
+- Run `pnpm exec werkstatt run mission.git.commit --mission warpgogol-com-m000035 --message "RFC-0728: enforce pbpChargeSchema on offering charges — schema + content updates"`
 - This commits the schema change in `packages/pbp` and the 12 offering files in the workpiece
 
 **Validation:**
@@ -175,7 +175,7 @@ Apply the same transformations as Step 2 to the DE versions:
 
 - Run `pnpm --filter @warpgogol/pbp run build:check` — typecheck
 - Run `pnpm --filter @warpgogol/pbp run test` — unit tests
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0728` — RFC validation
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0728` — RFC validation
 
 **Validation:**
 
@@ -224,13 +224,13 @@ Apply the same transformations as Step 2 to the DE versions:
   - [x] `pnpm --filter @warpgogol/pbp test` passes
   - [x] `rfc.validate` passes
 - Get the implementation commit SHA (last commit containing the code changes)
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0728 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0728 --implementation-commit <sha>`
 - No `rfc.verification.emit` needed — acceptance probes are commented out
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0728` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0728` passes
 - RFC status is `implemented`
 
 **Completion criterion:** All acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -241,7 +241,7 @@ Apply the same transformations as Step 2 to the DE versions:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0728`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0728`
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/pbp run test`
 
@@ -261,5 +261,5 @@ Apply the same transformations as Step 2 to the DE versions:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-55, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0728 --reason "..." --invariant "DNA-55"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-55, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0728 --reason "..." --invariant "DNA-55"` instead of working around it.
 - If `pbpChargeSchema` is found to be incompatible with existing content in ways the RFC did not anticipate, stop and create an amending RFC rather than weakening the schema.

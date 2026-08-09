@@ -91,7 +91,7 @@ The pitfall has two reinforcing sources:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.pages.filename.validate --app <id>
+pnpm exec werkstatt run content.pages.filename.validate --app <id>
 ```
 
 ### Output format

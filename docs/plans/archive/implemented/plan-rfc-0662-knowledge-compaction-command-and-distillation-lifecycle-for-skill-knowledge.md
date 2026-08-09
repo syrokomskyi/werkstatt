@@ -51,8 +51,8 @@ scope:
 
 - `pnpm --filter @warpgogol/forge test` — must pass with new compact tests
 - `pnpm --filter @warpgogol/forge build:check` — must pass
-- `pnpm exec site-kernel run rfc.validate --id RFC-0662` — must pass
-- `pnpm exec site-kernel run forge.skill.validate --all` — must pass (new skill must validate)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0662` — must pass
+- `pnpm exec werkstatt run forge.skill.validate --all` — must pass (new skill must validate)
 - No pipeline integration — compaction is operator-invoked maintenance, never wired into `build.check` or CI
 
 ## 3. Step sequence
@@ -128,7 +128,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge build:check` passes
-- Command appears in `pnpm exec site-kernel run forge.skill.list` (or equivalent registry)
+- Command appears in `pnpm exec werkstatt run forge.skill.list` (or equivalent registry)
 - `docs/command-manifest.generated.yaml` regenerated via `command.manifest.generate`
 
 **Completion criterion:** `forge.skill.knowledge.compact` is registered, accepts all documented flags, and produces the documented JSON output shape
@@ -167,7 +167,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` passes with the new skill (SKILL-01..18)
+- `pnpm exec werkstatt run forge.skill.validate --all` passes with the new skill (SKILL-01..18)
 - SKILL-13 passes (no knowledge files declared for this skill — it reads others')
 - SKILL-10 passes (document-only concern, no code execution instructions)
 
@@ -208,7 +208,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.skill.knowledge.compact --all --dry-run --json` on this monorepo
+- Run `pnpm exec werkstatt run forge.skill.knowledge.compact --all --dry-run --json` on this monorepo
 - Verify the report accurately reflects current knowledge file state (legacy sections, archivable entries, stale candidates)
 - Update `packages/forge/AGENTS.md`:
   - Add `forge.skill.knowledge.compact` to the `forgeCoreModule` command list in the OS modules table
@@ -221,7 +221,7 @@ scope:
 - `--all --dry-run --json` produces a valid report with no errors
 - `packages/forge/AGENTS.md` mentions `forge.skill.knowledge.compact` and `fo-knowledge-distill`
 - `docs/COMMANDS.md` includes the new command
-- `pnpm exec site-kernel run forge.skill.validate --all` passes
+- `pnpm exec werkstatt run forge.skill.validate --all` passes
 
 **Completion criterion:** Dry-run report is accurate; documentation artifacts updated; `forge.skill.validate` passes
 
@@ -238,16 +238,16 @@ scope:
 - Update affected `AGENTS.md` files (root, `packages/forge/`) with new command and skill.
 - Update affected `docs/*.xml` Compass files if repository-wide semantics changed (likely not needed for a forge-internal command — verify and document if skipped).
 - **Verify every file listed in `scope.docs` is updated** — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0662 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0662 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0662`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0662`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -259,11 +259,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0662`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0662`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --all`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0662` (RFC-0330)
+- `pnpm exec werkstatt run forge.skill.validate --all`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0662` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -283,5 +283,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0662 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0662 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If RFC-0660's parser/serializer are not yet implemented, implement RFC-0660 first — this RFC cannot proceed without them.

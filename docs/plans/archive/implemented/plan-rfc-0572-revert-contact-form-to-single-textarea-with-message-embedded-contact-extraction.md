@@ -65,7 +65,7 @@ scope:
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — scoped typecheck for checks package
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — scoped typecheck for handoff package
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — migrator tests
-- `pnpm exec site-kernel run migrator.registry.validate` — registry validation
+- `pnpm exec werkstatt run migrator.registry.validate` — registry validation
 
 ## 3. Step sequence
 
@@ -99,7 +99,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run props.types.generate`
+- Run `pnpm exec werkstatt run props.types.generate`
 - Verify the generated file has no `emailField`/`phoneField` and has `contactRequirementMessage?`
 
 **Validation:**
@@ -264,7 +264,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
 - `pnpm --filter @warpgogol/site-kernel-handoff test` passes
-- `pnpm exec site-kernel run migrator.registry.validate` passes
+- `pnpm exec werkstatt run migrator.registry.validate` passes
 
 **Completion criterion:** Migrator registered, tests pass, registry validation passes.
 
@@ -303,16 +303,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-checks/AGENTS.md` no longer lists `contact-form.ts` in the module table (done in Step 7).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (the command table changed — run it).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (the command table changed — run it).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0572 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0572 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0572`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0572`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -324,13 +324,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0572`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0572`
 - `pnpm --filter @warpgogol/ui run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run ecosystem.manifest.generate` (command table changed)
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.generate` (command table changed)
 
 ### 4.2 Evidence artifacts
 
@@ -349,5 +349,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-17, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0572 --reason "..." --invariant "DNA-17"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-17, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0572 --reason "..." --invariant "DNA-17"` instead of working around it.
 - If the migrator cannot handle a site's non-standard send-message block configuration, document the edge case and ask the operator before modifying the migrator logic.

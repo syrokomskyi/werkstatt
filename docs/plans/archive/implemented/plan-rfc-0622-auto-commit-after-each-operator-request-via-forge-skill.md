@@ -104,7 +104,7 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.skill.validate --skill fo-step-commit --json`
+- Run `pnpm exec werkstatt run forge.skill.validate --skill fo-step-commit --json`
 - Fix any violations (SKILL-01 through SKILL-17)
 
 **Validation:**
@@ -163,17 +163,17 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0622` — confirm RFC still validates
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0622` — confirm RFC still validates
 - Run `pnpm --filter @warpgogol/forge run build:check` — confirm forge package typechecks
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0622 --implementation-commit <sha>` (first `--dry-run`, then without).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0622 --implementation-commit <sha>` (first `--dry-run`, then without).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0622`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0622`
 - `pnpm --filter @warpgogol/forge run build:check`
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -185,8 +185,8 @@ No configuration or data files affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0622`
-- `pnpm exec site-kernel run forge.skill.validate --skill fo-step-commit`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0622`
+- `pnpm exec werkstatt run forge.skill.validate --skill fo-step-commit`
 - `pnpm --filter @warpgogol/forge run build:check`
 
 ### 4.2 Evidence artifacts
@@ -206,5 +206,5 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0622 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0622 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `forge.skill.validate` reports SKILL-17 violations (platform names in skill body), use `<!-- skill-lint-disable SKILL-17 -->` escape hatch or rephrase to use generic terms.

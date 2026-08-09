@@ -71,7 +71,7 @@ nonGoals:
   - Do not change the build.check or release.prepare pipelines — they remain full-pipeline for production validation
   - Do not add new CLI flags for forcing preflight — operators delete the state file to force re-validation
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -132,7 +132,7 @@ No new commands. No new flags. The operator experience is unchanged — `mission
 
 ```sh
 # Operator runs the same command as before:
-pnpm exec site-kernel run mission.materialize --mission warpgogol-com-m000023
+pnpm exec werkstatt run mission.materialize --mission warpgogol-com-m000023
 
 # Internally:
 # 1. Check .materialization-state.json — if cache clone HEAD matches last close, skip preflight
@@ -338,7 +338,7 @@ When preflight is not skipped: `preflightSkipped: false`, `preflightSkipReason: 
 - [x] `mission.materialize` `--json` output includes `preflightSkipped`, `pipelineUsed`, and `mediaCacheWarmed` fields (evidence: `mission-materialize.ts:1000-1004` adds `preflightSkipped`, `preflightSkipReason`, `pipelineUsed`, `mediaCacheWarmed`, `mediaCacheSources` to result data)
 - [x] Unit tests in `packages/os/site-kernel-handoff/src/tests/` verify: preflight skip on matching HEAD, preflight run on missing state file, media cache copy from cache clone, media cache copy to cache clone at close (evidence: `src/tests/mission-materialize-preflight-skip.test.ts` 5 tests and `src/tests/mission-close-state-file.test.ts` 4 tests — all 9 pass)
 - [x] `bordbuch.validate` at `mission.open` remains unchanged (RFC-0593 preserved) (evidence: no changes to `mission-open.ts`; `mission-close.ts` only adds state file write and `.cache/` copy after existing close logic)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate` reports no errors for RFC-0597)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate` reports no errors for RFC-0597)
 
 ## Implementation notes for agents
 

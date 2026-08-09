@@ -243,7 +243,7 @@ Migrator id: `rfc-0504`.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json
+pnpm exec werkstatt run ratgeber.article.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check` (blocking). The `--json` output shape follows the standard check-command contract: `{ exitCode, summary, diagnostics: Array<{ ruleId, severity, message, file?, fixHint?, data? }> }`.
@@ -344,7 +344,7 @@ Exit codes: 0 = pass, 1 = any error-level rule triggered, 2 = only warning-level
 - [x] `article-header`, `toc`, `changelog` block types are registered in `archetypes/index.yaml` with cosmic names `Himalia`, `Metis`, `Prometheus` respectively. (evidence: `packages/ontology/archetypes/index.yaml` — `blockTypeToCosmicName`, `roleByCosmicName`, `planetImportPaths` entries)
 - [x] Migrator `rfc-0504` is registered in the migrator registry and transforms existing article records (adds empty `articleSections` and `changelog`, strips H1 headings). (evidence: `packages/os/site-kernel-handoff/src/migrators/rfc-0504.ts` + `registry.ts` — migrator registered, PBT + snapshot tests pass)
 - [x] `ratgeber.article.validate --site warpgogol-com --json` passes. (evidence: `packages/os/site-kernel-checks/src/ratgeber-article-validate.ts` — `build:check` passes, validator compiles with RG-ART-07..10)
-- [x] `rfc.validate RFC-0504` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0504 --json` — status: pass, exitCode: 0)
+- [x] `rfc.validate RFC-0504` passes. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0504 --json` — status: pass, exitCode: 0)
 
 ## Implementation notes for agents
 

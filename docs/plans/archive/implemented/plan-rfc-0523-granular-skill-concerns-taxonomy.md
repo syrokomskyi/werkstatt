@@ -114,7 +114,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` — zero SKILL-01 violations (frontmatter parses against updated Zod schema)
+- `pnpm exec werkstatt run forge.skill.validate --all` — zero SKILL-01 violations (frontmatter parses against updated Zod schema)
 
 **Completion criterion:** All 30 SKILL.md files have `concerns` values matching their registry entries.
 
@@ -129,7 +129,7 @@ scope:
 **Agent actions:**
 
 - For each of the 30 SKILL.md files in `.agents/skills/**/SKILL.md`, update the `concerns` frontmatter field to match the `packages/forge/skills/` version.
-- Alternatively, run `pnpm exec site-kernel run forge.init` to sync all skills at once (if the command supports sync-only mode without overwriting other forge artifacts).
+- Alternatively, run `pnpm exec werkstatt run forge.init` to sync all skills at once (if the command supports sync-only mode without overwriting other forge artifacts).
 
 **Validation:**
 
@@ -214,7 +214,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0523 --json` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0523 --json` — passes
 
 **Completion criterion:** `docs/verification-plan.xml` documents SKILL-12 and the updated SKILL-10.
 
@@ -228,12 +228,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.skill.validate --all` — expect zero violations
+- Run `pnpm exec werkstatt run forge.skill.validate --all` — expect zero violations
 - If violations appear, fix the offending SKILL.md or registry entry and re-run
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` — status: pass, zero violations
+- `pnpm exec werkstatt run forge.skill.validate --all` — status: pass, zero violations
 
 **Completion criterion:** `forge.skill.validate --all` passes with zero violations.
 
@@ -248,17 +248,17 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.validate` logic changed — check if manifest needs refresh).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.validate` logic changed — check if manifest needs refresh).
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0523 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0523 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0523`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0523`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --all`
+- `pnpm exec werkstatt run forge.skill.validate --all`
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
 
@@ -268,10 +268,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0523`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0523`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --all`
+- `pnpm exec werkstatt run forge.skill.validate --all`
 
 ### 4.2 Evidence artifacts
 
@@ -289,5 +289,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0523 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0523 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If `forge.skill.validate` reveals orphan SKILL.md files not in the registry, add them to the registry or remove the files — do not suppress the SKILL-01 violation.

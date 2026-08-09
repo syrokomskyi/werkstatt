@@ -148,8 +148,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run sites-check.author --site warpgogol-com` passes (or no-ops if no people records)
-- `pnpm exec site-kernel run sites-check.postbuild --site warpgogol-com` passes (or no-ops if no people records)
+- `pnpm exec werkstatt run sites-check.author --site warpgogol-com` passes (or no-ops if no people records)
+- `pnpm exec werkstatt run sites-check.postbuild --site warpgogol-com` passes (or no-ops if no people records)
 
 **Completion criterion:** Both commands registered, pipeline wiring complete, `build:check` passes, commands are discoverable via `site-kernel run --list`.
 
@@ -221,13 +221,13 @@ scope:
 **Agent actions:**
 
 - Update `packages/os/site-kernel-checks/AGENTS.md` module table with entries for `src/team-lifecycle.ts` and `src/team-cross-page.ts`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml`
 - Do not hand-edit `docs/ecosystem.generated.yaml`
 
 **Validation:**
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
-- `pnpm exec site-kernel run workspace.surface.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run workspace.surface.validate`
 
 **Completion criterion:** AGENTS.md module table includes both new modules; `ecosystem.generated.yaml` regenerated and validates.
 
@@ -243,13 +243,13 @@ scope:
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0513 --implementation-commit <sha>`.
-- Run `pnpm exec site-kernel run rfc.validate` to confirm no errors.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0513 --implementation-commit <sha>`.
+- Run `pnpm exec werkstatt run rfc.validate` to confirm no errors.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate` — no errors for RFC-0513.
+- `pnpm exec werkstatt run rfc.validate` — no errors for RFC-0513.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -260,12 +260,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate` — no errors for RFC-0513
+- `pnpm exec werkstatt run rfc.validate` — no errors for RFC-0513
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
-- `pnpm exec site-kernel run workspace.surface.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run workspace.surface.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -285,5 +285,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0513 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0513 --reason "..." --invariant "DNA-24"` instead of working around it.
 - If the hero `tagline` prop is insufficient for the status badge (e.g., visual distinction requirements), create a follow-up RFC for a dedicated badge component rather than overloading `tagline`.

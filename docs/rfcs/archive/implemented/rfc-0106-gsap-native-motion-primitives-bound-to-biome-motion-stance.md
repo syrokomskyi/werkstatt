@@ -197,9 +197,9 @@ See `## CLI surface`, `## TypeScript contracts`, and `## File system responsibil
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run section.motion.contract.validate
-pnpm exec site-kernel run page.block.validate --app <id>
-pnpm exec site-kernel run layout.orchestrator.lint --app <id>
+pnpm exec werkstatt run section.motion.contract.validate
+pnpm exec werkstatt run page.block.validate --app <id>
+pnpm exec werkstatt run layout.orchestrator.lint --app <id>
 ```
 
 Behavior:

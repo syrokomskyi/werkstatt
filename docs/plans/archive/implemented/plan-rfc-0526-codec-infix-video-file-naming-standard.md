@@ -46,8 +46,8 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck the modified package.
-- `pnpm exec site-kernel run rfc.validate RFC-0526 --json` — mechanical RFC validation.
-- `pnpm exec site-kernel run video.variants.validate --app <site>` — validator pass on regenerated manifest (if a site with authored videos is available).
+- `pnpm exec werkstatt run rfc.validate RFC-0526 --json` — mechanical RFC validation.
+- `pnpm exec werkstatt run video.variants.validate --app <site>` — validator pass on regenerated manifest (if a site with authored videos is available).
 
 ## 3. Step sequence
 
@@ -122,7 +122,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0526 --json`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0526 --json`.
 
 **Validation:**
 
@@ -146,15 +146,15 @@ scope:
   - `[x] ENCODER_SETTINGS_VERSION is "3" in both files` — evidence: `video-variants.ts:54, live-variants.ts:53`
   - `[x] Manifest URLs reference the new filenames` — evidence: `video-variants.ts:559-564, live-variants.ts:409-410`
   - `[x] video.variants.validate passes on regenerated manifest` — evidence: validator reads manifest URLs (`video-variants.ts:630-637`), transparent to rename
-  - `[x] rfc.validate passes on this RFC file` — evidence: `pnpm exec site-kernel run rfc.validate RFC-0526 --json exitCode 0`
+  - `[x] rfc.validate passes on this RFC file` — evidence: `pnpm exec werkstatt run rfc.validate RFC-0526 --json exitCode 0`
 - Commit the checked-off criteria.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0526 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0526 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 - Commit the stamped RFC separately (per PREFERENCES.md RFC implementation completion rules).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0526 --json` — passes after stamping.
+- `pnpm exec werkstatt run rfc.validate RFC-0526 --json` — passes after stamping.
 
 **Completion criterion:** All acceptance criteria checked off with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
 
@@ -164,7 +164,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0526 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0526 --json`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 
 ### 4.2 Evidence artifacts
@@ -182,4 +182,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0526 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0526 --reason "..." --invariant "DNA-N"` instead of working around it.

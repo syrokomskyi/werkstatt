@@ -83,12 +83,12 @@ No CLI surface change. The sync is invoked internally by `mission.close` — the
 
 ```sh
 # Before (current):
-pnpm exec site-kernel run mission.close --mission <id>
+pnpm exec werkstatt run mission.close --mission <id>
 # Then manually:
-pnpm exec site-kernel run sternsystem.sync --id <systemId>
+pnpm exec werkstatt run sternsystem.sync --id <systemId>
 
 # After (proposed):
-pnpm exec site-kernel run mission.close --mission <id>
+pnpm exec werkstatt run mission.close --mission <id>
 # Mirrors synced automatically.
 ```
 
@@ -213,7 +213,7 @@ When sync fails (non-fatal):
 - [x] Unit test: sync called when mirrors > 2 (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0762-close-mirror-sync.test.ts test 1, vitest run passes)
 - [x] Unit test: sync failure does not block close (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0762-close-mirror-sync.test.ts test 2, vitest run passes)
 - [x] Unit test: sync skipped when mirrors <= 2 (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0762-close-mirror-sync.test.ts test 3, vitest run passes)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0762 --json` — 0 errors)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0762 --json` — 0 errors)
 
 ## Implementation notes for agents
 

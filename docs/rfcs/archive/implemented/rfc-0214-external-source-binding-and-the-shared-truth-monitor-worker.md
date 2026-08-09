@@ -93,13 +93,13 @@ Introduce two things:
 
 ```sh
 # App-scoped: validate descriptors + sourceRef resolution
-pnpm exec site-kernel run content.source.validate --app warpgogol-com
+pnpm exec werkstatt run content.source.validate --app warpgogol-com
 
 # Workspace-scoped: the shared monitor (mirrors lagebild.*)
-pnpm exec site-kernel run source.monitor.tenant.add    --source gov:destatis-backnang
-pnpm exec site-kernel run source.monitor.tenant.enable --source gov:destatis-backnang
-pnpm exec site-kernel run source.monitor.status
-pnpm exec site-kernel run source.monitor.run           # the worker entry (cron-driven)
+pnpm exec werkstatt run source.monitor.tenant.add    --source gov:destatis-backnang
+pnpm exec werkstatt run source.monitor.tenant.enable --source gov:destatis-backnang
+pnpm exec werkstatt run source.monitor.status
+pnpm exec werkstatt run source.monitor.run           # the worker entry (cron-driven)
 ```
 
 ### Source descriptor

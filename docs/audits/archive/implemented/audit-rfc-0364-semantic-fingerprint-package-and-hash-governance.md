@@ -20,7 +20,7 @@ Pass — `rfc.validate RFC-0364 --json` returns zero violations.
 
 ## Axis A — Structural completeness
 
-- **CLI surface incomplete**: §5.1 shows `fingerprint.calculate` with exact invocation, but §5.2 (`fingerprint.usage.lint`) and §5.3 (`fingerprint.fixtures.validate`) lack `pnpm exec site-kernel run …` invocations with flags. An agent implementing these cannot infer the exact CLI shape from the RFC alone.
+- **CLI surface incomplete**: §5.1 shows `fingerprint.calculate` with exact invocation, but §5.2 (`fingerprint.usage.lint`) and §5.3 (`fingerprint.fixtures.validate`) lack `pnpm exec werkstatt run …` invocations with flags. An agent implementing these cannot infer the exact CLI shape from the RFC alone.
 - **Output format**: `FingerprintResult` is documented as a TypeScript interface but the `--json` envelope shape for each command (the `{ commandName, data, exitCode, ok, … }` wrapper used by all kernel commands) is not shown.
 - **Failure modes**: The RFC does not specify exit codes or warn-vs-fail behavior for `fingerprint.usage.lint` (warning mode in step 4, blocking in step 6 — but the command-level flag that controls this is not named) or `fingerprint.fixtures.validate`.
 - **File system responsibilities**: §1 shows the package directory structure but does not name where fixtures live (`src/tests/fixtures/`?), where the allowlist file lives, or what file the allowlist format is (JSON? YAML? inline comment?).

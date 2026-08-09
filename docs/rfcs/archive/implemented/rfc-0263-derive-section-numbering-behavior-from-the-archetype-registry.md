@@ -81,8 +81,8 @@ The unprotected invariant is: **rendering behavior keyed on a cosmic name must d
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run archetype.registry.build      # now also emits roles
-pnpm exec site-kernel run cosmic.literals.lint --json
+pnpm exec werkstatt run archetype.registry.build      # now also emits roles
+pnpm exec werkstatt run cosmic.literals.lint --json
 ```
 
 ### TypeScript contracts

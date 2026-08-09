@@ -74,7 +74,7 @@ nonGoals:
   - "Does not introduce per-page Axiom checks (sitemap-driven full-site check only)"
   - "Does not change leitstand.promote (alt→main promotion with build-identity verification is unchanged from RFC-0608)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -135,16 +135,16 @@ The deployment chain gains a mandatory `dev` channel before `alt`. The new relea
 
 ```sh
 # Deploy to dev channel + automatic Axiom check
-pnpm exec site-kernel run leitstand.deploy --release warpgogol-com-r000006 [--json]
+pnpm exec werkstatt run leitstand.deploy --release warpgogol-com-r000006 [--json]
 
 # Propagate dev → alt (requires dev-deployed + Axiom evidence)
-pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000006 [--json]
+pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000006 [--json]
 
 # Promote alt → main (unchanged from RFC-0608)
-pnpm exec site-kernel run leitstand.promote --release warpgogol-com-r000006 [--json]
+pnpm exec werkstatt run leitstand.promote --release warpgogol-com-r000006 [--json]
 
 # Rollback — auto-detects channel from release state
-pnpm exec site-kernel run leitstand.rollback --system warpgogol-com [--to-release warpgogol-com-r000004] [--json]
+pnpm exec werkstatt run leitstand.rollback --system warpgogol-com [--to-release warpgogol-com-r000004] [--json]
 ```
 
 **`leitstand.deploy` flags:**

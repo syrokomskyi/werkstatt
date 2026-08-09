@@ -79,7 +79,7 @@ Treat the remaining RFC-0114 / RFC-0117 work as a single multi-package change wi
 2. **Dedicated narrower command `biome.site-background.derive`.**
    - Register in `packages/os/site-kernel-checks/src/module.ts` alongside `biome.tokens.derive`.
    - Implementation is the same `deriveSiteBackground` helper plus the YAML round-trip; the command exists for "I want to derive only the background block on a biome that already has palette / typography" — the focused-update use case from RFC-0117.
-   - Acceptance: `pnpm exec site-kernel run biome.site-background.derive --biome packages/ontology/biomes/<id>.yaml --inplace` produces the same `siteBackground` block as the full `biome.tokens.derive` run.
+   - Acceptance: `pnpm exec werkstatt run biome.site-background.derive --biome packages/ontology/biomes/<id>.yaml --inplace` produces the same `siteBackground` block as the full `biome.tokens.derive` run.
 
 3. **Onboarding scaffold integration in `packages/os/site-kernel-onboarding/src/scaffold.ts`.**
    - Read `biome.siteBackground` from the brief-resolved biome.
@@ -92,7 +92,7 @@ Treat the remaining RFC-0114 / RFC-0117 work as a single multi-package change wi
 
 5. **Validator alignment.**
    - Extend `biome.contract.validate` (per RFC-0114 §"File system responsibilities") to accept the new block and reject a `parallax` on a `static` biome (RFC-0106 envelope rule).
-   - Acceptance: `pnpm exec site-kernel run biome.contract.validate` exits zero on both biomes after step 4.
+   - Acceptance: `pnpm exec werkstatt run biome.contract.validate` exits zero on both biomes after step 4.
 
 ### Why steps must land together
 

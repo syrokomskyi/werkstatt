@@ -50,7 +50,7 @@ No configuration or data changes.
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — TypeScript compilation
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — vitest unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0763` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0763` — RFC validation
 
 ## 3. Step sequence
 
@@ -202,7 +202,7 @@ No configuration or data changes.
 
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0763 --json`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0763 --json`
 - Fix any TypeScript compilation errors or test failures
 
 **Validation:**
@@ -221,7 +221,7 @@ No configuration or data changes.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0763`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0763`
 - If evidence file is generated, commit it alongside the implementation
 
 **Validation:**
@@ -243,12 +243,12 @@ No configuration or data changes.
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0763 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0763 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0763` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0763` passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All acceptance criteria checked off with evidence annotations. RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -259,10 +259,10 @@ No configuration or data changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0763`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0763`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0763` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0763` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -280,4 +280,4 @@ No configuration or data changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0763 --reason "..." --invariant "DNA-46"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0763 --reason "..." --invariant "DNA-46"` instead of working around it.

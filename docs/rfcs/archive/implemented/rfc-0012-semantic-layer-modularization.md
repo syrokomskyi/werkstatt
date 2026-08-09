@@ -144,8 +144,8 @@ All hand-written type aliases in `pages.ts` and `site-profile.ts` are replaced b
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run semantic.mirror.validate --app nicaragua-projekt
-pnpm exec site-kernel run semantic.mirror.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run semantic.mirror.validate --app nicaragua-projekt
+pnpm exec werkstatt run semantic.mirror.validate --app nicaragua-projekt --json
 ```
 
 ### TypeScript contracts

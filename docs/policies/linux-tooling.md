@@ -30,8 +30,8 @@ This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX envir
 Agents **MAY** run `agent.environment.audit` at the start of any session and **SHOULD** include the result in the system prompt. The command is read-only, advisory, and never gates build pipelines.
 
 ```sh
-rtk pnpm exec site-kernel run agent.environment.audit --json
-rtk pnpm exec site-kernel run agent.environment.audit --emit-prompt
+rtk pnpm exec werkstatt run agent.environment.audit --json
+rtk pnpm exec werkstatt run agent.environment.audit --emit-prompt
 ```
 
 The `--emit-prompt` flag appends a `systemPromptSnippet` field and prints a plain-text snippet suitable for pasting into an agent system prompt. Missing tools include actionable `installHint` values with apt commands.
@@ -150,6 +150,6 @@ Restart the terminal or run `exec bash` to apply. This is a per-user setting —
 When moving the ecosystem to a new machine (e.g. Windows → Ubuntu), `pnpm install` restores JS dependencies but **not** OS-specific native binaries. Run these steps after `pnpm install`:
 
 1. `pnpm exec playwright install chromium` — browser binaries for `print.pdf.generate` and `qa.independent.run` (cached per-OS, not portable across platforms).
-2. `pnpm exec site-kernel run compass.audit.validate --strict` — verify the audit ledger has no phantom entries (path mismatch from cross-OS `compass.audit.record` runs).
+2. `pnpm exec werkstatt run compass.audit.validate --strict` — verify the audit ledger has no phantom entries (path mismatch from cross-OS `compass.audit.record` runs).
 3. `pnpm --filter <site> run build` — full pipeline smoke test (catches missing native deps like `better-sqlite3`).
 4. Apply system-level tuning from the sections above — inotify limits, VM dirty-page tuning, CPU governor, tmpfs, and bracketed paste. These are operator actions and are not automated by the ecosystem.

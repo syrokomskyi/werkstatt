@@ -67,7 +67,7 @@ nonGoals:
   - "Adaptive delay — fixed 6s delay only, no polling or dynamic wait"
   - "Purging alt URLs during leitstand.promote — alt was already purged during leitstand.propagate"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -133,9 +133,9 @@ The `purgeResult` (success/failure/skipped) is recorded in the per-channel `last
 No new commands. No new flags. The purge is internal to the leitstand command flow and transparent to the operator:
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000005
-pnpm exec site-kernel run leitstand.promote --release warpgogol-com-r000005
-pnpm exec site-kernel run leitstand.rollback --system warpgogol-com --channel main
+pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000005
+pnpm exec werkstatt run leitstand.promote --release warpgogol-com-r000005
+pnpm exec werkstatt run leitstand.rollback --system warpgogol-com --channel main
 ```
 
 The operator observes new log lines:

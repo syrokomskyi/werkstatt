@@ -261,11 +261,11 @@ See `## Decision` for the body-kind taxonomy, canonical shapes, and dispatcher p
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run section.body.contract.validate
-pnpm exec site-kernel run section.list-item.contract.validate
-pnpm exec site-kernel run section.contract.validate
-pnpm exec site-kernel run page.block.validate --app <id>
-pnpm exec site-kernel run section.scaffold --archetype <id> --slug <slug>
+pnpm exec werkstatt run section.body.contract.validate
+pnpm exec werkstatt run section.list-item.contract.validate
+pnpm exec werkstatt run section.contract.validate
+pnpm exec werkstatt run page.block.validate --app <id>
+pnpm exec werkstatt run section.scaffold --archetype <id> --slug <slug>
 ```
 
 Behavior:

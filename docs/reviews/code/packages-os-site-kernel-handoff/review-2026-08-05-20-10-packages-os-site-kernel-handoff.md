@@ -22,7 +22,7 @@ Finding A1 fixed in commit f2efb8f7. The implementation is clean, well-tested, a
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @warpgogol/site-kernel-handoff run build:check` exit 0. `pnpm exec site-kernel run rfc.validate --id RFC-0702` exit 0. 26 unit tests pass.
+Pass — `pnpm --filter @warpgogol/site-kernel-handoff run build:check` exit 0. `pnpm exec werkstatt run rfc.validate --id RFC-0702` exit 0. 26 unit tests pass.
 
 ### Axis A — Structural correctness
 

@@ -65,7 +65,7 @@ None.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0722 --json` — must pass (RFC-0722 is at root, not in a subdirectory)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0722 --json` — must pass (RFC-0722 is at root, not in a subdirectory)
 - `pnpm --filter @warpgogol/forge build:check` — must pass
 
 **Completion criterion:** RFC-DIR-01 rule is present in `validate-rules.ts`; `rfc.validate` passes for all existing RFCs (none are in unsanctioned subdirectories).
@@ -87,7 +87,7 @@ None.
 
 **Validation:**
 
-- `pnpm exec site-kernel run adr.validate --json` — must pass (all ADRs are either at root or in `archive/`)
+- `pnpm exec werkstatt run adr.validate --json` — must pass (all ADRs are either at root or in `archive/`)
 - `pnpm --filter @warpgogol/forge build:check` — must pass
 
 **Completion criterion:** ADR-DIR-01 rule is present in `validate.ts`; `adr.validate` passes for all existing ADRs.
@@ -174,17 +174,17 @@ None.
 **Agent actions:**
 
 - Verify `docs/policies/rfc-governance.md` is updated with rule 9.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands added, only validation rules extended — likely not needed, but verify).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands added, only validation rules extended — likely not needed, but verify).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0722 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0722 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0722`
-- `pnpm exec site-kernel run adr.validate`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0722`
+- `pnpm exec werkstatt run adr.validate`
 - `pnpm --filter @warpgogol/forge build:check`
 - Review report exists for this session.
 
@@ -196,8 +196,8 @@ None.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0722`
-- `pnpm exec site-kernel run adr.validate`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0722`
+- `pnpm exec werkstatt run adr.validate`
 - `pnpm --filter @warpgogol/forge build:check`
 - `pnpm --filter @warpgogol/forge test` (if tests added)
 

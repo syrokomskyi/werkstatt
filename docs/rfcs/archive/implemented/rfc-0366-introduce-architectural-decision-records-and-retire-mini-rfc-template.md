@@ -170,14 +170,14 @@ Status values are closed: `proposed`, `accepted`, `superseded`, `rejected`.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run adr.create \
+pnpm exec werkstatt run adr.create \
   --title "Use DuckDB for local analytics snapshots" \
   --scope package \
   --decider architecture \
   --related RFC-0365
 
-pnpm exec site-kernel run adr.list --status accepted --scope package --json
-pnpm exec site-kernel run adr.validate ADR-0001
+pnpm exec werkstatt run adr.list --status accepted --scope package --json
+pnpm exec werkstatt run adr.validate ADR-0001
 ```
 
 `adr.create` flags:

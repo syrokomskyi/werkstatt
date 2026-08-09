@@ -204,13 +204,13 @@ No new commands. Existing commands are updated:
 
 ```sh
 # Extended with prohibited-type checking for surface pages
-pnpm exec site-kernel run seo.structured-data.validate --site warpgogol-com
+pnpm exec werkstatt run seo.structured-data.validate --site warpgogol-com
 
 # Extended with BreadcrumbList URL checks for surface artifacts
-pnpm exec site-kernel run surface.validate --site warpgogol-com
+pnpm exec werkstatt run surface.validate --site warpgogol-com
 
 # Extended with per-depth JSON-LD type policy checks against C-contract
-pnpm exec site-kernel run surface.contract.validate --site warpgogol-com
+pnpm exec werkstatt run surface.contract.validate --site warpgogol-com
 ```
 
 All three commands are `scope: app` (they operate on a specific site's built artifacts). `seo.structured-data.validate` runs in `sites-check-postbuild` (it requires built `dist/` HTML). `surface.validate` runs in `build.check`. `surface.contract.validate` runs in `build.check`.
@@ -337,7 +337,7 @@ The migrator (`rfc-0498`) is a no-op on authored data — the per-depth type pol
 - [x] `surface.validate` checks BreadcrumbList URLs in generated surface artifacts. (evidence: packages/os/site-kernel-checks/src/surface/validate.ts SURF-BREADCRUMB-URL check; build:check passes)
 - [x] `surface.contract.validate` includes per-depth JSON-LD type policy checks against the C-contract. (evidence: packages/os/site-kernel-handoff/src/surface-contract.ts lines 119-140; build:check passes)
 - [x] Migrator `rfc-0498` registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts`. (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0498.ts; registry.ts includes rfc0498Migrator; PBT test passes)
-- [x] `rfc.validate` passes on this file. (evidence: pnpm exec site-kernel run rfc.validate reports no errors for RFC-0498)
+- [x] `rfc.validate` passes on this file. (evidence: pnpm exec werkstatt run rfc.validate reports no errors for RFC-0498)
 
 ## Implementation notes for agents
 

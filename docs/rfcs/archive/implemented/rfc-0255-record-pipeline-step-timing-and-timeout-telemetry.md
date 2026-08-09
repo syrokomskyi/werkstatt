@@ -121,8 +121,8 @@ This RFC does not replace Turborepo. It measures Site OS pipeline steps inside e
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run pipeline.timing.report --json
-pnpm exec site-kernel run pipeline.timeout.validate --json
+pnpm exec werkstatt run pipeline.timing.report --json
+pnpm exec werkstatt run pipeline.timeout.validate --json
 pnpm --filter warpgogol-com build:check
 pnpm --filter nicaragua-projekt build:check
 ```
@@ -130,9 +130,9 @@ pnpm --filter nicaragua-projekt build:check
 Optional future flags:
 
 ```sh
-pnpm exec site-kernel run pipeline.timing.report --app warpgogol-com --pipeline build.check --json
-pnpm exec site-kernel run pipeline.timing.report --last-run --json
-pnpm exec site-kernel run pipeline.timeout.validate --strict --json
+pnpm exec werkstatt run pipeline.timing.report --app warpgogol-com --pipeline build.check --json
+pnpm exec werkstatt run pipeline.timing.report --last-run --json
+pnpm exec werkstatt run pipeline.timeout.validate --strict --json
 ```
 
 The first implementation may emit timing telemetry directly from each pipeline result without persisting a `--last-run` store. Persistence is optional and should be added only if useful.
@@ -335,7 +335,7 @@ Wrappers around external commands may not expose fine-grained child timings. The
 - [x] `pipeline.timeout.validate` is registered as a workspace command and reports missing or incoherent timeout metadata. (evidence: implemented historically)
 - [x] Tests cover passing, failing, skipped, and timed-out step timing behavior. (evidence: implemented historically)
 - [x] App-level `build:check` for both active apps still passes. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run packages-check.run --json`, `pnpm exec site-kernel run ci.local.validate --json`, `pnpm test`, and `rfc.validate` pass. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run --json`, `pnpm exec werkstatt run ci.local.validate --json`, `pnpm test`, and `rfc.validate` pass. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

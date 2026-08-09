@@ -11,23 +11,23 @@
 
 @GOGOL/ONTOLOGY (zero workspace deps)
   |
-  +-- @warpgogol/passport
+  +-- @warpgogol/werkstatt-site/passport
   +-- @warpgogol/share
-  +-- @warpgogol/star-map
+  +-- @warpgogol/werkstatt-site/star-map
 
 @GOGOL/CHAT (zero workspace deps)
   |
-  +-- @warpgogol/chat-adapter-null
-  +-- @warpgogol/chat-adapter-uchat
+  +-- @warpgogol/werkstatt-site/chat-adapter-null
+  +-- @warpgogol/werkstatt-site/chat-adapter-uchat
   +-- @warpgogol/ui
 
 @GOGOL/GROWTH (zero workspace deps)
   |
-  +-- @warpgogol/growth-adapter-matomo
+  +-- @warpgogol/werkstatt-site/growth-adapter-matomo
 
 @GOGOL/NEBULA (zero workspace deps)
   |
-  +-- @warpgogol/passport
+  +-- @warpgogol/werkstatt-site/passport
 
 @GOGOL/CONTENT-SOURCE (zero workspace deps)
   |
@@ -35,27 +35,27 @@
 
 @GOGOL/SITE-KERNEL-CONTENT (zero workspace deps)
   |
-  +-- @warpgogol/passport
+  +-- @warpgogol/werkstatt-site/passport
 
 @GOGOL/STAR-MAP
   |
   +-- deps: @warpgogol/ontology
-  +-- consumers: @warpgogol/passport
+  +-- consumers: @warpgogol/werkstatt-site/passport
 
 @GOGOL/INTEGRATION (zero workspace deps)
   |
-  +-- consumers: @warpgogol/agent-gate, @warpgogol/integration-adapter-stripe,
-  |              @warpgogol/integration-adapter-supabase-crm, @warpgogol/ui,
-  |              @warpgogol/site-kernel-checks, @warpgogol/site-kernel-deploy
+  +-- consumers: @warpgogol/werkstatt/agent-gate, @warpgogol/werkstatt-site/integration-adapter-stripe,
+  |              @warpgogol/werkstatt-site/integration-adapter-supabase-crm, @warpgogol/ui,
+  |              @warpgogol/werkstatt-site/checks, @warpgogol/werkstatt-site/deploy
 
 @GOGOL/SHARE
   |
-  +-- deps: @warpgogol/content-source, @warpgogol/ontology
-  +-- consumers: @warpgogol/pbp, @warpgogol/ui, @warpgogol/site-kernel-checks
+  +-- deps: @warpgogol/werkstatt-site/content-source, @warpgogol/ontology
+  +-- consumers: @warpgogol/pbp, @warpgogol/ui, @warpgogol/werkstatt-site/checks
 
 @GOGOL/PASSPORT
   |
-  +-- deps: @warpgogol/nebula, @warpgogol/ontology, @warpgogol/site-kernel-content, @warpgogol/star-map
+  +-- deps: @warpgogol/werkstatt-site/nebula, @warpgogol/ontology, @warpgogol/werkstatt-site/content, @warpgogol/werkstatt-site/star-map
   +-- consumers: @warpgogol/ui
 
 @GOGOL/INTEGRATION-ADAPTER-STRIPE
@@ -82,17 +82,17 @@
 
 @GOGOL/UI (top-level consumer)
   |
-  +-- deps: @warpgogol/chat, @warpgogol/chat-adapter-null, @warpgogol/chat-adapter-uchat,
-  |          @warpgogol/integration, @warpgogol/integration-adapter-stripe,
-  |          @warpgogol/integration-adapter-supabase-crm, @warpgogol/passport
+  +-- deps: @warpgogol/chat, @warpgogol/werkstatt-site/chat-adapter-null, @warpgogol/werkstatt-site/chat-adapter-uchat,
+  |          @warpgogol/integration, @warpgogol/werkstatt-site/integration-adapter-stripe,
+  |          @warpgogol/werkstatt-site/integration-adapter-supabase-crm, @warpgogol/werkstatt-site/passport
   +-- consumers: apps/*
 
 @GOGOL/WERKSTATT (engine — RFC-0772 consolidated kernel, handoff, integrity, observability, fingerprint, agent-gate, changelog, schemas, plugin)
   |
-  +-- deps: @warpgogol/forge, @warpgogol/ontology, @warpgogol/share, @warpgogol/passport, @warpgogol/observability,
-  |          @warpgogol/integration, @warpgogol/integration-adapter-supabase-crm, @warpgogol/surface,
-  |          @warpgogol/site-kernel-content, @warpgogol/site-kernel-astro, @warpgogol/site-kernel-checks,
-  |          @warpgogol/site-kernel-codegen, @warpgogol/site-kernel-integrity, @warpgogol/site-kernel-onboarding
+  +-- deps: @warpgogol/forge, @warpgogol/ontology, @warpgogol/share, @warpgogol/werkstatt-site/passport, @warpgogol/observability,
+  |          @warpgogol/integration, @warpgogol/werkstatt-site/integration-adapter-supabase-crm, @warpgogol/werkstatt-site/surface,
+  |          @warpgogol/werkstatt-site/content, @warpgogol/werkstatt-site/paths, @warpgogol/werkstatt-site/checks,
+  |          @warpgogol/werkstatt-site/codegen, @warpgogol/werkstatt/integrity, @warpgogol/werkstatt-site/onboarding
   +-- consumers: root workspace (tools/kernel.config.ts), re-export shims (site-kernel, site-kernel-handoff, fingerprint, agent-gate, etc.)
 ```
 
@@ -100,33 +100,33 @@
 
 | Package | Depends on (workspace) |
 | --- | --- |
-| `@warpgogol/tokens` | — (zero) |
+| `@warpgogol/werkstatt-site/tokens` | — (zero) |
 | `@warpgogol/ontology` | `@warpgogol/werkstatt` (operations re-export shim) |
 | `@warpgogol/chat` | — (zero) |
 | `@warpgogol/growth` | — (zero) |
-| `@warpgogol/nebula` | — (zero) |
-| `@warpgogol/content-source` | — (zero) |
-| `@warpgogol/faq` | `@warpgogol/content-source`, `@warpgogol/share` |
-| `@warpgogol/site-kernel-content` | — (zero) |
-| `@warpgogol/surface` | — (zero; only `zod`) — framework-free route-source engine. MUST NOT depend on `@warpgogol/share` (would cycle). |
-| `@warpgogol/star-map` | `@warpgogol/ontology` |
-| `@warpgogol/share` | `@warpgogol/content-source`, `@warpgogol/ontology`, `@warpgogol/surface` |
-| `@warpgogol/passport` | `@warpgogol/nebula`, `@warpgogol/ontology`, `@warpgogol/site-kernel-content`, `@warpgogol/star-map` |
+| `@warpgogol/werkstatt-site/nebula` | — (zero) |
+| `@warpgogol/werkstatt-site/content-source` | — (zero) |
+| `@warpgogol/werkstatt-site/faq` | `@warpgogol/werkstatt-site/content-source`, `@warpgogol/share` |
+| `@warpgogol/werkstatt-site/content` | — (zero) |
+| `@warpgogol/werkstatt-site/surface` | — (zero; only `zod`) — framework-free route-source engine. MUST NOT depend on `@warpgogol/share` (would cycle). |
+| `@warpgogol/werkstatt-site/star-map` | `@warpgogol/ontology` |
+| `@warpgogol/share` | `@warpgogol/werkstatt-site/content-source`, `@warpgogol/ontology`, `@warpgogol/werkstatt-site/surface` |
+| `@warpgogol/werkstatt-site/passport` | `@warpgogol/werkstatt-site/nebula`, `@warpgogol/ontology`, `@warpgogol/werkstatt-site/content`, `@warpgogol/werkstatt-site/star-map` |
 | `@warpgogol/integration` | — (zero) |
-| `@warpgogol/integration-adapter-stripe` | `@warpgogol/integration`, `@warpgogol/share` |
-| `@warpgogol/integration-adapter-supabase-crm` | `@warpgogol/integration`, `@warpgogol/share` |
-| `@warpgogol/chat-adapter-null` | `@warpgogol/chat` |
-| `@warpgogol/chat-adapter-uchat` | `@warpgogol/chat` |
-| `@warpgogol/growth-adapter-matomo` | `@warpgogol/growth` |
-| `@warpgogol/ui` | `@warpgogol/chat`, `@warpgogol/chat-adapter-null`, `@warpgogol/chat-adapter-uchat`, `@warpgogol/integration`, `@warpgogol/integration-adapter-stripe`, `@warpgogol/integration-adapter-supabase-crm`, `@warpgogol/passport` |
-| `@warpgogol/werkstatt` | `@warpgogol/forge`, `@warpgogol/ontology`, `@warpgogol/share`, `@warpgogol/passport`, `@warpgogol/observability`, `@warpgogol/integration`, `@warpgogol/integration-adapter-supabase-crm`, `@warpgogol/surface`, `@warpgogol/site-kernel-content`, `@warpgogol/site-kernel-astro`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-integrity`, `@warpgogol/site-kernel-onboarding` |
+| `@warpgogol/werkstatt-site/integration-adapter-stripe` | `@warpgogol/integration`, `@warpgogol/share` |
+| `@warpgogol/werkstatt-site/integration-adapter-supabase-crm` | `@warpgogol/integration`, `@warpgogol/share` |
+| `@warpgogol/werkstatt-site/chat-adapter-null` | `@warpgogol/chat` |
+| `@warpgogol/werkstatt-site/chat-adapter-uchat` | `@warpgogol/chat` |
+| `@warpgogol/werkstatt-site/growth-adapter-matomo` | `@warpgogol/growth` |
+| `@warpgogol/ui` | `@warpgogol/chat`, `@warpgogol/werkstatt-site/chat-adapter-null`, `@warpgogol/werkstatt-site/chat-adapter-uchat`, `@warpgogol/integration`, `@warpgogol/werkstatt-site/integration-adapter-stripe`, `@warpgogol/werkstatt-site/integration-adapter-supabase-crm`, `@warpgogol/werkstatt-site/passport` |
+| `@warpgogol/werkstatt` | `@warpgogol/forge`, `@warpgogol/ontology`, `@warpgogol/share`, `@warpgogol/werkstatt-site/passport`, `@warpgogol/observability`, `@warpgogol/integration`, `@warpgogol/werkstatt-site/integration-adapter-supabase-crm`, `@warpgogol/werkstatt-site/surface`, `@warpgogol/werkstatt-site/content`, `@warpgogol/werkstatt-site/paths`, `@warpgogol/werkstatt-site/checks`, `@warpgogol/werkstatt-site/codegen`, `@warpgogol/werkstatt/integrity`, `@warpgogol/werkstatt-site/onboarding` |
 | `@warpgogol/site-kernel` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
-| `@warpgogol/site-kernel-handoff` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
-| `@warpgogol/site-kernel-integrity` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
-| `@warpgogol/site-kernel-observability` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
-| `@warpgogol/site-kernel-changelog` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
-| `@warpgogol/fingerprint` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
-| `@warpgogol/agent-gate` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/werkstatt/handoff` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/werkstatt/integrity` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/werkstatt/observability` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/werkstatt-site/changelog` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/werkstatt/fingerprint` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/werkstatt/agent-gate` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
 
 ## Blast Radius Guide
 
@@ -137,12 +137,12 @@
 | `@warpgogol/integration` (integration hub contracts) | `agent-gate`, `integration-adapter-stripe`, `integration-adapter-supabase-crm`, `ui`, `site-kernel-checks`, `site-kernel-deploy` |
 | `@warpgogol/chat` (port contract) | `chat-adapter-null`, `chat-adapter-uchat` → `ui` → all apps |
 | `@warpgogol/growth` (adapter interface, emit) | `growth-adapter-matomo` → all apps |
-| `@warpgogol/passport` (signing, data) | `ui` → all apps |
-| `@warpgogol/content-source` (CSP port, fs adapter) | `business`, `share` → `ui` → all apps |
-| `@warpgogol/faq` (FAQ collection factory, loaders) | `content-source`, `share` → all apps with FAQ content |
-| `@warpgogol/surface` (route-source engine, eligibility, blueprint, substance, geo) | `share` (registry merge) + `site-kernel-checks` (`surface.*` commands) → apps with a Programmatic Surface |
+| `@warpgogol/werkstatt-site/passport` (signing, data) | `ui` → all apps |
+| `@warpgogol/werkstatt-site/content-source` (CSP port, fs adapter) | `business`, `share` → `ui` → all apps |
+| `@warpgogol/werkstatt-site/faq` (FAQ collection factory, loaders) | `content-source`, `share` → all apps with FAQ content |
+| `@warpgogol/werkstatt-site/surface` (route-source engine, eligibility, blueprint, substance, geo) | `share` (registry merge) + `site-kernel-checks` (`surface.*` commands) → apps with a Programmatic Surface |
 | `@warpgogol/ui` (sections, components) | all apps directly |
-| `@warpgogol/tokens` (CSS only) | all apps (CSS import, no workspace dep) |
+| `@warpgogol/werkstatt-site/tokens` (CSS only) | all apps (CSS import, no workspace dep) |
 
 ## OS Packages (re-export shims — RFC-0772)
 
@@ -151,16 +151,16 @@ OS packages (`packages/os/*`) are now re-export shims pointing to `@warpgogol/we
 | Package | Status | Re-exports from |
 | --- | --- | --- |
 | `@warpgogol/site-kernel` | Re-export shim | `@warpgogol/werkstatt/kernel` |
-| `@warpgogol/site-kernel-content` | Active (not yet moved) | — |
-| `@warpgogol/site-kernel-astro` | Active (not yet moved) | — |
-| `@warpgogol/site-kernel-checks` | Active (not yet moved) | — |
-| `@warpgogol/site-kernel-codegen` | Active (not yet moved) | — |
-| `@warpgogol/site-kernel-onboarding` | Active (not yet moved) | — |
-| `@warpgogol/site-kernel-integrity` | Re-export shim | `@warpgogol/werkstatt/integrity` |
-| `@warpgogol/site-kernel-observability` | Re-export shim | `@warpgogol/werkstatt/observability` |
-| `@warpgogol/site-kernel-changelog` | Re-export shim | `@warpgogol/werkstatt/changelog` |
-| `@warpgogol/site-kernel-deploy` | Active (not yet moved) | — |
-| `@warpgogol/site-kernel-handoff` | Re-export shim | `@warpgogol/werkstatt` (handoff modules) |
-| `@warpgogol/site-kernel-audit` | Active (not yet moved) | — |
-| `@warpgogol/fingerprint` | Re-export shim | `@warpgogol/werkstatt/fingerprint` |
-| `@warpgogol/agent-gate` | Re-export shim | `@warpgogol/werkstatt/agent-gate` |
+| `@warpgogol/werkstatt-site/content` | Active (not yet moved) | — |
+| `@warpgogol/werkstatt-site/paths` | Active (not yet moved) | — |
+| `@warpgogol/werkstatt-site/checks` | Active (not yet moved) | — |
+| `@warpgogol/werkstatt-site/codegen` | Active (not yet moved) | — |
+| `@warpgogol/werkstatt-site/onboarding` | Active (not yet moved) | — |
+| `@warpgogol/werkstatt/integrity` | Re-export shim | `@warpgogol/werkstatt/integrity` |
+| `@warpgogol/werkstatt/observability` | Re-export shim | `@warpgogol/werkstatt/observability` |
+| `@warpgogol/werkstatt-site/changelog` | Re-export shim | `@warpgogol/werkstatt/changelog` |
+| `@warpgogol/werkstatt-site/deploy` | Active (not yet moved) | — |
+| `@warpgogol/werkstatt/handoff` | Re-export shim | `@warpgogol/werkstatt` (handoff modules) |
+| `@warpgogol/werkstatt-site/audit` | Active (not yet moved) | — |
+| `@warpgogol/werkstatt/fingerprint` | Re-export shim | `@warpgogol/werkstatt/fingerprint` |
+| `@warpgogol/werkstatt/agent-gate` | Re-export shim | `@warpgogol/werkstatt/agent-gate` |

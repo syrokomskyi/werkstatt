@@ -127,10 +127,10 @@ The kernel gains a `change.impact.derive` command (workspace scope, `mutatesStat
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run change.impact.derive                          # working-tree mode
-pnpm exec site-kernel run change.impact.derive --git-base origin/main   # branch-diff mode
-pnpm exec site-kernel run change.impact.derive --paths "packages/os/site-kernel/src/types.ts,docs/README.md"
-pnpm exec site-kernel run change.impact.derive --json
+pnpm exec werkstatt run change.impact.derive                          # working-tree mode
+pnpm exec werkstatt run change.impact.derive --git-base origin/main   # branch-diff mode
+pnpm exec werkstatt run change.impact.derive --paths "packages/os/site-kernel/src/types.ts,docs/README.md"
+pnpm exec werkstatt run change.impact.derive --json
 ```
 
 Flags: `paths` (string, optional), `git-base` (string, optional). Mutually exclusive; `--paths` wins if both given (with a warning).
@@ -161,7 +161,7 @@ export interface ImpactClassification {
 }
 
 export interface ProfileRecommendation {
-  /** Ordered commands as the caller would type them (without "pnpm exec site-kernel run "). */
+  /** Ordered commands as the caller would type them (without "pnpm exec werkstatt run "). */
   commands: string[];
   note: string;
 }

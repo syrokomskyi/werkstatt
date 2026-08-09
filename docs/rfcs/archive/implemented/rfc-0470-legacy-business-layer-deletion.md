@@ -78,7 +78,7 @@ nonGoals:
   - "Does not create a new FAQ collection — if FAQ content is still needed, it must be moved to a separate site content collection (e.g. src/content/faq/) before this RFC executes"
   - "Does not create a new people/person collection — if people content is still needed, it must be moved to a separate site content collection before this RFC executes"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

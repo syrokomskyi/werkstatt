@@ -109,9 +109,9 @@ Material-credit warnings relate to RFC-0220, but this RFC does not change the cr
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run warning.diagnostics.lint --json
-pnpm exec site-kernel run maintenance.debt.report --json
-pnpm exec site-kernel run apps-check.author --app warpgogol-com --json
+pnpm exec werkstatt run warning.diagnostics.lint --json
+pnpm exec werkstatt run maintenance.debt.report --json
+pnpm exec werkstatt run apps-check.author --app warpgogol-com --json
 ```
 
 `warning.diagnostics.lint` is workspace-scoped and scans check modules for summary-only warning patterns.

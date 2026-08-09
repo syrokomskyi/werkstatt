@@ -61,7 +61,7 @@ scope:
 - Write the new `packages/forge/skills/meta/forge-bootstrap/SKILL.md` with:
   - Frontmatter: `name: forge-bootstrap`, `description: Configure a freshly created forge project — greenfield or transplant.`, `invocation: user`, `concerns: content-mutation`, `category: meta`, `dependsOn: ['my-preferences']`, `languagePolicy: ref(PREFERENCES.md)`, `bindings: { requires: [], optional: [] }`
   - Body: "Read PREFERENCES.md…" instruction (SKILL-09), mode choice (greenfield/transplant), greenfield interview steps (language, stack, package manager, stack bindings, write PREFERENCES.md, emit next steps), transplant interview steps (source directory, analyze, propose, fill, write PREFERENCES.md, emit next steps), guardrails, failure modes, output format
-  - Ensure no hardcoded `pnpm exec site-kernel run` or `docs/architecture-dna.md` in code blocks (SKILL-11)
+  - Ensure no hardcoded `pnpm exec werkstatt run` or `docs/architecture-dna.md` in code blocks (SKILL-11)
   - Ensure no `pnpm run build` / `npm run test` patterns if concerns were read-only or document-only (SKILL-10 does not apply to `content-mutation`, but avoid unnecessary code execution instructions anyway)
 
 **Validation:**
@@ -122,7 +122,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.skill.validate --json` (or `pnpm --filter @wgogol/forge exec forge skill.validate --json`)
+- Run `pnpm exec werkstatt run forge.skill.validate --json` (or `pnpm --filter @wgogol/forge exec forge skill.validate --json`)
 - Run `pnpm --filter @wgogol/forge run build:check`
 - Run `pnpm --filter @wgogol/forge run test`
 
@@ -167,12 +167,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0545 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0545 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0545 --json` — passes with zero violations.
+- `pnpm exec werkstatt run rfc.validate RFC-0545 --json` — passes with zero violations.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -183,10 +183,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0545 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0545 --json`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --json` (or equivalent)
+- `pnpm exec werkstatt run forge.skill.validate --json` (or equivalent)
 
 ### 4.2 Evidence artifacts
 
@@ -203,4 +203,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0545 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0545 --reason "..." --invariant "DNA-54"` instead of working around it.

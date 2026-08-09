@@ -148,10 +148,10 @@ See `## CLI surface`, `## TypeScript contracts`, and `## File system responsibil
 Unchanged from RFC-0111.
 
 ```sh
-pnpm exec site-kernel run section.shell.contract.validate
-pnpm exec site-kernel run section.header.contract.validate
-pnpm exec site-kernel run section.cta.contract.validate
-pnpm exec site-kernel run section.image.contract.validate
+pnpm exec werkstatt run section.shell.contract.validate
+pnpm exec werkstatt run section.header.contract.validate
+pnpm exec werkstatt run section.cta.contract.validate
+pnpm exec werkstatt run section.image.contract.validate
 ```
 
 ## TypeScript contracts

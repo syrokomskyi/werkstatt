@@ -105,10 +105,10 @@ This is acceptable because: (1) the mutation is opt-in via an explicit flag, (2)
 
 ```sh
 # Standalone:
-pnpm exec site-kernel run content.regression.check --site warpgogol-com --auto-accept
+pnpm exec werkstatt run content.regression.check --site warpgogol-com --auto-accept
 
 # Via mission.validate:
-pnpm exec site-kernel run mission.validate --mission <id> --auto-accept-regression
+pnpm exec werkstatt run mission.validate --mission <id> --auto-accept-regression
 ```
 
 ### TypeScript contracts

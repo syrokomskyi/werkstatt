@@ -110,7 +110,7 @@ rtk ./scripts/devin-export.sh
 After exporting, run `session.save` to convert the raw file to structured markdown:
 
 ```bash
-rtk pnpm exec site-kernel run session.save
+rtk pnpm exec werkstatt run session.save
 ```
 
 ### Windsurf (Cascade) sessions

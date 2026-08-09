@@ -71,7 +71,7 @@ nonGoals:
   - "Does not implement canonical serialization or signature envelope — Wave 4 (RFC-0442, RFC-0459)"
   - "Does not implement incremental/bulk processing — Wave 3 (RFC-0430)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -616,7 +616,7 @@ N/A — library-only. The compiler returns `PbpCompilerResult` to the caller.
 - [x] Golden fixture tests pass for the full pipeline (discover through projection) (evidence: compiler-pipeline.test.ts — 2026-07-20)
 - [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @gogol/pbp build:check — 2026-07-20)
 - [x] `vitest run` passes for `packages/pbp/` (evidence: 12 files, 169 tests passed — 2026-07-20)
-- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec site-kernel run rfc.validate RFC-0467, 2026-07-20)
+- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec werkstatt run rfc.validate RFC-0467, 2026-07-20)
 - [x] No site imports from `@gogol/pbp/compiler` until RFC-0469 (cutover) (evidence: cutover completed in RFC-0469, 2026-07-20)
 
 ## Implementation notes for agents

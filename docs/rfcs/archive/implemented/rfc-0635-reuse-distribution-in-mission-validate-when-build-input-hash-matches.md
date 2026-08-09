@@ -66,7 +66,7 @@ nonGoals:
   - Parallelizing pipeline steps (separate future RFC)
   - Changing build-input-hash computation (DNA-53 fingerprint governance)
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -122,13 +122,13 @@ Additionally, `mission.build` does not run `build.check` — only `build.prepare
 
 ```sh
 # Normal validation — checks hash, skips build if distribution is current
-pnpm exec site-kernel run mission.validate --site warpgogol-com
+pnpm exec werkstatt run mission.validate --site warpgogol-com
 
 # Force full rebuild regardless of hash match
-pnpm exec site-kernel run mission.validate --site warpgogol-com --force
+pnpm exec werkstatt run mission.validate --site warpgogol-com --force
 
 # JSON output
-pnpm exec site-kernel run mission.validate --site warpgogol-com --json
+pnpm exec werkstatt run mission.validate --site warpgogol-com --json
 ```
 
 The `--force` flag is currently accepted by the kernel CLI's `consumeCommonFlags` for pipeline execution (`executeKernelPipeline`), but it is NOT passed through to `executeKernelCommand` for individual command invocations. The CLI's command path at `packages/os/site-kernel/src/cli/index.ts` destructures `force` from `consumeCommonFlags` but does not forward it to `executeKernelCommand`.
@@ -283,7 +283,7 @@ This is desirable: if the distribution is current, there is no reason to rebuild
 - [x] Unit test: `mission.build` includes `build.check` pipeline step (evidence: mission-build-check-phase.test.ts test 1)
 - [x] Existing test files (`mission-validate-dist-cleanup.test.ts`, `mission-validate-snapshot-auto-regen.test.ts`, `mission-validate-cache-clone-warning.test.ts`) updated to account for distribution reuse path (evidence: existing tests use result.summary/exitCode not result.data, no assertion changes needed — all 488 tests pass)
 - [x] `mission.validate` command registration in `mission.module.ts` declares `cacheable: false` for consistency with `mission.build` (both depend on external state: file system, build tools, git) (evidence: packages/os/site-kernel-handoff/src/mission/mission.module.ts:202)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0635` → status: pass, violations: [])
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0635` → status: pass, violations: [])
 
 ## Implementation notes for agents
 

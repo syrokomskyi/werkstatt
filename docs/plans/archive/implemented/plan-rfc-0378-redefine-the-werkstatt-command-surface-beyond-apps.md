@@ -107,13 +107,13 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0378`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0378`
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/forge run build:check`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0378`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0378`
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0378`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0378`
 - Repo-wide grep for `--app` to verify no remaining call sites
 
 ## 3. Step sequence
@@ -291,8 +291,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run fleet.sites.generate --json`
-- `pnpm exec site-kernel run workspace.surface.validate`
+- `pnpm exec werkstatt run fleet.sites.generate --json`
+- `pnpm exec werkstatt run workspace.surface.validate`
 
 **Completion criterion:** `fleet.sites.generate` registered; `fleet/fleet.sites.yaml` carries GENERATED header and is bit-identical under regeneration; drift guard in `workspace.surface.validate` passes.
 
@@ -314,8 +314,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run ecosystem.manifest.generate --json`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.generate --json`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
 
 **Completion criterion:** `ecosystem.manifest.generate` projects `sternsystems:` and `missions:` blocks; `ecosystem.manifest.validate` passes.
 
@@ -329,16 +329,16 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate` to regenerate `docs/COMMANDS.md`
-- Run `pnpm exec site-kernel run docs.commands.generate` to regenerate command docs
-- Run `pnpm exec site-kernel run agents.generate` to regenerate agent docs
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run command.manifest.generate` to regenerate `docs/COMMANDS.md`
+- Run `pnpm exec werkstatt run docs.commands.generate` to regenerate command docs
+- Run `pnpm exec werkstatt run agents.generate` to regenerate agent docs
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
 - Update `AGENTS.md` (root), `apps/AGENTS.md`, `packages/AGENTS.md`, `services/AGENTS.md` — replace any `--app` references with `--site`, `apps list` with `sites list`, `apps-check.*` with `sites-check.*`
 
 **Validation:**
 
 - Repo-wide grep for `--app` should return zero results in tracked files (excluding RFC files and this plan)
-- `pnpm exec site-kernel run workspace.surface.validate`
+- `pnpm exec werkstatt run workspace.surface.validate`
 
 **Completion criterion:** All generated docs regenerated; all AGENTS.md files use `--site` exclusively; no `--app` references remain in non-RFC tracked files.
 
@@ -360,7 +360,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run workspace.surface.validate`
+- `pnpm exec werkstatt run workspace.surface.validate`
 
 **Completion criterion:** All five Compass XML files updated and `workspace.surface.validate` passes.
 
@@ -374,13 +374,13 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0378 --json`
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0378`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0378 --json`
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0378`
 - Run `pnpm --filter @gogol/site-kernel run build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @gogol/forge run build:check`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0378`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0378`
 - Commit the evidence file
 
 **Validation:**
@@ -395,13 +395,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0378`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0378`
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/forge run build:check`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0378`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0378` (RFC-0330)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0378`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0378` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -420,6 +420,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44, DNA-45, DNA-46, or DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0378 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-44, DNA-45, DNA-46, or DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0378 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If the `DiscoveredKernelApp` type rename causes breaking changes in packages not listed in `packagesImpacted`, stop and create a follow-up RFC to address the additional impact surface.
 - If `fleet.sites.generate` cannot produce a bit-identical output under regeneration (non-deterministic), stop and investigate the source of non-determinism before proceeding.

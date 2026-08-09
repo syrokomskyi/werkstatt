@@ -142,8 +142,8 @@ Project the business service catalog into `SemanticOrganization.services` at the
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run services.projection.validate --app warpgogol-com
-pnpm exec site-kernel run services.projection.validate --all --json
+pnpm exec werkstatt run services.projection.validate --app warpgogol-com
+pnpm exec werkstatt run services.projection.validate --all --json
 ```
 
 App-scoped. Reads `business/{lang}/services/*.md` from the app's content directory. Validates schema compliance, slug uniqueness, and projection integrity.

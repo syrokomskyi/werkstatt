@@ -208,16 +208,16 @@ function validateSchemaOrgPrices(
 
 - Run `pnpm --filter @warpgogol/pbp run build:check` and `pnpm --filter @warpgogol/share run build:check`
 - Run `pnpm --filter @warpgogol/pbp run test` and `pnpm --filter @warpgogol/share run test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0745`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0745`
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0745 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0745 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0745`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0745`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -228,7 +228,7 @@ function validateSchemaOrgPrices(
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0745`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0745`
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/pbp run test`
 - `pnpm --filter @warpgogol/share run build:check`
@@ -250,5 +250,5 @@ function validateSchemaOrgPrices(
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-4 or DNA-16, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0745 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-4 or DNA-16, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0745 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `SemanticPrice` type in `packages/share/src/semantic/models.ts` cannot accommodate a `currency` field without breaking existing consumers, create a new RFC to extend the type rather than forcing it.

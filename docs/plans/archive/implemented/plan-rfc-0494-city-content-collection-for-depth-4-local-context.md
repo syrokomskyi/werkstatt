@@ -49,7 +49,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck the modified package
 - `pnpm --filter @gogol/site-kernel-checks run test` — run unit tests
-- `pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com` — verify doorway-risk report (when city records exist)
+- `pnpm exec werkstatt run surface.doorway-risk.report --site warpgogol-com` — verify doorway-risk report (when city records exist)
 
 ## 3. Step sequence
 
@@ -154,7 +154,7 @@ scope:
 **Agent actions:**
 
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add a note about the city content collection loading in the surface-expand module description.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0494` — verify RFC still passes validation.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0494` — verify RFC still passes validation.
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — final typecheck.
 - Run `pnpm --filter @gogol/site-kernel-checks run test` — final test run.
 - Check off acceptance criteria in the RFC:
@@ -170,7 +170,7 @@ scope:
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0494`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0494`
 - All typecheck and test commands pass.
 
 **Completion criterion:** All documentation artifacts in scope are updated; all verifiable acceptance criteria are checked off; agent has requested the human operator to perform the `accepted → implemented` transition.
@@ -181,10 +181,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0494`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0494`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com` (runtime, requires city records)
+- `pnpm exec werkstatt run surface.doorway-risk.report --site warpgogol-com` (runtime, requires city records)
 
 ### 4.2 Evidence artifacts
 
@@ -203,5 +203,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0494 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0494 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the supplementary content loading causes a performance regression in `surface.generate`, profile the `loadDataset` calls and consider caching the collection across languages (but do not change the design without a follow-up RFC).

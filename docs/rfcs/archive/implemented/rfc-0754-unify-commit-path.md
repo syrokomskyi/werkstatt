@@ -81,10 +81,10 @@ The direct `git commit` guard for platform-scope files remains as a safety net â
 
 ```sh
 # No change to flags â€” same interface, now handles all scopes
-pnpm exec site-kernel run ecosystem.commit --message "feat: add new schema field"
+pnpm exec werkstatt run ecosystem.commit --message "feat: add new schema field"
 
 # Dry-run still works
-pnpm exec site-kernel run ecosystem.commit --message "..." --dry-run
+pnpm exec werkstatt run ecosystem.commit --message "..." --dry-run
 ```
 
 ### TypeScript contracts

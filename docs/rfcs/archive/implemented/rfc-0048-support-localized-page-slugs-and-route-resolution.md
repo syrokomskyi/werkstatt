@@ -174,8 +174,8 @@ This RFC narrows the RFC-0047 `AuthorPageEntry.routeSlug` concept: a page entry 
 This RFC proposes one validation command:
 
 ```sh
-pnpm exec site-kernel run routes.localized.validate --app nicaragua-projekt
-pnpm exec site-kernel run routes.localized.validate --all --json
+pnpm exec werkstatt run routes.localized.validate --app nicaragua-projekt
+pnpm exec werkstatt run routes.localized.validate --all --json
 ```
 
 `routes.localized.validate` is app-scoped and checks:

@@ -280,16 +280,16 @@ Result-claim phrases are allowed only when the record provides a `measurementDef
 
 ```sh
 # Validate industry records against the publication gate + claim policy
-pnpm exec site-kernel run surface.industry.validate --site warpgogol-com
+pnpm exec werkstatt run surface.industry.validate --site warpgogol-com
 
 # Report city pages (depth-4) that lack unique local context (doorway risk)
-pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com
+pnpm exec werkstatt run surface.doorway-risk.report --site warpgogol-com
 
 # Report industry pages (depth-1) with >0.70 prose similarity to another industry page
-pnpm exec site-kernel run surface.duplicate-content.report --site warpgogol-com
+pnpm exec werkstatt run surface.duplicate-content.report --site warpgogol-com
 
 # All three accept --json for machine-readable output
-pnpm exec site-kernel run surface.industry.validate --site warpgogol-com --json
+pnpm exec werkstatt run surface.industry.validate --site warpgogol-com --json
 ```
 
 All three commands are `scope: workspace` (they operate on a specific site's surface content). `surface.industry.validate` is integrated into `build.check` as a blocking check. `surface.doorway-risk.report` and `surface.duplicate-content.report` are diagnostic reports — they emit warnings in `build.check` but do not block unless the doorway or duplicate threshold is exceeded (configurable in the blueprint).

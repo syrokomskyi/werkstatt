@@ -68,7 +68,7 @@ nonGoals:
   - "Do not encrypt gossip traffic — SWIM messages contain only membership metadata (workshop id, endpoint, status). No secrets in gossip messages."
   - "Do not implement genome log compaction in this RFC — compaction (snapshot + truncate) is deferred to a future RFC. The pilot uses a size-based warning threshold (default 10MB) to alert the operator."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -124,16 +124,16 @@ The Werkstatt P2P network uses the **SWIM protocol** (with Lifeguard extensions)
 
 ```sh
 # Join the P2P network via a seed node
-pnpm exec site-kernel run swim.join --seed 10.0.0.2:7946 --json
+pnpm exec werkstatt run swim.join --seed 10.0.0.2:7946 --json
 
 # Leave the network gracefully
-pnpm exec site-kernel run swim.leave --json
+pnpm exec werkstatt run swim.leave --json
 
 # List current membership view
-pnpm exec site-kernel run swim.members --json
+pnpm exec werkstatt run swim.members --json
 
 # Check SWIM status (am I alive? how many peers?)
-pnpm exec site-kernel run swim.status --json
+pnpm exec werkstatt run swim.status --json
 ```
 
 ### TypeScript contracts
@@ -301,7 +301,7 @@ This RFC does not change `docs/*.xml` Compass documents — SWIM membership is a
 - [x] `werkstatt.swim.json` config file schema defined and validated (evidence: packages/os/site-kernel/src/swim/config.ts:32-66 — validateConfig with Zod schema, loadSwimConfig, createSwimConfig)
 - [x] `werkstatt.genome.log` CRDT genome log format defined (NDJSON, append-only, signed) (evidence: packages/os/site-kernel/src/swim/genome-log.ts:107-120 — appendGenomeEntry writes NDJSON lines, signGenomeEntry uses Ed25519 via @warpgogol/passport)
 - [x] Workshop restart restores membership view from genome log (evidence: packages/os/site-kernel/src/swim/genome-log.ts:107-133 — readGenomeLog reads and verifies entries, deriveMembershipView reconstructs latest state per workshop)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --root ... -- RFC-0564` → "All 1 RFC(s) passed validation")
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --root ... -- RFC-0564` → "All 1 RFC(s) passed validation")
 
 ## Implementation notes for agents
 

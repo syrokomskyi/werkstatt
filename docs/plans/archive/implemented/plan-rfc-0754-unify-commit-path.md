@@ -51,7 +51,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — scoped typecheck
 - `pnpm --filter @warpgogol/site-kernel-checks run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0754` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0754` — RFC validation
 
 ## 3. Step sequence
 
@@ -176,7 +176,7 @@ scope:
 **Agent actions:**
 
 - In `packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts`, update the `ecosystem.commit` description from "Replaces direct git commit for packages/**, integrations/**, services/**." to mention auto-detect and fallback for non-platform scope
-- Regenerate command manifest if needed: `pnpm exec site-kernel run command.manifest.generate`
+- Regenerate command manifest if needed: `pnpm exec werkstatt run command.manifest.generate`
 
 **Validation:**
 
@@ -214,16 +214,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0754 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0754 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0754`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0754`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -235,7 +235,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0754`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0754`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 
@@ -254,5 +254,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0754 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0754 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the split-commit mechanism proves unreliable (git staging edge cases), escalate to the operator — a simpler approach (e.g. always-single-commit with optional bump) may be needed.

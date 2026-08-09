@@ -60,10 +60,10 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0564`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0564`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel run test`
-- `pnpm exec site-kernel run ecosystem.manifest.generate` (after command registration)
+- `pnpm exec werkstatt run ecosystem.manifest.generate` (after command registration)
 
 ## 3. Step sequence
 
@@ -168,7 +168,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel run build:check` — typecheck passes.
-- `pnpm exec site-kernel run swim.status --json` — command is registered and callable (returns `config-not-found` since no config exists yet — this confirms registration works).
+- `pnpm exec werkstatt run swim.status --json` — command is registered and callable (returns `config-not-found` since no config exists yet — this confirms registration works).
 
 **Completion criterion:** SWIM module registered, `swim.status` command is discoverable and callable.
 
@@ -239,8 +239,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with the four new commands.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0564` — must pass.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with the four new commands.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0564` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel run test` — all tests pass.
 - Verify `docs/ecosystem.generated.yaml` includes `swim.join`, `swim.leave`, `swim.members`, `swim.status`.
@@ -265,16 +265,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel/AGENTS.md` is updated with SWIM module documentation.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (already done in Step 7 — confirm no drift).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (already done in Step 7 — confirm no drift).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0564 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0564 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0564 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0564` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0564` — passes.
 - Review report exists in `docs/reviews/code/` for this session.
 - All acceptance criteria marked `[x]` with evidence.
 
@@ -286,10 +286,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0564`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0564`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel run test`
-- `pnpm exec site-kernel run ecosystem.manifest.validate` (drift check)
+- `pnpm exec werkstatt run ecosystem.manifest.validate` (drift check)
 
 ### 4.2 Evidence artifacts
 
@@ -308,6 +308,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0564 --reason "..." --invariant "DNA-1"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0564 --reason "..." --invariant "DNA-1"` instead of working around it.
 - If the `swim` npm package is incompatible with the TypeScript strict mode or ESM module system, evaluate `@libp2p/swim` or `swim-hashring` as alternatives before falling back to a stub implementation.
 - If the Ed25519 key reuse from RFC-0558's `PASSPORT_SIGNING_KEY` creates a circular dependency between `packages/os/site-kernel` and `packages/passport`, extract the signing primitives into a shared utility or use dynamic import to break the cycle.

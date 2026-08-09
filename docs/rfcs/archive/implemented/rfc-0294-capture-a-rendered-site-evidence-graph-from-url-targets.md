@@ -162,8 +162,8 @@ The graph must be serialized as sorted-key JSON. `contentHash` is a SHA-256 hex 
 The command accepts either a URL or a target file:
 
 ```sh
-pnpm exec site-kernel run check.evidence.capture --url https://alt.example.invalid --out .check-warpgogol/runs/run-001 --json
-pnpm exec site-kernel run check.evidence.capture --target ./check-targets/client.yaml --out .check-warpgogol/runs/run-002 --json
+pnpm exec werkstatt run check.evidence.capture --url https://alt.example.invalid --out .check-warpgogol/runs/run-001 --json
+pnpm exec werkstatt run check.evidence.capture --target ./check-targets/client.yaml --out .check-warpgogol/runs/run-002 --json
 ```
 
 ### Discovery Order

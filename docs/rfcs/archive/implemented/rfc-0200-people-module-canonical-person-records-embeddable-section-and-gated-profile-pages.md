@@ -119,11 +119,11 @@ All legacy surfaces (the `team` section, `founder-trust-card`, inline `members[]
 
 ```sh
 # Validate the People contract for one app (or all). Joins apps-check.run.
-pnpm exec site-kernel run people.validate --app nicaragua-projekt --json
-pnpm exec site-kernel run people.validate --all
+pnpm exec werkstatt run people.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run people.validate --all
 
 # Scaffold a new canonical Person record (+ asset placeholder, optional profile-page opt-in).
-pnpm exec site-kernel run person.create --app warpgogol-com --slug andrii-syrokomskyi --lang de --page
+pnpm exec werkstatt run person.create --app warpgogol-com --slug andrii-syrokomskyi --lang de --page
 ```
 
 ### TypeScript contracts

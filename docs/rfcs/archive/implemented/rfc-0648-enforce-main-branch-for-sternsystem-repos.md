@@ -63,7 +63,7 @@ nonGoals:
   - "Does not change git config init.defaultBranch globally — enforcement is per-repo, not per-machine."
   - "Does not rename branches on external GitHub mirrors automatically — operators must rename external mirrors manually."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -124,10 +124,10 @@ No new commands. The existing `sternsystem.validate` command gains a new validat
 
 ```sh
 # Validate all systems (including branch-convention rule)
-pnpm exec site-kernel run sternsystem.validate --json
+pnpm exec werkstatt run sternsystem.validate --json
 
 # Validate a single system
-pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json
+pnpm exec werkstatt run sternsystem.validate --id warpgogol-com --json
 ```
 
 The `sternsystem.status` and `mission.close` commands change their internal fallback branch name from `"master"` to `"main"`. No CLI-visible output change — the fallback is an internal implementation detail.
@@ -227,7 +227,7 @@ The `sternsystem.validate --json` output gains violations with `rule: "branch-co
   - `tests/mission-dirty-guard.test.ts`
   - `tests/mission-close-state-file.test.ts`
   - `tests/mission-open-clean-tree.test.ts`
-- **Command manifest:** After implementation, run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml` with the changed commands (RFC-CMD-02).
+- **Command manifest:** After implementation, run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml` with the changed commands (RFC-CMD-02).
 
 ## Alternatives considered
 
@@ -255,7 +255,7 @@ The `sternsystem.validate --json` output gains violations with `rule: "branch-co
 - [x] `sternsystem.validate --id warpgogol-com --json` reports 0 `branch-convention` violations after migration (evidence: operator renamed branches — `git -C ../systems-cache/warpgogol-com branch -m master main` + `git -C ../systems-git/warpgogol-com symbolic-ref HEAD refs/heads/main`; `sternsystem.validate --id warpgogol-com --json` reports 0 `branch-convention` violations)
 - [x] `AGENTS.md` documents the `main` branch convention for Sternsystem repos (evidence: `packages/os/site-kernel-handoff/AGENTS.md:214-220`)
 - [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: commit `2b047eeb`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0648 --json` — 0 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0648 --json` — 0 violations)
 
 ## Implementation notes for agents
 

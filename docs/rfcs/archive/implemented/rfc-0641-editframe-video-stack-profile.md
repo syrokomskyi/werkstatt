@@ -64,7 +64,7 @@ nonGoals:
   - Do not add React or Next.js Editframe profile variants — only the HTML composition profile is added in this RFC
   - Do not define Editframe CLI installation verification or runtime health checks — that is forge.doctor's responsibility (RFC-0640)
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -194,7 +194,7 @@ No command output — this RFC adds a profile YAML file. `forge profile.validate
 - [x] `forge create --profile editframe-html` scaffolds a working project structure (requires RFC-0640 implemented) (evidence: packages/forge/profiles/editframe-html.yaml:57-148, workspace.dirs/files/firstWorkspace declared; forge.create --profile support implemented in RFC-0640)
 - [x] Unit test verifies profile parses against extended schema (requires RFC-0638 implemented) (evidence: packages/forge/src/tests/editframe-profile.test.ts:19-22, 417 tests pass)
 - [x] `packages/forge/AGENTS.md` updated with Editframe profile documentation (evidence: packages/forge/AGENTS.md:99)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0641 --json` — status: pass, exitCode: 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0641 --json` — status: pass, exitCode: 0)
 
 ## Implementation notes for agents
 

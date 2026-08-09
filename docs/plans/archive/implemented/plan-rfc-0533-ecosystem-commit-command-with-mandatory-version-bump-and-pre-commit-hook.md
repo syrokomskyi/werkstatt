@@ -61,8 +61,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.validate RFC-0533`
-- `pnpm exec site-kernel run ecosystem.manifest.generate` (command surface changed)
+- `pnpm exec werkstatt run rfc.validate RFC-0533`
+- `pnpm exec werkstatt run ecosystem.manifest.generate` (command surface changed)
 
 ## 3. Step sequence
 
@@ -139,7 +139,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run ecosystem.manifest.generate` (regenerate manifest with new command)
+- `pnpm exec werkstatt run ecosystem.manifest.generate` (regenerate manifest with new command)
 
 **Completion criterion:** `ecosystem.commit` appears in `ECOSYSTEM_COMMANDS`; `ecosystem.manifest.generate` includes it; typecheck passes.
 
@@ -246,12 +246,12 @@ scope:
 - Update `packages/os/site-kernel-checks/AGENTS.md`: add `src/ecosystem-commit.ts` module entry to the table
 - Update `packages/os/site-kernel-handoff/AGENTS.md`: add PC-04 rule description
 - Update `docs/verification-plan.xml`: add PC-04 to the platform consistency verification flow
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with the new command
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with the new command
 
 **Validation:**
 
 - `git diff` shows only documentation files changed
-- `pnpm exec site-kernel run ecosystem.manifest.validate` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate` passes
 
 **Completion criterion:** All documentation artifacts in scope are updated; `ecosystem.manifest.validate` passes.
 
@@ -266,19 +266,19 @@ scope:
 **Agent actions:**
 
 - Verify every acceptance criterion in RFC-0533 against the implemented code; mark `[x]` with inline `(evidence: ...)` annotations
-- Run `pnpm exec site-kernel run rfc.validate RFC-0533`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0533`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks run test`
 - Run `pnpm --filter @gogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run ecosystem.manifest.validate`
-- Stamp the RFC: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0533 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run ecosystem.manifest.validate`
+- Stamp the RFC: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0533 --implementation-commit <sha>`
 - Commit the stamped RFC separately from the implementation commit
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0533` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0533` — passes
 - All acceptance criteria checked off
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; implementation commit and stamp commit are separate.
@@ -289,12 +289,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0533`
+- `pnpm exec werkstatt run rfc.validate RFC-0533`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
 - `bash -n hooks/pre-commit` (syntax check)
 
 ### 4.2 Evidence artifacts
@@ -314,5 +314,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53 (semantic fingerprint), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0533 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53 (semantic fingerprint), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0533 --reason "..." --invariant "DNA-53"` instead of working around it.
 - If `resolvePlatformSemanticHash` extension breaks existing callers (`release.prepare`, `sternsystem.pin`, `handoff.absorb`), do not add a compatibility layer — fix the callers forward-only or escalate via `rfc.supersede.propose`.

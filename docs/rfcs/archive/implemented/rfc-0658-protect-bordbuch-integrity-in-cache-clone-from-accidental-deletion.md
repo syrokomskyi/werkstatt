@@ -64,7 +64,7 @@ nonGoals:
   - "Does not add bordbuch.validate to SITES_BUILD_PREPARE_DEV_PIPELINE — the dev pipeline is codegen-only for fast materialization; bordbuch.validate is full-pipeline-only, consistent with bordbuch.generate and bordbuch.commit placement"
   - "Does not install the pre-commit hook in workpiece clones — git clone does not copy hooks; the hook targets cache clone mutations only"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -146,13 +146,13 @@ No new CLI commands. The changes are internal to existing commands:
 
 ```sh
 # mission.materialize installs the pre-commit hook transparently
-pnpm exec site-kernel run mission.materialize --mission <id>
+pnpm exec werkstatt run mission.materialize --mission <id>
 
 # mission.close now validates bordbuch before closing
-pnpm exec site-kernel run mission.close --mission <id>
+pnpm exec werkstatt run mission.close --mission <id>
 
 # build.prepare now includes bordbuch.validate step
-pnpm exec site-kernel run mission.build --mission <id>
+pnpm exec werkstatt run mission.build --mission <id>
 ```
 
 ### TypeScript contracts

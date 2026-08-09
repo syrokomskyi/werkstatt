@@ -61,7 +61,7 @@ scope:
 
 No pipeline integration. `sternsystem.sync` is standalone. Validation:
 
-- `pnpm exec site-kernel run rfc.validate RFC-0472`
+- `pnpm exec werkstatt run rfc.validate RFC-0472`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 
@@ -229,7 +229,7 @@ No pipeline integration. `sternsystem.sync` is standalone. Validation:
 
 **Validation:**
 
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json`
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com --json`
 
 **Completion criterion:** `warpgogol-com` entry has `mirror` field; `sternsystem.validate` passes (may show mirror-remote-missing warning if remote not yet configured — that's expected).
 
@@ -297,7 +297,7 @@ No pipeline integration. `sternsystem.sync` is standalone. Validation:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0472 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0472 --json`
 - Run `pnpm --filter @gogol/ontology build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 
@@ -313,7 +313,7 @@ No pipeline integration. `sternsystem.sync` is standalone. Validation:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0472`
+- `pnpm exec werkstatt run rfc.validate RFC-0472`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 
@@ -336,4 +336,4 @@ No pipeline integration. `sternsystem.sync` is standalone. Validation:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 or DNA-45, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0472 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44 or DNA-45, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0472 --reason "..." --invariant "DNA-N"` instead of working around it.

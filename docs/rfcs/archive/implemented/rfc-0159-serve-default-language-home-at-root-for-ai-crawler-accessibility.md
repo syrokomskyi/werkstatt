@@ -95,8 +95,8 @@ Concretely:
 A new static validator guards the contract:
 
 ```sh
-pnpm exec site-kernel run root.canonical.validate --app warpgogol-com
-pnpm exec site-kernel run root.canonical.validate --all --json
+pnpm exec werkstatt run root.canonical.validate --app warpgogol-com
+pnpm exec werkstatt run root.canonical.validate --all --json
 ```
 
 It asserts that the app root page renders default-language content (not a redirect stub) and that `/` vs `/<defaultLang>/` canonicalization is consistent with the sitemap.

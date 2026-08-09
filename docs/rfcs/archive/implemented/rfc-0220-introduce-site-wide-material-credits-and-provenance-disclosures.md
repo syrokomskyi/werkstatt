@@ -147,9 +147,9 @@ Expanded AI details disclose only the tool/model/platform, role, and prompt/work
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run material.credits.validate --app warpgogol-com
-pnpm exec site-kernel run material.credits.generate --app warpgogol-com
-pnpm exec site-kernel run material.credits.report --app warpgogol-com --json
+pnpm exec werkstatt run material.credits.validate --app warpgogol-com
+pnpm exec werkstatt run material.credits.generate --app warpgogol-com
+pnpm exec werkstatt run material.credits.report --app warpgogol-com --json
 ```
 
 `material.credits.validate` is app-scoped and runs in `APPS_CHECK_AUTHOR_PIPELINE` after `asset.reference.validate` and `video.media.validate`, because it depends on the same discovered content references. It exits non-zero when an in-scope material lacks credits or when a credit record has invalid role/license shape.

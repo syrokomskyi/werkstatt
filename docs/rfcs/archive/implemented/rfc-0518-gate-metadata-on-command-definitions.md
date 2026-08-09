@@ -257,10 +257,10 @@ No new commands are introduced. Two existing commands are changed:
 
 ```sh
 # Generate the ecosystem manifest (now includes gate metadata)
-pnpm exec site-kernel run ecosystem.manifest.generate
+pnpm exec werkstatt run ecosystem.manifest.generate
 
 # Validate the ecosystem manifest (drifts if gate metadata is stale)
-pnpm exec site-kernel run ecosystem.manifest.validate
+pnpm exec werkstatt run ecosystem.manifest.validate
 ```
 
 Both commands are workspace-scoped, accept `--json` for agent consumption, and have no new flags.

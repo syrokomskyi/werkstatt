@@ -68,7 +68,7 @@ nonGoals:
   - "Does not remove workpiece or distribution directories — use mission.cleanup before archiving"
   - "Does not archive open missions — only terminal-state (closed/aborted) missions are moved"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -124,18 +124,18 @@ The kernel gains a `mission.archive` command that moves terminal-state mission d
 
 ```sh
 # Archive all terminal-state missions (dry-run first)
-pnpm exec site-kernel run mission.archive --dry-run
-pnpm exec site-kernel run mission.archive
+pnpm exec werkstatt run mission.archive --dry-run
+pnpm exec werkstatt run mission.archive
 
 # Archive only closed missions
-pnpm exec site-kernel run mission.archive --status closed
+pnpm exec werkstatt run mission.archive --status closed
 
 # Archive only aborted missions
-pnpm exec site-kernel run mission.archive --status aborted
+pnpm exec werkstatt run mission.archive --status aborted
 
 # Via the docs.archive umbrella (runs mission.archive alongside rfc/adr/plan/audit/session)
-pnpm exec site-kernel run docs.archive --dry-run
-pnpm exec site-kernel run docs.archive
+pnpm exec werkstatt run docs.archive --dry-run
+pnpm exec werkstatt run docs.archive
 ```
 
 **Flags:**
@@ -297,7 +297,7 @@ The `writes` and `reads` arrays are extended to include `missions/**` paths. The
 - [x] `mission.status --mission <id>` resolves archived missions by searching both `missions/` and `missions/archive/<state>/` (evidence: packages/os/site-kernel-handoff/src/mission/mission-io.ts:22-31)
 - [x] `--json` output format matches `MissionArchiveResult` interface (evidence: packages/forge/os/mission/types.ts:28-34, handler returns MissionArchiveResult)
 - [x] Unit tests cover: terminal → archive, open ← archive, skip on destination exists, skip on unreadable manifest, `--status` filter, `--dry-run` (evidence: packages/forge/os/mission/handlers/archive.test.ts, 10/10 tests pass)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0573` → pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate RFC-0573` → pass)
 
 ## Implementation notes for agents
 

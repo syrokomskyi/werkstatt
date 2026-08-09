@@ -162,17 +162,17 @@ scope:
 **Agent actions:**
 
 - Verify every acceptance criterion in RFC-0517 against the implemented code. Mark `[x]` with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0517`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0517`
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `mission.materialize` gains a flag — check if manifest needs regeneration)
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0517 --implementation-commit <sha> --dry-run` then without `--dry-run`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `mission.materialize` gains a flag — check if manifest needs regeneration)
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0517 --implementation-commit <sha> --dry-run` then without `--dry-run`
 - Commit the stamped RFC separately
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0517`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0517`
 - All acceptance criteria checked off with evidence
 
 **Completion criterion:** All acceptance criteria verified with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; validation suite passes.
@@ -183,7 +183,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0517`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0517`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
@@ -206,5 +206,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 or DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0517 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 or DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0517 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `executeKernelPipeline` cannot run against the workpiece directory (e.g. discovery fails), escalate as a critical preflight failure rather than silently skipping the gate.

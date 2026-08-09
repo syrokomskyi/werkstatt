@@ -78,7 +78,7 @@ The user works in Windsurf, where the AI agent can call Bash, Edit, Read, and Wr
 2. **Package-level contracts are inconsistently enforced.** Some land in `STANDARD_CHECK_PIPELINE` (e.g. `manifest.contract.validate` runs from `STANDARD_BUILD_PREPARE_PIPELINE`), some are absent.
 3. **Legacy workflows are dangerous.** They reference paths (`spec/001-010/`, `src/configure/features.ts`) that no longer exist.
 4. **No workflow shape contract.** Agents have no schema for what a workflow file declares (inputs, outputs, scope, recovery), no `workflow.lint` to catch references to missing commands, no machine-readable map of "this workflow drives this phase."
-5. **Self-orchestration is undefined.** It is unclear, today, whether an agent following a workflow should ask the user before running `pnpm exec site-kernel run …` or run it directly. In a Windsurf setup, the answer should be "run directly until a human-side decision is required."
+5. **Self-orchestration is undefined.** It is unclear, today, whether an agent following a workflow should ask the user before running `pnpm exec werkstatt run …` or run it directly. In a Windsurf setup, the answer should be "run directly until a human-side decision is required."
 
 ## Decision
 
@@ -87,7 +87,7 @@ Two renames + one new pipeline + a full rewrite of `.agents/workflows/`:
 1. **Rename `STANDARD_CHECK_PIPELINE` → `APPS_CHECK_PIPELINE`.** Same shape; runs over one app. Apps that previously imported the symbol update to the new name.
 2. **Introduce `PACKAGES_CHECK_PIPELINE`.** New constant exported from `@gogol/site-kernel-checks`. Contains the workspace-level package validations. Runs over the whole workspace (or a subset of `packages/*`).
 3. **Introduce two driver commands**: `apps-check.run --app <id>` and `packages-check.run`. One command, one purpose each. Both emit the shared envelope.
-4. **Rewrite `.agents/workflows/`** to seven phase-aligned files. Each file's body is concrete, imperative, and structured around `pnpm exec site-kernel run …` invocations. The agent executes them directly.
+4. **Rewrite `.agents/workflows/`** to seven phase-aligned files. Each file's body is concrete, imperative, and structured around `pnpm exec werkstatt run …` invocations. The agent executes them directly.
 5. **Add `workflow.lint`** to gate workflow file quality and `workflow.list` for agent discovery.
 
 `STANDARD_BUILD_PREPARE_PIPELINE` is also renamed to `APPS_BUILD_PREPARE_PIPELINE` for parallel naming.
@@ -216,10 +216,10 @@ export const APPS_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
 
 ```sh
 # Validate one app against APPS_CHECK_PIPELINE.
-pnpm exec site-kernel run apps-check.run --app warpgogol-handwerk
+pnpm exec werkstatt run apps-check.run --app warpgogol-handwerk
 
 # Validate the workspace packages against PACKAGES_CHECK_PIPELINE.
-pnpm exec site-kernel run packages-check.run
+pnpm exec werkstatt run packages-check.run
 
 # Both also accept --json and --strict (warn → error promotion).
 ```
@@ -328,27 +328,27 @@ nextWorkflow: 04-author
 3. For every page in the wireframe, decide its blocks. For every block, pick an archetype from the catalog:
 ```
 
-pnpm exec site-kernel run archetype.registry.validate
+pnpm exec werkstatt run archetype.registry.validate
 
 ```
 …then iterate (this is prompt work).
 4. For every block whose archetype has no existing section in `packages/ui/src/sections/`, scaffold it:
 ```
 
-pnpm exec site-kernel run section.scaffold --archetype <id> --slug <slug> --cosmic-name $(pnpm exec site-kernel run cosmic.name.pick --catalog planet --archetype <id> --exclude-used apps/<client.id>/src/content/system.md --json | jq -r .cosmicName)
+pnpm exec werkstatt run section.scaffold --archetype <id> --slug <slug> --cosmic-name $(pnpm exec werkstatt run cosmic.name.pick --catalog planet --archetype <id> --exclude-used apps/<client.id>/src/content/system.md --json | jq -r .cosmicName)
 
 ```
 5. Author `onboarding/.output/03-compose/site-plan.md` using the strict grammar (RFC-0072).
 6. Compile:
 ```
 
-pnpm exec site-kernel run system-md.compile --client <client.id>
+pnpm exec werkstatt run system-md.compile --client <client.id>
 
 ```
 7. Validate:
 ```
 
-pnpm exec site-kernel run constellation.contract.validate pnpm exec site-kernel run section.contract.validate pnpm exec site-kernel run packages-check.run
+pnpm exec werkstatt run constellation.contract.validate pnpm exec werkstatt run section.contract.validate pnpm exec werkstatt run packages-check.run
 
 ```
 8. If green, update `onboarding/.output/status.md` with lastPhase: compose, outcome: ok.
@@ -401,7 +401,7 @@ Added to `PACKAGES_CHECK_PIPELINE`.
 ### `workflow.list` — single command, single purpose
 
 ```sh
-pnpm exec site-kernel run workflow.list --json
+pnpm exec werkstatt run workflow.list --json
 ```
 
 Lists every workflow file with its phase, reads/writes summary, and next workflow. Used by agents to discover the entry point and the chain.
@@ -409,11 +409,11 @@ Lists every workflow file with its phase, reads/writes summary, and next workflo
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run apps-check.run        --app <id>
-pnpm exec site-kernel run packages-check.run
-pnpm exec site-kernel run workflow.lint
-pnpm exec site-kernel run workflow.list         --json
-pnpm exec site-kernel run app.contract.full     --app <id>   # appended app.qa.validate per RFC-0074
+pnpm exec werkstatt run apps-check.run        --app <id>
+pnpm exec werkstatt run packages-check.run
+pnpm exec werkstatt run workflow.lint
+pnpm exec werkstatt run workflow.list         --json
+pnpm exec werkstatt run app.contract.full     --app <id>   # appended app.qa.validate per RFC-0074
 ```
 
 ### TypeScript contracts
@@ -495,7 +495,7 @@ export const WorkflowFile = z.object({
 ## Implementation notes for agents
 
 - Agents MUST start every onboarding session from `.agents/workflows/00-prepare.md`. Do not skip phases.
-- Agents MUST execute every command listed in the workflow's `runs` field directly via the Bash tool. Do not ask the user before each `pnpm exec site-kernel run …` invocation. The workflow's `selfOrchestration` policy authorizes the agent to proceed.
+- Agents MUST execute every command listed in the workflow's `runs` field directly via the Bash tool. Do not ask the user before each `pnpm exec werkstatt run …` invocation. The workflow's `selfOrchestration` policy authorizes the agent to proceed.
 - Agents MUST stop at every `selfOrchestration.pauseFor` condition and surface the situation to the user.
 - Agents MUST treat `scope.forbiddenWriteRoots` as binding. If a phase needs to write outside the allowed set, stop and ask.
 - Agents MUST update `onboarding/.output/status.md` at the end of every phase and check it at the start of every phase.

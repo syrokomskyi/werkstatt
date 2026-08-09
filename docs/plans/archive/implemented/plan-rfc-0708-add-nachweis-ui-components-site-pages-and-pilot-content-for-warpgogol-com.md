@@ -96,7 +96,7 @@ scope:
 - Create `packages/ontology/archetypes/components/nachweis-list.yaml` with `id: nachweis-list`, `displayName: Nachweis List`, `semanticRole: trust-list`, `layer: component`, `acceptedCosmicNames: [Hydra]`
 - Create `packages/ontology/archetypes/components/nachweis-detail.yaml` with `id: nachweis-detail`, `displayName: Nachweis Detail`, `semanticRole: trust-detail`, `layer: component`, `acceptedCosmicNames: [Kerberos]`
 - Create `packages/ontology/archetypes/components/nachweis-verify.yaml` with `id: nachweis-verify`, `displayName: Nachweis Verify`, `semanticRole: trust-verify`, `layer: component`, `acceptedCosmicNames: [Styx]`
-- Run `pnpm exec site-kernel run archetype.registry.build` to regenerate `index.yaml` and `index.json`
+- Run `pnpm exec werkstatt run archetype.registry.build` to regenerate `index.yaml` and `index.json`
 - Verify `Praxidike`, `Hydra`, `Kerberos`, `Styx` appear in `moonImportPaths` in `packages/ontology/archetypes/index.json`
 
 **Validation:**
@@ -281,7 +281,7 @@ scope:
 
 - Update `packages/ui/AGENTS.md` with Nachweis component conventions (accessibility requirements, public copy constraints, cosmicName assignments)
 - Update `packages/ontology/AGENTS.md` if archetype conventions section exists (4 new component archetypes)
-- Run `pnpm exec site-kernel run archetype.registry.build` to ensure registry is up to date
+- Run `pnpm exec werkstatt run archetype.registry.build` to ensure registry is up to date
 - Run `pnpm --filter @warpgogol/ui run build:check`
 - Run `pnpm --filter @warpgogol/share run build:check`
 - Run `pnpm --filter @warpgogol/ontology run build:check`
@@ -289,11 +289,11 @@ scope:
 - Run `entitlement.module.validate --system warpgogol-com`
 - Run `nachweis.validate --system warpgogol-com` (if RFC-0707 is implemented)
 - Run WCAG 2.2 AA compliance check (axe or manual) on Nachweis pages
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0708`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0708`
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review`. Max 3 iterations.
 - **Check off acceptance criteria:** verify each criterion against implemented code. Mark `[x]` with `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0708 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0708 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -310,13 +310,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0708`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0708`
 - `pnpm --filter @warpgogol/ui run build:check`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/ontology run build:check`
-- `pnpm exec site-kernel run archetype.registry.build`
-- `pnpm exec site-kernel run entitlement.module.validate --system warpgogol-com`
-- `pnpm exec site-kernel run nachweis.validate --system warpgogol-com` (requires RFC-0707)
+- `pnpm exec werkstatt run archetype.registry.build`
+- `pnpm exec werkstatt run entitlement.module.validate --system warpgogol-com`
+- `pnpm exec werkstatt run nachweis.validate --system warpgogol-com` (requires RFC-0707)
 - `astro check` on warpgogol-com workpiece
 - WCAG 2.2 AA compliance check (axe or manual)
 

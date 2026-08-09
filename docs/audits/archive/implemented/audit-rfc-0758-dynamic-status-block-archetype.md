@@ -78,7 +78,7 @@ The RFC correctly uses valid enum values (`bodyKind: composite`, `layoutHint: si
 The RFC's CLI example:
 
 ```sh
-pnpm exec site-kernel run section.scaffold --archetype dynamic-status-block --site warpgogol-com
+pnpm exec werkstatt run section.scaffold --archetype dynamic-status-block --site warpgogol-com
 ```
 
 The actual command requires `--name=<slug>` and `--archetype=<id>`. There is no `--site` flag. The command scaffolds into `packages/ui/src/sections/<slug>/`, not into an app directory.

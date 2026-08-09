@@ -98,7 +98,7 @@ A new kernel module `nachweis` is created in `packages/os/site-kernel-handoff/sr
 Intakes a source document (PDF), computes SHA-256, uploads to R2, and appends a Bordbuch `nachweis-record` entry.
 
 ```sh
-pnpm exec site-kernel run nachweis.ingest \
+pnpm exec werkstatt run nachweis.ingest \
   --system warpgogol-com \
   --file path/to/source.pdf \
   --record-type project_confirmation \
@@ -137,8 +137,8 @@ Output:
 Validates Nachweis PBP entities and enforces the publication gate.
 
 ```sh
-pnpm exec site-kernel run nachweis.validate --system warpgogol-com
-pnpm exec site-kernel run nachweis.validate --system warpgogol-com --json
+pnpm exec werkstatt run nachweis.validate --system warpgogol-com
+pnpm exec werkstatt run nachweis.validate --system warpgogol-com --json
 ```
 
 Checks:
@@ -154,7 +154,7 @@ Checks:
 Generates `public/nachweise/manifest.json` from published Nachweis records.
 
 ```sh
-pnpm exec site-kernel run nachweis.manifest.generate --system warpgogol-com
+pnpm exec werkstatt run nachweis.manifest.generate --system warpgogol-com
 ```
 
 Reads PBP trust collections, filters by `publication.visibility: public`, produces manifest with `schema_version`, `generated_at: null` (RFC-0602 determinism), `expires_at`, `records[]` (id, slug, title, canonical_url, verification_level, source_sha256).
@@ -166,7 +166,7 @@ Writes to `public/nachweise/manifest.json` in the cache clone. Integrated into `
 Updates consent status and appends Bordbuch entry.
 
 ```sh
-pnpm exec site-kernel run nachweis.consent.update \
+pnpm exec werkstatt run nachweis.consent.update \
   --system warpgogol-com \
   --consent-id consent_nicaragua_1 \
   --status requested \
@@ -180,7 +180,7 @@ Updates the PBP `Consent` entity's `status` field and appends a `nachweis-consen
 Transitions a record to `published` after gate check.
 
 ```sh
-pnpm exec site-kernel run nachweis.publish \
+pnpm exec werkstatt run nachweis.publish \
   --system warpgogol-com \
   --slug nicaragua-projekt
 ```
@@ -201,7 +201,7 @@ If all conditions met: sets `publication.visibility: public`, appends `nachweis-
 Withdraws a published record (revocation flow).
 
 ```sh
-pnpm exec site-kernel run nachweis.withdraw \
+pnpm exec werkstatt run nachweis.withdraw \
   --system warpgogol-com \
   --slug nicaragua-projekt \
   --reason "consent revoked"

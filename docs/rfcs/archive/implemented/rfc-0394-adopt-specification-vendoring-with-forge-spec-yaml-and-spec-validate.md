@@ -57,7 +57,7 @@ nonGoals:
 # docs/architecture-dna.md at implementation time; satisfies[] is then
 # extended with the new DNA id in the same commit.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -106,8 +106,8 @@ Forge gains a **spec vendoring contract**: an external specification package is 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run spec.validate --json                # all vendored specs
-pnpm exec site-kernel run spec.validate --spec=pbp --json     # one spec
+pnpm exec werkstatt run spec.validate --json                # all vendored specs
+pnpm exec werkstatt run spec.validate --spec=pbp --json     # one spec
 npx forge run spec.validate --spec=pbp --json                 # autonomous mode
 ```
 

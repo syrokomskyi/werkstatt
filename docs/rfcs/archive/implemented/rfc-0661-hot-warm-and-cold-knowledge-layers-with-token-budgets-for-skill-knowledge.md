@@ -63,7 +63,7 @@ nonGoals:
   - No automatic truncation or summarization of over-budget files — reduction flows through RFC-0662 compaction and RFC-0663 promotion with operator approval
   - No budgets on non-knowledge files (AGENTS.md, operator-profile, docs) — out of scope
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -189,8 +189,8 @@ function resolveKnowledgeBudgets(workspaceRoot: string): KnowledgeBudgets;
 
 ```sh
 # Existing commands, extended behavior — no new commands
-pnpm exec site-kernel run forge.skill.validate --all      # adds SKILL-21 warnings
-pnpm exec site-kernel run forge.doctor --json             # adds knowledge budget summary
+pnpm exec werkstatt run forge.skill.validate --all      # adds SKILL-21 warnings
+pnpm exec werkstatt run forge.doctor --json             # adds knowledge budget summary
 ```
 
 ### File system responsibilities

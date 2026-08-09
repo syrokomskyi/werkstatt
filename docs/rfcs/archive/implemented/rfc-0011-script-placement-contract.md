@@ -281,13 +281,13 @@ The kernel gains a `scripts.placement.validate` command that enforces the canoni
 
 ```sh
 # Validate script placement for one app
-pnpm exec site-kernel run scripts.placement.validate --app nicaragua-projekt
+pnpm exec werkstatt run scripts.placement.validate --app nicaragua-projekt
 
 # Machine-readable output for CI
-pnpm exec site-kernel run scripts.placement.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run scripts.placement.validate --app nicaragua-projekt --json
 
 # Validate all apps
-pnpm exec site-kernel run scripts.placement.validate --all --json
+pnpm exec werkstatt run scripts.placement.validate --all --json
 ```
 
 ### Validation rules

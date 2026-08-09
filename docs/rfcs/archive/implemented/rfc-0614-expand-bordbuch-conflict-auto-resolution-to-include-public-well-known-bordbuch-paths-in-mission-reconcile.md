@@ -60,7 +60,7 @@ nonGoals:
   - "Do not change the merge strategy (git merge --no-ff) — only the conflict resolution scope changes."
   - "Do not auto-resolve bordbuch conflicts in favor of the workpiece version — the cache clone version is always kept (ours)."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -182,7 +182,7 @@ The `--json` output shape is unchanged from RFC-0584. The `autoResolvedPaths` fi
 - [x] `mission.reconcile` still aborts on non-bordbuch conflicts (evidence: unit test `src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts` test case 5 "mixed conflict")
 - [x] Regression test covers both RFC-0584 `bordbuch/` and RFC-0614 `public/.well-known/bordbuch*` conflict scenarios (evidence: unit test `src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts` test cases 1-3)
 - [x] `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes with new tests (evidence: 412 tests passed, 96 test files, 0 failures)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0614 --json` — status: pass, violations: [])
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0614 --json` — status: pass, violations: [])
 - [x] RFC-0584 `amendedBy` field updated to include `RFC-0614` (evidence: `docs/rfcs/archive/implemented/rfc-0584-auto-resolve-bordbuch-delete-modify-conflicts-in-mission-reconcile.md:25-26`)
 
 ## Implementation notes for agents

@@ -110,7 +110,7 @@ A new `packages-check.run` lint enforces the contract: every `.astro` file refer
 A new workspace-scope command `astro.exports.lint` scans every workspace package's `package.json`, finds every `exports` entry whose target ends in `.astro`, and asserts that the corresponding `.astro`-suffixed key is also present and points to the same file.
 
 ```sh
-pnpm exec site-kernel run astro.exports.lint
+pnpm exec werkstatt run astro.exports.lint
 ```
 
 ### Output format

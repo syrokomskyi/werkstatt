@@ -51,7 +51,7 @@ scope:
 
 - `pnpm --filter @wgogol/forge run build:check` — typecheck
 - `pnpm --filter @wgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0544` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0544` — RFC validation
 
 ## 3. Step sequence
 
@@ -235,15 +235,15 @@ scope:
 
 - Run `pnpm --filter @wgogol/forge run build:check` — typecheck
 - Run `pnpm --filter @wgogol/forge run test` — all tests pass
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0544` — zero violations
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0544` — zero violations
 - Check off acceptance criteria in the RFC file with inline `(evidence: ...)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0544 --implementation-commit <sha>` to atomically transition `accepted → implemented`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new command registered)
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0544 --implementation-commit <sha>` to atomically transition `accepted → implemented`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new command registered)
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0544` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0544` — passes
 - All acceptance criteria marked `[x]` with evidence
 
 **Completion criterion:** RFC stamped as `implemented` via `rfc.implement.stamp`; all criteria verified
@@ -254,7 +254,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0544`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0544`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
 
@@ -274,5 +274,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0544 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0544 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If `forge.init` or `forge.scaffold` contracts need to change to support composition, stop — the RFC explicitly forbids changing their contracts. Create a superseding RFC instead.

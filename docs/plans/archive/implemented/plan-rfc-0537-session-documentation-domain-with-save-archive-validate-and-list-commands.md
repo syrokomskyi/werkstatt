@@ -85,8 +85,8 @@ scope:
 - `rfc.validate RFC-0537` — mechanical validation
 - `pnpm --filter @wgogol/forge build:check` — typecheck
 - `pnpm --filter @wgogol/forge test` — unit + integration + PBT tests (requires adding `fast-check` to `@wgogol/forge` devDependencies)
-- `pnpm exec site-kernel run command.manifest.generate` — regenerate command manifest
-- `pnpm exec site-kernel run docs.commands.generate` — regenerate COMMANDS.md
+- `pnpm exec werkstatt run command.manifest.generate` — regenerate command manifest
+- `pnpm exec werkstatt run docs.commands.generate` — regenerate COMMANDS.md
 - No pipeline integration — `session.validate` is on-demand only
 
 ## 3. Step sequence
@@ -182,7 +182,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @wgogol/forge build:check` passes
-- `pnpm exec site-kernel run session.list --json` returns `{ status: "ok", count: 0 }` (empty sessions dir)
+- `pnpm exec werkstatt run session.list --json` returns `{ status: "ok", count: 0 }` (empty sessions dir)
 
 **Completion criterion:** `forgeSessionModule` is registered, all four commands are discoverable via `session.list --json`.
 
@@ -207,7 +207,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @wgogol/forge build:check` passes
-- `pnpm exec site-kernel run docs.archive --dry-run` includes session.archive in output
+- `pnpm exec werkstatt run docs.archive --dry-run` includes session.archive in output
 
 **Completion criterion:** `docs.archive --dry-run` dispatches to `session.archive` alongside rfc/adr/plan/audit.
 
@@ -237,7 +237,7 @@ scope:
 
 - `pnpm --filter @wgogol/forge build:check` passes
 - `pnpm --filter @wgogol/forge test` passes (including new config tests)
-- `pnpm exec site-kernel run forge.doctor` validates `sessionsDir` binding
+- `pnpm exec werkstatt run forge.doctor` validates `sessionsDir` binding
 
 **Completion criterion:** `forge.yaml` includes `sessionsDir` in both `paths` and `bindings.paths`, schema validates, doctor checks pass.
 
@@ -286,7 +286,7 @@ scope:
 - Create `packages/forge/skills/fo/fo-session-save/qa-log.md` — empty knowledge file with header
 - Create `packages/forge/skills/fo/fo-session-save/learned-principles.md` — empty knowledge file with header
 - Create `packages/forge/skills/fo/fo-session-save/fix-patterns.md` — empty knowledge file with header
-- Run `pnpm exec site-kernel run forge.skill.validate` to verify SKILL-11/12/13 compliance
+- Run `pnpm exec werkstatt run forge.skill.validate` to verify SKILL-11/12/13 compliance
 
 **Validation:**
 
@@ -387,9 +387,9 @@ scope:
   - Add session domain to documentation domains list
   - Document `saveSessions` preference key
 - Regenerate command manifest:
-  - `pnpm exec site-kernel run command.manifest.generate`
-  - `pnpm exec site-kernel run docs.commands.generate`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+  - `pnpm exec werkstatt run command.manifest.generate`
+  - `pnpm exec werkstatt run docs.commands.generate`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 
 **Validation:**
 
@@ -411,12 +411,12 @@ scope:
 **Agent actions:**
 
 - Verify every acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0537` — must pass with zero errors
+- Run `pnpm exec werkstatt run rfc.validate RFC-0537` — must pass with zero errors
 - Run `pnpm --filter @wgogol/forge build:check` — must pass
 - Run `pnpm --filter @wgogol/forge test` — must pass
-- Run `pnpm exec site-kernel run forge.skill.validate` — must pass
+- Run `pnpm exec werkstatt run forge.skill.validate` — must pass
 - Run `git status` — no uncommitted changes from this session
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0537 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0537 --implementation-commit <sha>`
 - The stamp command validates all preconditions (status, criteria, clean tree, commit reachability)
 
 **Validation:**
@@ -435,11 +435,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0537`
+- `pnpm exec werkstatt run rfc.validate RFC-0537`
 - `pnpm --filter @wgogol/forge build:check`
 - `pnpm --filter @wgogol/forge test`
-- `pnpm exec site-kernel run forge.skill.validate`
-- `pnpm exec site-kernel run forge.doctor`
+- `pnpm exec werkstatt run forge.skill.validate`
+- `pnpm exec werkstatt run forge.doctor`
 
 ### 4.2 Evidence artifacts
 

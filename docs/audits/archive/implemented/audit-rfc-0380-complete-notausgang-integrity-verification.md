@@ -16,7 +16,7 @@ The RFC correctly identifies real gaps in the current `notausgang.validate` impl
 
 ## Mechanical validation (rfc.validate)
 
-Pass — `pnpm exec site-kernel run rfc.validate RFC-0380 --json` exits 0 with zero violations.
+Pass — `pnpm exec werkstatt run rfc.validate RFC-0380 --json` exits 0 with zero violations.
 
 ## Axis A — Structural completeness
 

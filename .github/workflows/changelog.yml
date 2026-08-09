@@ -60,7 +60,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm --filter @warpgogol/site-kernel-checks build
+        run: pnpm --filter @warpgogol/werkstatt-site build
 
       - name: Generate changelog — nicaragua-projekt
         if: ${{ github.event.inputs.app == 'nicaragua-projekt' || github.event.inputs.app == 'all' || github.event_name == 'schedule' }}
@@ -68,7 +68,7 @@ jobs:
           ARGS="--app nicaragua-projekt"
           if [ "${{ github.event.inputs.force }}" = "true" ]; then ARGS="$ARGS -- --force"; fi
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then ARGS="$ARGS -- --dry-run"; fi
-          pnpm --filter nicaragua-projekt site-kernel run changelog.generate $ARGS
+          pnpm --filter nicaragua-projekt werkstatt run changelog.generate $ARGS
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}

@@ -305,7 +305,7 @@ Seven new commands in `@gogol/site-kernel-handoff`:
 #### 6.1 `release.prepare`
 
 ```sh
-pnpm exec site-kernel run release.prepare \
+pnpm exec werkstatt run release.prepare \
   --mission <mission-id> \
   [--semver <semver>] \
   [--json]
@@ -329,7 +329,7 @@ Produces a release candidate from a validated mission:
 #### 6.2 `release.publish`
 
 ```sh
-pnpm exec site-kernel run release.publish \
+pnpm exec werkstatt run release.publish \
   --release <release-id> \
   [--json]
 ```
@@ -350,7 +350,7 @@ Fails if any discipline gate fails or the snapshot diff verdict is `fail`.
 #### 6.3 `release.validate`
 
 ```sh
-pnpm exec site-kernel run release.validate \
+pnpm exec werkstatt run release.validate \
   --release <release-id> \
   [--json]
 ```
@@ -367,7 +367,7 @@ Validates a release artifact:
 #### 6.4 `release.list`
 
 ```sh
-pnpm exec site-kernel run release.list [--system <system-id>] [--json]
+pnpm exec werkstatt run release.list [--system <system-id>] [--json]
 ```
 
 Lists releases, optionally filtered by system.
@@ -375,7 +375,7 @@ Lists releases, optionally filtered by system.
 #### 6.5 `behavior.snapshot.capture`
 
 ```sh
-pnpm exec site-kernel run behavior.snapshot.capture \
+pnpm exec werkstatt run behavior.snapshot.capture \
   --dist <path-to-dist> \
   --system <system-id> \
   --build-kind <readable|production> \
@@ -388,7 +388,7 @@ Captures a behavior snapshot from a build output directory. This is the low-leve
 #### 6.6 `behavior.snapshot.diff`
 
 ```sh
-pnpm exec site-kernel run behavior.snapshot.diff \
+pnpm exec werkstatt run behavior.snapshot.diff \
   --baseline <path-to-readable-snapshot> \
   --candidate <path-to-production-snapshot> \
   [--json]
@@ -399,7 +399,7 @@ Compares two behavior snapshots and reports differences with a pass/fail verdict
 #### 6.7 `release.rollback`
 
 ```sh
-pnpm exec site-kernel run release.rollback \
+pnpm exec werkstatt run release.rollback \
   --release <release-id> \
   [--json]
 ```
@@ -431,13 +431,13 @@ Marks a `published` release as `rolled-back`:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run release.prepare --mission <id> --semver 1.0.0
-pnpm exec site-kernel run release.publish --release <id>
-pnpm exec site-kernel run release.validate --release <id>
-pnpm exec site-kernel run release.list
-pnpm exec site-kernel run release.rollback --release <id>
-pnpm exec site-kernel run behavior.snapshot.capture --dist <path> --system <id> --build-kind production
-pnpm exec site-kernel run behavior.snapshot.diff --baseline <path> --candidate <path>
+pnpm exec werkstatt run release.prepare --mission <id> --semver 1.0.0
+pnpm exec werkstatt run release.publish --release <id>
+pnpm exec werkstatt run release.validate --release <id>
+pnpm exec werkstatt run release.list
+pnpm exec werkstatt run release.rollback --release <id>
+pnpm exec werkstatt run behavior.snapshot.capture --dist <path> --system <id> --build-kind production
+pnpm exec werkstatt run behavior.snapshot.diff --baseline <path> --candidate <path>
 ```
 
 All commands support `--json` output.

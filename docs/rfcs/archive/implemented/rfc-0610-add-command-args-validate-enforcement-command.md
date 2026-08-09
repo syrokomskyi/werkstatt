@@ -61,7 +61,7 @@ nonGoals:
   - "Do not validate command-specific flag schemas (e.g. whether a flag should be required or optional) — that is the command author's responsibility."
   - "Do not replace KERNEL-FLAG-01 or KERNEL-ARG-01 — those are runtime checks. This command is a static analysis check over command registrations and handler source code."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -111,8 +111,8 @@ The kernel gains a `command.args.validate` command that statically analyzes all 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run command.args.validate --json
-pnpm exec site-kernel run command.args.validate
+pnpm exec werkstatt run command.args.validate --json
+pnpm exec werkstatt run command.args.validate
 ```
 
 Scope: `workspace`. No flags needed — the command scans all registered commands in the kernel registry and their handler source files.
@@ -204,16 +204,16 @@ interface CommandArgsViolation {
 
 ## Acceptance criteria
 
-- [x] `command.args.validate` command registered in `07-structure-naming.ts` with `scope: workspace` (evidence: packages/os/site-kernel-checks/src/command-tables/07-structure-naming.ts:204-219, `pnpm exec site-kernel run command.args.validate --json` exits 0)
+- [x] `command.args.validate` command registered in `07-structure-naming.ts` with `scope: workspace` (evidence: packages/os/site-kernel-checks/src/command-tables/07-structure-naming.ts:204-219, `pnpm exec werkstatt run command.args.validate --json` exits 0)
 - [x] `runCommandArgsValidate` implemented in `packages/os/site-kernel-checks/src/command-args-validate.ts` (evidence: packages/os/site-kernel-checks/src/command-args-validate.ts:285-376, `pnpm --filter @warpgogol/site-kernel-checks exec tsc --noEmit` passes)
 - [x] ARG-COMPLIANCE-01 detects handler source files that reference `input.args` (evidence: packages/os/site-kernel-checks/src/command-args-validate.ts:222-264, test `ARG-COMPLIANCE-01: detects input.args reference` passes)
 - [x] ARG-COMPLIANCE-02 detects command registrations with `flags: {}` whose handler reads a named flag (evidence: packages/os/site-kernel-checks/src/command-args-validate.ts:270-282, tests `ARG-COMPLIANCE-02: hasEmptyFlags*` and `extractNamedFlagReads*` pass)
 - [x] ARG-COMPLIANCE-03 detects `?? input.args[0]` and `|| input.args[0]` patterns (evidence: packages/os/site-kernel-checks/src/command-args-validate.ts:240-257, tests `ARG-COMPLIANCE-03: detects ?? input.args[0]` and `|| input.args[0]` pass)
 - [x] Comment and string-literal exclusion prevents false positives (evidence: packages/os/site-kernel-checks/src/command-args-validate.ts:228-232 uses `stripCommentsAndStrings`, tests `comment exclusion` and `string-literal exclusion` pass)
 - [x] Command added to `PACKAGES_CHECK_PIPELINE` (evidence: packages/os/site-kernel-checks/src/pipelines/packages-check.ts:142-143, `{ command: "command.args.validate" }` after `kernel.io.lint`)
-- [x] `--json` output follows standard `CheckResult` shape with `diagnostics[]` (evidence: `pnpm exec site-kernel run command.args.validate --json` returns `{ data: { command, status, diagnostics, summary } }`)
+- [x] `--json` output follows standard `CheckResult` shape with `diagnostics[]` (evidence: `pnpm exec werkstatt run command.args.validate --json` returns `{ data: { command, status, diagnostics, summary } }`)
 - [x] Unit test in `src/tests/command-args-validate.test.ts` covers all three rules, comment exclusion, and clean-pass scenarios (evidence: packages/os/site-kernel-checks/src/tests/command-args-validate.test.ts, 14 tests pass)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0610 --json` exits 0 with zero violations)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0610 --json` exits 0 with zero violations)
 
 ## Implementation notes for agents
 

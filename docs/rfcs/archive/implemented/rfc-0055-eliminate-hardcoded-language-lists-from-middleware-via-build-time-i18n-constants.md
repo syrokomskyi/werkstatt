@@ -88,7 +88,7 @@ This follows the existing repository pattern for generated artifacts: `icons:gen
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run i18n.middleware.generate --app nicaragua-projekt
+pnpm exec werkstatt run i18n.middleware.generate --app nicaragua-projekt
 ```
 
 Scope: `app`. Reads `src/content/system.md` from the app directory, extracts `i18n.default` and `Object.keys(i18n.supported)`, and writes `src/middleware/language-redirect.ts` with inline constants. Uses `writeIfChanged` to avoid touching the file if content is already up to date.
@@ -182,7 +182,7 @@ No new types required. The existing `ResolvedI18n` from `@gogol/site-kernel-cont
 `src/middleware/language-redirect.ts` is a **generated, gitignored** file. It is produced by:
 
 ```sh
-pnpm exec site-kernel run i18n.middleware.generate --app nicaragua-projekt
+pnpm exec werkstatt run i18n.middleware.generate --app nicaragua-projekt
 # or via package script:
 pnpm -s i18n:middleware:gen
 ```

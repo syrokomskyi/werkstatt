@@ -84,16 +84,16 @@ The kernel gains a `wikidata.validate` command (scope: `app`, registered in `sit
 
 ```sh
 # Check a single site (warnings for missing QIDs)
-pnpm exec site-kernel run wikidata.validate --app warpgogol-com
+pnpm exec werkstatt run wikidata.validate --app warpgogol-com
 
 # Strict mode (errors for missing QIDs)
-pnpm exec site-kernel run wikidata.validate --app warpgogol-com --strict
+pnpm exec werkstatt run wikidata.validate --app warpgogol-com --strict
 
 # JSON output
-pnpm exec site-kernel run wikidata.validate --app warpgogol-com --json
+pnpm exec werkstatt run wikidata.validate --app warpgogol-com --json
 
 # All sites
-pnpm exec site-kernel run wikidata.validate --all --strict --json
+pnpm exec werkstatt run wikidata.validate --all --strict --json
 ```
 
 Flags:
@@ -226,7 +226,7 @@ type WikidataValidationRule =
 - [x] `--strict` flag escalates missing QID warnings to errors (evidence: `packages/os/site-kernel-checks/src/audit/validators/wikidata.ts` — `escalateMissingQidWarnings` function, `packages/os/site-kernel-checks/src/tests/wikidata-validate.test.ts` — `validateQidPresence` severity tests)
 - [x] `--json` output follows `AuditFinding` shape with `ruleId`, `severity`, `file`, `message`, `evidence` (evidence: `packages/os/site-kernel-checks/src/audit/validators/wikidata.ts` — uses `finding()` helper from `helpers.ts` which produces `AuditFinding` shape, `buildAuditResult` returns `auditResultSchema`-validated output)
 - [x] Command exits 0 when no findings, exits 1 when any error finding (evidence: `packages/os/site-kernel-checks/src/audit/validators/wikidata.ts:265-268` — `exitCode: result.status === "fail" ? 1 : 0`, `buildAuditResult` sets `status: "fail"` when `summary.error > 0`)
-- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0531 --json` exitCode 0)
+- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec werkstatt run rfc.validate RFC-0531 --json` exitCode 0)
 
 ## Implementation notes for agents
 

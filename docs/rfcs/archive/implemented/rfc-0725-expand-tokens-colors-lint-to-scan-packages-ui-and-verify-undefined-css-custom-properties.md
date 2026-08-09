@@ -105,7 +105,7 @@ The same `ignoredDefinitionPatterns` logic applies to packages-level scan. No ad
 
 ```sh
 # Unchanged — the command now scans both app and packages
-pnpm exec site-kernel run tokens.colors.lint --app warpgogol-com
+pnpm exec werkstatt run tokens.colors.lint --app warpgogol-com
 ```
 
 ### Contract changes

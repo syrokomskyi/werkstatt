@@ -49,8 +49,8 @@ None — the summit skill is a markdown-only skill with no code, no schemas, no 
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run skill.validate --skill fo-design-summit` — validate new skill
-- `pnpm exec site-kernel run rfc.validate --id RFC-0712` — validate RFC before stamping
+- `pnpm exec werkstatt run skill.validate --skill fo-design-summit` — validate new skill
+- `pnpm exec werkstatt run rfc.validate --id RFC-0712` — validate RFC before stamping
 - No pipeline integration — summit reports are informational artifacts, not part of any build or validation pipeline
 
 ## 3. Step sequence
@@ -187,8 +187,8 @@ None — the summit skill is a markdown-only skill with no code, no schemas, no 
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run skill.validate --skill fo-design-summit` — verify SKILL-01..13 pass
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0712` — verify RFC passes
+- Run `pnpm exec werkstatt run skill.validate --skill fo-design-summit` — verify SKILL-01..13 pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0712` — verify RFC passes
 - Verify `fo-idea-i-just-want-to-see-the-result` SKILL.md does NOT reference `fo-design-summit` (criterion 8)
 - Run `pnpm --filter @warpgogol/forge run build:check` — verify typecheck passes
 
@@ -225,13 +225,13 @@ None — the summit skill is a markdown-only skill with no code, no schemas, no 
 - Mark each criterion `[x]` with inline `(evidence: <file:line>)` annotation
 - Run `fo-review` on all session code changes
 - Run `fo-fix` if review has findings
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0712 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0712 --implementation-commit <sha>`
 - Run `fo-doc-audit` to sync documentation surfaces
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0712` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0712` — passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -242,8 +242,8 @@ None — the summit skill is a markdown-only skill with no code, no schemas, no 
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0712`
-- `pnpm exec site-kernel run skill.validate --skill fo-design-summit`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0712`
+- `pnpm exec werkstatt run skill.validate --skill fo-design-summit`
 - `pnpm --filter @warpgogol/forge run build:check`
 
 ### 4.2 Evidence artifacts

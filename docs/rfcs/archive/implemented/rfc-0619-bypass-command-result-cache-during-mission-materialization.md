@@ -60,7 +60,7 @@ nonGoals:
   - "Adding bordbuch.generate to the dev pipeline"
   - "Filtering generated files from data-path copy (covered by RFC-0620)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -181,7 +181,7 @@ The `executeKernelPipeline` function already supports `force: true` (RFC-0390). 
 - [x] Re-running `mission.materialize` for the same mission produces a workpiece with all generated files present (evidence: `packages/os/site-kernel-handoff/src/tests/mission-materialize-force-cache-bypass.test.ts:165` — test calls runMissionMaterialize and verifies force: true is passed, ensuring all pipeline steps execute and write files)
 - [x] No `SKIP (cached)` steps appear in the `build.prepare.dev` pipeline output during materialization (evidence: `packages/os/site-kernel/src/runtime/execute-pipeline.ts:201` — tryCacheRead returns null when force is true, ensuring all steps execute instead of returning cached results)
 - [x] Regression test verifies `force: true` is passed to `executeKernelPipeline` during materialization (evidence: `packages/os/site-kernel-handoff/src/tests/mission-materialize-force-cache-bypass.test.ts:165` — test passes, 422 tests green)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0619 --json` — status: pass, 0 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0619 --json` — status: pass, 0 violations)
 
 ## Implementation notes for agents
 

@@ -641,7 +641,7 @@ Create an export command that produces:
 The command name proposed by this RFC is:
 
 ```sh
-pnpm exec site-kernel run matomo.export --app <app> --client <clientSemanticId>
+pnpm exec werkstatt run matomo.export --app <app> --client <clientSemanticId>
 ```
 
 `matomo.export.validate` must be able to run against fixtures without live Matomo secrets.

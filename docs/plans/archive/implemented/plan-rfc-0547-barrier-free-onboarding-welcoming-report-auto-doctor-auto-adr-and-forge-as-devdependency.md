@@ -53,8 +53,8 @@ scope:
 
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck
 - `pnpm --filter @warpgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run forge.skill.validate` — skill validation
-- `pnpm exec site-kernel run rfc.validate RFC-0547` — RFC validation
+- `pnpm exec werkstatt run forge.skill.validate` — skill validation
+- `pnpm exec werkstatt run rfc.validate RFC-0547` — RFC validation
 
 ## 3. Step sequence
 
@@ -100,13 +100,13 @@ scope:
   11. Welcoming report (redesigned — 6 sections, zero CLI commands, in aiLanguage)
 - Add `knowledge` frontmatter array: `[forge-about.md, operator-profile-template.md, project-narrative-template.md, milestone-gallery/]`
 - Remove all CLI commands from user-facing report text. Remove `fo-compass-annotate` mention. Remove `MODULE_CONTRACT`, `CHANGE_SUMMARY`, `bindings`, `adapter-id` jargon.
-- Ensure SKILL.md instruction lines do not contain hardcoded `pnpm exec site-kernel run` or `docs/architecture-dna.md` (SKILL-11).
+- Ensure SKILL.md instruction lines do not contain hardcoded `pnpm exec werkstatt run` or `docs/architecture-dna.md` (SKILL-11).
 - Add guardrail: operator-profile.md is local and private, not committed to repository.
 - Add guardrail: gender is optional, operator may decline.
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` passes on the redesigned skill.
+- `pnpm exec werkstatt run forge.skill.validate` passes on the redesigned skill.
 - SKILL-11: no hardcoded project literals in instruction lines.
 - SKILL-13: all declared knowledge files exist.
 
@@ -229,19 +229,19 @@ scope:
 
 - Run `pnpm --filter @warpgogol/forge run build:check` — typecheck.
 - Run `pnpm --filter @warpgogol/forge run test` — all tests.
-- Run `pnpm exec site-kernel run forge.skill.validate` — skill validation.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0547` — RFC validation.
+- Run `pnpm exec werkstatt run forge.skill.validate` — skill validation.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0547` — RFC validation.
 - Check off each acceptance criterion in the RFC file with inline `(evidence: <file:line>, <test-or-command>)` annotations (V-27).
 - Run `fo-review` on all session code changes.
 - Run `fo-fix` if review has findings.
 - Run `fo-doc-audit` to sync documentation surfaces.
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0547 --implementation-commit <sha>`.
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0547 --implementation-commit <sha>`.
 - Commit the stamped RFC separately from the implementation commit.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0547` — passes with zero violations.
+- `pnpm exec werkstatt run rfc.validate RFC-0547` — passes with zero violations.
 - All acceptance criteria marked `[x]` with evidence annotations.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -253,10 +253,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0547`
+- `pnpm exec werkstatt run rfc.validate RFC-0547`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate`
+- `pnpm exec werkstatt run forge.skill.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -280,4 +280,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0547 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0547 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).

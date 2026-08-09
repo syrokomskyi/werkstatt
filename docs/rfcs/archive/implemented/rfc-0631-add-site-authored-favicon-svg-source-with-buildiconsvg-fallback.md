@@ -59,7 +59,7 @@ nonGoals:
   - "Changing the buildIconSvg fallback design (first-letter + biome palette)"
   - "Adding a maskable-specific source file requirement (maskable source is optional)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -110,10 +110,10 @@ No new commands. Existing commands change behavior:
 
 ```sh
 # Generation: reads src/content/favicon.svg if present, falls back to buildIconSvg
-pnpm exec site-kernel run public.icons.generate --site warpgogol-com
+pnpm exec werkstatt run public.icons.generate --site warpgogol-com
 
 # Validation: validates source SVG (when present) + existing artifact checks
-pnpm exec site-kernel run public.icons.validate --site warpgogol-com
+pnpm exec werkstatt run public.icons.validate --site warpgogol-com
 ```
 
 No new flags. The source-override is file-presence-based, not flag-based.
@@ -225,7 +225,7 @@ Diagnostic rules:
 - [x] `public.icons.validate` reports `ICON-SRC-03` when maskable source SVG has wrong viewBox (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:363-368`, `src/tests/icons-source-svg.test.ts:119`)
 - [x] Generator falls back to `buildIconSvg` when `sharp` throws during PNG/ICO conversion of a valid-XML source SVG (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:201-207`, `src/tests/icons-source-svg.test.ts:135`)
 - [x] Sites without `src/content/favicon.svg` are unaffected — `buildIconSvg` fallback produces identical output to pre-RFC behavior (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:169-173`, `src/tests/icons-source-svg.test.ts:71`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0631 --json` → status: pass, violations: [])
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0631 --json` → status: pass, violations: [])
 
 ## Implementation notes for agents
 

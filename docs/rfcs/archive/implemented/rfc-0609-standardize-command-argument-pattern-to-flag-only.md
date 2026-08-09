@@ -79,7 +79,7 @@ nonGoals:
   - "Do not address sub-command routing (e.g. rfc.validate vs rfc.acceptance.run) — that is handled by the command name, not by positional args."
   - "Do not remove `KernelPipelineStep.args` — pipeline step args are raw argv tokens passed to `executeRegisteredCommand`, not parsed positional args. They are flag-parsed by `resolveCommandFlags` or `parseKernelArgv`. Pipeline definitions that pass positional tokens via `step.args` must migrate to flag tokens, but the `args` field on `KernelPipelineStep` itself remains as raw argv input."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -145,19 +145,19 @@ Flag naming is domain-specific: each command domain uses the flag name already e
 Before (inconsistent):
 
 ```sh
-pnpm exec site-kernel run rfc.validate RFC-0609 --json          # positional
-pnpm exec site-kernel run rfc.implement.stamp --id RFC-0609 ... # flag
-pnpm exec site-kernel run adr.validate ADR-0003 --json          # positional
-pnpm exec site-kernel run spec.validate --spec=pbp-spec --json  # flag
+pnpm exec werkstatt run rfc.validate RFC-0609 --json          # positional
+pnpm exec werkstatt run rfc.implement.stamp --id RFC-0609 ... # flag
+pnpm exec werkstatt run adr.validate ADR-0003 --json          # positional
+pnpm exec werkstatt run spec.validate --spec=pbp-spec --json  # flag
 ```
 
 After (uniform flag-only):
 
 ```sh
-pnpm exec site-kernel run rfc.validate --id RFC-0609 --json
-pnpm exec site-kernel run rfc.implement.stamp --id RFC-0609 ...
-pnpm exec site-kernel run adr.validate --id ADR-0003 --json
-pnpm exec site-kernel run spec.validate --spec pbp-spec --json
+pnpm exec werkstatt run rfc.validate --id RFC-0609 --json
+pnpm exec werkstatt run rfc.implement.stamp --id RFC-0609 ...
+pnpm exec werkstatt run adr.validate --id ADR-0003 --json
+pnpm exec werkstatt run spec.validate --spec pbp-spec --json
 ```
 
 ### TypeScript contracts
@@ -345,7 +345,7 @@ The `KERNEL-ARG-01` diagnostic is emitted in the standard `Diagnostic[]` array r
 
 - [x] `KernelCommandInput` in `packages/os/site-kernel/src/types.ts` no longer has an `args` field (evidence: packages/os/site-kernel/src/types.ts:68-71, `pnpm --filter @warpgogol/site-kernel run build:check`)
 - [x] `resolveCommandFlags` in `packages/os/site-kernel/src/runtime/argv.ts` emits `KERNEL-ARG-01` for positional tokens and does not return `args` (evidence: packages/os/site-kernel/src/runtime/argv.ts:195-244, src/tests/flags.test.ts:49-51)
-- [x] `rfc.validate` accepts `--id RFC-0609` and rejects `RFC-0609` (positional) with KERNEL-ARG-01 (evidence: packages/forge/os/rfc/handlers/validate.ts:40, `pnpm exec site-kernel run rfc.validate --id RFC-0609 --json` passes)
+- [x] `rfc.validate` accepts `--id RFC-0609` and rejects `RFC-0609` (positional) with KERNEL-ARG-01 (evidence: packages/forge/os/rfc/handlers/validate.ts:40, `pnpm exec werkstatt run rfc.validate --id RFC-0609 --json` passes)
 - [x] `adr.validate` accepts `--id ADR-0003` and rejects positional (evidence: packages/forge/os/adr/handlers/validate.ts:53)
 - [x] `session.validate` accepts `--id` flag (evidence: packages/forge/os/session/handlers/validate.ts:62)
 - [x] `rfc.command-lifecycle.validate`, `rfc.graph`, `rfc.pipeline.status` accept `--id` flag (evidence: packages/forge/os/rfc/handlers/lifecycle.ts:190, index-graph.ts:101, pipeline-status.ts:87)
@@ -356,7 +356,7 @@ The `KERNEL-ARG-01` diagnostic is emitted in the standard `Diagnostic[]` array r
 - [x] `ForgeCommandInput` in `packages/forge/src/types.ts` no longer has an `args` field (evidence: packages/forge/src/types.ts:23-26, `pnpm --filter @warpgogol/forge run build:check`)
 - [x] `parseKernelArgv` no longer returns `args`; returns `{ argv, flags, diagnostics }` (evidence: packages/os/site-kernel/src/runtime/argv.ts:95-124, src/tests/runtime.test.ts:48-53)
 - [x] Unit tests for `KERNEL-ARG-01` diagnostic in `packages/os/site-kernel/src/tests/` (positional token rejected, fix hint correct) (evidence: src/tests/flags.test.ts:49-51,105-108,141-146,151-155, `pnpm --filter @warpgogol/site-kernel run test` — 191 tests pass)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0609 --json` — ok: true)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0609 --json` — ok: true)
 - [x] All affected packages pass `build:check` (typecheck) (evidence: `pnpm --filter @warpgogol/site-kernel run build:check`, `pnpm --filter @warpgogol/forge run build:check`, `pnpm --filter @warpgogol/site-kernel-checks run build:check`, `pnpm --filter @warpgogol/site-kernel-handoff run build:check`, `pnpm --filter @warpgogol/site-kernel-codegen run build:check`, `pnpm --filter @warpgogol/site-kernel-audit run build:check` — all pass)
 
 ## Implementation notes for agents

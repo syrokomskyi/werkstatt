@@ -21,7 +21,7 @@ Pass. 10 V-19 warnings (amended RFCs don't yet list RFC-0376 in `amendedBy`) —
 ## Axis A — Structural completeness
 
 - **Decision** is present-tense and clear: "Migrate all Category B and C files from JSON to YAML."
-- **CLI surface** shows exact `pnpm exec site-kernel run yaml.contract.lint --json` invocations.
+- **CLI surface** shows exact `pnpm exec werkstatt run yaml.contract.lint --json` invocations.
 - **File system responsibilities** table is extensive and names concrete paths.
 - **Output format** documents the `--json` shape with examples.
 - **Rollout** describes a big-bang approach with 16 numbered steps.

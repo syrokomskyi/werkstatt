@@ -86,9 +86,9 @@ Forge gains `forge.yaml` — a machine-readable, YAML-only (RFC-0376) project co
 Inside this monorepo (kernel-registered):
 
 ```sh
-pnpm exec site-kernel run forge.init --json
-pnpm exec site-kernel run forge.agents.generate --json
-pnpm exec site-kernel run forge.doctor --json
+pnpm exec werkstatt run forge.init --json
+pnpm exec werkstatt run forge.agents.generate --json
+pnpm exec werkstatt run forge.doctor --json
 ```
 
 Autonomous mode (any project with forge installed):

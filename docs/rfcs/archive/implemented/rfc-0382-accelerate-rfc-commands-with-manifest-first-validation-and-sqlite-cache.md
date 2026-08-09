@@ -103,18 +103,18 @@ The kernel gains a two-phase acceleration:
 
 ```sh
 # Phase 1 — no new commands, existing commands are faster:
-pnpm exec site-kernel run rfc.validate RFC-0382 --json
-pnpm exec site-kernel run rfc.validate --json
-pnpm exec site-kernel run rfc.list --json
-pnpm exec site-kernel run rfc.graph RFC-0001 --json
-pnpm exec site-kernel run rfc.dna.trace.validate --json
+pnpm exec werkstatt run rfc.validate RFC-0382 --json
+pnpm exec werkstatt run rfc.validate --json
+pnpm exec werkstatt run rfc.list --json
+pnpm exec werkstatt run rfc.graph RFC-0001 --json
+pnpm exec werkstatt run rfc.dna.trace.validate --json
 
 # Phase 2 — cache management:
-pnpm exec site-kernel run kernel.cache.status --json
-pnpm exec site-kernel run kernel.cache.clear --json
+pnpm exec werkstatt run kernel.cache.status --json
+pnpm exec werkstatt run kernel.cache.clear --json
 
 # Force cache refresh (any RFC command):
-pnpm exec site-kernel run rfc.validate --force-cache-refresh --json
+pnpm exec werkstatt run rfc.validate --force-cache-refresh --json
 ```
 
 ### TypeScript contracts
@@ -267,7 +267,7 @@ The `rfc_entries` namespace stores one row per RFC file, keyed by relative file 
 
 ### Failure modes
 
-- **Manifest missing or stale (Phase 1):** `collectRfcCommandLifecycleViolations` falls back to `listRegisteredKernelCommands` and logs a warning: `"command-manifest.generated.yaml is stale or missing; falling back to full registry build. Run: pnpm exec site-kernel run command.manifest.generate"`.
+- **Manifest missing or stale (Phase 1):** `collectRfcCommandLifecycleViolations` falls back to `listRegisteredKernelCommands` and logs a warning: `"command-manifest.generated.yaml is stale or missing; falling back to full registry build. Run: pnpm exec werkstatt run command.manifest.generate"`.
 - **better-sqlite3 unavailable (Phase 2):** `createCacheLayer` returns a `NoopCacheLayer` with `available: false` and `unavailableReason: "better-sqlite3 not installed or native binary incompatible"`. All commands continue to work by parsing files directly. `kernel.cache.status` reports the unavailable state.
 - **Corrupt cache DB:** On SQLite open error, delete the DB file and recreate. Log: `"cache DB was corrupt and has been recreated"`.
 - **`--force-cache-refresh` flag:** Skips cache reads, forces full parse, writes results back to cache. Available on all RFC commands.

@@ -65,7 +65,7 @@ nonGoals:
   - "Does not compute reads[] hash for transitive-skip decisions — the skip is based solely on upstream cache-hit status"
   - "Does not merge build.prepare and build.check into a single pipeline — they remain separate pipeline runs connected by a persisted cache-hit file"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -344,7 +344,7 @@ const entries: CommandManifestEntry[] = commands.map((command) => ({
 - [x] `mirror.quintet.validate` in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` NOT annotated — no validators are annotated in this RFC (infrastructure-only) (evidence: no `validatesOutputs` field added to any command definition in 01-codegen.ts)
 - [x] Unit tests verify: (a) transitive skip fires when all upstream cached, (b) no skip when upstream cache miss, (c) no skip for `cacheable: false` validators, (d) transitive skip through a chain of 2 validators, (e) `--force` disables transitive skip, (f) stale `.cache/pipeline-cache-hits.json` entries (>30 min) are ignored, (g) cross-pipeline skip works when `build.prepare` cache hits are loaded by `build.check`, (h) no skip when `validatesOutputs` is empty or undefined, (i) corrupt `.cache/pipeline-cache-hits.json` falls back to empty set, (j) `persistCacheHits` preserves entries for other pipelines (evidence: packages/os/site-kernel/src/tests/transitive-skip.test.ts, 16 tests, all pass)
 - [x] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks` (evidence: `pnpm --filter @warpgogol/site-kernel run build:check` exit 0; `pnpm --filter @warpgogol/site-kernel-checks run build:check` exit 0)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0687 --json` exit 0)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0687 --json` exit 0)
 - [x] `packages/os/site-kernel/AGENTS.md` § Command-result cache updated to document `validatesOutputs` and `.cache/pipeline-cache-hits.json` (evidence: packages/os/site-kernel/AGENTS.md:100-109, § Transitive cache skip for validator chains (RFC-0687))
 
 ## Implementation notes for agents

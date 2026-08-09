@@ -48,7 +48,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs.
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — unit tests
-- `pnpm exec site-kernel run rfc.validate` — mechanical validation
+- `pnpm exec werkstatt run rfc.validate` — mechanical validation
 
 ## 3. Step sequence
 
@@ -120,7 +120,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate` — V-19 warnings for RFC-0590 are resolved.
+- `pnpm exec werkstatt run rfc.validate` — V-19 warnings for RFC-0590 are resolved.
 
 **Completion criterion:** `rfc.validate` no longer reports V-19 warnings for RFC-0590.
 
@@ -153,20 +153,20 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate` — verify zero errors for RFC-0590.
+- Run `pnpm exec werkstatt run rfc.validate` — verify zero errors for RFC-0590.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck passes.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test` — all tests pass.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Max 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: <file:line>, <test-or-command>)`.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0590 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0590 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 - **Commit the stamped RFC separately** — implementation commit and stamp commit must be separate.
 - Run `fo-doc-audit` to sync documentation surfaces.
 
 **Validation:**
 
 - `git status` — no uncommitted changes.
-- `pnpm exec site-kernel run rfc.validate` — zero errors for RFC-0590.
+- `pnpm exec werkstatt run rfc.validate` — zero errors for RFC-0590.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; `git status` clean.
@@ -177,7 +177,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate` — zero errors for RFC-0590
+- `pnpm exec werkstatt run rfc.validate` — zero errors for RFC-0590
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — unit tests
 
@@ -198,4 +198,4 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs.
 ## 6. Escalation triggers
 
 - If `rfc.implement.stamp` fails with RFC-IMP-04 (dirty working tree), report the uncommitted changes to the operator and stop. Do NOT `git stash` or force the stamp.
-- If implementation reveals an invariant conflict with DNA-46 or DNA-48, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0590 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 or DNA-48, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0590 --reason "..." --invariant "DNA-N"` instead of working around it.

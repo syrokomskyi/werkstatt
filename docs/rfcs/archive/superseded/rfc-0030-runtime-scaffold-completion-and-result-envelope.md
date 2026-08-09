@@ -191,10 +191,10 @@ If `nicaragua-projekt` evolves, the template evolves; the extraction-parity test
 
 ```sh
 # Existing — no signature change
-pnpm exec site-kernel run onboarding.scaffold --client <id> --domain <fqdn> --biome <id> --constellation <id>
+pnpm exec werkstatt run onboarding.scaffold --client <id> --domain <fqdn> --biome <id> --constellation <id>
 
 # New
-pnpm exec site-kernel run kernel.result.envelope.lint
+pnpm exec werkstatt run kernel.result.envelope.lint
 ```
 
 | Command | Scope | Responsibility |

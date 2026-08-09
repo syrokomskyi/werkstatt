@@ -6,7 +6,8 @@ on:
       - "docs/rfcs/**"
       - "AGENTS.md"
       - ".github/workflows/rfc-governance.yml"
-      - "packages/os/site-kernel*/**"
+      - "packages/werkstatt/**"
+      - "packages/werkstatt-site/**"
       - "packages/forge/**"
   workflow_dispatch:
 
@@ -42,4 +43,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate RFC corpus
-        run: pnpm exec site-kernel run rfc.validate
+        run: pnpm exec werkstatt run rfc.validate

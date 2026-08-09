@@ -31,8 +31,8 @@ The session implements RFC-0389 end-to-end: audit, enhancement, planning, implem
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — Pass
 - `pnpm --filter @warpgogol/site-kernel-onboarding run build:check` — Pass
-- `pnpm exec site-kernel run rfc.validate RFC-0389 --json` — Pass
-- `pnpm exec site-kernel run mission.materialize --mission warpgogol-com-m000003 --json` — Pass (37 files, 0 errors, 5s)
+- `pnpm exec werkstatt run rfc.validate RFC-0389 --json` — Pass
+- `pnpm exec werkstatt run mission.materialize --mission warpgogol-com-m000003 --json` — Pass (37 files, 0 errors, 5s)
 
 ### Axis A — Structural correctness
 

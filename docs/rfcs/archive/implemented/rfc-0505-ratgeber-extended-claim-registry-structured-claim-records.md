@@ -221,7 +221,7 @@ Migrator id: `rfc-0505`.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json
+pnpm exec werkstatt run ratgeber.claim.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check` (blocking).
@@ -397,4 +397,4 @@ The validator scans: claim records (~10–50 files per language), article record
 - [x] Migrator `rfc-0505` is registered in the migrator registry and transforms claim sidecars into claim records. (evidence: `packages/os/site-kernel-handoff/src/migrators/rfc-0505.ts` + `registry.ts` — migrator registered, PBT + snapshot tests pass)
 - [x] Migrator deletes claim sidecars after transformation. (evidence: `packages/os/site-kernel-handoff/src/migrators/rfc-0505.ts` — sidecar file deletion logic)
 - [x] `surface/claims/{lang}/*.md` collection schema and loader are ready for operator editorial work. Initial claim record files for the two reference articles will be authored by the operator during mission workpiece editing (Rollout step 8 — human editorial work). (evidence: `packages/os/site-kernel-checks/src/lib/surface-claims.ts` — loader reads `surface/claims/{lang}/*.md`; `packages/share/src/schemas/claim-records.ts` — Zod schema ready)
-- [x] `rfc.validate RFC-0505` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0505 --json` — status: pass)
+- [x] `rfc.validate RFC-0505` passes. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0505 --json` — status: pass)

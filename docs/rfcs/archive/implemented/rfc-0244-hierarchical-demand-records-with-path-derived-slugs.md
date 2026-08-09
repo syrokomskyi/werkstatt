@@ -97,7 +97,7 @@ This RFC aligns with the existing `@gogol/surface` Blueprint axis system and the
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run demands.hierarchy.validate --app warpgogol-com --json
+pnpm exec werkstatt run demands.hierarchy.validate --app warpgogol-com --json
 ```
 
 Scope: `app`. Supports `--all` and `--json`.

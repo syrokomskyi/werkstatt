@@ -76,8 +76,8 @@ scope:
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — unit tests
 - `pnpm --filter @warpgogol/studio-gate run build:check` — typecheck
-- `pnpm exec site-kernel run rfc.validate RFC-0555 --json` — RFC validation
-- `pnpm exec site-kernel run ecosystem.manifest.generate` — ecosystem manifest update
+- `pnpm exec werkstatt run rfc.validate RFC-0555 --json` — RFC validation
+- `pnpm exec werkstatt run ecosystem.manifest.generate` — ecosystem manifest update
 - No new pipeline checks needed — `workpiece.read`/`write` are runtime commands, not build-time validators
 
 ## 3. Step sequence
@@ -176,7 +176,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
-- `pnpm exec site-kernel run workpiece.read --help` shows the command (if `--help` is supported, otherwise verify via `command.manifest.generate`)
+- `pnpm exec werkstatt run workpiece.read --help` shows the command (if `--help` is supported, otherwise verify via `command.manifest.generate`)
 
 **Completion criterion:** Both commands appear in the command manifest and are callable via `site-kernel run`.
 
@@ -291,13 +291,13 @@ scope:
   - Add `studio-gate` row to ownership table: `stdio MCP server for site owner content editing with mission lifecycle (RFC-0555). Projects workpiece.read/write and mission lifecycle commands as MCP tools. WERKSTATT_ROOT env var resolves workspace root.`
 - Update `docs/source-markup.xml`:
   - Add source file entries for `packages/studio-gate/src/*.ts` and `packages/os/site-kernel-handoff/src/workpiece/*.ts`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml`
 - Verify `docs/architecture-dna.md` DNA-56 includes `mission.abort` (already done in enhance step)
 
 **Validation:**
 
 - `git diff` shows all scope.docs files updated
-- `pnpm exec site-kernel run ecosystem.manifest.validate` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate` passes
 
 **Completion criterion:** All documentation artifacts in scope are updated; ecosystem manifest is regenerated.
 
@@ -344,16 +344,16 @@ scope:
 - Update affected `docs/*.xml` Compass files (source-markup) when repository-wide semantics changed.
 - Update `docs/architecture-dna.md` if a new DNA invariant was introduced (DNA-56 already exists).
 - **Verify every file listed in `scope.docs` is updated** — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why (e.g. "requires runtime command blocked by environment").
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0555 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0555 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0555`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0555`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -365,12 +365,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0555`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0555`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 - `pnpm --filter @warpgogol/studio-gate run build:check`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
-- `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0555 --implementation-commit <sha>`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0555 --implementation-commit <sha>`
 
 ### 4.2 Evidence artifacts
 
@@ -394,6 +394,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-22 (e.g. `clientEditable[]` pattern matching cannot be shared between `client.edit.validate` and `workpiece.read`/`write`), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0555 --reason "..." --invariant "DNA-22"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-22 (e.g. `clientEditable[]` pattern matching cannot be shared between `client.edit.validate` and `workpiece.read`/`write`), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0555 --reason "..." --invariant "DNA-22"` instead of working around it.
 - If `@modelcontextprotocol/sdk` >=1.0.0 does not support `serverInfo.instructions` as expected, document the SDK version constraint and adjust the implementation to use the supported API surface.
 - If `loadSystemManifest` from `@warpgogol/site-kernel-content` cannot be used in the workpiece context (e.g. workpiece `system.md` has a different structure), create a shared loader function in `packages/os/site-kernel-content` instead of duplicating the parsing logic.

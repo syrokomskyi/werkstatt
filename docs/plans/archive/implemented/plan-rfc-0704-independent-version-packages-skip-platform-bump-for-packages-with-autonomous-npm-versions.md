@@ -86,7 +86,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.doctor` does not report errors about the new field
+- `pnpm exec werkstatt run forge.doctor` does not report errors about the new field
 - `forge.yaml` is valid YAML
 
 **Completion criterion:** `forge.yaml` contains `independentVersionPackages: [packages/forge]`; `forge.doctor` passes.
@@ -206,11 +206,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0704` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0704` — must pass
 - Run `pnpm --filter @warpgogol/forge run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test` — must pass
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (they did not — skip)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (they did not — skip)
 - Check off each acceptance criterion in the RFC with evidence
 
 **Validation:**
@@ -232,16 +232,16 @@ scope:
 
 - Verify root `AGENTS.md` is updated with independent-version package contract (Step 5)
 - Verify `forge.yaml` declares `independentVersionPackages` (Step 2)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no changes — skip)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no changes — skip)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0704 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0704 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0704 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0704`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0704`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -253,11 +253,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0704`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0704`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0704` (RFC-0330 — no acceptance probes declared, so this will skip, but run for compliance)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0704` (RFC-0330 — no acceptance probes declared, so this will skip, but run for compliance)
 
 ### 4.2 Evidence artifacts
 
@@ -275,4 +275,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0704 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0704 --reason "..." --invariant "DNA-53"` instead of working around it.

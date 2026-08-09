@@ -111,7 +111,7 @@ export async function runBehaviorSnapshotStalenessCheck(
     ruleId: "SNAP-STALE-01",
     severity: "warning" as const,
     message: `Route "${route}" is declared in system.md but absent from behavior.snapshot.generated.yaml`,
-    fixHint: "Run: pnpm exec site-kernel run behavior.snapshot.generate --site <app>, then commit the updated snapshot",
+    fixHint: "Run: pnpm exec werkstatt run behavior.snapshot.generate --site <app>, then commit the updated snapshot",
   }));
 
   return diagnosticsResult("behavior.snapshot.staleness.check", diagnostics);
@@ -160,7 +160,7 @@ Also add to `SITES_BUILD_PREPARE_DEV_PIPELINE` (RFC-0597) so developers see stal
       "ruleId": "SNAP-STALE-01",
       "severity": "warning",
       "message": "Route \"/de/nachweis/foo/\" is declared in system.md but absent from behavior.snapshot.generated.yaml",
-      "fixHint": "Run: pnpm exec site-kernel run behavior.snapshot.generate --site <app>, then commit the updated snapshot"
+      "fixHint": "Run: pnpm exec werkstatt run behavior.snapshot.generate --site <app>, then commit the updated snapshot"
     }
   ],
   "summary": { "error": 0, "warning": 1, "info": 0 }

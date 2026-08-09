@@ -62,7 +62,7 @@ No configuration or data files affected. `TIMESTAMP_ALLOWLIST` entries are delet
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run generated.drift.validate --site warpgogol-com --json` and check for DRIFT-02 diagnostics
+- Run `pnpm exec werkstatt run generated.drift.validate --site warpgogol-com --json` and check for DRIFT-02 diagnostics
 - If any DRIFT-02 diagnostics exist, add dryRun support to those generators BEFORE proceeding
 - If a generator's dryRun output differs from its normal output, fix the dryRun implementation
 
@@ -207,9 +207,9 @@ No configuration or data files affected. `TIMESTAMP_ALLOWLIST` entries are delet
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run generated.drift.validate --site warpgogol-com --json`
+- Run `pnpm exec werkstatt run generated.drift.validate --site warpgogol-com --json`
 - Verify zero DRIFT-02 errors (all generators support dryRun per Step 1)
-- Run `pnpm exec site-kernel run mission.validate --site warpgogol-com --json` if a mission is active, or confirm `build.check` pipeline passes
+- Run `pnpm exec werkstatt run mission.validate --site warpgogol-com --json` if a mission is active, or confirm `build.check` pipeline passes
 
 **Validation:**
 
@@ -229,16 +229,16 @@ No configuration or data files affected. `TIMESTAMP_ALLOWLIST` entries are delet
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-checks/AGENTS.md` no longer references `generated.timestamp.validate` or `TIMESTAMP_ALLOWLIST`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (a command was removed)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (a command was removed)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0645 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0645 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0645`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0645`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC is stamped as `implemented` via `rfc.implement.stamp`
@@ -249,10 +249,10 @@ No configuration or data files affected. `TIMESTAMP_ALLOWLIST` entries are delet
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0645`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0645`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run generated.drift.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run generated.drift.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -271,5 +271,5 @@ No configuration or data files affected. `TIMESTAMP_ALLOWLIST` entries are delet
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0645 --reason "..." --invariant "DNA-58"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-58, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0645 --reason "..." --invariant "DNA-58"` instead of working around it.
 - If a generator cannot be made dryRun-compatible (e.g., it depends on external state), escalate via `rfc.supersede.propose` rather than exempting it from DRIFT-02.

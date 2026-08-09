@@ -116,11 +116,11 @@ The kernel gains two new commands, `llms.generate` and `llms.validate`, register
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run llms.generate --app nicaragua-projekt
-pnpm exec site-kernel run llms.generate --all --json
+pnpm exec werkstatt run llms.generate --app nicaragua-projekt
+pnpm exec werkstatt run llms.generate --all --json
 
-pnpm exec site-kernel run llms.validate --app nicaragua-projekt
-pnpm exec site-kernel run llms.validate --all --json
+pnpm exec werkstatt run llms.validate --app nicaragua-projekt
+pnpm exec werkstatt run llms.validate --all --json
 ```
 
 `llms.generate` is **app-scoped** because each app has its own content layer, default language, and site URL. It is registered with `mutatesState: true` because it writes files into `public/`.

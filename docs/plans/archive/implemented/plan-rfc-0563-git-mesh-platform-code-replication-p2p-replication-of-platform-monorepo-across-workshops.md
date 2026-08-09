@@ -229,7 +229,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel build:check` passes
-- `pnpm exec site-kernel run gitmesh.sync --json` is recognized as a command (may fail on execution due to no config, but command lookup succeeds)
+- `pnpm exec werkstatt run gitmesh.sync --json` is recognized as a command (may fail on execution due to no config, but command lookup succeeds)
 
 **Completion criterion:** `gitmesh.sync`, `gitmesh.status`, `gitmesh.verify` are registered commands discoverable via `site-kernel run`.
 
@@ -296,10 +296,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0563 --json` — fix any violations
+- Run `pnpm exec werkstatt run rfc.validate RFC-0563 --json` — fix any violations
 - Run `pnpm --filter @warpgogol/site-kernel build:check` — fix any type errors
 - Run `pnpm --filter @warpgogol/site-kernel test` — fix any test failures
-- Run `pnpm exec site-kernel run command.reads.validate` (if available) — ensure all three commands declare `reads` or `cacheable: false`
+- Run `pnpm exec werkstatt run command.reads.validate` (if available) — ensure all three commands declare `reads` or `cacheable: false`
 - Fix any issues found, re-run until all pass
 
 **Validation:**
@@ -319,16 +319,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (gitmesh commands are new).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (gitmesh commands are new).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)`. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0563 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0563 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0563`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0563`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -340,10 +340,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0563`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0563`
 - `pnpm --filter @warpgogol/site-kernel build:check`
 - `pnpm --filter @warpgogol/site-kernel test`
-- `pnpm exec site-kernel run ecosystem.manifest.generate` (if command surfaces changed)
+- `pnpm exec werkstatt run ecosystem.manifest.generate` (if command surfaces changed)
 
 ### 4.2 Evidence artifacts
 
@@ -365,6 +365,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0563 --reason "..." --invariant "DNA-1"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0563 --reason "..." --invariant "DNA-1"` instead of working around it.
 - If `gitmesh.verify` cannot read Ed25519 signatures from commit trailers because RFC-0560's trailer format is not yet implemented, split the verify command into a follow-up RFC rather than implementing a partial verification.
 - If the convergence algorithm (highest committer timestamp) proves ambiguous in practice (e.g., clock skew across workshops), escalate to a superseding RFC with a quorum-based or canonical-remote-priority algorithm.

@@ -79,8 +79,8 @@ No issues.
   - `execute-command.ts` — CHANGE_SUMMARY includes RFC-0579 entry
   - `types.ts` — CHANGE_SUMMARY includes RFC-0579 entry
 - `fixHint` fields in `buildFailureDiagnostics` are actionable: "Guard loadSystemManifestSync with import.meta.env.DEV", "Check the import path... run pnpm install", "Check the frontmatter... against its content collection schema", "Fix the TypeScript type mismatch".
-- `nextSteps` in `mission.validate` are actionable with copy-pasteable commands: `pnpm exec site-kernel run mission.reconcile --mission ${missionId}`.
-- Archive `nextSteps` are actionable: `pnpm exec site-kernel run rfc.list --json to verify archive status`.
+- `nextSteps` in `mission.validate` are actionable with copy-pasteable commands: `pnpm exec werkstatt run mission.reconcile --mission ${missionId}`.
+- Archive `nextSteps` are actionable: `pnpm exec werkstatt run rfc.list --json to verify archive status`.
 - RFC-0575 pre-flight steps in skill files are clear 6-point procedures.
 
 ### Axis F — Pragmatism

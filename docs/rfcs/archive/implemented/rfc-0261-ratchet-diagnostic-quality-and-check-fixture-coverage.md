@@ -78,9 +78,9 @@ Two unprotected invariants:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run diagnostic.shape.lint --json   # now includes DSL-04
-pnpm exec site-kernel run check.fixture.lint --json
-pnpm exec site-kernel run check.fixture.lint --write-baseline   # regenerate shrink-only baseline
+pnpm exec werkstatt run diagnostic.shape.lint --json   # now includes DSL-04
+pnpm exec werkstatt run check.fixture.lint --json
+pnpm exec werkstatt run check.fixture.lint --write-baseline   # regenerate shrink-only baseline
 ```
 
 ### TypeScript contracts

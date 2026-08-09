@@ -114,7 +114,7 @@ No configuration or data files affected. The structural tag list is a `const rea
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build` — compiles
-- `pnpm exec site-kernel run command.manifest.generate` — manifest includes new command
+- `pnpm exec werkstatt run command.manifest.generate` — manifest includes new command
 
 **Completion criterion:** Command `dist.html-structure.validate` appears in `docs/command-manifest.generated.yaml`.
 
@@ -180,7 +180,7 @@ No configuration or data files affected. The structural tag list is a `const rea
 **Agent actions:**
 
 - Build a site: `pnpm --filter warpgogol-com run build` (or the current active site)
-- Run: `pnpm exec site-kernel run dist.html-structure.validate --site warpgogol-com`
+- Run: `pnpm exec werkstatt run dist.html-structure.validate --site warpgogol-com`
 - If violations are found, investigate whether they are real bugs or false positives:
   - Real bugs: fix the source or mutator causing the imbalance
   - False positives: adjust the algorithm (e.g. comment stripping regex) and update tests
@@ -205,14 +205,14 @@ No configuration or data files affected. The structural tag list is a `const rea
   ```
   | `src/dist-html-structure.ts` | RFC-0654 `runDistHtmlStructureValidate` — post-build tag balance check for structural non-void HTML elements in dist/client. Exports pure `checkHtmlStructure` for direct reuse. Diagnostics: HTML-STRUCT-01 |
   ```
-- Run `pnpm exec site-kernel run command.manifest.generate`
-- Run `pnpm exec site-kernel run docs.commands.generate`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` (pipeline topology changed)
+- Run `pnpm exec werkstatt run command.manifest.generate`
+- Run `pnpm exec werkstatt run docs.commands.generate`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` (pipeline topology changed)
 
 **Validation:**
 
 - `git diff` shows AGENTS.md updated, manifest + COMMANDS.md regenerated
-- `pnpm exec site-kernel run rfc.validate --id RFC-0654` — passes (RFC-CMD-02 sees live command)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0654` — passes (RFC-CMD-02 sees live command)
 
 **Completion criterion:** AGENTS.md has new module entry; command manifest and COMMANDS.md are regenerated.
 
@@ -227,17 +227,17 @@ No configuration or data files affected. The structural tag list is a `const rea
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check `packages/os/site-kernel-checks/AGENTS.md` against `git diff`.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0654` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0654` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0654 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0654 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0654` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0654` — passes.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -249,10 +249,10 @@ No configuration or data files affected. The structural tag list is a `const rea
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0654`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0654`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test -- --run dist-html-structure`
-- `pnpm exec site-kernel run dist.html-structure.validate --site warpgogol-com` (on a clean build)
+- `pnpm exec werkstatt run dist.html-structure.validate --site warpgogol-com` (on a clean build)
 
 ### 4.2 Evidence artifacts
 
@@ -270,5 +270,5 @@ No configuration or data files affected. The structural tag list is a `const rea
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-8 or DNA-35, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0654 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-8 or DNA-35, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0654 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the comment stripping regex proves insufficient for real-world HTML (e.g. conditional comments, nested comments), escalate to a full HTML parser approach (Alternative 2 in the RFC) via a new RFC rather than patching the regex incrementally.

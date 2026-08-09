@@ -371,8 +371,8 @@ Not applicable — this RFC introduces no new OS command. Test failures surface 
 6. Run `pnpm test` again to verify PBT tests pass.
 7. Add the "Testing policy" section to `AGENTS.md` with the agent decision tree and MUST/MUST NOT rules.
 8. Add the DNA-41 entry to `docs/architecture-dna.md`.
-9. Run `pnpm exec site-kernel run rfc.validate RFC-0347 --json` to verify the RFC itself.
-10. Run `pnpm exec site-kernel run dna.registry.validate --json` to verify DNA-41 is registered.
+9. Run `pnpm exec werkstatt run rfc.validate RFC-0347 --json` to verify the RFC itself.
+10. Run `pnpm exec werkstatt run dna.registry.validate --json` to verify DNA-41 is registered.
 
 ## Alternatives considered
 

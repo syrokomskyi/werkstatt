@@ -62,7 +62,7 @@ nonGoals:
   - Do not change the GENERATOR_OWNERSHIP_MAP data structure or OwnershipEntry interface
   - Do not change how build-identity.json is written or cleaned up by leitstand.dev-deploy or release.prepare
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -143,9 +143,9 @@ No new commands. The fix is internal to `generated.stale.validate`:
 
 ```sh
 # These commands continue to work exactly as before:
-pnpm exec site-kernel run generated.stale.validate --site warpgogol-com
-pnpm exec site-kernel run ownership.sync.validate --site warpgogol-com
-pnpm exec site-kernel run generated.files.validate --site warpgogol-com
+pnpm exec werkstatt run generated.stale.validate --site warpgogol-com
+pnpm exec werkstatt run ownership.sync.validate --site warpgogol-com
+pnpm exec werkstatt run generated.files.validate --site warpgogol-com
 ```
 
 ### TypeScript contracts

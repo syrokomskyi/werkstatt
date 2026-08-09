@@ -18,10 +18,10 @@ This document was rewritten for the RFC-0047 thin-app content surface. The earli
 6. Gate readiness: `sites-check.run --site <id>` and `app.contract.full --site <id>`.
 
 ```sh
-rtk pnpm exec site-kernel run brief.validate
-rtk pnpm exec site-kernel run onboarding.scaffold --site <id>   # scaffold phase only
-rtk pnpm exec site-kernel run sites-check.run --site <id>
-rtk pnpm exec site-kernel run app.contract.full --site <id>
+rtk pnpm exec werkstatt run brief.validate
+rtk pnpm exec werkstatt run onboarding.scaffold --site <id>   # scaffold phase only
+rtk pnpm exec werkstatt run sites-check.run --site <id>
+rtk pnpm exec werkstatt run app.contract.full --site <id>
 ```
 
 ---
@@ -78,8 +78,8 @@ apps/<id>/
 If a site needs a section/component generic enough to share, add it to `packages/ui/src/{sections,components}/<name>/` with a colocated `<name>.manifest.yaml` (the Mirror Quintet — enforced by `manifest.contract.validate` + `mirror.quintet.validate`), then rebuild the registry:
 
 ```sh
-rtk pnpm exec site-kernel run uni.registry.build
-rtk pnpm exec site-kernel run uni.registry.validate
+rtk pnpm exec werkstatt run uni.registry.build
+rtk pnpm exec werkstatt run uni.registry.validate
 ```
 
 Apps consume it via the package export (`@warpgogol/ui/sections/<name>`), never via app-local component files.

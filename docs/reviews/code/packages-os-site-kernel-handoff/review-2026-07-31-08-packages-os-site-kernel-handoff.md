@@ -55,7 +55,7 @@ No issues. The test covers the happy path (materialization succeeds with `force:
 | --- | --- | --- |
 | Regression test verifies `force: true` is passed | Done | `mission-materialize-force-cache-bypass.test.ts:172-173` |
 | Test in `packages/os/site-kernel-handoff/src/tests/` | Done | File at expected path |
-| `rfc.validate` passes | Done | `pnpm exec site-kernel run rfc.validate --id RFC-0619` — 0 violations |
+| `rfc.validate` passes | Done | `pnpm exec werkstatt run rfc.validate --id RFC-0619` — 0 violations |
 
 ### Questions for the author
 

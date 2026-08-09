@@ -112,10 +112,10 @@ The key boundary is that `public/preview/**/*.png` and `public/og-image.png` pre
 The Site OS gains two app-scoped commands:
 
 ```sh
-pnpm exec site-kernel run preview.images.generate --app warpgogol-com
-pnpm exec site-kernel run preview.images.validate --app warpgogol-com
-pnpm exec site-kernel run preview.images.generate --app warpgogol-com --json
-pnpm exec site-kernel run preview.images.validate --app warpgogol-com --json
+pnpm exec werkstatt run preview.images.generate --app warpgogol-com
+pnpm exec werkstatt run preview.images.validate --app warpgogol-com
+pnpm exec werkstatt run preview.images.generate --app warpgogol-com --json
+pnpm exec werkstatt run preview.images.validate --app warpgogol-com --json
 ```
 
 `preview.images.generate`:

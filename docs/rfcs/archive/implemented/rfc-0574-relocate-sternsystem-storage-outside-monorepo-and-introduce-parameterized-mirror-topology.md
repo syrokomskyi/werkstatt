@@ -88,7 +88,7 @@ nonGoals:
   - "Does not change the Notausgang export or release artifact store"
   - "Does not modify the Bordbuch entry schema or Bordbuch event types"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -147,18 +147,18 @@ No new commands are introduced. Existing commands are modified to resolve paths 
 
 ```sh
 # sternsystem.sync — now synchronizes all mirrors via star topology through mirrors[0]
-pnpm exec site-kernel run sternsystem.sync --id warpgogol-com
-pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --all
+pnpm exec werkstatt run sternsystem.sync --id warpgogol-com
+pnpm exec werkstatt run sternsystem.sync --id warpgogol-com --all
 
 # sternsystem.validate — now validates mirror topology rules
-pnpm exec site-kernel run sternsystem.validate
-pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json
+pnpm exec werkstatt run sternsystem.validate
+pnpm exec werkstatt run sternsystem.validate --id warpgogol-com --json
 
 # mission.materialize — resolves cache clone from mirrors[0].path
-pnpm exec site-kernel run mission.materialize --mission warpgogol-com-m000017
+pnpm exec werkstatt run mission.materialize --mission warpgogol-com-m000017
 
 # mission.reconcile — merges back to mirrors[0].path
-pnpm exec site-kernel run mission.reconcile --mission warpgogol-com-m000017
+pnpm exec werkstatt run mission.reconcile --mission warpgogol-com-m000017
 ```
 
 ### TypeScript contracts
@@ -411,7 +411,7 @@ New Sternsystems registered via `sternsystem.register` use `mirrors[]` from day 
 - [x] `docs/architecture-dna.md` DNA-45 entry updated to list `mirrors[]` instead of `repo` and `mirror` fields (evidence: docs/architecture-dna.md:197)
 - [x] Post-receive hook (`mirror-hook.ts`) deleted; `ensureMirrorHook()` calls removed from `sternsystem-sync.ts` and `sternsystem-register.ts` (evidence: mirror-hook.ts not found in codebase)
 - [x] `sternsystem.register` uses `--mirrors` flag instead of `--repo`/`--mirror` (evidence: packages/os/site-kernel-handoff/src/sternsystem/sternsystem-register.ts, index.ts)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0574 --json` exit code 0)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate RFC-0574 --json` exit code 0)
 
 ## Implementation notes for agents
 

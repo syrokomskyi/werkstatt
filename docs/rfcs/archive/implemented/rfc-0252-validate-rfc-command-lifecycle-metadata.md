@@ -104,10 +104,10 @@ The implementation likely belongs in `@gogol/site-kernel` because RFC governance
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rfc.command-lifecycle.validate --json
-pnpm exec site-kernel run rfc.validate
-pnpm exec site-kernel run rfc.list --status implemented --json
-pnpm exec site-kernel run ecosystem.manifest.validate --json
+pnpm exec werkstatt run rfc.command-lifecycle.validate --json
+pnpm exec werkstatt run rfc.validate
+pnpm exec werkstatt run rfc.list --status implemented --json
+pnpm exec werkstatt run ecosystem.manifest.validate --json
 ```
 
 `rfc.command-lifecycle.validate` is workspace-scoped and read-only.
@@ -215,7 +215,7 @@ Historical RFC cleanup can create churn. The rollout should fix only current kno
 - [x] Current known drift in RFC-0246, RFC-0248, and RFC-0249 is fixed. (evidence: implemented historically)
 - [x] New rule ids are documented and emitted as canonical diagnostics or existing RFC warning records. (evidence: implemented historically)
 - [x] Agent Control Plane command provenance includes proposed/added/changed/removed RFC relationships. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run rfc.validate`, `pnpm exec site-kernel run rfc.command-lifecycle.validate --json`, `pnpm exec site-kernel run ecosystem.manifest.validate --json`, and `pnpm exec site-kernel run ci.local.validate --json` pass. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run rfc.validate`, `pnpm exec werkstatt run rfc.command-lifecycle.validate --json`, `pnpm exec werkstatt run ecosystem.manifest.validate --json`, and `pnpm exec werkstatt run ci.local.validate --json` pass. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

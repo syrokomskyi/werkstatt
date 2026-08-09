@@ -81,13 +81,13 @@ This enforces a performance-focused invariant aligned with:
 
 ```sh
 # Validate a single app
-pnpm exec site-kernel run image.format.validate --app nicaragua-projekt
+pnpm exec werkstatt run image.format.validate --app nicaragua-projekt
 
 # Validate all apps
-pnpm exec site-kernel run image.format.validate --all
+pnpm exec werkstatt run image.format.validate --all
 
 # JSON output for CI/CD
-pnpm exec site-kernel run image.format.validate --all --json
+pnpm exec werkstatt run image.format.validate --all --json
 ```
 
 Flags:
@@ -188,7 +188,7 @@ No need to precisely identify non-webp formats - only need to confirm "not valid
 
 Migration path for existing apps:
 
-1. Run `pnpm exec site-kernel run image.format.validate --app <name>` to identify violations
+1. Run `pnpm exec werkstatt run image.format.validate --app <name>` to identify violations
 2. Convert non-webp images to webp using external tools (e.g., `cwebp`, `sharp`)
 3. Commit converted images
 4. Validation passes automatically

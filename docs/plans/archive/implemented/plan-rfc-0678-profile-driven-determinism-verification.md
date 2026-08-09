@@ -87,7 +87,7 @@ Validation: `git diff docs/command-manifest.generated.yaml` shows `forge.determi
 
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0678`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0678`
 - Run `fo-review` and `fo-fix` if needed
 - Stamp with `rfc.implement.stamp --id RFC-0678 --implementation-commit <sha>`
 

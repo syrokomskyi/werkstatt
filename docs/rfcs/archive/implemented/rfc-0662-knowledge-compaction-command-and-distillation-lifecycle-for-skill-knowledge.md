@@ -61,7 +61,7 @@ nonGoals:
   - No deletion of knowledge — archival moves entries; nothing is destroyed
   - No compaction of non-knowledge files (sessions, audits, docs) — those have their own archive commands
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -115,13 +115,13 @@ Forge gains a deterministic command **`forge.skill.knowledge.compact`** that com
 
 ```sh
 # Preview everything that would change — the default first run
-pnpm exec site-kernel run forge.skill.knowledge.compact --all-skills --dry-run --json
+pnpm exec werkstatt run forge.skill.knowledge.compact --all-skills --dry-run --json
 
 # Compact one skill's knowledge files
-pnpm exec site-kernel run forge.skill.knowledge.compact --skill grilling
+pnpm exec werkstatt run forge.skill.knowledge.compact --skill grilling
 
 # Compact all skills (forge + pack) with custom windows
-pnpm exec site-kernel run forge.skill.knowledge.compact --all-skills --retention-days 120 --stale-days 90
+pnpm exec werkstatt run forge.skill.knowledge.compact --all-skills --retention-days 120 --stale-days 90
 ```
 
 Scope: `workspace`. Flags:

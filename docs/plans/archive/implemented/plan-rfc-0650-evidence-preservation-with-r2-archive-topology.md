@@ -50,8 +50,8 @@ scope:
 ### 2.4 Validation and pipelines
 
 - No pipeline changes. `mission.check` is already invoked by `leitstand.dev-deploy` (RFC-0628). The `runTimestamp` field is transparent to existing consumers.
-- `pnpm exec site-kernel run command.manifest.generate` — regenerate command manifest after adding `--run-timestamp` flag
-- `pnpm exec site-kernel run rfc.validate --id RFC-0650` — validate RFC before stamping
+- `pnpm exec werkstatt run command.manifest.generate` — regenerate command manifest after adding `--run-timestamp` flag
+- `pnpm exec werkstatt run rfc.validate --id RFC-0650` — validate RFC before stamping
 
 ## 3. Step sequence
 
@@ -97,7 +97,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run command.manifest.generate` — regenerate manifest
+- `pnpm exec werkstatt run command.manifest.generate` — regenerate manifest
 - Verify `run-timestamp` flag appears in `docs/command-manifest.generated.yaml` under `mission.check`
 
 **Completion criterion:** `--run-timestamp` flag is registered in the command table and appears in the regenerated command manifest.
@@ -188,7 +188,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0650` — should now pass without V-18 warning (DNA-59 exists)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0650` — should now pass without V-18 warning (DNA-59 exists)
 
 **Completion criterion:** `## DNA-59 · Evidence preservation` entry exists in `docs/architecture-dna.md`.
 
@@ -204,8 +204,8 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run command.manifest.generate`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0650`
+- `pnpm exec werkstatt run command.manifest.generate`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0650`
 - `git status` — verify only expected files changed
 
 **Validation:**
@@ -225,16 +225,16 @@ scope:
 **Agent actions:**
 
 - Verify all `scope.docs` files are updated: `packages/os/site-kernel-checks/AGENTS.md`, `packages/os/site-kernel-handoff/AGENTS.md`, `docs/architecture-dna.md`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not needed — no new commands, only a flag addition).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (not needed — no new commands, only a flag addition).
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0650 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0650 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0650`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0650`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -246,10 +246,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0650`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0650`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run command.manifest.generate`
+- `pnpm exec werkstatt run command.manifest.generate`
 
 ### 4.2 Evidence artifacts
 
@@ -267,4 +267,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 or DNA-52, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0650 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 or DNA-52, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0650 --reason "..." --invariant "DNA-N"` instead of working around it.

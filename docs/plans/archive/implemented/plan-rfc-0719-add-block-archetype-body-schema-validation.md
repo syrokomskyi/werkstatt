@@ -120,11 +120,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0719 --json` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0719 --json` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test` — must pass.
-- Run `pnpm exec site-kernel run command.manifest.generate` — regenerate manifest after command description change.
-- Run `pnpm exec site-kernel run docs.commands.generate` — regenerate COMMANDS.md.
+- Run `pnpm exec werkstatt run command.manifest.generate` — regenerate manifest after command description change.
+- Run `pnpm exec werkstatt run docs.commands.generate` — regenerate COMMANDS.md.
 
 **Validation:**
 
@@ -145,8 +145,8 @@ scope:
 - Check off all 6 acceptance criteria in the RFC with `[x]` and inline `(evidence: <file:line>)` annotations.
 - Run `fo-review` via the `skill` tool on all session code changes.
 - Run `fo-fix` if review findings exist. Re-run `fo-review` to confirm. Max 3 iterations.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0719 --implementation-commit <sha>` to transition `accepted → implemented`.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0719` to confirm implemented status passes validation (V-25 reviewers, V-26 criteria checked).
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0719 --implementation-commit <sha>` to transition `accepted → implemented`.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0719` to confirm implemented status passes validation (V-25 reviewers, V-26 criteria checked).
 
 **Validation:**
 
@@ -162,7 +162,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0719`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0719`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 
@@ -181,4 +181,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0719 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0719 --reason "..." --invariant "DNA-24"` instead of working around it.

@@ -348,7 +348,7 @@ scope:
 **Agent actions:**
 
 - Update `packages/os/site-kernel-handoff/AGENTS.md` with N3 workflow rules: key file security, TSA adapter pattern, N3 gate behavior, `--pilot-n2-exception` removal note
-- Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
+- Run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
 - Check `docs/verification-plan.xml` for needed sync (add new Bordbuch kinds if verification surface references them)
 - Update RFC-0707 (archived/implemented) `amendedBy` field to include `RFC-0715` (fix V-19 warning)
 
@@ -372,9 +372,9 @@ scope:
 - Run `fo-review` via skill tool on all session code changes
 - Run `fo-fix` if findings (max 3 iterations)
 - Verify each acceptance criterion in RFC-0715 against implemented code, mark `[x]` with evidence
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0715`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0715` (if acceptance probes declared)
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0715 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0715`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0715` (if acceptance probes declared)
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0715 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -390,7 +390,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0715`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0715`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
@@ -413,5 +413,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-34 (VC signing) or DNA-53 (fingerprint governance), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0715 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-34 (VC signing) or DNA-53 (fingerprint governance), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0715 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `@noble/ed25519` API is incompatible with the expected Ed25519 signature format, investigate the passport package's usage pattern (`packages/passport/src/sign.ts`) for the correct API calls before considering an alternative library.

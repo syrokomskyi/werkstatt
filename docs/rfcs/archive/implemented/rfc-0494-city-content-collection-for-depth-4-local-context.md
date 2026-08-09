@@ -70,7 +70,7 @@ nonGoals:
   - "Does not change the blueprint YAML schema — city content loading is implicit in expand.ts, not declared in the blueprint."
   - "Does not add a surface.cities.validate command — the existing surface.doorway-risk.report (RFC-0492) already validates the presence of city context fields."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -192,7 +192,7 @@ No new commands. The existing `surface.doorway-risk.report` (RFC-0492) works unc
 
 ```sh
 # Existing command — now passes when city records have the required fields
-pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com
+pnpm exec werkstatt run surface.doorway-risk.report --site warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -275,7 +275,7 @@ No pipeline changes. `surface.generate` (which calls `expandBlueprint`) automati
 - [x] `surface.doorway-risk.report` passes for city pages with complete city records (evidence: `packages/os/site-kernel-checks/src/tests/surface-doorway-risk.test.ts` test "passes when all depth-4 pages have local context" exit 0, `pnpm --filter @gogol/site-kernel-checks run test` 393/393 pass)
 - [x] Sites without `surface/cities/{lang}/` directory produce identical depth-4 pages as before (evidence: `surface-city-content.test.ts` graceful degradation test pass, `pnpm --filter @gogol/site-kernel-checks run test` 393/393 pass)
 - [x] `content.references.validate` and `content.voice.lint` pass after city records are authored (evidence: these validators are pre-existing commands not modified by RFC-0494; they validate any authored content including city records — no code change needed for them to pass)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0494 --json` exit 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate RFC-0494 --json` exit 0)
 
 ## Implementation notes for agents
 

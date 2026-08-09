@@ -81,7 +81,7 @@ No configuration or data files affected. The `--system` flag is a CLI surface on
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0726`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0726`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 
 **Completion criterion:** All four leitstand commands accept `--site` and reject `--system`. TypeScript compiles without errors.
@@ -159,7 +159,7 @@ No configuration or data files affected. The `--system` flag is a CLI surface on
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0726`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0726`
 - `git diff --stat` to confirm all scoped docs are modified
 
 **Completion criterion:** No `--system` references remain in AGENTS.md or docs/COMMANDS.md for leitstand/release commands.
@@ -176,16 +176,16 @@ No configuration or data files affected. The `--system` flag is a CLI surface on
 
 - Update affected `AGENTS.md` files with `--site` flag documentation.
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0726 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0726 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0726`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0726`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -197,7 +197,7 @@ No configuration or data files affected. The `--system` flag is a CLI surface on
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0726`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0726`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -215,4 +215,4 @@ No configuration or data files affected. The `--system` flag is a CLI surface on
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0726 --reason "..." --invariant "DNA-51"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0726 --reason "..." --invariant "DNA-51"` instead of working around it.

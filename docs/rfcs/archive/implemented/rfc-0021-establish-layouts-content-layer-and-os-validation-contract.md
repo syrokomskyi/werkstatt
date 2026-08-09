@@ -108,14 +108,14 @@ Specifically:
 
 ```sh
 # Validate layout content structure for a specific app
-pnpm exec site-kernel run content.layouts.validate --app nicaragua-projekt
+pnpm exec werkstatt run content.layouts.validate --app nicaragua-projekt
 
 # Lint layout naming conventions across all apps
-pnpm exec site-kernel run naming.layouts.lint --all --json
+pnpm exec werkstatt run naming.layouts.lint --all --json
 
 # Existing commands gain layout awareness
-pnpm exec site-kernel run mirror.quartet.validate --app nicaragua-projekt
-pnpm exec site-kernel run dispatcher.sync.validate --app nicaragua-projekt
+pnpm exec werkstatt run mirror.quartet.validate --app nicaragua-projekt
+pnpm exec werkstatt run dispatcher.sync.validate --app nicaragua-projekt
 ```
 
 **Flags**:

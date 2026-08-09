@@ -7,7 +7,7 @@ RFC (Request for Comments) is the formal lifecycle for architectural decisions i
 Before making any of the following changes, an agent MUST check existing RFCs:
 
 ```sh
-rtk pnpm exec site-kernel run rfc.list --status accepted --json
+rtk pnpm exec werkstatt run rfc.list --status accepted --json
 ```
 
 Changes that require RFC consultation:
@@ -34,8 +34,8 @@ For every `status: implemented` RFC, a live command listed under `commands.propo
 Run both checks after command lifecycle edits:
 
 ```sh
-rtk pnpm exec site-kernel run rfc.command-lifecycle.validate --json
-rtk pnpm exec site-kernel run rfc.validate
+rtk pnpm exec werkstatt run rfc.command-lifecycle.validate --json
+rtk pnpm exec werkstatt run rfc.validate
 ```
 
 If command lifecycle metadata changes, regenerate the Agent Control Plane projection with `ecosystem.manifest.generate` rather than hand-editing `docs/ecosystem.generated.json`.
@@ -140,7 +140,7 @@ Both rules apply to all RFCs regardless of `createdAt` — these are document-qu
 When an agent identifies a structural change not covered by an existing accepted RFC:
 
 ```sh
-rtk pnpm exec site-kernel run rfc.create --title "Short imperative title" --kind architecture
+rtk pnpm exec werkstatt run rfc.create --title "Short imperative title" --kind architecture
 ```
 
 Do not put `--` before the flags — `rfc.create` declares a typed flag schema (RFC-0260), and a leading `--` puts every following token into passthrough/positional mode instead of parsing them as flags.
@@ -160,7 +160,7 @@ After creation:
 After any change that deletes or renames files declared in an RFC's `## File system responsibilities` table, or that modifies Feature Policy in content frontmatter, run:
 
 ```sh
-rtk pnpm exec site-kernel run rfc.check --site <app-name>
+rtk pnpm exec werkstatt run rfc.check --site <app-name>
 ```
 
 This command verifies that every file and policy artifact referenced by accepted/implemented RFCs is still present. A non-zero exit code means an RFC contract is broken.
@@ -170,7 +170,7 @@ This command verifies that every file and policy artifact referenced by accepted
 Before self-transitioning an RFC from `accepted` to `implemented`, check whether it declares an `acceptance:` probe list in frontmatter. If it does, run:
 
 ```sh
-rtk pnpm exec site-kernel run rfc.acceptance.run --id <rfc-id>
+rtk pnpm exec werkstatt run rfc.acceptance.run --id <rfc-id>
 ```
 
 A green run (exit 0) is an ADDITIONAL precondition for the transition on top of the prose checkbox criteria — never mark the RFC `implemented` while a declared probe fails, even if the failure looks environmental; fix the environment or flag for human review instead. The transition commit must mention that `rfc.acceptance.run` passed. RFCs without an `acceptance:` block are unaffected — prose criteria remain the only gate.

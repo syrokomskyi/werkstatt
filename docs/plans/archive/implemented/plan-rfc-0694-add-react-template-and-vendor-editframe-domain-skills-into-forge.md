@@ -56,9 +56,9 @@ scope:
 
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript compilation
 - `pnpm --filter @warpgogol/forge run test` — unit tests (vitest)
-- `pnpm exec site-kernel run rfc.validate --id RFC-0694` — RFC mechanical validation
-- `pnpm exec site-kernel run forge.profile.validate --id editframe` — profile validation
-- `pnpm exec site-kernel run forge.skill.validate` — skill validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0694` — RFC mechanical validation
+- `pnpm exec werkstatt run forge.profile.validate --id editframe` — profile validation
+- `pnpm exec werkstatt run forge.skill.validate` — skill validation
 
 ## 3. Step sequence
 
@@ -145,7 +145,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.profile.validate --id editframe` — profile validates against schema
+- `pnpm exec werkstatt run forge.profile.validate --id editframe` — profile validates against schema
 
 **Completion criterion:** `packages/forge/profiles/editframe.yaml` exists with `id: editframe`, React template in `firstWorkspace`; `editframe-html.yaml` is deleted; `composition.tsx` exists with React components from `@editframe/react`.
 
@@ -171,8 +171,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` — all 6 new skills pass validation
-- `pnpm exec site-kernel run forge.skill.list` — all 6 new skills appear in the list
+- `pnpm exec werkstatt run forge.skill.validate` — all 6 new skills pass validation
+- `pnpm exec werkstatt run forge.skill.list` — all 6 new skills appear in the list
 
 **Completion criterion:** 6 new skill directories exist with `SKILL.md` passing `forge.skill.validate`; synced copies exist in `.agents/skills/`.
 
@@ -205,7 +205,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` — all 3 updated skills pass validation
+- `pnpm exec werkstatt run forge.skill.validate` — all 3 updated skills pass validation
 
 **Completion criterion:** `ef-onboard/SKILL.md` does not contain `npm create @editframe` or stack preference question; `ef-composition-review/SKILL.md` references `.tsx` and React components; `ef-render-verify/SKILL.md` references `compositions/**/*.tsx`.
 
@@ -251,13 +251,13 @@ scope:
   - Replace `editframe-html` with `editframe` in all references
   - Replace `html-attribute-pattern` with `attribute-pattern` in the invariant documentation
   - Update the skill count if needed (currently "29 fo skills + 4 shared + 3 meta = 36 skills" — add 6 new ef-* skills)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `commands.changed` lists 3 existing commands)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `commands.changed` lists 3 existing commands)
 
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0694`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0694`
 
 **Completion criterion:** `packages/forge/AGENTS.md` references `editframe` profile; `forge build:check` passes; `forge test` passes; `rfc.validate` passes.
 
@@ -272,16 +272,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0694 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0694 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0694`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0694`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -293,11 +293,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0694`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0694`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.profile.validate --id editframe`
-- `pnpm exec site-kernel run forge.skill.validate`
+- `pnpm exec werkstatt run forge.profile.validate --id editframe`
+- `pnpm exec werkstatt run forge.skill.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -317,5 +317,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0694 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0694 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If `ef-brand-video-generator` or `ef-motion-design` source content is unavailable at both the canonical URL and `npm create @editframe`, stop and ask the operator for guidance.

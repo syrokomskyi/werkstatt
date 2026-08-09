@@ -128,7 +128,7 @@ scope:
 
 - Verify RFC-0769, RFC-0772, RFC-0774, RFC-0775 are all `accepted` or `implemented`
 - Verify DNA-64 exists in `docs/architecture-dna.md`
-- Run `pnpm exec site-kernel run mission.list --json` and verify zero open missions
+- Run `pnpm exec werkstatt run mission.list --json` and verify zero open missions
 - If any missions are open, ask the operator to close them before proceeding
 
 **Validation:**
@@ -156,7 +156,7 @@ scope:
   - Add `plugins: [werkstattSitePlugin]` to the config
   - Remove all `moduleLoaders` entries that point at `@warpgogol/site-kernel*` or old domain packages
   - Keep forge module loaders (forge is a separate npm package, unchanged)
-- Run `pnpm exec site-kernel run command.manifest.generate` to regenerate the command manifest
+- Run `pnpm exec werkstatt run command.manifest.generate` to regenerate the command manifest
 
 **Validation:**
 
@@ -336,7 +336,7 @@ scope:
   - `docs/source-markup.xml`
 - Update each file with new package names and CLI references
 - Regenerate `docs/PACKAGE_GRAPH.md` after package deletion
-- Run `pnpm exec site-kernel run command.manifest.generate` (or `werkstatt run`) to regenerate the command manifest
+- Run `pnpm exec werkstatt run command.manifest.generate` (or `werkstatt run`) to regenerate the command manifest
 
 **Validation:**
 

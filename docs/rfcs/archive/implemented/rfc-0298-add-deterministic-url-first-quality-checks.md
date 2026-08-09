@@ -73,7 +73,7 @@ Add deterministic checks that consume `SiteEvidenceGraph` and emit canonical dia
 The aggregate command:
 
 ```sh
-pnpm exec site-kernel run check.deterministic.run --run .check-warpgogol/runs/<runId> --json
+pnpm exec werkstatt run check.deterministic.run --run .check-warpgogol/runs/<runId> --json
 ```
 
 runs:

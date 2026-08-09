@@ -70,7 +70,7 @@ nonGoals:
   - "Partial golden snapshot updates at the block level — apply updates the entire route's golden entry when any change is accepted"
   - "Cross-language parity checking — same non-goal as RFC-0732"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:
@@ -163,18 +163,18 @@ This RFC amends RFC-0732. The amendment is strictly additive:
 
 ```sh
 # Step 1: Check for drift (existing, unchanged)
-pnpm exec site-kernel run content.regression.check --site warpgogol-com
+pnpm exec werkstatt run content.regression.check --site warpgogol-com
 # → exit 1, CREG-01 diagnostics
 
 # Step 2: Generate review manifest (NEW)
-pnpm exec site-kernel run content.regression.review.generate --site warpgogol-com
+pnpm exec werkstatt run content.regression.review.generate --site warpgogol-com
 # → writes missions/<missionId>/evidence/content-regression/review.yaml
 # → output includes: "Review manifest: missions/<missionId>/evidence/content-regression/review.yaml"
 
 # Step 3: Operator edits review.yaml — sets decision per change (accept/reject/fix)
 
 # Step 4: Apply decisions (NEW)
-pnpm exec site-kernel run content.regression.apply --site warpgogol-com \
+pnpm exec werkstatt run content.regression.apply --site warpgogol-com \
   --review missions/warpgogol-com-m000035/evidence/content-regression/review.yaml
 # → updates golden snapshot for accepted changes
 # → emits CREG-04 if rejected/fix decisions not yet reflected in workpiece content
@@ -182,11 +182,11 @@ pnpm exec site-kernel run content.regression.apply --site warpgogol-com \
 # Step 5: Agent applies fixes/reverts to source .md files based on review.yaml
 
 # Step 6: Re-run check (should pass after agent fixes)
-pnpm exec site-kernel run content.regression.check --site warpgogol-com
+pnpm exec werkstatt run content.regression.check --site warpgogol-com
 # → exit 0
 
 # Step 7: mission.close (no longer silently accepts drift)
-pnpm exec site-kernel run mission.close --mission warpgogol-com-m000035
+pnpm exec werkstatt run mission.close --mission warpgogol-com-m000035
 # → blocks with CREG-05 if drift exists and no review.yaml was processed
 ```
 
@@ -218,7 +218,7 @@ pnpm exec site-kernel run mission.close --mission warpgogol-com-m000035
 #   3. For "fix": set fixValue to the desired text
 #   4. For "accept": no further action — golden will be updated
 #   5. For "reject": agent must revert the source content to match golden
-#   6. Run: pnpm exec site-kernel run content.regression.apply --site warpgogol-com --review <this-file>
+#   6. Run: pnpm exec werkstatt run content.regression.apply --site warpgogol-com --review <this-file>
 #
 # Instructions for AI agent (copy to agent after operator fills decisions):
 #   - Read this file
@@ -446,13 +446,13 @@ The review.yaml contains enough context (route, blockId, field, golden/current v
 The fixHint in CREG-01 and CREG-02 diagnostics changes from:
 
 ```
-"Review the content diff. If intended, run: pnpm exec site-kernel run content.regression.snapshot.update --site <systemId>"
+"Review the content diff. If intended, run: pnpm exec werkstatt run content.regression.snapshot.update --site <systemId>"
 ```
 
 to:
 
 ```
-"Review the content diff. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>"
+"Review the content diff. Run: pnpm exec werkstatt run content.regression.review.generate --site <systemId>"
 ```
 
 This guides operators to the new review workflow instead of the atomic `snapshot.update`.
@@ -626,7 +626,7 @@ The review.yaml contains route, blockId, and field information, but not the sour
 - [x] `CREG-04` and `CREG-05` diagnostic rules registered in `core-infra.ts` (evidence: `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:516-525`)
 - [x] `DNA-63` entry verified in `docs/architecture-dna.md` with reference to this RFC (evidence: `docs/architecture-dna.md:267-269`)
 - [x] Unit tests: review generation, apply with all decisions, apply with stale review, mission.close CREG-05 block (evidence: `packages/os/site-kernel-checks/src/tests/content-regression.test.ts:414-659`, `pnpm --filter @warpgogol/site-kernel-checks run test` — 905 tests passed)
-- [x] `rfc.validate` passes on this file with zero errors (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0734 --json` — exit 0)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0734 --json` — exit 0)
 
 ## Implementation notes for agents
 

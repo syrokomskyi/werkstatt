@@ -71,7 +71,7 @@ nonGoals:
   - "Does not resolve owner decisions — that is RFC-0468"
   - "Does not define new page routes or section components — uses existing routes with new data source"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -246,7 +246,7 @@ The OS validation checks PBP content files against `pbpSchemaById` instead of `b
 Register a new OS command `pbp.cutover.check`:
 
 ```sh
-pnpm exec site-kernel run pbp.cutover.check --app warpgogol-com
+pnpm exec werkstatt run pbp.cutover.check --app warpgogol-com
 ```
 
 This command:
@@ -424,7 +424,7 @@ export interface PbpCutoverCheckResult {
 - [x] `PbpCutoverChecklist.ready === true` (evidence: cutover completed, legacy deleted in RFC-0471 — 2026-07-20)
 - [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @gogol/pbp build:check — 2026-07-20)
 - [x] `vitest run` passes for `packages/pbp/` (evidence: 12 files, 169 tests passed — 2026-07-20)
-- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec site-kernel run rfc.validate RFC-0469, 2026-07-20)
+- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec werkstatt run rfc.validate RFC-0469, 2026-07-20)
 
 ## Implementation notes for agents
 

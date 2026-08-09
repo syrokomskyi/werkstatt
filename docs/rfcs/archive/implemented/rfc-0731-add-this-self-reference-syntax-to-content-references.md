@@ -65,7 +65,7 @@ nonGoals:
   - "Does not add formatters or pipe syntax — that is RFC-0729"
   - "Does not remove or migrate the presentation field — that is RFC-0730"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -121,7 +121,7 @@ The content reference system gains a `this.` prefix for self-referencing fields 
 No new commands. The existing `content.references.validate` command is updated to recognize and validate `this.` references:
 
 ```sh
-pnpm exec site-kernel run content.references.validate --app warpgogol-com
+pnpm exec werkstatt run content.references.validate --app warpgogol-com
 ```
 
 Behavior is unchanged for absolute references. `this.` references are validated by expanding them through the file's own `collection.file` context and checking the resolved field path in the index.

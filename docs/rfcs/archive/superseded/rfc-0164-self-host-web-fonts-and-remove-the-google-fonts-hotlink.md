@@ -75,8 +75,8 @@ Fonts are self-hosted. A build step `fonts.generate` materializes the biome's fo
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run fonts.generate --app nicaragua-projekt
-pnpm exec site-kernel run fonts.selfhost.validate --all --json
+pnpm exec werkstatt run fonts.generate --app nicaragua-projekt
+pnpm exec werkstatt run fonts.selfhost.validate --all --json
 ```
 
 ### TypeScript contracts

@@ -62,7 +62,7 @@ nonGoals:
   - "_redirects 410 Gone handling (covered by RFC-0589)"
   - "dist/client/ detection and behaviorSnapshot wrapper unwrapping — already fixed in commit 89085ed"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -124,7 +124,7 @@ No new commands. Changed commands:
 
 ```sh
 # behavior.snapshot.capture now excludes redirected routes from the snapshot
-pnpm exec site-kernel run behavior.snapshot.capture --dist <html-dir> --system <id> --build-kind <readable|production>
+pnpm exec werkstatt run behavior.snapshot.capture --dist <html-dir> --system <id> --build-kind <readable|production>
 ```
 
 ### TypeScript contracts

@@ -76,7 +76,7 @@ The Programmatic Surface is defined as a **dual surface**: every page the engine
 
 ```sh
 # unchanged command, extended to enumerate generated entries
-pnpm exec site-kernel run surface.generate --app warpgogol-com
+pnpm exec werkstatt run surface.generate --app warpgogol-com
 ```
 
 ### TypeScript contracts

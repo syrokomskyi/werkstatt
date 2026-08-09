@@ -370,7 +370,7 @@ The route registry stores an `aiAgentSlug` flag on `LocalizedRouteEntry` (set by
 
 ```sh
 # Validate AI-agent profile pages.
-pnpm exec site-kernel run participant.ai-agent.validate --site warpgogol-com --json
+pnpm exec werkstatt run participant.ai-agent.validate --site warpgogol-com --json
 ```
 
 ### TypeScript contracts

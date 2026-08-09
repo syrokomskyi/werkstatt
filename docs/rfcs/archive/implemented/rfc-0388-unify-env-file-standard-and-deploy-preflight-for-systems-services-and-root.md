@@ -139,11 +139,11 @@ A new command `deploy.preflight` runs before every `wrangler deploy` and validat
 
 ```sh
 # Sites
-pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env main
-pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env alt
+pnpm exec werkstatt run deploy.preflight --site warpgogol-com --env main
+pnpm exec werkstatt run deploy.preflight --site warpgogol-com --env alt
 
 # Services
-pnpm exec site-kernel run deploy.preflight --service lagebild-sync-worker
+pnpm exec werkstatt run deploy.preflight --service lagebild-sync-worker
 ```
 
 Checks:
@@ -219,26 +219,26 @@ The existing `lagebild.worker.deploy` command (in `packages/os/site-kernel/src/l
 
 ```sh
 # Validate .env.example presence, comments, how-to-obtain, and README reference
-pnpm exec site-kernel run env.contract.validate
+pnpm exec werkstatt run env.contract.validate
 
 # Check/create .env (local) for all projects
-pnpm exec site-kernel run env.local.check
+pnpm exec werkstatt run env.local.check
 
 # Check/create .env.alt (sites only)
-pnpm exec site-kernel run env.alt.check
+pnpm exec werkstatt run env.alt.check
 
 # Check/create .env.main (sites only)
-pnpm exec site-kernel run env.main.check
+pnpm exec werkstatt run env.main.check
 
 # Validate deploy scripts in systems/*/package.json and services/*/package.json
-pnpm exec site-kernel run deploy.scripts.validate
+pnpm exec werkstatt run deploy.scripts.validate
 
 # Pre-deploy gate (sites)
-pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env main
-pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env alt
+pnpm exec werkstatt run deploy.preflight --site warpgogol-com --env main
+pnpm exec werkstatt run deploy.preflight --site warpgogol-com --env alt
 
 # Pre-deploy gate (services)
-pnpm exec site-kernel run deploy.preflight --service lagebild-sync-worker
+pnpm exec werkstatt run deploy.preflight --service lagebild-sync-worker
 ```
 
 ### TypeScript contracts

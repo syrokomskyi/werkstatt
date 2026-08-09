@@ -101,8 +101,8 @@ The v1 catalog ships exactly two records:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.capability.validate --app warpgogol-com --json
-pnpm exec site-kernel run agent.capability.validate --all --json
+pnpm exec werkstatt run agent.capability.validate --app warpgogol-com --json
+pnpm exec werkstatt run agent.capability.validate --all --json
 ```
 
 App-scoped (workspace catalog checks run once per invocation regardless of app). Registered in `APPS_CHECK_PIPELINE`.

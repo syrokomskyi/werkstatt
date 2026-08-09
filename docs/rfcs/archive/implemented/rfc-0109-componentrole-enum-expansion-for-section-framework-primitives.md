@@ -110,7 +110,7 @@ See `## CLI surface`, `## TypeScript contracts`, and `## Failure modes` above fo
 No new commands. The change is purely a closed-enum amendment:
 
 ```sh
-pnpm exec site-kernel run manifest.contract.validate
+pnpm exec werkstatt run manifest.contract.validate
 ```
 
 continues to validate component manifests; it accepts the seven new values and continues to reject anything outside the enum.

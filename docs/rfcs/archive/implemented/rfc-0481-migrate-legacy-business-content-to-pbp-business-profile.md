@@ -146,7 +146,7 @@ This RFC explicitly does NOT propose coexistence as a design — it acknowledges
 No new command. The migrator is invoked by the existing `mission.migrate` command (RFC-0479):
 
 ```sh
-pnpm exec site-kernel run mission.migrate --mission <mission-id>
+pnpm exec werkstatt run mission.migrate --mission <mission-id>
 ```
 
 The migrator is registered in the registry and automatically selected by `migratorsToApply()` when `rfc-0481` is not in the system's `migratorCursor`.
@@ -254,7 +254,7 @@ The migrator checks for the existence of `business-profile/{lang}/business.md` w
 - [x] `packages/os/site-kernel-handoff/src/migrators/registry.ts` includes `rfc0481Migrator` in `migratorRegistry` (evidence: packages/os/site-kernel-handoff/src/migrators/registry.ts:21, `migratorRegistry: readonly Migrator[] = [rfc0479Migrator, rfc0481Migrator]`)
 - [x] `pnpm --filter @gogol/site-kernel-handoff build:check` passes (tsc --noEmit) (evidence: `pnpm --filter @gogol/site-kernel-handoff build:check` exit 0, 2026-07-21)
 - [x] `pnpm --filter @gogol/site-kernel-handoff test` passes (including new PBT + snapshot tests) (evidence: 77/77 tests pass, including rfc-0481.pbt.test.ts and rfc-0481.snapshot.test.ts)
-- [x] `pnpm exec site-kernel run migrator.registry.validate` passes with `rfc-0481` registered (evidence: `migrator.registry.validate` exit 0, "2 migrator(s) in registry — no violations")
+- [x] `pnpm exec werkstatt run migrator.registry.validate` passes with `rfc-0481` registered (evidence: `migrator.registry.validate` exit 0, "2 migrator(s) in registry — no violations")
 - [x] PBT test proves idempotency: `f(f(x)) == f(x)` for random `company.md` frontmatter (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0481.pbt.test.ts:73, `rfc-0481 migrator is idempotent: f(f(x)) == f(x) for random company.md`)
 - [x] Snapshot test matches expected `business.md` output from real `business/de/company.md` (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0481.snapshot.test.ts:89, `snapshot: rfc-0481 creates business-profile/de/business.md from real company.md`)
 - [x] `mission.migrate` on `warpgogol-com` creates `business-profile/de/business.md` and `business-profile/uk/business.md` (migrator `rfc-0481`) (evidence: `mission.migrate --mission warpgogol-com-m000009` exit 0, "created business-profile/de/business.md" + "created business-profile/uk/business.md")

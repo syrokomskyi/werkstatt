@@ -41,7 +41,7 @@ None — the lock schema and handler implementation are already applied (commit 
 - `pnpm --filter @warpgogol/forge test` — must pass with new assertion
 - `pnpm --filter @warpgogol/forge build:check` — must pass
 - `pnpm --filter @warpgogol/ontology build:check` — must pass (schema unchanged, already has `.optional()`)
-- `pnpm exec site-kernel run rfc.validate --id RFC-0616` — must pass
+- `pnpm exec werkstatt run rfc.validate --id RFC-0616` — must pass
 
 ## 3. Step sequence
 
@@ -93,7 +93,7 @@ None — the lock schema and handler implementation are already applied (commit 
 - Run `pnpm --filter @warpgogol/forge test`
 - Run `pnpm --filter @warpgogol/forge build:check`
 - Run `pnpm --filter @warpgogol/ontology build:check`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0616`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0616`
 
 **Validation:**
 
@@ -115,7 +115,7 @@ None — the lock schema and handler implementation are already applied (commit 
   - `[x] packages/forge/AGENTS.md documents the re-entrant lock behavior (evidence: packages/forge/AGENTS.md)`
   - `[x] Test asserts that re-entrant acquire preserves the original operationId and command (evidence: packages/forge/src/tests/werkstatt-lock.test.ts:<line>)`
 - Commit the acceptance criteria update.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0616 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0616 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 - Commit the stamp transition.
 
 **Validation:**
@@ -154,7 +154,7 @@ None — the lock schema and handler implementation are already applied (commit 
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0616`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0616`
 - `pnpm --filter @warpgogol/forge test`
 - `pnpm --filter @warpgogol/forge build:check`
 - `pnpm --filter @warpgogol/ontology build:check`
@@ -176,4 +176,4 @@ None — the lock schema and handler implementation are already applied (commit 
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0616 --reason "..." --invariant "DNA-51"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0616 --reason "..." --invariant "DNA-51"` instead of working around it.

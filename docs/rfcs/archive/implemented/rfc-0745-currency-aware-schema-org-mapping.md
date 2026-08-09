@@ -213,7 +213,7 @@ N/A — constrains existing Schema.org output.
 - [x] Offerings without `pricing` field do not trigger false positives (evidence: extractCanonicalPrice returns undefined when no pricing, validateSchemaOrgPrices skips offers without price field, compiler-pipeline.test.ts "Schema.org projection omits price for offering without pricing" and "validateSchemaOrgPrices skips offers without price field")
 - [x] `tsc --noEmit` passes (evidence: pnpm --filter @warpgogol/pbp run build:check and pnpm --filter @warpgogol/share run build:check both exit 0)
 - [x] `vitest run` passes (evidence: 16 compiler-pipeline tests pass, 3 organization-jsonld tests pass, 302 share tests pass)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0745 --json returns ok: true)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0745 --json returns ok: true)
 
 ## Implementation notes for agents
 

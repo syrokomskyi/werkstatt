@@ -60,7 +60,7 @@ scope:
 - `pnpm --filter @warpgogol/share build:check`
 - `pnpm --filter @warpgogol/ui build:check`
 - `pnpm --filter @warpgogol/faq build:check`
-- `pnpm exec site-kernel run rfc.validate RFC-0567 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0567 --json`
 
 ## 3. Step sequence
 
@@ -112,7 +112,7 @@ scope:
 
 - Edit `packages/ontology/archetypes/sections/hero-decision-card.yaml`: add `ctaNote: z.string().min(1).optional()` to the `propsSchema.shape` Zod string (after `tagline`)
 - Edit `packages/ui/src/sections/hero-decision-card/hero-decision-card-section.manifest.yaml`: add `ctaNote` to `propsSchema.properties` (after `tagline`)
-- Run `pnpm exec site-kernel run props.types.generate` to regenerate `hero-decision-card-section.types.generated.ts`
+- Run `pnpm exec werkstatt run props.types.generate` to regenerate `hero-decision-card-section.types.generated.ts`
 
 **Validation:**
 
@@ -207,7 +207,7 @@ export async function getFaqEntriesByTags(lang: string, tags: string[]): Promise
 - Run `pnpm --filter @warpgogol/share build:check`
 - Run `pnpm --filter @warpgogol/ui build:check`
 - Run `pnpm --filter @warpgogol/faq build:check`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0567 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0567 --json`
 - Verify existing content passes `page.block.validate` without changes (all new props are optional)
 
 **Validation:**
@@ -228,16 +228,16 @@ export async function getFaqEntriesByTags(lang: string, tags: string[]): Promise
 **Agent actions:**
 
 - Verify `packages/faq/AGENTS.md` is updated (Step 6).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no new commands in this RFC — likely not needed).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no new commands in this RFC — likely not needed).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0567 --implementation-commit <sha>` (dry-run first, then without `--dry-run`).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0567 --implementation-commit <sha>` (dry-run first, then without `--dry-run`).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0567`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0567`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -248,7 +248,7 @@ export async function getFaqEntriesByTags(lang: string, tags: string[]): Promise
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0567`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0567`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/ui run build:check`
@@ -270,4 +270,4 @@ export async function getFaqEntriesByTags(lang: string, tags: string[]): Promise
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-17 or DNA-24, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0567 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-17 or DNA-24, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0567 --reason "..." --invariant "DNA-N"` instead of working around it.

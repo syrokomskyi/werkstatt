@@ -381,8 +381,8 @@ The `people` collection name and file paths (`src/content/people/{lang}/`) are u
 
 ```sh
 # Validate the Participant contract for one site (or all). Joins apps-check.run.
-pnpm exec site-kernel run participant.validate --site warpgogol-com --json
-pnpm exec site-kernel run participant.validate --all
+pnpm exec werkstatt run participant.validate --site warpgogol-com --json
+pnpm exec werkstatt run participant.validate --all
 ```
 
 `people.validate` is renamed to `participant.validate`. The old command name is removed (no backward compatibility). `participant.validate` joins `SITES_CHECK_AUTHOR_PIPELINE` (the same pipeline step where `people.validate` currently runs, between `article.depth.validate` and `faq.validate`).

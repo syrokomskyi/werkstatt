@@ -189,8 +189,8 @@ This includes `.yaml` files in `packages/`, `missions/`, `systems/`, `docs/`, `s
 **CLI invocations:**
 
 ```sh
-pnpm exec site-kernel run yaml.parse.validate
-pnpm exec site-kernel run yaml.parse.validate --json
+pnpm exec werkstatt run yaml.parse.validate
+pnpm exec werkstatt run yaml.parse.validate --json
 ```
 
 **`--json` output shape:**
@@ -310,7 +310,7 @@ Prettier normalizes quoting when run (`pnpm format`), but it does not **gate** �
 ## Rollout
 
 - **Default behavior**: `yaml.parse.validate` runs as `error` severity from the first deployment. No warning-mode transition period — the ecosystem is forward-only.
-- **Existing files**: Before adding `yaml.parse.validate` to pipelines, run it once manually (`pnpm exec site-kernel run yaml.parse.validate`) to surface any existing parse errors. Fix all errors in a separate commit, then add the pipeline steps.
+- **Existing files**: Before adding `yaml.parse.validate` to pipelines, run it once manually (`pnpm exec werkstatt run yaml.parse.validate`) to surface any existing parse errors. Fix all errors in a separate commit, then add the pipeline steps.
 - **New files**: All new `.yaml` files must parse cleanly from the moment the pipeline step is active. Agents authoring YAML should follow the quoting policy in `docs/policies/generated-file-governance.md`.
 - **`eslint-plugin-yml` auto-fix**: Run `pnpm lint:yaml --fix` in a **separate commit** before enabling the `error` severity in CI. This isolates the cosmetic quote-removal diff from functional changes. After the auto-fix commit, `pnpm lint:yaml` should pass with zero violations.
 - **CI integration**: `lint:yaml` runs as part of the existing CI lint step alongside `lint:packages`.
@@ -319,8 +319,8 @@ Prettier normalizes quoting when run (`pnpm format`), but it does not **gate** �
 
 - [x] `docs/policies/generated-file-governance.md` has a "YAML quoting policy (RFC-0493)" section with the decision algorithm and quick reference table. (evidence: docs/policies/generated-file-governance.md:91-148, `grep -n "YAML quoting policy" docs/policies/generated-file-governance.md`)
 - [x] Root `AGENTS.md` references the YAML quoting policy section. (evidence: AGENTS.md:209, `grep -n "RFC-0493" AGENTS.md`)
-- [x] `pnpm exec site-kernel run yaml.parse.validate` exits 0 on the current repository (all existing `.yaml` files parse, no duplicate keys). (evidence: `pnpm exec site-kernel run yaml.parse.validate` → 0 error(s), 0 warning(s))
-- [x] `pnpm exec site-kernel run yaml.parse.validate --json` returns the documented output shape with `diagnostics` array and `summary` object. (evidence: `pnpm exec site-kernel run yaml.parse.validate --json` → data.diagnostics=[], data.summary={error:0,warning:0,info:0})
+- [x] `pnpm exec werkstatt run yaml.parse.validate` exits 0 on the current repository (all existing `.yaml` files parse, no duplicate keys). (evidence: `pnpm exec werkstatt run yaml.parse.validate` → 0 error(s), 0 warning(s))
+- [x] `pnpm exec werkstatt run yaml.parse.validate --json` returns the documented output shape with `diagnostics` array and `summary` object. (evidence: `pnpm exec werkstatt run yaml.parse.validate --json` → data.diagnostics=[], data.summary={error:0,warning:0,info:0})
 - [x] `yaml.parse.validate` is registered in `command-tables/infra-contracts.ts` with `scope: "workspace"` and `reads: ["**/*.yaml"]`. (evidence: packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:296-304)
 - [x] `YAML-PARSE-01` and `YAML-PARSE-02` are registered in `diagnostics/rules/core-infra.ts`. (evidence: packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:492-502)
 - [x] `{ command: "yaml.parse.validate" }` is in `SITES_BUILD_PREPARE_PIPELINE` after `yaml.contract.lint`. (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:19-20)
@@ -329,14 +329,14 @@ Prettier normalizes quoting when run (`pnpm format`), but it does not **gate** �
 - [x] `eslint-plugin-yml` is in root `package.json` `devDependencies`. (evidence: package.json:42, `pnpm list eslint-plugin-yml` → 1.19.1)
 - [x] `eslint.config.js` has the YAML config block with `yml/plain-scalar: ["error", "always"]`. (evidence: eslint.config.js:50-57, uses flat/base spread pattern with languageOptions.parser — `language: "yml/yaml"` was replaced by flat/base spread which provides the parser automatically)
 - [x] `pnpm lint:yaml` exits 0 after auto-fix. (evidence: `pnpm lint:yaml` → exit 0, zero violations)
-- [x] RFC-0376 frontmatter `amendedBy` includes `RFC-0493`. (evidence: docs/rfcs/archive/implemented/rfc-0376-migrate-generated-artifacts-and-project-configs-from-json-to-yaml.md:30-31, `pnpm exec site-kernel run rfc.validate RFC-0493` → 0 violations)
+- [x] RFC-0376 frontmatter `amendedBy` includes `RFC-0493`. (evidence: docs/rfcs/archive/implemented/rfc-0376-migrate-generated-artifacts-and-project-configs-from-json-to-yaml.md:30-31, `pnpm exec werkstatt run rfc.validate RFC-0493` → 0 violations)
 
 ## Implementation notes for agents
 
 - **When authoring YAML**: Follow the quoting policy decision algorithm (plain → double → never single). Use `yaml.stringify()` for generated YAML, not hand-composed strings.
 - **When `yaml.parse.validate` fails**: Read the diagnostic `message` and `fixHint`. Fix the syntax error or duplicate key in the offending file. Do not suppress or skip the validation.
 - **When `eslint-plugin-yml` fails**: Run `pnpm lint:yaml --fix` to auto-remove unnecessary quotes. Then run `pnpm format` to normalize remaining style. Commit the cosmetic fix separately from functional changes.
-- **When adding a new `.yaml` file**: Ensure it parses by running `pnpm exec site-kernel run yaml.parse.validate` locally before committing.
+- **When adding a new `.yaml` file**: Ensure it parses by running `pnpm exec werkstatt run yaml.parse.validate` locally before committing.
 - **Generated YAML files**: Files with the `GENERATED` marker are exempt from manual quoting fixes — fix the generator's `yaml.stringify()` call instead, then regenerate.
 - **Do not add `yaml.contract.lint` to `PACKAGES_CHECK_PIPELINE`** — it is not there currently and this RFC does not add it. Only `yaml.parse.validate` is added to `PACKAGES_CHECK_PIPELINE`.
 
@@ -371,7 +371,7 @@ Prettier normalizes quoting when run (`pnpm format`), but it does not **gate** �
 2. `pnpm --filter @gogol/site-kernel-checks build:check` — pipeline passes with new step.
 3. `pnpm lint:yaml` — zero violations after auto-fix.
 4. `pnpm format:check` — zero formatting drift.
-5. `pnpm exec site-kernel run yaml.parse.validate` — zero parse errors.
+5. `pnpm exec werkstatt run yaml.parse.validate` — zero parse errors.
 
 ## Risks
 

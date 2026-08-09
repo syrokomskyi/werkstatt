@@ -93,9 +93,9 @@ The commands are workspace-scoped and belong in `@gogol/site-kernel-checks`. Gen
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ecosystem.manifest.generate
-pnpm exec site-kernel run ecosystem.manifest.validate --json
-pnpm exec site-kernel run maintenance.debt.report --json
+pnpm exec werkstatt run ecosystem.manifest.generate
+pnpm exec werkstatt run ecosystem.manifest.validate --json
+pnpm exec werkstatt run maintenance.debt.report --json
 ```
 
 All commands are workspace-scoped. `ecosystem.manifest.generate` mutates `docs/ecosystem.generated.json`; the validators/reports are read-only.

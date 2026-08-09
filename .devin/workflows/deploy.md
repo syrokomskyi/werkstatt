@@ -24,7 +24,7 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
 Start a local dev server for manual verification:
 
 ```sh
-pnpm exec site-kernel run mission.preview --mission <missionId> --port 4321
+pnpm exec werkstatt run mission.preview --mission <missionId> --port 4321
 ```
 
 Open the site in the browser and verify the changes visually.
@@ -42,13 +42,13 @@ pkill -f "astro dev"
 For a workpiece (active mission):
 
 ```sh
-pnpm exec site-kernel run leitstand.dev-deploy --site <siteId>
+pnpm exec werkstatt run leitstand.dev-deploy --site <siteId>
 ```
 
 For an existing release (no active mission required):
 
 ```sh
-pnpm exec site-kernel run leitstand.dev-deploy --site <siteId> --release <releaseId>
+pnpm exec werkstatt run leitstand.dev-deploy --site <siteId> --release <releaseId>
 ```
 
 Review the Axiom findings in the output. If there are blocking findings, fix them before proceeding.
@@ -58,7 +58,7 @@ Review the Axiom findings in the output. If there are blocking findings, fix the
 `leitstand.propagate` deploys a verified release to the alt channel. It requires Axiom evidence from dev-deploy (commitSha + missionId match).
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate --release <releaseId>
+pnpm exec werkstatt run leitstand.propagate --release <releaseId>
 ```
 
 The site is now live on the alt domain. The operator verifies it before proceeding to Main.
@@ -70,7 +70,7 @@ The site is now live on the alt domain. The operator verifies it before proceedi
 **Only after Alt is verified by the operator.**
 
 ```sh
-pnpm exec site-kernel run leitstand.promote --release <releaseId>
+pnpm exec werkstatt run leitstand.promote --release <releaseId>
 ```
 
 ## Forbidden actions
@@ -93,7 +93,7 @@ The file is gitignored but may still be tracked. `mission.close` runs `mission.v
 
 ```sh
 git -C missions/<missionId>/workpiece rm --cached src/derived-prices.generated.json
-pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "fix: untrack derived-prices.generated.json"
+pnpm exec werkstatt run mission.git.commit --mission <missionId> --message "fix: untrack derived-prices.generated.json"
 ```
 
 Then re-run `mission.close`.
@@ -113,7 +113,7 @@ Commit all generated artifacts via `mission.git.commit`, then re-run `mission.cl
 If the mission is already closed, use `--release` to deploy an existing release:
 
 ```sh
-pnpm exec site-kernel run leitstand.dev-deploy --site <siteId> --release <releaseId>
+pnpm exec werkstatt run leitstand.dev-deploy --site <siteId> --release <releaseId>
 ```
 
 ### `leitstand.propagate` fails with "must be in state 'ready'"
@@ -121,7 +121,7 @@ pnpm exec site-kernel run leitstand.dev-deploy --site <siteId> --release <releas
 The release must be in `ready` state. Run `release.prepare` first:
 
 ```sh
-pnpm exec site-kernel run release.prepare --site <siteId> --mission <missionId>
+pnpm exec werkstatt run release.prepare --site <siteId> --mission <missionId>
 ```
 
 ### `leitstand.propagate` fails with "no Axiom evidence found"

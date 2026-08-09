@@ -184,10 +184,10 @@ Promotion is slow and earned; demotion is instant and cheap. This asymmetry is t
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run autonomy.level.report   --app warpgogol-com --module pseo --json
-pnpm exec site-kernel run autonomy.level.validate  --app warpgogol-com --json
-pnpm exec site-kernel run autonomy.promote --app warpgogol-com --scope pseo/narrative/de --to L2
-pnpm exec site-kernel run autonomy.demote  --app warpgogol-com --scope pseo/claims/de   --to L0 --reason "claims defect"
+pnpm exec werkstatt run autonomy.level.report   --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run autonomy.level.validate  --app warpgogol-com --json
+pnpm exec werkstatt run autonomy.promote --app warpgogol-com --scope pseo/narrative/de --to L2
+pnpm exec werkstatt run autonomy.demote  --app warpgogol-com --scope pseo/claims/de   --to L0 --reason "claims defect"
 ```
 
 `autonomy.promote` is itself governed: it fails unless the calibration evidence meets the bar for the requested level, so even the act of granting autonomy is not a matter of asserting it.

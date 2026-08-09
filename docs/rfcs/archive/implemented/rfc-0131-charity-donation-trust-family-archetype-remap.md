@@ -76,7 +76,7 @@ Remap each placeholder to the existing archetype that already covers the same se
 ## Acceptance criteria
 
 - [x] `charity-donation-trust/family.yaml requiredSectionArchetypes[]` lists `hero`, `impact`, `donation-use`, `final-cta`. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run family.contract.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run family.contract.validate` exits zero. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

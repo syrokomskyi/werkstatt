@@ -124,7 +124,7 @@ No configuration or data files are changed. The `spec.materialize` fix is a code
 **Validation:**
 
 - `pnpm --filter @wgogol/forge build:check` passes
-- `pnpm exec site-kernel run rfc.next-id --json` returns valid JSON with `nextId`, `nextNumber`, `maxExistingId`, `scannedFiles`
+- `pnpm exec werkstatt run rfc.next-id --json` returns valid JSON with `nextId`, `nextNumber`, `maxExistingId`, `scannedFiles`
 
 **Completion criterion:** `rfc.next-id` command is registered and callable via `site-kernel run rfc.next-id`
 
@@ -174,7 +174,7 @@ No configuration or data files are changed. The `spec.materialize` fix is a code
 **Validation:**
 
 - `pnpm --filter @wgogol/forge build:check` passes
-- `pnpm exec site-kernel run rfc.validate --json` passes (no existing mismatches or duplicates)
+- `pnpm exec werkstatt run rfc.validate --json` passes (no existing mismatches or duplicates)
 
 **Completion criterion:** V-31 is implemented and `rfc.validate` passes on the existing tree
 
@@ -238,9 +238,9 @@ No configuration or data files are changed. The `spec.materialize` fix is a code
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate`
-- Run `pnpm exec site-kernel run docs.commands.generate`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate`
+- Run `pnpm exec werkstatt run command.manifest.generate`
+- Run `pnpm exec werkstatt run docs.commands.generate`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate`
 
 **Validation:**
 
@@ -260,11 +260,11 @@ No configuration or data files are changed. The `spec.materialize` fix is a code
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0491 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0491 --json`
 - Run `pnpm --filter @wgogol/forge build:check`
 - Run `pnpm --filter @wgogol/forge test`
-- Run `pnpm exec site-kernel run rfc.next-id --json` and verify output
-- Run `pnpm exec site-kernel run rfc.validate --json` (full tree) to confirm V-31 doesn't break existing RFCs
+- Run `pnpm exec werkstatt run rfc.next-id --json` and verify output
+- Run `pnpm exec werkstatt run rfc.validate --json` (full tree) to confirm V-31 doesn't break existing RFCs
 
 **Validation:**
 
@@ -282,7 +282,7 @@ No configuration or data files are changed. The `spec.materialize` fix is a code
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0491 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0491 --implementation-commit <sha>`
 - The implementation commit is the commit that contains the code changes (Steps 1–6)
 - The stamp commit is separate (RFC-0476)
 
@@ -298,11 +298,11 @@ No configuration or data files are changed. The `spec.materialize` fix is a code
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0491 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0491 --json`
 - `pnpm --filter @wgogol/forge build:check`
 - `pnpm --filter @wgogol/forge test`
-- `pnpm exec site-kernel run rfc.next-id --json` (manual verification of output shape)
-- `pnpm exec site-kernel run rfc.validate --json` (full tree — V-31 must not break existing RFCs)
+- `pnpm exec werkstatt run rfc.next-id --json` (manual verification of output shape)
+- `pnpm exec werkstatt run rfc.validate --json` (full tree — V-31 must not break existing RFCs)
 
 ### 4.2 Evidence artifacts
 

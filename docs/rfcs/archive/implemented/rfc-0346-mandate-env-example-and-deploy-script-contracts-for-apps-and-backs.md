@@ -152,20 +152,20 @@ Every `apps/*/package.json` MUST contain these six scripts (matching the onboard
 
 ```sh
 # Validate .env.example presence, comments, and README reference across all apps and backs
-pnpm exec site-kernel run env.contract.validate --all
+pnpm exec werkstatt run env.contract.validate --all
 
 # Validate a single project
-pnpm exec site-kernel run env.contract.validate --app warpgogol-com
-pnpm exec site-kernel run env.contract.validate --back cf-analytics-poller
+pnpm exec werkstatt run env.contract.validate --app warpgogol-com
+pnpm exec werkstatt run env.contract.validate --back cf-analytics-poller
 
 # Check/create .env (local) for all projects that have .env.example
-pnpm exec site-kernel run env.local.check --all
+pnpm exec werkstatt run env.local.check --all
 
 # Check/create .env.production (deploy) for all apps that have .env.example
-pnpm exec site-kernel run env.production.check --all
+pnpm exec werkstatt run env.production.check --all
 
 # Validate deploy scripts in apps/*/package.json
-pnpm exec site-kernel run deploy.scripts.validate --all
+pnpm exec werkstatt run deploy.scripts.validate --all
 ```
 
 All four commands are workspace-scoped (they iterate `apps/*` and/or `backs/*`). They support `--all` and per-project targeting via `--app <id>` or `--back <id>`.

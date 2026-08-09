@@ -77,8 +77,8 @@ The shared `BaseLayout` gains a `<SocialMeta>` partial that emits Open Graph and
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run seo.meta.validate --app nicaragua-projekt
-pnpm exec site-kernel run seo.meta.validate --all --json
+pnpm exec werkstatt run seo.meta.validate --app nicaragua-projekt
+pnpm exec werkstatt run seo.meta.validate --all --json
 ```
 
 ### TypeScript contracts

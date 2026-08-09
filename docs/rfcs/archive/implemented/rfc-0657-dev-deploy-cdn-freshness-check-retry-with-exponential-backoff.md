@@ -64,7 +64,7 @@ nonGoals:
   - Making retry constants configurable per-site — hardcoded constants are sufficient for a dev-only command
   - Interacting with --force-build (RFC-0653) — the retry loop runs after build, --force-build only affects build-skip cache
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -198,7 +198,7 @@ No output format change. The `FreshnessResult` in `--json` output gains an `atte
 - [x] `leitstand.dev-deploy` exits 1 with clear error when all attempts fail (evidence: test "RFC-0657: all-attempts-fail with HTTP 404" — `exitCode === 1`, `freshness.attempts === 5`; test "RFC-0649: hash mismatch" — `exitCode === 1`, `freshness.attempts === 5`)
 - [x] `null` adapter skips freshness check (unchanged) (evidence: test "RFC-0649: null adapter skips purge and freshness check" — `freshness.attempts === 0`, `mockFetch not called`)
 - [x] Unit tests cover: first-attempt success, retry-then-success, all-attempts-fail, null adapter skip (evidence: `leitstand-0649-freshness.test.ts` — 8 tests, all passing)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0657 --json` — exit 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0657 --json` — exit 0)
 
 ## Implementation notes for agents
 

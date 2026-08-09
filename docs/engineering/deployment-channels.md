@@ -158,4 +158,4 @@ rtk cp .env.example .env
 `mission.check` auto-generates `report.html` in `missions/<mission>/evidence/axiom/` after writing evidence files. If it's missing:
 
 1. Check the `mission.check` output for a `Report generation failed` warning
-2. Run `pnpm exec site-kernel run axiom.report --mission <missionId>` manually as a fallback
+2. Run `pnpm exec werkstatt run axiom.report --mission <missionId>` manually as a fallback

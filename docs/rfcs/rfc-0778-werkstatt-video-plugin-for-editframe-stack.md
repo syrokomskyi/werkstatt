@@ -66,7 +66,7 @@ nonGoals:
   - "No additional deploy adapters beyond local-render — cloud storage adapters (R2 direct, S3 direct) are deferred to a future RFC if needed"
   - "No forge profile invariant changes — the forge editframe.yaml VIDEO-01..09 invariants remain unchanged; the plugin's WV-01..09 are distinct"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

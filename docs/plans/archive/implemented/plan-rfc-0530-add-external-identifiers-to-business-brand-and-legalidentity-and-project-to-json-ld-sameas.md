@@ -60,8 +60,8 @@ scope:
 - `pnpm --filter @gogol/pbp run build:check` — typecheck
 - `pnpm --filter @gogol/pbp run test` — unit tests
 - `pnpm --filter @gogol/ontology run build:check` — typecheck
-- `pnpm exec site-kernel run surface.contract.validate` — C-contract validation
-- `pnpm exec site-kernel run rfc.validate RFC-0530 --json` — RFC validation
+- `pnpm exec werkstatt run surface.contract.validate` — C-contract validation
+- `pnpm exec werkstatt run rfc.validate RFC-0530 --json` — RFC validation
 
 ## 3. Step sequence
 
@@ -143,7 +143,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` passes
-- `pnpm exec site-kernel run surface.contract.validate` passes
+- `pnpm exec werkstatt run surface.contract.validate` passes
 
 **Completion criterion:** `jsonld-types.yaml` declares `Organization` type with `sameAs` and all emitted properties in `optional`; `surface.contract.validate` exits 0.
 
@@ -202,10 +202,10 @@ scope:
 - Run `pnpm --filter @gogol/pbp run build:check`
 - Run `pnpm --filter @gogol/pbp run test`
 - Run `pnpm --filter @gogol/ontology run build:check`
-- Run `pnpm exec site-kernel run surface.contract.validate`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0530 --json`
+- Run `pnpm exec werkstatt run surface.contract.validate`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0530 --json`
 - Check off each acceptance criterion in the RFC with inline `(evidence: ...)` annotation
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0530 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0530 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -220,11 +220,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0530 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0530 --json`
 - `pnpm --filter @gogol/pbp run build:check`
 - `pnpm --filter @gogol/pbp run test`
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run surface.contract.validate`
+- `pnpm exec werkstatt run surface.contract.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -242,5 +242,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0530 --reason "..." --invariant "DNA-16"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0530 --reason "..." --invariant "DNA-16"` instead of working around it (RFC-0334).
 - If `surface.contract.validate` fails after adding the `Organization` type, check that the `optional` list matches all properties emitted by `buildOrganizationNode` — a missing property indicates the contract is incomplete, not that the RFC is wrong.

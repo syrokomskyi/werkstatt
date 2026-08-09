@@ -89,7 +89,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run blueprint.validate` (if command exists) or verify `loadSurfaceBlueprints` parses the new YAML without errors
+- `pnpm exec werkstatt run blueprint.validate` (if command exists) or verify `loadSurfaceBlueprints` parses the new YAML without errors
 - `pnpm --filter @gogol/surface run build:check`
 
 **Completion criterion:** `website-service.yaml` exists and is parsed by `parseBlueprint` without errors.
@@ -144,7 +144,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** `url-schema.yaml` contains the new route pattern with `generated: true`; `surface.contract.validate` passes.
 
@@ -249,7 +249,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run command.registry.validate` (if command exists)
+- `pnpm exec werkstatt run command.registry.validate` (if command exists)
 
 **Completion criterion:** `surface.service.validate` is registered in command tables and appears in the `sites-check-author` pipeline after `surface.industry.validate`.
 
@@ -277,7 +277,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** `rfc-0496` migrator is registered; `migrator.registry.validate` passes.
 
@@ -296,7 +296,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.generate --site warpgogol-com` (if mission workpiece is available)
+- `pnpm exec werkstatt run surface.generate --site warpgogol-com` (if mission workpiece is available)
 - Verify `src/surface.generated.yaml` contains `website-service` routes (empty if no service records exist)
 
 **Completion criterion:** `system.md` declares `website-service` in `surface.blueprints`; `surface.generate` processes the new blueprint.
@@ -315,12 +315,12 @@ scope:
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add `surface.service.validate` to the check commands table and the module table
 - Update `docs/requirements.xml` if it contains surface structure rules — add `website-service` surface
 - Update `docs/verification-plan.xml` if it contains surface verification rules — add `surface.service.validate`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
 
 **Validation:**
 
 - `git diff` — verify all scope.docs files are either updated or documented as not-applicable
-- `pnpm exec site-kernel run rfc.validate --id RFC-0496`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0496`
 
 **Completion criterion:** All documentation artifacts in scope are updated; `rfc.validate` passes.
 
@@ -365,12 +365,12 @@ scope:
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0496`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0496`
 - `pnpm --filter @gogol/surface run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` (if mission workpiece available)
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com` (if mission workpiece available)
 
 **Completion criterion:** All validation commands pass; all verifiable acceptance criteria are checked off; agent has requested the human operator to perform the `accepted → implemented` transition.
 
@@ -380,12 +380,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0496`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0496`
 - `pnpm --filter @gogol/surface run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` (if mission workpiece available)
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com` (if mission workpiece available)
 - `pnpm --filter @gogol/surface test`
 - `pnpm --filter @gogol/site-kernel-checks test`
 - `pnpm --filter @gogol/site-kernel-handoff test`
@@ -409,6 +409,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0496 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0496 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `website-service` blueprint cannot be parsed by `parseBlueprint` due to schema constraints, do not modify the schema to accept fractional depths — create a superseding RFC that proposes a schema extension.
 - If the `linking.parent` cross-surface reference cannot be resolved by the existing `expandBlueprint` orchestrator, do not add a parallel resolution path — create a superseding RFC that extends the blueprint contract.

@@ -42,7 +42,7 @@ None. No biome, manifest, or configuration changes.
 ### 2.4 Validation and pipelines
 
 - `pnpm --filter @gogol/ui run build:check` — scoped TypeScript check for `@gogol/ui`.
-- `pnpm exec site-kernel run rfc.validate RFC-0485 --json` — mechanical validation.
+- `pnpm exec werkstatt run rfc.validate RFC-0485 --json` — mechanical validation.
 
 ## 3. Step sequence
 
@@ -120,7 +120,7 @@ None. No biome, manifest, or configuration changes.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0485 --json`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0485 --json`.
 
 **Validation:**
 
@@ -155,7 +155,7 @@ None. No biome, manifest, or configuration changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0485 --json` — mechanical validation
+- `pnpm exec werkstatt run rfc.validate RFC-0485 --json` — mechanical validation
 - `pnpm --filter @gogol/ui run build:check` — scoped TypeScript check
 
 ### 4.2 Evidence artifacts
@@ -171,4 +171,4 @@ None. No biome, manifest, or configuration changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0485 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0485 --reason "..." --invariant "DNA-N"` instead of working around it.

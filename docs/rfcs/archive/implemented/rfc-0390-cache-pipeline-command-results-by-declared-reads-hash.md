@@ -101,19 +101,19 @@ Caching is enabled by default. The `--force` flag bypasses the cache for a full 
 
 ```sh
 # Normal pipeline run — cache active, unchanged commands skipped
-pnpm exec site-kernel pipeline build.check --site warpgogol-com
+pnpm exec werkstatt pipeline build.check --site warpgogol-com
 
 # Force full re-execution, bypass cache
-pnpm exec site-kernel pipeline build.check --site warpgogol-com --force
+pnpm exec werkstatt pipeline build.check --site warpgogol-com --force
 
 # Validate that all registered commands declare reads or cacheable: false
-pnpm exec site-kernel run command.reads.validate
+pnpm exec werkstatt run command.reads.validate
 
 # Clear command result cache
-pnpm exec site-kernel run kernel.cache.clear --namespace command_results
+pnpm exec werkstatt run kernel.cache.clear --namespace command_results
 
 # Check cache status (includes command_results namespace)
-pnpm exec site-kernel run kernel.cache.status
+pnpm exec werkstatt run kernel.cache.status
 ```
 
 ### TypeScript contracts

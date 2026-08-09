@@ -45,7 +45,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0693` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0693` — RFC mechanical validation
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript type check
 - `pnpm --filter @warpgogol/forge run test` — unit tests (including new ef-onboard tests)
 - `forge.skill.validate` — skill schema validation (SKILL-01..21)
@@ -219,11 +219,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0693`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0693`
 - Run `pnpm --filter @warpgogol/forge run build:check`
 - Run `pnpm --filter @warpgogol/forge run test`
-- Run `pnpm exec site-kernel run forge.skill.validate` (via forge CLI or site-kernel)
-- Run `pnpm exec site-kernel run forge.skill.list` and verify `ef-onboard` appears
+- Run `pnpm exec werkstatt run forge.skill.validate` (via forge CLI or site-kernel)
+- Run `pnpm exec werkstatt run forge.skill.list` and verify `ef-onboard` appears
 
 **Validation:**
 
@@ -243,16 +243,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` skill count is updated.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands added — skip).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands added — skip).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0693 against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0693 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0693 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0693`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0693`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -263,7 +263,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0693`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0693`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -283,4 +283,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If `forge.skill.validate` reports SKILL-17 violations for `ef-onboard` that cannot be resolved with the `<!-- skill-lint-disable SKILL-17 -->` escape hatch, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0693 --reason "SKILL-17 conflict" --invariant "DNA-54"` instead of working around it.
+- If `forge.skill.validate` reports SKILL-17 violations for `ef-onboard` that cannot be resolved with the `<!-- skill-lint-disable SKILL-17 -->` escape hatch, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0693 --reason "SKILL-17 conflict" --invariant "DNA-54"` instead of working around it.

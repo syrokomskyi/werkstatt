@@ -216,13 +216,13 @@ None. No YAML/JSON config, manifests, or ontology catalogs affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --json` (all RFCs, not just RFC-0755).
+- Run `pnpm exec werkstatt run rfc.validate --json` (all RFCs, not just RFC-0755).
 - If any V-RFC-33 violations appear on existing RFCs, fix the YAML in those RFC files (quote the offending values).
 - Re-run until clean.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — 0 violations.
+- `pnpm exec werkstatt run rfc.validate --json` — 0 violations.
 
 **Completion criterion:** All existing RFCs pass validation with V-RFC-33 active.
 
@@ -236,7 +236,7 @@ None. No YAML/JSON config, manifests, or ontology catalogs affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0755 --json`.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0755 --json`.
 - Fix any violations.
 
 **Validation:**
@@ -256,16 +256,16 @@ None. No YAML/JSON config, manifests, or ontology catalogs affected.
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` does not need updates (V-RFC rules are not enumerated there — confirm by grepping for "V-RFC" or "V-01").
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed (they didn't — only rule logic and message text changed — skip this step).
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed (they didn't — only rule logic and message text changed — skip this step).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0755 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0755 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0755 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0755`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0755`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 - Review report exists for this session.
@@ -278,10 +278,10 @@ None. No YAML/JSON config, manifests, or ontology catalogs affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0755`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0755`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run rfc.validate --json` (all RFCs — verify no latent YAML errors)
+- `pnpm exec werkstatt run rfc.validate --json` (all RFCs — verify no latent YAML errors)
 
 ### 4.2 Evidence artifacts
 

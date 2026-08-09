@@ -53,7 +53,7 @@ nonGoals:
   - "Do not change the existing Linux/macOS development workflow; this RFC only closes the Windows gap."
   - "Do not implement the proposed OS commands before acceptance; they remain optional probes."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:
@@ -184,7 +184,7 @@ Agents must also treat `*.svg` carefully: it is marked `binary` so that line-end
 `agent.environment.audit` is a proposed optional Site OS command. It scans the environment and reports which tools are present, missing, or misconfigured, producing a JSON envelope that agents can paste into their own system prompt. It does not mutate state. It is **not** in the acceptance path until a separate command RFC is accepted; this policy RFC only reserves the name and behavior contract.
 
 ```sh
-pnpm exec site-kernel run agent.environment.audit --json
+pnpm exec werkstatt run agent.environment.audit --json
 ```
 
 Example output:

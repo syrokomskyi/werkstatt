@@ -65,7 +65,7 @@ nonGoals:
   - "This RFC does not add a dry-run or review mode for pre-close validation"
   - "This RFC does not change mission.close preconditions"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -138,7 +138,7 @@ A mission with `state: closed` always has `reconciledAt` set to a non-null value
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run release.prepare --mission <mission-id>
+pnpm exec werkstatt run release.prepare --mission <mission-id>
 ```
 
 No new flags. The `--mission` flag is already required. The only change is the state check: `open` missions are refused.
@@ -232,7 +232,7 @@ No `--json` output shape changes. The command fails fast with a non-zero exit co
 - [x] `release.prepare` accepts missions with `state: "closed"` and completes the build pipeline (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:145, `state === "closed"` passes the check; pnpm --filter @warpgogol/site-kernel-handoff test — 354 tests pass)
 - [x] `mission.close` `missing-release-id` warning says "after close" instead of "before close" (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:258, test mission-close-release-id-warning.test.ts:41,55)
 - [x] `packages/os/site-kernel-handoff/AGENTS.md` documents the closed-mission requirement for `release.prepare` (evidence: packages/os/site-kernel-handoff/AGENTS.md:93)
-- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec site-kernel run rfc.validate` — zero errors for RFC-0590)
+- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec werkstatt run rfc.validate` — zero errors for RFC-0590)
 - [x] RFC-0357 frontmatter `amendedBy` includes RFC-0590 (evidence: docs/rfcs/archive/implemented/rfc-0357-release-discipline-and-behavior-snapshot-diff-gating.md:24)
 - [x] RFC-0522 frontmatter `amendedBy` includes RFC-0590 (evidence: docs/rfcs/archive/implemented/rfc-0522-reconcile-dirty-cache-clone-guard-3way-fallback-and-release-id-tracking.md:22)
 

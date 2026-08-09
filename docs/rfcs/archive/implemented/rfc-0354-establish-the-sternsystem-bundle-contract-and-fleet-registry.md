@@ -279,7 +279,7 @@ Four new commands in `@gogol/site-kernel-handoff` (the package that already owns
 #### 7.1 `sternsystem.register`
 
 ```sh
-pnpm exec site-kernel run sternsystem.register \
+pnpm exec werkstatt run sternsystem.register \
   --id <kebab-case-id> \
   --cosmicStar <StarName> \
   --repo <git-url> \
@@ -298,7 +298,7 @@ Fails if:
 #### 7.2 `sternsystem.list`
 
 ```sh
-pnpm exec site-kernel run sternsystem.list [--json]
+pnpm exec werkstatt run sternsystem.list [--json]
 ```
 
 Prints every registered Sternsystem with: id, cosmicStar, repo, pinnedPlatform, currentMission, lastRelease, status, registeredAt.
@@ -306,7 +306,7 @@ Prints every registered Sternsystem with: id, cosmicStar, repo, pinnedPlatform, 
 #### 7.3 `sternsystem.validate`
 
 ```sh
-pnpm exec site-kernel run sternsystem.validate [--id <id>] [--json]
+pnpm exec werkstatt run sternsystem.validate [--id <id>] [--json]
 ```
 
 Validates one or all Sternsystems:
@@ -319,7 +319,7 @@ Validates one or all Sternsystems:
 #### 7.4 `sternsystem.pin`
 
 ```sh
-pnpm exec site-kernel run sternsystem.pin --id <id> [--platform <semver>] [--json]
+pnpm exec werkstatt run sternsystem.pin --id <id> [--platform <semver>] [--json]
 ```
 
 Writes or updates `system.pin.json` for the specified Sternsystem. If `--platform` is omitted, pins to the current monorepo version. Records the current monorepo commit, RFC head, and `platformSemanticHash` from RFC-0364.
@@ -347,12 +347,12 @@ Fails if:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run sternsystem.register --id <id> --cosmicStar <Star> --repo <url>
-pnpm exec site-kernel run sternsystem.list
-pnpm exec site-kernel run sternsystem.validate
-pnpm exec site-kernel run sternsystem.validate --id <id>
-pnpm exec site-kernel run sternsystem.pin --id <id>
-pnpm exec site-kernel run sternsystem.pin --id <id> --platform 4.6.0
+pnpm exec werkstatt run sternsystem.register --id <id> --cosmicStar <Star> --repo <url>
+pnpm exec werkstatt run sternsystem.list
+pnpm exec werkstatt run sternsystem.validate
+pnpm exec werkstatt run sternsystem.validate --id <id>
+pnpm exec werkstatt run sternsystem.pin --id <id>
+pnpm exec werkstatt run sternsystem.pin --id <id> --platform 4.6.0
 ```
 
 All commands support `--json` output with the standard `{ command, status, data, summary }` envelope.

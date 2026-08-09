@@ -76,7 +76,7 @@ The indexability decision gains two modifiers, both composed after the record-co
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.freshness --app warpgogol-com --json
+pnpm exec werkstatt run surface.freshness --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

@@ -64,12 +64,12 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate RFC-0382 --json` — must pass
+- `pnpm exec werkstatt run rfc.validate RFC-0382 --json` — must pass
 - `pnpm --filter @gogol/site-kernel run build:check` — TypeScript must compile
 - `pnpm --filter @gogol/site-kernel run test` — existing tests must pass
-- `pnpm exec site-kernel run command.manifest.generate` — regenerate manifest with new `kernel.cache.*` commands
-- `pnpm exec site-kernel run kernel.cache.status --json` — verify cache is active
-- `pnpm exec site-kernel run kernel.cache.clear --json` — verify cache clears
+- `pnpm exec werkstatt run command.manifest.generate` — regenerate manifest with new `kernel.cache.*` commands
+- `pnpm exec werkstatt run kernel.cache.status --json` — verify cache is active
+- `pnpm exec werkstatt run kernel.cache.clear --json` — verify cache clears
 - No new pipeline membership — `kernel.cache.*` commands are standalone workspace commands
 
 ## 3. Step sequence
@@ -207,7 +207,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run kernel.cache.status --json` returns valid JSON
+- `pnpm exec werkstatt run kernel.cache.status --json` returns valid JSON
 
 **Completion criterion:** `cache-module.ts` exists, `tools/kernel.config.ts` registers `cache` module, `kernel.cache.status` and `kernel.cache.clear` are registered commands.
 
@@ -227,14 +227,14 @@ scope:
     2. Parse YAML, extract `commands[].name` into a `Set<string>`
     3. If file missing or unparseable: return `null` (triggers fallback)
   - Replace `getLiveCommands()` to call `readCommandNamesFromManifest` first
-  - If manifest returns `null`: fall back to `listRegisteredKernelCommands`, log warning: `"command-manifest.generated.yaml is stale or missing; falling back to full registry build. Run: pnpm exec site-kernel run command.manifest.generate"`
+  - If manifest returns `null`: fall back to `listRegisteredKernelCommands`, log warning: `"command-manifest.generated.yaml is stale or missing; falling back to full registry build. Run: pnpm exec werkstatt run command.manifest.generate"`
 - Update `MODULE_CONTRACT` and `CHANGE_SUMMARY` in the file
 
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run rfc.validate RFC-0382 --json` passes and completes in under 10 seconds
-- `pnpm exec site-kernel run rfc.validate --json` (all 367 files) completes in under 10 seconds
+- `pnpm exec werkstatt run rfc.validate RFC-0382 --json` passes and completes in under 10 seconds
+- `pnpm exec werkstatt run rfc.validate --json` (all 367 files) completes in under 10 seconds
 
 **Completion criterion:** `lifecycle.ts` reads manifest first, falls back to `listRegisteredKernelCommands` with warning, `rfc.validate` completes in under 10 seconds.
 
@@ -263,8 +263,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run rfc.validate RFC-0382 --json` passes
-- `pnpm exec site-kernel run rfc.validate --json` (warm cache) completes in under 5 seconds
+- `pnpm exec werkstatt run rfc.validate RFC-0382 --json` passes
+- `pnpm exec werkstatt run rfc.validate --json` (warm cache) completes in under 5 seconds
 
 **Completion criterion:** `validate.ts` uses cache, `rfc.validate` warm cache completes in under 5 seconds.
 
@@ -291,8 +291,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run rfc.list --json` (warm cache) completes in under 2 seconds
-- `pnpm exec site-kernel run rfc.graph RFC-0001 --json` (warm cache) completes in under 2 seconds
+- `pnpm exec werkstatt run rfc.list --json` (warm cache) completes in under 2 seconds
+- `pnpm exec werkstatt run rfc.graph RFC-0001 --json` (warm cache) completes in under 2 seconds
 
 **Completion criterion:** `list-create.ts` and `index-graph.ts` use cache, warm cache times meet targets.
 
@@ -315,7 +315,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run rfc.dna.trace.validate --json` (warm cache) completes in under 3 seconds
+- `pnpm exec werkstatt run rfc.dna.trace.validate --json` (warm cache) completes in under 3 seconds
 
 **Completion criterion:** `dna-trace.ts` uses cache, warm cache time meets target.
 
@@ -337,7 +337,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel run build:check` passes
-- `pnpm exec site-kernel run rfc.validate --force-cache-refresh --json` works (full parse, writes back to cache)
+- `pnpm exec werkstatt run rfc.validate --force-cache-refresh --json` works (full parse, writes back to cache)
 
 **Completion criterion:** All RFC commands have `--force-cache-refresh` flag, flag bypasses cache reads.
 
@@ -351,9 +351,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate`
-- Run `pnpm exec site-kernel run command.manifest.validate --json` — must pass
-- Run `pnpm exec site-kernel run rfc.validate RFC-0382 --json` — must pass (lifecycle validation should now find `kernel.cache.status` and `kernel.cache.clear` in the manifest)
+- Run `pnpm exec werkstatt run command.manifest.generate`
+- Run `pnpm exec werkstatt run command.manifest.validate --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0382 --json` — must pass (lifecycle validation should now find `kernel.cache.status` and `kernel.cache.clear` in the manifest)
 
 **Validation:**
 
@@ -394,15 +394,15 @@ scope:
 
 **Agent actions:**
 
-- Clear cache: `pnpm exec site-kernel run kernel.cache.clear --json`
-- Measure cold cache fill: time `pnpm exec site-kernel run rfc.validate --json` (first run, must be under 90 seconds)
+- Clear cache: `pnpm exec werkstatt run kernel.cache.clear --json`
+- Measure cold cache fill: time `pnpm exec werkstatt run rfc.validate --json` (first run, must be under 90 seconds)
 - Measure warm cache times (second run):
-  - `pnpm exec site-kernel run rfc.validate --json` — must be under 5 seconds
-  - `pnpm exec site-kernel run rfc.list --json` — must be under 2 seconds
-  - `pnpm exec site-kernel run rfc.graph RFC-0001 --json` — must be under 2 seconds
-  - `pnpm exec site-kernel run rfc.dna.trace.validate --json` — must be under 3 seconds
-- Measure single-RFC validate: `pnpm exec site-kernel run rfc.validate RFC-0382 --json` — must be under 5 seconds
-- Run `pnpm exec site-kernel run kernel.cache.status --json` — verify hit ratio and entry count
+  - `pnpm exec werkstatt run rfc.validate --json` — must be under 5 seconds
+  - `pnpm exec werkstatt run rfc.list --json` — must be under 2 seconds
+  - `pnpm exec werkstatt run rfc.graph RFC-0001 --json` — must be under 2 seconds
+  - `pnpm exec werkstatt run rfc.dna.trace.validate --json` — must be under 3 seconds
+- Measure single-RFC validate: `pnpm exec werkstatt run rfc.validate RFC-0382 --json` — must be under 5 seconds
+- Run `pnpm exec werkstatt run kernel.cache.status --json` — verify hit ratio and entry count
 - Record timing results as evidence
 
 **Validation:**
@@ -430,7 +430,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0382 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0382 --json` passes
 
 **Completion criterion:** `AGENTS.md` has cache layer note, `rfc.validate` still passes.
 
@@ -445,9 +445,9 @@ scope:
 **Agent actions:**
 
 - Set `status: implemented` and `implementedAt: 2026-07-14` in RFC-0382 frontmatter
-- Run `pnpm exec site-kernel run rfc.validate RFC-0382 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0382 --json` — must pass
 - Commit all changes with reference to RFC-0382 in commit messages
-- Run `pnpm exec site-kernel run command.manifest.generate` to update manifest with `implemented` status
+- Run `pnpm exec werkstatt run command.manifest.generate` to update manifest with `implemented` status
 
 **Validation:**
 
@@ -462,12 +462,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0382 --json` — must pass
+- `pnpm exec werkstatt run rfc.validate RFC-0382 --json` — must pass
 - `pnpm --filter @gogol/site-kernel run build:check` — TypeScript must compile
 - `pnpm --filter @gogol/site-kernel run test` — all tests must pass
-- `pnpm exec site-kernel run command.manifest.validate --json` — manifest must be current
-- `pnpm exec site-kernel run kernel.cache.status --json` — cache must be active (or report unavailable with reason)
-- `pnpm exec site-kernel run kernel.cache.clear --json` — cache must clear
+- `pnpm exec werkstatt run command.manifest.validate --json` — manifest must be current
+- `pnpm exec werkstatt run kernel.cache.status --json` — cache must be active (or report unavailable with reason)
+- `pnpm exec werkstatt run kernel.cache.clear --json` — cache must clear
 
 ### 4.2 Evidence artifacts
 
@@ -489,6 +489,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0382 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0382 --reason "..." --invariant "DNA-53"` instead of working around it.
 - If `better-sqlite3` cannot be installed on Windows despite prebuilt binaries, document the failure and proceed with NoopCacheLayer-only — the RFC explicitly accepts this as the degraded mode.
 - If timing targets are not met after Phase 2, profile the cache layer to identify the remaining bottleneck. Do not weaken validation rules to meet timing targets.

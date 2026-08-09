@@ -415,12 +415,12 @@ Every axis present in `apps/nicaragua-projekt` has a single documented destinati
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run manifest.contract.validate --app nicaragua-projekt
-pnpm exec site-kernel run mirror.quintet.validate --app nicaragua-projekt
-pnpm exec site-kernel run ontology.enums.validate
-pnpm exec site-kernel run uni.registry.build
-pnpm exec site-kernel run uni.registry.validate
-pnpm exec site-kernel run business.profile.validate --app nicaragua-projekt
+pnpm exec werkstatt run manifest.contract.validate --app nicaragua-projekt
+pnpm exec werkstatt run mirror.quintet.validate --app nicaragua-projekt
+pnpm exec werkstatt run ontology.enums.validate
+pnpm exec werkstatt run uni.registry.build
+pnpm exec werkstatt run uni.registry.validate
+pnpm exec werkstatt run business.profile.validate --app nicaragua-projekt
 ```
 
 | Command | Scope | Responsibility |

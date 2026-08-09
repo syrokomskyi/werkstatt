@@ -134,7 +134,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/werkstatt run build:check` passes
-- `pnpm exec site-kernel run werkstatt.plugin.validate --json` runs and returns warn-only result (PLUGIN-01 as warning, exit 0) since no plugin is registered yet
+- `pnpm exec werkstatt run werkstatt.plugin.validate --json` runs and returns warn-only result (PLUGIN-01 as warning, exit 0) since no plugin is registered yet
 
 **Completion criterion:** Command is registered, runs without crash, returns documented JSON output, and correctly emits warn-only for PLUGIN-01 in the current workshop state.
 
@@ -200,11 +200,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0770 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0770 --json` — must pass
 - Run `pnpm --filter @warpgogol/werkstatt run build:check` — must pass
 - Run `pnpm --filter @warpgogol/werkstatt run test` — must pass
-- Run `pnpm exec site-kernel run werkstatt.plugin.validate --json` — must return warn-only result (exit 0)
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surface changed
+- Run `pnpm exec werkstatt run werkstatt.plugin.validate --json` — must return warn-only result (exit 0)
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surface changed
 
 **Validation:**
 
@@ -223,16 +223,16 @@ scope:
 **Agent actions:**
 
 - Verify `AGENTS.md` (root) is updated with the plugin contract section (Step 5)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new `werkstatt.plugin.validate` command)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new `werkstatt.plugin.validate` command)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0770 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)`. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0770 --implementation-commit <sha>` (run `--dry-run` first, then without). The command validates all preconditions (status, criteria, clean tree, commit reachability).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0770 --implementation-commit <sha>` (run `--dry-run` first, then without). The command validates all preconditions (status, criteria, clean tree, commit reachability).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0770` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0770` — passes
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -244,10 +244,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0770`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0770`
 - `pnpm --filter @warpgogol/werkstatt run build:check`
 - `pnpm --filter @warpgogol/werkstatt run test`
-- `pnpm exec site-kernel run werkstatt.plugin.validate --json`
+- `pnpm exec werkstatt run werkstatt.plugin.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -266,6 +266,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `KernelModule` / `KernelPipelineStep` types from `@warpgogol/site-kernel/types` are insufficient for the plugin contract, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0770 --reason "..." --invariant "DNA-64"` instead of working around it.
+- If implementation reveals that `KernelModule` / `KernelPipelineStep` types from `@warpgogol/site-kernel/types` are insufficient for the plugin contract, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0770 --reason "..." --invariant "DNA-64"` instead of working around it.
 - If the dynamic import of `tools/kernel.config.ts` is not feasible (e.g. ESM/CJS interop issues), create an ADR documenting the alternative discovery mechanism.
 - If RFC-0772's inversion reveals a missing hook, a superseding RFC must be created — do not amend RFC-0770 to add hooks.

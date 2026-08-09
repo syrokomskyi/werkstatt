@@ -58,7 +58,7 @@ scope:
 - `pnpm --filter @warpgogol/fingerprint run test` — unit tests for normalizers
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — TypeScript type-check
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` — unit tests for dist.determinism.validate handler
-- `pnpm exec site-kernel run rfc.validate --id RFC-0656` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0656` — RFC validation
 - No new pipeline validator in this phase (build.check integration is deferred per RFC rollout)
 
 ## 3. Step sequence
@@ -247,7 +247,7 @@ scope:
 - Run `pnpm --filter @warpgogol/fingerprint run test`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0656`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0656`
 - Verify acceptance criteria checkboxes can be marked `[x]`:
   - `fingerprintTree` supports `mode: "stable"` — verified by tests in Step 5.
   - `FingerprintOptions.mode` type is `"byte" | "semantic" | "stable"` — verified by type-check.
@@ -302,12 +302,12 @@ scope:
 **Agent actions:**
 
 - Mark all acceptance criteria checkboxes as `[x]` in the RFC file with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0656 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0656 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 - Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0656` — passes with `implemented` status.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0656` — passes with `implemented` status.
 - `git status` — no uncommitted changes from the current session.
 
 **Completion criterion:** RFC-0656 is stamped as `implemented` via `rfc.implement.stamp`; all acceptance criteria are checked off with evidence.
@@ -318,7 +318,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0656`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0656`
 - `pnpm --filter @warpgogol/fingerprint run build:check`
 - `pnpm --filter @warpgogol/fingerprint run test`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
@@ -342,5 +342,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), DNA-48 (release discipline), or DNA-49 (fleet propagation), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0656 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53 (fingerprint governance), DNA-48 (release discipline), or DNA-49 (fleet propagation), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0656 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `pdf-lib` cannot parse certain PDF variants (encrypted, linearized), document the limitation in `packages/fingerprint/AGENTS.md` and add a fallback to byte hashing with a warning — do not suppress the error silently.

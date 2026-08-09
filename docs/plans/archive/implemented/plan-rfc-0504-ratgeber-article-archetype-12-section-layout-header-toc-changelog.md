@@ -250,8 +250,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0500`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0501`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0500`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0501`
 
 **Completion criterion:** Both RFCs have `RFC-0504` in `amendedBy`; `rfc.validate` passes for both.
 
@@ -281,12 +281,12 @@ scope:
   - Add three new UI components.
 - Update `docs/knowledge-graph.xml`:
   - Add RFC-0504 relationships (amends RFC-0500, RFC-0501; related to RFC-0502, RFC-0503, RFC-0506).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 
 **Validation:**
 
 - `git diff` — verify all scope docs are updated.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0504`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0504`
 
 **Completion criterion:** All documentation artifacts in scope are updated; `rfc.validate` passes.
 
@@ -301,13 +301,13 @@ scope:
 **Agent actions:**
 
 - Verify each acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Run `pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json` — must pass.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0504` — must pass.
+- Run `pnpm exec werkstatt run ratgeber.article.validate --site warpgogol-com --json` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0504` — must pass.
 - Run `pnpm --filter @gogol/ontology build:check` — must pass.
 - Run `pnpm --filter @gogol/site-kernel-checks build:check` — must pass.
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check` — must pass.
 - Run `pnpm --filter @gogol/ui build:check` — must pass.
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0504 --implementation-commit <sha>`.
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0504 --implementation-commit <sha>`.
 
 **Validation:**
 
@@ -324,14 +324,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0504`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0504`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/ui build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run ratgeber.article.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -350,6 +350,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-19 (closed catalog), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0504 --reason "..." --invariant "DNA-19"` instead of extending the catalog.
-- If implementation reveals an invariant conflict with DNA-23 (three-way alignment), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0504 --reason "..." --invariant "DNA-23"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-19 (closed catalog), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0504 --reason "..." --invariant "DNA-19"` instead of extending the catalog.
+- If implementation reveals an invariant conflict with DNA-23 (three-way alignment), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0504 --reason "..." --invariant "DNA-23"` instead of working around it.
 - If the migrator fails idempotency on real data, stop and fix the migrator before proceeding — do not suppress the test.

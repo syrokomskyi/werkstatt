@@ -115,11 +115,11 @@ The preferred project decision is to place the helper in `@gogol/site-kernel` if
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run workspace.discovery.validate --json
-pnpm exec site-kernel run workspace.surface.validate --json
-pnpm exec site-kernel run test.signal.validate --json
-pnpm exec site-kernel run ci.local.validate --json
-pnpm exec site-kernel run ecosystem.manifest.validate --json
+pnpm exec werkstatt run workspace.discovery.validate --json
+pnpm exec werkstatt run workspace.surface.validate --json
+pnpm exec werkstatt run test.signal.validate --json
+pnpm exec werkstatt run ci.local.validate --json
+pnpm exec werkstatt run ecosystem.manifest.validate --json
 ```
 
 `workspace.discovery.validate` is workspace-scoped and read-only.
@@ -271,7 +271,7 @@ Moving discovery into `@gogol/site-kernel` can create dependency pressure if the
 - [x] Commands mentioned only in comments or step names do not satisfy `ci.local.validate`. (evidence: implemented historically)
 - [x] Corepack and `pnpm/action-setup` version checks use structured workflow step data. (evidence: implemented historically)
 - [x] Tests cover workspace discovery fixtures, workflow comments, multiline run blocks, and pnpm version mismatch. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run ecosystem.manifest.validate --json`, `workspace.surface.validate --json`, `test.signal.validate --json`, `ci.local.validate --json`, `packages-check.run --json`, `pnpm test`, and `rfc.validate` pass. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run ecosystem.manifest.validate --json`, `workspace.surface.validate --json`, `test.signal.validate --json`, `ci.local.validate --json`, `packages-check.run --json`, `pnpm test`, and `rfc.validate` pass. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

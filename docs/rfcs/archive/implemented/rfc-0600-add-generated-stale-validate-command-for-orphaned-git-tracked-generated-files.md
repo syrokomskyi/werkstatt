@@ -68,7 +68,7 @@ nonGoals:
   - "Do not check files outside the site workpiece (e.g., packages/, docs/) — scope is strictly the site's public/ directory."
   - "Do not provide a --no-stale-validate bypass flag — stale files are always errors. No per-command bypass flag pattern exists in the pipeline runner."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -125,8 +125,8 @@ The kernel gains a `generated.stale.validate` command that detects files in a si
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run generated.stale.validate --site warpgogol-com
-pnpm exec site-kernel run generated.stale.validate --site warpgogol-com --json
+pnpm exec werkstatt run generated.stale.validate --site warpgogol-com
+pnpm exec werkstatt run generated.stale.validate --site warpgogol-com --json
 ```
 
 Scope: `workspace` (operates per-site via `--site`).
@@ -232,7 +232,7 @@ The command uses the existing `Diagnostic` type from `@warpgogol/site-kernel` an
 - [x] Uses `collectFiles` from `@warpgogol/share/fs` (no `git ls-files` dependency) (evidence: packages/os/site-kernel-checks/src/generated-stale-validate.ts:31, import { collectFiles } from "@warpgogol/share/fs")
 - [x] Uses `diagnosticsResult()` from `./result-helpers.ts` (no custom `StaleFileDiagnostic` interface) (evidence: packages/os/site-kernel-checks/src/generated-stale-validate.ts:32, import { diagnosticsResult } from "./result-helpers.ts")
 - [x] Unit test in `src/tests/generated-stale-validate.test.ts` covers stale detection, static asset exemption, preview image resolution, and clean-pass scenarios (evidence: src/tests/generated-stale-validate.test.ts, 7 tests passed)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate — no errors for RFC-0600)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate — no errors for RFC-0600)
 
 ## Implementation notes for agents
 

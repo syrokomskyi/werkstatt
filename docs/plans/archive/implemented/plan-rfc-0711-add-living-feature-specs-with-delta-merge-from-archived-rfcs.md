@@ -73,7 +73,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run rfc.validate --id RFC-0711 --json` — still passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0711 --json` — still passes
 
 **Completion criterion:** `liveSpec` is in `RFC_KNOWN_KEYS` and `RfcFrontmatter` interface; template has the field; TypeScript compiles; `rfc.validate` passes.
 
@@ -97,11 +97,11 @@ scope:
   - `docs.archive` triggers `spec.live.merge` for implemented RFCs with `liveSpec` field
   - `docs.archive` skips `rejected` RFCs with `liveSpec` field
   - `rfc.validate` accepts `liveSpec` as a known optional frontmatter field (no V-20 warning)
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0711 --json` to verify probes are syntactically valid
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0711 --json` to verify probes are syntactically valid
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0711 --json`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0711 --json`
 
 **Completion criterion:** RFC-0711 frontmatter has `acceptance` array with 9 probes; `rfc.validate` passes.
 
@@ -199,12 +199,12 @@ scope:
 - `spec.live.list`: `scope: "workspace"`, `reads: ["docs/specs/live/**"]`, flags: none
 - `spec.live.show`: `scope: "workspace"`, `reads: ["docs/specs/live/**"]`, flags: `domain` (string, required)
 - `spec.live.validate`: `scope: "workspace"`, `reads: ["docs/specs/live/**", "docs/rfcs/**/*.md"]`, flags: none
-- Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
+- Run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml`
 
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check`
-- `pnpm exec site-kernel run command.manifest.generate`
+- `pnpm exec werkstatt run command.manifest.generate`
 - Verify `docs/command-manifest.generated.yaml` contains the 4 new commands
 
 **Completion criterion:** All 4 commands are registered and discoverable in the command manifest.
@@ -276,7 +276,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0711 --json`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0711 --json`
 - `pnpm --filter @warpgogol/forge run build:check`
 
 **Completion criterion:** All documentation files updated; `rfc.validate` passes.
@@ -332,17 +332,17 @@ scope:
 
 - Update affected `AGENTS.md` files (root, `packages/forge/`) with new commands and living spec documentation.
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed (already done in Step 5).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if pipeline topology changed (no pipeline changes in this RFC).
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed (already done in Step 5).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if pipeline topology changed (no pipeline changes in this RFC).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0711 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0711 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0711`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0711`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
@@ -356,12 +356,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0711`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0711`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0711` (acceptance probes added in Step 1.5)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0711` (RFC-0330, generates evidence file)
-- `pnpm exec site-kernel run command.manifest.generate` (verify new commands appear in manifest)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0711` (acceptance probes added in Step 1.5)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0711` (RFC-0330, generates evidence file)
+- `pnpm exec werkstatt run command.manifest.generate` (verify new commands appear in manifest)
 
 ### 4.2 Evidence artifacts
 
@@ -379,5 +379,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-55, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0711 --reason "..." --invariant "DNA-55"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-55, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0711 --reason "..." --invariant "DNA-55"` instead of working around it.
 - If the delta classification heuristics prove insufficient for real RFCs, create a follow-up RFC to refine the merge algorithm rather than patching it inline.

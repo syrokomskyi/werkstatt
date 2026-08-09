@@ -51,7 +51,7 @@ scope:
 
 - `pnpm --filter @warpgogol/pbp run build:check` — scoped typecheck
 - `pnpm --filter @warpgogol/pbp run test` — scoped vitest
-- `pnpm exec site-kernel run rfc.validate --id RFC-0742` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0742` — RFC validation
 
 ## 3. Step sequence
 
@@ -216,12 +216,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations (RFC-IMP-02). For unchecked `[ ]` criteria, document why.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0742 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0742 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0742`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0742`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -233,10 +233,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0742`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0742`
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/pbp run test`
-- `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0742 --implementation-commit <sha>`
+- `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0742 --implementation-commit <sha>`
 
 ### 4.2 Evidence artifacts
 
@@ -255,4 +255,4 @@ scope:
 ## 6. Escalation triggers
 
 - If RFC-0740 types (`PbpMaterializedDerivedPrice`, `PbpCurrencyConversionTrace`, `PbpCurrentUses`, `PbpPriceKind`, `PbpCommercialMeaning`) are not yet implemented, block Step 1 and report: "RFC-0740 must be implemented first — this RFC depends on its types."
-- If implementation reveals an invariant conflict with DNA-4 or DNA-55, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0742 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-4 or DNA-55, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0742 --reason "..." --invariant "DNA-N"` instead of working around it.

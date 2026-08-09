@@ -132,13 +132,13 @@ Multiple onboarding processes can run in parallel (one per system-id). All artif
 
 ```sh
 # Validate and hash raw client materials
-pnpm exec site-kernel run onboarding.synthesize --system <system-id> --json
+pnpm exec werkstatt run onboarding.synthesize --system <system-id> --json
 
 # Create a new Sternsystem and auto-start first mission
-pnpm exec site-kernel run sternsystem.register --id <system-id> --cosmicStar <star> --repo <repo-url> --json
+pnpm exec werkstatt run sternsystem.register --id <system-id> --cosmicStar <star> --repo <repo-url> --json
 
 # Amend an existing Sternsystem with new raw materials
-pnpm exec site-kernel run sternsystem.register --id <system-id> --amend --amend-id <N> --json
+pnpm exec werkstatt run sternsystem.register --id <system-id> --amend --amend-id <N> --json
 
 # Orchestrate the full onboarding pipeline via skill
 /fo-onboard                          # New Sternsystem onboarding

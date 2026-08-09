@@ -62,7 +62,7 @@ nonGoals:
   - "Does not add registry tracking or bordbuch entries for dev deploys (same as RFC-0628)"
   - "Does not run Axiom checks in the release path — the release was already validated during release.prepare"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -117,10 +117,10 @@ The gap is in `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.
 
 ```sh
 # Current behavior (unchanged) — requires open mission:
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com
 
 # New behavior — deploy existing release to dev without open mission:
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --release warpgogol-com-r000012
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com --release warpgogol-com-r000012
 ```
 
 Flags:

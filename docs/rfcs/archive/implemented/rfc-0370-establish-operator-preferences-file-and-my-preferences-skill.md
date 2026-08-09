@@ -44,7 +44,7 @@ nonGoals:
   - "Do not enforce a single language across the repository; documentation language may differ from AI language."
   - "Do not store secrets, API keys, or environment-specific values in PREFERENCES.md."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:

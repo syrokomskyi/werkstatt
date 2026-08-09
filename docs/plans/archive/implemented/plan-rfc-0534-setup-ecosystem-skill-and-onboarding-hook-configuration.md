@@ -180,7 +180,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0534 --json` — must pass with zero violations
+- Run `pnpm exec werkstatt run rfc.validate RFC-0534 --json` — must pass with zero violations
 - Verify each acceptance criterion in the RFC:
   1. `.agents/skills/setup-ecosystem/SKILL.md` exists with setup instructions
   2. Skill verifies `pnpm install` has been run (checks for `node_modules/`)
@@ -196,7 +196,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0534 --json` — zero violations
+- `pnpm exec werkstatt run rfc.validate RFC-0534 --json` — zero violations
 - All acceptance criteria marked `[x]` with evidence
 
 **Completion criterion:** All 9 acceptance criteria verified and marked `[x]` with evidence; `rfc.validate` passes
@@ -211,14 +211,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0534 --implementation-commit <sha> --dry-run` first to verify preconditions
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0534 --implementation-commit <sha>` (without `--dry-run`) to stamp
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0534 --implementation-commit <sha> --dry-run` first to verify preconditions
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0534 --implementation-commit <sha>` (without `--dry-run`) to stamp
 - Commit the stamped RFC separately (implementation commit and stamp commit MUST be separate)
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0534 --json` — passes with `status: implemented`
+- `pnpm exec werkstatt run rfc.validate RFC-0534 --json` — passes with `status: implemented`
 
 **Completion criterion:** RFC-0534 status is `implemented` via `rfc.implement.stamp`; implementation commit and stamp commit are separate; `git status` is clean
 
@@ -228,8 +228,8 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0534 --json` — must pass with zero violations
-- `pnpm exec site-kernel run forge.skill.validate --json` — must pass (validates `fo-onboard` forge skill changes against SKILL-01..SKILL-13)
+- `pnpm exec werkstatt run rfc.validate RFC-0534 --json` — must pass with zero violations
+- `pnpm exec werkstatt run forge.skill.validate --json` — must pass (validates `fo-onboard` forge skill changes against SKILL-01..SKILL-13)
 - No `build:check` needed — no TypeScript code changes (skill files are markdown, `.env.example` and `README.md` are documentation)
 - No acceptance probes declared in RFC frontmatter — `rfc.verification.emit` not required
 
@@ -249,5 +249,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0534 --reason "..." --invariant "DNA-53"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0534 --reason "..." --invariant "DNA-53"` instead of working around it.
 - If `rfc.implement.stamp` fails due to unmet preconditions, do NOT hand-edit the RFC frontmatter — resolve the failing precondition and re-run the stamp command.

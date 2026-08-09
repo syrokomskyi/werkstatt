@@ -83,7 +83,7 @@ Forge gains **stack profiles** — YAML documents under `packages/forge/profiles
 ```sh
 npx forge run forge.scaffold --profile=astro-typescript-turborepo --name=my-site --json
 npx forge run forge.init --from=../legacy-project --json
-pnpm exec site-kernel run forge.scaffold --profile=phaser-turborepo --name=my-game --json
+pnpm exec werkstatt run forge.scaffold --profile=phaser-turborepo --name=my-game --json
 ```
 
 - `forge.scaffold` (workspace scope): `--profile` (required, must match a profile id), `--name` (required, kebab-case project name). Refuses to run in a non-empty directory.

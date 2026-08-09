@@ -179,7 +179,7 @@ Scope: app or URL target, networked, not required in offline package checks.
 Inputs:
 
 ```sh
-pnpm exec site-kernel run public.runtime.probe --app <app> --base-url <https-url> --json
+pnpm exec werkstatt run public.runtime.probe --app <app> --base-url <https-url> --json
 ```
 
 The command fetches declared runtime endpoints and public artifacts after deploy:

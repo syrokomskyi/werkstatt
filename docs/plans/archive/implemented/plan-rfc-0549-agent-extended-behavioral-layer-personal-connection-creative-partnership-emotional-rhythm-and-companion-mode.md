@@ -44,7 +44,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0549`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0549`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test` (agents-generate tests)
 - No new commands proposed
@@ -132,7 +132,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --skill fo-session-retro` passes (SKILL-13: knowledge files exist).
+- `pnpm exec werkstatt run forge.skill.validate --skill fo-session-retro` passes (SKILL-13: knowledge files exist).
 
 **Completion criterion:** `fo-session-retro` SKILL.md contains routing rules for emotional rhythm (Vertraulich, expiry) and aesthetic preferences (Öffentlich) to `operator-profile.md`.
 
@@ -190,18 +190,18 @@ scope:
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` is updated (Step 6).
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0549` — must pass with zero RFC-specific errors.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0549` — must pass with zero RFC-specific errors.
 - Run `pnpm --filter @warpgogol/forge run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/forge run test` — all tests pass.
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in RFC-0549 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0549 --implementation-commit <sha>`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0549 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0549` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0549` — passes.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -213,7 +213,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0549`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0549`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 - No acceptance probes declared (no `acceptance` frontmatter field in RFC-0549)
@@ -237,5 +237,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54 (Forge bindings contract), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0549 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-54 (Forge bindings contract), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0549 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
 - If RFC-0548 has not been implemented yet and `fo-session-retro` lacks `operator-profile.md` as a knowledge file, Step 4 adds it as part of this implementation — this is documented in the RFC's rollout step 2.

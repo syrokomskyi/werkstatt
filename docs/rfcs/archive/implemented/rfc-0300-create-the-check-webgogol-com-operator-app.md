@@ -103,7 +103,7 @@ The app must not:
 Local development may run:
 
 ```sh
-pnpm exec site-kernel run check.run --url https://alt.example.invalid --out .check-warpgogol/runs/demo
+pnpm exec werkstatt run check.run --url https://alt.example.invalid --out .check-warpgogol/runs/demo
 pnpm --filter check-warpgogol-com dev
 ```
 

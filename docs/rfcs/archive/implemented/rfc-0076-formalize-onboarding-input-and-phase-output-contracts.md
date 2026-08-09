@@ -90,12 +90,12 @@ The onboarding phase contract becomes the single source of truth for required ph
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run onboarding.input.validate --app <id>
-pnpm exec site-kernel run onboarding.phase.validate --app <id> --phase=00-intake
-pnpm exec site-kernel run onboarding.phase.validate --app <id> --phase=02-scaffold
-pnpm exec site-kernel run onboarding.phase.validate --app <id> --phase=03-compose
-pnpm exec site-kernel run onboarding.phase.validate --app <id> --phase=04-author
-pnpm exec site-kernel run onboarding.phase.validate --app <id> --phase=05-audit
+pnpm exec werkstatt run onboarding.input.validate --app <id>
+pnpm exec werkstatt run onboarding.phase.validate --app <id> --phase=00-intake
+pnpm exec werkstatt run onboarding.phase.validate --app <id> --phase=02-scaffold
+pnpm exec werkstatt run onboarding.phase.validate --app <id> --phase=03-compose
+pnpm exec werkstatt run onboarding.phase.validate --app <id> --phase=04-author
+pnpm exec werkstatt run onboarding.phase.validate --app <id> --phase=05-audit
 ```
 
 `--phase` is a closed enum. The initial implementation recognizes:

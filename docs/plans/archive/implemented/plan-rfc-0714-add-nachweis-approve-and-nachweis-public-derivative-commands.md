@@ -209,7 +209,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate` to regenerate `docs/command-manifest.generated.yaml`
+- Run `pnpm exec werkstatt run command.manifest.generate` to regenerate `docs/command-manifest.generated.yaml`
 - Update `packages/os/site-kernel-handoff/AGENTS.md`:
   - Add a Nachweis workflow section documenting the full workflow: `ingest` → `consent.update` → `approve` → `public-derivative` → `validate` → `publish`
   - Document that `nachweis.approve` is operator-invoked only — agents MUST NOT run it autonomously
@@ -232,19 +232,19 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0714` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0714` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test` — must pass
-- Run `pnpm exec site-kernel run command.manifest.generate` — verify manifest is up-to-date
+- Run `pnpm exec werkstatt run command.manifest.generate` — verify manifest is up-to-date
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0714 --implementation-commit <sha>` (use the first implementation commit SHA).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0714 --implementation-commit <sha>` (use the first implementation commit SHA).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0714` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0714` — passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All validation passes; code review passed (findings fixed if any); all acceptance criteria checked off with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -255,10 +255,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0714`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0714`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run command.manifest.generate` (verify manifest up-to-date)
+- `pnpm exec werkstatt run command.manifest.generate` (verify manifest up-to-date)
 
 ### 4.2 Evidence artifacts
 
@@ -276,5 +276,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0714 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0714 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `publicDerivativeSha256` storage approach (using `items.public.sha256`) conflicts with PBP schema validation, run `rfc.supersede.propose` against RFC-0706 instead of introducing an unregistered field.

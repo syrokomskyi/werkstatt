@@ -71,8 +71,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run rfc.validate RFC-0488`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run rfc.validate RFC-0488`
 
 ## 3. Step sequence
 
@@ -140,7 +140,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** Migrator is registered, idempotency PBT passes, snapshot test passes, `migrator.registry.validate` passes.
 
@@ -265,7 +265,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run material.credits.validate --site warpgogol-com --json`
 
 **Completion criterion:** Migrator runs without errors; sidecars are transformed.
 
@@ -284,7 +284,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json` (no `unverified-usage-basis` violations)
+- `pnpm exec werkstatt run material.credits.validate --site warpgogol-com --json` (no `unverified-usage-basis` violations)
 
 **Completion criterion:** No `unverified-usage-basis` violations remain.
 
@@ -298,15 +298,15 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run material.credits.generate --site warpgogol-com`.
+- Run `pnpm exec werkstatt run material.credits.generate --site warpgogol-com`.
 - Start dev build and verify `/bildnachweise/` renders without runtime errors.
 - Verify stable anchors work (`/bildnachweise/#warpgogol-promo-video`).
 - Verify no raw enum values are visible.
 
 **Validation:**
 
-- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json` exits 0.
-- `pnpm exec site-kernel run content.references.validate --site warpgogol-com` exits 0.
+- `pnpm exec werkstatt run material.credits.validate --site warpgogol-com --json` exits 0.
+- `pnpm exec werkstatt run content.references.validate --site warpgogol-com` exits 0.
 - Dev build of `warpgogol-com` starts without runtime errors on `/bildnachweise/`.
 
 **Completion criterion:** Credits page renders correctly; all validation passes.
@@ -326,7 +326,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0488 --json` (V-19 warnings resolved)
+- `pnpm exec werkstatt run rfc.validate RFC-0488 --json` (V-19 warnings resolved)
 
 **Completion criterion:** `rfc.validate RFC-0488` passes with zero warnings.
 
@@ -361,7 +361,7 @@ scope:
 **Agent actions:**
 
 - Run all validation commands (see section 4).
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0488` (RFC-0330).
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0488` (RFC-0330).
 - Stamp RFC-0488 as `implemented` via `rfc.implement.stamp`.
 
 **Validation:**
@@ -376,17 +376,17 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0488`
+- `pnpm exec werkstatt run rfc.validate RFC-0488`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run content.references.validate --site warpgogol-com`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0488` (RFC-0330)
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run material.credits.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run content.references.validate --site warpgogol-com`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0488` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -405,6 +405,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-4 or DNA-5, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0488 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-4 or DNA-5, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0488 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the migrator cannot handle a sidecar edge case (e.g. malformed YAML), raise `MigrationError` and let the operator fix the sidecar in the workpiece before restarting.
 - If the rights audit reveals a third-party material that cannot be verified and cannot be removed (e.g. legally required imprint image), escalate to the operator for a case-by-case decision.

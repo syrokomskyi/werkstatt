@@ -283,13 +283,13 @@ If git history transfer fails (complex history, submodules, replace objects): th
 - [x] `project-narrative-template.md` exists at `packages/forge/skills/meta/forge-bootstrap/project-narrative-template.md` and is declared in the skill's `knowledge` array (evidence: packages/forge/skills/meta/forge-bootstrap/project-narrative-template.md:1-22, SKILL.md:12-16, forge.skill.validate: 0 violations)
 - [x] `milestone-gallery/` directory exists at `packages/forge/skills/meta/forge-bootstrap/milestone-gallery/` and is declared in the skill's `knowledge` array (evidence: packages/forge/skills/meta/forge-bootstrap/milestone-gallery/.gitkeep, SKILL.md:12-16, forge.skill.validate: 0 violations)
 - [x] `packages/forge/AGENTS.md` Output contract section clarifies that skill reports use `aiLanguage` with zero CLI commands, guides, or formats in user-facing text (evidence: packages/forge/AGENTS.md:100)
-- [x] `forge.skill.validate` passes on the redesigned `forge-bootstrap` skill (evidence: pnpm exec site-kernel run forge.skill.validate — 0 violations)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0547 — All 1 RFC(s) passed validation)
+- [x] `forge.skill.validate` passes on the redesigned `forge-bootstrap` skill (evidence: pnpm exec werkstatt run forge.skill.validate — 0 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate RFC-0547 — All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- Agents MUST NOT include any CLI commands (e.g. `pnpm exec forge doctor`, `forge --help`, `pnpm exec site-kernel run`), guides, or format references in the welcoming report's user-facing text. The system hides all complexity from the operator. The operator is a creator; Forge is the team that helps them.
+- Agents MUST NOT include any CLI commands (e.g. `pnpm exec forge doctor`, `forge --help`, `pnpm exec werkstatt run`), guides, or format references in the welcoming report's user-facing text. The system hides all complexity from the operator. The operator is a creator; Forge is the team that helps them.
 - Agents MUST NOT explain ADR, RFC, or governance concepts to the operator during onboarding. The operator discovers these naturally during work. The ADR is created silently.
 - Agents MUST NOT ask the operator if they want to learn about RFCs, ADRs, or how the system works internally. Onboarding leads directly to creating.
 - Agents MUST read `forge-about.md` when the operator asks about the system at any point — not proactively during onboarding. The knowledge file is the single source of truth for self-description.

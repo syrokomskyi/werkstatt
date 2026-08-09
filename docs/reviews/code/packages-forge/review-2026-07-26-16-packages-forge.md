@@ -28,7 +28,7 @@ The implementation is clean, well-tested, and follows existing patterns. The cod
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @warpgogol/forge run build:check` (0 errors), `pnpm --filter @warpgogol/forge run test` (229/229 passed), `pnpm exec site-kernel run rfc.validate RFC-0543` (0 errors), `node packages/forge/scripts/publish-check.mjs` (all checks passed).
+Pass — `pnpm --filter @warpgogol/forge run build:check` (0 errors), `pnpm --filter @warpgogol/forge run test` (229/229 passed), `pnpm exec werkstatt run rfc.validate RFC-0543` (0 errors), `node packages/forge/scripts/publish-check.mjs` (all checks passed).
 
 ### Axis A — Structural correctness
 

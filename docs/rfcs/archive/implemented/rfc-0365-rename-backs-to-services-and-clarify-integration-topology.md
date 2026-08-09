@@ -348,10 +348,10 @@ Implementation MUST update active instruction and Compass surfaces in the same c
 
 Generated files MUST be regenerated, not hand-edited:
 
-- `docs/command-manifest.generated.json` via `pnpm exec site-kernel run command.manifest.generate`
-- `docs/COMMANDS.md` via `pnpm exec site-kernel run docs.commands.generate`
-- `docs/ecosystem.generated.json` via `pnpm exec site-kernel run ecosystem.manifest.generate`
-- `.gitattributes` generated block via `pnpm exec site-kernel run gitattributes.generate`
+- `docs/command-manifest.generated.json` via `pnpm exec werkstatt run command.manifest.generate`
+- `docs/COMMANDS.md` via `pnpm exec werkstatt run docs.commands.generate`
+- `docs/ecosystem.generated.json` via `pnpm exec werkstatt run ecosystem.manifest.generate`
+- `.gitattributes` generated block via `pnpm exec werkstatt run gitattributes.generate`
 - `docs/compass-inventory.xml` through the existing Compass inventory command if the path inventory changes
 
 Historical RFCs SHOULD NOT be rewritten wholesale. For RFCs amended by this one, update frontmatter `amendedBy` to include `RFC-0365` where that is the repository's current RFC practice. If a short implementation note is added to an old RFC, it must point to this RFC instead of restating the migration.
@@ -411,27 +411,27 @@ This list is a starting point, not a substitute for `rg "backs|backs-check|back.
 Run these commands after implementation:
 
 ```sh
-pnpm exec site-kernel run services.workspace.validate --json
-pnpm exec site-kernel run services.check.run --json
-pnpm exec site-kernel run check-warpgogol.runner.validate --json
-pnpm exec site-kernel run env.contract.validate --json
-pnpm exec site-kernel run observability.conventions.validate --json
-pnpm exec site-kernel run observability.workers.validate --json
-pnpm exec site-kernel run observability.stack.validate --json
-pnpm exec site-kernel run fleet.probe.validate --json
-pnpm exec site-kernel run observability.delivery.validate --json
-pnpm exec site-kernel run matomo.proxy.validate --json
-pnpm exec site-kernel run lagebild.validate --json
-pnpm exec site-kernel run command.manifest.generate
-pnpm exec site-kernel run docs.commands.generate
-pnpm exec site-kernel run ecosystem.manifest.generate
-pnpm exec site-kernel run gitattributes.generate
-pnpm exec site-kernel run command.manifest.validate --json
-pnpm exec site-kernel run docs.commands.validate --json
-pnpm exec site-kernel run ecosystem.manifest.validate --json
-pnpm exec site-kernel run workspace.surface.validate --json
-pnpm exec site-kernel run rfc.validate
-pnpm exec site-kernel run packages-check.run --json
+pnpm exec werkstatt run services.workspace.validate --json
+pnpm exec werkstatt run services.check.run --json
+pnpm exec werkstatt run check-warpgogol.runner.validate --json
+pnpm exec werkstatt run env.contract.validate --json
+pnpm exec werkstatt run observability.conventions.validate --json
+pnpm exec werkstatt run observability.workers.validate --json
+pnpm exec werkstatt run observability.stack.validate --json
+pnpm exec werkstatt run fleet.probe.validate --json
+pnpm exec werkstatt run observability.delivery.validate --json
+pnpm exec werkstatt run matomo.proxy.validate --json
+pnpm exec werkstatt run lagebild.validate --json
+pnpm exec werkstatt run command.manifest.generate
+pnpm exec werkstatt run docs.commands.generate
+pnpm exec werkstatt run ecosystem.manifest.generate
+pnpm exec werkstatt run gitattributes.generate
+pnpm exec werkstatt run command.manifest.validate --json
+pnpm exec werkstatt run docs.commands.validate --json
+pnpm exec werkstatt run ecosystem.manifest.validate --json
+pnpm exec werkstatt run workspace.surface.validate --json
+pnpm exec werkstatt run rfc.validate
+pnpm exec werkstatt run packages-check.run --json
 ```
 
 If Compass inventory is path-sensitive in the implementation branch, also run the repository's Compass inventory/generation command and commit the regenerated artifact if it is tracked.

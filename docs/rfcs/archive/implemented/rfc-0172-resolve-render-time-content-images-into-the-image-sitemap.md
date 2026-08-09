@@ -94,9 +94,9 @@ So today the only way to put a hero image in the sitemap is to also hand-author 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run dist.sitemap.images.generate --app nicaragua-projekt
-pnpm exec site-kernel run dist.sitemap.images.validate --app nicaragua-projekt --json
-pnpm exec site-kernel run dist.sitemap.images.validate --all --json
+pnpm exec werkstatt run dist.sitemap.images.generate --app nicaragua-projekt
+pnpm exec werkstatt run dist.sitemap.images.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run dist.sitemap.images.validate --all --json
 ```
 
 `dist.sitemap.images.generate` is **post-build** (requires `dist/client/`). `dist.sitemap.images.validate` joins `apps-check.run` (post-build phase).

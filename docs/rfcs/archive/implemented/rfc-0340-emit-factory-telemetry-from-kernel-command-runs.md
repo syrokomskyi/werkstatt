@@ -100,7 +100,7 @@ Instrument the **single kernel command execution path** — the code in `@gogol/
 Scope: workspace, read-only (remote-write of one test metric), **network, manual-only** (never in pipelines):
 
 ```sh
-pnpm exec site-kernel run observability.factory.smoke --json
+pnpm exec werkstatt run observability.factory.smoke --json
 ```
 
 Sends `wgogol_factory_smoke_total` +1 through the port and reports `{ delivered, reason }` plus the HTTP status. Exit non-zero when env is present but delivery fails; exit zero with an explanatory diagnostic when env is absent (so the command is safely runnable anywhere).

@@ -46,7 +46,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.validate`
+- `pnpm exec werkstatt run rfc.validate`
 
 ## 3. Step sequence
 
@@ -210,16 +210,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 5)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but changed command behavior — run to refresh generated projection)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but changed command behavior — run to refresh generated projection)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0568 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0568 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate` passes
+- `pnpm exec werkstatt run rfc.validate` passes
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
 - `pnpm --filter @warpgogol/site-kernel-handoff test` passes
 - Review report exists in `docs/reviews/code/` for this session
@@ -232,7 +232,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate`
+- `pnpm exec werkstatt run rfc.validate`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -253,5 +253,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle contract — boilerplate files entering cache clone via merge), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0568 --reason "..." --invariant "DNA-44"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44 (Sternsystem bundle contract — boilerplate files entering cache clone via merge), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0568 --reason "..." --invariant "DNA-44"` instead of working around it.
 - If the `git clone` approach fails for non-git Sternsystems in a way that cannot be handled by the `copyDir` fallback, escalate via `rfc.supersede.propose`.

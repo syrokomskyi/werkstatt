@@ -61,7 +61,7 @@ nonGoals:
   - "Do not add retry to gitExec calls in other modules — only bordbuch.commit uses gitExecWithRetry initially. Other modules may adopt it incrementally."
   - "Do not change the bordbuch projection file paths or the commit message format."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -217,7 +217,7 @@ The retry logic distinguishes transient from non-transient failures by inspectin
 - [x] Unit tests for `gitExecWithRetry` cover: retry on transient, no retry on non-transient, backoff timing, exhaustion throws (evidence: `packages/os/site-kernel-handoff/src/tests/git-exec-retry.test.ts` 7 tests, `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run src/tests/git-exec-retry.test.ts` passes)
 - [x] `bordbuch-commit.test.ts` updated to verify retry behavior (evidence: `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:46-51` `gitExecWithRetry` mock, `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:145-153` all-operations test)
 - [x] `mission.validate` completes without `bordbuch.commit` failing on transient git lock contention (evidence: `bordbuch.commit` now retries transient failures via `gitExecWithRetry` before throwing; `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run` 499 tests pass)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0646 --json` exits 0, 2026-08-02)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0646 --json` exits 0, 2026-08-02)
 
 ## Implementation notes for agents
 

@@ -124,8 +124,8 @@ A dedicated RFC should pick up this migration. RFC-0127 leaves the one HEAD-01 f
 - [x] `runSectionCtaContractValidate` skips files whose slug is in the set (and continues to skip utility sections via `isUtilitySection`). (evidence: implemented historically)
 - [x] `markdown-section.manifest.yaml` declares `defaultImageFade` as a nested object and no longer declares the flat keys. (evidence: implemented historically)
 - [x] `markdown-section.astro` consumes the nested shape and applies the existing CSS classes accordingly. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run section.cta.contract.validate` exits zero. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run section.image.contract.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run section.cta.contract.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run section.image.contract.validate` exits zero. (evidence: implemented historically)
 - [x] `pnpm --filter warpgogol-com astro check` and `pnpm --filter nicaragua-projekt astro check` both exit zero. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

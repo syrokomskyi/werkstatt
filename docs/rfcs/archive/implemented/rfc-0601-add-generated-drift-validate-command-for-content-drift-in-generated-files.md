@@ -70,7 +70,7 @@ nonGoals:
   - "Do not check files outside the site workpiece — scope is strictly the site's public/ and src/ directories."
   - "Do not replace RFC-0236 (material.credits.drift.validate) — that RFC targets a specific prose credits generator. This RFC is the general-purpose drift validator for all text-based generated files."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -139,8 +139,8 @@ The kernel gains a `generated.drift.validate` command that re-generates each tex
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run generated.drift.validate --site warpgogol-com
-pnpm exec site-kernel run generated.drift.validate --site warpgogol-com --json
+pnpm exec werkstatt run generated.drift.validate --site warpgogol-com
+pnpm exec werkstatt run generated.drift.validate --site warpgogol-com --json
 ```
 
 Scope: `workspace` (operates per-site via `--site`).
@@ -166,7 +166,7 @@ import type { Diagnostic, CheckResult, KernelCommandResult } from "@warpgogol/si
 // - message: human-readable description
 // - file: workspace-relative POSIX path to the drifted file
 // - data: { generator: string } — owning kernel command name
-// - fixHint: "Re-run: pnpm exec site-kernel run <generator> --site <id>"
+// - fixHint: "Re-run: pnpm exec werkstatt run <generator> --site <id>"
 ```
 
 ### Algorithm
@@ -224,7 +224,7 @@ Canonical `CheckResult` (RFC-0203) with `diagnostics: Diagnostic[]`:
       "message": "Committed file content differs from generator output",
       "file": "public/humans.txt",
       "data": { "generator": "humans.generate" },
-      "fixHint": "Re-run: pnpm exec site-kernel run humans.generate --site warpgogol-com"
+      "fixHint": "Re-run: pnpm exec werkstatt run humans.generate --site warpgogol-com"
     },
     {
       "ruleId": "DRIFT-02",
@@ -286,7 +286,7 @@ Canonical `CheckResult` (RFC-0203) with `diagnostics: Diagnostic[]`:
 - [x] Command added to `build.check` pipeline after `generated.marker.validate`, before `generated.stale.validate` (evidence: packages/os/site-kernel-checks/src/pipelines/build-check.ts:39)
 - [x] `--json` output follows canonical `CheckResult` shape with `diagnostics: Diagnostic[]` (DRIFT-01 as error, DRIFT-02 as info) (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts)
 - [x] Unit test in `src/tests/generated-drift-validate.test.ts` covers drift detection, clean-pass, dryRun-skip, binary-skip, and glob-expansion scenarios (evidence: packages/os/site-kernel-checks/src/tests/generated-drift-validate.test.ts)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0601)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate RFC-0601)
 
 ## Implementation notes for agents
 

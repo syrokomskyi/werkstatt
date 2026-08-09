@@ -47,7 +47,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0596`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0596`
 
 ## 3. Step sequence
 
@@ -176,16 +176,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 4).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `release.publish` behavior changed — check if manifest needs update).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `release.publish` behavior changed — check if manifest needs update).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0596 against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0596 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0596 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0596`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0596`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 - Review report exists in `docs/reviews/code/` for this session.
@@ -198,7 +198,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0596`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0596`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -219,5 +219,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48 or DNA-52, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0596 --reason "..." --invariant "DNA-48"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48 or DNA-52, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0596 --reason "..." --invariant "DNA-48"` instead of working around it.
 - If `storeArtifactCore` extraction reveals additional lock-related side effects not identified in the audit, stop and document the finding before proceeding.

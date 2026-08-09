@@ -63,7 +63,7 @@ No configuration or data files affected.
 **Validation:**
 
 - `pnpm --filter forge run build:check` passes
-- `pnpm exec site-kernel run rfc.validate RFC-0463 --json` — V-26 and V-27 do not fire on RFC-0463 (it is `accepted`, not `implemented`; its `[x]` items have evidence)
+- `pnpm exec werkstatt run rfc.validate RFC-0463 --json` — V-26 and V-27 do not fire on RFC-0463 (it is `accepted`, not `implemented`; its `[x]` items have evidence)
 
 **Completion criterion:** V-26 and V-27 rules present in `validate-rules.ts`, `build:check` passes.
 
@@ -133,7 +133,7 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.list --status implemented --json` to get the full list
+- Run `pnpm exec werkstatt run rfc.list --status implemented --json` to get the full list
 - Write a detection script (inline or temporary) that for each implemented RFC:
   - Parses the acceptance criteria section
   - Detects `[x]` without `(evidence: ...)` → candidate for backfill
@@ -146,7 +146,7 @@ No configuration or data files affected.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — no V-26 or V-27 violations on any implemented RFC
+- `pnpm exec werkstatt run rfc.validate --json` — no V-26 or V-27 violations on any implemented RFC
 
 **Completion criterion:** `rfc.validate` passes on the full RFC tree with zero V-26 and V-27 violations.
 
@@ -163,9 +163,9 @@ No configuration or data files affected.
 - For each acceptance criterion in RFC-0463:
   - Verify it is met (check the code, run the command, inspect the artifact)
   - Check `[x]` and add `(evidence: ...)` annotation
-- Run `pnpm exec site-kernel run rfc.validate RFC-0463 --json` — must pass
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0463 --json` — must pass (3 file-contains probes)
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0463` — emit evidence file
+- Run `pnpm exec werkstatt run rfc.validate RFC-0463 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0463 --json` — must pass (3 file-contains probes)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0463` — emit evidence file
 - Set `status: implemented`, `implementedAt: 2026-07-20`, `updatedAt: 2026-07-20`
 - Commit the RFC file and evidence file
 
@@ -187,10 +187,10 @@ No configuration or data files affected.
 
 - `pnpm --filter forge run build:check` — scoped typecheck
 - `pnpm --filter forge run test` — unit tests for V-26 and V-27
-- `pnpm exec site-kernel run rfc.validate RFC-0463 --json` — RFC passes validation
-- `pnpm exec site-kernel run rfc.validate --json` — full RFC tree passes validation (after backfill)
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0463 --json` — acceptance probes pass
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0463` — verification evidence emitted (RFC-0330)
+- `pnpm exec werkstatt run rfc.validate RFC-0463 --json` — RFC passes validation
+- `pnpm exec werkstatt run rfc.validate --json` — full RFC tree passes validation (after backfill)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0463 --json` — acceptance probes pass
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0463` — verification evidence emitted (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -209,5 +209,5 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If backfilling existing implemented RFCs reveals an RFC whose deferred work cannot be split via supersede (e.g., the RFC is foundational and splitting would break traceability), run `pnpm exec site-kernel run rfc.supersede.propose --id <rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If backfilling existing implemented RFCs reveals an RFC whose deferred work cannot be split via supersede (e.g., the RFC is foundational and splitting would break traceability), run `pnpm exec werkstatt run rfc.supersede.propose --id <rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If V-26 or V-27 produces false positives on a legitimate edge case (e.g., RFC with no acceptance criteria section but `status: implemented`), do not weaken the rules — instead, ensure V-13 (missing section check) fires first and the RFC is fixed to include the section.

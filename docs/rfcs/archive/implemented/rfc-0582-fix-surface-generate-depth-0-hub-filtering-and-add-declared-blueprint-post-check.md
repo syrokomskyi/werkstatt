@@ -56,7 +56,7 @@ nonGoals:
   - "Do not add a new cache invalidation mechanism for filesystem state"
   - "Do not change expandBlueprint internals — it already handles empty collections correctly"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -112,10 +112,10 @@ No CLI surface change. `surface.generate` is invoked the same way:
 
 ```sh
 # Pipeline step (build.prepare)
-pnpm exec site-kernel run surface.generate --site warpgogol-com
+pnpm exec werkstatt run surface.generate --site warpgogol-com
 
 # Via mission.validate / build.check pipeline
-pnpm exec site-kernel run mission.validate --mission warpgogol-com-m000019
+pnpm exec werkstatt run mission.validate --mission warpgogol-com-m000019
 ```
 
 The command's behavior changes: it no longer silently skips blueprints whose collection directory is absent, and it emits `SURFACE-GEN-01` when a declared blueprint produces zero entries.

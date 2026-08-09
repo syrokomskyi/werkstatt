@@ -179,7 +179,7 @@ The mandatory `## Quellen` section (RFC-0501) in the prose body must list all re
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json
+pnpm exec werkstatt run ratgeber.provenance.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check`.
@@ -313,4 +313,4 @@ The Quellen section coverage check matches `sourceId` strings in the prose body'
 - [x] Every `sourceId` resolves to a source descriptor. (evidence: `packages/os/site-kernel-checks/src/ratgeber-provenance-validate.ts` RG-PROV-02)
 - [x] Every `claimId` exists in the article's claim sidecar. (evidence: `packages/os/site-kernel-checks/src/ratgeber-provenance-validate.ts` RG-PROV-03)
 - [x] Article pages display provenance footer. (evidence: `packages/os/site-kernel-checks/src/surface-expand/bake-ratgeber-article.ts` `buildProvenanceFooter`)
-- [x] `rfc.validate` passes. (evidence: `pnpm exec site-kernel run rfc.validate --root docs/rfcs/rfc-0502-ratgeber-editorial-provenance-authors-sources-claims.md` — only V-19 warning)
+- [x] `rfc.validate` passes. (evidence: `pnpm exec werkstatt run rfc.validate --root docs/rfcs/rfc-0502-ratgeber-editorial-provenance-authors-sources-claims.md` — only V-19 warning)

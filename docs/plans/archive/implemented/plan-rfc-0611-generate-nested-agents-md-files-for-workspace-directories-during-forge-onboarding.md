@@ -53,7 +53,7 @@ scope:
 
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck
 - `pnpm --filter @warpgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0611` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0611` — RFC validation
 
 ## 3. Step sequence
 
@@ -199,7 +199,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` — skill validation passes (SKILL-01..17)
+- `pnpm exec werkstatt run forge.skill.validate` — skill validation passes (SKILL-01..17)
 
 **Completion criterion:** `forge-bootstrap` SKILL.md includes transplant step with LLM instructions for hand-written AGENTS.md improvement proposals.
 
@@ -270,18 +270,18 @@ scope:
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` is updated (step 8).
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0611` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0611` — must pass.
 - Run `pnpm --filter @warpgogol/forge run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/forge run test` — all tests pass.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0611 --implementation-commit <sha>`. Commit the stamp transition separately.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0611 --implementation-commit <sha>`. Commit the stamp transition separately.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from this session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0611` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0611` — passes.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; `git status` clean.
@@ -292,7 +292,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0611`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0611`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -314,5 +314,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0611 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0611 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the type-specific template content requires RFC-level specification (contrary to the non-goal), create an amending RFC via `fo-idea-create-rfc` with `amends: [RFC-0611]`.

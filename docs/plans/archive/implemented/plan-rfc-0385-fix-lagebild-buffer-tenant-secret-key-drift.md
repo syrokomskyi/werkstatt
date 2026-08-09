@@ -59,7 +59,7 @@ scope:
 - `pnpm --filter @gogol/integration-adapter-supabase-crm run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run rfc.validate RFC-0385 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0385 --json`
 - Grep verification: no `TENANT_ID` as buffer tenant secret outside historical RFC text
 
 ## 3. Step sequence
@@ -184,7 +184,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0385 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0385 --json`
 - Run scoped `build:check` for all three packages
 - Verify spec `05-site-config.md` uses canonical name (already confirmed)
 - Stamp RFC `status: implemented`, `implementedAt: 2026-07-14`
@@ -205,7 +205,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0385 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0385 --json`
 - `pnpm --filter @gogol/integration-adapter-supabase-crm run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
@@ -226,4 +226,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0385 --reason "..." --invariant "DNA-40"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0385 --reason "..." --invariant "DNA-40"` instead of working around it.

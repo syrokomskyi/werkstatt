@@ -106,8 +106,8 @@ The workspace adopts a single canonical finding model, the **`Diagnostic`**, pro
 
 ```sh
 # New governance lint — inner-shape analogue of kernel.result.envelope.lint.
-pnpm exec site-kernel run diagnostic.shape.lint
-pnpm exec site-kernel run diagnostic.shape.lint --json
+pnpm exec werkstatt run diagnostic.shape.lint
+pnpm exec werkstatt run diagnostic.shape.lint --json
 ```
 
 `diagnostic.shape.lint` is `scope: workspace`. It scans `packages/os/site-kernel-checks/src/**/*.ts` and reports:

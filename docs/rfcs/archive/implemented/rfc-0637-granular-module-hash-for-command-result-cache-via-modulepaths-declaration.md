@@ -57,7 +57,7 @@ nonGoals:
   - Changing the command-result cache key structure (RFC-0390)
   - Caching astro build or execSync-based commands
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -109,13 +109,13 @@ No new CLI commands. This is an internal change to the command-result cache logi
 
 ```sh
 # Check cache status (unchanged)
-pnpm exec site-kernel run kernel.cache.status --json
+pnpm exec werkstatt run kernel.cache.status --json
 
 # Clear cache (unchanged)
-pnpm exec site-kernel run kernel.cache.clear
+pnpm exec werkstatt run kernel.cache.clear
 
 # Force cache refresh for a pipeline run (unchanged)
-pnpm exec site-kernel run mission.validate --site warpgogol-com --force
+pnpm exec werkstatt run mission.validate --site warpgogol-com --force
 ```
 
 ### TypeScript contracts
@@ -247,7 +247,7 @@ No output format changes. The command-result cache operates internally. The `ker
 - [x] Unit test: `computeModuleHash` without `modulePaths` hashes full `src/` (existing behavior) (evidence: packages/os/site-kernel/src/cache/**tests**/command-result-cache.test.ts:132-140)
 - [x] Unit test: `moduleHashCache` keys are distinct for different `modulePaths` values (evidence: packages/os/site-kernel/src/cache/**tests**/command-result-cache.test.ts:142-149)
 - [x] Unit test: non-existent path in `modulePaths` is silently skipped (evidence: packages/os/site-kernel/src/cache/**tests**/command-result-cache.test.ts:151-156)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0637` → status: pass, violations: [])
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0637` → status: pass, violations: [])
 
 ## Implementation notes for agents
 

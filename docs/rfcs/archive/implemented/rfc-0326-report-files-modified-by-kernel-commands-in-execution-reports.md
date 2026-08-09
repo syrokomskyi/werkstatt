@@ -53,7 +53,7 @@ nonGoals:
 
 This repository is developed and operated primarily by AI agents. When an agent runs a kernel generator command (e.g. `sitemap.generate`, `command.manifest.generate`, `ecosystem.manifest.generate`), the command writes files to disk. The agent's IDE tooling layer (e.g. Cascade) maintains a cache of file contents it has previously read. If a command modifies a file the agent has cached, the agent's subsequent edit may silently operate on stale content — causing broken diffs, failed edits, or corrupted generated files.
 
-The IDE tooling layer already emits messages like `[This command modified 1 file you've previously read: path. Call Read before editing.]` when its own tool calls modify files. But when a Site OS kernel command modifies files via `pnpm exec site-kernel run ...`, the IDE layer has no visibility into which files were touched. The agent must either re-read every file it has ever cached (wasteful) or guess (error-prone).
+The IDE tooling layer already emits messages like `[This command modified 1 file you've previously read: path. Call Read before editing.]` when its own tool calls modify files. But when a Site OS kernel command modifies files via `pnpm exec werkstatt run ...`, the IDE layer has no visibility into which files were touched. The agent must either re-read every file it has ever cached (wasteful) or guess (error-prone).
 
 RFC-0267 introduced the `WorkspaceIO` port with three adapters: `createDefaultIO` (real fs), `createRecordingIO` (dry-run, captures `WriteIntent[]`), and `createReadOnlyIO` (throws on mutation). The recording adapter already proves the pattern: intercept mutations, record paths, surface them on the report. But `createDefaultIO` — the adapter used for real (non-dry-run) executions — writes to disk without recording what it wrote. `KernelExecutionReport` (in `packages/os/site-kernel/src/types.ts:256-273`) has no `filesModified` field. The CLI (`packages/os/site-kernel/src/cli/index.ts:205-211`) prints JSON or lets the logger handle pretty output, with no post-execution summary of touched files.
 
@@ -69,7 +69,7 @@ The unprotected invariant is: **after a kernel command runs, the caller (agent o
 4. **Absent from CLI JSON output** — no structured field to parse.
 5. **Only partially available in dry-run mode** — `createRecordingIO` captures `WriteIntent[]` and the executor surfaces them as `report.data.writeIntents`, but this is dry-run-only and uses a different field name than what this RFC standardizes.
 
-An agent running `pnpm exec site-kernel run ecosystem.manifest.generate` has no machine-readable way to know which files were just written. It must re-read blindly or risk stale-cache edits.
+An agent running `pnpm exec werkstatt run ecosystem.manifest.generate` has no machine-readable way to know which files were just written. It must re-read blindly or risk stale-cache edits.
 
 ## Decision
 

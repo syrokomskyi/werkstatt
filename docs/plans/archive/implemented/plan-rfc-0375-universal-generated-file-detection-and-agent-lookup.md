@@ -140,7 +140,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run generator.ownership.lint` passes (no multi-owner violations).
+- `pnpm exec werkstatt run generator.ownership.lint` passes (no multi-owner violations).
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
 
 **Completion criterion:** All listed generators have entries in `GENERATOR_OWNERSHIP_MAP` with `markerPolicy` and `module`; `generator.ownership.lint` passes.
@@ -166,7 +166,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run generated.file.lookup --path apps/warpgogol-com/public/robots.txt --json` returns `generated: true`.
+- `pnpm exec werkstatt run generated.file.lookup --path apps/warpgogol-com/public/robots.txt --json` returns `generated: true`.
 
 **Completion criterion:** Command registered, returns correct metadata for known generated files, returns `generated: false` for non-generated files.
 
@@ -192,7 +192,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run generated.files.validate --app warpgogol-com --json` passes.
+- `pnpm exec werkstatt run generated.files.validate --app warpgogol-com --json` passes.
 
 **Completion criterion:** Command registered, validates existence of all registry-declared files, correctly expands globs.
 
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run generated.marker.validate --app warpgogol-com --phase=author` no longer reports Category B files.
+- `pnpm exec werkstatt run generated.marker.validate --app warpgogol-com --phase=author` no longer reports Category B files.
 
 **Completion criterion:** `generated.marker.validate` only checks Category A files; Category B files are not in its expected list.
 
@@ -238,7 +238,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run generated.edit.guard --json` passes with no diff.
+- `pnpm exec werkstatt run generated.edit.guard --json` passes with no diff.
 
 **Completion criterion:** Guard processes all file types; Category B files are protected; binary regeneration exemption works.
 
@@ -270,7 +270,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run build.prepare --app warpgogol-com` regenerates public files without markers.
+- `pnpm exec werkstatt run build.prepare --app warpgogol-com` regenerates public files without markers.
 - `grep -r "GENERATED" apps/warpgogol-com/public/` returns no results (after regeneration).
 
 **Completion criterion:** All listed `public/**` generators produce clean output without `GENERATED_MARKER`.
@@ -293,7 +293,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run semantic.parity --app warpgogol-com` passes (after `build.prepare` regenerated `llms.txt` without marker).
+- `pnpm exec werkstatt run semantic.parity --app warpgogol-com` passes (after `build.prepare` regenerated `llms.txt` without marker).
 
 **Completion criterion:** `stripMarker` function deleted; parity check compares raw content; `semantic.parity` passes.
 
@@ -318,8 +318,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0375 --json` passes.
-- `pnpm exec site-kernel run compass.validate --json` passes.
+- `pnpm exec werkstatt run rfc.validate RFC-0375 --json` passes.
+- `pnpm exec werkstatt run compass.validate --json` passes.
 
 **Completion criterion:** `AGENTS.md` documents two-category system; Compass XML files synchronized if needed.
 
@@ -334,12 +334,12 @@ scope:
 **Agent actions:**
 
 - Verify `generated.file.lookup` and `generated.files.validate` are registered in `command-tables/01-codegen.ts` and `module.ts`.
-- Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`.
-- Run `pnpm exec site-kernel run gitattributes.generate` to update `.gitattributes`.
+- Run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml`.
+- Run `pnpm exec werkstatt run gitattributes.generate` to update `.gitattributes`.
 - Run `pnpm exec site-kernel rfc.validate RFC-0375 --json`.
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`.
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0375 --json`.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0375` (RFC-0330).
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0375 --json`.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0375` (RFC-0330).
 - Stamp `implementedAt: 2026-07-12` in RFC-0375 frontmatter.
 - Commit with `RFC-0375` in subject.
 
@@ -358,17 +358,17 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0375 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0375 --json`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel run build:check`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0375 --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0375` (RFC-0330)
-- `pnpm exec site-kernel run generated.file.lookup --path apps/warpgogol-com/public/robots.txt --json`
-- `pnpm exec site-kernel run generated.files.validate --app warpgogol-com --json`
-- `pnpm exec site-kernel run generated.marker.validate --app warpgogol-com --phase=author`
-- `pnpm exec site-kernel run generated.edit.guard --json`
-- `pnpm exec site-kernel run semantic.parity --app warpgogol-com`
-- `pnpm exec site-kernel run generator.ownership.lint`
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0375 --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0375` (RFC-0330)
+- `pnpm exec werkstatt run generated.file.lookup --path apps/warpgogol-com/public/robots.txt --json`
+- `pnpm exec werkstatt run generated.files.validate --app warpgogol-com --json`
+- `pnpm exec werkstatt run generated.marker.validate --app warpgogol-com --phase=author`
+- `pnpm exec werkstatt run generated.edit.guard --json`
+- `pnpm exec werkstatt run semantic.parity --app warpgogol-com`
+- `pnpm exec werkstatt run generator.ownership.lint`
 
 ### 4.2 Evidence artifacts
 
@@ -387,6 +387,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0375 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0375 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `generated.edit.guard` binary regeneration exemption cannot distinguish hand-edit from regeneration reliably, escalate via RFC-0334 — do not weaken the guard silently.
 - If `collectFiles` glob expansion is too slow (>500ms per app), escalate — may need a cached index approach (new RFC).

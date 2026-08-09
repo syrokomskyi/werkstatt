@@ -105,10 +105,10 @@ The semantic block projection system is unified into a single pipeline with no h
 
 ```sh
 # Renamed and strengthened validator (replaces page.blocks.validate)
-pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com
+pnpm exec werkstatt run page.blocks.extract.validate --app warpgogol-com
 
 # Existing generator (unchanged command name, but now produces complete home twins)
-pnpm exec site-kernel run page.markdown.generate --app warpgogol-com
+pnpm exec werkstatt run page.markdown.generate --app warpgogol-com
 ```
 
 ### TypeScript contracts

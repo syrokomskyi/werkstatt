@@ -135,7 +135,7 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0725 --json`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0725 --json`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 
@@ -156,17 +156,17 @@ No configuration or data files affected.
 **Agent actions:**
 
 - Update `packages/os/site-kernel-checks/AGENTS.md` if the `tokens.ts` module description needs updating to reflect the new undefined token check
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (description changed — regenerate manifest)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (description changed — regenerate manifest)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: ...)` annotations
-- **Emit verification evidence:** run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0725` (RFC-0330). Note: this RFC has no acceptance probes, so the command may skip — that is expected and non-blocking.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0725 --implementation-commit <sha>` (use first implementation commit SHA)
+- **Emit verification evidence:** run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0725` (RFC-0330). Note: this RFC has no acceptance probes, so the command may skip — that is expected and non-blocking.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0725 --implementation-commit <sha>` (use first implementation commit SHA)
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0725`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0725`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -177,10 +177,10 @@ No configuration or data files affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0725`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0725`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0725` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0725` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -198,5 +198,5 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-10, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0725 --reason "..." --invariant "DNA-10"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-10, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0725 --reason "..." --invariant "DNA-10"` instead of working around it.
 - If `TOKEN_NAME_SET` import fails due to package resolution issues, investigate `@warpgogol/tokens` build state before proceeding — do not duplicate the token list.

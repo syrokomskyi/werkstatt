@@ -243,7 +243,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run command.manifest.validate --json` — no warnings
+- `pnpm exec werkstatt run command.manifest.validate --json` — no warnings
 
 **Completion criterion:** `GENERATOR_OWNERSHIP_MAP` entries match the command's `writes` declarations, and command descriptions reflect manifest-based discovery.
 
@@ -263,8 +263,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json` — no drift
-- `pnpm exec site-kernel run workspace.surface.validate --json` — no drift
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json` — no drift
+- `pnpm exec werkstatt run workspace.surface.validate --json` — no drift
 
 **Completion criterion:** All documentation artifacts in `scope.docs` are updated and validation passes.
 
@@ -278,16 +278,16 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0528 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0528 --json` — must pass
 - Run `pnpm --filter @gogol/site-kernel-codegen run build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
 - Check off all 11 acceptance criteria in the RFC with inline `(evidence: ...)` annotations
-- Stamp the RFC: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0528 --implementation-commit <sha>`
+- Stamp the RFC: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0528 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0528 --json` — pass
+- `pnpm exec werkstatt run rfc.validate RFC-0528 --json` — pass
 
 **Completion criterion:** All acceptance criteria verified, RFC stamped as `implemented` via `rfc.implement.stamp`.
 
@@ -297,11 +297,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0528 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0528 --json`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run command.manifest.validate --json`
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json`
+- `pnpm exec werkstatt run command.manifest.validate --json`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -320,6 +320,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0528 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0528 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If RFC-0527 (content reference index) is not yet implemented, Step 4 degrades gracefully — `substituteContentReferences` returns raw strings. This is acceptable; the RFC explicitly depends on RFC-0527 but the implementation can proceed with unresolved references (they will be treated as literal strings).
 - If `loadSemanticSiteModel` fails to load (e.g. missing `system.md`), log a warning and skip the fallback. Files without credits will get no metadata — same as current behavior. This is a graceful degradation, not a blocking error.

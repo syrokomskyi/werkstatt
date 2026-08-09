@@ -21,7 +21,7 @@ Pass — 0 violations.
 ## Axis A — Structural completeness
 
 - **Decision** is present tense and specific: cutover preconditions, semantic profile adapter, collection switch, page route switch, OS validation switch, cutover check command, execution steps, rollback plan.
-- **CLI surface** specifies exact command: `pnpm exec site-kernel run pbp.cutover.check --app warpgogol-com`.
+- **CLI surface** specifies exact command: `pnpm exec werkstatt run pbp.cutover.check --app warpgogol-com`.
 - **TypeScript contracts** — `PbpCutoverCheckResult` interface is minimal and purpose-driven.
 - **File system responsibilities** table names 7 concrete paths.
 - **Output format** documents the JSON shape with all fields.

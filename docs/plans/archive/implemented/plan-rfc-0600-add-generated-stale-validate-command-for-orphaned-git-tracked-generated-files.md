@@ -134,7 +134,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build` — compiles without errors
-- `pnpm exec site-kernel run command.manifest.validate --json` — no CMD-MAN-03 warnings for the new command
+- `pnpm exec werkstatt run command.manifest.validate --json` — no CMD-MAN-03 warnings for the new command
 
 **Completion criterion:** Command is registered and `command.manifest.validate` passes without warnings about the new entry.
 
@@ -158,7 +158,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build` — compiles without errors
-- `pnpm exec site-kernel run gate-catalog.validate --json` — no gate catalog drift
+- `pnpm exec werkstatt run gate-catalog.validate --json` — no gate catalog drift
 
 **Completion criterion:** All three pipeline files include the new step and the package builds successfully.
 
@@ -201,11 +201,11 @@ scope:
 **Agent actions:**
 
 - Add `src/generated-stale-validate.ts` to the module table in `packages/os/site-kernel-checks/AGENTS.md` with a one-line description
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0600` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0600` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test` — all tests pass
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
-- Run `pnpm exec site-kernel run command.manifest.validate --json` — no warnings for the new command
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run command.manifest.validate --json` — no warnings for the new command
 
 **Validation:**
 
@@ -227,16 +227,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-checks/AGENTS.md` module table includes the new module
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0600 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0600 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0600`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0600`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline evidence annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -247,10 +247,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0600`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0600`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run command.manifest.validate --json`
+- `pnpm exec werkstatt run command.manifest.validate --json`
 
 ### 4.2 Evidence artifacts
 

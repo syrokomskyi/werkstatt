@@ -181,7 +181,7 @@ export type AmendBrief = z.infer<typeof AmendBrief>;
 The amend analog of `brief.validate` + `onboarding.input.validate`, with the precondition inverted.
 
 ```sh
-pnpm exec site-kernel run amend.input.validate --app warpgogol-com --batch amend-007
+pnpm exec werkstatt run amend.input.validate --app warpgogol-com --batch amend-007
 ```
 
 Behavior:
@@ -235,7 +235,7 @@ The strengthen branch is contractually a **content-only** change: a validator (`
 ### `amend.atoms.merge` — strengthen merge with similarity + voice guards (П-6)
 
 ```sh
-pnpm exec site-kernel run amend.atoms.merge --app <id> --batch amend-<NNN> --page <pageId>
+pnpm exec werkstatt run amend.atoms.merge --app <id> --batch amend-<NNN> --page <pageId>
 ```
 
 - Atomizes the strengthen source into candidate atoms (RFC-0073 intent enum).
@@ -266,7 +266,7 @@ atoms:
 ```
 
 ```sh
-pnpm exec site-kernel run content.coverage.delta --app <id> --batch amend-<NNN>
+pnpm exec werkstatt run content.coverage.delta --app <id> --batch amend-<NNN>
 ```
 
 - Validates that every atom the batch authored is recorded with its `sourceId`, `version`, and `atomHash`.
@@ -301,8 +301,8 @@ export interface AmendProvenanceRecord {
 ```
 
 ```sh
-pnpm exec site-kernel run amend.provenance.append   --app <id> --batch amend-<NNN>
-pnpm exec site-kernel run amend.provenance.validate --app <id>
+pnpm exec werkstatt run amend.provenance.append   --app <id> --batch amend-<NNN>
+pnpm exec werkstatt run amend.provenance.validate --app <id>
 ```
 
 - `amend.provenance.append` is **single-owner and immutable**: it refuses to overwrite an existing `amend-<NNN>.json`. Appending the same batch twice with identical content is a no-op; appending different content under an existing batch id is an error.

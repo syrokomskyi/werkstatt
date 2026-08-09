@@ -73,7 +73,7 @@ nonGoals:
   - Do not change the open-source page layout or SBOM data — only the build-identity reading mechanism changes
   - Do not address the distribution-reuse path in release.prepare — when canReuseDistribution is true, the workpiece is not rebuilt and the preliminary build-identity.json is not written. The reused distribution's open-source page retains whatever metadata it was built with. This is a known limitation documented in the Design section.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -144,13 +144,13 @@ No new commands. Existing commands gain build-identity responsibilities:
 
 ```sh
 # Dev: builds workpiece, writes build-identity.json, deploys to dev, runs Axiom
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com
 
 # Alt: verifies build-identity from dev URL, deploys to alt
-pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000006
+pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000006
 
 # Main: verifies build-identity from alt URL, deploys to main (unchanged from RFC-0608)
-pnpm exec site-kernel run leitstand.promote --release warpgogol-com-r000006
+pnpm exec werkstatt run leitstand.promote --release warpgogol-com-r000006
 ```
 
 ### Build-identity lifecycle

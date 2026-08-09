@@ -72,7 +72,7 @@ nonGoals:
   - "Route metadata drift (title, OG tags, JSON-LD) — covered by behavior.snapshot.validate (RFC-0269)"
   - "Auto-fixing content drift — the command is read-only; operators must edit content and re-validate"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:
@@ -153,13 +153,13 @@ The kernel gains a `content.regression.check` command that snapshots resolved pa
 
 ```sh
 # Validate resolved content against golden snapshot (runs in build.check pipeline)
-pnpm exec site-kernel run content.regression.check --site warpgogol-com
+pnpm exec werkstatt run content.regression.check --site warpgogol-com
 
 # Update golden snapshot after operator review (prints diff first, requires --confirm to write)
-pnpm exec site-kernel run content.regression.snapshot.update --site warpgogol-com --confirm
+pnpm exec werkstatt run content.regression.snapshot.update --site warpgogol-com --confirm
 
 # Skip content regression gate during mission.validate (escape hatch)
-pnpm exec site-kernel run mission.validate --site warpgogol-com --skip-content-regression
+pnpm exec werkstatt run mission.validate --site warpgogol-com --skip-content-regression
 ```
 
 **Flags:**
@@ -258,7 +258,7 @@ The snapshot file is **not committed to the workpiece git repo** — it lives on
         ],
         "faqChanged": false
       },
-      "fixHint": "Review the content diff. If intended, run: pnpm exec site-kernel run content.regression.snapshot.update --site warpgogol-com"
+      "fixHint": "Review the content diff. If intended, run: pnpm exec werkstatt run content.regression.snapshot.update --site warpgogol-com"
     },
     {
       "ruleId": "CREG-02",

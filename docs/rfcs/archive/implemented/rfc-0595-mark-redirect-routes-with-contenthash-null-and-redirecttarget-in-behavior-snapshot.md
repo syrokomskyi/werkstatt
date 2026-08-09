@@ -82,11 +82,11 @@ No new commands. Two existing commands are modified:
 
 ```sh
 # behavior.snapshot.capture — now detects redirect pages
-pnpm exec site-kernel run behavior.snapshot.capture --dist releases/warpgogol-com-r000003/dist --system warpgogol-com --release warpgogol-com-r000003
+pnpm exec werkstatt run behavior.snapshot.capture --dist releases/warpgogol-com-r000003/dist --system warpgogol-com --release warpgogol-com-r000003
 # Route /de now has: { path: "/de", contentHash: null, redirectTarget: "/" }
 
 # leitstand.health — skips content-hash for contentHash: null routes
-pnpm exec site-kernel run leitstand.health --system warpgogol-com --channel alt
+pnpm exec werkstatt run leitstand.health --system warpgogol-com --channel alt
 # Route /de: checks HTTP 307/308 + redirect target, skips content hash
 ```
 
@@ -199,7 +199,7 @@ function verifyRedirectRoute(
 - [x] Health check verifies `Location` header matches `redirectTarget` when `redirectTarget` is known (evidence: `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:280-281` — `targetKnown` + `locationMatches`)
 - [x] Non-redirect routes are unaffected — content-hash comparison works as before (evidence: `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:330-345` — `if (route.contentHash)` branch unchanged)
 - [x] Unit tests cover: redirect page detection, redirect health check (307 pass, 200 fail), non-redirect route unaffected, multi-hop redirect target extraction (evidence: `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot.test.ts:104-149`, `packages/share/src/redirects.test.ts:1-65`)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0595 --json` exit 0, 1 warning V-30 non-blocking)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate RFC-0595 --json` exit 0, 1 warning V-30 non-blocking)
 - [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: exit 0, `tsc --noEmit` clean)
 - [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes (evidence: 87 test files, 369 tests passed)
 - [x] `pnpm --filter @warpgogol/ontology build:check` passes (evidence: exit 0, `tsc --noEmit` clean)

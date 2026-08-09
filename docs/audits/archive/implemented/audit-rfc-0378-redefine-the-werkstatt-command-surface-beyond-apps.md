@@ -16,11 +16,11 @@ The RFC is architecturally sound and addresses a real gap — the command surfac
 
 ## Mechanical validation (rfc.validate)
 
-Pass — `pnpm exec site-kernel run rfc.validate RFC-0378 --json` returns zero violations.
+Pass — `pnpm exec werkstatt run rfc.validate RFC-0378 --json` returns zero violations.
 
 ## Axis A — Structural completeness
 
-No issues. All sections contain real content. The Decision is a single present-tense statement ("The kernel gains a site workspace resolver…"). CLI surface shows exact `pnpm exec site-kernel run` invocations with `--site` and `--all` flags. TypeScript contracts are minimal type signatures (`SiteWorkspace`, `resolveSiteWorkspace`, `discoverSiteWorkspaces`). File system responsibilities table names concrete paths. Output format documents the `--json` shape for `fleet.sites.generate`. Failure modes specify exit codes and behavior for unknown id, dual representation, registry unreadable, and drift. Rollout describes a 5-step sequence with default behavior and new-app compliance. Alternatives considered has four real alternatives with rejection reasons. Risks include agent misinterpretation risk (stale `--app` memories). Acceptance criteria are checkable and cover the full scope. Implementation notes are explicit behavioral rules.
+No issues. All sections contain real content. The Decision is a single present-tense statement ("The kernel gains a site workspace resolver…"). CLI surface shows exact `pnpm exec werkstatt run` invocations with `--site` and `--all` flags. TypeScript contracts are minimal type signatures (`SiteWorkspace`, `resolveSiteWorkspace`, `discoverSiteWorkspaces`). File system responsibilities table names concrete paths. Output format documents the `--json` shape for `fleet.sites.generate`. Failure modes specify exit codes and behavior for unknown id, dual representation, registry unreadable, and drift. Rollout describes a 5-step sequence with default behavior and new-app compliance. Alternatives considered has four real alternatives with rejection reasons. Risks include agent misinterpretation risk (stale `--app` memories). Acceptance criteria are checkable and cover the full scope. Implementation notes are explicit behavioral rules.
 
 ## Axis B — DNA alignment
 

@@ -116,7 +116,7 @@ CSS custom-property cascade means a biome override cannot make a token "disappea
 ## Acceptance criteria
 
 - [x] `tokens.section-shell.contract.validate` is registered in `module.ts` and listed in `PACKAGES_CHECK_PIPELINE`. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run tokens.section-shell.contract.validate` exits zero on the current workspace. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run tokens.section-shell.contract.validate` exits zero on the current workspace. (evidence: implemented historically)
 - [x] A deliberately introduced `--ds-color-nonexistent` reference in a scoped CSS file makes the validator fail with `SHELL-TOK-CONTRACT-01` (verified locally, reverted before commit). (evidence: implemented historically)
 - [x] `packages/ui/docs/section-framework-token-contract.md` exists and reflects the current categories of tokens consumed. (evidence: packages/ directory, package exists)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)

@@ -59,7 +59,7 @@ nonGoals:
   - "Does not add passport.key.ensure to the build.prepare pipeline — that is RFC-0604."
   - "Does not handle key revocation or expiry — only initial creation and no-op."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -108,13 +108,13 @@ The kernel gains a `passport.key.ensure` command that creates the passport publi
 
 ```sh
 # Initial key creation (pipeline context — no private key to stdout)
-pnpm exec site-kernel run passport.key.ensure --site warpgogol-com
+pnpm exec werkstatt run passport.key.ensure --site warpgogol-com
 
 # Initial key creation with private key written to a file (operator context)
-pnpm exec site-kernel run passport.key.ensure --site warpgogol-com --private-key-out /tmp/passport-private-key.txt
+pnpm exec werkstatt run passport.key.ensure --site warpgogol-com --private-key-out /tmp/passport-private-key.txt
 
 # Subsequent runs are no-op (key file already exists)
-pnpm exec site-kernel run passport.key.ensure --site warpgogol-com
+pnpm exec werkstatt run passport.key.ensure --site warpgogol-com
 ```
 
 Scope: `app`. The command reads the system manifest to get `appId` and writes to `<app>/public/.well-known/cosmic-passport-key.json`.
@@ -213,11 +213,11 @@ When a new key is created:
 - [x] Command never prints the private key to stdout (evidence: packages/os/site-kernel-checks/src/passport.ts:232-365 — no console.log in handler, passport-key-ensure.test.ts "never prints private key to stdout")
 - [x] `--private-key-out` flag writes the private key to the specified file path when a new key is created, with `0600` file permissions (evidence: packages/os/site-kernel-checks/src/passport.ts:333-348, passport-key-ensure.test.ts "--private-key-out writes private key with 0600 permissions")
 - [x] `GENERATOR_OWNERSHIP_MAP` lists `passport.key.ensure` as the owner of `public/.well-known/cosmic-passport-key.json` (evidence: packages/os/site-kernel-checks/src/generator-ownership.ts:498-504)
-- [x] `generator.ownership.lint` passes with no multi-owner violations (evidence: pnpm exec site-kernel run generator.ownership.lint — 0 violations)
+- [x] `generator.ownership.lint` passes with no multi-owner violations (evidence: pnpm exec werkstatt run generator.ownership.lint — 0 violations)
 - [x] `passport.key.rotate` remains registered and unchanged (evidence: packages/os/site-kernel-checks/src/command-tables/06-growth-passport.ts:142-157 — no changes to rotate entry)
 - [x] Command fails with PKE-03 if existing key file has no active key (all keys `active: false`) (evidence: packages/os/site-kernel-checks/src/passport.ts:279-284, passport-key-ensure.test.ts "PKE-03: all keys inactive")
 - [x] `packages/passport/AGENTS.md` updated to list `generateKeypair` in the exports table (evidence: packages/passport/AGENTS.md:11)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0605 — All 1 RFC(s) passed)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate RFC-0605 — All 1 RFC(s) passed)
 
 ## Implementation notes for agents
 

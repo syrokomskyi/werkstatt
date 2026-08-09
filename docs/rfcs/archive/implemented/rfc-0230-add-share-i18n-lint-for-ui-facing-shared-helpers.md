@@ -114,13 +114,13 @@ The initial target set is deliberately narrow and allowlist-driven. It must catc
 
 ```sh
 # Run against the default @gogol/share public-helper target set.
-pnpm exec site-kernel run share.i18n.lint
+pnpm exec werkstatt run share.i18n.lint
 
 # Emit structured output for CI/agents.
-pnpm exec site-kernel run share.i18n.lint --json
+pnpm exec werkstatt run share.i18n.lint --json
 
 # Inspect a specific share subpath during migration or debugging.
-pnpm exec site-kernel run share.i18n.lint --path packages/share/src/schemas/material-credit.ts
+pnpm exec werkstatt run share.i18n.lint --path packages/share/src/schemas/material-credit.ts
 ```
 
 Flags:

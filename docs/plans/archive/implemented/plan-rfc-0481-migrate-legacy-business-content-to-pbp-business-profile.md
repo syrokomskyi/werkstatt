@@ -50,8 +50,8 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — scoped tsc
 - `pnpm --filter @gogol/site-kernel-handoff test` — vitest including new tests
-- `pnpm exec site-kernel run migrator.registry.validate` — registry validation
-- `pnpm exec site-kernel run rfc.validate RFC-0481` — RFC validation
+- `pnpm exec werkstatt run migrator.registry.validate` — registry validation
+- `pnpm exec werkstatt run rfc.validate RFC-0481` — RFC validation
 
 ## 3. Step sequence
 
@@ -109,7 +109,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run migrator.registry.validate` passes
+- `pnpm exec werkstatt run migrator.registry.validate` passes
 
 **Completion criterion:** `migratorRegistry` includes `rfc0481Migrator`, registry validation passes.
 
@@ -171,8 +171,8 @@ scope:
 
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff test`
-- Run `pnpm exec site-kernel run migrator.registry.validate`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0481`
+- Run `pnpm exec werkstatt run migrator.registry.validate`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0481`
 - Fix any failures
 
 **Validation:**
@@ -192,7 +192,7 @@ scope:
 **Agent actions:**
 
 - Set `status: implemented` and `implementedAt: 2026-07-21` in RFC frontmatter
-- Run `pnpm exec site-kernel run rfc.validate RFC-0481` to confirm
+- Run `pnpm exec werkstatt run rfc.validate RFC-0481` to confirm
 - Commit all files: migrator, registry edit, tests, RFC status change
 - Commit message: `feat(rfc-0481): implement PBP business singleton migrator`
 
@@ -210,8 +210,8 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — tsc --noEmit
 - `pnpm --filter @gogol/site-kernel-handoff test` — vitest (PBT + snapshot)
-- `pnpm exec site-kernel run migrator.registry.validate` — registry validation
-- `pnpm exec site-kernel run rfc.validate RFC-0481` — RFC validation
+- `pnpm exec werkstatt run migrator.registry.validate` — registry validation
+- `pnpm exec werkstatt run rfc.validate RFC-0481` — RFC validation
 
 ### 4.2 Evidence artifacts
 
@@ -230,5 +230,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0481 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0481 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `MigrationContext` needs a new field (`locales`), this is a contract change to `@gogol/site-kernel-handoff` — assess whether it needs a separate RFC or can be an additive change within this RFC's scope.

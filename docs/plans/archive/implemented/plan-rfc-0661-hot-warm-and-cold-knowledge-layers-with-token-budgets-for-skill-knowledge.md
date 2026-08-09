@@ -156,7 +156,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` passes
-- `pnpm exec site-kernel run forge.skill.validate --all` returns `status: "pass"` with `warnings: []` for current forge skills (all within default budgets)
+- `pnpm exec werkstatt run forge.skill.validate --all` returns `status: "pass"` with `warnings: []` for current forge skills (all within default budgets)
 
 **Completion criterion:** SKILL-21 warnings appear in `warnings` array when a hot/warm knowledge file exceeds its budget; `status` remains `"pass"` when only warnings are present; all current forge skills validate within default budgets (zero warnings at introduction).
 
@@ -180,7 +180,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` passes
-- `pnpm exec site-kernel run forge.doctor --json` includes `knowledge-budgets` check in output
+- `pnpm exec werkstatt run forge.doctor --json` includes `knowledge-budgets` check in output
 
 **Completion criterion:** `forge.doctor` reports knowledge-budget summary with per-skill, per-layer size/budget/headroom; invalid override shapes produce warnings with defaults applied; valid state produces a pass check.
 
@@ -231,7 +231,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` passes (SKILL-17 check — no platform RFC ids in skill body; reference RFC-0661 only in comments, not in instruction lines)
+- `pnpm exec werkstatt run forge.skill.validate --all` passes (SKILL-17 check — no platform RFC ids in skill body; reference RFC-0661 only in comments, not in instruction lines)
 
 **Completion criterion:** `writing-great-skills` contains the hot/warm/cold discipline table and budget semantics; synced to `.agents/skills/`; skill validation passes.
 
@@ -252,8 +252,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` passes
-- `pnpm exec site-kernel run forge.doctor` reports no stale skill copies
+- `pnpm exec werkstatt run forge.skill.validate --all` passes
+- `pnpm exec werkstatt run forge.doctor` reports no stale skill copies
 
 **Completion criterion:** All knowledge-adopting forge skills (`grilling`, `fo-memory-sync`, `fo-session-save`) have one-line read-discipline statements; synced to `.agents/skills/`; no stale copies.
 
@@ -272,7 +272,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` passes
+- `pnpm exec werkstatt run forge.skill.validate --all` passes
 
 **Completion criterion:** `packages/forge/AGENTS.md` references SKILL-21 and describes it as warnings-only.
 
@@ -287,19 +287,19 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.validate` and `forge.doctor` behavior extended — check if manifest needs regeneration).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.validate` and `forge.doctor` behavior extended — check if manifest needs regeneration).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0661 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0661 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0661`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0661`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0661` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0661` (RFC-0330)
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists for this session.
 
@@ -311,12 +311,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0661`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0661`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --all` (zero violations, zero warnings at introduction)
-- `pnpm exec site-kernel run forge.doctor --json` (knowledge-budgets check present)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0661` (RFC-0330)
+- `pnpm exec werkstatt run forge.skill.validate --all` (zero violations, zero warnings at introduction)
+- `pnpm exec werkstatt run forge.doctor --json` (knowledge-budgets check present)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0661` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -334,6 +334,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0661 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0661 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If RFC-0660's `parseKnowledgeFile` is not yet implemented when this plan executes, create a minimal type stub in `packages/forge/src/knowledge/` and coordinate with RFC-0660's implementation to replace it. The stub must not diverge from RFC-0660's specified interface.
 - If the `SkillValidateResult` output shape change (adding `warnings`) breaks downstream consumers, check `docs/command-manifest.generated.yaml` and `ecosystem.manifest.generate` — the change is additive (new field), not breaking.

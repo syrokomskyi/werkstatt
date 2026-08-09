@@ -209,19 +209,19 @@ The merge is **semi-automatic**: the agent running `spec.live.merge` proposes th
 
 ```sh
 # Preview deltas for an implemented RFC (dry-run)
-pnpm exec site-kernel run spec.live.merge --id RFC-0708 --dry-run
+pnpm exec werkstatt run spec.live.merge --id RFC-0708 --dry-run
 
 # Merge an implemented RFC into its living spec
-pnpm exec site-kernel run spec.live.merge --id RFC-0708
+pnpm exec werkstatt run spec.live.merge --id RFC-0708
 
 # List all living specs
-pnpm exec site-kernel run spec.live.list --json
+pnpm exec werkstatt run spec.live.list --json
 
 # Show a living spec
-pnpm exec site-kernel run spec.live.show --domain forge --json
+pnpm exec werkstatt run spec.live.show --domain forge --json
 
 # Validate all living specs
-pnpm exec site-kernel run spec.live.validate --json
+pnpm exec werkstatt run spec.live.validate --json
 ```
 
 ### TypeScript contracts

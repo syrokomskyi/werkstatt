@@ -230,11 +230,11 @@ This mirrors the sitemap hreflang cluster for the same page so `<head>` and `sit
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run sitemap.generate --app nicaragua-projekt
-pnpm exec site-kernel run sitemap.generate --all --json
+pnpm exec werkstatt run sitemap.generate --app nicaragua-projekt
+pnpm exec werkstatt run sitemap.generate --all --json
 
-pnpm exec site-kernel run sitemap.validate --app nicaragua-projekt
-pnpm exec site-kernel run sitemap.validate --all --json
+pnpm exec werkstatt run sitemap.validate --app nicaragua-projekt
+pnpm exec werkstatt run sitemap.validate --all --json
 ```
 
 `sitemap.generate` writes `public/sitemap.xml` (index) and `public/sitemap-<category>.xml` (sub-sitemaps) during `build.prepare` so that Astro copies them into the build output. It also prints the XML to stdout for CI inspection and reports the URL count.

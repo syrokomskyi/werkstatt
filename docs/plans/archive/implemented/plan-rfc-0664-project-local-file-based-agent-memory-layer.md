@@ -65,7 +65,7 @@ scope:
 
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck for forge package
 - `pnpm --filter @warpgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0664` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0664` — RFC validation
 - No pipeline integration (memory layer is agent-facing state, never build input)
 
 ## 3. Step sequence
@@ -183,7 +183,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --name fo-session-retro` passes.
+- `pnpm exec werkstatt run forge.skill.validate --name fo-session-retro` passes.
 - Diff between `packages/forge/skills/fo/fo-session-retro/SKILL.md` and `.agents/skills/fo-session-retro/SKILL.md` is empty.
 
 **Completion criterion:** `fo-session-retro` routes Context to `.agents/memory/` with Memory DB as optional mirror; constraint text amended.
@@ -209,8 +209,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --name fo-handoff` passes.
-- `pnpm exec site-kernel run forge.skill.validate --name fo-memory-sync` passes.
+- `pnpm exec werkstatt run forge.skill.validate --name fo-handoff` passes.
+- `pnpm exec werkstatt run forge.skill.validate --name fo-memory-sync` passes.
 - Diffs between source and synced copies are empty.
 
 **Completion criterion:** `fo-handoff` references the memory layer; `fo-memory-sync` treats it as an import source.
@@ -231,7 +231,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0664` passes (AGENTS.md change doesn't affect RFC validation, but confirms no regressions).
+- `pnpm exec werkstatt run rfc.validate --id RFC-0664` passes (AGENTS.md change doesn't affect RFC validation, but confirms no regressions).
 
 **Completion criterion:** Root AGENTS.md recognises `.agents/memory/` as an active context store and includes the read discipline note.
 
@@ -245,7 +245,7 @@ scope:
 
 **Agent actions:**
 
-- After all code changes (Steps 1–7) are committed, run `pnpm exec site-kernel run forge.upgrade` in this monorepo.
+- After all code changes (Steps 1–7) are committed, run `pnpm exec werkstatt run forge.upgrade` in this monorepo.
 - Verify `.agents/memory/MEMORY.md` and `.agents/memory/daily/.gitkeep` are created.
 - Verify `.gitignore` has the marker-delimited `forge-agent-memory` block.
 - Commit the scaffolded files: `git add .agents/memory/MEMORY.md .agents/memory/daily/.gitkeep .gitignore && git commit -m "chore: scaffold memory layer via forge.upgrade (RFC-0664)"`.
@@ -254,7 +254,7 @@ scope:
 
 - `ls .agents/memory/MEMORY.md .agents/memory/daily/.gitkeep` — both exist.
 - `grep -q "forge-agent-memory" .gitignore` — marker block present.
-- `pnpm exec site-kernel run forge.doctor --json` — `memoryLayer` fragment appears with `gitignoreCoversDaily: true`.
+- `pnpm exec werkstatt run forge.doctor --json` — `memoryLayer` fragment appears with `gitignoreCoversDaily: true`.
 
 **Completion criterion:** This monorepo has `.agents/memory/` scaffolded and committed.
 
@@ -294,17 +294,17 @@ scope:
 **Agent actions:**
 
 - Verify all files listed in `scope.docs` are updated — check each path against `git diff`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.create`/`forge.upgrade`/`forge.doctor`/`forge.agents.generate` behavior changed — check if manifest needs refresh).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.create`/`forge.upgrade`/`forge.doctor`/`forge.agents.generate` behavior changed — check if manifest needs refresh).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0664 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
 - **Dogfood check:** verify that a fresh agent following only the documented read discipline can reconstruct current project context from files (acceptance criterion 6). This can be verified by checking that `MEMORY.md` template + daily logs exist and the read rule is in AGENTS.md.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0664 --implementation-commit <sha>`. Ensure working tree is clean before stamping.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0664 --implementation-commit <sha>`. Ensure working tree is clean before stamping.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0664`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0664`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
@@ -318,10 +318,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0664`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0664`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0664` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0664` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
 
 ### 4.2 Evidence artifacts
 
@@ -339,5 +339,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0664 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0664 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `.agents/**` convention amendment in Step 7 reveals a deeper conflict with the root AGENTS.md instruction model, escalate via `rfc.supersede.propose` rather than weakening the convention.

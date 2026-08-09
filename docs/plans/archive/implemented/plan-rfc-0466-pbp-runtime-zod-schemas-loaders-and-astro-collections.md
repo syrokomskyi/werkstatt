@@ -52,7 +52,7 @@ scope:
 
 - `pnpm --filter @gogol/pbp run build:check` — tsc --noEmit
 - `pnpm --filter @gogol/pbp run test` — vitest run
-- `pnpm exec site-kernel run rfc.validate RFC-0466 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0466 --json`
 
 ## 3. Step sequence
 
@@ -212,7 +212,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0466 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0466 --json` passes
 
 **Completion criterion:** All documentation files updated
 
@@ -228,9 +228,9 @@ scope:
 
 - Run `pnpm --filter @gogol/pbp run build:check` — tsc --noEmit
 - Run `pnpm --filter @gogol/pbp run test` — vitest run
-- Run `pnpm exec site-kernel run rfc.validate RFC-0466 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0466 --json`
 - Verify no site imports from `@gogol/pbp`: `grep -r "@gogol/pbp" systems/ --include="*.ts" --include="*.astro"` returns 0 results (excluding content.config.ts which is not yet switched — that's RFC-0469)
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0466` (RFC-0330)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0466` (RFC-0330)
 
 **Validation:**
 
@@ -244,11 +244,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0466`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0466`
 - `pnpm --filter @gogol/pbp run build:check`
 - `pnpm --filter @gogol/pbp run test`
 - `grep -r "@gogol/pbp" systems/ --include="*.ts" --include="*.astro"` — 0 results (no site consumption yet)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0466` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0466` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -267,5 +267,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-20, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0466 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-1 or DNA-20, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0466 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If `zod@^4.4.3` is incompatible with existing PBP TypeScript interfaces, create a new RFC to resolve the version conflict — do not downgrade or patch.

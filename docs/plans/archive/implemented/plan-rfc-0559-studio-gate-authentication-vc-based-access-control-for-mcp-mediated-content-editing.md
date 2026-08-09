@@ -49,7 +49,7 @@ scope:
 
 - `pnpm --filter @warpgogol/studio-gate build:check` — TypeScript compilation
 - `pnpm --filter @warpgogol/studio-gate test` — Vitest unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0559` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0559` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -157,7 +157,7 @@ scope:
   - Add "Authentication" section documenting: credential presentation via `_meta.identity`, permissive vs enforced modes, error codes (-32001 through -32006), site-scoping, scope enforcement
   - Update `src/auth.ts` row in "What lives here" table to mention RFC-0559 additions
 - Update `docs/source-markup.xml` — update `packages/studio-gate/src/auth.ts` entry to reflect RFC-0559 changes (site-scoping, scope enforcement, error codes)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC, so likely no change needed)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC, so likely no change needed)
 
 **Validation:**
 
@@ -177,16 +177,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0559 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0559 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0559`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0559`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -198,7 +198,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0559`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0559`
 - `pnpm --filter @warpgogol/studio-gate build:check`
 - `pnpm --filter @warpgogol/studio-gate test`
 
@@ -218,5 +218,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-56 or DNA-22, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0559 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-56 or DNA-22, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0559 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `systemId` extraction from `_meta.system` proves insufficient (e.g., MCP clients cannot provide it), escalate to the operator rather than falling back to mission manifest I/O.

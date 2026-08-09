@@ -172,11 +172,11 @@ The block is validated by `system.manifest.validate`. Unrecognized provider name
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ai.generate --app nicaragua-projekt
-pnpm exec site-kernel run ai.generate --all --json
+pnpm exec werkstatt run ai.generate --app nicaragua-projekt
+pnpm exec werkstatt run ai.generate --all --json
 
-pnpm exec site-kernel run ai.validate --app nicaragua-projekt
-pnpm exec site-kernel run ai.validate --all --json
+pnpm exec werkstatt run ai.validate --app nicaragua-projekt
+pnpm exec werkstatt run ai.validate --all --json
 ```
 
 `ai.generate` is **app-scoped** with `mutatesState: true` (writes to `public/`).

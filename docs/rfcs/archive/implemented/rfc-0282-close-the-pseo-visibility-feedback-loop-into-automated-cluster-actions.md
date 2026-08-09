@@ -129,9 +129,9 @@ visibilityPolicy:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run visibility.import --app warpgogol-com --source gsc --input ./exports/gsc.json --json
-pnpm exec site-kernel run visibility.reconcile --app warpgogol-com --json
-pnpm exec site-kernel run visibility.action.plan --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run visibility.import --app warpgogol-com --source gsc --input ./exports/gsc.json --json
+pnpm exec werkstatt run visibility.reconcile --app warpgogol-com --json
+pnpm exec werkstatt run visibility.action.plan --app warpgogol-com --module pseo --json
 ```
 
 ### File system responsibilities

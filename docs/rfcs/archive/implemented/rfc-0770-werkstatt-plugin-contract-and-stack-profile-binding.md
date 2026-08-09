@@ -59,7 +59,7 @@ nonGoals:
   - "No multi-plugin workshops"
   - "No Compass XML sync — docs/*.xml synchronization is handled by RFC-0772 when the engine package is created"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -171,7 +171,7 @@ Note: `forge.yaml` `project.stack` is a technology array (e.g. `[typescript, ast
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run werkstatt.plugin.validate --json
+pnpm exec werkstatt run werkstatt.plugin.validate --json
 ```
 
 Workspace scope. Verifies: exactly one plugin registered; plugin `profileId` matches the detected forge stack profile; all plugin moduleLoaders resolve; deploy adapters referenced in `systems/registry.yaml` exist in the engine or plugin.
@@ -228,7 +228,7 @@ Workspace scope. Verifies: exactly one plugin registered; plugin `profileId` mat
 - [x] Profile binding cross-check implemented (plugin `profileId` ↔ `forge.yaml` `profile` field) (evidence: `packages/werkstatt/src/validate/plugin-validate.ts` PLUGIN-02 check, `readForgeProfile` function)
 - [x] Warn-only behavior for PLUGIN-01 implemented and tested (transition period) (evidence: `packages/werkstatt/src/validate/plugin-validate.ts` lines 88-98, test `PLUGIN-01 (warn-only)` — exit 0, severity warning)
 - [x] Root `AGENTS.md` documents the plugin contract for agents (evidence: `AGENTS.md` section `Werkstatt plugin contract (RFC-0770)` lines 24-34)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0770` — exit 0, `All 1 RFC(s) passed validation`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0770` — exit 0, `All 1 RFC(s) passed validation`)
 
 ## Implementation notes for agents
 

@@ -57,7 +57,7 @@ scope:
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 - `pnpm --filter @warpgogol/ontology build:check`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0624`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0624`
 
 ## 3. Step sequence
 
@@ -278,16 +278,16 @@ scope:
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test`
 - Run `pnpm --filter @warpgogol/ontology build:check`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0624`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0624`
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`
 - Check off acceptance criteria: verify each criterion against implemented code, mark `[x]` with `(evidence: <file:line>)`
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0624 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0624 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0624`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0624`
 - Review report exists in `docs/reviews/code/`
 
 **Completion criterion:** All docs updated; review passed; all acceptance criteria checked with evidence; RFC stamped as `implemented`.
@@ -298,7 +298,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0624`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0624`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
@@ -320,4 +320,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0624 --reason "..." --invariant "DNA-49"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0624 --reason "..." --invariant "DNA-49"` instead of working around it.

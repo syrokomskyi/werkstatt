@@ -225,9 +225,9 @@ Dirty flags are produced by changes to source records, CKL claims, freshness led
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.plan.generate --app warpgogol-com --json
-pnpm exec site-kernel run surface.generate --app warpgogol-com --json
-pnpm exec site-kernel run surface.graph.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.plan.generate --app warpgogol-com --json
+pnpm exec werkstatt run surface.generate --app warpgogol-com --json
+pnpm exec werkstatt run surface.graph.validate --app warpgogol-com --json
 ```
 
 `surface.generate` may call `surface.plan.generate` internally and fail early when module budget or CI memory policy would be exceeded.

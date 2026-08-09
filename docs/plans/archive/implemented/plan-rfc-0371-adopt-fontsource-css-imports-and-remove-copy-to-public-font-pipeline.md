@@ -117,7 +117,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` passes
-- `pnpm exec site-kernel run biome.contract.validate --all` still passes (fonts is optional)
+- `pnpm exec werkstatt run biome.contract.validate --all` still passes (fonts is optional)
 
 **Completion criterion:** `biomeSchema` accepts a `fonts` key; existing biome YAMLs without `fonts` still validate.
 
@@ -137,7 +137,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run biome.contract.validate --all` passes with new `fonts` sections
+- `pnpm exec werkstatt run biome.contract.validate --all` passes with new `fonts` sections
 
 **Completion criterion:** All 3 biome YAMLs have valid `fonts` sections that `biome.contract.validate` accepts.
 
@@ -165,7 +165,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` passes
-- `pnpm exec site-kernel run fonts.imports.generate --app warpgogol-com` produces correct `fonts.imports.css` with Inter, Playfair Display, DM Mono imports
+- `pnpm exec werkstatt run fonts.imports.generate --app warpgogol-com` produces correct `fonts.imports.css` with Inter, Playfair Display, DM Mono imports
 
 **Completion criterion:** `fonts.imports.generate --app warpgogol-com` writes `src/styles/fonts.imports.css` with 9 `@import` lines matching the RFC example.
 
@@ -192,7 +192,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run fonts.contract.validate --app warpgogol-com --json` returns `status: "pass"` after migration (or reports violations before migration)
+- `pnpm exec werkstatt run fonts.contract.validate --app warpgogol-com --json` returns `status: "pass"` after migration (or reports violations before migration)
 
 **Completion criterion:** `fonts.contract.validate` enforces all 4 rules and returns structured JSON violations.
 
@@ -217,7 +217,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run fonts.origin.validate --app warpgogol-com` passes after build (no external font origins)
+- `pnpm exec werkstatt run fonts.origin.validate --app warpgogol-com` passes after build (no external font origins)
 
 **Completion criterion:** `fonts.origin.validate` detects external font origins in dist HTML and returns structured violations.
 
@@ -238,7 +238,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run kernel.wire --app warpgogol-com` regenerates `tools/kernel.config.ts` with new commands
+- `pnpm exec werkstatt run kernel.wire --app warpgogol-com` regenerates `tools/kernel.config.ts` with new commands
 
 **Completion criterion:** All 3 pipeline files reference the new commands; no references to `fonts.generate` or `fonts.selfhost.validate` remain in pipeline files.
 
@@ -255,15 +255,15 @@ scope:
 - For each app (`warpgogol-com`, `nicaragua-projekt`, `check-warpgogol-com`):
   1. Add `@fontsource/*` packages to `package.json` dependencies (matching the biome `fonts` section)
   2. Run `pnpm install` to resolve new dependencies
-  3. Run `pnpm exec site-kernel run fonts.imports.generate --app <app>` to produce `fonts.imports.css`
+  3. Run `pnpm exec werkstatt run fonts.imports.generate --app <app>` to produce `fonts.imports.css`
   4. Edit `src/styles/global.css`: replace `@import "./fonts.generated.css"` with `@import "./fonts.imports.css"` and update the comment
   5. Delete `src/styles/fonts.generated.css`
   6. Delete `public/fonts/` directory (all woff2 files)
-  7. Run `pnpm exec site-kernel run fonts.contract.validate --app <app>` to confirm compliance
+  7. Run `pnpm exec werkstatt run fonts.contract.validate --app <app>` to confirm compliance
 
 **Validation:**
 
-- `pnpm exec site-kernel run fonts.contract.validate --app <app>` passes for each app
+- `pnpm exec werkstatt run fonts.contract.validate --app <app>` passes for each app
 - `pnpm --filter <app> run build:check` passes for each app (includes `fonts.origin.validate` in postbuild)
 
 **Completion criterion:** All 3 apps have `fonts.imports.css`, no `fonts.generated.css`, no `public/fonts/` directory, and pass both `fonts.contract.validate` and `fonts.origin.validate`.
@@ -324,7 +324,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` passes
-- `pnpm exec site-kernel run app.boilerplate.validate --app warpgogol-com` passes (template matches generated file)
+- `pnpm exec werkstatt run app.boilerplate.validate --app warpgogol-com` passes (template matches generated file)
 
 **Completion criterion:** Codegen template references `fonts.imports.css`; new template file exists with default Inter imports.
 
@@ -345,7 +345,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run adr.validate ADR-0001 --json` passes
+- `pnpm exec werkstatt run adr.validate ADR-0001 --json` passes
 
 **Completion criterion:** ADR-0001 has `status: superseded` and `supersededBy: [RFC-0371]`.
 
@@ -371,7 +371,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0371 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0371 --json` passes
 - Compass files are consistent with the implemented changes
 
 **Completion criterion:** Root `AGENTS.md` has a "Font licensing" section; 3 Compass XML files updated.
@@ -386,12 +386,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0371 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0371 --json` — must pass
 - Run `pnpm --filter @gogol/ontology run build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - For each app: `pnpm --filter <app> run build:check` — must pass (includes `fonts.contract.validate` in author pipeline and `fonts.origin.validate` in postbuild)
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0371` (RFC-0330)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0371` (RFC-0330)
 - Transition RFC-0371 to `implemented` per RFC-0224 preconditions
 
 **Validation:**
@@ -408,15 +408,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0371`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0371`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter warpgogol-com run build:check`
 - `pnpm --filter nicaragua-projekt run build:check`
 - `pnpm --filter check-warpgogol-com run build:check`
-- `pnpm exec site-kernel run fonts.contract.validate --all --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0371` (RFC-0330)
+- `pnpm exec werkstatt run fonts.contract.validate --all --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0371` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -434,6 +434,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-50 (Notausgang export), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0371 --reason "..." --invariant "DNA-50"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-50 (Notausgang export), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0371 --reason "..." --invariant "DNA-50"` instead of working around it (RFC-0334).
 - If Vite cannot resolve `@fontsource/*` CSS imports from app `package.json` dependencies (e.g., pnpm workspace hoisting issue), investigate the root cause before adding workarounds — the RFC's per-app dependency model is the correct approach.
 - If `fonts.contract.validate` produces false positives during migration (e.g., font binaries in `public/` that are not from the old pipeline), investigate before suppressing the rule.

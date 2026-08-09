@@ -183,9 +183,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run preview.images.generate --site warpgogol-com` (first run).
+- Run `pnpm exec werkstatt run preview.images.generate --site warpgogol-com` (first run).
 - Capture `git diff --stat` output.
-- Run `pnpm exec site-kernel run preview.images.generate --site warpgogol-com` (second run).
+- Run `pnpm exec werkstatt run preview.images.generate --site warpgogol-com` (second run).
 - Capture `git diff --stat` output again.
 - Verify the second run produces zero changes to `public/preview/` and `public/og-image.png`.
 - If the second run still shows changes, investigate which files differ and identify the remaining non-determinism source. If `sharp` options are insufficient, proceed to Phase 2 (add `@resvg/resvg-js`).
@@ -207,16 +207,16 @@ scope:
 **Agent actions:**
 
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add RFC-0603 note to `preview-templates.ts` module description noting deterministic rendering.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, so likely not needed).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, so likely not needed).
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Max 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: <file:line>, <test-or-command>)`.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0603 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0603 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0603`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0603`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -228,11 +228,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0603`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0603`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test -- --run preview-determinism`
-- `pnpm exec site-kernel run preview.images.generate --site warpgogol-com` (twice, verify zero git diff)
+- `pnpm exec werkstatt run preview.images.generate --site warpgogol-com` (twice, verify zero git diff)
 
 ### 4.2 Evidence artifacts
 
@@ -252,4 +252,4 @@ scope:
 
 - If `sharp` remains non-deterministic after disabling `adaptiveFiltering` and removing `resize`, add `@resvg/resvg-js` as Phase 2 fallback (per RFC Design §Phase 2). This is within RFC scope, not an escalation.
 - If cross-platform font determinism becomes a requirement, create a follow-up RFC for Fontsource font bundling. This is out of scope for RFC-0603.
-- If implementation reveals an invariant conflict with DNA-18, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0603 --reason "..." --invariant "DNA-18"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-18, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0603 --reason "..." --invariant "DNA-18"` instead of working around it.

@@ -76,7 +76,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-codegen run test`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run rfc.validate RFC-0489`
+- `pnpm exec werkstatt run rfc.validate RFC-0489`
 
 ## 3. Step sequence
 
@@ -375,7 +375,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run open-source.generate --site warpgogol-com` (verify labels are loaded)
+- `pnpm exec werkstatt run open-source.generate --site warpgogol-com` (verify labels are loaded)
 
 **Completion criterion:** Both label files have `openSource` keys with all 24 labels.
 
@@ -395,7 +395,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0489`
+- `pnpm exec werkstatt run rfc.validate RFC-0489`
 
 **Completion criterion:** AGENTS.md files updated, `rfc.validate` passes.
 
@@ -409,20 +409,20 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run open-source.generate --site warpgogol-com`.
+- Run `pnpm exec werkstatt run open-source.generate --site warpgogol-com`.
 - Verify the generated prose file is under 500 lines.
 - Verify `THIRD_PARTY_NOTICES.txt`, `THIRD_PARTY_LICENSES.txt`, and `sbom.cdx.json` exist in `public/open-source/`.
 - Verify the UK page renders without errors.
-- Run `pnpm exec site-kernel run open-source.validate --site warpgogol-com`.
-- Run `pnpm exec site-kernel run content.idempotency.validate --site warpgogol-com`.
+- Run `pnpm exec werkstatt run open-source.validate --site warpgogol-com`.
+- Run `pnpm exec werkstatt run content.idempotency.validate --site warpgogol-com`.
 - Run dev build of `warpgogol-com` and verify `/open-source/` (DE) and `/vidkrytyy-kod/` (UK) render without runtime errors.
 
 **Validation:**
 
-- `pnpm exec site-kernel run open-source.validate --site warpgogol-com` exits 0
-- `pnpm exec site-kernel run content.idempotency.validate --site warpgogol-com` exits 0
+- `pnpm exec werkstatt run open-source.validate --site warpgogol-com` exits 0
+- `pnpm exec werkstatt run content.idempotency.validate --site warpgogol-com` exits 0
 - Dev build succeeds
-- `pnpm exec site-kernel run rfc.validate RFC-0489` exits 0
+- `pnpm exec werkstatt run rfc.validate RFC-0489` exits 0
 
 **Completion criterion:** All acceptance criteria pass. The open-source page is compact, multi-language, with downloadable artifacts and valid SBOM.
 
@@ -439,9 +439,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel-codegen run test`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run open-source.validate --site warpgogol-com`
-- `pnpm exec site-kernel run content.idempotency.validate --site warpgogol-com`
-- `pnpm exec site-kernel run rfc.validate RFC-0489`
+- `pnpm exec werkstatt run open-source.validate --site warpgogol-com`
+- `pnpm exec werkstatt run content.idempotency.validate --site warpgogol-com`
+- `pnpm exec werkstatt run rfc.validate RFC-0489`
 
 ### 4.2 Evidence artifacts
 
@@ -466,4 +466,4 @@ scope:
 - If `@cyclonedx/cyclonedx-library` API is incompatible or too heavy, fall back to hand-rolled JSON builder and validate against the CycloneDX 1.5 schema in the validator step.
 - If no existing block type can render the UI section with structured data props, a new block type RFC is needed — stop and create a follow-up RFC before proceeding with Step 8.
 - If `pnpm licenses list --prod` at the workpiece root does not scope correctly (includes workspace-wide dependencies), switch to `pnpm list --filter <workspace> --prod --json` + manual license resolution from `package.json` files.
-- If implementation reveals an invariant conflict with DNA-11 (language mirroring), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0489 --reason "..." --invariant "DNA-11"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-11 (language mirroring), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0489 --reason "..." --invariant "DNA-11"` instead of working around it.

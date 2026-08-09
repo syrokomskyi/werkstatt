@@ -62,10 +62,10 @@ The `grace.clear` command gains a `--history <DEPTH>` parameter that restricts t
 
 ```sh
 # Clear GRACE markup from newly created files in the last 3 commits
-pnpm exec site-kernel run grace.clear --history 3
+pnpm exec werkstatt run grace.clear --history 3
 
 # Combine with specific app scoping if applicable
-pnpm exec site-kernel run grace.clear --app main --history 1
+pnpm exec werkstatt run grace.clear --app main --history 1
 ```
 
 - `--history <DEPTH>`: Numeric value indicating the number of most recent git commits to analyze. The command will find all newly added files in those commits and apply the clear operation only to them.

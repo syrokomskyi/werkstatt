@@ -71,7 +71,7 @@ nonGoals:
   - "Do not implement a public key discovery network — bootstrap config is a local file in the pilot."
   - "Do not implement transfer of site ownership between operators — the owner field is set at bootstrap time; transfer chains are future work."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -125,17 +125,17 @@ The Werkstatt gains a VC-based identity model with two new credential types — 
 
 ```sh
 # One-time bootstrap: generate keypair, write werkstatt.identity.json, issue self-ownership VC
-pnpm exec site-kernel run identity.bootstrap --operator-name "Andrii Syrokomskyi" --domain warpgogol.com --json
+pnpm exec werkstatt run identity.bootstrap --operator-name "Andrii Syrokomskyi" --domain warpgogol.com --json
 
 # Issue a SiteOwnershipCredential for a specific Sternsystem
-pnpm exec site-kernel run identity.credential.issue \
+pnpm exec werkstatt run identity.credential.issue \
   --type SiteOwnershipCredential \
   --subject did:web:warpgogol.com#operator-v1 \
   --site warpgogol-com \
   --json
 
 # Issue an ActorDelegationCredential for an LLM agent
-pnpm exec site-kernel run identity.credential.issue \
+pnpm exec werkstatt run identity.credential.issue \
   --type ActorDelegationCredential \
   --subject did:web:warpgogol.com#agent-llm-001 \
   --site warpgogol-com \
@@ -144,10 +144,10 @@ pnpm exec site-kernel run identity.credential.issue \
   --json
 
 # Verify a credential (used by Studio Gate middleware, also callable directly)
-pnpm exec site-kernel run identity.credential.verify --credential-file werkstatt.identity.json --json
+pnpm exec werkstatt run identity.credential.verify --credential-file werkstatt.identity.json --json
 
 # Revoke a credential by id
-pnpm exec site-kernel run identity.credential.revoke --credential-id urn:warpgogol:cred:abc123 --json
+pnpm exec werkstatt run identity.credential.revoke --credential-id urn:warpgogol:cred:abc123 --json
 ```
 
 All commands are scope: `workspace`.
@@ -339,7 +339,7 @@ The following `AGENTS.md` files need updates during implementation:
 - [x] `authMode: "permissive"` default allows existing workflow without credentials (evidence: packages/studio-gate/src/index.ts:118, packages/os/site-kernel-handoff/src/identity/identity-bootstrap.ts:84)
 - [x] `authMode: "enforced"` rejects MCP calls without valid VC (evidence: packages/studio-gate/src/index.ts:118-128, packages/studio-gate/src/auth.ts:81-91)
 - [x] Mission `actor` field accepts VC subject id from auth context (evidence: packages/os/site-kernel-handoff/src/mission/mission-open.ts:54, mission-close.ts:98, mission-abort.ts:52)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0558 --json — 0 errors, 0 warnings)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate RFC-0558 --json — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 

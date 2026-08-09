@@ -54,7 +54,7 @@ scope:
 - `pnpm --filter @gogol/share run build:check` — typecheck the schema change
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck the encoding + validator changes
 - `pnpm --filter @gogol/ui run build:check` — typecheck the Media component change
-- `pnpm exec site-kernel run rfc.validate RFC-0525 --json` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate RFC-0525 --json` — RFC mechanical validation
 - No new pipeline wiring — `video.variants.generate` and `video.variants.validate` are already registered in `build.prepare` and `build.check`.
 
 ## 3. Step sequence
@@ -221,15 +221,15 @@ scope:
 - Check `packages/os/site-kernel-checks/AGENTS.md` — update if the `video-variants.ts` module description mentions encoding parameters (currently it does not; verify and skip if no change needed).
 - No `docs/*.xml` Compass files need updates — no repository-wide semantics changed.
 - No `docs/architecture-dna.md` changes — no DNA invariant introduced.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands added; skip).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands added; skip).
 - **Verify every acceptance criterion** against the implemented code. For each `[x]`, add inline `(evidence: <file:line>, <test-or-command>)`.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0525 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0525 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 - Commit the stamped RFC separately from the implementation commit.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0525 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0525 --json`
 - All acceptance criteria checked off with evidence annotations.
 
 **Completion criterion:** All acceptance criteria verified with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`; `rfc.validate` passes.
@@ -240,7 +240,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0525 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0525 --json`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ui run build:check`
@@ -263,5 +263,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0525 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0525 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If `libsvtav1` is not available in the build environment and cannot be installed, escalate to the operator — do not silently skip AV1 encoding.

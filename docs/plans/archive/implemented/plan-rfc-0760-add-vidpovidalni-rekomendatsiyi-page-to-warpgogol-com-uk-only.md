@@ -178,8 +178,8 @@ No `AGENTS.md` updates needed — no new commands, packages, or governance rules
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run page.block.validate --site warpgogol-com` — validates block props against archetype schemas
-- Run `pnpm exec site-kernel run mirror.quintet.validate --site warpgogol-com` — validates manifest quintet
+- Run `pnpm exec werkstatt run page.block.validate --site warpgogol-com` — validates block props against archetype schemas
+- Run `pnpm exec werkstatt run mirror.quintet.validate --site warpgogol-com` — validates manifest quintet
 - Run `pnpm --filter warpgogol-com exec astro check` — scoped typecheck (per AGENTS.md build verification discipline)
 - Fix any violations found by re-editing the page content file or prose files
 - Commit fixes via `mission.git.commit`
@@ -228,7 +228,7 @@ No `AGENTS.md` updates needed — no new commands, packages, or governance rules
 
 - Run `mission.git.commit --mission warpgogol-com-m000040 --message "Add vidpovidalni-rekomendatsiyi UK-only page content"` for any remaining uncommitted files
 - Run `rtk git status` — verify clean working tree
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0760` — verify RFC still valid
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0760` — verify RFC still valid
 
 **Validation:**
 
@@ -264,12 +264,12 @@ No `AGENTS.md` updates needed — no new commands, packages, or governance rules
   - [x] `rfc.validate` passes (evidence: validator output)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session changes. Wait for review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Max 3 iterations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0760 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0760 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0760`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0760`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All acceptance criteria checked off with evidence; code review passed; RFC stamped as `implemented`.
@@ -280,9 +280,9 @@ No `AGENTS.md` updates needed — no new commands, packages, or governance rules
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0760`
-- `pnpm exec site-kernel run page.block.validate --site warpgogol-com`
-- `pnpm exec site-kernel run mirror.quintet.validate --site warpgogol-com`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0760`
+- `pnpm exec werkstatt run page.block.validate --site warpgogol-com`
+- `pnpm exec werkstatt run mirror.quintet.validate --site warpgogol-com`
 - `pnpm --filter warpgogol-com exec astro check`
 - `pnpm --filter warpgogol-com run build` (scoped, per AGENTS.md exception)
 
@@ -303,5 +303,5 @@ No `AGENTS.md` updates needed — no new commands, packages, or governance rules
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0760 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0760 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If RFC-0758 or RFC-0759 have not yet been implemented (archetypes not in catalog), stop and wait — this RFC cannot be implemented without them.

@@ -122,7 +122,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run release.state.validate --release <test-release>` (smoke test if a release exists)
+- `pnpm exec werkstatt run release.state.validate --release <test-release>` (smoke test if a release exists)
 
 **Completion criterion:** Command registered, all five checks implemented, `--json` output format matches RFC spec, exports in place.
 
@@ -169,11 +169,11 @@ scope:
 **Agent actions:**
 
 - Update `packages/os/site-kernel-handoff/AGENTS.md` with note about `release.state.validate` command and `close-report.json` `releaseId` field
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0655`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0655`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0655` (if acceptance probes declared — check RFC frontmatter)
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0655` (RFC-0330)
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0655` (if acceptance probes declared — check RFC frontmatter)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0655` (RFC-0330)
 
 **Validation:**
 
@@ -192,16 +192,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new `release.state.validate` command).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new `release.state.validate` command).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0655 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0655 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0655`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0655`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists for this session.
 
@@ -213,11 +213,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0655`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0655`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0655` (if acceptance probes declared)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0655` (RFC-0330)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0655` (if acceptance probes declared)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0655` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -236,4 +236,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48, DNA-46, or DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0655 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48, DNA-46, or DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0655 --reason "..." --invariant "DNA-N"` instead of working around it.

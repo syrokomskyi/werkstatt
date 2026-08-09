@@ -181,8 +181,8 @@ export interface SurfaceModuleContext {
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.context.validate --app warpgogol-com --json
-pnpm exec site-kernel run surface.enrich --app warpgogol-com --module pseo
+pnpm exec werkstatt run surface.context.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.enrich --app warpgogol-com --module pseo
 ```
 
 ## Failure modes

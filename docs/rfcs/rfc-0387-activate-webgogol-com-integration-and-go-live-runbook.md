@@ -150,18 +150,18 @@ Per-tenant Lagebild worker secrets follow the `TENANT_WEBGOGOL_COM_*` pattern in
 The following must pass for `warpgogol-com` before propagation:
 
 ```sh
-pnpm exec site-kernel run funnel.contract.validate    --site warpgogol-com --json
-pnpm exec site-kernel run funnel.stage.validate       --site warpgogol-com --json
-pnpm exec site-kernel run funnel.copy.validate        --site warpgogol-com --json
-pnpm exec site-kernel run funnel.lagebild.validate    --site warpgogol-com --json
-pnpm exec site-kernel run funnel.org.validate         --site warpgogol-com --json
-pnpm exec site-kernel run integration.config.validate --site warpgogol-com --json
-pnpm exec site-kernel run integration.secrets.validate --site warpgogol-com --json
-pnpm exec site-kernel run consent.activation.validate --site warpgogol-com --json
-pnpm exec site-kernel run legal.processors.validate   --site warpgogol-com --json
+pnpm exec werkstatt run funnel.contract.validate    --site warpgogol-com --json
+pnpm exec werkstatt run funnel.stage.validate       --site warpgogol-com --json
+pnpm exec werkstatt run funnel.copy.validate        --site warpgogol-com --json
+pnpm exec werkstatt run funnel.lagebild.validate    --site warpgogol-com --json
+pnpm exec werkstatt run funnel.org.validate         --site warpgogol-com --json
+pnpm exec werkstatt run integration.config.validate --site warpgogol-com --json
+pnpm exec werkstatt run integration.secrets.validate --site warpgogol-com --json
+pnpm exec werkstatt run consent.activation.validate --site warpgogol-com --json
+pnpm exec werkstatt run legal.processors.validate   --site warpgogol-com --json
 # Tier 2:
-pnpm exec site-kernel run billing.config.validate     --site warpgogol-com --json
-pnpm exec site-kernel run billing.secrets.validate    --site warpgogol-com --json
+pnpm exec werkstatt run billing.config.validate     --site warpgogol-com --json
+pnpm exec werkstatt run billing.secrets.validate    --site warpgogol-com --json
 ```
 
 ### Pipeline promotion (RFC-0188 Phase 9)
@@ -198,9 +198,9 @@ Once the pilot is stable, the four `funnel.*` validators are added to `APPS_CHEC
 
 ### Phase 4 — Lagebild worker
 
-9. `pnpm exec site-kernel run lagebild.tenant.add --site <SITE>`.
+9. `pnpm exec werkstatt run lagebild.tenant.add --site <SITE>`.
 10. Set the `TENANT_WEBGOGOL_COM_*` secrets via `wrangler secret put`; then `lagebild.tenant.enable --site <SITE>`.
-11. `pnpm exec site-kernel run lagebild.worker.deploy`.
+11. `pnpm exec werkstatt run lagebild.worker.deploy`.
 12. **Verify:** `lagebild.validate` and `lagebild.tenant.status --site <SITE>` are green (no per-site workers, no leaked values).
 
 ### Phase 5 — site activation mission

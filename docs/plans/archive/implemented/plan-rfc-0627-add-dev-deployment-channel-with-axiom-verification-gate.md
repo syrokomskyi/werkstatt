@@ -59,7 +59,7 @@ scope:
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0627`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0627`
 
 ## 3. Step sequence
 
@@ -228,7 +228,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run leitstand.status --system warpgogol-com` (manual, requires runtime)
+- `pnpm exec werkstatt run leitstand.status --system warpgogol-com` (manual, requires runtime)
 
 **Completion criterion:** Registry has `dev`, `alt`, and `main` channels for warpgogol-com.
 
@@ -299,16 +299,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0627 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0627 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0627`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0627`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -320,7 +320,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0627`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0627`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
@@ -343,6 +343,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0627 --reason "..." --invariant "DNA-48"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0627 --reason "..." --invariant "DNA-48"` instead of working around it.
 - If `mission.check` cannot be invoked from `leitstand.deploy` due to kernel command execution constraints, escalate to the operator — the Axiom gate depends on this integration.
 - If the `Channel` type change from `"alt" | "main"` to `"dev" | "alt" | "main"` causes widespread type errors beyond `leitstand-commands.ts`, audit all consumers and fix forward-only.

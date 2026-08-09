@@ -165,7 +165,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes
-- `pnpm exec site-kernel run seo.structured.data.validate --site warpgogol-com` passes on a built site
+- `pnpm exec werkstatt run seo.structured.data.validate --site warpgogol-com` passes on a built site
 
 **Completion criterion:** `seo.structured.data.validate` reports `prohibited-{type}`, `service-provider-mismatch`, and `fabricated-offer` findings for surface pages that violate the per-depth policy.
 
@@ -191,7 +191,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes
-- `pnpm exec site-kernel run surface.validate --site warpgogol-com` passes
+- `pnpm exec werkstatt run surface.validate --site warpgogol-com` passes
 
 **Completion criterion:** `surface.validate` reports `SURF-BREADCRUMB-URL` for any surface artifact with breadcrumb URLs containing old `/deu/bw/` segments.
 
@@ -217,7 +217,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` passes
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com` passes
 
 **Completion criterion:** `surface.contract.validate` reports `jsonld-surface-policy-missing` when the section is absent and `jsonld-surface-policy-overlap` when required and prohibited types overlap.
 
@@ -250,7 +250,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
 - `pnpm --filter @gogol/site-kernel-handoff test` passes (including new PBT tests)
-- `pnpm exec site-kernel run migrator.registry.validate` passes
+- `pnpm exec werkstatt run migrator.registry.validate` passes
 
 **Completion criterion:** `migrator.registry.validate` passes with `rfc0498Migrator` registered; idempotency PBT test passes.
 
@@ -269,14 +269,14 @@ scope:
 - Update `packages/os/site-kernel-checks/AGENTS.md` with note about prohibited-type checking extension in `seo-structured-data.ts`
 - Update `docs/requirements.xml` if structured data rules are present
 - Update `docs/verification-plan.xml` with verification steps for per-depth JSON-LD type policy
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Check off acceptance criteria in the RFC file with inline (evidence: ...) annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0498 --implementation-commit <sha>` to transition the RFC to `implemented`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0498 --implementation-commit <sha>` to transition the RFC to `implemented`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0498` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0498` passes
 - Every file in `scope.docs` is either updated or documented as not-applicable
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria are checked off with evidence; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -287,7 +287,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0498`
+- `pnpm exec werkstatt run rfc.validate RFC-0498`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/share build:check`
 - `pnpm --filter @gogol/pbp build:check`
@@ -295,10 +295,10 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
-- `pnpm exec site-kernel run surface.validate --site warpgogol-com`
-- `pnpm exec site-kernel run seo.structured.data.validate --site warpgogol-com` (requires built dist)
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run surface.validate --site warpgogol-com`
+- `pnpm exec werkstatt run seo.structured.data.validate --site warpgogol-com` (requires built dist)
 
 ### 4.2 Evidence artifacts
 
@@ -319,5 +319,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0498 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0498 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `surfacePolicy` schema cannot be expressed in the existing `jsonldTypesContract` Zod schema without breaking existing consumers, escalate via `rfc.supersede.propose` — do not weaken the C-contract.

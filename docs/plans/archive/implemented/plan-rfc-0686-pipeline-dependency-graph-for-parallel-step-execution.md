@@ -269,7 +269,7 @@ scope:
   - Document the `--concurrency` CLI flag in the reserved CLI flags section
   - Document the behavior change (abort-on-failure → skip-dependents-only) and the `--concurrency 1` escape hatch
   - Document the telemetry mutex and timing summary changes
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new `pipeline.dependencies.validate` command)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new `pipeline.dependencies.validate` command)
 
 **Validation:**
 
@@ -290,12 +290,12 @@ scope:
 - Run `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - Run `fo-fix` if the review has findings. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off each acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0686`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0686`
 - Run `pnpm --filter @warpgogol/site-kernel run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel run test`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test`
-- Stamp the RFC: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0686 --implementation-commit <sha>`
+- Stamp the RFC: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0686 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -314,7 +314,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0686`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0686`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel run test`
@@ -340,5 +340,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-35, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0686 --reason "..." --invariant "DNA-35"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-35, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0686 --reason "..." --invariant "DNA-35"` instead of working around it.
 - If the telemetry mutex approach proves insufficient (e.g. telemetry file corruption detected in tests), escalate to a dedicated `telemetry-write-queue` module rather than inlining the mutex in the executor.

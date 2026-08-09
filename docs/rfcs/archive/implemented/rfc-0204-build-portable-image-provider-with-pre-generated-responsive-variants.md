@@ -91,8 +91,8 @@ The app's existing image-provider wiring calls `setDefaultImageProvider(createBu
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run image.variants.generate --app nicaragua-projekt
-pnpm exec site-kernel run image.variants.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run image.variants.generate --app nicaragua-projekt
+pnpm exec werkstatt run image.variants.validate --app nicaragua-projekt --json
 ```
 
 `image.variants.generate` scans resolved content image assets, generates a no-upscale width ladder (reusing `candidateWidths` / `DEFAULT_IMAGE_WIDTHS`) per source with `sharp`, writes `.webp` variants, and emits the manifest. Idempotent: unchanged sources produce identical output (skip-on-hash). `image.variants.validate` fails when the manifest references a missing variant file, when a content image has no variants, or when the manifest is stale relative to source hashes.

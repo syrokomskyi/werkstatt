@@ -179,8 +179,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` passes for all existing RFCs.
-- `pnpm exec site-kernel run rfc.create --title="Smoke test command" --kind=command` works and produces a valid RFC.
+- `pnpm exec werkstatt run rfc.validate --json` passes for all existing RFCs.
+- `pnpm exec werkstatt run rfc.create --title="Smoke test command" --kind=command` works and produces a valid RFC.
 
 **Completion criterion:** No references to `rfc-0000-mini-template.md` or `--mini` remain in code or docs.
 
@@ -258,7 +258,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run command.manifest.validate --json` passes.
+- `pnpm exec werkstatt run command.manifest.validate --json` passes.
 - `adr.validate` runs during `build.check`.
 
 **Completion criterion:** A workspace `build.check` executes `adr.validate` and fails on invalid ADRs.
@@ -273,12 +273,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --json`.
+- Run `pnpm exec werkstatt run rfc.validate --json`.
 - Run `pnpm --filter @gogol/site-kernel run build:check`.
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`.
 - Run `pnpm build` from workspace root.
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0366`.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0366`.
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0366`.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0366`.
 - Fix any errors.
 
 **Completion criterion:** All checks pass and evidence file is emitted.
@@ -304,14 +304,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0366`
-- `pnpm exec site-kernel run adr.validate --json`
-- `pnpm exec site-kernel run adr.list --json`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0366`
+- `pnpm exec werkstatt run adr.validate --json`
+- `pnpm exec werkstatt run adr.list --json`
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm build`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0366`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0366`
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0366`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0366`
 
 ### 4.2 Evidence artifacts
 

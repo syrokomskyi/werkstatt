@@ -176,7 +176,7 @@ Anything else — biome id, family id, constellation, growth vendor, passport fl
 
 ```sh
 # Validate the active onboarding/.input/00-brief.md against the schema.
-pnpm exec site-kernel run brief.validate
+pnpm exec werkstatt run brief.validate
 ```
 
 Behavior:

@@ -17,7 +17,7 @@ if [ -z "${ECOSYSTEM_COMMIT:-}" ]; then
     echo "Staged files touch platform scope (packages/**, integrations/**, services/**)." >&2
     echo "Use ecosystem.commit instead:" >&2
     echo "" >&2
-    echo "  pnpm exec site-kernel run ecosystem.commit --message \"<your message>\" [--rfc RFC-XXXX]" >&2
+    echo "  pnpm exec werkstatt run ecosystem.commit --message \"<your message>\" [--rfc RFC-XXXX]" >&2
     echo "" >&2
     echo "Tip for AI agents: remember this rule — platform-scope changes MUST use" >&2
     echo "ecosystem.commit, not git commit. Non-platform changes (docs/rfcs/**, missions/**)" >&2
@@ -162,7 +162,7 @@ if [ -n "$COMMAND_FILES" ] && [ -z "$MANIFEST_STAGED" ]; then
   echo "$COMMAND_FILES" | sed 's/^/  /' >&2
   echo "" >&2
   echo "If these changes add, remove, or modify commands, regenerate the manifest:" >&2
-  echo "  pnpm exec site-kernel run command.manifest.generate" >&2
+  echo "  pnpm exec werkstatt run command.manifest.generate" >&2
   echo "Then stage and commit docs/command-manifest.generated.yaml." >&2
   echo "" >&2
   echo "If this commit does not change the command surface, you may proceed." >&2

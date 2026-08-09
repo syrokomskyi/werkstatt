@@ -125,9 +125,9 @@ export interface BreakerVerdict {
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.breaker.evaluate --app warpgogol-com --json
-pnpm exec site-kernel run surface.rollback.plan --app warpgogol-com --to <lastKnownGood-id> --json
-pnpm exec site-kernel run surface.rollback.apply --app warpgogol-com --to <lastKnownGood-id> --json
+pnpm exec werkstatt run surface.breaker.evaluate --app warpgogol-com --json
+pnpm exec werkstatt run surface.rollback.plan --app warpgogol-com --to <lastKnownGood-id> --json
+pnpm exec werkstatt run surface.rollback.apply --app warpgogol-com --to <lastKnownGood-id> --json
 ```
 
 ### File system responsibilities

@@ -223,8 +223,8 @@ The badge is rendered via the hero block's `tagline` prop (a top-level prop in t
 
 ```sh
 # Validate lifecycle and cross-page consistency.
-pnpm exec site-kernel run team.lifecycle.validate --site warpgogol-com --json
-pnpm exec site-kernel run team.cross-page.validate --site warpgogol-com --json
+pnpm exec werkstatt run team.lifecycle.validate --site warpgogol-com --json
+pnpm exec werkstatt run team.cross-page.validate --site warpgogol-com --json
 ```
 
 ### File system responsibilities
@@ -417,7 +417,7 @@ interface TeamCrossPageData {
 - [x] `content.voice.lint` checks profile-specific prohibited patterns scoped to profile prose files. (evidence: packages/os/site-kernel-checks/src/content-voice.ts:259-309)
 - [x] Status badges render in the hero block `tagline` for `former`, `retired`, `on-leave`, `temporarily-unavailable`, and `suspended` participants. (evidence: packages/share/src/astro/page-handler/resolve-route.ts:94-110, packages/share/src/astro/page-handler/resolve-route.ts:140, packages/share/src/astro/page-handler/resolve-route.ts:300)
 - [x] `team.lifecycle.validate` is registered in `SITES_CHECK_AUTHOR_PIPELINE` and `team.cross-page.validate` is registered in `SITES_CHECK_POSTBUILD_PIPELINE`; both pass on the current content. (evidence: packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts:176, packages/os/site-kernel-checks/src/pipelines/sites-check-postbuild.ts:23)
-- [x] `rfc.validate` passes on this file before merging. (evidence: pnpm exec site-kernel run rfc.validate --json → 0 RFC-0513 errors)
+- [x] `rfc.validate` passes on this file before merging. (evidence: pnpm exec werkstatt run rfc.validate --json → 0 RFC-0513 errors)
 
 ## Implementation notes for agents
 

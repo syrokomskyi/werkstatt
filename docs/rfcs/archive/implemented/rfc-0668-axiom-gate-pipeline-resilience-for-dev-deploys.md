@@ -70,7 +70,7 @@ nonGoals:
   - "Does not change the external Axiom CLI capture logic — only werkstatt's invocation wrapper"
   - "Does not change the external Axiom CLI internal maxDurationMs default — leitstand.dev-deploy passes --max-duration explicitly; the Axiom CLI default is fixed separately by the Axiom expert"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -146,10 +146,10 @@ No new CLI commands. `leitstand.dev-deploy` internally wraps `mission.check`:
 
 ```sh
 # leitstand.dev-deploy calls mission.check with a 15-minute timeout and one retry on exit code 2
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --channel dev
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com --channel dev
 
 # mission.check can also be run standalone — exit code semantics are documented
-pnpm exec site-kernel run mission.check --mission warpgogol-com-m000027 --external-preview
+pnpm exec werkstatt run mission.check --mission warpgogol-com-m000027 --external-preview
 # exit 0 = pass, exit 1 = violations, exit 2 = infrastructure error
 ```
 

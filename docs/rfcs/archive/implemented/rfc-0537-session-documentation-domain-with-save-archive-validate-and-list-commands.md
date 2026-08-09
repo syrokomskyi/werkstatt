@@ -102,23 +102,23 @@ The architecture follows a hybrid approach: Devin CLI `--export` writes raw ATIF
 
 ```sh
 # session.save — convert raw ATIF export to structured markdown
-pnpm exec site-kernel run session.save
-pnpm exec site-kernel run session.save --raw-file docs/sessions/.raw/2026-07-26-session.atif
-pnpm exec site-kernel run session.save --json
+pnpm exec werkstatt run session.save
+pnpm exec werkstatt run session.save --raw-file docs/sessions/.raw/2026-07-26-session.atif
+pnpm exec werkstatt run session.save --json
 
 # session.archive — move sessions older than --max-age-days to archive/
-pnpm exec site-kernel run session.archive
-pnpm exec site-kernel run session.archive --max-age-days 7 --dry-run
-pnpm exec site-kernel run session.archive --json
+pnpm exec werkstatt run session.archive
+pnpm exec werkstatt run session.archive --max-age-days 7 --dry-run
+pnpm exec werkstatt run session.archive --json
 
 # session.validate — check frontmatter, RFC-id references, .raw/ hygiene
-pnpm exec site-kernel run session.validate
-pnpm exec site-kernel run session.validate --json
+pnpm exec werkstatt run session.validate
+pnpm exec werkstatt run session.validate --json
 
 # session.list — list sessions with filters
-pnpm exec site-kernel run session.list
-pnpm exec site-kernel run session.list --rfc RFC-0537 --json
-pnpm exec site-kernel run session.list --date-from 2026-07-01 --date-to 2026-07-31 --type grilling
+pnpm exec werkstatt run session.list
+pnpm exec werkstatt run session.list --rfc RFC-0537 --json
+pnpm exec werkstatt run session.list --date-from 2026-07-01 --date-to 2026-07-31 --type grilling
 ```
 
 All four commands are `scope: workspace`.
@@ -596,7 +596,7 @@ OUTPUT_FILE="$SESSIONS_RAW_DIR/${TIMESTAMP}-session.atif"
 devin --export "$OUTPUT_FILE"
 
 echo "Raw session exported to: $OUTPUT_FILE"
-echo "Run 'pnpm exec site-kernel run session.save' to convert to structured markdown."
+echo "Run 'pnpm exec werkstatt run session.save' to convert to structured markdown."
 ```
 
 The wrapper is documented in `docs/authoring/session-composition.md` and tested to ensure it works with the current Devin CLI. The script uses POSIX-compatible syntax (no bashisms) for portability.

@@ -46,7 +46,7 @@ Create a separate `packages/warpgogol-skills/` package for Warpgogol-specific sk
 
 - **Separation of concerns:** forge = portable governance; warpgogol-skills = Warpgogol operations. Different audiences, different distribution.
 - **No forge pollution:** forge's npm consumers never see Warpgogol-specific skills.
-- **No binding hacks:** Warpgogol skills reference `pnpm exec site-kernel run` directly — no need to route through forge bindings.
+- **No binding hacks:** Warpgogol skills reference `pnpm exec werkstatt run` directly — no need to route through forge bindings.
 - **Simple sync:** a flat copy script is sufficient — no registry, no validation framework, just `skills/ → .agents/skills/`.
 
 ## Consequences

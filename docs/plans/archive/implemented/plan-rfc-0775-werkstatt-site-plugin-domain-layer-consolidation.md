@@ -313,7 +313,7 @@ scope:
 
 **Agent actions:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0775`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0775`
 - `pnpm --filter @warpgogol/werkstatt-site run build:check`
 - `pnpm --filter @warpgogol/werkstatt-site run test`
 - Verify LFS assets materialize: run extraction dry-run per RFC-0773 (if `extract.config.yaml` exists)
@@ -340,12 +340,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0775 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0775 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0775`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0775`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -357,7 +357,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0775`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0775`
 - `pnpm --filter @warpgogol/werkstatt-site run build:check`
 - `pnpm --filter @warpgogol/werkstatt-site run test`
 - Runtime subpath export smoke test (summit Q1)
@@ -384,6 +384,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1, DNA-5, DNA-17, DNA-20, DNA-56, or DNA-64, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0775 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1, DNA-5, DNA-17, DNA-20, DNA-56, or DNA-64, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0775 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `share`/`ontology` split boundary is ambiguous (operations schemas not cleanly separable from site-facing parts), escalate to the operator — this may require an amendment to RFC-0771.
 - If `packages/ui` LFS assets fail to materialize in extraction dry-run, escalate to RFC-0773 publication runbook before proceeding.

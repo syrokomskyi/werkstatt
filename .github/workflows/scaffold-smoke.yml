@@ -8,10 +8,9 @@ name: Scaffold smoke test
 on:
   pull_request:
     paths:
-      - "packages/os/site-kernel-onboarding/**"
-      - "packages/os/site-kernel-checks/**"
+      - "packages/werkstatt-site/src/onboarding/**"
+      - "packages/werkstatt-site/src/checks/**"
       - "packages/forge/**"
-      - "apps/nicaragua-projekt/**"
   workflow_dispatch:
 
 concurrency:
@@ -47,7 +46,7 @@ jobs:
 
       - name: Run onboarding.scaffold (throwaway client)
         run: |
-          node packages/os/site-kernel/bin/site-kernel.mjs run onboarding.scaffold \
+          pnpm exec werkstatt run onboarding.scaffold \
             --client __scaffold-test__ \
             --domain test.example.de \
             --biome nonprofit-trust \
@@ -60,7 +59,7 @@ jobs:
 
       - name: Run app.contract.full on scaffolded app
         run: |
-          node packages/os/site-kernel/bin/site-kernel.mjs run app.contract.full \
+          pnpm exec werkstatt run app.contract.full \
             --app __scaffold-test__
         # Exit code propagated by kernel — 0 = all validators pass, 1 = at least one failed.
 

@@ -83,8 +83,8 @@ The existing `cloudflare.residency.validate` command remains the static author-t
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run cloudflare.regional-services.validate --app warpgogol-com
-pnpm exec site-kernel run cloudflare.regional-services.validate --all --json
+pnpm exec werkstatt run cloudflare.regional-services.validate --app warpgogol-com
+pnpm exec werkstatt run cloudflare.regional-services.validate --all --json
 ```
 
 The command is app-scoped in behavior and workspace-registered through `createStandardCheckModule`, consistent with existing `site-kernel-checks` commands. It supports `--json` through the normal kernel result envelope.

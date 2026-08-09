@@ -133,7 +133,7 @@ No `AGENTS.md` or `docs/*.xml` updates needed — this RFC extends validation ru
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck passes
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0709 --json` — output includes `markers` field (empty array for this RFC since it has no markers)
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0709 --json` — output includes `markers` field (empty array for this RFC since it has no markers)
 
 **Completion criterion:** `--json` output includes `markers` array; error-severity markers cause status `"fail"`.
 
@@ -188,8 +188,8 @@ No `AGENTS.md` or `docs/*.xml` updates needed — this RFC extends validation ru
 
 **Validation:**
 
-- `rtk pnpm exec site-kernel run forge.skill.validate` — skills pass validation
-- `rtk pnpm exec site-kernel run forge.doctor` — no skill drift
+- `rtk pnpm exec werkstatt run forge.skill.validate` — skills pass validation
+- `rtk pnpm exec werkstatt run forge.doctor` — no skill drift
 
 **Completion criterion:** All three skills updated in both `packages/forge/skills/` and `.agents/skills/`, `forge.skill.validate` passes, `forge.doctor` reports no drift.
 
@@ -204,16 +204,16 @@ No `AGENTS.md` or `docs/*.xml` updates needed — this RFC extends validation ru
 **Agent actions:**
 
 - Verify no `AGENTS.md` or `docs/*.xml` updates are needed (confirmed during planning — this RFC extends validation rules and skill instructions only)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (V-NC-01 is a new rule on existing command, not a new command — manifest may not need regeneration; verify with `git diff`)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (V-NC-01 is a new rule on existing command, not a new command — manifest may not need regeneration; verify with `git diff`)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion against implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0709 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0709 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0709` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0709` — passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed; all acceptance criteria checked off with inline evidence; RFC stamped as `implemented`.
@@ -224,11 +224,11 @@ No `AGENTS.md` or `docs/*.xml` updates needed — this RFC extends validation ru
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0709`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0709`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate`
-- `pnpm exec site-kernel run forge.doctor`
+- `pnpm exec werkstatt run forge.skill.validate`
+- `pnpm exec werkstatt run forge.doctor`
 
 ### 4.2 Evidence artifacts
 
@@ -246,4 +246,4 @@ No `AGENTS.md` or `docs/*.xml` updates needed — this RFC extends validation ru
 
 ## 6. Escalation triggers
 
-- If implementation reveals that V-NC-01 conflicts with an existing DNA invariant, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0709 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals that V-NC-01 conflicts with an existing DNA invariant, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0709 --reason "..." --invariant "DNA-N"` instead of working around it.

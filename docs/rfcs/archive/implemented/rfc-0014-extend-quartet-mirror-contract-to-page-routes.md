@@ -108,13 +108,13 @@ The existing component quartet rules Q-01 through Q-05 are unchanged.
 
 ```sh
 # Validate quartet mirror (components + pages) for one app
-pnpm exec site-kernel run mirror.quartet.validate --app nicaragua-projekt
+pnpm exec werkstatt run mirror.quartet.validate --app nicaragua-projekt
 
 # Machine-readable output for CI
-pnpm exec site-kernel run mirror.quartet.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run mirror.quartet.validate --app nicaragua-projekt --json
 
 # All apps
-pnpm exec site-kernel run mirror.quartet.validate --all --json
+pnpm exec werkstatt run mirror.quartet.validate --all --json
 ```
 
 ### Validation rules

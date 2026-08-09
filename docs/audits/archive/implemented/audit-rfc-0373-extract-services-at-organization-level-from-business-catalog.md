@@ -14,7 +14,7 @@
 
 ## Mechanical validation
 
-`pnpm exec site-kernel run rfc.validate RFC-0373 --json` — **pass**, 0 violations, 0 warnings.
+`pnpm exec werkstatt run rfc.validate RFC-0373 --json` — **pass**, 0 violations, 0 warnings.
 
 ---
 
@@ -23,7 +23,7 @@
 | Item | Result | Notes |
 | --- | --- | --- |
 | Decision is single, present tense | **pass** | "Project the business service catalog into `SemanticOrganization.services`…" — clear, decisive. |
-| CLI surface shows exact invocations | **pass** | `pnpm exec site-kernel run services.projection.validate --app warpgogol-com` and `--all --json`. |
+| CLI surface shows exact invocations | **pass** | `pnpm exec werkstatt run services.projection.validate --app warpgogol-com` and `--all --json`. |
 | TypeScript contracts are minimal signatures | **pass** | `projectServices()` signature, `OrganizationProfileInput` extension, `SemanticService` type change. No full implementations. |
 | File system responsibilities table | **fail** | **Missing `packages/share/src/semantic/jsonld.ts`**. The `buildJsonLd()` function at line 36–47 constructs `servicesListNode` from `context.page.services`. Removing `SemanticPageModel.services` breaks this file. The RFC lists `jsonld/service.ts`, `jsonld/context.ts`, `jsonld/organization.ts`, `jsonld/webpage.ts` but omits the top-level `jsonld.ts` which also reads `context.page.services` directly. |
 | Output format documents `--json` shape | **pass** | Both pass and failure JSON examples provided. |

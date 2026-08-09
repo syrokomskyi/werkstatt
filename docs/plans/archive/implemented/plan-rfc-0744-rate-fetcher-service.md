@@ -77,8 +77,8 @@ scope:
 - `pnpm --filter @warpgogol/pbp run build:check` — typecheck PBP
 - `pnpm --filter @warpgogol/pbp-rate-adapters run build:check` — typecheck adapters
 - `pnpm --filter @warpgogol/rate-fetcher-worker run build:check` — typecheck worker
-- `pnpm exec site-kernel run services.check.run` — service import rules
-- `pnpm exec site-kernel run rfc.validate --id RFC-0744` — RFC validation
+- `pnpm exec werkstatt run services.check.run` — service import rules
+- `pnpm exec werkstatt run rfc.validate --id RFC-0744` — RFC validation
 
 ## 3. Step sequence
 
@@ -182,8 +182,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/rate-fetcher-worker run build:check` passes
-- `pnpm exec site-kernel run services.check.run` passes
-- `pnpm exec site-kernel run env.contract.validate --service rate-fetcher-worker` passes (if available)
+- `pnpm exec werkstatt run services.check.run` passes
+- `pnpm exec werkstatt run env.contract.validate --service rate-fetcher-worker` passes (if available)
 
 **Completion criterion:** Service workspace created with all files, typecheck passes, services.check.run passes, env contract compliant.
 
@@ -230,13 +230,13 @@ scope:
 - Update `packages/pbp/AGENTS.md` — add `PbpRateSource` to API surface multi-currency section
 - Update `docs/technology.xml` — add `rate-fetcher-worker` service and `pbp-rate-adapters` package
 - Update `docs/development-plan.xml` — add rate fetcher service to development plan
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed
 - Verify every file in `scope.docs` is updated
 
 **Validation:**
 
 - `git diff` shows changes to all scope.docs files
-- `pnpm exec site-kernel run rfc.validate --id RFC-0744` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0744` passes
 
 **Completion criterion:** All documentation artifacts in scope are updated; `rfc.validate` passes.
 
@@ -276,16 +276,16 @@ scope:
 
 - Update affected `AGENTS.md` files (root, services/, packages/) with new modules, commands, or ownership changes.
 - Update affected `docs/*.xml` Compass files (requirements, technology, development-plan, knowledge-graph, verification-plan, source-markup, styling) when repository-wide semantics changed.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0744 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0744 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0744`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0744`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -297,7 +297,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0744`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0744`
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/pbp-rate-adapters run build:check`
 - `pnpm --filter @warpgogol/rate-fetcher-worker run build:check`
@@ -305,7 +305,7 @@ scope:
 - `pnpm --filter @warpgogol/pbp run test`
 - `pnpm --filter @warpgogol/pbp-rate-adapters run test`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run services.check.run`
+- `pnpm exec werkstatt run services.check.run`
 
 ### 4.2 Evidence artifacts
 
@@ -324,6 +324,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 or DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0744 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1 or DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0744 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the Supabase schema requires changes to existing Lagebild tables, stop and escalate — Lagebild tables are owned by RFC-0186.
 - If `rate-snapshot.resolve` command registration conflicts with RFC-0741's registration, stop and resolve the conflict via an amending RFC before proceeding.

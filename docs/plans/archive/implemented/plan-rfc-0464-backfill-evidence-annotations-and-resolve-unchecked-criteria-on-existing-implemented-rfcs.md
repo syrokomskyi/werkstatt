@@ -52,7 +52,7 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --json` and extract the list of V-27 violations
+- Run `pnpm exec werkstatt run rfc.validate --json` and extract the list of V-27 violations
 - Sort violations by file path, take the first 50 files
 - For each file, read the RFC, find each `[x]` without `(evidence: ...)`, inspect the codebase to find the real implementation file and/or test, add `(evidence: <file-path:line>, <test-or-command>)` annotation
 - Verify each evidence file path exists before writing
@@ -60,7 +60,7 @@ No configuration or data files affected.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — V-27 count decreased by at least the number of items fixed in this batch
+- `pnpm exec werkstatt run rfc.validate --json` — V-27 count decreased by at least the number of items fixed in this batch
 
 **Completion criterion:** 50 RFCs backfilled with evidence annotations, V-27 count decreased.
 
@@ -80,7 +80,7 @@ No configuration or data files affected.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — V-27 count reaches 0 after the final batch
+- `pnpm exec werkstatt run rfc.validate --json` — V-27 count reaches 0 after the final batch
 
 **Completion criterion:** V-27 count = 0 in `rfc.validate --json`.
 
@@ -94,7 +94,7 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --json` and extract the list of V-26 violations
+- Run `pnpm exec werkstatt run rfc.validate --json` and extract the list of V-26 violations
 - Sort by file path, take the first 20 files
 - For each RFC, read it and determine for each unchecked `[ ]`:
   - Was the work completed? Check the codebase for the implementation. If yes, check `[x]` and add `(evidence: ...)`.
@@ -103,7 +103,7 @@ No configuration or data files affected.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — V-26 count decreased
+- `pnpm exec werkstatt run rfc.validate --json` — V-26 count decreased
 
 **Completion criterion:** 20 RFCs triaged, V-26 count decreased.
 
@@ -123,7 +123,7 @@ No configuration or data files affected.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --json` — V-26 count reaches 0
+- `pnpm exec werkstatt run rfc.validate --json` — V-26 count reaches 0
 
 **Completion criterion:** V-26 count = 0 in `rfc.validate --json`.
 
@@ -137,7 +137,7 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --json` — must exit 0 with zero V-26 and V-27 violations
+- Run `pnpm exec werkstatt run rfc.validate --json` — must exit 0 with zero V-26 and V-27 violations
 - Spot-check 10 random RFCs: verify evidence annotations point to files that exist in the codebase
 - If any fake evidence is found, fix it
 
@@ -161,7 +161,7 @@ No configuration or data files affected.
 - For each acceptance criterion in RFC-0464:
   - Verify it is met
   - Check `[x]` and add `(evidence: ...)` annotation
-- Run `pnpm exec site-kernel run rfc.validate RFC-0464 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0464 --json` — must pass
 - Set `status: implemented`, `implementedAt: <today's date>`, `updatedAt: <today's date>`
 - Commit the RFC file
 
@@ -179,8 +179,8 @@ No configuration or data files affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --json` — full RFC tree passes with zero V-26 and V-27 violations
-- `pnpm exec site-kernel run rfc.validate RFC-0464 --json` — RFC-0464 passes validation
+- `pnpm exec werkstatt run rfc.validate --json` — full RFC tree passes with zero V-26 and V-27 violations
+- `pnpm exec werkstatt run rfc.validate RFC-0464 --json` — RFC-0464 passes validation
 
 ### 4.2 Evidence artifacts
 
@@ -198,5 +198,5 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If triage of an RFC reveals an invariant conflict (the RFC's unchecked criterion contradicts a DNA invariant), run `pnpm exec site-kernel run rfc.supersede.propose --id <rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If triage of an RFC reveals an invariant conflict (the RFC's unchecked criterion contradicts a DNA invariant), run `pnpm exec werkstatt run rfc.supersede.propose --id <rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If an RFC has so many unchecked criteria that supersede would fragment the work, consider creating a single follow-up RFC that supersede the original and covers all deferred work.

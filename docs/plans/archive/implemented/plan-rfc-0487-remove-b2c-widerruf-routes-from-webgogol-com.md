@@ -90,7 +90,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` passes
-- `pnpm exec site-kernel run system.manifest.validate --app warpgogol-com` still passes (existing system.md without new fields is valid because fields are optional)
+- `pnpm exec werkstatt run system.manifest.validate --app warpgogol-com` still passes (existing system.md without new fields is valid because fields are optional)
 
 **Completion criterion:** `systemManifestSchema` includes `retiredRoutes` and `businessModel` fields; `@gogol/ontology` build passes; existing system.md still validates.
 
@@ -141,7 +141,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json` exits 0 (no `businessModel` field yet → no-op)
+- `pnpm exec werkstatt run b2b.model.validate --app warpgogol-com --json` exits 0 (no `businessModel` field yet → no-op)
 
 **Completion criterion:** `b2b.model.validate` command is registered, runs as no-op for apps without `businessModel`, and is wired into `sites-check-author` pipeline.
 
@@ -161,8 +161,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate` passes
-- `pnpm exec site-kernel run ecosystem.manifest.validate` passes (if applicable)
+- `pnpm exec werkstatt run compass.validate` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate` passes (if applicable)
 
 **Completion criterion:** All three documentation files updated and validated.
 
@@ -190,11 +190,11 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json` exits 0
-- `pnpm exec site-kernel run redirect.map.validate --app warpgogol-com` exits 0
-- `pnpm exec site-kernel run content.references.validate --app warpgogol-com` exits 0
-- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com` exits 0
-- `pnpm exec site-kernel run system.manifest.validate --app warpgogol-com` exits 0
+- `pnpm exec werkstatt run b2b.model.validate --app warpgogol-com --json` exits 0
+- `pnpm exec werkstatt run redirect.map.validate --app warpgogol-com` exits 0
+- `pnpm exec werkstatt run content.references.validate --app warpgogol-com` exits 0
+- `pnpm exec werkstatt run surface.contract.validate --app warpgogol-com` exits 0
+- `pnpm exec werkstatt run system.manifest.validate --app warpgogol-com` exits 0
 
 **Completion criterion:** All validation commands pass; no widerruf/musterWiderruf entries remain in system.md, navigation, labels, or PBP terms; 8 files deleted; `retiredRoutes` and `businessModel` declared in system.md.
 
@@ -216,8 +216,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0487 --json` exits 0
-- `pnpm exec site-kernel run app.contract.full --app warpgogol-com` exits 0
+- `pnpm exec werkstatt run rfc.validate RFC-0487 --json` exits 0
+- `pnpm exec werkstatt run app.contract.full --app warpgogol-com` exits 0
 
 **Completion criterion:** RFC status is `implemented`; all acceptance criteria checkboxes can be checked; full build passes.
 
@@ -227,15 +227,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0487`
+- `pnpm exec werkstatt run rfc.validate RFC-0487`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json`
-- `pnpm exec site-kernel run redirect.map.validate --app warpgogol-com`
-- `pnpm exec site-kernel run content.references.validate --app warpgogol-com`
-- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com`
-- `pnpm exec site-kernel run system.manifest.validate --app warpgogol-com`
+- `pnpm exec werkstatt run b2b.model.validate --app warpgogol-com --json`
+- `pnpm exec werkstatt run redirect.map.validate --app warpgogol-com`
+- `pnpm exec werkstatt run content.references.validate --app warpgogol-com`
+- `pnpm exec werkstatt run surface.contract.validate --app warpgogol-com`
+- `pnpm exec werkstatt run system.manifest.validate --app warpgogol-com`
 
 ### 4.2 Evidence artifacts
 
@@ -255,6 +255,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `retiredRoutes` conflicts with existing `redirect.map.validate` logic (e.g., 410 entries not supported for page routes), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0487 --reason "retiredRoutes 410 mechanism incompatible with redirect.map.validate" --invariant "DNA-39"` instead of working around it.
+- If implementation reveals that `retiredRoutes` conflicts with existing `redirect.map.validate` logic (e.g., 410 entries not supported for page routes), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0487 --reason "retiredRoutes 410 mechanism incompatible with redirect.map.validate" --invariant "DNA-39"` instead of working around it.
 - If `b2b.model.validate` false positive rate is unacceptably high for legitimate B2B "Widerruf ausschließen" usage, refine the B2B-LABEL-01 check to match only `semanticTarget.pageId: widerruf` entries, not label text. Do not suppress the check entirely.
 - If cross-page cleanup sessions (expert files 4-8) cannot be completed, STOP at Step 5 and report to the operator. Do not deploy route removal without cross-page cleanup.

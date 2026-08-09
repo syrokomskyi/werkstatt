@@ -189,7 +189,7 @@ All three commands return the standard kernel `--json` envelope: `{ commandName,
 #### 5.1 `fingerprint.calculate`
 
 ```sh
-pnpm exec site-kernel run fingerprint.calculate --path <path> --mode semantic --json
+pnpm exec werkstatt run fingerprint.calculate --path <path> --mode semantic --json
 ```
 
 Prints a `FingerprintResult`. Scope: workspace (utility command, not in any pipeline). Exit code 0 on success, 1 on read/parse error.
@@ -197,8 +197,8 @@ Prints a `FingerprintResult`. Scope: workspace (utility command, not in any pipe
 #### 5.2 `fingerprint.usage.lint`
 
 ```sh
-pnpm exec site-kernel run fingerprint.usage.lint --mode warning --json
-pnpm exec site-kernel run fingerprint.usage.lint --mode fail --json
+pnpm exec werkstatt run fingerprint.usage.lint --mode warning --json
+pnpm exec werkstatt run fingerprint.usage.lint --mode fail --json
 ```
 
 Scans authored source for direct hash usage. The `--mode` flag controls behavior: `warning` (default during migration) emits diagnostics but exits 0; `fail` exits 1 on any violation. It fails on:
@@ -214,7 +214,7 @@ Pipeline placement: joins `PACKAGES_CHECK_PIPELINE` in warning mode (step 4), pr
 #### 5.3 `fingerprint.fixtures.validate`
 
 ```sh
-pnpm exec site-kernel run fingerprint.fixtures.validate --json
+pnpm exec werkstatt run fingerprint.fixtures.validate --json
 ```
 
 Validates fixture pairs:

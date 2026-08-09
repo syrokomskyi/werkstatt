@@ -16,12 +16,12 @@ The RFC is structurally well-organized as an execution-wave pilot and correctly 
 
 ## Mechanical validation (rfc.validate)
 
-Pass. `pnpm exec site-kernel run rfc.validate RFC-0381 --json` — 0 violations, exit 0.
+Pass. `pnpm exec werkstatt run rfc.validate RFC-0381 --json` — 0 violations, exit 0.
 
 ## Axis A — Structural completeness
 
 - **Decision** is present-tense and clear: "Execute the pilot migration wave for `warpgogol-com`."
-- **CLI surface** shows exact `pnpm exec site-kernel run …` invocations — but multiple commands use flags not defined in their establishing RFCs (see Axis C for details). The invocations are syntactically plausible but semantically inconsistent with the contracts they invoke.
+- **CLI surface** shows exact `pnpm exec werkstatt run …` invocations — but multiple commands use flags not defined in their establishing RFCs (see Axis C for details). The invocations are syntactically plausible but semantically inconsistent with the contracts they invoke.
 - **TypeScript contracts** section is absent. This is acceptable only if no command contracts change — but `commands.changed` lists 6 commands, which implies contract changes that should be documented.
 - **File system responsibilities** table names concrete paths. No issues.
 - **Output format** section is absent. N/A — no new commands, output shapes are defined by the establishing RFCs.

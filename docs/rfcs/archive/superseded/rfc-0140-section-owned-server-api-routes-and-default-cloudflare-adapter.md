@@ -154,10 +154,10 @@ Idempotency and ownership mirror the `writeManagedFile` discipline in [`app-boil
 
 ```sh
 # Generate API routes for the current app from its used sections
-pnpm exec site-kernel run api.routes.generate
+pnpm exec werkstatt run api.routes.generate
 
 # Dry-run: list what would be written / deleted
-pnpm exec site-kernel run api.routes.generate --dry-run
+pnpm exec werkstatt run api.routes.generate --dry-run
 ```
 
 ### TypeScript contracts

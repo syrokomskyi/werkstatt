@@ -132,8 +132,8 @@ This RFC intentionally treats icon support as the first standardized reusable au
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run section.content.contract.validate
-pnpm exec site-kernel run section.list-item.contract.validate
+pnpm exec werkstatt run section.content.contract.validate
+pnpm exec werkstatt run section.list-item.contract.validate
 ```
 
 `section.content.contract.validate` is workspace-scoped and verifies that authored shared section schemas and implementations conform to the standardized section-content contracts.
@@ -143,9 +143,9 @@ pnpm exec site-kernel run section.list-item.contract.validate
 Existing commands gain additional duties:
 
 ```sh
-pnpm exec site-kernel run section.contract.validate
-pnpm exec site-kernel run page.block.validate --app warpgogol-com
-pnpm exec site-kernel run section.scaffold --archetype trust-strip --slug trust-strip
+pnpm exec werkstatt run section.contract.validate
+pnpm exec werkstatt run page.block.validate --app warpgogol-com
+pnpm exec werkstatt run section.scaffold --archetype trust-strip --slug trust-strip
 ```
 
 Behavior expectations:

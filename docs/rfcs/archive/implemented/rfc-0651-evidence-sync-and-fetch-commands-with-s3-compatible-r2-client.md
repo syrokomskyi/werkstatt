@@ -70,7 +70,7 @@ nonGoals:
   - "Does not support resumable uploads — if sync fails mid-way, the operator re-runs the command"
   - "Does not implement a TUI or dashboard for browsing evidence history — evidence.fetch --list is the CLI interface"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -126,28 +126,28 @@ The kernel gains two new Site OS commands: `evidence.sync` and `evidence.fetch`.
 
 ```sh
 # Sync current evidence to R2
-pnpm exec site-kernel run evidence.sync --mission warpgogol-com-m000025
+pnpm exec werkstatt run evidence.sync --mission warpgogol-com-m000025
 
 # Sync with explicit run timestamp (defaults to evidence-metadata.json runTimestamp)
-pnpm exec site-kernel run evidence.sync --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z
+pnpm exec werkstatt run evidence.sync --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z
 
 # Dry-run: report what would be uploaded without making R2 API calls
-pnpm exec site-kernel run evidence.sync --mission warpgogol-com-m000025 --dry-run
+pnpm exec werkstatt run evidence.sync --mission warpgogol-com-m000025 --dry-run
 
 # Sync with JSON output
-pnpm exec site-kernel run evidence.sync --mission warpgogol-com-m000025 --json
+pnpm exec werkstatt run evidence.sync --mission warpgogol-com-m000025 --json
 
 # Fetch a historical run from R2 to a local directory
-pnpm exec site-kernel run evidence.fetch --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z --output-dir /tmp/evidence-review
+pnpm exec werkstatt run evidence.fetch --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z --output-dir /tmp/evidence-review
 
 # Fetch only structured JSON (skip raw/ artifacts — faster, less data)
-pnpm exec site-kernel run evidence.fetch --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z --no-raw --output-dir /tmp/evidence-review
+pnpm exec werkstatt run evidence.fetch --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z --no-raw --output-dir /tmp/evidence-review
 
 # List available runs for a mission (lists R2 objects with prefix)
-pnpm exec site-kernel run evidence.fetch --mission warpgogol-com-m000025 --list
+pnpm exec werkstatt run evidence.fetch --mission warpgogol-com-m000025 --list
 
 # List with JSON output
-pnpm exec site-kernel run evidence.fetch --mission warpgogol-com-m000025 --list --json
+pnpm exec werkstatt run evidence.fetch --mission warpgogol-com-m000025 --list --json
 ```
 
 ### TypeScript contracts
@@ -298,7 +298,7 @@ interface R2ClientConfig {
 - **Existing missions**: No migration — `evidence.sync` only syncs runs that have `runTimestamp` in `evidence-metadata.json` (produced by `mission.check` after RFC-0650 implementation).
 - **New missions**: Automatically supported — `mission.check` writes `runTimestamp`, then `evidence.sync` uploads to R2.
 - **Pipeline integration**: None in this RFC. RFC-0652 integrates `evidence.sync` into `mission.close` and `leitstand.dev-deploy`.
-- **Command manifest**: After implementation, run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml` (RFC-CMD-02).
+- **Command manifest**: After implementation, run `pnpm exec werkstatt run command.manifest.generate` to update `docs/command-manifest.generated.yaml` (RFC-CMD-02).
 
 ## Alternatives considered
 

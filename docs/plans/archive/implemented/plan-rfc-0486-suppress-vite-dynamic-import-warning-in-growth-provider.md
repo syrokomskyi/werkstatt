@@ -43,7 +43,7 @@ None — no configuration, manifests, or ontology catalogs are touched.
 ### 2.4 Validation and pipelines
 
 - `pnpm --filter @gogol/growth build:check` — scoped TypeScript check for the growth package
-- `pnpm exec site-kernel run rfc.validate RFC-0486 --json` — mechanical RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0486 --json` — mechanical RFC validation
 
 ## 3. Step sequence
 
@@ -92,7 +92,7 @@ None — no configuration, manifests, or ontology catalogs are touched.
 **Agent actions:**
 
 - Run `pnpm --filter @gogol/growth build:check`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0486 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0486 --json`
 
 **Validation:**
 
@@ -111,7 +111,7 @@ None — no configuration, manifests, or ontology catalogs are touched.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0486 --implementation-commit <commit-sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0486 --implementation-commit <commit-sha>`
 - Commit `packages/growth/src/provider.astro` and `packages/AGENTS.md` with a message referencing RFC-0486
 
 **Validation:**
@@ -128,7 +128,7 @@ None — no configuration, manifests, or ontology catalogs are touched.
 ### 4.1 Required checks
 
 - `pnpm --filter @gogol/growth build:check` — TypeScript compilation passes
-- `pnpm exec site-kernel run rfc.validate RFC-0486 --json` — RFC mechanical validation passes
+- `pnpm exec werkstatt run rfc.validate RFC-0486 --json` — RFC mechanical validation passes
 
 ### 4.1.1 Indirect verification of Vite warning suppression
 

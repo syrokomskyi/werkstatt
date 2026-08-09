@@ -151,7 +151,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** C-contract files updated; `surface.contract.validate` passes with the new definitions.
 
@@ -175,7 +175,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run participant.json.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run participant.json.validate --site warpgogol-com --json`
 
 **Completion criterion:** Validator runs, passes on valid output, fails on private field leakage; registered in command table and postbuild pipeline.
 
@@ -196,7 +196,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** Migrator file created; registered in registry; `migrator.registry.validate` passes.
 
@@ -214,7 +214,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0512`
+- `pnpm exec werkstatt run rfc.validate RFC-0512`
 
 **Completion criterion:** `rfc.validate` passes with zero warnings (V-19 resolved).
 
@@ -231,12 +231,12 @@ scope:
 - Update `docs/technology.xml` — add `participant.json.generate` (build.prepare step) and `participant.json.validate` (sites-check-postbuild step) to the command surface
 - Update `docs/knowledge-graph.xml` — add RFC-0512 relationships (amends RFC-0200, related to RFC-0508/0509/0510/0511/0513, satisfies DNA-53)
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add `participant.json.validate` to the command inventory
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed
 
 **Validation:**
 
 - `git diff --name-only` shows only expected files
-- `pnpm exec site-kernel run workspace.surface.validate`
+- `pnpm exec werkstatt run workspace.surface.validate`
 
 **Completion criterion:** All scope docs updated; `workspace.surface.validate` passes.
 
@@ -251,16 +251,16 @@ scope:
 **Agent actions:**
 
 - Run full validation suite:
-  - `pnpm exec site-kernel run rfc.validate RFC-0512`
+  - `pnpm exec werkstatt run rfc.validate RFC-0512`
   - `pnpm --filter @gogol/share run build:check`
   - `pnpm --filter @gogol/ontology run build:check`
   - `pnpm --filter @gogol/site-kernel-checks run build:check`
   - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-  - `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
-  - `pnpm exec site-kernel run migrator.registry.validate`
-  - `pnpm exec site-kernel run sites-check.postbuild --site warpgogol-com`
+  - `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
+  - `pnpm exec werkstatt run migrator.registry.validate`
+  - `pnpm exec werkstatt run sites-check.postbuild --site warpgogol-com`
 - Check off each acceptance criterion in the RFC with `(evidence: <command or file>)`
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0512 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0512 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -275,14 +275,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0512`
+- `pnpm exec werkstatt run rfc.validate RFC-0512`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run sites-check.postbuild --site warpgogol-com`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run sites-check.postbuild --site warpgogol-com`
 
 ### 4.2 Evidence artifacts
 
@@ -299,5 +299,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages) — JSON endpoints are static files, not block-declarative — run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0512 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages) — JSON endpoints are static files, not block-declarative — run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0512 --reason "..." --invariant "DNA-24"` instead of working around it.
 - If the JSON-LD builder integration in `resolve-route.ts` conflicts with the existing `buildJsonLd` orchestration in `jsonld.ts`, escalate to the architecture owner before modifying the `@graph` assembly path.

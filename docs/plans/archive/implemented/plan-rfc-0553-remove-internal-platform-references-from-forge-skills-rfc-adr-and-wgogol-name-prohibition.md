@@ -128,7 +128,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --json` — zero SKILL-17 violations
+- `pnpm exec werkstatt run forge.skill.validate --json` — zero SKILL-17 violations
 - Manual review: skill instructions remain clear and meaningful after id removal
 
 **Completion criterion:** Zero `RFC-\d{4}` or `ADR-\d{4}` matches in `packages/forge/skills/**/*.md` files (except generic placeholders `RFC-XXXX`/`ADR-XXXX`).
@@ -155,7 +155,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --json` — zero SKILL-17 violations for platform names
+- `pnpm exec werkstatt run forge.skill.validate --json` — zero SKILL-17 violations for platform names
 - `grep -ri "WGogol\|WebGogol\|WarpGogol" packages/forge/skills/` — zero matches
 
 **Completion criterion:** Zero "WGogol", "WebGogol", or "WarpGogol" matches in `packages/forge/skills/**/*.md` files.
@@ -191,10 +191,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.skill.validate --json` — expect status: "pass", zero violations
+- Run `pnpm exec werkstatt run forge.skill.validate --json` — expect status: "pass", zero violations
 - Run `pnpm --filter @warpgogol/forge run build:check` — expect pass
 - Run `pnpm --filter @warpgogol/forge run test` — expect all tests pass
-- Run `pnpm exec site-kernel run rfc.validate` — expect zero RFC-0553 violations
+- Run `pnpm exec werkstatt run rfc.validate` — expect zero RFC-0553 violations
 - Verify each acceptance criterion in the RFC:
   - [x] SKILL-17 is added to forge.skill.validate prohibiting specific platform RFC/ADR ids and platform names
   - [x] SKILL-17 allows generic "RFC"/"ADR" terms and generic placeholder ids
@@ -224,16 +224,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` is updated with SKILL-17 documentation (step 5 already does this)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC, so likely not needed)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC, so likely not needed)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0553 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0553 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate` — zero violations
+- `pnpm exec werkstatt run rfc.validate` — zero violations
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -245,10 +245,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate`
+- `pnpm exec werkstatt run rfc.validate`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --json`
+- `pnpm exec werkstatt run forge.skill.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -268,5 +268,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0553 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0553 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If the cleanup of skill files reveals that removing RFC/ADR id references makes instructions ambiguous or unclear, escalate to the operator for guidance on rewording rather than leaving unclear instructions.

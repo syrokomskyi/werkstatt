@@ -118,7 +118,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run blueprint.validate --site warpgogol-com` (if available)
+- `pnpm exec werkstatt run blueprint.validate --site warpgogol-com` (if available)
 
 **Completion criterion:** `ratgeber.yaml` parses against the extended `blueprintSchema`; no `pillar` or `article` block at depth-0.
 
@@ -203,7 +203,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json` (after content migration)
+- `pnpm exec werkstatt run ratgeber.hub.validate --site warpgogol-com --json` (after content migration)
 
 **Completion criterion:** Command runs and returns diagnostics with correct exit codes.
 
@@ -233,7 +233,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** Migrator transforms topics to articles, creates category records, converts sections to prose; idempotent; registered in registry.
 
@@ -274,7 +274,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** `surface.contract.validate` enforces the ratgeber type policy.
 
@@ -288,7 +288,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run mission.migrate --mission warpgogol-com-m000010` (or the current mission id)
+- Run `pnpm exec werkstatt run mission.migrate --mission warpgogol-com-m000010` (or the current mission id)
 - Verify `surface/articles/{lang}/*.md` exists with correct fields
 - Verify `surface/article-categories/{lang}/*.md` exists with `kosten` and `sichtbarkeit`
 - Verify `prose/{lang}/ratgeber-{slug}.md` exists with converted sections
@@ -296,8 +296,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run surface.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run ratgeber.hub.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.validate --site warpgogol-com --json`
 
 **Completion criterion:** Migration produces valid article records, category records, and prose files; old topics collection removed.
 
@@ -317,7 +317,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0500 --json` (warnings should be resolved)
+- `pnpm exec werkstatt run rfc.validate RFC-0500 --json` (warnings should be resolved)
 
 **Completion criterion:** `rfc.validate` reports zero violations for RFC-0500.
 
@@ -339,14 +339,14 @@ scope:
 - Update `docs/requirements.xml`: new content collections, blueprint schema extension
 - Update `docs/technology.xml`: new baker files, validator
 - Update `docs/knowledge-graph.xml`: RFC-0500 relationships
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Check off all acceptance criteria with inline `(evidence: ...)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0500 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0500 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0500 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0500 --json`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -357,16 +357,16 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0500 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0500 --json`
 - `pnpm --filter @gogol/surface run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run surface.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run ratgeber.hub.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
 
 ### 4.2 Evidence artifacts
 
@@ -384,5 +384,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16 (semantic layer topology), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0500 --reason "..." --invariant "DNA-16"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16 (semantic layer topology), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0500 --reason "..." --invariant "DNA-16"` instead of working around it.
 - If the blueprint schema extension is rejected by `blueprintSchema.safeParse` due to an unforeseen constraint, investigate the schema contract before loosening validation.

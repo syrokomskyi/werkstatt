@@ -94,8 +94,8 @@ export const sectionManifestSchema = manifestBaseSchema.extend({
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run archetype.registry.build   # writes index.json with sectionRoles[]
-pnpm exec site-kernel run archetype.registry.validate
+pnpm exec werkstatt run archetype.registry.build   # writes index.json with sectionRoles[]
+pnpm exec werkstatt run archetype.registry.validate
 ```
 
 ### Failure modes

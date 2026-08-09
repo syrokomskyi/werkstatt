@@ -65,7 +65,7 @@ nonGoals:
   - "Does not generate PDF or other non-HTML report formats"
   - "Does not replace the existing renderReportHtml function in check-core (different ecosystem)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -118,13 +118,13 @@ The kernel gains an `axiom.report` command that reads Axiom evidence JSON files 
 
 ```sh
 # Standalone invocation
-pnpm exec site-kernel run axiom.report --mission=<missionId>
+pnpm exec werkstatt run axiom.report --mission=<missionId>
 
 # With JSON output (for programmatic consumers)
-pnpm exec site-kernel run axiom.report --mission=<missionId> --json
+pnpm exec werkstatt run axiom.report --mission=<missionId> --json
 
 # dryRun mode (RFC-0601) — returns HTML in data.renderedFiles, no file write
-pnpm exec site-kernel run axiom.report --mission=<missionId> --dry-run --json
+pnpm exec werkstatt run axiom.report --mission=<missionId> --dry-run --json
 ```
 
 **Flags:**
@@ -282,7 +282,7 @@ The HTML file is self-contained (Tailwind CDN + Mermaid CDN) and contains:
 - [x] Failure modes implemented: `AXIOM-REPORT-01` through `AXIOM-REPORT-05` with correct exit codes (evidence: packages/os/site-kernel-checks/src/axiom-report.ts:393-415, src/tests/axiom-report.test.ts:258-322)
 - [x] `leitstand.dev-deploy` in `site-kernel-handoff` auto-invokes `axiom.report` after `mission.check` (best-effort, non-blocking) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:561-575)
 - [x] Unit tests in `site-kernel-checks` cover: successful report generation, missing evidence directory, missing individual JSON files, dryRun mode, HTML contains expected sections (evidence: packages/os/site-kernel-checks/src/tests/axiom-report.test.ts:10 tests, pnpm --filter @warpgogol/site-kernel-checks run test — 741 passed)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0633 — exit 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0633 — exit 0)
 
 ## Implementation notes for agents
 

@@ -84,7 +84,7 @@ src/content/
 Run the validation command:
 
 ```bash
-rtk pnpm exec site-kernel run i18n.config.validate --site <your-app>
+rtk pnpm exec werkstatt run i18n.config.validate --site <your-app>
 ```
 
 ### Step 4: Regenerate Middleware (if using language detection)
@@ -92,7 +92,7 @@ rtk pnpm exec site-kernel run i18n.config.validate --site <your-app>
 If you're using auto-generated language detection:
 
 ```bash
-rtk pnpm exec site-kernel run i18n.detect.implement --site <your-app>
+rtk pnpm exec werkstatt run i18n.detect.implement --site <your-app>
 ```
 
 This updates `src/middleware/language-detect.ts` with the new language.
@@ -125,7 +125,7 @@ rtk rm -rf src/content/components/en
 ### Step 3: Validate
 
 ```bash
-rtk pnpm exec site-kernel run i18n.config.validate --site <your-app>
+rtk pnpm exec werkstatt run i18n.config.validate --site <your-app>
 ```
 
 ⚠️ **Warning**: Removing a language without removing its content files will trigger validation warnings for "orphan content".
@@ -155,7 +155,7 @@ i18n:
 ### Step 2: Validate
 
 ```bash
-rtk pnpm exec site-kernel run i18n.config.validate --site <your-app>
+rtk pnpm exec werkstatt run i18n.config.validate --site <your-app>
 ```
 
 ### Step 3: Update Static Generation (if needed)

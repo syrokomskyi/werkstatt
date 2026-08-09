@@ -384,7 +384,7 @@ The `stats` field (e.g. "25+ Jahre Erfahrung") is removed from the hero block sy
 
 ```sh
 # Validate the human profile page structure.
-pnpm exec site-kernel run participant.profile.validate --site warpgogol-com --json
+pnpm exec werkstatt run participant.profile.validate --site warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -551,7 +551,7 @@ function buildHumanProfileBlocks(participant: ParticipantView, lang: string): Bl
 - [x] Andrii's prose is split into three files: `-beruflich`, `-nachweise`, `-persoenlich`. (evidence: missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-{beruflich,nachweise,persoenlich}.md created, old andrii-syrokomskyi.md removed)
 - [x] Andrii's Participant record has `responsibility`, `authority`, `evidence`, updated `consent`. (evidence: missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md:26-52, participant.validate passes)
 - [x] `participant.profile.validate` passes and is registered in `SITES_CHECK_AUTHOR_PIPELINE` after `team.hub.validate`. (evidence: packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts:171-172, participant.profile.validate: OK in sites-check.run)
-- [x] `rfc.validate` passes on this file before merging. (evidence: pnpm exec site-kernel run rfc.validate --json, only shared V-19 warning)
+- [x] `rfc.validate` passes on this file before merging. (evidence: pnpm exec werkstatt run rfc.validate --json, only shared V-19 warning)
 
 ## Implementation notes for agents
 

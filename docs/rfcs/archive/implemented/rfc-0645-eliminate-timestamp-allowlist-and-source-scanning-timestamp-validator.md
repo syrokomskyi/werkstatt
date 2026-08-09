@@ -64,7 +64,7 @@ nonGoals:
   - "Do not change GENERATOR_OWNERSHIP_MAP structure or contents — it remains the canonical registry of generated files and their owning commands."
   - "Do not remove the stripCommentsAndStrings utility if it is still imported by command-args-validate.ts — only remove it if no other consumers remain."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -125,10 +125,10 @@ No new CLI commands. The `generated.timestamp.validate` command is removed:
 
 ```sh
 # Removed from all pipelines:
-# pnpm exec site-kernel run generated.timestamp.validate --site <id>
+# pnpm exec werkstatt run generated.timestamp.validate --site <id>
 
 # Still available (sole determinism check):
-pnpm exec site-kernel run generated.drift.validate --site <id>
+pnpm exec werkstatt run generated.drift.validate --site <id>
 ```
 
 ### TypeScript contracts
@@ -211,9 +211,9 @@ In `packages/os/site-kernel-checks/src/generated-drift-validate.ts` and `diagnos
 - [x] TS-TIME-01 rule descriptor deleted from `diagnostics/rules/core-infra.ts`; `TS-TIME-02` constant deleted with `generated-timestamp-validate.ts` (evidence: `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:492-497` — only DRIFT-01 and DRIFT-02 remain for generated validators)
 - [x] DRIFT-02 severity promoted from info to error in `generated-drift-validate.ts` and `diagnostics/rules/core-infra.ts` (evidence: `packages/os/site-kernel-checks/src/generated-drift-validate.ts:181,193` — `severity: "error"`; `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:496` — `"error"`)
 - [x] `tests/generated-timestamp-validate.test.ts` deleted (evidence: `git show --stat 477d559` — `delete mode 100644 packages/os/site-kernel-checks/src/tests/generated-timestamp-validate.test.ts`)
-- [x] All generators in `GENERATOR_OWNERSHIP_MAP` support dryRun mode (no DRIFT-02 errors when running `generated.drift.validate`) (evidence: `pnpm exec site-kernel run generated.drift.validate --site warpgogol-com --json` — 0 error(s), 0 warning(s), exitCode 0)
+- [x] All generators in `GENERATOR_OWNERSHIP_MAP` support dryRun mode (no DRIFT-02 errors when running `generated.drift.validate`) (evidence: `pnpm exec werkstatt run generated.drift.validate --site warpgogol-com --json` — 0 error(s), 0 warning(s), exitCode 0)
 - [x] `mission.validate` passes without `generated.timestamp.validate` in the pipeline (evidence: `generated.drift.validate` passes with 0 errors; `build.check` pipeline no longer includes `generated.timestamp.validate` step)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0645 --json` — All 1 RFC(s) passed validation, exitCode 0)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0645 --json` — All 1 RFC(s) passed validation, exitCode 0)
 
 ## Implementation notes for agents
 

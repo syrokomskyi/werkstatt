@@ -66,11 +66,11 @@ scope:
 ### 2.4 Validation and pipelines
 
 - No new pipeline commands. All four leitstand commands are workspace-scoped, not pipeline-integrated.
-- `pnpm exec site-kernel run rfc.validate RFC-0379 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0379 --json`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/fingerprint run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0379` (acceptance probes declared)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0379` (acceptance probes declared)
 
 ## 3. Step sequence
 
@@ -275,7 +275,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0379 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0379 --json`
 
 **Completion criterion:** DNA-49 text says "MVP: Cloudflare Workers"; `packages/AGENTS.md` contains the lastPropagated write rule.
 
@@ -289,12 +289,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0379 --json` — must pass
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0379` — must pass (file-exists probe for adapter, run probe for status)
+- Run `pnpm exec werkstatt run rfc.validate RFC-0379 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0379` — must pass (file-exists probe for adapter, run probe for status)
 - Run `pnpm --filter @gogol/ontology run build:check`
 - Run `pnpm --filter @gogol/fingerprint run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0379` (RFC-0330)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0379` (RFC-0330)
 - Commit the verification evidence file
 
 **Validation:**
@@ -311,12 +311,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0379 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0379 --json`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/fingerprint run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0379`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0379` (RFC-0330)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0379`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0379` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -335,6 +335,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49 or DNA-52, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0379 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49 or DNA-52, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0379 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the HTML normalizer proves too inaccurate for health verification (too many false positives), escalate via a new RFC rather than disabling the check silently.
 - If `wrangler deploy` flags change in a way that breaks the adapter contract, create an amending RFC rather than patching the adapter inline.

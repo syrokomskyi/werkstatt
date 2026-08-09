@@ -57,7 +57,7 @@ nonGoals:
   - "Does not add any new commands to the build.prepare pipeline — that is RFC-0604."
   - "Does not fix {id} brace expansion for packages/ui/src/sections/{id}/ and packages/ui/src/components/{id}/ entries — same silent-pass issue but separate scope; noted as a known limitation."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -115,7 +115,7 @@ No CLI surface change. The fix is internal to `generated.files.validate` path re
 
 ```sh
 # After the fix, this correctly finds bordbuch files at systems/<id>/public/.well-known/
-pnpm exec site-kernel run generated.files.validate --site warpgogol-com
+pnpm exec werkstatt run generated.files.validate --site warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -182,7 +182,7 @@ No change to output format. The fix enables `GEN-FILES-01` errors to be reported
 - [x] `generated.files.validate --site warpgogol-com` reports `GEN-FILES-01` error when `systems/warpgogol-com/public/.well-known/bordbuch.json` does not exist (evidence: generated-files-validate.test.ts "red: reports GEN-FILES-01 for missing bordbuch files")
 - [x] `generated.files.validate --site warpgogol-com` passes (no `GEN-FILES-01` for bordbuch) when `systems/warpgogol-com/public/.well-known/bordbuch.json` exists after `bordbuch.generate` has run (evidence: generated-files-validate.test.ts "green: no GEN-FILES-01 for bordbuch when files exist")
 - [x] `generated.files.validate` without `--site` expands `{system}` to `*` and scans all `systems/*/` directories (evidence: generated-files-validate.test.ts "wildcard: expands {system} to * when --site is not provided")
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0606 — All 1 RFC(s) passed)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate RFC-0606 — All 1 RFC(s) passed)
 
 ## Implementation notes for agents
 

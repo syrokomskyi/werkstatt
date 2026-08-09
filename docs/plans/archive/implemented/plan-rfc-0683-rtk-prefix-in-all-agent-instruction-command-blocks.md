@@ -56,7 +56,7 @@ No YAML/JSON/manifest changes.
 - `.agents/skills/**/*.SKILL.md` — synced copies of all 33 skills
 - `packages/*/AGENTS.md` — 15+ nested package AGENTS.md files: `pnpm --filter` and `pnpm exec` commands prefixed
 - `services/*/AGENTS.md` — 5+ service AGENTS.md files: same treatment
-- `docs/authoring/*.md` — 10+ authoring docs: `pnpm exec site-kernel run` commands prefixed
+- `docs/authoring/*.md` — 10+ authoring docs: `pnpm exec werkstatt run` commands prefixed
 - `docs/specs/**/*.md` — spec docs with command blocks prefixed
 - `docs/implementation/*.md` — implementation docs with command blocks prefixed
 - `docs/policies/*.md` — policy docs with command blocks prefixed
@@ -145,7 +145,7 @@ No YAML/JSON/manifest changes.
 
 - For each `packages/*/AGENTS.md`:
   - Add `rtk` prefix to `pnpm --filter` commands
-  - Add `rtk` prefix to `pnpm exec site-kernel run` commands
+  - Add `rtk` prefix to `pnpm exec werkstatt run` commands
   - Add `rtk` prefix to `git` commands
   - Add `rtk` prefix to any other direct shell commands
 - For each `services/*/AGENTS.md`:
@@ -167,9 +167,9 @@ No YAML/JSON/manifest changes.
 
 **Agent actions:**
 
-- Update `docs/authoring/*.md` — all `pnpm exec site-kernel run`, `pnpm --filter`, `pnpm run`, `wrangler` commands
-- Update `docs/specs/**/*.md` — all `pnpm exec site-kernel run`, `wrangler` commands
-- Update `docs/implementation/*.md` — all `pnpm exec site-kernel run` commands
+- Update `docs/authoring/*.md` — all `pnpm exec werkstatt run`, `pnpm --filter`, `pnpm run`, `wrangler` commands
+- Update `docs/specs/**/*.md` — all `pnpm exec werkstatt run`, `wrangler` commands
+- Update `docs/implementation/*.md` — all `pnpm exec werkstatt run` commands
 - Update `docs/policies/*.md` — any command blocks
 - Update `docs/COMMANDS.md` — any command blocks
 - Do NOT update `docs/rfcs/archive/**`, `docs/audits/**`, `docs/reviews/**`
@@ -213,7 +213,7 @@ No YAML/JSON/manifest changes.
 - Check off all acceptance criteria with inline `(evidence: ...)` annotations
 - Run code review: invoke `fo-review` via the `skill` tool on all session changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0683 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0683 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -230,7 +230,7 @@ No YAML/JSON/manifest changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0683`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0683`
 - `pnpm --filter @warpgogol/forge run build:check` (if any forge source touched — unlikely for docs-only RFC)
 - `forge.skill.validate` on all updated skills
 
@@ -251,4 +251,4 @@ No YAML/JSON/manifest changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0683 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0683 --reason "..." --invariant "DNA-N"` instead of working around it.

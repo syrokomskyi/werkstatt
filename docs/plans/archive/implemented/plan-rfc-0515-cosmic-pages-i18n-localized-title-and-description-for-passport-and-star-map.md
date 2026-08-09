@@ -46,8 +46,8 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `pnpm --filter @gogol/site-kernel-codegen test` — generator unit test
-- `pnpm exec site-kernel run overlay.pages.generate --site warpgogol-com` — regeneration
-- `pnpm exec site-kernel run rfc.validate` — RFC validation
+- `pnpm exec werkstatt run overlay.pages.generate --site warpgogol-com` — regeneration
+- `pnpm exec werkstatt run rfc.validate` — RFC validation
 
 ## 3. Step sequence
 
@@ -127,7 +127,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run overlay.pages.generate --site warpgogol-com` in the mission workpiece
+- Run `pnpm exec werkstatt run overlay.pages.generate --site warpgogol-com` in the mission workpiece
 - Verify UK cosmic passport `title` is `"Cosmic Passport · warpgogol-com"` (not the German tagline)
 - Verify UK cosmic star-map `title` is `"Cosmic Star Map · warpgogol-com"` (not the German tagline)
 - Verify DE cosmic pages remain unchanged (tagline-derived brand retained)
@@ -151,14 +151,14 @@ scope:
 **Agent actions:**
 
 - Verify all acceptance criteria in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Run `pnpm exec site-kernel run rfc.validate` — must pass
+- Run `pnpm exec werkstatt run rfc.validate` — must pass
 - Run `pnpm --filter @gogol/site-kernel-codegen test` — all tests pass
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0515 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0515 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate` — no violations
+- `pnpm exec werkstatt run rfc.validate` — no violations
 - All acceptance criteria checked off
 
 **Completion criterion:** All acceptance criteria verified; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -169,10 +169,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate` — RFC validation
+- `pnpm exec werkstatt run rfc.validate` — RFC validation
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` — TypeScript compiles
 - `pnpm --filter @gogol/site-kernel-codegen test` — generator unit tests pass
-- `pnpm exec site-kernel run overlay.pages.generate --site warpgogol-com` — regeneration succeeds
+- `pnpm exec werkstatt run overlay.pages.generate --site warpgogol-com` — regeneration succeeds
 
 ### 4.2 Evidence artifacts
 
@@ -190,4 +190,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-23, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0515 --reason "..." --invariant "DNA-23"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-23, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0515 --reason "..." --invariant "DNA-23"` instead of working around it.

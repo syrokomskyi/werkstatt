@@ -62,7 +62,7 @@ nonGoals:
   - "Meta-refresh redirect stub exclusion from the behavior snapshot (covered by RFC-0595, which marks redirect routes with contentHash: null + redirectTarget instead of excluding them)"
   - "Moving isHtmlRedirectPage between @warpgogol/share subpath modules (RFC-0595 imports it from its current location)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -117,7 +117,7 @@ No new commands. Changed commands:
 
 ```sh
 # behavior.snapshot.capture now fixes wildcard matching for _redirects rules
-pnpm exec site-kernel run behavior.snapshot.capture --dist <html-dir> --system <id> --build-kind <readable|production>
+pnpm exec werkstatt run behavior.snapshot.capture --dist <html-dir> --system <id> --build-kind <readable|production>
 ```
 
 No new flags. The wildcard matching fix is automatic — `/de/*` now matches `/de` in addition to `/de/anything`.

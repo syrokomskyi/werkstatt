@@ -86,7 +86,7 @@ The `icons.generate` command gains the ability to generate a master `index.ts` f
 
 ```sh
 # Regenerate icons and the master index.ts
-pnpm exec site-kernel run icons.generate
+pnpm exec werkstatt run icons.generate
 ```
 
 No new flags are added. The master index generation is part of the default command behavior.

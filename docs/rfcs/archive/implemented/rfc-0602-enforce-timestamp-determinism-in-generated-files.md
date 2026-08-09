@@ -66,7 +66,7 @@ nonGoals:
   - "Do not address binary file timestamps — that is an OS/filesystem concern, not a generated file concern."
   - "Do not replace RFC-0345 — that RFC fixed specific generators. This RFC adds a lint to prevent regression."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -119,8 +119,8 @@ The kernel gains a `generated.timestamp.validate` command that scans generator s
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run generated.timestamp.validate --site warpgogol-com
-pnpm exec site-kernel run generated.timestamp.validate --site warpgogol-com --json
+pnpm exec werkstatt run generated.timestamp.validate --site warpgogol-com
+pnpm exec werkstatt run generated.timestamp.validate --site warpgogol-com --json
 ```
 
 Scope: `workspace` (operates per-site via `--site`).
@@ -271,7 +271,7 @@ Generators NOT eligible for the allowlist (must be fixed):
 - [x] Unit test in `src/tests/generated-timestamp-validate.test.ts` covers source lint, allowlist exemption, comment/string exclusion, and clean-pass scenarios (evidence: 20 tests passing, commit 66697bc)
 - [x] `docs/verification-plan.xml` updated with new command (evidence: commit 3ae400d, `docs/verification-plan.xml:421-424` vm-11 entry)
 - [x] `packages/os/site-kernel-checks/AGENTS.md` updated with new module entry (evidence: commit f8e9651, `packages/os/site-kernel-checks/AGENTS.md:46`)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --root docs/rfcs/rfc-0602-...md --json` reports zero errors for RFC-0602)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --root docs/rfcs/rfc-0602-...md --json` reports zero errors for RFC-0602)
 
 ## Implementation notes for agents
 

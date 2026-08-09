@@ -124,7 +124,7 @@ Signs already-generated agent artifacts. It may be invoked by `agent.manifest.ge
 Inputs:
 
 ```sh
-pnpm exec site-kernel run agent.surface.sign --app <app> --json
+pnpm exec werkstatt run agent.surface.sign --app <app> --json
 ```
 
 Behavior:
@@ -143,8 +143,8 @@ Scope: app or URL target.
 Inputs:
 
 ```sh
-pnpm exec site-kernel run agent.surface.verify --app <app> --json
-pnpm exec site-kernel run agent.surface.verify --base-url https://example.com --json
+pnpm exec werkstatt run agent.surface.verify --app <app> --json
+pnpm exec werkstatt run agent.surface.verify --base-url https://example.com --json
 ```
 
 Behavior:

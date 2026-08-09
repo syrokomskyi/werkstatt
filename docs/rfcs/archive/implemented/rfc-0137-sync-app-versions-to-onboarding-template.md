@@ -68,13 +68,13 @@ The kernel gains a `config.template.sync` command that reads selected generated 
 
 ```sh
 # Sync all supported template files from a reference app
-pnpm exec site-kernel run config.template.sync --app warpgogol-com
+pnpm exec werkstatt run config.template.sync --app warpgogol-com
 
 # Sync only specific files (comma-separated)
-pnpm exec site-kernel run config.template.sync --app warpgogol-com --files package.json,astro.config.mjs
+pnpm exec werkstatt run config.template.sync --app warpgogol-com --files package.json,astro.config.mjs
 
 # Dry-run: show what would change without writing
-pnpm exec site-kernel run config.template.sync --app warpgogol-com --dry-run
+pnpm exec werkstatt run config.template.sync --app warpgogol-com --dry-run
 ```
 
 Flags:

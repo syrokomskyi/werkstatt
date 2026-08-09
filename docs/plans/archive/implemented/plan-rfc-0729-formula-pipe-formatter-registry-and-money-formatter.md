@@ -179,9 +179,9 @@ No pipeline changes. The existing `content.references.validate` validator alread
 
 - Run `pnpm --filter @warpgogol/share run build:check`
 - Run `pnpm --filter @warpgogol/share run test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0729 --json`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0729 --json`
 - Check off each acceptance criterion in the RFC with inline evidence
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0729` (RFC-0330)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0729` (RFC-0330)
 - Commit verification evidence file
 
 **Validation:**
@@ -225,7 +225,7 @@ No pipeline changes. The existing `content.references.validate` validator alread
 **Agent actions:**
 
 - Get the implementation commit SHA (last commit with code changes)
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0729 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0729 --implementation-commit <sha>`
 - The command validates all preconditions atomically (status, criteria, clean tree, commit reachability)
 
 **Validation:**
@@ -241,10 +241,10 @@ No pipeline changes. The existing `content.references.validate` validator alread
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0729`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0729`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/share run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0729` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0729` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -262,4 +262,4 @@ No pipeline changes. The existing `content.references.validate` validator alread
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-4, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0729 --reason "..." --invariant "DNA-4"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-4, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0729 --reason "..." --invariant "DNA-4"` instead of working around it.

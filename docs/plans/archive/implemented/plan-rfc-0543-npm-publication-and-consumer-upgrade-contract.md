@@ -54,7 +54,7 @@ scope:
 
 - `pnpm --filter @wgogol/forge run build:check` — scoped typecheck for the forge package
 - `pnpm --filter @wgogol/forge run test` — unit tests for upgrade handler, version sourcing, and prepublishOnly check
-- `pnpm exec site-kernel run rfc.validate RFC-0543` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0543` — RFC validation
 
 ## 3. Step sequence
 
@@ -270,14 +270,14 @@ scope:
 - Update `packages/forge/AGENTS.md`:
   - Add `forge.upgrade` to the `forgeCoreModule` OS modules table
 - Update `docs/technology.xml` if the `pkg-forge` role description or command count changes
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (do not hand-edit `docs/ecosystem.generated.yaml`)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (do not hand-edit `docs/ecosystem.generated.yaml`)
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0543 --implementation-commit <sha>` (dry-run first, then without `--dry-run`)
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0543 --implementation-commit <sha>` (dry-run first, then without `--dry-run`)
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0543`
+- `pnpm exec werkstatt run rfc.validate RFC-0543`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
 - Every file in `scope.docs` is either updated or documented as not-applicable
@@ -290,7 +290,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0543`
+- `pnpm exec werkstatt run rfc.validate RFC-0543`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
 - `node packages/forge/scripts/publish-check.mjs` (after `pnpm run build`)
@@ -310,5 +310,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0543 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0543 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
 - RFC-0540 is implemented: `FORGE_CLI_BINDING_DEFAULTS` exists in `packages/forge/src/config/forge-config.ts` and is available for `forge.upgrade` step 4. No escalation needed.

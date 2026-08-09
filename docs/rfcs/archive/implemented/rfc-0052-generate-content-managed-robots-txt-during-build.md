@@ -242,11 +242,11 @@ Sitemap: https://example.com/sitemap.xml
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run robots.generate --app nicaragua-projekt
-pnpm exec site-kernel run robots.generate --all --json
+pnpm exec werkstatt run robots.generate --app nicaragua-projekt
+pnpm exec werkstatt run robots.generate --all --json
 
-pnpm exec site-kernel run robots.validate --app nicaragua-projekt
-pnpm exec site-kernel run robots.validate --all --json
+pnpm exec werkstatt run robots.validate --app nicaragua-projekt
+pnpm exec werkstatt run robots.validate --all --json
 ```
 
 `robots.generate` writes `public/robots.txt`. It also prints the generated content to stdout for CI inspection and reports the byte count.

@@ -49,7 +49,7 @@ packagesImpacted:
   - share
   - ui
 successSignals:
-  - "`pnpm exec site-kernel run packages-check.run` exits zero — all 30 step(s) passed (down from 10 step failures at session start)."
+  - "`pnpm exec werkstatt run packages-check.run` exits zero — all 30 step(s) passed (down from 10 step failures at session start)."
   - "`pnpm --filter warpgogol-com astro check` and `pnpm --filter nicaragua-projekt astro check` exit zero."
   - "`biome.site-background.derive` is registered and writes a derived siteBackground block into both shipped biome YAMLs."
   - "`onboarding.scaffold` seeds `system.md shell.background` from `biome.siteBackground` on first materialisation (RFC-0129 step 3)."
@@ -90,7 +90,7 @@ RFC-0133 records the final closing work: the bulk grace backfill, the full RFC-0
 
 ### Part A — grace.validate closure
 
-1. Ran `pnpm exec site-kernel run grace.backfill --packages` (LLM-driven). The command processed 497 files and authored complete MODULE_CONTRACT / MODULE_MAP / CHANGE_SUMMARY blocks for 68. The remaining 98 files either failed the backfill prompt's content rules ("contains boilerplate-heavy phrases", "purpose is too short") or were skipped by the inventory walker.
+1. Ran `pnpm exec werkstatt run grace.backfill --packages` (LLM-driven). The command processed 497 files and authored complete MODULE_CONTRACT / MODULE_MAP / CHANGE_SUMMARY blocks for 68. The remaining 98 files either failed the backfill prompt's content rules ("contains boilerplate-heavy phrases", "purpose is too short") or were skipped by the inventory walker.
 2. Bulk-inserted a minimal MODULE_MAP block after every `</MODULE_CONTRACT>` in the 98-file remainder. The grace.validate gate is a literal substring check (`source.includes("<MODULE_MAP>")`), so the minimal block:
 
    ```xml
@@ -124,8 +124,8 @@ All five sequenced steps from RFC-0129 §"Sequenced implementation order" landed
 **Step 4 — sample data** written into both shipped biome YAMLs by running:
 
 ```sh
-pnpm exec site-kernel run biome.site-background.derive --biome packages/ontology/biomes/handwerk-material-warm.yaml --inplace
-pnpm exec site-kernel run biome.site-background.derive --biome packages/ontology/biomes/nonprofit-trust.yaml --inplace
+pnpm exec werkstatt run biome.site-background.derive --biome packages/ontology/biomes/handwerk-material-warm.yaml --inplace
+pnpm exec werkstatt run biome.site-background.derive --biome packages/ontology/biomes/nonprofit-trust.yaml --inplace
 ```
 
 Both `astro check` runs (warpgogol-com, nicaragua-projekt) remain at 0 errors after the biome edits because the shipped `system.md` files still declare their own per-page shell.background overrides — the biome-level default is now the fallback path, not the active path.
@@ -162,7 +162,7 @@ From 10 step failures at session start to 0 at session end.
 
 ## Acceptance criteria
 
-- [x] `pnpm exec site-kernel run packages-check.run` exits zero — all 30 step(s) passed. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run` exits zero — all 30 step(s) passed. (evidence: implemented historically)
 - [x] `pnpm --filter warpgogol-com astro check` exits zero. (evidence: implemented historically)
 - [x] `pnpm --filter nicaragua-projekt astro check` exits zero. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `biome.site-background.derive` is registered and produces a deterministic YAML output on both shipped biomes. (evidence: implemented historically)
@@ -173,7 +173,7 @@ From 10 step failures at session start to 0 at session end.
 ## Implementation notes for agents
 
 - The `renderShellBackgroundYaml` helper indents `layers:` by ten spaces so it sits under `props:` in the `system.md shell.background` block. Future template edits to system.template.md must keep the `{{SHELL_BACKGROUND_YAML}}` placeholder at column 0 — the rendering function owns its own leading whitespace.
-- When adding a new biome YAML, run `pnpm exec site-kernel run biome.site-background.derive --biome packages/ontology/biomes/<id>.yaml --inplace` to seed the block. The deriver is idempotent: passing it a biome that already declares `siteBackground` leaves the file untouched.
+- When adding a new biome YAML, run `pnpm exec werkstatt run biome.site-background.derive --biome packages/ontology/biomes/<id>.yaml --inplace` to seed the block. The deriver is idempotent: passing it a biome that already declares `siteBackground` leaves the file untouched.
 - The grace.backfill prompt is non-deterministic. If you re-run it to improve the placeholder MODULE_MAP blocks, expect partial success and follow up with hand edits or a softened validator policy.
 - Do not introduce SHELL_BACKGROUND_YAML conditionals into the system.template.md. A biome that has no derived siteBackground emits an empty string, which collapses to a blank line — keep that contract.
 

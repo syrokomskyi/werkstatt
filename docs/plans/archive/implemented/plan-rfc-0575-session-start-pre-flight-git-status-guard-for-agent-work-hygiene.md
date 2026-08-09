@@ -161,12 +161,12 @@ Before starting the fix workflow, check the working tree for foreign uncommitted
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented changes. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0575 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0575 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --root docs/rfcs/rfc-0575-session-start-pre-flight-git-status-guard-for-agent-work-hygiene.md` — zero RFC-0575-specific errors.
+- `pnpm exec werkstatt run rfc.validate --root docs/rfcs/rfc-0575-session-start-pre-flight-git-status-guard-for-agent-work-hygiene.md` — zero RFC-0575-specific errors.
 - Every file in `scope.docs` is updated.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -178,7 +178,7 @@ Before starting the fix workflow, check the working tree for foreign uncommitted
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --root docs/rfcs/rfc-0575-session-start-pre-flight-git-status-guard-for-agent-work-hygiene.md` — zero RFC-0575-specific errors
+- `pnpm exec werkstatt run rfc.validate --root docs/rfcs/rfc-0575-session-start-pre-flight-git-status-guard-for-agent-work-hygiene.md` — zero RFC-0575-specific errors
 - No build checks needed (prose-only changes to `.md` files, no `packages/*` or `apps/*` touched)
 - No acceptance probes declared in RFC frontmatter
 
@@ -198,4 +198,4 @@ Before starting the fix workflow, check the working tree for foreign uncommitted
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0575 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0575 --reason "..." --invariant "DNA-N"` instead of working around it.

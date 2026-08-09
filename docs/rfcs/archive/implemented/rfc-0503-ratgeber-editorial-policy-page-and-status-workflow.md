@@ -187,7 +187,7 @@ The link is emitted by appending a `ctaBlock` after the `md` block, or by includ
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.policy.validate --site warpgogol-com --json
+pnpm exec werkstatt run ratgeber.policy.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check`.
@@ -327,4 +327,4 @@ const REVIEW_CADENCE_MONTHS = 3;
 - [x] Hub links to the policy page in the "So arbeitet die Redaktion" block with link text "Mehr zur Redaktion" (DE) / "Докладніше про редакцію" (UK). (evidence: `packages/os/site-kernel-checks/src/surface-expand/bake-ratgeber-hub.ts:62,72,190-193`)
 - [x] `ratgeber.policy.validate` passes on `warpgogol-com`. (evidence: `packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts`, `pnpm --filter @gogol/site-kernel-checks run build:check` passes)
 - [x] No `review-required` article appears in the surface artifact. (evidence: `packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts` RG-POL-05)
-- [x] `rfc.validate` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0503` — 0 violations, 0 warnings)
+- [x] `rfc.validate` passes. (evidence: `pnpm exec werkstatt run rfc.validate RFC-0503` — 0 violations, 0 warnings)

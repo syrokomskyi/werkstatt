@@ -147,7 +147,7 @@ scope:
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/ontology run test`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.validate RFC-0574 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0574 --json`
 
 **Completion criterion:** All code changes in one commit. Schema uses `mirrors[]`, all path references use `resolveMirrors()`, sync uses star topology, validation enforces 5 mirror rules, register uses `--mirrors`, registry.yaml migrated, AGENTS.md and DNA-45 updated. All tests pass.
 
@@ -168,7 +168,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json`
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com --json`
 - `git status` — `systems/warpgogol-com/` no longer tracked
 
 **Completion criterion:** `systems/warpgogol-com/` is physically at `../systems-cache/warpgogol-com/`. `sternsystem.validate` passes. `origin` remote points to correct relative path.
@@ -218,17 +218,17 @@ scope:
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/ontology run test`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0574 --json`
-- Run `pnpm exec site-kernel run sternsystem.validate --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0574 --json`
+- Run `pnpm exec werkstatt run sternsystem.validate --json`
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: ...)` annotations
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0574 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0574 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0574`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0574`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -239,12 +239,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0574`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0574`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/ontology run test`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run sternsystem.validate --json`
+- `pnpm exec werkstatt run sternsystem.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -267,5 +267,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44, DNA-45, DNA-46, or DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0574 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44, DNA-45, DNA-46, or DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0574 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the physical relocation of `systems/warpgogol-com/` fails (git corruption, broken origin), stop and report to the operator — do not attempt to recover programmatically.

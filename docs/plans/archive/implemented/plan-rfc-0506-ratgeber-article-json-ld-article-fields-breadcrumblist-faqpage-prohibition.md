@@ -87,7 +87,7 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 **Validation:**
 
 - `pnpm --filter @gogol/ontology build:check`
-- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com --json`
+- `pnpm exec werkstatt run surface.contract.validate --app warpgogol-com --json`
 
 **Completion criterion:** `jsonld-types.yaml` Article type includes `description` and `mainEntityOfPage` in optional; ratgeber depth-1 prohibitedTypes includes `FAQPage`; `build:check` passes.
 
@@ -197,7 +197,7 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
-- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com --json`
+- `pnpm exec werkstatt run surface.contract.validate --app warpgogol-com --json`
 
 **Completion criterion:** `surface.contract.validate` reports violations if Article optional fields or FAQPage prohibition are missing from C-contract; `build:check` passes.
 
@@ -224,7 +224,7 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** `rfc-0506` migrator registered; `migrator.registry.validate` passes; `build:check` passes.
 
@@ -243,19 +243,19 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 - Update `docs/requirements.xml` with ratgeber Article JSON-LD field policy
 - Update `docs/verification-plan.xml` with SD-RAT-01..04 checks
 - Update `docs/knowledge-graph.xml` with RFC-0506 relationships
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Check off acceptance criteria: verify each criterion against implemented code, mark `[x]` with `(evidence: ...)` annotations
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0506 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0506 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0506`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0506`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/share build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -266,13 +266,13 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0506`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0506`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/share build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com --json`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run surface.contract.validate --app warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -292,5 +292,5 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0506 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0506 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `surface.contract.validate` reveals additional C-contract drift beyond Article fields and FAQPage, document it in a new RFC rather than expanding this RFC's scope.

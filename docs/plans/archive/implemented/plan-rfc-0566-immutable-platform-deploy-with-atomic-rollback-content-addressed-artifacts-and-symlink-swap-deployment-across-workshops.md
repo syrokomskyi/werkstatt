@@ -68,7 +68,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0566` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0566` — RFC validation
 - No pipeline integration needed — `deploy.*` commands are operational, not part of `build.check` or `sites-check`
 
 ## 3. Step sequence
@@ -112,7 +112,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- Manual smoke test: `pnpm exec site-kernel run deploy.artifact.build --json` produces a valid artifact directory
+- Manual smoke test: `pnpm exec werkstatt run deploy.artifact.build --json` produces a valid artifact directory
 
 **Completion criterion:** `deploy.artifact.build` creates a `.werkstatt/artifacts/platform/<sha-256>/` directory with `dist/` and signed `manifest.json`
 
@@ -298,7 +298,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run deploy.status --json` resolves (even if no artifacts exist yet — should return empty status)
+- `pnpm exec werkstatt run deploy.status --json` resolves (even if no artifacts exist yet — should return empty status)
 
 **Completion criterion:** All 6 `deploy.*` commands are registered and callable via `site-kernel run`
 
@@ -346,12 +346,12 @@ scope:
   - Document Ed25519 signing via `@warpgogol/site-kernel-integrity`
 - Update `packages/AGENTS.md`:
   - Update `site-kernel-handoff` ownership entry to mention deploy commands
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with new command surface
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with new command surface
 
 **Validation:**
 
 - `git diff` shows only the expected AGENTS.md files and `docs/ecosystem.generated.yaml` changed
-- `pnpm exec site-kernel run rfc.validate --id RFC-0566` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0566` passes
 
 **Completion criterion:** Both AGENTS.md files updated with deploy command documentation; `ecosystem.generated.yaml` regenerated
 
@@ -366,16 +366,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (already done in Step 10).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (already done in Step 10).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)`. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0566 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0566 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0566`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0566`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -387,10 +387,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0566`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0566`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run ecosystem.manifest.validate` (if command surface changed)
+- `pnpm exec werkstatt run ecosystem.manifest.validate` (if command surface changed)
 
 ### 4.2 Evidence artifacts
 
@@ -410,6 +410,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49 (Leitstand), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0566 --reason "..." --invariant "DNA-49"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49 (Leitstand), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0566 --reason "..." --invariant "DNA-49"` instead of working around it.
 - If the Ed25519 signing utilities in `@warpgogol/site-kernel-integrity` are insufficient for artifact manifest signing (different schema, different key management), create a follow-up RFC rather than duplicating signing logic. Step 1b exports `signPayload` — if this approach proves insufficient, escalate.
 - If the two-phase commit (Phase 4) requires changes to DNA-49's propagation model, create a separate superseding RFC — Phase 4 is explicitly deferred in this plan.

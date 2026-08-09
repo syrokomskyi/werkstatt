@@ -117,7 +117,7 @@ No configuration or data files affected.
 **Agent actions:**
 
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0606 --json`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0606 --json`.
 
 **Validation:**
 
@@ -137,16 +137,16 @@ No configuration or data files affected.
 **Agent actions:**
 
 - No AGENTS.md or Compass XML updates needed — internal fix with no governance or semantic changes.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (they did not — `generated.files.validate` is already registered).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (they did not — `generated.files.validate` is already registered).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0606 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0606 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0606`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0606`
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -157,7 +157,7 @@ No configuration or data files affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0606`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0606`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 
@@ -176,4 +176,4 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0606 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0606 --reason "..." --invariant "DNA-N"` instead of working around it.

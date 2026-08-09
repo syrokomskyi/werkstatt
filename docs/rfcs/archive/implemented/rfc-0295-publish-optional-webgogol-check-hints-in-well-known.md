@@ -144,8 +144,8 @@ export interface SourceAnchor {
 ### Generation
 
 ```sh
-pnpm exec site-kernel run warpgogol.check-hints.generate --app warpgogol-com
-pnpm exec site-kernel run warpgogol.check-hints.validate --app warpgogol-com --json
+pnpm exec werkstatt run warpgogol.check-hints.generate --app warpgogol-com
+pnpm exec werkstatt run warpgogol.check-hints.validate --app warpgogol-com --json
 ```
 
 Generation runs in `APPS_BUILD_PREPARE_PIPELINE` after route and surface generation and before postbuild checks that may consume public files.

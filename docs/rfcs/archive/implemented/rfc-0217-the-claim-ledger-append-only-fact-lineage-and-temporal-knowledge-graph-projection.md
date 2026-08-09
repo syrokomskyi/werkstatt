@@ -86,14 +86,14 @@ The ledger is files; the graph is a projection. No database.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.claim.ledger.append --app warpgogol-com \
+pnpm exec werkstatt run content.claim.ledger.append --app warpgogol-com \
   --subject "business/de/location#residents" --value "39120" \
   --provenance external --sourceRef gov:destatis-backnang --as-of 2026-06-18
-pnpm exec site-kernel run content.claim.ledger.query  --app warpgogol-com \
+pnpm exec werkstatt run content.claim.ledger.query  --app warpgogol-com \
   --subject "business/de/location#residents" --as-of 2025-01-01
-pnpm exec site-kernel run content.claim.ledger.query  --app warpgogol-com \
+pnpm exec werkstatt run content.claim.ledger.query  --app warpgogol-com \
   --subject "business/de/location#residents" --lineage
-pnpm exec site-kernel run content.claim.ledger.project --app warpgogol-com   # graph + temporal SEO
+pnpm exec werkstatt run content.claim.ledger.project --app warpgogol-com   # graph + temporal SEO
 ```
 
 ### Ledger event (NDJSON, append-only)

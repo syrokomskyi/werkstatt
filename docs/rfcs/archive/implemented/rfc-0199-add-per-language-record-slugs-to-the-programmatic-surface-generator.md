@@ -85,8 +85,8 @@ This keeps page identity, eligibility, redirect-stub logic, and the matrix shape
 No new commands. Existing surface commands keep their signatures:
 
 ```sh
-pnpm exec site-kernel run surface.generate --app warpgogol-com
-pnpm exec site-kernel run surface.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.generate --app warpgogol-com
+pnpm exec werkstatt run surface.validate --app warpgogol-com --json
 ```
 
 `surface.generate` now emits localized slug segments; `surface.validate` checks that every per-language slug is collision-free within its axis and language and that fallbacks are well-formed.

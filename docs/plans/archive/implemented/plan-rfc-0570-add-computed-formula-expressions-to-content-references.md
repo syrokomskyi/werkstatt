@@ -198,7 +198,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run content.formula.lint --app warpgogol-com --json` — runs without error
+- `pnpm exec werkstatt run content.formula.lint --app warpgogol-com --json` — runs without error
 
 **Completion criterion:** `content.formula.lint` command registered, runs, outputs warnings in `--json` format, always exits 0.
 
@@ -224,7 +224,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
-- `pnpm exec site-kernel run content.formula.migrate --app warpgogol-com --json` — runs without error
+- `pnpm exec werkstatt run content.formula.migrate --app warpgogol-com --json` — runs without error
 
 **Completion criterion:** `content.formula.migrate` command registered, runs, writes converted content, no duplicated detection logic.
 
@@ -248,7 +248,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0570 --json` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0570 --json` — passes
 - `git diff` shows all scope.docs files updated
 
 **Completion criterion:** All documentation artifacts in `scope.docs` are updated; `rfc.validate` passes.
@@ -264,16 +264,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0570 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0570 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0570`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0570`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -285,14 +285,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0570`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0570`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/share run test`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
-- `pnpm exec site-kernel run content.formula.lint --app warpgogol-com --json`
-- `pnpm exec site-kernel run content.references.validate --app warpgogol-com --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0570` (RFC-0330)
+- `pnpm exec werkstatt run content.formula.lint --app warpgogol-com --json`
+- `pnpm exec werkstatt run content.references.validate --app warpgogol-com --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0570` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -312,5 +312,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-4 or DNA-24, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0570 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-4 or DNA-24, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0570 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `expr-eval` proves unsuitable (security, bundle size, API mismatch), create an ADR documenting the alternative choice and update the RFC's Alternatives section.

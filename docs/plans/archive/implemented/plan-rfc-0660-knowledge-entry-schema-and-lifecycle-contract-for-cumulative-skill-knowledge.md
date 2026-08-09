@@ -66,8 +66,8 @@ scope:
 
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck
 - `pnpm --filter @warpgogol/forge run test` — unit + PBT tests
-- `pnpm exec site-kernel run forge.skill.validate --all` — all skills pass with zero legacy warnings
-- `pnpm exec site-kernel run forge.doctor --json` — reports zero legacy sections
+- `pnpm exec werkstatt run forge.skill.validate --all` — all skills pass with zero legacy warnings
+- `pnpm exec werkstatt run forge.doctor --json` — reports zero legacy sections
 
 ## 3. Step sequence
 
@@ -154,8 +154,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` passes
-- `pnpm exec site-kernel run forge.skill.validate --all --json` — zero SKILL-19/SKILL-20 errors, zero legacy-section warnings on forge's own knowledge files
-- `pnpm exec site-kernel run forge.doctor --json` — reports zero legacy sections
+- `pnpm exec werkstatt run forge.skill.validate --all --json` — zero SKILL-19/SKILL-20 errors, zero legacy-section warnings on forge's own knowledge files
+- `pnpm exec werkstatt run forge.doctor --json` — reports zero legacy sections
 
 **Completion criterion:** SKILL-19/SKILL-20 violations appear in `forge.skill.validate --json` output with correct severity, file, and line fields; `forge.doctor --json` reports legacy-section counts as informational output; all forge knowledge files validate with zero legacy warnings
 
@@ -222,7 +222,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` passes (SKILL-11/SKILL-17 still pass on updated skill files)
+- `pnpm exec werkstatt run forge.skill.validate --all` passes (SKILL-11/SKILL-17 still pass on updated skill files)
 - `git diff` shows all `scope.docs` files modified
 
 **Completion criterion:** All scope docs updated; `forge.skill.validate` passes on updated skill files
@@ -238,16 +238,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0660 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0660 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0660`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0660`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -259,12 +259,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0660`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0660`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --all --json`
-- `pnpm exec site-kernel run forge.doctor --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0660` (RFC-0330)
+- `pnpm exec werkstatt run forge.skill.validate --all --json`
+- `pnpm exec werkstatt run forge.doctor --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0660` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -282,5 +282,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0660 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0660 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the parser cannot handle a knowledge file format without throwing, expand the tolerant parser rather than adding special-case bypasses.

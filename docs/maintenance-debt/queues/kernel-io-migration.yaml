@@ -34,9 +34,9 @@ batchPolicy:
   push: false
 acceptance:
   commands:
-    - pnpm exec site-kernel run kernel.io.lint --json
-    - pnpm exec site-kernel run kernel.io.lint --write-baseline --json
-    - pnpm exec site-kernel run check.fixture.lint --json
+    - pnpm exec werkstatt run kernel.io.lint --json
+    - pnpm exec werkstatt run kernel.io.lint --write-baseline --json
+    - pnpm exec werkstatt run check.fixture.lint --json
 notes:
   - Prioritize generator-class commands first — they gain --dry-run value immediately (RFC-0267 Rollout step 4).
   - "Swap fs calls mechanically; do NOT refactor a module's logic in the same commit — keeps diffs reviewable and parity obvious."

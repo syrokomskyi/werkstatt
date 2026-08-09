@@ -82,8 +82,8 @@ The canonical export list is derived at lint time by reflecting on `@gogol/share
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run share.utility.lint
-pnpm exec site-kernel run share.utility.lint --json
+pnpm exec werkstatt run share.utility.lint
+pnpm exec werkstatt run share.utility.lint --json
 ```
 
 Scope: `workspace`. No per-app `--app` flag — the command always scans all apps.

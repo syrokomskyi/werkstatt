@@ -46,7 +46,7 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0700`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0700`
 - `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run --reporter=verbose` (leitstand-0700 tests)
 
 ## 3. Step sequence
@@ -169,7 +169,7 @@ scope:
 **Agent actions:**
 
 - In `packages/os/site-kernel-handoff/AGENTS.md`, Leitstand section: add note that `leitstand.dev-deploy` accepts optional `--release <id>` flag for deploying existing releases to dev without open mission (RFC-0700)
-- Run `pnpm exec site-kernel run command.manifest.generate` to refresh `docs/command-manifest.generated.yaml`
+- Run `pnpm exec werkstatt run command.manifest.generate` to refresh `docs/command-manifest.generated.yaml`
 
 **Validation:**
 
@@ -192,12 +192,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations
 - Check off acceptance criteria: verify each criterion in the RFC against implemented code. Mark `[x]` with inline `(evidence: ...)` annotations
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0700 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0700 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0700`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0700`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -209,7 +209,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0700`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0700`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run leitstand-0700 --reporter=verbose`
 
@@ -228,4 +228,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0700 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0700 --reason "..." --invariant "DNA-N"` instead of working around it.

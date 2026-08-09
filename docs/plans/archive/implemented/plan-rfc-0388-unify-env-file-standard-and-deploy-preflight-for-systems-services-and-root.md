@@ -264,7 +264,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run env.contract.validate --json`
+- `pnpm exec werkstatt run env.contract.validate --json`
 
 **Completion criterion:** `lagebild-sync-worker` has `.env.example` + `.env` (no `.dev.vars*`); root has `.env.example`; `.gitignore` has no `.dev.vars` lines.
 
@@ -285,7 +285,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0388 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0388 --json`
 
 **Completion criterion:** DNA-40, AGENTS.md, services/AGENTS.md updated; Compass XML checked.
 
@@ -297,12 +297,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0388 --json` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0388 --json` — must pass.
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass.
 - Run `pnpm --filter @gogol/site-kernel run build:check` — must pass.
-- Run `pnpm exec site-kernel run env.contract.validate --json` — must pass (all `.env.example` files have `# How to obtain:`).
-- Run `pnpm exec site-kernel run deploy.scripts.validate --json` — must pass.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0388` and commit evidence file.
+- Run `pnpm exec werkstatt run env.contract.validate --json` — must pass (all `.env.example` files have `# How to obtain:`).
+- Run `pnpm exec werkstatt run deploy.scripts.validate --json` — must pass.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0388` and commit evidence file.
 
 **Validation:**
 
@@ -316,13 +316,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0388`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0388`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-onboarding run build:check`
-- `pnpm exec site-kernel run env.contract.validate --json`
-- `pnpm exec site-kernel run deploy.scripts.validate --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0388` (RFC-0330)
+- `pnpm exec werkstatt run env.contract.validate --json`
+- `pnpm exec werkstatt run deploy.scripts.validate --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0388` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -340,5 +340,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0388 --reason "..." --invariant "DNA-40"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0388 --reason "..." --invariant "DNA-40"` instead of working around it.
 - If Wrangler `.env` loading fails in `wrangler dev`, check Wrangler version and `CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV` env var before modifying the standard.

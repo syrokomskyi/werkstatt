@@ -128,7 +128,7 @@ const heading = props.heading ?? "NEED_THIS_HEADING";
 Build validation catches these markers:
 
 ```sh
-pnpm exec site-kernel run semantic.page.validate --app nicaragua-projekt
+pnpm exec werkstatt run semantic.page.validate --app nicaragua-projekt
 # Error: pages/de/index.md blocks[0].props.heading is missing or empty
 ```
 
@@ -175,10 +175,10 @@ const imagePath = props.image.startsWith("/")
 
 ```sh
 # Validate that semantic content matches page content (no drift)
-pnpm exec site-kernel run semantic.page.validate --app nicaragua-projekt
+pnpm exec werkstatt run semantic.page.validate --app nicaragua-projekt
 
 # Detect content drift between pages and any remaining stubs
-pnpm exec site-kernel run content.drift.detect --app nicaragua-projekt
+pnpm exec werkstatt run content.drift.detect --app nicaragua-projekt
 ```
 
 ### TypeScript contracts

@@ -88,8 +88,8 @@ Additionally, `surface.generate` is changed to call `surface.plan.generate` inte
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.plan.generate --app warpgogol-com --json
-pnpm exec site-kernel run surface.plan.generate --app warpgogol-com
+pnpm exec werkstatt run surface.plan.generate --app warpgogol-com --json
+pnpm exec werkstatt run surface.plan.generate --app warpgogol-com
 ```
 
 The command is app-scoped. It runs the expansion pipeline (blueprint discovery, dataset loading, eligibility matrix, evidence gates, dedup) but stops before `bakePage`. No artifact is written. No twins are written. No lazy cache is written.

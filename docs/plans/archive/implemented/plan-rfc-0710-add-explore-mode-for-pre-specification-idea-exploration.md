@@ -53,8 +53,8 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run skill.validate` — must pass on new `fo-explore` skill
-- `pnpm exec site-kernel run rfc.validate --id RFC-0710` — must pass
+- `pnpm exec werkstatt run skill.validate` — must pass on new `fo-explore` skill
+- `pnpm exec werkstatt run rfc.validate --id RFC-0710` — must pass
 - `pnpm --filter @warpgogol/forge run build:check` — must pass (new module compiles)
 - No pipeline integration needed — exploration notes are not part of any build or validation pipeline
 
@@ -115,7 +115,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` passes
-- `pnpm exec site-kernel run exploration.list --json` returns `{ explorations: [] }` with exit code 0
+- `pnpm exec werkstatt run exploration.list --json` returns `{ explorations: [] }` with exit code 0
 
 **Completion criterion:** All three integration points (index.ts, cli.ts, kernel.config.ts) reference `forgeExplorationModule`; `exploration.list` command is discoverable via CLI
 
@@ -153,8 +153,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run skill.validate` passes on `fo-explore` SKILL.md (SKILL-01..21)
-- `pnpm exec site-kernel run forge.skill.validate` passes with 0 violations
+- `pnpm exec werkstatt run skill.validate` passes on `fo-explore` SKILL.md (SKILL-01..21)
+- `pnpm exec werkstatt run forge.skill.validate` passes with 0 violations
 
 **Completion criterion:** `fo-explore` skill created in `packages/forge/skills/fo/fo-explore/SKILL.md`, synced to `.agents/skills/fo-explore/SKILL.md`, and `skill.validate` passes
 
@@ -174,7 +174,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run skill.validate` passes on `fo-idea` SKILL.md
+- `pnpm exec werkstatt run skill.validate` passes on `fo-idea` SKILL.md
 
 **Completion criterion:** `fo-idea` skill includes step 1b explore suggestion in both canonical and synced locations; `skill.validate` passes
 
@@ -240,17 +240,17 @@ scope:
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` is updated (step 6).
-- Run `pnpm exec site-kernel run command.manifest.generate` — new commands (`exploration.list/show/archive`) were added and must appear in `docs/command-manifest.generated.yaml` (RFC-CMD-02 checks this file, not `ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run command.manifest.generate` — new commands (`exploration.list/show/archive`) were added and must appear in `docs/command-manifest.generated.yaml` (RFC-CMD-02 checks this file, not `ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in RFC-0710 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0710 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0710 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0710`
-- `pnpm exec site-kernel run skill.validate`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0710`
+- `pnpm exec werkstatt run skill.validate`
 - `pnpm --filter @warpgogol/forge run build:check`
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -262,12 +262,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0710`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0710`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run skill.validate`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0710` (if acceptance probes declared)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0710` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
+- `pnpm exec werkstatt run skill.validate`
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0710` (if acceptance probes declared)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0710` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
 
 ### 4.2 Evidence artifacts
 
@@ -284,5 +284,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54 (Forge bindings contract), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0710 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54 (Forge bindings contract), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0710 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If `skill.validate` fails on `fo-explore` SKILL.md due to SKILL-11 (hardcoded literals), fix the skill body to use `ref(forge.yaml bindings.*)` references instead of bypassing the validator.

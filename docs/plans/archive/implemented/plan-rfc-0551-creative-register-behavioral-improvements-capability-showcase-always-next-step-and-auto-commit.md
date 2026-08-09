@@ -45,9 +45,9 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0551` — must pass with zero errors (V-19 warnings expected)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0551` — must pass with zero errors (V-19 warnings expected)
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
-- `pnpm exec site-kernel run forge.skill.validate` — SKILL-11 (no hardcoded project literals), SKILL-12 (concerns), SKILL-13 (knowledge files) must pass
+- `pnpm exec werkstatt run forge.skill.validate` — SKILL-11 (no hardcoded project literals), SKILL-12 (concerns), SKILL-13 (knowledge files) must pass
 
 ## 3. Step sequence
 
@@ -154,9 +154,9 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0551 --json` — must pass (V-19 warnings expected)
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0551 --json` — must pass (V-19 warnings expected)
 - Run `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
-- Run `pnpm exec site-kernel run forge.skill.validate` — SKILL-11/12/13 must pass for forge-bootstrap
+- Run `pnpm exec werkstatt run forge.skill.validate` — SKILL-11/12/13 must pass for forge-bootstrap
 - Check `git status` — no uncommitted changes from this session
 
 **Validation:**
@@ -177,16 +177,16 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` is updated (step 4)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (they did not — skip)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (they did not — skip)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0551 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0551 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0551` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0551` — passes
 - Review report exists for this session
 - All acceptance criteria checked off with evidence annotations
 
@@ -198,9 +198,9 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0551` — must pass (V-19 warnings expected for amending draft)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0551` — must pass (V-19 warnings expected for amending draft)
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
-- `pnpm exec site-kernel run forge.skill.validate` — SKILL-11/12/13 must pass
+- `pnpm exec werkstatt run forge.skill.validate` — SKILL-11/12/13 must pass
 
 ### 4.2 Evidence artifacts
 

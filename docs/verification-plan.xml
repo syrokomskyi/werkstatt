@@ -28,35 +28,35 @@
       <commands>
         <command>`pnpm --filter warpgogol-com astro check`</command>
         <command>`pnpm --filter warpgogol-com build`</command>
-        <command>`pnpm exec site-kernel run sites-check.run --site warpgogol-com`</command>
-        <command>`pnpm exec site-kernel run app.contract.full --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run sites-check.run --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run app.contract.full --site warpgogol-com`</command>
       </commands>
     </check-set>
 
     <check-set id="apps-warpgogol-com-authored-content">
       <scope>`apps/warpgogol-com` authored offer pillar and navigation (RFC-0243)</scope>
       <commands>
-        <command>`pnpm exec site-kernel run content.links.validate --site warpgogol-com`</command>
-        <command>`pnpm exec site-kernel run content.surface.validate --site warpgogol-com`</command>
-        <command>`pnpm exec site-kernel run system.manifest.validate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run content.links.validate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run content.surface.validate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run system.manifest.validate --site warpgogol-com`</command>
       </commands>
     </check-set>
 
     <check-set id="apps-warpgogol-com-surface">
       <scope>`apps/warpgogol-com` programmatic surface and demand records (RFC-0244)</scope>
       <commands>
-        <command>`pnpm exec site-kernel run demands.hierarchy.validate --site warpgogol-com`</command>
-        <command>`pnpm exec site-kernel run surface.generate --site warpgogol-com`</command>
-        <command>`pnpm exec site-kernel run pseo.validate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run demands.hierarchy.validate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run surface.generate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run pseo.validate --site warpgogol-com`</command>
       </commands>
     </check-set>
 
     <check-set id="apps-media-leakage-prevention-rfc-0499">
       <scope>RFC-0499 media metadata leakage prevention on surface pages</scope>
       <commands>
-        <command>`pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`</command>
-        <command>`pnpm exec site-kernel run surface.validate --site warpgogol-com --json`</command>
-        <command>`pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run surface.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run surface.media-leakage.validate --site warpgogol-com --json`</command>
       </commands>
       <rules>
         <rule id="MEDIA-LEAK-EXACT" level="error">Rendered surface page HTML must not contain prohibited exact-match strings (e.g. copyright boilerplate) outside footer elements.</rule>
@@ -70,8 +70,8 @@
     <check-set id="apps-ratgeber-claim-registry-rfc-0505">
       <scope>RFC-0505 ratgeber extended claim registry — structured claim records</scope>
       <commands>
-        <command>`pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json`</command>
-        <command>`pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run ratgeber.claim.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run ratgeber.provenance.validate --site warpgogol-com --json`</command>
       </commands>
       <rules>
         <rule id="RG-CLAIM-01" level="error">Claim record missing required field.</rule>
@@ -91,8 +91,8 @@
     <check-set id="apps-ratgeber-article-jsonld-rfc-0506">
       <scope>RFC-0506 ratgeber article JSON-LD — Article fields, BreadcrumbList, FAQPage prohibition</scope>
       <commands>
-        <command>`pnpm exec site-kernel run seo.structured-data.validate --site warpgogol-com --json`</command>
-        <command>`pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run seo.structured-data.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json`</command>
       </commands>
       <rules>
         <rule id="SD-RAT-01" level="error">Article JSON-LD missing required field (headline, description, author, publisher, datePublished, mainEntityOfPage) on ratgeber depth-1 page.</rule>
@@ -105,8 +105,8 @@
     <check-set id="apps-ratgeber-hub-card-fields-rfc-0507">
       <scope>RFC-0507 ratgeber hub card fields and cross-page editorial alignment</scope>
       <commands>
-        <command>`pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json`</command>
-        <command>`pnpm exec site-kernel run content.voice.lint --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run ratgeber.hub.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run content.voice.lint --site warpgogol-com --json`</command>
       </commands>
       <rules>
         <rule id="RG-HUB-09" level="warning">Hub audience-cards block contains a card with a "description" prop — RFC-0507 removes description (summary) from hub cards.</rule>
@@ -117,8 +117,8 @@
     <check-set id="route-markdown-twins-rfc-0377">
       <scope>RFC-0377 route Markdown twin semantic frontmatter and body sections</scope>
       <commands>
-        <command>`pnpm exec site-kernel run page.markdown.generate --site warpgogol-com`</command>
-        <command>`pnpm exec site-kernel run page.markdown.validate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run page.markdown.generate --site warpgogol-com`</command>
+        <command>`pnpm exec werkstatt run page.markdown.validate --site warpgogol-com`</command>
       </commands>
       <rules>
         <rule id="MDMETA-08" level="error">Every generated twin must include semantic frontmatter fields: id, route, title, type, domain, audience, lang, metaDescription, priority, tags.</rule>
@@ -139,17 +139,17 @@
       <commands>
         <command>`pnpm --filter nicaragua-projekt astro check`</command>
         <command>`pnpm --filter nicaragua-projekt build`</command>
-        <command>`pnpm exec site-kernel run sites-check.run --site nicaragua-projekt`</command>
-        <command>`pnpm exec site-kernel run app.contract.full --site nicaragua-projekt`</command>
+        <command>`pnpm exec werkstatt run sites-check.run --site nicaragua-projekt`</command>
+        <command>`pnpm exec werkstatt run app.contract.full --site nicaragua-projekt`</command>
       </commands>
     </check-set>
 
     <check-set id="apps-shared-context-rfc-0099">
       <scope>Apps using page-driven shared block context fallback</scope>
       <commands>
-        <command>`pnpm exec site-kernel run system.manifest.validate --site &lt;app&gt;`</command>
-        <command>`pnpm exec site-kernel run shared.context.validate --site &lt;app&gt;`</command>
-        <command>`pnpm exec site-kernel run page.block.validate --site &lt;app&gt;`</command>
+        <command>`pnpm exec werkstatt run system.manifest.validate --site &lt;app&gt;`</command>
+        <command>`pnpm exec werkstatt run shared.context.validate --site &lt;app&gt;`</command>
+        <command>`pnpm exec werkstatt run page.block.validate --site &lt;app&gt;`</command>
       </commands>
     </check-set>
 
@@ -163,105 +163,105 @@
     <check-set id="agent-control-plane">
       <scope>RFC-0245 Agent Control Plane</scope>
       <commands>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.generate`</command>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.validate --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.report --json`</command>
-        <command>`pnpm --filter @warpgogol/site-kernel-checks build:check`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.generate`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.validate --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.report --json`</command>
+        <command>`pnpm --filter @warpgogol/werkstatt-site/checks build:check`</command>
       </commands>
     </check-set>
     <check-set id="agent-control-plane-rfc-0246">
       <scope>RFC-0246 hardened Agent Control Plane workspace surface</scope>
       <commands>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.generate`</command>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.validate --json`</command>
-        <command>`pnpm exec site-kernel run workspace.surface.validate --json`</command>
-        <command>`pnpm exec site-kernel run packages.check --json`</command>
-        <command>`pnpm exec site-kernel run packages-check.run --json`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.generate`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.validate --json`</command>
+        <command>`pnpm exec werkstatt run workspace.surface.validate --json`</command>
+        <command>`pnpm exec werkstatt run packages.check --json`</command>
+        <command>`pnpm exec werkstatt run packages-check.run --json`</command>
         <command>`pnpm --filter @warpgogol/site-kernel test`</command>
-        <command>`pnpm --filter @warpgogol/site-kernel-checks test`</command>
+        <command>`pnpm --filter @warpgogol/werkstatt-site/checks test`</command>
       </commands>
     </check-set>
     <check-set id="gate-catalog-rfc-0519">
       <scope>RFC-0519 gate catalog generator and validator</scope>
       <commands>
-        <command>`pnpm exec site-kernel run gate.catalog.generate`</command>
-        <command>`pnpm exec site-kernel run gate.catalog.validate --json`</command>
-        <command>`pnpm --filter @warpgogol/site-kernel-checks exec vitest run src/tests/gate-catalog.test.ts`</command>
+        <command>`pnpm exec werkstatt run gate.catalog.generate`</command>
+        <command>`pnpm exec werkstatt run gate.catalog.validate --json`</command>
+        <command>`pnpm --filter @warpgogol/werkstatt-site/checks exec vitest run src/tests/gate-catalog.test.ts`</command>
       </commands>
     </check-set>
     <check-set id="autonomous-package-quality-rfc-0249">
       <scope>RFC-0249 autonomous package quality and CI gates</scope>
       <commands>
         <command>`pnpm lint:packages`</command>
-        <command>`pnpm exec site-kernel run ci.local.validate --json`</command>
-        <command>`pnpm exec site-kernel run test.signal.validate --json`</command>
-        <command>`pnpm exec site-kernel run packages-check.run --json`</command>
-        <command>`pnpm exec site-kernel run rfc.validate`</command>
-        <command>`pnpm exec site-kernel run platform.consistency.validate --check --json`</command>
+        <command>`pnpm exec werkstatt run ci.local.validate --json`</command>
+        <command>`pnpm exec werkstatt run test.signal.validate --json`</command>
+        <command>`pnpm exec werkstatt run packages-check.run --json`</command>
+        <command>`pnpm exec werkstatt run rfc.validate`</command>
+        <command>`pnpm exec werkstatt run platform.consistency.validate --check --json`</command>
         <command>`pnpm test`</command>
       </commands>
     </check-set>
     <check-set id="test-signal-maintenance-baseline-rfc-0251">
       <scope>RFC-0251 test signal maturity and maintenance debt baselines</scope>
       <commands>
-        <command>`pnpm exec site-kernel run test.signal.validate --json`</command>
-        <command>`pnpm exec site-kernel run test.signal.policy.validate --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.report --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.baseline.write --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.baseline.validate --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.triage.report --json`</command>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.generate`</command>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.validate --json`</command>
-        <command>`pnpm exec site-kernel run packages-check.run --json`</command>
-        <command>`pnpm exec site-kernel run ci.local.validate --json`</command>
+        <command>`pnpm exec werkstatt run test.signal.validate --json`</command>
+        <command>`pnpm exec werkstatt run test.signal.policy.validate --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.report --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.baseline.write --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.baseline.validate --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.triage.report --json`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.generate`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.validate --json`</command>
+        <command>`pnpm exec werkstatt run packages-check.run --json`</command>
+        <command>`pnpm exec werkstatt run ci.local.validate --json`</command>
         <command>`pnpm test`</command>
         <command>`pnpm build`</command>
-        <command>`pnpm exec site-kernel run rfc.validate`</command>
+        <command>`pnpm exec werkstatt run rfc.validate`</command>
       </commands>
     </check-set>
     <check-set id="maintenance-debt-queues-rfc-0256">
       <scope>RFC-0256 advisory maintenance debt burn-down queues</scope>
       <commands>
-        <command>`pnpm exec site-kernel run maintenance.debt.queue.generate --dry-run --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.queue.report --queue prose-credit-sidecars --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.queue.report --queue surface-substance-assets-and-narratives --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.queue.report --queue demand-slug-overrides --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.queue.validate --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.baseline.validate --json`</command>
-        <command>`pnpm exec site-kernel run maintenance.debt.triage.report --json`</command>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.generate`</command>
-        <command>`pnpm exec site-kernel run ecosystem.manifest.validate --json`</command>
-        <command>`pnpm exec site-kernel run packages-check.run --json`</command>
-        <command>`pnpm exec site-kernel run ci.local.validate --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.queue.generate --dry-run --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.queue.report --queue prose-credit-sidecars --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.queue.report --queue surface-substance-assets-and-narratives --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.queue.report --queue demand-slug-overrides --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.queue.validate --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.baseline.validate --json`</command>
+        <command>`pnpm exec werkstatt run maintenance.debt.triage.report --json`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.generate`</command>
+        <command>`pnpm exec werkstatt run ecosystem.manifest.validate --json`</command>
+        <command>`pnpm exec werkstatt run packages-check.run --json`</command>
+        <command>`pnpm exec werkstatt run ci.local.validate --json`</command>
         <command>`pnpm test`</command>
-        <command>`pnpm exec site-kernel run rfc.validate`</command>
+        <command>`pnpm exec werkstatt run rfc.validate`</command>
       </commands>
     </check-set>
     <check-set id="runtime-fallback-diagnostics-rfc-0250">
       <scope>RFC-0250 runtime fallback and semantic target diagnostics</scope>
       <commands>
-        <command>`pnpm exec site-kernel run section.defaults.validate --json`</command>
-        <command>`pnpm exec site-kernel run runtime.warnings.lint --json`</command>
-        <command>`pnpm exec site-kernel run semantic.targets.validate --site warpgogol-com --json`</command>
-        <command>`pnpm exec site-kernel run semantic.targets.validate --site nicaragua-projekt --json`</command>
-        <command>`pnpm exec site-kernel run packages-check.run --json`</command>
+        <command>`pnpm exec werkstatt run section.defaults.validate --json`</command>
+        <command>`pnpm exec werkstatt run runtime.warnings.lint --json`</command>
+        <command>`pnpm exec werkstatt run semantic.targets.validate --site warpgogol-com --json`</command>
+        <command>`pnpm exec werkstatt run semantic.targets.validate --site nicaragua-projekt --json`</command>
+        <command>`pnpm exec werkstatt run packages-check.run --json`</command>
         <command>`pnpm build`</command>
       </commands>
     </check-set>
     <check-set id="packages-ui">
       <scope>`packages/ui`</scope>
       <commands>
-        <command>`pnpm exec site-kernel run icons.generate`</command>
+        <command>`pnpm exec werkstatt run icons.generate`</command>
         <command>`pnpm --filter @warpgogol/ui build:check`</command>
-        <command>`pnpm exec site-kernel run shared-ui.thin-copy.validate`</command>
+        <command>`pnpm exec werkstatt run shared-ui.thin-copy.validate`</command>
       </commands>
     </check-set>
     <check-set id="packages-kernel-handoff">
       <scope>`packages/os/site-kernel-handoff`</scope>
       <commands>
-        <command>`pnpm --filter @warpgogol/site-kernel-handoff build:check`</command>
-        <command>`pnpm exec site-kernel run migrator.registry.validate`</command>
-        <command>`pnpm exec site-kernel run handoff.validate --bundle &lt;bundle-dir&gt;`</command>
+        <command>`pnpm --filter @warpgogol/werkstatt/handoff build:check`</command>
+        <command>`pnpm exec werkstatt run migrator.registry.validate`</command>
+        <command>`pnpm exec werkstatt run handoff.validate --bundle &lt;bundle-dir&gt;`</command>
       </commands>
     </check-set>
     <check-set id="Compass-foundation">
@@ -380,15 +380,15 @@
     </entry>
     <entry id="vm-03b">
       <change-type>Published material changes: video sources, image tokens, material credit sidecars, or credits-page generation</change-type>
-      <expectation>Run `pnpm exec site-kernel run material.credits.validate --site &lt;app&gt;`; for shared renderer or validator changes, also run the affected package build checks and the app `build:check` pipeline.</expectation>
+      <expectation>Run `pnpm exec werkstatt run material.credits.validate --site &lt;app&gt;`; for shared renderer or validator changes, also run the affected package build checks and the app `build:check` pipeline.</expectation>
     </entry>
     <entry id="vm-03c">
       <change-type>Open-source page generation, SBOM registry, or downloadable artifact changes (RFC-0489)</change-type>
-      <expectation>Run `pnpm exec site-kernel run open-source.generate --site &lt;app&gt;` then `pnpm exec site-kernel run open-source.validate --site &lt;app&gt;`; for shared generator or validator changes, also run `pnpm --filter @warpgogol/site-kernel-codegen build:check` and `pnpm --filter @warpgogol/site-kernel-checks build:check`.</expectation>
+      <expectation>Run `pnpm exec werkstatt run open-source.generate --site &lt;app&gt;` then `pnpm exec werkstatt run open-source.validate --site &lt;app&gt;`; for shared generator or validator changes, also run `pnpm --filter @warpgogol/werkstatt-site/codegen build:check` and `pnpm --filter @warpgogol/werkstatt-site/checks build:check`.</expectation>
     </entry>
     <entry id="vm-03d">
       <change-type>Contact form structured fields or send-message section changes (RFC-0514)</change-type>
-      <expectation>Run `pnpm exec site-kernel run contact.form.validate --site &lt;app&gt;`; for shared section or validator changes, also run `pnpm --filter @warpgogol/ui build:check` and `pnpm --filter @warpgogol/site-kernel-checks build:check`; for migrator changes, also run `pnpm --filter @warpgogol/site-kernel-handoff build:check` and `pnpm exec site-kernel run migrator.registry.validate`.</expectation>
+      <expectation>Run `pnpm exec werkstatt run contact.form.validate --site &lt;app&gt;`; for shared section or validator changes, also run `pnpm --filter @warpgogol/ui build:check` and `pnpm --filter @warpgogol/werkstatt-site/checks build:check`; for migrator changes, also run `pnpm --filter @warpgogol/werkstatt/handoff build:check` and `pnpm exec werkstatt run migrator.registry.validate`.</expectation>
     </entry>
     <entry id="vm-04">
       <change-type>Shared icon assets, exports, or generation workflow</change-type>
@@ -396,35 +396,35 @@
     </entry>
     <entry id="vm-05">
       <change-type>Shared ontology / biome / site-family / token-generation contract</change-type>
-      <expectation>Validate `@warpgogol/ontology`, `@warpgogol/tokens`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-codegen`, and any command-owning package before running targeted workspace commands such as `family.contract.validate`, `biome.contract.validate`, `family.list`, and `rfc.validate`.</expectation>
+      <expectation>Validate `@warpgogol/ontology`, `@warpgogol/werkstatt-site/tokens`, `@warpgogol/werkstatt-site/checks`, `@warpgogol/werkstatt-site/codegen`, and any command-owning package before running targeted workspace commands such as `family.contract.validate`, `biome.contract.validate`, `family.list`, and `rfc.validate`.</expectation>
     </entry>
     <entry id="vm-06">
       <change-type>Onboarding lifecycle or phase-contract changes</change-type>
-      <expectation>Validate `@warpgogol/site-kernel-onboarding`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel`, and `@warpgogol/site-kernel-checks`, then run `onboarding.input.validate`, `onboarding.phase.validate --phase=05-audit`, `app.boilerplate.validate`, `app.qa.validate`, and `sites-check.run` for the affected app.</expectation>
+      <expectation>Validate `@warpgogol/werkstatt-site/onboarding`, `@warpgogol/werkstatt-site/codegen`, `@warpgogol/site-kernel`, and `@warpgogol/werkstatt-site/checks`, then run `onboarding.input.validate`, `onboarding.phase.validate --phase=05-audit`, `app.boilerplate.validate`, `app.qa.validate`, and `sites-check.run` for the affected app.</expectation>
     </entry>
     <entry id="vm-07">
       <change-type>Internal site handoff bundle, migrator registry, or RFC-0221 schema changes</change-type>
-      <expectation>Validate `@warpgogol/ontology`, `@warpgogol/site-kernel-handoff`, and the root site-kernel command registration; run `migrator.registry.validate`, and run `handoff.validate --bundle &lt;bundle-dir&gt;` when a fixture or real bundle is available.</expectation>
+      <expectation>Validate `@warpgogol/ontology`, `@warpgogol/werkstatt/handoff`, and the root site-kernel command registration; run `migrator.registry.validate`, and run `handoff.validate --bundle &lt;bundle-dir&gt;` when a fixture or real bundle is available.</expectation>
     </entry>
     <entry id="vm-08">
       <change-type>Forge skill frontmatter contract or concerns taxonomy changes (RFC-0523)</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/forge build:check` and `pnpm --filter @warpgogol/forge test`; run `pnpm exec site-kernel run forge.skill.validate --all` to verify all skills pass SKILL-01..SKILL-17 validation including the four-level concerns enum, knowledge file existence, and platform reference prohibition.</expectation>
+      <expectation>Run `pnpm --filter @warpgogol/forge build:check` and `pnpm --filter @warpgogol/forge test`; run `pnpm exec werkstatt run forge.skill.validate --all` to verify all skills pass SKILL-01..SKILL-17 validation including the four-level concerns enum, knowledge file existence, and platform reference prohibition.</expectation>
     </entry>
     <entry id="vm-09">
       <change-type>Forge skill knowledge file or cumulative knowledge system changes (RFC-0524)</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/forge build:check` and `pnpm --filter @warpgogol/forge test`; run `pnpm exec site-kernel run forge.skill.validate --all` to verify SKILL-13 (declared knowledge files must exist); run `pnpm exec site-kernel run forge.doctor` to verify knowledge file sync state.</expectation>
+      <expectation>Run `pnpm --filter @warpgogol/forge build:check` and `pnpm --filter @warpgogol/forge test`; run `pnpm exec werkstatt run forge.skill.validate --all` to verify SKILL-13 (declared knowledge files must exist); run `pnpm exec werkstatt run forge.doctor` to verify knowledge file sync state.</expectation>
     </entry>
     <entry id="vm-10">
       <change-type>Forge skill file platform reference changes (RFC-0553)</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/forge build:check` and `pnpm --filter @warpgogol/forge test`; run `pnpm exec site-kernel run forge.skill.validate --json` to verify SKILL-17 (no specific platform RFC/ADR ids or platform names in skill files); run `grep -rnE 'RFC-[0-9]{4}|ADR-[0-9]{4}' packages/forge/skills/` to confirm zero specific platform id matches.</expectation>
+      <expectation>Run `pnpm --filter @warpgogol/forge build:check` and `pnpm --filter @warpgogol/forge test`; run `pnpm exec werkstatt run forge.skill.validate --json` to verify SKILL-17 (no specific platform RFC/ADR ids or platform names in skill files); run `grep -rnE 'RFC-[0-9]{4}|ADR-[0-9]{4}' packages/forge/skills/` to confirm zero specific platform id matches.</expectation>
     </entry>
     <entry id="vm-11">
       <change-type>Generated file determinism changes (RFC-0601, RFC-0645)</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/site-kernel-checks build:check` and `pnpm --filter @warpgogol/site-kernel-checks test`; run `pnpm exec site-kernel run generated.drift.validate --site <site-id>` to verify content drift detection (DRIFT-01 error + DRIFT-02 error for missing dryRun); run `pnpm exec site-kernel run generator.ownership.lint` to verify ownership map integrity.</expectation>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-site/checks build:check` and `pnpm --filter @warpgogol/werkstatt-site/checks test`; run `pnpm exec werkstatt run generated.drift.validate --site <site-id>` to verify content drift detection (DRIFT-01 error + DRIFT-02 error for missing dryRun); run `pnpm exec werkstatt run generator.ownership.lint` to verify ownership map integrity.</expectation>
     </entry>
     <entry id="vm-12">
       <change-type>Content regression gate changes (RFC-0732, RFC-0734)</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/site-kernel-checks build:check` and `pnpm --filter @warpgogol/site-kernel-checks test`; run `pnpm exec site-kernel run content.regression.check --site <site-id>` to verify resolved content drift detection (CREG-01 error for content drift, CREG-02 error for route set mismatch, CREG-03 warning for cold start); run `pnpm exec site-kernel run content.regression.review.generate --site <site-id>` to generate review.yaml; run `pnpm exec site-kernel run content.regression.apply --site <site-id> --review <path>` to apply decisions (CREG-04 error for workpiece mismatch); run `mission.close` to verify CREG-05 blocks unreviewed drift.</expectation>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-site/checks build:check` and `pnpm --filter @warpgogol/werkstatt-site/checks test`; run `pnpm exec werkstatt run content.regression.check --site <site-id>` to verify resolved content drift detection (CREG-01 error for content drift, CREG-02 error for route set mismatch, CREG-03 warning for cold start); run `pnpm exec werkstatt run content.regression.review.generate --site <site-id>` to generate review.yaml; run `pnpm exec werkstatt run content.regression.apply --site <site-id> --review <path>` to apply decisions (CREG-04 error for workpiece mismatch); run `mission.close` to verify CREG-05 blocks unreviewed drift.</expectation>
     </entry>
   </change-validation-matrix>
 </verification-plan>

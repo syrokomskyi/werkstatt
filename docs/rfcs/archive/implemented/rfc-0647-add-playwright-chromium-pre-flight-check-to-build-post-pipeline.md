@@ -61,7 +61,7 @@ nonGoals:
   - "Do not auto-install Chromium in CI environments where PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is set — the ensure command respects this env var."
   - "Do not add the ensure step to build.prepare — it is only needed before Playwright-dependent steps in build.post."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -112,7 +112,7 @@ The kernel gains a `playwright.chromium.ensure` command that checks for Playwrig
 The new command is an internal pipeline step, but can be invoked directly:
 
 ```sh
-pnpm exec site-kernel run playwright.chromium.ensure
+pnpm exec werkstatt run playwright.chromium.ensure
 ```
 
 No site-specific flags. Scope: `workspace`. The command operates on the global Playwright cache (`~/.cache/ms-playwright/`), not on any specific site. No `--json` output beyond the standard kernel result envelope.

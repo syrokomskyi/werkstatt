@@ -68,7 +68,7 @@ nonGoals:
   - "Does not add new Site OS commands — only changes the contract of existing ones"
   - "Does not address the validTimeStart format violation — that bug is in the external Axiom study pipeline (buildInstrumentContext in @syrokomskyi/axiom-study), not in werkstatt code. Werkstatt check modules correctly pass recordedAt: new Date().toISOString() to toDeterministicContext."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -148,13 +148,13 @@ No new CLI commands. Existing commands changed:
 ```sh
 # mission.check — passes --mission <missionId> to external Axiom CLI as auditId
 # External CLI writes auditId to evidence-metadata.json
-pnpm exec site-kernel run mission.check --mission warpgogol-com-m000027 --external-preview --base-url https://dev.warpgogol.com
+pnpm exec werkstatt run mission.check --mission warpgogol-com-m000027 --external-preview --base-url https://dev.warpgogol.com
 
 # axiom.report — reads evidence-metadata.json, maps auditId ↔ missionId
-pnpm exec site-kernel run axiom.report --mission warpgogol-com-m000027
+pnpm exec werkstatt run axiom.report --mission warpgogol-com-m000027
 
 # leitstand.propagate — reads auditId from evidence-metadata.json, compares to release missionId
-pnpm exec site-kernel run leitstand.propagate --system warpgogol-com
+pnpm exec werkstatt run leitstand.propagate --system warpgogol-com
 ```
 
 ### TypeScript contracts

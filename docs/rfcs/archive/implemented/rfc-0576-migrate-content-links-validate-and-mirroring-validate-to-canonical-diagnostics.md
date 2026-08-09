@@ -61,7 +61,7 @@ nonGoals:
   - "Does not add new validation commands"
   - "Does not change the set of rules each validator checks — only the output shape and fixHint content"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -122,9 +122,9 @@ The trailing slash mismatch between `localizeUrl` (no trailing slash) and author
 No CLI surface changes. The three commands are invoked identically:
 
 ```sh
-pnpm exec site-kernel run content.links.validate --site <id>
-pnpm exec site-kernel run mirroring.validate --site <id>
-pnpm exec site-kernel run page.blocks.mirror.validate --site <id>
+pnpm exec werkstatt run content.links.validate --site <id>
+pnpm exec werkstatt run mirroring.validate --site <id>
+pnpm exec werkstatt run page.blocks.mirror.validate --site <id>
 ```
 
 The `--json` output shape changes: `data.diagnostics` is now populated with canonical `Diagnostic[]` in all cases (previously: `content.links.validate` had coarse diagnostics, `mirroring.validate` had none, `page.blocks.mirror.validate` had custom-shape diagnostics).
@@ -297,7 +297,7 @@ The `data` field of `ForgeCommandResult` changes for two validators:
 - **Agent-facing improvement.** Agents parsing `ForgeCommandResult.data.diagnostics` now find all violations in the canonical array with `fixHint` fields. The `fix-patterns.md` catalog in `wg-mission-complete` can reference LINK-01..03, MIRROR-MISSING, and MIRROR-01..03 by ruleId.
 - **Trailing slash normalization** is a pure bug fix — existing links that were false-positive LINK-03 will now pass. No app changes needed.
 - `diagnostic.shape.lint` (DSL-02) will now enforce that these three validators use registered ruleIds — future drift is prevented.
-- **DSL-04 baseline shrink.** `content-links.ts` is removed from `dsl04-baseline.generated.yaml` after migration. `mirroring.ts` and `page-blocks-mirror.ts` are not in the baseline (they use custom result shapes, not `resultFromViolations`). Regenerate the baseline via `pnpm exec site-kernel run diagnostic.shape.lint --write-baseline`.
+- **DSL-04 baseline shrink.** `content-links.ts` is removed from `dsl04-baseline.generated.yaml` after migration. `mirroring.ts` and `page-blocks-mirror.ts` are not in the baseline (they use custom result shapes, not `resultFromViolations`). Regenerate the baseline via `pnpm exec werkstatt run diagnostic.shape.lint --write-baseline`.
 
 ## Alternatives considered
 

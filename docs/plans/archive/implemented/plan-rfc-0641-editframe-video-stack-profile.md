@@ -50,7 +50,7 @@ No `docs/architecture-dna.md` changes — no new DNA invariant.
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0641` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0641` — RFC validation
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript typecheck
 - `pnpm --filter @warpgogol/forge run test` — unit tests (including new profile test)
 
@@ -167,18 +167,18 @@ No CI workflow changes. No new pipeline checks.
 - Verify `packages/forge/AGENTS.md` is updated (Step 4).
 - No `docs/*.xml` Compass files need updates — this RFC adds a profile, not a repository-wide semantic change.
 - No `docs/architecture-dna.md` changes — no new DNA invariant.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0641` — verify RFC passes validation.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0641` — verify RFC passes validation.
 - Run `pnpm --filter @warpgogol/forge run build:check` — verify TypeScript compiles.
 - Run `pnpm --filter @warpgogol/forge run test` — verify all tests pass including new profile test.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0641 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0641 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0641`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0641`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 - Review report exists in `docs/reviews/code/` for this session.
@@ -191,7 +191,7 @@ No CI workflow changes. No new pipeline checks.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0641`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0641`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -216,5 +216,5 @@ No verification evidence needed (RFC-0330 applies only to probe-bearing RFCs cre
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54 (forge bindings contract), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0641 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54 (forge bindings contract), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0641 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If the profile YAML fails to parse against the extended schema from RFC-0638, verify RFC-0638 is implemented first. This RFC depends on RFC-0638→0639→0640 being implemented in order.

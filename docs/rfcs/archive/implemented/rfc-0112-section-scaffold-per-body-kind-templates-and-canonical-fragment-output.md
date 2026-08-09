@@ -65,7 +65,7 @@ Update `section.scaffold` to emit per-`bodyKind` templates. The agent supplies (
 ### CLI surface (unchanged)
 
 ```sh
-pnpm exec site-kernel run section.scaffold \
+pnpm exec werkstatt run section.scaffold \
   --archetype <id> \
   --slug <slug>
 ```
@@ -231,7 +231,7 @@ See `## CLI surface`, `## File system responsibilities`, and `## Failure modes` 
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run section.scaffold \
+pnpm exec werkstatt run section.scaffold \
   --archetype <archetype-id> \
   --slug <slug>
 ```

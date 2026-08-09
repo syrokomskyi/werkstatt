@@ -58,7 +58,7 @@ nonGoals:
   - "Do not change the workpiece materialization flow — bordbuch removal during materialize is correct (RFC-0568)"
   - "Do not change the bordbuch append/validate/repair commands"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -112,7 +112,7 @@ The `mission.reconcile` command auto-resolves `bordbuch/` delete-modify conflict
 No CLI surface change. `mission.reconcile` is invoked the same way:
 
 ```sh
-pnpm exec site-kernel run mission.reconcile --mission warpgogol-com-m000019
+pnpm exec werkstatt run mission.reconcile --mission warpgogol-com-m000019
 ```
 
 The command's behavior changes: after `git merge --no-ff` fails, it checks if all conflicted paths are under `bordbuch/`. If so, it auto-resolves with `git checkout --ours bordbuch/` and completes the merge. If non-bordbuch conflicts exist, it fails with the existing error message.

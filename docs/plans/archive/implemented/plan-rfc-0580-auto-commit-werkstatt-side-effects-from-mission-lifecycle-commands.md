@@ -54,7 +54,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — TypeScript compilation
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — unit + integration tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0580` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0580` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -375,16 +375,16 @@ scope:
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated with RFC-0580 pattern documentation.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check`.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test`.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0580`.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0580`.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0580 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0580 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0580`.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0580`.
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes.
 - `pnpm --filter @warpgogol/site-kernel-handoff test` passes.
 - Review report exists in `docs/reviews/code/` for this session.
@@ -397,7 +397,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0580`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0580`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 
@@ -415,5 +415,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-45, DNA-46, or DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0580 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-45, DNA-46, or DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0580 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the shared `git-exec.ts` approach causes issues, fall back to duplicating the 5-line utility in `werkstatt-commit.ts`.

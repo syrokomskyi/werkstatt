@@ -187,16 +187,16 @@ curl -X POST "https://api.telegram.org/bot8053691768:AAF6nnCXhjfYtR1KpiA_HzDGGUT
 
 ```bash
 # Verify Compass compliance
-pnpm exec site-kernel run compass.validate
+pnpm exec werkstatt run compass.validate
 
 # Check content surface
-pnpm exec site-kernel run content.surface.validate --app <app>
+pnpm exec werkstatt run content.surface.validate --app <app>
 
 # Check generator ownership
-pnpm exec site-kernel run generator.ownership.lint
+pnpm exec werkstatt run generator.ownership.lint
 
 # Check RFC validity (isolated)
-pnpm exec site-kernel run rfc.validate RFC-XXXX --json
+pnpm exec werkstatt run rfc.validate RFC-XXXX --json
 ```
 
 ## 11. Recommended First Wave Actions

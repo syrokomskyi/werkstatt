@@ -170,7 +170,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json` — command is found (may skip if no articles exist yet)
+- `pnpm exec werkstatt run ratgeber.article.validate --site warpgogol-com --json` — command is found (may skip if no articles exist yet)
 
 **Completion criterion:** `ratgeber.article.validate` is callable via the kernel CLI and appears in the command table.
 
@@ -198,7 +198,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — typecheck passes
-- `pnpm exec site-kernel run migrator.registry.validate` — registry is valid
+- `pnpm exec werkstatt run migrator.registry.validate` — registry is valid
 
 **Completion criterion:** Migrator file exists, registered, typechecks, and `migrator.registry.validate` passes.
 
@@ -249,15 +249,15 @@ scope:
 - Update `docs/requirements.xml` — article type enum, mandatory section structure
 - Update `docs/technology.xml` — new validator file, migrator file
 - Update `docs/knowledge-graph.xml` — RFC-0501 relationships
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Check off acceptance criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0501 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0501 --implementation-commit <sha> --dry-run` first, then without `--dry-run`
 - Commit the stamped RFC separately from the implementation commit
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0501` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0501` — passes
 - Every file in `scope.docs` is either updated or documented as not-applicable
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria checked off with inline evidence; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -268,11 +268,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0501`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0501`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -291,5 +291,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0501 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0501 --reason "..." --invariant "DNA-24"` instead of working around it.
 - If the type-specific detection heuristics prove too strict for valid articles, do not weaken the validator — create a follow-up RFC adjusting the detection rules.

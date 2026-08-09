@@ -400,12 +400,12 @@ export const NEBULA_WEIGHTS_VERSION = "1.0.0";
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run passport.emit --app nicaragua-projekt
-pnpm exec site-kernel run passport.verify --app nicaragua-projekt --artifact dist/
-pnpm exec site-kernel run passport.key.rotate --app nicaragua-projekt
-pnpm exec site-kernel run star-map.render --app nicaragua-projekt --depth 3
-pnpm exec site-kernel run nebula.score.compute --app nicaragua-projekt
-pnpm exec site-kernel run pulsar.heartbeat --app nicaragua-projekt
+pnpm exec werkstatt run passport.emit --app nicaragua-projekt
+pnpm exec werkstatt run passport.verify --app nicaragua-projekt --artifact dist/
+pnpm exec werkstatt run passport.key.rotate --app nicaragua-projekt
+pnpm exec werkstatt run star-map.render --app nicaragua-projekt --depth 3
+pnpm exec werkstatt run nebula.score.compute --app nicaragua-projekt
+pnpm exec werkstatt run pulsar.heartbeat --app nicaragua-projekt
 ```
 
 | Command | Scope | Responsibility |

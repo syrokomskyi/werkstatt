@@ -61,7 +61,7 @@ nonGoals:
   - "Do not auto-commit workpiece changes from other lifecycle commands (mission.materialize, mission.close) — only mission.reconcile fetches from the workpiece and needs a clean tree."
   - "Do not add a --skip-auto-commit flag — if the operator has unfinished manual edits, they should commit or stash before running reconcile."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -117,7 +117,7 @@ DNA-46 (Mission lifecycle) requires reliable state transitions. DNA-51 (Werkstat
 No new CLI commands. The change is internal to the existing `mission.reconcile` handler:
 
 ```sh
-pnpm exec site-kernel run mission.reconcile --mission <missionId>
+pnpm exec werkstatt run mission.reconcile --mission <missionId>
 ```
 
 The handler now auto-commits the workpiece before proceeding with fetch+merge.
@@ -239,7 +239,7 @@ When the workpiece was clean:
 - [x] Unit test: dirty workpiece → auto-commit created, reconcile proceeds (evidence: `packages/os/site-kernel-handoff/src/mission/rfc-0644-workpiece-auto-commit.test.ts:47-64`)
 - [x] Unit test: clean workpiece → no auto-commit, reconcile proceeds (evidence: `packages/os/site-kernel-handoff/src/mission/rfc-0644-workpiece-auto-commit.test.ts:67-75`)
 - [x] `mission.validate` passes after implementation (evidence: `pnpm --filter @warpgogol/site-kernel-handoff run test` — 491/491 tests pass)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0644 --json` — exit 0, 0 errors, 0 warnings)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0644 --json` — exit 0, 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 

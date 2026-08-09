@@ -62,7 +62,7 @@ nonGoals:
   - "Changing the regular (non-maskable) icon generation pipeline"
   - "Generalizing the safe-zone pattern to other generated artifacts"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -113,10 +113,10 @@ No new commands. Existing commands change behavior:
 
 ```sh
 # Generation: auto-wraps favicon.svg for maskable variants
-pnpm exec site-kernel run public.icons.generate --site warpgogol-com
+pnpm exec werkstatt run public.icons.generate --site warpgogol-com
 
 # Validation: reports ICON-SRC-04 when auto-wrap is applied
-pnpm exec site-kernel run public.icons.validate --site warpgogol-com
+pnpm exec werkstatt run public.icons.validate --site warpgogol-com
 ```
 
 No new flags. The auto-wrap is unconditional when `favicon.svg` exists — there is no opt-out.
@@ -239,7 +239,7 @@ Diagnostic rules after this RFC:
 - [x] Generated maskable PNGs differ from regular PNGs (safe-zone padding visible) when `favicon.svg` has edge elements (evidence: `wrapMaskableSvg` applies `translate(51.2, 51.2) scale(0.8)` transform at `icons.ts:193`, producing visually distinct maskable PNGs via `buildIconWrites` at `icons.ts:209-224`)
 - [x] Sites without `src/content/favicon.svg` are unaffected — `buildIconSvg` fallback produces identical output to pre-RFC behavior (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:201-206`, `src/tests/icons-source-svg.test.ts:110-116`)
 - [x] `docs/authoring/site-composition.md` updated to remove `favicon-maskable.svg` mention and document auto-wrap (evidence: `docs/authoring/site-composition.md:455-459`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0632 --json` → status: pass, 0 warnings)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0632 --json` → status: pass, 0 warnings)
 
 ## Implementation notes for agents
 

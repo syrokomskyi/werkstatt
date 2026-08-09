@@ -53,7 +53,7 @@ nonGoals:
   - "Does not change RFC acceptance for non-spec RFCs — the inherited path applies only to RFCs with specRef into an accepted spec"
   - "Does not define amendments — that is RFC-0397"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -103,9 +103,9 @@ Spec roadmap nodes are materialized **lazily, in dependency-front portions** (de
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run spec.status --spec=pbp --json
-pnpm exec site-kernel run spec.materialize --spec=pbp --next=8 --json
-pnpm exec site-kernel run rfc.list --spec=pbp --json
+pnpm exec werkstatt run spec.status --spec=pbp --json
+pnpm exec werkstatt run spec.materialize --spec=pbp --next=8 --json
+pnpm exec werkstatt run rfc.list --spec=pbp --json
 ```
 
 - `spec.status` (workspace, read-only): without `--spec`, summarizes all specs; with it, full per-node table + computed front.

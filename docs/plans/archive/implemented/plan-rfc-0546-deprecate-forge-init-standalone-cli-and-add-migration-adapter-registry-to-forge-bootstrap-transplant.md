@@ -59,10 +59,10 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate` — must pass on RFC-0546
+- `pnpm exec werkstatt run rfc.validate` — must pass on RFC-0546
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
 - `pnpm --filter @warpgogol/forge run test` — unit tests must pass
-- `pnpm exec site-kernel run forge.skill.validate` — must pass on redesigned forge-bootstrap skill
+- `pnpm exec werkstatt run forge.skill.validate` — must pass on redesigned forge-bootstrap skill
 
 ## 3. Step sequence
 
@@ -207,7 +207,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` passes on the redesigned skill
+- `pnpm exec werkstatt run forge.skill.validate` passes on the redesigned skill
 
 **Completion criterion:** SKILL.md transplant mode follows adapter-driven flow (detect → analyze → migrate → post-setup)
 
@@ -290,19 +290,19 @@ scope:
 **Agent actions:**
 
 - Verify all `scope.docs` files are updated — check each path against `git diff`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (forge.init removed)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (forge.init removed)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0546 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0546 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate` passes on RFC-0546
+- `pnpm exec werkstatt run rfc.validate` passes on RFC-0546
 - `pnpm --filter @warpgogol/forge run build:check` passes
 - `pnpm --filter @warpgogol/forge run test` passes
-- `pnpm exec site-kernel run forge.skill.validate` passes
+- `pnpm exec werkstatt run forge.skill.validate` passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed (findings fixed if any); all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`
@@ -313,10 +313,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate` — must pass on RFC-0546
+- `pnpm exec werkstatt run rfc.validate` — must pass on RFC-0546
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
 - `pnpm --filter @warpgogol/forge run test` — unit tests must pass
-- `pnpm exec site-kernel run forge.skill.validate` — must pass on redesigned forge-bootstrap skill
+- `pnpm exec werkstatt run forge.skill.validate` — must pass on redesigned forge-bootstrap skill
 
 ### 4.2 Evidence artifacts
 
@@ -338,5 +338,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0546 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0546 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If the `forge.yaml` schema extension breaks existing validation, do not weaken the schema — investigate whether `migrationAdapters` needs a different shape or a separate schema version.

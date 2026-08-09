@@ -169,17 +169,17 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate` (no new commands, but `nachweis.ingest` is in `commands.changed` — verify manifest is current)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if needed
+- Run `pnpm exec werkstatt run command.manifest.generate` (no new commands, but `nachweis.ingest` is in `commands.changed` — verify manifest is current)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if needed
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: <file:line>)` annotations
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0713 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0713 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0713`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0713`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -191,10 +191,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0713`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0713`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run env.contract.validate` (root `.env.example` check)
+- `pnpm exec werkstatt run env.contract.validate` (root `.env.example` check)
 
 ### 4.2 Evidence artifacts
 
@@ -210,4 +210,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0713 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0713 --reason "..." --invariant "DNA-N"` instead of working around it.

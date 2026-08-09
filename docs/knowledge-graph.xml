@@ -353,7 +353,7 @@
     <node id="changelog.system" type="subsystem">
       <name>Changelog OS</name>
       <path>`packages/os/site-kernel-changelog/src/changelog/` + `packages/os/site-kernel-changelog/src/changelog-command.ts`</path>
-      <role>AI-powered changelog generation pipeline. Lives in @warpgogol/site-kernel-changelog. Each app wires it up via its own changelog.module.ts.</role>
+      <role>AI-powered changelog generation pipeline. Lives in @warpgogol/werkstatt-site/changelog. Each app wires it up via its own changelog.module.ts.</role>
       <links>
         <link rel="owned-by" target="root.rules" />
         <link rel="reads-from" target="changelog.prompts" />

@@ -61,7 +61,7 @@ nonGoals:
   - "Adding bordbuch.generate to the build.prepare.dev pipeline"
   - "Filtering site-relative generated files from the data-path copy (they are overwritten by dev pipeline generators)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -196,7 +196,7 @@ function getWorkspaceAbsoluteGeneratedPaths(systemId: string): Set<string> {
 - [x] No files matching `GENERATOR_OWNERSHIP_MAP` workspace-absolute paths appear in the workpiece after materialization (evidence: regression test `src/tests/rfc-0620-workspace-absolute-generated-files-filter.test.ts` test 1 verifies `bordbuch.json` and `bordbuch/index.html` are absent from workpiece `public/`)
 - [x] Adding a new workspace-absolute generated file to `GENERATOR_OWNERSHIP_MAP` automatically excludes it from the workpiece copy without code changes in `mission-materialize.ts` (evidence: regression test `src/tests/rfc-0620-workspace-absolute-generated-files-filter.test.ts` test 4 uses a mock entry `test-generated.json` that is also filtered, proving the filter reads from `GENERATOR_OWNERSHIP_MAP` not hardcoded paths)
 - [x] Regression test verifies workspace-absolute generated files are absent from the workpiece after materialization (evidence: `packages/os/site-kernel-handoff/src/tests/rfc-0620-workspace-absolute-generated-files-filter.test.ts`, 4 tests all passing)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0620 --json` exits 0, status: pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0620 --json` exits 0, status: pass)
 
 ## Implementation notes for agents
 

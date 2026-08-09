@@ -91,7 +91,7 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `services.projection.validate` joins `APPS_BUILD_CHECK_PIPELINE`.
-- `pnpm exec site-kernel run rfc.validate RFC-0373 --json` — must pass.
+- `pnpm exec werkstatt run rfc.validate RFC-0373 --json` — must pass.
 - `pnpm --filter @gogol/share run build:check` — must pass after type changes.
 - `pnpm --filter @gogol/business run build:check` — must pass after schema change.
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass after new command.
@@ -368,8 +368,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass.
-- `pnpm exec site-kernel run services.projection.validate --app warpgogol-com` — must pass (no services files = no violations).
-- `pnpm exec site-kernel run services.projection.validate --app nicaragua-projekt` — must pass.
+- `pnpm exec werkstatt run services.projection.validate --app warpgogol-com` — must pass (no services files = no violations).
+- `pnpm exec werkstatt run services.projection.validate --app nicaragua-projekt` — must pass.
 
 **Completion criterion:** `services.projection.validate` is registered, runs per-app, and passes on all apps (no services files = no violations).
 
@@ -387,8 +387,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0373 --json` — must pass.
-- `pnpm exec site-kernel run rfc.validate RFC-0147 --json` — must pass.
+- `pnpm exec werkstatt run rfc.validate RFC-0373 --json` — must pass.
+- `pnpm exec werkstatt run rfc.validate RFC-0147 --json` — must pass.
 
 **Completion criterion:** RFC-0147 `amendedBy` includes `RFC-0373`.
 
@@ -402,14 +402,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.json`.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.json`.
 - Update `docs/technology.xml` inventory entries for new/changed source files if the generator does not auto-update them.
 - Update `docs/verification-plan.xml` if it lists individual check commands.
 
 **Validation:**
 
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json` — must pass.
-- `pnpm exec site-kernel run workspace.surface.validate --json` — must pass.
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json` — must pass.
+- `pnpm exec werkstatt run workspace.surface.validate --json` — must pass.
 
 **Completion criterion:** `ecosystem.manifest.validate` and `workspace.surface.validate` pass.
 
@@ -427,7 +427,7 @@ scope:
 - Run `pnpm run build:check` for `nicaragua-projekt`.
 - Run `pnpm run build:check` for `check-warpgogol-com`.
 - Verify `nicaragua-projekt` (no services) omits `## Services` in llms-full.txt with no error.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0373 --json` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0373 --json` — must pass.
 
 **Validation:**
 
@@ -444,18 +444,18 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0373 --json`
-- `pnpm exec site-kernel run rfc.validate RFC-0147 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0373 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0147 --json`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/business run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-content run build:check`
-- `pnpm exec site-kernel run services.projection.validate --app warpgogol-com`
-- `pnpm exec site-kernel run services.projection.validate --app nicaragua-projekt`
-- `pnpm exec site-kernel run services.projection.validate --app check-warpgogol-com`
+- `pnpm exec werkstatt run services.projection.validate --app warpgogol-com`
+- `pnpm exec werkstatt run services.projection.validate --app nicaragua-projekt`
+- `pnpm exec werkstatt run services.projection.validate --app check-warpgogol-com`
 - `pnpm run build:check` (per app, all three)
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json`
-- `pnpm exec site-kernel run workspace.surface.validate --json`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json`
+- `pnpm exec werkstatt run workspace.surface.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -475,6 +475,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0373 --reason "..." --invariant "DNA-16"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0373 --reason "..." --invariant "DNA-16"` instead of working around it.
 - If `projectServices()` cannot produce valid `SemanticService[]` from the existing `businessServiceSchema` shape (e.g. `slug` field is missing or renamed), escalate — the schema may need a separate RFC amendment.
 - If the disk loader's `readBusinessCollection()` cannot read `services/` subdirectory (e.g. path resolution differs from other collections), escalate — the loader may need a fix outside this RFC's scope.

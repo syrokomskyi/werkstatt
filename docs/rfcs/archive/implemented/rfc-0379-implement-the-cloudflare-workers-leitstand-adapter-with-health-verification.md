@@ -76,7 +76,7 @@ acceptance:
   - probe: command-registered
     name: "leitstand.status"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -135,19 +135,19 @@ The Leitstand gains a concrete `cloudflare-workers` adapter that wraps `wrangler
 
 ```sh
 # stage a published release on the alt channel (default)
-pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --json
+pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000001 --json
 
 # promote the same release to production after alt is healthy
-pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --channel main --json
+pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000001 --channel main --json
 
 # verify a deployed channel on demand
-pnpm exec site-kernel run leitstand.health --system warpgogol-com --channel alt --json
+pnpm exec werkstatt run leitstand.health --system warpgogol-com --channel alt --json
 
 # rollback production to the previous published release
-pnpm exec site-kernel run leitstand.rollback --system warpgogol-com --channel main --json
+pnpm exec werkstatt run leitstand.rollback --system warpgogol-com --channel main --json
 
 # show both channels' deployment state (optional --channel to filter)
-pnpm exec site-kernel run leitstand.status --system warpgogol-com --json
+pnpm exec werkstatt run leitstand.status --system warpgogol-com --json
 ```
 
 All four commands stay workspace-scoped. New flag `--channel <alt|main>` (default `alt` for propagate/health; required for rollback; optional filter for status, which shows both channels by default).

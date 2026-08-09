@@ -55,12 +55,12 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0548`
-- `pnpm exec site-kernel run forge.skill.validate` — must pass with new `triggers` field
+- `pnpm exec werkstatt run rfc.validate --id RFC-0548`
+- `pnpm exec werkstatt run forge.skill.validate` — must pass with new `triggers` field
 - `pnpm --filter @warpgogol/forge build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 ## 3. Step sequence
 
@@ -77,7 +77,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge build:check` passes
-- `pnpm exec site-kernel run forge.skill.validate` passes (no skills have `triggers` yet — field is optional)
+- `pnpm exec werkstatt run forge.skill.validate` passes (no skills have `triggers` yet — field is optional)
 
 **Completion criterion:** `triggers` field is accepted in skill frontmatter schema; SKILL-16 validation rule is implemented; typecheck passes.
 
@@ -97,7 +97,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` passes with all skills having valid `triggers` fields
+- `pnpm exec werkstatt run forge.skill.validate` passes with all skills having valid `triggers` fields
 - `pnpm --filter @warpgogol/forge build:check` passes
 
 **Completion criterion:** All 22 fo-skills have `triggers` arrays in frontmatter; `forge.skill.validate` passes.
@@ -168,7 +168,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` passes
+- `pnpm exec werkstatt run forge.skill.validate` passes
 - Manual inspection: verify the updated SKILL.md references `.agents/operator-profile.md` and describes entry expiry
 
 **Completion criterion:** `fo-session-retro` SKILL.md routes operator insights to `.agents/operator-profile.md`; entry expiry marking is documented; profile review capability is described.
@@ -200,7 +200,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
 - `pnpm --filter @gogol/site-kernel-handoff test` passes (including new migrator tests)
-- `pnpm exec site-kernel run migrator.registry.validate` passes
+- `pnpm exec werkstatt run migrator.registry.validate` passes
 
 **Completion criterion:** Migrator for RFC-0548 is registered; backs up AGENTS.md to AGENTS.md.bak; idempotent (PBT passes); migrator.registry.validate passes.
 
@@ -269,16 +269,16 @@ scope:
 **Agent actions:**
 
 - Update affected `AGENTS.md` files (root, `packages/forge/AGENTS.md`) with new behavioral layer documentation.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0548 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0548 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0548`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0548`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists for this session.
 
@@ -290,13 +290,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0548`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0548`
 - `pnpm --filter @warpgogol/forge build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/forge test`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run forge.skill.validate`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run forge.skill.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -316,6 +316,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54 (Forge bindings contract), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0548 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54 (Forge bindings contract), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0548 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If the `triggers` field approach conflicts with existing skill frontmatter validation (SKILL-01..15), escalate to a superseding RFC rather than weakening existing validation rules.
 - If RFC-0547 (dependency for `operator-profile-template.md`) is rejected or superseded, this RFC's acceptance criterion for the template becomes unmet — escalate to amend or supersede.

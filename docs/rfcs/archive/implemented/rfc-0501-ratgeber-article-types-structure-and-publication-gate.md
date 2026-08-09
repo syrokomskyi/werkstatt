@@ -169,7 +169,7 @@ The `bakeRatgeberArticle` baker (from RFC-0500) emits a context-specific closing
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json
+pnpm exec werkstatt run ratgeber.article.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check` (blocking).

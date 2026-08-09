@@ -51,7 +51,7 @@ No configuration or data files affected. The `pbpSchemaById` registry and `pbpEn
 
 - `pnpm --filter @gogol/pbp run build:check` — tsc --noEmit
 - `pnpm --filter @gogol/pbp run test` — vitest run
-- `pnpm exec site-kernel run rfc.validate RFC-0482` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate RFC-0482` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -153,7 +153,7 @@ No configuration or data files affected. The `pbpSchemaById` registry and `pbpEn
 
 - Run `pnpm --filter @gogol/pbp run build:check`
 - Run `pnpm --filter @gogol/pbp run test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0482`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0482`
 - Verify all 9 acceptance criteria checkboxes in the RFC are satisfied
 
 **Validation:**
@@ -176,11 +176,11 @@ No configuration or data files affected. The `pbpSchemaById` registry and `pbpEn
 - Set `implementedAt` to today's date
 - Set `updatedAt` to today's date
 - Commit the status transition
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0482` (if acceptance probes are declared — they are not, so this step is optional)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0482` (if acceptance probes are declared — they are not, so this step is optional)
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0482` passes with `status: implemented`
+- `pnpm exec werkstatt run rfc.validate RFC-0482` passes with `status: implemented`
 
 **Completion criterion:** RFC-0482 has `status: implemented` and `implementedAt` set.
 
@@ -190,7 +190,7 @@ No configuration or data files affected. The `pbpSchemaById` registry and `pbpEn
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0482`
+- `pnpm exec werkstatt run rfc.validate RFC-0482`
 - `pnpm --filter @gogol/pbp run build:check`
 - `pnpm --filter @gogol/pbp run test`
 
@@ -210,4 +210,4 @@ No configuration or data files affected. The `pbpSchemaById` registry and `pbpEn
 ## 6. Escalation triggers
 
 - If implementation reveals that adding `presentation` to `.strict()` schemas causes existing entities to fail validation (e.g. because existing content already has a `presentation` field with incompatible data), stop and consult the operator. This would indicate the field is not purely additive.
-- If the `versionBump: patch` declaration is rejected by `platform.consistency.validate` (RFC-0478), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0482 --reason "versionBump mismatch" --invariant "DNA-53"` instead of working around it.
+- If the `versionBump: patch` declaration is rejected by `platform.consistency.validate` (RFC-0478), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0482 --reason "versionBump mismatch" --invariant "DNA-53"` instead of working around it.

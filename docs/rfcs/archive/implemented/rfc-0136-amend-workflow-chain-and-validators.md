@@ -134,7 +134,7 @@ branch:                        # NEW (a2-compose only)
 ### `amend.phase.validate` — batch-scoped readiness gate
 
 ```sh
-pnpm exec site-kernel run amend.phase.validate --app <id> --batch amend-<NNN> --phase a2-compose
+pnpm exec werkstatt run amend.phase.validate --app <id> --batch amend-<NNN> --phase a2-compose
 ```
 
 ```ts
@@ -159,7 +159,7 @@ It validates the declared inputs/outputs of an amend phase and their freshness a
 ### `audit.delta.run` — delta-scoped audit with cache reuse (П-5)
 
 ```sh
-pnpm exec site-kernel run audit.delta.run --app <id> --batch amend-<NNN>
+pnpm exec werkstatt run audit.delta.run --app <id> --batch amend-<NNN>
 ```
 
 - Computes the delta set from the batch provenance changes (RFC-0135): the touched `pageId`s plus any new routes.
@@ -173,9 +173,9 @@ pnpm exec site-kernel run audit.delta.run --app <id> --batch amend-<NNN>
 Mirrors the RFC-0085 author/postbuild split, delta-scoped:
 
 ```sh
-pnpm exec site-kernel run amend-check.author    --app <id> --batch amend-<NNN>
-pnpm exec site-kernel run amend-check.postbuild --app <id> --batch amend-<NNN>
-pnpm exec site-kernel run amend-check.run       --app <id> --batch amend-<NNN>   # = author + postbuild
+pnpm exec werkstatt run amend-check.author    --app <id> --batch amend-<NNN>
+pnpm exec werkstatt run amend-check.postbuild --app <id> --batch amend-<NNN>
+pnpm exec werkstatt run amend-check.run       --app <id> --batch amend-<NNN>   # = author + postbuild
 ```
 
 | Stage | Members |
@@ -196,7 +196,7 @@ pnpm exec site-kernel run amend-check.run       --app <id> --batch amend-<NNN>  
 - `nextWorkflow` resolves within the same chain.
 
 ```sh
-pnpm exec site-kernel run workflow-amend.list --json
+pnpm exec werkstatt run workflow-amend.list --json
 ```
 
 Lists the amend chain with phase, branch, reads/writes summary, and next workflow — the agent's discovery entry point for amend.

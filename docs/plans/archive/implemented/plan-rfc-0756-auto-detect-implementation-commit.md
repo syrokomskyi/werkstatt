@@ -48,10 +48,10 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0756` — must pass with zero violations
+- `pnpm exec werkstatt run rfc.validate --id RFC-0756` — must pass with zero violations
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
 - `pnpm --filter @warpgogol/forge run test` — unit tests must pass
-- `pnpm exec site-kernel run command.manifest.generate` — regenerate manifest after flag change
+- `pnpm exec werkstatt run command.manifest.generate` — regenerate manifest after flag change
 
 ## 3. Step sequence
 
@@ -133,13 +133,13 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate`
+- Run `pnpm exec werkstatt run command.manifest.generate`
 - Verify `docs/command-manifest.generated.yaml` shows `required: false` for the `implementation-commit` flag of `rfc.implement.stamp`
 - Commit the regenerated manifest
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0756` — passes with zero violations (no RFC-CMD-02 stale manifest)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0756` — passes with zero violations (no RFC-CMD-02 stale manifest)
 
 **Completion criterion:** `docs/command-manifest.generated.yaml` reflects `required: false` for `--implementation-commit`; `rfc.validate` passes.
 
@@ -175,16 +175,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed (already done in Step 4).
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed (already done in Step 4).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0756` (auto-detect will find the implementation commit) to atomically transition `accepted → implemented` (RFC-0476). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0756` (auto-detect will find the implementation commit) to atomically transition `accepted → implemented` (RFC-0476). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0756`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0756`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -196,10 +196,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0756`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0756`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run command.manifest.generate` (regenerate, then validate)
+- `pnpm exec werkstatt run command.manifest.generate` (regenerate, then validate)
 
 ### 4.2 Evidence artifacts
 
@@ -217,5 +217,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `--fixed-strings` is not available in the git version used by CI, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0756 --reason "git --fixed-strings not available" --invariant "DNA-49"` instead of working around it.
+- If implementation reveals that `--fixed-strings` is not available in the git version used by CI, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0756 --reason "git --fixed-strings not available" --invariant "DNA-49"` instead of working around it.
 - If auto-detect produces false positives at an unacceptable rate, consider reverting to `required: true` via a superseding RFC rather than adding heuristics to filter candidates.

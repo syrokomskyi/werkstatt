@@ -90,8 +90,8 @@ The command is a cross-artifact lint. It composes and complements specialized va
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run public.surface.lint --app warpgogol-com
-pnpm exec site-kernel run public.surface.lint --app warpgogol-com --json
+pnpm exec werkstatt run public.surface.lint --app warpgogol-com
+pnpm exec werkstatt run public.surface.lint --app warpgogol-com --json
 ```
 
 The command reads `apps/<app>/public/` and, when `dist/client/` exists, may also read built HTML and generated public output copied by Astro.

@@ -62,7 +62,7 @@ nonGoals:
   - "Retry for non-Cloudflare adapters (null adapter has no network calls)"
   - "Exponential backoff jitter or circuit-breaker patterns"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -114,9 +114,9 @@ The cloudflare-workers adapter wraps `wrangler deploy` in a shared `runWranglerD
 No new commands. No new flags. The retry is internal to the cloudflare-workers adapter and transparent to the operator. The existing commands behave identically:
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000005
-pnpm exec site-kernel run leitstand.promote --release warpgogol-com-r000005
-pnpm exec site-kernel run leitstand.rollback --release warpgogol-com-r000005 --to-release warpgogol-com-r000004
+pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000005
+pnpm exec werkstatt run leitstand.promote --release warpgogol-com-r000005
+pnpm exec werkstatt run leitstand.rollback --release warpgogol-com-r000005 --to-release warpgogol-com-r000004
 ```
 
 The only observable difference: on transient Cloudflare API 5xx errors, the command retries internally instead of failing immediately. Retry attempts and delays are logged to stderr.

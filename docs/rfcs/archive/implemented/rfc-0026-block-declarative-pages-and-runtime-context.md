@@ -360,10 +360,10 @@ A block with `props: { headline, subline, image, accentColor }` fails because `a
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run page.block.validate --app nicaragua-projekt
-pnpm exec site-kernel run visibility.expr.validate
-pnpm exec site-kernel run page.pipeline.contract
-pnpm exec site-kernel run runtime.context.shape
+pnpm exec werkstatt run page.block.validate --app nicaragua-projekt
+pnpm exec werkstatt run visibility.expr.validate
+pnpm exec werkstatt run page.pipeline.contract
+pnpm exec werkstatt run runtime.context.shape
 ```
 
 | Command | Scope | Responsibility |

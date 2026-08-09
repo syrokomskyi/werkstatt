@@ -192,7 +192,7 @@ N/A — deletion operation.
 - [x] `docs/architecture-dna.md` updated: DNA-20 marked as superseded (evidence: architecture-dna.md DNA-20 section — 2026-07-20)
 - [x] `docs/requirements.xml`, `docs/technology.xml` — no DNA-20 references found in these files; no update needed (evidence: repository documentation audit, 2026-07-20)
 - [x] Git tag `pbp-legacy-deleted` created (evidence: git tag exists — 2026-07-20)
-- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec site-kernel run rfc.validate RFC-0471, 2026-07-20)
+- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec werkstatt run rfc.validate RFC-0471, 2026-07-20)
 
 ## Implementation notes for agents
 

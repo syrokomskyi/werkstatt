@@ -134,13 +134,13 @@ The reviewer runs a closed, versioned checklist so verdicts are comparable acros
 
 ```sh
 # Review one artifact or a queue; emit verdicts, never render.
-pnpm exec site-kernel run surface.review.run --app warpgogol-com --module pseo --queue ready --json
+pnpm exec werkstatt run surface.review.run --app warpgogol-com --module pseo --queue ready --json
 
 # Recompute agreement/defect metrics against the human-labelled golden set.
-pnpm exec site-kernel run surface.review.calibrate --app warpgogol-com --module pseo --json
+pnpm exec werkstatt run surface.review.calibrate --app warpgogol-com --module pseo --json
 
 # Validate reviewer configuration and log integrity.
-pnpm exec site-kernel run surface.review.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.review.validate --app warpgogol-com --json
 ```
 
 ### File system responsibilities

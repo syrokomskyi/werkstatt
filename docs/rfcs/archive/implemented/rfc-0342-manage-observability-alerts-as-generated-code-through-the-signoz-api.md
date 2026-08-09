@@ -160,8 +160,8 @@ Channels: `email-studio` → founder address(es); `telegram-studio` → webhook 
 **`observability.alerts.apply`** — workspace, **network + remote-mutating**, manual/ops only (never in pipelines):
 
 ```sh
-pnpm exec site-kernel run observability.alerts.apply --dry-run
-pnpm exec site-kernel run observability.alerts.apply --json
+pnpm exec werkstatt run observability.alerts.apply --dry-run
+pnpm exec werkstatt run observability.alerts.apply --json
 ```
 
 - Env: `WGOGOL_SIGNOZ_API_URL` (e.g. `https://observe.warpgogol.com`), `WGOGOL_SIGNOZ_API_TOKEN` (SigNoz API key with rule/channel write permission). Missing env → clear error, exit non-zero.

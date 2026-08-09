@@ -63,7 +63,7 @@ nonGoals:
   - "Do not implement a WERKSTATT_CREDENTIAL env var fallback for MCP clients that do not support _meta.identity — if _meta is unavailable, the X-Werkstatt-Credential header is the fallback. Env var fallback is deferred to a future RFC if a real client need arises."
   - "Do not modify Site OS command implementations (workpiece.read, workpiece.write, mission lifecycle commands) — command-level changes to accept actor from auth context are in RFC-0558's scope. This RFC only adds the MCP server middleware."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -320,7 +320,7 @@ Concurrent verification: the auth middleware is stateless — each `authenticate
 - [x] `SiteOwnershipCredential` grants scope `*` (all tools) (evidence: auth.test.ts:270-275 — owner credential passes all tools, auth.ts:92-96 — `extractScopes` returns `["*"]` for owner)
 - [x] `ActorDelegationCredential` grants only scopes listed in credential (evidence: auth.test.ts:253-261 — delegation with `workpiece.read` fails for `workpiece.write`)
 - [x] Auth result (actorId, siteId) is injected into MCP tool args as `actor` by the MCP server (not by modifying Site OS command implementations — command-level changes are in RFC-0558) (evidence: packages/studio-gate/src/index.ts:129-131 — `--_authActor` CLI flag injection)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0559 --json` — status: pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate RFC-0559 --json` — status: pass)
 
 ## Implementation notes for agents
 

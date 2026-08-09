@@ -247,8 +247,8 @@ scope:
 
 **Validation:**
 
-- `rtk pnpm exec site-kernel run service.registry.validate`
-- `rtk pnpm exec site-kernel run sternsystem.validate`
+- `rtk pnpm exec werkstatt run service.registry.validate`
+- `rtk pnpm exec werkstatt run sternsystem.validate`
 
 **Completion criterion:** `service.registry.validate` passes on the initial registry; `sternsystem.validate` passes.
 
@@ -269,7 +269,7 @@ scope:
 
 **Validation:**
 
-- `rtk pnpm exec site-kernel run service.naming.validate`
+- `rtk pnpm exec werkstatt run service.naming.validate`
 
 **Completion criterion:** `service.naming.validate` passes on all 4 services.
 
@@ -291,8 +291,8 @@ scope:
 
 **Validation:**
 
-- `rtk pnpm exec site-kernel run deploy.scripts.validate`
-- `rtk pnpm exec site-kernel run env.contract.validate`
+- `rtk pnpm exec werkstatt run deploy.scripts.validate`
+- `rtk pnpm exec werkstatt run env.contract.validate`
 
 **Completion criterion:** No `deploy` scripts in CF Worker service `package.json` files; `deploy.scripts.validate` and `env.contract.validate` pass.
 
@@ -355,7 +355,7 @@ scope:
 
 **Validation:**
 
-- `rtk pnpm exec site-kernel run rfc.validate --id RFC-0751`
+- `rtk pnpm exec werkstatt run rfc.validate --id RFC-0751`
 
 **Completion criterion:** All 3 docs updated; `rfc.validate` passes.
 
@@ -370,17 +370,17 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0751 --implementation-commit <sha>`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0751 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0751`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0751`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0751`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0751`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -392,20 +392,20 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0751`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0751`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 - `pnpm --filter @warpgogol/site-kernel-checks build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks test`
 - `pnpm --filter @warpgogol/site-kernel-check-warpgogol build:check`
-- `pnpm exec site-kernel run service.registry.validate`
-- `pnpm exec site-kernel run service.naming.validate`
-- `pnpm exec site-kernel run services.check.run`
-- `pnpm exec site-kernel run deploy.scripts.validate`
-- `pnpm exec site-kernel run env.contract.validate`
-- `pnpm exec site-kernel run sternsystem.validate`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0751`
+- `pnpm exec werkstatt run service.registry.validate`
+- `pnpm exec werkstatt run service.naming.validate`
+- `pnpm exec werkstatt run services.check.run`
+- `pnpm exec werkstatt run deploy.scripts.validate`
+- `pnpm exec werkstatt run env.contract.validate`
+- `pnpm exec werkstatt run sternsystem.validate`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0751`
 
 ### 4.2 Evidence artifacts
 
@@ -423,5 +423,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-40 (env-example and deploy-script contract), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0751 --reason "..." --invariant "DNA-40"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-40 (env-example and deploy-script contract), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0751 --reason "..." --invariant "DNA-40"` instead of working around it.
 - If `sternsystem.validate` rejects the `services:` key despite the schema accepting it, investigate whether the validate command has a separate unknown-key check that needs updating.

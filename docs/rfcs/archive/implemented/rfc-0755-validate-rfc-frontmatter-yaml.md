@@ -74,7 +74,7 @@ Additionally, `rfc.implement.stamp` is updated to include the YAML parser error 
 
 ```sh
 # No change to interface — rfc.validate already runs all rules
-pnpm exec site-kernel run rfc.validate --id RFC-0752
+pnpm exec werkstatt run rfc.validate --id RFC-0752
 
 # Now fails if frontmatter YAML is malformed:
 # [ERROR] V-RFC-33 · RFC frontmatter YAML parse error in rfc-0752-...md at line 40, column 5:

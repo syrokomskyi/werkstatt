@@ -65,7 +65,7 @@ nonGoals:
   - "Renaming the forge.doctor or forge.skill.validate commands — these are CLI commands, not skill content"
   - "Removing file path references like 'adr-0000-template.md' — these are file names, not RFC/ADR id references"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -94,7 +94,7 @@ However, the Forge skill files (`packages/forge/skills/**/*.md`) currently conta
 
 2. **WGogol/WebGogol/WarpGogol names** — skills contain references to the parent platform name in various forms. Forge is an autonomous product and should not expose its parent platform's name.
 
-RFC-0393 established SKILL-11 (no hardcoded project literals like `pnpm exec site-kernel run` and `docs/architecture-dna.md`) and DNA-54 (Forge bindings contract). This RFC extends the skill validation rules with a new SKILL-17 prohibiting internal platform RFC/ADR id references and platform name references.
+RFC-0393 established SKILL-11 (no hardcoded project literals like `pnpm exec werkstatt run` and `docs/architecture-dna.md`) and DNA-54 (Forge bindings contract). This RFC extends the skill validation rules with a new SKILL-17 prohibiting internal platform RFC/ADR id references and platform name references.
 
 ## Problem
 
@@ -113,7 +113,7 @@ A new validation rule SKILL-17 is added to `forge.skill.validate`: Forge skill f
 ## Architectural fit
 
 - **DNA-54 (Forge bindings contract)** — extends skill validation with a new prohibition rule targeting internal platform references.
-- **RFC-0393** (Forge bindings contract) — established SKILL-11..13; this RFC adds SKILL-17. SKILL-11 prohibits hardcoded project literals (`pnpm exec site-kernel run`, `docs/architecture-dna.md`); SKILL-17 prohibits specific platform RFC/ADR id references and platform name references. They are complementary: SKILL-11 catches hardcoded commands and paths, SKILL-17 catches hardcoded governance artifact references and platform names.
+- **RFC-0393** (Forge bindings contract) — established SKILL-11..13; this RFC adds SKILL-17. SKILL-11 prohibits hardcoded project literals (`pnpm exec werkstatt run`, `docs/architecture-dna.md`); SKILL-17 prohibits specific platform RFC/ADR id references and platform name references. They are complementary: SKILL-11 catches hardcoded commands and paths, SKILL-17 catches hardcoded governance artifact references and platform names.
 - **RFC-0524** (cumulative knowledge system) — skill knowledge files must also comply with SKILL-17.
 - **RFC-0539** (portable skill registry) — synced skills must be clean of internal references.
 - **RFC-0547** (barrier-free onboarding) — aligns with the principle that operators should not see internal jargon.
@@ -195,9 +195,9 @@ All `packages/forge/skills/**/*.md` files are scanned and cleaned:
 - [x] SKILL-17 allows generic "RFC"/"ADR" terms and generic placeholder ids (RFC-XXXX, ADR-XXXX) (evidence: packages/forge/src/tests/skill-validate.test.ts:122-130, pattern test confirms RFC-XXXX does not match, bare RFC/ADR terms do not match)
 - [x] SKILL-17 excludes file paths (adr-0000-template.md) and binding key names (validateRfc) from the prohibition (evidence: packages/forge/src/tests/skill-validate.test.ts:132-135, pattern test confirms lowercase file paths do not match; SKILL17_ID_PATTERNS uses case-sensitive \bRFC-\d{4}\b which does not match camelCase validateRfc)
 - [x] All existing packages/forge/skills/**/*.md files are cleaned of specific platform RFC/ADR id references and platform name references (evidence: grep -rnE 'RFC-[0-9]{4}|ADR-[0-9]{4}' packages/forge/skills/ returns zero matches; grep -rnE '\bWGogol\b|\bWebGogol\b|\bWarpGogol\b' packages/forge/skills/ returns zero matches excluding @warpgogol/forge npm package name)
-- [x] forge.skill.validate passes on all cleaned skill files (evidence: pnpm exec site-kernel run forge.skill.validate --json returns status: pass, 0 violations)
+- [x] forge.skill.validate passes on all cleaned skill files (evidence: pnpm exec werkstatt run forge.skill.validate --json returns status: pass, 0 violations)
 - [x] packages/forge/AGENTS.md documents SKILL-17 alongside SKILL-11..16 (evidence: packages/forge/AGENTS.md:87, SKILL-17 bullet added in bindings contract section; packages/forge/AGENTS.md:51, pack skills section updated)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --json returns ok: true, zero errors)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --json returns ok: true, zero errors)
 
 ## Implementation notes for agents
 

@@ -22,7 +22,7 @@ Pass — 0 нарушений. `rfc.validate --id RFC-0772 --json` проход�
 
 - **Нет таблицы файловых обязанностей.** RFC-0771 содержит таблицу "File system responsibilities" с конкретными путями. RFC-0772, хотя затрагивает ~15 пакетов и создаёт новую структуру каталогов `packages/werkstatt/src/`, не содержит аналогичной таблицы. Фазовая таблица (lines 99-106) описывает содержимое фаз, но не конкретные пути.
 - **Acceptance criteria неконкретны.** "All engine→stack call sites inverted" (line 157) не перечисляет конкретные call sites — RFC называет только 3 файла (`mission-materialize.ts`, `leitstand-commands.ts`, `release-commands.ts`), но не перечисляет вызовы внутри них. "Emptied source packages deleted" (line 159) не перечисляет какие именно пакеты удаляются.
-- **CLI surface использует `site-kernel`.** Line 113: `pnpm exec site-kernel run werkstatt.autonomy.validate --json`. RFC-0771 (line 122) объявляет退休 `site-kernel` CLI имени. RFC-0772 должен либо указать что `site-kernel` используется только в transition window, либо использовать `werkstatt` CLI.
+- **CLI surface использует `site-kernel`.** Line 113: `pnpm exec werkstatt run werkstatt.autonomy.validate --json`. RFC-0771 (line 122) объявляет退休 `site-kernel` CLI имени. RFC-0772 должен либо указать что `site-kernel` используется только в transition window, либо использовать `werkstatt` CLI.
 - **Нет списка исключений для autonomy guard.** Forge precedent (`packages/forge/src/onboarding/doctor.ts:106`) исключает `node_modules/` и `tests/` из сканирования. RFC не указывает исключения для `werkstatt.autonomy.validate`.
 
 ## Ось B — DNA alignment

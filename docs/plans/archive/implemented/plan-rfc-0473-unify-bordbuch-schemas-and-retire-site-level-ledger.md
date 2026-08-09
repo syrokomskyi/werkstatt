@@ -77,8 +77,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/surface build:check`
-- `pnpm exec site-kernel run rfc.validate`
-- `pnpm exec site-kernel run ecosystem.manifest.generate`
+- `pnpm exec werkstatt run rfc.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.generate`
 
 ## 3. Step sequence
 
@@ -331,12 +331,12 @@ scope:
 - Edit `docs/requirements.xml`: update req-23 — path from `src/bordbuch/events.ndjson` to `systems/<id>/bordbuch/events.ndjson`, command from `site.bordbuch.generate` to `bordbuch.generate`
 - Edit `packages/AGENTS.md`: update `@gogol/surface` description — remove "bordbuch" from governance schema bag list
 - Edit `packages/os/site-kernel-checks/AGENTS.md`: remove `site.bordbuch.*` command rows from check commands table
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate `docs/ecosystem.generated.yaml`
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate` — no new violations
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run rfc.validate` — no new violations
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
 
 **Completion criterion:** All docs updated; `ecosystem.generated.yaml` regenerated; `rfc.validate` passes.
 
@@ -354,7 +354,7 @@ scope:
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks build:check`
 - Run `pnpm --filter @gogol/surface build:check`
-- Run `pnpm exec site-kernel run rfc.validate`
+- Run `pnpm exec werkstatt run rfc.validate`
 - Verify no file in `packages/` imports `bordbuchEventSchema` or `BordbuchEvent` from `@gogol/surface`
 - Stamp RFC-0473 as `implemented` with today's date
 - Commit with RFC-0473 reference
@@ -372,12 +372,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate`
+- `pnpm exec werkstatt run rfc.validate`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/surface build:check`
-- `pnpm exec site-kernel run ecosystem.manifest.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -398,5 +398,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0473 --reason "..." --invariant "DNA-46"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-46, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0473 --reason "..." --invariant "DNA-46"` instead of working around it (RFC-0334).
 - If `bordbuch.generate` cannot access PSEO module context from `site-kernel-handoff` (package boundary issue), consider moving the PSEO context reading into a shared helper or keeping the generate command in `site-kernel-checks` — but only if the package boundary is truly impassable. Prefer keeping it in `site-kernel-handoff` per the RFC.

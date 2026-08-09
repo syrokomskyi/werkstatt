@@ -84,7 +84,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate RFC-0355 --json` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0355 --json` — RFC validation
 - `pnpm --filter @gogol/site-kernel-handoff run test` — unit tests for all handlers
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — TypeScript compilation
 - `pnpm --filter @gogol/ontology run build:check` — schema compilation
@@ -385,7 +385,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
-- `pnpm exec site-kernel run --help` lists all seven new commands
+- `pnpm exec werkstatt run --help` lists all seven new commands
 
 **Completion criterion:** All seven commands appear in the kernel command list and are invocable
 
@@ -411,7 +411,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0355 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0355 --json` passes
 - Documentation files are consistent with code
 
 **Completion criterion:** DNA-46 verified, AGENTS.md updated, Compass XML updated where applicable
@@ -429,7 +429,7 @@ scope:
 - Run `pnpm --filter @gogol/ontology run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0355 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0355 --json`
 - Verify all acceptance criteria checkboxes can be checked
 
 **Validation:**
@@ -449,7 +449,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0355` (if the command is available — RFC-0330 is still draft)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0355` (if the command is available — RFC-0330 is still draft)
 - If `rfc.verification.emit` is not yet implemented, document the verification results in the commit message
 - Commit all changes with reference to RFC-0355 in the subject
 
@@ -465,11 +465,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0355 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0355 --json`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0355` (RFC-0330, if implemented)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0355` (RFC-0330, if implemented)
 
 ### 4.2 Evidence artifacts
 
@@ -489,6 +489,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 (mission lifecycle), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0355 --reason "..." --invariant "DNA-46"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-46 (mission lifecycle), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0355 --reason "..." --invariant "DNA-46"` instead of working around it (RFC-0334).
 - If the `mission.close` reconciliation precondition cannot be verified without RFC-0356's `mission.reconcile` command, implement a stub check that reads `reconciledAt` from the manifest and document the dependency — do NOT relax the precondition.
 - If RFC-0362 lock/idempotency primitives are not yet implemented, use the minimal local locking abstraction from Step 2 (`lock.ts`). When RFC-0362 lands, replace `lock.ts` with the shared `werkstatt.lock` primitives — do NOT ship without any locking.

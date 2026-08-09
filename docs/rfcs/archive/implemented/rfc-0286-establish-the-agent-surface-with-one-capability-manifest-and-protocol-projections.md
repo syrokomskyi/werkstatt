@@ -123,8 +123,8 @@ The workspace gains the **Agent Surface**: a per-site machine surface governed b
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.manifest.generate --app warpgogol-com
-pnpm exec site-kernel run agent.surface.validate --app warpgogol-com --json
+pnpm exec werkstatt run agent.manifest.generate --app warpgogol-com
+pnpm exec werkstatt run agent.surface.validate --app warpgogol-com --json
 ```
 
 Both are app-scoped. `agent.manifest.generate` is registered with `mutatesState: true` and runs in `APPS_BUILD_PREPARE_PIPELINE` **after** `entitlements.resolve` and after `surface.generate` (so the final page/route set is known). `agent.surface.validate` runs in `APPS_CHECK_PIPELINE`.

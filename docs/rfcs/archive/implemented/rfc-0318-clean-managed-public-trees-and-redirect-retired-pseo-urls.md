@@ -189,7 +189,7 @@ Scope: app plus `--base-url`, networked.
 Inputs:
 
 ```sh
-pnpm exec site-kernel run deploy.surface.parity.validate --app warpgogol-com --base-url https://warpgogol.com --json
+pnpm exec werkstatt run deploy.surface.parity.validate --app warpgogol-com --base-url https://warpgogol.com --json
 ```
 
 Behavior:

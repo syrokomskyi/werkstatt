@@ -468,7 +468,7 @@ The generation happens in a new `participant.json.generate` step in `build.prepa
 
 ```sh
 # Validate JSON endpoints and JSON-LD emission.
-pnpm exec site-kernel run participant.json.validate --site warpgogol-com --json
+pnpm exec werkstatt run participant.json.validate --site warpgogol-com --json
 ```
 
 ### File system responsibilities

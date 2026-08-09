@@ -86,18 +86,18 @@ The kernel gains a `bordbuch.repair` command that detects `orphan-mission-close`
 
 ```sh
 # Dry-run: show planned repairs without writing
-pnpm exec site-kernel run bordbuch.repair --system warpgogol-com --dry-run
+pnpm exec werkstatt run bordbuch.repair --system warpgogol-com --dry-run
 
 # Repair with auto-derived metadata for missing mission-open events
-pnpm exec site-kernel run bordbuch.repair --system warpgogol-com
+pnpm exec werkstatt run bordbuch.repair --system warpgogol-com
 
 # Repair with explicit metadata for a specific mission
-pnpm exec site-kernel run bordbuch.repair --system warpgogol-com \
+pnpm exec werkstatt run bordbuch.repair --system warpgogol-com \
   --mission warpgogol-com-m000016 \
   --metadata '{"occurredAt":"2026-07-28T10:20:38.590Z","summary":"Mission opened (auto-repaired)","actor":"agent"}'
 
 # JSON output
-pnpm exec site-kernel run bordbuch.repair --system warpgogol-com --json
+pnpm exec werkstatt run bordbuch.repair --system warpgogol-com --json
 ```
 
 Flags:

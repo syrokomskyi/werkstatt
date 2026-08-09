@@ -60,8 +60,8 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0724`
-- `pnpm exec site-kernel run ecosystem.manifest.generate` (regenerate command manifest)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0724`
+- `pnpm exec werkstatt run ecosystem.manifest.generate` (regenerate command manifest)
 
 ## 3. Step sequence
 
@@ -273,12 +273,12 @@ scope:
 - **`packages/os/site-kernel-handoff/AGENTS.md`:** Update all `release.publish` references to `release.ready`, update `published` state references to `ready`, update the release path description to mention mandatory Axiom gate
 - **`docs/architecture-dna.md`:** Update DNA-48 and DNA-56 references from `release.publish` to `release.ready`, `published` to `ready`
 - **`docs/verification-plan.xml`:** Update release state values from `published` to `ready`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to regenerate `docs/command-manifest.generated.yaml`, `docs/ecosystem.generated.yaml`, `docs/gate-catalog.generated.yaml`, and `docs/COMMANDS.md`
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to regenerate `docs/command-manifest.generated.yaml`, `docs/ecosystem.generated.yaml`, `docs/gate-catalog.generated.yaml`, and `docs/COMMANDS.md`
 
 **Validation:**
 
 - `grep -r "release\.publish" AGENTS.md packages/os/site-kernel-handoff/AGENTS.md docs/architecture-dna.md docs/verification-plan.xml` returns no results
-- `pnpm exec site-kernel run rfc.validate --id RFC-0724`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0724`
 
 **Completion criterion:** All documentation artifacts use `release.ready` and `ready` state. Generated manifests are regenerated.
 
@@ -293,12 +293,12 @@ scope:
 - Run `fo-review` via the `skill` tool on all session code changes
 - If findings, run `fo-fix` via the `skill` tool. Re-run `fo-review`. Max 3 iterations.
 - Check off acceptance criteria in the RFC
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0724 --implementation-commit <sha>` (use the first `implement:` commit SHA)
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0724 --implementation-commit <sha>` (use the first `implement:` commit SHA)
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0724`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0724`
 - Review report exists in `docs/reviews/code/`
 
 **Completion criterion:** All acceptance criteria checked off. RFC stamped as `implemented`.
@@ -309,12 +309,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0724`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0724`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 - `pnpm --filter @warpgogol/site-kernel-checks test`
-- `pnpm exec site-kernel run ecosystem.manifest.generate`
+- `pnpm exec werkstatt run ecosystem.manifest.generate`
 
 ### 4.2 Evidence artifacts
 

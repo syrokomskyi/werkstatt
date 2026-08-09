@@ -102,13 +102,13 @@ The command is integrated into `PACKAGES_CHECK_PIPELINE` so that any `pnpm --fil
 
 ```sh
 # Run against the workspace default path (packages/ui/src)
-pnpm exec site-kernel run ui.i18n.lint
+pnpm exec werkstatt run ui.i18n.lint
 
 # Run with JSON output for CI
-pnpm exec site-kernel run ui.i18n.lint --json
+pnpm exec werkstatt run ui.i18n.lint --json
 
 # Run scoped to a specific subdirectory
-pnpm exec site-kernel run ui.i18n.lint --path packages/ui/src/sections/send-message
+pnpm exec werkstatt run ui.i18n.lint --path packages/ui/src/sections/send-message
 ```
 
 Flags:

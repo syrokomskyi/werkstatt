@@ -86,8 +86,8 @@ RFC-0286 fixed the invariant: protocols are sibling projections of one manifest 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.openapi.generate --app warpgogol-com
-pnpm exec site-kernel run agent.openapi.validate --app warpgogol-com --json
+pnpm exec werkstatt run agent.openapi.generate --app warpgogol-com
+pnpm exec werkstatt run agent.openapi.validate --app warpgogol-com --json
 ```
 
 App-scoped; generate is `mutatesState: true`; validate runs in `APPS_CHECK_PIPELINE`.

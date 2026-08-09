@@ -89,8 +89,8 @@ The workspace gains the **fleet agent catalog**: `fleet/agent-catalog.generated.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run fleet.agent.catalog.generate --json
-pnpm exec site-kernel run fleet.agent.catalog.validate --json
+pnpm exec werkstatt run fleet.agent.catalog.generate --json
+pnpm exec werkstatt run fleet.agent.catalog.validate --json
 ```
 
 Workspace-scoped (root `tools/kernel.config.ts` registration, like other `fleet.*` commands). `generate` is `mutatesState: true`. Ordering: after every app's `build.prepare` (it reads built artifacts); in practice it joins the same workspace phase that produces `fleet.status.generated.json`.

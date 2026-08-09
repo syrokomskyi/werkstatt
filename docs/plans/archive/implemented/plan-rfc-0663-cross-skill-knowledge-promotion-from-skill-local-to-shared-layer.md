@@ -60,8 +60,8 @@ scope:
 
 - `pnpm --filter @warpgogol/forge test` — must pass with new promote tests
 - `pnpm --filter @warpgogol/forge build:check` — must pass
-- `pnpm exec site-kernel run rfc.validate --id RFC-0663` — must pass
-- `pnpm exec site-kernel run forge.skill.validate --all` — must pass (extended `fo-knowledge-distill` and `writing-great-skills` must validate)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0663` — must pass
+- `pnpm exec werkstatt run forge.skill.validate --all` — must pass (extended `fo-knowledge-distill` and `writing-great-skills` must validate)
 - No pipeline integration — `knowledge-duplicate` warnings are informational, never affect doctor's exit status
 
 ## 3. Step sequence
@@ -221,7 +221,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge build:check` passes
-- `pnpm exec site-kernel run forge.doctor --json` includes `knowledge-duplicates` and `shared-knowledge-file` checks
+- `pnpm exec werkstatt run forge.doctor --json` includes `knowledge-duplicates` and `shared-knowledge-file` checks
 - Doctor's exit status is unaffected by duplicate detection (`warn`); shared-layer schema violations produce `fail`
 
 **Completion criterion:** `forge.doctor` emits `knowledge-duplicate` warnings with promotion fixHints; shared-layer file validated for schema/id uniqueness; exit status unaffected by duplicates
@@ -284,7 +284,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` passes with the extended skill (SKILL-01..21)
+- `pnpm exec werkstatt run forge.skill.validate --all` passes with the extended skill (SKILL-01..21)
 - SKILL-17 passes (no platform RFC/ADR ids in the skill body — reference "RFC-0663" only in the process description, not in instruction lines)
 
 **Completion criterion:** `fo-knowledge-distill` contains the promotion protocol steps; every promotion requires operator approval; skill validates cleanly
@@ -349,7 +349,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --all` passes with the updated skill
+- `pnpm exec werkstatt run forge.skill.validate --all` passes with the updated skill
 
 **Completion criterion:** `writing-great-skills` documents the shared layer as the fourth tier of the cumulative knowledge pattern
 
@@ -363,7 +363,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.doctor --json` on this monorepo
+- Run `pnpm exec werkstatt run forge.doctor --json` on this monorepo
 - Check the `knowledge-duplicates` check for detected pairs
 - If duplicate pairs are found:
   - Present them to the operator via `ask_user_question`
@@ -379,7 +379,7 @@ scope:
 
 - `forge.doctor --json` includes the `knowledge-duplicates` check
 - If promoted: shared layer has the new entry; skill-local files have pointer entries
-- `pnpm exec site-kernel run forge.skill.validate --all` passes after promotion
+- `pnpm exec werkstatt run forge.skill.validate --all` passes after promotion
 
 **Completion criterion:** Detection pipeline ran end-to-end on this monorepo. If duplicates found: at least one promoted with operator approval. If none found: documented and detection verified.
 
@@ -400,16 +400,16 @@ scope:
 - Regenerate `docs/COMMANDS.md` via `docs.commands.generate` (no new commands, but `forge.doctor` output changed)
 - Regenerate `docs/command-manifest.generated.yaml` via `command.manifest.generate`
 - **Verify every file listed in `scope.docs` is updated** — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0663 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0663 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0663`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0663`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -421,11 +421,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0663`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0663`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate --all`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0663` (RFC-0330)
+- `pnpm exec werkstatt run forge.skill.validate --all`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0663` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -448,7 +448,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0663 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0663 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If RFC-0660's parser/serializer or RFC-0662's distill skill are not yet implemented, implement those first — this RFC cannot proceed without them.
 - If the `shared/knowledge/` directory cannot be synced by `forge.create` without breaking the existing skill sync loop, create a separate sync path rather than modifying the skill discovery logic.
 - If extending the RFC-0660 schema with `promotedFrom` breaks existing round-trip tests, the field may need to be in a separate schema extension (e.g., `knowledgeEntryMetaSchemaV2`) — but this is unlikely since the field is optional.

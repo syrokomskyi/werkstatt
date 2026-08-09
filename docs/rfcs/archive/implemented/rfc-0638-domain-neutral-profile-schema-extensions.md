@@ -59,7 +59,7 @@ nonGoals:
   - Do not change forge.create or forge.doctor command behavior in this RFC — that is RFC-0640
   - Do not modify fo-* skill language in this RFC — that is RFC-0642
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -294,7 +294,7 @@ This RFC defines the `invariants` schema only. Enforcement — how `fo-review` r
 - [x] Existing profiles (`astro-typescript-turborepo`, `phaser-turborepo`, `forge-shell`) parse without changes (evidence: packages/forge/src/tests/profile-schema.test.ts:120-131, pnpm --filter @warpgogol/forge run test passes)
 - [x] Unit tests verify: new fields parse correctly, absent fields default to undefined, invalid invariant ids fail validation (evidence: packages/forge/src/tests/profile-schema.test.ts:1-191, 14 test cases pass)
 - [x] `packages/forge/AGENTS.md` updated with domain fields documentation (evidence: packages/forge/AGENTS.md:97-108)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0638 --json, status: pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0638 --json, status: pass)
 
 ## Implementation notes for agents
 

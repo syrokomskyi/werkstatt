@@ -68,7 +68,7 @@ nonGoals:
   - "Do not implement automatic conflict resolution for platform code — platform code conflicts are resolved by human review and merge, not by automated CRDT merge."
   - "Do not implement peer discovery in this RFC — Phase 2 peer discovery depends on RFC-0564 (SWIM), which is currently draft. Phase 1 (single remote) does not depend on RFC-0564 and can be implemented independently."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -124,13 +124,13 @@ Platform code replication uses **standard git protocols** (push/pull/fetch) betw
 
 ```sh
 # Sync platform code from all configured remotes
-pnpm exec site-kernel run gitmesh.sync --json
+pnpm exec werkstatt run gitmesh.sync --json
 
 # Check sync status (am I up-to-date?)
-pnpm exec site-kernel run gitmesh.status --json
+pnpm exec werkstatt run gitmesh.status --json
 
 # Verify all commit signatures in the local clone
-pnpm exec site-kernel run gitmesh.verify --json
+pnpm exec werkstatt run gitmesh.verify --json
 ```
 
 ### TypeScript contracts
@@ -272,7 +272,7 @@ All commands exit 0 on success and 1 on error. Warnings are logged to stderr but
 - [x] `werkstatt.gitmesh.json` config file schema defined and validated (evidence: packages/os/site-kernel/src/gitmesh/config.ts:28-66, validateConfig() enforces all fields, tests in src/tests/gitmesh.test.ts)
 - [x] `gitmesh.sync` is pull-only — never pushes to remotes (evidence: packages/os/site-kernel/src/gitmesh/sync.ts uses only gitFetch and gitMergeFfOnly from git-ops.ts, no push function exists in git-ops.ts)
 - [x] `gitmesh.verify` reports unsigned commits, invalid signatures, and total verified (evidence: packages/os/site-kernel/src/gitmesh/verify.ts:107-119, counts signed/unsigned/invalid separately, does not abort on first invalid)
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0563 --json → status: pass, 0 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate RFC-0563 --json → status: pass, 0 violations)
 
 ## Implementation notes for agents
 

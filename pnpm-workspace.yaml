@@ -1,7 +1,6 @@
 packages:
   - services/*
   - packages/*
-  - packages/os/*
   - missions/*/workpiece
 allowBuilds:
   better-sqlite3: true

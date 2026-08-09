@@ -34,8 +34,8 @@ RFC-0377 delivers the promised MarkdownTwinSemanticMeta contract, threads `audie
 - `pnpm --filter @warpgogol/ontology run build:check` — pass.
 - `pnpm --filter @warpgogol/site-kernel-content run build:check` — pass.
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — pass.
-- `pnpm exec site-kernel run rfc.validate RFC-0377 --json` — pass (0 violations).
-- `pnpm exec site-kernel run page.markdown.validate --site warpgogol-com` — could not be re-run because the RFC-0378 app→site migration left `apps/warpgogol-com/` empty in this snapshot. Historical evidence in `warpgogol-com-build-check2.log` shows `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok`.
+- `pnpm exec werkstatt run rfc.validate RFC-0377 --json` — pass (0 violations).
+- `pnpm exec werkstatt run page.markdown.validate --site warpgogol-com` — could not be re-run because the RFC-0378 app→site migration left `apps/warpgogol-com/` empty in this snapshot. Historical evidence in `warpgogol-com-build-check2.log` shows `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok`.
 
 ### Axis A — Structural correctness
 

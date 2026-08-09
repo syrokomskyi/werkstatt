@@ -66,7 +66,7 @@ nonGoals:
   - "No changes to JSON-LD projection — this RFC validates content readiness, not rendered output"
   - "No integration into build.check or sites-check pipelines — remains standalone like RFC-0531"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -134,16 +134,16 @@ No new command. The existing `wikidata.validate` command is extended with four n
 
 ```sh
 # Check a single site (warnings for missing QIDs and missing evidence)
-pnpm exec site-kernel run wikidata.validate --app warpgogol-com
+pnpm exec werkstatt run wikidata.validate --app warpgogol-com
 
 # Strict mode (errors for missing QIDs and missing evidence)
-pnpm exec site-kernel run wikidata.validate --app warpgogol-com --strict
+pnpm exec werkstatt run wikidata.validate --app warpgogol-com --strict
 
 # JSON output
-pnpm exec site-kernel run wikidata.validate --app warpgogol-com --json
+pnpm exec werkstatt run wikidata.validate --app warpgogol-com --json
 
 # All sites
-pnpm exec site-kernel run wikidata.validate --all --strict --json
+pnpm exec werkstatt run wikidata.validate --all --strict --json
 ```
 
 No new flags. The existing `--strict` flag now also escalates `wikidata.no-notability-evidence` and `wikidata.claim-without-evidence` warnings to errors, in addition to the existing `*-missing-qid` escalation.

@@ -86,7 +86,7 @@ When the biome YAML already declares `siteBackground`, the deriver leaves it unt
 New command under `packages/os/site-kernel-codegen/src/biome-tokens.ts` that derives only the `siteBackground` block. Useful for incremental updates without re-running the full token deriver.
 
 ```sh
-pnpm exec site-kernel run biome.site-background.derive \
+pnpm exec werkstatt run biome.site-background.derive \
   --biome packages/ontology/biomes/<id>.yaml \
   --inplace
 ```
@@ -140,13 +140,13 @@ See `## CLI surface`, `## File system responsibilities`, and `## Failure modes` 
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run biome.tokens.derive \
+pnpm exec werkstatt run biome.tokens.derive \
   --biome packages/ontology/biomes/<id>.yaml \
   --inplace
-pnpm exec site-kernel run biome.site-background.derive \
+pnpm exec werkstatt run biome.site-background.derive \
   --biome packages/ontology/biomes/<id>.yaml \
   --inplace
-pnpm exec site-kernel run onboarding.scaffold \
+pnpm exec werkstatt run onboarding.scaffold \
   --client <id> --domain <domain> --biome <id> --constellation <id>
 ```
 

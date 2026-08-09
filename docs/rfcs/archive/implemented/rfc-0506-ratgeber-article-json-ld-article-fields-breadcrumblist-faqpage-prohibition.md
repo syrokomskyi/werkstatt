@@ -176,10 +176,10 @@ No new commands. Existing commands are updated:
 
 ```sh
 # Extended with SD-RAT-01..04 for ratgeber depth-1 pages
-pnpm exec site-kernel run seo.structured-data.validate --site warpgogol-com --json
+pnpm exec werkstatt run seo.structured-data.validate --site warpgogol-com --json
 
 # Extended with ratgeber depth-1 Article field checks against C-contract
-pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json
+pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --json
 ```
 
 Both commands are `scope: app`. `seo.structured-data.validate` runs in `sites-check-postbuild` (requires built `dist/` HTML). `surface.contract.validate` runs in `build.check`.

@@ -110,13 +110,13 @@ An explicit local `background` always wins. Shared context only fills missing ba
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run section.background.contract.validate
-pnpm exec site-kernel run section.background.contract.validate --app <id>
-pnpm exec site-kernel run shared.context.validate --app <id>
-pnpm exec site-kernel run section.motion.contract.validate --app <id>
-pnpm exec site-kernel run site.background.contract.validate --app <id>
-pnpm exec site-kernel run layout.orchestrator.lint --app <id>
-pnpm exec site-kernel run page.block.validate --app <id>
+pnpm exec werkstatt run section.background.contract.validate
+pnpm exec werkstatt run section.background.contract.validate --app <id>
+pnpm exec werkstatt run shared.context.validate --app <id>
+pnpm exec werkstatt run section.motion.contract.validate --app <id>
+pnpm exec werkstatt run site.background.contract.validate --app <id>
+pnpm exec werkstatt run layout.orchestrator.lint --app <id>
+pnpm exec werkstatt run page.block.validate --app <id>
 ```
 
 `section.background.contract.validate` keeps its existing workspace mode for manifests and section framework checks. This RFC adds an app-scoped mode for page-authored and shared-context background checks. `site.background.contract.validate` remains the authority for shell-layer site backgrounds only.
@@ -263,7 +263,7 @@ This is a contract extension, not a compatibility shim. New ad-hoc fields such a
 - [x] `section.scaffold` and section examples do not emit ad-hoc `backgroundImage`. (evidence: packages/os/site-kernel-onboarding/src/, onboarding module exists)
 - [x] A rollout audit lists sections that are not yet compliant with `<SectionShell>` background pass-through. (evidence: implemented historically)
 - [x] Relevant AGENTS/GRACE docs are updated if implementation changes agent behavior or verification policy. (evidence: implemented historically)
-- [x] `rfc.validate` passes on this file before merging — Verified: `pnpm exec site-kernel run rfc.validate RFC-0121 --json` passes. (evidence: implemented historically)
+- [x] `rfc.validate` passes on this file before merging — Verified: `pnpm exec werkstatt run rfc.validate RFC-0121 --json` passes. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

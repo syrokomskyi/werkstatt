@@ -161,7 +161,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json` — command is recognized (may pass or produce diagnostics depending on content state).
+- `pnpm exec werkstatt run ratgeber.claim.validate --site warpgogol-com --json` — command is recognized (may pass or produce diagnostics depending on content state).
 
 **Completion criterion:** `ratgeber.claim.validate` is registered and callable via the kernel CLI.
 
@@ -235,7 +235,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0502 --json` passes.
+- `pnpm exec werkstatt run rfc.validate RFC-0502 --json` passes.
 
 **Completion criterion:** RFC-0502 `amendedBy` includes RFC-0505.
 
@@ -255,11 +255,11 @@ scope:
 - Update `docs/requirements.xml`: add claim record collection requirement.
 - Update `docs/technology.xml`: add new validator, migrator, and schema files.
 - Update `docs/knowledge-graph.xml`: add RFC-0505 relationships.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surface changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surface changed.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0505 --json` passes.
+- `pnpm exec werkstatt run rfc.validate RFC-0505 --json` passes.
 - All scope docs are either updated or documented as not-applicable.
 
 **Completion criterion:** All documentation surfaces in scope are updated.
@@ -275,8 +275,8 @@ scope:
 **Agent actions:**
 
 - Run migrator via `mission.migrate` on warpgogol-com mission workpiece (or manually if no active mission).
-- Run `pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json` — verify it passes (may have warnings for unverified/expired claims).
-- Run `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json` — verify it passes.
+- Run `pnpm exec werkstatt run ratgeber.claim.validate --site warpgogol-com --json` — verify it passes (may have warnings for unverified/expired claims).
+- Run `pnpm exec werkstatt run ratgeber.provenance.validate --site warpgogol-com --json` — verify it passes.
 - Verify claim sidecar files are deleted and claim record files exist in `surface/claims/{lang}/`.
 
 **Validation:**
@@ -299,13 +299,13 @@ scope:
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0505 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0505 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 - Commit the stamped RFC separately from the implementation commit.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0505 --json` passes.
+- `pnpm exec werkstatt run rfc.validate RFC-0505 --json` passes.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria are checked off with inline evidence annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -316,12 +316,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0505 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0505 --json`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run ratgeber.claim.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run ratgeber.provenance.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -342,5 +342,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0505 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0505 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the claim record schema cannot be expressed as a strict Zod object without breaking `@gogol/share` barrel size limits (BARREL-01), split the schema into a subpath export instead of adding to the root barrel.

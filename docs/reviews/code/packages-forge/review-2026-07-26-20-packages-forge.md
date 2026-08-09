@@ -30,7 +30,7 @@ No issues. The SKILL.md is a Markdown file with YAML frontmatter — no TypeScri
 
 ### Axis B — DNA alignment
 
-No issues. DNA-54 (Forge bindings contract) is satisfied — the skill body contains no hardcoded `pnpm exec site-kernel run` or `docs/architecture-dna.md` literals in instruction lines (SKILL-11 passes). The skill fills binding keys (`typecheck`, `test`, `scopedBuild`) rather than hardcoding commands.
+No issues. DNA-54 (Forge bindings contract) is satisfied — the skill body contains no hardcoded `pnpm exec werkstatt run` or `docs/architecture-dna.md` literals in instruction lines (SKILL-11 passes). The skill fills binding keys (`typecheck`, `test`, `scopedBuild`) rather than hardcoding commands.
 
 ### Axis C — Ecosystem fit
 

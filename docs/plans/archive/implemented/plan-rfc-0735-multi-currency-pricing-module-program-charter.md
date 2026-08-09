@@ -99,7 +99,7 @@ All 10 child RFCs (0736–0745) were implemented in prior sessions through their
 **Agent actions:**
 
 - Verify all 10 child RFCs (0736–0745) have status `implemented`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0735` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0735` — must pass
 - Run `pnpm --filter @warpgogol/pbp build:check` and `test` — must pass
 - Run `pnpm --filter @warpgogol/share build:check` and `test` — must pass
 - Run `pnpm --filter @warpgogol/ui build:check` — must pass
@@ -110,12 +110,12 @@ All 10 child RFCs (0736–0745) were implemented in prior sessions through their
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: invoke `fo-fix` if `fo-review` reported findings. Re-run `fo-review`. Max 3 iterations.
 - Check off acceptance criteria: verify each criterion in RFC-0735 against implemented child RFCs. Mark `[x]` with inline `(evidence: ...)` annotations.
-- Stamp: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0735 --implementation-commit <sha>`
+- Stamp: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0735 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0735`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0735`
 - All 10 child RFCs have status `implemented`
 - All affected packages pass `build:check` and `test`
 - Review report exists in `docs/reviews/code/` for this session
@@ -128,8 +128,8 @@ All 10 child RFCs (0736–0745) were implemented in prior sessions through their
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0735`
-- `pnpm exec site-kernel run rfc.validate` (all RFCs, including 0736–0745)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0735`
+- `pnpm exec werkstatt run rfc.validate` (all RFCs, including 0736–0745)
 - `pnpm --filter @warpgogol/pbp build:check`
 - `pnpm --filter @warpgogol/pbp test`
 - `pnpm --filter @warpgogol/share build:check`
@@ -155,6 +155,6 @@ All 10 child RFCs (0736–0745) were implemented in prior sessions through their
 
 ## 6. Escalation triggers
 
-- If implementation of any child RFC reveals an invariant conflict with DNA-4 or DNA-55, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-07XX --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation of any child RFC reveals an invariant conflict with DNA-4 or DNA-55, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-07XX --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `pbp/*@1` namespace cannot accommodate a new entity type additively, escalate to a namespace bump (`@2`) via a new superseding RFC — do not force incompatible changes into `@1`.
 - If decimal arithmetic precision cannot be achieved with bigint-based approach, escalate to a dedicated decimal library evaluation RFC — do not use binary float arithmetic.

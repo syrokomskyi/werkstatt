@@ -74,7 +74,7 @@ nonGoals:
   - "Does not change mission.check or Axiom evidence format"
   - "Does not add registry tracking or bordbuch entries for dev deploys"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -125,15 +125,15 @@ The dev deployment channel is restructured to deploy the active mission workpiec
 
 ```sh
 # Dev iteration: build → deploy → Axiom (repeat as needed)
-pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com
+pnpm exec werkstatt run leitstand.dev-deploy --system warpgogol-com
 
 # Full pipeline: validate → close → release → propagate → promote
-pnpm exec site-kernel run mission.validate --mission <mid>
-pnpm exec site-kernel run mission.close --mission <mid>
-pnpm exec site-kernel run release.prepare --mission <mid>
-pnpm exec site-kernel run release.publish --release <rid>
-pnpm exec site-kernel run leitstand.propagate --release <rid>
-pnpm exec site-kernel run leitstand.promote --release <rid>
+pnpm exec werkstatt run mission.validate --mission <mid>
+pnpm exec werkstatt run mission.close --mission <mid>
+pnpm exec werkstatt run release.prepare --mission <mid>
+pnpm exec werkstatt run release.publish --release <rid>
+pnpm exec werkstatt run leitstand.propagate --release <rid>
+pnpm exec werkstatt run leitstand.promote --release <rid>
 ```
 
 **`leitstand.dev-deploy` flags:**

@@ -66,11 +66,11 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0539`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0539`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate` (via forge CLI or site-kernel)
-- `pnpm exec site-kernel run forge.doctor`
+- `pnpm exec werkstatt run forge.skill.validate` (via forge CLI or site-kernel)
+- `pnpm exec werkstatt run forge.doctor`
 
 ## 3. Step sequence
 
@@ -302,19 +302,19 @@ scope:
 **Agent actions:**
 
 - Verify every acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0539`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0539`
 - Run `pnpm --filter @wgogol/forge run build:check`
 - Run `pnpm --filter @wgogol/forge run test`
-- Run `pnpm exec site-kernel run forge.skill.validate` — zero violations
-- Run `pnpm exec site-kernel run forge.doctor` — no fails
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.list` output shape changed)
-- Stamp the RFC: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0539 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run forge.skill.validate` — zero violations
+- Run `pnpm exec werkstatt run forge.doctor` — no fails
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.list` output shape changed)
+- Stamp the RFC: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0539 --implementation-commit <sha>`
 - Verify `git status` is clean
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0539` — pass
+- `pnpm exec werkstatt run rfc.validate --id RFC-0539` — pass
 - All acceptance criteria marked `[x]` with evidence
 
 **Completion criterion:** All acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC stamped as `implemented` via `rfc.implement.stamp`; `git status` clean.
@@ -325,11 +325,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0539`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0539`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate` — zero violations
-- `pnpm exec site-kernel run forge.doctor` — no fails
+- `pnpm exec werkstatt run forge.skill.validate` — zero violations
+- `pnpm exec werkstatt run forge.doctor` — no fails
 
 ### 4.2 Evidence artifacts
 
@@ -347,5 +347,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0539 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0539 --reason "..." --invariant "DNA-54"` instead of working around it (RFC-0334).
 - If the `skillPacks` schema cannot be expressed as a Zod refinement (e.g. cross-field uniqueness), escalate to a custom validation function in `forge-config.ts` rather than weakening the schema.

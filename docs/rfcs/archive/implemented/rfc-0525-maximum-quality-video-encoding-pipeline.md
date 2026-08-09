@@ -63,7 +63,7 @@ nonGoals:
   - "No runtime transcoding — build-time only (RFC-0149)"
   - "No change to the ambient/live-photo pipeline (RFC-0234)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -438,7 +438,7 @@ Background videos do not get AV1 — they are short, muted, looping clips where 
 - [x] `video.variants.validate` passes on regenerated manifest (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:639 entry.sources.av1 in urls array)
 - [x] Rendered `<video>` element contains three `<source>` elements (AV1, WebM, MP4) for feature videos (evidence: packages/ui/src/components/media/media.astro:168-170)
 - [x] ffmpeg/ffprobe availability check includes `libsvtav1` verification (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:465-498)
-- [x] `rfc.validate` passes on this RFC file (evidence: pnpm exec site-kernel run rfc.validate RFC-0525 --json exitCode 0)
+- [x] `rfc.validate` passes on this RFC file (evidence: pnpm exec werkstatt run rfc.validate RFC-0525 --json exitCode 0)
 
 ## Implementation notes for agents
 

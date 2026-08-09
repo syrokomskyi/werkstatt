@@ -148,7 +148,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.markdown.generate --app warpgogol-com` succeeds.
+- `pnpm exec werkstatt run page.markdown.generate --app warpgogol-com` succeeds.
 - At least one generated twin (e.g. `public/preis.md`) contains the new semantic frontmatter fields and `schema: "gogol.markdown-twin@2"`.
 
 **Completion criterion:** Every generated twin in `public/` has the new semantic frontmatter fields and the `@2` schema tag.
@@ -172,7 +172,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.markdown.validate --app warpgogol-com` passes after regenerating twins.
+- `pnpm exec werkstatt run page.markdown.validate --app warpgogol-com` passes after regenerating twins.
 - Intentionally stale twins (if any remain) fail `MDMETA-12`.
 
 **Completion criterion:** `page.markdown.validate` passes for the reference app and correctly reports `MDMETA-08..12` / `MDBODY-01..05` violations on malformed twins.
@@ -210,7 +210,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run workspace.surface.validate` (or equivalent XML sync check) passes.
+- `pnpm exec werkstatt run workspace.surface.validate` (or equivalent XML sync check) passes.
 - Manual review of the XML changes for semantic accuracy.
 
 **Completion criterion:** The two Compass XML files accurately reflect the new contract and validation rules.
@@ -223,8 +223,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0377 --json`.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0377` (RFC-0330) and commit the evidence artifact to `docs/rfcs/verification/`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0377 --json`.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0377` (RFC-0330) and commit the evidence artifact to `docs/rfcs/verification/`.
 - Update the RFC frontmatter `implementedAt` to today's date and `status` to `implemented` (per RFC-0224).
 - Commit the final RFC status change.
 
@@ -242,16 +242,16 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0377`
+- `pnpm exec werkstatt run rfc.validate RFC-0377`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/share run test`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
 - `pnpm --filter @gogol/site-kernel-content run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run page.markdown.validate --site warpgogol-com`
+- `pnpm exec werkstatt run page.markdown.validate --site warpgogol-com`
 - `pnpm run build:check` for `apps/warpgogol-com`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0377` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0377` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -272,6 +272,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that the `MarkdownTwinSemanticMeta` contract conflicts with an existing DNA invariant (e.g. DNA-19 closed vocabularies), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0377 --reason "..." --invariant "DNA-19"` instead of working around it.
+- If implementation reveals that the `MarkdownTwinSemanticMeta` contract conflicts with an existing DNA invariant (e.g. DNA-19 closed vocabularies), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0377 --reason "..." --invariant "DNA-19"` instead of working around it.
 - If the body section mapping cannot be made deterministic without inventing new `SemanticBlock` fields, escalate to a new RFC rather than adding ad-hoc heuristics.
 - If the `page.markdown.validate` false-positive rate exceeds the documented tolerance, pause and refine the heuristics before stamping `implemented`.

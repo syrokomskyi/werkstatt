@@ -52,7 +52,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0703`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0703`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks test`
@@ -123,15 +123,15 @@ scope:
 **Agent actions:**
 
 - Edit `.github/workflows/ci.yml`:
-  - Add step `Platform commit discipline validate` in `autonomous-quality` job: `pnpm exec site-kernel run platform.commit.discipline.validate --base origin/introduce-axiom-system --json`
-  - Add step `Platform consistency validate` (fixing audit C-2): `pnpm exec site-kernel run platform.consistency.validate --check --json`
+  - Add step `Platform commit discipline validate` in `autonomous-quality` job: `pnpm exec werkstatt run platform.commit.discipline.validate --base origin/introduce-axiom-system --json`
+  - Add step `Platform consistency validate` (fixing audit C-2): `pnpm exec werkstatt run platform.consistency.validate --check --json`
 - Edit `packages/os/site-kernel-checks/src/ci-local.ts`:
-  - Add `"pnpm exec site-kernel run platform.commit.discipline.validate --base origin/introduce-axiom-system --json"` to `CI_LOCAL_CHECKED_COMMANDS`
+  - Add `"pnpm exec werkstatt run platform.commit.discipline.validate --base origin/introduce-axiom-system --json"` to `CI_LOCAL_CHECKED_COMMANDS`
   - Add `CHANGE_SUMMARY` entry for RFC-0703
 
 **Validation:**
 
-- `pnpm exec site-kernel run ci.local.validate --json` — passes with both new commands present in `ci.yml`
+- `pnpm exec werkstatt run ci.local.validate --json` — passes with both new commands present in `ci.yml`
 
 **Completion criterion:** `ci.local.validate` passes; both commands present in `ci.yml`.
 
@@ -277,11 +277,11 @@ scope:
 
 - Edit `docs/rfcs/rfc-0703-*.md`:
   - Set `reviewers: ["human:andrii-syrokomskyi"]` (default reviewer per forge template)
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0703` — must pass with 0 violations
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0703` — must pass with 0 violations
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0703` — 0 violations
+- `pnpm exec werkstatt run rfc.validate --id RFC-0703` — 0 violations
 
 **Completion criterion:** `rfc.validate` passes on RFC-0703.
 
@@ -296,7 +296,7 @@ scope:
 **Agent actions:**
 
 - Stage all changed files: `packages/os/site-kernel-checks/src/platform-commit-discipline.ts`, `packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts`, `packages/os/site-kernel-checks/src/ci-local.ts`, `packages/os/site-kernel-handoff/src/mission/mission-close.ts`, `.github/workflows/ci.yml`, `AGENTS.md`, test files
-- Run `pnpm exec site-kernel run ecosystem.commit --message="feat: enforce platform commit discipline and auto-pin on mission close (RFC-0703)" --rfc=RFC-0703`
+- Run `pnpm exec werkstatt run ecosystem.commit --message="feat: enforce platform commit discipline and auto-pin on mission close (RFC-0703)" --rfc=RFC-0703`
 - This will bump patch version, add `X-Platform-Bump` trailer, and commit
 
 **Validation:**
@@ -316,16 +316,16 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: invoke `fo-fix` if `fo-review` reported findings
 - Check off all 13 acceptance criteria in the RFC with inline `(evidence: ...)` annotations
-- Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0703 --implementation-commit <sha>`
+- Stamp the RFC as implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0703 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0703`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0703`
 - Review report exists in `docs/reviews/code/`
 
 **Completion criterion:** All acceptance criteria checked off; RFC stamped as `implemented`.
@@ -336,12 +336,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0703`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0703`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks test`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run ci.local.validate --json`
+- `pnpm exec werkstatt run ci.local.validate --json`
 
 ### 4.2 Evidence artifacts
 
@@ -359,5 +359,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44/46/47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0703 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44/46/47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0703 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `sternsystem.pin` cannot be called within `mission.close`'s lock scope (deadlock or lock re-acquisition), create a superseding RFC to restructure the lock protocol.

@@ -157,7 +157,7 @@ The validator reports both the raw value and the normalized diagnostic value, bu
 ### 2. `naming.policy.validate` command
 
 ```sh
-pnpm exec site-kernel run naming.policy.validate [--system <id>] [--json]
+pnpm exec werkstatt run naming.policy.validate [--system <id>] [--json]
 ```
 
 Validates naming policies across all Werkstatt artifacts:
@@ -236,10 +236,10 @@ The command is an aggregator, not the owner of every invariant. Shared regexes a
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run naming.policy.validate
-pnpm exec site-kernel run naming.policy.validate --system warpgogol-com
-pnpm exec site-kernel run naming.policy.validate --json
-pnpm exec site-kernel run naming.policy.validate --migrate-plan tmp/naming-cleanup-plan.json
+pnpm exec werkstatt run naming.policy.validate
+pnpm exec werkstatt run naming.policy.validate --system warpgogol-com
+pnpm exec werkstatt run naming.policy.validate --json
+pnpm exec werkstatt run naming.policy.validate --migrate-plan tmp/naming-cleanup-plan.json
 ```
 
 ### TypeScript contracts

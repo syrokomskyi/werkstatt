@@ -201,7 +201,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run dns.record.list --zone warpgogol.com --json` returns a result (or a clear error if token/zone missing)
+- `pnpm exec werkstatt run dns.record.list --zone warpgogol.com --json` returns a result (or a clear error if token/zone missing)
 - `command.reads.validate` passes for all new commands
 
 **Completion criterion:** All four commands appear in the kernel command registry and can be invoked.
@@ -318,11 +318,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0753`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0753`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/ontology run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- Run `pnpm exec site-kernel run packages-check.run` (includes `dns.record.validate` step)
+- Run `pnpm exec werkstatt run packages-check.run` (includes `dns.record.validate` step)
 - Check off acceptance criteria in the RFC
 
 **Validation:**
@@ -341,7 +341,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0753`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0753`
 - If evidence file is generated, commit it
 
 **Validation:**
@@ -362,16 +362,16 @@ scope:
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated with DNS command family documentation.
 - Verify no `docs/*.xml` Compass files need synchronization (operational concern, not content model).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion against the implemented code. Mark `[x]` for verified. For unchecked `[ ]`, document why (e.g. "requires live Cloudflare API token").
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0753 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0753 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0753`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0753`
 - Review report exists for this session.
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed; all acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -382,13 +382,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0753`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0753`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run packages-check.run`
+- `pnpm exec werkstatt run packages-check.run`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0753` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0753` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -408,6 +408,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0753 --reason "..." --invariant "DNA-40"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-40, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0753 --reason "..." --invariant "DNA-40"` instead of working around it.
 - If the shared `src/cloudflare/` client cannot be used by RFC-0752 (e.g. different auth model), create a follow-up RFC to reconcile the client contracts.
 - If `dns.records.schema.validate` in `PACKAGES_CHECK_PIPELINE` causes CI failures, ensure the handler gracefully skips zones without declaration files (info-level, not error). No `CLOUDFLARE_API_TOKEN` is needed for schema-only validation.

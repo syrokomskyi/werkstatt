@@ -25,7 +25,7 @@ Pass with 3 warnings (all expected for a draft RFC):
 ## Axis A — Structural completeness
 
 - **Decision** is present-tense and single: "The ratgeber surface is restructured from a flat topic list into an editorial knowledge hub." Good.
-- **CLI surface** shows exact `pnpm exec site-kernel run` invocations with `--site` and `--json` flags. Good.
+- **CLI surface** shows exact `pnpm exec werkstatt run` invocations with `--site` and `--json` flags. Good.
 - **TypeScript contracts** are minimal type signatures (`ArticleRecord`, `ArticleType`, `ArticleCategoryRecord`). Good.
 - **File system responsibilities** table names 13 concrete paths. Good.
 - **Failure modes** table has 8 rule IDs (`RG-HUB-01`..`RG-HUB-08`) with severity. Good.

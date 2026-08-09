@@ -127,8 +127,8 @@ All three are generator-owned (RFC-0081) and produced by `routes.generate` in `@
 A new validator guards the topology:
 
 ```bash
-pnpm exec site-kernel run route.topology.validate --app warpgogol-com --json
-pnpm exec site-kernel run route.topology.validate --all --json
+pnpm exec werkstatt run route.topology.validate --app warpgogol-com --json
+pnpm exec werkstatt run route.topology.validate --all --json
 ```
 
 It asserts:

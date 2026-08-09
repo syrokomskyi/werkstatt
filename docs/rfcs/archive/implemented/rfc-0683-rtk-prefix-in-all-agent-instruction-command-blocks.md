@@ -59,7 +59,7 @@ nonGoals:
   - "Changing RTK configuration or initialization flow (covered by RFC-0681)"
   - "Adding `rtk` prefix to archived mission workpieces or docs/rfcs/archive/"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -86,11 +86,11 @@ The `.windsurfrules` file (lines 34–65) declares the RTK usage rule: "Always p
 
 However, **no other agent instruction file uses the `rtk` prefix in its command examples**. A comprehensive audit found 40+ files with command blocks that omit `rtk`:
 
-- **Root `AGENTS.md`** — 8 command blocks (`pnpm exec site-kernel run mission.git.commit`, `pnpm exec site-kernel run ecosystem.commit`, `git add`, `git commit`, `pnpm exec site-kernel run props.types.generate`, `pnpm exec site-kernel run uni.registry.build`, etc.)
+- **Root `AGENTS.md`** — 8 command blocks (`pnpm exec werkstatt run mission.git.commit`, `pnpm exec werkstatt run ecosystem.commit`, `git add`, `git commit`, `pnpm exec werkstatt run props.types.generate`, `pnpm exec werkstatt run uni.registry.build`, etc.)
 - **`PREFERENCES.md`** — `git status` in pre-response checklists
-- **All 33 Forge skill files** (`packages/forge/skills/**/*.SKILL.md`) — `pnpm --filter`, `git status`, `git diff`, `git add`, `git commit`, `pnpm exec site-kernel run`, `pnpm exec forge`, `find`, `cat`, `git rev-parse`, `git fetch`, `git checkout`, `git am`, `git push`
+- **All 33 Forge skill files** (`packages/forge/skills/**/*.SKILL.md`) — `pnpm --filter`, `git status`, `git diff`, `git add`, `git commit`, `pnpm exec werkstatt run`, `pnpm exec forge`, `find`, `cat`, `git rev-parse`, `git fetch`, `git checkout`, `git am`, `git push`
 - **15+ nested `packages/*/AGENTS.md`** — `pnpm --filter <pkg> build:check` / `test` blocks
-- **`docs/authoring/*.md`**, **`docs/specs/*.md`**, **`docs/implementation/*.md`** — dozens of `pnpm exec site-kernel run` and `wrangler` commands
+- **`docs/authoring/*.md`**, **`docs/specs/*.md`**, **`docs/implementation/*.md`** — dozens of `pnpm exec werkstatt run` and `wrangler` commands
 
 This creates a cognitive dissonance: agents read the rule "always prefix shell commands with `rtk`" in `.windsurfrules`, but every example they see in AGENTS.md, SKILL.md, and docs/ shows commands **without** `rtk`. Agents copy the examples, not the rule.
 
@@ -98,9 +98,9 @@ This creates a cognitive dissonance: agents read the rule "always prefix shell c
 
 The RTK usage rule is declared but not reflected in any command example that agents see. This means:
 
-1. **Agents copy examples, not rules.** When an agent reads `AGENTS.md` § Commit discipline and sees `pnpm exec site-kernel run mission.git.commit`, it runs that command verbatim — without `rtk`. The `.windsurfrules` rule is in a different file that the agent may not re-read for every command.
+1. **Agents copy examples, not rules.** When an agent reads `AGENTS.md` § Commit discipline and sees `pnpm exec werkstatt run mission.git.commit`, it runs that command verbatim — without `rtk`. The `.windsurfrules` rule is in a different file that the agent may not re-read for every command.
 2. **No graceful degradation.** The current rule says "always prefix" but does not address what happens when RTK is not installed. Forge consumers (external npm users) may not have RTK. The rule should explicitly state that commands work without `rtk` — RTK is an optimization, not a dependency.
-3. **`ref()` bindings are ambiguous.** Skill files use `ref(forge.yaml bindings.commands.validateRfc)` which resolves to `pnpm exec site-kernel run rfc.validate`. It is unclear whether `rtk` should wrap the `ref()` reference or the resolved command.
+3. **`ref()` bindings are ambiguous.** Skill files use `ref(forge.yaml bindings.commands.validateRfc)` which resolves to `pnpm exec werkstatt run rfc.validate`. It is unclear whether `rtk` should wrap the `ref()` reference or the resolved command.
 
 ## Decision
 
@@ -142,8 +142,8 @@ without `rtk` for the entire session.
 When a skill instruction uses `ref(forge.yaml bindings.commands.<key>)`, do not
 prefix the `ref()` with `rtk`. Instead, add `rtk` after the binding is resolved
 to a concrete command. Example: `ref(forge.yaml bindings.commands.validateRfc)`
-resolves to `pnpm exec site-kernel run rfc.validate` — run as
-`rtk pnpm exec site-kernel run rfc.validate`.
+resolves to `pnpm exec werkstatt run rfc.validate` — run as
+`rtk pnpm exec werkstatt run rfc.validate`.
 ```
 
 ### AGENTS.md rule addition
@@ -216,7 +216,7 @@ This note appears once per skill file, not per command block.
 
 - `ref()` is an abstraction that resolves to a concrete command at runtime.
 - The agent adds `rtk` after resolving the binding.
-- Example: `ref(forge.yaml bindings.commands.validateRfc) --json` → run as `rtk pnpm exec site-kernel run rfc.validate RFC-XXXX --json`.
+- Example: `ref(forge.yaml bindings.commands.validateRfc) --json` → run as `rtk pnpm exec werkstatt run rfc.validate RFC-XXXX --json`.
 
 ### Failure modes
 

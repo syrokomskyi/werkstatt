@@ -123,8 +123,8 @@ pages:
 Validation command for shell configuration:
 
 ```sh
-pnpm exec site-kernel run page.shell.validate --app nicaragua-projekt
-pnpm exec site-kernel run page.shell.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run page.shell.validate --app nicaragua-projekt
+pnpm exec werkstatt run page.shell.validate --app nicaragua-projekt --json
 ```
 
 Checks:

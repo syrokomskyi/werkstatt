@@ -27,11 +27,11 @@ batchPolicy:
   push: false
 acceptance:
   commands:
-    - pnpm exec site-kernel run maintenance.debt.queue.validate --queue surface-substance-assets-and-narratives --json
-    - pnpm exec site-kernel run surface.validate --site <app> --json
-    - pnpm exec site-kernel run asset.reference.validate --site <app> --json
-    - pnpm exec site-kernel run material.credits.validate --site <app> --json
-    - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+    - pnpm exec werkstatt run maintenance.debt.queue.validate --queue surface-substance-assets-and-narratives --json
+    - pnpm exec werkstatt run surface.validate --site <app> --json
+    - pnpm exec werkstatt run asset.reference.validate --site <app> --json
+    - pnpm exec werkstatt run material.credits.validate --site <app> --json
+    - pnpm exec werkstatt run maintenance.debt.baseline.validate --json
 notes:
   - Prefer improving authored source records over editing generated surface output.
   - Preserve bare image tokens and add material credits when introducing new material.

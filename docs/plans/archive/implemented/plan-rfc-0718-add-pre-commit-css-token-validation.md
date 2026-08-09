@@ -110,12 +110,12 @@ scope:
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0718 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0718 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0718` — passes with 0 violations.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0718` — passes with 0 violations.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with inline evidence; code review passed (findings fixed if any); RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -126,7 +126,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0718`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0718`
 - No `build:check` needed — no TypeScript package changes (only `hooks/pre-commit` bash script modified).
 - No `rfc.verification.emit` needed — RFC has no acceptance probes in frontmatter.
 

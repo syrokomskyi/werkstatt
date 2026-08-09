@@ -220,10 +220,10 @@ Output uses the shared envelope; findings include the reference text, file, and 
 
 ```sh
 # Each validator: one purpose, app-scoped.
-pnpm exec site-kernel run content.coverage.validate --app warpgogol-handwerk
-pnpm exec site-kernel run content.voice.lint        --app warpgogol-handwerk
-pnpm exec site-kernel run content.business.validate --app warpgogol-handwerk
-pnpm exec site-kernel run content.references.validate --app warpgogol-handwerk
+pnpm exec werkstatt run content.coverage.validate --app warpgogol-handwerk
+pnpm exec werkstatt run content.voice.lint        --app warpgogol-handwerk
+pnpm exec werkstatt run content.business.validate --app warpgogol-handwerk
+pnpm exec werkstatt run content.references.validate --app warpgogol-handwerk
 ```
 
 All four also support `--all` to iterate over every app in `apps/`.

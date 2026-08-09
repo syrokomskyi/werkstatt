@@ -87,7 +87,7 @@ scope:
 - **`pnpm --filter @gogol/ontology build:check`** — type-check new schemas.
 - **`pnpm --filter @gogol/site-kernel-handoff build:check`** — type-check new command handlers.
 - **`pnpm --filter @gogol/site-kernel-handoff test`** — vitest unit tests for registry IO, validate, pin, bundle contract, and register.
-- **`pnpm exec site-kernel run rfc.validate --id RFC-0354`** — RFC validation.
+- **`pnpm exec werkstatt run rfc.validate --id RFC-0354`** — RFC validation.
 - **`pnpm -s run build:check`** — workspace-level build check (no `apps/` pipeline regression).
 - No new pipeline wiring — the four commands are workspace-scoped and invoked manually; they do not join `build.check` or `build.prepare` at this stage. Future wiring is a follow-up after RFC-0356.
 
@@ -202,7 +202,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes.
-- Manual smoke test: `pnpm exec site-kernel run sternsystem.list --json` returns `{ systems: [], count: 0 }`.
+- Manual smoke test: `pnpm exec werkstatt run sternsystem.list --json` returns `{ systems: [], count: 0 }`.
 
 **Completion criterion:** Both commands are registered, type-check, and produce correct JSON output for an empty registry.
 
@@ -300,7 +300,7 @@ scope:
 
 ### Step 6. Command module registration
 
-**Goal:** Wire the four new commands into the workspace kernel configuration so they are discoverable via `pnpm exec site-kernel run`.
+**Goal:** Wire the four new commands into the workspace kernel configuration so they are discoverable via `pnpm exec werkstatt run`.
 
 **Agent actions:**
 
@@ -316,8 +316,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run sternsystem.list --json` works from the workspace root.
-- All four commands appear in `pnpm exec site-kernel run --help` (or equivalent command listing).
+- `pnpm exec werkstatt run sternsystem.list --json` works from the workspace root.
+- All four commands appear in `pnpm exec werkstatt run --help` (or equivalent command listing).
 
 **Completion criterion:** All four commands are registered, discoverable, and executable from the workspace root.
 
@@ -417,7 +417,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0354` passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0354` passes.
 - `pnpm -s run build:check` passes (no documentation lint regression).
 
 **Completion criterion:** All documentation files are updated and synchronized with the new architectural elements.
@@ -436,9 +436,9 @@ scope:
   1. `pnpm --filter @gogol/ontology build:check`
   2. `pnpm --filter @gogol/site-kernel-handoff build:check`
   3. `pnpm --filter @gogol/site-kernel-handoff test`
-  4. `pnpm exec site-kernel run sternsystem.list --json` (smoke test)
-  5. `pnpm exec site-kernel run sternsystem.validate --json` (smoke test on empty registry)
-  6. `pnpm exec site-kernel run rfc.validate --id RFC-0354`
+  4. `pnpm exec werkstatt run sternsystem.list --json` (smoke test)
+  5. `pnpm exec werkstatt run sternsystem.validate --json` (smoke test on empty registry)
+  6. `pnpm exec werkstatt run rfc.validate --id RFC-0354`
   7. `pnpm -s run build:check`
 - Verify all acceptance criteria checkboxes that are in scope for this plan:
   - [x] Zod schemas defined
@@ -474,7 +474,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0354` (RFC-0330, implemented).
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0354` (RFC-0330, implemented).
 - Commit the generated evidence file `docs/rfcs/verification/rfc-0354.generated.json` in the same commit as the `implemented` status stamp.
 - Reference `RFC-0354` in the commit subject line (RFC-0265 commit hygiene).
 
@@ -496,11 +496,11 @@ scope:
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.validate --id RFC-0354`
-- `pnpm exec site-kernel run sternsystem.list --json` (smoke test)
-- `pnpm exec site-kernel run sternsystem.validate --json` (smoke test)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0354`
+- `pnpm exec werkstatt run sternsystem.list --json` (smoke test)
+- `pnpm exec werkstatt run sternsystem.validate --json` (smoke test)
 - `pnpm -s run build:check`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0354` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0354` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -523,7 +523,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1 (monorepo boundary), DNA-4 (canonical content), DNA-6 (kebab-case), or DNA-17 (uni manifest), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0354 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict with DNA-1 (monorepo boundary), DNA-4 (canonical content), DNA-6 (kebab-case), or DNA-17 (uni manifest), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0354 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - If the `platformSemanticHash` requirement cannot be satisfied via `@gogol/fingerprint` (e.g., the package's API doesn't match the RFC-0364 §4 scope), escalate via `rfc.supersede.propose` to amend the pin schema rather than silently using a raw hash.
 - If the bundle contract scanner discovers that the RFC-0221 `authored-set.ts` partition is incompatible with the stricter Sternsystem data-only ownership, escalate rather than creating a parallel classifier — the RFC explicitly says "do not invent a parallel classifier."
 

@@ -175,7 +175,7 @@ export const FORGE_CLI_BINDING_DEFAULTS: ForgeCliBindingDefault[];
 - [x] Existing `forge.yaml` files (including this monorepo's) are never modified by `forge.init` (evidence: packages/forge/src/onboarding/init.ts:81-82 skip-with-warning, packages/forge/src/tests/init-bindings.test.ts:86-113)
 - [x] Unit tests cover pm-runner derivation (pnpm/npm/yarn/bun/none/unknown) and the doctor notice (evidence: packages/forge/src/tests/forge-config.test.ts:54-65, packages/forge/src/tests/doctor-bindings.test.ts:55-82)
 - [x] `packages/forge/AGENTS.md` bindings section updated (evidence: packages/forge/AGENTS.md:83-84)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0540 --json` returns status: pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate RFC-0540 --json` returns status: pass)
 
 ## Implementation notes for agents
 

@@ -78,7 +78,7 @@ None — no YAML/JSON/NDJSON changes.
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0601 --json` — must pass.
+- `pnpm exec werkstatt run rfc.validate RFC-0601 --json` — must pass.
 
 **Completion criterion:** RFC-0601 `satisfies` includes DNA-58 and `rfc.validate` passes.
 
@@ -92,8 +92,8 @@ None — no YAML/JSON/NDJSON changes.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0607 --json`.
-- Run `pnpm exec site-kernel run rfc.validate RFC-0601 --json`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0607 --json`.
+- Run `pnpm exec werkstatt run rfc.validate RFC-0601 --json`.
 - Fix any violations if found.
 
 **Validation:**
@@ -115,7 +115,7 @@ None — no YAML/JSON/NDJSON changes.
 - Check off all 6 acceptance criteria with inline `(evidence: ...)` annotations.
 - Run `fo-review` via the `skill` tool on all session code changes.
 - Run `fo-fix` if review has findings.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0607 --implementation-commit <sha>`.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0607 --implementation-commit <sha>`.
 - Commit the stamped RFC.
 
 **Validation:**
@@ -132,8 +132,8 @@ None — no YAML/JSON/NDJSON changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0607 --json`
-- `pnpm exec site-kernel run rfc.validate RFC-0601 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0607 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0601 --json`
 
 ### 4.2 Evidence artifacts
 
@@ -149,4 +149,4 @@ None — no YAML/JSON/NDJSON changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-18, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0607 --reason "..." --invariant "DNA-18"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-18, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0607 --reason "..." --invariant "DNA-18"` instead of working around it.

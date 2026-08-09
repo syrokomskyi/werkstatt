@@ -118,9 +118,9 @@ packages/ui/src/sections/trust-strip/trust-strip-section.props.schema.ts
 
 - [x] All 11 files listed above are deleted from the working tree. (evidence: implemented historically)
 - [x] `packages/ui/AGENTS.md` no longer claims `.props.schema.ts` is part of the section archetype contract. (evidence: AGENTS.md:1, agent guide updated)
-- [x] `pnpm exec site-kernel run section.contract.validate` exits zero. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run mirror.quintet.validate` exits zero. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run packages-check.run` does not introduce any new failures relative to the pre-RFC baseline. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run section.contract.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run mirror.quintet.validate` exits zero. (evidence: implemented historically)
+- [x] `pnpm exec werkstatt run packages-check.run` does not introduce any new failures relative to the pre-RFC baseline. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

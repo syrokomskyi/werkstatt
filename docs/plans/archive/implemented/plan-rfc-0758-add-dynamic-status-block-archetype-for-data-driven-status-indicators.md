@@ -101,12 +101,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run archetype.registry.build`
+- Run `pnpm exec werkstatt run archetype.registry.build`
 - Verify `packages/ontology/archetypes/index.yaml` contains `dynamic-status-block` in `entries`, `sectionRoles`, `blockTypeToCosmicName`, `roleByCosmicName`, `planetImportPaths`
 
 **Validation:**
 
-- `pnpm exec site-kernel run archetype.registry.validate` — confirms registry is in sync
+- `pnpm exec werkstatt run archetype.registry.validate` — confirms registry is in sync
 
 **Completion criterion:** `index.yaml` and `index.json` contain `dynamic-status-block` entries.
 
@@ -120,7 +120,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run section.scaffold --name dynamic-status-block --archetype dynamic-status-block`
+- Run `pnpm exec werkstatt run section.scaffold --name dynamic-status-block --archetype dynamic-status-block`
 - Verify the following files are created in `packages/ui/src/sections/dynamic-status-block/`:
   - `dynamic-status-block-section.astro`
   - `dynamic-status-block-section.css`
@@ -199,12 +199,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run section.contract.validate` — validates section manifest, archetype reference, cosmic name
-- Run `pnpm exec site-kernel run page.block.validate` — validates block props against archetype propsSchema (using a test block entry if needed)
+- Run `pnpm exec werkstatt run section.contract.validate` — validates section manifest, archetype reference, cosmic name
+- Run `pnpm exec werkstatt run page.block.validate` — validates block props against archetype propsSchema (using a test block entry if needed)
 - Run `pnpm --filter @warpgogol/ontology build:check`
 - Run `pnpm --filter @warpgogol/ui build:check`
 - Run `pnpm --filter @warpgogol/share build:check`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0758`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0758`
 
 **Validation:**
 
@@ -247,12 +247,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0758 --dry-run` first, then without `--dry-run`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0758 --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0758`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0758`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All acceptance criteria checked off with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -263,9 +263,9 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0758`
-- `pnpm exec site-kernel run archetype.registry.validate`
-- `pnpm exec site-kernel run section.contract.validate`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0758`
+- `pnpm exec werkstatt run archetype.registry.validate`
+- `pnpm exec werkstatt run section.contract.validate`
 - `pnpm --filter @warpgogol/ontology build:check`
 - `pnpm --filter @warpgogol/ui build:check`
 - `pnpm --filter @warpgogol/share build:check`
@@ -286,4 +286,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0758 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0758 --reason "..." --invariant "DNA-N"` instead of working around it.

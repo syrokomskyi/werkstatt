@@ -151,7 +151,7 @@ The release directory may still include a local `dist/` for inspection, but `art
 #### 4.1 `artifact.store.put`
 
 ```sh
-pnpm exec site-kernel run artifact.store.put --release <release-id> --dist <path> --site <path> [--json]
+pnpm exec werkstatt run artifact.store.put --release <release-id> --dist <path> --site <path> [--json]
 ```
 
 Creates the content-addressed tarball and manifest. It uses RFC-0362 staging and locks `release:<id>`.
@@ -159,7 +159,7 @@ Creates the content-addressed tarball and manifest. It uses RFC-0362 staging and
 #### 4.2 `artifact.store.get`
 
 ```sh
-pnpm exec site-kernel run artifact.store.get --release <release-id> --output <path> [--json]
+pnpm exec werkstatt run artifact.store.get --release <release-id> --output <path> [--json]
 ```
 
 Rehydrates `dist/` into `--output` after verifying `distArtifactHash` and `distTreeHash`.
@@ -167,7 +167,7 @@ Rehydrates `dist/` into `--output` after verifying `distArtifactHash` and `distT
 #### 4.3 `artifact.store.validate`
 
 ```sh
-pnpm exec site-kernel run artifact.store.validate --release <release-id> [--json]
+pnpm exec werkstatt run artifact.store.validate --release <release-id> [--json]
 ```
 
 Validates artifact presence, byte hash, extracted tree hash, release manifest parity, and snapshot hashes.
@@ -175,7 +175,7 @@ Validates artifact presence, byte hash, extracted tree hash, release manifest pa
 #### 4.4 `artifact.store.gc`
 
 ```sh
-pnpm exec site-kernel run artifact.store.gc [--system <id>] [--dry-run] [--json]
+pnpm exec werkstatt run artifact.store.gc [--system <id>] [--dry-run] [--json]
 ```
 
 Deletes artifacts outside retention policy.

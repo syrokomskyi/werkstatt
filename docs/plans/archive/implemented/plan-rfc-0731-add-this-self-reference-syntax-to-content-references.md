@@ -160,7 +160,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run content.references.validate --app warpgogol-com` — passes (no `this.` refs in content yet, but validator doesn't crash)
+- `pnpm exec werkstatt run content.references.validate --app warpgogol-com` — passes (no `this.` refs in content yet, but validator doesn't crash)
 
 **Completion criterion:** Validator recognizes `this.` references, derives `sourceRef` from file path, emits REF-12/REF-13 errors, existing absolute reference validation unchanged.
 
@@ -211,20 +211,20 @@ For each call site: if the entity context (collection + file slug) is available,
 - Update `packages/share/AGENTS.md`:
   - `@warpgogol/share/content-reference` entry: add `SourceRef` to exports list, note `sourceRef` optional parameter
   - `@warpgogol/share/formula-eval` entry: note `sourceRef` optional parameter and `this.` expansion support
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0731`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0731`
 - Run `pnpm --filter @warpgogol/share run test` — all tests pass
 - Run `pnpm --filter @warpgogol/share run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
-- Run `pnpm exec site-kernel run content.references.validate --app warpgogol-com` — passes
+- Run `pnpm exec werkstatt run content.references.validate --app warpgogol-com` — passes
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0731 --implementation-commit <sha>` to transition `accepted → implemented`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0731 --implementation-commit <sha>` to transition `accepted → implemented`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0731`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0731`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation updated; code review passed; all acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -235,7 +235,7 @@ For each call site: if the entity context (collection + file slug) is available,
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0731`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0731`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/share run test`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
@@ -243,7 +243,7 @@ For each call site: if the entity context (collection + file slug) is available,
 - `pnpm --filter @warpgogol/pbp run build:check`
 - `pnpm --filter @warpgogol/ui run build:check`
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
-- `pnpm exec site-kernel run content.references.validate --app warpgogol-com`
+- `pnpm exec werkstatt run content.references.validate --app warpgogol-com`
 
 ### 4.2 Evidence artifacts
 
@@ -262,4 +262,4 @@ For each call site: if the entity context (collection + file slug) is available,
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-4, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0731 --reason "..." --invariant "DNA-4"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-4, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0731 --reason "..." --invariant "DNA-4"` instead of working around it.

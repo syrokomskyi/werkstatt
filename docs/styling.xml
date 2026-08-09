@@ -43,7 +43,7 @@
 
     <layer-definitions>
       <layer id="tokens">
-        <source>`@warpgogol/tokens/tokens.css`</source>
+        <source>`@warpgogol/werkstatt-site/tokens/tokens.css`</source>
         <css-layer>`@layer tokens { :root { ... } }`</css-layer>
         <role>
           Studio-default `--ds-*` CSS custom properties. Every app in the monorepo
@@ -262,7 +262,7 @@
     <rule id="pa-01">
       Per-app `global.css` contains exactly:
         (a) `@layer` declaration line
-        (b) `@import "@warpgogol/tokens/tokens.css"`
+        (b) `@import "@warpgogol/werkstatt-site/tokens/tokens.css"`
         (c) `@import "./biome.generated.css"`
         (d) `@layer app { :root { ... } }` — component-specific token extensions only
         (e) `@layer base { ... }` — element resets

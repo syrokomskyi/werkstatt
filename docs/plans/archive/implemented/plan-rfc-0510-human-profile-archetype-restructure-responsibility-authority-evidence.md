@@ -159,7 +159,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run participant.profile.validate --site warpgogol-com --json` — command is discoverable
+- `pnpm exec werkstatt run participant.profile.validate --site warpgogol-com --json` — command is discoverable
 
 **Completion criterion:** Command is registered, discoverable, and typechecks; pipeline includes it after `team.hub.validate`.
 
@@ -184,8 +184,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json` — Participant record validates against schema
-- `pnpm exec site-kernel run content.references.validate --site warpgogol-com --json` — prose file references resolve
+- `pnpm exec werkstatt run participant.validate --site warpgogol-com --json` — Participant record validates against schema
+- `pnpm exec werkstatt run content.references.validate --site warpgogol-com --json` — prose file references resolve
 
 **Completion criterion:** Three prose files exist; old prose file removed; Participant record has new fields and validates; content references resolve.
 
@@ -199,8 +199,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0510` — only shared V-19 warning expected
-- Run `pnpm exec site-kernel run sites-check.run --site warpgogol-com --json` — full author pipeline including new `participant.profile.validate`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0510` — only shared V-19 warning expected
+- Run `pnpm exec werkstatt run sites-check.run --site warpgogol-com --json` — full author pipeline including new `participant.profile.validate`
 - Run `pnpm --filter @gogol/share run build:check` — package typecheck
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — package typecheck
 - Verify each acceptance criterion in RFC-0510 against the implemented code
@@ -223,14 +223,14 @@ scope:
 
 - Update `packages/share/AGENTS.md` — note `ParticipantView` extension and `buildHumanProfileBlocks` in `resolve-route.ts`
 - Update `packages/os/site-kernel-checks/AGENTS.md` — note `participant.profile.validate` command and pipeline registration
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Check off all acceptance criteria in RFC-0510 with `(evidence: ...)` annotations
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0510 --implementation-commit <sha>` to transition `accepted → implemented`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0510 --implementation-commit <sha>` to transition `accepted → implemented`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0510`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0510`
 - All scope docs updated or documented as not-applicable
 
 **Completion criterion:** All documentation artifacts updated; all acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -241,13 +241,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0510`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0510`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run sites-check.run --site warpgogol-com --json`
-- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run participant.profile.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run content.references.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run sites-check.run --site warpgogol-com --json`
+- `pnpm exec werkstatt run participant.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run participant.profile.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run content.references.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -265,5 +265,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), DNA-37 (SectionProps), or DNA-38 (canonical item objects), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0510 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), DNA-37 (SectionProps), or DNA-38 (canonical item objects), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0510 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `controlled-responsibility-block` archetype cannot accept the `body.split-list` props shape as described, stop and create an ADR documenting the actual props contract before proceeding.

@@ -82,7 +82,7 @@ nonGoals:
   - "Does not define the site workspace resolver or --site flag rename — that is RFC-0378"
   - "Does not set up GitHub hosting for the Sternsystem git repo — pilot uses local bare repo at ../systems-git/warpgogol-com"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -168,7 +168,7 @@ The pilot is a linear sequence of existing commands. No new commands are added. 
 #### Step 1: Register the Sternsystem
 
 ```sh
-pnpm exec site-kernel run sternsystem.register \
+pnpm exec werkstatt run sternsystem.register \
   --id warpgogol-com \
   --cosmicStar Vega \
   --repo ../systems-git/warpgogol-com
@@ -187,7 +187,7 @@ Creates the local bare repo that will receive the Sternsystem data push.
 #### Step 3: Extract the site
 
 ```sh
-pnpm exec site-kernel run sternsystem.extract \
+pnpm exec werkstatt run sternsystem.extract \
   --app warpgogol-com \
   --repo ../systems-git/warpgogol-com
 ```
@@ -197,7 +197,7 @@ Copies `src/content/`, `public/`, `provenance/` from `apps/warpgogol-com/` into 
 #### Step 3a: Validate the Sternsystem
 
 ```sh
-pnpm exec site-kernel run sternsystem.validate --id warpgogol-com
+pnpm exec werkstatt run sternsystem.validate --id warpgogol-com
 ```
 
 Verifies the extracted Sternsystem: pin file parse, authored-data partition, no scripts, no package manifests, no runtime config, no generated files, no `dist/`. This is the gate for proceeding to mission open.
@@ -205,7 +205,7 @@ Verifies the extracted Sternsystem: pin file parse, authored-data partition, no 
 #### Step 4: Open a mission
 
 ```sh
-pnpm exec site-kernel run mission.open \
+pnpm exec werkstatt run mission.open \
   --system warpgogol-com \
   --brief "Pilot migration: extract to Sternsystem and release warpgogol-com-r000001"
 ```
@@ -215,7 +215,7 @@ Creates mission `warpgogol-com-m000001` in `missions/`. Acquires system lock. Ap
 #### Step 5: Materialize the Werkstück
 
 ```sh
-pnpm exec site-kernel run mission.materialize \
+pnpm exec werkstatt run mission.materialize \
   --mission warpgogol-com-m000001
 ```
 
@@ -224,7 +224,7 @@ Materializes `missions/warpgogol-com-m000001/workpiece/` from the pinned Sternsy
 #### Step 6: Validate the Werkstück
 
 ```sh
-pnpm exec site-kernel run mission.validate \
+pnpm exec werkstatt run mission.validate \
   --mission warpgogol-com-m000001
 ```
 
@@ -233,7 +233,7 @@ Runs `app.contract.full` against the materialized Werkstück. This is the gate f
 #### Step 7: Build the distribution
 
 ```sh
-pnpm exec site-kernel run mission.build \
+pnpm exec werkstatt run mission.build \
   --mission warpgogol-com-m000001
 ```
 
@@ -242,7 +242,7 @@ Produces `missions/warpgogol-com-m000001/distribution/dist/`.
 #### Step 8: Prepare the release
 
 ```sh
-pnpm exec site-kernel run release.prepare \
+pnpm exec werkstatt run release.prepare \
   --mission warpgogol-com-m000001
 ```
 
@@ -251,7 +251,7 @@ Produces release candidate `warpgogol-com-r000001` in `releases/warpgogol-com-r0
 #### Step 8a: Publish the release
 
 ```sh
-pnpm exec site-kernel run release.publish \
+pnpm exec werkstatt run release.publish \
   --release warpgogol-com-r000001
 ```
 
@@ -260,7 +260,7 @@ Finalizes the release: runs discipline gates (`migrator.validate`, version-compa
 #### Step 8b: Validate the release
 
 ```sh
-pnpm exec site-kernel run release.validate \
+pnpm exec werkstatt run release.validate \
   --release warpgogol-com-r000001
 ```
 
@@ -269,7 +269,7 @@ Verifies the published release artifact: manifest integrity, artifact reference 
 #### Step 9: Propagate to alt channel
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate \
+pnpm exec werkstatt run leitstand.propagate \
   --release warpgogol-com-r000001 \
   --channel alt
 ```
@@ -279,7 +279,7 @@ Deploys to `alt-warpgogol-com` worker via `wrangler deploy`. Health-checks alt.w
 #### Step 10: Propagate to main channel
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate \
+pnpm exec werkstatt run leitstand.propagate \
   --release warpgogol-com-r000001 \
   --channel main
 ```
@@ -289,7 +289,7 @@ Deploys to `warpgogol-com` worker via `wrangler deploy`. Health-checks warpgogol
 #### Step 10a: Verify propagation status
 
 ```sh
-pnpm exec site-kernel run leitstand.status --system warpgogol-com
+pnpm exec werkstatt run leitstand.status --system warpgogol-com
 ```
 
 Prints the current deployed release, health, and propagation state for both channels.
@@ -297,7 +297,7 @@ Prints the current deployed release, health, and propagation state for both chan
 #### Step 11: Generate Notausgang export
 
 ```sh
-pnpm exec site-kernel run notausgang.export \
+pnpm exec werkstatt run notausgang.export \
   --system warpgogol-com \
   --release warpgogol-com-r000001 \
   --output ./notausgang-warpgogol-com-r000001
@@ -306,14 +306,14 @@ pnpm exec site-kernel run notausgang.export \
 #### Step 12: Validate Notausgang export
 
 ```sh
-pnpm exec site-kernel run notausgang.validate \
+pnpm exec werkstatt run notausgang.validate \
   --path ./notausgang-warpgogol-com-r000001
 ```
 
 #### Step 12a: Reconcile the mission
 
 ```sh
-pnpm exec site-kernel run mission.reconcile \
+pnpm exec werkstatt run mission.reconcile \
   --mission warpgogol-com-m000001
 ```
 
@@ -322,7 +322,7 @@ Reconciles the validated Werkstück data changes to the Sternsystem's git repo. 
 #### Step 13: Close the mission
 
 ```sh
-pnpm exec site-kernel run mission.close \
+pnpm exec werkstatt run mission.close \
   --mission warpgogol-com-m000001
 ```
 
@@ -337,7 +337,7 @@ Remove the `apps/*` glob from `pnpm-workspace.yaml`. Run `pnpm install` to updat
 #### Step 15: Generate fleet projection
 
 ```sh
-pnpm exec site-kernel run fleet.sites.generate
+pnpm exec werkstatt run fleet.sites.generate
 ```
 
 `fleet/fleet.sites.yaml` now resolves `warpgogol-com` from `systems/registry.yaml`, not `apps/` discovery.
@@ -345,8 +345,8 @@ pnpm exec site-kernel run fleet.sites.generate
 #### Step 16: Verify ecosystem manifest
 
 ```sh
-pnpm exec site-kernel run ecosystem.manifest.generate
-pnpm exec site-kernel run workspace.surface.validate
+pnpm exec werkstatt run ecosystem.manifest.generate
+pnpm exec werkstatt run workspace.surface.validate
 ```
 
 Confirm the ecosystem projection no longer references `apps/warpgogol-com` and resolves the site from the registry.

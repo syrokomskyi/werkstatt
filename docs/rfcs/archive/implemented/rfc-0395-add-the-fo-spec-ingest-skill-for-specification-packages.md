@@ -49,7 +49,7 @@ nonGoals:
   - "Does not translate spec documents — snapshots are vendored in their original language"
   - "Does not auto-accept specs — acceptance is a human decision, always"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -100,7 +100,7 @@ Forge gains the **`fo-spec-ingest`** skill (document-only) with two modes. **Ing
 No new CLI commands — this RFC ships a skill. The skill invokes existing commands:
 
 ```sh
-pnpm exec site-kernel run spec.validate --spec=<id> --json   # after building the projection
+pnpm exec werkstatt run spec.validate --spec=<id> --json   # after building the projection
 ```
 
 Invocation: `/fo-spec-ingest <path-to-package>` (ingest mode) or inline delegation from `fo-idea` (authoring mode).

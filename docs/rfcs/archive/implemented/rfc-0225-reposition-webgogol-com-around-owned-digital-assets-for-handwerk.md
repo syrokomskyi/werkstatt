@@ -34,10 +34,10 @@ appsImpacted:
 packagesImpacted:
   - "@gogol/ontology"
 successSignals:
-  - "`pnpm exec site-kernel run rfc.validate` passes."
-  - "`pnpm exec site-kernel run page.block.validate --app warpgogol-com` passes."
+  - "`pnpm exec werkstatt run rfc.validate` passes."
+  - "`pnpm exec werkstatt run page.block.validate --app warpgogol-com` passes."
   - "`pnpm --filter @gogol/ontology build:check` passes."
-  - "`pnpm exec site-kernel run apps-check.run --app warpgogol-com` passes or reports only pre-existing unrelated issues."
+  - "`pnpm exec werkstatt run apps-check.run --app warpgogol-com` passes or reports only pre-existing unrelated issues."
 nonGoals:
   - "No four-segment homepage launch before a signed case proves a second doorway."
   - "No new shared UI package contract unless existing section archetypes cannot express the content."
@@ -97,10 +97,10 @@ No new CLI surface is introduced.
 Validation uses existing commands:
 
 ```sh
-pnpm exec site-kernel run rfc.validate
-pnpm exec site-kernel run page.block.validate --app warpgogol-com
-pnpm exec site-kernel run material.credits.validate --app warpgogol-com
-pnpm exec site-kernel run apps-check.run --app warpgogol-com
+pnpm exec werkstatt run rfc.validate
+pnpm exec werkstatt run page.block.validate --app warpgogol-com
+pnpm exec werkstatt run material.credits.validate --app warpgogol-com
+pnpm exec werkstatt run apps-check.run --app warpgogol-com
 ```
 
 ### TypeScript contracts

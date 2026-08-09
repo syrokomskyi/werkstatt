@@ -59,7 +59,7 @@ scope:
 
 - `pnpm --filter @warpgogol/share test` — unit tests for new middleware factory.
 - `pnpm --filter @warpgogol/share run build:check` — TypeScript compilation.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0569` — RFC validation.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0569` — RFC validation.
 - Manual: `astro dev` on warpgogol-com — visual verification of dev/prod parity.
 - Manual: `astro build` on warpgogol-com — verify production build unaffected.
 
@@ -161,8 +161,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run routes.generate --site warpgogol-com` (or the mission workpiece equivalent).
-- Run `pnpm exec site-kernel run config.regenerate --site warpgogol-com` (or the mission workpiece equivalent).
+- Run `pnpm exec werkstatt run routes.generate --site warpgogol-com` (or the mission workpiece equivalent).
+- Run `pnpm exec werkstatt run config.regenerate --site warpgogol-com` (or the mission workpiece equivalent).
 - Verify `missions/warpgogol-com-m000016/workpiece/src/middleware.ts` includes the dev-normalize middleware chain.
 - Verify `missions/warpgogol-com-m000016/workpiece/astro.config.mjs` includes `smartypants: !isAstroDev`.
 
@@ -225,16 +225,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (they did not — only templates changed).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (they did not — only templates changed).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0569 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0569 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0569`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0569`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -246,7 +246,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0569`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0569`
 - `pnpm --filter @warpgogol/share run build:check`
 - `pnpm --filter @warpgogol/share test`
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check`
@@ -269,5 +269,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0569 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0569 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `loadSystemManifest()` cannot be imported in the dev middleware context (e.g. Vite SSR externalization issue), escalate to the operator — do not switch to a different config-loading mechanism without discussion.

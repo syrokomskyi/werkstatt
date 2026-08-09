@@ -59,7 +59,7 @@ nonGoals:
 # docs/architecture-dna.md at implementation time; satisfies[] is then
 # extended with the new DNA id in the same commit.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -80,13 +80,13 @@ nonGoals:
 
 ## Context
 
-The fo-* skills in `packages/forge/skills/fo/` are the portable heart of forge — the idea-to-implementation pipeline (`fo-idea` → audit → enhance → plan → implement). Their _logic_ is stack-agnostic, but their *text\* is welded to WGogol: they instruct agents to run `pnpm exec site-kernel run rfc.validate`, read `docs/architecture-dna.md`, run `pnpm --filter @gogol/<package> run build:check`, sync Compass XML files, and assume pnpm everywhere.
+The fo-* skills in `packages/forge/skills/fo/` are the portable heart of forge — the idea-to-implementation pipeline (`fo-idea` → audit → enhance → plan → implement). Their _logic_ is stack-agnostic, but their *text\* is welded to WGogol: they instruct agents to run `pnpm exec werkstatt run rfc.validate`, read `docs/architecture-dna.md`, run `pnpm --filter @gogol/<package> run build:check`, sync Compass XML files, and assume pnpm everywhere.
 
 RFC-0391 gives every forge-managed project a `forge.yaml`. The skills already demonstrate the reference pattern for external configuration: `languagePolicy: ref(PREFERENCES.md)` — the skill text names a config source instead of embedding values. This RFC applies the same pattern to paths and commands.
 
 ## Problem
 
-1. **Skills break outside WGogol.** On a Phaser game or a plain npm library, `pnpm exec site-kernel run …` does not exist, `docs/architecture-dna.md` does not exist, and `build:check` is not a script. An agent following `fo-idea-implement` verbatim fails at step one.
+1. **Skills break outside WGogol.** On a Phaser game or a plain npm library, `pnpm exec werkstatt run …` does not exist, `docs/architecture-dna.md` does not exist, and `build:check` is not a script. An agent following `fo-idea-implement` verbatim fails at step one.
 2. **No degradation semantics.** Skills have no defined behavior for absent capabilities. `fo-idea-audit` Axis B (DNA alignment) is meaningless in a project without an invariants file — but nothing tells the agent whether to skip, warn, or halt.
 3. **Fork pressure.** Without a binding layer, deploying forge elsewhere forces editing skill texts per project — the deployed copies then diverge from canonical forge and every `fo-harvest` cycle becomes a merge conflict.
 
@@ -109,7 +109,7 @@ RFC-0391 gives every forge-managed project a `forge.yaml`. The skills already de
 No new commands. `forge.doctor` (workspace scope) gains bindings validation:
 
 ```sh
-pnpm exec site-kernel run forge.doctor --json   # WGogol
+pnpm exec werkstatt run forge.doctor --json   # WGogol
 npx forge run forge.doctor --json               # any project
 ```
 
@@ -124,7 +124,7 @@ interface ForgeBindings {
   schema: "forge/bindings@1";
   commands: {
     /** Command templates. `{id}`, `{workspace}`, `{file}` placeholders. null = capability absent. */
-    validateRfc: string | null;    // WGogol: "pnpm exec site-kernel run rfc.validate {id} --json"
+    validateRfc: string | null;    // WGogol: "pnpm exec werkstatt run rfc.validate {id} --json"
     validateAdr: string | null;
     typecheck: string | null;      // WGogol: "pnpm --filter {workspace} run build:check"
     test: string | null;           // WGogol: "pnpm --filter {workspace} run test"

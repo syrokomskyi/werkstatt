@@ -76,7 +76,7 @@ acceptance:
   - probe: file-exists
     path: "packages/os/site-kernel/src/site-workspace-resolver.ts"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -141,10 +141,10 @@ The kernel gains a **site workspace resolver** that resolves a site id to its ru
 
 ```sh
 # after this RFC — identical semantics, new addressing
-pnpm exec site-kernel run build.check --site warpgogol-com
-pnpm exec site-kernel run page.block.validate --all --json
+pnpm exec werkstatt run build.check --site warpgogol-com
+pnpm exec werkstatt run page.block.validate --all --json
 pnpm exec site-kernel sites list
-pnpm exec site-kernel run fleet.sites.generate --json
+pnpm exec werkstatt run fleet.sites.generate --json
 ```
 
 - `--site <id>` — resolves through the site workspace resolver. `--app` is removed in the same change; passing it produces the kernel's standard unknown-flag error.

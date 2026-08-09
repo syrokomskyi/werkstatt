@@ -259,7 +259,7 @@ Four new commands in `@gogol/site-kernel-handoff`:
 #### 5.1 `leitstand.propagate`
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate \
+pnpm exec werkstatt run leitstand.propagate \
   --release <release-id> \
   [--json]
 ```
@@ -269,7 +269,7 @@ Deploys the release to the Sternsystem's deployment target and runs health check
 #### 5.2 `leitstand.status`
 
 ```sh
-pnpm exec site-kernel run leitstand.status \
+pnpm exec werkstatt run leitstand.status \
   --system <system-id> \
   [--json]
 ```
@@ -279,7 +279,7 @@ Prints the current deployment state: last propagated release, propagation state,
 #### 5.3 `leitstand.rollback`
 
 ```sh
-pnpm exec site-kernel run leitstand.rollback \
+pnpm exec werkstatt run leitstand.rollback \
   --system <system-id> \
   [--to-release <release-id>] \
   [--json]
@@ -290,7 +290,7 @@ Rolls back to the previous published release (or a specific release if `--to-rel
 #### 5.4 `leitstand.health`
 
 ```sh
-pnpm exec site-kernel run leitstand.health \
+pnpm exec werkstatt run leitstand.health \
   --system <system-id> \
   [--json]
 ```
@@ -312,10 +312,10 @@ Runs health checks against the deployed site and reports pass/fail.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run leitstand.propagate --release <id>
-pnpm exec site-kernel run leitstand.status --system <id>
-pnpm exec site-kernel run leitstand.rollback --system <id>
-pnpm exec site-kernel run leitstand.health --system <id>
+pnpm exec werkstatt run leitstand.propagate --release <id>
+pnpm exec werkstatt run leitstand.status --system <id>
+pnpm exec werkstatt run leitstand.rollback --system <id>
+pnpm exec werkstatt run leitstand.health --system <id>
 ```
 
 All commands support `--json` output.

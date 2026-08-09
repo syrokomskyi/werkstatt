@@ -127,13 +127,13 @@ services:
 
 ```sh
 # Register a service subdomain (DNS + Workers route)
-pnpm exec site-kernel run subdomain.register --service matomo-proxy
+pnpm exec werkstatt run subdomain.register --service matomo-proxy
 
 # Validate a service subdomain
-pnpm exec site-kernel run subdomain.validate --service matomo-proxy
+pnpm exec werkstatt run subdomain.validate --service matomo-proxy
 
 # List all subdomains in a zone
-pnpm exec site-kernel run subdomain.list --zone warpgogol.com
+pnpm exec werkstatt run subdomain.list --zone warpgogol.com
 ```
 
 ### TypeScript contracts

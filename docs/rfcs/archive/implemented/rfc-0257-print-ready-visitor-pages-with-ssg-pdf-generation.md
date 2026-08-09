@@ -355,9 +355,9 @@ The layout orchestrator (RFC-0106) already receives its config from `site/{lang}
 `print.pdf.generate` is a new app-scoped Site OS command. It runs only in `build.post` because it needs the built static site in `dist/client`.
 
 ```sh
-pnpm exec site-kernel run print.pdf.generate --app warpgogol-com
-pnpm exec site-kernel run print.pdf.generate --app warpgogol-com --force
-pnpm exec site-kernel run print.pdf.generate --app warpgogol-com --json
+pnpm exec werkstatt run print.pdf.generate --app warpgogol-com
+pnpm exec werkstatt run print.pdf.generate --app warpgogol-com --force
+pnpm exec werkstatt run print.pdf.generate --app warpgogol-com --json
 ```
 
 Behavior:
@@ -568,19 +568,19 @@ export interface PrintPdfGenerateResult {
 
 ```sh
 # Generate PDFs for the pilot app after the Astro build.
-pnpm exec site-kernel run print.pdf.generate --app warpgogol-com
+pnpm exec werkstatt run print.pdf.generate --app warpgogol-com
 
 # Force regeneration even if PDFs already exist.
-pnpm exec site-kernel run print.pdf.generate --app warpgogol-com --force
+pnpm exec werkstatt run print.pdf.generate --app warpgogol-com --force
 
 # Validate that expected PDFs exist.
-pnpm exec site-kernel run print.pdf.validate --app warpgogol-com --json
+pnpm exec werkstatt run print.pdf.validate --app warpgogol-com --json
 
 # Static analysis of print layout rules.
-pnpm exec site-kernel run print.layout.validate --app warpgogol-com --json
+pnpm exec werkstatt run print.layout.validate --app warpgogol-com --json
 
 # Validate content contract for print.
-pnpm exec site-kernel run print.contract.validate --app warpgogol-com --json
+pnpm exec werkstatt run print.contract.validate --app warpgogol-com --json
 ```
 
 All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires the app to have been built first; it is a `build.post` command. `print.layout.validate` and `print.contract.validate` run in `build.check`. `print.pdf.validate` runs in `build.post`.
@@ -728,9 +728,9 @@ All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires t
 - Agents MUST update `docs/ecosystem.generated.json` via `ecosystem.manifest.generate` after adding or removing commands (AGENTS.md "RFC command lifecycle metadata").
 - Agents MUST run the full validation matrix for the pilot after implementation:
   ```sh
-  pnpm exec site-kernel run print.contract.validate --app warpgogol-com --json
-  pnpm exec site-kernel run print.layout.validate --app warpgogol-com --json
+  pnpm exec werkstatt run print.contract.validate --app warpgogol-com --json
+  pnpm exec werkstatt run print.layout.validate --app warpgogol-com --json
   pnpm --filter warpgogol-com build:check
-  pnpm exec site-kernel run print.pdf.validate --app warpgogol-com --json
-  pnpm exec site-kernel run rfc.validate RFC-0257 --json
+  pnpm exec werkstatt run print.pdf.validate --app warpgogol-com --json
+  pnpm exec werkstatt run rfc.validate RFC-0257 --json
   ```

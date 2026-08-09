@@ -56,7 +56,7 @@ After implementation is complete, run heavy checks for the impacted workspaces o
 1. ADR validation:
 
    ```sh
-   pnpm exec site-kernel run adr.validate <adr-id> --json
+   pnpm exec werkstatt run adr.validate <adr-id> --json
    ```
 
 2. Determine impacted packages/apps from the ADR's `scope` and the files touched during implementation. Build only those workspaces:

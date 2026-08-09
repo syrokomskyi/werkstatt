@@ -53,7 +53,7 @@ packagesImpacted:
 successSignals: []
 nonGoals: []
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -116,7 +116,7 @@ The `concerns` field in `ForgeSkillEntry` is replaced with a four-level taxonomy
 No new commands. The existing `forge.skill.validate` command gains a new validation rule:
 
 ```sh
-pnpm exec site-kernel run forge.skill.validate --all
+pnpm exec werkstatt run forge.skill.validate --all
 ```
 
 Exits non-zero if any skill has a `concerns` value outside the four-level enum.
@@ -239,10 +239,10 @@ The `concerns` union type changes from two values to four. `forge.skill.validate
 - [x] SKILL-10 is updated: `read-only` and `document-only` skills are blocked from containing code execution instructions (evidence: packages/forge/src/validators/skill-validate.ts:143, condition checks read-only || document-only)
 - [x] All existing skills in `packages/forge/src/registry.ts` are reclassified per the Rollout table (evidence: packages/forge/src/registry.ts:29-273, 30 entries with four-level concerns)
 - [x] All SKILL.md frontmatter files in `packages/forge/skills/` and `.agents/skills/` are synced with the new `concerns` values (evidence: 26 files changed in commit 5d8e3ccce)
-- [x] `forge.skill.validate --all` passes with zero violations after reclassification (evidence: pnpm exec site-kernel run forge.skill.validate --all → 0 violations)
+- [x] `forge.skill.validate --all` passes with zero violations after reclassification (evidence: pnpm exec werkstatt run forge.skill.validate --all → 0 violations)
 - [x] `packages/forge/AGENTS.md` documents the four-level taxonomy in the Skills section (evidence: packages/forge/AGENTS.md:31, four-level taxonomy documented with RFC-0523 reference)
 - [x] `docs/verification-plan.xml` documents the SKILL-12 rule in the verification surface (evidence: docs/verification-plan.xml:409-412, vm-08 entry for forge skill validation changes)
-- [x] `rfc.validate` passes on this RFC file (evidence: pnpm exec site-kernel run rfc.validate RFC-0523 --json → status: pass, 0 violations)
+- [x] `rfc.validate` passes on this RFC file (evidence: pnpm exec werkstatt run rfc.validate RFC-0523 --json → status: pass, 0 violations)
 
 ## Implementation notes for agents
 

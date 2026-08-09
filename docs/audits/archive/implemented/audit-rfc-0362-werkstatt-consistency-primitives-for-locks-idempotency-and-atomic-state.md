@@ -20,7 +20,7 @@ Pass — all 351 RFCs pass, including RFC-0362.
 
 ## Axis A — Structural completeness
 
-1. **CLI surface missing.** The RFC proposes three commands (`werkstatt.lock.status`, `werkstatt.lock.recover`, `werkstatt.operation.validate`) but never shows exact `pnpm exec site-kernel run ...` invocations with flags. The "Design" section describes behavior but does not include a "CLI surface" subsection. Compare RFC-0354 §7, RFC-0355 §5, RFC-0357 §6 — all show exact CLI invocations. **Fix: add a "CLI surface" subsection under Design with exact invocations for all three commands.**
+1. **CLI surface missing.** The RFC proposes three commands (`werkstatt.lock.status`, `werkstatt.lock.recover`, `werkstatt.operation.validate`) but never shows exact `pnpm exec werkstatt run ...` invocations with flags. The "Design" section describes behavior but does not include a "CLI surface" subsection. Compare RFC-0354 §7, RFC-0355 §5, RFC-0357 §6 — all show exact CLI invocations. **Fix: add a "CLI surface" subsection under Design with exact invocations for all three commands.**
 
 2. **`--json` output shape undocumented.** The RFC mentions no `--json` output for any of the three commands. All Werkstatt commands in RFC-0354..0361 document their `--json` envelope. **Fix: add an "Output format" subsection showing `--json` output for `werkstatt.lock.status`, `werkstatt.lock.recover`, and `werkstatt.operation.validate`.**
 

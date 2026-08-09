@@ -74,7 +74,7 @@ scope:
 - `werkstatt.plugin.validate` (from RFC-0770) — validates plugin registration
 - `pnpm --filter @warpgogol/werkstatt-site run build:check` — typecheck
 - `pnpm --filter @warpgogol/werkstatt-site run test` — unit tests (moved from old packages)
-- `pnpm exec site-kernel run command.manifest.generate` — verify command id parity
+- `pnpm exec werkstatt run command.manifest.generate` — verify command id parity
 - `packages.check` pipeline — verify no regressions
 
 ## 3. Step sequence
@@ -138,14 +138,14 @@ scope:
 - Update intra-plugin import paths: `@warpgogol/site-kernel-checks` → `./checks/`, `@warpgogol/site-kernel-codegen` → `./codegen/`, `@warpgogol/site-kernel-content` → `./content/`, `@warpgogol/site-kernel-astro` → `./paths/`
 - Update `package.json` exports map with subpath exports for `./checks`, `./checks/suppressions-config`, `./checks/methodologies-config`, `./checks/pipelines/packages-check`, etc. (mirror current subpath exports)
 - Install temporary re-export shim in `packages/os/site-kernel-checks/src/index.ts` pointing to `packages/werkstatt-site/src/checks/`
-- **Command id parity check:** run `pnpm exec site-kernel run command.manifest.generate` and diff the command list against the pre-move baseline — zero command ids may change
+- **Command id parity check:** run `pnpm exec werkstatt run command.manifest.generate` and diff the command list against the pre-move baseline — zero command ids may change
 - **Test fixture path repair:** update test fixtures that reference old package names (`@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-codegen`, etc.) to new intra-plugin paths. Budget explicit time for this — 140 test files may have fixture path references.
 
 **Validation:**
 
 - `pnpm --filter @warpgogol/werkstatt-site run build:check` — typecheck passes
 - `pnpm --filter @warpgogol/werkstatt-site run test` — all 140+ test files pass from new location
-- `pnpm exec site-kernel run command.manifest.generate` — command manifest unchanged (zero command id diffs)
+- `pnpm exec werkstatt run command.manifest.generate` — command manifest unchanged (zero command id diffs)
 
 **Completion criterion:** `site-kernel-checks` fully moved into `checks/`; all command ids preserved; all tests pass from new location; command manifest shows zero diffs.
 
@@ -191,11 +191,11 @@ scope:
   - `pipelines: { "build.prepare": [...], "build.check": [...] }` — from `checks/pipelines/`
   - `deployAdapters: { "cloudflare-workers": createCloudflareWorkersAdapter }`
   - `hooks: { materialize, build, checkGate, releaseEvidence, scaffoldProject }` — each delegates to the moved module's hook implementation
-- Run `pnpm exec site-kernel run werkstatt.plugin.validate --json` — verify: exactly one plugin registered, profileId matches forge stack profile, all moduleLoaders resolve, deploy adapters referenced in registry exist
+- Run `pnpm exec werkstatt run werkstatt.plugin.validate --json` — verify: exactly one plugin registered, profileId matches forge stack profile, all moduleLoaders resolve, deploy adapters referenced in registry exist
 
 **Validation:**
 
-- `pnpm exec site-kernel run werkstatt.plugin.validate --json` — status: pass, zero violations
+- `pnpm exec werkstatt run werkstatt.plugin.validate --json` — status: pass, zero violations
 - `pnpm --filter @warpgogol/werkstatt-site run build:check` — typecheck passes
 
 **Completion criterion:** Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate` with zero violations.
@@ -226,7 +226,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/werkstatt-site run build:check` — typecheck still passes (re-export shims from RFC-0772 bridge `kernel.config.ts` imports)
-- `pnpm exec site-kernel run packages.check` — no regressions
+- `pnpm exec werkstatt run packages.check` — no regressions
 - `git status` — old package directories are deleted
 
 **Completion criterion:** All old site-kernel stack package directories are deleted; workshop still builds via re-export scaffold; `packages.check` passes.
@@ -244,13 +244,13 @@ scope:
 - Create `packages/werkstatt-site/AGENTS.md` — document the plugin's module layout, ownership, entry points, and dependencies
 - Update `packages/AGENTS.md` — remove old `site-kernel-*` ownership entries, add `werkstatt-site` entry
 - Regenerate `docs/PACKAGE_GRAPH.md` (or update manually if regeneration command is unavailable)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if package topology changed
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed (should be no change — command ids are preserved)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if package topology changed
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed (should be no change — command ids are preserved)
 
 **Validation:**
 
 - `git diff --stat` — documentation files are updated
-- `pnpm exec site-kernel run rfc.validate --id RFC-0774` — still passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0774` — still passes
 
 **Completion criterion:** All documentation artifacts in scope are updated; `PACKAGE_GRAPH.md` reflects the new package structure.
 
@@ -269,12 +269,12 @@ scope:
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
   - Criterion 4 (deploy adapter): lightweight check = adapter factory unit test + `werkstatt.plugin.validate` passing. Full `leitstand dev-deploy → promote` cycle verification is deferred to RFC-0776 (workshop migration), when `tools/kernel.config.ts` is switched to import from the plugin. RFC-0774 does not switch `kernel.config.ts`, so a full deploy cycle is not possible until RFC-0776. Noted in the evidence annotation.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0774 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0774 --implementation-commit <sha>` to atomically transition `accepted → implemented`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0774`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0774`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -286,12 +286,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0774`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0774`
 - `pnpm --filter @warpgogol/werkstatt-site run build:check`
 - `pnpm --filter @warpgogol/werkstatt-site run test`
-- `pnpm exec site-kernel run werkstatt.plugin.validate --json`
-- `pnpm exec site-kernel run command.manifest.generate` (command id parity check)
-- `pnpm exec site-kernel run packages.check` (no regressions)
+- `pnpm exec werkstatt run werkstatt.plugin.validate --json`
+- `pnpm exec werkstatt run command.manifest.generate` (command id parity check)
+- `pnpm exec werkstatt run packages.check` (no regressions)
 
 ### 4.2 Evidence artifacts
 
@@ -312,6 +312,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-3 or DNA-5, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0774 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-3 or DNA-5, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0774 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the plugin contract (RFC-0770) is missing a needed hook or module loader slot, do not bypass the registry — create an amending RFC via `fo-idea-create-rfc` with `amends: [RFC-0770]`.
 - If `site-kernel-check-warpgogol` cannot resolve its `check-core`/`check-runner-node` dependencies (e.g. packages deleted before RFC-0775 moves them), escalate to the operator — the temporary import strategy from old locations depends on those packages existing until RFC-0775 is implemented.

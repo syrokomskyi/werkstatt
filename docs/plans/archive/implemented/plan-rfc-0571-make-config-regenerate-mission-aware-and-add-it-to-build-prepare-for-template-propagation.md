@@ -65,7 +65,7 @@ No configuration or data files affected.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-onboarding build:check` passes
-- `pnpm exec site-kernel run config.regenerate --site warpgogol-com --json` succeeds (no `"apps/<id> does not exist"` error)
+- `pnpm exec werkstatt run config.regenerate --site warpgogol-com --json` succeeds (no `"apps/<id> does not exist"` error)
 
 **Completion criterion:** `config.regenerate` resolves site directory via `requireAstroSitePaths` and error messages reference the resolved path, not `apps/`.
 
@@ -87,7 +87,7 @@ No configuration or data files affected.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks build:check` passes
-- `pnpm exec site-kernel run build.prepare --site warpgogol-com --json` succeeds and `config.regenerate` appears in the pipeline output
+- `pnpm exec werkstatt run build.prepare --site warpgogol-com --json` succeeds and `config.regenerate` appears in the pipeline output
 
 **Completion criterion:** `config.regenerate` is the first step in `SITES_BUILD_PREPARE_PIPELINE` and `build.prepare` regenerates root config files.
 
@@ -121,7 +121,7 @@ No configuration or data files affected.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run build.prepare --site warpgogol-com --json` and verify `config.regenerate` appears in the pipeline output with `generated` or `skipped` files
+- Run `pnpm exec werkstatt run build.prepare --site warpgogol-com --json` and verify `config.regenerate` appears in the pipeline output with `generated` or `skipped` files
 - Check that `missions/warpgogol-com-m000016/workpiece/astro.config.mjs` matches the template (smartypants setting present)
 - Check that `missions/warpgogol-com-m000016/workpiece/package.json` matches the template
 
@@ -162,16 +162,16 @@ No configuration or data files affected.
 **Agent actions:**
 
 - Update affected `AGENTS.md` files (root, `packages/os/site-kernel-onboarding/`) with the `config.regenerate` path resolution change.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0571 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0571 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0571`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0571`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -183,10 +183,10 @@ No configuration or data files affected.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0571`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0571`
 - `pnpm --filter @warpgogol/site-kernel-onboarding build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks build:check`
-- `pnpm exec site-kernel run build.prepare --site warpgogol-com --json` (integration verification)
+- `pnpm exec werkstatt run build.prepare --site warpgogol-com --json` (integration verification)
 
 ### 4.2 Evidence artifacts
 
@@ -203,4 +203,4 @@ No configuration or data files affected.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-44 or DNA-47, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0571 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-44 or DNA-47, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0571 --reason "..." --invariant "DNA-N"` instead of working around it.

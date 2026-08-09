@@ -201,7 +201,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` — zero SKILL-01 violations (frontmatter parses with new `knowledge` field)
+- `pnpm exec werkstatt run forge.skill.validate` — zero SKILL-01 violations (frontmatter parses with new `knowledge` field)
 
 **Completion criterion:** Both SKILL.md files have `knowledge:` frontmatter matching their registry entries.
 
@@ -224,7 +224,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` — zero SKILL-13 violations (declared knowledge files exist)
+- `pnpm exec werkstatt run forge.skill.validate` — zero SKILL-13 violations (declared knowledge files exist)
 
 **Completion criterion:** `grilling` has `qa-log.md` and `learned-principles.md` files, and its SKILL.md body references the knowledge system.
 
@@ -291,7 +291,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` — zero violations
+- `pnpm exec werkstatt run forge.skill.validate` — zero violations
 
 **Completion criterion:** `skill-create` SKILL.md documents the knowledge system adoption prompt.
 
@@ -355,7 +355,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0524 --json` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0524 --json` — passes
 
 **Completion criterion:** `docs/verification-plan.xml` documents SKILL-13.
 
@@ -369,12 +369,12 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.skill.validate` — expect zero violations
+- Run `pnpm exec werkstatt run forge.skill.validate` — expect zero violations
 - If violations appear, fix the offending SKILL.md, registry entry, or knowledge file and re-run
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate` — status: pass, zero violations
+- `pnpm exec werkstatt run forge.skill.validate` — status: pass, zero violations
 
 **Completion criterion:** `forge.skill.validate` passes with zero violations.
 
@@ -389,17 +389,17 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.validate`, `forge.init`, and `forge.doctor` logic changed — check if manifest needs refresh).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands, but `forge.skill.validate`, `forge.init`, and `forge.doctor` logic changed — check if manifest needs refresh).
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0524 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0524 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0524`
+- `pnpm exec werkstatt run rfc.validate RFC-0524`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate`
+- `pnpm exec werkstatt run forge.skill.validate`
 
 **Completion criterion:** All documentation artifacts in scope are updated; all acceptance criteria are checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
 
@@ -409,10 +409,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0524`
+- `pnpm exec werkstatt run rfc.validate RFC-0524`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @wgogol/forge run test`
-- `pnpm exec site-kernel run forge.skill.validate`
+- `pnpm exec werkstatt run forge.skill.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -433,6 +433,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0524 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0524 --reason "..." --invariant "DNA-54"` instead of working around it.
 - If SKILL-13 numbering conflicts with another RFC (e.g., RFC-0523 introduces SKILL-12 and another RFC claims SKILL-13), coordinate numbering via RFC supersedence — do not renumber unilaterally.
 - If `forge.init` sync logic cannot handle knowledge files without a full re-init, escalate to a separate RFC for incremental sync — do not add a `--sync-knowledge-only` flag without RFC governance.

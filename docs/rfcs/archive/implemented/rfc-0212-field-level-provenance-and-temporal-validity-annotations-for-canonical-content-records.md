@@ -91,9 +91,9 @@ Introduce a **per-record provenance sidecar**: for a record `business/{lang}/<na
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.claim.validate --app warpgogol-com
-pnpm exec site-kernel run content.claim.validate --app warpgogol-com --json
-pnpm exec site-kernel run content.claim.report   --app warpgogol-com   # coverage, never fails
+pnpm exec werkstatt run content.claim.validate --app warpgogol-com
+pnpm exec werkstatt run content.claim.validate --app warpgogol-com --json
+pnpm exec werkstatt run content.claim.report   --app warpgogol-com   # coverage, never fails
 ```
 
 ### Sidecar format

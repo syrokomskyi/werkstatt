@@ -74,7 +74,7 @@ nonGoals:
   - "No site plugin composition — RFC-0774/0775"
   - "No deletion of old source packages — deferred to RFC-0776 after workshop migration completes. Re-export scaffold persists between RFC-0772 and RFC-0776 as a construction scaffold within the program waves, not a permanent compatibility layer."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -131,7 +131,7 @@ During phases 1–5 the old packages temporarily re-export from the new location
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run werkstatt.autonomy.validate --json
+pnpm exec werkstatt run werkstatt.autonomy.validate --json
 ```
 
 > **CLI name note:** RFC-0771 retires the `site-kernel` CLI binary name in favor of `werkstatt`. The rename happens in RFC-0776 (workshop migration). Until then, `site-kernel` remains the active CLI binary name, and the command above is correct for the implementation window.
@@ -258,12 +258,12 @@ Additional call sites discovered during implementation must be added to this tab
 - [x] Plugin registry and hooks implemented per RFC-0770 in `src/plugin/` (evidence: `packages/werkstatt/src/plugin-contract.ts`, `packages/werkstatt/src/plugin-registry.ts`, `packages/werkstatt/src/plugin/invoke-hook.ts`)
 - [x] Plugin hook invocation helper implemented (`invokeHook`, `invokeMaterializeHook`, etc.) (evidence: `packages/werkstatt/src/plugin/invoke-hook.ts:23-70`)
 - [x] `werkstatt.autonomy.validate` registered (workspace scope) and wired into `packages.check` (evidence: `packages/werkstatt/os/werkstatt-autonomy.module.ts`, `tools/kernel.config.ts:157-158`)
-- [x] `werkstatt.autonomy.validate` passes — excludes `@warpgogol/werkstatt` (self-imports), `@warpgogol/ontology`, `@warpgogol/share` (shared schema packages, not stack plugins); flags `@warpgogol/site-kernel-*` stack-specific imports (evidence: `pnpm exec site-kernel run werkstatt.autonomy.validate --json` → status: pass, 378 files scanned, zero violations)
+- [x] `werkstatt.autonomy.validate` passes — excludes `@warpgogol/werkstatt` (self-imports), `@warpgogol/ontology`, `@warpgogol/share` (shared schema packages, not stack plugins); flags `@warpgogol/site-kernel-*` stack-specific imports (evidence: `pnpm exec werkstatt run werkstatt.autonomy.validate --json` → status: pass, 378 files scanned, zero violations)
 - [x] Re-export shims in old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) re-export from `@warpgogol/werkstatt` so the workshop builds (evidence: `packages/os/site-kernel/src/index.ts` → `export * from "@warpgogol/werkstatt/kernel"`, `packages/os/site-kernel-handoff/src/index.ts` → `export * from "@warpgogol/werkstatt/handoff"`, `packages/fingerprint/src/index.ts` → `export * from "@warpgogol/werkstatt/fingerprint"`, `packages/agent-gate/src/index.ts` → `export * from "@warpgogol/werkstatt/agent-gate"`)
 - [x] `docs/PACKAGE_GRAPH.md` regenerated/updated (evidence: `docs/PACKAGE_GRAPH.md` — updated with consolidated engine package structure and re-export shim table)
 - [x] Root `AGENTS.md` § Monorepo layout updated to reference `packages/werkstatt` (evidence: `AGENTS.md` — `packages/werkstatt` listed in Monorepo layout section)
 - [x] `packages/werkstatt/AGENTS.md` created (evidence: `packages/werkstatt/AGENTS.md` — full engine package guide with entry points, scripts, architecture, autonomy guard documentation)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0772 --json` → status: pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0772 --json` → status: pass)
 
 ## Implementation notes for agents
 

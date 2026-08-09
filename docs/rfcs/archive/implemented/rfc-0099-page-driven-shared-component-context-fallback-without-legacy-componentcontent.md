@@ -113,8 +113,8 @@ Backward compatibility is intentionally removed:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run shared.context.validate --app warpgogol-com
-pnpm exec site-kernel run shared.context.validate --app nicaragua-projekt --json
+pnpm exec werkstatt run shared.context.validate --app warpgogol-com
+pnpm exec werkstatt run shared.context.validate --app nicaragua-projekt --json
 ```
 
 `shared.context.validate` is an app-scoped author/build-time validator.
@@ -289,7 +289,7 @@ Targeted verification completed:
 - `site-kernel run system.manifest.validate` for `warpgogol-com` and `nicaragua-projekt`
 - `site-kernel run shared.context.validate` for `warpgogol-com` and `nicaragua-projekt`
 - `site-kernel run page.block.validate` for `warpgogol-com` and `nicaragua-projekt`
-- `pnpm exec site-kernel run rfc.validate RFC-0099 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0099 --json`
 
 ## Implementation notes for agents
 

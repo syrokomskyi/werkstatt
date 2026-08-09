@@ -238,11 +238,11 @@ See `## CLI surface`, `## TypeScript contracts`, and `## Failure modes` above fo
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run section.cta.contract.validate
-pnpm exec site-kernel run section.image.contract.validate
-pnpm exec site-kernel run section.contract.validate
-pnpm exec site-kernel run page.block.validate --app <id>
-pnpm exec site-kernel run section.scaffold --archetype <id> --slug <slug>
+pnpm exec werkstatt run section.cta.contract.validate
+pnpm exec werkstatt run section.image.contract.validate
+pnpm exec werkstatt run section.contract.validate
+pnpm exec werkstatt run page.block.validate --app <id>
+pnpm exec werkstatt run section.scaffold --archetype <id> --slug <slug>
 ```
 
 Behavior:

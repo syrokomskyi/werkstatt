@@ -56,7 +56,7 @@ scope:
 - `pnpm --filter @warpgogol/forge build:check` — typecheck forge package
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — typecheck handoff package
 - `pnpm --filter @warpgogol/forge test` — unit tests for mission archive handler
-- `pnpm exec site-kernel run rfc.validate --id RFC-0573` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0573` — RFC validation
 - No pipeline integration (`mission.archive` is opt-in, not part of `build.check`)
 
 ## 3. Step sequence
@@ -173,7 +173,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge build:check` passes
-- `pnpm exec site-kernel run mission.archive --dry-run --json` returns valid JSON (command is registered)
+- `pnpm exec werkstatt run mission.archive --dry-run --json` returns valid JSON (command is registered)
 
 **Completion criterion:** `mission.archive` command is available via `site-kernel run`.
 
@@ -197,7 +197,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge build:check` passes
-- `pnpm exec site-kernel run docs.archive --dry-run --json` includes `mission.archive` in results
+- `pnpm exec werkstatt run docs.archive --dry-run --json` includes `mission.archive` in results
 
 **Completion criterion:** `docs.archive` umbrella includes `mission.archive` as sixth sub-command and description mentions it.
 
@@ -306,7 +306,7 @@ scope:
 - Run `pnpm --filter @warpgogol/forge build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @warpgogol/forge test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0573`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0573`
 - Verify each acceptance criterion against the implemented code:
   1. `mission.archive` registered in `forgeMissionModule` with `--dry-run` and `--status` — check `mission.module.ts`
   2. `forgeMissionModule` exported from `packages/forge/src/index.ts` and registered in `tools/kernel.config.ts` — check both files
@@ -343,16 +343,16 @@ scope:
 - Update affected `AGENTS.md` files: `packages/forge/AGENTS.md` (OS modules table — done in Step 10)
 - Update affected `docs/*.xml` Compass files: no changes needed (no repository-wide semantic changes)
 - Update `docs/architecture-dna.md`: no changes needed (DNA-46 is extended, not modified)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed — run if needed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed — run if needed
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0573 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0573 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0573`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0573`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -364,7 +364,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0573`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0573`
 - `pnpm --filter @warpgogol/forge build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/forge test`
@@ -386,5 +386,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0573 --reason "..." --invariant "DNA-46"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0573 --reason "..." --invariant "DNA-46"` instead of working around it.
 - If the forge autonomy guard fails on the new handler, ensure no `@warpgogol/*` imports are present — the handler must use only `node:fs`, `node:path`, and `yaml`.

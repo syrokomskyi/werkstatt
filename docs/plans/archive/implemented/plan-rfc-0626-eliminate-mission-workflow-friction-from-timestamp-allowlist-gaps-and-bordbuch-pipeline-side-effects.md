@@ -163,7 +163,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run bordbuch.commit --site warpgogol-com --json` (manual smoke test)
+- `pnpm exec werkstatt run bordbuch.commit --site warpgogol-com --json` (manual smoke test)
 
 **Completion criterion:** `bordbuch.commit` is a registered kernel command callable via `site-kernel run bordbuch.commit`.
 
@@ -256,7 +256,7 @@ scope:
 
 - Check `packages/os/site-kernel-handoff/AGENTS.md` — if it lists bordbuch commands (`bordbuch.append`, `bordbuch.validate`, `bordbuch.status`, `bordbuch.generate`, `bordbuch.repair`), add `bordbuch.commit` with a brief description
 - Check `packages/os/site-kernel-checks/AGENTS.md` — if it lists `generated.timestamp.validate` rules, add `TS-TIME-02` (allowlist parity)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 
 **Validation:**
 
@@ -276,16 +276,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0626 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0626 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0626`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0626`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -297,12 +297,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0626`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0626`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks test`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0626` (RFC-0330, for RFCs created on or after 2026-07-07)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0626` (RFC-0330, for RFCs created on or after 2026-07-07)
 
 ### 4.2 Evidence artifacts
 
@@ -321,5 +321,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0626 --reason "..." --invariant "DNA-51"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0626 --reason "..." --invariant "DNA-51"` instead of working around it.
 - If `bordbuch.commit` registration conflicts with existing command names, check for duplicate registration in `bordbuch.module.ts` vs `bordbuch/index.ts` — the active module is `bordbuch.module.ts` (imported in `kernel.config.ts`).

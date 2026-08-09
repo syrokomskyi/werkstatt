@@ -103,9 +103,9 @@ acceptance:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rfc.acceptance.run --id rfc-0258
-pnpm exec site-kernel run rfc.acceptance.run --id rfc-0258 --json
-pnpm exec site-kernel run rfc.acceptance.run --status accepted   # all accepted RFCs with probes
+pnpm exec werkstatt run rfc.acceptance.run --id rfc-0258
+pnpm exec werkstatt run rfc.acceptance.run --id rfc-0258 --json
+pnpm exec werkstatt run rfc.acceptance.run --status accepted   # all accepted RFCs with probes
 ```
 
 ### TypeScript contracts

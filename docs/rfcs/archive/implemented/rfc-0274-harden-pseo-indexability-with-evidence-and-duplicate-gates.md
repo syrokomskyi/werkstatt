@@ -167,9 +167,9 @@ Diagnostics report the pair, similarity score, shared shingles, and the first di
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.evidence.validate --app warpgogol-com --blueprint website-local --json
-pnpm exec site-kernel run surface.duplicate.validate --app warpgogol-com --blueprint website-local --json
-pnpm exec site-kernel run pseo.validate --app warpgogol-com --json
+pnpm exec werkstatt run surface.evidence.validate --app warpgogol-com --blueprint website-local --json
+pnpm exec werkstatt run surface.duplicate.validate --app warpgogol-com --blueprint website-local --json
+pnpm exec werkstatt run pseo.validate --app warpgogol-com --json
 ```
 
 `pseo.validate` becomes the aggregate quality gate that includes substance, evidence, duplicate, freshness, entitlement, and link checks.

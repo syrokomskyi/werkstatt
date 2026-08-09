@@ -59,7 +59,7 @@ nonGoals:
   - "Do not modify existing DNA invariants — this RFC adds a new one."
   - "Do not retroactively reassign DNA-18 — it remains the Uni registry invariant."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -159,8 +159,8 @@ This RFC does not introduce or modify any commands. It is a policy-only RFC.
 - [x] DNA-58 text matches the Decision section of this RFC (evidence: docs/architecture-dna.md:249, text aligned with RFC-0607 Decision section and Invariant text section — both list full binary file set)
 - [x] DNA-58 enforcement status references RFC-0601 (`generated.drift.validate`) (evidence: docs/architecture-dna.md:249, "Enforcement: `generated.drift.validate` (RFC-0601)")
 - [x] RFC-0601 `satisfies` field updated to include DNA-58 (after this RFC is accepted) (evidence: docs/rfcs/rfc-0601-*.md:36-37, `satisfies: [DNA-58]`)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0607 --json` → status: pass, 0 violations)
-- [x] `rfc.validate` passes on RFC-0601 after its `satisfies` update (evidence: `pnpm exec site-kernel run rfc.validate RFC-0601 --json` → status: pass, 0 violations)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate RFC-0607 --json` → status: pass, 0 violations)
+- [x] `rfc.validate` passes on RFC-0601 after its `satisfies` update (evidence: `pnpm exec werkstatt run rfc.validate RFC-0601 --json` → status: pass, 0 violations)
 
 ## Implementation notes for agents
 

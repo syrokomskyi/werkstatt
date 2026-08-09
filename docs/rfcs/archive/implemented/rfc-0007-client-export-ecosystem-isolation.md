@@ -109,8 +109,8 @@ The `.env` hard-inclusion rule is narrowed:
 No new flags. The command signature is unchanged:
 
 ```sh
-pnpm exec site-kernel run client.export --app <name>
-pnpm exec site-kernel run client.export --app <name> --dry-run
+pnpm exec werkstatt run client.export --app <name>
+pnpm exec werkstatt run client.export --app <name> --dry-run
 ```
 
 ### TypeScript contracts

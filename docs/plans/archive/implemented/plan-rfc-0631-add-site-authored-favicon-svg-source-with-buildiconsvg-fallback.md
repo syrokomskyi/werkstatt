@@ -105,7 +105,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run public.icons.validate --site <test-site>` passes for sites without source SVG (no new diagnostics)
+- `pnpm exec werkstatt run public.icons.validate --site <test-site>` passes for sites without source SVG (no new diagnostics)
 
 **Completion criterion:** Validator reports ICON-SRC-01/02/03 when source SVGs have issues; no false positives for sites without source SVGs
 
@@ -184,16 +184,16 @@ scope:
 **Agent actions:**
 
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0631` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0631` — must pass
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- Stamp the RFC as implemented: commit the implementation code first, then run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0631 --implementation-commit <sha> --dry-run` to verify, then without `--dry-run` to stamp. Commit the stamped RFC separately.
+- Stamp the RFC as implemented: commit the implementation code first, then run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0631 --implementation-commit <sha> --dry-run` to verify, then without `--dry-run` to stamp. Commit the stamped RFC separately.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0631` — passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0631` — passes
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`; implementation commit and stamp commit are separate.
@@ -204,7 +204,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0631`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0631`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run vitest -- --run src/tests/icons-source-svg.test.ts`
 
@@ -223,4 +223,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0631 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0631 --reason "..." --invariant "DNA-N"` instead of working around it.

@@ -164,10 +164,10 @@ Service `.env.example` files no longer list `WARPGOGOL_OTLP_ENDPOINT` or `WARPGO
 
 ```sh
 # Sites
-pnpm exec site-kernel run deploy.preflight --site warpgogol-com
+pnpm exec werkstatt run deploy.preflight --site warpgogol-com
 
 # Services
-pnpm exec site-kernel run deploy.preflight --service lagebild-sync-worker
+pnpm exec werkstatt run deploy.preflight --service lagebild-sync-worker
 ```
 
 ### Rule 7 — env.main.check and env.alt.check removed
@@ -201,19 +201,19 @@ DNA-40 is updated to reflect the single-file model: `.env` for local development
 
 ```sh
 # Pre-deploy gate (sites — no --env flag)
-pnpm exec site-kernel run deploy.preflight --site warpgogol-com
+pnpm exec werkstatt run deploy.preflight --site warpgogol-com
 
 # Pre-deploy gate (services — unchanged)
-pnpm exec site-kernel run deploy.preflight --service lagebild-sync-worker
+pnpm exec werkstatt run deploy.preflight --service lagebild-sync-worker
 
 # Validate .env.example presence, comments, how-to-obtain (unchanged)
-pnpm exec site-kernel run env.contract.validate
+pnpm exec werkstatt run env.contract.validate
 
 # Check/create .env from .env.example (unchanged)
-pnpm exec site-kernel run env.local.check
+pnpm exec werkstatt run env.local.check
 
 # Validate deploy scripts (updated — checks --secrets-file .env for all)
-pnpm exec site-kernel run deploy.scripts.validate
+pnpm exec werkstatt run deploy.scripts.validate
 ```
 
 ### TypeScript contracts

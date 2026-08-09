@@ -119,7 +119,7 @@ policy:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run offer.provider.validate --app warpgogol-com --json
+pnpm exec werkstatt run offer.provider.validate --app warpgogol-com --json
 ```
 
 `offer.provider.validate` (app scope) inspects each emitted offer page's provider node and the offer records, and fails when the provider is anything other than the site's own business profile, or when an offer record names an external provider.

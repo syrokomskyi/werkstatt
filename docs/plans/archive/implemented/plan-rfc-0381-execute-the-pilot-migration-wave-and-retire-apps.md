@@ -65,15 +65,15 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0381` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0381` — RFC validation
 - `pnpm --filter @gogol/ontology run build:check` — type check after repo regex change
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — type check after register error message change
 - `pnpm --filter @gogol/site-kernel-handoff test` — unit tests including new local-path repo test
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com` — pilot validation gate
-- `pnpm exec site-kernel run release.validate --release warpgogol-com-r000001` — release validation
-- `pnpm exec site-kernel run notausgang.validate --path ./notausgang-warpgogol-com-r000001` — notausgang validation
-- `pnpm exec site-kernel run workspace.surface.validate` — ecosystem drift guard
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0381` — verification evidence (RFC-0330)
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com` — pilot validation gate
+- `pnpm exec werkstatt run release.validate --release warpgogol-com-r000001` — release validation
+- `pnpm exec werkstatt run notausgang.validate --path ./notausgang-warpgogol-com-r000001` — notausgang validation
+- `pnpm exec werkstatt run workspace.surface.validate` — ecosystem drift guard
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0381` — verification evidence (RFC-0330)
 
 ## 3. Step sequence
 
@@ -224,7 +224,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run sternsystem.register --id warpgogol-com --cosmicStar Vega --repo ../systems-git/warpgogol-com`.
+- Run `pnpm exec werkstatt run sternsystem.register --id warpgogol-com --cosmicStar Vega --repo ../systems-git/warpgogol-com`.
 - Verify `systems/registry.yaml` has a new entry with `status: registered`.
 
 **Validation:**
@@ -243,9 +243,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run sternsystem.extract --app warpgogol-com --repo ../systems-git/warpgogol-com`.
+- Run `pnpm exec werkstatt run sternsystem.extract --app warpgogol-com --repo ../systems-git/warpgogol-com`.
 - Verify `systems/warpgogol-com/` contains `src/content/`, `public/`, `provenance/`, `system.pin.json`, and `bordbuch/events.ndjson`.
-- Run `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com` — must pass with 0 violations.
+- Run `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com` — must pass with 0 violations.
 
 **Validation:**
 
@@ -265,10 +265,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run mission.open --system warpgogol-com --brief "Pilot migration: extract to Sternsystem and release warpgogol-com-r000001"`.
-- Run `pnpm exec site-kernel run mission.materialize --mission warpgogol-com-m000001`.
-- Run `pnpm exec site-kernel run mission.validate --mission warpgogol-com-m000001` — must pass.
-- Run `pnpm exec site-kernel run mission.build --mission warpgogol-com-m000001`.
+- Run `pnpm exec werkstatt run mission.open --system warpgogol-com --brief "Pilot migration: extract to Sternsystem and release warpgogol-com-r000001"`.
+- Run `pnpm exec werkstatt run mission.materialize --mission warpgogol-com-m000001`.
+- Run `pnpm exec werkstatt run mission.validate --mission warpgogol-com-m000001` — must pass.
+- Run `pnpm exec werkstatt run mission.build --mission warpgogol-com-m000001`.
 
 **Validation:**
 
@@ -287,11 +287,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run release.prepare --mission warpgogol-com-m000001`.
+- Run `pnpm exec werkstatt run release.prepare --mission warpgogol-com-m000001`.
 - Verify `releases/warpgogol-com-r000001/` exists with `release.yaml` state `prepared`.
-- Run `pnpm exec site-kernel run release.publish --release warpgogol-com-r000001`.
+- Run `pnpm exec werkstatt run release.publish --release warpgogol-com-r000001`.
 - Verify `release.yaml` state is `published`.
-- Run `pnpm exec site-kernel run release.validate --release warpgogol-com-r000001` — must pass.
+- Run `pnpm exec werkstatt run release.validate --release warpgogol-com-r000001` — must pass.
 
 **Validation:**
 
@@ -311,9 +311,9 @@ scope:
 **Agent actions:**
 
 - Ensure `CLOUDFLARE_API_TOKEN` and `WERKSTATT_SECRETS_ALT` are set in the environment.
-- Run `pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --channel alt`.
+- Run `pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000001 --channel alt`.
 - Verify the propagation result shows `state: succeeded` and health check passed.
-- Run `pnpm exec site-kernel run leitstand.status --system warpgogol-com` — verify alt channel shows `healthy: true`.
+- Run `pnpm exec werkstatt run leitstand.status --system warpgogol-com` — verify alt channel shows `healthy: true`.
 
 **Validation:**
 
@@ -331,9 +331,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --channel main`.
+- Run `pnpm exec werkstatt run leitstand.propagate --release warpgogol-com-r000001 --channel main`.
 - Verify the propagation result shows `state: succeeded` and health check passed.
-- Run `pnpm exec site-kernel run leitstand.status --system warpgogol-com` — verify both channels show `healthy: true`.
+- Run `pnpm exec werkstatt run leitstand.status --system warpgogol-com` — verify both channels show `healthy: true`.
 
 **Validation:**
 
@@ -351,10 +351,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output ./notausgang-warpgogol-com-r000001`.
-- Run `pnpm exec site-kernel run notausgang.validate --path ./notausgang-warpgogol-com-r000001` — must pass.
-- Run `pnpm exec site-kernel run mission.reconcile --mission warpgogol-com-m000001` — commits and pushes Werkstück data changes to `../systems-git/warpgogol-com`.
-- Run `pnpm exec site-kernel run mission.close --mission warpgogol-com-m000001` — releases system lock, appends Bordbuch `mission-close` event.
+- Run `pnpm exec werkstatt run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output ./notausgang-warpgogol-com-r000001`.
+- Run `pnpm exec werkstatt run notausgang.validate --path ./notausgang-warpgogol-com-r000001` — must pass.
+- Run `pnpm exec werkstatt run mission.reconcile --mission warpgogol-com-m000001` — commits and pushes Werkstück data changes to `../systems-git/warpgogol-com`.
+- Run `pnpm exec werkstatt run mission.close --mission warpgogol-com-m000001` — releases system lock, appends Bordbuch `mission-close` event.
 
 **Validation:**
 
@@ -398,10 +398,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run fleet.sites.generate`.
+- Run `pnpm exec werkstatt run fleet.sites.generate`.
 - Verify `fleet/fleet.sites.yaml` resolves `warpgogol-com` from `systems/registry.yaml` (not `apps/` discovery).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate`.
-- Run `pnpm exec site-kernel run workspace.surface.validate` — must pass.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate`.
+- Run `pnpm exec werkstatt run workspace.surface.validate` — must pass.
 - Commit fleet projection and ecosystem manifest updates.
 
 **Validation:**
@@ -487,10 +487,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0381` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0381` — must pass.
 - Run `pnpm --filter @gogol/ontology run build:check` — must pass.
 - Run `pnpm --filter @gogol/site-kernel-handoff test` — must pass.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0381` — emits verification evidence file.
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0381` — emits verification evidence file.
 - Update RFC-0381 frontmatter: `status: implemented`, `implementedAt: 2026-07-12`.
 - Commit the RFC status change and evidence file with message: `implement: RFC-0381 — stamp implemented` / `All acceptance criteria pass. Pilot migration wave complete. apps/warpgogol-com retired.`
 
@@ -508,15 +508,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0381`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0381`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com`
-- `pnpm exec site-kernel run release.validate --release warpgogol-com-r000001`
-- `pnpm exec site-kernel run notausgang.validate --path ./notausgang-warpgogol-com-r000001`
-- `pnpm exec site-kernel run workspace.surface.validate`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0381` (RFC-0330)
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com`
+- `pnpm exec werkstatt run release.validate --release warpgogol-com-r000001`
+- `pnpm exec werkstatt run notausgang.validate --path ./notausgang-warpgogol-com-r000001`
+- `pnpm exec werkstatt run workspace.surface.validate`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0381` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -541,7 +541,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If `sternsystem.extract` reveals a data path that the current classifier misses (e.g., a new content directory not in the data-only partition), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0381 --reason "extraction classifier misses <path>" --invariant "DNA-44"` instead of working around it.
-- If `release.prepare` snapshot diff reveals a structural difference that cannot be resolved without changing the build pipeline, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0381 --reason "snapshot diff reveals structural mismatch" --invariant "DNA-48"`.
-- If `leitstand.propagate` reveals an incompatibility between the RFC-0379 adapter contract and the actual Cloudflare Workers API, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0379 --reason "adapter contract mismatch" --invariant "DNA-49"`.
-- If `notausgang.validate` reveals a Bordbuch or artifact integrity issue that requires contract changes, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0380 --reason "integrity verification gap" --invariant "DNA-50"`.
+- If `sternsystem.extract` reveals a data path that the current classifier misses (e.g., a new content directory not in the data-only partition), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0381 --reason "extraction classifier misses <path>" --invariant "DNA-44"` instead of working around it.
+- If `release.prepare` snapshot diff reveals a structural difference that cannot be resolved without changing the build pipeline, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0381 --reason "snapshot diff reveals structural mismatch" --invariant "DNA-48"`.
+- If `leitstand.propagate` reveals an incompatibility between the RFC-0379 adapter contract and the actual Cloudflare Workers API, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0379 --reason "adapter contract mismatch" --invariant "DNA-49"`.
+- If `notausgang.validate` reveals a Bordbuch or artifact integrity issue that requires contract changes, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0380 --reason "integrity verification gap" --invariant "DNA-50"`.

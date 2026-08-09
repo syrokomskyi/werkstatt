@@ -254,7 +254,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** `migrator.registry.validate` passes with the new `rfc-0497` migrator registered.
 
@@ -310,18 +310,18 @@ scope:
 
 - Update `packages/os/site-kernel-checks/AGENTS.md` command table with `surface.intersection.validate` and `surface.intersection.report`
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
 - DO NOT stamp RFC or plan status as `implemented` — request the human operator to run `rfc.implement.stamp --id RFC-0497 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0497`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0497`
 - `pnpm --filter @gogol/surface run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 
 **Completion criterion:** All documentation artifacts in scope are updated; all verifiable acceptance criteria are checked off; agent has requested the human operator to perform the `accepted → implemented` transition.
@@ -332,13 +332,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0497`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0497`
 - `pnpm --filter @gogol/surface run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -358,5 +358,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0497 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0497 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the substance independence test cannot be implemented with the existing `pageText()` + `tokenize()` helpers (e.g., because the block structure doesn't allow element removal by string replacement), escalate to the operator — do not invent a new scoring method without RFC approval.

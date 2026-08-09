@@ -115,7 +115,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` compiles
-- `pnpm exec site-kernel run suppressions.validate --json` passes on `systems/axiom-suppressions.yaml` with zero warnings (no default rule uses `messagePattern`/`descriptionPattern`)
+- `pnpm exec werkstatt run suppressions.validate --json` passes on `systems/axiom-suppressions.yaml` with zero warnings (no default rule uses `messagePattern`/`descriptionPattern`)
 
 **Completion criterion:** SUPPRESS-VAL-06 emitted for rules using `messagePattern`/`descriptionPattern` without `titlePattern`. `ruleSignature` includes `titlePattern`. `isBroadPattern` checks `titlePattern`. Command table description includes SUPPRESS-VAL-06. `suppressions.validate` passes with zero warnings on default rules.
 
@@ -181,20 +181,20 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-checks/AGENTS.md` is updated (Step 3)
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0688`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0688`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test`
-- Run `pnpm exec site-kernel run suppressions.validate --json` — verify zero warnings on default rules
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0688` (RFC-0330 — acceptance probes are commented out, so this will produce no evidence file, which is expected)
+- Run `pnpm exec werkstatt run suppressions.validate --json` — verify zero warnings on default rules
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0688` (RFC-0330 — acceptance probes are commented out, so this will produce no evidence file, which is expected)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: invoke `fo-fix` if review has findings
 - Check off acceptance criteria: verify each criterion against implemented code
-- Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0688 --implementation-commit <sha>`
+- Stamp: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0688 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0688`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0688`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts updated; code review passed; all acceptance criteria checked off; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -205,11 +205,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0688`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0688`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run suppressions.validate --json` (verify zero warnings)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0688` (no evidence file expected — probes commented out)
+- `pnpm exec werkstatt run suppressions.validate --json` (verify zero warnings)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0688` (no evidence file expected — probes commented out)
 
 ### 4.2 Evidence artifacts
 
@@ -226,4 +226,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0688 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0688 --reason "..." --invariant "DNA-N"` instead of working around it.

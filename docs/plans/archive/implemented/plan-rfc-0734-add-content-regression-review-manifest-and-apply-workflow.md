@@ -105,8 +105,8 @@ scope:
 
 **Files:** `packages/os/site-kernel-checks/src/content-regression.ts`
 
-- [ ] Update CREG-01 fixHint to: "Review the content diff. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>"
-- [ ] Update CREG-02 fixHint to: "Route set mismatch. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>"
+- [ ] Update CREG-01 fixHint to: "Review the content diff. Run: pnpm exec werkstatt run content.regression.review.generate --site <systemId>"
+- [ ] Update CREG-02 fixHint to: "Route set mismatch. Run: pnpm exec werkstatt run content.regression.review.generate --site <systemId>"
 
 ### Step 7: `mission.close` CREG-05 enforcement and `--skip-content-regression` flag
 
@@ -158,13 +158,13 @@ scope:
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0734`
-- Run `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0734`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0734` and commit evidence file
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0734`
+- Run `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0734`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0734` and commit evidence file
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Max 3 iterations.
 - Check off acceptance criteria: verify each criterion against implemented code. Mark `[x]` with inline `(evidence: ...)` annotation.
-- Stamp: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0734 --implementation-commit <sha>`
+- Stamp: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0734 --implementation-commit <sha>`
 
 **Completion criterion:** All build:check and test commands pass; rfc.validate passes; acceptance probes pass; review report exists in `docs/reviews/code/`; all acceptance criteria checked off with evidence annotations; RFC stamped as `implemented`.
 
@@ -174,13 +174,13 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0734`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0734`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0734`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0734`
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0734`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0734`
 
 ### 4.2 Evidence artifacts
 
@@ -199,7 +199,7 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-63, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0734 --reason "..." --invariant "DNA-63"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-63, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0734 --reason "..." --invariant "DNA-63"` instead of working around it.
 - If CREG-05 enforcement breaks existing mission workflows in unexpected ways, do not weaken the check — create a new RFC to adjust the enforcement policy.
 
 ## 7. Sequencing

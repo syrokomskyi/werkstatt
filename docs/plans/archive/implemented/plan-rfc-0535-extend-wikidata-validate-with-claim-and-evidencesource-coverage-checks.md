@@ -48,7 +48,7 @@ None — no schema changes, no YAML/JSON config, no ontology catalogs.
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck
 - `pnpm --filter @gogol/site-kernel-checks run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0535 --json` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0535 --json` — RFC validation
 - No pipeline integration changes — command remains standalone
 
 ## 3. Step sequence
@@ -283,14 +283,14 @@ None — no schema changes, no YAML/JSON config, no ontology catalogs.
 - Update `packages/os/site-kernel-checks/AGENTS.md` — add note about new wikidata.validate rules (RFC-0535) to the wikidata validator module description
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-checks run test -- --run wikidata-validate` — all tests must pass
-- Run `pnpm exec site-kernel run rfc.validate RFC-0535 --json` — must pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0535 --json` — must pass
 - Check off every acceptance criterion in the RFC with `[x]` and inline `(evidence: ...)` annotation
-- Stamp implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0535 --implementation-commit <sha>`
+- Stamp implemented: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0535 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0535 --json` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0535 --json` — passes
 - All acceptance criteria checked off with evidence annotations
 
 **Completion criterion:** All documentation updated, all acceptance criteria verified, RFC stamped as implemented.
@@ -301,7 +301,7 @@ None — no schema changes, no YAML/JSON config, no ontology catalogs.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0535 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0535 --json`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test -- --run wikidata-validate`
 
@@ -321,4 +321,4 @@ None — no schema changes, no YAML/JSON config, no ontology catalogs.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0535 --reason "..." --invariant "DNA-16"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0535 --reason "..." --invariant "DNA-16"` instead of working around it.

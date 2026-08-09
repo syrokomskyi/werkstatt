@@ -117,8 +117,8 @@ scope:
 **Validation:**
 
 - Unit tests for valid policy, missing job, renamed job, malformed policy, and absent RFC validation step.
-- `pnpm exec site-kernel run github.branch-protection.validate --json`
-- `pnpm exec site-kernel run ci.local.validate --json`
+- `pnpm exec werkstatt run github.branch-protection.validate --json`
+- `pnpm exec werkstatt run ci.local.validate --json`
 
 **Completion criterion:** Offline policy/workflow drift fails locally and in CI without a network request.
 
@@ -138,9 +138,9 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate`
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json`
-- `pnpm exec site-kernel run command.manifest.validate --json`
+- `pnpm exec werkstatt run rfc.validate`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json`
+- `pnpm exec werkstatt run command.manifest.validate --json`
 
 **Completion criterion:** Documentation, generated projections, and command registry describe the same transition procedure.
 
@@ -165,9 +165,9 @@ scope:
 - `pnpm --filter @wgogol/forge test`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-checks test`
-- `pnpm exec site-kernel run github.branch-protection.validate --json`
-- `pnpm exec site-kernel run ci.local.validate --json`
-- `pnpm exec site-kernel run rfc.validate`
+- `pnpm exec werkstatt run github.branch-protection.validate --json`
+- `pnpm exec werkstatt run ci.local.validate --json`
+- `pnpm exec werkstatt run rfc.validate`
 
 **Completion criterion:** All scoped checks pass and RFC-0476 contains only checked, evidenced criteria before it is stamped.
 
@@ -181,9 +181,9 @@ scope:
 - `pnpm --filter @wgogol/forge test`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-checks test`
-- `pnpm exec site-kernel run github.branch-protection.validate --json`
-- `pnpm exec site-kernel run ci.local.validate --json`
-- `pnpm exec site-kernel run rfc.validate`
+- `pnpm exec werkstatt run github.branch-protection.validate --json`
+- `pnpm exec werkstatt run ci.local.validate --json`
+- `pnpm exec werkstatt run rfc.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -202,5 +202,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If the stamp command cannot atomically coordinate RFC and evidence publication without violating the existing atomic-write contract, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0476 --reason "Atomic transition evidence cannot be proven with the existing storage primitives" --invariant "RFC-0330"`.
+- If the stamp command cannot atomically coordinate RFC and evidence publication without violating the existing atomic-write contract, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0476 --reason "Atomic transition evidence cannot be proven with the existing storage primitives" --invariant "RFC-0330"`.
 - If enforcing the policy requires an authenticated external GitHub API integration, stop and create a follow-up RFC rather than adding credentials or network dependencies to CI.

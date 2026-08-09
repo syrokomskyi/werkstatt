@@ -86,7 +86,7 @@ A generic provider reads the Blueprint and drives the engine; no per-business co
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run blueprint.validate --app warpgogol-com --json
+pnpm exec werkstatt run blueprint.validate --app warpgogol-com --json
 ```
 
 ### Blueprint schema (illustrative `website-local.yaml`)

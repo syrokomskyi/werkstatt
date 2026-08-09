@@ -62,7 +62,7 @@ scope:
 
 - Read `docs/rfcs/rfc-0605-*.md` frontmatter — confirm `status: implemented`. If not implemented, stop and report to operator.
 - Read `docs/rfcs/rfc-0606-*.md` frontmatter — confirm `status: implemented`. If not implemented, stop and report to operator.
-- Verify `passport.key.ensure` command is registered: `pnpm exec site-kernel run command.list --json 2>/dev/null | grep passport.key.ensure` (or check command table in `packages/os/site-kernel-checks/src/command-tables/06-growth-passport.ts`).
+- Verify `passport.key.ensure` command is registered: `pnpm exec werkstatt run command.list --json 2>/dev/null | grep passport.key.ensure` (or check command table in `packages/os/site-kernel-checks/src/command-tables/06-growth-passport.ts`).
 - Verify `generated.files.validate` resolves `systems/{system}/` paths (RFC-0606 fix is in place).
 
 **Validation:**
@@ -146,15 +146,15 @@ scope:
 
 **4a. Individual command verification:**
 
-- Run `pnpm exec site-kernel run bordbuch.generate --site warpgogol-com`.
+- Run `pnpm exec werkstatt run bordbuch.generate --site warpgogol-com`.
 - Verify `systems/warpgogol-com/public/.well-known/bordbuch.json` exists.
 - Verify `systems/warpgogol-com/public/.well-known/bordbuch/index.html` exists.
-- Run `pnpm exec site-kernel run passport.key.ensure --site warpgogol-com`.
+- Run `pnpm exec werkstatt run passport.key.ensure --site warpgogol-com`.
 - Verify `public/.well-known/cosmic-passport-key.json` exists in the build workspace.
 
 **4b. Full pipeline verification:**
 
-- Run `pnpm exec site-kernel run build.prepare --site warpgogol-com` (6-minute budget, non-blocking).
+- Run `pnpm exec werkstatt run build.prepare --site warpgogol-com` (6-minute budget, non-blocking).
 - Verify `generated.files.validate` passes with no missing-output errors for bordbuch or passport.
 - Verify `generated.stale.validate` does not flag bordbuch or passport files as stale.
 
@@ -177,7 +177,7 @@ scope:
 **Agent actions:**
 
 - Capture `git log --oneline -1` in `systems/warpgogol-com/` before running `bordbuch.generate`.
-- Run `pnpm exec site-kernel run bordbuch.generate --site warpgogol-com` (isolated, not full pipeline).
+- Run `pnpm exec werkstatt run bordbuch.generate --site warpgogol-com` (isolated, not full pipeline).
 - Capture `git log --oneline -1` in `systems/warpgogol-com/` after running.
 - Confirm the HEAD SHA is unchanged (no new commits from `bordbuch.generate`).
 - Read `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts` — confirm it uses `writeFileIfChanged` (line 214-216) and does NOT call `appendBordbuchEntry` or `commitAndPushBordbuch`.
@@ -199,7 +199,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run passport.key.ensure --site warpgogol-com` once.
+- Run `pnpm exec werkstatt run passport.key.ensure --site warpgogol-com` once.
 - Capture stdout — verify no private key hex string appears.
 - Run `passport.key.ensure` again — verify it is a no-op (key file unchanged, no new key generated).
 - Compare `public/.well-known/cosmic-passport-key.json` content before and after second run — must be identical.
@@ -222,16 +222,16 @@ scope:
 **Agent actions:**
 
 - Update `CHANGE_SUMMARY` in `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` (done in Step 2).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed — pipeline topology changed (two new steps), so run it.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed — pipeline topology changed (two new steps), so run it.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>, <test-or-command>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0604 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0604 --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0604` — passes with zero errors.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0604` — passes with zero errors.
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck passes.
 - `pnpm --filter @warpgogol/site-kernel-checks run test -- --run src/tests/build-prepare-pipeline.test.ts` — unit test passes.
 - Review report exists in `docs/reviews/code/` for this session.
@@ -244,12 +244,12 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0604`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0604`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test -- --run src/tests/build-prepare-pipeline.test.ts`
-- `pnpm exec site-kernel run build.prepare --site warpgogol-com` (end-to-end verification)
-- `pnpm exec site-kernel run generated.files.validate --site warpgogol-com` (requires RFC-0606)
-- `pnpm exec site-kernel run generated.stale.validate --site warpgogol-com` (requires RFC-0600)
+- `pnpm exec werkstatt run build.prepare --site warpgogol-com` (end-to-end verification)
+- `pnpm exec werkstatt run generated.files.validate --site warpgogol-com` (requires RFC-0606)
+- `pnpm exec werkstatt run generated.stale.validate --site warpgogol-com` (requires RFC-0600)
 
 ### 4.2 Evidence artifacts
 

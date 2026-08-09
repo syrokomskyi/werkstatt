@@ -113,7 +113,7 @@ digitalReadinessBw:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run hdri.firewall.validate --app warpgogol-com --json
+pnpm exec werkstatt run hdri.firewall.validate --app warpgogol-com --json
 ```
 
 App-scoped; runs in apps build-check.

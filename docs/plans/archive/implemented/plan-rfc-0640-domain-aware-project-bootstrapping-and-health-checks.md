@@ -57,7 +57,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0640` — must pass before stamping
+- `pnpm exec werkstatt run rfc.validate --id RFC-0640` — must pass before stamping
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript compilation and tests
 - `pnpm --filter @warpgogol/forge run test` — vitest unit tests including new test files
 
@@ -279,16 +279,16 @@ scope:
 - Verify `packages/forge/AGENTS.md` is updated (Step 8).
 - Verify no `docs/*.xml` Compass files need updating (confirmed in RFC).
 - Verify no `docs/architecture-dna.md` changes needed (no new DNA invariant).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (they did — `forge.profile.validate` is new).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (they did — `forge.profile.validate` is new).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0640 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0640 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0640`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0640`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -300,7 +300,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0640`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0640`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -319,5 +319,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0640 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0640 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If RFC-0638 (profile schema extensions) or RFC-0639 (bindings schema extensions) are not yet implemented, this RFC cannot be implemented — their schema fields are prerequisites. Stop and inform the operator.

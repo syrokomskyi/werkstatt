@@ -158,4 +158,4 @@ The same passport keypair also signs the **Agent Surface** artifacts (`agent.jso
 
 **Key rotation blast radius:** when the passport key is rotated via `passport.key.rotate`, the new key automatically covers agent surface artifacts on the next `agent.surface.sign` run. Third parties verify agent surface signatures with `agent.manifest.verify` (RFC-0291), which reads the same `cosmic-passport-key.json` public key file.
 
-**Post-deploy verification:** `pnpm exec site-kernel run agent.manifest.verify --site <site> --url https://<origin>` fetches `/.well-known/agent.json` + the passport key from the live origin and verifies the signature, contentHash, and ref-reachability — mirroring `passport.verify` for the agent surface.
+**Post-deploy verification:** `pnpm exec werkstatt run agent.manifest.verify --site <site> --url https://<origin>` fetches `/.well-known/agent.json` + the passport key from the live origin and verifies the signature, contentHash, and ref-reachability — mirroring `passport.verify` for the agent surface.

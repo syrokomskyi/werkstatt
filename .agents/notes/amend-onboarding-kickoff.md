@@ -31,7 +31,7 @@
 
 ### 2.1 Действующая онбординг-цепочка (RFC-0075)
 
-`.agents/workflows/00-prepare → 01-synthesize → 02-scaffold → 03-compose → 04-author → 05-audit → 06-handoff`. Каждый файл — frontmatter с `reads/writes/runs/scope (allowedWriteRoots/forbiddenWriteRoots)/recoveryRules/agentInvariants/selfOrchestration (autoRun,pauseFor)/checkpoints/nextWorkflow`. Самооркестрация: agent выполняет `runs` напрямую, пока `autoRun: true`, останавливается только на `pauseFor`/forbidden roots. Линт цепочки: `pnpm exec site-kernel run workflow.lint`.
+`.agents/workflows/00-prepare → 01-synthesize → 02-scaffold → 03-compose → 04-author → 05-audit → 06-handoff`. Каждый файл — frontmatter с `reads/writes/runs/scope (allowedWriteRoots/forbiddenWriteRoots)/recoveryRules/agentInvariants/selfOrchestration (autoRun,pauseFor)/checkpoints/nextWorkflow`. Самооркестрация: agent выполняет `runs` напрямую, пока `autoRun: true`, останавливается только на `pauseFor`/forbidden roots. Линт цепочки: `pnpm exec werkstatt run workflow.lint`.
 
 Назначение фаз:
 

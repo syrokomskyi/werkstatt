@@ -81,10 +81,10 @@ The commands belong in `@gogol/site-kernel-checks` / `@gogol/site-kernel-codegen
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run docs.commands.generate
-pnpm exec site-kernel run docs.commands.validate
-pnpm exec site-kernel run docs.architecture.validate
-pnpm exec site-kernel run docs.architecture.validate --json
+pnpm exec werkstatt run docs.commands.generate
+pnpm exec werkstatt run docs.commands.validate
+pnpm exec werkstatt run docs.architecture.validate
+pnpm exec werkstatt run docs.architecture.validate --json
 ```
 
 All three commands are workspace-scoped. `docs.commands.generate` mutates `docs/COMMANDS.md`; the two validators are read-only.

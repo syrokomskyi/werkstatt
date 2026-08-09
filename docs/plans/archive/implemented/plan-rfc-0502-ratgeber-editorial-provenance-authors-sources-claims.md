@@ -108,7 +108,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — typecheck passes
 - `pnpm --filter @gogol/site-kernel-handoff run test` — migrator tests pass
-- `pnpm exec site-kernel run migrator.registry.validate` — registry is valid
+- `pnpm exec werkstatt run migrator.registry.validate` — registry is valid
 
 **Completion criterion:** Migrator is registered, tests pass, `migrator.registry.validate` passes.
 
@@ -165,7 +165,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json` — command is found and runs
+- `pnpm exec werkstatt run ratgeber.provenance.validate --site warpgogol-com --json` — command is found and runs
 
 **Completion criterion:** Command is registered, discoverable, and runs without crashing (empty diagnostics on a clean site or appropriate diagnostics on a site with issues).
 
@@ -191,7 +191,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.generate --site warpgogol-com` — surface generates with provenance footer block
+- `pnpm exec werkstatt run surface.generate --site warpgogol-com` — surface generates with provenance footer block
 
 **Completion criterion:** Baked article pages include the provenance footer as the final block.
 
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run source.binding.validate --site warpgogol-com --json` — runs without error
+- `pnpm exec werkstatt run source.binding.validate --site warpgogol-com --json` — runs without error
 
 **Completion criterion:** `source.binding.validate` scans both business and article claim sidecars.
 
@@ -256,7 +256,7 @@ scope:
 - Update `docs/verification-plan.xml` — add `ratgeber.provenance.validate` check entry
 - Update `docs/COMMANDS.md` — add `ratgeber.provenance.validate` command documentation
 - Update `packages/os/site-kernel-checks/AGENTS.md` if the new module needs an ownership entry
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 
 **Validation:**
 
@@ -280,16 +280,16 @@ scope:
   - [ ] Every `sourceId` resolves to a source descriptor — run `ratgeber.provenance.validate`
   - [ ] Every `claimId` exists in the article's claim sidecar — run `ratgeber.provenance.validate`
   - [ ] Article pages display provenance footer — run `surface.generate` and inspect output
-  - [ ] `rfc.validate` passes — run `pnpm exec site-kernel run rfc.validate RFC-0502 --json`
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0502 --implementation-commit <sha>`
+  - [ ] `rfc.validate` passes — run `pnpm exec werkstatt run rfc.validate RFC-0502 --json`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0502 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0502 --json` — passes
+- `pnpm exec werkstatt run rfc.validate RFC-0502 --json` — passes
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — passes
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — passes
-- `pnpm exec site-kernel run migrator.registry.validate` — passes
+- `pnpm exec werkstatt run migrator.registry.validate` — passes
 
 **Completion criterion:** All acceptance criteria checked off with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
 
@@ -299,14 +299,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0502 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0502 --json`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run source.binding.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run migrator.registry.validate`
+- `pnpm exec werkstatt run ratgeber.provenance.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run source.binding.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -324,6 +324,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0502 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16, DNA-24, or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0502 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the provenance footer block cannot be represented as a `markdown` block (DNA-24 conflict), escalate to a superseding RFC proposing a new block type.
 - If `source.binding.validate` cannot be extended to scan article claim sidecars without breaking existing behavior, escalate to a separate RFC for the scanner extension.

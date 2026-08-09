@@ -86,8 +86,8 @@ Failure scenario today: app A's Astro build or `uni.registry.validate` reads `un
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run workspace.write.boundary.lint
-pnpm exec site-kernel run workspace.write.boundary.lint --json
+pnpm exec werkstatt run workspace.write.boundary.lint
+pnpm exec werkstatt run workspace.write.boundary.lint --json
 ```
 
 Workspace-scoped, read-only, no flags beyond the universal set.

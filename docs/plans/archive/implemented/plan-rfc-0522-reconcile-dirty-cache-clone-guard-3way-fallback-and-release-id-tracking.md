@@ -48,7 +48,7 @@ No configuration or data file changes. The `missionManifestSchema` in `@gogol/on
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — typecheck
 - `pnpm --filter @gogol/site-kernel-handoff test` — unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0522` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0522` — RFC validation
 
 ## 3. Step sequence
 
@@ -279,9 +279,9 @@ No configuration or data file changes. The `missionManifestSchema` in `@gogol/on
 
 - Run `pnpm --filter @gogol/site-kernel-handoff build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0522`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0522`
 - Check off all acceptance criteria in the RFC
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0522 --implementation-commit <sha>`
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0522 --implementation-commit <sha>`
 
 **Validation:**
 
@@ -296,7 +296,7 @@ No configuration or data file changes. The `missionManifestSchema` in `@gogol/on
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0522`
+- `pnpm exec werkstatt run rfc.validate RFC-0522`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 
@@ -316,5 +316,5 @@ No configuration or data file changes. The `missionManifestSchema` in `@gogol/on
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `isWorkpieceDirty` cannot be reused for cache clone checks (e.g., different git behavior), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0522 --reason "isWorkpieceDirty not suitable for cache clone" --invariant "DNA-51"` instead of creating a parallel helper.
-- If `mission.close` `releaseId` precedence change breaks existing missions, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0522 --reason "releaseId precedence conflicts with existing mission.close contract" --invariant "DNA-46"`.
+- If implementation reveals that `isWorkpieceDirty` cannot be reused for cache clone checks (e.g., different git behavior), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0522 --reason "isWorkpieceDirty not suitable for cache clone" --invariant "DNA-51"` instead of creating a parallel helper.
+- If `mission.close` `releaseId` precedence change breaks existing missions, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0522 --reason "releaseId precedence conflicts with existing mission.close contract" --invariant "DNA-46"`.

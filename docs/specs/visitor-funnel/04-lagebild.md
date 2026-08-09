@@ -33,13 +33,13 @@ This is additive and idempotent: it adds `buffer_deals.funnel_stage` + `offer_sn
 Register `webgogol-com` as a tenant and set its secrets (the sync worker resolves them per tenant — RFC-0186):
 
 ```sh
-rtk pnpm exec site-kernel run lagebild.tenant.add --site webgogol-com
+rtk pnpm exec werkstatt run lagebild.tenant.add --site webgogol-com
 # → prints the secret names to set, then:
 rtk wrangler secret put TENANT_WEBGOGOL_COM_SUPABASE_URL
 rtk wrangler secret put TENANT_WEBGOGOL_COM_SUPABASE_SERVICE_KEY
 rtk wrangler secret put TENANT_WEBGOGOL_COM_PIPEDRIVE_TOKEN
 rtk wrangler secret put TENANT_WEBGOGOL_COM_PIPEDRIVE_DOMAIN
-rtk pnpm exec site-kernel run lagebild.tenant.enable --site webgogol-com
+rtk pnpm exec werkstatt run lagebild.tenant.enable --site webgogol-com
 ```
 
 The **site adapter** (writing into the buffer) needs, in the site's own env:
@@ -57,9 +57,9 @@ Never put the service key in markdown, the tenant registry rows, or UChat config
 One **shared** worker (`services/lagebild-sync-worker`) drains every tenant's `sync_outbox` to Pipedrive — there are no per-site workers (`lagebild.validate` enforces this). Generate and check its dev vars, then deploy:
 
 ```sh
-rtk pnpm exec site-kernel run lagebild.worker.dev.vars.generate
-rtk pnpm exec site-kernel run lagebild.worker.dev.vars.validate     # leak guard: values must be empty
-rtk pnpm exec site-kernel run lagebild.validate                     # no per-site workers; dev.vars clean
+rtk pnpm exec werkstatt run lagebild.worker.dev.vars.generate
+rtk pnpm exec werkstatt run lagebild.worker.dev.vars.validate     # leak guard: values must be empty
+rtk pnpm exec werkstatt run lagebild.validate                     # no per-site workers; dev.vars clean
 # deploy:
 rtk bash -c 'cd services/lagebild-sync-worker && wrangler deploy'
 ```

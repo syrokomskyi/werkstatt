@@ -138,8 +138,8 @@ New file `packages/share/src/schemas/features.ts` contains the moved schema verb
 ### `schema.drift.validate` CLI surface
 
 ```sh
-pnpm exec site-kernel run schema.drift.validate --app nicaragua-projekt
-pnpm exec site-kernel run schema.drift.validate   # workspace-wide scan
+pnpm exec werkstatt run schema.drift.validate --app nicaragua-projekt
+pnpm exec werkstatt run schema.drift.validate   # workspace-wide scan
 ```
 
 ### TypeScript contract for the command

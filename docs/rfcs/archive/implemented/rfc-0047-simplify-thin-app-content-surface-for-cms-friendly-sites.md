@@ -194,8 +194,8 @@ This RFC keeps the package-first architecture but changes what the app exposes t
 This RFC proposes one new validation command and changes several existing commands.
 
 ```sh
-pnpm exec site-kernel run content.surface.validate --app nicaragua-projekt
-pnpm exec site-kernel run content.surface.validate --all --json
+pnpm exec werkstatt run content.surface.validate --app nicaragua-projekt
+pnpm exec werkstatt run content.surface.validate --all --json
 ```
 
 `content.surface.validate` validates the CMS-friendly app surface:

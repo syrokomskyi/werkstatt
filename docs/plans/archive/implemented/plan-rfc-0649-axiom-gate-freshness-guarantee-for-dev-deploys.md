@@ -250,7 +250,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0649` — V-19 warning is resolved
+- `pnpm exec werkstatt run rfc.validate --id RFC-0649` — V-19 warning is resolved
 
 **Completion criterion:** `rfc.validate` passes without V-19 warning for RFC-0649.
 
@@ -265,16 +265,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run command.manifest.generate` if command surfaces changed (they did not — no new commands, only behavior change to existing `leitstand.dev-deploy`).
+- Run `pnpm exec werkstatt run command.manifest.generate` if command surfaces changed (they did not — no new commands, only behavior change to existing `leitstand.dev-deploy`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0649 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0649 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0649`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0649`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -286,7 +286,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0649`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0649`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test -- --run leitstand-0649`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test -- --run leitstand-0628` (regression)
@@ -307,5 +307,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0649 --reason "..." --invariant "DNA-49"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0649 --reason "..." --invariant "DNA-49"` instead of working around it.
 - If the freshness check proves too brittle for dev channel (e.g. CDN propagation consistently exceeds 6s sleep), do not add retry — create a new RFC to reconsider the sleep duration or retry strategy.

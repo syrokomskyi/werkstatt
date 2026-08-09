@@ -69,7 +69,7 @@ nonGoals:
   - "No domain packages (ui, pbp, ontology, ...) — that is RFC-0775"
   - "No workshop migration — RFC-0776"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -174,7 +174,7 @@ Module behavior is unchanged; failure modes stay as defined by each validator/co
 
 - [x] `packages/werkstatt-site` exists with the module layout above and `profileId: "astro-typescript-turborepo"` (evidence: `packages/werkstatt-site/src/index.ts:24-27`, `werkstatt.plugin.validate` status: pass)
 - [x] All site kernel commands keep their existing ids and behavior (test suites move with their modules and pass from the new location) (evidence: source moved to `packages/werkstatt-site/src/checks/`, `packages/werkstatt-site/src/codegen/`, etc.; command ids preserved — no new commands added or removed in RFC frontmatter)
-- [x] Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate` (`pnpm exec site-kernel run werkstatt.plugin.validate --json`) (evidence: `werkstatt.plugin.validate` status: pass, plugin id: `werkstatt-site`, profileId: `astro-typescript-turborepo`)
+- [x] Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate` (`pnpm exec werkstatt run werkstatt.plugin.validate --json`) (evidence: `werkstatt.plugin.validate` status: pass, plugin id: `werkstatt-site`, profileId: `astro-typescript-turborepo`)
 - [x] Cloudflare Workers deploy adapter works through `deployAdapters` (evidence: `packages/werkstatt-site/src/index.ts:39-46` declares `deployAdapters["cloudflare-workers"]`; full `leitstand dev-deploy → promote` cycle verification deferred to RFC-0776 when `kernel.config.ts` is switched — RFC-0774 does not switch `kernel.config.ts`)
 - [x] Old site-kernel stack packages deleted (re-export scaffold bridges the gap until RFC-0776 switches `kernel.config.ts`) (evidence: original source moved to `packages/werkstatt-site/src/`; old `packages/os/site-kernel-*` directories contain only re-export shim files + `package.json` + `tsconfig.json`)
 - [x] `site-kernel-check-warpgogol` moved into `checks/check-warpgogol/` with its `check-core`/`check-runner-node` dependencies resolved via RFC-0775 domain layer (evidence: `packages/werkstatt-site/src/checks/check-warpgogol/` exists; temporary imports from `@warpgogol/check-core` and `@warpgogol/check-runner-node` at old locations until RFC-0775 moves them to `domain/`)

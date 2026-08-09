@@ -40,4 +40,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: generated.edit.guard
-        run: pnpm exec site-kernel run generated.edit.guard --range origin/main..HEAD --json
+        run: pnpm exec werkstatt run generated.edit.guard --range origin/main..HEAD --json

@@ -92,10 +92,10 @@ Due dates are computed _before_ the deadline: a claim with `validUntil` gets a t
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.plan.build  --app warpgogol-com           # emit plan + calendar
-pnpm exec site-kernel run content.plan.status --app warpgogol-com           # due / overdue / blocking
-pnpm exec site-kernel run content.plan.status --app warpgogol-com --json
-pnpm exec site-kernel run content.plan.route  --app warpgogol-com --to agent-intake
+pnpm exec werkstatt run content.plan.build  --app warpgogol-com           # emit plan + calendar
+pnpm exec werkstatt run content.plan.status --app warpgogol-com           # due / overdue / blocking
+pnpm exec werkstatt run content.plan.status --app warpgogol-com --json
+pnpm exec werkstatt run content.plan.route  --app warpgogol-com --to agent-intake
 ```
 
 ### TypeScript contracts

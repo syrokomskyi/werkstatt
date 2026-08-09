@@ -76,7 +76,7 @@ scope:
 - `sites-check-author` pipeline — add `faq.validate` step
 - `pnpm --filter @gogol/faq build:check` — package build verification
 - `pnpm --filter warpgogol-com build` — site build verification
-- `pnpm exec site-kernel run rfc.validate --id RFC-0475` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0475` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -212,7 +212,7 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run routes.generate --site warpgogol-com` to regenerate `content.config.ts` from the updated codegen template
+- Run `pnpm exec werkstatt run routes.generate --site warpgogol-com` to regenerate `content.config.ts` from the updated codegen template
 - Verify the generated file contains `createFaqCollection` import and `...faq` spread
 
 **Validation:**
@@ -345,10 +345,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0475` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0475` — must pass
 - Run `pnpm --filter @gogol/faq build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-checks build:check` — must pass
-- Run `pnpm exec site-kernel run faq.validate --site warpgogol-com` — must pass
+- Run `pnpm exec werkstatt run faq.validate --site warpgogol-com` — must pass
 - Run `pnpm --filter warpgogol-com build` — must succeed
 - Fix any failures
 
@@ -386,10 +386,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0475`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0475`
 - `pnpm --filter @gogol/faq build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
-- `pnpm exec site-kernel run faq.validate --site warpgogol-com`
+- `pnpm exec werkstatt run faq.validate --site warpgogol-com`
 - `pnpm --filter warpgogol-com build`
 
 ### 4.2 Evidence artifacts
@@ -411,6 +411,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0475 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0475 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `createFaqCollection` cannot be called outside site context (unlike PBP pattern), escalate to a new RFC proposing a different integration mechanism.
 - If legacy FAQ files contain fields incompatible with strict Zod schema even with `.loose()`, escalate to amend RFC-0475 schema.

@@ -68,7 +68,7 @@ nonGoals:
   - No centralization of all knowledge — skill-local layers stay the default; only demonstrated cross-skill principles promote
   - No shared L0/L1 layers — the shared layer holds distilled principles (L2-grade) only
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -181,7 +181,7 @@ function planPromotion(
 
 ```sh
 # Existing command, extended output — no new commands
-pnpm exec site-kernel run forge.doctor --json   # adds knowledge-duplicate warnings
+pnpm exec werkstatt run forge.doctor --json   # adds knowledge-duplicate warnings
 ```
 
 Promotion runs inside the `fo-knowledge-distill` skill (RFC-0662), not a CLI command — it is a semantic merge requiring operator judgment.
@@ -257,7 +257,7 @@ Promotion runs inside the `fo-knowledge-distill` skill (RFC-0662), not a CLI com
 - [x] `fo-knowledge-distill` contains the promotion protocol steps; every promotion requires operator approval (evidence: `packages/forge/skills/fo/fo-knowledge-distill/SKILL.md` — Cross-skill promotion section, Promotion constraints)
 - [x] At least one real duplicate pair from this monorepo is promoted end-to-end during implementation (dogfood) — no duplicates found in current monorepo; detection pipeline verified end-to-end via forge.doctor, promotion mechanics verified by 27 unit tests (conditional dogfood per K-0008) (evidence: `forge.doctor --json` output shows knowledge-duplicates: pass, shared-knowledge-file: pass; 27 tests in promote.test.ts)
 - [x] `writing-great-skills` documents the shared layer as the fourth tier of the cumulative knowledge pattern (evidence: `packages/forge/skills/shared/writing-great-skills/SKILL.md` — Shared layer subsection)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0663` — 0 errors, 1 warning, passed)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0663` — 0 errors, 1 warning, passed)
 
 ## Implementation notes for agents
 

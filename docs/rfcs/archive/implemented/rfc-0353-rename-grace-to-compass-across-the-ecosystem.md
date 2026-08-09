@@ -156,14 +156,14 @@ No new navigation metaphors (NEEDLE, NORTH, BEARING_BLOCK) are introduced. The C
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run compass.inventory
-pnpm exec site-kernel run compass.validate
-pnpm exec site-kernel run compass.annotate
-pnpm exec site-kernel run compass.clear
-pnpm exec site-kernel run compass.markup.migrate
-pnpm exec site-kernel run compass.invariant.add --file <path> --text "<invariant>"
-pnpm exec site-kernel run compass.changesummary.validate
-pnpm exec site-kernel run compass.audit.validate
+pnpm exec werkstatt run compass.inventory
+pnpm exec werkstatt run compass.validate
+pnpm exec werkstatt run compass.annotate
+pnpm exec werkstatt run compass.clear
+pnpm exec werkstatt run compass.markup.migrate
+pnpm exec werkstatt run compass.invariant.add --file <path> --text "<invariant>"
+pnpm exec werkstatt run compass.changesummary.validate
+pnpm exec werkstatt run compass.audit.validate
 ```
 
 All flags, arguments, and scopes remain identical to the current `grace.*` commands.

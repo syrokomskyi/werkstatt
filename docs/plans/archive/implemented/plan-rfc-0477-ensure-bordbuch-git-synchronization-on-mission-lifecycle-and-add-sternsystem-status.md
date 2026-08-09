@@ -211,7 +211,7 @@ No pipeline integration. All commands are operator-invoked.
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
-- `pnpm exec site-kernel run sternsystem.status --id warpgogol-com --json` returns valid JSON
+- `pnpm exec werkstatt run sternsystem.status --id warpgogol-com --json` returns valid JSON
 
 **Completion criterion:** `sternsystem.status` registered, returns HEAD/origin/mirror SHAs, dirty files, last 6 bordbuch events, last reconciledAt.
 
@@ -249,7 +249,7 @@ No pipeline integration. All commands are operator-invoked.
 
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.validate RFC-0477 --json`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0477 --json`
 - Verify all acceptance criteria checkboxes are met
 
 **Validation:**
@@ -266,7 +266,7 @@ No pipeline integration. All commands are operator-invoked.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0477 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0477 --json`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
 
@@ -285,4 +285,4 @@ No pipeline integration. All commands are operator-invoked.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 or DNA-44, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0477 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 or DNA-44, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0477 --reason "..." --invariant "DNA-N"` instead of working around it.

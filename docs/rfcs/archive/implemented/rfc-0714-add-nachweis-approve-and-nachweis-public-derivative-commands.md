@@ -53,7 +53,7 @@ packagesImpacted:
 successSignals: []
 nonGoals: []
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -116,14 +116,14 @@ The Nachweis kernel module gains two new commands:
 
 ```sh
 # Approve a record — sets verification level and legal content check
-pnpm exec site-kernel run nachweis.approve \
+pnpm exec werkstatt run nachweis.approve \
   --system warpgogol-com \
   --slug mein-kunde-xyz \
   --verification-level N3 \
   --legal-content-check passed
 
 # Create a public derivative — uploads redacted PDF and flips storage
-pnpm exec site-kernel run nachweis.public-derivative \
+pnpm exec werkstatt run nachweis.public-derivative \
   --system warpgogol-com \
   --slug mein-kunde-xyz \
   --file /path/to/public-derivative.pdf

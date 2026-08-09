@@ -68,7 +68,7 @@ nonGoals:
   - "Does not add server-side email validation beyond format checking — SMTP verification is out of scope."
   - "Does not make phone mandatory — phone is opt-in per site; email is the minimum required structured field."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -117,8 +117,8 @@ The send-message section gains structured `emailField` and `phoneField` props in
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run contact.form.validate --site warpgogol-com
-pnpm exec site-kernel run contact.form.validate --all --json
+pnpm exec werkstatt run contact.form.validate --site warpgogol-com
+pnpm exec werkstatt run contact.form.validate --all --json
 ```
 
 Checks that sites using the send-message section declare `emailField` and `phoneField` props consistently across all published locales. Warns if a locale enables a structured field that another locale does not.

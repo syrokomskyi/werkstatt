@@ -66,7 +66,7 @@ nonGoals:
   - Replacing the existing fingerprintTree function — it is extended, not replaced
   - Changing the build-identity.json format or schema
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -128,10 +128,10 @@ The `@warpgogol/fingerprint` package gains a `mode: "stable"` option for `finger
 
 ```sh
 # Validate dist determinism for a release
-pnpm exec site-kernel run dist.determinism.validate --release warpgogol-com-r000008
+pnpm exec werkstatt run dist.determinism.validate --release warpgogol-com-r000008
 
 # Validate dist determinism for a workpiece
-pnpm exec site-kernel run dist.determinism.validate --mission warpgogol-com-m000026
+pnpm exec werkstatt run dist.determinism.validate --mission warpgogol-com-m000026
 ```
 
 Flags: `--release` (string) or `--mission` (string). Exactly one required. Scope: workspace.

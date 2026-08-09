@@ -53,8 +53,8 @@ scope:
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — existing leitstand tests with updated fixtures
-- `pnpm exec site-kernel run rfc.validate --id RFC-0666`
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0666`
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com`
 
 ## 3. Step sequence
 
@@ -249,7 +249,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com`
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com`
 
 **Completion criterion:** No `secretsFile` fields in `systems/registry.yaml`; `sternsystem.validate` passes with 0 violations.
 
@@ -307,20 +307,20 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 8)
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0666`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0666`
 - Run `pnpm --filter @warpgogol/ontology run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test`
-- Run `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com`
+- Run `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com`
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0666 --implementation-commit <sha>`
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0666 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes
-- `pnpm exec site-kernel run rfc.validate --id RFC-0666`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0666`
 - All acceptance criteria checked off
 
 **Completion criterion:** All documentation updated; code review passed; all acceptance criteria verified; RFC stamped as `implemented`.
@@ -331,11 +331,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0666`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0666`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com`
+- `pnpm exec werkstatt run sternsystem.validate --id warpgogol-com`
 
 ### 4.2 Evidence artifacts
 
@@ -352,5 +352,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals that `secretsFile` was actually used by some external consumer (not found in audit), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0666 --reason "secretsFile has active consumers" --invariant "DNA-40"` instead of removing it.
+- If implementation reveals that `secretsFile` was actually used by some external consumer (not found in audit), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0666 --reason "secretsFile has active consumers" --invariant "DNA-40"` instead of removing it.
 - If the `z.string().optional()` detection approach causes Zod parsing issues in `fleetRegistrySchema`, escalate to a schema-level `.refine()` rejection instead.

@@ -63,10 +63,10 @@ scope:
 - `pnpm --filter @gogol/integration-adapter-stripe run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run billing.config.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run billing.secrets.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run funnel.contract.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run lagebild.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run billing.config.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run billing.secrets.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run funnel.contract.validate --site warpgogol-com --json`
 
 ## 3. Step sequence
 
@@ -228,7 +228,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run lagebild.validate --site warpgogol-com --json`
 
 **Completion criterion:** `lagebild.validate` asserts DDL presence; `build:check` passes for `@gogol/site-kernel-checks`.
 
@@ -266,10 +266,10 @@ scope:
 - Run `pnpm --filter @gogol/integration-adapter-stripe run build:check`
 - Run `pnpm --filter @gogol/ui run build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
-- Run `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
-- Run `pnpm exec site-kernel run billing.config.validate --site warpgogol-com --json`
-- Run `pnpm exec site-kernel run billing.secrets.validate --site warpgogol-com --json`
-- Run `pnpm exec site-kernel run funnel.contract.validate --site warpgogol-com --json`
+- Run `pnpm exec werkstatt run lagebild.validate --site warpgogol-com --json`
+- Run `pnpm exec werkstatt run billing.config.validate --site warpgogol-com --json`
+- Run `pnpm exec werkstatt run billing.secrets.validate --site warpgogol-com --json`
+- Run `pnpm exec werkstatt run funnel.contract.validate --site warpgogol-com --json`
 - Grep for `Make.com` or `make.com` in `packages/integration-adapter-supabase-crm/`, `packages/integration-adapter-stripe/`, `packages/ui/src/integration-routes/` — confirm zero matches
 
 **Validation:**
@@ -310,14 +310,14 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0386`
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0386`
 - Commit the evidence file in the same commit as the status stamp
 - Set `status: implemented`, `implementedAt: 2026-07-14` in the RFC frontmatter
 - Commit with message: `implement: RFC-0386 stamp implemented + verification evidence`
 
 **Validation:**
 
-- `pnpm exec site-kernel run rfc.validate RFC-0386 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0386 --json`
 
 **Completion criterion:** RFC-0386 is `implemented`; evidence file committed; `rfc.validate` passes.
 
@@ -327,17 +327,17 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0386 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0386 --json`
 - `pnpm --filter @gogol/integration run build:check`
 - `pnpm --filter @gogol/integration-adapter-supabase-crm run build:check`
 - `pnpm --filter @gogol/integration-adapter-stripe run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run billing.config.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run billing.secrets.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run funnel.contract.validate --site warpgogol-com --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0386`
+- `pnpm exec werkstatt run lagebild.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run billing.config.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run billing.secrets.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run funnel.contract.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0386`
 
 ### 4.2 Evidence artifacts
 
@@ -355,6 +355,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-1, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0386 --reason "..." --invariant "DNA-1"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-1, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0386 --reason "..." --invariant "DNA-1"` instead of working around it.
 - If the `SyncOutboxOp` extension conflicts with an existing consumer of `@gogol/integration`, run `rfc.supersede.propose` with `--invariant "DNA-1"` rather than adding a compatibility alias.
 - If live Stripe verification (Step 11) reveals a wiring gap in the webhook route that requires more than a minimal fix, escalate to a superseding RFC rather than expanding the route's scope.

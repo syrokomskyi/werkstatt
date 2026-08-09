@@ -204,12 +204,12 @@ External consumers are unaffected until they opt into `skillPacks`; new projects
 - [x] `forge.doctor` reports stale/missing pack copies and invalid `skillPacks` config (evidence: packages/forge/src/onboarding/doctor.ts:243-311, checkPackSkills function)
 - [x] `wgogol-skills` standalone sync script is removed; `forge.yaml` declares the `wg` pack (evidence: packages/wgogol-skills/sync.mjs deleted, forge.yaml:56-58 skillPacks section)
 - [x] `packages/forge/AGENTS.md`, `packages/AGENTS.md` (ownership table), and ADR-0003 updated to reference this RFC (evidence: packages/forge/AGENTS.md:10,40-54 skill packs section; packages/AGENTS.md:56 wgogol-skills ownership entry; docs/adrs/adr-0003-wgogol-skills-package.md:11-16,59 supersededBy RFC-0539)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate rfc-0539 --json` returns status: pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate rfc-0539 --json` returns status: pass)
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- Agents MUST NOT add any skill to `FORGE_SKILLS` that references WGogol-specific commands (`mission.*`, `sternsystem.*`, `page.block.validate`, `pnpm exec site-kernel run` outside bindings) or directories (`missions/`, `systems/`, `onboarding/`).
+- Agents MUST NOT add any skill to `FORGE_SKILLS` that references WGogol-specific commands (`mission.*`, `sternsystem.*`, `page.block.validate`, `pnpm exec werkstatt run` outside bindings) or directories (`missions/`, `systems/`, `onboarding/`).
 - Agents MUST NOT create backward-compatibility aliases for the renamed skills — forward-only.
 - Agents MUST NOT re-add the `wgogol-skills` standalone sync script; `forge.init` is the single sync path after this RFC.
 - When renaming, agents MUST update every reference found by a repo-wide search for the old skill names, including `.windsurf/workflows/`, AGENTS.md files, and skill cross-references.

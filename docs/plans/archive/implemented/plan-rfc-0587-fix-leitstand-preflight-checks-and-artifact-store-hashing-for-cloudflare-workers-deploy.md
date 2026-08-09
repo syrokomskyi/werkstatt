@@ -49,7 +49,7 @@ scope:
 
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check` — TypeScript strict build
 - `pnpm --filter @warpgogol/site-kernel-handoff test` — Vitest unit tests
-- `pnpm exec site-kernel run rfc.validate RFC-0587` — RFC mechanical validation
+- `pnpm exec werkstatt run rfc.validate RFC-0587` — RFC mechanical validation
 
 ## 3. Step sequence
 
@@ -265,16 +265,16 @@ scope:
 **Agent actions:**
 
 - Verify `packages/os/site-kernel-handoff/AGENTS.md` is updated (Step 8).
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no new commands in this RFC, so likely not needed).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (no new commands in this RFC, so likely not needed).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0587 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0587 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate RFC-0587`
+- `pnpm exec werkstatt run rfc.validate RFC-0587`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -286,10 +286,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0587`
+- `pnpm exec werkstatt run rfc.validate RFC-0587`
 - `pnpm --filter @warpgogol/site-kernel-handoff build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0587` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0587` (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
 
 ### 4.2 Evidence artifacts
 
@@ -308,5 +308,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49 or DNA-52, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0587 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49 or DNA-52, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0587 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `node:tar` is unavailable in the target Node.js version, escalate to the operator — do not shell out to `tar` command (cross-platform requirement).

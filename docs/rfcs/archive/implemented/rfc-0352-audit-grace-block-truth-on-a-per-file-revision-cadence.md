@@ -141,19 +141,19 @@ The trigger is revision delta only — the concrete "this file changed N times s
 
 ```sh
 # One-time seed of the whole repo at current revisions
-pnpm exec site-kernel run grace.audit.baseline --all
+pnpm exec werkstatt run grace.audit.baseline --all
 
 # Get the audit work-order (files whose revision advanced >= threshold)
-pnpm exec site-kernel run grace.audit.plan --all
-pnpm exec site-kernel run grace.audit.plan --all --threshold 20
+pnpm exec werkstatt run grace.audit.plan --all
+pnpm exec werkstatt run grace.audit.plan --all --threshold 20
 
 # After reconciling a file's blocks with its code, record the verdict
-pnpm exec site-kernel run grace.audit.record --file packages/share/src/page.ts --verdict pass
-pnpm exec site-kernel run grace.audit.record --file packages/share/src/page.ts --verdict repaired
+pnpm exec werkstatt run grace.audit.record --file packages/share/src/page.ts --verdict pass
+pnpm exec werkstatt run grace.audit.record --file packages/share/src/page.ts --verdict repaired
 
 # Report overdue files (warn); fail in QA
-pnpm exec site-kernel run grace.audit.validate --all
-pnpm exec site-kernel run grace.audit.validate --all --strict
+pnpm exec werkstatt run grace.audit.validate --all
+pnpm exec werkstatt run grace.audit.validate --all --strict
 ```
 
 ### TypeScript contracts

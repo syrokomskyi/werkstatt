@@ -64,7 +64,7 @@ Implement in order: RFC-0638 → RFC-0639 → RFC-0640 → RFC-0643.
 
 - `pnpm --filter @warpgogol/forge run build:check` — typecheck
 - `pnpm --filter @warpgogol/forge run test` — unit tests
-- `pnpm exec site-kernel run rfc.validate --id RFC-0643` — RFC validation
+- `pnpm exec werkstatt run rfc.validate --id RFC-0643` — RFC validation
 
 ## 3. Step sequence
 
@@ -275,16 +275,16 @@ Implement in order: RFC-0638 → RFC-0639 → RFC-0640 → RFC-0643.
 **Agent actions:**
 
 - Verify `packages/forge/AGENTS.md` is updated (step 7)
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC — `forge.agents.generate` is existing)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (no new commands in this RFC — `forge.agents.generate` is existing)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report in `docs/reviews/code/`.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0643 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0643 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0643` passes
+- `pnpm exec werkstatt run rfc.validate --id RFC-0643` passes
 - `pnpm --filter @warpgogol/forge run build:check` passes
 - `pnpm --filter @warpgogol/forge run test` passes
 - Review report exists in `docs/reviews/code/` for this session
@@ -297,7 +297,7 @@ Implement in order: RFC-0638 → RFC-0639 → RFC-0640 → RFC-0643.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0643`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0643`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -316,5 +316,5 @@ Implement in order: RFC-0638 → RFC-0639 → RFC-0640 → RFC-0643.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0643 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0643 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `resolveTerminology()` from RFC-0639 is not yet exported, stop and implement RFC-0639 first — do not create a temporary substitute.

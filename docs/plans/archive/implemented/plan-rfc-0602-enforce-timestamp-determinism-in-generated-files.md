@@ -87,8 +87,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run generator.ownership.lint` — still passes (no ownership conflicts introduced)
-- `pnpm exec site-kernel run command.manifest.validate` — no new CMD-MAN-03 warnings
+- `pnpm exec werkstatt run generator.ownership.lint` — still passes (no ownership conflicts introduced)
+- `pnpm exec werkstatt run command.manifest.validate` — no new CMD-MAN-03 warnings
 
 **Completion criterion:** Every entry in `GENERATOR_OWNERSHIP_MAP` has a `module` field pointing to an existing source file.
 
@@ -159,7 +159,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run command.manifest.validate --json` — no CMD-MAN-03 warning for the new command
+- `pnpm exec werkstatt run command.manifest.validate --json` — no CMD-MAN-03 warning for the new command
 
 **Completion criterion:** Command appears in `docs/command-manifest.generated.yaml` after `ecosystem.manifest.generate` runs.
 
@@ -180,7 +180,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run build.check --site warpgogol-com --json` — `generated.timestamp.validate` appears in pipeline sub-results with `status: "warn"` (warning mode, existing violations)
+- `pnpm exec werkstatt run build.check --site warpgogol-com --json` — `generated.timestamp.validate` appears in pipeline sub-results with `status: "warn"` (warning mode, existing violations)
 
 **Completion criterion:** `build.check` pipeline includes `generated.timestamp.validate` and it runs without crashing.
 
@@ -233,7 +233,7 @@ scope:
   ```
   | `src/generated-timestamp-validate.ts` | RFC-0602 `runGeneratedTimestampValidate` — scans generator source modules (from `GENERATOR_OWNERSHIP_MAP`) for volatile timestamp patterns (`new Date().toISOString()`, `Date.now()`, `new Date()`, `process.env.BUILD_TIMESTAMP`). Diagnostics: TS-TIME-01. Allowlist exemptions reported as info-severity diagnostics. `--deep` enables Phase 2 double-build drift detection (standalone, not in `build.check`). `--mode warning|fail` controls exit code (default `warning` during migration window). |
   ```
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with the new command
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml` with the new command
 
 **Validation:**
 
@@ -253,11 +253,11 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0602` — RFC validates
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0602` — RFC validates
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — typecheck passes
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test -- --run` — all tests pass
-- Run `pnpm exec site-kernel run build.check --site warpgogol-com --json` — command appears in pipeline, exits 0 (warning mode)
-- Run `pnpm exec site-kernel run generated.timestamp.validate --json` — command runs standalone, produces `CheckResult` with `diagnostics[]`
+- Run `pnpm exec werkstatt run build.check --site warpgogol-com --json` — command appears in pipeline, exits 0 (warning mode)
+- Run `pnpm exec werkstatt run generated.timestamp.validate --json` — command runs standalone, produces `CheckResult` with `diagnostics[]`
 - Verify `docs/command-manifest.generated.yaml` includes the new command
 
 **Validation:**
@@ -279,16 +279,16 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces or pipeline topology changed (do not hand-edit `docs/ecosystem.generated.yaml`).
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes (`git diff <merge-base-of-session>...HEAD`). Wait for the review report in `docs/reviews/code/`.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria. For unchecked `[ ]` criteria, document why.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0602 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0602 --implementation-commit <sha>` to atomically transition `accepted → implemented` (RFC-0476). The command validates all preconditions (status, criteria, clean tree, commit reachability). Do NOT hand-edit `status`, `implementedAt`, or `closedAt` fields — use the command.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0602`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0602`
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -300,10 +300,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0602`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0602`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test -- --run generated-timestamp-validate`
-- `pnpm exec site-kernel run build.check --site warpgogol-com --json`
+- `pnpm exec werkstatt run build.check --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -322,6 +322,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-18 or DNA-53, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0602 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-18 or DNA-53, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0602 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If the `CheckResult` type does not support `notices[]` (it uses `diagnostics[]` with severity levels), use `info`-severity diagnostics for allowlist exemptions — this is a type-level adaptation, not an RFC-level change.
 - If a `module` path added in Step 1 does not exist on disk, verify the command-to-module mapping — the generator may have been renamed or refactored. Fix the path, do not skip the entry.

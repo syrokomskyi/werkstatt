@@ -97,7 +97,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @warpgogol/forge run build:check` — TypeScript compiles
-- Manual dry-run test: `pnpm exec site-kernel run adr.implement.stamp --id ADR-0001 --implementation-commit <sha> --dry-run`
+- Manual dry-run test: `pnpm exec werkstatt run adr.implement.stamp --id ADR-0001 --implementation-commit <sha> --dry-run`
 
 **Completion criterion:** Handler compiles, all 4 ADR-IMP rules implemented, dry-run mode works.
 
@@ -118,7 +118,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run adr.implement.stamp --id ADR-0001 --dry-run --implementation-commit HEAD` — command is discovered and runs
+- `pnpm exec werkstatt run adr.implement.stamp --id ADR-0001 --dry-run --implementation-commit HEAD` — command is discovered and runs
 
 **Completion criterion:** Command appears in registry and is callable via CLI.
 
@@ -162,8 +162,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run skill.validate` — skills pass validation
-- `pnpm exec site-kernel run forge.doctor` — no skill drift
+- `pnpm exec werkstatt run skill.validate` — skills pass validation
+- `pnpm exec werkstatt run forge.doctor` — no skill drift
 
 **Completion criterion:** Both skills reference `adr.implement.stamp` instead of manual editing; synced copies match.
 
@@ -180,15 +180,15 @@ scope:
 - Update `packages/forge/AGENTS.md` `forgeAdrModule` row: add `adr.implement.stamp` to command list
 - Add `adrImplementStamp` binding to `forge.yaml` under `bindings.commands`:
   ```yaml
-  adrImplementStamp: pnpm exec site-kernel run adr.implement.stamp --id {id}
+  adrImplementStamp: pnpm exec werkstatt run adr.implement.stamp --id {id}
     --implementation-commit {commit}
   ```
 - Add `.adr-locks` to `.gitignore` (near existing `.rfc-locks` entry)
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.doctor` — no drift
-- `pnpm exec site-kernel run ecosystem.manifest.generate` — regenerate manifest if command surface changed
+- `pnpm exec werkstatt run forge.doctor` — no drift
+- `pnpm exec werkstatt run ecosystem.manifest.generate` — regenerate manifest if command surface changed
 
 **Completion criterion:** All three files updated, forge.doctor passes.
 
@@ -241,13 +241,13 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0727 --implementation-commit <sha>`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0727 --implementation-commit <sha>`.
 - Update `RFC-0625.amendedBy` to include `RFC-0727` (resolves V-19 warning).
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0727` — zero errors.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0727` — zero errors.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -259,10 +259,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0727`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0727`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
-- `pnpm exec site-kernel run forge.doctor`
+- `pnpm exec werkstatt run forge.doctor`
 
 ### 4.2 Evidence artifacts
 
@@ -281,4 +281,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0727 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0727 --reason "..." --invariant "DNA-N"` instead of working around it.

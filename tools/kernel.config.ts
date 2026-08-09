@@ -74,14 +74,14 @@
 </CHANGE_SUMMARY>
 */
 
-import { defineKernelConfig } from "@warpgogol/site-kernel/types";
-import { PACKAGES_CHECK_PIPELINE } from "@warpgogol/site-kernel-checks/pipelines/packages-check";
+import { defineKernelConfig } from "@warpgogol/werkstatt/kernel/types";
+import { PACKAGES_CHECK_PIPELINE } from "@warpgogol/werkstatt-site/checks/pipelines/packages-check";
 
 export default defineKernelConfig({
   name: "warpgogol-platform",
   description: "Warpgogol platform workspace configuration",
   moduleLoaders: {
-    icons: async () => (await import("@warpgogol/site-kernel/icons")).iconsModule,
+    icons: async () => (await import("@warpgogol/werkstatt/kernel/icons")).iconsModule,
     "forge-core": async () => (await import("@warpgogol/forge/os/core")).forgeCoreModule,
     "forge-compass": async () => (await import("@warpgogol/forge/os/compass")).forgeCompassModule,
     "forge-naming": async () =>
@@ -95,61 +95,59 @@ export default defineKernelConfig({
       (await import("@warpgogol/forge/os/session-module")).forgeSessionModule,
     "forge-mission": async () =>
       (await import("@warpgogol/forge/os/mission-module")).forgeMissionModule,
-    lagebild: async () => (await import("@warpgogol/site-kernel/lagebild-module")).lagebildModule,
+    lagebild: async () =>
+      (await import("@warpgogol/werkstatt/kernel/lagebild-module")).lagebildModule,
     "commit-message": async () =>
-      (await import("@warpgogol/site-kernel/commit-message")).commitMessageModule,
+      (await import("@warpgogol/werkstatt/kernel/commit-message")).commitMessageModule,
     "pipeline-budget": async () =>
-      (await import("@warpgogol/site-kernel/pipeline-budget")).pipelineBudgetModule,
+      (await import("@warpgogol/werkstatt/kernel/pipeline-budget")).pipelineBudgetModule,
     "command-manifest": async () =>
-      (await import("@warpgogol/site-kernel/command-manifest-module")).commandManifestModule,
-    cache: async () => (await import("@warpgogol/site-kernel/cache-module")).cacheModule,
+      (await import("@warpgogol/werkstatt/kernel/command-manifest-module")).commandManifestModule,
+    cache: async () => (await import("@warpgogol/werkstatt/kernel/cache-module")).cacheModule,
     check: async () =>
-      (await import("@warpgogol/site-kernel-checks/module")).createStandardCheckModule(),
+      (await import("@warpgogol/werkstatt-site/checks/module")).createStandardCheckModule(),
     observability: async () =>
-      (await import("@warpgogol/site-kernel-observability/module")).observabilityModule,
+      (await import("@warpgogol/werkstatt/observability/module")).observabilityModule,
     onboarding: async () =>
-      (await import("@warpgogol/site-kernel-onboarding/module")).createOnboardingModule(),
+      (await import("@warpgogol/werkstatt-site/onboarding/module")).createOnboardingModule(),
     handoff: async () =>
-      (await import("@warpgogol/site-kernel-handoff/handoff-module")).createHandoffModule(),
+      (await import("@warpgogol/werkstatt/handoff-module")).createHandoffModule(),
     sternsystem: async () =>
-      (await import("@warpgogol/site-kernel-handoff/sternsystem-module")).createSternsystemModule(),
+      (await import("@warpgogol/werkstatt/sternsystem-module")).createSternsystemModule(),
     "forge-werkstatt": async () =>
       (await import("@warpgogol/forge/os/werkstatt")).forgeWerkstattModule,
     "forge-spec": async () => (await import("@warpgogol/forge/os/spec-module")).forgeSpecModule,
     mission: async () =>
-      (await import("@warpgogol/site-kernel-handoff/mission-module")).createMissionModule(),
+      (await import("@warpgogol/werkstatt/mission-module")).createMissionModule(),
     bordbuch: async () =>
-      (await import("@warpgogol/site-kernel-handoff/bordbuch-module")).createBordbuchModule(),
+      (await import("@warpgogol/werkstatt/bordbuch-module")).createBordbuchModule(),
     "artifact-store": async () =>
-      (
-        await import("@warpgogol/site-kernel-handoff/artifact-store-module")
-      ).createArtifactStoreModule(),
+      (await import("@warpgogol/werkstatt/artifact-store-module")).createArtifactStoreModule(),
     "behavior-snapshot": async () =>
       (
-        await import("@warpgogol/site-kernel-handoff/behavior-snapshot-module")
+        await import("@warpgogol/werkstatt/behavior-snapshot-module")
       ).createBehaviorSnapshotModule(),
     release: async () =>
-      (await import("@warpgogol/site-kernel-handoff/release-module")).createReleaseModule(),
+      (await import("@warpgogol/werkstatt/release-module")).createReleaseModule(),
     leitstand: async () =>
-      (await import("@warpgogol/site-kernel-handoff/leitstand-module")).createLeitstandModule(),
+      (await import("@warpgogol/werkstatt/leitstand-module")).createLeitstandModule(),
     subdomain: async () =>
-      (await import("@warpgogol/site-kernel-handoff/subdomain-module")).createSubdomainModule(),
-    dns: async () => (await import("@warpgogol/site-kernel-handoff/dns-module")).createDnsModule(),
+      (await import("@warpgogol/werkstatt/subdomain-module")).createSubdomainModule(),
+    dns: async () => (await import("@warpgogol/werkstatt/dns-module")).createDnsModule(),
     notausgang: async () =>
-      (await import("@warpgogol/site-kernel-handoff/notausgang-module")).createNotausgangModule(),
+      (await import("@warpgogol/werkstatt/notausgang-module")).createNotausgangModule(),
     platform: async () =>
-      (await import("@warpgogol/site-kernel-handoff/platform-module")).createPlatformModule(),
-    gitmesh: async () => (await import("@warpgogol/site-kernel")).gitmeshModule,
+      (await import("@warpgogol/werkstatt/platform-module")).createPlatformModule(),
+    gitmesh: async () => (await import("@warpgogol/werkstatt/kernel")).gitmeshModule,
     identity: async () =>
-      (await import("@warpgogol/site-kernel-handoff/identity-module")).createIdentityModule(),
-    dht: async () => (await import("@warpgogol/site-kernel/dht-module")).dhtModule,
-    swim: async () => (await import("@warpgogol/site-kernel/swim-module")).swimModule,
-    deploy: async () =>
-      (await import("@warpgogol/site-kernel-handoff/deploy-module")).createDeployModule(),
+      (await import("@warpgogol/werkstatt/identity-module")).createIdentityModule(),
+    dht: async () => (await import("@warpgogol/werkstatt/kernel/dht-module")).dhtModule,
+    swim: async () => (await import("@warpgogol/werkstatt/kernel/swim-module")).swimModule,
+    deploy: async () => (await import("@warpgogol/werkstatt/deploy-module")).createDeployModule(),
     evidence: async () =>
-      (await import("@warpgogol/site-kernel-handoff/evidence-module")).createEvidenceModule(),
+      (await import("@warpgogol/werkstatt/evidence-module")).createEvidenceModule(),
     nachweis: async () =>
-      (await import("@warpgogol/site-kernel-handoff/nachweis-module")).createNachweisModule(),
+      (await import("@warpgogol/werkstatt/nachweis-module")).createNachweisModule(),
     "forge-exploration": async () =>
       (await import("@warpgogol/forge/os/exploration")).forgeExplorationModule,
     "werkstatt-site": async () => (await import("@warpgogol/werkstatt-site")).werkstattSitePlugin,

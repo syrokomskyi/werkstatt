@@ -69,7 +69,7 @@ nonGoals:
   - Auto-publishing or auto-propagating releases upon mission close
   - Changing the release state machine (prepared → published → alt-deployed → promoted)
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -129,13 +129,13 @@ The kernel gains a `release.state.validate` command that checks consistency betw
 
 ```sh
 # Validate a specific mission's release state
-pnpm exec site-kernel run release.state.validate --mission warpgogol-com-m000025
+pnpm exec werkstatt run release.state.validate --mission warpgogol-com-m000025
 
 # Validate a specific release
-pnpm exec site-kernel run release.state.validate --release warpgogol-com-r000008
+pnpm exec werkstatt run release.state.validate --release warpgogol-com-r000008
 
 # Validate all releases for a system
-pnpm exec site-kernel run release.state.validate --system warpgogol-com
+pnpm exec werkstatt run release.state.validate --system warpgogol-com
 ```
 
 Flags: `--mission` (string), `--release` (string), `--system` (string). Exactly one is required. Scope: workspace.

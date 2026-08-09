@@ -176,7 +176,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --skill fo-compass-annotate`
+- `pnpm exec werkstatt run forge.skill.validate --skill fo-compass-annotate`
 
 **Completion criterion:** Skill directory exists with all 7 files; `forge.skill.validate` passes.
 
@@ -194,7 +194,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.doctor` — bindings check passes
+- `pnpm exec werkstatt run forge.doctor` — bindings check passes
 
 **Completion criterion:** `forge.yaml` has `bindings.compass.fileExtensions` and `bindings.compass.testPatterns`; `forge.doctor` passes.
 
@@ -212,7 +212,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --skill forge-bootstrap`
+- `pnpm exec werkstatt run forge.skill.validate --skill forge-bootstrap`
 
 **Completion criterion:** `forge-bootstrap` SKILL.md has project detection step; `forge.skill.validate` passes.
 
@@ -230,7 +230,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run forge.skill.validate --skill fo-fix`
+- `pnpm exec werkstatt run forge.skill.validate --skill fo-fix`
 
 **Completion criterion:** `fo-fix` SKILL.md has step 4.5; `forge.skill.validate` passes.
 
@@ -251,7 +251,7 @@ scope:
 - Update `packages/os/site-kernel-checks/README.md`: remove wiring examples for 4 removed commands.
 - Update `packages/os/site-kernel-checks/AGENTS.md`: remove `compass.annotate` from example code.
 - Update `packages/os/site-kernel-checks/docs/compass-operations.md`: remove 4 command docs, update `compass.changesummary.tidy` references to `compass.summary.trim`, update cap description.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 
 **Validation:**
 
@@ -269,15 +269,15 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0538`.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0538`.
 - Run `pnpm --filter @gogol/site-kernel-codegen run build:check`.
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`.
 - Run `pnpm --filter @wgogol/forge run build:check`.
-- Run `pnpm exec site-kernel run forge.skill.validate` (all skills).
+- Run `pnpm exec werkstatt run forge.skill.validate` (all skills).
 - Check off every acceptance criterion in the RFC with `[x]` and inline `(evidence: ...)` annotations.
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0538` (RFC-0330).
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0538` (RFC-0330).
 - Commit evidence file.
-- Run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0538 --implementation-commit <sha>`.
+- Run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0538 --implementation-commit <sha>`.
 
 **Validation:**
 
@@ -294,15 +294,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0538`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0538`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @wgogol/forge run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen test`
 - `pnpm --filter @gogol/site-kernel-checks test`
 - `pnpm --filter @wgogol/forge test`
-- `pnpm exec site-kernel run forge.skill.validate`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0538` (RFC-0330)
+- `pnpm exec werkstatt run forge.skill.validate`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0538` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -326,6 +326,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-42, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0538 --reason "..." --invariant "DNA-42"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-42, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0538 --reason "..." --invariant "DNA-42"` instead of working around it.
 - If the `forge/bindings@1` schema cannot be extended without a major version bump, create a superseding RFC for `forge/bindings@2`.
 - **Migrator note:** RFC-0538 declares `versionBump: minor` which under RFC-0478 (currently `draft`, not implemented) would require a migrator. Since RFC-0478 is not yet active, no migrator is registered in this plan. When RFC-0478 is implemented, a migrator may need to be registered for RFC-0538 to handle the `compass.changesummary.tidy` → `compass.summary.trim` rename in any site configs or scripts that reference the old command name.

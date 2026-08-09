@@ -60,7 +60,7 @@ nonGoals:
   - "Adding new audit verdicts"
   - "Modifying compass.audit.validate behavior"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -111,7 +111,7 @@ This relies on operator discipline: the operator must remember to run `compass.a
 New flag on existing command:
 
 ```sh
-pnpm exec site-kernel run compass.audit.baseline --workpiece missions/warpgogol-com-m000022/workpiece
+pnpm exec werkstatt run compass.audit.baseline --workpiece missions/warpgogol-com-m000022/workpiece
 ```
 
 The `--workpiece <path>` flag restricts scanning to the specified workpiece directory. Only authored files within that directory are seeded into the ledger. The flag is mutually exclusive with `--packages` and `--site`.

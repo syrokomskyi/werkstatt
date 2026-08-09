@@ -58,7 +58,7 @@ nonGoals:
   - "Does not introduce per-site R2 credentials — per-feature isolation is sufficient"
   - "Does not rename the R2 bucket — bucket name discrepancy between RFC-0707 text (\"nachweise\") and code (\"nachweis\") is pre-existing and out of scope"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -183,7 +183,7 @@ const config = resolveR2ConfigFromEnv(NACHWEIS_BUCKET, "R2_NACHWEIS");
 - [x] `.env.example` includes `R2_NACHWEIS_*` placeholders with "How to obtain" comments (evidence: `.env.example:43-53`)
 - [x] `MissingEnvError` for nachweis reports `R2_NACHWEIS_ACCOUNT_ID` (not `R2_ACCOUNT_ID`) when vars absent (evidence: `packages/os/site-kernel-handoff/src/tests/r2-client-env-prefix.test.ts:46-53`, `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run src/tests/r2-client-env-prefix.test.ts`)
 - [x] `AGENTS.md` updated to document per-bucket R2 token scoping (evidence: `packages/os/site-kernel-handoff/AGENTS.md:34`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0713 --json`, exit code 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0713 --json`, exit code 0)
 
 ## Implementation notes for agents
 

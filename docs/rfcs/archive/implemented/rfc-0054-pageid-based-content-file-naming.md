@@ -231,10 +231,10 @@ The prose resolution (in the markdown section component or a shared helper) read
 
 ```sh
 # Validate content file naming across an app
-pnpm exec site-kernel run content.filename.validate --app nicaragua-projekt
+pnpm exec werkstatt run content.filename.validate --app nicaragua-projekt
 
 # Validate with --fix to auto-rename (planned but not in scope)
-pnpm exec site-kernel run content.filename.validate --app nicaragua-projekt --fix
+pnpm exec werkstatt run content.filename.validate --app nicaragua-projekt --fix
 ```
 
 ```json

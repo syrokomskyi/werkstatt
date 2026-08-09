@@ -210,13 +210,13 @@ layout.orchestrator.lint
 The last gate in the merge train runs:
 
 ```
-pnpm exec site-kernel run packages-check.run
-pnpm exec site-kernel run apps-check.author --app warpgogol-com
-pnpm exec site-kernel run apps-check.author --app nicaragua-projekt
-pnpm exec site-kernel run onboarding.phase.validate --app warpgogol-com --phase=04-author
-pnpm exec site-kernel run onboarding.phase.validate --app nicaragua-projekt --phase=04-author
-pnpm exec site-kernel run workflow.lint
-pnpm exec site-kernel run rfc.validate
+pnpm exec werkstatt run packages-check.run
+pnpm exec werkstatt run apps-check.author --app warpgogol-com
+pnpm exec werkstatt run apps-check.author --app nicaragua-projekt
+pnpm exec werkstatt run onboarding.phase.validate --app warpgogol-com --phase=04-author
+pnpm exec werkstatt run onboarding.phase.validate --app nicaragua-projekt --phase=04-author
+pnpm exec werkstatt run workflow.lint
+pnpm exec werkstatt run rfc.validate
 ```
 
 All exit 0 or the train is rejected.
@@ -255,13 +255,13 @@ This RFC is the integration layer; it composes RFC-0101 through RFC-0106 and upd
 No new commands; this RFC enumerates the existing commands that gain duties or pipeline membership:
 
 ```
-pnpm exec site-kernel run packages-check.run
-pnpm exec site-kernel run apps-check.author --app <id>
-pnpm exec site-kernel run section.scaffold --archetype <id> --slug <slug>
-pnpm exec site-kernel run kernel.wire --app <id>
-pnpm exec site-kernel run styles.global.generate --app <id>
-pnpm exec site-kernel run workflow.lint
-pnpm exec site-kernel run rfc.validate
+pnpm exec werkstatt run packages-check.run
+pnpm exec werkstatt run apps-check.author --app <id>
+pnpm exec werkstatt run section.scaffold --archetype <id> --slug <slug>
+pnpm exec werkstatt run kernel.wire --app <id>
+pnpm exec werkstatt run styles.global.generate --app <id>
+pnpm exec werkstatt run workflow.lint
+pnpm exec werkstatt run rfc.validate
 ```
 
 ## Failure modes

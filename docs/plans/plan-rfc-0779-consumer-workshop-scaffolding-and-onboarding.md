@@ -149,7 +149,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run command.manifest.generate` — `workshop.scaffold` appears in manifest
+- `pnpm exec werkstatt run command.manifest.generate` — `workshop.scaffold` appears in manifest
 - `pnpm --filter @warpgogol/werkstatt run build:check`
 
 **Completion criterion:** `workshop.scaffold` is registered and appears in the command manifest.
@@ -193,7 +193,7 @@ scope:
 
 - Update root `AGENTS.md` — add `workshop.scaffold` to the command surface section, note it creates consumer workshops (not projects)
 - Update `docs/authoring/site-composition.md` — note that consumer workshops are scaffolded via `workshop.scaffold`
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command manifest changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command manifest changed
 
 **Validation:**
 
@@ -241,16 +241,16 @@ scope:
 **Agent actions:**
 
 - Verify `AGENTS.md` and `docs/authoring/site-composition.md` are updated
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion against implemented code. Mark `[x]` with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0779 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0779 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0779`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0779`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts updated; code review passed; all acceptance criteria checked off with evidence; RFC stamped as `implemented`.
@@ -261,10 +261,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0779`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0779`
 - `pnpm --filter @warpgogol/werkstatt run build:check`
 - `pnpm --filter @warpgogol/werkstatt run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0779` (RFC-0330)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0779` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -283,6 +283,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-62 (pinned files), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0779 --reason "..." --invariant "DNA-62"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-62 (pinned files), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0779 --reason "..." --invariant "DNA-62"` instead of working around it.
 - If `forge.init` API is insufficient for delegation (e.g. missing a way to pass stack profile), create an amending RFC rather than monkey-patching `forge.init`.
 - If the plugin contract (RFC-0770) is missing a hook needed by `workshop.scaffold`, create an amending RFC for RFC-0770.

@@ -135,7 +135,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run axiom.report --mission=test 2>&1 | grep "axiom.report"` — command is recognized (will fail on missing mission, but command name should appear)
+- `pnpm exec werkstatt run axiom.report --mission=test 2>&1 | grep "axiom.report"` — command is recognized (will fail on missing mission, but command name should appear)
 
 **Completion criterion:** `axiom.report` appears in the command registry and is callable via `site-kernel run axiom.report`.
 
@@ -233,20 +233,20 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0633` — must pass
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0633` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — must pass
 - Run `pnpm --filter @warpgogol/site-kernel-checks run test -- axiom-report` — all tests pass
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (new `axiom.report` command added)
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed (new `axiom.report` command added)
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review`. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion against implemented code. Mark `[x]` with inline `(evidence: <file:line>)` annotations.
-- **Stamp implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0633 --implementation-commit <sha>`
+- **Stamp implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0633 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — clean working tree
-- `pnpm exec site-kernel run rfc.validate --id RFC-0633` — passes (V-25 reviewers, V-26 criteria checked, V-27 evidence annotations)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0633` — passes (V-25 reviewers, V-26 criteria checked, V-27 evidence annotations)
 - Review report exists in `docs/reviews/code/`
 
 **Completion criterion:** All validation passes; acceptance criteria checked with evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -257,7 +257,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0633`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0633`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test -- axiom-report`
@@ -278,4 +278,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-49 or DNA-46, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0633 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-49 or DNA-46, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0633 --reason "..." --invariant "DNA-N"` instead of working around it.

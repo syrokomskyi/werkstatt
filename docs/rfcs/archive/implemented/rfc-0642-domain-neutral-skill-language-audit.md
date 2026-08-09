@@ -66,7 +66,7 @@ nonGoals:
   - Do not create new skills — this RFC audits and migrates existing skill language only
   - Do not implement `resolveTerminology()` — that is RFC-0639. This RFC consumes it.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -87,7 +87,7 @@ nonGoals:
 
 ## Context
 
-Forge ships 33 skills (`fo-*` prefix) that are designed to be domain-neutral and portable. SKILL-11 (RFC-0393) already enforces that skill bodies must not contain hardcoded `pnpm exec site-kernel run` or `docs/architecture-dna.md` in instruction lines. SKILL-17 (RFC-0539) enforces that skill files must not contain specific platform RFC/ADR ids or platform names.
+Forge ships 33 skills (`fo-*` prefix) that are designed to be domain-neutral and portable. SKILL-11 (RFC-0393) already enforces that skill bodies must not contain hardcoded `pnpm exec werkstatt run` or `docs/architecture-dna.md` in instruction lines. SKILL-17 (RFC-0539) enforces that skill files must not contain specific platform RFC/ADR ids or platform names.
 
 However, skills still contain software-domain-specific language in instruction lines: references to "typecheck", "build", "test", "package", "app", "service" — terms that are meaningless in a video, book, or music project. The semantic binding keys from RFC-0639 (`validate`, `produce`, `verify`, `preview`, `lint`) and the terminology resolution chain (bindings → profile → default) exist, but skills have not been audited to use them.
 

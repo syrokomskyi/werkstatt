@@ -56,7 +56,7 @@ nonGoals:
   - "Modifying health check logic"
   - "Adding retry logic for other fetch operations"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -159,7 +159,7 @@ No `--json` output changes. The log line changes from: `Fetching build identity 
 - [x] First `leitstand.promote` after a fresh `leitstand.propagate` succeeds without manual retry (evidence: leitstand-0608-promote.test.ts success path test passes with cache-buster URL, 419/419 tests green)
 - [x] Unit test: build-identity fetch URL includes cache-buster query param (evidence: leitstand-0608-promote.test.ts:343, test "RFC-0618: build-identity fetch URL includes cache-buster query param")
 - [x] Unit test: health check route probe URLs do NOT include cache-buster query param (evidence: cloudflare-workers.test.ts:129, test "RFC-0618: health check route probe URLs do NOT include cache-buster query param")
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0618 --json` — zero violations)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0618 --json` — zero violations)
 
 ## Implementation notes for agents
 

@@ -74,7 +74,7 @@ nonGoals:
   - "Do not support multi-RFC commits — one commit references at most one RFC"
   - "Do not address general enforcement of ecosystem commands beyond git commit — that is a separate concern"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -152,7 +152,7 @@ if [ -n "$PLATFORM_FILES" ]; then
   echo "Staged files touch platform scope (packages/**, integrations/**, services/**)." >&2
   echo "Use ecosystem.commit instead:" >&2
   echo "" >&2
-  echo "  pnpm exec site-kernel run ecosystem.commit --message "<your message>" [--rfc RFC-XXXX]" >&2
+  echo "  pnpm exec werkstatt run ecosystem.commit --message "<your message>" [--rfc RFC-XXXX]" >&2
   echo "" >&2
   echo "Tip for AI agents: remember this rule — platform-scope changes MUST use" >&2
   echo "ecosystem.commit, not git commit. Non-platform changes (docs/rfcs/**, missions/**)" >&2
@@ -196,19 +196,19 @@ PC-04 skips merge commits — merge commits do not carry `X-Platform-Bump` trail
 
 ```sh
 # Commit a platform change without an RFC (defaults to patch bump)
-pnpm exec site-kernel run ecosystem.commit --message "fix: resolve null-pointer in fingerprint normalizer"
+pnpm exec werkstatt run ecosystem.commit --message "fix: resolve null-pointer in fingerprint normalizer"
 
 # Commit a platform change referencing an RFC (bump type from RFC frontmatter)
-pnpm exec site-kernel run ecosystem.commit --message "feat: add ecosystem.commit command" --rfc RFC-0533
+pnpm exec werkstatt run ecosystem.commit --message "feat: add ecosystem.commit command" --rfc RFC-0533
 
 # Dry-run: preview the bump, new version, and PC-02/PC-03 forecast without committing
-pnpm exec site-kernel run ecosystem.commit --message "fix: resolve null-pointer" --dry-run
+pnpm exec werkstatt run ecosystem.commit --message "fix: resolve null-pointer" --dry-run
 
 # Amend the last commit (recalculates version, hash, trailers; refuses if pushed)
-pnpm exec site-kernel run ecosystem.commit --message "fix: resolve null-pointer" --amend
+pnpm exec werkstatt run ecosystem.commit --message "fix: resolve null-pointer" --amend
 
 # JSON output for agent consumption
-pnpm exec site-kernel run ecosystem.commit --message "fix: ..." --json
+pnpm exec werkstatt run ecosystem.commit --message "fix: ..." --json
 ```
 
 Flags:

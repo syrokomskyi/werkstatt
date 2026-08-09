@@ -268,17 +268,17 @@ scope:
 - Update `docs/verification-plan.xml` — add content regression gate verification entry
 - Update `docs/development-plan.xml` — add `content.regression.check` and `content.regression.snapshot.update` to the command development plan
 - Verify `docs/architecture-dna.md` DNA-61 entry (line 259-261) already references RFC-0732 correctly
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm all findings are resolved. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- **Run `rfc.verification.emit`:** `pnpm exec site-kernel run rfc.verification.emit --id RFC-0732` and commit evidence file
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0732 --implementation-commit <sha>`
+- **Run `rfc.verification.emit`:** `pnpm exec werkstatt run rfc.verification.emit --id RFC-0732` and commit evidence file
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0732 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0732`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0732`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -290,14 +290,14 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0732`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0732`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run test`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0732` (acceptance probes declared)
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0732` (RFC-0330)
+- `pnpm exec werkstatt run rfc.acceptance.run --id RFC-0732` (acceptance probes declared)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0732` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -316,6 +316,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-58 or DNA-61, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0732 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-58 or DNA-61, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0732 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `loadSemanticSiteModel` cannot provide resolved block content at the granularity required (e.g., blocks are already rendered to HTML, not structured data), escalate — the snapshot structure may need to hash rendered HTML instead of structured block fields.
 - If `executeKernelPipeline` does not support flag passthrough to individual steps, escalate — the `--skip-content-regression` mechanism may need a different approach (e.g., environment variable or pipeline-level conditional).

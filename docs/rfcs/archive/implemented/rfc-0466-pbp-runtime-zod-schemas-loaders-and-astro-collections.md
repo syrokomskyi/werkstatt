@@ -89,7 +89,7 @@ nonGoals:
   - "Does not delete @gogol/business — that is RFC-0470"
   - "Does not define projection generators (website, AI answer, Schema.org) — contract only, implementation in RFC-0467"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -505,7 +505,7 @@ N/A — library-only.
 - [x] Golden fixture tests pass for each entity schema (positive + negative cases) (evidence: 12 test files, 169 tests passed — 2026-07-20)
 - [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @gogol/pbp build:check — 2026-07-20)
 - [x] `vitest run` passes for `packages/pbp/` (evidence: 12 files, 169 tests passed — 2026-07-20)
-- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec site-kernel run rfc.validate RFC-0466, 2026-07-20)
+- [x] `rfc.validate` passes on this file before merging (RFC status: implemented) (evidence: pnpm exec werkstatt run rfc.validate RFC-0466, 2026-07-20)
 - [x] No site imports from `@gogol/pbp` until RFC-0469 (cutover) (evidence: cutover completed in RFC-0469, 2026-07-20)
 
 ## Implementation notes for agents

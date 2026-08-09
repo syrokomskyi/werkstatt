@@ -59,7 +59,7 @@ nonGoals:
   - "Does not change the SNAP-01 auto-regeneration behavior — only extracts shared code"
   - "Does not add new commands or pipeline steps"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -235,7 +235,7 @@ The shared helper is caller-agnostic via dependency injection. Each caller is re
 - [x] No duplicated SNAP-01 detection + re-build code between the two callers (evidence: both callers import only orchestrateSnap01Recovery from snapshot-auto-regen.ts; detectSnap01/autoRegenerateSnapshotOnSnap01 no longer imported directly)
 - [x] Existing tests pass (leitstand-0689-cache-snapshot.test.ts) (evidence: pnpm --filter @warpgogol/site-kernel-handoff run test — 599 passed, 2 skipped)
 - [x] New test case for cache size logging (evidence: leitstand-0689-cache-snapshot.test.ts:351 "RFC-0697: logs cache file count and total size before clearing")
-- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0697 — 0 errors, 1 expected warning V-19)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0697 — 0 errors, 1 expected warning V-19)
 
 ## Implementation notes for agents
 

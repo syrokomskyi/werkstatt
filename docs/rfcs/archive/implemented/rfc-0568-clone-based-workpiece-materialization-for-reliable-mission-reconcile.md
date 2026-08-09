@@ -71,7 +71,7 @@ nonGoals:
   - Does not change the git bundle audit trail or mission.cleanup behavior
   - Does not add cache clone drift detection or interactive merge/overlay prompt — `syncCacheClone` already handles cache clone freshness via fetch + reset, and `sternsystem.validate` detects external edits
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -165,10 +165,10 @@ No new commands. Changed commands:
 
 ```sh
 # materialize — now clones cache clone instead of git init
-pnpm exec site-kernel run mission.materialize --mission <id>
+pnpm exec werkstatt run mission.materialize --mission <id>
 
 # reconcile — now uses git merge instead of git format-patch + git am
-pnpm exec site-kernel run mission.reconcile --mission <id>
+pnpm exec werkstatt run mission.reconcile --mission <id>
 ```
 
 No new flags for reconcile. Existing flags (`--mission`, `--report-only`, `--skip-preflight`) unchanged. The `--message` flag on reconcile is preserved.
@@ -282,7 +282,7 @@ This is the same idempotency mechanism as RFC-0480, just using `git reset` to un
 - [x] `mission.reconcile` is idempotent: re-run resets cache clone to `preReconcileSha` and re-merges (evidence: `mission-materialization-commands.ts:548-572` — `git reset --hard ${prevReport.preReconcileSha}` before re-merge; test `git merge --no-ff is idempotent via preReconcileSha reset` verifies content consistency after re-run)
 - [x] `packages/os/site-kernel-handoff/AGENTS.md` updated to reflect clone-based materialization and merge-based reconcile (evidence: `AGENTS.md:93` — Workpiece git repository section updated; `AGENTS.md:99-103` — Reconcile section updated with untracked file investigation, merge-based reconcile, push retry)
 - [x] RFC-0480 and RFC-0522 `amendedBy` fields reference this RFC (evidence: `archive/implemented/rfc-0480-*.md:27` — `amendedBy: [RFC-0568]`; `archive/implemented/rfc-0522-*.md:21` — `amendedBy: [RFC-0568]`)
-- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --json` — no errors for RFC-0568)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --json` — no errors for RFC-0568)
 - [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: `tsc -p tsconfig.json --noEmit` exit 0)
 - [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes (evidence: 283 tests passed across 72 test files including 9 new RFC-0568 integration tests)
 

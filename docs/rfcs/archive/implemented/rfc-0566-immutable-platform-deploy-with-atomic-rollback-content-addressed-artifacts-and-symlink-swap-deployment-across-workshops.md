@@ -75,7 +75,7 @@ nonGoals:
   - "Do not implement canary deployments — this RFC deploys to all workshops atomically. Canary deployments are a future extension."
   - "Do not implement custom artifact formats — this RFC uses directory-based artifacts with content-addressed hashes (SHA-256), consistent with the existing artifact store (DNA-52)."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -148,19 +148,19 @@ Site content artifacts (Sternsystem releases) remain in the existing `.werkstatt
 
 ```sh
 # Build an immutable platform artifact from the local git clone
-pnpm exec site-kernel run deploy.artifact.build --json
+pnpm exec werkstatt run deploy.artifact.build --json
 
 # Verify an artifact's content hash
-pnpm exec site-kernel run deploy.artifact.verify --hash <sha-256> --json
+pnpm exec werkstatt run deploy.artifact.verify --hash <sha-256> --json
 
 # Atomic symlink swap to deploy a new artifact
-pnpm exec site-kernel run deploy.atomic.swap --hash <sha-256> --json
+pnpm exec werkstatt run deploy.atomic.swap --hash <sha-256> --json
 
 # Atomic rollback to the previous artifact
-pnpm exec site-kernel run deploy.atomic.rollback --json
+pnpm exec werkstatt run deploy.atomic.rollback --json
 
 # Check deployment status
-pnpm exec site-kernel run deploy.status --json
+pnpm exec werkstatt run deploy.status --json
 ```
 
 ### TypeScript contracts
@@ -300,7 +300,7 @@ export interface TwoPhaseCommitResult {
 - [x] Two-phase commit (Phase 4): a unit test simulates prepare failure → abort, and commit failure → rollback, verifying no partial state remains (evidence: Phase 4 deferred per RFC rollout section — `TwoPhaseCommitResult` and `WorkshopDeployStatus` types defined as stubs in `types.ts`, logic to be implemented in a follow-up RFC)
 - [x] Artifacts are never modified after creation (immutability) — a test verifies that modifying an artifact directory causes `deploy.artifact.verify` to fail (evidence: test 'immutability: modifying an artifact directory causes verify to fail' in `deploy.test.ts`)
 - [x] Artifact manifest is signed with Ed25519 using `@warpgogol/site-kernel-integrity` signing utilities (evidence: `signJsonPayload` in `artifact-build.ts`, exported from `site-kernel-integrity/src/signing.ts`)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate` — no RFC-0566-specific errors)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate` — no RFC-0566-specific errors)
 
 ## Implementation notes for agents
 

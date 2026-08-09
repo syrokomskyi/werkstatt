@@ -87,7 +87,7 @@ status: completed
 
 **Actions:**
 
-- Run: `pnpm exec site-kernel run rfc.verification.emit --id RFC-0376`
+- Run: `pnpm exec werkstatt run rfc.verification.emit --id RFC-0376`
 - Verify the generated file at `docs/rfcs/verification/rfc-0376.generated.yaml` has `overall: "pass"`
 - If `overall: "fail"`, inspect probe results and fix failing probes before proceeding
 
@@ -109,9 +109,9 @@ status: completed
 
 **Actions:**
 
-- Run: `pnpm exec site-kernel run rfc.validate --json`
+- Run: `pnpm exec werkstatt run rfc.validate --json`
 - Verify: 0 violations across all rules
-- Run: `pnpm exec site-kernel run rfc.validate RFC-0465 --json`
+- Run: `pnpm exec werkstatt run rfc.validate RFC-0465 --json`
 - Verify: 0 violations
 
 **Completion criterion:** `rfc.validate --json` reports 0 violations total.
@@ -123,7 +123,7 @@ status: completed
 - Check all 9 acceptance criteria in RFC-0465
 - Mark each `[x]` with evidence
 - Set `status: implemented`, `implementedAt: 2026-07-20`
-- Run: `pnpm exec site-kernel run rfc.validate RFC-0465 --json` — must pass
+- Run: `pnpm exec werkstatt run rfc.validate RFC-0465 --json` — must pass
 
 **Completion criterion:** RFC-0465 status is `implemented` with all criteria checked.
 
@@ -131,8 +131,8 @@ status: completed
 
 | Check | Command | Expected |
 | --- | --- | --- |
-| RFC validation | `pnpm exec site-kernel run rfc.validate --json` | 0 violations |
-| RFC-0465 validation | `pnpm exec site-kernel run rfc.validate RFC-0465 --json` | pass |
+| RFC validation | `pnpm exec werkstatt run rfc.validate --json` | 0 violations |
+| RFC-0465 validation | `pnpm exec werkstatt run rfc.validate RFC-0465 --json` | pass |
 | Unit tests | `pnpm --filter @wgogol/forge test` | all pass |
 | V-23 evidence | `docs/rfcs/verification/rfc-0376.generated.yaml` exists with `overall: "pass"` | true |
 

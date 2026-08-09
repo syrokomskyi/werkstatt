@@ -141,10 +141,10 @@ RFC frontmatter gains a sanctioned `satisfies` key; `rfc.validate` gains rule **
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run rfc.dna.trace.validate                 # validate only, read-only
-pnpm exec site-kernel run rfc.dna.trace.generate                 # write the generated matrix
-pnpm exec site-kernel run rfc.dna.trace.validate --dna DNA-35    # filter reverse view to one invariant
-pnpm exec site-kernel run rfc.dna.trace.validate --json
+pnpm exec werkstatt run rfc.dna.trace.validate                 # validate only, read-only
+pnpm exec werkstatt run rfc.dna.trace.generate                 # write the generated matrix
+pnpm exec werkstatt run rfc.dna.trace.validate --dna DNA-35    # filter reverse view to one invariant
+pnpm exec werkstatt run rfc.dna.trace.validate --json
 ```
 
 Flags: `dna` (string, optional on validate — filters output, not validation scope). The generate command has no filter: committed projections are always corpus-wide.

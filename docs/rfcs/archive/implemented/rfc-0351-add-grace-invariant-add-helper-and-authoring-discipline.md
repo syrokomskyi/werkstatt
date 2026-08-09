@@ -65,7 +65,7 @@ Add a deterministic insertion helper `grace.invariant.add`, and make authoring a
 ### `grace.invariant.add` (deterministic, no LLM)
 
 ```sh
-pnpm exec site-kernel run grace.invariant.add --file <path> --text "<invariant>"
+pnpm exec werkstatt run grace.invariant.add --file <path> --text "<invariant>"
 ```
 
 Behavior:

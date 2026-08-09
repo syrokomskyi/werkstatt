@@ -88,8 +88,8 @@ The storage / third-party-script policy is codified with the following clauses, 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run consent.activation.validate --all --json
-pnpm exec site-kernel run legal.processors.validate --app warpgogol-com --json
+pnpm exec werkstatt run consent.activation.validate --all --json
+pnpm exec werkstatt run legal.processors.validate --app warpgogol-com --json
 ```
 
 ### Policy contract

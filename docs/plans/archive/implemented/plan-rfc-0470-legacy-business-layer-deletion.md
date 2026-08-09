@@ -298,5 +298,5 @@ These remain as a follow-up execution phase after content migration is complete.
 
 ## 6. Escalation triggers
 
-- If moving `buildPageSemanticModel` reveals a circular dependency between `@gogol/pbp` and `@gogol/business`, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0470 --reason "circular dependency discovered"` instead of working around it.
+- If moving `buildPageSemanticModel` reveals a circular dependency between `@gogol/pbp` and `@gogol/business`, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0470 --reason "circular dependency discovered"` instead of working around it.
 - If `recordClaimsSchema` has hidden dependencies on other business schemas (beyond zod), escalate rather than partial-copy.

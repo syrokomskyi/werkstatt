@@ -110,7 +110,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — helper compilation
 - `pnpm --filter @gogol/site-kernel-handoff run test` — unit tests for helpers
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — command handler compilation
-- `pnpm exec site-kernel run rfc.validate RFC-0362 --json` — RFC validation
+- `pnpm exec werkstatt run rfc.validate RFC-0362 --json` — RFC validation
 
 ## 3. Step sequence
 
@@ -127,7 +127,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` passes
-- `pnpm exec site-kernel run rfc.validate RFC-0362 --json` passes
+- `pnpm exec werkstatt run rfc.validate RFC-0362 --json` passes
 
 **Completion criterion:** Schemas compile, are exported from `@gogol/ontology/schemas`, and match the RFC interfaces.
 
@@ -222,8 +222,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
-- `pnpm exec site-kernel run werkstatt.lock.status --json` returns `{ status: "pass", data: { locks: [], count: 0 } }`
-- `pnpm exec site-kernel run werkstatt.lock.recover --json` returns `{ status: "pass", data: { recovered: [], failed: [] } }`
+- `pnpm exec werkstatt run werkstatt.lock.status --json` returns `{ status: "pass", data: { locks: [], count: 0 } }`
+- `pnpm exec werkstatt run werkstatt.lock.recover --json` returns `{ status: "pass", data: { recovered: [], failed: [] } }`
 
 **Completion criterion:** Both commands are registered, callable via `site-kernel run`, return correct `--json` envelopes, and handle empty-state cleanly.
 
@@ -254,7 +254,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run werkstatt.operation.validate --json` returns `{ status: "pass", data: { scannedCommands: N, scannedFiles: M, violations: [] } }` (zero violations expected since no Werkstatt commands are implemented yet)
+- `pnpm exec werkstatt run werkstatt.operation.validate --json` returns `{ status: "pass", data: { scannedCommands: N, scannedFiles: M, violations: [] } }` (zero violations expected since no Werkstatt commands are implemented yet)
 
 **Completion criterion:** Validator is registered, callable, path-scoped to `packages/os/site-kernel-handoff/src/`, and returns correct `--json` envelope with zero violations on the current codebase.
 
@@ -274,7 +274,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run apps-check.run --app warpgogol-com --json` passes (new step runs with zero violations)
+- `pnpm exec werkstatt run apps-check.run --app warpgogol-com --json` passes (new step runs with zero violations)
 
 **Completion criterion:** `APPS_CHECK_AUTHOR_PIPELINE` includes `werkstatt.operation.validate`; `apps-check.run` passes.
 
@@ -336,9 +336,9 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run compass.validate --json` passes
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json` passes
-- `pnpm exec site-kernel run workspace.surface.validate --json` passes
+- `pnpm exec werkstatt run compass.validate --json` passes
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json` passes
+- `pnpm exec werkstatt run workspace.surface.validate --json` passes
 
 **Completion criterion:** All documentation files updated, Compass validation passes.
 
@@ -352,16 +352,16 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate RFC-0362 --json` — verify pass
+- Run `pnpm exec werkstatt run rfc.validate RFC-0362 --json` — verify pass
 - Run `pnpm --filter @gogol/ontology run build:check` — verify pass
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — verify pass
 - Run `pnpm --filter @gogol/site-kernel-handoff run test` — verify pass
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — verify pass
-- Run `pnpm exec site-kernel run apps-check.run --app warpgogol-com --json` — verify pass (includes `werkstatt.operation.validate`)
-- Run `pnpm exec site-kernel run werkstatt.lock.status --json` — verify empty-state pass
-- Run `pnpm exec site-kernel run werkstatt.lock.recover --json` — verify empty-state pass
-- Run `pnpm exec site-kernel run werkstatt.operation.validate --json` — verify zero violations
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0362` (RFC-0330) — emit verification evidence
+- Run `pnpm exec werkstatt run apps-check.run --app warpgogol-com --json` — verify pass (includes `werkstatt.operation.validate`)
+- Run `pnpm exec werkstatt run werkstatt.lock.status --json` — verify empty-state pass
+- Run `pnpm exec werkstatt run werkstatt.lock.recover --json` — verify empty-state pass
+- Run `pnpm exec werkstatt run werkstatt.operation.validate --json` — verify zero violations
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0362` (RFC-0330) — emit verification evidence
 - Update RFC-0362 acceptance criteria checkboxes to reflect verified state
 
 **Validation:**
@@ -382,18 +382,18 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0362 --json`
+- `pnpm exec werkstatt run rfc.validate RFC-0362 --json`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run apps-check.run --app warpgogol-com --json`
-- `pnpm exec site-kernel run werkstatt.lock.status --json`
-- `pnpm exec site-kernel run werkstatt.lock.recover --json`
-- `pnpm exec site-kernel run werkstatt.operation.validate --json`
-- `pnpm exec site-kernel run compass.validate --json`
-- `pnpm exec site-kernel run ecosystem.manifest.validate --json`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0362` (RFC-0330)
+- `pnpm exec werkstatt run apps-check.run --app warpgogol-com --json`
+- `pnpm exec werkstatt run werkstatt.lock.status --json`
+- `pnpm exec werkstatt run werkstatt.lock.recover --json`
+- `pnpm exec werkstatt run werkstatt.operation.validate --json`
+- `pnpm exec werkstatt run compass.validate --json`
+- `pnpm exec werkstatt run ecosystem.manifest.validate --json`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0362` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -415,6 +415,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0362 --reason "..." --invariant "DNA-51"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-51, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0362 --reason "..." --invariant "DNA-51"` instead of working around it.
 - If `@gogol/fingerprint` (RFC-0364) cannot be accepted before RFC-0362 implementation is needed, escalate via `rfc.supersede.propose` with `--reason "RFC-0364 dependency blocking — propose soft-dependency variant with null hashes"` rather than adding a temporary hash implementation.
 - If the `werkstatt.operation.validate` false-positive surface is larger than expected (legitimate writes in `site-kernel-handoff/src/` outside `werkstatt/` are flagged), escalate to adjust the allowlist mechanism rather than suppressing violations silently.

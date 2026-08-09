@@ -50,11 +50,11 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0628`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0628`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test` (vitest)
-- `pnpm exec site-kernel run command.manifest.generate`
+- `pnpm exec werkstatt run command.manifest.generate`
 
 ## 3. Step sequence
 
@@ -285,8 +285,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run command.manifest.generate`.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0628`.
+- Run `pnpm exec werkstatt run command.manifest.generate`.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0628`.
 - Run `pnpm --filter @warpgogol/ontology run build:check`.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`.
@@ -314,12 +314,12 @@ scope:
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0628 --implementation-commit <sha>`.
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0628 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0628` passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0628` passes.
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 - Review report exists in `docs/reviews/code/` for this session.
 
@@ -331,11 +331,11 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0628`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0628`
 - `pnpm --filter @warpgogol/ontology run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run command.manifest.generate`
+- `pnpm exec werkstatt run command.manifest.generate`
 
 ### 4.2 Evidence artifacts
 
@@ -354,5 +354,5 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0628 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-48 or DNA-49, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0628 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `leitstand.propagate` gate cannot be changed without breaking existing releases (e.g., a release is already in `dev-deployed` state), stop and report to the operator — the RFC assumes clean slate (no release has entered `dev-deployed` in production).

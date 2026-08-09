@@ -303,7 +303,7 @@ Mitigations are integrated into risk table above. Key strategies:
 
 ## Acceptance criteria
 
-- [x] `lighthouse.validate` command registered and executable via `pnpm exec site-kernel run lighthouse.validate --app nicaragua-projekt` (evidence: packages/os/site-kernel-checks/src/lighthouse.ts:1, command implemented in site-kernel-checks)
+- [x] `lighthouse.validate` command registered and executable via `pnpm exec werkstatt run lighthouse.validate --app nicaragua-projekt` (evidence: packages/os/site-kernel-checks/src/lighthouse.ts:1, command implemented in site-kernel-checks)
 - [x] Command detects LH-01 through LH-09 violations with appropriate severity (error vs warn) (evidence: packages/os/site-kernel-checks/src/lighthouse.ts:1, LH rules implemented)
 - [x] `lighthouse.budget.check` validates bundle sizes against LH-10 (evidence: packages/os/site-kernel-checks/src/lighthouse.ts:1, budget check implemented)
 - [x] All violations in `nicaragua-projekt` resolved or suppressed with justification (LH-10 documented) (evidence: original apps retired by RFC-0381, violations resolved historically)

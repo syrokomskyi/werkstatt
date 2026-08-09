@@ -64,7 +64,7 @@ nonGoals:
   - "Syncing mirrors on mission.abort or mission.cleanup"
   - "Adding mirror sync to leitstand.dev-deploy or leitstand.propagate"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -132,8 +132,8 @@ This two-phase approach guarantees:
 No new commands. No new flags. The operator runs the same commands as before:
 
 ```sh
-pnpm exec site-kernel run mission.reconcile --mission <id>
-pnpm exec site-kernel run mission.close --mission <id>
+pnpm exec werkstatt run mission.reconcile --mission <id>
+pnpm exec werkstatt run mission.close --mission <id>
 ```
 
 The behavior change is internal: reconcile now attempts `sternsystem.sync` after the bare repo push, and close blocks if external mirrors are desynced.
@@ -281,7 +281,7 @@ Mirror is behind origin. Run: sternsystem.sync --id warpgogol-com
 - [x] Unit test: close with desynced mirrors → throws with actionable error message (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0705-mirror-sync.test.ts test 3, vitest run passes)
 - [x] Unit test: close with no external mirrors → does not throw (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0705-mirror-sync.test.ts test 4, vitest run passes)
 - [x] `AGENTS.md` updated: rule transitions from conventional to enforced (evidence: AGENTS.md:18-19, packages/os/site-kernel-handoff/AGENTS.md:37-38)
-- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0705 --json` — 0 errors)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0705 --json` — 0 errors)
 
 ## Implementation notes for agents
 

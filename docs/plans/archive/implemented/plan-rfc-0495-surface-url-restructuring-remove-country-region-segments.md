@@ -64,8 +64,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks test` — surface.validate tests
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — handoff validation
 - `pnpm --filter @gogol/site-kernel-handoff test` — migrator tests
-- `pnpm exec site-kernel run migrator.registry.validate` — migrator registry validation
-- `pnpm exec site-kernel run rfc.validate RFC-0495` — RFC validation
+- `pnpm exec werkstatt run migrator.registry.validate` — migrator registry validation
+- `pnpm exec werkstatt run rfc.validate RFC-0495` — RFC validation
 
 ## 3. Step sequence
 
@@ -182,7 +182,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 **Completion criterion:** Migrator `rfc-0495` registered in registry.ts. `migrator.registry.validate` passes. Idempotency test passes.
 
@@ -198,7 +198,7 @@ scope:
 
 - Check `docs/requirements.xml` for URL structure rules referencing old slug templates — update if found
 - Check `docs/verification-plan.xml` for redirect validation rules — add `redirect.map.validate` check for old URL patterns if not present
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed
 
 **Validation:**
 
@@ -217,7 +217,7 @@ scope:
 **Agent actions:**
 
 - Verify every file listed in `scope.docs` is updated — check each path against `git diff`; if a scope doc was not modified, document why
-- Run `pnpm exec site-kernel run rfc.validate RFC-0495`
+- Run `pnpm exec werkstatt run rfc.validate RFC-0495`
 - Check off acceptance criteria:
   - [ ] `website-local.yaml` slug templates for depth-4 and depth-5 no longer include `{country}` or `{region}` — verify via Step 1
   - [ ] `url-schema.yaml` contains depth-4 and depth-5 route patterns — verify via Step 2
@@ -235,7 +235,7 @@ scope:
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate RFC-0495`
+- `pnpm exec werkstatt run rfc.validate RFC-0495`
 - Every file in `scope.docs` is either updated or documented as not-applicable
 
 **Completion criterion:** All documentation artifacts in scope are updated; all verifiable acceptance criteria are checked off; agent has requested the human operator to perform the `accepted → implemented` transition.
@@ -246,7 +246,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate RFC-0495`
+- `pnpm exec werkstatt run rfc.validate RFC-0495`
 - `pnpm --filter @gogol/ontology build:check`
 - `pnpm --filter @gogol/site-kernel-codegen build:check`
 - `pnpm --filter @gogol/site-kernel-codegen test`
@@ -254,7 +254,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks test`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
-- `pnpm exec site-kernel run migrator.registry.validate`
+- `pnpm exec werkstatt run migrator.registry.validate`
 
 ### 4.2 Evidence artifacts
 
@@ -276,6 +276,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-16 or DNA-39, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0495 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-16 or DNA-39, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0495 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `buildRetiredSurfaceRedirectBlock` cannot construct old URLs from new routes (e.g., surface.generated.json doesn't include country/region axis data), escalate — the function may need to read the full surface artifact entries instead of just route strings.
 - If `surface.contract.validate` is needed but RFC-0480 is not yet implemented, document the blocked acceptance criterion and proceed without it — the C-contract update (Step 2) is still valid as a declarative contract.

@@ -335,7 +335,7 @@ N/A — library-only.
 - [x] Unit tests: schema validation (valid/invalid snapshots), digest computation, ID convention (evidence: packages/pbp/src/schemas/**tests**/golden-fixtures.test.ts:878-932, packages/pbp/tests/entities.test.ts:112-116, dde4dd78)
 - [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run build:check exit 0)
 - [x] `vitest run` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run test — 13 test files pass, 1 pre-existing failure in rfc-0468 unrelated to RFC-0738)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0738 exit 0)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0738 exit 0)
 
 ## Implementation notes for agents
 

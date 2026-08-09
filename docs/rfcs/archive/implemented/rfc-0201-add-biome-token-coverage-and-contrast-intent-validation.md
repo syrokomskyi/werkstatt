@@ -99,9 +99,9 @@ The command treats `packages/ontology/biomes/*.yaml` and generated `apps/<site>/
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run biome.tokens.validate --app warpgogol-com
-pnpm exec site-kernel run biome.tokens.validate --app warpgogol-com --json
-pnpm exec site-kernel run biome.tokens.validate --all --json
+pnpm exec werkstatt run biome.tokens.validate --app warpgogol-com
+pnpm exec werkstatt run biome.tokens.validate --app warpgogol-com --json
+pnpm exec werkstatt run biome.tokens.validate --all --json
 ```
 
 Scope:

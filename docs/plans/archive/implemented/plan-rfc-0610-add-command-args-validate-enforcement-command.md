@@ -67,7 +67,7 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build` compiles without errors
-- Manual smoke: `pnpm exec site-kernel run command.args.validate --json` exits 0 with zero violations (since RFC-0609 is already implemented)
+- Manual smoke: `pnpm exec werkstatt run command.args.validate --json` exits 0 with zero violations (since RFC-0609 is already implemented)
 
 **Completion criterion:** Module compiles, handler returns a `CheckResult` with `diagnostics[]`, all three rules are implemented.
 
@@ -90,7 +90,7 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build` compiles
-- `pnpm exec site-kernel run diagnostic.shape.lint` does not flag `ARG-COMPLIANCE-*` as unregistered
+- `pnpm exec werkstatt run diagnostic.shape.lint` does not flag `ARG-COMPLIANCE-*` as unregistered
 
 **Completion criterion:** Three rule IDs registered in `core-infra.ts`.
 
@@ -120,7 +120,7 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build` compiles
-- `pnpm exec site-kernel run command.args.validate --json` returns a valid `CheckResult`
+- `pnpm exec werkstatt run command.args.validate --json` returns a valid `CheckResult`
 
 **Completion criterion:** Command is registered and invocable via `site-kernel run command.args.validate`.
 
@@ -141,7 +141,7 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 **Validation:**
 
 - `pnpm --filter @warpgogol/site-kernel-checks run build` compiles
-- `pnpm exec site-kernel run packages.check --strict 2>&1 | head -50` shows `command.args.validate` in the pipeline output
+- `pnpm exec werkstatt run packages.check --strict 2>&1 | head -50` shows `command.args.validate` in the pipeline output
 
 **Completion criterion:** Command appears in `PACKAGES_CHECK_PIPELINE` and runs as part of `packages.check`.
 
@@ -202,11 +202,11 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0610`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0610`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build`
 - Run `pnpm --filter @warpgogol/site-kernel-checks run vitest -- src/tests/command-args-validate.test.ts`
-- Run `pnpm exec site-kernel run command.args.validate --json` — confirm zero violations
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surface changed (it did — new command)
+- Run `pnpm exec werkstatt run command.args.validate --json` — confirm zero violations
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surface changed (it did — new command)
 
 **Validation:**
 
@@ -232,13 +232,13 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations
 - Check off acceptance criteria: verify each criterion against the implemented code. Mark `[x]` for verified criteria
 - Commit acceptance criteria update: `git commit -m "rfc: RFC-0610 check acceptance criteria with evidence"`
-- Stamp the RFC: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0610 --implementation-commit <sha>`
+- Stamp the RFC: `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0610 --implementation-commit <sha>`
 - Commit the stamp transition: `git commit -m "rfc: implement RFC-0610 command.args.validate enforcement command"`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0610`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0610`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All documentation artifacts in scope are updated; code review passed; all acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -249,11 +249,11 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0610`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0610`
 - `pnpm --filter @warpgogol/site-kernel-checks run build`
 - `pnpm --filter @warpgogol/site-kernel-checks run vitest -- src/tests/command-args-validate.test.ts`
-- `pnpm exec site-kernel run command.args.validate --json`
-- `pnpm exec site-kernel run packages.check --strict` (full pipeline including new step)
+- `pnpm exec werkstatt run command.args.validate --json`
+- `pnpm exec werkstatt run packages.check --strict` (full pipeline including new step)
 
 ### 4.2 Evidence artifacts
 
@@ -272,5 +272,5 @@ No YAML/JSON/manifest changes. The command is read-only and scans source files.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0610 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0610 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `command.args.validate` produces false positives on existing commands after RFC-0609 migration, verify RFC-0609 is fully implemented before adjusting detection rules.

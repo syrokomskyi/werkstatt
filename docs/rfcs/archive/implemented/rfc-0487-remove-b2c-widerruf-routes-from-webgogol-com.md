@@ -226,7 +226,7 @@ The existing `redirect.map.validate` (RFC-0318) already supports status 410 — 
 New command in `@gogol/site-kernel-checks`:
 
 ```sh
-pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json
+pnpm exec werkstatt run b2b.model.validate --app warpgogol-com --json
 ```
 
 Scope: `app`, supports `--app` flag (consistent with `redirect.map.validate`, `content.references.validate`). Runs in `sites-check-author` pipeline. All checks are **blocking** (exit code 1 on any violation) — there is no advisory mode.
@@ -428,9 +428,9 @@ This RFC adds new schema fields (`retiredRoutes`, `businessModel`) to `systemMan
 - [x] No `widerruf` or `musterWiderruf` entries in `legalIds` (DE + UK) (evidence: workpiece src/content/site/{de,uk}/labels.md — legalIds entries removed, commit 3894)
 - [x] `widerrufCreationDate` and `widerrufFormCreationDate` absent from PBP terms and site meta (evidence: workpiece src/content/site/de/meta.md and business-profile/de/documents/terms.md — fields removed, commit 3894)
 - [x] 8 page/prose files deleted (DE + UK × widerruf + muster-widerruf) (evidence: workpiece — 8 files deleted via rm, commit 3894)
-- [x] `b2b.model.validate --app warpgogol-com` exits 0 (evidence: `pnpm exec site-kernel run b2b.model.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — status: pass, count: 0)
-- [x] `redirect.map.validate --app warpgogol-com` exits 0 (evidence: `pnpm exec site-kernel run redirect.map.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — status: pass)
-- [x] `surface.contract.validate --app warpgogol-com` exits 0 (with `breaksC: true` acknowledged) (evidence: `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — exitCode: 0, RFC frontmatter breaksC: true)
+- [x] `b2b.model.validate --app warpgogol-com` exits 0 (evidence: `pnpm exec werkstatt run b2b.model.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — status: pass, count: 0)
+- [x] `redirect.map.validate --app warpgogol-com` exits 0 (evidence: `pnpm exec werkstatt run redirect.map.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — status: pass)
+- [x] `surface.contract.validate --app warpgogol-com` exits 0 (with `breaksC: true` acknowledged) (evidence: `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — exitCode: 0, RFC frontmatter breaksC: true)
 - [x] `retiredRoutes` field in `system.md` lists all four retired slugs with `status: 410` (evidence: workpiece src/content/system.md:6-14 — retiredRoutes with widerruf, widerruf-formular, vidmova, forma-vidmovy, all status: 410)
 - [x] `businessModel: b2b-only` declared in `system.md` (evidence: workpiece src/content/system.md:5 — businessModel: b2b-only)
 - [x] Cross-page cleanup sessions (expert files 4-8) completed before route removal deployment (evidence: commits c1ef and 3894 — widerruf references removed from AGB DE, Impressum DE, consent funnel; AGB UK and Impressum UK already clean from enhance-site-pages mission)

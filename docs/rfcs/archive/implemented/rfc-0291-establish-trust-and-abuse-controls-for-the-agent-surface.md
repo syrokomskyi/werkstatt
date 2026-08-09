@@ -102,7 +102,7 @@ Three additions, all inside existing components:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.manifest.verify --app warpgogol-com --url https://warpgogol.com --json
+pnpm exec werkstatt run agent.manifest.verify --app warpgogol-com --url https://warpgogol.com --json
 ```
 
 App-scoped, network-performing, **never** in `build.check` (post-deploy gate, like `passport.verify`). Local mode (`--url` omitted): verifies the signature of the freshly generated `public/.well-known/agent.json` against the committed public key — this mode IS safe for pipelines and is added to `APPS_CHECK_PIPELINE` guarded by key-material presence (skips with a note when the site has no passport key).

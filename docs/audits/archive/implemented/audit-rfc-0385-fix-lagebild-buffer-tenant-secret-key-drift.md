@@ -16,7 +16,7 @@ The RFC correctly identifies a real, verified secret-key drift between the adapt
 
 ## Mechanical validation (rfc.validate)
 
-Pass — `pnpm exec site-kernel run rfc.validate RFC-0385 --json` returns 0 violations.
+Pass — `pnpm exec werkstatt run rfc.validate RFC-0385 --json` returns 0 violations.
 
 ## Axis A — Structural completeness
 

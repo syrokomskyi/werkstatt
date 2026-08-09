@@ -289,10 +289,10 @@ The funnel introduces a dedicated app content domain `src/content/funnel/{lang}/
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run funnel.contract.validate --app warpgogol-com --json
-pnpm exec site-kernel run funnel.stage.validate --app warpgogol-com --json
-pnpm exec site-kernel run funnel.copy.validate --app warpgogol-com --json
-pnpm exec site-kernel run funnel.lagebild.validate --app warpgogol-com --json
+pnpm exec werkstatt run funnel.contract.validate --app warpgogol-com --json
+pnpm exec werkstatt run funnel.stage.validate --app warpgogol-com --json
+pnpm exec werkstatt run funnel.copy.validate --app warpgogol-com --json
+pnpm exec werkstatt run funnel.lagebild.validate --app warpgogol-com --json
 ```
 
 Proposed command responsibilities:

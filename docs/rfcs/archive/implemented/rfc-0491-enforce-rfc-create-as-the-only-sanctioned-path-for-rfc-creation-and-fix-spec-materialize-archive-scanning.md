@@ -71,7 +71,7 @@ nonGoals:
   - "Does not change the rfc.create flag surface (--title, --kind, --scope, --satisfies) — these are already sufficient."
   - "Does not add a registry or database of RFC numbers — the filesystem is the single source of truth, scanned recursively."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -145,13 +145,13 @@ Four changes close the gaps:
 
 ```sh
 # Read-only query: get the next free RFC number
-pnpm exec site-kernel run rfc.next-id
+pnpm exec werkstatt run rfc.next-id
 
 # JSON output for agent consumption
-pnpm exec site-kernel run rfc.next-id --json
+pnpm exec werkstatt run rfc.next-id --json
 
 # Create an RFC (existing command, unchanged)
-pnpm exec site-kernel run rfc.create --title "Short title" --kind architecture --satisfies DNA-24
+pnpm exec werkstatt run rfc.create --title "Short title" --kind architecture --satisfies DNA-24
 ```
 
 `rfc.next-id` takes no flags (except `--json` for output format). It is workspace-scoped — it always scans `docs/rfcs/` relative to the workspace root.
@@ -215,7 +215,7 @@ V-31 has two sub-checks, both reported as errors:
 2. **Fix `spec.materialize`**: delete the local `listRfcFiles` in `spec-materialize.ts`, add import from `../rfc/frontmatter-io.ts`.
 3. **Add V-31 to `rfc.validate`**: implement filename-number uniqueness and filename/id consistency checks in `validate-rules.ts`. The check iterates all parsed RFC files (already available via the `allParsed` map keyed by RFC id, or equivalently `allParsedByFile` keyed by filename — both contain the same data), extracts the numeric prefix from each filename, and flags duplicates and mismatches. A pre-implementation scan of all 477 existing RFC files (including `archive/implemented/` and `archive/superseded/`) confirmed zero filename/id mismatches and zero duplicate filename numbers, so V-31 can safely apply to all RFCs without a cutoff date.
 4. **Update AGENTS.md**: add the agent instruction to the RFC governance protocol section.
-5. **Regenerate generated documentation**: run `pnpm exec site-kernel run command.manifest.generate`, `pnpm exec site-kernel run docs.commands.generate`, and `pnpm exec site-kernel run ecosystem.manifest.generate` to sync the new `rfc.next-id` command into `docs/command-manifest.generated.yaml`, `docs/COMMANDS.md`, and `docs/ecosystem.generated.yaml`.
+5. **Regenerate generated documentation**: run `pnpm exec werkstatt run command.manifest.generate`, `pnpm exec werkstatt run docs.commands.generate`, and `pnpm exec werkstatt run ecosystem.manifest.generate` to sync the new `rfc.next-id` command into `docs/command-manifest.generated.yaml`, `docs/COMMANDS.md`, and `docs/ecosystem.generated.yaml`.
 6. **No migration needed**: the `spec.materialize` fix is a code change, not a data migration. Existing RFC files are unaffected.
 7. **No pipeline integration**: `rfc.next-id` is an on-demand query, not a build pipeline step. V-28, V-02, and V-31 remain as post-hoc validators in `rfc.validate`.
 

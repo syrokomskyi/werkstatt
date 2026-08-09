@@ -77,7 +77,7 @@ nonGoals:
   - "Does not change the hash-chain algorithm or `schemaVersion`"
   - "Does not remove `@gogol/surface` — only the `bordbuch.ts` module and its governance re-exports are deleted"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -187,7 +187,7 @@ Two new commands are added to `@gogol/site-kernel-handoff`:
 
 ```sh
 # Append a PSEO event (replaces site.bordbuch.append)
-pnpm exec site-kernel run bordbuch.append \
+pnpm exec werkstatt run bordbuch.append \
   --system warpgogol-com \
   --kind pseo \
   --writer-role runtime \
@@ -195,7 +195,7 @@ pnpm exec site-kernel run bordbuch.append \
   --actor agent
 
 # Append an IndexNow event
-pnpm exec site-kernel run bordbuch.append \
+pnpm exec werkstatt run bordbuch.append \
   --system warpgogol-com \
   --kind indexnow.submit \
   --writer-role runtime \
@@ -204,13 +204,13 @@ pnpm exec site-kernel run bordbuch.append \
   --metadata '{"key":"abc","batchHash":"sha256:...","urlCount":42}'
 
 # Validate the unified ledger
-pnpm exec site-kernel run bordbuch.validate --system warpgogol-com
+pnpm exec werkstatt run bordbuch.validate --system warpgogol-com
 
 # Get status projection (read-only, replaces site.bordbuch.status)
-pnpm exec site-kernel run bordbuch.status --system warpgogol-com
+pnpm exec werkstatt run bordbuch.status --system warpgogol-com
 
 # Generate public projections (replaces site.bordbuch.generate)
-pnpm exec site-kernel run bordbuch.generate --system warpgogol-com
+pnpm exec werkstatt run bordbuch.generate --system warpgogol-com
 ```
 
 ### New `bordbuch.status` command
@@ -389,7 +389,7 @@ The projection shape matches the old `bordbuchStatusSchema` from `@gogol/surface
 - [x] `packages/AGENTS.md` updated: `@gogol/surface` description no longer lists bordbuch in governance schema bags (evidence: surface entry in AGENTS.md — 2026-07-24)
 - [x] `packages/os/site-kernel-checks/AGENTS.md` updated: `site.bordbuch.*` command rows removed (evidence: no site.bordbuch entries — 2026-07-24)
 - [x] Orphaned `src/bordbuch/status.generated.yaml` and `src/bordbuch/events.ndjson` files in retired `apps/` directories are documented as orphaned and ignored (not cleaned up by this RFC) (evidence: apps/ retired, no cleanup needed — 2026-07-24)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0473 — 0 errors, 1 warning — 2026-07-24)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate RFC-0473 — 0 errors, 1 warning — 2026-07-24)
 - [x] `pnpm --filter @gogol/ontology build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)
 - [x] `pnpm --filter @gogol/site-kernel-handoff build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)
 - [x] `pnpm --filter @gogol/site-kernel-checks build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-24)

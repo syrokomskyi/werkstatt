@@ -76,8 +76,8 @@ The semantic pipeline is corrected so that `page.url` is the page's own absolute
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run jsonld.url.validate --all --json
-pnpm exec site-kernel run jsonld.parity --app nicaragua-projekt
+pnpm exec werkstatt run jsonld.url.validate --all --json
+pnpm exec werkstatt run jsonld.parity --app nicaragua-projekt
 ```
 
 ### TypeScript contracts

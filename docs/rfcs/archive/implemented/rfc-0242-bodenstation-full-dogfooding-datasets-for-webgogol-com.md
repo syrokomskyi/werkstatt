@@ -97,7 +97,7 @@ Make `warpgogol-com` the canonical **Bodenstation** deployment with full dogfood
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run bodenstation.voice.validate --app warpgogol-com --json
+pnpm exec werkstatt run bodenstation.voice.validate --app warpgogol-com --json
 ```
 
 App-scoped; runs in `warpgogol-com` build-check.

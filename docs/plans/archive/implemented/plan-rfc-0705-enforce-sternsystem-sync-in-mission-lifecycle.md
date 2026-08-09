@@ -44,7 +44,7 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0705`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0705`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
 
@@ -153,19 +153,19 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0705`
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0705`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0705` (RFC-0330 — acceptance probes are commented out, so this will skip silently, which is expected)
+- Run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0705` (RFC-0330 — acceptance probes are commented out, so this will skip silently, which is expected)
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix` via the `skill` tool. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
-- Stamp the RFC as implemented: run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0705 --implementation-commit <sha>`
+- Stamp the RFC as implemented: run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0705 --implementation-commit <sha>`
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session
-- `pnpm exec site-kernel run rfc.validate --id RFC-0705`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0705`
 - Review report exists in `docs/reviews/code/` for this session
 
 **Completion criterion:** All validation passes; code review passed (findings fixed if any); all acceptance criteria checked off with inline evidence; RFC stamped as `implemented` via `rfc.implement.stamp`.
@@ -176,10 +176,10 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0705`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0705`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run test`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0705` (will skip — acceptance probes commented out)
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0705` (will skip — acceptance probes commented out)
 
 ### 4.2 Evidence artifacts
 
@@ -197,4 +197,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-46 or DNA-44, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0705 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-46 or DNA-44, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0705 --reason "..." --invariant "DNA-N"` instead of working around it.

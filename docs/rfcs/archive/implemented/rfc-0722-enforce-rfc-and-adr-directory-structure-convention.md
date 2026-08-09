@@ -60,7 +60,7 @@ nonGoals:
   - "Changing rfc.create or adr.create behavior — these already write to the correct root location"
   - "Moving misplaced plan-rfc-0665.md from docs/rfcs/ to docs/plans/ — that is a pre-existing anomaly unrelated to this RFC"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:

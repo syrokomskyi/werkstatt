@@ -143,10 +143,10 @@ The acceptance-probe vocabulary gains a `page` kind (amending RFC-0268), and `@g
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run qa.independent.run --app warpgogol-com
-pnpm exec site-kernel run qa.independent.run --all
-pnpm exec site-kernel run qa.independent.run --app warpgogol-com --rfc RFC-0322   # single-RFC filter
-pnpm exec site-kernel run qa.independent.run --app warpgogol-com --json
+pnpm exec werkstatt run qa.independent.run --app warpgogol-com
+pnpm exec werkstatt run qa.independent.run --all
+pnpm exec werkstatt run qa.independent.run --app warpgogol-com --rfc RFC-0322   # single-RFC filter
+pnpm exec werkstatt run qa.independent.run --app warpgogol-com --json
 ```
 
 Flags: `rfc` (string, optional — restrict to one RFC's probes). `app`/`all` per standard app-scope conventions.

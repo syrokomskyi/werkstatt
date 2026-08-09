@@ -65,7 +65,7 @@ nonGoals:
   - "Does not add new validators — reuses existing author-time validators from SITES_CHECK_AUTHOR_PIPELINE"
   - "Does not restructure --report-only mode — it retains its current behavior (version comparison only, no staging, no preflight)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
@@ -128,10 +128,10 @@ At this point the workpiece is fully assembled on disk (pinned data + template f
 
 ```sh
 # Normal materialization with preflight gate
-pnpm exec site-kernel run mission.materialize --mission <mission-id>
+pnpm exec werkstatt run mission.materialize --mission <mission-id>
 
 # Skip preflight (records Bordbuch entry)
-pnpm exec site-kernel run mission.materialize --mission <mission-id> --skip-preflight
+pnpm exec werkstatt run mission.materialize --mission <mission-id> --skip-preflight
 
 ```
 
@@ -317,7 +317,7 @@ The `preflight-skipped` entry is appended via the existing `appendBordbuchEntry`
 - [x] `bordbuch.validate` accepts the `preflight-skipped` event type (evidence: packages/ontology/src/operations/mission.ts:60, bordbuchEntryKindSchema includes "preflight-skipped")
 - [x] `WRITER_ROLE_KINDS["mission"]` in `bordbuch-io.ts` includes `preflight-skipped` (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts:34)
 - [x] `packages/os/site-kernel-handoff/AGENTS.md` documents the preflight gate in the mission materialization section (evidence: packages/os/site-kernel-handoff/AGENTS.md:98-105)
-- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --json, only V-30 warning for @gogol/ontology in packagesImpacted)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate --json, only V-30 warning for @gogol/ontology in packagesImpacted)
 
 ## Implementation notes for agents
 

@@ -267,16 +267,16 @@ scope:
 - Verify `packages/forge/AGENTS.md` is updated (Step 7).
 - Run `pnpm --filter @warpgogol/forge run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/forge run test` — must pass.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0639` — must pass.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0639` — must pass.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - **Check off acceptance criteria:** verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: <file:line>)` annotations.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0639 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0639 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0639` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0639` — passes.
 - All 10 acceptance criteria checked off with evidence.
 
 **Completion criterion:** All documentation in scope is updated; code review passed; all acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -287,7 +287,7 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0639`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0639`
 - `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/forge run test`
 
@@ -306,4 +306,4 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0639 --reason "..." --invariant "DNA-54"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-54, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0639 --reason "..." --invariant "DNA-54"` instead of working around it.

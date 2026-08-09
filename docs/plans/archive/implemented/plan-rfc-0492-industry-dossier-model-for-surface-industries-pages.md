@@ -116,7 +116,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/surface run build:check`
-- `pnpm exec site-kernel run blueprint.validate --site warpgogol-com`
+- `pnpm exec werkstatt run blueprint.validate --site warpgogol-com`
 
 **Completion criterion:** `dossierSchema` validates the `BlueprintDossier` shape; existing blueprints without `dossier` still pass.
 
@@ -196,7 +196,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** `jsonld-types.yaml` declares `Service`; `surface.contract.validate` passes.
 
@@ -219,7 +219,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.generate --site warpgogol-com` (verify depth-1 pages bake without errors)
+- `pnpm exec werkstatt run surface.generate --site warpgogol-com` (verify depth-1 pages bake without errors)
 
 **Completion criterion:** Depth-1 `website-local` pages bake with dossier blocks from industry record fields; absent fields omit their block.
 
@@ -246,7 +246,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.industry.validate --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.industry.validate --site warpgogol-com --json`
 
 **Completion criterion:** `surface.industry.validate` runs, reports gate failures and claim violations, and is wired into `build.check` (warn mode initially).
 
@@ -272,7 +272,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.doorway-risk.report --site warpgogol-com --json`
 
 **Completion criterion:** `surface.doorway-risk.report` runs, flags depth-4 pages missing local context fields, and is wired into `build.check` as diagnostic.
 
@@ -297,7 +297,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.duplicate-content.report --site warpgogol-com --json`
+- `pnpm exec werkstatt run surface.duplicate-content.report --site warpgogol-com --json`
 
 **Completion criterion:** `surface.duplicate-content.report` runs, flags depth-1 industry pairs with >0.70 similarity, and blocks `surface.validate` when threshold exceeded.
 
@@ -348,7 +348,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run blueprint.validate --site warpgogol-com`
+- `pnpm exec werkstatt run blueprint.validate --site warpgogol-com`
 
 **Completion criterion:** `website-local.yaml` depth-1 level has a valid `dossier` block.
 
@@ -391,15 +391,15 @@ scope:
 - Update `packages/share/AGENTS.md` — note `surfaceId`/`depth` on `SemanticModelOptions` and Service deduplication behavior.
 - Update `packages/pbp/AGENTS.md` — note `buildPageSemanticModel` depth-1 industry Service node emission.
 - Update `packages/surface/AGENTS.md` — note `BlueprintDossier` and `dossier` field on `BlueprintLevel`.
-- Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed.
+- Run `pnpm exec werkstatt run ecosystem.manifest.generate` if command surfaces changed.
 - Check off acceptance criteria: verify each criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
 - DO NOT stamp RFC or plan status as `implemented` — request the human operator to run `rfc.implement.stamp`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0492`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0492` (RFC-0330)
+- `pnpm exec werkstatt run rfc.validate --id RFC-0492`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0492` (RFC-0330)
 - Every file in `scope.docs` is either updated or documented as not-applicable.
 
 **Completion criterion:** All documentation artifacts in scope are updated; all verifiable acceptance criteria are checked off; agent has requested the human operator to perform the `accepted → implemented` transition.
@@ -410,15 +410,15 @@ scope:
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0492`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0492`
 - `pnpm --filter @gogol/surface run build:check`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/pbp run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
-- `pnpm exec site-kernel run rfc.verification.emit --id RFC-0492` (RFC-0330)
+- `pnpm exec werkstatt run surface.contract.validate --site warpgogol-com`
+- `pnpm exec werkstatt run rfc.verification.emit --id RFC-0492` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
@@ -437,6 +437,6 @@ scope:
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0492 --reason "..." --invariant "DNA-24"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-24 (block-declarative pages), run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0492 --reason "..." --invariant "DNA-24"` instead of working around it.
 - If the `Service` JSON-LD type conflicts with existing `buildServiceNodes` consumers in unexpected ways, run `rfc.supersede.propose` rather than adding compatibility shims.
 - If the migrator cannot be made idempotent (e.g. field copy semantics conflict with operator edits), escalate via `rfc.supersede.propose` rather than weakening idempotency.

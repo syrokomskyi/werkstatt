@@ -40,4 +40,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: pipeline.cache.parity — ${{ matrix.app }}
-        run: pnpm exec site-kernel run pipeline.cache.parity --app ${{ matrix.app }} --json
+        run: pnpm exec werkstatt run pipeline.cache.parity --app ${{ matrix.app }} --json

@@ -79,9 +79,9 @@ Naive LLM review produces vague advice and cannot be repeated reliably. It may h
 Add a cached AI audience review lane:
 
 ```sh
-pnpm exec site-kernel run check.audience.profile.validate --profile handwerk-owner-de --json
-pnpm exec site-kernel run check.audience.review.run --run .check-warpgogol/runs/<runId> --profile handwerk-owner-de --json
-pnpm exec site-kernel run check.audience.review.validate --run .check-warpgogol/runs/<runId> --json
+pnpm exec werkstatt run check.audience.profile.validate --profile handwerk-owner-de --json
+pnpm exec werkstatt run check.audience.review.run --run .check-warpgogol/runs/<runId> --profile handwerk-owner-de --json
+pnpm exec werkstatt run check.audience.review.validate --run .check-warpgogol/runs/<runId> --json
 ```
 
 The reviewer receives only the evidence graph, screenshots, deterministic diagnostics, audience profile, and prompt rubric. It never crawls the web directly and never invents factual corrections.

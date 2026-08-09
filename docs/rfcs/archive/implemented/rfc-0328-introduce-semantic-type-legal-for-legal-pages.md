@@ -206,16 +206,16 @@ The command is not mandatory for the initial implementation; it can ship after t
 No new commands are added in the initial implementation. Existing commands change behavior:
 
 ```sh
-pnpm exec site-kernel run system.manifest.validate --app warpgogol-com
-pnpm exec site-kernel run sitemap.generate --app warpgogol-com
-pnpm exec site-kernel run llms.generate --app warpgogol-com
+pnpm exec werkstatt run system.manifest.validate --app warpgogol-com
+pnpm exec werkstatt run sitemap.generate --app warpgogol-com
+pnpm exec werkstatt run llms.generate --app warpgogol-com
 ```
 
 Proposed later:
 
 ```sh
-pnpm exec site-kernel run legal.page.validate --app warpgogol-com
-pnpm exec site-kernel run legal.page.validate --all --json
+pnpm exec werkstatt run legal.page.validate --app warpgogol-com
+pnpm exec werkstatt run legal.page.validate --all --json
 ```
 
 ### TypeScript contracts

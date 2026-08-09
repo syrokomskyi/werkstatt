@@ -135,9 +135,9 @@ No configuration or data file changes.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run forge.doctor` — verify zero stale skill copies.
-- Run `pnpm exec site-kernel run forge.skill.validate` — verify skill text complies with SKILL-01..21.
-- Run `pnpm exec site-kernel run rfc.validate --id RFC-0669` — verify RFC is valid.
+- Run `pnpm exec werkstatt run forge.doctor` — verify zero stale skill copies.
+- Run `pnpm exec werkstatt run forge.skill.validate` — verify skill text complies with SKILL-01..21.
+- Run `pnpm exec werkstatt run rfc.validate --id RFC-0669` — verify RFC is valid.
 
 **Validation:**
 
@@ -170,12 +170,12 @@ No configuration or data file changes.
 - No `ecosystem.manifest.generate` needed — no command surfaces changed.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Since this is a skill-text-only change (no `.ts` code), the review checks skill text quality, binding compliance, and sync correctness.
 - **Run fix if needed:** if `fo-review` reported findings, invoke `fo-fix`.
-- **Stamp the RFC as implemented:** run `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0669 --implementation-commit <sha>`.
+- **Stamp the RFC as implemented:** run `pnpm exec werkstatt run rfc.implement.stamp --id RFC-0669 --implementation-commit <sha>`.
 
 **Validation:**
 
 - `git status` — no uncommitted changes from the current session.
-- `pnpm exec site-kernel run rfc.validate --id RFC-0669` — passes.
+- `pnpm exec werkstatt run rfc.validate --id RFC-0669` — passes.
 - Review report exists in `docs/reviews/code/` for this session.
 
 **Completion criterion:** All acceptance criteria checked off with inline `(evidence: ...)` annotations; RFC is stamped as `implemented` via `rfc.implement.stamp`.
@@ -186,9 +186,9 @@ No configuration or data file changes.
 
 ### 4.1 Required checks
 
-- `pnpm exec site-kernel run rfc.validate --id RFC-0669`
-- `pnpm exec site-kernel run forge.doctor`
-- `pnpm exec site-kernel run forge.skill.validate`
+- `pnpm exec werkstatt run rfc.validate --id RFC-0669`
+- `pnpm exec werkstatt run forge.doctor`
+- `pnpm exec werkstatt run forge.skill.validate`
 - No `build:check` needed — no TypeScript code changes.
 - No `rfc.verification.emit` needed — RFC-0669 has no acceptance probes (commented out in frontmatter).
 
@@ -209,5 +209,5 @@ No configuration or data file changes.
 
 ## 6. Escalation triggers
 
-- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0669 --reason "..." --invariant "DNA-N"` instead of working around it.
+- If implementation reveals an invariant conflict with DNA-N, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0669 --reason "..." --invariant "DNA-N"` instead of working around it.
 - If `forge.skill.validate` reports a SKILL rule violation in the new checkpoint text, revise the text to comply — do not weaken the directive.

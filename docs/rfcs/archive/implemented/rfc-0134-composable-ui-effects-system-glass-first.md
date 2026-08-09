@@ -284,9 +284,9 @@ Future effects define their own composition rules when introduced.
 Add validation commands:
 
 ```sh
-pnpm exec site-kernel run effects.contract.validate --app warpgogol-com
-pnpm exec site-kernel run effects.contract.validate --all --json
-pnpm exec site-kernel run effects.coverage.audit --packages --json
+pnpm exec werkstatt run effects.contract.validate --app warpgogol-com
+pnpm exec werkstatt run effects.contract.validate --all --json
+pnpm exec werkstatt run effects.coverage.audit --packages --json
 ```
 
 `effects.contract.validate` checks content and schema usage:

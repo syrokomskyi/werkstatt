@@ -75,9 +75,9 @@ The fix cascaded through conflicts: Naiad → Hyperion (taken by `markdown` sect
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run archetype.registry.validate
-pnpm exec site-kernel run cosmic.name.rename --from Naiad --to Prometheus --layer section
-pnpm exec site-kernel run cosmic.name.rename --from Naiad --to Prometheus --layer section --dry-run
+pnpm exec werkstatt run archetype.registry.validate
+pnpm exec werkstatt run cosmic.name.rename --from Naiad --to Prometheus --layer section
+pnpm exec werkstatt run cosmic.name.rename --from Naiad --to Prometheus --layer section --dry-run
 ```
 
 ### TypeScript contracts
