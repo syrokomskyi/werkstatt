@@ -87,10 +87,13 @@
   |          @warpgogol/integration-adapter-supabase-crm, @warpgogol/passport
   +-- consumers: apps/*
 
-@GOGOL/WERKSTATT (platform-level, consumed by root tools/kernel.config.ts)
+@GOGOL/WERKSTATT (engine — RFC-0772 consolidated kernel, handoff, integrity, observability, fingerprint, agent-gate, changelog, schemas, plugin)
   |
-  +-- deps: @warpgogol/site-kernel
-  +-- consumers: root workspace (tools/kernel.config.ts)
+  +-- deps: @warpgogol/forge, @warpgogol/ontology, @warpgogol/share, @warpgogol/passport, @warpgogol/observability,
+  |          @warpgogol/integration, @warpgogol/integration-adapter-supabase-crm, @warpgogol/surface,
+  |          @warpgogol/site-kernel-content, @warpgogol/site-kernel-astro, @warpgogol/site-kernel-checks,
+  |          @warpgogol/site-kernel-codegen, @warpgogol/site-kernel-integrity, @warpgogol/site-kernel-onboarding
+  +-- consumers: root workspace (tools/kernel.config.ts), re-export shims (site-kernel, site-kernel-handoff, fingerprint, agent-gate, etc.)
 ```
 
 ## Dependency Matrix
@@ -98,7 +101,7 @@
 | Package | Depends on (workspace) |
 | --- | --- |
 | `@warpgogol/tokens` | — (zero) |
-| `@warpgogol/ontology` | — (zero) |
+| `@warpgogol/ontology` | `@warpgogol/werkstatt` (operations re-export shim) |
 | `@warpgogol/chat` | — (zero) |
 | `@warpgogol/growth` | — (zero) |
 | `@warpgogol/nebula` | — (zero) |
@@ -116,7 +119,14 @@
 | `@warpgogol/chat-adapter-uchat` | `@warpgogol/chat` |
 | `@warpgogol/growth-adapter-matomo` | `@warpgogol/growth` |
 | `@warpgogol/ui` | `@warpgogol/chat`, `@warpgogol/chat-adapter-null`, `@warpgogol/chat-adapter-uchat`, `@warpgogol/integration`, `@warpgogol/integration-adapter-stripe`, `@warpgogol/integration-adapter-supabase-crm`, `@warpgogol/passport` |
-| `@warpgogol/werkstatt` | `@warpgogol/site-kernel` |
+| `@warpgogol/werkstatt` | `@warpgogol/forge`, `@warpgogol/ontology`, `@warpgogol/share`, `@warpgogol/passport`, `@warpgogol/observability`, `@warpgogol/integration`, `@warpgogol/integration-adapter-supabase-crm`, `@warpgogol/surface`, `@warpgogol/site-kernel-content`, `@warpgogol/site-kernel-astro`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-integrity`, `@warpgogol/site-kernel-onboarding` |
+| `@warpgogol/site-kernel` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/site-kernel-handoff` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/site-kernel-integrity` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/site-kernel-observability` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/site-kernel-changelog` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/fingerprint` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
+| `@warpgogol/agent-gate` | `@warpgogol/werkstatt` (re-export shim — RFC-0772) |
 
 ## Blast Radius Guide
 
@@ -134,20 +144,23 @@
 | `@warpgogol/ui` (sections, components) | all apps directly |
 | `@warpgogol/tokens` (CSS only) | all apps (CSS import, no workspace dep) |
 
-## OS Packages (separate dependency tree)
+## OS Packages (re-export shims — RFC-0772)
 
-OS packages (`packages/os/*`) depend on each other and on shared packages but are NOT consumed by `apps/*` at build time — they are CLI tooling.
+OS packages (`packages/os/*`) are now re-export shims pointing to `@warpgogol/werkstatt`. They preserve backward-compatible import paths during the transition period (RFC-0772 → RFC-0776).
 
-| Package | Depends on |
-| --- | --- |
-| `@warpgogol/site-kernel` | (framework-free core) |
-| `@warpgogol/site-kernel-content` | (pure Node.js, no kernel dep) |
-| `@warpgogol/site-kernel-astro` | `@warpgogol/site-kernel` |
-| `@warpgogol/site-kernel-checks` | `@warpgogol/site-kernel`, `@warpgogol/site-kernel-astro`, `@warpgogol/site-kernel-content`, `@warpgogol/site-kernel-audit`, `@warpgogol/integration`, shared packages |
-| `@warpgogol/site-kernel-codegen` | `@warpgogol/site-kernel`, `@warpgogol/site-kernel-checks` |
-| `@warpgogol/site-kernel-onboarding` | `@warpgogol/site-kernel`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-checks` |
-| `@warpgogol/site-kernel-integrity` | `@warpgogol/site-kernel` |
-| `@warpgogol/site-kernel-changelog` | `@warpgogol/site-kernel` |
-| `@warpgogol/site-kernel-deploy` | `@warpgogol/integration`, `@warpgogol/share`, `@warpgogol/site-kernel` |
-| `@warpgogol/site-kernel-handoff` | `@warpgogol/fingerprint`, `@warpgogol/ontology`, `@warpgogol/share`, `@warpgogol/site-kernel`, `@warpgogol/site-kernel-astro`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-onboarding` |
-| `@warpgogol/site-kernel-audit` | `@warpgogol/site-kernel` |
+| Package | Status | Re-exports from |
+| --- | --- | --- |
+| `@warpgogol/site-kernel` | Re-export shim | `@warpgogol/werkstatt/kernel` |
+| `@warpgogol/site-kernel-content` | Active (not yet moved) | — |
+| `@warpgogol/site-kernel-astro` | Active (not yet moved) | — |
+| `@warpgogol/site-kernel-checks` | Active (not yet moved) | — |
+| `@warpgogol/site-kernel-codegen` | Active (not yet moved) | — |
+| `@warpgogol/site-kernel-onboarding` | Active (not yet moved) | — |
+| `@warpgogol/site-kernel-integrity` | Re-export shim | `@warpgogol/werkstatt/integrity` |
+| `@warpgogol/site-kernel-observability` | Re-export shim | `@warpgogol/werkstatt/observability` |
+| `@warpgogol/site-kernel-changelog` | Re-export shim | `@warpgogol/werkstatt/changelog` |
+| `@warpgogol/site-kernel-deploy` | Active (not yet moved) | — |
+| `@warpgogol/site-kernel-handoff` | Re-export shim | `@warpgogol/werkstatt` (handoff modules) |
+| `@warpgogol/site-kernel-audit` | Active (not yet moved) | — |
+| `@warpgogol/fingerprint` | Re-export shim | `@warpgogol/werkstatt/fingerprint` |
+| `@warpgogol/agent-gate` | Re-export shim | `@warpgogol/werkstatt/agent-gate` |
