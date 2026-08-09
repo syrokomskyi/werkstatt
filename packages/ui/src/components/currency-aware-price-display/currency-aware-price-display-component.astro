@@ -17,7 +17,6 @@ visibility based on the selected currency.
 </CHANGE_SUMMARY>
 */
 
-import { initCurrencyAwarePriceDisplay } from "./currency-aware-price-display-component.client.ts";
 import "./currency-aware-price-display-component.css";
 
 interface Props {
@@ -30,7 +29,6 @@ interface Props {
 
 const { priceVariants } = Astro.props as Props;
 
-const defaultVariant = priceVariants[0];
 const variantCurrencies = priceVariants.map((v) => v.currency);
 ---
 

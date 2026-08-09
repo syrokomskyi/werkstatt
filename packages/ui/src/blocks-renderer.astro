@@ -66,7 +66,11 @@ const sectionModules = import.meta.glob("./sections/*/*.astro", { eager: true })
 const componentModules = import.meta.glob("./components/*/*.astro", { eager: true });
 
 // Build lookup table: import path -> component
-const componentRegistry = new Map<string, any>();
+type AstroComponentModule = { default: (props: Record<string, unknown>) => unknown };
+const componentRegistry = new Map<
+  string,
+  ((props: Record<string, unknown>) => unknown) | undefined
+>();
 
 for (const [path, mod] of Object.entries(sectionModules)) {
   // Extract the section name from path: ./sections/hero/hero-section.astro -> @warpgogol/ui/sections/hero
@@ -74,7 +78,7 @@ for (const [path, mod] of Object.entries(sectionModules)) {
   if (match) {
     const sectionName = match[1];
     const importPath = `@warpgogol/ui/sections/${sectionName}`;
-    componentRegistry.set(importPath, (mod as any).default);
+    componentRegistry.set(importPath, (mod as AstroComponentModule).default);
   }
 }
 
@@ -84,7 +88,7 @@ for (const [path, mod] of Object.entries(componentModules)) {
   if (match) {
     const componentName = match[1];
     const importPath = `@warpgogol/ui/components/${componentName}`;
-    componentRegistry.set(importPath, (mod as any).default);
+    componentRegistry.set(importPath, (mod as AstroComponentModule).default);
   }
 }
 ---

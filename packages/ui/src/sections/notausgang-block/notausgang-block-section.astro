@@ -18,6 +18,7 @@
 
 import type { SectionProps } from "@warpgogol/share/page";
 import { cast, need, resolveSectionAnchor, resolveSemanticTarget } from "@warpgogol/share";
+import type { StandardListItem, EffectAssignment } from "@warpgogol/share";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionList from "@warpgogol/ui/components/section-body/list/section-list.astro";
@@ -29,13 +30,13 @@ const sectionId = await resolveSectionAnchor(Astro.props, "notausgang");
 const props = cast<NotausgangBlockSectionContent>(pageOverride);
 const body = need("body", props.body) as {
   kind: "list";
-  items: any[];
+  items: StandardListItem[];
   note?: string;
   iconColor?: string;
   align?: string;
   itemAlign?: string;
   hideMarkers?: boolean;
-  effects?: any[];
+  effects?: EffectAssignment[];
 };
 const ctaAlign = props.header?.align ?? "left";
 

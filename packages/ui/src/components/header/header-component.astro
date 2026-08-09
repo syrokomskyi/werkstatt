@@ -18,9 +18,9 @@
 import BrandLabel from "@warpgogol/ui/components/brand-label";
 import LangSwitcher from "@warpgogol/ui/components/lang-switcher";
 import CurrencySelector from "@warpgogol/ui/components/currency-selector";
-import { getResolvedComponentContent } from "@warpgogol/share";
+import { getResolvedComponentContent, resolveSemanticTarget, type LinkTargetRef } from "@warpgogol/share";
 import { getFeaturePolicyResolver } from "@warpgogol/share/astro/feature-policy";
-import { getRouteRegistry, resolveSemanticTarget } from "@warpgogol/share";
+import { getRouteRegistry } from "@warpgogol/share";
 import type { HeaderComponentContent } from "@warpgogol/ui/components/header/types";
 import "./header-component.css";
 
@@ -71,7 +71,7 @@ const content = await getResolvedComponentContent<HeaderComponentContent>({
 
 const navLinks = await Promise.all(
   content.navLinks.map(async (link) => {
-    const semTarget = link.semanticTarget as any;
+    const semTarget = link.semanticTarget as LinkTargetRef;
     // RFC-0048: Only use semanticTarget for navigation resolution
     // link.target (legacy id) should NOT be used as pageId
     const href = semTarget ? await resolveSemanticTarget(semTarget, activeLang) : null;
@@ -258,7 +258,7 @@ const ctaHref = ctaTarget
               toggle.setAttribute("aria-expanded", "false");
               nav.hidden = true;
               // Use Lenis if available for consistent smooth scrolling
-              const lenis = (window as any).wgLenis;
+              const lenis = (window as Window & { wgLenis?: { scrollTo: (el: Element, opts: { offset: number }) => void } }).wgLenis;
               if (lenis) {
                 const targetElement = document.getElementById(anchorId);
                 if (targetElement) {
@@ -305,7 +305,7 @@ const ctaHref = ctaTarget
       setTimeout(() => {
         const targetElement = document.getElementById(hashTarget);
         if (targetElement) {
-          const lenis = (window as any).wgLenis;
+          const lenis = (window as Window & { wgLenis?: { scrollTo: (el: Element, opts: { offset: number }) => void } }).wgLenis;
           if (lenis) {
             lenis.scrollTo(targetElement, { offset: -80 });
           } else {

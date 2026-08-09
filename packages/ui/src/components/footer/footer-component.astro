@@ -24,6 +24,7 @@ import {
   readAttributionPolicy,
   resolveImage,
   resolveSemanticTarget,
+  type LinkTargetRef,
 } from "@warpgogol/share";
 import { getFeaturePolicyResolver } from "@warpgogol/share/astro/feature-policy";
 import type { FooterComponentContent } from "@warpgogol/ui/components/footer/types";
@@ -87,12 +88,6 @@ const contactVisible = resolver.isEnabled({
   itemId: "contact",
   lang: activeLang,
 });
-const qrCodeVisible = resolver.isEnabled({
-  kind: "item",
-  componentId: "footer",
-  itemId: "qrCode",
-  lang: activeLang,
-});
 const copyrightFeatureEnabled = resolver.isEnabled({
   kind: "item",
   componentId: "footer",
@@ -115,7 +110,7 @@ const content = await getResolvedComponentContent<FooterComponentContent>({
 // Helper to resolve footer links using semantic targets
 async function resolveFooterLink(link: FooterLink): Promise<FooterLink | null> {
   if (link.semanticTarget) {
-    const target = link.semanticTarget as any;
+    const target = link.semanticTarget as LinkTargetRef;
     let resolvedHref = await resolveSemanticTarget(target, activeLang);
     if (!resolvedHref && defaultLang !== activeLang) {
       resolvedHref = await resolveSemanticTarget(target, defaultLang);
@@ -133,7 +128,7 @@ async function resolveFooterLink(link: FooterLink): Promise<FooterLink | null> {
 
 const hasEmail = content.contact.email != null && content.contact.email !== "";
 
-function resolveFooterHref(link: any): string {
+function resolveFooterHref(link: FooterLink): string {
   if (link.href) {
     return link.href;
   }
@@ -168,8 +163,6 @@ const copyrightContent = await getResolvedComponentContent<CopyrightComponentCon
   languageCode: activeLang,
   defaultLanguageCode: defaultLang,
 });
-
-const hasQrCode = false; // QR code asset not provided — feature disabled
 
 // [RFC-0053][RFC-0141] Resolve footer background image from the shared content-asset map.
 const footerImages = contentAssetImages;
@@ -431,9 +424,9 @@ const backgroundImageMeta = content.backgroundImage
           await navigator.clipboard.writeText(value);
 
           // Manually trigger animation to ensure it plays even if clicking button padding
-          const icon = btn.querySelector("lord-icon");
-          if (icon && "play" in icon && typeof (icon as any).play === "function") {
-            (icon as any).play();
+          const icon = btn.querySelector("lord-icon") as (Element & { play?: () => void }) | null;
+          if (icon && "play" in icon && typeof icon.play === "function") {
+            icon.play();
           }
         } catch (err) {
           console.error("[clipboard-copy-failure]", err);

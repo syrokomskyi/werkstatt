@@ -14,24 +14,29 @@ import "./changelog-section.css";
 import type { SectionProps } from "@warpgogol/share/page";
 
 const rawProps = (Astro.props as SectionProps) ?? {};
-const p = (rawProps.pageOverride ?? {}) as Record<string, any>;
-const entries: Array<{ date: string; summary: string; authorId: string }> = Array.isArray(
-  p.entries,
-)
+interface ChangelogOverride {
+  entries?: Array<{ date: string; summary: string; authorId: string }>;
+}
+const p = (rawProps.pageOverride ?? {}) as ChangelogOverride;
+const entries: Array<{ date: string; summary: string; authorId: string }> = Array.isArray(p.entries)
   ? p.entries
   : [];
 ---
 
-{entries.length > 0 && (
-  <section class="changelog-section">
-    <ul class="changelog-list">
-      {entries.map((entry) => (
-        <li class="changelog-item">
-          <time class="changelog-date" datetime={entry.date}>{entry.date}</time>
-          <span class="changelog-summary">{entry.summary}</span>
-          <span class="changelog-author">{entry.authorId}</span>
-        </li>
-      ))}
-    </ul>
-  </section>
-)}
+{
+  entries.length > 0 && (
+    <section class="changelog-section">
+      <ul class="changelog-list">
+        {entries.map((entry) => (
+          <li class="changelog-item">
+            <time class="changelog-date" datetime={entry.date}>
+              {entry.date}
+            </time>
+            <span class="changelog-summary">{entry.summary}</span>
+            <span class="changelog-author">{entry.authorId}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

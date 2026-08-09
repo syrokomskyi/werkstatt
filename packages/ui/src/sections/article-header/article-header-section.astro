@@ -15,7 +15,16 @@ import "./article-header-section.css";
 import type { SectionProps } from "@warpgogol/share/page";
 
 const rawProps = (Astro.props as SectionProps) ?? {};
-const p = (rawProps.pageOverride ?? {}) as Record<string, any>;
+interface ArticleHeaderOverride {
+  header?: { heading?: string; level?: number };
+  category?: string;
+  summary?: string;
+  articleType?: string;
+  authorName?: string;
+  reviewedAt?: string;
+  readTime?: string;
+}
+const p = (rawProps.pageOverride ?? {}) as ArticleHeaderOverride;
 const heading: string = p.header?.heading ?? "";
 const headingLevel: number = p.header?.level ?? 1;
 const category: string | undefined = p.category;

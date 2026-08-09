@@ -69,8 +69,6 @@ import { contentAssetImages } from "../../content-assets.ts";
 const images = contentAssetImages;
 const bgImage = bg.kind === "image" ? resolveImage(images, bg.imageName, { lang }) : null;
 
-const qualityMap = { low: 30, mid: 60, high: 80, max: 100 } as const;
-const bgQuality = bg.kind === "image" ? qualityMap[bg.quality ?? "high"] : 80;
 const bgFitClass = bg.kind === "image" ? `section-shell__bg-image--${bg.fit ?? "cover"}` : "";
 
 const fadeVars: string[] = [];

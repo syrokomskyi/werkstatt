@@ -43,7 +43,7 @@ const siteLabels = await getSiteSectionLabels<Record<string, unknown>>(
 );
 
 function resolveLabel(key: string, fallback: string): string {
-  const propValue = (props as any)[key];
+  const propValue = (props as unknown as Record<string, unknown>)[key];
   if (typeof propValue === "string" && propValue.length > 0) return propValue;
   const siteValue = siteLabels?.[key];
   if (typeof siteValue === "string" && siteValue.length > 0) return siteValue;

@@ -82,7 +82,7 @@ if (proseEntry) {
   }
 }
 
-let ProseContent: any = null;
+let ProseContent: (() => unknown) | null = null;
 let proseHtml: string | null = null;
 if (hasReferences && proseBody) {
   proseHtml = renderMarkdownGfm(proseBody, true);

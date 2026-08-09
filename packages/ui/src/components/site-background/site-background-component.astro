@@ -27,7 +27,6 @@ if (!lang) {
 
 import { contentAssetImages } from "../../content-assets.ts";
 const images = contentAssetImages;
-const qualityMap = { low: 30, mid: 60, high: 80, max: 100 } as const;
 
 const resolvedLayers = layers.map((layer) => {
   if (layer.kind === "image") {
@@ -99,7 +98,7 @@ function gradientCss(layer: Extract<SiteBackgroundConfig["layers"][number], { ki
         );
       }
       console.warn(
-        `[site-background-component] Unknown layer kind: "${(layer as any).kind}". Expected: color, gradient, image.`,
+        `[site-background-component] Unknown layer kind: "${(layer as { kind?: string }).kind ?? "unknown"}. Expected: color, gradient, image.`,
       );
       return null;
     })

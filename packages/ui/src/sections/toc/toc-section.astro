@@ -15,20 +15,25 @@ import "./toc-section.css";
 import type { SectionProps } from "@warpgogol/share/page";
 
 const rawProps = (Astro.props as SectionProps) ?? {};
-const p = (rawProps.pageOverride ?? {}) as Record<string, any>;
-const entries: Array<{ text: string; anchor: string }> = Array.isArray(p.entries)
-  ? p.entries
-  : [];
+interface TocOverride {
+  entries?: Array<{ text: string; anchor: string }>;
+}
+const p = (rawProps.pageOverride ?? {}) as TocOverride;
+const entries: Array<{ text: string; anchor: string }> = Array.isArray(p.entries) ? p.entries : [];
 ---
 
-{entries.length > 0 && (
-  <nav class="toc-section" aria-label="Table of contents">
-    <ul class="toc-list">
-      {entries.map((entry) => (
-        <li class="toc-item">
-          <a href={`#${entry.anchor}`} class="toc-link">{entry.text}</a>
-        </li>
-      ))}
-    </ul>
-  </nav>
-)}
+{
+  entries.length > 0 && (
+    <nav class="toc-section" aria-label="Table of contents">
+      <ul class="toc-list">
+        {entries.map((entry) => (
+          <li class="toc-item">
+            <a href={`#${entry.anchor}`} class="toc-link">
+              {entry.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
