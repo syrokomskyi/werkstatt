@@ -19,6 +19,7 @@ visibility based on the selected currency.
 */
 
 import "./currency-aware-price-display-component.css";
+import { CURRENCY_STORAGE_KEY_PREFIX } from "../currency-selector/currency-selector-component.client.ts";
 
 interface Props {
   priceVariants: Array<{
@@ -49,11 +50,11 @@ const variantCurrencies = priceVariants.map((v) => v.currency);
     ))
   }
 </span>
-<script is:inline define:vars={{ variantCurrencies, lang }}>
+<script is:inline define:vars={{ variantCurrencies, lang, keyPrefix: CURRENCY_STORAGE_KEY_PREFIX }}>
   try {
     var c = document.documentElement.getAttribute("data-wg-currency");
     if (!c) {
-      c = localStorage.getItem("wg-currency:" + lang);
+      c = localStorage.getItem(keyPrefix + ":" + lang);
     }
     if (c && variantCurrencies.indexOf(c) !== -1) {
       var containers = document.querySelectorAll("[data-currency-price-display]");

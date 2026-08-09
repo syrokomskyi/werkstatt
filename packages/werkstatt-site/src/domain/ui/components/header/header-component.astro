@@ -22,6 +22,7 @@ import { getResolvedComponentContent, resolveSemanticTarget, type LinkTargetRef 
 import { getFeaturePolicyResolver } from "@warpgogol/werkstatt-site/share/astro/feature-policy";
 import { getRouteRegistry } from "@warpgogol/werkstatt-site/share";
 import type { HeaderComponentContent } from "@warpgogol/werkstatt-site/ui/components/header/types";
+import { CURRENCY_STORAGE_KEY_PREFIX } from "../currency-selector/currency-selector-component.client.ts";
 import "./header-component.css";
 
 interface Props {
@@ -119,9 +120,9 @@ const ctaHref = ctaTarget
       </div>
       {content.motto && <span class="site-header__motto">{content.motto}</span>}
       {currencies.length > 0 && (
-        <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR", lang: activeLang }}>
+        <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR", lang: activeLang, keyPrefix: CURRENCY_STORAGE_KEY_PREFIX }}>
           try {
-            var key = "wg-currency:" + lang;
+            var key = keyPrefix + ":" + lang;
             var c = localStorage.getItem(key);
             if (!c) { c = defaultCurrency; localStorage.setItem(key, c); }
             document.documentElement.setAttribute("data-wg-currency", c);
