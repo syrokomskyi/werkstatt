@@ -219,7 +219,7 @@ describe("workshop.scaffold", () => {
       expect(fs.existsSync(path.join(dest, ".gitattributes"))).toBe(true);
       expect(fs.existsSync(path.join(dest, "hooks/pre-commit"))).toBe(true);
       expect(fs.existsSync(path.join(dest, ".github/workflows/ci.yml"))).toBe(true);
-      expect(fs.existsSync(path.join(dest, "systems/registry.yaml"))).toBe(true);
+      expect(fs.existsSync(path.join(dest, "systems-cache/.gitkeep"))).toBe(true);
       expect(fs.existsSync(path.join(dest, "missions/.gitkeep"))).toBe(true);
       expect(fs.existsSync(path.join(dest, ".forge/pinned.yaml"))).toBe(true);
       expect(fs.existsSync(path.join(dest, "README.md"))).toBe(true);

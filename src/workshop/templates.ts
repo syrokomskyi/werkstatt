@@ -26,25 +26,27 @@ export interface WorkshopFile {
 }
 
 function rootPackageJson(vars: WorkshopTemplateVars): string {
-  return JSON.stringify(
-    {
-      name: vars.workshopName,
-      private: true,
-      type: "module",
-      scripts: {
-        build: "pnpm exec tsc -p tsconfig.json --noEmit",
-        test: "vitest run",
-        format: "prettier --write .",
+  return (
+    JSON.stringify(
+      {
+        name: vars.workshopName,
+        private: true,
+        type: "module",
+        scripts: {
+          build: "pnpm exec tsc -p tsconfig.json --noEmit",
+          test: "vitest run",
+          format: "prettier --write .",
+        },
+        dependencies: {
+          "@warpgogol/werkstatt": "latest",
+          [vars.pluginPackage]: "latest",
+          "@warpgogol/forge": "latest",
+        },
       },
-      dependencies: {
-        "@warpgogol/werkstatt": "latest",
-        [vars.pluginPackage]: "latest",
-        "@warpgogol/forge": "latest",
-      },
-    },
-    null,
-    2,
-  ) + "\n";
+      null,
+      2,
+    ) + "\n"
+  );
 }
 
 function pnpmWorkspaceYaml(): string {
@@ -56,25 +58,27 @@ function pnpmWorkspaceYaml(): string {
 }
 
 function turboJson(): string {
-  return JSON.stringify(
-    {
-      $schema: "https://turbo.build/schema.json",
-      tasks: {
-        build: {
-          dependsOn: ["^build"],
-          outputs: ["dist/**"],
-        },
-        test: {
-          dependsOn: ["^build"],
-        },
-        "build:check": {
-          dependsOn: ["^build"],
+  return (
+    JSON.stringify(
+      {
+        $schema: "https://turbo.build/schema.json",
+        tasks: {
+          build: {
+            dependsOn: ["^build"],
+            outputs: ["dist/**"],
+          },
+          test: {
+            dependsOn: ["^build"],
+          },
+          "build:check": {
+            dependsOn: ["^build"],
+          },
         },
       },
-    },
-    null,
-    2,
-  ) + "\n";
+      null,
+      2,
+    ) + "\n"
+  );
 }
 
 function kernelConfigTs(vars: WorkshopTemplateVars): string {
@@ -122,24 +126,26 @@ function npmrc(): string {
 }
 
 function tsconfigBaseJson(): string {
-  return JSON.stringify(
-    {
-      compilerOptions: {
-        target: "ES2022",
-        module: "ESNext",
-        moduleResolution: "bundler",
-        strict: true,
-        esModuleInterop: true,
-        skipLibCheck: true,
-        forceConsistentCasingInFileNames: true,
-        resolveJsonModule: true,
-        isolatedModules: true,
-        noEmit: true,
+  return (
+    JSON.stringify(
+      {
+        compilerOptions: {
+          target: "ES2022",
+          module: "ESNext",
+          moduleResolution: "bundler",
+          strict: true,
+          esModuleInterop: true,
+          skipLibCheck: true,
+          forceConsistentCasingInFileNames: true,
+          resolveJsonModule: true,
+          isolatedModules: true,
+          noEmit: true,
+        },
       },
-    },
-    null,
-    2,
-  ) + "\n";
+      null,
+      2,
+    ) + "\n"
+  );
 }
 
 function eslintConfigJs(): string {
@@ -231,19 +237,20 @@ pnpm exec werkstatt run werkstatt.plugin.validate || exit 1
 }
 
 function ciYml(vars: WorkshopTemplateVars): string {
-  const stackSpecific = vars.stackId === "astro-typescript-turborepo"
-    ? `      - name: Build check
+  const stackSpecific =
+    vars.stackId === "astro-typescript-turborepo"
+      ? `      - name: Build check
         run: pnpm run build
       - name: Test
         run: pnpm run test`
-    : vars.stackId === "phaser-turborepo"
-      ? `      - name: Build check
+      : vars.stackId === "phaser-turborepo"
+        ? `      - name: Build check
         run: pnpm run build
       - name: Test
         run: pnpm run test
       - name: Bundle validate
         run: pnpm exec werkstatt run forge.validate`
-      : `      - name: Build check
+        : `      - name: Build check
         run: pnpm run build
       - name: Test
         run: pnpm run test
@@ -283,9 +290,9 @@ ${stackSpecific}
 }
 
 function registryYaml(): string {
-  return `# Sternsystem registry (RFC-0574)
-# Each Sternsystem declares mirrors[], pin file, and bordbuch.
-systems: []
+  return `# Sternsystem cache directory (RFC-0790)
+# Per-system config and state files live in systems-cache/<id>/
+systems-cache/.gitkeep
 `;
 }
 
@@ -303,7 +310,7 @@ entries:
     mode: protect
   - path: tsconfig/base.json
     mode: protect
-  - path: systems/registry.yaml
+  - path: systems-cache/.gitkeep
     mode: protect
 `;
 }
@@ -375,18 +382,21 @@ export function getWorkshopFiles(vars: WorkshopTemplateVars): WorkshopFile[] {
     },
     { path: "hooks/pre-commit", content: preCommit() },
     { path: ".github/workflows/ci.yml", content: ciYml(vars) },
-    { path: "systems/registry.yaml", content: registryYaml() },
+    { path: "systems-cache/.gitkeep", content: registryYaml() },
     { path: "missions/.gitkeep", content: "" },
     { path: ".forge/pinned.yaml", content: pinnedYaml() },
     { path: "README.md", content: readmeMd(vars) },
   ];
 }
 
-export const STACK_PLUGIN_MAP: Record<string, {
-  package: string;
-  importName: string;
-  exportName: string;
-}> = {
+export const STACK_PLUGIN_MAP: Record<
+  string,
+  {
+    package: string;
+    importName: string;
+    exportName: string;
+  }
+> = {
   "astro-typescript-turborepo": {
     package: "@warpgogol/werkstatt-site",
     importName: "@warpgogol/werkstatt-site",

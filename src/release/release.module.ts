@@ -41,7 +41,7 @@ export function createReleaseModule(): KernelModule {
           semver: { kind: "string", default: "0.1.0", description: "Release semantic version." },
         },
         writes: ["releases/{release}/**"],
-        reads: ["missions/{mission}/**", "systems/registry.yaml"],
+        reads: ["missions/{mission}/**", "systems-cache/{system}/system-config.yaml"],
         cacheable: false,
         execute: runReleasePrepare,
       });
@@ -57,10 +57,14 @@ export function createReleaseModule(): KernelModule {
         },
         writes: [
           "releases/{release}/release.yaml",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
-        reads: ["releases/{release}/**", "systems/registry.yaml"],
+        reads: [
+          "releases/{release}/**",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
         cacheable: false,
         execute: runReleaseReady,
       });
@@ -83,7 +87,7 @@ export function createReleaseModule(): KernelModule {
         flags: {
           site: { kind: "string", description: "Filter by Sternsystem id." },
         },
-        reads: ["releases/*/release.yaml", "systems/registry.yaml"],
+        reads: ["releases/*/release.yaml", "systems-cache/*/system-config.yaml"],
         execute: runReleaseList,
       });
       registry.registerCommand({
@@ -96,8 +100,11 @@ export function createReleaseModule(): KernelModule {
         flags: {
           release: { kind: "string", required: true, description: "Release id to roll back." },
         },
-        writes: ["releases/{release}/release.yaml", "systems/{system}/bordbuch/events.ndjson"],
-        reads: ["releases/{release}/**", "systems/registry.yaml"],
+        writes: [
+          "releases/{release}/release.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
+        ],
+        reads: ["releases/{release}/**", "systems-cache/{system}/system-config.yaml"],
         cacheable: false,
         execute: runReleaseRollback,
       });
@@ -119,8 +126,9 @@ export function createReleaseModule(): KernelModule {
           "missions/{mission}/mission.yaml",
           "missions/{mission}/evidence/close-report.json",
           "releases/{release}/release.yaml",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
         execute: runReleaseStateValidate,
       });

@@ -82,8 +82,8 @@ export function createMissionModule(): KernelModule {
         },
         writes: [
           "missions/{mission}/**",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
         execute: runMissionOpen,
       });
@@ -127,8 +127,8 @@ export function createMissionModule(): KernelModule {
         },
         writes: [
           "missions/{mission}/mission.yaml",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
         execute: runMissionClose,
       });
@@ -156,8 +156,8 @@ export function createMissionModule(): KernelModule {
           "missions/{mission}/mission.yaml",
           "missions/{mission}/workpiece/**",
           "missions/{mission}/distribution/**",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
         execute: runMissionAbort,
       });

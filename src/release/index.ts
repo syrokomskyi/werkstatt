@@ -68,8 +68,8 @@ export function createReleaseModule(): KernelModule {
         },
         writes: [
           "releases/{release}/release.yaml",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
         execute: runReleaseReady,
       });
@@ -124,8 +124,8 @@ export function createReleaseModule(): KernelModule {
           "missions/{mission}/mission.yaml",
           "missions/{mission}/evidence/close-report.json",
           "releases/{release}/release.yaml",
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
         ],
         execute: runReleaseStateValidate,
       });

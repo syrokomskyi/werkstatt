@@ -19,7 +19,7 @@ import {
   dnsListResponse,
   routeListResponse,
 } from "./helpers/cloudflare-api-mock.ts";
-import { buildRegistry } from "./helpers/registry-builder.ts";
+import { buildSystemConfig, buildServicesRegistry } from "./helpers/registry-builder.ts";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 let tmpDir: string;
@@ -62,27 +62,30 @@ function makeInput(flags: Record<string, string>): KernelCommandInput {
 }
 
 function createRegistry(workspaceRoot: string): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = buildRegistry({
-    systems: [
-      {
-        id: "warpgogol-com",
-        cosmicStar: "Vega",
-        mirrors: [{ path: "/tmp/test-cache", storageType: "non-bare" }],
-        pinnedPlatform: "1.0.0",
-        notes: "",
-        cloudflareZoneId: "zone-123",
-        deployment: {
-          adapter: "cloudflare-workers",
-          channels: {
-            dev: { workerName: "wg-dev", url: "https://dev.warpgogol.com" },
-            alt: { workerName: "wg-alt", url: "https://alt.warpgogol.com" },
-            main: { workerName: "wg-main", url: "https://warpgogol.com" },
-          },
-        },
+  const cacheDir = join(workspaceRoot, "..", "systems-cache", "warpgogol-com");
+  mkdirSync(cacheDir, { recursive: true });
+  const configContent = buildSystemConfig({
+    id: "warpgogol-com",
+    cosmicStar: "Vega",
+    mirrors: [{ path: "/tmp/test-cache", storageType: "non-bare" }],
+    pinnedPlatform: "1.0.0",
+    notes: "",
+    cloudflareZoneId: "zone-123",
+    deployment: {
+      adapter: "cloudflare-workers",
+      channels: {
+        dev: { workerName: "wg-dev", url: "https://dev.warpgogol.com" },
+        alt: { workerName: "wg-alt", url: "https://alt.warpgogol.com" },
+        main: { workerName: "wg-main", url: "https://warpgogol.com" },
       },
-    ],
+    },
+  });
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+
+  const servicesDir = join(workspaceRoot, "services");
+  mkdirSync(servicesDir, { recursive: true });
+  const servicesContent = buildServicesRegistry({
+    systems: [],
     services: [
       {
         id: "matomo-proxy",
@@ -94,7 +97,7 @@ function createRegistry(workspaceRoot: string): void {
       },
     ],
   });
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+  writeFileSync(join(servicesDir, "registry.yaml"), servicesContent);
 }
 
 test("reports valid when both DNS and route exist and are correct", async () => {

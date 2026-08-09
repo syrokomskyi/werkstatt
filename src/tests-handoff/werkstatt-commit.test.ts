@@ -41,13 +41,13 @@ afterEach(() => {
 
 test("idempotent skip — no changes returns committed: false", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems"));
-  writeFileSync(join(tmpDir, "systems", "registry.yaml"), "initial\n");
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
+  writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   gitCommit(tmpDir, "initial");
 
   const result = await commitWerkstattSideEffects(
     tmpDir,
-    ["systems/registry.yaml"],
+    ["systems-cache/test-system/system-config.yaml"],
     "werkstatt: test",
   );
 
@@ -57,19 +57,19 @@ test("idempotent skip — no changes returns committed: false", async () => {
 
 test("specific-file staging — only named files are staged", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems"));
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
   mkdirSync(join(tmpDir, "missions"));
-  writeFileSync(join(tmpDir, "systems", "registry.yaml"), "initial\n");
+  writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   writeFileSync(join(tmpDir, "missions", "mission.yaml"), "initial\n");
   writeFileSync(join(tmpDir, "foreign.txt"), "foreign change\n");
   gitCommit(tmpDir, "initial");
 
-  writeFileSync(join(tmpDir, "systems", "registry.yaml"), "modified\n");
+  writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "modified\n");
   writeFileSync(join(tmpDir, "foreign.txt"), "foreign modified\n");
 
   const result = await commitWerkstattSideEffects(
     tmpDir,
-    ["systems/registry.yaml"],
+    ["systems-cache/test-system/system-config.yaml"],
     "werkstatt: test",
   );
 
@@ -83,8 +83,8 @@ test("specific-file staging — only named files are staged", async () => {
 
 test("throw on commit failure — pre-commit hook blocks", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems"));
-  writeFileSync(join(tmpDir, "systems", "registry.yaml"), "initial\n");
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
+  writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   gitCommit(tmpDir, "initial");
 
   // Install a failing pre-commit hook
@@ -92,24 +92,28 @@ test("throw on commit failure — pre-commit hook blocks", async () => {
   writeFileSync(hookPath, "#!/bin/sh\necho 'blocked by hook'\nexit 1\n");
   execSync(`chmod +x ${hookPath}`, { stdio: "pipe" });
 
-  writeFileSync(join(tmpDir, "systems", "registry.yaml"), "modified\n");
+  writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "modified\n");
 
   await expect(
-    commitWerkstattSideEffects(tmpDir, ["systems/registry.yaml"], "werkstatt: test"),
+    commitWerkstattSideEffects(
+      tmpDir,
+      ["systems-cache/test-system/system-config.yaml"],
+      "werkstatt: test",
+    ),
   ).rejects.toThrow();
 });
 
 test("non-existent file — skipped silently via allowNonZero", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems"));
-  writeFileSync(join(tmpDir, "systems", "registry.yaml"), "initial\n");
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
+  writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   gitCommit(tmpDir, "initial");
 
-  writeFileSync(join(tmpDir, "systems", "registry.yaml"), "modified\n");
+  writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "modified\n");
 
   const result = await commitWerkstattSideEffects(
     tmpDir,
-    ["systems/registry.yaml", "does/not/exist.yaml"],
+    ["systems-cache/test-system/system-config.yaml", "does/not/exist.yaml"],
     "werkstatt: test",
   );
 

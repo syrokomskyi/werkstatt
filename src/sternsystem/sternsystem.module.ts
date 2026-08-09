@@ -30,7 +30,7 @@ export function createSternsystemModule(): KernelModule {
       registry.registerCommand({
         name: "sternsystem.register",
         description:
-          "Register a new Sternsystem in systems/registry.yaml, create pin, content stubs, open first mission, and trigger materialization (RFC-0354, RFC-0532). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror], [--owner], [--amend], [--amend-id].",
+          "Register a new Sternsystem: create system-config.yaml, system-state.yaml, pin, content stubs, open first mission, and trigger materialization (RFC-0354, RFC-0532, RFC-0790). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror], [--owner], [--amend], [--amend-id].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -63,11 +63,12 @@ export function createSternsystemModule(): KernelModule {
           },
         },
         writes: [
-          "systems/registry.yaml",
-          "systems/{id}/system.pin.json",
-          "systems/{id}/content/system.md",
+          "systems-cache/{id}/system-config.yaml",
+          "systems-cache/{id}/system-state.yaml",
+          "systems-cache/{id}/system.pin.json",
+          "systems-cache/{id}/src/content/system.md",
         ],
-        reads: ["systems/registry.yaml", "onboarding/{id}/.input/00-brief.md"],
+        reads: ["systems-cache/*/system-config.yaml", "onboarding/{id}/.input/00-brief.md"],
         cacheable: false,
         execute: runSternsystemRegister,
       });
@@ -78,7 +79,7 @@ export function createSternsystemModule(): KernelModule {
         scope: "workspace",
         supportsAllSites: false,
         flags: {},
-        reads: ["systems/registry.yaml", "systems/*/system.pin.json"],
+        reads: ["systems-cache/*/system-config.yaml", "systems-cache/*/system.pin.json"],
         execute: runSternsystemList,
       });
       registry.registerCommand({
@@ -90,7 +91,7 @@ export function createSternsystemModule(): KernelModule {
         flags: {
           id: { kind: "string", description: "Optional Sternsystem id to validate." },
         },
-        reads: ["systems/registry.yaml", "systems/*/system.pin.json"],
+        reads: ["systems-cache/*/system-config.yaml", "systems-cache/*/system.pin.json"],
         execute: runSternsystemValidate,
         gate: {
           severity: "error",
@@ -109,8 +110,8 @@ export function createSternsystemModule(): KernelModule {
           id: { kind: "string", required: true, description: "Sternsystem id." },
           platform: { kind: "string", description: "Pinned platform version." },
         },
-        writes: ["systems/{id}/system.pin.json", "systems/registry.yaml"],
-        reads: ["systems/registry.yaml", "systems/{id}/system.pin.json"],
+        writes: ["systems-cache/{id}/system.pin.json", "systems-cache/{id}/system-config.yaml"],
+        reads: ["systems-cache/{id}/system-config.yaml", "systems-cache/{id}/system.pin.json"],
         cacheable: false,
         execute: runSternsystemPin,
       });
@@ -125,8 +126,8 @@ export function createSternsystemModule(): KernelModule {
           site: { kind: "string", required: true, description: "Site id to extract." },
           repo: { kind: "string", description: "Sternsystem repository URL." },
         },
-        writes: ["systems/{site}/**", "systems/registry.yaml"],
-        reads: ["systems/registry.yaml", "missions/*/workpiece/**"],
+        writes: ["systems-cache/{site}/**", "systems-cache/{site}/system-config.yaml"],
+        reads: ["systems-cache/*/system-config.yaml", "missions/*/workpiece/**"],
         cacheable: false,
         execute: runSternsystemExtract,
       });
@@ -148,8 +149,8 @@ export function createSternsystemModule(): KernelModule {
             description: "Sync all branches + tags instead of current branch only.",
           },
         },
-        writes: ["systems/{id}/bordbuch/events.ndjson"],
-        reads: ["systems/registry.yaml"],
+        writes: ["systems-cache/{id}/bordbuch/events.ndjson"],
+        reads: ["systems-cache/{id}/system-config.yaml"],
         cacheable: false,
         execute: runSternsystemSync,
       });
@@ -165,8 +166,8 @@ export function createSternsystemModule(): KernelModule {
           all: { kind: "boolean", description: "Show status for all registered systems." },
         },
         reads: [
-          "systems/registry.yaml",
-          "systems/{id}/bordbuch/events.ndjson",
+          "systems-cache/*/system-config.yaml",
+          "systems-cache/{id}/bordbuch/events.ndjson",
           "missions/*/mission.yaml",
         ],
         execute: runSternsystemStatus,
@@ -185,9 +186,9 @@ export function createSternsystemModule(): KernelModule {
           },
         },
         reads: [
-          "systems/{id}/src/surface.generated.json",
-          "systems/{id}/src/content/**",
-          "systems/{id}/dist/sitemap.xml",
+          "systems-cache/{id}/src/surface.generated.json",
+          "systems-cache/{id}/src/content/**",
+          "systems-cache/{id}/dist/sitemap.xml",
         ],
         execute: runSurfaceContractValidate,
         gate: {

@@ -41,7 +41,11 @@ export function createNotausgangModule(): KernelModule {
           },
         },
         writes: ["{--output}/**"],
-        reads: ["releases/{release}/**", "systems/{system}/**", "systems/registry.yaml"],
+        reads: [
+          "releases/{release}/**",
+          "systems-cache/{system}/**",
+          "systems-cache/{system}/system-config.yaml",
+        ],
         cacheable: false,
         execute: runNotausgangExport,
       });

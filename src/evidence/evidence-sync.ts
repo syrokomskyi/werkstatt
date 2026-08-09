@@ -6,7 +6,7 @@
   <item>Reads evidence-metadata.json to resolve runTimestamp.</item>
   <item>Walks evidence/axiom/ recursively and uploads all files to R2.</item>
   <item>Supports --dry-run mode that makes no R2 API calls.</item>
-  <item>Resolves systemId from systems/registry.yaml by matching missionId to currentMission.</item>
+  <item>Resolves systemId from system-config.yaml by matching missionId to currentMission.</item>
 </responsibilities>
 <non-goals>
   <item>Does not integrate with mission.close or leitstand.dev-deploy — that is RFC-0652.</item>

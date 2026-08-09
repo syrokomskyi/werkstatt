@@ -77,7 +77,11 @@ export function createLeitstandModule(): KernelModule {
           },
         },
         writes: ["missions/{mission}/evidence/axiom/**"],
-        reads: ["systems/registry.yaml", "missions/{mission}/workpiece/**"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+          "missions/{mission}/workpiece/**",
+        ],
         cacheable: false,
         execute: runLeitstandDevDeploy,
       });
@@ -97,8 +101,8 @@ export function createLeitstandModule(): KernelModule {
           },
         },
         writes: [
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
           "releases/{release}/release.yaml",
         ],
         execute: runLeitstandPropagate,
@@ -118,8 +122,8 @@ export function createLeitstandModule(): KernelModule {
           },
         },
         writes: [
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
           "releases/{release}/release.yaml",
         ],
         execute: runLeitstandPromote,
@@ -151,8 +155,8 @@ export function createLeitstandModule(): KernelModule {
           "to-release": { kind: "string", description: "Explicit target release id." },
         },
         writes: [
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/bordbuch/events.ndjson",
           "releases/{release}/release.yaml",
         ],
         execute: runLeitstandRollback,
@@ -183,11 +187,11 @@ export function createLeitstandModule(): KernelModule {
           service: {
             kind: "string",
             required: true,
-            description: "Service id from the services: key in systems/registry.yaml.",
+            description: "Service id from the services: key in services/registry.yaml.",
           },
         },
-        writes: ["systems/registry.yaml"],
-        reads: ["systems/registry.yaml", "services/{service}/**"],
+        writes: ["services/registry.yaml"],
+        reads: ["services/registry.yaml", "services/{service}/**"],
         execute: runLeitstandServiceDeploy,
       });
     },

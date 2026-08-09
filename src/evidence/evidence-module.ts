@@ -54,7 +54,11 @@ export function createEvidenceModule(): KernelModule {
           },
           json: { kind: "boolean", description: "Output JSON result." },
         },
-        reads: ["missions/{mission}/evidence/axiom/**", "systems/registry.yaml"],
+        reads: [
+          "missions/{mission}/evidence/axiom/**",
+          "systems-cache/*/system-config.yaml",
+          "systems-cache/*/system-state.yaml",
+        ],
         writes: [],
         execute: runEvidenceSync,
       });
@@ -95,7 +99,7 @@ export function createEvidenceModule(): KernelModule {
           },
           json: { kind: "boolean", description: "Output JSON result." },
         },
-        reads: ["systems/registry.yaml"],
+        reads: ["systems-cache/*/system-config.yaml", "systems-cache/*/system-state.yaml"],
         writes: ["{--output-dir}/**"],
         execute: runEvidenceFetch,
       });
