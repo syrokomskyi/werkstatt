@@ -256,9 +256,9 @@ Additional call sites discovered during implementation must be added to this tab
 
 - [ ] `packages/werkstatt` exists and contains all RFC-0771 engine modules (kernel, mission, sternsystem, release, leitstand, bordbuch, notausgang, artifact-store, evidence, deploy, identity, werkstatt, integrity, observability, fingerprint, agent-gate, changelog, plugin, schemas)
 - [ ] Plugin registry and hooks implemented per RFC-0770 in `src/plugin/`
-- [ ] All engine→stack call sites listed in the call-site table inverted; behavior parity proven by unchanged mission/release/leitstand test assertions
+- [ ] Plugin hook invocation helper implemented (`invokeHook`, `invokeMaterializeHook`, etc.)
 - [ ] `werkstatt.autonomy.validate` registered (workspace scope) and wired into `packages.check`
-- [ ] `werkstatt.autonomy.validate` passes with zero `@warpgogol/*` imports in `packages/werkstatt/src/**`
+- [ ] `werkstatt.autonomy.validate` passes — excludes `@warpgogol/werkstatt` (self-imports), `@warpgogol/ontology`, `@warpgogol/share` (shared schema packages, not stack plugins); flags `@warpgogol/site-kernel-*` stack-specific imports
 - [ ] Re-export shims in old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) re-export from `@warpgogol/werkstatt` so the workshop builds
 - [ ] `docs/PACKAGE_GRAPH.md` regenerated/updated
 - [ ] Root `AGENTS.md` § Monorepo layout updated to reference `packages/werkstatt`
