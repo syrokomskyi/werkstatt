@@ -12,6 +12,7 @@
   <item>RFC-0624: add purgeResult to lastPropagatedChannelSchema, purgeResultSchema, deploymentConfigSchema, purge tracking.</item>
   <item>RFC-0627: add channels.dev (required), make channels.alt required, add dev to lastPropagated.</item>
   <item>RFC-0666: remove secretRefSchema and SecretRef (dead code); change secretsFile field to z.string().optional() for detection (sternsystem.validate rejects any value).</item>
+  <item>RFC-0790: add deploymentStaticConfigSchema (adapter + channels only, no lastPropagated) for system-config.yaml.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -89,7 +90,17 @@ export type DeploymentAdapterName = z.infer<typeof deploymentAdapterNameSchema>;
 export type DeploymentChannel = z.infer<typeof deploymentChannelSchema>;
 export type LastPropagatedChannel = z.infer<typeof lastPropagatedChannelSchema>;
 export type PurgeResult = z.infer<typeof purgeResultSchema>;
+export const deploymentStaticConfigSchema = z.object({
+  adapter: deploymentAdapterNameSchema,
+  channels: z.object({
+    dev: deploymentChannelSchema,
+    alt: deploymentChannelSchema,
+    main: deploymentChannelSchema,
+  }),
+});
+
 export type DeploymentConfig = z.infer<typeof deploymentConfigSchema>;
 export type HealthCheck = z.infer<typeof healthCheckSchema>;
 export type PropagationResult = z.infer<typeof propagationResultSchema>;
+export type DeploymentStaticConfig = z.infer<typeof deploymentStaticConfigSchema>;
 export type RouteFact = z.infer<typeof routeFactSchema>;
