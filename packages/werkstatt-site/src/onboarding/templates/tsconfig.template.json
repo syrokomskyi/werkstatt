@@ -16,10 +16,10 @@
     "paths": {
       "@schemas/*": ["src/content/schemas/*"],
       "@styles/*": ["src/styles/*"],
-      "@warpgogol/ui": ["../../packages/ui/src/index.ts"],
-      "@warpgogol/ui/*": ["../../packages/ui/src/*"],
-      "@warpgogol/share": ["../../packages/share/src/index.ts"],
-      "@warpgogol/share/*": ["../../packages/share/src/*"]
+      "@warpgogol/werkstatt-site": ["../../packages/werkstatt-site/src/index.ts"],
+      "@warpgogol/werkstatt-site/*": ["../../packages/werkstatt-site/src/*"],
+      "@warpgogol/werkstatt": ["../../packages/werkstatt/src/index.ts"],
+      "@warpgogol/werkstatt/*": ["../../packages/werkstatt/src/*"]
     }
   }
 }

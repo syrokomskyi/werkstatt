@@ -1,0 +1,34 @@
+# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-site
+# Extracts packages/werkstatt-site from the werkstatt monorepo into a standalone private repo.
+# RFC-0773: Engine publication pipeline via repo-extract to private npm.
+# RFC-0774/0775: Site plugin publication config.
+
+projectDir: packages/werkstatt-site
+destName: werkstatt-site
+standalone: true
+
+workspacePrefixes:
+  - "@warpgogol/"
+stripScopes:
+  - "@warpgogol/"
+preservePackages:
+  - "@warpgogol/werkstatt-site"
+  - "@warpgogol/werkstatt"
+packageManager: "pnpm"
+
+ignoreDirs:
+  - .turbo
+  - .agents
+  - node_modules
+  - tmp-*
+
+excludePathSegments:
+  - .npmrc
+
+postProcess:
+  - action: delete
+    path: AGENTS.md
+
+git:
+  remote: git@github.com:syrokomskyi/werkstatt-site.git
+  autoPush: true
