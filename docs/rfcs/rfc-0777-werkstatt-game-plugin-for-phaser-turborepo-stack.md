@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
@@ -25,6 +26,9 @@ related:
   - RFC-0769
   - RFC-0770
   - RFC-0771
+  - RFC-0773
+  - RFC-0774
+  - RFC-0778
   - RFC-0779
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
@@ -40,13 +44,17 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed: []
+  proposed:
+    - game.assets.validate
+    - game.scenes.validate
+    - game.bundle.validate
   added: []
   changed: []
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
-packagesImpacted: []
+packagesImpacted:
+  - packages/werkstatt-game
 successSignals:
   - "werkstatt-game registers via plugin contract and werkstatt.plugin.validate passes"
   - "A Phaser game project builds, deploys to GitHub Pages, and passes game-specific checks"
@@ -125,9 +133,14 @@ export const werkstattGamePlugin: WerkstattPlugin = {
 };
 ```
 
+### Hook scope: why `materialize` is omitted
+
+The `WerkstattPluginHooks` interface (RFC-0770) includes an optional `materialize` hook for scaffolding/regenerating the workpiece after authored data injection. The game plugin omits it intentionally: game projects have no authored-data injection step (no business profiles, no content collections). The workpiece is created by `scaffoldProject` and then developed directly by the game developer. The engine's default materialize behavior (creating the workpiece directory from the project template) is sufficient. If a future game variant needs generated content (e.g. localization injection), a `materialize` hook can be added via amendment.
+
 ## Architectural fit
 
-- **DNA-64** — game plugin implements the same contract as the site plugin.
+- **DNA-1 (monorepo boundary)** — the game plugin is shared reusable logic in `packages/*`, published as a private npm package. Game projects remain Sternsystemen outside the workshop in mirrors per RFC-0574. No cross-project imports at runtime.
+- **DNA-64 (engine/plugin/workshop boundary, established by RFC-0769 — currently draft)** — the game plugin implements the same `WerkstattPlugin` contract as the site plugin. DNA-64 will enter `docs/architecture-dna.md` upon RFC-0769 implementation; until then this RFC references it as a forward dependency.
 - **DNA-46..49** — mission/release/Leitstand semantics unchanged; the plugin supplies the build and deploy hooks.
 - **Forge `phaser-turborepo` profile** — the plugin's `profileId` binds to it; `forge.doctor` cross-checks.
 
@@ -183,6 +196,68 @@ pnpm exec werkstatt run game.scenes.validate --system my-first-game
 pnpm exec werkstatt run game.bundle.validate --system my-first-game
 ```
 
+### Output format
+
+All three validators return a uniform `--json` shape:
+
+```json
+{
+  "command": "game.assets.validate",
+  "status": "pass",
+  "violations": []
+}
+```
+
+On failure:
+
+```json
+{
+  "command": "game.scenes.validate",
+  "status": "fail",
+  "violations": [
+    { "ruleId": "GAME-01", "file": "src/scenes/level-01.ts", "message": "Scene not registered in phaser.config.ts" }
+  ]
+}
+```
+
+`game.bundle.validate` uses `ruleId: "GAME-03"` and includes the bundle size and budget in the violation:
+
+```json
+{
+  "command": "game.bundle.validate",
+  "status": "fail",
+  "violations": [
+    { "ruleId": "GAME-03", "bundleBytes": 6291456, "budgetBytes": 5242880, "message": "Bundle exceeds 5 MB gzipped budget" }
+  ]
+}
+```
+
+### File system responsibilities
+
+| Path | Role |
+| --- | --- |
+| `packages/werkstatt-game/src/paths/` | Phaser path conventions (`src/scenes/`, `src/assets/`, `public/`, `dist/`, `phaser.config.ts` entry) |
+| `packages/werkstatt-game/src/checks/` | `game.assets.validate`, `game.scenes.validate`, `game.bundle.validate` validators |
+| `packages/werkstatt-game/src/build/` | `hooks.build` — runs `vite build` in the workpiece |
+| `packages/werkstatt-game/src/deploy/github-pages/` | `deployAdapters["github-pages"]` |
+| `packages/werkstatt-game/src/deploy/cloudflare-pages/` | `deployAdapters["cloudflare-pages"]` |
+| `packages/werkstatt-game/src/onboarding/` | `hooks.scaffoldProject` — generates Phaser project boilerplate |
+| `packages/werkstatt-game/src/release-evidence/` | `hooks.releaseEvidence` — bundle hash, asset manifest hash, scene registry hash |
+| `packages/werkstatt-game/src/invariants/` | Game stack invariants surfaced to agents (AGENTS.md generation) |
+| `packages/werkstatt-game/extract.config.yaml` | Publication config (RFC-0773) |
+
+### Empty-state behavior
+
+A freshly scaffolded game project (from `hooks.scaffoldProject`) contains one boot scene and an empty asset manifest. Validators must pass on this state:
+
+- `game.scenes.validate` — passes if at least one scene is registered in `phaser.config.ts` (the boot scene). Zero scenes is a `GAME-01` violation.
+- `game.assets.validate` — passes with an empty manifest (zero assets to check). An empty manifest is valid; missing entries for referenced assets are not.
+- `game.bundle.validate` — passes if the bundle is under the budget. A minimal boot-scene bundle is well under 5 MB.
+
+### Bundle budget source of truth
+
+The bundle size budget is declared in the game project's `phaser.config.ts` under a `bundleBudget` field (bytes, gzipped). If absent, the default is 5 MB (5242880 bytes). `game.bundle.validate` reads the budget from the project config, not from the plugin or workshop config.
+
 ### Failure modes
 
 - Missing scene in `phaser.config.ts` → `GAME-01` violation, exit 1.
@@ -203,6 +278,7 @@ pnpm exec werkstatt run game.bundle.validate --system my-first-game
 
 - **Phaser version churn.** Phaser 3 vs 4 vs CE have different APIs. The plugin does not depend on Phaser directly — it validates project structure and builds via the project's own Vite config. Phaser version is the project's choice.
 - **GitHub Pages deploy specifics.** Branch naming (`gh-pages` vs `main`), base path, etc. The adapter accepts configuration from `systems/registry.yaml` channel config.
+- **No LFS-tracked binary assets in the plugin package.** `packages/werkstatt-game` contains TypeScript code, YAML schemas, and onboarding templates (scene boilerplate, asset manifest skeleton) — no binary game assets. Binary game assets (sprites, audio) live in game project mirrors, not in the plugin package. The extraction pipeline (RFC-0773) does not need LFS support for this package.
 
 ## Acceptance criteria
 
@@ -213,6 +289,7 @@ pnpm exec werkstatt run game.bundle.validate --system my-first-game
 - [ ] `hooks.scaffoldProject` creates a valid Phaser project that builds
 - [ ] `extract.config.yaml` exists (RFC-0773)
 - [ ] `rfc.validate` passes on this file before merging
+
 ## Implementation notes for agents
 
 <!-- Rules that govern how AI agents interact with this RFC.
