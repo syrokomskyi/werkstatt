@@ -98,7 +98,7 @@ describe("PBP Compiler Pipeline", () => {
     const result = await compilePbpProfile(input);
 
     const dupErrors = result.validationErrors.filter(
-      (e: { code: string }) => e.code === "PBP-ID-DUPLICATE",
+      (e: { code: string }) => e.code === "PBP-ID-LOCALE-DUPLICATE",
     );
     expect(dupErrors.length).toBeGreaterThan(0);
   });

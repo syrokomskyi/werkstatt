@@ -23,7 +23,11 @@ export type {
 export { discover } from "./discover.js";
 export { parse, type ParsedEntity } from "./parse.js";
 export { validateRaw, type RawValidationResult } from "./validate.js";
-export { buildEntityIndex, type EntityIndexResult } from "./entity-index.js";
+export {
+  buildEntityIndex,
+  type EntityIndexResult,
+  type LocaleAwareEntityIndex,
+} from "./entity-index.js";
 export { resolveLocales, type LocaleResolutionResult } from "./locale.js";
 export { resolveReferences, type ReferenceResolutionResult } from "./references.js";
 export { resolveProfile } from "./profile.js";

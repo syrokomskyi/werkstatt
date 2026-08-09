@@ -7,11 +7,14 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0467 — Phase 5: locale-resolution.</item>
+  <item>RFC-0781 — Accept locale-aware index, use shared deepMerge with JSON Merge Patch semantics.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { PbpEntity } from "../envelope.js";
 import type { PbpFallbackReport, PbpFallbackEntry } from "../locale.js";
+import type { LocaleAwareEntityIndex } from "./entity-index.js";
+import { deepMerge } from "../utils/deep-merge.js";
 
 export interface LocaleResolutionResult {
   resolved: Map<string, PbpEntity>;
@@ -19,39 +22,52 @@ export interface LocaleResolutionResult {
 }
 
 export async function resolveLocales(
-  index: Map<string, PbpEntity>,
+  index: LocaleAwareEntityIndex,
   locale: string,
   defaultLocale: string,
 ): Promise<LocaleResolutionResult> {
   const resolved = new Map<string, PbpEntity>();
   const fallbacks: PbpFallbackEntry[] = [];
 
-  if (locale === defaultLocale) {
-    for (const [id, entity] of index) {
-      resolved.set(id, entity);
-    }
-    return {
-      resolved,
-      fallbackReport: { locale, fallbacks: [] },
-    };
-  }
+  const defaultLocaleKey = defaultLocale;
+  const targetLocaleKey = locale;
 
-  for (const [id, entity] of index) {
-    const defaultEntity = index.get(id);
+  for (const [id, localeMap] of index) {
+    const defaultEntity = localeMap.get(defaultLocaleKey);
+    const targetEntity = localeMap.get(targetLocaleKey);
+
+    if (!defaultEntity && !targetEntity) {
+      continue;
+    }
+
+    if (locale === defaultLocale) {
+      if (defaultEntity) {
+        resolved.set(id, defaultEntity);
+      }
+      continue;
+    }
+
     if (!defaultEntity) {
-      resolved.set(id, entity);
+      if (targetEntity) {
+        resolved.set(id, targetEntity);
+      }
+      continue;
+    }
+
+    if (!targetEntity) {
+      resolved.set(id, defaultEntity);
       continue;
     }
 
     const merged = deepMerge(
       defaultEntity as unknown as Record<string, unknown>,
-      entity as unknown as Record<string, unknown>,
-    );
+      targetEntity as unknown as Record<string, unknown>,
+    ) as unknown as PbpEntity;
     resolved.set(id, merged);
 
     const diffPaths = findDiffPaths(
       defaultEntity as unknown as Record<string, unknown>,
-      entity as unknown as Record<string, unknown>,
+      targetEntity as unknown as Record<string, unknown>,
     );
     for (const path of diffPaths) {
       fallbacks.push({
@@ -70,30 +86,6 @@ export async function resolveLocales(
     resolved,
     fallbackReport: { locale, fallbacks },
   };
-}
-
-function deepMerge(base: Record<string, unknown>, overlay: Record<string, unknown>): PbpEntity {
-  const result: Record<string, unknown> = { ...base };
-  for (const key of Object.keys(overlay).sort()) {
-    const baseVal = base[key];
-    const overlayVal = overlay[key];
-    if (
-      baseVal &&
-      overlayVal &&
-      typeof baseVal === "object" &&
-      typeof overlayVal === "object" &&
-      !Array.isArray(baseVal) &&
-      !Array.isArray(overlayVal)
-    ) {
-      result[key] = deepMerge(
-        baseVal as Record<string, unknown>,
-        overlayVal as Record<string, unknown>,
-      );
-    } else if (overlayVal !== undefined) {
-      result[key] = overlayVal;
-    }
-  }
-  return result as unknown as PbpEntity;
 }
 
 function findDiffPaths(
