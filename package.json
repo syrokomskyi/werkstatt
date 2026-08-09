@@ -278,6 +278,14 @@
     "./schemas": {
       "types": "./src/schemas/index.ts",
       "default": "./src/schemas/index.ts"
+    },
+    "./workshop": {
+      "types": "./src/workshop/index.ts",
+      "default": "./src/workshop/index.ts"
+    },
+    "./workshop-module": {
+      "types": "./src/workshop/workshop.module.ts",
+      "default": "./src/workshop/workshop.module.ts"
     }
   },
   "files": ["src", "bin", "os"],
