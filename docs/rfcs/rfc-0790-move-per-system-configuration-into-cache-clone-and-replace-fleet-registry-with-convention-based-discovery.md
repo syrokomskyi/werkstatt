@@ -15,21 +15,27 @@ owners:
 reviewers: []
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
+enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
 amends:
   - RFC-0354
+  - RFC-0355
+  - RFC-0356
   - RFC-0574
   - RFC-0472
 amendedBy: []
 related:
+  - DNA-1
   - DNA-44
   - DNA-45
   - DNA-46
   - DNA-47
   - RFC-0354
+  - RFC-0355
+  - RFC-0356
   - RFC-0472
   - RFC-0574
   - RFC-0666
@@ -37,8 +43,11 @@ related:
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
+  - DNA-1
   - DNA-44
   - DNA-45
+  - DNA-46
+  - DNA-47
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -149,15 +158,19 @@ The cache clone path is fixed by convention: `../systems-cache/<id>/`. This elim
 
 | File | Content | Reason |
 | --- | --- | --- |
-| `services/registry.yaml` | Service fleet registry | Services do not have cache clones; they are monorepo-resident runtime compositions shared across all systems via tenancy |
+| `services/registry.yaml` | Service fleet registry (extracted from `systems/registry.yaml`) | Services do not have cache clones; they are monorepo-resident runtime compositions shared across all systems via tenancy. Currently services are defined alongside systems in `systems/registry.yaml`; this RFC extracts them into a separate `services/registry.yaml` file. |
+| `systems/methodologies.md` | Check methodology configuration | Shared across all systems, not per-system |
 
 ## Architectural fit
 
+- **DNA-1 (Monorepo boundary)**: Amended — the phrase "registered in `systems/registry.yaml`" is replaced by "discovered via convention-based discovery from `../systems-cache/<id>/system-config.yaml`". The monorepo no longer carries a fleet registry file.
 - **DNA-44 (Sternsystem bundle contract)**: Extended — the cache clone now carries the complete system package: content, pin, bordbuch, configuration, state, DNS, suppressions. The Sternsystem is a self-contained, mirrorable unit. The data-only constraint is preserved: `system-config.yaml` and `system-state.yaml` are YAML data files, not runtime scripts or package.json.
-- **DNA-45 (Fleet registry)**: Amended — the central `systems/registry.yaml` is replaced by convention-based discovery. The `fleetRegistrySchema` is split into `systemConfigSchema` (static) and `systemStateSchema` (runtime). Service entries remain in `services/registry.yaml`.
-- **DNA-46 (Mission lifecycle)**: `mission.open`, `mission.materialize`, `mission.reconcile`, `mission.close`, `mission.abort` resolve the cache clone from the convention path `../systems-cache/<id>/` instead of `mirrors[0].path` from a registry entry. Runtime state reads/writes go to `system-state.yaml` in the cache clone.
-- **DNA-47 (Materialization)**: `mission.materialize` clones from `../systems-cache/<id>/` (convention path). The shared git object database mechanism (RFC-0568) is preserved.
+- **DNA-45 (Fleet registry)**: Amended — the central `systems/registry.yaml` is replaced by convention-based discovery. The `fleetRegistrySchema` is split into `systemConfigSchema` (static) and `systemStateSchema` (runtime). Service entries are extracted into a separate `services/registry.yaml`.
+- **DNA-46 (Mission lifecycle)**: Amended — `mission.open`, `mission.materialize`, `mission.reconcile`, `mission.close`, `mission.abort` resolve the cache clone from the convention path `../systems-cache/<id>/` instead of `mirrors[0].path` from a registry entry. Runtime state reads/writes go to `system-state.yaml` in the cache clone.
+- **DNA-47 (Materialization)**: Amended — `mission.materialize` clones from `../systems-cache/<id>/` (convention path). The shared git object database mechanism (RFC-0568) is preserved.
 - **RFC-0354 (Sternsystem bundle contract)**: Amended — registry schema split, per-system config files added to the bundle.
+- **RFC-0355 (Mission lifecycle)**: Amended — mission commands resolve cache clone from convention path instead of registry entry. The `registry` lock is removed; per-system locks (`system:${systemId}`) remain.
+- **RFC-0356 (Materialization)**: Amended — materialization resolves cache clone from convention path.
 - **RFC-0574 (mirror topology)**: Amended — `mirrors[]` moves from `registry.yaml` entry to `system-config.yaml`. Mirror resolution logic (`resolveMirrors`) reads from `system-config.yaml` instead of a registry entry.
 - **RFC-0472 (sternsystem.sync)**: Amended — sync reads mirror topology from `system-config.yaml` in the cache clone instead of the registry.
 - **RFC-0666 (convention-based .env paths)**: Precedent for replacing configuration indirection with convention-based paths. This RFC applies the same principle to fleet registry.
@@ -198,6 +211,16 @@ pnpm exec werkstatt run leitstand.promote --release warpgogol-com-r000017
 ### TypeScript contracts
 
 ```ts
+// Deployment config schema (static — no lastPropagated, which moves to system-state.yaml)
+const deploymentStaticConfigSchema = z.object({
+  adapter: deploymentAdapterNameSchema,
+  channels: z.object({
+    dev: deploymentChannelSchema,
+    alt: deploymentChannelSchema,
+    main: deploymentChannelSchema,
+  }),
+});
+
 // system-config.yaml schema (static configuration)
 const systemConfigSchema = z.object({
   schemaVersion: z.string().min(1),
@@ -207,7 +230,7 @@ const systemConfigSchema = z.object({
   pinnedPlatform: z.string().regex(semverRe),
   status: z.enum(["registered", "active", "paused", "archived"]),
   registeredAt: z.string().datetime(),
-  deployment: deploymentConfigSchema.optional(),
+  deployment: deploymentStaticConfigSchema.optional(),
   cloudflareZoneId: z.string().optional(),
   owner: z.string().regex(didWebRe).optional(),
   notes: z.string().default(""),
@@ -223,6 +246,16 @@ const systemStateSchema = z.object({
   lastRelease: z.string().nullable().default(null),
   lastPropagated: z
     .object({
+      dev: z
+        .object({
+          releaseId: z.string(),
+          at: z.string().datetime(),
+          healthy: z.boolean(),
+          state: z.enum(["succeeded", "failed"]),
+          operationId: z.string(),
+          leaseExpiresAt: z.string().datetime().nullable(),
+        })
+        .optional(),
       alt: z
         .object({
           releaseId: z.string(),
@@ -281,9 +314,9 @@ async function readServicesRegistry(workspaceRoot: string): Promise<ServiceEntry
 | `../systems-cache/<id>/system.md` | Astro content (unchanged) |
 | `../systems-cache/<id>/system.pin.json` | Platform pin (unchanged) |
 | `../systems-cache/<id>/bordbuch/` | Bordbuch event log (unchanged) |
-| `services/registry.yaml` | Service fleet registry (remains in monorepo) |
-| `systems/registry.yaml` | **Deleted** — replaced by convention-based discovery |
-| `systems/<id>/` | **Deleted** — per-system subdirectories moved to cache clone |
+| `services/registry.yaml` | Service fleet registry (extracted from `systems/registry.yaml` during migration) |
+| `systems/registry.yaml` | **Deleted** — replaced by convention-based discovery. Services array extracted to `services/registry.yaml` before deletion. |
+| `systems/axiom-suppressions.yaml` | **Moved** to `../systems-cache/<id>/axiom-suppressions.yaml` (per-system) |
 | `systems/methodologies.md` | Check methodology configuration (remains in monorepo, shared across all systems) |
 
 ### Output format
@@ -324,12 +357,21 @@ async function readServicesRegistry(workspaceRoot: string): Promise<ServiceEntry
 
 The migration is performed as a single atomic step within one mission:
 
-1. **Create per-system files in cache clone**: For each system in `registry.yaml`, generate `system-config.yaml` (static fields), `system-state.yaml` (runtime fields), and move `dns-records.yaml` / `axiom-suppressions.yaml` from `systems/<id>/` to `../systems-cache/<id>/`.
-2. **Update engine code**: Replace `readRegistry()` / `writeRegistry()` / `findEntry()` with `discoverSystems()` / `readSystemConfig()` / `readSystemState()` / `writeSystemState()`. Update all 30+ call sites.
-3. **Delete monorepo-side files**: Remove `systems/registry.yaml`, `systems/<id>/` subdirectories. Keep `services/registry.yaml` and `systems/methodologies.md`.
-4. **Update `sternsystem.validate`**: Iterate `discoverSystems()` instead of `registry.systems`. Validate each `system-config.yaml` schema, mirror topology, pin file, and Bordbuch consistency per-system.
-5. **Update `sternsystem.register`**: Create `../systems-cache/<id>/` directory, `git init` if no `.git` exists, write `system-config.yaml`. Do not destroy existing git history.
-6. **Update DNA-44 and DNA-45**: Amend the DNA entries to reflect convention-based discovery and per-system config files.
+1. **Extract services**: Extract the `services[]` array from `systems/registry.yaml` into a new `services/registry.yaml` file. Update `readServicesRegistry()` to read from the new path.
+2. **Create per-system files in cache clone**: For each system in `registry.yaml`, generate `system-config.yaml` (static fields), `system-state.yaml` (runtime fields), and move `dns-records.yaml` / `axiom-suppressions.yaml` from `systems/` to `../systems-cache/<id>/`.
+3. **Update engine code**: Replace `readRegistry()` / `writeRegistry()` / `findEntry()` with `discoverSystems()` / `readSystemConfig()` / `readSystemState()` / `writeSystemState()`. Update all ~200 call sites across ~48 files in `packages/werkstatt/src/` and `packages/werkstatt-site/src/`. Remove the `registry` lock from `mission.open`, `mission.close`, `mission.abort`, and `sternsystem.register` — per-system locks (`system:${systemId}`) remain.
+4. **Delete monorepo-side files**: Remove `systems/registry.yaml`, `systems/axiom-suppressions.yaml`. Keep `services/registry.yaml` and `systems/methodologies.md`.
+5. **Update `sternsystem.validate`**: Iterate `discoverSystems()` instead of `registry.systems`. Validate each `system-config.yaml` schema, mirror topology, pin file, and Bordbuch consistency per-system.
+6. **Update `sternsystem.register`**: Create `../systems-cache/<id>/` directory, `git init` if no `.git` exists, write `system-config.yaml`. Do not destroy existing git history.
+7. **Update DNA-1, DNA-44 and DNA-45**: Amend the DNA entries to reflect convention-based discovery and per-system config files.
+
+### Auto-commit behavior
+
+`writeSystemState()` writes to `system-state.yaml` in the cache clone's git repo. It commits via the cache clone's git mechanism (same as `appendAndCommitBordbuch`), not via RFC-0580's `commitWerkstattSideEffects` which commits to the monorepo git repo. This ensures state changes are propagated by `sternsystem.sync`. Similarly, `sternsystem.pin` writes to `system-config.yaml` in the cache clone and commits there.
+
+### CI behavior
+
+`sternsystem.validate` and `sternsystem.list` scan `../systems-cache/` instead of reading `systems/registry.yaml`. In CI, cache clones must be checked out (e.g., via `git clone` or cache restore) before running these commands. CI templates that only check out the monorepo will find zero systems — `sternsystem.validate` emits a warning when zero systems are discovered (non-fatal), and `sternsystem.list` returns an empty list. This is a behavioral change from the current behavior where `systems/registry.yaml` is in the monorepo and always available.
 
 ### New systems
 
@@ -352,11 +394,14 @@ New systems automatically comply from day one: `sternsystem.register` creates th
 - **No central fleet view**: Without `registry.yaml`, there is no single file listing all systems. `sternsystem.list --json` provides the view on-demand. Operators who grep `registry.yaml` for system information must switch to `sternsystem.list`.
 - **Migration data loss risk**: If the migration script fails between creating cache clone files and deleting `registry.yaml`, the system could be in an inconsistent state. Mitigation: the migration is atomic within one mission — `mission.reconcile` and `mission.close` propagate the cache clone changes, and `registry.yaml` deletion is the last step.
 - **Agent confusion**: Agents accustomed to reading `systems/registry.yaml` for system information must learn to use `sternsystem.discover` or `readSystemConfig()`. The `AGENTS.md` update and this RFC's implementation notes mitigate this.
-- **`system-config.yaml` and `system-state.yaml` must be committed to cache clone git**: These files live in the cache clone's git repo and are propagated via `sternsystem.sync`. If an agent forgets to commit state changes, `sternsystem.sync` will not propagate them. Mitigation: `writeSystemState` auto-commits via the existing auto-commit mechanism (RFC-0580).
+- **`system-config.yaml` and `system-state.yaml` must be committed to cache clone git**: These files live in the cache clone's git repo and are propagated via `sternsystem.sync`. If an agent forgets to commit state changes, `sternsystem.sync` will not propagate them. Mitigation: `writeSystemState` auto-commits via the cache clone git mechanism.
+- **`sternsystem.list` requires cache clones**: Currently, `sternsystem.list` reads `systems/registry.yaml` from the monorepo and works without cache clones. With this RFC, `sternsystem.list` scans `../systems-cache/` — which is absent in a fresh monorepo clone. Operators must check out cache clones before running `sternsystem.list`. This is a behavioral change.
+- **`fleet/` directory**: The `fleet/` directory at the workspace root contains generated fleet artifacts (`fleet.sites.yaml`, `fleet.plan.generated.yaml`, `fleet.status.generated.yaml`). These files do not reference `systems/registry.yaml` and are unaffected by this RFC.
 
 ## Acceptance criteria
 
 - [ ] `systemConfigSchema` and `systemStateSchema` Zod schemas defined in `@warpgogol/werkstatt/schemas`
+- [ ] `deploymentStaticConfigSchema` (without `lastPropagated`) defined in `@warpgogol/werkstatt/schemas`
 - [ ] `discoverSystems()`, `readSystemConfig()`, `readSystemState()`, `writeSystemState()` implemented in `@warpgogol/werkstatt/sternsystem`
 - [ ] `readRegistry()`, `writeRegistry()`, `findEntry()` removed from `registry-io.ts`
 - [ ] `resolveCacheClonePath()` uses convention path `../systems-cache/<id>/` (no registry lookup)
@@ -365,14 +410,16 @@ New systems automatically comply from day one: `sternsystem.register` creates th
 - [ ] `sternsystem.register` creates cache clone directory + `system-config.yaml` + `git init` if absent
 - [ ] `sternsystem.list` reads from `discoverSystems()` instead of `registry.yaml`
 - [ ] `mission.open` / `mission.materialize` / `mission.reconcile` / `mission.close` / `mission.abort` resolve cache clone from convention path
+- [ ] `registry` lock removed from `mission.open`, `mission.close`, `mission.abort`, `sternsystem.register`
 - [ ] `leitstand.dev-deploy` / `leitstand.propagate` / `leitstand.promote` read deployment channels from `system-config.yaml`
 - [ ] `sternsystem.sync` reads mirror topology from `system-config.yaml`
+- [ ] `services/registry.yaml` created by extracting `services[]` from `systems/registry.yaml`
 - [ ] `systems/registry.yaml` deleted from the monorepo
-- [ ] `systems/<id>/` per-system subdirectories deleted (DNS, suppressions moved to cache clone)
-- [ ] `services/registry.yaml` remains in monorepo unchanged
+- [ ] `systems/axiom-suppressions.yaml` moved to `../systems-cache/<id>/axiom-suppressions.yaml`
+- [ ] `services/registry.yaml` remains in monorepo with service entries
 - [ ] `systems/methodologies.md` remains in monorepo unchanged
-- [ ] DNA-44 and DNA-45 amended in `docs/architecture-dna.md`
-- [ ] `AGENTS.md` updated: remove references to `systems/registry.yaml`, document convention-based discovery
+- [ ] DNA-1, DNA-44 and DNA-45 amended in `docs/architecture-dna.md`
+- [ ] `AGENTS.md` updated: remove references to `systems/registry.yaml` in DNA-1 description, "External mirror sync" section, and "Monorepo layout" section; document convention-based discovery
 - [ ] `rfc.validate` passes on this file with zero errors
 
 ## Implementation notes for agents
@@ -386,4 +433,4 @@ New systems automatically comply from day one: `sternsystem.register` creates th
 - Agents MUST NOT create `systems/registry.yaml` or per-system subdirectories under `systems/` — these are deleted and not recreated.
 - Agents MUST use `resolveCacheClonePath(workspaceRoot, systemId)` for all cache clone path resolution — never hardcode `mirrors[0].path` from a registry entry.
 - `sternsystem.register` MUST NOT destroy existing git history in the cache clone. If `.git` exists, skip `git init`. If the directory exists without `.git`, run `git init`. If the directory does not exist, create it and run `git init`.
-- `writeSystemState` MUST auto-commit changes to the cache clone git repo (RFC-0580 auto-commit mechanism) so that `sternsystem.sync` propagates state updates.
+- `writeSystemState` MUST auto-commit changes to the cache clone git repo (via the cache clone's git mechanism, not RFC-0580's `commitWerkstattSideEffects`) so that `sternsystem.sync` propagates state updates.
