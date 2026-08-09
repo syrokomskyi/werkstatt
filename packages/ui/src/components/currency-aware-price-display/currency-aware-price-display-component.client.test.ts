@@ -91,11 +91,16 @@ class MockContainer {
 
 const mockWindow = new MockWindow();
 const mockLocalStorage = mockWindow.storage;
+const mockDocumentElement = {
+  setAttribute: vi.fn(),
+};
 
 // @ts-expect-error — injecting mock into global scope
 globalThis.localStorage = mockLocalStorage;
 // @ts-expect-error — injecting mock into global scope
 globalThis.window = mockWindow;
+// @ts-expect-error — injecting mock into global scope
+globalThis.document = { documentElement: mockDocumentElement };
 // @ts-expect-error — injecting mock into global scope
 globalThis.CustomEvent = class CustomEvent<T = unknown> {
   type: string;
@@ -115,6 +120,7 @@ describe("currency-aware-price-display client", () => {
   beforeEach(() => {
     mockLocalStorage.clear();
     mockWindow._clearListeners();
+    mockDocumentElement.setAttribute.mockClear();
   });
 
   afterEach(() => {
@@ -131,6 +137,7 @@ describe("currency-aware-price-display client", () => {
     expect(variants[0]!.hasAttribute("hidden")).toBe(true);
     expect(variants[1]!.hasAttribute("hidden")).toBe(false);
     expect(variants[2]!.hasAttribute("hidden")).toBe(true);
+    expect(mockDocumentElement.setAttribute).toHaveBeenCalledWith("data-wg-currency", "UAH");
   });
 
   test("toggles visibility on wg-currency-change event", () => {

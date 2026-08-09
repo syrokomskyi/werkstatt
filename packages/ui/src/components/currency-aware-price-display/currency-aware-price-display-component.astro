@@ -31,23 +31,52 @@ interface Props {
 const { priceVariants } = Astro.props as Props;
 
 const defaultVariant = priceVariants[0];
+const variantCurrencies = priceVariants.map((v) => v.currency);
 ---
 
-<div class="currency-aware-price-display" data-currency-price-display aria-live="polite">
+<span class="currency-aware-price-display" data-currency-price-display aria-live="polite">
   {
     priceVariants.map((variant, index) => (
-      <div
+      <span
         class="currency-aware-price-display__variant"
         data-currency={variant.currency}
         hidden={index !== 0}
         aria-label={variant.formatted}
       >
         <span class="currency-aware-price-display__amount">{variant.formatted}</span>
-        {variant.note && <p class="currency-aware-price-display__note">{variant.note}</p>}
-      </div>
+        {variant.note && <span class="currency-aware-price-display__note">{variant.note}</span>}
+      </span>
     ))
   }
-</div>
+</span>
+<script is:inline define:vars={{ variantCurrencies }}>
+  try {
+    var c = document.documentElement.getAttribute("data-wg-currency");
+    if (!c) {
+      c = localStorage.getItem("wg-currency");
+    }
+    if (c && variantCurrencies.indexOf(c) !== -1) {
+      var containers = document.querySelectorAll("[data-currency-price-display]");
+      for (var ci = 0; ci < containers.length; ci++) {
+        var variants = containers[ci].querySelectorAll("[data-currency]");
+        var matched = false;
+        for (var vi = 0; vi < variants.length; vi++) {
+          if (variants[vi].getAttribute("data-currency") === c) {
+            variants[vi].removeAttribute("hidden");
+            matched = true;
+          } else {
+            variants[vi].setAttribute("hidden", "");
+          }
+        }
+        if (!matched) {
+          for (var vi = 0; vi < variants.length; vi++) {
+            variants[vi].removeAttribute("hidden");
+          }
+        }
+      }
+    }
+  } catch {}
+</script>
 
 <script>
   import { initCurrencyAwarePriceDisplay } from "./currency-aware-price-display-component.client.ts";

@@ -118,10 +118,15 @@ const ctaHref = ctaTarget
         }
       </div>
       {content.motto && <span class="site-header__motto">{content.motto}</span>}
-      {currencies.length > 0 && activeLang === defaultLang && (
+      {currencies.length > 0 && (
         <script is:inline define:vars={{ defaultCurrency: currencies[0]?.code ?? "EUR" }}>
-          try { localStorage.setItem("wg-currency", defaultCurrency); } catch {}
-          window.dispatchEvent(new CustomEvent("wg-currency-change", { detail: { currency: defaultCurrency } }));
+          try {
+            var c = localStorage.getItem("wg-currency");
+            if (!c) { c = defaultCurrency; localStorage.setItem("wg-currency", c); }
+            document.documentElement.setAttribute("data-wg-currency", c);
+          } catch {
+            document.documentElement.setAttribute("data-wg-currency", defaultCurrency);
+          }
         </script>
       )}
     </div>

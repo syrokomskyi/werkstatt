@@ -49,6 +49,7 @@ export function initCurrencySelector(container: HTMLElement, currencies: string[
   const initialCurrency = stored && currencies.includes(stored) ? stored : (currencies[0] ?? "");
 
   function setActive(currency: string): void {
+    document.documentElement.setAttribute("data-wg-currency", currency);
     for (const btn of buttons) {
       const isActive = btn.getAttribute("data-currency-option") === currency;
       btn.setAttribute("aria-pressed", String(isActive));

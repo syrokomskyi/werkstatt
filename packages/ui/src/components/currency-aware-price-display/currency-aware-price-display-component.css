@@ -41,6 +41,11 @@ span.currency-aware-price-display__amount {
   font-weight: inherit;
 }
 
+span.currency-aware-price-display__note {
+  display: inline;
+  margin: 0 0 0 0.25em;
+}
+
 .currency-aware-price-display__amount {
   font-family: var(--ds-font-heading);
   font-size: var(--ds-text-lg);

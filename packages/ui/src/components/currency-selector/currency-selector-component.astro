@@ -54,6 +54,26 @@ const currencyCodes = currencies.map((c) => c.code);
     ))
   }
 </div>
+<script is:inline define:vars={{ currencyCodes }}>
+  try {
+    var c = document.documentElement.getAttribute("data-wg-currency");
+    if (!c) {
+      c = localStorage.getItem("wg-currency");
+    }
+    if (c && currencyCodes.indexOf(c) !== -1) {
+      var selectors = document.querySelectorAll("[data-currency-selector]");
+      for (var si = 0; si < selectors.length; si++) {
+        var btns = selectors[si].querySelectorAll("[data-currency-option]");
+        for (var bi = 0; bi < btns.length; bi++) {
+          btns[bi].setAttribute(
+            "aria-pressed",
+            String(btns[bi].getAttribute("data-currency-option") === c),
+          );
+        }
+      }
+    }
+  } catch {}
+</script>
 
 <script>
   import { initCurrencySelector } from "./currency-selector-component.client.ts";

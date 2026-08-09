@@ -47,20 +47,39 @@ class MockWindow {
   }
 }
 
-class MockSelectElement {
-  value = "";
-  private changeHandlers: Array<(event: { type: string }) => void> = [];
-  options: { value: string }[] = [];
+class MockButton {
+  private _currency: string;
+  private _attrs = new Map<string, string>();
+  private clickHandlers: Array<(event: { type: string }) => void> = [];
+  classList = {
+    toggle: (cls: string, force?: boolean) => {
+      if (force) this._attrs.set(`class-${cls}`, "true");
+      else this._attrs.delete(`class-${cls}`);
+    },
+  };
+
+  constructor(currency: string) {
+    this._currency = currency;
+  }
+
+  getAttribute(name: string): string | null {
+    if (name === "data-currency-option") return this._currency;
+    return this._attrs.get(name) ?? null;
+  }
+
+  setAttribute(name: string, value: string): void {
+    this._attrs.set(name, value);
+  }
 
   addEventListener(type: string, handler: (event: { type: string }) => void): void {
-    if (type === "change") {
-      this.changeHandlers.push(handler);
+    if (type === "click") {
+      this.clickHandlers.push(handler);
     }
   }
 
   dispatchEvent(event: { type: string }): boolean {
-    if (event.type === "change") {
-      for (const h of this.changeHandlers) {
+    if (event.type === "click") {
+      for (const h of this.clickHandlers) {
         h(event);
       }
     }
@@ -68,13 +87,30 @@ class MockSelectElement {
   }
 }
 
+class MockButtonContainer {
+  private buttons: MockButton[];
+
+  constructor(currencies: string[]) {
+    this.buttons = currencies.map((c) => new MockButton(c));
+  }
+
+  querySelectorAll(_selector: string): MockButton[] {
+    return this.buttons;
+  }
+}
+
 const mockWindow = new MockWindow();
 const mockLocalStorage = mockWindow.storage;
+const mockDocumentElement = {
+  setAttribute: vi.fn(),
+};
 
 // @ts-expect-error — injecting mock into global scope
 globalThis.localStorage = mockLocalStorage;
 // @ts-expect-error — injecting mock into global scope
 globalThis.window = mockWindow;
+// @ts-expect-error — injecting mock into global scope
+globalThis.document = { documentElement: mockDocumentElement };
 // @ts-expect-error — injecting mock into global scope
 globalThis.CustomEvent = class CustomEvent<T = unknown> {
   type: string;
@@ -98,6 +134,7 @@ describe("currency-selector client", () => {
   beforeEach(() => {
     mockLocalStorage.clear();
     mockWindow._clearListeners();
+    mockDocumentElement.setAttribute.mockClear();
   });
 
   afterEach(() => {
@@ -150,59 +187,68 @@ describe("currency-selector client", () => {
   });
 
   describe("initCurrencySelector", () => {
-    function createSelect(currencies: string[]): MockSelectElement {
-      const select = new MockSelectElement();
-      for (const code of currencies) {
-        select.options.push({ value: code });
-      }
-      select.value = currencies[0] ?? "";
-      return select;
+    function createContainer(currencies: string[]): MockButtonContainer {
+      return new MockButtonContainer(currencies);
     }
 
-    test("sets initial value from localStorage", () => {
+    test("sets aria-pressed from localStorage on init", () => {
       mockLocalStorage.setItem(CURRENCY_STORAGE_KEY, "UAH");
-      const select = createSelect(["EUR", "UAH", "USD"]);
-      initCurrencySelector(select as unknown as HTMLSelectElement, ["EUR", "UAH", "USD"]);
-      expect(select.value).toBe("UAH");
+      const container = createContainer(["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      const buttons = container.querySelectorAll("[data-currency-option]");
+      expect(buttons[0]!.getAttribute("aria-pressed")).toBe("false");
+      expect(buttons[1]!.getAttribute("aria-pressed")).toBe("true");
+      expect(buttons[2]!.getAttribute("aria-pressed")).toBe("false");
+      expect(mockDocumentElement.setAttribute).toHaveBeenCalledWith("data-wg-currency", "UAH");
     });
 
     test("defaults to first currency when localStorage has unknown currency", () => {
       mockLocalStorage.setItem(CURRENCY_STORAGE_KEY, "GBP");
-      const select = createSelect(["EUR", "UAH", "USD"]);
-      initCurrencySelector(select as unknown as HTMLSelectElement, ["EUR", "UAH", "USD"]);
-      expect(select.value).toBe("EUR");
+      const container = createContainer(["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      const buttons = container.querySelectorAll("[data-currency-option]");
+      expect(buttons[0]!.getAttribute("aria-pressed")).toBe("true");
+      expect(mockDocumentElement.setAttribute).toHaveBeenCalledWith("data-wg-currency", "EUR");
     });
 
     test("defaults to first currency when localStorage is empty", () => {
-      const select = createSelect(["EUR", "UAH", "USD"]);
-      initCurrencySelector(select as unknown as HTMLSelectElement, ["EUR", "UAH", "USD"]);
-      expect(select.value).toBe("EUR");
+      const container = createContainer(["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
+      const buttons = container.querySelectorAll("[data-currency-option]");
+      expect(buttons[0]!.getAttribute("aria-pressed")).toBe("true");
+      expect(mockDocumentElement.setAttribute).toHaveBeenCalledWith("data-wg-currency", "EUR");
     });
 
-    test("writes to localStorage and dispatches event on change", () => {
-      const select = createSelect(["EUR", "UAH", "USD"]);
-      initCurrencySelector(select as unknown as HTMLSelectElement, ["EUR", "UAH", "USD"]);
+    test("writes to localStorage, sets aria-pressed, and dispatches event on click", () => {
+      const container = createContainer(["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
       const handler = vi.fn();
       mockWindow.addEventListener(CURRENCY_CHANGE_EVENT, handler);
 
-      select.value = "UAH";
-      select.dispatchEvent({ type: "change" });
+      const buttons = container.querySelectorAll("[data-currency-option]");
+      buttons[1]!.dispatchEvent({ type: "click" });
 
       expect(mockLocalStorage.getItem(CURRENCY_STORAGE_KEY)).toBe("UAH");
+      expect(buttons[0]!.getAttribute("aria-pressed")).toBe("false");
+      expect(buttons[1]!.getAttribute("aria-pressed")).toBe("true");
+      expect(mockDocumentElement.setAttribute).toHaveBeenLastCalledWith("data-wg-currency", "UAH");
       expect(handler).toHaveBeenCalledOnce();
       const event = handler.mock.calls[0]![0] as { detail: unknown };
       expect(event.detail).toEqual({ currency: "UAH" });
     });
 
-    test("syncs select value when wg-currency-change event fires", () => {
-      const select = createSelect(["EUR", "UAH", "USD"]);
-      initCurrencySelector(select as unknown as HTMLSelectElement, ["EUR", "UAH", "USD"]);
+    test("syncs aria-pressed when wg-currency-change event fires", () => {
+      const container = createContainer(["EUR", "UAH", "USD"]);
+      initCurrencySelector(container as unknown as HTMLElement, ["EUR", "UAH", "USD"]);
 
       mockWindow.dispatchEvent(
         new CustomEvent(CURRENCY_CHANGE_EVENT, { detail: { currency: "USD" } }),
       );
 
-      expect(select.value).toBe("USD");
+      const buttons = container.querySelectorAll("[data-currency-option]");
+      expect(buttons[0]!.getAttribute("aria-pressed")).toBe("false");
+      expect(buttons[1]!.getAttribute("aria-pressed")).toBe("false");
+      expect(buttons[2]!.getAttribute("aria-pressed")).toBe("true");
     });
   });
 });
