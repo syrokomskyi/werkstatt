@@ -20,7 +20,7 @@ import { loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";
 import { buildGeneratedHeader, hasGeneratedMarker } from "./generated-marker.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMPLATES_DIR = path.join(__dirname, "..", "src", "templates", "wire");
+const TEMPLATES_DIR = path.join(__dirname, "templates", "wire");
 
 type WireWarning = {
   file: string;
@@ -108,7 +108,15 @@ function rel(appDirectory: string, absolutePath: string): string {
 }
 
 function hasPackage(pkg: AppPackageJson | null, name: string): boolean {
-  return Boolean(pkg?.dependencies?.[name] ?? pkg?.devDependencies?.[name]);
+  if (pkg?.dependencies?.[name] ?? pkg?.devDependencies?.[name]) return true;
+  // Consolidated packages (RFC-0776): @warpgogol/werkstatt covers all /changelog,
+  // /integrity, /handoff subpaths; @warpgogol/werkstatt-site covers /onboarding,
+  // /checks, /codegen, /deploy, etc.
+  const parent = name.split("/").slice(0, 2).join("/");
+  if (parent !== name) {
+    return Boolean(pkg?.dependencies?.[parent] ?? pkg?.devDependencies?.[parent]);
+  }
+  return false;
 }
 
 function buildModuleDecisions(

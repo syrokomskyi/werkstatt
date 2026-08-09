@@ -29,7 +29,7 @@ import type {
 } from "../types.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMPLATES_DIR = path.join(__dirname, "..", "..", "src", "templates", "icons");
+const TEMPLATES_DIR = path.join(__dirname, "..", "templates", "icons");
 
 // Configuration
 const UI_PACKAGE_PATH = path.join(__dirname, "..", "..", "..", "..", "ui");
