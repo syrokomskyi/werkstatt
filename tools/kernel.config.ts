@@ -13,7 +13,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <MODULE_MAP>
-  <entry key="icons.generate">Generates icon components for @warpgogol/ui package.</entry>
+  <entry key="icons.generate">Generates icon components for @warpgogol/werkstatt-site/ui package.</entry>
   <entry key="onboarding.scaffold">Generates a fully RFC-compliant new app skeleton (RFC-0029 / DNA-36).</entry>
   <entry key="onboarding.checklist">Emits a readiness report for an in-progress app (RFC-0029 / DNA-36).</entry>
   <entry key="kernel.wire">Generates app-local tools/ kernel wiring from system.md (RFC-0078).</entry>

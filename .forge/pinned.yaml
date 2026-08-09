@@ -80,6 +80,9 @@ pinned:
   - path: packages/werkstatt/extract.config.yaml
     mode: protect
     reason: Engine extraction config — required for npm publication (RFC-0773)
+  - path: packages/werkstatt-site/extract.config.yaml
+    mode: protect
+    reason: Site plugin extraction config — required for npm publication (RFC-0773)
   - path: packages/werkstatt-game/extract.config.yaml
     mode: protect
     reason: Game plugin extraction config — required for npm publication (RFC-0773)

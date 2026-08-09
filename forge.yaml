@@ -63,7 +63,7 @@ bindings:
       - "**/test/**"
 skillPacks:
   - prefix: wg
-    dir: packages/warpgogol-skills/skills
+    dir: packages/werkstatt-site/src/domain/skills
 forge:
   syncedVersion: 0.23.0
 independentVersionPackages:
