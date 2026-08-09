@@ -2,7 +2,7 @@
   "name": "warpgogol-platform",
   "private": true,
   "type": "module",
-  "version": "4.82.13",
+  "version": "4.82.14",
   "packageManager": "pnpm@11.10.0",
   "engines": {
     "node": ">=22"
@@ -25,6 +25,8 @@
     "compass:validate:ref": "node packages/os/site-kernel/bin/site-kernel.mjs run compass.validate --site <app-name>",
     "compass:inventory": "node packages/os/site-kernel/bin/site-kernel.mjs run compass.inventory",
     "lint:packages": "eslint \"packages/**/*.ts\"",
+    "lint:astro": "eslint \"packages/**/*.astro\"",
+    "lint:all": "eslint \"packages/**/*.ts\" \"packages/**/*.astro\"",
     "lint:yaml": "eslint --config eslint.config.js \"**/*.yaml\"",
     "git-add-force": "git rm -r --cached . && git add .",
     "postinstall": "playwright install chromium"
@@ -47,6 +49,7 @@
     "@warpgogol/site-kernel-observability": "workspace:*",
     "@warpgogol/site-kernel-onboarding": "workspace:*",
     "eslint": "^10.8.0",
+    "eslint-plugin-astro": "3.1.0",
     "eslint-plugin-yml": "^1.19.1",
     "openai": "^7.4.0",
     "playwright": "1.62.1",

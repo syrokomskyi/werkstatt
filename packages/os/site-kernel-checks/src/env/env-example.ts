@@ -131,7 +131,7 @@ const HOW_TO_OBTAIN: Readonly<Record<string, string>> = {
   CLOUDFLARE_READONLY_API_TOKEN:
     "Cloudflare Dashboard → My Profile → API Tokens → Create Custom Token with Zone:Read.",
   CLOUDFLARE_API_TOKEN:
-    "Cloudflare Dashboard → My Profile → API Tokens. Prefer CLOUDFLARE_READONLY_API_TOKEN (least-privilege).",
+    "Cloudflare Dashboard → My Profile → API Tokens → Create Custom Token (User API Token, NOT Account API Token). Required permissions: Zone → Cache Purge → Purge, Account → Workers Scripts → Edit, Zone → Workers Routes → Edit, Zone → DNS → Edit (for subdomain.register), Zone → Page Rules → Edit (for cache bypass setup). Scope to specific account and zone only. See docs/engineering/workshop-setup.md for full guide.",
   CLOUDFLARE_ZONE_ID:
     "Cloudflare Dashboard → Domains Overview → click any domain → right-hand sidebar → API section → Zone ID.",
   R2_AXIOM_ACCOUNT_ID:
