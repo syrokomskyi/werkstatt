@@ -60,6 +60,8 @@ Platform operations schemas (handoff, sternsystem, werkstatt, mission, release, 
 
 `src/archetype-registry.ts` validates `archetypes/index.json` with Zod `safeParse` at import time. If the JSON shape drifts, the module throws a descriptive error (not a silent empty map). The schema mirrors the full index shape: entries, sectionRoles, componentRoles, planetImportPaths, blockTypeToCosmicName, moonImportPaths, roleByCosmicName.
 
+- **`archetype.registry.build` generates both `archetypes/index.yaml` and `archetypes/index.json`.** Always commit both files together — staging only `index.yaml` leaves `index.json` dirty and causes drift between the human-readable and machine-readable indexes.
+
 ## RFC-0504: New block types in archetype registry
 
 Three new block types were added to `archetypes/index.yaml` for the ratgeber 12-section article layout:
