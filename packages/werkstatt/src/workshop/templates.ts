@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0779: initial workshop template strings.</item>
+  <item>RFC-0790: replace systems/registry.yaml scaffold with systems-cache/.gitkeep; rename registryYaml to systemsCacheGitkeep.</item>
 </CHANGE_SUMMARY>
 */
 
