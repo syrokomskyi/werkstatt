@@ -263,6 +263,24 @@ describe("parseSitemapXml", () => {
     ]);
   });
 
+  it("parses xhtml:link with href before hreflang (attribute-order-independent)", () => {
+    const xml = `<urlset xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://example.com/</loc>
+    <xhtml:link rel="alternate" href="https://example.com/" hreflang="de" />
+    <xhtml:link rel="alternate" href="https://example.com/index.md" type="text/markdown" />
+  </url>
+</urlset>`;
+
+    const entries = parseSitemapXml(xml);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0].hreflangs).toEqual([{ lang: "de", href: "https://example.com/" }]);
+    expect(entries[0].markdownAlternates).toEqual([
+      { type: "text/markdown", href: "https://example.com/index.md" },
+    ]);
+  });
+
   it("returns empty array for XML without url elements", () => {
     const entries = parseSitemapXml('<?xml version="1.0"?><urlset></urlset>');
     expect(entries).toEqual([]);

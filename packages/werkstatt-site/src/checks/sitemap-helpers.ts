@@ -325,19 +325,23 @@ export function parseSitemapXml(xml: string): SitemapUrlEntry[] {
     const locMatch = block.match(/<loc>(.*?)<\/loc>/);
     const loc = locMatch?.[1] ?? "";
 
+    // RFC-0788: use a single attribute-order-independent regex to capture all
+    // xhtml:link elements, then dispatch based on which attributes are present.
     const hreflangs: Array<{ lang: string; href: string }> = [];
-    const linkRegex = /<xhtml:link[^>]*?hreflang="([^"]*)"[^>]*?href="([^"]*)"[^>]*?\/?>/g;
+    const markdownAlternates: Array<{ type: string; href: string }> = [];
+    const linkRegex = /<xhtml:link\s[^>]*?\/?>/g;
     let linkMatch;
     while ((linkMatch = linkRegex.exec(block)) !== null) {
-      hreflangs.push({ lang: linkMatch[1], href: linkMatch[2] });
-    }
-
-    // RFC-0788: extract markdown alternate links (type-bearing, no hreflang).
-    const markdownAlternates: Array<{ type: string; href: string }> = [];
-    const mdLinkRegex = /<xhtml:link[^>]*?type="([^"]*)"[^>]*?href="([^"]*)"[^>]*?\/?>/g;
-    let mdLinkMatch;
-    while ((mdLinkMatch = mdLinkRegex.exec(block)) !== null) {
-      markdownAlternates.push({ type: mdLinkMatch[1], href: mdLinkMatch[2] });
+      const tag = linkMatch[0];
+      const hrefMatch = tag.match(/href="([^"]*)"/);
+      const href = hrefMatch?.[1] ?? "";
+      const hreflangMatch = tag.match(/hreflang="([^"]*)"/);
+      const typeMatch = tag.match(/type="([^"]*)"/);
+      if (hreflangMatch) {
+        hreflangs.push({ lang: hreflangMatch[1], href });
+      } else if (typeMatch) {
+        markdownAlternates.push({ type: typeMatch[1], href });
+      }
     }
 
     entries.push({ loc, hreflangs, markdownAlternates });

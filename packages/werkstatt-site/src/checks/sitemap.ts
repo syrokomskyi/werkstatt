@@ -95,6 +95,11 @@ export async function runSitemapGenerate(
     clusters,
     supportedLanguages,
   );
+  if (markdownTwins.size === 0) {
+    context.logger.info(
+      "sitemap.generate: no markdown twins found in public/ — sitemap will not include text/markdown alternate links",
+    );
+  }
 
   const writtenFiles: string[] = [];
   const subSitemapNames: string[] = [];
