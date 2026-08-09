@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@warpgogol/site-kernel": "workspace:*",
+    "tsx": "^4.20.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
