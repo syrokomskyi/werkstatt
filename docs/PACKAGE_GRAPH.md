@@ -86,6 +86,11 @@
   |          @warpgogol/integration, @warpgogol/integration-adapter-stripe,
   |          @warpgogol/integration-adapter-supabase-crm, @warpgogol/passport
   +-- consumers: apps/*
+
+@GOGOL/WERKSTATT (platform-level, consumed by root tools/kernel.config.ts)
+  |
+  +-- deps: @warpgogol/site-kernel
+  +-- consumers: root workspace (tools/kernel.config.ts)
 ```
 
 ## Dependency Matrix
@@ -111,6 +116,7 @@
 | `@warpgogol/chat-adapter-uchat` | `@warpgogol/chat` |
 | `@warpgogol/growth-adapter-matomo` | `@warpgogol/growth` |
 | `@warpgogol/ui` | `@warpgogol/chat`, `@warpgogol/chat-adapter-null`, `@warpgogol/chat-adapter-uchat`, `@warpgogol/integration`, `@warpgogol/integration-adapter-stripe`, `@warpgogol/integration-adapter-supabase-crm`, `@warpgogol/passport` |
+| `@warpgogol/werkstatt` | `@warpgogol/site-kernel` |
 
 ## Blast Radius Guide
 
