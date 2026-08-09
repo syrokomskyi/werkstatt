@@ -138,6 +138,37 @@ export const werkstattGamePlugin: WerkstattPlugin = {
 
 The `WerkstattPluginHooks` interface (RFC-0770) includes an optional `materialize` hook for scaffolding/regenerating the workpiece after authored data injection. The game plugin omits it intentionally: game projects have no authored-data injection step (no business profiles, no content collections). The workpiece is created by `scaffoldProject` and then developed directly by the game developer. The engine's default materialize behavior (creating the workpiece directory from the project template) is sufficient. If a future game variant needs generated content (e.g. localization injection), a `materialize` hook can be added via amendment.
 
+### `phaser.config.ts` shape
+
+The game project's `phaser.config.ts` is the single source of truth for scene registration and bundle budget. The plugin validators read this file:
+
+```ts
+import { BootScene } from "./src/scenes/boot.ts";
+
+export interface PhaserGameConfig {
+  type: number;
+  width: number;
+  height: number;
+  scene: Array<{ key: string; scene: unknown }>;
+  bundleBudget: number;
+}
+
+const config: PhaserGameConfig = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  scene: [
+    { key: "BootScene", scene: BootScene },
+  ],
+  bundleBudget: 5242880, // 5 MB gzipped
+};
+
+export default config;
+```
+
+- `scene[]` entries register each scene class. `game.scenes.validate` checks that every exported class in `src/scenes/*.ts` appears here.
+- `bundleBudget` is the gzipped size budget in bytes. `game.bundle.validate` reads this value (default: 5242880 = 5 MB).
+
 ## Architectural fit
 
 - **DNA-1 (monorepo boundary)** — the game plugin is shared reusable logic in `packages/*`, published as a private npm package. Game projects remain Sternsystemen outside the workshop in mirrors per RFC-0574. No cross-project imports at runtime.
@@ -267,7 +298,8 @@ The bundle size budget is declared in the game project's `phaser.config.ts` unde
 
 ## Rollout
 
-- Implemented after the site plugin is live and the workshop migration (RFC-0776) is complete.
+- **Hard dependencies:** RFC-0770 (plugin contract), RFC-0771 (plugin registry), RFC-0772 (engine consolidation), RFC-0773 (extraction pipeline). These must be completed before the game plugin can be registered and published.
+- **Soft sequencing:** RFC-0776 (workshop migration) and RFC-0779 (video plugin) are soft dependencies. The game plugin can be tested with a manually created workshop (`tools/kernel.config.ts` + `forge.yaml` with `profile: phaser-turborepo`) without waiting for the full workshop migration.
 - The first real game project validates the plugin; contract gaps are fixed forward.
 
 ## Alternatives considered
@@ -299,11 +331,11 @@ The bundle size budget is declared in the game project's `phaser.config.ts` unde
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run
-  `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file
+  `werkstatt run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file
   in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC
   without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run
-  `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"`
+  `werkstatt run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"`
   instead of working around it (RFC-0334).
 -->
