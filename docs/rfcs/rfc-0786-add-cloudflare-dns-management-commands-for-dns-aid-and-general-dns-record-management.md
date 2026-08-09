@@ -283,20 +283,20 @@ _agent.warpgogol.com. 3600 IN TXT "https://warpgogol.com/.well-known/agent.json"
 
 ## Acceptance criteria
 
-- [ ] `buildDnsAidRecord` pure function defined in `packages/werkstatt-site/src/domain/share/agent/dns-aid.ts`
-- [ ] `agent.dns-aid.generate` registered in command table `29-agent-surface.ts`
-- [ ] `agent.dns-aid.validate` registered in command table `29-agent-surface.ts`
-- [ ] `agent.dns-aid.generate` integrated into `build.prepare` pipeline after `agent.manifest.generate`
-- [ ] `agent.dns-aid.validate` integrated into `build.check` pipeline
-- [ ] `agent.enabled: false` skip pattern works (stale declaration removed)
-- [ ] Generator writes DNS-AID TXT record to `dns-records.yaml` in marked section
-- [ ] Generator is idempotent — regenerating produces byte-identical output (DNA-58)
-- [ ] `ttl?: number` field added to `dnsRecordDeclarationSchema` in `packages/werkstatt-site/src/domain/ontology/schemas/dns-records.ts`
-- [ ] `agent.dns-aid.validate` emits `AGD-01..04` diagnostics with correct severity (error for AGD-01..03, warning for AGD-04)
-- [ ] `agent.dns-aid.validate` is advisory (exit 0 with diagnostics), consistent with `dns.record.validate`
+- [x] `buildDnsAidRecord` pure function defined in `packages/werkstatt-site/src/domain/share/agent/dns-aid.ts` (evidence: src/domain/share/agent/dns-aid.ts)
+- [x] `agent.dns-aid.generate` registered in command table `29-agent-surface.ts` (evidence: src/checks/command-tables/29-agent-surface.ts)
+- [x] `agent.dns-aid.validate` registered in command table `29-agent-surface.ts` (evidence: src/checks/command-tables/29-agent-surface.ts)
+- [x] `agent.dns-aid.generate` integrated into `build.prepare` pipeline after `agent.manifest.generate` (evidence: src/checks/pipelines/build-prepare.ts)
+- [x] `agent.dns-aid.validate` integrated into `build.check` pipeline (evidence: src/checks/pipelines/sites-check-author.ts)
+- [x] `agent.enabled: false` skip pattern works (stale declaration removed) (evidence: src/checks/agent/agent-dns-aid.test.ts)
+- [x] Generator writes DNS-AID TXT record to `dns-records.yaml` in marked section (evidence: src/checks/agent/agent-dns-aid.test.ts)
+- [x] Generator is idempotent — regenerating produces byte-identical output (DNA-58) (evidence: src/checks/agent/agent-dns-aid.test.ts)
+- [x] `ttl?: number` field added to `dnsRecordDeclarationSchema` in `packages/werkstatt-site/src/domain/ontology/schemas/dns-records.ts` (evidence: src/domain/ontology/schemas/dns-records.ts)
+- [x] `agent.dns-aid.validate` emits `AGD-01..04` diagnostics with correct severity (error for AGD-01..03, warning for AGD-04) (evidence: src/checks/agent/agent-dns-aid.test.ts)
+- [x] `agent.dns-aid.validate` is advisory (exit 0 with diagnostics), consistent with `dns.record.validate` (evidence: src/checks/agent/agent-dns-aid.ts advisoryResult)
 - [ ] `dig TXT _agent.warpgogol.com` returns the agent.json URL after `dns.record.upsert`
 - [ ] `isitagentready.com` reports DNS-AID record present for warpgogol.com after deploy
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0786 exit 0)
 
 ## Implementation notes for agents
 
