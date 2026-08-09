@@ -95,3 +95,8 @@ Domain modules import from each other via subpath exports: `@warpgogol/werkstatt
 ### Workshop-wide rewrite
 
 Other packages that still import from the old `@warpgogol/<name>` packages will break until RFC-0776 rewrites those imports. This is expected during the transition wave.
+
+### Consolidation gotchas (RFC-0775)
+
+- **Relative imports break when files move between directory depths.** When moving a file from `src/archetype-registry.ts` to `src/domain/ontology/archetype-registry.ts`, relative imports like `../archetypes/index.json` must be recalculated — `..` now resolves one level higher. Use `./archetypes/index.json` instead.
+- **Do not add `src/**/*.json` to `tsconfig.json` `include`** for this package. It contains 1167 LordIcon JSON assets; including them causes TSC to crash with SIGABRT (out of memory). `resolveJsonModule` resolves JSON imports without explicit inclusion — `src/**/*.ts` is sufficient.
