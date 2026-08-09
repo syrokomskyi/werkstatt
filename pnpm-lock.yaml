@@ -1495,6 +1495,9 @@ importers:
       '@warpgogol/passport':
         specifier: workspace:*
         version: link:../passport
+      '@warpgogol/pbp':
+        specifier: workspace:*
+        version: link:../pbp
       '@warpgogol/share':
         specifier: workspace:*
         version: link:../share
