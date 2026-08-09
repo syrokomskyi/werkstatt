@@ -9,6 +9,7 @@
   <item>RFC-0286..0290: initial command table for Agent Surface (capability manifest + protocol projections).</item>
   <item>RFC-0291: add agent.manifest.verify (local + --url mode).</item>
   <item>RFC-0783: add agent.api-catalog.generate/validate and agent.mcp-card.generate/validate.</item>
+  <item>RFC-0785: add agent.markdown-negotiation.generate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,6 +24,7 @@ import {
 } from "../agent/agent-api-catalog.ts";
 import { runAgentMcpCardGenerate, runAgentMcpCardValidate } from "../agent/agent-mcp-card.ts";
 import { runAgentRoutesGenerate } from "../agent/agent-routes.ts";
+import { runAgentMarkdownNegotiationGenerate } from "../agent/agent-markdown-negotiation.ts";
 import { runAgentGateFixturesRun } from "../agent/agent-gate-fixtures.ts";
 import { runAgentSurfaceSign, runAgentSurfaceVerify } from "../agent/agent-surface-sign.ts";
 
@@ -183,6 +185,19 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/src/agent-surface.generated.yaml"],
     modulePaths: ["agent/agent-routes.ts"],
     execute: runAgentRoutesGenerate,
+  },
+  {
+    name: "agent.markdown-negotiation.generate",
+    description:
+      "Generate Astro middleware for Accept-header-based markdown content negotiation (RFC-0785). Writes a no-op pass-through when agent.enabled is false.",
+    scope: "app",
+    supportsAllSites: true,
+    mutatesState: true,
+    writes: ["<app>/src/middleware/markdown-negotiation.ts"],
+    flags: {},
+    reads: ["<app>/src/content/system.md"],
+    modulePaths: ["agent/agent-markdown-negotiation.ts"],
+    execute: runAgentMarkdownNegotiationGenerate,
   },
   {
     name: "agent.surface.sign",

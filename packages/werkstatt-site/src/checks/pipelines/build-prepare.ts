@@ -109,6 +109,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "public.managed.clean" },
   // RFC-0166: per-page Markdown twins into public/ before Astro build copies them to dist/
   { command: "page.markdown.generate" },
+  // RFC-0785: markdown content negotiation middleware (after twins exist, before Astro build)
+  { command: "agent.markdown-negotiation.generate" },
   // RFC-0165: RSS feed from dated article pages into public/
   { command: "feed.generate" },
   // RFC-0051: generate ai.txt into public/ before Astro build
@@ -210,6 +212,8 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "archetype.registry.build" },
   { command: "uni.registry.build" },
   { command: "i18n.middleware.generate" },
+  // RFC-0785: markdown content negotiation middleware (needed in dev for testing)
+  { command: "agent.markdown-negotiation.generate" },
   // RFC-0210: video manifest is read synchronously by <Media> via import.meta.glob;
   // without it the video section renders nothing in dev. Warm cache makes this ~300ms.
   { command: "video.variants.generate", expectedDurationMs: 180_000, timeoutMs: 1_200_000 },
