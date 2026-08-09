@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Werkstatt site plugin — Astro stack engine modules and domain layer (RFC-0774/0775).",
+  "description": "Werkstatt site plugin \u2014 Astro stack engine modules and domain layer (RFC-0774/0775).",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
@@ -94,9 +94,1220 @@
     "./deploy": {
       "types": "./src/deploy/index.ts",
       "default": "./src/deploy/index.ts"
+    },
+    "./tokens": {
+      "types": "./src/domain/tokens/index.ts",
+      "default": "./src/domain/tokens/index.ts"
+    },
+    "./tokens./tokens.css": "./src/tokens.css",
+    "./geo": {
+      "types": "./src/domain/geo/index.ts",
+      "default": "./src/domain/geo/index.ts"
+    },
+    "./faq": {
+      "types": "./src/domain/faq/index.ts",
+      "default": "./src/domain/faq/index.ts"
+    },
+    "./faq./astro": {
+      "types": "./src/domain/faq/astro.ts",
+      "default": "./src/domain/faq/astro.ts"
+    },
+    "./passport": {
+      "types": "./src/domain/passport/index.ts",
+      "default": "./src/domain/passport/index.ts"
+    },
+    "./passport./schema": {
+      "types": "./src/domain/passport/schema.ts",
+      "default": "./src/domain/passport/schema.ts"
+    },
+    "./passport./sign": {
+      "types": "./src/domain/passport/sign.ts",
+      "default": "./src/domain/passport/sign.ts"
+    },
+    "./passport./emit": {
+      "types": "./src/domain/passport/emit.ts",
+      "default": "./src/domain/passport/emit.ts"
+    },
+    "./passport./verify": {
+      "types": "./src/domain/passport/verify.ts",
+      "default": "./src/domain/passport/verify.ts"
+    },
+    "./passport./key-rotate": {
+      "types": "./src/domain/passport/key-rotate.ts",
+      "default": "./src/domain/passport/key-rotate.ts"
+    },
+    "./passport./data": {
+      "types": "./src/domain/passport/data.ts",
+      "default": "./src/domain/passport/data.ts"
+    },
+    "./passport./identity-sign": {
+      "types": "./src/domain/passport/identity-sign.ts",
+      "default": "./src/domain/passport/identity-sign.ts"
+    },
+    "./passport./dht-sign": {
+      "types": "./src/domain/passport/dht-sign.ts",
+      "default": "./src/domain/passport/dht-sign.ts"
+    },
+    "./content-source": {
+      "types": "./src/domain/content-source/index.ts",
+      "default": "./src/domain/content-source/index.ts"
+    },
+    "./content-source./astro": {
+      "types": "./src/domain/content-source/astro.ts",
+      "default": "./src/domain/content-source/astro.ts"
+    },
+    "./content-source./cms-git": {
+      "types": "./src/domain/content-source/adapters/cms-git/index.ts",
+      "default": "./src/domain/content-source/adapters/cms-git/index.ts"
+    },
+    "./content-source./fs": {
+      "types": "./src/domain/content-source/fs.ts",
+      "default": "./src/domain/content-source/fs.ts"
+    },
+    "./check-core": {
+      "types": "./src/domain/check-core/index.ts",
+      "default": "./src/domain/check-core/index.ts"
+    },
+    "./check-runner": {
+      "types": "./src/domain/check-runner/index.ts",
+      "default": "./src/domain/check-runner/index.ts"
+    },
+    "./observability": {
+      "types": "./src/domain/observability/index.ts",
+      "default": "./src/domain/observability/index.ts"
+    },
+    "./nebula": {
+      "types": "./src/domain/nebula/index.ts",
+      "default": "./src/domain/nebula/index.ts"
+    },
+    "./nebula./weights": {
+      "types": "./src/domain/nebula/weights.ts",
+      "default": "./src/domain/nebula/weights.ts"
+    },
+    "./nebula./compute": {
+      "types": "./src/domain/nebula/compute.ts",
+      "default": "./src/domain/nebula/compute.ts"
+    },
+    "./nebula./collect": {
+      "types": "./src/domain/nebula/collect.ts",
+      "default": "./src/domain/nebula/collect.ts"
+    },
+    "./star-map": {
+      "types": "./src/domain/star-map/index.ts",
+      "default": "./src/domain/star-map/index.ts"
+    },
+    "./star-map./render": {
+      "types": "./src/domain/star-map/render.ts",
+      "default": "./src/domain/star-map/render.ts"
+    },
+    "./surface": {
+      "types": "./src/domain/surface/index.ts",
+      "default": "./src/domain/surface/index.ts"
+    },
+    "./surface./eligibility": {
+      "types": "./src/domain/surface/eligibility.ts",
+      "default": "./src/domain/surface/eligibility.ts"
+    },
+    "./surface./blueprint": {
+      "types": "./src/domain/surface/blueprint.ts",
+      "default": "./src/domain/surface/blueprint.ts"
+    },
+    "./surface./blueprint-schema": {
+      "types": "./src/domain/surface/blueprint-schema.ts",
+      "default": "./src/domain/surface/blueprint-schema.ts"
+    },
+    "./surface./decision-composer": {
+      "types": "./src/domain/surface/decision-composer.ts",
+      "default": "./src/domain/surface/decision-composer.ts"
+    },
+    "./surface./geo": {
+      "types": "./src/domain/surface/geo.ts",
+      "default": "./src/domain/surface/geo.ts"
+    },
+    "./surface./io": {
+      "types": "./src/domain/surface/io/index.ts",
+      "default": "./src/domain/surface/io/index.ts"
+    },
+    "./surface./substance": {
+      "types": "./src/domain/surface/substance.ts",
+      "default": "./src/domain/surface/substance.ts"
+    },
+    "./surface./types": {
+      "types": "./src/domain/surface/types.ts",
+      "default": "./src/domain/surface/types.ts"
+    },
+    "./studio-gate": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./ontology": {
+      "types": "./src/domain/ontology/index.ts",
+      "default": "./src/domain/ontology/index.ts"
+    },
+    "./ontology./enums": {
+      "types": "./src/domain/ontology/enums.ts",
+      "default": "./src/domain/ontology/enums.ts"
+    },
+    "./ontology./manifest": {
+      "types": "./src/domain/ontology/manifest.ts",
+      "default": "./src/domain/ontology/manifest.ts"
+    },
+    "./ontology./cosmic": {
+      "types": "./src/domain/ontology/cosmic/index.ts",
+      "default": "./src/domain/ontology/cosmic/index.ts"
+    },
+    "./ontology./schemas": {
+      "types": "./src/domain/ontology/schemas/index.ts",
+      "default": "./src/domain/ontology/schemas/index.ts"
+    },
+    "./ontology./schemas/manifest-resolver": {
+      "types": "./src/domain/ontology/schemas/manifest-resolver.ts",
+      "default": "./src/domain/ontology/schemas/manifest-resolver.ts"
+    },
+    "./ontology./operations": {
+      "types": "./src/domain/ontology/operations/index.ts",
+      "default": "./src/domain/ontology/operations/index.ts"
+    },
+    "./ontology./archetypes": {
+      "types": "./src/domain/ontology/archetype-registry.ts",
+      "default": "./src/domain/ontology/archetype-registry.ts"
+    },
+    "./ontology./shared-section-props": {
+      "types": "./src/domain/ontology/shared-section-props/index.ts",
+      "default": "./src/domain/ontology/shared-section-props/index.ts"
+    },
+    "./ontology./external-surfaces": {
+      "types": "./src/domain/ontology/external-surfaces/index.ts",
+      "default": "./src/domain/ontology/external-surfaces/index.ts"
+    },
+    "./share": {
+      "types": "./src/domain/share/index.ts",
+      "default": "./src/domain/share/index.ts"
+    },
+    "./share./content": {
+      "types": "./src/domain/share/content/index.ts",
+      "default": "./src/domain/share/content/index.ts"
+    },
+    "./share./text-normalize": {
+      "types": "./src/domain/share/text-normalize.ts",
+      "default": "./src/domain/share/text-normalize.ts"
+    },
+    "./share./fs": {
+      "types": "./src/domain/share/fs/index.ts",
+      "default": "./src/domain/share/fs/index.ts"
+    },
+    "./share./text-position": {
+      "types": "./src/domain/share/text-position.ts",
+      "default": "./src/domain/share/text-position.ts"
+    },
+    "./share./content/merge": {
+      "types": "./src/domain/share/content/merge.ts",
+      "default": "./src/domain/share/content/merge.ts"
+    },
+    "./share./content/resolve-field-path": {
+      "types": "./src/domain/share/content/resolve-field-path.ts",
+      "default": "./src/domain/share/content/resolve-field-path.ts"
+    },
+    "./share./agent": {
+      "types": "./src/domain/share/agent/index.ts",
+      "default": "./src/domain/share/agent/index.ts"
+    },
+    "./share./agent/*": {
+      "types": "./src/domain/share/agent/*.ts",
+      "default": "./src/domain/share/agent/*.ts"
+    },
+    "./share./knowledge": {
+      "types": "./src/domain/share/knowledge/index.ts",
+      "default": "./src/domain/share/knowledge/index.ts"
+    },
+    "./share./knowledge/*": {
+      "types": "./src/domain/share/knowledge/*.ts",
+      "default": "./src/domain/share/knowledge/*.ts"
+    },
+    "./share./content-discipline": {
+      "types": "./src/domain/share/content-discipline/index.ts",
+      "default": "./src/domain/share/content-discipline/index.ts"
+    },
+    "./share./onboarding-yaml": {
+      "types": "./src/domain/share/onboarding-yaml/index.ts",
+      "default": "./src/domain/share/onboarding-yaml/index.ts"
+    },
+    "./share./content-reference": {
+      "types": "./src/domain/share/content-reference.ts",
+      "default": "./src/domain/share/content-reference.ts"
+    },
+    "./share./formula-eval": {
+      "types": "./src/domain/share/formula-eval.ts",
+      "default": "./src/domain/share/formula-eval.ts"
+    },
+    "./share./redirects": {
+      "types": "./src/domain/share/redirects.ts",
+      "default": "./src/domain/share/redirects.ts"
+    },
+    "./share./check-hints": {
+      "types": "./src/domain/share/check-hints.ts",
+      "default": "./src/domain/share/check-hints.ts"
+    },
+    "./share./i18n": {
+      "types": "./src/domain/share/i18n/localization.ts",
+      "default": "./src/domain/share/i18n/localization.ts"
+    },
+    "./share./entitlement": {
+      "types": "./src/domain/share/entitlement.ts",
+      "default": "./src/domain/share/entitlement.ts"
+    },
+    "./share./offer-capacity": {
+      "types": "./src/domain/share/offer-capacity.ts",
+      "default": "./src/domain/share/offer-capacity.ts"
+    },
+    "./share./schemas": {
+      "types": "./src/domain/share/schemas/index.ts",
+      "default": "./src/domain/share/schemas/index.ts"
+    },
+    "./share./schemas/features": {
+      "types": "./src/domain/share/schemas/features.ts",
+      "default": "./src/domain/share/schemas/features.ts"
+    },
+    "./share./schemas/effects": {
+      "types": "./src/domain/share/schemas/effects.ts",
+      "default": "./src/domain/share/schemas/effects.ts"
+    },
+    "./share./schemas/site-background": {
+      "types": "./src/domain/share/schemas/site-background.ts",
+      "default": "./src/domain/share/schemas/site-background.ts"
+    },
+    "./share./schemas/live-photo": {
+      "types": "./src/domain/share/schemas/live-photo.ts",
+      "default": "./src/domain/share/schemas/live-photo.ts"
+    },
+    "./share./schemas/media": {
+      "types": "./src/domain/share/schemas/media.ts",
+      "default": "./src/domain/share/schemas/media.ts"
+    },
+    "./share./schemas/material-credit": {
+      "types": "./src/domain/share/schemas/material-credit.ts",
+      "default": "./src/domain/share/schemas/material-credit.ts"
+    },
+    "./share./schemas/print": {
+      "types": "./src/domain/share/schemas/print.ts",
+      "default": "./src/domain/share/schemas/print.ts"
+    },
+    "./share./material-credits": {
+      "types": "./src/domain/share/material-credits.ts",
+      "default": "./src/domain/share/material-credits.ts"
+    },
+    "./share./semantic": {
+      "types": "./src/domain/share/semantic/index.ts",
+      "default": "./src/domain/share/semantic/index.ts"
+    },
+    "./share./semantic/models": {
+      "types": "./src/domain/share/semantic/models.ts",
+      "default": "./src/domain/share/semantic/models.ts"
+    },
+    "./share./semantic/jsonld": {
+      "types": "./src/domain/share/semantic/jsonld.ts",
+      "default": "./src/domain/share/semantic/jsonld.ts"
+    },
+    "./share./semantic/llms": {
+      "types": "./src/domain/share/semantic/llms.ts",
+      "default": "./src/domain/share/semantic/llms.ts"
+    },
+    "./share./semantic/extract": {
+      "types": "./src/domain/share/semantic/extract.ts",
+      "default": "./src/domain/share/semantic/extract.ts"
+    },
+    "./share./semantic/page-utils": {
+      "types": "./src/domain/share/semantic/page-utils.ts",
+      "default": "./src/domain/share/semantic/page-utils.ts"
+    },
+    "./share./semantic/build-page": {
+      "types": "./src/domain/share/semantic/build-page.ts",
+      "default": "./src/domain/share/semantic/build-page.ts"
+    },
+    "./share./semantic/price-marker-resolver": {
+      "types": "./src/domain/share/semantic/price-marker-resolver.ts",
+      "import": "./src/domain/share/semantic/price-marker-resolver.ts",
+      "default": "./src/domain/share/semantic/price-marker-resolver.ts"
+    },
+    "./share./semantic/derived-prices-loader": {
+      "types": "./src/domain/share/semantic/derived-prices-loader.ts",
+      "import": "./src/domain/share/semantic/derived-prices-loader.ts",
+      "default": "./src/domain/share/semantic/derived-prices-loader.ts"
+    },
+    "./share./semantic/output-projection": {
+      "types": "./src/domain/share/semantic/output-projection.ts",
+      "default": "./src/domain/share/semantic/output-projection.ts"
+    },
+    "./share./astro": {
+      "types": "./src/domain/share/astro/content.ts",
+      "default": "./src/domain/share/astro/content.ts"
+    },
+    "./share./astro/feature-graph": {
+      "types": "./src/domain/share/astro/feature-graph.ts",
+      "default": "./src/domain/share/astro/feature-graph.ts"
+    },
+    "./share./astro/feature-policy": {
+      "types": "./src/domain/share/astro/feature-policy.ts",
+      "default": "./src/domain/share/astro/feature-policy.ts"
+    },
+    "./share./astro/url-policy": {
+      "types": "./src/domain/share/astro/url-policy.ts",
+      "default": "./src/domain/share/astro/url-policy.ts"
+    },
+    "./share./middleware": {
+      "types": "./src/domain/share/middleware/language-redirect.ts",
+      "default": "./src/domain/share/middleware/language-redirect.ts"
+    },
+    "./share./scripts": {
+      "types": "./src/domain/share/scripts/index.ts",
+      "default": "./src/domain/share/scripts/index.ts"
+    },
+    "./share./runtime-context": {
+      "types": "./src/domain/share/runtime-context.ts",
+      "default": "./src/domain/share/runtime-context.ts"
+    },
+    "./share./visibility": {
+      "types": "./src/domain/share/visibility.ts",
+      "default": "./src/domain/share/visibility.ts"
+    },
+    "./share./page": {
+      "types": "./src/domain/share/page.ts",
+      "default": "./src/domain/share/page.ts"
+    },
+    "./share./shared-context": {
+      "types": "./src/domain/share/shared-context.ts",
+      "default": "./src/domain/share/shared-context.ts"
+    },
+    "./share./routes": {
+      "types": "./src/domain/share/astro/routes.ts",
+      "default": "./src/domain/share/astro/routes.ts"
+    },
+    "./share./url-policy": {
+      "types": "./src/domain/share/astro/url-policy.ts",
+      "default": "./src/domain/share/astro/url-policy.ts"
+    },
+    "./share./canonical-url": {
+      "types": "./src/domain/share/astro/canonical-url.ts",
+      "default": "./src/domain/share/astro/canonical-url.ts"
+    },
+    "./share./people-profile-defaults": {
+      "types": "./src/domain/share/astro/people-profile-defaults.ts",
+      "default": "./src/domain/share/astro/people-profile-defaults.ts"
+    },
+    "./share./astro/root-redirect-content": {
+      "types": "./src/domain/share/astro/root-redirect-content.astro",
+      "default": "./src/domain/share/astro/root-redirect-content.astro"
+    },
+    "./share./astro/root-redirect-content.astro": {
+      "types": "./src/domain/share/astro/root-redirect-content.astro",
+      "default": "./src/domain/share/astro/root-redirect-content.astro"
+    },
+    "./share./astro/page-handler": {
+      "types": "./src/domain/share/astro/page-handler/resolve-route.ts",
+      "default": "./src/domain/share/astro/page-handler/resolve-route.ts"
+    },
+    "./share./astro/loaders": {
+      "types": "./src/domain/share/astro/loaders.ts",
+      "default": "./src/domain/share/astro/loaders.ts"
+    },
+    "./share./astro/surface-routes": {
+      "types": "./src/domain/share/astro/surface-routes.ts",
+      "default": "./src/domain/share/astro/surface-routes.ts"
+    },
+    "./share./image-provider": {
+      "types": "./src/domain/share/image-provider.ts",
+      "default": "./src/domain/share/image-provider.ts"
+    },
+    "./share./string-utils": {
+      "types": "./src/domain/share/string-utils.ts",
+      "default": "./src/domain/share/string-utils.ts"
+    },
+    "./share./legal": {
+      "types": "./src/domain/share/legal/translation-policy.ts",
+      "default": "./src/domain/share/legal/translation-policy.ts"
+    },
+    "./share./feature-policy": {
+      "types": "./src/domain/share/feature-policy.ts",
+      "default": "./src/domain/share/feature-policy.ts"
+    },
+    "./share./counter-utils": {
+      "types": "./src/domain/share/counter-utils.ts",
+      "default": "./src/domain/share/counter-utils.ts"
+    },
+    "./share./dev-props-validator": {
+      "types": "./src/domain/share/dev-props-validator.ts",
+      "default": "./src/domain/share/dev-props-validator.ts"
+    },
+    "./share./rfc0042-utils": {
+      "types": "./src/domain/share/rfc0042-utils.ts",
+      "default": "./src/domain/share/rfc0042-utils.ts"
+    },
+    "./share./wrap-inline-numbers": {
+      "types": "./src/domain/share/wrap-inline-numbers.ts",
+      "default": "./src/domain/share/wrap-inline-numbers.ts"
+    },
+    "./share./attribution-display": {
+      "types": "./src/domain/share/attribution-display.ts",
+      "default": "./src/domain/share/attribution-display.ts"
+    },
+    "./share./css-value-normalize": {
+      "types": "./src/domain/share/css-value-normalize.ts",
+      "default": "./src/domain/share/css-value-normalize.ts"
+    },
+    "./pbp": {
+      "types": "./src/domain/pbp/index.ts",
+      "default": "./src/domain/pbp/index.ts"
+    },
+    "./pbp./schemas": {
+      "types": "./src/domain/pbp/schemas/index.ts",
+      "default": "./src/domain/pbp/schemas/index.ts"
+    },
+    "./pbp./loaders": {
+      "types": "./src/domain/pbp/loaders.ts",
+      "default": "./src/domain/pbp/loaders.ts"
+    },
+    "./pbp./astro": {
+      "types": "./src/domain/pbp/astro.ts",
+      "default": "./src/domain/pbp/astro.ts"
+    },
+    "./pbp./compiler": {
+      "types": "./src/domain/pbp/compiler/index.ts",
+      "default": "./src/domain/pbp/compiler/index.ts"
+    },
+    "./pbp./semantic-profile": {
+      "types": "./src/domain/pbp/semantic-profile.ts",
+      "default": "./src/domain/pbp/semantic-profile.ts"
+    },
+    "./pbp./semantic-model": {
+      "types": "./src/domain/pbp/semantic-model.ts",
+      "default": "./src/domain/pbp/semantic-model.ts"
+    },
+    "./pbp./cutover-check": {
+      "types": "./src/domain/pbp/cutover-check.ts",
+      "default": "./src/domain/pbp/cutover-check.ts"
+    },
+    "./pbp-rate-adapters": {
+      "types": "./src/domain/pbp-rate-adapters/index.ts",
+      "default": "./src/domain/pbp-rate-adapters/index.ts"
+    },
+    "./growth": {
+      "types": "./src/domain/growth/index.ts",
+      "default": "./src/domain/growth/index.ts"
+    },
+    "./growth./adapter": {
+      "types": "./src/domain/growth/adapter.ts",
+      "default": "./src/domain/growth/adapter.ts"
+    },
+    "./growth./emit": {
+      "types": "./src/domain/growth/emit.ts",
+      "default": "./src/domain/growth/emit.ts"
+    },
+    "./growth./client": {
+      "types": "./src/domain/growth/client.ts",
+      "default": "./src/domain/growth/client.ts"
+    },
+    "./growth./null-adapter": {
+      "types": "./src/domain/growth/null-adapter.ts",
+      "default": "./src/domain/growth/null-adapter.ts"
+    },
+    "./growth./config": {
+      "types": "./src/domain/growth/config.ts",
+      "default": "./src/domain/growth/config.ts"
+    },
+    "./growth./provider": {
+      "types": "./src/domain/growth/provider.astro",
+      "default": "./src/domain/growth/provider.astro"
+    },
+    "./growth./provider.astro": {
+      "types": "./src/domain/growth/provider.astro",
+      "default": "./src/domain/growth/provider.astro"
+    },
+    "./growth-adapter-matomo": {
+      "types": "./src/domain/growth-adapter-matomo/index.ts",
+      "default": "./src/domain/growth-adapter-matomo/index.ts"
+    },
+    "./growth-adapter-matomo./adapter": {
+      "types": "./src/domain/growth-adapter-matomo/adapter.ts",
+      "default": "./src/domain/growth-adapter-matomo/adapter.ts"
+    },
+    "./growth-adapter-matomo./binding": {
+      "types": "./src/domain/growth-adapter-matomo/binding.ts",
+      "default": "./src/domain/growth-adapter-matomo/binding.ts"
+    },
+    "./growth-adapter-matomo./transport": {
+      "types": "./src/domain/growth-adapter-matomo/transport.ts",
+      "default": "./src/domain/growth-adapter-matomo/transport.ts"
+    },
+    "./integration": {
+      "types": "./src/domain/integration/index.ts",
+      "default": "./src/domain/integration/index.ts"
+    },
+    "./integration./port": {
+      "types": "./src/domain/integration/port-barrel.ts",
+      "default": "./src/domain/integration/port-barrel.ts"
+    },
+    "./integration./crm-buffer": {
+      "types": "./src/domain/integration/crm-buffer.ts",
+      "default": "./src/domain/integration/crm-buffer.ts"
+    },
+    "./integration-adapter-stripe": {
+      "types": "./src/domain/integration-adapter-stripe/index.ts",
+      "default": "./src/domain/integration-adapter-stripe/index.ts"
+    },
+    "./integration-adapter-stripe./signature": {
+      "types": "./src/domain/integration-adapter-stripe/signature.ts",
+      "default": "./src/domain/integration-adapter-stripe/signature.ts"
+    },
+    "./integration-adapter-stripe./mapping": {
+      "types": "./src/domain/integration-adapter-stripe/mapping.ts",
+      "default": "./src/domain/integration-adapter-stripe/mapping.ts"
+    },
+    "./integration-adapter-supabase-crm": {
+      "types": "./src/domain/integration-adapter-supabase-crm/index.ts",
+      "default": "./src/domain/integration-adapter-supabase-crm/index.ts"
+    },
+    "./integration-adapter-supabase-crm./client": {
+      "types": "./src/domain/integration-adapter-supabase-crm/client.ts",
+      "default": "./src/domain/integration-adapter-supabase-crm/client.ts"
+    },
+    "./integration-adapter-supabase-crm./adapter": {
+      "types": "./src/domain/integration-adapter-supabase-crm/adapter.ts",
+      "default": "./src/domain/integration-adapter-supabase-crm/adapter.ts"
+    },
+    "./integration-adapter-supabase-crm./worker": {
+      "types": "./src/domain/integration-adapter-supabase-crm/worker.ts",
+      "default": "./src/domain/integration-adapter-supabase-crm/worker.ts"
+    },
+    "./integration-adapter-supabase-crm./pipedrive-sync-target": {
+      "types": "./src/domain/integration-adapter-supabase-crm/pipedrive-sync-target.ts",
+      "default": "./src/domain/integration-adapter-supabase-crm/pipedrive-sync-target.ts"
+    },
+    "./integration-adapter-supabase-crm./tenant-registry": {
+      "types": "./src/domain/integration-adapter-supabase-crm/tenant-registry.ts",
+      "default": "./src/domain/integration-adapter-supabase-crm/tenant-registry.ts"
+    },
+    "./chat": {
+      "types": "./src/domain/chat/index.ts",
+      "default": "./src/domain/chat/index.ts"
+    },
+    "./chat./port": {
+      "types": "./src/domain/chat/port.ts",
+      "default": "./src/domain/chat/port.ts"
+    },
+    "./chat./client": {
+      "types": "./src/domain/chat/client.ts",
+      "default": "./src/domain/chat/client.ts"
+    },
+    "./chat-adapter-null": {
+      "types": "./src/domain/chat-adapter-null/index.ts",
+      "default": "./src/domain/chat-adapter-null/index.ts"
+    },
+    "./chat-adapter-uchat": {
+      "types": "./src/domain/chat-adapter-uchat/index.ts",
+      "default": "./src/domain/chat-adapter-uchat/index.ts"
+    },
+    "./ui": {
+      "types": "./src/domain/ui/index.ts",
+      "default": "./src/domain/ui/index.ts"
+    },
+    "./ui./blocks-renderer": {
+      "types": "./src/domain/ui/blocks-renderer.astro",
+      "default": "./src/domain/ui/blocks-renderer.astro"
+    },
+    "./ui./blocks-renderer.astro": {
+      "types": "./src/domain/ui/blocks-renderer.astro",
+      "default": "./src/domain/ui/blocks-renderer.astro"
+    },
+    "./ui./legal/translation-notice": {
+      "types": "./src/domain/ui/legal/translation-notice.astro",
+      "default": "./src/domain/ui/legal/translation-notice.astro"
+    },
+    "./ui./legal/translation-notice.astro": {
+      "types": "./src/domain/ui/legal/translation-notice.astro",
+      "default": "./src/domain/ui/legal/translation-notice.astro"
+    },
+    "./ui./components/brand-label": {
+      "types": "./src/domain/ui/components/brand-label/brand-label-component.astro",
+      "default": "./src/domain/ui/components/brand-label/brand-label-component.astro"
+    },
+    "./ui./components/brand-label.astro": {
+      "types": "./src/domain/ui/components/brand-label/brand-label-component.astro",
+      "default": "./src/domain/ui/components/brand-label/brand-label-component.astro"
+    },
+    "./ui./components/brand-label/types": {
+      "types": "./src/domain/ui/components/brand-label/brand-label-component.types.generated.ts",
+      "default": "./src/domain/ui/components/brand-label/brand-label-component.types.generated.ts"
+    },
+    "./ui./components/breadcrumbs": {
+      "types": "./src/domain/ui/components/breadcrumbs/breadcrumbs-component.astro",
+      "default": "./src/domain/ui/components/breadcrumbs/breadcrumbs-component.astro"
+    },
+    "./ui./components/breadcrumbs.astro": {
+      "types": "./src/domain/ui/components/breadcrumbs/breadcrumbs-component.astro",
+      "default": "./src/domain/ui/components/breadcrumbs/breadcrumbs-component.astro"
+    },
+    "./ui./components/breadcrumbs/types": {
+      "types": "./src/domain/ui/components/breadcrumbs/breadcrumbs-component.types.generated.ts",
+      "default": "./src/domain/ui/components/breadcrumbs/breadcrumbs-component.types.generated.ts"
+    },
+    "./ui./components/copyright": {
+      "types": "./src/domain/ui/components/copyright/copyright-component.astro",
+      "default": "./src/domain/ui/components/copyright/copyright-component.astro"
+    },
+    "./ui./components/copyright.astro": {
+      "types": "./src/domain/ui/components/copyright/copyright-component.astro",
+      "default": "./src/domain/ui/components/copyright/copyright-component.astro"
+    },
+    "./ui./components/copyright/types": {
+      "types": "./src/domain/ui/components/copyright/copyright-component.types.generated.ts",
+      "default": "./src/domain/ui/components/copyright/copyright-component.types.generated.ts"
+    },
+    "./ui./components/currency-selector": {
+      "types": "./src/domain/ui/components/currency-selector/currency-selector-component.astro",
+      "default": "./src/domain/ui/components/currency-selector/currency-selector-component.astro"
+    },
+    "./ui./components/currency-selector.astro": {
+      "types": "./src/domain/ui/components/currency-selector/currency-selector-component.astro",
+      "default": "./src/domain/ui/components/currency-selector/currency-selector-component.astro"
+    },
+    "./ui./components/currency-selector/types": {
+      "types": "./src/domain/ui/components/currency-selector/currency-selector-component.types.generated.ts",
+      "default": "./src/domain/ui/components/currency-selector/currency-selector-component.types.generated.ts"
+    },
+    "./ui./components/currency-aware-price-display": {
+      "types": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro",
+      "default": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro"
+    },
+    "./ui./components/currency-aware-price-display.astro": {
+      "types": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro",
+      "default": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro"
+    },
+    "./ui./components/currency-aware-price-display/types": {
+      "types": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.types.generated.ts",
+      "default": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.types.generated.ts"
+    },
+    "./ui./components/donation-card": {
+      "types": "./src/domain/ui/components/donation-card/donation-card-component.astro",
+      "default": "./src/domain/ui/components/donation-card/donation-card-component.astro"
+    },
+    "./ui./components/donation-card.astro": {
+      "types": "./src/domain/ui/components/donation-card/donation-card-component.astro",
+      "default": "./src/domain/ui/components/donation-card/donation-card-component.astro"
+    },
+    "./ui./components/donation-card/types": {
+      "types": "./src/domain/ui/components/donation-card/donation-card-component.types.generated.ts",
+      "default": "./src/domain/ui/components/donation-card/donation-card-component.types.generated.ts"
+    },
+    "./ui./components/footer": {
+      "types": "./src/domain/ui/components/footer/footer-component.astro",
+      "default": "./src/domain/ui/components/footer/footer-component.astro"
+    },
+    "./ui./components/footer-promo": {
+      "types": "./src/domain/ui/components/footer-promo/footer-promo-component.astro",
+      "default": "./src/domain/ui/components/footer-promo/footer-promo-component.astro"
+    },
+    "./ui./components/footer-promo.astro": {
+      "types": "./src/domain/ui/components/footer-promo/footer-promo-component.astro",
+      "default": "./src/domain/ui/components/footer-promo/footer-promo-component.astro"
+    },
+    "./ui./components/footer-promo/types": {
+      "types": "./src/domain/ui/components/footer-promo/footer-promo-component.types.generated.ts",
+      "default": "./src/domain/ui/components/footer-promo/footer-promo-component.types.generated.ts"
+    },
+    "./ui./components/footer.astro": {
+      "types": "./src/domain/ui/components/footer/footer-component.astro",
+      "default": "./src/domain/ui/components/footer/footer-component.astro"
+    },
+    "./ui./components/footer/types": {
+      "types": "./src/domain/ui/components/footer/footer-component.types.generated.ts",
+      "default": "./src/domain/ui/components/footer/footer-component.types.generated.ts"
+    },
+    "./ui./components/glass-panel": {
+      "types": "./src/domain/ui/components/glass-panel/glass-panel.astro",
+      "default": "./src/domain/ui/components/glass-panel/glass-panel.astro"
+    },
+    "./ui./components/glass-panel.astro": {
+      "types": "./src/domain/ui/components/glass-panel/glass-panel.astro",
+      "default": "./src/domain/ui/components/glass-panel/glass-panel.astro"
+    },
+    "./ui./components/header": {
+      "types": "./src/domain/ui/components/header/header-component.astro",
+      "default": "./src/domain/ui/components/header/header-component.astro"
+    },
+    "./ui./components/header.astro": {
+      "types": "./src/domain/ui/components/header/header-component.astro",
+      "default": "./src/domain/ui/components/header/header-component.astro"
+    },
+    "./ui./components/header/types": {
+      "types": "./src/domain/ui/components/header/header-component.types.generated.ts",
+      "default": "./src/domain/ui/components/header/header-component.types.generated.ts"
+    },
+    "./ui./components/lang-switcher": {
+      "types": "./src/domain/ui/components/lang-switcher/lang-switcher-component.astro",
+      "default": "./src/domain/ui/components/lang-switcher/lang-switcher-component.astro"
+    },
+    "./ui./components/lang-switcher.astro": {
+      "types": "./src/domain/ui/components/lang-switcher/lang-switcher-component.astro",
+      "default": "./src/domain/ui/components/lang-switcher/lang-switcher-component.astro"
+    },
+    "./ui./components/lang-switcher/types": {
+      "types": "./src/domain/ui/components/lang-switcher/lang-switcher-component.types.generated.ts",
+      "default": "./src/domain/ui/components/lang-switcher/lang-switcher-component.types.generated.ts"
+    },
+    "./ui./components/layout": {
+      "types": "./src/domain/ui/components/layout/layout-component.astro",
+      "default": "./src/domain/ui/components/layout/layout-component.astro"
+    },
+    "./ui./components/layout.astro": {
+      "types": "./src/domain/ui/components/layout/layout-component.astro",
+      "default": "./src/domain/ui/components/layout/layout-component.astro"
+    },
+    "./ui./components/layout/types": {
+      "types": "./src/domain/ui/components/layout/layout.types.ts",
+      "default": "./src/domain/ui/components/layout/layout.types.ts"
+    },
+    "./ui./components/media": {
+      "types": "./src/domain/ui/components/media/media.astro",
+      "default": "./src/domain/ui/components/media/media.astro"
+    },
+    "./ui./components/media.astro": {
+      "types": "./src/domain/ui/components/media/media.astro",
+      "default": "./src/domain/ui/components/media/media.astro"
+    },
+    "./ui./components/material-credit": {
+      "types": "./src/domain/ui/components/material-credit/material-credit.astro",
+      "default": "./src/domain/ui/components/material-credit/material-credit.astro"
+    },
+    "./ui./components/material-credit.astro": {
+      "types": "./src/domain/ui/components/material-credit/material-credit.astro",
+      "default": "./src/domain/ui/components/material-credit/material-credit.astro"
+    },
+    "./ui./components/not-found": {
+      "types": "./src/domain/ui/components/not-found/not-found-component.astro",
+      "default": "./src/domain/ui/components/not-found/not-found-component.astro"
+    },
+    "./ui./components/not-found.astro": {
+      "types": "./src/domain/ui/components/not-found/not-found-component.astro",
+      "default": "./src/domain/ui/components/not-found/not-found-component.astro"
+    },
+    "./ui./components/not-found/not-found-component": {
+      "types": "./src/domain/ui/components/not-found/not-found-component.astro",
+      "default": "./src/domain/ui/components/not-found/not-found-component.astro"
+    },
+    "./ui./components/not-found/not-found-component.astro": {
+      "types": "./src/domain/ui/components/not-found/not-found-component.astro",
+      "default": "./src/domain/ui/components/not-found/not-found-component.astro"
+    },
+    "./ui./components/passport-header": {
+      "types": "./src/domain/ui/components/passport-header/passport-header-component.astro",
+      "default": "./src/domain/ui/components/passport-header/passport-header-component.astro"
+    },
+    "./ui./components/passport-header.astro": {
+      "types": "./src/domain/ui/components/passport-header/passport-header-component.astro",
+      "default": "./src/domain/ui/components/passport-header/passport-header-component.astro"
+    },
+    "./ui./components/passport-provenance": {
+      "types": "./src/domain/ui/components/passport-provenance/passport-provenance-component.astro",
+      "default": "./src/domain/ui/components/passport-provenance/passport-provenance-component.astro"
+    },
+    "./ui./components/passport-provenance.astro": {
+      "types": "./src/domain/ui/components/passport-provenance/passport-provenance-component.astro",
+      "default": "./src/domain/ui/components/passport-provenance/passport-provenance-component.astro"
+    },
+    "./ui./components/passport-score-grid": {
+      "types": "./src/domain/ui/components/passport-score-grid/passport-score-grid-component.astro",
+      "default": "./src/domain/ui/components/passport-score-grid/passport-score-grid-component.astro"
+    },
+    "./ui./components/passport-score-grid.astro": {
+      "types": "./src/domain/ui/components/passport-score-grid/passport-score-grid-component.astro",
+      "default": "./src/domain/ui/components/passport-score-grid/passport-score-grid-component.astro"
+    },
+    "./ui./components/passport-star-map": {
+      "types": "./src/domain/ui/components/passport-star-map/passport-star-map-component.astro",
+      "default": "./src/domain/ui/components/passport-star-map/passport-star-map-component.astro"
+    },
+    "./ui./components/passport-star-map.astro": {
+      "types": "./src/domain/ui/components/passport-star-map/passport-star-map-component.astro",
+      "default": "./src/domain/ui/components/passport-star-map/passport-star-map-component.astro"
+    },
+    "./ui./components/person-profile": {
+      "types": "./src/domain/ui/components/person-profile/person-profile-component.astro",
+      "default": "./src/domain/ui/components/person-profile/person-profile-component.astro"
+    },
+    "./ui./components/person-profile.astro": {
+      "types": "./src/domain/ui/components/person-profile/person-profile-component.astro",
+      "default": "./src/domain/ui/components/person-profile/person-profile-component.astro"
+    },
+    "./ui./components/scroll-to-top": {
+      "types": "./src/domain/ui/components/scroll-to-top/scroll-to-top-component.astro",
+      "default": "./src/domain/ui/components/scroll-to-top/scroll-to-top-component.astro"
+    },
+    "./ui./components/scroll-to-top.astro": {
+      "types": "./src/domain/ui/components/scroll-to-top/scroll-to-top-component.astro",
+      "default": "./src/domain/ui/components/scroll-to-top/scroll-to-top-component.astro"
+    },
+    "./ui./components/scroll-to-top/types": {
+      "types": "./src/domain/ui/components/scroll-to-top/scroll-to-top-component.types.generated.ts",
+      "default": "./src/domain/ui/components/scroll-to-top/scroll-to-top-component.types.generated.ts"
+    },
+    "./ui./components/section-body/cards": {
+      "types": "./src/domain/ui/components/section-body/cards/section-card-grid.astro",
+      "default": "./src/domain/ui/components/section-body/cards/section-card-grid.astro"
+    },
+    "./ui./components/section-cta": {
+      "types": "./src/domain/ui/components/section-cta/section-cta.astro",
+      "default": "./src/domain/ui/components/section-cta/section-cta.astro"
+    },
+    "./ui./components/section-cta.astro": {
+      "types": "./src/domain/ui/components/section-cta/section-cta.astro",
+      "default": "./src/domain/ui/components/section-cta/section-cta.astro"
+    },
+    "./ui./components/section-cta-group": {
+      "types": "./src/domain/ui/components/section-cta-group/section-cta-group.astro",
+      "default": "./src/domain/ui/components/section-cta-group/section-cta-group.astro"
+    },
+    "./ui./components/section-cta-group.astro": {
+      "types": "./src/domain/ui/components/section-cta-group/section-cta-group.astro",
+      "default": "./src/domain/ui/components/section-cta-group/section-cta-group.astro"
+    },
+    "./ui./components/responsive-image": {
+      "types": "./src/domain/ui/components/responsive-image/responsive-image.astro",
+      "default": "./src/domain/ui/components/responsive-image/responsive-image.astro"
+    },
+    "./ui./components/responsive-image.astro": {
+      "types": "./src/domain/ui/components/responsive-image/responsive-image.astro",
+      "default": "./src/domain/ui/components/responsive-image/responsive-image.astro"
+    },
+    "./ui./components/section-image": {
+      "types": "./src/domain/ui/components/section-image/section-image.astro",
+      "default": "./src/domain/ui/components/section-image/section-image.astro"
+    },
+    "./ui./components/section-image.astro": {
+      "types": "./src/domain/ui/components/section-image/section-image.astro",
+      "default": "./src/domain/ui/components/section-image/section-image.astro"
+    },
+    "./ui./components/section-body/cards.astro": {
+      "types": "./src/domain/ui/components/section-body/cards/section-card-grid.astro",
+      "default": "./src/domain/ui/components/section-body/cards/section-card-grid.astro"
+    },
+    "./ui./components/section-body/comparison": {
+      "types": "./src/domain/ui/components/section-body/comparison/section-comparison.astro",
+      "default": "./src/domain/ui/components/section-body/comparison/section-comparison.astro"
+    },
+    "./ui./components/section-body/comparison.astro": {
+      "types": "./src/domain/ui/components/section-body/comparison/section-comparison.astro",
+      "default": "./src/domain/ui/components/section-body/comparison/section-comparison.astro"
+    },
+    "./ui./components/section-body/list": {
+      "types": "./src/domain/ui/components/section-body/list/section-list.astro",
+      "default": "./src/domain/ui/components/section-body/list/section-list.astro"
+    },
+    "./ui./components/section-body/list.astro": {
+      "types": "./src/domain/ui/components/section-body/list/section-list.astro",
+      "default": "./src/domain/ui/components/section-body/list/section-list.astro"
+    },
+    "./ui./components/section-body/paragraphs": {
+      "types": "./src/domain/ui/components/section-body/paragraphs/section-paragraphs.astro",
+      "default": "./src/domain/ui/components/section-body/paragraphs/section-paragraphs.astro"
+    },
+    "./ui./components/section-body/paragraphs.astro": {
+      "types": "./src/domain/ui/components/section-body/paragraphs/section-paragraphs.astro",
+      "default": "./src/domain/ui/components/section-body/paragraphs/section-paragraphs.astro"
+    },
+    "./ui./components/section-body/rich": {
+      "types": "./src/domain/ui/components/section-body/rich/section-rich.astro",
+      "default": "./src/domain/ui/components/section-body/rich/section-rich.astro"
+    },
+    "./ui./components/section-body/rich.astro": {
+      "types": "./src/domain/ui/components/section-body/rich/section-rich.astro",
+      "default": "./src/domain/ui/components/section-body/rich/section-rich.astro"
+    },
+    "./ui./components/section-body/split-list": {
+      "types": "./src/domain/ui/components/section-body/split-list/section-split-list.astro",
+      "default": "./src/domain/ui/components/section-body/split-list/section-split-list.astro"
+    },
+    "./ui./components/section-body/split-list.astro": {
+      "types": "./src/domain/ui/components/section-body/split-list/section-split-list.astro",
+      "default": "./src/domain/ui/components/section-body/split-list/section-split-list.astro"
+    },
+    "./ui./components/section-body/stats": {
+      "types": "./src/domain/ui/components/section-body/stats/section-stats.astro",
+      "default": "./src/domain/ui/components/section-body/stats/section-stats.astro"
+    },
+    "./ui./components/section-body/stats.astro": {
+      "types": "./src/domain/ui/components/section-body/stats/section-stats.astro",
+      "default": "./src/domain/ui/components/section-body/stats/section-stats.astro"
+    },
+    "./ui./components/section-header": {
+      "types": "./src/domain/ui/components/section-header/section-header.astro",
+      "default": "./src/domain/ui/components/section-header/section-header.astro"
+    },
+    "./ui./components/section-header.astro": {
+      "types": "./src/domain/ui/components/section-header/section-header.astro",
+      "default": "./src/domain/ui/components/section-header/section-header.astro"
+    },
+    "./ui./components/section-shell": {
+      "types": "./src/domain/ui/components/section-shell/section-shell.astro",
+      "default": "./src/domain/ui/components/section-shell/section-shell.astro"
+    },
+    "./ui./components/section-shell.astro": {
+      "types": "./src/domain/ui/components/section-shell/section-shell.astro",
+      "default": "./src/domain/ui/components/section-shell/section-shell.astro"
+    },
+    "./ui./components/site-background": {
+      "types": "./src/domain/ui/components/site-background/site-background-component.astro",
+      "default": "./src/domain/ui/components/site-background/site-background-component.astro"
+    },
+    "./ui./components/site-background.astro": {
+      "types": "./src/domain/ui/components/site-background/site-background-component.astro",
+      "default": "./src/domain/ui/components/site-background/site-background-component.astro"
+    },
+    "./ui./components/seo/structured-data": {
+      "types": "./src/domain/ui/components/seo/structured-data/structured-data-component.astro",
+      "default": "./src/domain/ui/components/seo/structured-data/structured-data-component.astro"
+    },
+    "./ui./components/seo/structured-data.astro": {
+      "types": "./src/domain/ui/components/seo/structured-data/structured-data-component.astro",
+      "default": "./src/domain/ui/components/seo/structured-data/structured-data-component.astro"
+    },
+    "./ui./components/seo/social-meta": {
+      "types": "./src/domain/ui/components/seo/social-meta/social-meta-component.astro",
+      "default": "./src/domain/ui/components/seo/social-meta/social-meta-component.astro"
+    },
+    "./ui./components/seo/social-meta.astro": {
+      "types": "./src/domain/ui/components/seo/social-meta/social-meta-component.astro",
+      "default": "./src/domain/ui/components/seo/social-meta/social-meta-component.astro"
+    },
+    "./ui./icons": {
+      "types": "./src/domain/ui/icons/index.ts",
+      "default": "./src/domain/ui/icons/index.ts"
+    },
+    "./ui./icons/lord-icon-base": {
+      "types": "./src/domain/ui/icons/lord-icon-base.astro",
+      "default": "./src/domain/ui/icons/lord-icon-base.astro"
+    },
+    "./ui./icons/lord-icon-base.astro": {
+      "types": "./src/domain/ui/icons/lord-icon-base.astro",
+      "default": "./src/domain/ui/icons/lord-icon-base.astro"
+    },
+    "./ui./icons/lord-icon-types": {
+      "types": "./src/domain/ui/icons/lord-icon-types.ts",
+      "default": "./src/domain/ui/icons/lord-icon-types.ts"
+    },
+    "./ui./sections/approach": {
+      "types": "./src/domain/ui/sections/approach/approach-section.astro",
+      "default": "./src/domain/ui/sections/approach/approach-section.astro"
+    },
+    "./ui./sections/approach.astro": {
+      "types": "./src/domain/ui/sections/approach/approach-section.astro",
+      "default": "./src/domain/ui/sections/approach/approach-section.astro"
+    },
+    "./ui./sections/approach/types": {
+      "types": "./src/domain/ui/sections/approach/approach-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/approach/approach-section.types.generated.ts"
+    },
+    "./ui./sections/donation-card": {
+      "types": "./src/domain/ui/sections/donation-card/donation-card-section.astro",
+      "default": "./src/domain/ui/sections/donation-card/donation-card-section.astro"
+    },
+    "./ui./sections/donation-card.astro": {
+      "types": "./src/domain/ui/sections/donation-card/donation-card-section.astro",
+      "default": "./src/domain/ui/sections/donation-card/donation-card-section.astro"
+    },
+    "./ui./sections/donation-card/types": {
+      "types": "./src/domain/ui/sections/donation-card/donation-card-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/donation-card/donation-card-section.types.generated.ts"
+    },
+    "./ui./sections/donation-use": {
+      "types": "./src/domain/ui/sections/donation-use/donation-use-section.astro",
+      "default": "./src/domain/ui/sections/donation-use/donation-use-section.astro"
+    },
+    "./ui./sections/donation-use.astro": {
+      "types": "./src/domain/ui/sections/donation-use/donation-use-section.astro",
+      "default": "./src/domain/ui/sections/donation-use/donation-use-section.astro"
+    },
+    "./ui./sections/donation-use/types": {
+      "types": "./src/domain/ui/sections/donation-use/donation-use-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/donation-use/donation-use-section.types.generated.ts"
+    },
+    "./ui./sections/final-cta": {
+      "types": "./src/domain/ui/sections/final-cta/final-cta-section.astro",
+      "default": "./src/domain/ui/sections/final-cta/final-cta-section.astro"
+    },
+    "./ui./sections/final-cta.astro": {
+      "types": "./src/domain/ui/sections/final-cta/final-cta-section.astro",
+      "default": "./src/domain/ui/sections/final-cta/final-cta-section.astro"
+    },
+    "./ui./sections/final-cta/types": {
+      "types": "./src/domain/ui/sections/final-cta/final-cta-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/final-cta/final-cta-section.types.generated.ts"
+    },
+    "./ui./sections/send-message": {
+      "types": "./src/domain/ui/sections/send-message/send-message-section.astro",
+      "default": "./src/domain/ui/sections/send-message/send-message-section.astro"
+    },
+    "./ui./sections/send-message.astro": {
+      "types": "./src/domain/ui/sections/send-message/send-message-section.astro",
+      "default": "./src/domain/ui/sections/send-message/send-message-section.astro"
+    },
+    "./ui./sections/send-message/types": {
+      "types": "./src/domain/ui/sections/send-message/send-message-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/send-message/send-message-section.types.generated.ts"
+    },
+    "./ui./sections/send-message/api": {
+      "types": "./src/domain/ui/sections/send-message/send-message-section.api.ts",
+      "default": "./src/domain/ui/sections/send-message/send-message-section.api.ts"
+    },
+    "./ui./sections/chat-widget": {
+      "types": "./src/domain/ui/sections/chat-widget/chat-widget-section.astro",
+      "default": "./src/domain/ui/sections/chat-widget/chat-widget-section.astro"
+    },
+    "./ui./sections/chat-widget.astro": {
+      "types": "./src/domain/ui/sections/chat-widget/chat-widget-section.astro",
+      "default": "./src/domain/ui/sections/chat-widget/chat-widget-section.astro"
+    },
+    "./ui./sections/chat-widget/types": {
+      "types": "./src/domain/ui/sections/chat-widget/chat-widget-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/chat-widget/chat-widget-section.types.generated.ts"
+    },
+    "./ui./integration-routes/inbound": {
+      "types": "./src/domain/ui/integration-routes/integration-inbound.api.ts",
+      "default": "./src/domain/ui/integration-routes/integration-inbound.api.ts"
+    },
+    "./ui./integration-routes/delivery": {
+      "types": "./src/domain/ui/integration-routes/integration-delivery.api.ts",
+      "default": "./src/domain/ui/integration-routes/integration-delivery.api.ts"
+    },
+    "./ui./integration-routes/stripe-webhook": {
+      "types": "./src/domain/ui/integration-routes/stripe-webhook.api.ts",
+      "default": "./src/domain/ui/integration-routes/stripe-webhook.api.ts"
+    },
+    "./ui./sections/hero": {
+      "types": "./src/domain/ui/sections/hero/hero-section.astro",
+      "default": "./src/domain/ui/sections/hero/hero-section.astro"
+    },
+    "./ui./sections/hero.astro": {
+      "types": "./src/domain/ui/sections/hero/hero-section.astro",
+      "default": "./src/domain/ui/sections/hero/hero-section.astro"
+    },
+    "./ui./sections/hero/types": {
+      "types": "./src/domain/ui/sections/hero/hero-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/hero/hero-section.types.generated.ts"
+    },
+    "./ui./sections/impact": {
+      "types": "./src/domain/ui/sections/impact/impact-section.astro",
+      "default": "./src/domain/ui/sections/impact/impact-section.astro"
+    },
+    "./ui./sections/impact.astro": {
+      "types": "./src/domain/ui/sections/impact/impact-section.astro",
+      "default": "./src/domain/ui/sections/impact/impact-section.astro"
+    },
+    "./ui./sections/impact/types": {
+      "types": "./src/domain/ui/sections/impact/impact-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/impact/impact-section.types.generated.ts"
+    },
+    "./ui./sections/markdown": {
+      "types": "./src/domain/ui/sections/markdown/markdown-section.astro",
+      "default": "./src/domain/ui/sections/markdown/markdown-section.astro"
+    },
+    "./ui./sections/markdown.astro": {
+      "types": "./src/domain/ui/sections/markdown/markdown-section.astro",
+      "default": "./src/domain/ui/sections/markdown/markdown-section.astro"
+    },
+    "./ui./sections/navigation": {
+      "types": "./src/domain/ui/sections/navigation/navigation-section.astro",
+      "default": "./src/domain/ui/sections/navigation/navigation-section.astro"
+    },
+    "./ui./sections/navigation.astro": {
+      "types": "./src/domain/ui/sections/navigation/navigation-section.astro",
+      "default": "./src/domain/ui/sections/navigation/navigation-section.astro"
+    },
+    "./ui./sections/problem": {
+      "types": "./src/domain/ui/sections/problem/problem-section.astro",
+      "default": "./src/domain/ui/sections/problem/problem-section.astro"
+    },
+    "./ui./sections/problem.astro": {
+      "types": "./src/domain/ui/sections/problem/problem-section.astro",
+      "default": "./src/domain/ui/sections/problem/problem-section.astro"
+    },
+    "./ui./sections/problem/types": {
+      "types": "./src/domain/ui/sections/problem/problem-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/problem/problem-section.types.generated.ts"
+    },
+    "./ui./sections/social-proof": {
+      "types": "./src/domain/ui/sections/social-proof/social-proof-section.astro",
+      "default": "./src/domain/ui/sections/social-proof/social-proof-section.astro"
+    },
+    "./ui./sections/social-proof.astro": {
+      "types": "./src/domain/ui/sections/social-proof/social-proof-section.astro",
+      "default": "./src/domain/ui/sections/social-proof/social-proof-section.astro"
+    },
+    "./ui./sections/social-proof/types": {
+      "types": "./src/domain/ui/sections/social-proof/social-proof-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/social-proof/social-proof-section.types.generated.ts"
+    },
+    "./ui./sections/team": {
+      "types": "./src/domain/ui/sections/team/team-section.astro",
+      "default": "./src/domain/ui/sections/team/team-section.astro"
+    },
+    "./ui./sections/team.astro": {
+      "types": "./src/domain/ui/sections/team/team-section.astro",
+      "default": "./src/domain/ui/sections/team/team-section.astro"
+    },
+    "./ui./sections/team/types": {
+      "types": "./src/domain/ui/sections/team/team-section.types.ts",
+      "default": "./src/domain/ui/sections/team/team-section.types.ts"
+    },
+    "./ui./sections/transparency": {
+      "types": "./src/domain/ui/sections/transparency/transparency-section.astro",
+      "default": "./src/domain/ui/sections/transparency/transparency-section.astro"
+    },
+    "./ui./sections/transparency.astro": {
+      "types": "./src/domain/ui/sections/transparency/transparency-section.astro",
+      "default": "./src/domain/ui/sections/transparency/transparency-section.astro"
+    },
+    "./ui./sections/transparency/types": {
+      "types": "./src/domain/ui/sections/transparency/transparency-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/transparency/transparency-section.types.generated.ts"
+    },
+    "./ui./sections/video-section": {
+      "types": "./src/domain/ui/sections/video-section/video-section.astro",
+      "default": "./src/domain/ui/sections/video-section/video-section.astro"
+    },
+    "./ui./sections/video-section.astro": {
+      "types": "./src/domain/ui/sections/video-section/video-section.astro",
+      "default": "./src/domain/ui/sections/video-section/video-section.astro"
+    },
+    "./ui./sections/women": {
+      "types": "./src/domain/ui/sections/women/women-section.astro",
+      "default": "./src/domain/ui/sections/women/women-section.astro"
+    },
+    "./ui./sections/women.astro": {
+      "types": "./src/domain/ui/sections/women/women-section.astro",
+      "default": "./src/domain/ui/sections/women/women-section.astro"
+    },
+    "./ui./sections/women/types": {
+      "types": "./src/domain/ui/sections/women/women-section.types.generated.ts",
+      "default": "./src/domain/ui/sections/women/women-section.types.generated.ts"
+    },
+    "./ui./components/*": {
+      "astro": "./src/domain/ui/components/*",
+      "import": "./src/domain/ui/components/*",
+      "default": "./src/domain/ui/components/*"
+    },
+    "./ui./sections/*": {
+      "astro": "./src/domain/ui/sections/*",
+      "import": "./src/domain/ui/sections/*",
+      "default": "./src/domain/ui/sections/*"
+    },
+    "./ui./styles/*": {
+      "import": "./src/domain/ui/styles/*",
+      "default": "./src/domain/ui/styles/*"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
