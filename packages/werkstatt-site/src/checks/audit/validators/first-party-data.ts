@@ -45,14 +45,14 @@ export async function runFirstPartyDataValidate(
   const strategy = (await pathExists(strategyPath))
     ? (parseYaml(await readFile(strategyPath, "utf8")) as Record<string, unknown>)
     : {};
+  const fields = Array.isArray(strategy.fields)
+    ? (strategy.fields as Record<string, unknown>[])
+    : [];
   const allowedFields = new Set<string>(
-    (strategy.fields ?? []).map((field: unknown) => String(field.name ?? field.id ?? field)),
+    fields.map((field) => String(field.name ?? field.id ?? field)),
   );
-  // Consent text is only required when the strategy declares it. Surfaces that
-  // collect a single free-text message and no structured PII can opt out via
-  // `consent.required: false`. Absent that flag we default to requiring consent
-  // so structured-PII forms stay covered (back-compatible with older strategies).
-  const consentRequired = strategy.consent?.required !== false;
+  const consent = (strategy.consent ?? {}) as Record<string, unknown>;
+  const consentRequired = consent.required !== false;
   const htmlFiles = await collectRenderedHtml(audit.distDirectory);
   for (const html of htmlFiles) {
     // Skip noindex pages — they are not public-facing and tool pages (e.g.

@@ -56,10 +56,10 @@ export async function runPrintContractValidate(
   const contentDir = join(appDir, "src", "content");
   const violations: PrintViolation[] = [];
 
-  let manifest: unknown;
+  let manifest: Record<string, unknown>;
   try {
     const result = await loadSystemManifest(contentDir);
-    manifest = result.manifest;
+    manifest = result.manifest as unknown as Record<string, unknown>;
   } catch {
     return {
       exitCode: 1,
@@ -67,9 +67,10 @@ export async function runPrintContractValidate(
     };
   }
 
-  const printPdfEnabled = manifest?.output?.printPdf === true;
-  const languages: string[] = manifest.i18n?.supported
-    ? Object.keys(manifest.i18n.supported)
+  const printPdfEnabled =
+    (manifest.output as Record<string, unknown> | undefined)?.printPdf === true;
+  const languages: string[] = (manifest.i18n as Record<string, unknown> | undefined)?.supported
+    ? Object.keys((manifest.i18n as Record<string, unknown>).supported as Record<string, unknown>)
     : [defaultLanguageFromManifest(manifest)];
 
   // Check site labels for print blocks
@@ -92,11 +93,11 @@ export async function runPrintContractValidate(
   }
 
   // Validate per-page print frontmatter
-  for (const page of manifest.pages ?? []) {
-    const pageId = page.pageId;
-    const semanticType = page.semanticType;
+  for (const page of (manifest.pages as Array<Record<string, unknown>>) ?? []) {
+    const pageId = page.pageId as string;
+    const semanticType = page.semanticType as string | undefined;
     const fileSlug = pageIdToContentFileSlug(pageId);
-    const locales = page.locales ?? languages;
+    const locales = (page.locales as string[] | undefined) ?? languages;
 
     for (const lang of locales) {
       const pageFile = join(contentDir, "pages", lang, `${fileSlug}.md`);
@@ -109,7 +110,7 @@ export async function runPrintContractValidate(
 
       if (!printCfg) continue;
 
-      const route = page.routes?.[lang] ?? fileSlug;
+      const route = (page.routes as Record<string, string> | undefined)?.[lang] ?? fileSlug;
 
       // PRINT-CONTRACT-01: legal/authority pages cannot opt out
       if (
@@ -129,7 +130,19 @@ export async function runPrintContractValidate(
       const hide = printCfg.hide;
       if (Array.isArray(hide)) {
         for (const region of hide) {
-          if (typeof region === "string" && !PRINT_REGIONS.includes(region as unknown)) {
+          if (
+            typeof region === "string" &&
+            !PRINT_REGIONS.includes(
+              region as
+                | "navigation"
+                | "cta"
+                | "breadcrumbs"
+                | "site-background"
+                | "footer-links"
+                | "header-logo"
+                | "hero-animation",
+            )
+          ) {
             violations.push({
               rule: "PRINT-CONTRACT-02",
               severity: "error",
@@ -145,7 +158,7 @@ export async function runPrintContractValidate(
       if (
         printCfg.orientation !== undefined &&
         typeof printCfg.orientation === "string" &&
-        !PRINT_ORIENTATIONS.includes(printCfg.orientation as unknown)
+        !PRINT_ORIENTATIONS.includes(printCfg.orientation as "portrait" | "landscape" | "auto")
       ) {
         violations.push({
           rule: "PRINT-CONTRACT-03",
@@ -160,7 +173,7 @@ export async function runPrintContractValidate(
       if (
         printCfg.pageSize !== undefined &&
         typeof printCfg.pageSize === "string" &&
-        !PRINT_PAGE_SIZES.includes(printCfg.pageSize as unknown)
+        !PRINT_PAGE_SIZES.includes(printCfg.pageSize as "legal" | "a4" | "letter")
       ) {
         violations.push({
           rule: "PRINT-CONTRACT-04",
@@ -175,7 +188,7 @@ export async function runPrintContractValidate(
       if (
         printCfg.background !== undefined &&
         typeof printCfg.background === "string" &&
-        !PRINT_BACKGROUND_MODES.includes(printCfg.background as unknown)
+        !PRINT_BACKGROUND_MODES.includes(printCfg.background as "preserve" | "flatten")
       ) {
         violations.push({
           rule: "PRINT-CONTRACT-05",
@@ -255,7 +268,16 @@ export async function runPrintLayoutValidate(
 
   // PRINT-LAYOUT-01: check for position:fixed/sticky without @media print override
   // in shared UI CSS files
-  const uiComponentsDir = join(monorepoRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components");
+  const uiComponentsDir = join(
+    monorepoRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ui",
+    "src",
+    "components",
+  );
   if (existsSync(uiComponentsDir)) {
     scanCssForPrintBlocking(uiComponentsDir, violations);
   }

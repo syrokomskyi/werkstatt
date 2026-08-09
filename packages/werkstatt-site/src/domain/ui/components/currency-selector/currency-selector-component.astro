@@ -83,6 +83,6 @@ const currencyCodes = currencies.map((c) => c.code);
     const codes = Array.from(
       container.querySelectorAll<HTMLButtonElement>("[data-currency-option]"),
     ).map((btn) => btn.getAttribute("data-currency-option") ?? "");
-    initCurrencySelector(container, codes, lang);
+    initCurrencySelector(container, codes, document.documentElement.lang);
   }
 </script>

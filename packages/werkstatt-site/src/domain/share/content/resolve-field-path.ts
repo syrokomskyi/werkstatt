@@ -33,7 +33,7 @@ export function resolveFieldPath(data: unknown, fieldPath: string[]): FieldResol
       const nextField = i + 1 < fieldPath.length ? fieldPath[i + 1] : null;
       return { value: undefined, missingField: nextField };
     }
-    value = value[field];
+    value = (value as Record<string, unknown>)[field];
   }
   return { value, missingField: null };
 }

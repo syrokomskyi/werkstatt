@@ -48,13 +48,14 @@ export async function runPrintPdfGenerate(
   const appDir = app.directory;
   const contentDir = join(appDir, "src", "content");
   const distDir = join(appDir, "dist", "client");
-  const force = input?.force === true || input?.f === true;
+  const inputRecord = input as Record<string, unknown> | undefined;
+  const force = inputRecord?.force === true || inputRecord?.f === true;
 
   // 1. Read system.md and check output.printPdf
-  let manifest: unknown;
+  let manifest: Record<string, unknown>;
   try {
     const result = await loadSystemManifest(contentDir);
-    manifest = result.manifest;
+    manifest = result.manifest as unknown as Record<string, unknown>;
   } catch {
     return {
       exitCode: 1,
@@ -62,7 +63,7 @@ export async function runPrintPdfGenerate(
     };
   }
 
-  if (manifest?.output?.printPdf !== true) {
+  if ((manifest.output as Record<string, unknown> | undefined)?.printPdf !== true) {
     return {
       exitCode: 0,
       summary: "PDF generation disabled for this app.",
@@ -85,8 +86,8 @@ export async function runPrintPdfGenerate(
   }
 
   // 3. Discover routable pages
-  const languages: string[] = manifest.i18n?.supported
-    ? Object.keys(manifest.i18n.supported)
+  const languages: string[] = (manifest.i18n as Record<string, unknown> | undefined)?.supported
+    ? Object.keys((manifest.i18n as Record<string, unknown>).supported as Record<string, unknown>)
     : [defaultLanguageFromManifest(manifest)];
 
   interface PageTarget {
@@ -98,10 +99,10 @@ export async function runPrintPdfGenerate(
   }
 
   const targets: PageTarget[] = [];
-  for (const page of manifest.pages ?? []) {
-    const pageId = page.pageId;
+  for (const page of (manifest.pages as Array<Record<string, unknown>>) ?? []) {
+    const pageId = page.pageId as string;
     const fileSlug = pageIdToContentFileSlug(pageId);
-    const locales = page.locales ?? languages;
+    const locales = (page.locales as string[] | undefined) ?? languages;
 
     for (const lang of locales) {
       const pageFile = join(contentDir, "pages", lang, `${fileSlug}.md`);
@@ -115,7 +116,7 @@ export async function runPrintPdfGenerate(
       // Skip pages with print.enabled: false
       if (printCfg?.enabled === false) continue;
 
-      const routeSlug = page.routes?.[lang] ?? fileSlug;
+      const routeSlug = (page.routes as Record<string, string> | undefined)?.[lang] ?? fileSlug;
       // Build the route path — default language is unprefixed
       const isDefaultLang = lang === defaultLanguageFromManifest(manifest);
       const routePath = isDefaultLang ? `/${routeSlug}` : `/${lang}/${routeSlug}`;
@@ -243,7 +244,8 @@ export async function runPrintPdfGenerate(
   // 6. Launch Playwright and generate PDFs
   let generated = 0;
   const errors: Array<{ route: string; error: string }> = [];
-  let browser: unknown = null;
+  let browser: Awaited<ReturnType<(typeof import("playwright"))["chromium"]["launch"]>> | null =
+    null;
 
   try {
     const playwright = await import("playwright");
@@ -294,13 +296,13 @@ export async function runPrintPdfGenerate(
         generated++;
         await page.close();
       } catch (err: unknown) {
-        errors.push({ route: target.route, error: err.message ?? String(err) });
+        errors.push({ route: target.route, error: (err as Error).message ?? String(err) });
       }
     }
   } catch (err: unknown) {
     return {
       exitCode: 1,
-      summary: `Playwright error: ${err.message ?? String(err)}. Ensure Playwright Chromium is installed (pnpm exec playwright install chromium).`,
+      summary: `Playwright error: ${(err as Error).message ?? String(err)}. Ensure Playwright Chromium is installed (pnpm exec playwright install chromium).`,
       data: {
         generated,
         skipped: 0,
@@ -393,7 +395,7 @@ export async function runPrintPdfCopy(
   } catch (err: unknown) {
     return {
       exitCode: 1,
-      summary: `Failed to read PDF manifest: ${err.message ?? String(err)}`,
+      summary: `Failed to read PDF manifest: ${(err as Error).message ?? String(err)}`,
       data: {
         command: "print.pdf.copy",
         status: "fail",
@@ -476,10 +478,10 @@ export async function runPrintPdfValidate(
   const printDir = join(distDir, "_print");
 
   // Check if printPdf is enabled
-  let manifest: unknown;
+  let manifest: Record<string, unknown>;
   try {
     const result = await loadSystemManifest(contentDir);
-    manifest = result.manifest;
+    manifest = result.manifest as unknown as Record<string, unknown>;
   } catch {
     return {
       exitCode: 1,
@@ -487,7 +489,7 @@ export async function runPrintPdfValidate(
     };
   }
 
-  if (manifest?.output?.printPdf !== true) {
+  if ((manifest.output as Record<string, unknown> | undefined)?.printPdf !== true) {
     return {
       exitCode: 0,
       summary: "PDF generation disabled for this app. Nothing to validate.",
@@ -502,8 +504,8 @@ export async function runPrintPdfValidate(
   }
 
   // Discover expected PDFs from the route registry
-  const languages: string[] = manifest.i18n?.supported
-    ? Object.keys(manifest.i18n.supported)
+  const languages: string[] = (manifest.i18n as Record<string, unknown> | undefined)?.supported
+    ? Object.keys((manifest.i18n as Record<string, unknown>).supported as Record<string, unknown>)
     : [defaultLanguageFromManifest(manifest)];
 
   interface ExpectedPdf {
@@ -513,10 +515,10 @@ export async function runPrintPdfValidate(
   }
 
   const expected: ExpectedPdf[] = [];
-  for (const page of manifest.pages ?? []) {
-    const pageId = page.pageId;
+  for (const page of (manifest.pages as Array<Record<string, unknown>>) ?? []) {
+    const pageId = page.pageId as string;
     const fileSlug = pageIdToContentFileSlug(pageId);
-    const locales = page.locales ?? languages;
+    const locales = (page.locales as string[] | undefined) ?? languages;
 
     for (const lang of locales) {
       const pageFile = join(contentDir, "pages", lang, `${fileSlug}.md`);
@@ -529,7 +531,7 @@ export async function runPrintPdfValidate(
 
       if (printCfg?.enabled === false) continue;
 
-      const routeSlug = page.routes?.[lang] ?? fileSlug;
+      const routeSlug = (page.routes as Record<string, string> | undefined)?.[lang] ?? fileSlug;
       const pdfPath = join(printDir, lang, `${routeSlug || "index"}.pdf`);
       expected.push({ route: `/${lang}/${routeSlug}`, lang, pdfPath });
     }

@@ -653,13 +653,13 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
 
   // Read system.md for shell/growth/config/biome/ctaTarget
   const systemEntries = await getCollection("system");
-  const systemEntry = systemEntries.find((e: unknown) => e.id === "system");
-  const systemData = systemEntry?.data as Record<string, unknown> | undefined;
+  const systemEntry = systemEntries.find((e: unknown) => (e as { id?: string }).id === "system");
+  const systemData = systemEntry?.data as any;
 
-  const pages = Array.isArray(systemData?.pages) ? systemData.pages : [];
-  const pageSystemConfig = pages.find((p: unknown) => p.pageId === pageId);
-  const requiredPageIds = Array.isArray(systemData?.sharedContext?.requiredPageIds)
-    ? (systemData.sharedContext.requiredPageIds as string[])
+  const pages = Array.isArray(systemData.pages) ? systemData.pages : [];
+  const pageSystemConfig = pages.find((p: unknown) => (p as { pageId?: string }).pageId === pageId);
+  const requiredPageIds = Array.isArray(systemData.sharedContext?.requiredPageIds)
+    ? systemData.sharedContext.requiredPageIds
     : [];
 
   // RFC-0193: Programmatic Surface pages (surfaceEntry) need a default site background
@@ -976,10 +976,8 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
     if (personSlug) {
       semanticPage.ogType = "profile";
     }
-    const i18nSupported = (systemData?.i18n?.supported ?? {}) as Record<
-      string,
-      { hreflang?: string }
-    >;
+    const i18nSupported = ((systemData?.i18n as Record<string, unknown> | undefined)?.supported ??
+      {}) as Record<string, { hreflang?: string }>;
     const toOgLocale = (code: string): string =>
       (i18nSupported[code]?.hreflang ?? code).replace("-", "_");
     semanticPage.ogLocale = toOgLocale(lang);

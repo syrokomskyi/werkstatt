@@ -64,14 +64,15 @@ export async function hasLocalizedPage(pageId: PageId, lang: LanguageCode): Prom
  * const sectionId = await resolveSectionAnchor(Astro.props, "approach");
  */
 export async function resolveSectionAnchor(
-  props: unknown,
+  props: Record<string, unknown>,
   defaultAnchorId?: string,
 ): Promise<string> {
-  const anchorId = props.pageOverride?.anchorId ?? defaultAnchorId;
+  const pageOverride = (props.pageOverride ?? {}) as Record<string, unknown>;
+  const anchorId = pageOverride.anchorId ?? defaultAnchorId;
   if (!anchorId) return "";
   if (props.pageId) {
-    return resolveAnchorFragment(anchorId, props.pageId, props.lang);
+    return resolveAnchorFragment(anchorId as string, props.pageId as string, props.lang as string);
   }
   // No pageId available — use raw anchorId (language-neutral fallback)
-  return anchorId;
+  return anchorId as string;
 }

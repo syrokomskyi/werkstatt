@@ -66,7 +66,8 @@ export async function loadMatomoFleetRegistry(
 }
 
 export function isProductionMatomo(growth: Record<string, unknown>): boolean {
-  return growth.vendor?.adapter === "matomo";
+  const vendor = (growth.vendor ?? {}) as Record<string, unknown>;
+  return vendor.adapter === "matomo";
 }
 
 export function escapeXml(value: string): string {

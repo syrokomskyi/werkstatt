@@ -29,6 +29,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { collectMarkdownFiles } from "@warpgogol/werkstatt-site/content";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
+import type { AstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 interface ContentSurfaceViolation {
@@ -97,7 +98,7 @@ async function collectAllFiles(dir: string, extensions: string[] = []): Promise<
 }
 
 async function checkLegacySchemaSurface(
-  paths: unknown,
+  paths: AstroSitePaths,
   violations: ContentSurfaceViolation[],
 ): Promise<void> {
   const componentSchemasDir = join(paths.contentDirectory, "schemas", "components");
@@ -134,7 +135,7 @@ function isPublicException(relPath: string): boolean {
 }
 
 async function checkSystemManifest(
-  paths: unknown,
+  paths: AstroSitePaths,
   violations: ContentSurfaceViolation[],
   _warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -176,7 +177,7 @@ async function checkSystemManifest(
 }
 
 async function checkContentFolders(
-  paths: unknown,
+  paths: AstroSitePaths,
   violations: ContentSurfaceViolation[],
   warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -228,7 +229,7 @@ async function checkContentFolders(
 }
 
 async function checkAssetsStructure(
-  paths: unknown,
+  paths: AstroSitePaths,
   violations: ContentSurfaceViolation[],
   warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -260,7 +261,7 @@ async function checkAssetsStructure(
 }
 
 async function checkPublicFolder(
-  paths: unknown,
+  paths: AstroSitePaths,
   violations: ContentSurfaceViolation[],
   warnings: ContentSurfaceViolation[],
 ): Promise<void> {
@@ -288,7 +289,7 @@ async function checkPublicFolder(
 }
 
 async function checkPageBlocks(
-  paths: unknown,
+  paths: AstroSitePaths,
   violations: ContentSurfaceViolation[],
   _warnings: ContentSurfaceViolation[],
 ): Promise<void> {

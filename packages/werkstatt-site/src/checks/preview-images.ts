@@ -21,7 +21,10 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
-import { resolveNormalizeConfig, normalizeText } from "@warpgogol/werkstatt-site/share/text-normalize";
+import {
+  resolveNormalizeConfig,
+  normalizeText,
+} from "@warpgogol/werkstatt-site/share/text-normalize";
 import type { NormalizeConfig } from "@warpgogol/werkstatt-site/share/text-normalize";
 import { generateBrandCardPng } from "./preview-templates.ts";
 import YAML from "yaml";
@@ -170,7 +173,16 @@ async function readBiomePalette(
   workspaceRoot: string,
   biomeId: string,
 ): Promise<{ surface?: string; ink?: string; brand?: string }> {
-  const biomePath = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "biomes", `${biomeId}.yaml`);
+  const biomePath = join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "biomes",
+    `${biomeId}.yaml`,
+  );
   try {
     const raw = await readFile(biomePath, "utf-8");
     const data = YAML.parse(raw) || {};
@@ -209,10 +221,12 @@ export async function runPreviewImagesGenerate(
   // RFC-0235: --force-normalize re-renders an EXISTING template card when its source
   // text carries a signal (so pre-feature committed cards get normalized pixels).
   // Owner-custom images whose source text is already clean are never touched.
-  const forceNormalize = Boolean(input?.flags?.["force-normalize"] ?? input?.flags?.forceNormalize);
+  const inputFlags = (input as Record<string, unknown> | undefined)?.flags as
+    Record<string, unknown> | undefined;
+  const forceNormalize = Boolean(inputFlags?.["force-normalize"] ?? inputFlags?.forceNormalize);
 
   const appDir = app.directory;
-  const items: unknown[] = [];
+  const items: Record<string, unknown>[] = [];
   let generatedCount = 0;
   let skippedCount = 0;
   let optOutCount = 0;
@@ -225,7 +239,7 @@ export async function runPreviewImagesGenerate(
   } catch (err: unknown) {
     return {
       exitCode: 1,
-      summary: `Failed to load system manifest: ${err.message}`,
+      summary: `Failed to load system manifest: ${(err as Error).message}`,
     };
   }
 
@@ -287,7 +301,7 @@ export async function runPreviewImagesGenerate(
         outputPath: ultimateFallbackRelative,
         status: "failed",
         template: "ultimate-fallback",
-        message: err.message,
+        message: (err as Error).message,
       });
     }
   } else {
@@ -458,7 +472,7 @@ export async function runPreviewImagesGenerate(
           outputPath: pagePreviewRelative,
           status: "failed",
           template: "brand-card",
-          message: err.message,
+          message: (err as Error).message,
           fileSlug,
         });
       }

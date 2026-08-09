@@ -38,7 +38,7 @@ import { PageEntrySchema } from "@warpgogol/werkstatt-site/ontology";
 import { getSectionPropsSchema } from "@warpgogol/werkstatt-site/ontology/schemas/manifest-resolver";
 import { systemManifestSchema } from "@warpgogol/werkstatt-site/ontology";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { normalizeBlockType } from "@warpgogol/werkstatt-site/share/page";
+import { normalizeBlockType, type BlockEntry } from "@warpgogol/werkstatt-site/share/page";
 import { resolveSharedContextProps } from "@warpgogol/werkstatt-site/share/shared-context";
 import { readScopeFiles, outOfScope } from "./scope.ts";
 
@@ -170,7 +170,10 @@ export async function runPageBlockValidate(
 
     const pagesDir = join(paths.appDirectory, "src", "content", "pages");
     const contentDir = join(paths.appDirectory, "src", "content");
-    const packagesUiSrc = resolve(paths.appDirectory, "../../packages/werkstatt-site/src/domain/ui/src");
+    const packagesUiSrc = resolve(
+      paths.appDirectory,
+      "../../packages/werkstatt-site/src/domain/ui/src",
+    );
 
     // Load system manifest for planet-pin cross-reference
     let systemManifest: ReturnType<typeof systemManifestSchema.parse> | null = null;
@@ -298,7 +301,7 @@ export async function runPageBlockValidate(
           pages: pageEntries,
           requiredPageIds,
         });
-        const blockCosmicName = normalizeBlockType(block);
+        const blockCosmicName = normalizeBlockType(block as BlockEntry);
         const blockPath = `${rel}: blocks[${i}] (type=${block.type ?? block.use})`;
 
         // B-02: use is pinned in system.yaml
