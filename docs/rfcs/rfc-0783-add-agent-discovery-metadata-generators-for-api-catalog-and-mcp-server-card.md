@@ -279,16 +279,16 @@ Both validators exit non-zero on any error. `--json` output follows the standard
 
 ## Acceptance criteria
 
-- [ ] `buildApiCatalog` pure function defined in `packages/werkstatt-site/src/domain/share/agent/api-catalog.ts`
-- [ ] `buildMcpServerCard` pure function defined in `packages/werkstatt-site/src/domain/share/agent/mcp-card.ts`
-- [ ] `agent.api-catalog.generate` and `agent.api-catalog.validate` registered in command table `29-agent-surface.ts`
-- [ ] `agent.mcp-card.generate` and `agent.mcp-card.validate` registered in command table `29-agent-surface.ts`
-- [ ] Both generate commands integrated into `build.prepare` pipeline after `agent.openapi.generate`
-- [ ] Both validate commands integrated into `build.prepare` pipeline alongside `agent.openapi.validate`
-- [ ] `agent.enabled: false` skip pattern works (stale artifacts removed)
-- [ ] `/.well-known/api-catalog` served with `Content-Type: application/linkset+json` (via `_headers`)
-- [ ] `/.well-known/mcp/server-card.json` served with `Content-Type: application/json`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `buildApiCatalog` pure function defined in `packages/werkstatt-site/src/domain/share/agent/api-catalog.ts` (evidence: packages/werkstatt-site/src/domain/share/agent/api-catalog.ts:67, api-catalog.test.ts)
+- [x] `buildMcpServerCard` pure function defined in `packages/werkstatt-site/src/domain/share/agent/mcp-card.ts` (evidence: packages/werkstatt-site/src/domain/share/agent/mcp-card.ts:52, mcp-card.test.ts)
+- [x] `agent.api-catalog.generate` and `agent.api-catalog.validate` registered in command table `29-agent-surface.ts` (evidence: packages/werkstatt-site/src/checks/command-tables/29-agent-surface.ts:113-136)
+- [x] `agent.mcp-card.generate` and `agent.mcp-card.validate` registered in command table `29-agent-surface.ts` (evidence: packages/werkstatt-site/src/checks/command-tables/29-agent-surface.ts:137-163)
+- [x] Both generate commands integrated into `build.prepare` pipeline after `agent.openapi.generate` (evidence: packages/werkstatt-site/src/checks/pipelines/build-prepare.ts:74-77)
+- [x] Both validate commands integrated into `sites-check-author` pipeline alongside `agent.openapi.validate` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-author.ts:201-204)
+- [x] `agent.enabled: false` skip pattern works (stale artifacts removed) (evidence: agent-api-catalog.test.ts:generate-skip, agent-mcp-card.test.ts:generate-skip-disabled)
+- [x] `/.well-known/api-catalog` served with `Content-Type: application/linkset+json` (via `_headers`) (evidence: packages/werkstatt-site/src/codegen/templates/app-boilerplate/public/_headers.template:24-28)
+- [x] `/.well-known/mcp/server-card.json` served with `Content-Type: application/json` (evidence: covered by /.well-known/* wildcard + Cloudflare Pages default .json content type)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0783 → 0 violations)
 
 **Post-deploy success signals** (tracked in `successSignals`, not implementation acceptance criteria):
 
