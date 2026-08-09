@@ -11,23 +11,28 @@ dispatches wg-currency-change events, and syncs across multiple instances.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0743: Initial creation of currency selector client script.</item>
+  <item>RFC-0782: Locale-scoped localStorage key (wg-currency:{lang}) and lang parameter on all public functions.</item>
 </CHANGE_SUMMARY>
 */
 
-export const CURRENCY_STORAGE_KEY = "wg-currency";
+export const CURRENCY_STORAGE_KEY_PREFIX = "wg-currency";
 export const CURRENCY_CHANGE_EVENT = "wg-currency-change";
 
-export function getSelectedCurrency(): string | null {
+export function getCurrencyStorageKey(lang: string): string {
+  return `${CURRENCY_STORAGE_KEY_PREFIX}:${lang}`;
+}
+
+export function getSelectedCurrency(lang: string): string | null {
   try {
-    return localStorage.getItem(CURRENCY_STORAGE_KEY);
+    return localStorage.getItem(getCurrencyStorageKey(lang));
   } catch {
     return null;
   }
 }
 
-export function setSelectedCurrency(currency: string): void {
+export function setSelectedCurrency(currency: string, lang: string): void {
   try {
-    localStorage.setItem(CURRENCY_STORAGE_KEY, currency);
+    localStorage.setItem(getCurrencyStorageKey(lang), currency);
   } catch {
     // localStorage unavailable — silently ignore
   }
@@ -41,11 +46,15 @@ export function dispatchCurrencyChange(currency: string): void {
   );
 }
 
-export function initCurrencySelector(container: HTMLElement, currencies: string[]): void {
+export function initCurrencySelector(
+  container: HTMLElement,
+  currencies: string[],
+  lang: string,
+): void {
   const buttons = container.querySelectorAll<HTMLButtonElement>("[data-currency-option]");
   if (buttons.length === 0) return;
 
-  const stored = getSelectedCurrency();
+  const stored = getSelectedCurrency(lang);
   const initialCurrency = stored && currencies.includes(stored) ? stored : (currencies[0] ?? "");
 
   function setActive(currency: string): void {
@@ -65,7 +74,7 @@ export function initCurrencySelector(container: HTMLElement, currencies: string[
     btn.addEventListener("click", () => {
       const currency = btn.getAttribute("data-currency-option") ?? "";
       if (!currency) return;
-      setSelectedCurrency(currency);
+      setSelectedCurrency(currency, lang);
       setActive(currency);
       dispatchCurrencyChange(currency);
     });
