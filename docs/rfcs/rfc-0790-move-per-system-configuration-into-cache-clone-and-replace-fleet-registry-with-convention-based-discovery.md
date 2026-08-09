@@ -15,7 +15,7 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-09
-updatedAt: 2026-08-09
+updatedAt: 2026-08-10
 enhancedAt: 2026-08-09
 implementedAt:
 closedAt:
@@ -288,16 +288,31 @@ function resolveCacheClonePath(workspaceRoot: string, systemId: string): string 
   return path.join(workspaceRoot, "..", "systems-cache", systemId);
 }
 
+// Workpiece path resolution (during an active mission)
+function resolveWorkpiecePath(workspaceRoot: string, missionId: string): string {
+  return path.join(workspaceRoot, "missions", missionId, "workpiece");
+}
+
 // Discovery: scan ../systems-cache/ and read each system-config.yaml
+// Used OUTSIDE missions (sternsystem.validate, sternsystem.list, sternsystem.discover)
 async function discoverSystems(workspaceRoot: string): Promise<SystemConfig[]>;
 
-// Read a single system's config (efficient — no full scan)
+// Read a single system's config from cache clone (OUTSIDE mission)
 async function readSystemConfig(workspaceRoot: string, systemId: string): Promise<SystemConfig>;
 
-// Read a single system's runtime state
+// Read a single system's config from workpiece (INSIDE mission)
+async function readSystemConfigFromWorkpiece(workpieceDir: string): Promise<SystemConfig>;
+
+// Read a single system's runtime state from cache clone (OUTSIDE mission)
 async function readSystemState(workspaceRoot: string, systemId: string): Promise<SystemState>;
 
-// Write system state (atomic, used by mission/close/deploy commands)
+// Read a single system's runtime state from workpiece (INSIDE mission)
+async function readSystemStateFromWorkpiece(workpieceDir: string): Promise<SystemState>;
+
+// Write system state to workpiece (INSIDE mission — propagated to cache clone by mission.reconcile/close)
+async function writeSystemStateToWorkpiece(workpieceDir: string, state: SystemState): Promise<void>;
+
+// Write system state to cache clone (OUTSIDE mission — auto-commits to cache clone git)
 async function writeSystemState(workspaceRoot: string, systemId: string, state: SystemState): Promise<void>;
 
 // Services registry remains in monorepo
@@ -308,8 +323,10 @@ async function readServicesRegistry(workspaceRoot: string): Promise<ServiceEntry
 
 | Path | Role |
 | --- | --- |
-| `../systems-cache/<id>/system-config.yaml` | Static system configuration (created by `sternsystem.register`, read by all system commands) |
-| `../systems-cache/<id>/system-state.yaml` | Runtime state (written by `mission.open`, `mission.close`, `leitstand.propagate`, `leitstand.promote`) |
+| `../systems-cache/<id>/system-config.yaml` | Static system configuration (created by `sternsystem.register`, read by commands OUTSIDE missions) |
+| `../systems-cache/<id>/system-state.yaml` | Runtime state (read by commands OUTSIDE missions; written by `mission.reconcile`/`mission.close` propagation) |
+| `missions/<missionId>/workpiece/system-config.yaml` | Copy of system config inside the active mission's workpiece (read by commands INSIDE the mission) |
+| `missions/<missionId>/workpiece/system-state.yaml` | Runtime state inside the active mission's workpiece (read/written by commands INSIDE the mission — `mission.open`, `leitstand.dev-deploy`, `release.ready`, etc.) |
 | `../systems-cache/<id>/dns-records.yaml` | DNS records (moved from `systems/<id>/dns-records.yaml`) |
 | `../systems-cache/<id>/axiom-suppressions.yaml` | Axiom suppressions (moved from `systems/<id>/axiom-suppressions.yaml` or `systems/axiom-suppressions.yaml`) |
 | `../systems-cache/<id>/system.md` | Astro content (unchanged) |
@@ -366,9 +383,17 @@ The migration is performed as a single atomic step within one mission:
 6. **Update `sternsystem.register`**: Create `../systems-cache/<id>/` directory, `git init` if no `.git` exists, write `system-config.yaml`. Do not destroy existing git history.
 7. **Update DNA-1, DNA-44 and DNA-45**: Amend the DNA entries to reflect convention-based discovery and per-system config files.
 
-### Auto-commit behavior
+### Mission lifecycle integration
 
-`writeSystemState()` writes to `system-state.yaml` in the cache clone's git repo. It commits via the cache clone's git mechanism (same as `appendAndCommitBordbuch`), not via RFC-0580's `commitWerkstattSideEffects` which commits to the monorepo git repo. This ensures state changes are propagated by `sternsystem.sync`. Similarly, `sternsystem.pin` writes to `system-config.yaml` in the cache clone and commits there.
+**Materialization:** `system-config.yaml` and `system-state.yaml` are added to `STERNSYSTEM_DATA_PATHS` in `mission-materialize.ts`. They are copied from the cache clone into the workpiece during materialization, alongside `src/content`, `public`, `provenance`, and `system.pin.json`.
+
+**During mission:** Commands running inside a mission (`leitstand.dev-deploy`, `release.ready`, `mission.close`, etc.) read and write `system-config.yaml` / `system-state.yaml` from the **workpiece** (`missions/<missionId>/workpiece/`), not the cache clone. This follows the same principle as all other Sternsystem data: the workpiece is the single mutable copy during a mission.
+
+**Reconcile / Close:** `mission.reconcile` and `mission.close` propagate the workpiece's `system-config.yaml` and `system-state.yaml` back to the cache clone, same as they propagate `src/content`, `public/`, and `system.pin.json`. The cache clone git commit includes these files.
+
+**Outside mission:** Commands running without an active mission (`sternsystem.validate`, `sternsystem.list`, `sternsystem.discover`, `sternsystem.sync`, `sternsystem.register`) read from the cache clone directly. `writeSystemState()` (cache clone variant) auto-commits via the cache clone's git mechanism, same as `appendAndCommitBordbuch`.
+
+**`sternsystem.pin`:** Writes `pinnedPlatform` updates to `system-config.yaml`. During a mission, it writes to the workpiece copy; `mission.close` propagates it back. Outside a mission (e.g., `mission.close` auto-pin), it writes to the cache clone directly.
 
 ### CI behavior
 
@@ -410,6 +435,9 @@ New systems automatically comply from day one: `sternsystem.register` creates th
 - [ ] `sternsystem.validate` iterates `discoverSystems()` instead of `registry.systems`
 - [ ] `sternsystem.register` creates cache clone directory + `system-config.yaml` + `git init` if absent
 - [ ] `sternsystem.list` reads from `discoverSystems()` instead of `registry.yaml`
+- [ ] `system-config.yaml` and `system-state.yaml` added to `STERNSYSTEM_DATA_PATHS` in `mission-materialize.ts` (copied into workpiece during materialization)
+- [ ] Commands inside an active mission read `system-config.yaml` / `system-state.yaml` from the workpiece, not the cache clone
+- [ ] `mission.reconcile` / `mission.close` propagate `system-config.yaml` and `system-state.yaml` from workpiece back to cache clone
 - [ ] `mission.open` / `mission.materialize` / `mission.reconcile` / `mission.close` / `mission.abort` resolve cache clone from convention path
 - [ ] `registry` lock removed from `mission.open`, `mission.close`, `mission.abort`, `sternsystem.register`
 - [ ] `leitstand.dev-deploy` / `leitstand.propagate` / `leitstand.promote` read deployment channels from `system-config.yaml`
@@ -434,4 +462,6 @@ New systems automatically comply from day one: `sternsystem.register` creates th
 - Agents MUST NOT create `systems/registry.yaml` or per-system subdirectories under `systems/` — these are deleted and not recreated.
 - Agents MUST use `resolveCacheClonePath(workspaceRoot, systemId)` for all cache clone path resolution — never hardcode `mirrors[0].path` from a registry entry.
 - `sternsystem.register` MUST NOT destroy existing git history in the cache clone. If `.git` exists, skip `git init`. If the directory exists without `.git`, run `git init`. If the directory does not exist, create it and run `git init`.
-- `writeSystemState` MUST auto-commit changes to the cache clone git repo (via the cache clone's git mechanism, not RFC-0580's `commitWerkstattSideEffects`) so that `sternsystem.sync` propagates state updates.
+- `writeSystemState` has two variants: `writeSystemStateToWorkpiece` (inside mission — writes to workpiece, no git commit) and `writeSystemState` (outside mission — writes to cache clone, auto-commits to cache clone git repo via the cache clone's git mechanism, not RFC-0580's `commitWerkstattSideEffects`).
+- During a mission, commands MUST read `system-config.yaml` and `system-state.yaml` from the workpiece, not the cache clone. The workpiece is the single source of truth during a mission.
+- `mission.reconcile` and `mission.close` MUST propagate `system-config.yaml` and `system-state.yaml` from the workpiece back to the cache clone, same as other `STERNSYSTEM_DATA_PATHS` files.
