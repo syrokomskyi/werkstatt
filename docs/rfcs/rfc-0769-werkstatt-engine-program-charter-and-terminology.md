@@ -189,10 +189,10 @@ This is a charter (prose-only). It introduces no CLI surface, types, or files be
 
 ## Acceptance criteria
 
-- [ ] DNA-64 entry appended to `docs/architecture-dna.md` referencing this RFC
-- [ ] Root `AGENTS.md` gains a "Werkstatt engine program" section with terminology and package taxonomy
-- [ ] All downstream RFCs (RFC-0770..0779) exist in draft with `related: [RFC-0769]`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] DNA-64 entry appended to `docs/architecture-dna.md` referencing this RFC (evidence: docs/architecture-dna.md:271-273, dna.registry.validate exit 0)
+- [x] Root `AGENTS.md` gains a "Werkstatt engine program" section with terminology and package taxonomy (evidence: AGENTS.md:650-692)
+- [x] All downstream RFCs (RFC-0770..0779) exist in draft with `related: [RFC-0769]` (evidence: docs/rfcs/rfc-0770..0779, all 10 files verified with related: [RFC-0769])
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0769 exit 0)
 
 ## Implementation notes for agents
 
