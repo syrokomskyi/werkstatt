@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0286..0290: initial command table for Agent Surface (capability manifest + protocol projections).</item>
   <item>RFC-0291: add agent.manifest.verify (local + --url mode).</item>
+  <item>RFC-0783: add agent.api-catalog.generate/validate and agent.mcp-card.generate/validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -16,6 +17,11 @@ import { runAgentManifestGenerate, runAgentSurfaceValidate } from "../agent/agen
 import { runAgentKnowledgeGenerate, runAgentKnowledgeValidate } from "../agent/agent-knowledge.ts";
 import { runAgentCapabilityValidate } from "../agent/agent-capability.ts";
 import { runAgentOpenApiGenerate, runAgentOpenApiValidate } from "../agent/agent-openapi.ts";
+import {
+  runAgentApiCatalogGenerate,
+  runAgentApiCatalogValidate,
+} from "../agent/agent-api-catalog.ts";
+import { runAgentMcpCardGenerate, runAgentMcpCardValidate } from "../agent/agent-mcp-card.ts";
 import { runAgentRoutesGenerate } from "../agent/agent-routes.ts";
 import { runAgentGateFixturesRun } from "../agent/agent-gate-fixtures.ts";
 import { runAgentSurfaceSign, runAgentSurfaceVerify } from "../agent/agent-surface-sign.ts";
@@ -52,7 +58,10 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     supportsAllSites: true,
     flags: {},
-    reads: ["packages/werkstatt-site/src/domain/ontology/capabilities/**/*.yaml", "<app>/src/content/system.md"],
+    reads: [
+      "packages/werkstatt-site/src/domain/ontology/capabilities/**/*.yaml",
+      "<app>/src/content/system.md",
+    ],
     modulePaths: ["agent/agent-capability.ts"],
     execute: runAgentCapabilityValidate,
   },
@@ -106,6 +115,57 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     ],
     modulePaths: ["agent/agent-openapi.ts"],
     execute: runAgentOpenApiValidate,
+  },
+  {
+    name: "agent.api-catalog.generate",
+    description:
+      "Generate the RFC 9727 linkset+json API Catalog projection to public/.well-known/api-catalog (RFC-0783).",
+    scope: "app",
+    supportsAllSites: true,
+    mutatesState: true,
+    writes: ["<app>/public/.well-known/api-catalog"],
+    flags: {},
+    reads: ["<app>/src/agent-surface.generated.yaml"],
+    modulePaths: ["agent/agent-api-catalog.ts"],
+    execute: runAgentApiCatalogGenerate,
+  },
+  {
+    name: "agent.api-catalog.validate",
+    description:
+      "Validate the API Catalog linkset: well-formedness and manifest↔linkset bijection (RFC-0783, AGC-01..03).",
+    scope: "app",
+    supportsAllSites: true,
+    flags: {},
+    reads: ["<app>/public/.well-known/api-catalog", "<app>/src/agent-surface.generated.yaml"],
+    modulePaths: ["agent/agent-api-catalog.ts"],
+    execute: runAgentApiCatalogValidate,
+  },
+  {
+    name: "agent.mcp-card.generate",
+    description:
+      "Generate the SEP-1649 MCP Server Card projection to public/.well-known/mcp/server-card.json (RFC-0783).",
+    scope: "app",
+    supportsAllSites: true,
+    mutatesState: true,
+    writes: ["<app>/public/.well-known/mcp/server-card.json"],
+    flags: {},
+    reads: ["<app>/src/agent-surface.generated.yaml"],
+    modulePaths: ["agent/agent-mcp-card.ts"],
+    execute: runAgentMcpCardGenerate,
+  },
+  {
+    name: "agent.mcp-card.validate",
+    description:
+      "Validate the MCP Server Card: well-formedness and manifest↔card bijection (RFC-0783, AGM-01..03).",
+    scope: "app",
+    supportsAllSites: true,
+    flags: {},
+    reads: [
+      "<app>/public/.well-known/mcp/server-card.json",
+      "<app>/src/agent-surface.generated.yaml",
+    ],
+    modulePaths: ["agent/agent-mcp-card.ts"],
+    execute: runAgentMcpCardValidate,
   },
   {
     name: "agent.routes.generate",
