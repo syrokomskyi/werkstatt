@@ -38,11 +38,9 @@ export const werkstattSitePlugin: WerkstattPlugin = {
   },
   deployAdapters: {
     "cloudflare-workers": async () => {
-      // The concrete Cloudflare Workers adapter lives in the engine
-      // (packages/werkstatt/src/leitstand/adapters/cloudflare-workers.ts).
-      // Full inversion to the plugin is deferred to RFC-0776.
-      // For now, the plugin declares the adapter id; the engine resolves it.
-      return {};
+      const { createCloudflareWorkersAdapter } =
+        await import("@warpgogol/werkstatt/leitstand/adapters/cloudflare-workers");
+      return createCloudflareWorkersAdapter();
     },
   },
   invariants: [

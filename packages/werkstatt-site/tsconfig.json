@@ -9,6 +9,7 @@
   "include": ["src/**/*.ts"],
   "exclude": [
     "src/**/*.template.*",
+    // TODO: RFC-0776 — remove test exclusions once test fixture paths are repaired
     "src/**/*.test.ts",
     "src/**/tests/**",
     "dist/**",

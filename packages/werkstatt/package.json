@@ -163,6 +163,10 @@
       "types": "./src/leitstand/index.ts",
       "default": "./src/leitstand/index.ts"
     },
+    "./leitstand/adapters/cloudflare-workers": {
+      "types": "./src/leitstand/adapters/cloudflare-workers.ts",
+      "default": "./src/leitstand/adapters/cloudflare-workers.ts"
+    },
     "./notausgang": {
       "types": "./src/notausgang/index.ts",
       "default": "./src/notausgang/index.ts"
