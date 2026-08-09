@@ -12,6 +12,7 @@ that are synced to Cloudflare via the dns.record.* command family.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0753: initial DNS record declaration schema — dnsRecordTypeSchema, dnsRecordDeclarationSchema, dnsRecordFileSchema.</item>
+  <item>RFC-0786: add ttl?: number field to dnsRecordDeclarationSchema for DNS-AID records.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,6 +26,7 @@ export const dnsRecordDeclarationSchema = z.object({
   content: z.string(),
   priority: z.number().int().min(0).max(65535).optional(),
   proxied: z.boolean().optional().default(false),
+  ttl: z.number().int().min(1).max(86400).optional(),
   comment: z.string().optional(),
 });
 

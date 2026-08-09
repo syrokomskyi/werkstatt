@@ -19,6 +19,7 @@
   <item>RFC-0707: added nachweis.manifest.generate after bordbuch.commit, before passport.key.ensure.</item>
   <item>RFC-0721: added behavior.snapshot.staleness.check to both SITES_BUILD_PREPARE_PIPELINE and SITES_BUILD_PREPARE_DEV_PIPELINE.</item>
   <item>RFC-0741: added rate-snapshot.resolve, currency-pricing.compile, derived-prices.materialize after entitlements.resolve in both pipelines.</item>
+  <item>RFC-0786: added agent.dns-aid.generate after agent.manifest.generate in SITES_BUILD_PREPARE_PIPELINE only.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -69,6 +70,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   // RFC-0286: assemble the Agent Surface Manifest (knowledge/action refs + protocol
   // interfaces) after entitlements and the final page/route set are known.
   { command: "agent.manifest.generate" },
+  // RFC-0786: generate DNS-AID TXT record declaration from the manifest.
+  { command: "agent.dns-aid.generate" },
   // RFC-0289: project the manifest into a static OpenAPI 3.1 document.
   { command: "agent.openapi.generate" },
   // RFC-0783: project the manifest into RFC 9727 API Catalog linkset+json.

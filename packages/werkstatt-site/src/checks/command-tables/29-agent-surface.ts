@@ -10,6 +10,7 @@
   <item>RFC-0291: add agent.manifest.verify (local + --url mode).</item>
   <item>RFC-0783: add agent.api-catalog.generate/validate and agent.mcp-card.generate/validate.</item>
   <item>RFC-0785: add agent.markdown-negotiation.generate.</item>
+  <item>RFC-0786: add agent.dns-aid.generate/validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,6 +28,7 @@ import { runAgentRoutesGenerate } from "../agent/agent-routes.ts";
 import { runAgentMarkdownNegotiationGenerate } from "../agent/agent-markdown-negotiation.ts";
 import { runAgentGateFixturesRun } from "../agent/agent-gate-fixtures.ts";
 import { runAgentSurfaceSign, runAgentSurfaceVerify } from "../agent/agent-surface-sign.ts";
+import { runAgentDnsAidGenerate, runAgentDnsAidValidate } from "../agent/agent-dns-aid.ts";
 
 export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
@@ -231,6 +233,34 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     ],
     modulePaths: ["agent/agent-surface-sign.ts"],
     execute: runAgentSurfaceVerify,
+  },
+  {
+    name: "agent.dns-aid.generate",
+    description:
+      "Generate the DNS-AID TXT record declaration in systems/<id>/dns-records.yaml from the Agent Surface Manifest (RFC-0786).",
+    scope: "app",
+    supportsAllSites: true,
+    mutatesState: true,
+    writes: ["systems/<id>/dns-records.yaml"],
+    flags: {},
+    reads: ["<app>/src/agent-surface.generated.yaml", "<app>/src/content/system.md"],
+    modulePaths: ["agent/agent-dns-aid.ts"],
+    execute: runAgentDnsAidGenerate,
+  },
+  {
+    name: "agent.dns-aid.validate",
+    description:
+      "Validate the DNS-AID TXT record declaration against the Agent Surface Manifest and check Cloudflare presence (RFC-0786, AGD-01..04).",
+    scope: "app",
+    supportsAllSites: true,
+    flags: {},
+    reads: [
+      "systems/<id>/dns-records.yaml",
+      "<app>/src/agent-surface.generated.yaml",
+      "<app>/src/content/system.md",
+    ],
+    modulePaths: ["agent/agent-dns-aid.ts"],
+    execute: runAgentDnsAidValidate,
   },
   {
     name: "agent.gate.fixtures.run",

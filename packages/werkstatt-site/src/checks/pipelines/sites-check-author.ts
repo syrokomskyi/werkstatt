@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>Extracted from module.ts to shrink the registration surface.</item>
   <item>RFC-0600: added generated.stale.validate after generated.files.validate.</item>
+  <item>RFC-0786: added agent.dns-aid.validate after agent.openapi.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -198,6 +199,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.surface.validate" },
   // RFC-0289: OpenAPI projection — well-formedness + manifest↔document bijection
   { command: "agent.openapi.validate" },
+  // RFC-0786: DNS-AID TXT record declaration — manifest sync + Cloudflare presence (AGD-01..04)
+  { command: "agent.dns-aid.validate" },
   // RFC-0783: API Catalog — well-formedness + manifest↔linkset bijection
   { command: "agent.api-catalog.validate" },
   // RFC-0783: MCP Server Card — well-formedness + manifest↔card bijection
