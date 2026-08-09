@@ -63,6 +63,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@warpgogol/werkstatt-site": "workspace:*",
     "@ai-sdk/anthropic": "^4.0.27",
     "@ai-sdk/openai": "^4.0.27",
     "@astrojs/compiler": "^4.0.0",

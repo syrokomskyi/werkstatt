@@ -7,5 +7,11 @@
     "allowImportingTsExtensions": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.template.*", "dist/**", "node_modules/**"]
+  "exclude": [
+    "src/**/*.template.*",
+    "src/**/*.test.ts",
+    "src/**/tests/**",
+    "dist/**",
+    "node_modules/**"
+  ]
 }
