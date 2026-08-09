@@ -153,7 +153,7 @@ export interface RobotsPolicy {
 | `packages/werkstatt-site/src/codegen/app-boilerplate.ts` | Amended — resolve `AGENT_LINK_HEADERS` token: Link header lines when `agent.enabled !== false`, empty string otherwise |
 | `packages/werkstatt-site/src/domain/share/semantic/robots.ts` | Amended — add `contentSignal` field to `RobotsPolicy` and `Content-Signal:` output to `buildRobotsTxt()` |
 | `packages/werkstatt-site/src/checks/robots.ts` | Amended — pass `contentSignal` from `system.md` robots block, or default `["text/html", "text/markdown", "application/ld+json", "text/plain"]` when absent |
-| `packages/werkstatt-site/src/checks/public-surface/security.ts` | Amended — add HDR-05 rule: verify `Link:` headers present in `/*` block when `agent.enabled !== false` |
+| `packages/werkstatt-site/src/checks/public-surface/security.ts` | Amended — add HDR-07 rule: verify `Link:` headers present in `/*` block when `agent.enabled !== false` |
 | `packages/werkstatt-site/src/checks/robots.ts` | Amended — add PUBTXT rule: verify `Content-Signal:` directive present in `robots.txt` |
 | `public/_headers` | Generated output — gains `Link:` headers |
 | `public/robots.txt` | Generated output — gains `Content-Signal:` line |
@@ -187,10 +187,10 @@ Content-Signal: text/html, text/markdown, application/ld+json, text/plain
 
 ### Failure modes
 
-**`headers.security.validate`** — new rule `HDR-05`:
+**`headers.security.validate`** — new rule `HDR-07`:
 
-- `HDR-05`: `Link:` header pointing to `/.well-known/agent.json` absent from `/*` block when `agent.enabled !== false` → error, fixHint: rerun `public.infrastructure.generate`.
-- When `agent.enabled: false`, `HDR-05` is silent — Link headers are expected to be absent.
+- `HDR-07`: `Link:` header pointing to `/.well-known/agent.json` absent from `/*` block when `agent.enabled !== false` → error, fixHint: rerun `public.infrastructure.generate`.
+- When `agent.enabled: false`, `HDR-07` is silent — Link headers are expected to be absent.
 
 **`robots.validate`** — new rule `PUBTXT-CS`:
 
@@ -229,9 +229,9 @@ Both validators exit non-zero on any error. `--json` output follows the standard
 - [ ] `robots.generate` passes `contentSignal` from `system.md` robots block (or default)
 - [ ] `_headers.template` includes `Link:` headers in `/*` block pointing to all 5 agent discovery endpoints
 - [ ] `public.infrastructure.generate` output (`_headers`) contains the Link headers
-- [ ] `headers.security.validate` includes new `HDR-05` rule: `Link:` headers present in `/*` block when `agent.enabled !== false`
+- [ ] `headers.security.validate` includes new `HDR-07` rule: `Link:` headers present in `/*` block when `agent.enabled !== false`
 - [ ] `robots.validate` includes new `PUBTXT-CS` rule: `Content-Signal:` directive present in `robots.txt`
-- [ ] `HDR-05` is silent when `agent.enabled: false` (Link headers absent, no error)
+- [ ] `HDR-07` is silent when `agent.enabled: false` (Link headers absent, no error)
 - [ ] `headers.security.validate` still passes (HDR-01..04 unchanged)
 - [ ] `robots.validate` still passes (existing PUBTXT rules unchanged)
 - [ ] `isitagentready.com` reports Link headers present for warpgogol.com after deploy
