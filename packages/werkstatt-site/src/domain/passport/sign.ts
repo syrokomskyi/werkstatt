@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY> */
 
 /**
- * @warpgogol/passport — Ed25519 VC signing helpers
+ * @warpgogol/werkstatt-site/passport — Ed25519 VC signing helpers
  *
  * DNA-34 / RFC-0028
  *

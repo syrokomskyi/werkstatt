@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Re-export barrel for @warpgogol/check-core: aggregates all check-core schemas, types, and utilities.</purpose>
+<purpose>Re-export barrel for @warpgogol/werkstatt-site/check-core: aggregates all check-core schemas, types, and utilities.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>

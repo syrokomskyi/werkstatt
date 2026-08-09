@@ -15,7 +15,7 @@
 */
 
 /**
- * @warpgogol/star-map — SVG renderer
+ * @warpgogol/werkstatt-site/star-map — SVG renderer
  *
  * DNA-32 / RFC-0028
  *

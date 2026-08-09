@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
   [RFC-0141][RFC-0042][RFC-0053] Filesystem asset resolution — the relocated bare-filename
-  image resolver that previously lived in @warpgogol/share/src/image-utils.ts. It is now the
+  image resolver that previously lived in @warpgogol/werkstatt-site/share/src/image-utils.ts. It is now the
   filesystem adapter's implementation of the abstract resolveAsset() contract.
 
   The actual glob map of available images is supplied by the consumer (a Vite

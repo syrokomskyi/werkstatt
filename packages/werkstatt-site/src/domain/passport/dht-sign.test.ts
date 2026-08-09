@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { dhtEntryBytes, signDhtEntry, verifyDhtEntry, type DHTEntryData } from "./dht-sign.ts";
 import { generateKeypair } from "./sign.ts";
-import type { DHTSiteEntry } from "@warpgogol/ontology/operations";
+import type { DHTSiteEntry } from "@warpgogol/werkstatt-site/ontology/operations";
 
 describe("dht-sign", () => {
   it("dhtEntryBytes produces deterministic canonical bytes", () => {

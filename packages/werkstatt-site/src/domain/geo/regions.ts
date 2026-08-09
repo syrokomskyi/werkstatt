@@ -6,7 +6,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0237: add ISO 3166-2 region lookup as the region layer of @warpgogol/geo.</item>
+  <item>RFC-0237: add ISO 3166-2 region lookup as the region layer of @warpgogol/werkstatt-site/geo.</item>
   <item>Architecture review 2026-07-10: add regionNames override layer and configurable languages.</item>
 </CHANGE_SUMMARY>
 */

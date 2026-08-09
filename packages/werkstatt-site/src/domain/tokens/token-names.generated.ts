@@ -1,4 +1,4 @@
-/* GENERATED — do not edit. Run `pnpm --filter @warpgogol/tokens codegen:token-names` to regenerate. */
+/* GENERATED — do not edit. Run `pnpm --filter @warpgogol/werkstatt-site/tokens codegen:token-names` to regenerate. */
 
 export const TOKEN_NAMES = [
   "--ds-rgb-white",

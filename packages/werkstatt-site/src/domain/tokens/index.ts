@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-TypeScript companion to @warpgogol/tokens — exports TOKEN_NAMES (a readonly const
+TypeScript companion to @warpgogol/werkstatt-site/tokens — exports TOKEN_NAMES (a readonly const
 tuple of every --ds-* custom property defined in tokens.css) and a DesignToken
 type alias for safe usage in validators, style tooling, and tests.
 DEFAULT values are the Warpgogol studio defaults.

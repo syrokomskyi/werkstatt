@@ -1,9 +1,9 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  Filesystem adapter barrel for @warpgogol/content-source. Exports the FS
+  Filesystem adapter barrel for @warpgogol/werkstatt-site/content-source. Exports the FS
   capabilities, asset resolvers, and collection loaders. Consumers that need
-  FS-specific imports should use @warpgogol/content-source/fs to avoid
+  FS-specific imports should use @warpgogol/werkstatt-site/content-source/fs to avoid
   pulling FS dependencies into port-only consumers.
 </purpose>
 <non-goals>

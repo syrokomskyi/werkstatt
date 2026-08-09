@@ -1,9 +1,9 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Public API entry point for @warpgogol/faq. Re-exports schema and types
+<purpose>Public API entry point for @warpgogol/werkstatt-site/faq. Re-exports schema and types
 for consumers that do not need Astro collection wiring.</purpose>
 <non-goals>
-  <item>Does not export Astro-dependent code — use @warpgogol/faq/astro for that.</item>
+  <item>Does not export Astro-dependent code — use @warpgogol/werkstatt-site/faq/astro for that.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

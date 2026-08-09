@@ -5,7 +5,7 @@
 query entries via getFaqEntries / getFaqEntriesByTags.</purpose>
 <non-goals>
   <item>Does not define the Zod schema — that is schema.ts.</item>
-  <item>Does not define JSON-LD or semantic model logic — that lives in @warpgogol/share.</item>
+  <item>Does not define JSON-LD or semantic model logic — that lives in @warpgogol/werkstatt-site/share.</item>
   <item>Does not validate FAQ content at build time — that is faq.validate in site-kernel-checks.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -16,10 +16,10 @@ query entries via getFaqEntries / getFaqEntriesByTags.</purpose>
 */
 
 import { defineCollection } from "astro:content";
-import { fsDataCollectionLoader } from "@warpgogol/content-source";
-import { toDataEntryId } from "@warpgogol/share/content";
-import { getCollection } from "@warpgogol/content-source/astro";
-import type { SemanticFaqEntry } from "@warpgogol/share/semantic";
+import { fsDataCollectionLoader } from "@warpgogol/werkstatt-site/content-source";
+import { toDataEntryId } from "@warpgogol/werkstatt-site/share/content";
+import { getCollection } from "@warpgogol/werkstatt-site/content-source/astro";
+import type { SemanticFaqEntry } from "@warpgogol/werkstatt-site/share/semantic";
 import { faqSchema, type FaqEntry } from "./schema.ts";
 
 export function createFaqCollection() {

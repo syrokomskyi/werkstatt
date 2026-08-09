@@ -8,12 +8,12 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Added Compass scaffolding to clarify module purpose, responsibilities, and boundaries.</item>
-  <item>Use collectNebulaInputs + toPassportScores from @warpgogol/nebula instead of manual stub + field mapping.</item>
+  <item>Use collectNebulaInputs + toPassportScores from @warpgogol/werkstatt-site/nebula instead of manual stub + field mapping.</item>
 </CHANGE_SUMMARY>
 */
 
 /**
- * @warpgogol/passport — Passport emission pipeline
+ * @warpgogol/werkstatt-site/passport — Passport emission pipeline
  *
  * DNA-31 / RFC-0028
  *
@@ -32,12 +32,12 @@
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import type { SystemManifest } from "@warpgogol/ontology/schemas";
+import type { SystemManifest } from "@warpgogol/werkstatt-site/ontology/schemas";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
-import { collectNebulaInputs } from "@warpgogol/nebula/collect";
-import type { NebulaInputs } from "@warpgogol/nebula";
-import { manifestToStarMapInput, emitStarMap } from "@warpgogol/star-map/render";
-import type { UniRegistry } from "@warpgogol/star-map";
+import { collectNebulaInputs } from "@warpgogol/werkstatt-site/nebula/collect";
+import type { NebulaInputs } from "@warpgogol/werkstatt-site/nebula";
+import { manifestToStarMapInput, emitStarMap } from "@warpgogol/werkstatt-site/star-map/render";
+import type { UniRegistry } from "@warpgogol/werkstatt-site/star-map";
 import type { PassportJson } from "./schema.ts";
 import { runPipeline, type PipelineContext } from "./pipeline.ts";
 

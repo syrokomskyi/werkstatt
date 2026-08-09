@@ -14,15 +14,15 @@ import { describe, it, expect, afterEach } from "vitest";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { generateKeypair } from "@warpgogol/passport/sign";
-import { signIdentityCredential } from "@warpgogol/passport";
+import { generateKeypair } from "@warpgogol/werkstatt-site/passport/sign";
+import { signIdentityCredential } from "@warpgogol/werkstatt-site/passport";
 import type {
   SiteOwnershipCredentialSubject,
   ActorDelegationCredentialSubject,
   WerkstattIdentityConfig,
   WerkstattCredential,
   VCProof,
-} from "@warpgogol/passport";
+} from "@warpgogol/werkstatt-site/passport";
 import { verifyAuthFromMeta, IDENTITY_CONFIG_FILENAME } from "../auth.ts";
 
 async function makeTempDir(): Promise<string> {

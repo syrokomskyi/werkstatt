@@ -13,7 +13,7 @@
 </CHANGE_SUMMARY> */
 
 /**
- * @warpgogol/nebula — Nebula Score computation
+ * @warpgogol/werkstatt-site/nebula — Nebula Score computation
  *
  * DNA-33 / RFC-0028
  *

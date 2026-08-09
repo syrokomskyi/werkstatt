@@ -12,7 +12,7 @@
 */
 
 /**
- * @warpgogol/star-map — Deterministic SSG SVG star map renderer
+ * @warpgogol/werkstatt-site/star-map — Deterministic SSG SVG star map renderer
  * DNA-32 / RFC-0028
  */
 

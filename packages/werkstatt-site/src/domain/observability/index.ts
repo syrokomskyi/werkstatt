@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Barrel export for @warpgogol/observability — the observability port package (RFC-0337).</purpose>
+<purpose>Barrel export for @warpgogol/werkstatt-site/observability — the observability port package (RFC-0337).</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>

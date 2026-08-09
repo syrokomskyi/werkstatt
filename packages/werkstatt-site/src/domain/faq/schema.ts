@@ -4,7 +4,7 @@
 strict content contract for FAQ files at src/content/faq/{lang}/.</purpose>
 <non-goals>
   <item>Does not define Astro collection wiring — that is astro.ts.</item>
-  <item>Does not define semantic model types — those live in @warpgogol/share/semantic.</item>
+  <item>Does not define semantic model types — those live in @warpgogol/werkstatt-site/share/semantic.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

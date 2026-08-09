@@ -31,7 +31,7 @@ export interface MetricsPusher {
   flush(): Promise<{ delivered: boolean; reason?: string }>;
 }
 
-const SCOPE_NAME = "@warpgogol/observability";
+const SCOPE_NAME = "@warpgogol/werkstatt-site/observability";
 const SCOPE_VERSION = "1";
 const DEFAULT_TIMEOUT_MS = 2000;
 

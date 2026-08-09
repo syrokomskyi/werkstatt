@@ -4,7 +4,7 @@
   [RFC-0192/0193] The Blueprint contract type (the declarative spec that configures one surface)
   plus the pure helpers that turn a Blueprint + loaded datasets into the eligibility matrix and
   the materialized VirtualRouteEntry[] (routes + redirect decisions). Framework-free. The runtime
-  Zod schema and the YAML files live in @warpgogol/ontology (RFC-0193); block baking is added there.
+  Zod schema and the YAML files live in @warpgogol/werkstatt-site/ontology (RFC-0193); block baking is added there.
 </purpose>
 <non-goals>
   <item>Do not parse YAML or validate (ontology owns the Zod schema).</item>

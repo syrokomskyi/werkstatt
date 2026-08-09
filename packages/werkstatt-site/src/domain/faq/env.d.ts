@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Defines type stubs for Astro virtual modules to facilitate type safety in
 TypeScript without requiring a full Astro project context (RFC-0475). Mirrors
-@warpgogol/pbp/src/env.d.ts and @warpgogol/content-source/src/env.d.ts.</purpose>
+@warpgogol/werkstatt-site/pbp/src/env.d.ts and @warpgogol/werkstatt-site/content-source/src/env.d.ts.</purpose>
 <non-goals>
   <item>Do not implement actual data fetching logic.</item>
   <item>Do not handle raw content parsing.</item>

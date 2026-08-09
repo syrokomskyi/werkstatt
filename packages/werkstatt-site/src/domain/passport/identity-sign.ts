@@ -17,7 +17,7 @@ subjects, built on the existing Ed25519 signBytes/verifyBytes primitives.
 */
 
 /**
- * @warpgogol/passport/identity-sign — Identity credential signing (RFC-0558)
+ * @warpgogol/werkstatt-site/passport/identity-sign — Identity credential signing (RFC-0558)
  *
  * Uses signBytes/verifyBytes from sign.ts with a dedicated canonicalization
  * function for identity credential subjects. signCredential is NOT reused —

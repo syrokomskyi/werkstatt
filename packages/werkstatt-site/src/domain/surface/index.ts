@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>[RFC-0192] Public entrypoint for @warpgogol/surface — the Programmatic Surface port.</purpose>
+<purpose>[RFC-0192] Public entrypoint for @warpgogol/werkstatt-site/surface — the Programmatic Surface port.</purpose>
 <non-goals>
   <item>Do not perform I/O — consumers (kernel command) supply loaded data.</item>
 </non-goals>

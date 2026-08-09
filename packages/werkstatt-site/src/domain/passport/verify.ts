@@ -13,7 +13,7 @@
 */
 
 /**
- * @warpgogol/passport — Passport verification
+ * @warpgogol/werkstatt-site/passport — Passport verification
  *
  * DNA-34 / RFC-0028
  *

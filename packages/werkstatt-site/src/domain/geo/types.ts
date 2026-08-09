@@ -54,7 +54,7 @@ export interface GeoServiceConfig {
   overrides?: GeoOverrides;
 }
 
-/** Structurally identical to LocalizedSlug in @warpgogol/surface. Duplicated to avoid a @warpgogol/geo -> @warpgogol/surface dependency (which would form a workspace cycle). */
+/** Structurally identical to LocalizedSlug in @warpgogol/werkstatt-site/surface. Duplicated to avoid a @warpgogol/werkstatt-site/geo -> @warpgogol/werkstatt-site/surface dependency (which would form a workspace cycle). */
 export interface GeoLocalizedSlug {
   neutral: string;
   byLang?: Record<string, string>;
@@ -88,7 +88,7 @@ export interface GeoService {
     langs: string[],
     defaultLang: string,
     options?: {
-      /** Returns an image slug (e.g. "freiburg-skyline") for a neutral slug, or undefined if no image exists. Injected by the consumer to keep @warpgogol/geo app-agnostic. */
+      /** Returns an image slug (e.g. "freiburg-skyline") for a neutral slug, or undefined if no image exists. Injected by the consumer to keep @warpgogol/werkstatt-site/geo app-agnostic. */
       imageResolver?: (neutral: string) => string | undefined;
       filterValues?: Set<string>;
     },

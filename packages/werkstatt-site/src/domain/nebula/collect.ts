@@ -13,7 +13,7 @@
 */
 
 /**
- * @warpgogol/nebula — Input collector
+ * @warpgogol/werkstatt-site/nebula — Input collector
  *
  * DNA-33 / RFC-0028
  *

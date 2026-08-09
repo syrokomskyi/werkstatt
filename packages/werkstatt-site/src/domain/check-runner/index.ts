@@ -18,7 +18,7 @@ import {
   type CheckTarget,
   type PageEvidence,
   type SiteEvidenceGraph,
-} from "@warpgogol/check-core";
+} from "@warpgogol/werkstatt-site/check-core";
 import { byteHash } from "@warpgogol/fingerprint";
 import type { BrowserCapturePort, CapturedPage } from "./browser-capture-port.ts";
 import { PlaywrightCaptureAdapter } from "./playwright-adapter.ts";
@@ -27,7 +27,7 @@ export type { BrowserCapturePort, CapturedPage } from "./browser-capture-port.ts
 export { PlaywrightCaptureAdapter } from "./playwright-adapter.ts";
 
 export const CHECK_RUNNER_INFO = {
-  name: "@warpgogol/check-runner-node",
+  name: "@warpgogol/werkstatt-site/check-runner",
   artifactVersion: 1,
   capabilities: {
     targetValidation: true,

@@ -1,8 +1,8 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0473: Barrel for @warpgogol/surface/io — I/O helpers extracted from site-kernel-checks.</purpose>
+<purpose>RFC-0473: Barrel for @warpgogol/werkstatt-site/surface/io — I/O helpers extracted from site-kernel-checks.</purpose>
 <non-goals>
-  <item>Does not contain pure domain logic — that lives in the root @warpgogol/surface entry points.</item>
+  <item>Does not contain pure domain logic — that lives in the root @warpgogol/werkstatt-site/surface entry points.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

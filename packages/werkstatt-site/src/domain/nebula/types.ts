@@ -12,7 +12,7 @@
 */
 
 /**
- * @warpgogol/nebula — Input and output types for Nebula Score computation
+ * @warpgogol/werkstatt-site/nebula — Input and output types for Nebula Score computation
  *
  * DNA-33 / RFC-0028
  */

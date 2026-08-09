@@ -12,7 +12,7 @@
 */
 
 /**
- * @warpgogol/passport — Key rotation
+ * @warpgogol/werkstatt-site/passport — Key rotation
  *
  * DNA-34 / RFC-0028
  *

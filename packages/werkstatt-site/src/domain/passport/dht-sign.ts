@@ -18,7 +18,7 @@ entry shape.
 */
 
 /**
- * @warpgogol/passport/dht-sign — DHT entry signing (RFC-0565)
+ * @warpgogol/werkstatt-site/passport/dht-sign — DHT entry signing (RFC-0565)
  *
  * Uses signBytes/verifyBytes from sign.ts with a dedicated canonicalization
  * function for DHT site entries. The signature field is excluded from
@@ -26,7 +26,7 @@ entry shape.
  */
 
 import { signBytes, verifyBytes } from "./sign.ts";
-import type { DHTSiteEntry } from "@warpgogol/ontology/operations";
+import type { DHTSiteEntry } from "@warpgogol/werkstatt-site/ontology/operations";
 
 /**
  * DHTSiteEntry without the signature field — the data that is actually signed.

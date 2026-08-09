@@ -6,7 +6,7 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.json"],
   "exclude": [
     "src/**/*.template.*",
     // TODO: RFC-0776 — remove test exclusions once test fixture paths are repaired

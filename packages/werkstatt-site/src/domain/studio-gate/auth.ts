@@ -28,8 +28,8 @@ import {
   verifyIdentityCredential,
   type WerkstattIdentityConfig,
   type WerkstattCredential,
-} from "@warpgogol/passport";
-import { fleetRegistrySchema } from "@warpgogol/ontology/operations";
+} from "@warpgogol/werkstatt-site/passport";
+import { fleetRegistrySchema } from "@warpgogol/werkstatt-site/ontology/operations";
 import { parse as parseYaml } from "yaml";
 
 export interface StudioGateAuthResult {

@@ -14,7 +14,7 @@
 */
 
 /**
- * @warpgogol/star-map — types
+ * @warpgogol/werkstatt-site/star-map — types
  * DNA-32 / RFC-0028
  */
 
@@ -112,7 +112,7 @@ export interface NodePosition {
 
 /**
  * Structural subset of SystemManifest that `manifestToStarMapInput` consumes.
- * Both `@warpgogol/ontology/schemas` SystemManifest and `@warpgogol/site-kernel-content`
+ * Both `@warpgogol/werkstatt-site/ontology/schemas` SystemManifest and `@warpgogol/site-kernel-content`
  * SystemManifest satisfy this interface, eliminating the need for type casts.
  */
 export interface StarMapManifestSubset {
