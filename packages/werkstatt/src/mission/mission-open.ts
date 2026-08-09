@@ -24,10 +24,10 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import type { MissionManifest } from "@warpgogol/werkstatt/schemas";
 import {
-  readRegistry,
-  writeRegistry,
-  findEntry,
-  resolveCachePath,
+  readSystemConfig,
+  readSystemState,
+  writeSystemState,
+  resolveCacheClonePath,
 } from "../sternsystem/registry-io.ts";
 import { createMissionDirectories, writeMissionManifest, missionExists } from "./mission-io.ts";
 import {
@@ -101,25 +101,22 @@ export async function runMissionOpen(
   await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "mission.open", actor);
 
   try {
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, systemId);
+    const config = await readSystemConfig(workspaceRoot, systemId);
+    const state = await readSystemState(workspaceRoot, systemId);
 
-    if (!entry) {
-      throw new Error(`[mission.open] system '${systemId}' is not registered`);
-    }
-    if (entry.status === "paused" || entry.status === "archived") {
+    if (config.status === "paused" || config.status === "archived") {
       throw new Error(
-        `[mission.open] system '${systemId}' has status '${entry.status}' — cannot open missions`,
+        `[mission.open] system '${systemId}' has status '${config.status}' — cannot open missions`,
       );
     }
-    if (entry.currentMission) {
+    if (state.currentMission) {
       throw new Error(
-        `[mission.open] system '${systemId}' already has open mission '${entry.currentMission}'`,
+        `[mission.open] system '${systemId}' already has open mission '${state.currentMission}'`,
       );
     }
 
     // Check pin file exists
-    const cacheDir = await resolveCachePath(workspaceRoot, systemId);
+    const cacheDir = resolveCacheClonePath(workspaceRoot, systemId);
     const pinPath = path.join(cacheDir, "system.pin.json");
     if (!existsSync(pinPath)) {
       throw new Error(
@@ -199,14 +196,14 @@ export async function runMissionOpen(
       );
     }
 
-    // Update registry
-    entry.currentMission = missionId;
-    await writeRegistry(workspaceRoot, registry);
+    // Update state
+    state.currentMission = missionId;
+    await writeSystemState(workspaceRoot, systemId, state);
 
     // RFC-0580: auto-commit werkstatt side-effects
     await commitWerkstattSideEffects(
       workspaceRoot,
-      [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
+      [path.join("missions", missionId, "mission.yaml")],
       `werkstatt: mission.open ${missionId}`,
     );
 

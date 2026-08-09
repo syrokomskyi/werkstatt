@@ -61,11 +61,17 @@ import {
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
-import { resolveCachePath, readRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath, readSystemConfig } from "../sternsystem/registry-io.ts";
 import { orchestrateSnap01Recovery } from "./snapshot-auto-regen.ts";
 import { commitBordbuchProjections } from "../bordbuch/bordbuch-commit.ts";
 
-const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
+const STERNSYSTEM_DATA_PATHS = [
+  "src/content",
+  "public",
+  "provenance",
+  "system-config.yaml",
+  "system-state.yaml",
+];
 
 // RFC-0763: shared helper for bordbuch cleanup on failure paths.
 // Avoids duplicating the try/catch/log block at each failure early-return.
@@ -649,7 +655,7 @@ export async function runMissionValidate(
   }
 
   // RFC-0522: warn on dirty cache clone — reconcile will fail until resolved
-  const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+  const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
   if (existsSync(path.join(systemDir, ".git"))) {
     const cacheDirtyCheck = isWorkpieceDirty(systemDir);
     if (cacheDirtyCheck.dirty) {
@@ -865,7 +871,7 @@ export async function runMissionDiff(
   if (!missionId) throw new Error("[mission.diff] --mission is required");
 
   const manifest = await readMissionManifest(workspaceRoot, missionId);
-  const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+  const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
   const workpieceDir = path.join(resolveMissionDir(workspaceRoot, missionId), "workpiece");
 
   const systemFiles = new Set(await collectRelativeFiles(systemDir));
@@ -987,7 +993,7 @@ export async function runMissionReconcile(
   }
 
   const workpieceDir = path.join(resolveMissionDir(workspaceRoot, missionId), "workpiece");
-  const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+  const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
 
   try {
     const now = new Date().toISOString();
@@ -1268,9 +1274,8 @@ export async function runMissionReconcile(
       // Only called when external mirrors are configured (mirrors.length > 2).
       // Non-fatal: sync failure logs a warning but does not block reconcile.
       try {
-        const registry = await readRegistry(workspaceRoot);
-        const entry = findEntry(registry, manifest.systemId);
-        if (entry && entry.mirrors.length > 2) {
+        const config = await readSystemConfig(workspaceRoot, manifest.systemId);
+        if (config && config.mirrors.length > 2) {
           mirrorSync.attempted = true;
           logger.info(`  Syncing external mirrors via sternsystem.sync…`);
           try {

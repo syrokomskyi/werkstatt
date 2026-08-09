@@ -34,11 +34,14 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { runKernelWire, executeKernelCommand, executeKernelPipeline } from "@warpgogol/werkstatt/kernel";
 import {
-  readRegistry,
-  findEntry,
-  resolveCachePath,
+  runKernelWire,
+  executeKernelCommand,
+  executeKernelPipeline,
+} from "@warpgogol/werkstatt/kernel";
+import {
+  readSystemConfig,
+  resolveCacheClonePath,
   resolveMirrors,
   resolveMirrorPath,
 } from "../sternsystem/registry-io.ts";
@@ -55,7 +58,11 @@ import {
   runFontsImportsGenerate,
   runBiomeCssGenerate,
 } from "@warpgogol/werkstatt-site/codegen";
-import { applyTokens, readTemplate, readRuntimeTemplate } from "@warpgogol/werkstatt-site/onboarding";
+import {
+  applyTokens,
+  readTemplate,
+  readRuntimeTemplate,
+} from "@warpgogol/werkstatt-site/onboarding";
 import {
   runEnvExampleGenerate,
   MISSION_PREFLIGHT_CRITICAL,
@@ -358,14 +365,18 @@ async function syncCacheClone(
   systemId: string,
   logger: { info: (msg: string) => void; warn: (msg: string) => void },
 ): Promise<void> {
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, systemId);
-  if (!entry) {
-    logger.info(`  No registry entry for system '${systemId}' — skipping cache clone sync`);
+  let config: Awaited<ReturnType<typeof readSystemConfig>> | null = null;
+  try {
+    config = await readSystemConfig(workspaceRoot, systemId);
+  } catch {
+    config = null;
+  }
+  if (!config) {
+    logger.info(`  No system-config.yaml for system '${systemId}' — skipping cache clone sync`);
     return;
   }
 
-  const { cachePath, gitMirrors } = resolveMirrors(workspaceRoot, entry);
+  const { cachePath, gitMirrors } = resolveMirrors(workspaceRoot, config);
   const gitDir = path.join(cachePath, ".git");
 
   if (gitMirrors.length === 0) {
@@ -733,15 +744,14 @@ export async function runMissionMaterialize(
 
   try {
     // RFC-0480: refuse materialization on paused Sternsystem (external edit detection)
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, manifest.systemId);
-    if (entry?.status === "paused") {
+    const config = await readSystemConfig(workspaceRoot, manifest.systemId);
+    if (config?.status === "paused") {
       throw new Error(
         `[mission.materialize] system '${manifest.systemId}' is paused due to external edit detection. Run sternsystem.validate for details.`,
       );
     }
 
-    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+    const systemDir = resolveCacheClonePath(workspaceRoot, manifest.systemId);
 
     // RFC-0356 §1.1 step 2: fetch the latest remote state into the cache clone.
     await syncCacheClone(workspaceRoot, manifest.systemId, logger);
