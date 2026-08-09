@@ -43,6 +43,9 @@ export {
   fleetRegistrySchema,
   serviceSubdomainSchema,
   serviceEntrySchema,
+  systemConfigSchema,
+  systemStateSchema,
+  servicesRegistrySchema,
 } from "./sternsystem.ts";
 export type {
   SystemPin,
@@ -52,6 +55,9 @@ export type {
   FleetRegistry,
   ServiceSubdomain,
   ServiceEntry,
+  SystemConfig,
+  SystemState,
+  ServicesRegistry,
 } from "./sternsystem.ts";
 
 // RFC-0362: Werkstatt consistency primitive schemas.
@@ -124,6 +130,7 @@ export {
   lastPropagatedChannelSchema,
   purgeResultSchema,
   deploymentConfigSchema,
+  deploymentStaticConfigSchema,
   healthCheckSchema,
   propagationResultSchema,
   routeFactSchema,
@@ -134,6 +141,7 @@ export type {
   LastPropagatedChannel,
   PurgeResult,
   DeploymentConfig,
+  DeploymentStaticConfig,
   HealthCheck,
   PropagationResult,
   RouteFact,

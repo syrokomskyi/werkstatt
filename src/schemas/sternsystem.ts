@@ -8,6 +8,7 @@ RFC-0561: fleetRegistryEntrySchema gains optional owner field (did:web VC subjec
 RFC-0574: replace repo/mirror with parameterized mirrors[] array.
 RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, services[] with subdomains to fleetRegistrySchema.
 RFC-0751: extend serviceEntrySchema with deployment fields (kind, url, publicEndpoints, routes, upstreams, lastDeployed, healthCheckPath).
+RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for convention-based discovery (replaces fleetRegistrySchema).
 </purpose>
 <non-goals>
   <item>Do not perform file IO or git operations — pure shape only.</item>
@@ -21,12 +22,17 @@ RFC-0751: extend serviceEntrySchema with deployment fields (kind, url, publicEnd
   <item>RFC-0574: replace repo/mirror with mirrors[] array (mirrorEntrySchema, mirrorStorageTypeSchema).</item>
   <item>RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, serviceSubdomainSchema + serviceEntrySchema + services[] to fleetRegistrySchema.</item>
   <item>RFC-0751: extend serviceEntrySchema with kind, url, publicEndpoints, routes, upstreams, lastDeployed, healthCheckPath.</item>
+  <item>RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for convention-based discovery.</item>
 </CHANGE_SUMMARY>
 */
 
 import { z } from "zod";
 import { starNameSchema } from "@warpgogol/werkstatt-site/ontology/cosmic";
-import { deploymentConfigSchema } from "./leitstand.ts";
+import {
+  deploymentConfigSchema,
+  deploymentStaticConfigSchema,
+  lastPropagatedChannelSchema,
+} from "./leitstand.ts";
 
 const semverRe = /^\d+\.\d+\.\d+$/;
 const sha256Re = /^sha256:[0-9a-f]{64}$/;
@@ -122,8 +128,54 @@ export const fleetRegistrySchema = z.object({
   services: z.array(serviceEntrySchema).optional(),
 });
 
+// RFC-0790: Convention-based discovery schemas (replaces fleet registry)
+
+export const systemConfigSchema = z.object({
+  schemaVersion: z.string().min(1),
+  id: z.string().regex(kebabRe, "id must be kebab-case, lowercase, latin-only"),
+  cosmicStar: starNameSchema,
+  mirrors: z.array(mirrorEntrySchema).min(1, "mirrors must contain at least 1 entry"),
+  pinnedPlatform: z.string().regex(semverRe, "pinnedPlatform must be x.y.z"),
+  status: z.enum(["registered", "active", "paused", "archived"]),
+  registeredAt: z.string().datetime(),
+  deployment: deploymentStaticConfigSchema.optional(),
+  cloudflareZoneId: z
+    .string()
+    .min(1, "cloudflareZoneId must be non-empty")
+    .optional()
+    .describe("Cloudflare zone ID for DNS and Workers route management (RFC-0752)"),
+  owner: z
+    .string()
+    .regex(didWebRe, "owner must be a did:web identifier (did:web:<domain>#<key-version>)")
+    .optional()
+    .describe("VC subject id of the site owner (RFC-0558, RFC-0561)"),
+  notes: z.string().default(""),
+});
+
+export const systemStateSchema = z.object({
+  schemaVersion: z.string().min(1),
+  systemId: z.string().regex(kebabRe, "systemId must be kebab-case, lowercase, latin-only"),
+  currentMission: z.string().nullable().default(null),
+  lastRelease: z.string().nullable().default(null),
+  lastPropagated: z
+    .object({
+      dev: lastPropagatedChannelSchema.optional(),
+      alt: lastPropagatedChannelSchema.optional(),
+      main: lastPropagatedChannelSchema.optional(),
+    })
+    .default({}),
+});
+
+export const servicesRegistrySchema = z.object({
+  schemaVersion: z.string().min(1),
+  services: z.array(serviceEntrySchema),
+});
+
 export type SystemPin = z.infer<typeof systemPinSchema>;
 export type FleetRegistryEntry = z.infer<typeof fleetRegistryEntrySchema>;
 export type FleetRegistry = z.infer<typeof fleetRegistrySchema>;
 export type ServiceSubdomain = z.infer<typeof serviceSubdomainSchema>;
 export type ServiceEntry = z.infer<typeof serviceEntrySchema>;
+export type SystemConfig = z.infer<typeof systemConfigSchema>;
+export type SystemState = z.infer<typeof systemStateSchema>;
+export type ServicesRegistry = z.infer<typeof servicesRegistrySchema>;
