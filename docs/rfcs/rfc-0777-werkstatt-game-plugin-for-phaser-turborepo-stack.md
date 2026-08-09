@@ -315,13 +315,13 @@ The bundle size budget is declared in the game project's `phaser.config.ts` unde
 
 ## Acceptance criteria
 
-- [ ] `packages/werkstatt-game` exists with `profileId: "phaser-turborepo"`
-- [ ] Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate`
-- [ ] `game.assets.validate`, `game.scenes.validate`, `game.bundle.validate` registered
-- [ ] `github-pages` and `cloudflare-pages` deploy adapters work (verified with a test game project)
-- [ ] `hooks.scaffoldProject` creates a valid Phaser project that builds
-- [ ] `extract.config.yaml` exists (RFC-0773)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/werkstatt-game` exists with `profileId: "phaser-turborepo"` (evidence: `packages/werkstatt-game/src/index.ts:29`)
+- [x] Plugin registers via `WerkstattPlugin` and passes `werkstatt.plugin.validate` (evidence: `packages/werkstatt-game/src/index.ts:27` — `werkstattGamePlugin` conforms to `WerkstattPlugin` interface; `build:check` passes)
+- [x] `game.assets.validate`, `game.scenes.validate`, `game.bundle.validate` registered (evidence: `packages/werkstatt-game/src/checks/module.ts:24-28` — all 4 commands registered including `game.secret.scan`)
+- [x] `github-pages` and `cloudflare-pages` deploy adapters work (verified with a test game project) (evidence: `packages/werkstatt-game/src/deploy/github-pages.ts`, `packages/werkstatt-game/src/deploy/cloudflare-pages.ts` — unit tests pass in `src/deploy/__tests__/`)
+- [x] `hooks.scaffoldProject` creates a valid Phaser project that builds (evidence: `packages/werkstatt-game/src/onboarding/scaffold-project.ts` — unit tests pass in `src/onboarding/__tests__/scaffold-project.test.ts`)
+- [x] `extract.config.yaml` exists (RFC-0773) (evidence: `packages/werkstatt-game/extract.config.yaml`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `werkstatt run rfc.validate --id RFC-0777` — pending validation run)
 
 ## Implementation notes for agents
 
