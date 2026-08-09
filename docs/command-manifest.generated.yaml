@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 1b6539df079dda5ae72613eb026a6a4fb93b825cd3c0ee1f6f42498cabbd5334
+  contentHash: 9064a9490572449e88e9a7667cbfeaeed0b134882582e464fd0f9ec9d23a8bc8
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -149,8 +149,9 @@ commands:
       - packages.check
   - name: agent.capability.validate
     description: Validate the closed capability catalog
-      (packages/ontology/capabilities/) and enforce human-parity + gating for
-      capabilities active on this app (RFC-0288, AGC-01..05).
+      (packages/werkstatt-site/src/domain/ontology/capabilities/) and enforce
+      human-parity + gating for capabilities active on this app (RFC-0288,
+      AGC-01..05).
     scope: app
     provider: workspace
     module: check
@@ -159,7 +160,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/capabilities/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/capabilities/**/*.yaml
       - <app>/src/content/system.md
     writes: []
     validatesOutputs: []
@@ -660,7 +661,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/analytics/**
+      - packages/werkstatt-site/src/domain/ontology/analytics/**
     writes: []
     validatesOutputs: []
     pipelines:
@@ -690,7 +691,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/analytics/messkanon.yaml
+      - packages/werkstatt-site/src/domain/ontology/analytics/messkanon.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -783,8 +784,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: archetype.registry.build
-    description: Build packages/ontology/archetypes/index.yaml from RFC-0072
-      archetype YAML files.
+    description: Build
+      packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml from
+      RFC-0072 archetype YAML files.
     scope: workspace
     provider: workspace
     module: check
@@ -793,9 +795,9 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/archetypes/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml
     writes:
-      - packages/ontology/archetypes/index.yaml
+      - packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml
     validatesOutputs: []
     pipelines: []
   - name: archetype.registry.validate
@@ -809,9 +811,9 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/archetypes/index.yaml
-      - packages/ontology/archetypes/**/*.yaml
-      - packages/ui/src/{sections,components}/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml
+      - packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -969,7 +971,7 @@ commands:
     flags: {}
     reads:
       - packages/*/package.json
-      - packages/ui/src/{sections,components,pages}/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -1194,10 +1196,11 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: barrel.size.lint
-    description: "Guard the @warpgogol/share barrel split: BARREL-01 fails when a
-      package's root src/index.ts exceeds the export-line threshold (error for
-      @warpgogol/share, warning elsewhere); BARREL-02 fails when a symbol is
-      exported from both the root barrel and a declared subpath (RFC-0264)."
+    description: "Guard the @warpgogol/werkstatt-site/share barrel split: BARREL-01
+      fails when a package's root src/index.ts exceeds the export-line threshold
+      (error for @warpgogol/werkstatt-site/share, warning elsewhere); BARREL-02
+      fails when a symbol is exported from both the root barrel and a declared
+      subpath (RFC-0264)."
     scope: workspace
     provider: workspace
     module: check
@@ -1371,7 +1374,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/site-families/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml
       - <app>/src/content/system.md
     writes: []
     validatesOutputs: []
@@ -1768,8 +1771,8 @@ commands:
     pipelines: []
   - name: chat.metadata.drift.validate
     description: "Workspace-scoped drift guard: verify CHAT_ADAPTER_METADATA in
-      @warpgogol/chat matches the requiredOptions/vendorOrigins declared on each
-      ChatWidgetAdapter in chat-adapter-* packages."
+      @warpgogol/werkstatt-site/chat matches the requiredOptions/vendorOrigins
+      declared on each ChatWidgetAdapter in chat-adapter-* packages."
     scope: workspace
     provider: workspace
     module: check
@@ -1888,7 +1891,7 @@ commands:
         kind: string
         description: Path to an audience profile YAML file.
     reads:
-      - packages/ontology/check-audiences/**
+      - packages/werkstatt-site/src/domain/ontology/check-audiences/**
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -1916,7 +1919,7 @@ commands:
         description: Regenerate even when audience-review.json already exists.
     reads:
       - .check-warpgogol/runs/**
-      - packages/ontology/check-audiences/**
+      - packages/werkstatt-site/src/domain/ontology/check-audiences/**
     writes:
       - .check-warpgogol/runs/**
     validatesOutputs: []
@@ -2748,7 +2751,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/system.md
-      - packages/ui/src/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -2763,16 +2766,16 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/constellations/**/*.yaml
-      - packages/ontology/archetypes/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/constellations/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
   - name: content-types.validate
     description: Validate that every manifest.yaml in
-      packages/ui/src/{components,sections}/ with contentSchemaKey has a
-      matching .types.ts sibling (DNA-10, RFC-0034).
+      packages/werkstatt-site/src/domain/ui/{components,sections}/ with
+      contentSchemaKey has a matching .types.ts sibling (DNA-10, RFC-0034).
     scope: workspace
     provider: workspace
     module: check
@@ -2781,8 +2784,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/{components,sections}/**/*.manifest.yaml
-      - packages/ui/src/{components,sections}/**/*.types.ts
+      - packages/werkstatt-site/src/domain/ui/{components,sections}/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/{components,sections}/**/*.types.ts
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -3353,7 +3356,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/**/*.md
-      - packages/ontology/site-families/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -3369,8 +3372,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.manifest.yaml
-      - packages/ui/src/components/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/components/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -3378,7 +3381,8 @@ commands:
   - name: cosmic.literals.lint
     description: Fail when any Star/Planet/Moon cosmic-catalog name appears as a
       string literal in packages/share/src — cosmic-name-keyed dispatch behavior
-      must derive from @warpgogol/ontology/archetypes instead (RFC-0263).
+      must derive from @warpgogol/werkstatt-site/ontology/archetypes instead
+      (RFC-0263).
     scope: workspace
     provider: workspace
     module: check
@@ -3435,8 +3439,8 @@ commands:
         description: Cosmic/archetype layer to update.
     reads: []
     writes:
-      - packages/ontology/{archetypes,constellations}/**/*.{yaml,yml,md}
-      - packages/ui/src/{sections,components}/**/*.{yaml,yml,md}
+      - packages/werkstatt-site/src/domain/ontology/{archetypes,constellations}/**/*.{yaml,yml,md}
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.{yaml,yml,md}
       - apps/**/*.{yaml,yml,md}
       - onboarding/.output/**/*.{yaml,yml,md}
     validatesOutputs: []
@@ -3452,8 +3456,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.manifest.yaml
-      - packages/ui/src/components/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/components/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -4407,7 +4411,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/{sections,components}/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -4470,7 +4474,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/entitlements.generated.yaml
-      - packages/ontology/entitlements/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/entitlements/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -4748,7 +4752,8 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: family.contract.validate
-    description: Validate packages/ontology/site-families/<id>/family.yaml
+    description: Validate
+      packages/werkstatt-site/src/domain/ontology/site-families/<id>/family.yaml
       contracts, companion files, and recipe references (RFC-0071).
     scope: workspace
     provider: workspace
@@ -4758,7 +4763,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/site-families/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -5201,7 +5206,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/system.md
-      - packages/ontology/site-families/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml
     writes:
       - <app>/src/styles/fonts.imports.css
     validatesOutputs: []
@@ -5679,7 +5684,7 @@ commands:
   - name: fs.walk.lint
     description: "WALK-01: fails when a packages/** source file declares its own
       nested recursive readdir walker instead of importing collectFiles from
-      @warpgogol/share/fs (RFC-0303)."
+      @warpgogol/werkstatt-site/share/fs (RFC-0303)."
     scope: workspace
     provider: workspace
     module: check
@@ -6180,7 +6185,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/system.md
-      - packages/ontology/growth/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/growth/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -6197,14 +6202,14 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/system.md
-      - packages/ontology/growth/experiments/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/growth/experiments/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
   - name: growth.experiment.validate
     description: Validate experiment YAML files in
-      packages/ontology/growth/experiments/ and cross-reference with system.yaml
-      growth.experiments[] (DNA-29, RFC-0027).
+      packages/werkstatt-site/src/domain/ontology/growth/experiments/ and
+      cross-reference with system.yaml growth.experiments[] (DNA-29, RFC-0027).
     scope: app
     provider: workspace
     module: check
@@ -6214,12 +6219,13 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/system.md
-      - packages/ontology/growth/experiments/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/growth/experiments/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
   - name: growth.funnel.validate
-    description: Validate funnel YAML files in packages/ontology/growth/funnels/ and
+    description: Validate funnel YAML files in
+      packages/werkstatt-site/src/domain/ontology/growth/funnels/ and
       cross-reference with system.yaml growth.funnels[] (DNA-28, RFC-0027).
     scope: app
     provider: workspace
@@ -6230,7 +6236,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/system.md
-      - packages/ontology/growth/funnels/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/growth/funnels/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -6309,7 +6315,8 @@ commands:
       bundle:
         kind: string
         description: Path to the handoff bundle directory.
-    reads: []
+    reads:
+      - handoff/**/*
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -6443,9 +6450,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: icons.generate
-    description: Generate Astro icon components for @warpgogol/ui package. Reads
-      JSON files from packages/ui/src/assets/icons/lordicon/ and outputs
-      components to packages/ui/src/icons/gen/lordicon/.
+    description: Generate Astro icon components for @warpgogol/werkstatt-site/ui
+      package. Reads JSON files from packages/ui/src/assets/icons/lordicon/ and
+      outputs components to packages/ui/src/icons/gen/lordicon/.
     scope: workspace
     provider: workspace
     module: icons
@@ -7491,8 +7498,9 @@ commands:
     pipelines: []
   - name: manifest.contract.validate
     description: Validate every *.manifest.yaml in
-      packages/ui/src/{sections,components,pages}/ against @warpgogol/ontology
-      manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).
+      packages/werkstatt-site/src/domain/ui/{sections,components,pages}/ against
+      @warpgogol/werkstatt-site/ontology manifestSchema and check colocated
+      .astro exists (DNA-17, RFC-0023).
     scope: workspace
     provider: workspace
     module: check
@@ -7501,7 +7509,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/{sections,components,pages}/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -7595,7 +7603,7 @@ commands:
     flags: {}
     reads:
       - packages/os/site-kernel-checks/src/analytics/matomo/provisioning.ts
-      - packages/ontology/analytics/matomo-fleet.registry.yaml
+      - packages/werkstatt-site/src/domain/ontology/analytics/matomo-fleet.registry.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -7677,7 +7685,8 @@ commands:
     requiresNetwork: false
     timeoutMs: null
     flags: {}
-    reads: []
+    reads:
+      - docs/rfcs/**/*.md
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -7700,8 +7709,9 @@ commands:
     pipelines: []
   - name: mirror.quintet.validate
     description: Validate every .astro file in
-      packages/ui/src/{sections,components,pages}/ has a colocated
-      *.manifest.yaml — the fifth Mirror Quintet leg (DNA-17, RFC-0023).
+      packages/werkstatt-site/src/domain/ui/{sections,components,pages}/ has a
+      colocated *.manifest.yaml — the fifth Mirror Quintet leg (DNA-17,
+      RFC-0023).
     scope: workspace
     provider: workspace
     module: check
@@ -7710,7 +7720,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/{sections,components,pages}/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -8774,8 +8784,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: not-found.validate
-    description: Validate generated 404 route status handling, shared @warpgogol/ui
-      import, and absence of app-local styling (RFC-0310).
+    description: Validate generated 404 route status handling, shared
+      @warpgogol/werkstatt-site/ui import, and absence of app-local styling
+      (RFC-0310).
     scope: app
     provider: workspace
     module: check
@@ -8898,7 +8909,7 @@ commands:
     description: "Offline lint: every metric name/label key is declared in
       WARPGOGOL_METRIC_REGISTRY, naming grammar is valid, no forbidden label
       keys, no duplicate names, no direct OTLP env reads outside
-      @warpgogol/observability (RFC-0337)."
+      @warpgogol/werkstatt-site/observability (RFC-0337)."
     scope: workspace
     provider: workspace
     module: observability
@@ -9070,7 +9081,7 @@ commands:
   - name: onboarding.yaml.import.lint
     description: Block direct YAML.parse of RFC-0076 onboarding artifacts in kernel
       onboarding/audit/content-discipline sources; require
-      @warpgogol/share/onboarding-yaml (RFC-0082).
+      @warpgogol/werkstatt-site/share/onboarding-yaml (RFC-0082).
     scope: workspace
     provider: workspace
     module: check
@@ -9188,7 +9199,7 @@ commands:
     reads:
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
-      - packages/ui/src/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -9260,9 +9271,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: page.pipeline.contract
-    description: Verify buildPage(entry, ctx) from @warpgogol/share returns a valid
-      ResolvedPage shape and that visibility filtering works correctly (DNA-25,
-      RFC-0026).
+    description: Verify buildPage(entry, ctx) from @warpgogol/werkstatt-site/share
+      returns a valid ResolvedPage shape and that visibility filtering works
+      correctly (DNA-25, RFC-0026).
     scope: workspace
     provider: workspace
     module: check
@@ -9288,7 +9299,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/system.md
-      - packages/ui/src/components/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/components/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -9739,8 +9750,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/archetypes/**/*.yaml
-      - packages/ui/src/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -9830,7 +9841,7 @@ commands:
     reads:
       - <app>/src/content/system.md
       - <app>/src/content/**/*.md
-      - packages/ontology/biomes/**/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/biomes/**/*.yaml
     writes:
       - <app>/public/preview/**
       - <app>/public/og-image.png
@@ -9880,8 +9891,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/**/*.css
-      - packages/ui/src/**/*.scss
+      - packages/werkstatt-site/src/domain/ui/**/*.css
+      - packages/werkstatt-site/src/domain/ui/**/*.scss
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -9951,8 +9962,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/{sections,components}/**/*.manifest.yaml
-      - packages/ui/src/{sections,components}/**/*.types.generated.ts
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.types.generated.ts
     writes: []
     validatesOutputs: []
     pipelines:
@@ -9973,10 +9984,10 @@ commands:
         kind: boolean
         description: Report what would be written without touching the filesystem.
     reads:
-      - packages/ui/src/{sections,components}/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml
     writes:
-      - packages/ui/src/sections/{id}/{id}.types.generated.ts
-      - packages/ui/src/components/{id}/{id}.types.generated.ts
+      - packages/werkstatt-site/src/domain/ui/sections/{id}/{id}.types.generated.ts
+      - packages/werkstatt-site/src/domain/ui/components/{id}/{id}.types.generated.ts
     validatesOutputs: []
     pipelines: []
   - name: pseo.experiment.plan
@@ -10329,7 +10340,7 @@ commands:
       - <app>/src/surface.generated.yaml
       - <app>/src/content/surface/articles/**/*.md
       - <app>/src/content/surface/article-categories/**/*.md
-      - packages/ontology/blueprints/ratgeber.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/ratgeber.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -11062,7 +11073,7 @@ commands:
     flags: {}
     reads:
       - packages/share/src/**/*.ts
-      - packages/ui/src/**/*.ts
+      - packages/werkstatt-site/src/domain/ui/**/*.ts
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -11143,7 +11154,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -11160,16 +11171,16 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.manifest.yaml
-      - packages/ontology/src/**/*.ts
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ontology/src/**/*.ts
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
   - name: section.contract.validate
     description: Validate section folder contract surfaces in
-      packages/ui/src/sections including manifest, astro, css, types/schema, and
-      story files (RFC-0072).
+      packages/werkstatt-site/src/domain/ui/sections including manifest, astro,
+      css, types/schema, and story files (RFC-0072).
     scope: workspace
     provider: workspace
     module: check
@@ -11178,16 +11189,17 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**
+      - packages/werkstatt-site/src/domain/ui/sections/**
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
   - name: section.css.import.validate
-    description: Validate every colocated .css file under packages/ui/src/sections/
-      and packages/ui/src/components/ is imported by at least one .astro file
-      (CSS-IMPORT-01) and that .css filename matches colocated .astro filename
-      (CSS-NAME-01).
+    description: Validate every colocated .css file under
+      packages/werkstatt-site/src/domain/ui/sections/ and
+      packages/werkstatt-site/src/domain/ui/components/ is imported by at least
+      one .astro file (CSS-IMPORT-01) and that .css filename matches colocated
+      .astro filename (CSS-NAME-01).
     scope: workspace
     provider: workspace
     module: check
@@ -11196,10 +11208,10 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.css
-      - packages/ui/src/sections/**/*.astro
-      - packages/ui/src/components/**/*.css
-      - packages/ui/src/components/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.css
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/components/**/*.css
+      - packages/werkstatt-site/src/domain/ui/components/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -11207,7 +11219,7 @@ commands:
   - name: section.cta.contract.validate
     description: Validate CTAs in shared sections render through <SectionCta> or
       <SectionCtaGroup>. Raw <a class="btn ..."> markup inside
-      packages/ui/src/sections is rejected (RFC-0104).
+      packages/werkstatt-site/src/domain/ui/sections is rejected (RFC-0104).
     scope: workspace
     provider: workspace
     module: check
@@ -11216,7 +11228,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -11232,16 +11244,16 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/**/*.ts
-      - packages/ui/src/**/*.tsx
+      - packages/werkstatt-site/src/domain/ui/**/*.ts
+      - packages/werkstatt-site/src/domain/ui/**/*.tsx
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
   - name: section.header.contract.validate
     description: Validate every section uses <SectionHeader> for headings; raw
-      <h1>/<h2> with section-heading classes inside packages/ui/src/sections are
-      rejected (RFC-0102).
+      <h1>/<h2> with section-heading classes inside
+      packages/werkstatt-site/src/domain/ui/sections are rejected (RFC-0102).
     scope: workspace
     provider: workspace
     module: check
@@ -11250,7 +11262,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -11267,8 +11279,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.astro
-      - packages/ui/src/sections/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -11290,9 +11302,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: section.placeholder.lint
-    description: Lint packages/ui/src/sections for section components that still
-      render the JSON.stringify scaffold stub. Failing means the section is
-      unfit to ship (RFC-0093).
+    description: Lint packages/werkstatt-site/src/domain/ui/sections for section
+      components that still render the JSON.stringify scaffold stub. Failing
+      means the section is unfit to ship (RFC-0093).
     scope: workspace
     provider: workspace
     module: check
@@ -11301,14 +11313,14 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
   - name: section.scaffold
     description: Generate a starter section folder from an RFC-0072 archetype
-      contract in packages/ui/src/sections.
+      contract in packages/werkstatt-site/src/domain/ui/sections.
     scope: workspace
     provider: workspace
     module: check
@@ -11333,14 +11345,14 @@ commands:
         description: Semantic role for the scaffolded section/component.
     reads: []
     writes:
-      - packages/ui/src/sections/{section-id}/**
+      - packages/werkstatt-site/src/domain/ui/sections/{section-id}/**
     validatesOutputs: []
     pipelines: []
   - name: section.shell.contract.validate
-    description: Validate every section .astro under packages/ui/src/sections
-      renders through <SectionShell>. Rejects raw <section> roots, missing
-      SectionShell imports, and any reference to the deleted VisualModifiers
-      (RFC-0101 + RFC-0107).
+    description: Validate every section .astro under
+      packages/werkstatt-site/src/domain/ui/sections renders through
+      <SectionShell>. Rejects raw <section> roots, missing SectionShell imports,
+      and any reference to the deleted VisualModifiers (RFC-0101 + RFC-0107).
     scope: workspace
     provider: workspace
     module: check
@@ -11349,7 +11361,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -11701,8 +11713,8 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: share.i18n.lint
-    description: Scan registered @warpgogol/share UI-facing helper targets for
-      unclassified hardcoded public strings (RFC-0230).
+    description: Scan registered @warpgogol/werkstatt-site/share UI-facing helper
+      targets for unclassified hardcoded public strings (RFC-0230).
     scope: workspace
     provider: workspace
     module: check
@@ -11720,9 +11732,9 @@ commands:
     pipelines:
       - packages.check
   - name: share.utility.lint
-    description: "Validate that apps use @warpgogol/share utilities instead of
-      re-implementing them locally. Per RFC-0037: allows astro:content imports
-      in @warpgogol/share."
+    description: "Validate that apps use @warpgogol/werkstatt-site/share utilities
+      instead of re-implementing them locally. Per RFC-0037: allows
+      astro:content imports in @warpgogol/werkstatt-site/share."
     scope: workspace
     provider: workspace
     module: check
@@ -11742,7 +11754,7 @@ commands:
     pipelines: []
   - name: shared-ui.thin-copy.validate
     description: Detect hardcoded copy in shared UI Astro sections under
-      packages/ui/src/sections.
+      packages/werkstatt-site/src/domain/ui/sections.
     scope: workspace
     provider: workspace
     module: check
@@ -11751,7 +11763,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/sections/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -11799,7 +11811,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ontology/src/**/*.ts
+      - packages/werkstatt-site/src/domain/ontology/src/**/*.ts
     writes: []
     validatesOutputs: []
     pipelines:
@@ -12370,7 +12382,7 @@ commands:
         description: Emit machine-readable JSON output.
     reads:
       - <app>/src/pages/**/*.astro
-      - packages/ui/src/sections/navigation-section/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/sections/navigation-section/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -12572,7 +12584,7 @@ commands:
       - <app>/src/surface.generated.yaml
       - <app>/src/content/surface/cities/**/*.md
       - <app>/src/content/surface/demands/**/*.md
-      - packages/ontology/blueprints/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -12590,7 +12602,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/surface.generated.yaml
-      - packages/ontology/blueprints/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -12773,7 +12785,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/surface.generated.yaml
-      - packages/ontology/blueprints/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -12790,7 +12802,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/surface/industries/**/*.md
-      - packages/ontology/blueprints/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -12806,7 +12818,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/surface/intersections/**/*.md
-      - packages/ontology/blueprints/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -12823,7 +12835,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/surface/intersections/**/*.md
-      - packages/ontology/blueprints/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -12964,7 +12976,7 @@ commands:
     flags: {}
     reads:
       - <app>/src/content/surface/services/**/*.md
-      - packages/ontology/blueprints/*.yaml
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -13466,8 +13478,9 @@ commands:
     pipelines: []
   - name: tokens.catalog.sync
     description: Verify that every --ds-* custom property in
-      packages/tokens/src/tokens.css is listed in @warpgogol/tokens TOKEN_NAMES
-      and vice versa. Reports drift in both directions.
+      packages/tokens/src/tokens.css is listed in
+      @warpgogol/werkstatt-site/tokens TOKEN_NAMES and vice versa. Reports drift
+      in both directions.
     scope: workspace
     provider: workspace
     module: check
@@ -13494,16 +13507,16 @@ commands:
     flags: {}
     reads:
       - <app>/src/styles/**/*.css
-      - packages/ui/src/**/*.css
+      - packages/werkstatt-site/src/domain/ui/**/*.css
     writes: []
     validatesOutputs: []
     pipelines: []
   - name: tokens.colors.section-shell.lint
     description: "Lint CSS under
-      packages/ui/src/components/{section-shell,section-header,section-body,sec\
-      tion-cta,section-cta-group,section-image,site-background}: raw #hex,
-      rgb()/rgba(), and hsl()/hsla() are forbidden (RFC-0098 + RFC-0108 +
-      RFC-0122)."
+      packages/werkstatt-site/src/domain/ui/components/{section-shell,section-h\
+      eader,section-body,section-cta,section-cta-group,section-image,site-backg\
+      round}: raw #hex, rgb()/rgba(), and hsl()/hsla() are forbidden (RFC-0098 +
+      RFC-0108 + RFC-0122)."
     scope: workspace
     provider: workspace
     module: check
@@ -13512,7 +13525,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css
+      - packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css
     writes: []
     validatesOutputs: []
     pipelines:
@@ -13533,8 +13546,8 @@ commands:
     pipelines: []
   - name: tokens.section-shell.contract.validate
     description: Verify every --ds-* token referenced under the eight
-      section-framework component directories exists in @warpgogol/tokens
-      TOKEN_NAME_SET (RFC-0108 + RFC-0124).
+      section-framework component directories exists in
+      @warpgogol/werkstatt-site/tokens TOKEN_NAME_SET (RFC-0108 + RFC-0124).
     scope: workspace
     provider: workspace
     module: check
@@ -13543,7 +13556,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css
+      - packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css
       - packages/tokens/src/**/*.ts
     writes: []
     validatesOutputs: []
@@ -13584,8 +13597,9 @@ commands:
     pipelines:
       - packages.check
   - name: ui.i18n.lint
-    description: Scan packages/ui/src/{sections,components}/ for hardcoded
-      human-readable strings and non-trivial resolveLabel fallbacks (RFC-0189).
+    description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
+      for hardcoded human-readable strings and non-trivial resolveLabel
+      fallbacks (RFC-0189).
     scope: workspace
     provider: workspace
     module: check
@@ -13597,15 +13611,15 @@ commands:
         kind: string
         description: Override the default scan path.
     reads:
-      - packages/ui/src/{sections,components}/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
   - name: ui.silent-defaults.lint
-    description: Scan packages/ui/src/{sections,components}/ for silent empty-string
-      fallbacks (?? "", = "", defaultContent) on UI-visible text props
-      (RFC-0205).
+    description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
+      for silent empty-string fallbacks (?? "", = "", defaultContent) on
+      UI-visible text props (RFC-0205).
     scope: workspace
     provider: workspace
     module: check
@@ -13617,7 +13631,7 @@ commands:
         kind: string
         description: Override the default scan path.
     reads:
-      - packages/ui/src/{sections,components}/**/*.astro
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro
     writes: []
     validatesOutputs: []
     pipelines:
@@ -13634,7 +13648,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - packages/ui/src/{sections,components,pages}/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml
       - <app>/src/content/system.md
     writes:
       - uni.registry.yaml
@@ -13652,7 +13666,7 @@ commands:
     flags: {}
     reads:
       - uni.registry.yaml
-      - packages/ui/src/{sections,components,pages}/**/*.manifest.yaml
+      - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
     pipelines:
@@ -14160,6 +14174,42 @@ commands:
       - missions/{mission}/workpiece/**
     validatesOutputs: []
     pipelines: []
+  - name: workshop.scaffold
+    description: Scaffold a consumer workshop monorepo from a stack profile
+      (RFC-0779). Creates workshop files, delegates forge artifacts to
+      forge.init.
+    scope: workspace
+    provider: workspace
+    module: workshop
+    mutatesState: true
+    requiresNetwork: true
+    timeoutMs: null
+    flags:
+      name:
+        kind: string
+        required: true
+        description: Workshop name (kebab-case).
+      stack:
+        kind: string
+        required: true
+        description: "Stack profile id. Available: astro-typescript-turborepo,
+          phaser-turborepo, editframe."
+      dest:
+        kind: string
+        required: true
+        description: Absolute path for the new workshop directory.
+      dry-run:
+        kind: boolean
+        description: Preview generated files without writing.
+      verify:
+        kind: boolean
+        description: Run post-scaffold verification (pnpm install + forge.doctor +
+          plugin.validate + autonomy.validate). Requires valid .npmrc token.
+    reads: []
+    writes:
+      - "{dest}/**"
+    validatesOutputs: []
+    pipelines: []
   - name: workspace.discovery.validate
     description: Validate shared pnpm workspace package discovery helper behavior
       and diagnostics (RFC-0253).
@@ -14197,8 +14247,8 @@ commands:
       - packages.check
   - name: workspace.write.boundary.lint
     description: Validate that every workspace-shared file write (workspace root,
-      docs/, packages/ontology/) is atomic (writeFileAtomic) and declared on
-      SHARED_WRITE_ALLOWLIST (RFC-0258).
+      docs/, packages/werkstatt-site/src/domain/ontology/) is atomic
+      (writeFileAtomic) and declared on SHARED_WRITE_ALLOWLIST (RFC-0258).
     scope: workspace
     provider: workspace
     module: check
