@@ -20,11 +20,11 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Dirent } from "node:fs";
 import { dnsRecordFileSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
 import { flagString } from "./dns-helpers.ts";
+import { discoverSystems, resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 export interface DnsRecordsSchemaValidateResult {
   command: "dns.records.schema.validate";
@@ -50,19 +50,14 @@ export async function runDnsRecordsSchemaValidate(
   const filePaths: string[] = [];
 
   if (systemId) {
-    const filePath = join(workspaceRoot, "systems", systemId, "dns-records.yaml");
+    const cacheDir = resolveCacheClonePath(workspaceRoot, systemId);
+    const filePath = join(cacheDir, "dns-records.yaml");
     filePaths.push(filePath);
   } else {
-    const systemsDir = join(workspaceRoot, "systems");
-    let entries: Dirent[];
-    try {
-      entries = await readdir(systemsDir, { withFileTypes: true });
-    } catch {
-      entries = [];
-    }
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const filePath = join(systemsDir, entry.name, "dns-records.yaml");
+    const { systems } = await discoverSystems(workspaceRoot);
+    for (const sys of systems) {
+      const cacheDir = resolveCacheClonePath(workspaceRoot, sys.id);
+      const filePath = join(cacheDir, "dns-records.yaml");
       filePaths.push(filePath);
     }
   }

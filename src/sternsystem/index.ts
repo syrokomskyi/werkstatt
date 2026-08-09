@@ -155,7 +155,7 @@ export function createSternsystemModule(): KernelModule {
             description: "Sync all branches + tags instead of current branch only.",
           },
         },
-        writes: ["systems/{id}/bordbuch/events.ndjson"],
+        writes: ["../systems-cache/{id}/bordbuch/events.ndjson"],
         execute: runSternsystemSync,
       });
       registry.registerCommand({

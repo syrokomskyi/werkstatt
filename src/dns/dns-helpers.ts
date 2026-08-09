@@ -22,6 +22,7 @@ import type {
 } from "@warpgogol/werkstatt-site/ontology/schemas";
 import { filterEnv, sourceDotenv } from "../leitstand/adapters/cloudflare-workers.ts";
 import { resolveZoneId } from "../subdomain/subdomain-helpers.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 export { resolveZoneId as resolveDnsZoneId };
 
@@ -45,7 +46,8 @@ export async function loadDnsRecordFile(
   workspaceRoot: string,
   systemId: string,
 ): Promise<DnsRecordFile | null> {
-  const filePath = join(workspaceRoot, "systems", systemId, "dns-records.yaml");
+  const cacheDir = resolveCacheClonePath(workspaceRoot, systemId);
+  const filePath = join(cacheDir, "dns-records.yaml");
   let raw: string;
   try {
     raw = await readFile(filePath, "utf-8");
