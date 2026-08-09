@@ -858,6 +858,9 @@ importers:
       '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
+      '@warpgogol/werkstatt-site':
+        specifier: workspace:*
+        version: link:../../werkstatt-site
       yaml:
         specifier: ^2.9.0
         version: 2.9.0
