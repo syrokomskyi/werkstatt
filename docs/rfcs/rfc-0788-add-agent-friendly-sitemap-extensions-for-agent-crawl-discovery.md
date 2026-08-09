@@ -223,17 +223,17 @@ No new output format. The sitemap XML is amended in-place with additional `<xhtm
 
 ## Acceptance criteria
 
-- [ ] `generateSitemapXml` in `sitemap-helpers.ts` accepts optional `markdownTwins` parameter
-- [ ] `SitemapUrlEntry` type gains `markdownAlternates` field
-- [ ] `parseSitemapXml` extracts `<xhtml:link>` entries with `type` attribute into `markdownAlternates`
-- [ ] `runSitemapGenerate` builds `markdownTwins` map from `public/*.md` files using `markdownTwinRelPath`
-- [ ] Sitemap XML includes `<xhtml:link rel="alternate" type="text/markdown" href="...">` for pages with `.md` twins
-- [ ] `validateSitemapFile` validates markdown alternates separately from hreflang alternates
-- [ ] `sitemap.validate` verifies markdown alternate links point to existing `.md` files
-- [ ] Pages without `.md` twins do not have markdown alternate links
-- [ ] Empty `public/` (no `.md` twins) produces sitemap without markdown alternates — not an error
+- [x] `generateSitemapXml` in `sitemap-helpers.ts` accepts optional `markdownTwins` parameter (evidence: packages/werkstatt-site/src/checks/sitemap-helpers.ts:256-259, sitemap-helpers.test.ts:156-173)
+- [x] `SitemapUrlEntry` type gains `markdownAlternates` field (evidence: packages/werkstatt-site/src/checks/sitemap-helpers.ts:301-304, sitemap-helpers.test.ts:252-269)
+- [x] `parseSitemapXml` extracts `<xhtml:link>` entries with `type` attribute into `markdownAlternates` (evidence: packages/werkstatt-site/src/checks/sitemap-helpers.ts:324-330, sitemap-helpers.test.ts:252-269)
+- [x] `runSitemapGenerate` builds `markdownTwins` map from `public/*.md` files using `markdownTwinRelPath` (evidence: packages/werkstatt-site/src/checks/sitemap.ts:56-81, 97-103)
+- [x] Sitemap XML includes `<xhtml:link rel="alternate" type="text/markdown" href="...">` for pages with `.md` twins (evidence: packages/werkstatt-site/src/checks/sitemap-helpers.ts:267-271, sitemap-helpers.test.ts:156-173)
+- [x] `validateSitemapFile` validates markdown alternates separately from hreflang alternates (evidence: packages/werkstatt-site/src/checks/sitemap-helpers.ts:418-437, sitemap-helpers.test.ts:381-497)
+- [x] `sitemap.validate` verifies markdown alternate links point to existing `.md` files (evidence: packages/werkstatt-site/src/checks/sitemap.ts:166-172, 210, sitemap-helpers.test.ts:406-429)
+- [x] Pages without `.md` twins do not have markdown alternate links (evidence: packages/werkstatt-site/src/checks/sitemap-helpers.ts:268-271, sitemap-helpers.test.ts:175-197)
+- [x] Empty `public/` (no `.md` twins) produces sitemap without markdown alternates — not an error (evidence: packages/werkstatt-site/src/checks/sitemap.ts:62-80, sitemap-helpers.test.ts:456-472)
 - [ ] `isitagentready.com` reports sitemap includes content type alternates for warpgogol.com after deploy
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0788, exit code 0)
 
 ## Implementation notes for agents
 
