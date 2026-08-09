@@ -207,15 +207,15 @@ No new output format. Pipeline steps produce the same `KernelCommandResult` as w
 
 ## Acceptance criteria
 
-- [ ] `SITES_BUILD_PREPARE_PIPELINE` includes `agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.dns-aid.generate` before `agent.surface.sign` and after `agent.manifest.generate`
-- [ ] `SITES_BUILD_PREPARE_PIPELINE` includes `agent.markdown-negotiation.generate` after `page.markdown.generate`
-- [ ] `SITES_CHECK_AUTHOR_PIPELINE` includes `agent.api-catalog.validate`, `agent.mcp-card.validate`, `agent.dns-aid.validate` after `agent.surface.validate`
-- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` excludes `agent.api-catalog.generate` and `agent.mcp-card.generate` (public/ producers not needed for dev)
-- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` includes `agent.markdown-negotiation.generate` (src/ producer needed for dev testing)
-- [ ] `build.prepare` runs all new generators in correct order without manual intervention
-- [ ] `build.check` validates all new artifacts and reports drift
-- [ ] `agent.enabled: false` sites skip all new generators without errors
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `SITES_BUILD_PREPARE_PIPELINE` includes `agent.api-catalog.generate`, `agent.mcp-card.generate`, `agent.dns-aid.generate` before `agent.surface.sign` and after `agent.manifest.generate` (evidence: build-prepare.ts:73-81, grep verified)
+- [x] `SITES_BUILD_PREPARE_PIPELINE` includes `agent.markdown-negotiation.generate` after `page.markdown.generate` (evidence: build-prepare.ts:115-117, grep verified)
+- [x] `SITES_CHECK_AUTHOR_PIPELINE` includes `agent.api-catalog.validate`, `agent.mcp-card.validate`, `agent.dns-aid.validate` after `agent.surface.validate` (evidence: sites-check-author.ts:199-207, grep verified)
+- [x] `SITES_BUILD_PREPARE_DEV_PIPELINE` excludes `agent.api-catalog.generate` and `agent.mcp-card.generate` (public/ producers not needed for dev) (evidence: build-prepare.ts:197-200, removed by ecosystem.commit 5.9.18)
+- [x] `SITES_BUILD_PREPARE_DEV_PIPELINE` includes `agent.markdown-negotiation.generate` (src/ producer needed for dev testing) (evidence: build-prepare.ts:220, grep verified)
+- [x] `build.prepare` runs all new generators in correct order without manual intervention (evidence: pipeline array is linear and explicit, all generators after agent.manifest.generate and before agent.surface.sign)
+- [x] `build.check` validates all new artifacts and reports drift (evidence: sites-check-author.ts:202-207, validators spread into SITES_BUILD_CHECK_PIPELINE via ...SITES_CHECK_AUTHOR_PIPELINE)
+- [x] `agent.enabled: false` sites skip all new generators without errors (evidence: each generator handler checks agent.enabled and returns status: "skip" — agent-api-catalog.ts:48-55, agent-mcp-card.ts:48-55, agent-dns-aid.ts, agent-markdown-negotiation.ts:96-110)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0787 --json exitCode: 0, zero violations)
 
 ## Implementation notes for agents
 
