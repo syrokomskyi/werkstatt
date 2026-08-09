@@ -533,7 +533,8 @@ export async function loadSemanticSiteModel(
     // RFC-0160: unprefixed default language; prefixed non-default languages.
     const url = `${baseUrl}${localizeUrl(lang, slug, { defaultLanguage: defaultLang })}`;
 
-    const semanticType = page.semanticType as import("@warpgogol/werkstatt-site/share/semantic").SemanticPageType;
+    const semanticType =
+      page.semanticType as import("@warpgogol/werkstatt-site/share/semantic").SemanticPageType;
     const audience = page.audience ?? AUDIENCE_BY_PAGE_TYPE[semanticType];
 
     const model = await buildSemanticPageModelWith(reader, {
@@ -582,7 +583,8 @@ export async function loadSemanticSiteModel(
       const localized = (langBySlug.get(slug) ?? anchor) as Record<string, unknown>;
       const name = String(localized.name ?? slug);
       const url = `${baseUrl}${localizeUrl(lang, `${baseSeg}/${slug}`, { defaultLanguage: defaultLang })}`;
-      const semanticType = "person" as import("@warpgogol/werkstatt-site/share/semantic").SemanticPageType;
+      const semanticType =
+        "person" as import("@warpgogol/werkstatt-site/share/semantic").SemanticPageType;
       const model = await buildSemanticPageModelWith(reader, {
         pageId: `person:${slug}`,
         semanticType,
@@ -611,6 +613,8 @@ export async function loadSemanticSiteModel(
     defaultLanguage: defaultLang,
     organization: siteProfile.organization,
     pages: pageModels,
+    agent: (manifest as unknown as Record<string, unknown>).agent as
+      { enabled?: boolean } | undefined,
   };
 }
 

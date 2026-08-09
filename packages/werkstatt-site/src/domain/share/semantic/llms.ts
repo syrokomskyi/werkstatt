@@ -307,10 +307,18 @@ function formatMarkdownLinkRow(site: SemanticSiteModel, page: SemanticPageModel)
 export function buildLlmsIndex(site: SemanticSiteModel): string {
   const indexPages = site.pages.filter(inIndex);
   const llmsFullUrl = canonicalStaticUrl("/llms-full.txt", { baseUrl: site.baseUrl });
-  // RFC-0286/0287: the Agent Surface discovery document — structured knowledge +
-  // capabilities for tool-using agents, complementing this prose export.
-  const agentJsonUrl = canonicalStaticUrl("/.well-known/agent.json", { baseUrl: site.baseUrl });
   const siteDescription = site.organization.description ?? "";
+
+  // RFC-0789: agent discovery links — omitted when agent.enabled is false.
+  const agentEnabled = site.agent?.enabled !== false;
+  const agentLinks = agentEnabled
+    ? [
+        `> Machine-readable Agent Surface (structured knowledge + capabilities): [agent.json](${canonicalStaticUrl("/.well-known/agent.json", { baseUrl: site.baseUrl })}).`,
+        `> API discovery catalog (RFC 9727): [api-catalog](${canonicalStaticUrl("/.well-known/api-catalog", { baseUrl: site.baseUrl })}).`,
+        `> MCP Server Card (SEP-1649): [server-card.json](${canonicalStaticUrl("/.well-known/mcp/server-card.json", { baseUrl: site.baseUrl })}).`,
+        `> OpenAPI 3.1 specification: [agent.openapi.json](${canonicalStaticUrl("/.well-known/agent.openapi.json", { baseUrl: site.baseUrl })}).`,
+      ]
+    : [];
 
   // RFC-0184: canonical Markdown link rows with absolute URLs
   const primarySources = indexPages.map((page) => formatMarkdownLinkRow(site, page));
@@ -320,7 +328,7 @@ export function buildLlmsIndex(site: SemanticSiteModel): string {
     // RFC-0184: blockquoted site description with llms-full.txt reference
     ...(siteDescription ? [`> ${siteDescription}`] : []),
     `> For complete documentation in a single file, see [llms-full.txt](${llmsFullUrl}).`,
-    `> Machine-readable Agent Surface (structured knowledge + capabilities): [agent.json](${agentJsonUrl}).`,
+    ...agentLinks,
     "",
     "## Primary sources",
     ...primarySources,

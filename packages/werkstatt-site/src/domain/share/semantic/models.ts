@@ -397,4 +397,6 @@ export type SemanticSiteModel = {
   defaultLanguage?: string;
   organization: SemanticOrganization;
   pages: SemanticPageModel[];
+  /** RFC-0789: agent block from system.md, populated by the semantic loader. */
+  agent?: { enabled?: boolean };
 };
