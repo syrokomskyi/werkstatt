@@ -1,6 +1,11 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0354: Shared registry IO helpers for reading and writing systems/registry.yaml. RFC-0574: mirror path resolution helpers. RFC-0751: findServiceEntry helper.</purpose>
+<purpose>
+RFC-0790: Convention-based discovery IO helpers. Replaces registry-based readRegistry/writeRegistry
+with per-system system-config.yaml and system-state.yaml in cache clones.
+RFC-0574: mirror path resolution helpers (preserved, signature updated for SystemConfig).
+RFC-0751: findServiceEntry helper (preserved, reads from services/registry.yaml).
+</purpose>
 <non-goals>
   <item>Do not implement command logic — that lives in the individual command files.</item>
 </non-goals>
@@ -9,75 +14,179 @@
   <item>RFC-0354: initial registry IO helpers.</item>
   <item>RFC-0574: add resolveMirrors() and resolveCachePath() for parameterized mirror topology.</item>
   <item>RFC-0751: add findServiceEntry() helper for service registry lookups.</item>
+  <item>RFC-0790: replace registry IO with convention-based discovery. Add resolveCacheClonePath, readSystemConfig, readSystemState, writeSystemState, discoverSystems, readServicesRegistry. Remove readRegistry, writeRegistry, findEntry, findEntryByStar, resolveCachePath, registryExists, resolveRegistryPath. Change resolveMirrors to accept SystemConfig.</item>
 </CHANGE_SUMMARY>
 */
 
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile, readdir, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import {
-  fleetRegistrySchema,
-  type FleetRegistry,
-  type FleetRegistryEntry,
+  systemConfigSchema,
+  systemStateSchema,
+  servicesRegistrySchema,
+  type SystemConfig,
+  type SystemState,
+  type ServicesRegistry,
   type MirrorEntry,
   type ServiceEntry,
 } from "@warpgogol/werkstatt/schemas";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 
-const REGISTRY_PATH = path.join("systems", "registry.yaml");
+// --- RFC-0790: Convention-based path resolution ---
 
-export function resolveRegistryPath(workspaceRoot: string): string {
-  return path.join(workspaceRoot, REGISTRY_PATH);
+const SYSTEMS_CACHE_DIR = path.join("..", "systems-cache");
+const SERVICES_REGISTRY_PATH = path.join("services", "registry.yaml");
+
+export function resolveCacheClonePath(workspaceRoot: string, systemId: string): string {
+  return path.resolve(workspaceRoot, SYSTEMS_CACHE_DIR, systemId);
 }
 
-export async function readRegistry(workspaceRoot: string): Promise<FleetRegistry> {
-  const filePath = resolveRegistryPath(workspaceRoot);
+export function resolveWorkpiecePath(workspaceRoot: string, missionId: string): string {
+  return path.join(workspaceRoot, "missions", missionId, "workpiece");
+}
+
+// --- RFC-0790: Per-system config/state IO (cache clone — OUTSIDE mission) ---
+
+export async function readSystemConfig(workspaceRoot: string, systemId: string): Promise<SystemConfig> {
+  const cacheClone = resolveCacheClonePath(workspaceRoot, systemId);
+  const filePath = path.join(cacheClone, "system-config.yaml");
   const raw = await readFile(filePath, "utf8");
   const parsed = parseYaml(raw);
-  return fleetRegistrySchema.parse(parsed);
+  return systemConfigSchema.parse(parsed);
 }
 
-export async function writeRegistry(workspaceRoot: string, registry: FleetRegistry): Promise<void> {
-  const filePath = resolveRegistryPath(workspaceRoot);
+export async function readSystemConfigFromWorkpiece(workpieceDir: string): Promise<SystemConfig> {
+  const filePath = path.join(workpieceDir, "system-config.yaml");
+  const raw = await readFile(filePath, "utf8");
+  const parsed = parseYaml(raw);
+  return systemConfigSchema.parse(parsed);
+}
+
+export async function readSystemState(workspaceRoot: string, systemId: string): Promise<SystemState> {
+  const cacheClone = resolveCacheClonePath(workspaceRoot, systemId);
+  const filePath = path.join(cacheClone, "system-state.yaml");
+  if (!existsSync(filePath)) {
+    return {
+      schemaVersion: "1.0.0",
+      systemId,
+      currentMission: null,
+      lastRelease: null,
+      lastPropagated: {},
+    };
+  }
+  const raw = await readFile(filePath, "utf8");
+  const parsed = parseYaml(raw);
+  return systemStateSchema.parse(parsed);
+}
+
+export async function readSystemStateFromWorkpiece(workpieceDir: string): Promise<SystemState> {
+  const filePath = path.join(workpieceDir, "system-state.yaml");
+  if (!existsSync(filePath)) {
+    throw new Error(`[readSystemStateFromWorkpiece] system-state.yaml not found in workpiece ${workpieceDir}`);
+  }
+  const raw = await readFile(filePath, "utf8");
+  const parsed = parseYaml(raw);
+  return systemStateSchema.parse(parsed);
+}
+
+export async function writeSystemStateToWorkpiece(
+  workpieceDir: string,
+  state: SystemState,
+): Promise<void> {
+  const filePath = path.join(workpieceDir, "system-state.yaml");
   await mkdir(path.dirname(filePath), { recursive: true });
-  const yaml = stringifyYaml(registry);
+  const yaml = stringifyYaml(state);
   await atomicWriteFile(filePath, yaml + "\n");
 }
 
-export async function registryExists(workspaceRoot: string): Promise<boolean> {
-  try {
-    await readFile(resolveRegistryPath(workspaceRoot), "utf8");
-    return true;
-  } catch {
-    return false;
+export async function writeSystemState(
+  workspaceRoot: string,
+  systemId: string,
+  state: SystemState,
+): Promise<void> {
+  const cacheClone = resolveCacheClonePath(workspaceRoot, systemId);
+  const filePath = path.join(cacheClone, "system-state.yaml");
+  await mkdir(path.dirname(filePath), { recursive: true });
+  const yaml = stringifyYaml(state);
+  await atomicWriteFile(filePath, yaml + "\n");
+
+  // Auto-commit to cache clone git
+  if (existsSync(path.join(cacheClone, ".git"))) {
+    try {
+      execSync(`git add system-state.yaml`, {
+        cwd: cacheClone,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      execSync(`git commit -m "system-state: update ${systemId}"`, {
+        cwd: cacheClone,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+    } catch {
+      // Git commit may fail if nothing changed — non-fatal
+    }
   }
 }
 
-export function findEntry(registry: FleetRegistry, id: string): FleetRegistryEntry | undefined {
-  return registry.systems.find((s) => s.id === id);
+// --- RFC-0790: Discovery (scan ../systems-cache/) ---
+
+export interface DiscoveryResult {
+  systems: SystemConfig[];
+  errors: Array<{ id: string; error: string }>;
 }
 
-export function findServiceEntry(registry: FleetRegistry, id: string): ServiceEntry | undefined {
-  return registry.services?.find((s) => s.id === id);
+export async function discoverSystems(workspaceRoot: string): Promise<DiscoveryResult> {
+  const cacheRoot = path.resolve(workspaceRoot, SYSTEMS_CACHE_DIR);
+  const systems: SystemConfig[] = [];
+  const errors: Array<{ id: string; error: string }> = [];
+
+  if (!existsSync(cacheRoot)) {
+    return { systems, errors };
+  }
+
+  const entries = await readdir(cacheRoot, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const systemId = entry.name;
+    if (systemId.startsWith(".")) continue;
+
+    try {
+      const config = await readSystemConfig(workspaceRoot, systemId);
+      systems.push(config);
+    } catch (err) {
+      errors.push({
+        id: systemId,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
+  return { systems, errors };
 }
 
-export function findEntryByStar(
-  registry: FleetRegistry,
-  cosmicStar: string,
-  excludeStatus?: FleetRegistryEntry["status"],
-): FleetRegistryEntry | undefined {
-  return registry.systems.find(
-    (s) => s.cosmicStar === cosmicStar && (!excludeStatus || s.status !== excludeStatus),
-  );
+// --- RFC-0790: Services registry (remains in monorepo) ---
+
+export async function readServicesRegistry(workspaceRoot: string): Promise<ServicesRegistry> {
+  const filePath = path.join(workspaceRoot, SERVICES_REGISTRY_PATH);
+  const raw = await readFile(filePath, "utf8");
+  const parsed = parseYaml(raw);
+  return servicesRegistrySchema.parse(parsed);
 }
+
+export function findServiceEntry(registry: ServicesRegistry, id: string): ServiceEntry | undefined {
+  return registry.services.find((s) => s.id === id);
+}
+
+// --- Existing helpers (preserved) ---
 
 export function hasAppsCollision(workspaceRoot: string, id: string): boolean {
   const appsDir = path.join(workspaceRoot, "apps", id);
   return existsSync(appsDir);
 }
 
-// --- RFC-0574: Mirror path resolution ---
+// --- RFC-0574: Mirror path resolution (signature updated for SystemConfig) ---
 
 export type MirrorProtocol = "file" | "ssh" | "https" | "ftp" | "s3" | "rsync";
 
@@ -112,14 +221,14 @@ export interface MirrorResolution {
   backupMirrors: MirrorEntry[];
 }
 
-export function resolveMirrors(workspaceRoot: string, entry: FleetRegistryEntry): MirrorResolution {
-  const cacheMirror = entry.mirrors[0];
+export function resolveMirrors(workspaceRoot: string, config: SystemConfig): MirrorResolution {
+  const cacheMirror = config.mirrors[0];
   const cachePath = resolveMirrorPath(workspaceRoot, cacheMirror.path);
   const gitMirrors: MirrorEntry[] = [];
   const backupMirrors: MirrorEntry[] = [];
 
-  for (let i = 1; i < entry.mirrors.length; i++) {
-    const m = entry.mirrors[i];
+  for (let i = 1; i < config.mirrors.length; i++) {
+    const m = config.mirrors[i];
     if (m.storageType === "bundle") {
       backupMirrors.push(m);
     } else if (isGitAccessible(m.path)) {
@@ -128,13 +237,4 @@ export function resolveMirrors(workspaceRoot: string, entry: FleetRegistryEntry)
   }
 
   return { cachePath, gitMirrors, backupMirrors };
-}
-
-export async function resolveCachePath(workspaceRoot: string, systemId: string): Promise<string> {
-  const registry = await readRegistry(workspaceRoot);
-  const entry = findEntry(registry, systemId);
-  if (!entry) {
-    throw new Error(`[resolveCachePath] system '${systemId}' not found in registry`);
-  }
-  return resolveMirrors(workspaceRoot, entry).cachePath;
 }

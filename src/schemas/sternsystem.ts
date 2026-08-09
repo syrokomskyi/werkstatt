@@ -28,11 +28,7 @@ RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for 
 
 import { z } from "zod";
 import { starNameSchema } from "@warpgogol/werkstatt-site/ontology/cosmic";
-import {
-  deploymentConfigSchema,
-  deploymentStaticConfigSchema,
-  lastPropagatedChannelSchema,
-} from "./leitstand.ts";
+import { deploymentStaticConfigSchema, lastPropagatedChannelSchema } from "./leitstand.ts";
 
 const semverRe = /^\d+\.\d+\.\d+$/;
 const sha256Re = /^sha256:[0-9a-f]{64}$/;
@@ -73,29 +69,6 @@ export const mirrorEntrySchema = z.object({
 
 export type MirrorEntry = z.infer<typeof mirrorEntrySchema>;
 
-export const fleetRegistryEntrySchema = z.object({
-  id: z.string().regex(kebabRe, "id must be kebab-case, lowercase, latin-only"),
-  cosmicStar: starNameSchema,
-  mirrors: z.array(mirrorEntrySchema).min(1, "mirrors must contain at least 1 entry"),
-  pinnedPlatform: z.string().regex(semverRe, "pinnedPlatform must be x.y.z"),
-  currentMission: z.string().nullable().default(null),
-  lastRelease: z.string().nullable().default(null),
-  status: z.enum(["registered", "active", "paused", "archived"]),
-  registeredAt: z.string().datetime(),
-  deployment: deploymentConfigSchema.optional(),
-  cloudflareZoneId: z
-    .string()
-    .min(1, "cloudflareZoneId must be non-empty")
-    .optional()
-    .describe("Cloudflare zone ID for DNS and Workers route management (RFC-0752)"),
-  owner: z
-    .string()
-    .regex(didWebRe, "owner must be a did:web identifier (did:web:<domain>#<key-version>)")
-    .optional()
-    .describe("VC subject id of the site owner (RFC-0558, RFC-0561)"),
-  notes: z.string().default(""),
-});
-
 export const serviceSubdomainSchema = z.object({
   domain: z.string().min(1, "subdomain domain must be non-empty"),
   zone: z.string().min(1, "subdomain zone must be non-empty"),
@@ -120,12 +93,6 @@ export const serviceEntrySchema = z.object({
     })
     .default({ at: null, state: null, operationId: null }),
   healthCheckPath: z.string().optional(),
-});
-
-export const fleetRegistrySchema = z.object({
-  schemaVersion: z.string().min(1),
-  systems: z.array(fleetRegistryEntrySchema),
-  services: z.array(serviceEntrySchema).optional(),
 });
 
 // RFC-0790: Convention-based discovery schemas (replaces fleet registry)
@@ -172,8 +139,6 @@ export const servicesRegistrySchema = z.object({
 });
 
 export type SystemPin = z.infer<typeof systemPinSchema>;
-export type FleetRegistryEntry = z.infer<typeof fleetRegistryEntrySchema>;
-export type FleetRegistry = z.infer<typeof fleetRegistrySchema>;
 export type ServiceSubdomain = z.infer<typeof serviceSubdomainSchema>;
 export type ServiceEntry = z.infer<typeof serviceEntrySchema>;
 export type SystemConfig = z.infer<typeof systemConfigSchema>;
