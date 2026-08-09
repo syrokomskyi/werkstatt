@@ -8,6 +8,7 @@ import {
   parseSitemapIndex,
   validateSitemapFile,
   type PageCluster,
+  type SitemapUrlEntry,
 } from "../sitemap-helpers.ts";
 
 /*
@@ -26,6 +27,14 @@ function makeCluster(
   locales: Array<{ lang: string; path: string; url: string }>,
 ): PageCluster {
   return { pageId, locales };
+}
+
+function makeEntry(
+  loc: string,
+  hreflangs: Array<{ lang: string; href: string }>,
+  markdownAlternates: Array<{ type: string; href: string }> = [],
+): SitemapUrlEntry {
+  return { loc, hreflangs, markdownAlternates };
 }
 
 describe("clusterAlternates", () => {
@@ -144,6 +153,45 @@ describe("generateSitemapXml", () => {
     expect(xml).toContain('hreflang="x-default"');
   });
 
+  it("includes markdown alternate links when markdownTwins map is provided", () => {
+    const clusters = [
+      makeCluster("home", [
+        { lang: "de", path: "/", url: "https://example.com/" },
+        { lang: "en", path: "/en/", url: "https://example.com/en/" },
+      ]),
+    ];
+    const markdownTwins = new Map([
+      ["https://example.com/", "https://example.com/index.md"],
+      ["https://example.com/en/", "https://example.com/en/index.md"],
+    ]);
+
+    const xml = generateSitemapXml(clusters, "de", markdownTwins);
+
+    expect(xml).toContain('type="text/markdown"');
+    expect(xml).toContain('href="https://example.com/index.md"');
+    expect(xml).toContain('href="https://example.com/en/index.md"');
+  });
+
+  it("does not include markdown alternate links when markdownTwins is empty", () => {
+    const clusters = [
+      makeCluster("home", [{ lang: "de", path: "/", url: "https://example.com/" }]),
+    ];
+
+    const xml = generateSitemapXml(clusters, "de", new Map());
+
+    expect(xml).not.toContain('type="text/markdown"');
+  });
+
+  it("does not include markdown alternate links when markdownTwins is undefined", () => {
+    const clusters = [
+      makeCluster("home", [{ lang: "de", path: "/", url: "https://example.com/" }]),
+    ];
+
+    const xml = generateSitemapXml(clusters, "de");
+
+    expect(xml).not.toContain('type="text/markdown"');
+  });
+
   it("includes lastmod when updateStamp is present", () => {
     const clusters = [
       {
@@ -192,8 +240,27 @@ describe("parseSitemapXml", () => {
       { lang: "de", href: "https://example.com/" },
       { lang: "en", href: "https://example.com/en/" },
     ]);
+    expect(entries[0].markdownAlternates).toEqual([]);
     expect(entries[1].loc).toBe("https://example.com/about/");
     expect(entries[1].hreflangs).toHaveLength(1);
+  });
+
+  it("extracts markdown alternate links with type attribute", () => {
+    const xml = `<urlset xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://example.com/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://example.com/" />
+    <xhtml:link rel="alternate" type="text/markdown" href="https://example.com/index.md" />
+  </url>
+</urlset>`;
+
+    const entries = parseSitemapXml(xml);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0].hreflangs).toEqual([{ lang: "de", href: "https://example.com/" }]);
+    expect(entries[0].markdownAlternates).toEqual([
+      { type: "text/markdown", href: "https://example.com/index.md" },
+    ]);
   });
 
   it("returns empty array for XML without url elements", () => {
@@ -247,71 +314,226 @@ describe("validateSitemapFile", () => {
 
   it("returns no violations for a correct sitemap", () => {
     const parsed = [
-      {
-        loc: "https://example.com/",
-        hreflangs: [
-          { lang: "de", href: "https://example.com/" },
-          { lang: "en", href: "https://example.com/en/" },
-          { lang: "x-default", href: "https://example.com/" },
-        ],
-      },
-      {
-        loc: "https://example.com/en/",
-        hreflangs: [
-          { lang: "de", href: "https://example.com/" },
-          { lang: "en", href: "https://example.com/en/" },
-          { lang: "x-default", href: "https://example.com/" },
-        ],
-      },
+      makeEntry("https://example.com/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
+      makeEntry("https://example.com/en/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
     ];
 
-    const violations = validateSitemapFile(parsed, clusters, "sitemap-0.xml", defaultLanguage);
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      new Map(),
+    );
     expect(violations).toEqual([]);
   });
 
   it("detects duplicate loc entries", () => {
-    const parsed = [
-      { loc: "https://example.com/", hreflangs: [] },
-      { loc: "https://example.com/", hreflangs: [] },
-    ];
+    const parsed = [makeEntry("https://example.com/", []), makeEntry("https://example.com/", [])];
 
-    const violations = validateSitemapFile(parsed, clusters, "sitemap-0.xml", defaultLanguage);
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      new Map(),
+    );
     expect(violations.some((v) => v.includes("Duplicate"))).toBe(true);
   });
 
   it("detects unexpected URL not in route registry", () => {
-    const parsed = [{ loc: "https://example.com/nonexistent/", hreflangs: [] }];
+    const parsed = [makeEntry("https://example.com/nonexistent/", [])];
 
-    const violations = validateSitemapFile(parsed, clusters, "sitemap-0.xml", defaultLanguage);
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      new Map(),
+    );
     expect(violations.some((v) => v.includes("Unexpected"))).toBe(true);
   });
 
   it("detects missing alternate link", () => {
     const parsed = [
-      {
-        loc: "https://example.com/",
-        hreflangs: [{ lang: "de", href: "https://example.com/" }],
-      },
+      makeEntry("https://example.com/", [{ lang: "de", href: "https://example.com/" }]),
     ];
 
-    const violations = validateSitemapFile(parsed, clusters, "sitemap-0.xml", defaultLanguage);
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      new Map(),
+    );
     expect(violations.some((v) => v.includes("Missing alternate"))).toBe(true);
   });
 
   it("detects unexpected alternate link", () => {
     const parsed = [
-      {
-        loc: "https://example.com/",
-        hreflangs: [
+      makeEntry("https://example.com/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+        { lang: "fr", href: "https://example.com/fr/" },
+      ]),
+    ];
+
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      new Map(),
+    );
+    expect(violations.some((v) => v.includes("Unexpected alternate"))).toBe(true);
+  });
+
+  it("passes when markdown alternates match expected twins", () => {
+    const markdownTwins = new Map([["https://example.com/", "https://example.com/index.md"]]);
+    const parsed = [
+      makeEntry(
+        "https://example.com/",
+        [
           { lang: "de", href: "https://example.com/" },
           { lang: "en", href: "https://example.com/en/" },
           { lang: "x-default", href: "https://example.com/" },
-          { lang: "fr", href: "https://example.com/fr/" },
         ],
-      },
+        [{ type: "text/markdown", href: "https://example.com/index.md" }],
+      ),
+      makeEntry("https://example.com/en/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
     ];
 
-    const violations = validateSitemapFile(parsed, clusters, "sitemap-0.xml", defaultLanguage);
-    expect(violations.some((v) => v.includes("Unexpected alternate"))).toBe(true);
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      markdownTwins,
+    );
+    expect(violations).toEqual([]);
+  });
+
+  it("detects missing markdown alternate link", () => {
+    const markdownTwins = new Map([["https://example.com/", "https://example.com/index.md"]]);
+    const parsed = [
+      makeEntry(
+        "https://example.com/",
+        [
+          { lang: "de", href: "https://example.com/" },
+          { lang: "en", href: "https://example.com/en/" },
+          { lang: "x-default", href: "https://example.com/" },
+        ],
+        [],
+      ),
+      makeEntry("https://example.com/en/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
+    ];
+
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      markdownTwins,
+    );
+    expect(violations.some((v) => v.includes("Missing markdown alternate"))).toBe(true);
+  });
+
+  it("detects unexpected markdown alternate link", () => {
+    const markdownTwins = new Map([["https://example.com/", "https://example.com/index.md"]]);
+    const parsed = [
+      makeEntry(
+        "https://example.com/",
+        [
+          { lang: "de", href: "https://example.com/" },
+          { lang: "en", href: "https://example.com/en/" },
+          { lang: "x-default", href: "https://example.com/" },
+        ],
+        [{ type: "text/markdown", href: "https://example.com/wrong.md" }],
+      ),
+      makeEntry("https://example.com/en/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
+    ];
+
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      markdownTwins,
+    );
+    expect(violations.some((v) => v.includes("Unexpected markdown alternate"))).toBe(true);
+  });
+
+  it("passes when no markdown twins exist (empty map)", () => {
+    const parsed = [
+      makeEntry("https://example.com/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
+      makeEntry("https://example.com/en/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
+    ];
+
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      new Map(),
+    );
+    expect(violations).toEqual([]);
+  });
+
+  it("does not flag markdown alternates as unexpected hreflang alternates", () => {
+    const markdownTwins = new Map([["https://example.com/", "https://example.com/index.md"]]);
+    const parsed = [
+      makeEntry(
+        "https://example.com/",
+        [
+          { lang: "de", href: "https://example.com/" },
+          { lang: "en", href: "https://example.com/en/" },
+          { lang: "x-default", href: "https://example.com/" },
+        ],
+        [{ type: "text/markdown", href: "https://example.com/index.md" }],
+      ),
+      makeEntry("https://example.com/en/", [
+        { lang: "de", href: "https://example.com/" },
+        { lang: "en", href: "https://example.com/en/" },
+        { lang: "x-default", href: "https://example.com/" },
+      ]),
+    ];
+
+    const violations = validateSitemapFile(
+      parsed,
+      clusters,
+      "sitemap-0.xml",
+      defaultLanguage,
+      markdownTwins,
+    );
+    expect(violations).toEqual([]);
   });
 });

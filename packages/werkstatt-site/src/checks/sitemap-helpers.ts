@@ -8,6 +8,7 @@ import { parse as yamlParse } from "yaml";
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted helpers from sitemap.ts into sitemap-helpers.ts.</item>
+  <item>RFC-0788: Add markdown alternate link support — generateSitemapXml accepts optional markdownTwins map, SitemapUrlEntry gains markdownAlternates field, parseSitemapXml extracts type-bearing alternates, validateSitemapFile validates markdown alternates separately from hreflang.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -16,8 +17,14 @@ import type { WorkspaceIO, DirEntry } from "@warpgogol/werkstatt/kernel";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { resolvePageOutput, type RawPageOutput } from "@warpgogol/werkstatt-site/share/semantic";
 import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/canonical-url";
-import { resolvePageUpdateStamp, type PageUpdateStampResult } from "@warpgogol/werkstatt-site/share/semantic";
+import {
+  canonicalPageUrl,
+  type CanonicalUrlOptions,
+} from "@warpgogol/werkstatt-site/share/canonical-url";
+import {
+  resolvePageUpdateStamp,
+  type PageUpdateStampResult,
+} from "@warpgogol/werkstatt-site/share/semantic";
 import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/werkstatt-site/share/people-profile-defaults";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
@@ -43,7 +50,12 @@ export async function buildClustersFromSystemMd(
   io: WorkspaceIO,
   appDir: string,
   siteUrl: string,
-): Promise<{ clusters: PageCluster[]; categoryMap: Map<string, string>; defaultLanguage: string }> {
+): Promise<{
+  clusters: PageCluster[];
+  categoryMap: Map<string, string>;
+  defaultLanguage: string;
+  supportedLanguages: string[];
+}> {
   const contentDir = join(appDir, "src", "content");
   const manifest = await loadSystemManifest(contentDir);
   type SitemapPageExtensions = {
@@ -60,6 +72,7 @@ export async function buildClustersFromSystemMd(
       [defaultLanguage]: true,
     },
   );
+  // RFC-0788: expose supportedLanguages so sitemap generate/validate can build markdownTwins map.
   const canonicalOpts: CanonicalUrlOptions = {
     baseUrl,
     defaultLanguage,
@@ -143,7 +156,7 @@ export async function buildClustersFromSystemMd(
     }
   }
 
-  return { clusters, categoryMap, defaultLanguage };
+  return { clusters, categoryMap, defaultLanguage, supportedLanguages: supportedLangs };
 }
 
 /** Read profile-page-enabled Person slugs from disk (default-language anchors). Fail-open to []. */
@@ -251,19 +264,28 @@ function escapeXml(value: string): string {
     .replace(/>/g, "&gt;");
 }
 
-export function generateSitemapXml(clusters: PageCluster[], defaultLanguage: string): string {
+export function generateSitemapXml(
+  clusters: PageCluster[],
+  defaultLanguage: string,
+  markdownTwins?: Map<string, string>,
+): string {
   const urls = clusters.flatMap((cluster) => {
     const alternates = clusterAlternates(cluster, defaultLanguage);
     const lastmod = cluster.updateStamp?.stamp?.date;
 
     return cluster.locales.map((locale) => {
       const lastmodXml = lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : "";
+      // RFC-0788: add markdown alternate link if a .md twin exists for this locale.
+      const mdHref = markdownTwins?.get(locale.url);
+      const mdLink = mdHref
+        ? `\n    <xhtml:link rel="alternate" type="text/markdown" href="${escapeXml(mdHref)}" />`
+        : "";
       return `  <url>\n    <loc>${escapeXml(locale.url)}</loc>${lastmodXml}\n${alternates
         .map(
           ({ lang, href }) =>
             `    <xhtml:link rel="alternate" hreflang="${escapeXml(lang)}" href="${escapeXml(href)}" />`,
         )
-        .join("\n")}\n  </url>`;
+        .join("\n")}${mdLink}\n  </url>`;
     });
   });
 
@@ -290,6 +312,7 @@ export async function writeGeneratedFile(
 export interface SitemapUrlEntry {
   loc: string;
   hreflangs: Array<{ lang: string; href: string }>;
+  markdownAlternates: Array<{ type: string; href: string }>;
 }
 
 export function parseSitemapXml(xml: string): SitemapUrlEntry[] {
@@ -309,7 +332,15 @@ export function parseSitemapXml(xml: string): SitemapUrlEntry[] {
       hreflangs.push({ lang: linkMatch[1], href: linkMatch[2] });
     }
 
-    entries.push({ loc, hreflangs });
+    // RFC-0788: extract markdown alternate links (type-bearing, no hreflang).
+    const markdownAlternates: Array<{ type: string; href: string }> = [];
+    const mdLinkRegex = /<xhtml:link[^>]*?type="([^"]*)"[^>]*?href="([^"]*)"[^>]*?\/?>/g;
+    let mdLinkMatch;
+    while ((mdLinkMatch = mdLinkRegex.exec(block)) !== null) {
+      markdownAlternates.push({ type: mdLinkMatch[1], href: mdLinkMatch[2] });
+    }
+
+    entries.push({ loc, hreflangs, markdownAlternates });
   }
 
   return entries;
@@ -339,6 +370,7 @@ export function validateSitemapFile(
   clusters: PageCluster[],
   filename: string,
   defaultLanguage: string,
+  markdownTwins: Map<string, string>,
 ): string[] {
   const violations: string[] = [];
 
@@ -390,6 +422,27 @@ export function validateSitemapFile(
       if (!expectedSet.has(key)) {
         violations.push(
           `[${filename}] Unexpected alternate link on ${entry.loc}: hreflang="${actualHreflang.lang}" href="${actualHreflang.href}"`,
+        );
+      }
+    }
+
+    // RFC-0788: validate markdown alternate links separately from hreflang alternates.
+    const expectedMdHref = markdownTwins.get(entry.loc);
+    if (expectedMdHref) {
+      const hasMd = entry.markdownAlternates.some(
+        (a) => a.type === "text/markdown" && a.href === expectedMdHref,
+      );
+      if (!hasMd) {
+        violations.push(
+          `[${filename}] Missing markdown alternate link on ${entry.loc}: type="text/markdown" href="${expectedMdHref}"`,
+        );
+      }
+    }
+    for (const actual of entry.markdownAlternates) {
+      if (actual.type !== "text/markdown") continue;
+      if (actual.href !== expectedMdHref) {
+        violations.push(
+          `[${filename}] Unexpected markdown alternate link on ${entry.loc}: type="${actual.type}" href="${actual.href}"`,
         );
       }
     }
