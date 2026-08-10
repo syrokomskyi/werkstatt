@@ -11,6 +11,7 @@
   <item>RFC-0520: extract Bordbuch-vs-git-log check into evaluateExternalEditGate pure function.</item>
   <item>RFC-0561: add owner-format-invalid check and missing-owner notice warning.</item>
   <item>RFC-0648: add branch-convention rule enforcing main as default branch for cache clone and bare repo.</item>
+  <item>RFC-0792: add yaml-syntax-error rule for top-level YAML file syntax checking in systems-cache.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -18,6 +19,7 @@ import { execSync } from "node:child_process";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { parse as parseYaml } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -107,6 +109,34 @@ async function checkBundleContract(
         systemId,
         rule: "bundle-contract",
         message: `${systemId}: cache clone contains generated file: ${rel}`,
+      });
+    }
+  }
+
+  return violations;
+}
+
+async function validateYamlFiles(
+  cacheDir: string,
+  systemId: string,
+): Promise<Array<{ systemId: string; rule: string; message: string }>> {
+  const violations: Array<{ systemId: string; rule: string; message: string }> = [];
+  if (!existsSync(cacheDir)) return violations;
+
+  const entries = await fs.readdir(cacheDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    if (!entry.name.endsWith(".yaml") && !entry.name.endsWith(".yml")) continue;
+
+    const filePath = path.join(cacheDir, entry.name);
+    try {
+      const raw = await fs.readFile(filePath, "utf8");
+      parseYaml(raw);
+    } catch (err) {
+      violations.push({
+        systemId,
+        rule: "yaml-syntax-error",
+        message: `${entry.name}: YAML syntax error: ${(err as Error).message}`,
       });
     }
   }
@@ -396,6 +426,10 @@ export async function runSternsystemValidate(
         // Bordbuch read failed — skip
       }
     }
+
+    // RFC-0792: YAML syntax checking for all top-level YAML files in cache clone
+    const yamlViolations = await validateYamlFiles(cacheDir, entry.id);
+    violations.push(...yamlViolations);
   }
 
   const validated = systems.length;
