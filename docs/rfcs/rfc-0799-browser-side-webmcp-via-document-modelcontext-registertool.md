@@ -1,7 +1,7 @@
 ---
 id: RFC-0799
 title: "Browser-side WebMCP via document.modelContext.registerTool"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
