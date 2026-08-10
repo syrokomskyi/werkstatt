@@ -15,6 +15,7 @@ RFC-0751: findServiceEntry helper (preserved, reads from services/registry.yaml)
   <item>RFC-0574: add resolveMirrors() and resolveCachePath() for parameterized mirror topology.</item>
   <item>RFC-0751: add findServiceEntry() helper for service registry lookups.</item>
   <item>RFC-0790: replace registry IO with convention-based discovery. Add resolveCacheClonePath, readSystemConfig, readSystemState, writeSystemState, discoverSystems, readServicesRegistry. Remove readRegistry, writeRegistry, findEntry, findEntryByStar, resolveCachePath, registryExists, resolveRegistryPath. Change resolveMirrors to accept SystemConfig.</item>
+  <item>ADR-0040: add JSDoc return-type contracts to path-returning functions (resolveCacheClonePath, resolveWorkpiecePath, resolveMirrorPath).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -40,10 +41,24 @@ import { atomicWriteFile } from "../werkstatt/atomic.ts";
 const SYSTEMS_CACHE_DIR = path.join("..", "systems-cache");
 const SERVICES_REGISTRY_PATH = path.join("services", "registry.yaml");
 
+/**
+ * Resolves the expected cache clone path for a system by convention.
+ *
+ * @returns The computed cache clone path. Always returns a string — the
+ *          directory may not exist on disk. Callers MUST check with
+ *          `existsSync` before relying on the path.
+ */
 export function resolveCacheClonePath(workspaceRoot: string, systemId: string): string {
   return path.resolve(workspaceRoot, SYSTEMS_CACHE_DIR, systemId);
 }
 
+/**
+ * Resolves the expected workpiece path for a mission by convention.
+ *
+ * @returns The computed workpiece path. Always returns a string — the
+ *          directory may not exist on disk. Callers MUST check with
+ *          `existsSync` before relying on the path.
+ */
 export function resolveWorkpiecePath(workspaceRoot: string, missionId: string): string {
   return path.join(workspaceRoot, "missions", missionId, "workpiece");
 }
@@ -252,6 +267,15 @@ export function isGitAccessible(mirrorPath: string): boolean {
   return GIT_PROTOCOLS.includes(inferMirrorProtocol(mirrorPath));
 }
 
+/**
+ * Resolves a mirror path relative to the workspace root.
+ *
+ * @returns The resolved mirror path. Always returns a string — the
+ *          path may not exist on disk. Callers MUST check with
+ *          `existsSync` before relying on the path. For non-local
+ *          protocols (ssh, https, ftp, s3, rsync) the returned string
+ *          is the raw mirror path as-is.
+ */
 export function resolveMirrorPath(workspaceRoot: string, mirrorPath: string): string {
   if (mirrorPath.startsWith("file://")) {
     return path.resolve(workspaceRoot, mirrorPath.slice("file://".length));

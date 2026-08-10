@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0520: initial extraction of Bordbuch reading and git rev-list I/O from sternsystem.validate inline block.</item>
+  <item>ADR-0040: add JSDoc return-type contract to bordbuchPathFor.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -85,6 +86,13 @@ export function bordbuchFileExists(cacheDir: string): boolean {
   return existsSync(bordbuchPath) && existsSync(gitDir);
 }
 
+/**
+ * Computes the bordbuch events.ndjson path for a cache directory.
+ *
+ * @returns The computed bordbuch file path. Always returns a string — the
+ *          file may not exist on disk. Callers MUST check with
+ *          `existsSync` before relying on the path.
+ */
 export function bordbuchPathFor(cacheDir: string): string {
   return path.join(cacheDir, "bordbuch", "events.ndjson");
 }
