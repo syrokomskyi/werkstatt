@@ -133,6 +133,10 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - The pre-commit hook is activated via `git config core.hooksPath hooks` (one-time per clone). New clones need this activation.
 - `ecosystem.commit` sets `ECOSYSTEM_COMMIT=1` env var to bypass the hook — this is the only sanctioned bypass.
 - `mission.close` auto-pins the platform version by calling `sternsystem.pin` after successful close (RFC-0703).
+- `mission.close` auto-archives terminal-state missions by calling `mission.archive --status=closed` after writing `.materialization-state.json` (RFC-0796). Non-fatal: archive failure logs a warning but does not block close — the mission is already closed (irreversible). The `--skip-auto-archive` flag skips this step. `closeReport.archive` tracks the result (`{ archived: boolean, error: string | null }`).
+- `mission.open` performs pre-flight cleanup of stale symlinks and empty directories in `missions/` root before creating mission directories (RFC-0796). Non-empty real directories are skipped with a warning. `staleEntries` in the response tracks removed and skipped paths.
+- `mission.validate` warns (non-blocking) about stale symlinks or terminal-state directories in `missions/` root (RFC-0796). `staleEntryWarnings` in the response lists the violations.
+- `mission.materialize` runs a pre-flight workspace glob check before `pnpm install` to detect stale `workspace:*` references to missing packages (RFC-0796). Aborts with a clear error listing stale packages and suggesting `mission.archive`. `workspaceGlobCheck` in the response tracks the result.
 
 ### Independent version packages (RFC-0704)
 
