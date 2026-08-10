@@ -191,7 +191,7 @@ const LICENSE_ALIASES: Record<string, string> = {
   "MIT License": "MIT",
   "The MIT License": "MIT",
   "ISC License": "ISC",
-  "Python-2.0": "PSF-2.0",
+  Apache2: "Apache-2.0",
   "GNU GPL v3": "GPL-3.0-only",
   "GNU GPL v2": "GPL-2.0-only",
   "GNU LGPL v3": "LGPL-3.0-only",
@@ -232,8 +232,10 @@ export function normalizeLicense(licenseString: string): {
     }
   }
 
-  if (trimmed.includes(" OR ")) {
-    const parts = trimmed.split(" OR ").map((p) => p.trim());
+  const withoutParens = trimmed.replace(/[()]/g, "");
+
+  if (withoutParens.includes(" OR ")) {
+    const parts = withoutParens.split(" OR ").map((p) => p.trim());
     for (const part of parts) {
       if (spdxIds.has(part)) {
         return { status: "verified", spdxId: part };
@@ -245,10 +247,10 @@ export function normalizeLicense(licenseString: string): {
     }
   }
 
-  if (trimmed.includes(" AND ")) {
-    const parts = trimmed.split(" AND ").map((p) => p.trim());
+  if (withoutParens.includes(" AND ")) {
+    const parts = withoutParens.split(" AND ").map((p) => p.trim());
     if (parts.every((p) => spdxIds.has(p))) {
-      return { status: "verified", spdxId: trimmed };
+      return { status: "verified", spdxId: withoutParens };
     }
   }
 
@@ -576,6 +578,7 @@ function buildRegistryData(
 
   const licenseMap = new Map<string, number>();
   for (const dep of publicDeps) {
+    if (dep.normalizedLicense.status === "unknown") continue;
     const licenseKey = dep.normalizedLicense.spdxId ?? dep.license ?? "UNKNOWN";
     licenseMap.set(licenseKey, (licenseMap.get(licenseKey) ?? 0) + 1);
   }

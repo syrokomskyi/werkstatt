@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: cf3892e5600eaa5823e378eb30804b5bb834638c6c0d337e7a8fcc7cfdd2f63f
+  contentHash: 49e200c157d444798b627adcbabf6e1cdbd6f080796c0bef75eb17252885c7d9
   sources:
     - path: docs/architecture-dna.md
       hash: eddef9d587f6e3839099737eae20110e42b436039759a35c6a4ba95b66dc5a00
@@ -29,7 +29,7 @@ meta:
     - path: missions/warpgogol-com-m000043/workpiece/package.json
       hash: 48907d4f8c815b2832b7776ef621733804d758910105d5a05f5c4a578f821478
     - path: package.json
-      hash: f54ccc2976bde4cc5f40aaef8751f37f568fe0e33583109b8108bf409e84b17a
+      hash: 1843b0777cfe1d222a41aaed7d1ce574e9b19b677a63a931ec948b5e44c72c25
     - path: packages/forge/package.json
       hash: 7a0fd15cbd172653f813af864d68bc674d45906b0e1563b0d161a2b7cd95fbb3
     - path: packages/werkstatt-game/package.json
@@ -62,7 +62,7 @@ meta:
       hash: 324e44318352484409a037647f242cd90b6ef0e5d42d676b3b3cac16a76cc9fb
 workspace:
   name: warpgogol-platform
-  version: 5.18.9
+  version: 5.18.11
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -7342,8 +7342,8 @@ generatedOwnership:
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
   accepted: 7
-  implemented: 2
-  draft: 5
+  implemented: 3
+  draft: 4
   reviewing: 0
 baseline:
   implementedRfcs:
@@ -7358,6 +7358,11 @@ baseline:
       kind: command
       scope: app
       dnaRefs: []
+    - id: RFC-0792
+      implementedAt: 2026-08-10
+      kind: command
+      scope: workspace
+      dnaRefs: []
   nonImplementedRfcs:
     accepted:
       - RFC-0179
@@ -7366,13 +7371,12 @@ baseline:
       - RFC-0785
       - RFC-0786
       - RFC-0790
-      - RFC-0792
+      - RFC-0793
     draft:
       - RFC-0000
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0793
     reviewing: []
     superseded: []
     rejected: []
