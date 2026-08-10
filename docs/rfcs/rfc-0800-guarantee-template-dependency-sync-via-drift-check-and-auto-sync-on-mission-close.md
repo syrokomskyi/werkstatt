@@ -5,7 +5,7 @@ status: draft
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
-scope: workspace
+scope: app
 owners:
   - architecture
 # Set by the deciding human together with the status change (RFC-0335).
@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
+enhancedAt: 2026-08-10
 implementedAt:
 closedAt:
 supersedes: []
@@ -43,14 +44,22 @@ commands:
   added: []
   changed:
     - mission.close
+    - config.template.sync
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - packages/werkstatt-site
   - packages/werkstatt
-successSignals: []
-nonGoals: []
+successSignals:
+  - "template.deps.drift passes on all sites after mission.close auto-sync"
+  - "mission.close auto-sync produces zero-drift template (no TEMPLATE-DEPS-DRIFT-01 errors on next mission.validate)"
+  - "--skip-template-sync flag disables auto-sync without breaking close"
+nonGoals:
+  - "Does not sync scripts, engines, or other package.json fields — only dependencies and devDependencies"
+  - "Does not compare astro.config.mjs blocks (optimizeDeps, ssr) — already handled by config.template.sync"
+  - "Does not resolve multi-site dep divergence — all sites share the same template by convention; site-specific deps are a non-goal of the template system"
+  - "Does not fix the stale writes path in config.template.sync module declaration (pre-existing metadata bug, tracked separately)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -95,8 +104,8 @@ The kernel gains a `template.deps.drift` check command that compares `dependenci
 
 - **RFC-0557** (`template.imports.validate`): extends the template validation layer from import-existence to dependency-version drift. RFC-0557 checks that imported packages exist; this RFC checks that version ranges match.
 - **RFC-0797** (`mission.close` auto-sync): follows the same pattern of automating manual interventions inside `mission.close`. The `--skip-template-sync` flag mirrors `--skip-auto-sync`.
-- **RFC-0137** (rejected): prior attempt to sync app dependency versions into onboarding templates. This RFC succeeds where RFC-0137 was rejected by using a drift check + auto-sync combination instead of a unilateral sync.
-- **Site OS operator model**: `template.deps.drift` is a workspace-scope check integrated into `build.check` pipeline. `config.template.sync` is invoked from `mission.close` via `executeKernelCommand`, consistent with the existing `sternsystem.sync` pattern.
+- **RFC-0137** (implemented): established `config.template.sync` as a manual command for propagating dependency versions from a reference system into templates. This RFC automates the manual sync that RFC-0137 introduced — the drift check ensures the sync actually runs, and the auto-sync in `mission.close` removes the reliance on operator discipline.
+- **Site OS operator model**: `template.deps.drift` is a site-scoped check (`scope: app`) integrated into `SITES_BUILD_CHECK_PIPELINE`. `config.template.sync` is invoked from `mission.close` via `executeKernelCommand`, consistent with the existing `sternsystem.sync` pattern.
 
 ## Design
 
@@ -113,7 +122,7 @@ pnpm exec werkstatt run mission.close --mission warpgogol-com-m000047
 pnpm exec werkstatt run mission.close --mission warpgogol-com-m000047 --skip-template-sync
 ```
 
-`template.deps.drift` is a workspace-scope check integrated into the `build.check` pipeline. It takes `--site <id>` to resolve the workpiece directory and the template path.
+`template.deps.drift` is a site-scoped check (`scope: app`) integrated into `SITES_BUILD_CHECK_PIPELINE`. It takes `--site <id>` to resolve the workpiece directory and the template path.
 
 ### TypeScript contracts
 
@@ -184,8 +193,10 @@ The check reads both JSON files, iterates `dependencies` and `devDependencies` k
 - **Default behavior**: `template.deps.drift` is an error-level check from introduction. No grace period — the goal is guarantee, not gradual adoption.
 - **Existing apps**: no migration needed. The check reads `package.template.json` (already present) and the current workpiece `package.json`. If they are already in sync (the common case), the check passes.
 - **New apps**: automatically compliant — `config.regenerate` writes `package.json` from the template, so they start in sync.
-- **Pipeline integration**: `template.deps.drift` is added to `SITES_BUILD_CHECK_PIPELINE` after `template.imports.validate`.
+- **Pipeline integration**: `template.deps.drift` is added to `SITES_BUILD_CHECK_PIPELINE`. Note: `template.imports.validate` (RFC-0557) lives in `PACKAGES_CHECK_PIPELINE`, not `SITES_BUILD_CHECK_PIPELINE` — the two checks operate in different pipelines (workspace-level import resolvability vs. site-level dep version drift).
 - **mission.close integration**: auto-sync call is placed after inline validate and before the final cache clone commits (werkstatt, pin, bordbuch). This ensures the template is updated with any dependency changes made during the mission.
+- **Data flow**: `config.template.sync` reads from `systems/<site>/package.json` (cache clone), not from `missions/<mission>/workpiece/package.json` directly. By close time, the cache clone reflects the workpiece: `mission.reconcile` pushes workpiece changes to the bare repo, and `mission.close` pushes to the cache clone before the auto-sync runs. The full flow is: workpiece → reconcile → cache clone → `config.template.sync` → `package.template.json`.
+- **config.template.sync module declaration fix**: the handler at `config-template-sync.ts:141` already reads `input.flags.site` (not `--app` as RFC-0137 documented), but the module declaration at `module.ts:298` still declares `app` as the flag name. This RFC updates the module declaration to declare `site` instead, aligning the metadata with the actual handler behavior.
 
 ## Alternatives considered
 
@@ -208,6 +219,7 @@ The check reads both JSON files, iterates `dependencies` and `devDependencies` k
 - **Auto-sync committing unwanted changes**: `config.template.sync` copies `dependencies` and `devDependencies` from workpiece to template. If the workpiece has a broken or malicious dep, it propagates to the template. Mitigation: the template is version-controlled; the commit is visible in git history and can be reverted.
 
 - **Agent confusion**: agents may not understand why `mission.close` modifies a file in `packages/werkstatt-site/`. Mitigation: log message clearly states "Auto-syncing template dependencies from workpiece…" and the `--skip-template-sync` flag is documented in AGENTS.md.
+- **Multiple sites — last close wins**: if two sites have different dep versions in their workpieces, the last `mission.close` auto-sync overwrites the template with that site's versions. This is acceptable because all sites share the same template by convention — site-specific deps are a non-goal of the template system. If a site genuinely needs a different dep version, it should be handled via a separate mechanism (e.g. overrides), not via template drift.
 
 ## Acceptance criteria
 
