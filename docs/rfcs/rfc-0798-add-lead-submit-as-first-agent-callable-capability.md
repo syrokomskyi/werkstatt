@@ -1,7 +1,7 @@
 ---
 id: RFC-0798
 title: "Add lead.submit as first agent-callable capability"
-status: accepted
+status: implemented
 kind: policy
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-07-10
 updatedAt: 2026-08-10
 enhancedAt: 2026-08-10
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
