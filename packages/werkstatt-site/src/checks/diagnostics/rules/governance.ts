@@ -168,4 +168,14 @@ export const GOVERNANCE_RULES: Record<string, RuleDescriptor> = {
     "Workpiece import cannot be resolved from root node_modules",
     "workpiece.imports.validate",
   ),
+  "TEMPLATE-DEPS-DRIFT-01": rule(
+    "TEMPLATE-DEPS-DRIFT-01",
+    "Dependency version mismatch between workpiece and template",
+    "template.deps.drift",
+  ),
+  "TEMPLATE-DEPS-DRIFT-02": rule(
+    "TEMPLATE-DEPS-DRIFT-02",
+    "Template or workpiece package.json missing",
+    "template.deps.drift",
+  ),
 };
