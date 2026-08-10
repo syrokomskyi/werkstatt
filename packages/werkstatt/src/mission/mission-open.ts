@@ -147,7 +147,6 @@ export async function runMissionOpen(
 
   const operationId = generateOperationId();
 
-  await acquireLock(workspaceRoot, "registry", operationId, "mission.open", actor);
   await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "mission.open", actor);
 
   try {
@@ -271,6 +270,5 @@ export async function runMissionOpen(
     };
   } finally {
     await releaseLock(workspaceRoot, `system:${systemId}`);
-    await releaseLock(workspaceRoot, "registry");
   }
 }

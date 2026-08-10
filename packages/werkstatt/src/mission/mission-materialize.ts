@@ -128,6 +128,8 @@ const STERNSYSTEM_DATA_PATHS = [
   "public",
   "provenance",
   "behavior.snapshot.generated.yaml",
+  "system-config.yaml",
+  "system-state.yaml",
 ];
 
 // RFC-0597: Materialization state file interface

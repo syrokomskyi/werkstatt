@@ -65,7 +65,6 @@ export async function runMissionAbort(
     );
   }
 
-  await acquireLock(workspaceRoot, "registry", manifest.operationId, "mission.abort", actor);
   await acquireLock(
     workspaceRoot,
     `system:${manifest.systemId}`,
@@ -162,6 +161,5 @@ export async function runMissionAbort(
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);
     await releaseLock(workspaceRoot, `system:${manifest.systemId}`);
-    await releaseLock(workspaceRoot, "registry");
   }
 }

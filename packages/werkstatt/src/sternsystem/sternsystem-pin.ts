@@ -23,7 +23,11 @@ import type {
 import { systemPinSchema, type SystemPin } from "@warpgogol/werkstatt/schemas";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../handoff/bundle-io.ts";
 import { allMigratorIds } from "../migrators/registry.ts";
-import { readSystemConfig, writeSystemConfig, resolveCacheClonePath } from "./registry-io.ts";
+import {
+  readSystemConfigSmart,
+  writeSystemConfigSmart,
+  resolveCacheClonePath,
+} from "./registry-io.ts";
 import { highestRfcId, snapshotCapabilities } from "./pin-helpers.ts";
 
 export interface SternsystemPinData {
@@ -54,7 +58,7 @@ export async function runSternsystemPin(
   const id = flagString(input, "id");
   if (!id) throw new Error("[sternsystem.pin] requires --id <system-id>");
 
-  const config = await readSystemConfig(workspaceRoot, id);
+  const config = await readSystemConfigSmart(workspaceRoot, id);
 
   const cacheDir = resolveCacheClonePath(workspaceRoot, id);
   if (!existsSync(cacheDir)) {
@@ -116,7 +120,7 @@ export async function runSternsystemPin(
     configChanged = true;
   }
   if (configChanged) {
-    await writeSystemConfig(workspaceRoot, id, config);
+    await writeSystemConfigSmart(workspaceRoot, id, config);
   }
 
   logger.success(`[sternsystem.pin] pinned '${id}' to platform ${platform} (${rfcHead})`);
