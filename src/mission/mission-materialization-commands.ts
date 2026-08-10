@@ -30,13 +30,15 @@
   <item>RFC-0749: add post-validation commitBordbuchProjections cleanup call in mission.validate to commit bordbuch projections that were regenerated during build.prepare but not committed by bordbuch.commit due to transient git failure.</item>
   <item>RFC-0763: add commitBordbuchProjections cleanup on build.prepare failure and validation failure early-return paths to clean bordbuch projections from cache clone on all exit paths. Extract cleanupBordbuchOnFailure helper to avoid duplication.</item>
   <item>Bug fix: post-merge guard — restore system-config.yaml/system-state.yaml if merge silently removed them; commit restored files to avoid leaving cache clone dirty.</item>
+  <item>RFC-0796: add validateNoStaleMissionEntries workspace-level advisory check — warns about stale symlinks or terminal-state dirs in missions/ root (non-blocking).</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import path from "node:path";
+import { parse as yamlParse } from "yaml";
 import type {
   Diagnostic,
   KernelCommandInput,
@@ -116,7 +118,64 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
   return typeof v === "string" ? v : undefined;
 }
 
+// RFC-0796: Workspace-level advisory check for stale entries in missions/ root.
+// Warns about stale symlinks or terminal-state directories. Non-blocking.
+function validateNoStaleMissionEntries(workspaceRoot: string): StaleEntryViolation[] {
+  const missionsPath = path.join(workspaceRoot, "missions");
+  if (!existsSync(missionsPath)) return [];
+
+  const warnings: StaleEntryViolation[] = [];
+  const entries = readdirSync(missionsPath, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name === "archive") continue;
+    const entryPath = path.join(missionsPath, entry.name);
+    const sourceRel = `missions/${entry.name}`;
+
+    let stat;
+    try {
+      stat = lstatSync(entryPath);
+    } catch {
+      continue;
+    }
+
+    if (stat.isSymbolicLink()) {
+      warnings.push({
+        path: sourceRel,
+        kind: "symlink",
+        message: "stale symlink in missions/ root — run mission.archive to clean up",
+      });
+    } else if (stat.isDirectory()) {
+      // Check if this is a terminal-state mission directory
+      const manifestPath = path.join(entryPath, "mission.yaml");
+      if (existsSync(manifestPath)) {
+        try {
+          const content = readFileSync(manifestPath, "utf8");
+          const m = yamlParse(content);
+          if (m.state === "closed" || m.state === "aborted") {
+            warnings.push({
+              path: sourceRel,
+              kind: "terminal-state-in-root",
+              state: m.state,
+              message: `terminal-state mission (${m.state}) in missions/ root — run mission.archive to move to archive`,
+            });
+          }
+        } catch {
+          // Can't read manifest — skip
+        }
+      }
+    }
+  }
+  return warnings;
+}
+
 // §2: mission.validate
+export interface StaleEntryViolation {
+  path: string;
+  kind: "symlink" | "terminal-state-in-root";
+  state?: string;
+  message: string;
+}
+
 export interface MissionValidateData {
   missionId: string;
   contractFull: { passed: boolean; validators: Array<Record<string, unknown>> };
@@ -126,6 +185,7 @@ export interface MissionValidateData {
   buildInputHash: string | null;
   fullBuildRan: boolean;
   validatedAt: string;
+  staleEntryWarnings?: StaleEntryViolation[];
 }
 
 interface BuildFailurePattern {
@@ -345,8 +405,16 @@ export async function runMissionValidate(
 
         const reuseNextSteps = buildValidateNextSteps(missionId, dirtyCheck);
 
+        // RFC-0796: stale entry warnings (non-blocking)
+        const staleEntryWarnings = validateNoStaleMissionEntries(workspaceRoot);
+        if (staleEntryWarnings.length > 0) {
+          for (const w of staleEntryWarnings) {
+            logger.warn(`  [stale-entry] ${w.path}: ${w.message}`);
+          }
+        }
+
         return {
-          data: reusedReport as unknown as MissionValidateData,
+          data: { ...reusedReport, staleEntryWarnings } as unknown as MissionValidateData,
           summary: `[mission.validate] ${missionId} validation passed (distribution reused, build-input-hash matched)`,
           nextSteps: reuseNextSteps,
         };
@@ -666,11 +734,19 @@ export async function runMissionValidate(
     }
   }
 
+  // RFC-0796: stale entry warnings (non-blocking)
+  const staleEntryWarnings = validateNoStaleMissionEntries(workspaceRoot);
+  if (staleEntryWarnings.length > 0) {
+    for (const w of staleEntryWarnings) {
+      logger.warn(`  [stale-entry] ${w.path}: ${w.message}`);
+    }
+  }
+
   // RFC-0579: populate nextSteps based on workpiece dirty state
   const passNextSteps = buildValidateNextSteps(missionId, dirtyCheck);
 
   return {
-    data: report as unknown as MissionValidateData,
+    data: { ...report, staleEntryWarnings } as unknown as MissionValidateData,
     summary: `[mission.validate] ${missionId} validation passed (${stepCount} steps, ${routeCount} routes built)`,
     nextSteps: passNextSteps,
   };
