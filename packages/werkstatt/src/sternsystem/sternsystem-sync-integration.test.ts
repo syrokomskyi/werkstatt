@@ -13,6 +13,7 @@ import { execSync } from "node:child_process";
 import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { stringify as stringifyYaml } from "yaml";
 import { runSternsystemSync } from "./sternsystem-sync.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
@@ -24,7 +25,7 @@ function git(cwd: string, args: string): string {
   }).trim();
 }
 
-let tmpDir: string;
+let testRoot: string;
 let workspaceRoot: string;
 let cacheDir: string;
 let bareDir: string;
@@ -51,24 +52,40 @@ function makeContext(root: string): KernelRuntimeContext {
   } as unknown as KernelRuntimeContext;
 }
 
-async function setupRegistry(yaml: string): Promise<void> {
-  await mkdir(join(workspaceRoot, "systems"), { recursive: true });
-  await writeFile(join(workspaceRoot, "systems", "registry.yaml"), yaml, "utf8");
+interface MirrorSpec {
+  path: string;
+  storageType: "non-bare" | "bare" | "bundle";
+}
+
+async function setupSystemConfig(mirrors: MirrorSpec[]): Promise<void> {
+  const config = {
+    schemaVersion: "system-config/v1",
+    id: "test-site",
+    cosmicStar: "Vega",
+    mirrors,
+    pinnedPlatform: "4.5.0",
+    status: "registered",
+    registeredAt: "2026-01-01T00:00:00Z",
+    notes: "",
+  };
+  await writeFile(join(cacheDir, "system-config.yaml"), stringifyYaml(config) + "\n", "utf8");
 }
 
 beforeEach(async () => {
-  tmpDir = await mkdtemp(join(tmpdir(), "sync-integration-"));
-  workspaceRoot = tmpDir;
-  cacheDir = join(tmpDir, "cache");
-  bareDir = join(tmpDir, "bare.git");
-  externalDir = join(tmpDir, "external.git");
+  testRoot = await mkdtemp(join(tmpdir(), "sync-integration-"));
+  workspaceRoot = join(testRoot, "workspace");
+  cacheDir = join(testRoot, "systems-cache", "test-site");
+  bareDir = join(testRoot, "bare.git");
+  externalDir = join(testRoot, "external.git");
+
+  await mkdir(workspaceRoot, { recursive: true });
 
   // Create bare repos
-  git(tmpDir, `init --bare -b main "${bareDir}"`);
-  git(tmpDir, `init --bare -b main "${externalDir}"`);
+  git(testRoot, `init --bare -b main "${bareDir}"`);
+  git(testRoot, `init --bare -b main "${externalDir}"`);
 
   // Create cache clone with initial content
-  git(tmpDir, `clone "${bareDir}" "${cacheDir}"`);
+  git(testRoot, `clone "${bareDir}" "${cacheDir}"`);
   git(cacheDir, 'config user.email "test@example.com"');
   git(cacheDir, 'config user.name "Test"');
   await mkdir(join(cacheDir, "src/content"), { recursive: true });
@@ -101,28 +118,14 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await rm(tmpDir, { recursive: true, force: true });
+  await rm(testRoot, { recursive: true, force: true });
 });
 
 test("sync pushes from cache clone to bare mirror", async () => {
-  await setupRegistry(
-    `schemaVersion: "1.0.0"
-systems:
-  - id: test-site
-    cosmicStar: Vega
-    mirrors:
-      - path: "${cacheDir}"
-        storageType: non-bare
-      - path: "${bareDir}"
-        storageType: bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: registered
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
-`,
-  );
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+  ]);
 
   // Make a new commit in cache
   await writeFile(join(cacheDir, "src/content/system.md"), "# Updated\n");
@@ -142,26 +145,11 @@ systems:
 });
 
 test("sync pushes to multiple external mirrors", async () => {
-  await setupRegistry(
-    `schemaVersion: "1.0.0"
-systems:
-  - id: test-site
-    cosmicStar: Vega
-    mirrors:
-      - path: "${cacheDir}"
-        storageType: non-bare
-      - path: "${bareDir}"
-        storageType: bare
-      - path: "${externalDir}"
-        storageType: bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: registered
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
-`,
-  );
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+    { path: externalDir, storageType: "bare" },
+  ]);
 
   // Make a new commit in cache
   await writeFile(join(cacheDir, "src/content/system.md"), "# Multi-sync\n");
@@ -183,27 +171,12 @@ systems:
 });
 
 test("sync handles per-mirror failure non-fatally", async () => {
-  const nonExistentMirror = join(tmpDir, "nonexistent.git");
-  await setupRegistry(
-    `schemaVersion: "1.0.0"
-systems:
-  - id: test-site
-    cosmicStar: Vega
-    mirrors:
-      - path: "${cacheDir}"
-        storageType: non-bare
-      - path: "${bareDir}"
-        storageType: bare
-      - path: "${nonExistentMirror}"
-        storageType: bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: registered
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
-`,
-  );
+  const nonExistentMirror = join(testRoot, "nonexistent.git");
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+    { path: nonExistentMirror, storageType: "bare" },
+  ]);
 
   // Make a new commit in cache
   await writeFile(join(cacheDir, "src/content/system.md"), "# Failure test\n");
@@ -224,26 +197,11 @@ systems:
 });
 
 test("sync with external mirrors creates refs/mirror/${branch} matching bare repo HEAD", async () => {
-  await setupRegistry(
-    `schemaVersion: "1.0.0"
-systems:
-  - id: test-site
-    cosmicStar: Vega
-    mirrors:
-      - path: "${cacheDir}"
-        storageType: non-bare
-      - path: "${bareDir}"
-        storageType: bare
-      - path: "${externalDir}"
-        storageType: bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: registered
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
-`,
-  );
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+    { path: externalDir, storageType: "bare" },
+  ]);
 
   // Make a new commit in cache
   await writeFile(join(cacheDir, "src/content/system.md"), "# Mirror ref test\n");
@@ -264,24 +222,10 @@ systems:
 });
 
 test("sync without external mirrors does not create refs/mirror/${branch}", async () => {
-  await setupRegistry(
-    `schemaVersion: "1.0.0"
-systems:
-  - id: test-site
-    cosmicStar: Vega
-    mirrors:
-      - path: "${cacheDir}"
-        storageType: non-bare
-      - path: "${bareDir}"
-        storageType: bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: registered
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
-`,
-  );
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+  ]);
 
   // Make a new commit in cache
   await writeFile(join(cacheDir, "src/content/system.md"), "# No mirror ref\n");
@@ -300,22 +244,7 @@ systems:
 });
 
 test("sync with single mirror (cache only) throws — no bare mirror", async () => {
-  await setupRegistry(
-    `schemaVersion: "1.0.0"
-systems:
-  - id: test-site
-    cosmicStar: Vega
-    mirrors:
-      - path: "${cacheDir}"
-        storageType: non-bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: registered
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
-`,
-  );
+  await setupSystemConfig([{ path: cacheDir, storageType: "non-bare" }]);
 
   await expect(
     runSternsystemSync(

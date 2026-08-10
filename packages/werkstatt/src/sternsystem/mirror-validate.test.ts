@@ -15,15 +15,18 @@ import { join } from "node:path";
 import { runSternsystemValidate } from "./sternsystem-validate.ts";
 import { makeInput, makeContext, writeSystemConfig, BASE_SETUP } from "./test-helpers.ts";
 
+let testRoot: string;
 let workspaceRoot: string;
 
 beforeEach(async () => {
-  workspaceRoot = await mkdtemp(join(tmpdir(), "mirror-validate-test-"));
+  testRoot = await mkdtemp(join(tmpdir(), "mirror-validate-test-"));
+  workspaceRoot = join(testRoot, "workspace");
+  await mkdir(workspaceRoot, { recursive: true });
   await BASE_SETUP(workspaceRoot);
 });
 
 afterEach(async () => {
-  await rm(workspaceRoot, { recursive: true, force: true });
+  await rm(testRoot, { recursive: true, force: true });
 });
 
 test("validate passes with single non-bare mirror (cache only)", async () => {
@@ -86,9 +89,6 @@ test("validate resolves cache dir from mirrors[0].path", async () => {
     (v) => v.rule === "bundle-contract" || v.rule === "cache-missing",
   );
   expect(result.exitCode).toBe(0);
-
-  // Cleanup
-  await rm(join(workspaceRoot, "..", "systems-cache"), { recursive: true, force: true });
 });
 
 test("validate detects mirrors[0] with wrong storageType (bare instead of non-bare)", async () => {
