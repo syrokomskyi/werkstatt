@@ -1,7 +1,7 @@
 ---
 id: RFC-0793
 title: "Fix SPDX license normalization in open-source page generator"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
 enhancedAt: 2026-08-10
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
