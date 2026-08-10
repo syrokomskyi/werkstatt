@@ -23,6 +23,7 @@
   <item>RFC-0705: move mirror status gathering before state transition; add blocking check when external mirrors are desynced.</item>
   <item>RFC-0734: add CREG-05 enforcement — block close when content drift exists and no apply-result.json; add --skip-content-regression flag.</item>
   <item>RFC-0762: extend CloseReportMirror with synced/syncError; add post-close sternsystem.sync call before state file write.</item>
+  <item>Bug fix: push cache clone to origin before mirror sync check to prevent false "out of sync" when commits were created between reconcile and close.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -271,6 +272,26 @@ export async function runMissionClose(
     let recommendation: string | null = null;
 
     const config = await readSystemConfig(workspaceRoot, manifest.systemId);
+
+    // Pre-check: push cache clone to origin (bare repo) to ensure the bare repo
+    // HEAD is current before comparing with the mirror ref. Without this push,
+    // commits created between reconcile and close (e.g., system-state updates,
+    // bordbuch entries from other operations) would make the bare repo appear
+    // behind, causing a false "mirror out of sync" error.
+    if (config && config.mirrors.length > 1) {
+      const preCheckSystemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
+      if (existsSync(path.join(preCheckSystemDir, ".git"))) {
+        try {
+          const branch = gitExec(preCheckSystemDir, "rev-parse --abbrev-ref HEAD");
+          gitExec(preCheckSystemDir, `push origin ${JSON.stringify(branch)}`);
+          logger.info(`  Pushed cache clone to origin before mirror sync check`);
+        } catch (pushErr) {
+          logger.warn(
+            `  Could not push cache clone to origin before mirror check: ${pushErr instanceof Error ? pushErr.message : String(pushErr)}`,
+          );
+        }
+      }
+    }
 
     if (config && config.mirrors.length > 1) {
       const bareMirror = config.mirrors[1];

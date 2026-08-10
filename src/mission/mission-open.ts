@@ -12,6 +12,7 @@
   <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
   <item>RFC-0593: add bordbuch.validate pre-flight gate before lock acquisition.</item>
   <item>ADR-0030: verify commitAndPushBordbuch succeeded — throw on commit failure (commitSha null) and push failure (pushed false) with distinct error messages.</item>
+  <item>Bug fix: auto-repair orphan-mission-close bordbuch violations before lock acquisition; commit and push repaired bordbuch to avoid dirty cache clone blocking mission.reconcile.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -34,6 +35,7 @@ import {
   readBordbuch,
   deriveNextMissionNumberSafe,
   validateBordbuch,
+  commitAndPushBordbuch,
   type BordbuchViolation,
 } from "../bordbuch/bordbuch-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
@@ -54,6 +56,8 @@ export interface MissionOpenData {
   pinAtOpen: string;
   operationId: string;
 }
+
+const REPAIRABLE_RULES = new Set(["orphan-mission-close"]);
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -85,14 +89,60 @@ export async function runMissionOpen(
   // to avoid holding locks during validation. Known TOCTOU limitation: bordbuch.repair
   // (operator-only) could change the bordbuch concurrently — low risk, failed attempt
   // exits with code 1 before any side effects.
+  //
+  // Auto-repair: if all violations are orphan-mission-close (safe to repair per
+  // RFC-0583), automatically call bordbuch.repair instead of requiring manual
+  // intervention. This is the most common violation after a manual bordbuch edit
+  // or a crashed mission.close, and repair is deterministic and safe.
   const bordbuchCheck = await preflightBordbuch(workspaceRoot, systemId);
   if (!bordbuchCheck.passed) {
-    const violationLines = bordbuchCheck.violations
-      .map((v) => `  ${v.rule}: ${v.message}`)
-      .join("\n");
-    throw new Error(
-      `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} violation(s) — run bordbuch.repair first\n${violationLines}`,
-    );
+    const allRepairable = bordbuchCheck.violations.every((v) => REPAIRABLE_RULES.has(v.rule));
+    if (allRepairable) {
+      try {
+        const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+        await executeKernelCommand({
+          workspaceRoot,
+          commandName: "bordbuch.repair",
+          argv: [`--system=${systemId}`],
+        });
+        const recheck = await preflightBordbuch(workspaceRoot, systemId);
+        if (!recheck.passed) {
+          const violationLines = recheck.violations
+            .map((v) => `  ${v.rule}: ${v.message}`)
+            .join("\n");
+          throw new Error(
+            `[mission.open] bordbuch.repair ran but ${recheck.violations.length} violation(s) remain for system '${systemId}'\n${violationLines}`,
+          );
+        }
+        // Commit and push the repaired bordbuch to avoid dirty cache clone
+        // blocking mission.reconcile. bordbuch.repair writes the file but does
+        // not commit (by design — operator command). mission.open must commit
+        // the auto-repaired file before proceeding.
+        const repairSystemDir = await resolveCacheClonePath(workspaceRoot, systemId);
+        if (existsSync(path.join(repairSystemDir, ".git"))) {
+          const repairResult = await commitAndPushBordbuch(
+            repairSystemDir,
+            "bordbuch.repair: auto-repair orphan-mission-close (mission.open)",
+          );
+          if (!repairResult.commitSha) {
+            throw new Error(
+              `[mission.open] bordbuch.repair succeeded but commit failed for system '${systemId}'`,
+            );
+          }
+        }
+      } catch (repairErr) {
+        throw new Error(
+          `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} orphan-mission-close violation(s) — auto-repair failed: ${repairErr instanceof Error ? repairErr.message : String(repairErr)}`,
+        );
+      }
+    } else {
+      const violationLines = bordbuchCheck.violations
+        .map((v) => `  ${v.rule}: ${v.message}`)
+        .join("\n");
+      throw new Error(
+        `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} violation(s) — run bordbuch.repair first\n${violationLines}`,
+      );
+    }
   }
 
   const operationId = generateOperationId();
