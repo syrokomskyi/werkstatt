@@ -44,11 +44,13 @@ import {
 
 export interface SternsystemValidateData {
   validated: number;
-  violations: Array<{ systemId: string; rule: string; message: string }>;
+  violations: SternsystemViolation[];
   warnings: Array<{ systemId: string; field: string; message: string }>;
   withOwner: number;
   withoutOwner: number;
 }
+
+type SternsystemViolation = { systemId: string; rule: string; message: string };
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -71,8 +73,8 @@ const FORBIDDEN_PATTERNS = [
 async function checkBundleContract(
   cacheDir: string,
   systemId: string,
-): Promise<Array<{ systemId: string; rule: string; message: string }>> {
-  const violations: Array<{ systemId: string; rule: string; message: string }> = [];
+): Promise<SternsystemViolation[]> {
+  const violations: SternsystemViolation[] = [];
   if (!existsSync(cacheDir)) return violations;
 
   const entries = await collectFiles(cacheDir, {
@@ -119,8 +121,8 @@ async function checkBundleContract(
 async function validateYamlFiles(
   cacheDir: string,
   systemId: string,
-): Promise<Array<{ systemId: string; rule: string; message: string }>> {
-  const violations: Array<{ systemId: string; rule: string; message: string }> = [];
+): Promise<SternsystemViolation[]> {
+  const violations: SternsystemViolation[] = [];
   if (!existsSync(cacheDir)) return violations;
 
   const entries = await fs.readdir(cacheDir, { withFileTypes: true });
@@ -153,7 +155,7 @@ export async function runSternsystemValidate(
 
   const { systems: allSystems, errors: discoveryErrors } = await discoverSystems(workspaceRoot);
 
-  const violations: Array<{ systemId: string; rule: string; message: string }> = [];
+  const violations: SternsystemViolation[] = [];
   const warnings: Array<{ systemId: string; field: string; message: string }> = [];
 
   if (discoveryErrors.length > 0) {
