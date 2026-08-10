@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: c72b745b4691abb2db4b29be96c00035881ccb0480e2a7ab42946274ad3f224a
+  contentHash: cf3892e5600eaa5823e378eb30804b5bb834638c6c0d337e7a8fcc7cfdd2f63f
   sources:
     - path: docs/architecture-dna.md
-      hash: 629105ce1e1caccc2ce85493f15419f2fe3d0a6aff9b5cf5e50d34c601cc68e3
+      hash: eddef9d587f6e3839099737eae20110e42b436039759a35c6a4ba95b66dc5a00
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -26,8 +26,10 @@ meta:
       hash: 0c952f4e3a18eaabea5952b4a3e9d665220a731b8e4a2b7f82e15b087f09f194
     - path: missions/warpgogol-com-m000042/workpiece/package.json
       hash: 48907d4f8c815b2832b7776ef621733804d758910105d5a05f5c4a578f821478
+    - path: missions/warpgogol-com-m000043/workpiece/package.json
+      hash: 48907d4f8c815b2832b7776ef621733804d758910105d5a05f5c4a578f821478
     - path: package.json
-      hash: d6de7d845d0048e9ca50de0145c6759b4eb845110853fac6f420331e49321e50
+      hash: f54ccc2976bde4cc5f40aaef8751f37f568fe0e33583109b8108bf409e84b17a
     - path: packages/forge/package.json
       hash: 7a0fd15cbd172653f813af864d68bc674d45906b0e1563b0d161a2b7cd95fbb3
     - path: packages/werkstatt-game/package.json
@@ -60,7 +62,7 @@ meta:
       hash: 324e44318352484409a037647f242cd90b6ef0e5d42d676b3b3cac16a76cc9fb
 workspace:
   name: warpgogol-platform
-  version: 5.9.15
+  version: 5.18.9
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -68,17 +70,18 @@ workspace:
     - services/*
 apps:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000042/workpiece
+    directory: missions/warpgogol-com-m000043/workpiece
     packageName: warpgogol-com
-sternsystems:
-  - id: warpgogol-com
-    currentMission: warpgogol-com-m000042
-    registeredAt: 2026-07-13T00:00:00.000Z
+sternsystems: []
 missions:
   - id: warpgogol-com-m000042
     sternsystem: ""
     status: open
     workpiecePath: missions/warpgogol-com-m000042/workpiece
+  - id: warpgogol-com-m000043
+    sternsystem: ""
+    status: open
+    workpiecePath: missions/warpgogol-com-m000043/workpiece
 packages:
   - name: warpgogol-com
     directory: missions/warpgogol-com-m000031/workpiece
@@ -142,6 +145,42 @@ packages:
     testSignal:
       packageName: warpgogol-com
       directory: missions/warpgogol-com-m000042/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000043/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/forge"
+      - "@warpgogol/werkstatt"
+      - "@warpgogol/werkstatt-site"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000043/workpiece
       signal: skipped
       evidence: App author/build checks currently cover the deployable site; direct
         app unit tests are deferred until an app-level smoke-test harness lands.
@@ -459,7 +498,7 @@ quality:
     real: 5
     noop: 0
     absent: 0
-    skipped: 10
+    skipped: 11
   testSignalPolicy:
     hasErrors: false
     errorCount: 0
@@ -516,6 +555,20 @@ commands:
       - site
       - workspace
   - name: agent.capability.validate
+    scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: agent.dns-aid.generate
+    scope: app
+    mutatesState: true
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: agent.dns-aid.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
@@ -5668,6 +5721,18 @@ commands:
       - site
       - workspace
 commandProvenance:
+  - command: agent.dns-aid.generate
+    proposedBy:
+      - RFC-0786
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: agent.dns-aid.validate
+    proposedBy:
+      - RFC-0786
+    addedBy: []
+    changedBy: []
+    removedBy: []
   - command: agent.markdown-negotiation.generate
     proposedBy:
       - RFC-0785
@@ -5736,6 +5801,24 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
+  - command: leitstand.dev-deploy
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: leitstand.promote
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: leitstand.propagate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
   - command: llms.generate
     proposedBy: []
     addedBy: []
@@ -5777,11 +5860,59 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
+  - command: mission.abort
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: mission.close
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: mission.materialize
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: mission.open
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: mission.reconcile
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: notausgang.export
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: open-source.generate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0793
+    removedBy: []
   - command: public.infrastructure.generate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0784
+    removedBy: []
+  - command: public.surface.lint
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0791
     removedBy: []
   - command: robots.generate
     proposedBy: []
@@ -5789,17 +5920,48 @@ commandProvenance:
     changedBy:
       - RFC-0784
     removedBy: []
-  - command: sitemap.generate
+  - command: sternsystem.extract
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0788
+      - RFC-0790
     removedBy: []
-  - command: sitemap.validate
+  - command: sternsystem.list
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0788
+      - RFC-0790
+    removedBy: []
+  - command: sternsystem.pin
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: sternsystem.register
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: sternsystem.status
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: sternsystem.sync
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+    removedBy: []
+  - command: sternsystem.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0790
+      - RFC-0792
     removedBy: []
   - command: surface.generate
     proposedBy: []
@@ -5919,6 +6081,7 @@ pipelines:
       - agent.capability.validate
       - agent.surface.validate
       - agent.openapi.validate
+      - agent.dns-aid.validate
       - agent.api-catalog.validate
       - agent.mcp-card.validate
       - agent.surface.verify
@@ -6083,6 +6246,7 @@ pipelines:
       - content.freshness.validate
       - agent.knowledge.generate
       - agent.manifest.generate
+      - agent.dns-aid.generate
       - agent.openapi.generate
       - agent.api-catalog.generate
       - agent.mcp-card.generate
@@ -6159,8 +6323,6 @@ pipelines:
       - agent.knowledge.generate
       - agent.manifest.generate
       - agent.openapi.generate
-      - agent.api-catalog.generate
-      - agent.mcp-card.generate
       - agent.routes.generate
       - agent.surface.sign
       - styles.global.generate
@@ -6509,6 +6671,7 @@ pipelines:
       - agent.capability.validate
       - agent.surface.validate
       - agent.openapi.validate
+      - agent.dns-aid.validate
       - agent.api-catalog.validate
       - agent.mcp-card.validate
       - agent.surface.verify
@@ -6735,6 +6898,7 @@ pipelines:
       - agent.capability.validate
       - agent.surface.validate
       - agent.openapi.validate
+      - agent.dns-aid.validate
       - agent.api-catalog.validate
       - agent.mcp-card.validate
       - agent.surface.verify
@@ -7177,12 +7341,23 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 5
-  implemented: 0
-  draft: 7
+  accepted: 7
+  implemented: 2
+  draft: 5
   reviewing: 0
 baseline:
-  implementedRfcs: []
+  implementedRfcs:
+    - id: RFC-0789
+      implementedAt: 2026-08-09
+      kind: command
+      scope: app
+      dnaRefs:
+        - DNA-34
+    - id: RFC-0791
+      implementedAt: 2026-08-10
+      kind: command
+      scope: app
+      dnaRefs: []
   nonImplementedRfcs:
     accepted:
       - RFC-0179
@@ -7190,14 +7365,14 @@ baseline:
       - RFC-0784
       - RFC-0785
       - RFC-0786
+      - RFC-0790
+      - RFC-0792
     draft:
       - RFC-0000
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0787
-      - RFC-0788
-      - RFC-0789
+      - RFC-0793
     reviewing: []
     superseded: []
     rejected: []
