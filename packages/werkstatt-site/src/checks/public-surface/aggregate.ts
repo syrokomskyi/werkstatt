@@ -10,11 +10,12 @@
   <item>RFC-0577: Enrich PUBTXT-07 fixHint with resolveProseSource helper and build.prepare command.</item>
   <item>RFC-0577 review fix: Make resolveProseSource async and use context.io.exists instead of existsSync.</item>
   <item>RFC-0789: register agent discovery surface routes (api-catalog, mcp/server-card.json, agent.openapi.json) in routePaths so PUBTXT-07 recognizes them as locally known.</item>
+  <item>RFC-0791: replace manual .well-known/ routePaths.add calls with complementary .well-known/ glob into publicPaths, covering extensionless files like api-catalog.</item>
 </CHANGE_SUMMARY>
 */
 
 import { join } from "node:path";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
@@ -153,6 +154,19 @@ export async function runPublicSurfaceLint(
     .filter(isPublicTextArtifact)
     .sort();
   const publicPaths = new Set(files.map(publicPathFromRelPath));
+  // RFC-0791: Include extensionless .well-known/ files (e.g. api-catalog)
+  // that isPublicTextArtifact filters out. Node's fs.glob returns both
+  // files and directories — use stat to filter out directories.
+  const wellKnownEntries = await context.io.glob(".well-known/**/*", {
+    cwd: app.publicDirectory,
+  });
+  for (const relPath of wellKnownEntries) {
+    const normalized = normalizePublicRelPath(relPath);
+    const stats = await stat(join(app.publicDirectory, normalized));
+    if (stats.isFile()) {
+      publicPaths.add(publicPathFromRelPath(normalized));
+    }
+  }
   const routePaths = new Set<string>();
   try {
     const sitemap = await context.io.readFile(join(app.publicDirectory, "sitemap.xml"));
@@ -170,11 +184,6 @@ export async function runPublicSurfaceLint(
       routePaths.add(`${prefix}/${slug}`.replace(/\/$/, "") || "/");
     }
   }
-  routePaths.add("/.well-known/agent.json");
-  // RFC-0789: agent discovery surface files linked from llms.txt.
-  routePaths.add("/.well-known/api-catalog");
-  routePaths.add("/.well-known/mcp/server-card.json");
-  routePaths.add("/.well-known/agent.openapi.json");
   // Also include PSEO surface routes from surface.generated.yaml so that
   // llms.txt links to programmatic surface pages are recognized as locally known.
   try {
