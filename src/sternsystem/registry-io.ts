@@ -147,6 +147,24 @@ export async function writeSystemState(
     } catch {
       // Git commit may fail if nothing changed — non-fatal
     }
+
+    // RFC-0790: Push to bare repo so syncCacheClone's git reset --hard origin/main
+    // does not discard the commit. Without this push, mission.materialize loses
+    // the system-state.yaml update written by mission.open.
+    try {
+      const branch = execSync("git rev-parse --abbrev-ref HEAD", {
+        cwd: cacheClone,
+        encoding: "utf-8",
+        timeout: 10_000,
+      }).trim();
+      execSync(`git push origin ${branch}`, {
+        cwd: cacheClone,
+        stdio: ["pipe", "pipe", "pipe"],
+        timeout: 30_000,
+      });
+    } catch {
+      // Push may fail if no bare repo is configured — non-fatal
+    }
   }
 }
 

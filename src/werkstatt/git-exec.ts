@@ -14,13 +14,18 @@
 
 import { execSync } from "node:child_process";
 
-export function gitExec(cwd: string, args: string, options?: { allowNonZero?: boolean }): string {
+export function gitExec(
+  cwd: string,
+  args: string,
+  options?: { allowNonZero?: boolean; env?: NodeJS.ProcessEnv },
+): string {
   try {
     return execSync(`git ${args}`, {
       cwd,
       encoding: "utf-8",
       stdio: ["pipe", "pipe", "pipe"],
       timeout: 30_000,
+      ...(options?.env ? { env: options.env } : {}),
     }).trim();
   } catch (err) {
     if (options?.allowNonZero) {
@@ -58,7 +63,7 @@ export async function gitExecWithRetry(
   cwd: string,
   args: string,
   retryOptions: RetryOptions,
-  options?: { allowNonZero?: boolean },
+  options?: { allowNonZero?: boolean; env?: NodeJS.ProcessEnv },
 ): Promise<string> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retryOptions.backoffMs.length; attempt++) {
