@@ -1,12 +1,12 @@
 ---
 id: ADR-0040
 title: "JSDoc return-type contracts for sternsystem registry functions"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
