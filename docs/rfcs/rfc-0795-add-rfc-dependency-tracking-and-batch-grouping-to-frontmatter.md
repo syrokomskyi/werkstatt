@@ -294,22 +294,22 @@ export type RfcImplementStampRule =
 
 ## Acceptance criteria
 
-- [ ] `dependsOn` and `batch` fields added to `RfcFrontmatter` interface in `packages/forge/os/rfc/types.ts`
-- [ ] `dependsOn` and `batch` added to `RFC_KNOWN_KEYS` array
-- [ ] V-33 validation rule added to `validate-rules.ts` (dependsOn referential integrity + self-dependency + rejected-dependency deadlock, warning severity)
-- [ ] V-34 validation rule added to `validate-rules.ts` (batch slug format, warning severity)
-- [ ] RFC-IMP-07 dependency gate added to `rfc.implement.stamp` handler (hard block when dependsOn entry is not `implemented`)
-- [ ] `RFC-IMP-07` added to `RfcImplementStampRule` union type in `types.ts`
-- [ ] `batch` and `dependsOn` fields added to `RfcListEntry` type in `types.ts`
-- [ ] `--batch` flag added to `rfc.list` command registration and handler
-- [ ] `rfc.list --batch <slug> --json` returns only RFCs with matching batch slug
-- [ ] `fo-idea` step 4c updated to write `dependsOn` and `batch` during series creation
-- [ ] `fo-idea-plan` SKILL.md updated with session affinity recommendation
-- [ ] `fo-idea-implement` SKILL.md updated with session affinity recommendation
-- [ ] DNA-65 entry added to `docs/architecture-dna.md`
-- [ ] Retroactive batch auto-detection implemented for existing `implemented` RFCs
-- [ ] Unit tests for V-33, V-34, and RFC-IMP-07 in `validate-rules.test.ts` and stamp handler tests
-- [ ] `rfc.validate` passes on this file with zero errors
+- [x] `dependsOn` and `batch` fields added to `RfcFrontmatter` interface in `packages/forge/os/rfc/types.ts` (evidence: packages/forge/os/rfc/types.ts:241-260)
+- [x] `dependsOn` and `batch` added to `RFC_KNOWN_KEYS` array (evidence: packages/forge/os/rfc/types.ts:578-581)
+- [x] V-33 validation rule added to `validate-rules.ts` (dependsOn referential integrity + self-dependency + rejected-dependency deadlock, warning severity) (evidence: packages/forge/os/rfc/handlers/validate-rules.ts:896-930)
+- [x] V-34 validation rule added to `validate-rules.ts` (batch slug format, warning severity) (evidence: packages/forge/os/rfc/handlers/validate-rules.ts:932-949)
+- [x] RFC-IMP-07 dependency gate added to `rfc.implement.stamp` handler (hard block when dependsOn entry is not `implemented`) (evidence: packages/forge/os/rfc/handlers/implement-stamp.ts:298-319)
+- [x] `RFC-IMP-07` added to `RfcImplementStampRule` union type in `types.ts` (evidence: packages/forge/os/rfc/types.ts:511-518)
+- [x] `batch` and `dependsOn` fields added to `RfcListEntry` type in `types.ts` (evidence: packages/forge/os/rfc/types.ts:379-386)
+- [x] `--batch` flag added to `rfc.list` command registration and handler (evidence: packages/forge/os/rfc/rfc.module.ts:61-64, packages/forge/os/rfc/handlers/list-create.ts:76,95)
+- [x] `rfc.list --batch <slug> --json` returns only RFCs with matching batch slug (evidence: packages/forge/os/rfc/handlers/list-create.ts:95)
+- [x] `fo-idea` step 4c updated to write `dependsOn` and `batch` during series creation (evidence: packages/forge/skills/fo/fo-idea/SKILL.md:226-227)
+- [x] `fo-idea-plan` SKILL.md updated with session affinity recommendation (evidence: packages/forge/skills/fo/fo-idea-plan/SKILL.md:233-235)
+- [x] `fo-idea-implement` SKILL.md updated with session affinity recommendation (evidence: packages/forge/skills/fo/fo-idea-implement/SKILL.md:506-508)
+- [x] DNA-65 entry added to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:275-277)
+- [x] Retroactive batch auto-detection implemented for existing `implemented` RFCs (evidence: docs/rfcs/archive/implemented/rfc-0769..0776 batch: engine-consolidation, docs/rfcs/archive/implemented/rfc-0466..0469 batch: pbp-implementation)
+- [x] Unit tests for V-33, V-34, and RFC-IMP-07 in `validate-rules.test.ts` and stamp handler tests (evidence: packages/forge/os/rfc/handlers/validate-rules.test.ts:766-883, packages/forge/src/tests/implement-stamp.test.ts:432-504)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: rfc.validate --id RFC-0795 --json → 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
