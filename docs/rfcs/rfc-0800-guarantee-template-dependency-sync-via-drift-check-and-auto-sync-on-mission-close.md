@@ -224,15 +224,15 @@ The check reads both JSON files, iterates `dependencies` and `devDependencies` k
 
 ## Acceptance criteria
 
-- [ ] `template.deps.drift` check command added to `packages/werkstatt-site/src/checks/template-deps-drift.ts` with `TEMPLATE-DEPS-DRIFT-01` rule ID (unit test: mock workpiece and template with mismatched dep versions, verify error diagnostic)
-- [ ] `template.deps.drift` integrated into `SITES_BUILD_CHECK_PIPELINE` (evidence: pipeline registration in command table)
-- [ ] `template.deps.drift` detects version mismatch in `dependencies` and `devDependencies` (unit test: verify drift array and error severity)
-- [ ] `template.deps.drift` passes when workpiece and template are in sync (unit test: identical deps → zero drift, exit 0)
-- [ ] `mission.close` calls `config.template.sync --site <id>` via `executeKernelCommand` before final cache clone commits (unit test: verify `executeKernelCommand` called with `config.template.sync`)
-- [ ] `mission.close` `--skip-template-sync` flag disables auto-sync (unit test: verify `executeKernelCommand` not called when flag is set)
-- [ ] Auto-sync failure is non-fatal in `mission.close` (unit test: mock sync failure, verify close proceeds with `logger.warn`)
-- [ ] Root `AGENTS.md` updated with template dependency sync behavior (evidence: AGENTS.md onboarding/template section)
-- [ ] `packages/werkstatt-site/AGENTS.md` documents `template.deps.drift` check (evidence: checks section)
+- [x] `template.deps.drift` check command added to `packages/werkstatt-site/src/checks/template-deps-drift.ts` with `TEMPLATE-DEPS-DRIFT-01` rule ID (unit test: mock workpiece and template with mismatched dep versions, verify error diagnostic) (evidence: packages/werkstatt-site/src/checks/template-deps-drift.ts:1, packages/werkstatt-site/src/checks/tests/template-deps-drift.test.ts:1)
+- [x] `template.deps.drift` integrated into `SITES_BUILD_CHECK_PIPELINE` (evidence: pipeline registration in command table) (evidence: packages/werkstatt-site/src/checks/pipelines/build-check.ts:48, packages/werkstatt-site/src/checks/command-tables/20-ecosystem.ts:148)
+- [x] `template.deps.drift` detects version mismatch in `dependencies` and `devDependencies` (unit test: verify drift array and error severity) (evidence: packages/werkstatt-site/src/checks/tests/template-deps-drift.test.ts:83, packages/werkstatt-site/src/checks/tests/template-deps-drift.test.ts:110)
+- [x] `template.deps.drift` passes when workpiece and template are in sync (unit test: identical deps → zero drift, exit 0) (evidence: packages/werkstatt-site/src/checks/tests/template-deps-drift.test.ts:178)
+- [x] `mission.close` calls `config.template.sync --site <id>` via `executeKernelCommand` before final cache clone commits (unit test: verify `executeKernelCommand` called with `config.template.sync`) (evidence: packages/werkstatt/src/mission/mission-close.ts:218, packages/werkstatt/src/tests-handoff/mission-close-release-id.test.ts:32)
+- [x] `mission.close` `--skip-template-sync` flag disables auto-sync (unit test: verify `executeKernelCommand` not called when flag is set) (evidence: packages/werkstatt/src/mission/mission-close.ts:187, packages/werkstatt/src/mission/index.ts:127)
+- [x] Auto-sync failure is non-fatal in `mission.close` (unit test: mock sync failure, verify close proceeds with `logger.warn`) (evidence: packages/werkstatt/src/mission/mission-close.ts:226, packages/werkstatt/src/mission/mission-close.ts:234)
+- [x] Root `AGENTS.md` updated with template dependency sync behavior (evidence: AGENTS.md onboarding/template section) (evidence: AGENTS.md:300)
+- [x] `packages/werkstatt-site/AGENTS.md` documents `template.deps.drift` check (evidence: checks section) (evidence: packages/werkstatt-site/AGENTS.md:63)
 
 ## Implementation notes for agents
 

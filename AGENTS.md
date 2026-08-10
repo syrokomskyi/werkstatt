@@ -297,6 +297,7 @@ Rules:
 - Direct `git commit` in the workpiece is discouraged but not technically prevented.
 - `mission.reconcile` and `mission.close` block if the workpiece has uncommitted changes — run `mission.git.commit` first.
 - `mission.close` mandates `evidence.sync` to R2 before writing `close-report.json` (RFC-0652). The `--skip-evidence-sync` flag is an escape hatch for offline scenarios only — it appends a Bordbuch audit entry. Agents MUST NOT use `--skip-evidence-sync` unless explicitly directed by the operator.
+- `mission.close` auto-syncs template dependencies from the workpiece to `package.template.json` via `config.template.sync` before inline validate (RFC-0800). The `--skip-template-sync` flag disables this auto-sync. Auto-sync failure is non-fatal (`logger.warn`); the `template.deps.drift` check in `SITES_BUILD_CHECK_PIPELINE` is the safety net that blocks close if drift remains.
 - `mission.cleanup` removes `evidence/axiom/` older than `--evidence-retention-days` (default: 30). Non-Axiom evidence is always preserved (RFC-0652).
 - `mission.validate` warns (non-blocking) if the workpiece is dirty after validation — commit generated artifacts too.
 - Before sending any response to the operator, verify via `git status` that no uncommitted changes from the current session remain. If any exist, commit first.
