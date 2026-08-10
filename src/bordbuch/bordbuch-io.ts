@@ -338,6 +338,8 @@ export async function deriveNextMissionNumberSafe(
   if (existsSync(missionsPath)) {
     const dirs = await fs.readdir(missionsPath, { withFileTypes: true });
     for (const d of dirs) {
+      if (d.name === "archive") continue;
+      if (d.isSymbolicLink()) continue;
       if (!d.isDirectory()) continue;
       if (!d.name.startsWith(`${systemId}-m`)) continue;
       const m = d.name.match(/-m(\d{6})$/);
