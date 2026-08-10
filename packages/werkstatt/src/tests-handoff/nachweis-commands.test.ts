@@ -64,7 +64,7 @@ vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../sternsystem/registry-io.ts")>();
   return {
     ...actual,
-    resolveCacheClonePath: vi.fn(async (workspaceRoot: string, systemId: string) => {
+    resolveCacheClonePath: vi.fn((workspaceRoot: string, systemId: string) => {
       return join(workspaceRoot, "systems-cache", systemId);
     }),
   };

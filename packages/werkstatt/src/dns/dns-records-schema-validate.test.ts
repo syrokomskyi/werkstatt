@@ -13,10 +13,11 @@ import { join } from "node:path";
 import { runDnsRecordsSchemaValidate } from "./dns-records-schema-validate.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "../kernel/types.ts";
 
+let testRoot: string;
 let tmpDir: string;
 
 function resolveCacheDir(systemId: string): string {
-  return join(tmpDir, "..", "systems-cache", systemId);
+  return join(testRoot, "systems-cache", systemId);
 }
 
 function resolveDnsPath(systemId: string): string {
@@ -24,11 +25,13 @@ function resolveDnsPath(systemId: string): string {
 }
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-dns-schema-validate-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-dns-schema-validate-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 function makeInput(flags: Record<string, unknown>): {
@@ -111,7 +114,7 @@ test("schema.validate: no --system scans all systems", async () => {
 id: ${id}
 cosmicStar: Vega
 mirrors:
-  - path: ./systems/${id}
+  - path: ../systems-cache/${id}
     storageType: non-bare
 pinnedPlatform: "1.0.0"
 status: active

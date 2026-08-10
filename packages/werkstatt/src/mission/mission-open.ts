@@ -315,7 +315,10 @@ export async function runMissionOpen(
     // RFC-0580: auto-commit werkstatt side-effects
     await commitWerkstattSideEffects(
       workspaceRoot,
-      [path.join("missions", missionId, "mission.yaml")],
+      [
+        path.join("missions", missionId, "mission.yaml"),
+        path.join("..", "systems-cache", systemId, "system-state.yaml"),
+      ],
       `werkstatt: mission.open ${missionId}`,
     );
 

@@ -14,6 +14,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:
 import { join } from "node:path";
 import { runLeitstandDevDeploy } from "../leitstand/leitstand-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 const { mockExecSync, mockExecuteKernelCommand } = vi.hoisted(() => ({
   mockExecSync: vi.fn(),
@@ -57,40 +58,8 @@ function makeInput(flags: Record<string, string>): KernelCommandInput {
   return { flags, argv: [] };
 }
 
-function createRegistryWithDevChannel(
-  workspaceRoot: string,
-  systemId: string,
-  missionId: string,
-): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: ${missionId}
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+function createRegistryWithDevChannel(testRoot: string, systemId: string, missionId: string): void {
+  createLeitstandSystem(testRoot, systemId, { currentMission: missionId });
 }
 
 function createWorkpieceWithDist(workspaceRoot: string, missionId: string): string {
@@ -113,10 +82,13 @@ function createAxiomCacheDir(workspaceRoot: string, missionId: string): string {
   return cacheDir;
 }
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0689-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0689-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
   mockExecSync.mockReset();
   mockExecuteKernelCommand.mockReset();
@@ -135,7 +107,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
@@ -145,7 +117,7 @@ test("RFC-0689: clears Axiom browser evidence cache before mission.check", async
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceWithDist(tmpDir, missionId);
   const cacheDir = createAxiomCacheDir(tmpDir, missionId);
 
@@ -164,7 +136,7 @@ test("RFC-0689: auto-regenerates snapshot and re-runs build when SNAP-01 detecte
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceWithDist(tmpDir, missionId);
 
   let buildCallCount = 0;
@@ -226,7 +198,7 @@ test("RFC-0689: does not regenerate snapshot when build fails for non-SNAP-01 re
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceWithDist(tmpDir, missionId);
 
   mockExecSync.mockImplementation((cmd: string) => {
@@ -274,7 +246,7 @@ test("RFC-0689: checks stale snapshot and regenerates when build is skipped (RFC
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceWithDist(tmpDir, missionId);
 
   // First run — writes build-skip cache with real platformSemanticHash
@@ -331,7 +303,7 @@ test("RFC-0689: does not error when Axiom cache directory does not exist", async
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceWithDist(tmpDir, missionId);
 
   // Do NOT create the cache directory — verify no error
@@ -352,7 +324,7 @@ test("RFC-0697: logs cache file count and total size before clearing", async () 
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceWithDist(tmpDir, missionId);
 
   const cacheDir = join(tmpDir, "missions", missionId, "evidence", "axiom", ".cache");

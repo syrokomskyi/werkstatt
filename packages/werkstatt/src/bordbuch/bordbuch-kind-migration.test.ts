@@ -70,19 +70,23 @@ function makeEntryWithDeprecatedKind(
 }
 
 async function writeBordbuch(entries: BordbuchEntry[]): Promise<void> {
-  const cacheDir = path.join(tmpDir, "cache", systemId);
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
   const bordbuchDir = path.join(cacheDir, "bordbuch");
   if (!existsSync(bordbuchDir)) mkdirSync(bordbuchDir, { recursive: true });
   const ndjson = entries.map((e) => JSON.stringify(e)).join("\n") + "\n";
   await fs.writeFile(path.join(bordbuchDir, "events.ndjson"), ndjson, "utf8");
 }
 
+let testRoot: string;
+
 beforeEach(async () => {
-  tmpDir = mkdtempSync(path.join(os.tmpdir(), "tmp-bordbuch-migration-"));
+  testRoot = mkdtempSync(path.join(os.tmpdir(), "tmp-bordbuch-migration-"));
+  tmpDir = path.join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
 });
 
 afterEach(async () => {
-  await fs.rm(tmpDir, { recursive: true, force: true });
+  await fs.rm(testRoot, { recursive: true, force: true });
 });
 
 test("migrateDeprecatedKind maps release-published to release-ready", () => {

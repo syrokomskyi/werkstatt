@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runLeitstandDevDeploy } from "../leitstand/leitstand-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -82,44 +83,13 @@ function writeReleaseManifest(
 }
 
 function createRegistryWithChannels(
-  workspaceRoot: string,
+  testRoot: string,
   systemId: string,
   options?: {
     currentMission?: string;
   },
 ): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-
-  const missionField = options?.currentMission ?? "null";
-
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: ${missionField}
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+  createLeitstandSystem(testRoot, systemId, { currentMission: options?.currentMission });
 }
 
 function createDistDir(workspaceRoot: string, releaseId: string): string {
@@ -137,15 +107,18 @@ function createWorkpieceDist(workspaceRoot: string, missionId: string): string {
   return distDir;
 }
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0700-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0700-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
@@ -156,7 +129,7 @@ test("RFC-0700: --release deploys from releases/<id>/dist/ and returns success",
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     missionId,
@@ -196,7 +169,7 @@ test("RFC-0700: --release succeeds without currentMission (no open mission requi
   const missionId = "test-sys-m000001";
 
   // No currentMission set — registry has currentMission: null
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     missionId,
@@ -221,7 +194,7 @@ test("RFC-0700: --release with system mismatch returns exitCode 1", async () => 
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   writeReleaseManifest(tmpDir, releaseId, {
     systemId: "other-sys",
     missionId,
@@ -244,7 +217,7 @@ test("RFC-0700: --release not found throws error", async () => {
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
 
   await expect(
     runLeitstandDevDeploy(
@@ -259,7 +232,7 @@ test("RFC-0700: --release with missing dist throws error", async () => {
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     missionId,
@@ -278,7 +251,7 @@ test("RFC-0700: without --release, workpiece path is unchanged (requires open mi
   const systemId = "test-sys";
 
   // No currentMission, no --release → should throw "no active mission"
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
 
   await expect(
     runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir)),
@@ -289,7 +262,7 @@ test("RFC-0700: without --release, releaseDeployed is undefined in result", asyn
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
   const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
@@ -304,7 +277,7 @@ test("RFC-0700: --force-build warning is logged when --release is set", async ()
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     missionId,

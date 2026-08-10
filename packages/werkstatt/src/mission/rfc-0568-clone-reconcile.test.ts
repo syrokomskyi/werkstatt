@@ -25,9 +25,10 @@ function git(cwd: string, args: string): string {
 }
 
 async function setupRegistry(workspaceRoot: string, systemId: string): Promise<void> {
-  await fs.mkdir(path.join(workspaceRoot, "systems"), { recursive: true });
-  const registryYaml = `schemaVersion: "1.0.0"\nsystems:\n  - id: ${systemId}\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/${systemId}"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n`;
-  await fs.writeFile(path.join(workspaceRoot, "systems", "registry.yaml"), registryYaml, "utf8");
+  const cacheDir = path.join(workspaceRoot, "..", "systems-cache", systemId);
+  await fs.mkdir(cacheDir, { recursive: true });
+  const configContent = `schemaVersion: system-config/v1\nid: ${systemId}\ncosmicStar: Vega\nmirrors:\n  - path: "../systems-cache/${systemId}"\n    storageType: non-bare\npinnedPlatform: "4.5.0"\nstatus: active\nregisteredAt: "2026-01-01T00:00:00Z"\nnotes: ""\n`;
+  await fs.writeFile(path.join(cacheDir, "system-config.yaml"), configContent, "utf8");
 }
 
 let tmpDir: string;
@@ -70,7 +71,7 @@ test("investigateUntrackedFiles classifies boilerplate files as previous-mission
   const workspaceRoot = path.join(tmpDir, "workspace");
   await setupRegistry(workspaceRoot, "test-system");
   // Create a bordbuch file with a mission-open entry
-  const bordbuchDir = path.join(workspaceRoot, "systems", "test-system", "bordbuch");
+  const bordbuchDir = path.join(workspaceRoot, "..", "systems-cache", "test-system", "bordbuch");
   await fs.mkdir(bordbuchDir, { recursive: true });
   const missionOpenTime = new Date(Date.now() - 60000).toISOString(); // 1 minute ago
   const bordbuchEntry = {
@@ -93,14 +94,6 @@ test("investigateUntrackedFiles classifies boilerplate files as previous-mission
   const boilerplateFile = "package.json";
   await fs.writeFile(path.join(cacheCloneDir, boilerplateFile), '{"name":"test"}');
 
-  const systemDir = path.join(workspaceRoot, "systems", "test-system");
-  // Ensure the system dir has the untracked file
-  await fs.mkdir(path.join(systemDir, "bordbuch"), { recursive: true });
-  await fs.writeFile(
-    path.join(systemDir, "bordbuch", "events.ndjson"),
-    JSON.stringify(bordbuchEntry) + "\n",
-  );
-
   const reports = await investigateUntrackedFiles(workspaceRoot, "test-system", cacheCloneDir, [
     boilerplateFile,
   ]);
@@ -114,11 +107,11 @@ test("investigateUntrackedFiles classifies non-boilerplate files as direct-commi
   // No bordbuch entries — no mission time ranges
   const workspaceRoot = path.join(tmpDir, "workspace");
   await setupRegistry(workspaceRoot, "test-system");
-  await fs.mkdir(path.join(workspaceRoot, "systems", "test-system", "bordbuch"), {
+  await fs.mkdir(path.join(workspaceRoot, "..", "systems-cache", "test-system", "bordbuch"), {
     recursive: true,
   });
   await fs.writeFile(
-    path.join(workspaceRoot, "systems", "test-system", "bordbuch", "events.ndjson"),
+    path.join(workspaceRoot, "..", "systems-cache", "test-system", "bordbuch", "events.ndjson"),
     "",
   );
 
@@ -138,11 +131,11 @@ test("investigateUntrackedFiles classifies non-boilerplate files as direct-commi
 test("investigateUntrackedFiles returns unknown for boilerplate files outside mission time range", async () => {
   const workspaceRoot = path.join(tmpDir, "workspace");
   await setupRegistry(workspaceRoot, "test-system");
-  await fs.mkdir(path.join(workspaceRoot, "systems", "test-system", "bordbuch"), {
+  await fs.mkdir(path.join(workspaceRoot, "..", "systems-cache", "test-system", "bordbuch"), {
     recursive: true,
   });
   await fs.writeFile(
-    path.join(workspaceRoot, "systems", "test-system", "bordbuch", "events.ndjson"),
+    path.join(workspaceRoot, "..", "systems-cache", "test-system", "bordbuch", "events.ndjson"),
     "",
   );
 

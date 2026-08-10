@@ -123,7 +123,7 @@ function buildValidBordbuch(): BordbuchEntry[] {
 }
 
 async function writeBordbuch(entries: BordbuchEntry[]): Promise<void> {
-  const cacheDir = path.join(tmpDir, "cache", systemId);
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
   const bordbuchDir = path.join(cacheDir, "bordbuch");
   if (!existsSync(bordbuchDir)) mkdirSync(bordbuchDir, { recursive: true });
   const ndjson = entries.map((e) => JSON.stringify(e)).join("\n") + "\n";
@@ -131,18 +131,22 @@ async function writeBordbuch(entries: BordbuchEntry[]): Promise<void> {
 }
 
 async function readBordbuchFile(): Promise<BordbuchEntry[]> {
-  const filePath = path.join(tmpDir, "cache", systemId, "bordbuch", "events.ndjson");
+  const filePath = path.join(tmpDir, "..", "systems-cache", systemId, "bordbuch", "events.ndjson");
   const raw = await fs.readFile(filePath, "utf8");
   const lines = raw.split("\n").filter((l) => l.trim().length > 0);
   return lines.map((l) => JSON.parse(l) as BordbuchEntry);
 }
 
+let testRoot: string;
+
 beforeEach(async () => {
-  tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "bordbuch-repair-test-"));
+  testRoot = await fs.mkdtemp(path.join(os.tmpdir(), "bordbuch-repair-test-"));
+  tmpDir = path.join(testRoot, "workspace");
+  await fs.mkdir(tmpDir, { recursive: true });
 });
 
 afterEach(async () => {
-  await fs.rm(tmpDir, { recursive: true, force: true });
+  await fs.rm(testRoot, { recursive: true, force: true });
 });
 
 test("repairs orphan-mission-close by inserting mission-open and recomputing hashes", async () => {
@@ -189,7 +193,7 @@ test("dry-run shows planned repairs without writing", async () => {
   const entries = buildValidBordbuchWithOrphan();
   await writeBordbuch(entries);
   const originalContent = await fs.readFile(
-    path.join(tmpDir, "cache", systemId, "bordbuch", "events.ndjson"),
+    path.join(tmpDir, "..", "systems-cache", systemId, "bordbuch", "events.ndjson"),
     "utf8",
   );
 
@@ -206,7 +210,7 @@ test("dry-run shows planned repairs without writing", async () => {
   expect(result.data!.orphans![0].metadataSource).toBe("auto-derived");
 
   const contentAfter = await fs.readFile(
-    path.join(tmpDir, "cache", systemId, "bordbuch", "events.ndjson"),
+    path.join(tmpDir, "..", "systems-cache", systemId, "bordbuch", "events.ndjson"),
     "utf8",
   );
   expect(contentAfter).toBe(originalContent);

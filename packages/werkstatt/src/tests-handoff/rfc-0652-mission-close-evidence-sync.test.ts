@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 const mockState = vi.hoisted(() => ({
   validateResult: {
@@ -79,16 +80,19 @@ function gitCommit(dir: string, msg: string): void {
   execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd: dir, stdio: "pipe" });
 }
 
+let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-close-evidence-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-close-evidence-"));
+  tmpWorkspace = join(testRoot, "workspace");
+  mkdirSync(tmpWorkspace, { recursive: true });
   mockState.syncCalled = false;
   mockState.syncShouldFail = false;
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
@@ -100,33 +104,13 @@ function setupWorkspace(options?: {
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
   gitCommit(tmpWorkspace, "initial");
 
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
-      - path: "./systems/test-system"
-        storageType: non-bare
-    pinnedPlatform: "1.0.0"
-    currentMission: test-system-m000001
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
-`;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  createLeitstandSystem(testRoot, "test-system", {
+    currentMission: "test-system-m000001",
+  });
 
-  const systemDir = join(tmpWorkspace, "systems", "test-system");
-  mkdirSync(systemDir, { recursive: true });
-  writeFileSync(
-    join(systemDir, "system.pin.json"),
-    JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
-  );
-  mkdirSync(join(systemDir, "bordbuch"), { recursive: true });
-  writeFileSync(join(systemDir, "bordbuch", "events.ndjson"), "");
-  gitCommit(tmpWorkspace, "add system");
+  const cacheDir = join(testRoot, "systems-cache", "test-system");
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
+  writeFileSync(join(cacheDir, "bordbuch", "events.ndjson"), "");
 
   const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
   mkdirSync(missionDir, { recursive: true });
@@ -170,7 +154,7 @@ systems:
   writeFileSync(join(missionDir, "mission.yaml"), JSON.stringify(manifest, null, 2) + "\n");
 
   gitCommit(tmpWorkspace, "add mission");
-  return systemDir;
+  return cacheDir;
 }
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {

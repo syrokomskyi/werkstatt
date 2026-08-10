@@ -28,6 +28,50 @@ const mockState = vi.hoisted(() => ({
   pinArgs: null as { commandName: string; argv: string[] } | null,
 }));
 
+vi.mock("../bordbuch/bordbuch-io.ts", () => ({
+  validateBordbuch: vi.fn(async () => ({ entries: 0, violations: [] })),
+  readBordbuch: vi.fn(async () => []),
+  commitAndPushBordbuch: vi.fn(async () => ({
+    commitSha: "abc123",
+    pushed: true,
+    error: null,
+  })),
+}));
+
+vi.mock("../bordbuch/bordbuch-commit-helper.ts", () => ({
+  appendAndCommitBordbuch: vi.fn(async () => ({
+    entry: { id: "event-000001", kind: "mission-close" },
+    commitResult: { commitSha: "abc123", pushed: true, error: null },
+  })),
+}));
+
+vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
+  const original = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...original,
+    resolveCacheClonePath: vi.fn((workspaceRoot: string, systemId: string) =>
+      join(workspaceRoot, "..", "systems-cache", systemId),
+    ),
+    readSystemConfigSmart: vi.fn(async () => ({
+      schemaVersion: "system-config/v1",
+      id: "test-system",
+      cosmicStar: "Vega",
+      mirrors: [{ path: "../systems-cache/test-system", storageType: "non-bare" }],
+      pinnedPlatform: "1.0.0",
+      status: "active",
+      registeredAt: "2026-01-01T00:00:00Z",
+      notes: "",
+    })),
+    readSystemState: vi.fn(async () => ({
+      schemaVersion: "1.0.0",
+      id: "test-system",
+      currentMission: "test-system-m000001",
+      lastRelease: null,
+    })),
+    writeSystemState: vi.fn(async () => {}),
+  };
+});
+
 vi.mock("../mission/mission-materialization-commands.ts", () => ({
   runMissionValidate: vi.fn(async () => mockState.validateResult),
   runMissionMaterialize: vi.fn(),
@@ -68,50 +112,49 @@ function gitCommit(dir: string, msg: string): void {
   execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd: dir, stdio: "pipe" });
 }
 
+let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-close-autopin-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-close-autopin-"));
+  tmpWorkspace = join(testRoot, "workspace");
+  mkdirSync(tmpWorkspace, { recursive: true });
   mockState.pinCalled = false;
   mockState.pinArgs = null;
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 function setupWorkspace(): string {
-  gitInit(tmpWorkspace);
+  gitInit(testRoot);
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
-  gitCommit(tmpWorkspace, "initial");
+  gitCommit(testRoot, "initial");
 
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
-      - path: "./systems/test-system"
-        storageType: non-bare
-    pinnedPlatform: "1.0.0"
-    currentMission: test-system-m000001
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
+  const cacheDir = join(testRoot, "systems-cache", "test-system");
+  mkdirSync(cacheDir, { recursive: true });
+  const configContent = `schemaVersion: system-config/v1
+id: test-system
+cosmicStar: Vega
+mirrors:
+  - path: "../systems-cache/test-system"
+    storageType: non-bare
+pinnedPlatform: "1.0.0"
+status: active
+registeredAt: "2026-01-01T00:00:00Z"
+notes: ""
 `;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+  gitCommit(testRoot, "add system config");
 
-  const systemDir = join(tmpWorkspace, "systems", "test-system");
-  mkdirSync(systemDir, { recursive: true });
   writeFileSync(
-    join(systemDir, "system.pin.json"),
+    join(cacheDir, "system.pin.json"),
     JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
   );
-  mkdirSync(join(systemDir, "bordbuch"), { recursive: true });
-  writeFileSync(join(systemDir, "bordbuch", "events.ndjson"), "");
-  gitCommit(tmpWorkspace, "add system");
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
+  writeFileSync(join(cacheDir, "bordbuch", "events.ndjson"), "");
+  gitCommit(testRoot, "add system");
 
   const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
   mkdirSync(missionDir, { recursive: true });
@@ -138,8 +181,8 @@ systems:
   };
   writeFileSync(join(missionDir, "mission.yaml"), JSON.stringify(manifest, null, 2) + "\n");
 
-  gitCommit(tmpWorkspace, "add mission");
-  return systemDir;
+  gitCommit(testRoot, "add mission");
+  return cacheDir;
 }
 
 test("mission.close calls sternsystem.pin with systemId", async () => {

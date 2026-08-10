@@ -19,6 +19,7 @@ import {
 } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -97,60 +98,31 @@ function readReleaseState(workspaceRoot: string, releaseId: string): string {
 }
 
 function createRegistryWithChannels(
-  workspaceRoot: string,
+  testRoot: string,
   systemId: string,
   options?: {
     currentMission?: string;
     lastPropagated?: Record<string, { releaseId: string; state: string; healthy: boolean }>;
   },
 ): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-
-  const lpEntries: string[] = [];
+  let lastPropagatedYaml: string | undefined;
   if (options?.lastPropagated) {
+    const entries: string[] = [];
     for (const [ch, info] of Object.entries(options.lastPropagated)) {
-      lpEntries.push(`        ${ch}:
-          releaseId: ${info.releaseId}
-          at: 2026-01-01T00:00:00.000Z
-          healthy: ${info.healthy}
-          state: ${info.state}
-          operationId: op-123
-          leaseExpiresAt: null`);
+      entries.push(`  ${ch}:
+    releaseId: ${info.releaseId}
+    at: 2026-01-01T00:00:00.000Z
+    healthy: ${info.healthy}
+    state: ${info.state}
+    operationId: op-123
+    leaseExpiresAt: null`);
     }
+    lastPropagatedYaml = entries.join("\n") + "\n";
   }
-
-  const lpSection = lpEntries.length > 0 ? `\n      lastPropagated:\n${lpEntries.join("\n")}` : "";
-
-  const missionField = options?.currentMission ?? "null";
-
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: ${missionField}
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com${lpSection}
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+  createLeitstandSystem(testRoot, systemId, {
+    currentMission: options?.currentMission,
+    lastPropagated: lastPropagatedYaml,
+  });
 }
 
 function createDistDir(workspaceRoot: string, releaseId: string): string {
@@ -204,16 +176,19 @@ function writeEvidenceMetadata(
   );
 }
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0628-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0628-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
   // RFC-0634: computeBuildInputHash calls resolveCurrentEcosystem which reads workspaceRoot/package.json
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
@@ -223,7 +198,7 @@ test("leitstand.dev-deploy deploys workpiece to dev channel and returns success"
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
   const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
@@ -240,7 +215,7 @@ test("leitstand.dev-deploy deploys workpiece to dev channel and returns success"
 test("leitstand.dev-deploy rejects when system has no active mission", async () => {
   const systemId = "test-sys";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
 
   await expect(
     runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir)),
@@ -257,17 +232,20 @@ test("leitstand.dev-deploy does not write to registry or bordbuch", async () => 
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
   await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
-  // Verify registry was not modified — no lastPropagated.dev entry
-  const registryContent = readFileSync(join(tmpDir, "systems", "registry.yaml"), "utf8");
-  expect(registryContent).not.toContain("lastPropagated");
+  // Verify system-state was not modified — no lastPropagated.dev entry
+  const stateContent = readFileSync(
+    join(testRoot, "systems-cache", systemId, "system-state.yaml"),
+    "utf8",
+  );
+  expect(stateContent).not.toContain("lastPropagated");
 
   // Verify no bordbuch directory was created
-  const bordbuchDir = join(tmpDir, "systems", systemId, "bordbuch");
+  const bordbuchDir = join(testRoot, "systems-cache", systemId, "bordbuch");
   expect(existsSync(bordbuchDir)).toBe(false);
 }, 15_000);
 
@@ -277,7 +255,7 @@ test("RFC-0653: leitstand.dev-deploy writes build-skip cache after successful bu
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
   await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
@@ -294,7 +272,7 @@ test("RFC-0653: leitstand.dev-deploy skips build on cache hit", async () => {
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
   // First run — writes cache
@@ -311,7 +289,7 @@ test("RFC-0653: leitstand.dev-deploy --force-build bypasses cache", async () => 
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createRegistryWithChannels(testRoot, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
   // First run — writes cache
@@ -333,7 +311,7 @@ test("leitstand.propagate rejects release not in ready state", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     schemaVersion: "1.0.0",
     releaseId,
@@ -352,7 +330,7 @@ test("leitstand.propagate rejects when no evidence metadata exists", async () =>
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     schemaVersion: "1.0.0",
     releaseId,
@@ -372,7 +350,7 @@ test("leitstand.propagate rejects when evidence commitSha does not match release
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     schemaVersion: "1.0.0",
     releaseId,
@@ -396,7 +374,7 @@ test("leitstand.propagate rejects when evidence auditId does not match release",
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     schemaVersion: "1.0.0",
     releaseId,
@@ -423,7 +401,7 @@ test("leitstand.propagate rejects when Axiom evidence has high/critical violatio
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     schemaVersion: "1.0.0",
     releaseId,
@@ -461,7 +439,7 @@ test("leitstand.propagate passes when Axiom evidence has only incomplete finding
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     schemaVersion: "1.0.0",
     releaseId,
@@ -500,7 +478,7 @@ test("leitstand.rollback auto-detects main channel from promoted state", async (
   const currentRelease = "test-sys-r000002";
   const targetRelease = "test-sys-r000001";
 
-  createRegistryWithChannels(tmpDir, systemId, {
+  createRegistryWithChannels(testRoot, systemId, {
     lastPropagated: {
       main: { releaseId: currentRelease, state: "succeeded", healthy: true },
     },
@@ -539,7 +517,7 @@ test("leitstand.rollback auto-detects alt channel and steps to published", async
   const currentRelease = "test-sys-r000002";
   const targetRelease = "test-sys-r000001";
 
-  createRegistryWithChannels(tmpDir, systemId, {
+  createRegistryWithChannels(testRoot, systemId, {
     lastPropagated: {
       alt: { releaseId: currentRelease, state: "succeeded", healthy: true },
     },
@@ -576,7 +554,7 @@ test("leitstand.rollback auto-detects alt channel and steps to published", async
 test("leitstand.rollback rejects --channel flag", async () => {
   const systemId = "test-sys";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
 
   await expect(
     runLeitstandRollback(makeInput({ site: systemId, channel: "main" }), makeContext(tmpDir)),
@@ -586,7 +564,7 @@ test("leitstand.rollback rejects --channel flag", async () => {
 test("leitstand.rollback rejects when no previous release found", async () => {
   const systemId = "test-sys";
 
-  createRegistryWithChannels(tmpDir, systemId);
+  createRegistryWithChannels(testRoot, systemId);
 
   await expect(
     runLeitstandRollback(makeInput({ site: systemId }), makeContext(tmpDir)),
@@ -597,7 +575,7 @@ test("leitstand.rollback rejects when release is in non-deployed state", async (
   const systemId = "test-sys";
   const currentRelease = "test-sys-r000002";
 
-  createRegistryWithChannels(tmpDir, systemId, {
+  createRegistryWithChannels(testRoot, systemId, {
     lastPropagated: {
       alt: { releaseId: currentRelease, state: "succeeded", healthy: true },
     },

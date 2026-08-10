@@ -72,6 +72,50 @@ vi.mock("@warpgogol/werkstatt-site/onboarding", () => ({
   readRuntimeTemplate: vi.fn(() => ""),
 }));
 
+vi.mock("../bordbuch/bordbuch-io.ts", () => ({
+  validateBordbuch: vi.fn(async () => ({ entries: 0, violations: [] })),
+  readBordbuch: vi.fn(async () => []),
+  commitAndPushBordbuch: vi.fn(async () => ({
+    commitSha: "abc123",
+    pushed: true,
+    error: null,
+  })),
+}));
+
+vi.mock("../bordbuch/bordbuch-commit-helper.ts", () => ({
+  appendAndCommitBordbuch: vi.fn(async () => ({
+    entry: { id: "event-000001", kind: "mission-materialize" },
+    commitResult: { commitSha: "abc123", pushed: true, error: null },
+  })),
+}));
+
+vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
+  const original = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...original,
+    resolveCacheClonePath: vi.fn((workspaceRoot: string, systemId: string) =>
+      join(workspaceRoot, "..", "systems-cache", systemId),
+    ),
+    readSystemConfigSmart: vi.fn(async () => ({
+      schemaVersion: "system-config/v1",
+      id: "test-system",
+      cosmicStar: "Vega",
+      mirrors: [{ path: "../systems-cache/test-system", storageType: "non-bare" }],
+      pinnedPlatform: "1.0.0",
+      status: "active",
+      registeredAt: "2026-01-01T00:00:00Z",
+      notes: "",
+    })),
+    readSystemState: vi.fn(async () => ({
+      schemaVersion: "1.0.0",
+      id: "test-system",
+      currentMission: "test-system-m000001",
+      lastRelease: null,
+    })),
+    writeSystemState: vi.fn(async () => {}),
+  };
+});
+
 vi.mock("@warpgogol/werkstatt-site/checks", () => ({
   runEnvExampleGenerate: vi.fn(async () => []),
   MISSION_PREFLIGHT_CRITICAL: [],
@@ -80,21 +124,23 @@ vi.mock("@warpgogol/werkstatt-site/checks", () => ({
   ensureChromium: vi.fn(async () => {}),
 }));
 
+let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-mat-artifact-cache-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-mat-artifact-cache-"));
+  tmpWorkspace = join(testRoot, "workspace");
   mockPipeline.forceUsed = undefined;
   mockPipeline.pipelineNameUsed = "";
   mockPipeline.callCount = 0;
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 function setupWorkspace(): string {
-  const systemDir = createMaterializeWorkspace(tmpWorkspace);
+  const systemDir = createMaterializeWorkspace(testRoot);
   return systemDir;
 }
 

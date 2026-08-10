@@ -45,30 +45,33 @@ function gitStatusPorcelain(dir: string): string {
   return execSync("git status --porcelain", { cwd: dir, encoding: "utf-8", stdio: "pipe" }).trim();
 }
 
+let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-mission-open-integration-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-mission-open-integration-"));
+  tmpWorkspace = join(testRoot, "workspace");
+  mkdirSync(tmpWorkspace, { recursive: true });
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 test("after mission.open, git status in monorepo is clean", async () => {
-  // Set up workspace structure
-  gitInit(tmpWorkspace);
+  // Set up workspace structure — git repo in testRoot so systems-cache is tracked
+  gitInit(testRoot);
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
-  gitCommit(tmpWorkspace, "initial");
+  gitCommit(testRoot, "initial");
 
-  // Create per-system config and state files
-  const cacheDir = join(tmpWorkspace, "..", "systems-cache", "test-system");
+  // Create per-system config and state files in systems-cache
+  const cacheDir = join(testRoot, "systems-cache", "test-system");
   mkdirSync(cacheDir, { recursive: true });
   const configContent = `schemaVersion: system-config/v1
 id: test-system
 cosmicStar: Vega
 mirrors:
-  - path: "./systems/test-system"
+  - path: "../systems-cache/test-system"
     storageType: non-bare
 pinnedPlatform: "4.5.0"
 status: active
@@ -82,23 +85,21 @@ currentMission: null
 lastRelease: null
 `;
   writeFileSync(join(cacheDir, "system-state.yaml"), stateContent);
-  gitCommit(tmpWorkspace, "add system config");
 
-  // Create cache clone directory with pin file
-  mkdirSync(join(tmpWorkspace, "systems", "test-system"), { recursive: true });
+  // Create pin file in cache clone dir
   writeFileSync(
-    join(tmpWorkspace, "systems", "test-system", "system.pin.json"),
+    join(cacheDir, "system.pin.json"),
     JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
   );
 
   // Create bordbuch directory
-  mkdirSync(join(tmpWorkspace, "systems", "test-system", "bordbuch"), { recursive: true });
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
 
   // Commit the system directory
-  gitCommit(tmpWorkspace, "add system");
+  gitCommit(testRoot, "add system");
 
   // ADR-0030: commitAndPushBordbuch now verifies push succeeded — set up bare origin
-  setupBareOrigin(tmpWorkspace);
+  setupBareOrigin(testRoot);
 
   // Run mission.open
   const input = {
@@ -113,6 +114,6 @@ lastRelease: null
   await runMissionOpen(input, context);
 
   // Verify git status is clean (no uncommitted changes)
-  const status = gitStatusPorcelain(tmpWorkspace);
+  const status = gitStatusPorcelain(testRoot);
   expect(status).toBe("");
 });

@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync
 import { join } from "node:path";
 import { runLeitstandDevDeploy } from "../leitstand/leitstand-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 // Track git rev-parse HEAD call count to simulate pre-commit vs post-commit sha
 let gitRevParseCallCount = 0;
@@ -83,40 +84,8 @@ function makeInput(flags: Record<string, string>): KernelCommandInput {
   return { flags, argv: [] };
 }
 
-function createRegistryWithChannels(
-  workspaceRoot: string,
-  systemId: string,
-  missionId: string,
-): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: ${missionId}
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+function createRegistryWithChannels(testRoot: string, systemId: string, missionId: string): void {
+  createLeitstandSystem(testRoot, systemId, { currentMission: missionId });
 }
 
 function createWorkpieceDist(workspaceRoot: string, missionId: string): string {
@@ -127,10 +96,13 @@ function createWorkpieceDist(workspaceRoot: string, missionId: string): string {
   return distDir;
 }
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-rfc-0698-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-rfc-0698-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
   gitRevParseCallCount = 0;
   commitMockExitCode = 0;
@@ -138,7 +110,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
@@ -146,7 +118,7 @@ test("RFC-0698: leitstand.dev-deploy calls mission.git.commit after build", asyn
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, missionId);
+  createRegistryWithChannels(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
@@ -162,7 +134,7 @@ test("RFC-0698: build-skip cache is written with post-commit commitSha", async (
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, missionId);
+  createRegistryWithChannels(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
@@ -179,7 +151,7 @@ test("RFC-0698: auto-commit failure aborts deploy with fatal error", async () =>
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, missionId);
+  createRegistryWithChannels(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   commitMockExitCode = 1;
@@ -202,7 +174,7 @@ test("RFC-0698: auto-commit runs during build-skip (cache hit) path", async () =
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithChannels(tmpDir, systemId, missionId);
+  createRegistryWithChannels(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   // First run — writes cache with post-commit sha

@@ -5,7 +5,8 @@ import { test, expect, describe } from "vitest";
 import { resolveSiteWorkspace, discoverSiteWorkspaces } from "../site-workspace-resolver.ts";
 
 async function makeWorkspace(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "resolver-test-"));
+  const testRoot = await fs.mkdtemp(path.join(os.tmpdir(), "resolver-test-"));
+  const dir = path.join(testRoot, "workspace");
   await fs.mkdir(path.join(dir, "apps"), { recursive: true });
   await fs.mkdir(path.join(dir, "missions"), { recursive: true });
   await fs.mkdir(path.join(dir, "systems"), { recursive: true });

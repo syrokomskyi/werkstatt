@@ -73,50 +73,51 @@ function writeBordbuch(dir: string, entries: BordbuchEntry[]): void {
   writeFileSync(join(dir, "bordbuch", "events.ndjson"), ndjson);
 }
 
+let testRoot: string;
 let tmpWorkspace: string;
+let cacheDir: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-bordbuch-gate-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-bordbuch-gate-"));
+  tmpWorkspace = join(testRoot, "workspace");
+  cacheDir = join(testRoot, "systems-cache", "test-system");
+  mkdirSync(tmpWorkspace, { recursive: true });
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 function setupWorkspace(): void {
-  gitInit(tmpWorkspace);
+  gitInit(testRoot);
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
-  gitCommit(tmpWorkspace, "initial");
+  gitCommit(testRoot, "initial");
 
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
-      - path: "./systems/test-system"
-        storageType: non-bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
+  mkdirSync(cacheDir, { recursive: true });
+  const configContent = `schemaVersion: system-config/v1
+id: test-system
+cosmicStar: Vega
+mirrors:
+  - path: "../systems-cache/test-system"
+    storageType: non-bare
+pinnedPlatform: "4.5.0"
+status: active
+registeredAt: "2026-01-01T00:00:00Z"
+notes: ""
 `;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+  gitCommit(testRoot, "add system config");
 
-  mkdirSync(join(tmpWorkspace, "systems", "test-system"), { recursive: true });
   writeFileSync(
-    join(tmpWorkspace, "systems", "test-system", "system.pin.json"),
+    join(cacheDir, "system.pin.json"),
     JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
   );
 
-  mkdirSync(join(tmpWorkspace, "systems", "test-system", "bordbuch"), { recursive: true });
-  gitCommit(tmpWorkspace, "add system");
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
+  gitCommit(testRoot, "add system");
 
   // ADR-0030: commitAndPushBordbuch now verifies push succeeded — set up bare origin
-  setupBareOrigin(tmpWorkspace);
+  setupBareOrigin(testRoot);
 }
 
 test("mission.open refuses when bordbuch has orphan-mission-close violation", async () => {
@@ -132,7 +133,7 @@ test("mission.open refuses when bordbuch has orphan-mission-close violation", as
     null,
     "test-agent",
   );
-  writeBordbuch(join(tmpWorkspace, "systems", "test-system"), [closeEntry]);
+  writeBordbuch(cacheDir, [closeEntry]);
 
   const input = {
     flags: { system: "test-system", brief: "Test mission", actor: "test-agent" },
@@ -140,7 +141,7 @@ test("mission.open refuses when bordbuch has orphan-mission-close violation", as
   const context = { workspaceRoot: tmpWorkspace } as unknown as KernelRuntimeContext;
 
   await expect(runMissionOpen(input, context)).rejects.toThrow(
-    /bordbuch for system 'test-system' has 1 violation\(s\)/,
+    /bordbuch for system 'test-system' has 1 orphan-mission-close violation\(s\)/,
   );
 
   // Verify no side effects — no mission directory created
@@ -169,7 +170,7 @@ test("mission.open proceeds when bordbuch is clean (0 violations)", async () => 
     openEntry.hash,
     "test-agent",
   );
-  writeBordbuch(join(tmpWorkspace, "systems", "test-system"), [openEntry, closeEntry]);
+  writeBordbuch(cacheDir, [openEntry, closeEntry]);
 
   const input = {
     flags: { system: "test-system", brief: "Test mission 2", actor: "test-agent" },

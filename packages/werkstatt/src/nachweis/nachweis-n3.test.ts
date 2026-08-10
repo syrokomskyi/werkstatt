@@ -70,7 +70,7 @@ function makeEntry(
 }
 
 async function writeBordbuch(entries: BordbuchEntry[]): Promise<void> {
-  const cacheDir = path.join(tmpDir, "cache", systemId);
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
   const bordbuchDir = path.join(cacheDir, "bordbuch");
   if (!existsSync(bordbuchDir)) mkdirSync(bordbuchDir, { recursive: true });
   const ndjson = entries.map((e) => JSON.stringify(e)).join("\n") + "\n";
@@ -78,7 +78,7 @@ async function writeBordbuch(entries: BordbuchEntry[]): Promise<void> {
 }
 
 async function readBordbuchFile(): Promise<BordbuchEntry[]> {
-  const filePath = path.join(tmpDir, "cache", systemId, "bordbuch", "events.ndjson");
+  const filePath = path.join(tmpDir, "..", "systems-cache", systemId, "bordbuch", "events.ndjson");
   if (!existsSync(filePath)) return [];
   const raw = await fs.readFile(filePath, "utf8");
   const lines = raw.split("\n").filter((l) => l.trim().length > 0);
@@ -86,7 +86,7 @@ async function readBordbuchFile(): Promise<BordbuchEntry[]> {
 }
 
 async function writeEntitlements(): Promise<void> {
-  const cacheDir = path.join(tmpDir, "cache", systemId);
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
   const srcDir = path.join(cacheDir, "src");
   if (!existsSync(srcDir)) mkdirSync(srcDir, { recursive: true });
   const { stringify: yamlStringify } = await import("yaml");
@@ -101,7 +101,7 @@ async function writeEvidenceSource(
   slug: string,
   overrides: Record<string, unknown> = {},
 ): Promise<void> {
-  const cacheDir = path.join(tmpDir, "cache", systemId);
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
   const evidenceDir = path.join(
     cacheDir,
     "src",
@@ -129,21 +129,25 @@ async function writeEvidenceSource(
 }
 
 async function writeSystemMd(): Promise<void> {
-  const cacheDir = path.join(tmpDir, "cache", systemId);
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
   const contentDir = path.join(cacheDir, "src", "content");
   if (!existsSync(contentDir)) mkdirSync(contentDir, { recursive: true });
   const systemMd = "---\ni18n:\n  default: de\n---\n\n# Test System\n";
   await fs.writeFile(path.join(contentDir, "system.md"), systemMd, "utf8");
 }
 
+let testRoot: string;
+
 beforeEach(async () => {
-  tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "nachweis-n3-test-"));
+  testRoot = await fs.mkdtemp(path.join(os.tmpdir(), "nachweis-n3-test-"));
+  tmpDir = path.join(testRoot, "workspace");
+  await fs.mkdir(tmpDir, { recursive: true });
   await writeEntitlements();
   await writeSystemMd();
 });
 
 afterEach(async () => {
-  await fs.rm(tmpDir, { recursive: true, force: true });
+  await fs.rm(testRoot, { recursive: true, force: true });
 });
 
 // ---------------------------------------------------------------------------

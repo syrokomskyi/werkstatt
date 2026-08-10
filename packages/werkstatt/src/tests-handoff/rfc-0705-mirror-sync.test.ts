@@ -56,10 +56,13 @@ function gitCommit(dir: string, msg: string): void {
   execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd: dir, stdio: "pipe" });
 }
 
+let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-rfc-0705-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-rfc-0705-"));
+  tmpWorkspace = join(testRoot, "workspace");
+  mkdirSync(tmpWorkspace, { recursive: true });
   mockSync.executeKernelCommandResult = {
     exitCode: 0,
     data: {
@@ -75,7 +78,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 // --- Reconcile tests ---
@@ -85,55 +88,56 @@ function setupReconcileWorkspace(opts?: { externalMirrors?: boolean }): void {
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
   gitCommit(tmpWorkspace, "initial");
 
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
+  const cacheDir = join(testRoot, "systems-cache", "test-system");
+  mkdirSync(cacheDir, { recursive: true });
   const mirrors = opts?.externalMirrors
-    ? `      - path: "./systems/test-system"
-        storageType: non-bare
-      - path: "./systems/test-system.git"
-        storageType: bare
-      - path: "git@github.com:warpgogol/test-system.git"
-        storageType: bare`
-    : `      - path: "./systems/test-system"
-        storageType: non-bare
-      - path: "./systems/test-system.git"
-        storageType: bare`;
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
+    ? `  - path: "../systems-cache/test-system"
+    storageType: non-bare
+  - path: "../systems-cache/test-system.git"
+    storageType: bare
+  - path: "git@github.com:warpgogol/test-system.git"
+    storageType: bare`
+    : `  - path: "../systems-cache/test-system"
+    storageType: non-bare
+  - path: "../systems-cache/test-system.git"
+    storageType: bare`;
+  const configContent = `schemaVersion: system-config/v1
+id: test-system
+cosmicStar: Vega
+mirrors:
 ${mirrors}
-    pinnedPlatform: "4.5.0"
-    currentMission: test-system-m000001
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
+pinnedPlatform: "4.5.0"
+status: active
+registeredAt: "2026-01-01T00:00:00Z"
+notes: ""
 `;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+  const stateContent = `schemaVersion: system-state/v1
+systemId: test-system
+currentMission: test-system-m000001
+lastRelease: null
+`;
+  writeFileSync(join(cacheDir, "system-state.yaml"), stateContent);
 
-  // Create cache clone (non-bare)
-  const systemDir = join(tmpWorkspace, "systems", "test-system");
-  mkdirSync(systemDir, { recursive: true });
-  gitInit(systemDir);
-  writeFileSync(join(systemDir, "README.md"), "# system\n");
-  gitCommit(systemDir, "initial system");
+  // Create cache clone (non-bare) as a git repo
+  gitInit(cacheDir);
+  writeFileSync(join(cacheDir, "README.md"), "# system\n");
+  gitCommit(cacheDir, "initial system");
 
   // Create bordbuch dir
-  mkdirSync(join(systemDir, "bordbuch"), { recursive: true });
-  writeFileSync(join(systemDir, "bordbuch", "events.ndjson"), "");
-  gitCommit(systemDir, "add bordbuch");
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
+  writeFileSync(join(cacheDir, "bordbuch", "events.ndjson"), "");
+  gitCommit(cacheDir, "add bordbuch");
 
   // Create bare repo
-  const bareDir = join(tmpWorkspace, "systems", "test-system.git");
-  execSync(`git clone --bare ${JSON.stringify(systemDir)} ${JSON.stringify(bareDir)}`, {
+  const bareDir = join(testRoot, "systems-cache", "test-system.git");
+  execSync(`git clone --bare ${JSON.stringify(cacheDir)} ${JSON.stringify(bareDir)}`, {
     stdio: "pipe",
   });
 
   // Add origin remote to cache clone
   execSync(`git remote add origin ${JSON.stringify(bareDir)}`, {
-    cwd: systemDir,
+    cwd: cacheDir,
     stdio: "pipe",
   });
 
@@ -172,7 +176,7 @@ ${mirrors}
 
   // Create workpiece as a clone of the cache clone (shared history for merge)
   const workpieceDir = join(missionDir, "workpiece");
-  execSync(`git clone ${JSON.stringify(systemDir)} ${JSON.stringify(workpieceDir)}`, {
+  execSync(`git clone ${JSON.stringify(cacheDir)} ${JSON.stringify(workpieceDir)}`, {
     stdio: "pipe",
   });
   mkdirSync(join(workpieceDir, "src", "content"), { recursive: true });
@@ -261,55 +265,56 @@ function setupCloseWorkspace(opts?: { externalMirrors?: boolean; desynced?: bool
   writeFileSync(join(tmpWorkspace, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
   gitCommit(tmpWorkspace, "add package.json");
 
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
+  const cacheDir = join(testRoot, "systems-cache", "test-system");
+  mkdirSync(cacheDir, { recursive: true });
   const mirrors = opts?.externalMirrors
-    ? `      - path: "./systems/test-system"
-        storageType: non-bare
-      - path: "./systems/test-system.git"
-        storageType: bare
-      - path: "git@github.com:warpgogol/test-system.git"
-        storageType: bare`
-    : `      - path: "./systems/test-system"
-        storageType: non-bare
-      - path: "./systems/test-system.git"
-        storageType: bare`;
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
+    ? `  - path: "../systems-cache/test-system"
+    storageType: non-bare
+  - path: "../systems-cache/test-system.git"
+    storageType: bare
+  - path: "git@github.com:warpgogol/test-system.git"
+    storageType: bare`
+    : `  - path: "../systems-cache/test-system"
+    storageType: non-bare
+  - path: "../systems-cache/test-system.git"
+    storageType: bare`;
+  const configContent = `schemaVersion: system-config/v1
+id: test-system
+cosmicStar: Vega
+mirrors:
 ${mirrors}
-    pinnedPlatform: "4.5.0"
-    currentMission: test-system-m000001
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
+pinnedPlatform: "4.5.0"
+status: active
+registeredAt: "2026-01-01T00:00:00Z"
+notes: ""
 `;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+  const stateContent = `schemaVersion: system-state/v1
+systemId: test-system
+currentMission: test-system-m000001
+lastRelease: null
+`;
+  writeFileSync(join(cacheDir, "system-state.yaml"), stateContent);
 
-  // Create cache clone (non-bare)
-  const systemDir = join(tmpWorkspace, "systems", "test-system");
-  mkdirSync(systemDir, { recursive: true });
-  gitInit(systemDir);
-  writeFileSync(join(systemDir, "README.md"), "# system\n");
-  gitCommit(systemDir, "initial system");
+  // Create cache clone (non-bare) as a git repo
+  gitInit(cacheDir);
+  writeFileSync(join(cacheDir, "README.md"), "# system\n");
+  gitCommit(cacheDir, "initial system");
 
   // Create bordbuch dir
-  mkdirSync(join(systemDir, "bordbuch"), { recursive: true });
-  writeFileSync(join(systemDir, "bordbuch", "events.ndjson"), "");
-  gitCommit(systemDir, "add bordbuch");
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
+  writeFileSync(join(cacheDir, "bordbuch", "events.ndjson"), "");
+  gitCommit(cacheDir, "add bordbuch");
 
   // Create bare repo
-  const bareDir = join(tmpWorkspace, "systems", "test-system.git");
-  execSync(`git clone --bare ${JSON.stringify(systemDir)} ${JSON.stringify(bareDir)}`, {
+  const bareDir = join(testRoot, "systems-cache", "test-system.git");
+  execSync(`git clone --bare ${JSON.stringify(cacheDir)} ${JSON.stringify(bareDir)}`, {
     stdio: "pipe",
   });
 
   // Add origin remote to cache clone
   execSync(`git remote add origin ${JSON.stringify(bareDir)}`, {
-    cwd: systemDir,
+    cwd: cacheDir,
     stdio: "pipe",
   });
 
@@ -331,10 +336,10 @@ ${mirrors}
 
   // Create system.pin.json
   writeFileSync(
-    join(systemDir, "system.pin.json"),
+    join(cacheDir, "system.pin.json"),
     JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
   );
-  gitCommit(systemDir, "add pin");
+  gitCommit(cacheDir, "add pin");
 
   // Create mission
   const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
