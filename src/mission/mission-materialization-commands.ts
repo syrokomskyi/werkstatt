@@ -120,7 +120,7 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
 
 // RFC-0796: Workspace-level advisory check for stale entries in missions/ root.
 // Warns about stale symlinks or terminal-state directories. Non-blocking.
-function validateNoStaleMissionEntries(workspaceRoot: string): StaleEntryViolation[] {
+export function validateNoStaleMissionEntries(workspaceRoot: string): StaleEntryViolation[] {
   const missionsPath = path.join(workspaceRoot, "missions");
   if (!existsSync(missionsPath)) return [];
 
