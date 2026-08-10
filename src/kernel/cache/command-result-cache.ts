@@ -160,7 +160,12 @@ export async function computeInputsHash(
   for (const abs of files) {
     const rel = toPosix(relative(workspaceRoot, abs));
     const mode = selectFingerprintMode(abs);
-    const result = await fingerprintFile(abs, { mode });
+    let result;
+    try {
+      result = await fingerprintFile(abs, { mode });
+    } catch {
+      continue;
+    }
     hashes.push({ path: rel, hash: result.hash });
     const s = await stat(abs);
     metadata.push({ path: rel, mtimeMs: s.mtimeMs, size: s.size });
