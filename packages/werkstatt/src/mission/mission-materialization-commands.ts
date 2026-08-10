@@ -29,6 +29,7 @@
   <item>RFC-0705: add non-fatal sternsystem.sync call after git push origin in reconcile when external mirrors exist; add mirrorSync to MissionReconcileData and reconciliation-report.json.</item>
   <item>RFC-0749: add post-validation commitBordbuchProjections cleanup call in mission.validate to commit bordbuch projections that were regenerated during build.prepare but not committed by bordbuch.commit due to transient git failure.</item>
   <item>RFC-0763: add commitBordbuchProjections cleanup on build.prepare failure and validation failure early-return paths to clean bordbuch projections from cache clone on all exit paths. Extract cleanupBordbuchOnFailure helper to avoid duplication.</item>
+  <item>Bug fix: post-merge guard — restore system-config.yaml/system-state.yaml if merge silently removed them; commit restored files to avoid leaving cache clone dirty.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -1212,6 +1213,42 @@ export async function runMissionReconcile(
         stdio: "pipe",
         encoding: "utf-8",
       }).trim();
+
+      // Post-merge guard: verify critical config files still exist in cache clone.
+      // The merge can silently remove system-config.yaml / system-state.yaml if the
+      // workpiece branch doesn't track them. Restore from preReconcileSha if missing.
+      const criticalFiles = ["system-config.yaml", "system-state.yaml"];
+      let restoredFiles: string[] = [];
+      for (const cf of criticalFiles) {
+        if (!existsSync(path.join(systemDir, cf)) && preReconcileSha) {
+          try {
+            execSync(`git checkout ${preReconcileSha} -- ${JSON.stringify(cf)}`, {
+              cwd: systemDir,
+              stdio: "pipe",
+              encoding: "utf-8",
+            });
+            restoredFiles.push(cf);
+            logger.info(`  Restored ${cf} after merge (was missing)`);
+          } catch {
+            // File may not exist in preReconcileSha either — skip
+          }
+        }
+      }
+      // Commit restored files so they are included in the subsequent git push
+      if (restoredFiles.length > 0) {
+        const addArgs = restoredFiles.map((f) => JSON.stringify(f)).join(" ");
+        execSync(`git add -- ${addArgs}`, {
+          cwd: systemDir,
+          stdio: "pipe",
+          encoding: "utf-8",
+        });
+        execSync(`git commit -m ${JSON.stringify("restore critical config files after merge")}`, {
+          cwd: systemDir,
+          stdio: "pipe",
+          encoding: "utf-8",
+        });
+        logger.info(`  Committed ${restoredFiles.length} restored config file(s)`);
+      }
 
       mergeCommitSha = execSync("git rev-parse HEAD^1", {
         cwd: systemDir,
