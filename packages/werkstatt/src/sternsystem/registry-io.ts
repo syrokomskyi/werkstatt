@@ -16,6 +16,7 @@ RFC-0751: findServiceEntry helper (preserved, reads from services/registry.yaml)
   <item>RFC-0751: add findServiceEntry() helper for service registry lookups.</item>
   <item>RFC-0790: replace registry IO with convention-based discovery. Add resolveCacheClonePath, readSystemConfig, readSystemState, writeSystemState, discoverSystems, readServicesRegistry. Remove readRegistry, writeRegistry, findEntry, findEntryByStar, resolveCachePath, registryExists, resolveRegistryPath. Change resolveMirrors to accept SystemConfig.</item>
   <item>ADR-0040: add JSDoc return-type contracts to path-returning functions (resolveCacheClonePath, resolveWorkpiecePath, resolveMirrorPath).</item>
+  <item>RFC-0794: push system-state.yaml commit to bare repo in writeSystemState to survive syncCacheClone resets.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,6 +24,7 @@ import { readFile, readdir, mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
+import { gitExec } from "../werkstatt/git-exec.js";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import {
   systemConfigSchema,
@@ -163,22 +165,16 @@ export async function writeSystemState(
       // Git commit may fail if nothing changed — non-fatal
     }
 
-    // RFC-0790: Push to bare repo so syncCacheClone's git reset --hard origin/main
+    // RFC-0794: Push to bare repo so syncCacheClone's git reset --hard origin/main
     // does not discard the commit. Without this push, mission.materialize loses
     // the system-state.yaml update written by mission.open.
     try {
-      const branch = execSync("git rev-parse --abbrev-ref HEAD", {
-        cwd: cacheClone,
-        encoding: "utf-8",
-        timeout: 10_000,
-      }).trim();
-      execSync(`git push origin ${branch}`, {
-        cwd: cacheClone,
-        stdio: ["pipe", "pipe", "pipe"],
-        timeout: 30_000,
-      });
-    } catch {
-      // Push may fail if no bare repo is configured — non-fatal
+      const branch = gitExec(cacheClone, "rev-parse --abbrev-ref HEAD");
+      gitExec(cacheClone, `push origin ${branch}`);
+    } catch (err) {
+      // Push may fail if no bare repo is configured or branch diverged — non-fatal
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[writeSystemState] git push failed for ${systemId}: ${msg}`);
     }
   }
 }
