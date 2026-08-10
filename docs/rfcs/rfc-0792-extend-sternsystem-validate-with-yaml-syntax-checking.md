@@ -1,12 +1,13 @@
 ---
 id: RFC-0792
 title: "Extend sternsystem.validate with YAML syntax checking for system config files"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
 enhancedAt: 2026-08-10
