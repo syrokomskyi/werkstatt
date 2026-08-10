@@ -15,6 +15,7 @@
   <item>RFC-0375: initial implementation.</item>
   <item>RFC-0612: extract expandOwnershipPlaceholders as shared utility for reuse by ownership.sync.validate and generated.stale.validate.</item>
   <item>RFC-0790: replace systems/registry.yaml IO with convention-based discoverSystems + resolveCacheClonePath from @warpgogol/werkstatt/sternsystem.</item>
+  <item>RFC-0790 review fix: add existsSync check for cache clone directory and skip with continue when missing, restoring original skip-on-missing behavior.</item>
 </CHANGE_SUMMARY>
 */
 import { join, relative } from "node:path";

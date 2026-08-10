@@ -16,6 +16,7 @@
 </MODULE_MAP>
 <CHANGE_SUMMARY>
   <item>RFC-0375: initial implementation.</item>
+  <item>RFC-0790 review fix: add G1 test for skip-on-missing cache clone, fix existing tests to use ../systems-cache/ path.</item>
 </CHANGE_SUMMARY>
 */
 
