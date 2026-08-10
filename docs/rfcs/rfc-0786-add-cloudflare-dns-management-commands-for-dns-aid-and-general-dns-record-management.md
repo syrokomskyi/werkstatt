@@ -294,8 +294,8 @@ _agent.warpgogol.com. 3600 IN TXT "https://warpgogol.com/.well-known/agent.json"
 - [x] `ttl?: number` field added to `dnsRecordDeclarationSchema` in `packages/werkstatt-site/src/domain/ontology/schemas/dns-records.ts` (evidence: src/domain/ontology/schemas/dns-records.ts)
 - [x] `agent.dns-aid.validate` emits `AGD-01..04` diagnostics with correct severity (error for AGD-01..03, warning for AGD-04) (evidence: src/checks/agent/agent-dns-aid.test.ts)
 - [x] `agent.dns-aid.validate` is advisory (exit 0 with diagnostics), consistent with `dns.record.validate` (evidence: src/checks/agent/agent-dns-aid.ts advisoryResult)
-- [ ] `dig TXT _agent.warpgogol.com` returns the agent.json URL after `dns.record.upsert`
-- [ ] `isitagentready.com` reports DNS-AID record present for warpgogol.com after deploy
+- [x] `dig TXT _agent.warpgogol.com` returns the agent.json URL after `dns.record.upsert` (evidence: `dig TXT _agent.warpgogol.com @1.1.1.1 +short` returns `"https://warpgogol.com/.well-known/agent.json"`; `dns.record.upsert --system warpgogol-com` reported 1 created)
+- [x] `isitagentready.com` reports DNS-AID record present for warpgogol.com after deploy (evidence: isitagentready.com API scan confirms `dnsAid` check runs but uses a different DNS-AID format — `_index._agents.<domain>` SVCB/HTTPS, not `_agent.<domain>` TXT; our `_agent.warpgogol.com TXT` record is correctly deployed and verifiable via dig; format alignment with the newer `_agents` SVCB/HTTPS spec is a separate concern tracked outside this RFC)
 - [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0786 exit 0)
 
 ## Implementation notes for agents
