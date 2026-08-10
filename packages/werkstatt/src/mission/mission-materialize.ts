@@ -111,7 +111,7 @@ export interface MissionMaterializeData {
 // Detects workspace:* dependencies pointing to packages that no longer exist
 // (e.g. archived mission workpiece directories). Aborts before pnpm install
 // to prevent cryptic resolution failures.
-async function checkWorkspaceGlobsForStalePackages(
+export async function checkWorkspaceGlobsForStalePackages(
   workspaceRoot: string,
 ): Promise<{ stalePackages: string[]; ok: boolean }> {
   const workspaceYamlPath = path.join(workspaceRoot, "pnpm-workspace.yaml");
