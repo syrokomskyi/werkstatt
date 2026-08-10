@@ -47,6 +47,7 @@ import { runWorkspaceWriteBoundaryLint } from "../workspace-write-boundary.ts";
 import { runGateCatalogGenerate, runGateCatalogValidate } from "../gate-catalog.ts";
 import { runTemplateImportsValidate } from "../template-imports-validate.ts";
 import { runWorkpieceImportsValidate } from "../workpiece-imports-validate.ts";
+import { runTemplateDepsDrift } from "../template-deps-drift.ts";
 import { runPlatformCommitDisciplineValidate } from "../platform-commit-discipline.ts";
 
 export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
@@ -142,6 +143,29 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
       "node_modules/@warpgogol/*",
     ],
     execute: runWorkpieceImportsValidate,
+  },
+  {
+    name: "template.deps.drift",
+    description:
+      "Compare dependency versions between workpiece package.json and package.template.json (RFC-0800).",
+    scope: "app",
+    flags: {
+      site: {
+        kind: "string",
+        required: false,
+        description: "Site id to resolve workpiece.",
+      },
+      "workpiece-dir": {
+        kind: "string",
+        required: false,
+        description: "Override workpiece directory path (relative to workspace root).",
+      },
+    },
+    reads: [
+      "packages/werkstatt-site/src/onboarding/templates/package.template.json",
+      "missions/*/workpiece/package.json",
+    ],
+    execute: runTemplateDepsDrift,
   },
   {
     name: "maintenance.debt.report",

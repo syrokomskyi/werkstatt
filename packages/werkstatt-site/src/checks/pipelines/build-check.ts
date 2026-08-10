@@ -44,4 +44,6 @@ export const SITES_BUILD_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "generated.drift.validate" },
   // RFC-0732: content regression gate — resolved page content drift detection (DNA-61)
   { command: "content.regression.check" },
+  // RFC-0800: template dependency drift — safety net for mission.close auto-sync
+  { command: "template.deps.drift" },
 ];
