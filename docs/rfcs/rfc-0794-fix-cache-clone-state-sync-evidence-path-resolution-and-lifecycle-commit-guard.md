@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
+enhancedAt: 2026-08-10
 implementedAt:
 closedAt:
 supersedes: []
@@ -48,6 +49,7 @@ commands:
   added: []
   changed:
     - mission.open
+    - mission.close
     - mission.reconcile
     - leitstand.propagate
   removed: []
@@ -188,6 +190,20 @@ gitExec(workspaceRoot, `commit -m ${JSON.stringify(message)}`, {
 
 This mirrors how `ecosystem.commit` bypasses the pre-commit hook's platform-scope guard.
 
+### 4. `computeInputsHash` — skip missing files during fingerprinting
+
+In `packages/werkstatt/src/kernel/cache/command-result-cache.ts`, the `computeInputsHash` function calls `fingerprintFile` for each input file. If a lock file is deleted between pipeline step execution and cache write, `fingerprintFile` throws `ENOENT`, crashing the pipeline. The fix wraps the call in try/catch and skips missing files:
+
+```ts
+try {
+  hash.update(fingerprintFile(filePath));
+} catch {
+  // File may have been deleted between pipeline step and cache write — skip
+}
+```
+
+This is a defensive fix discovered during mission `warpgogol-com-m000043` when a lock file was removed by a concurrent pipeline step.
+
 ### CLI surface
 
 No new commands. The fixes change internal behavior of existing commands:
@@ -253,6 +269,7 @@ Instead of setting `ECOSYSTEM_COMMIT=1`, route the commit through `ecosystem.com
 ## Risks
 
 - **Push to bare repo on every `writeSystemState` call**: `writeSystemState` is called by `mission.open`, `mission.close`, and other lifecycle commands. Each call now triggers a `git push`. This is acceptable — the push is fast (local bare repo) and non-fatal on failure. If the bare repo is on a remote server, network latency could add ~1s per call.
+- **Concurrent execution**: DNA-46 enforces "only one open mission per Sternsystem at a time," preventing concurrent `mission.open` calls for the same system. Intra-system concurrency (e.g., `mission.close` overlapping with `mission.reconcile`) is mitigated by git's own concurrency handling — `git push` is idempotent if nothing changed, and fast-forward conflicts are resolved by git's lock file mechanism. This is out of scope for this RFC.
 - **Archive evidence path drift**: If `mission.close` changes its archive path convention in the future, the fallback in `leitstand.propagate` must be updated. This is a low risk — the archive path is stable and defined by `mission.close` itself.
 - **`ECOSYSTEM_COMMIT=1` bypass scope**: The env var bypasses only the platform-scope guard (EC-01). All other pre-commit checks (ENV-CONTRACT, CSS tokens, RFC directory structure) still run. This is the correct scope — lifecycle auto-commits should not be blocked by platform-scope rules, but should still respect content-level guards.
 - **Agent misinterpretation**: Agents might see `ECOSYSTEM_COMMIT=1` in `commitWerkstattSideEffects` and assume it applies to all git operations. It does not — it is scoped to the `gitExec` call inside `commitWerkstattSideEffects` only.
