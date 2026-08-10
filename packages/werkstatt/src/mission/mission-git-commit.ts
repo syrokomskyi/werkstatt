@@ -284,30 +284,26 @@ export interface WorkpieceCommitResult {
   commitSha: string | null;
 }
 
-export function commitWorkpieceIfDirty(
-  workpieceDir: string,
-  missionId: string,
-): WorkpieceCommitResult {
-  const dirtyCheck = isWorkpieceDirty(workpieceDir);
+function commitDirIfDirty(dir: string, commitMessage: string): WorkpieceCommitResult {
+  const dirtyCheck = isWorkpieceDirty(dir);
   if (!dirtyCheck.dirty) {
     return { committed: false, commitSha: null };
   }
 
   execSync("git add -A", {
-    cwd: workpieceDir,
+    cwd: dir,
     stdio: ["pipe", "pipe", "pipe"],
     encoding: "utf-8",
   });
 
-  const commitMessage = `workpiece: auto-commit before reconcile ${missionId}`;
   execSync(`git commit --no-verify -m ${JSON.stringify(commitMessage)}`, {
-    cwd: workpieceDir,
+    cwd: dir,
     stdio: ["pipe", "pipe", "pipe"],
     encoding: "utf-8",
   });
 
   const commitSha = execSync("git rev-parse HEAD", {
-    cwd: workpieceDir,
+    cwd: dir,
     stdio: ["pipe", "pipe", "pipe"],
     encoding: "utf-8",
   }).trim();
@@ -315,35 +311,21 @@ export function commitWorkpieceIfDirty(
   return { committed: true, commitSha };
 }
 
+export function commitWorkpieceIfDirty(
+  workpieceDir: string,
+  missionId: string,
+): WorkpieceCommitResult {
+  return commitDirIfDirty(workpieceDir, `workpiece: auto-commit before reconcile ${missionId}`);
+}
+
 export function commitCacheCloneIfDirty(
   systemDir: string,
   systemId: string,
 ): WorkpieceCommitResult {
-  const dirtyCheck = isWorkpieceDirty(systemDir);
-  if (!dirtyCheck.dirty) {
-    return { committed: false, commitSha: null };
-  }
-
-  execSync("git add -A", {
-    cwd: systemDir,
-    stdio: ["pipe", "pipe", "pipe"],
-    encoding: "utf-8",
-  });
-
-  const commitMessage = `cache-clone: auto-commit generated files before reconcile ${systemId}`;
-  execSync(`git commit --no-verify -m ${JSON.stringify(commitMessage)}`, {
-    cwd: systemDir,
-    stdio: ["pipe", "pipe", "pipe"],
-    encoding: "utf-8",
-  });
-
-  const commitSha = execSync("git rev-parse HEAD", {
-    cwd: systemDir,
-    stdio: ["pipe", "pipe", "pipe"],
-    encoding: "utf-8",
-  }).trim();
-
-  return { committed: true, commitSha };
+  return commitDirIfDirty(
+    systemDir,
+    `cache-clone: auto-commit generated files before reconcile ${systemId}`,
+  );
 }
 
 export function isWorkpieceDirty(workpieceDir: string): WorkpieceDirtyResult {
