@@ -274,7 +274,7 @@ async function checkWorkspaceGlobsForStalePackages(
 - [x] `deriveNextMissionNumberSafe` skips `archive/` and symlinks (already implemented) (evidence: `bordbuch-io.ts:336-351`)
 - [x] `mission.cleanup --older-than` skips `archive/` and symlinks (already implemented) (evidence: `mission-cleanup.ts:160-163`)
 - [x] `mission.archive` trashes stale symlinks in `missions/` root (already implemented) (evidence: `archive.ts:156-171`)
-- [x] Unit tests for all four new changes (2a, 2b, 3a, 3b) — bug fixes 1a/1b/1c already have tests in `rfc-0796-stale-symlink-guard.test.ts` and `archive.test.ts` (evidence: `rfc-0796-validate-stale-warning.test.ts` 5 tests, `rfc-0796-materialize-glob-guard.test.ts` 4 tests, `rfc-0796-stale-symlink-guard.test.ts` 7 tests)
+- [x] Unit tests for all four new changes (2a, 2b, 3a, 3b) — bug fixes 1a/1b/1c already have tests in `rfc-0796-stale-symlink-guard.test.ts` and `archive.test.ts` (evidence: `rfc-0796-auto-archive.test.ts` 3 tests, `rfc-0796-stale-cleanup-open.test.ts` 4 tests, `rfc-0796-validate-stale-warning.test.ts` 5 tests, `rfc-0796-materialize-glob-guard.test.ts` 4 tests, `rfc-0796-stale-symlink-guard.test.ts` 7 tests, `archive.test.ts` 2 RFC-0796 tests)
 - [x] `AGENTS.md` updated with auto-archive behavior note (evidence: `AGENTS.md:136-139`)
 
 ### Compass XML synchronization
