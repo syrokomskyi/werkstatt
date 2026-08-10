@@ -29,6 +29,7 @@ test("CloseReport interface includes releaseId field", () => {
     },
     reconcile: { reconciledAt: "2026-08-01T10:00:00.000Z", verified: true },
     archive: { archived: false, error: null },
+    templateSync: { synced: false, syncError: null },
     warnings: [],
   };
   expect(report.releaseId).toBe("sys-r000001");
@@ -48,6 +49,7 @@ test("CloseReport accepts null releaseId", () => {
     },
     reconcile: { reconciledAt: "2026-08-01T10:00:00.000Z", verified: true },
     archive: { archived: false, error: null },
+    templateSync: { synced: false, syncError: null },
     warnings: [{ rule: "missing-release-id", message: "test" }],
   };
   expect(report.releaseId).toBe(null);
