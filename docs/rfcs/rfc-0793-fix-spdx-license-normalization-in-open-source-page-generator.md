@@ -242,18 +242,18 @@ The `(MIT OR CC0-1.0)` packages now normalize to `MIT` (first valid SPDX ID in t
 
 ## Acceptance criteria
 
-- [ ] `normalizeLicense` strips parentheses before `OR`/`AND` parsing — `(MIT OR CC0-1.0)` normalizes to `MIT` (first valid SPDX ID)
-- [ ] `LICENSE_ALIASES` includes `"Apache2": "Apache-2.0"`
-- [ ] `LICENSE_ALIASES` no longer contains `"Python-2.0": "PSF-2.0"`
-- [ ] `buildRegistryData` excludes dependencies with `normalizedLicense.status === "unknown"` from `licenseDistribution` only
-- [ ] Unit test: `(MIT OR CC0-1.0)` normalizes to a valid SPDX ID (not the raw string)
-- [ ] Unit test: `(MIT OR Apache2)` normalizes to `MIT` (Apache2 alias resolves)
-- [ ] Unit test: `(MIT AND Zlib)` normalizes to `MIT AND Zlib` (both valid SPDX IDs)
-- [ ] Unit test: `Python-2.0` normalizes to `Python-2.0` (not `PSF-2.0`)
-- [ ] Unit test: empty license string → `status: "unknown"`, excluded from `licenseDistribution`
-- [ ] Unit test: `licenseDistribution` does not contain an entry with `license: "Unknown"`
-- [ ] Component table, SBOM, and THIRD_PARTY_NOTICES still include packages with unknown licenses
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `normalizeLicense` strips parentheses before `OR`/`AND` parsing — `(MIT OR CC0-1.0)` normalizes to `MIT` (first valid SPDX ID) (evidence: packages/werkstatt-site/src/codegen/open-source-page.ts:235, open-source-normalize-license.test.ts:30)
+- [x] `LICENSE_ALIASES` includes `"Apache2": "Apache-2.0"` (evidence: packages/werkstatt-site/src/codegen/open-source-page.ts:194)
+- [x] `LICENSE_ALIASES` no longer contains `"Python-2.0": "PSF-2.0"` (evidence: packages/werkstatt-site/src/codegen/open-source-page.ts:185-208, open-source-normalize-license.test.ts:82)
+- [x] `buildRegistryData` excludes dependencies with `normalizedLicense.status === "unknown"` from `licenseDistribution` only (evidence: packages/werkstatt-site/src/codegen/open-source-page.ts:581)
+- [x] Unit test: `(MIT OR CC0-1.0)` normalizes to a valid SPDX ID (not the raw string) (evidence: open-source-normalize-license.test.ts:30)
+- [x] Unit test: `(MIT OR Apache2)` normalizes to `MIT` (Apache2 alias resolves) (evidence: open-source-normalize-license.test.ts:36)
+- [x] Unit test: `(MIT AND Zlib)` normalizes to `MIT AND Zlib` (both valid SPDX IDs) (evidence: open-source-normalize-license.test.ts:48)
+- [x] Unit test: `Python-2.0` normalizes to `Python-2.0` (not `PSF-2.0`) (evidence: open-source-normalize-license.test.ts:82)
+- [x] Unit test: empty license string → `status: "unknown"`, excluded from `licenseDistribution` (evidence: open-source-normalize-license.test.ts:88)
+- [x] Unit test: `licenseDistribution` does not contain an entry with `license: "Unknown"` (evidence: packages/werkstatt-site/src/codegen/open-source-page.ts:581, open-source-normalize-license.test.ts:88)
+- [x] Component table, SBOM, and THIRD_PARTY_NOTICES still include packages with unknown licenses (evidence: packages/werkstatt-site/src/codegen/open-source-page.ts:581 — filter is in licenseMap loop only, components array at line 601 and sbomComponents at line 848 are unfiltered)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0793 --json → zero violations)
 
 ## Implementation notes for agents
 
