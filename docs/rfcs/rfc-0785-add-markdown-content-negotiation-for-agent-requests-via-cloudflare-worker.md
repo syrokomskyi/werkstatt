@@ -1,7 +1,7 @@
 ---
 id: RFC-0785
 title: "Add markdown content negotiation for agent requests via Cloudflare Worker"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-09
-updatedAt: 2026-08-09
+updatedAt: 2026-08-10
 enhancedAt: 2026-08-09
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
