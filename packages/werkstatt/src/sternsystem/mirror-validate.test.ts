@@ -9,69 +9,13 @@
 */
 
 import { test, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { stringify as stringifyYaml } from "yaml";
 import { runSternsystemValidate } from "./sternsystem-validate.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { makeInput, makeContext, writeSystemConfig, BASE_SETUP } from "./test-helpers.ts";
 
 let workspaceRoot: string;
-
-function makeInput(flags: Record<string, unknown>): KernelCommandInput {
-  return {
-    flags: flags as Record<string, import("@warpgogol/werkstatt/kernel").KernelFlagValue>,
-    argv: [],
-  };
-}
-
-function makeContext(root: string): KernelRuntimeContext {
-  return {
-    workspaceRoot: root,
-    logger: {
-      section: () => {},
-      info: () => {},
-      warn: () => {},
-      error: () => {},
-      success: () => {},
-    },
-    dryRun: false,
-  } as unknown as KernelRuntimeContext;
-}
-
-interface MirrorEntry {
-  path: string;
-  storageType: "non-bare" | "bare" | "bundle";
-}
-
-async function writeSystemConfig(root: string, mirrors: MirrorEntry[]): Promise<void> {
-  const cacheDir = join(root, "..", "systems-cache", "test-site");
-  await mkdir(cacheDir, { recursive: true });
-  const config = {
-    schemaVersion: "system-config/v1",
-    id: "test-site",
-    cosmicStar: "Vega",
-    mirrors,
-    pinnedPlatform: "4.5.0",
-    status: "active",
-    registeredAt: "2026-01-01T00:00:00Z",
-    notes: "",
-  };
-  await writeFile(join(cacheDir, "system-config.yaml"), stringifyYaml(config) + "\n", "utf8");
-}
-
-const BASE_SETUP = async (root: string) => {
-  await mkdir(join(root, "docs", "rfcs"), { recursive: true });
-  await writeFile(join(root, "docs", "rfcs", "RFC-0001-test.md"), "", "utf8");
-  await writeFile(join(root, "package.json"), JSON.stringify({ version: "4.5.0" }), "utf8");
-  await writeFile(
-    join(root, "uni.registry.yaml"),
-    JSON.stringify({ entries: [{ id: "test", semanticId: "test", version: "1.0.0", intent: [] }] }),
-    "utf8",
-  );
-  await mkdir(join(root, "packages", "dummy"), { recursive: true });
-  await writeFile(join(root, "packages", "dummy", "index.ts"), "export const x = 1;\n", "utf8");
-};
 
 beforeEach(async () => {
   workspaceRoot = await mkdtemp(join(tmpdir(), "mirror-validate-test-"));
