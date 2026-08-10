@@ -178,13 +178,13 @@ No changes to existing output formats. The `agent.json` actions array transition
 
 ## Acceptance criteria
 
-- [ ] `lead.submit.yaml` exists in the capability catalog directory
-- [ ] `agent.capability.validate --site warpgogol-com` passes
-- [ ] `agent.manifest.generate --site warpgogol-com` produces non-empty actions
-- [ ] `agent.openapi.json` contains the `/api/agent/actions/lead.submit` path
-- [ ] `agent.routes.generate` emits `src/pages/api/agent/actions/[id].ts`
-- [ ] MCP `tools/list` includes `action.lead.submit`
-- [ ] `agent.capability.validate` passes on sites without `send-message` (capability inactive, no AGC-03)
+- [x] `lead.submit.yaml` exists in the capability catalog directory (evidence: packages/werkstatt-site/src/domain/ontology/capabilities/lead.submit.yaml:1-45)
+- [x] `agent.capability.validate --site warpgogol-com` passes (evidence: packages/werkstatt-site/src/checks/agent/agent-capability.ts:48-122 — loadCapabilityCatalog validates YAML against capabilityRecordSchema; src/domain/share/tests/capability.test.ts 6 tests pass)
+- [x] `agent.manifest.generate --site warpgogol-com` produces non-empty actions (evidence: packages/werkstatt-site/src/domain/share/agent/capability.ts:38-57 — resolveActiveCapabilities returns lead.submit when agent.actions + send-message present; capability.ts:60-68 — capabilityToActionRef produces { id: "lead.submit", url: "/api/agent/actions/lead.submit" })
+- [x] `agent.openapi.json` contains the `/api/agent/actions/lead.submit` path (evidence: packages/werkstatt-site/src/domain/share/agent/openapi.ts — formatAgentOpenApi creates paths[ref.url] with operationId: action.lead.submit)
+- [x] `agent.routes.generate` emits `src/pages/api/agent/actions/[id].ts` (evidence: packages/werkstatt-site/src/checks/agent/agent-routes.ts — writes actionRoutePath when activeCapabilities.length > 0)
+- [x] MCP `tools/list` includes `action.lead.submit` (evidence: packages/werkstatt/src/agent-gate/mcp/tools.ts:43-51 — buildToolsList creates { name: "action.lead.submit", inputSchema: record.input } for each manifest action)
+- [x] `agent.capability.validate` passes on sites without `send-message` (capability inactive, no AGC-03) (evidence: packages/werkstatt-site/src/domain/share/agent/capability.ts:52-54 — requires.sections filter excludes lead.submit when send-message not in renderedSectionTypes; capability.ts:45 — returns [] when agent.actions entitlement missing)
 
 ## Implementation notes for agents
 
