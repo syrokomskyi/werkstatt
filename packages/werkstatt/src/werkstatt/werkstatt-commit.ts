@@ -44,7 +44,9 @@ export async function commitWerkstattSideEffects(
     return { committed: false, commitSha: null };
   }
 
-  gitExec(workspaceRoot, `commit -m ${JSON.stringify(message)}`);
+  gitExec(workspaceRoot, `commit -m ${JSON.stringify(message)}`, {
+    env: { ...process.env, ECOSYSTEM_COMMIT: "1" },
+  });
   const commitSha = gitExec(workspaceRoot, "rev-parse HEAD");
 
   return { committed: true, commitSha };

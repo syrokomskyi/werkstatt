@@ -1644,7 +1644,7 @@ export async function runLeitstandPropagate(
 
   // RFC-0629: Axiom evidence gate — verify evidence-metadata.json exists with matching auditId + commitSha
   // RFC-0041 (Axiom): missionId renamed to auditId in evidence-metadata.json
-  const metadataPath = path.join(
+  let metadataPath = path.join(
     workspaceRoot,
     "missions",
     missionId,
@@ -1653,9 +1653,24 @@ export async function runLeitstandPropagate(
     "evidence-metadata.json",
   );
   if (!existsSync(metadataPath)) {
-    throw new Error(
-      `[leitstand.propagate] no Axiom evidence found for mission '${missionId}'. Run leitstand.dev-deploy first.`,
+    // RFC-0790: mission.close archives the mission to missions/archive/closed/.
+    // Fall back to the archived evidence path.
+    const archivedPath = path.join(
+      workspaceRoot,
+      "missions",
+      "archive",
+      "closed",
+      missionId,
+      "evidence",
+      "axiom",
+      "evidence-metadata.json",
     );
+    if (!existsSync(archivedPath)) {
+      throw new Error(
+        `[leitstand.propagate] no Axiom evidence found for mission '${missionId}'. Run leitstand.dev-deploy first.`,
+      );
+    }
+    metadataPath = archivedPath;
   }
 
   // Parse evidence-metadata.json for auditId + commitSha verification
