@@ -100,6 +100,22 @@ export function createMissionModule(): KernelModule {
             description:
               "RFC-0652: Skip mandatory evidence.sync to R2. Escape hatch for offline close only — local evidence will be lost when mission.cleanup runs.",
           },
+          "skip-auto-archive": {
+            kind: "boolean",
+            description: "RFC-0796: Skip auto-archiving of terminal missions after close.",
+          },
+          "skip-auto-sync": {
+            kind: "boolean",
+            description: "RFC-0797: Skip pre-mirror-check sternsystem.sync inside close lock.",
+          },
+          "skip-content-regression": {
+            kind: "boolean",
+            description: "RFC-0734: Skip CREG-05 content regression review check.",
+          },
+          "skip-template-sync": {
+            kind: "boolean",
+            description: "RFC-0800: Skip auto-sync of template dependencies from workpiece.",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",
