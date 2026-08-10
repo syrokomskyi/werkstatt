@@ -264,18 +264,18 @@ async function checkWorkspaceGlobsForStalePackages(
 
 ## Acceptance criteria
 
-- [ ] `mission.close` calls `mission.archive --status=closed` as a non-fatal post-close step
-- [ ] `--skip-auto-archive` flag on `mission.close` disables auto-archive
-- [ ] `mission.open` removes stale symlinks at the target mission path before creating directories
-- [ ] `mission.open` skips non-empty real directories with a warning
-- [ ] `mission.validate` warns when stale symlinks or terminal-state directories exist in `missions/` root
-- [ ] `mission.materialize` checks workspace globs for stale `package.json` before `pnpm install`
-- [ ] `mission.materialize` aborts with a clear error message if stale packages are found
-- [ ] `deriveNextMissionNumberSafe` skips `archive/` and symlinks (already implemented)
-- [ ] `mission.cleanup --older-than` skips `archive/` and symlinks (already implemented)
-- [ ] `mission.archive` trashes stale symlinks in `missions/` root (already implemented)
-- [ ] Unit tests for all four new changes (2a, 2b, 3a, 3b) — bug fixes 1a/1b/1c already have tests in `rfc-0796-stale-symlink-guard.test.ts` and `archive.test.ts`
-- [ ] `AGENTS.md` updated with auto-archive behavior note
+- [x] `mission.close` calls `mission.archive --status=closed` as a non-fatal post-close step (evidence: `mission-close.ts:770-806`)
+- [x] `--skip-auto-archive` flag on `mission.close` disables auto-archive (evidence: `mission-close.ts:178`)
+- [x] `mission.open` removes stale symlinks at the target mission path before creating directories (evidence: `mission-open.ts:256` calls `cleanupStaleMissionEntries`)
+- [x] `mission.open` skips non-empty real directories with a warning (evidence: `mission-open.ts:100-116`)
+- [x] `mission.validate` warns when stale symlinks or terminal-state directories exist in `missions/` root (evidence: `mission-materialization-commands.ts:408-414` and `737-743`)
+- [x] `mission.materialize` checks workspace globs for stale `package.json` before `pnpm install` (evidence: `mission-materialize.ts:1204`)
+- [x] `mission.materialize` aborts with a clear error message if stale packages are found (evidence: `mission-materialize.ts:1205-1213`)
+- [x] `deriveNextMissionNumberSafe` skips `archive/` and symlinks (already implemented) (evidence: `bordbuch-io.ts:336-351`)
+- [x] `mission.cleanup --older-than` skips `archive/` and symlinks (already implemented) (evidence: `mission-cleanup.ts:160-163`)
+- [x] `mission.archive` trashes stale symlinks in `missions/` root (already implemented) (evidence: `archive.ts:156-171`)
+- [x] Unit tests for all four new changes (2a, 2b, 3a, 3b) — bug fixes 1a/1b/1c already have tests in `rfc-0796-stale-symlink-guard.test.ts` and `archive.test.ts` (evidence: `rfc-0796-validate-stale-warning.test.ts` 5 tests, `rfc-0796-materialize-glob-guard.test.ts` 4 tests, `rfc-0796-stale-symlink-guard.test.ts` 7 tests)
+- [x] `AGENTS.md` updated with auto-archive behavior note (evidence: `AGENTS.md:136-139`)
 
 ### Compass XML synchronization
 
