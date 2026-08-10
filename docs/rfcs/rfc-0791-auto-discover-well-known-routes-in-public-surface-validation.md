@@ -145,13 +145,13 @@ No change to `--json` output. The `routePaths` set is internal; the diagnostics 
 
 ## Acceptance criteria
 
-- [ ] Complementary `.well-known/` glob added to `publicPaths` in `aggregate.ts`
-- [ ] Manual `routePaths.add` calls for `.well-known/` routes removed from `aggregate.ts`
-- [ ] `public.surface.lint` recognizes extensionless `.well-known/` files (e.g. `api-catalog`) via `publicPaths`
-- [ ] Unit test: site with `public/.well-known/api-catalog` (extensionless) → no PUBTXT-07
-- [ ] Unit test: site with `public/.well-known/agent.json` → no PUBTXT-07 (already worked, regression guard)
-- [ ] Unit test: site without `public/.well-known/` → no error, `publicPaths` unchanged
-- [ ] `rfc.validate` passes on this file before merging
+- [x] Complementary `.well-known/` glob added to `publicPaths` in `aggregate.ts` (evidence: packages/werkstatt-site/src/checks/public-surface/aggregate.ts:156-168)
+- [x] Manual `routePaths.add` calls for `.well-known/` routes removed from `aggregate.ts` (evidence: git diff — lines 173-177 removed in commit 90d0d22f)
+- [x] `public.surface.lint` recognizes extensionless `.well-known/` files (e.g. `api-catalog`) via `publicPaths` (evidence: rfc-0791-well-known-routes.test.ts test 1 passes)
+- [x] Unit test: site with `public/.well-known/api-catalog` (extensionless) → no PUBTXT-07 (evidence: rfc-0791-well-known-routes.test.ts:113-128)
+- [x] Unit test: site with `public/.well-known/agent.json` → no PUBTXT-07 (already worked, regression guard) (evidence: rfc-0791-well-known-routes.test.ts:131-148)
+- [x] Unit test: site without `public/.well-known/` → no error, `publicPaths` unchanged (evidence: rfc-0791-well-known-routes.test.ts:151-167)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0791 exitCode 0)
 
 ## Implementation notes for agents
 
