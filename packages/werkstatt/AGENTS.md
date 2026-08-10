@@ -54,6 +54,11 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - The `werkstatt.autonomy.validate` command (DNA-64 enforcement) scans `src/**` for forbidden `@warpgogol/*` imports.
 - RFC-0776 completed the migration: old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) are deleted. All imports now go through `@warpgogol/werkstatt` subpath exports.
 
+## Mission git helpers
+
+- `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.
+- `commitCacheCloneIfDirty(systemDir, systemId)` (RFC-0797): auto-commits all dirty files in the cache clone via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` (before the dirty guard) and `mission.validate` (post-validate cleanup) to auto-commit generated files instead of leaving the cache clone dirty.
+
 ## Autonomy guard
 
 The `werkstatt.autonomy.validate` command enforces DNA-64. It scans `packages/werkstatt/src/**` for `@warpgogol/*` import specifiers. Exemptions:
