@@ -1,12 +1,13 @@
 ---
 id: RFC-0796
 title: "Harden mission directory lifecycle against stale symlinks and residual entries"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
 enhancedAt: 2026-08-10
