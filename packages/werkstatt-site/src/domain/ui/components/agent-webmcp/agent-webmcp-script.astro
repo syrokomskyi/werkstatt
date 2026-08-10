@@ -1,0 +1,71 @@
+---
+/*
+<MODULE_CONTRACT>
+  <purpose>RFC-0799: Register the site's agent capabilities on document.modelContext
+  so browser-resident AI agents can discover tools without a network roundtrip.
+  Progressive enhancement — exits silently when document.modelContext is undefined.</purpose>
+  <non-goals>
+    <item>Do not implement tool invocation — discovery only. Invocation goes through
+    the server-side MCP endpoint (/api/agent/mcp) with rate limiting and validation.</item>
+    <item>Do not fetch the manifest from the network — read from the embedded JSON script tag.</item>
+  </non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0799: initial WebMCP script component.</item>
+</CHANGE_SUMMARY>
+*/
+
+interface AgentSurfaceManifest {
+  actions?: Array<{
+    id: string;
+    description?: string;
+    inputSchema?: Record<string, unknown>;
+  }>;
+  knowledge?: Array<{
+    domain: string;
+    url?: string;
+  }>;
+}
+
+interface Props {
+  manifest?: AgentSurfaceManifest | null;
+}
+
+const { manifest } = Astro.props as Props;
+const manifestJson = manifest ? JSON.stringify(manifest) : "null";
+---
+
+{manifest && (
+  <script is:inline define:vars={{ manifestJson }}>
+    (function () {
+      var mc = document.modelContext;
+      if (!mc || typeof mc.registerTool !== "function") return;
+      try {
+        var manifest = JSON.parse(manifestJson);
+        if (!manifest) return;
+        var actions = manifest.actions || [];
+        for (var i = 0; i < actions.length; i++) {
+          var action = actions[i];
+          mc.registerTool({
+            name: "action." + action.id,
+            description: action.description || ("Callable action: " + action.id),
+            inputSchema: action.inputSchema || { type: "object", properties: {} }
+          });
+        }
+        var knowledge = manifest.knowledge || [];
+        for (var j = 0; j < knowledge.length; j++) {
+          var domain = knowledge[j];
+          mc.registerTool({
+            name: "knowledge." + domain.domain + ".get",
+            description: "Fetch the " + domain.domain + " knowledge envelope for this site.",
+            inputSchema: { type: "object", properties: {} }
+          });
+        }
+      } catch (e) {
+        if (import.meta && import.meta.env && import.meta.env.DEV) {
+          console.warn("[agent-webmcp] Failed to register tools:", e);
+        }
+      }
+    })();
+  </script>
+)}

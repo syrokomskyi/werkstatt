@@ -28,6 +28,17 @@ import GrowthProvider from "@warpgogol/werkstatt-site/growth/provider.astro";
 import Header from "@warpgogol/werkstatt-site/ui/components/header";
 import Footer from "@warpgogol/werkstatt-site/ui/components/footer";
 import globalStylesheetUrl from "@styles/global.css?url";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+let agentSurfaceManifest: { actions?: Array<{ id: string; description?: string }>; knowledge?: Array<{ domain: string; url?: string }> } | null = null;
+try {
+  agentSurfaceManifest = JSON.parse(
+    readFileSync(join(process.cwd(), "src/agent-surface.generated.json"), "utf-8"),
+  );
+} catch {
+  agentSurfaceManifest = null;
+}
 
 const siteUrl = Astro.site?.toString() ?? Astro.url.origin;
 const { defaultLanguage: lang } = await getRouteRegistry();
@@ -58,6 +69,7 @@ const data = await resolvePageRoute({
   skipLinkLabel={data.skipLinkLabel}
   globalStylesheetUrl={globalStylesheetUrl}
   orchestratorConfig={data.orchestratorConfig}
+  agentSurfaceManifest={agentSurfaceManifest}
 >
   {
     data.growthConfig && (

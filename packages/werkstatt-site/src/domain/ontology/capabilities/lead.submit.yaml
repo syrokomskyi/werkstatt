@@ -1,0 +1,44 @@
+id: lead.submit
+version: 1
+kind: action
+title:
+  de: "Anfrage senden"
+  en: "Submit a lead"
+description:
+  de: "Reicht eine Kontaktanfrage (Name, E-Mail, Nachricht) beim Gewerbe ein. Die Anfrage wird asynchron zugestellt — die Bestätigung signalisiert Annahme, nicht Zustellung."
+  en: "Submit a contact request (name, email, message) to the business. The request is delivered asynchronously — the confirmation signals acceptance, not delivery."
+input:
+  type: object
+  required: [name, email, message]
+  additionalProperties: false
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 200
+    email:
+      type: string
+      format: email
+      maxLength: 254
+    message:
+      type: string
+      minLength: 1
+      maxLength: 5000
+output:
+  type: object
+  required: [accepted]
+  additionalProperties: false
+  properties:
+    accepted:
+      type: boolean
+integration:
+  eventKind: lead
+  source: agent
+requires:
+  entitlements: [agent.actions]
+  sections: [send-message]
+humanEquivalent:
+  sectionType: send-message
+limits:
+  perMinutePerIp: 3
+  maxPayloadBytes: 10240

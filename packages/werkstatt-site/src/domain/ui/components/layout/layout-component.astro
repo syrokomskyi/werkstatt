@@ -28,6 +28,7 @@ import type { SemanticPageModel } from "@warpgogol/werkstatt-site/share/semantic
 import type { OrchestratorConfig } from "@warpgogol/werkstatt-site/share/astro/page-handler";
 import { contentAssetImages } from "../../content-assets.ts";
 import ScrollToTop from "../scroll-to-top/scroll-to-top-component.astro";
+import AgentWebmcpScript from "../agent-webmcp/agent-webmcp-script.astro";
 
 interface Props {
   title: string;
@@ -55,6 +56,11 @@ interface Props {
   pdfUrl?: string;
   /** RFC-0257: URL to the shared print stylesheet. */
   printStylesheetUrl?: string;
+  /** RFC-0799: Agent surface manifest for browser-side WebMCP tool registration. */
+  agentSurfaceManifest?: {
+    actions?: Array<{ id: string; description?: string; inputSchema?: Record<string, unknown> }>;
+    knowledge?: Array<{ domain: string; url?: string }>;
+  } | null;
 }
 
 const {
@@ -72,6 +78,7 @@ const {
   canonicalUrl: canonicalUrlOverride,
   pdfUrl,
   printStylesheetUrl,
+  agentSurfaceManifest,
 } = Astro.props;
 
 const canonicalUrl = canonicalUrlOverride ?? Astro.url.toString();
@@ -202,6 +209,9 @@ const robotsContent = robots ?? robotsFromOutput;
         document.documentElement.setAttribute("data-print", "");
       }
     </script>
+
+    {/* RFC-0799: browser-side WebMCP tool registration (progressive enhancement) */}
+    <AgentWebmcpScript manifest={agentSurfaceManifest} />
   </head>
   <body class={className}>
     <a href="#main-content" class="sr-only">{skipLinkLabel}</a>

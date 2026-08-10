@@ -188,28 +188,191 @@ interface ContactFrontmatter {
   contactType?: string;
 }
 
+async function loadPbpBusinessFallback(
+  contentDir: string,
+  lang: string,
+  defaultLang: string,
+): Promise<{
+  company: Partial<CompanyFrontmatter>;
+  legal: Partial<LegalFrontmatter>;
+  contact: Partial<ContactFrontmatter>;
+  firstPlace: Record<string, unknown>;
+}> {
+  const business = ((await readLocalizedData(
+    contentDir,
+    "business-profile",
+    lang,
+    "business.md",
+    defaultLang,
+  )) ?? {}) as Record<string, unknown>;
+  const brand = ((await readLocalizedData(
+    contentDir,
+    "business-profile",
+    lang,
+    "organization/brand.md",
+    defaultLang,
+  )) ?? {}) as Record<string, unknown>;
+  const legalIdentity = ((await readLocalizedData(
+    contentDir,
+    "business-profile",
+    lang,
+    "organization/legal-identity.md",
+    defaultLang,
+  )) ?? {}) as Record<string, unknown>;
+
+  const contactDir = join(contentDir, "business-profile", lang, "contact");
+  let contactFiles = await collectMarkdownFiles(contactDir);
+  if (contactFiles.length === 0 && lang !== defaultLang) {
+    contactFiles = await collectMarkdownFiles(
+      join(contentDir, "business-profile", defaultLang, "contact"),
+    );
+  }
+  const firstContact = contactFiles[0]
+    ? parseMarkdownFrontmatter(await readFile(contactFiles[0], "utf-8")).data
+    : {};
+
+  const placeDir = join(contentDir, "business-profile", lang, "places");
+  let placeFiles = await collectMarkdownFiles(placeDir);
+  if (placeFiles.length === 0 && lang !== defaultLang) {
+    placeFiles = await collectMarkdownFiles(
+      join(contentDir, "business-profile", defaultLang, "places"),
+    );
+  }
+  const firstPlace = placeFiles[0]
+    ? parseMarkdownFrontmatter(await readFile(placeFiles[0], "utf-8")).data
+    : {};
+  const placeAddress = (firstPlace as Record<string, unknown>).address as
+    Record<string, unknown> | undefined;
+
+  const company: Partial<CompanyFrontmatter> = {
+    brand: { name: (brand.name as string) ?? (business.name as string) },
+    description: (business.description as string) ?? (business.summary as string),
+    foundingYear: business.yearEstablished ? String(business.yearEstablished) : undefined,
+  };
+  const legal: Partial<LegalFrontmatter> = {
+    companyName: (legalIdentity.legalName as string) ?? (legalIdentity.name as string),
+    owner: {
+      fullName: (legalIdentity.responsiblePerson as Record<string, unknown>)?.name as
+        string | undefined,
+      ...(placeAddress
+        ? {
+            address: {
+              street: placeAddress.street as string | undefined,
+              streetNumber: placeAddress.streetNumber as string | undefined,
+              zip: placeAddress.postalCode as string | undefined,
+              city: placeAddress.locality as string | undefined,
+              country: placeAddress.countryCode as string | undefined,
+            },
+          }
+        : {}),
+    },
+  };
+  const contact: Partial<ContactFrontmatter> = {
+    email: (firstContact as Record<string, unknown>).value as string | undefined,
+    contactType: (firstContact as Record<string, unknown>).channel as string | undefined,
+  };
+
+  return { company, legal, contact, firstPlace };
+}
+
+function mapPbpOfferingToProjectOfferShape(
+  offering: Record<string, unknown>,
+): Record<string, unknown> {
+  const pricing = (offering["pricing"] ?? {}) as Record<string, unknown>;
+  const charges = (pricing["charges"] ?? {}) as Record<string, unknown>;
+  const currency = pricing["currency"] as string | undefined;
+
+  const chargeValue = (key: string): string | undefined => {
+    const charge = charges[key] as Record<string, unknown> | undefined;
+    const amount = charge?.["amount"] as Record<string, unknown> | undefined;
+    return (amount?.["value"] as string) ?? (amount?.["unitValue"] as string);
+  };
+
+  const price: Record<string, string> = {};
+  const monthly = chargeValue("monthlySubscription");
+  if (monthly) price["monthly"] = monthly;
+  const yearly = chargeValue("yearlySubscription");
+  if (yearly) price["yearly"] = yearly;
+  const setup = chargeValue("activation");
+  if (setup) price["setup"] = setup;
+
+  const guarantees = offering["guarantees"] as
+    Record<string, { label?: string; detail?: string } | undefined> | undefined;
+
+  const fulfillment = (offering["fulfillment"] ?? {}) as Record<string, unknown>;
+  const billingDay =
+    fulfillment["billingDay"] != null ? String(fulfillment["billingDay"]) : undefined;
+  const capacity = fulfillment["capacity"] as Record<string, unknown> | undefined;
+
+  const changePrice = chargeValue("additionalChange");
+  const hourlyRate = chargeValue("hourlyWork");
+
+  return {
+    ...(Object.keys(price).length ? { price } : {}),
+    ...(currency ? { currency } : {}),
+    ...(guarantees ? { guarantees } : {}),
+    ...(billingDay ? { billingDay } : {}),
+    ...(capacity ? { capacity } : {}),
+    ...(changePrice ? { changePrice } : {}),
+    ...(hourlyRate ? { hourlyRate } : {}),
+  };
+}
+
+function mapPbpPlaceToProjectLocationShape(
+  place: Record<string, unknown>,
+): Record<string, unknown> {
+  const address = (place["address"] ?? {}) as Record<string, unknown>;
+  return {
+    city: { name: address["locality"] as string | undefined },
+    region: { name: address["administrativeArea"] as string | undefined },
+    country: { name: address["countryCode"] as string | undefined },
+  };
+}
+
 async function loadSiteSemanticProfile(
   contentDir: string,
   lang: string,
   siteUrl: string,
   defaultLang: string,
 ): Promise<SiteProfile> {
-  const company = ((await readLocalizedData(
+  const legacyCompany = await readLocalizedData(
     contentDir,
     "business",
     lang,
     "company.md",
     defaultLang,
-  )) ?? {}) as CompanyFrontmatter;
-  const legal = ((await readLocalizedData(contentDir, "business", lang, "legal.md", defaultLang)) ??
-    {}) as LegalFrontmatter;
-  const contact = ((await readLocalizedData(
+  );
+  const legacyLegal = await readLocalizedData(
+    contentDir,
+    "business",
+    lang,
+    "legal.md",
+    defaultLang,
+  );
+  const legacyContact = await readLocalizedData(
     contentDir,
     "business",
     lang,
     "contact.md",
     defaultLang,
-  )) ?? {}) as ContactFrontmatter;
+  );
+
+  let company: CompanyFrontmatter;
+  let legal: LegalFrontmatter;
+  let contact: ContactFrontmatter;
+
+  let pbpFallback: { firstPlace: Record<string, unknown> } | undefined;
+  if (legacyCompany || legacyLegal || legacyContact) {
+    company = (legacyCompany ?? {}) as CompanyFrontmatter;
+    legal = (legacyLegal ?? {}) as LegalFrontmatter;
+    contact = (legacyContact ?? {}) as ContactFrontmatter;
+  } else {
+    const pbp = await loadPbpBusinessFallback(contentDir, lang, defaultLang);
+    company = pbp.company as CompanyFrontmatter;
+    legal = pbp.legal as LegalFrontmatter;
+    contact = pbp.contact as ContactFrontmatter;
+    pbpFallback = pbp;
+  }
 
   const rawBrand = company.brand ?? {};
   const companyName = legal.companyName ?? "";
@@ -245,12 +408,61 @@ async function loadSiteSemanticProfile(
     : "";
 
   // RFC-0147/RFC-0148: project the public business catalog (offer, location, team).
-  const offer = projectOffer(
-    await readLocalizedData(contentDir, "business", lang, "offer.md", defaultLang),
+  const legacyOffer = await readLocalizedData(
+    contentDir,
+    "business",
+    lang,
+    "offer.md",
+    defaultLang,
   );
-  const location = projectLocation(
-    await readLocalizedData(contentDir, "business", lang, "location.md", defaultLang),
+  const legacyLocation = await readLocalizedData(
+    contentDir,
+    "business",
+    lang,
+    "location.md",
+    defaultLang,
   );
+
+  let offerData: Record<string, unknown> | undefined;
+  let locationData: Record<string, unknown> | undefined;
+
+  if (legacyOffer) {
+    offerData = legacyOffer;
+  } else if (!legacyCompany) {
+    const offeringsDir = join(contentDir, "business-profile", lang, "offerings");
+    let offeringFiles = await collectMarkdownFiles(offeringsDir);
+    if (offeringFiles.length === 0 && lang !== defaultLang) {
+      offeringFiles = await collectMarkdownFiles(
+        join(contentDir, "business-profile", defaultLang, "offerings"),
+      );
+    }
+    if (offeringFiles.length > 0) {
+      const parsedOfferings = await Promise.all(
+        offeringFiles.map(async (f) => parseMarkdownFrontmatter(await readFile(f, "utf-8")).data),
+      );
+      parsedOfferings.sort((a, b) => {
+        const aCharges = Object.keys(
+          ((a["pricing"] as Record<string, unknown>)?.["charges"] as Record<string, unknown>) || {},
+        ).length;
+        const bCharges = Object.keys(
+          ((b["pricing"] as Record<string, unknown>)?.["charges"] as Record<string, unknown>) || {},
+        ).length;
+        return bCharges - aCharges;
+      });
+      offerData = mapPbpOfferingToProjectOfferShape(parsedOfferings[0]);
+    }
+  }
+
+  if (legacyLocation) {
+    locationData = legacyLocation;
+  } else if (!legacyCompany && pbpFallback?.firstPlace) {
+    locationData = mapPbpPlaceToProjectLocationShape(
+      pbpFallback.firstPlace as Record<string, unknown>,
+    );
+  }
+
+  const offer = projectOffer(offerData);
+  const location = projectLocation(locationData);
   const services = projectServices(
     await readBusinessCollection(contentDir, lang, "services", defaultLang),
   );
