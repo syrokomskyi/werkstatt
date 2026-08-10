@@ -158,6 +158,8 @@ export async function runMissionCleanup(
     const now = Date.now();
 
     for (const entry of entries) {
+      if (entry.name === "archive") continue;
+      if (entry.isSymbolicLink()) continue;
       if (!entry.isDirectory()) continue;
       const missionDir = path.join(missionsDir, entry.name);
 
