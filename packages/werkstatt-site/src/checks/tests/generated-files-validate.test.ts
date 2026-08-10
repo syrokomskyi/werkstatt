@@ -22,10 +22,12 @@
 import { describe, it, expect } from "vitest";
 import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { createDefaultIO } from "@warpgogol/werkstatt/kernel";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { runGeneratedFilesValidate } from "../generated-files-validate.ts";
+
+const SYSTEMS_CACHE_REL = join("..", "systems-cache");
 
 const logger = {
   section() {},
@@ -81,14 +83,49 @@ describe("generated.files.validate (RFC-0375)", () => {
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it("G1: skips silently when cache clone directory does not exist (no false-positive GEN-FILES-01)", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-files-sys-skip-"));
+    const cacheCloneResolved = resolve(root, SYSTEMS_CACHE_REL, "warpgogol-com");
+    // Clean up any leftover cache clone from a previous test run
+    await rm(resolve(root, SYSTEMS_CACHE_REL), { recursive: true, force: true });
+    try {
+      // Do NOT create the cache clone directory — resolveCacheClonePath returns
+      // a string but the directory does not exist. The validator should skip
+      // silently, not produce false-positive GEN-FILES-01 errors.
+      const sysInput = {
+        argv: [],
+        flags: { site: "warpgogol-com" },
+      } as unknown as KernelCommandInput;
+      const result = await runGeneratedFilesValidate(sysInput, ctx(root));
+      const diagnostics = (result.data?.diagnostics ?? []) as Array<{
+        message: string;
+        file?: string;
+        severity: string;
+      }>;
+
+      // No error-level bordbuch diagnostics should be produced when the cache
+      // clone directory itself doesn't exist.
+      const bordbuchErrors = diagnostics.filter(
+        (d) =>
+          (d.message.includes("bordbuch") || (d.file && d.file.includes("bordbuch"))) &&
+          d.severity === "error",
+      );
+      expect(bordbuchErrors).toHaveLength(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+      await rm(resolve(root, SYSTEMS_CACHE_REL), { recursive: true, force: true });
+    }
+  });
 });
 
 describe("generated.files.validate {system} expansion (RFC-0606)", () => {
   it("red: reports GEN-FILES-01 for missing bordbuch files under systems/{system}/", async () => {
     const root = await mkdtemp(join(tmpdir(), "gen-files-sys-red-"));
+    const cacheClone = join(root, SYSTEMS_CACHE_REL, "warpgogol-com");
     try {
-      // Create systems/warpgogol-com/ but no bordbuch files
-      await mkdir(join(root, "systems", "warpgogol-com"), { recursive: true });
+      // Create the cache clone directory but no bordbuch files inside it
+      await mkdir(cacheClone, { recursive: true });
 
       const sysInput = {
         argv: [],
@@ -106,13 +143,15 @@ describe("generated.files.validate {system} expansion (RFC-0606)", () => {
       expect(bordbuchDiags.length).toBeGreaterThan(0);
     } finally {
       await rm(root, { recursive: true, force: true });
+      await rm(join(root, SYSTEMS_CACHE_REL), { recursive: true, force: true });
     }
   });
 
   it("green: no GEN-FILES-01 for bordbuch when files exist under systems/{system}/", async () => {
     const root = await mkdtemp(join(tmpdir(), "gen-files-sys-green-"));
+    const cacheClone = join(root, SYSTEMS_CACHE_REL, "warpgogol-com");
     try {
-      const baseDir = join(root, "systems", "warpgogol-com", "public", ".well-known");
+      const baseDir = join(cacheClone, "public", ".well-known");
       await mkdir(baseDir, { recursive: true });
       await writeFile(join(baseDir, "bordbuch.json"), "{}", "utf8");
       await mkdir(join(baseDir, "bordbuch"), { recursive: true });
@@ -134,15 +173,17 @@ describe("generated.files.validate {system} expansion (RFC-0606)", () => {
       expect(bordbuchDiags).toHaveLength(0);
     } finally {
       await rm(root, { recursive: true, force: true });
+      await rm(join(root, SYSTEMS_CACHE_REL), { recursive: true, force: true });
     }
   });
 
   it("wildcard: expands {system} to * when --site is not provided", async () => {
     const root = await mkdtemp(join(tmpdir(), "gen-files-sys-wild-"));
+    const cacheRoot = join(root, SYSTEMS_CACHE_REL);
     try {
-      // Create two system directories with bordbuch files
+      // Create two system cache clone directories with bordbuch files
       for (const sys of ["warpgogol-com", "other-site"]) {
-        const baseDir = join(root, "systems", sys, "public", ".well-known");
+        const baseDir = join(cacheRoot, sys, "public", ".well-known");
         await mkdir(baseDir, { recursive: true });
         await writeFile(join(baseDir, "bordbuch.json"), "{}", "utf8");
         await mkdir(join(baseDir, "bordbuch"), { recursive: true });
@@ -170,6 +211,7 @@ describe("generated.files.validate {system} expansion (RFC-0606)", () => {
       expect(bordbuchErrors).toHaveLength(0);
     } finally {
       await rm(root, { recursive: true, force: true });
+      await rm(cacheRoot, { recursive: true, force: true });
     }
   });
 });

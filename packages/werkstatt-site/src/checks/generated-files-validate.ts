@@ -18,6 +18,7 @@
 </CHANGE_SUMMARY>
 */
 import { join, relative } from "node:path";
+import { existsSync } from "node:fs";
 import type {
   CheckResult,
   Diagnostic,
@@ -237,7 +238,7 @@ export async function runGeneratedFilesValidate(
 
       const cachePath =
         allCacheClones.get(systemId) ?? resolveCacheClonePathSync(context.workspaceRoot, systemId);
-      if (cachePath) {
+      if (cachePath && existsSync(cachePath)) {
         const resolvedPath = join(cachePath, restAfterSystemId);
         const exists = await checkFileExists(context.io, resolvedPath);
         if (!exists) {
@@ -251,6 +252,8 @@ export async function runGeneratedFilesValidate(
         }
         continue;
       }
+      // Cache clone directory does not exist — skip silently (RFC-0790 convention-based discovery).
+      continue;
     }
 
     if (hasGlobPattern(expandedPath)) {

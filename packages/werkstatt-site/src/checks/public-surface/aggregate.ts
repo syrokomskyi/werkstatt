@@ -9,6 +9,7 @@
   <item>RFC-0303: extracted aggregate commands from public-surface.ts into public-surface/aggregate.ts.</item>
   <item>RFC-0577: Enrich PUBTXT-07 fixHint with resolveProseSource helper and build.prepare command.</item>
   <item>RFC-0577 review fix: Make resolveProseSource async and use context.io.exists instead of existsSync.</item>
+  <item>RFC-0789: register agent discovery surface routes (api-catalog, mcp/server-card.json, agent.openapi.json) in routePaths so PUBTXT-07 recognizes them as locally known.</item>
 </CHANGE_SUMMARY>
 */
 
