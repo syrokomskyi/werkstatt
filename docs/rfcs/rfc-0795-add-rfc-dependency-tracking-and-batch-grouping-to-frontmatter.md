@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
+enhancedAt: 2026-08-10
 implementedAt:
 closedAt:
 supersedes: []
@@ -28,7 +29,8 @@ related:
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies: []
+satisfies:
+  - DNA-65
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -112,7 +114,7 @@ The RFC frontmatter schema gains two optional fields: `dependsOn: string[]` (RFC
 - **DNA-65 (new)** — established by this RFC. Codifies that RFCs in a series declare dependencies and batch identity in frontmatter, and that `rfc.implement.stamp` enforces dependency ordering.
 - **RFC-0331** — `--satisfies` enforcement. This RFC is `kind: policy`, so `--satisfies` is not required. DNA-65 is added to `docs/architecture-dna.md` during implementation.
 - **RFC-0476** — `rfc.implement.stamp` command. This RFC extends the stamping handler with a dependency check, following the existing pattern of stamp-time validation (RFC-IMP-02 evidence annotations, RFC-IMP-03 commit message reference, RFC-IMP-04 dirty file check).
-- **Existing referential integrity pattern** — `rfc.validate` already checks `supersedes`/`supersededBy` (V-10..V-12) and `amends`/`amendedBy` (V-19) bidirectionally. `dependsOn` follows the same referential integrity pattern (V-31: entries must match existing RFC IDs) but without a reverse field — reverse lookup is done by scanning all RFCs.
+- **Existing referential integrity pattern** — `rfc.validate` already checks `supersedes`/`supersededBy` (V-10..V-12) and `amends`/`amendedBy` (V-19) bidirectionally. `dependsOn` follows the same referential integrity pattern (V-33: entries must match existing RFC IDs) but without a reverse field — reverse lookup is done by scanning all RFCs. V-33 and V-34 are the next available rule numbers after V-32 (RFC-0625: implementation commit drift detection).
 
 ## Design
 
@@ -127,14 +129,14 @@ pnpm exec werkstatt run rfc.implement.stamp --id RFC-0782 --implementation-commi
 
 # Stamp an RFC whose dependencies are NOT all implemented (fails)
 pnpm exec werkstatt run rfc.implement.stamp --id RFC-0782 --implementation-commit abc123
-# Error: RFC-DEP-01: RFC-0782 depends on RFC-0781, which is not implemented (status: accepted)
+# Error: RFC-IMP-07: RFC-0782 depends on RFC-0781, which is not implemented (status: accepted)
 ```
 
 No new commands are introduced. Two existing commands are extended:
 
 - `rfc.list` gains `--batch <slug>` flag (optional, filters by batch slug)
 - `rfc.implement.stamp` gains internal dependency check (no CLI surface change)
-- `rfc.validate` gains V-31 validation rule (no CLI surface change)
+- `rfc.validate` gains V-33 and V-34 validation rules (no CLI surface change)
 
 ### TypeScript contracts
 
@@ -149,7 +151,7 @@ export interface RfcFrontmatter {
    * can be stamped `implemented` via `rfc.implement.stamp`.
    * Direct dependencies only — not transitive.
    * Each entry must match ^RFC-\d{4}$ and exist in docs/rfcs/.
-   * Validated by V-31 (referential integrity) and RFC-DEP-01 (stamp gate).
+   * Validated by V-33 (referential integrity) and RFC-IMP-07 (stamp gate).
    */
   dependsOn?: string[];
 
@@ -163,12 +165,26 @@ export interface RfcFrontmatter {
   batch?: string;
 }
 
-// Addition to RFC_KNOWN_KEYS
+// Addition to RFC_KNOWN_KEYS (defined in packages/forge/os/rfc/handlers/validate-rules.ts,
+// used by V-20 unknown-key check)
 export const RFC_KNOWN_KEYS: readonly string[] = [
   // ... existing keys ...
   "dependsOn",
   "batch",
 ] as const;
+
+// packages/forge/os/rfc/types.ts — addition to RfcListEntry
+export interface RfcListEntry {
+  // ... existing fields ...
+  batch?: string;
+  dependsOn?: string[];
+}
+
+// packages/forge/os/rfc/types.ts — addition to RfcImplementStampRule union
+export type RfcImplementStampRule =
+  | "RFC-IMP-01" | "RFC-IMP-02" | "RFC-IMP-03"
+  | "RFC-IMP-04" | "RFC-IMP-05" | "RFC-IMP-06"
+  | "RFC-IMP-07"; // RFC-0795: dependsOn gate
 ```
 
 ### File system responsibilities
@@ -176,10 +192,10 @@ export const RFC_KNOWN_KEYS: readonly string[] = [
 | Path | Role |
 | --- | --- |
 | `packages/forge/os/rfc/types.ts` | Add `dependsOn` and `batch` to `RfcFrontmatter` and `RFC_KNOWN_KEYS` |
-| `packages/forge/os/rfc/handlers/validate-rules.ts` | Add V-31 (dependsOn referential integrity) and V-32 (batch slug format) |
-| `packages/forge/os/rfc/handlers/rfc-implement-stamp.ts` | Add RFC-DEP-01 dependency gate before status transition |
-| `packages/forge/os/rfc/handlers/rfc-list.ts` | Add `--batch` flag filtering |
-| `packages/forge/os/rfc/rfc.module.ts` | Register `--batch` flag on `rfc.list` command |
+| `packages/forge/os/rfc/handlers/validate-rules.ts` | Add V-33 (dependsOn referential integrity) and V-34 (batch slug format) |
+| `packages/forge/os/rfc/handlers/implement-stamp.ts` | Add RFC-IMP-07 dependency gate before status transition |
+| `packages/forge/os/rfc/handlers/list-create.ts` | Add `--batch` flag filtering in `runRfcList` |
+| `packages/forge/os/rfc/rfc.module.ts` | Register `batch` flag in `rfc.list` command `flags` object (following existing `status`/`kind`/`owner` pattern) |
 | `packages/forge/skills/fo/fo-idea-plan/SKILL.md` | Add session affinity recommendation |
 | `packages/forge/skills/fo/fo-idea-implement/SKILL.md` | Add session affinity recommendation |
 | `packages/forge/skills/fo/fo-idea/SKILL.md` | Step 4c: write `dependsOn` and `batch` during series creation |
@@ -221,7 +237,7 @@ export const RFC_KNOWN_KEYS: readonly string[] = [
   "exitCode": 1,
   "errors": [
     {
-      "rule": "RFC-DEP-01",
+      "rule": "RFC-IMP-07",
       "message": "RFC-0782 depends on RFC-0781, which is not implemented (status: accepted). Implement RFC-0781 first."
     }
   ]
@@ -230,9 +246,9 @@ export const RFC_KNOWN_KEYS: readonly string[] = [
 
 ### Failure modes
 
-- **RFC-DEP-01 (hard block)**: `rfc.implement.stamp` refuses to stamp an RFC when any `dependsOn` entry is not `implemented`. The error message names the blocking RFC and its current status. The operator must implement the dependency first, or remove the `dependsOn` entry via an amending RFC.
-- **V-31 (warning)**: `rfc.validate` warns when a `dependsOn` entry does not match any existing RFC file. This is a warning, not an error — the referenced RFC may not yet have been created (e.g. during parallel series creation where RFC-A is created before RFC-B).
-- **V-32 (warning)**: `rfc.validate` warns when a `batch` slug does not match the kebab-case pattern `/^[a-z0-9]+(-[a-z0-9]+)*$/`.
+- **RFC-IMP-07 (hard block)**: `rfc.implement.stamp` refuses to stamp an RFC when any `dependsOn` entry is not `implemented`. The error message names the blocking RFC and its current status. The operator must implement the dependency first, or remove the `dependsOn` entry via an amending RFC. Uses `loadRfcStatusMap` from `frontmatter-io.ts` to read all RFC statuses in a single scan.
+- **V-33 (warning)**: `rfc.validate` warns when a `dependsOn` entry does not match any existing RFC file, when an entry references the RFC itself (self-dependency), or when an entry references an RFC with terminal status `rejected` (deadlock detection). These are warnings, not errors — the referenced RFC may not yet have been created (e.g. during parallel series creation where RFC-A is created before RFC-B).
+- **V-34 (warning)**: `rfc.validate` warns when a `batch` slug does not match the kebab-case pattern `/^[a-z0-9]+(-[a-z0-9]+)*$/`.
 - **Missing `dependsOn`/`batch`**: No violation. Both fields are optional. Standalone RFCs need neither.
 
 ## Rollout
@@ -247,7 +263,7 @@ export const RFC_KNOWN_KEYS: readonly string[] = [
 
 - **Skill updates**: `fo-idea-plan` and `fo-idea-implement` gain a session affinity recommendation paragraph. This is advisory text, not enforced — sessions have no forge-internal identity.
 
-- **No pipeline integration**: `rfc.validate` V-31/V-32 are warnings, not errors. No `build.check` or `build.prepare` pipeline step is added. The dependency gate lives exclusively in `rfc.implement.stamp`.
+- **No pipeline integration**: `rfc.validate` V-33/V-34 are warnings, not errors. No `build.check` or `build.prepare` pipeline step is added. The dependency gate lives exclusively in `rfc.implement.stamp`.
 
 ## Alternatives considered
 
@@ -271,7 +287,7 @@ export const RFC_KNOWN_KEYS: readonly string[] = [
 
 - **Retroactive batch auto-detection errors.** Auto-detecting batch groupings from `related` fields may produce false positives (grouping RFCs that reference each other but were not designed as a batch). Mitigation: the auto-detection heuristic requires mutual `related` references AND close creation dates. Ambiguous cases are skipped, not guessed.
 
-- **V-31 false positives during parallel series creation.** When RFC-A and RFC-B are created in parallel sessions, RFC-B's `dependsOn: [RFC-A]` may reference an RFC that does not yet exist. V-31 is a warning, not an error — this is by design. The warning disappears once RFC-A is created.
+- **V-33 false positives during parallel series creation.** When RFC-A and RFC-B are created in parallel sessions, RFC-B's `dependsOn: [RFC-A]` may reference an RFC that does not yet exist. V-33 is a warning, not an error — this is by design. The warning disappears once RFC-A is created.
 
 - **Maintenance burden.** Two new frontmatter fields, two new validation rules, one stamping gate check, one list filter. The maintenance surface is small and follows existing patterns in `validate-rules.ts`.
 
@@ -279,9 +295,11 @@ export const RFC_KNOWN_KEYS: readonly string[] = [
 
 - [ ] `dependsOn` and `batch` fields added to `RfcFrontmatter` interface in `packages/forge/os/rfc/types.ts`
 - [ ] `dependsOn` and `batch` added to `RFC_KNOWN_KEYS` array
-- [ ] V-31 validation rule added to `validate-rules.ts` (dependsOn referential integrity, warning severity)
-- [ ] V-32 validation rule added to `validate-rules.ts` (batch slug format, warning severity)
-- [ ] RFC-DEP-01 dependency gate added to `rfc.implement.stamp` handler (hard block when dependsOn entry is not `implemented`)
+- [ ] V-33 validation rule added to `validate-rules.ts` (dependsOn referential integrity + self-dependency + rejected-dependency deadlock, warning severity)
+- [ ] V-34 validation rule added to `validate-rules.ts` (batch slug format, warning severity)
+- [ ] RFC-IMP-07 dependency gate added to `rfc.implement.stamp` handler (hard block when dependsOn entry is not `implemented`)
+- [ ] `RFC-IMP-07` added to `RfcImplementStampRule` union type in `types.ts`
+- [ ] `batch` and `dependsOn` fields added to `RfcListEntry` type in `types.ts`
 - [ ] `--batch` flag added to `rfc.list` command registration and handler
 - [ ] `rfc.list --batch <slug> --json` returns only RFCs with matching batch slug
 - [ ] `fo-idea` step 4c updated to write `dependsOn` and `batch` during series creation
@@ -289,7 +307,7 @@ export const RFC_KNOWN_KEYS: readonly string[] = [
 - [ ] `fo-idea-implement` SKILL.md updated with session affinity recommendation
 - [ ] DNA-65 entry added to `docs/architecture-dna.md`
 - [ ] Retroactive batch auto-detection implemented for existing `implemented` RFCs
-- [ ] Unit tests for V-31, V-32, and RFC-DEP-01 in `validate-rules.test.ts` and stamp handler tests
+- [ ] Unit tests for V-33, V-34, and RFC-IMP-07 in `validate-rules.test.ts` and stamp handler tests
 - [ ] `rfc.validate` passes on this file with zero errors
 
 ## Implementation notes for agents
