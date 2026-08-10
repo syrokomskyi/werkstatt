@@ -80,7 +80,7 @@ nonGoals:
 
 ## Context
 
-RFC-0753 implemented a DNS record management protocol with `dns.record.upsert`, `dns.record.validate`, `dns.record.list`, and `dns.record.delete` commands. DNS records are declared in version-controlled YAML files (`systems/<id>/dns-records.yaml`) and synced to Cloudflare via the API.
+RFC-0753 implemented a DNS record management protocol with `dns.record.upsert`, `dns.record.validate`, `dns.record.list`, and `dns.record.delete` commands. DNS records are declared in version-controlled YAML files (`systems-cache/<id>/dns-records.yaml`) and synced to Cloudflare via the API.
 
 The [isitagentready.com](https://isitagentready.com/warpgogol.com) audit checks for **DNS-AID** — a DNS TXT record at `_agent.<domain>` that points to the agent discovery manifest URL (`/.well-known/agent.json`). This provides a DNS-level discovery path for agents that check DNS before making HTTP requests.
 
@@ -96,7 +96,7 @@ The gap is: no command generates or validates the DNS-AID TXT record declaration
 
 The kernel gains two new commands:
 
-1. **`agent.dns-aid.generate --site <app>`** — reads the internal Agent Surface Manifest (`src/agent-surface.generated.yaml`) and writes a DNS-AID TXT record declaration fragment to `systems/<id>/dns-records.yaml` (or a separate `dns-aid.yaml` fragment that is included by the main declaration). The record is `_agent.<domain> TXT "https://<domain>/.well-known/agent.json"`.
+1. **`agent.dns-aid.generate --site <app>`** — reads the internal Agent Surface Manifest (`src/agent-surface.generated.yaml`) and writes a DNS-AID TXT record declaration fragment to `systems-cache/<id>/dns-records.yaml` (or a separate `dns-aid.yaml` fragment that is included by the main declaration). The record is `_agent.<domain> TXT "https://<domain>/.well-known/agent.json"`.
 
 2. **`agent.dns-aid.validate --site <app>`** — verifies that the DNS-AID TXT record declared in `dns-records.yaml` matches the agent surface manifest URL, and that the record exists in Cloudflare (via `dns.record.validate` from RFC-0753).
 
@@ -152,7 +152,7 @@ function buildDnsAidRecord(manifest: AgentSurfaceManifest): DnsAidRecord {
   };
 }
 
-// dns-records.yaml fragment (appended to systems/<id>/dns-records.yaml):
+// dns-records.yaml fragment (appended to systems-cache/<id>/dns-records.yaml):
 // - name: _agent.warpgogol.com
 //   type: TXT
 //   content: "https://warpgogol.com/.well-known/agent.json"
@@ -165,7 +165,7 @@ function buildDnsAidRecord(manifest: AgentSurfaceManifest): DnsAidRecord {
 | Path | Role |
 | --- | --- |
 | `src/agent-surface.generated.yaml` | Read — internal manifest, source of truth for agent surface URL |
-| `systems/<id>/dns-records.yaml` | Written — DNS-AID TXT record declaration appended/updated |
+| `systems-cache/<id>/dns-records.yaml` | Written — DNS-AID TXT record declaration appended/updated |
 | `packages/werkstatt-site/src/domain/share/agent/dns-aid.ts` | New module — `buildDnsAidRecord` pure function |
 | `packages/werkstatt-site/src/checks/agent/agent-dns-aid.ts` | New module — generate + validate handlers |
 | `packages/werkstatt-site/src/checks/command-tables/29-agent-surface.ts` | Amended — new command entries |
@@ -277,7 +277,7 @@ _agent.warpgogol.com. 3600 IN TXT "https://warpgogol.com/.well-known/agent.json"
 - **DNS-AID spec status**: DNS-AID is a draft proposal, not a finalized RFC. Some agents may not check for it. Mitigation: it is a single TXT record, zero maintenance burden, and harmless if ignored.
 - **DNS propagation delay**: After `dns.record.upsert`, the DNS-AID record takes time to propagate (TTL: 3600s). This is inherent to DNS and not a bug.
 - **`dns-records.yaml` merge conflicts**: The generator writes to a shared file. Mitigation: the generator only updates a marked section (between `# BEGIN dns-aid` and `# END dns-aid` comments), preserving manual edits to other records.
-- **Concurrent execution**: `dns-records.yaml` is per-system (`systems/<id>/`), and each system maps to one zone. Concurrent `build.prepare` runs for different apps in the same system could write to the same file. Mitigation: the generator is idempotent and uses text-level section replacement — concurrent runs produce the same output. If a race condition causes a corrupt file, re-running `build.prepare` fixes it.
+- **Concurrent execution**: `dns-records.yaml` is per-system (`systems-cache/<id>/`), and each system maps to one zone. Concurrent `build.prepare` runs for different apps in the same system could write to the same file. Mitigation: the generator is idempotent and uses text-level section replacement — concurrent runs produce the same output. If a race condition causes a corrupt file, re-running `build.prepare` fixes it.
 - **Agent misinterpretation risk**: Agents may confuse `agent.dns-aid.generate` (declaration generator, this RFC) with `dns.record.upsert` (Cloudflare API application, RFC-0753). The command namespaces are distinct (`agent.dns-aid.*` vs `dns.record.*`) and the two-step process is documented in the Rollout section.
 - **Cloudflare API token permissions**: The operator needs `Zone:DNS:Edit` permission (already required by RFC-0753). No new permissions needed.
 
