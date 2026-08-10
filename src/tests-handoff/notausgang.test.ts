@@ -21,6 +21,7 @@ import { runNotausgangValidate } from "../notausgang/notausgang-commands.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
+let testRoot: string;
 let workspaceRoot: string;
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
@@ -45,7 +46,8 @@ function makeContext(root: string): KernelRuntimeContext {
 }
 
 async function setupRelease(root: string, systemId: string, releaseId: string): Promise<void> {
-  const releaseDir = join(root, "releases", releaseId);
+  const workspace = join(root, "workspace");
+  const releaseDir = join(workspace, "releases", releaseId);
   await mkdir(releaseDir, { recursive: true });
 
   const releaseManifest = `state: ready
@@ -69,7 +71,7 @@ behaviorSnapshotHash: sha256:snap-abc
     "utf8",
   );
 
-  const bordbuchDir = join(root, "systems", systemId, "bordbuch");
+  const bordbuchDir = join(root, "systems-cache", systemId, "bordbuch");
   await mkdir(bordbuchDir, { recursive: true });
   const bordbuchLine = (kind: string) =>
     JSON.stringify({
@@ -108,7 +110,7 @@ behaviorSnapshotHash: sha256:snap-abc
     capabilities: [],
   };
   await writeFile(
-    join(root, "systems", systemId, "system.pin.json"),
+    join(root, "systems-cache", systemId, "system.pin.json"),
     JSON.stringify(pin, null, 2),
     "utf8",
   );
@@ -117,36 +119,33 @@ behaviorSnapshotHash: sha256:snap-abc
   await writeFile(join(releaseDir, "production-snapshot.json"), '{"version":"1.0"}\n', "utf8");
   await writeFile(join(releaseDir, "snapshot-diff.json"), '{"diff":[]}\n', "utf8");
 
-  const siteContentDir = join(root, "apps", systemId, "src", "content");
+  const siteContentDir = join(workspace, "apps", systemId, "src", "content");
   await mkdir(siteContentDir, { recursive: true });
   await writeFile(join(siteContentDir, "test.md"), "# Test\n", "utf8");
   await writeFile(
-    join(root, "apps", systemId, "package.json"),
+    join(workspace, "apps", systemId, "package.json"),
     JSON.stringify({ name: "test-site", version: "1.0.0" }),
     "utf8",
   );
 }
 
 beforeEach(async () => {
-  workspaceRoot = await mkdtemp(join(tmpdir(), "notausgang-test-"));
-  await mkdir(join(workspaceRoot, "systems"), { recursive: true });
+  testRoot = await mkdtemp(join(tmpdir(), "notausgang-test-"));
+  workspaceRoot = join(testRoot, "workspace");
+  await mkdir(workspaceRoot, { recursive: true });
+  const cacheDir = join(testRoot, "systems-cache", "test-site");
+  await mkdir(cacheDir, { recursive: true });
   await writeFile(
-    join(workspaceRoot, "systems", "registry.yaml"),
+    join(cacheDir, "system-config.yaml"),
     stringifyYaml({
-      schemaVersion: "1.0.0",
-      systems: [
-        {
-          id: "test-site",
-          cosmicStar: "Vega",
-          status: "registered",
-          mirrors: [{ path: "./systems/test-site", storageType: "non-bare" }],
-          pinnedPlatform: "4.5.0",
-          currentMission: null,
-          lastRelease: null,
-          registeredAt: "2026-07-12T10:00:00.000Z",
-          notes: "",
-        },
-      ],
+      schemaVersion: "system-config/v1",
+      id: "test-site",
+      cosmicStar: "Vega",
+      status: "active",
+      mirrors: [{ path: "../systems-cache/test-site", storageType: "non-bare" }],
+      pinnedPlatform: "4.5.0",
+      registeredAt: "2026-07-12T10:00:00.000Z",
+      notes: "",
     }) + "\n",
     "utf8",
   );
@@ -163,11 +162,11 @@ beforeEach(async () => {
     "export const x = 1;\n",
     "utf8",
   );
-  await setupRelease(workspaceRoot, "test-site", "test-site-r202607");
+  await setupRelease(testRoot, "test-site", "test-site-r202607");
 });
 
 afterEach(async () => {
-  await rm(workspaceRoot, { recursive: true, force: true });
+  await rm(testRoot, { recursive: true, force: true });
 });
 
 test("export writes YAML artifacts (not JSON)", async () => {

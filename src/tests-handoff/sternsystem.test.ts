@@ -12,7 +12,6 @@ import { mkdtemp, rm, mkdir, writeFile, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parse as parseYaml } from "yaml";
 import { runSternsystemRegister } from "../sternsystem/sternsystem-register.ts";
 import { runSternsystemList } from "../sternsystem/sternsystem-list.ts";
 import { runSternsystemValidate } from "../sternsystem/sternsystem-validate.ts";
@@ -20,7 +19,48 @@ import { runSternsystemPin } from "../sternsystem/sternsystem-pin.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 
+let testRoot: string;
 let workspaceRoot: string;
+let cacheRoot: string;
+
+async function writeSystemConfigFile(
+  systemId: string,
+  overrides: Record<string, unknown> = {},
+): Promise<void> {
+  const dir = join(cacheRoot, systemId);
+  await mkdir(dir, { recursive: true });
+  const config = {
+    schemaVersion: "system-config/v1",
+    id: systemId,
+    cosmicStar: "Vega",
+    mirrors: [{ path: `../systems-cache/${systemId}`, storageType: "non-bare" }],
+    pinnedPlatform: "4.5.0",
+    status: "active",
+    registeredAt: "2026-01-01T00:00:00Z",
+    notes: "",
+    ...overrides,
+  };
+  const { stringify: stringifyYaml } = await import("yaml");
+  await writeFile(join(dir, "system-config.yaml"), stringifyYaml(config) + "\n", "utf8");
+
+  // Write a minimal pin file so validate doesn't report pin-missing
+  const pin = {
+    schemaVersion: "system-pin/v1",
+    systemId,
+    cosmicStar: config.cosmicStar,
+    pinnedAt: "2026-01-01T00:00:00Z",
+    platform: {
+      version: "4.5.0",
+      commit: "abcdef0",
+      rfcHead: "RFC-0001",
+      platformSemanticHash:
+        "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    },
+    migratorCursor: [],
+    capabilities: [],
+  };
+  await writeFile(join(dir, "system.pin.json"), JSON.stringify(pin, null, 2) + "\n", "utf8");
+}
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
@@ -44,13 +84,11 @@ function makeContext(root: string): KernelRuntimeContext {
 }
 
 beforeEach(async () => {
-  workspaceRoot = await mkdtemp(join(tmpdir(), "sternsystem-test-"));
-  await mkdir(join(workspaceRoot, "systems"), { recursive: true });
-  await writeFile(
-    join(workspaceRoot, "systems", "registry.yaml"),
-    'schemaVersion: "1.0.0"\nsystems: []\n',
-    "utf8",
-  );
+  testRoot = await mkdtemp(join(tmpdir(), "sternsystem-test-"));
+  workspaceRoot = join(testRoot, "workspace");
+  cacheRoot = join(testRoot, "systems-cache");
+  await mkdir(workspaceRoot, { recursive: true });
+  await mkdir(cacheRoot, { recursive: true });
   await mkdir(join(workspaceRoot, "docs", "rfcs"), { recursive: true });
   await writeFile(join(workspaceRoot, "docs", "rfcs", "RFC-0001-test.md"), "", "utf8");
   await writeFile(
@@ -73,20 +111,16 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await rm(workspaceRoot, { recursive: true, force: true });
+  await rm(testRoot, { recursive: true, force: true });
 });
 
 test("register fails on duplicate id", async () => {
-  // Pre-create a registry entry to simulate an existing Sternsystem
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  await writeFile(
-    registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-    "utf8",
-  );
+  // Pre-create a system config to simulate an existing Sternsystem
+  await writeSystemConfigFile("test-site");
+
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "Sirius", mirrors: "./systems/test-site" }),
+      makeInput({ id: "test-site", cosmicStar: "Sirius", mirrors: "../systems-cache/test-site" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/already exists/);
@@ -95,7 +129,7 @@ test("register fails on duplicate id", async () => {
 test("register fails on invalid cosmicStar", async () => {
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "NotAStar", mirrors: "./systems/test-site" }),
+      makeInput({ id: "test-site", cosmicStar: "NotAStar", mirrors: "../systems-cache/test-site" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/not in StarCatalog/);
@@ -105,34 +139,22 @@ test("register fails on apps/ collision", async () => {
   await mkdir(join(workspaceRoot, "apps", "test-site"), { recursive: true });
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "Vega", mirrors: "./systems/test-site" }),
+      makeInput({ id: "test-site", cosmicStar: "Vega", mirrors: "../systems-cache/test-site" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/extract first/);
 });
 
 test("validate passes for a system with a local path repo", async () => {
-  // Create a registry entry directly for validate testing
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  await writeFile(
-    registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-    "utf8",
-  );
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await writeSystemConfigFile("test-site");
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   expect(expectData(result).violations).toHaveLength(0);
 });
 
 test("list returns all registered systems", async () => {
-  // Create registry entries directly for list testing
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  await writeFile(
-    registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: site-a\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/site-a"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n  - id: site-b\n    cosmicStar: Sirius\n    mirrors:\n      - path: "./systems/site-b"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-    "utf8",
-  );
+  await writeSystemConfigFile("site-a", { cosmicStar: "Vega" });
+  await writeSystemConfigFile("site-b", { cosmicStar: "Sirius" });
 
   const result = await runSternsystemList(makeInput({}), makeContext(workspaceRoot));
   expect(expectData(result).count).toBe(2);
@@ -140,14 +162,7 @@ test("list returns all registered systems", async () => {
 });
 
 test("validate passes on a clean registry", async () => {
-  // Create a registry entry directly for validate testing
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  await writeFile(
-    registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-    "utf8",
-  );
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await writeSystemConfigFile("test-site");
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   expect(expectData(result).validated).toBe(1);
@@ -156,14 +171,7 @@ test("validate passes on a clean registry", async () => {
 });
 
 test("validate detects apps/ collision", async () => {
-  // Create a registry entry directly for validate testing
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  await writeFile(
-    registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-    "utf8",
-  );
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await writeSystemConfigFile("test-site");
   await mkdir(join(workspaceRoot, "apps", "test-site"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
@@ -173,14 +181,7 @@ test("validate detects apps/ collision", async () => {
 });
 
 test("pin writes system.pin.json and activates the system", async () => {
-  // Create a registry entry directly for pin testing
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  await writeFile(
-    registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-    "utf8",
-  );
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await writeSystemConfigFile("test-site");
 
   const result = await runSternsystemPin(
     makeInput({ id: "test-site", platform: "4.5.0" }),
@@ -189,7 +190,7 @@ test("pin writes system.pin.json and activates the system", async () => {
   expect(expectData(result).systemId).toBe("test-site");
   expect(expectData(result).platform).toBe("4.5.0");
 
-  const pinPath = join(workspaceRoot, "systems", "test-site", "system.pin.json");
+  const pinPath = join(cacheRoot, "test-site", "system.pin.json");
   expect(existsSync(pinPath)).toBe(true);
 
   const pin = JSON.parse(await readFile(pinPath, "utf8"));
@@ -221,23 +222,10 @@ test("pin writes system.pin.json and activates the system", async () => {
     "rfc-0572",
     "rfc-0757",
   ]);
-
-  // Registry should have been updated to active
-  const raw = await readFile(join(workspaceRoot, "systems", "registry.yaml"), "utf8");
-  const parsed = parseYaml(raw);
-  expect(parsed.systems[0].status).toBe("active");
 });
 
 test("pin refuses downgrade", async () => {
-  // Create a registry entry directly for pin testing
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
-  await writeFile(
-    registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
-    "utf8",
-  );
-  const cacheDir = join(workspaceRoot, "systems", "test-site");
-  await mkdir(cacheDir, { recursive: true });
+  await writeSystemConfigFile("test-site");
 
   // Write an initial pin at 4.5.0
   await runSternsystemPin(

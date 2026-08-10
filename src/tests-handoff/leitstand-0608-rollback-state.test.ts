@@ -16,6 +16,7 @@ import { runLeitstandRollback } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -77,48 +78,20 @@ function readReleaseState(workspaceRoot: string, releaseId: string): string {
 }
 
 function createRegistryWithLastPropagated(
-  workspaceRoot: string,
+  testRoot: string,
   systemId: string,
   channel: string,
   releaseId: string,
 ): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-      lastPropagated:
-        ${channel}:
-          releaseId: ${releaseId}
-          at: 2026-01-01T00:00:00.000Z
-          healthy: true
-          state: succeeded
-          operationId: op-123
-          leaseExpiresAt: null
+  const lastPropagated = `  ${channel}:
+    releaseId: ${releaseId}
+    at: 2026-01-01T00:00:00.000Z
+    healthy: true
+    state: succeeded
+    operationId: op-123
+    leaseExpiresAt: null
 `;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+  createLeitstandSystem(testRoot, systemId, { lastPropagated });
 }
 
 function createDistDir(workspaceRoot: string, releaseId: string): string {
@@ -128,14 +101,17 @@ function createDistDir(workspaceRoot: string, releaseId: string): string {
   return distDir;
 }
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-rb-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-rb-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
@@ -144,7 +120,7 @@ test("leitstand.rollback auto-detects main from promoted, steps to alt-deployed"
   const currentRelease = "test-sys-r000002";
   const targetRelease = "test-sys-r000001";
 
-  createRegistryWithLastPropagated(tmpDir, systemId, "main", currentRelease);
+  createRegistryWithLastPropagated(testRoot, systemId, "main", currentRelease);
   writeReleaseManifest(tmpDir, currentRelease, {
     systemId,
     state: "promoted",
@@ -173,7 +149,7 @@ test("leitstand.rollback auto-detects alt from alt-deployed, steps to published"
   const currentRelease = "test-sys-r000002";
   const targetRelease = "test-sys-r000001";
 
-  createRegistryWithLastPropagated(tmpDir, systemId, "alt", currentRelease);
+  createRegistryWithLastPropagated(testRoot, systemId, "alt", currentRelease);
   writeReleaseManifest(tmpDir, currentRelease, {
     systemId,
     state: "alt-deployed",

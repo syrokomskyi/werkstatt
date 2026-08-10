@@ -41,7 +41,7 @@ afterEach(() => {
 
 test("idempotent skip — no changes returns committed: false", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"), { recursive: true });
   writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   gitCommit(tmpDir, "initial");
 
@@ -57,7 +57,7 @@ test("idempotent skip — no changes returns committed: false", async () => {
 
 test("specific-file staging — only named files are staged", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"), { recursive: true });
   mkdirSync(join(tmpDir, "missions"));
   writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   writeFileSync(join(tmpDir, "missions", "mission.yaml"), "initial\n");
@@ -83,7 +83,7 @@ test("specific-file staging — only named files are staged", async () => {
 
 test("throw on commit failure — pre-commit hook blocks", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"), { recursive: true });
   writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   gitCommit(tmpDir, "initial");
 
@@ -105,7 +105,7 @@ test("throw on commit failure — pre-commit hook blocks", async () => {
 
 test("non-existent file — skipped silently via allowNonZero", async () => {
   gitInit(tmpDir);
-  mkdirSync(join(tmpDir, "systems-cache", "test-system"));
+  mkdirSync(join(tmpDir, "systems-cache", "test-system"), { recursive: true });
   writeFileSync(join(tmpDir, "systems-cache", "test-system", "system-config.yaml"), "initial\n");
   gitCommit(tmpDir, "initial");
 

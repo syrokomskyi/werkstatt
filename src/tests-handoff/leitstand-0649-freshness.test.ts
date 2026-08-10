@@ -14,6 +14,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runLeitstandDevDeploy } from "../leitstand/leitstand-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 // Mock child_process: execSync for pnpm build + git rev-parse; execFile for wrangler version;
 // spawn for wrangler deploy — returns a fake child process that emits stdout, exit event.
@@ -79,77 +80,23 @@ function makeInput(flags: Record<string, string>): KernelCommandInput {
 }
 
 function createRegistry(
-  workspaceRoot: string,
+  testRoot: string,
   systemId: string,
   adapter: string,
   currentMission?: string,
 ): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const missionField = currentMission ?? "null";
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: ${missionField}
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "${adapter}"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+  createLeitstandSystem(testRoot, systemId, {
+    adapter: adapter === "cloudflare-workers" ? "cloudflare-workers" : "null",
+    currentMission,
+  });
 }
 
 function createRegistryWithCloudflareAdapter(
-  workspaceRoot: string,
+  testRoot: string,
   systemId: string,
   currentMission: string,
 ): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: ${currentMission}
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "cloudflare-workers"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+  createLeitstandSystem(testRoot, systemId, { adapter: "cloudflare-workers", currentMission });
 }
 
 function createWorkpieceDist(
@@ -167,18 +114,21 @@ function createWorkpieceDist(
   return distDir;
 }
 
+let testRoot: string;
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0649-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0649-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
   mockFetch = vi.fn();
   vi.stubGlobal("fetch", mockFetch);
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   delete process.env.CLOUDFLARE_SECRETS_FILE;
@@ -205,7 +155,7 @@ test("RFC-0649: null adapter skips purge and freshness check — Axiom runs norm
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistry(tmpDir, systemId, "null", missionId);
+  createRegistry(testRoot, systemId, "null", missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
@@ -225,7 +175,7 @@ test("RFC-0649: cloudflare-workers adapter with missing CLOUDFLARE_ZONE_ID — f
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   // No secrets file → no CLOUDFLARE_ZONE_ID → purge skips with warning → fatal
@@ -248,7 +198,7 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
   // Write .env with CLOUDFLARE_ZONE_ID so purge doesn't skip
   const envContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId, envContent);
 
   // Mock fetch: purge API returns success, build-identity returns mismatched hash on all attempts
@@ -290,7 +240,7 @@ test("RFC-0649: cloudflare-workers adapter with freshness verified — normal fl
   // Write .env
   const envContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId, envContent);
 
   // Mock fetch: purge API returns success, build-identity returns matching hash.
@@ -342,7 +292,7 @@ test("RFC-0649: --json output includes freshness object with required fields", a
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistry(tmpDir, systemId, "null", missionId);
+  createRegistry(testRoot, systemId, "null", missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
@@ -366,7 +316,7 @@ test("RFC-0657: retry-then-success — first attempt stale, second attempt fresh
 
   const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success.
@@ -431,7 +381,7 @@ test("RFC-0657: all-attempts-fail with HTTP 404 — exit 1, Axiom not run", asyn
 
   const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success, build-identity returns 404 on all attempts
@@ -462,7 +412,7 @@ test("RFC-0657: network error retried — first attempt throws, second succeeds"
 
   const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success.

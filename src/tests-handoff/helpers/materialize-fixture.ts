@@ -27,45 +27,44 @@ export function gitHead(dir: string): string {
   return execSync("git rev-parse HEAD", { cwd: dir, stdio: "pipe", encoding: "utf-8" }).trim();
 }
 
-export function createMaterializeWorkspace(tmpWorkspace: string): string {
-  gitInit(tmpWorkspace);
+export function createMaterializeWorkspace(testRoot: string): string {
+  const tmpWorkspace = join(testRoot, "workspace");
+  mkdirSync(tmpWorkspace, { recursive: true });
+
+  gitInit(testRoot);
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
   writeFileSync(join(tmpWorkspace, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
   writeFileSync(join(tmpWorkspace, "pnpm-workspace.yaml"), "packages: []\n");
-  gitCommit(tmpWorkspace, "initial");
+  gitCommit(testRoot, "initial");
 
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
-      - path: "./systems/test-system"
-        storageType: non-bare
-    pinnedPlatform: "1.0.0"
-    currentMission: test-system-m000001
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
+  const cacheDir = join(testRoot, "systems-cache", "test-system");
+  mkdirSync(cacheDir, { recursive: true });
+  const configContent = `schemaVersion: system-config/v1
+id: test-system
+cosmicStar: Vega
+mirrors:
+  - path: "../systems-cache/test-system"
+    storageType: non-bare
+pinnedPlatform: "1.0.0"
+status: active
+registeredAt: "2026-01-01T00:00:00Z"
+notes: ""
 `;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+  gitCommit(testRoot, "add system config");
 
-  const systemDir = join(tmpWorkspace, "systems", "test-system");
-  mkdirSync(systemDir, { recursive: true });
   writeFileSync(
-    join(systemDir, "system.pin.json"),
+    join(cacheDir, "system.pin.json"),
     JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
   );
-  mkdirSync(join(systemDir, "bordbuch"), { recursive: true });
-  writeFileSync(join(systemDir, "bordbuch", "events.ndjson"), "");
-  mkdirSync(join(systemDir, "src", "content"), { recursive: true });
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
+  writeFileSync(join(cacheDir, "bordbuch", "events.ndjson"), "");
+  mkdirSync(join(cacheDir, "src", "content"), { recursive: true });
   writeFileSync(
-    join(systemDir, "src", "content", "system.md"),
+    join(cacheDir, "src", "content", "system.md"),
     "---\n  domain: test\n  i18n:\n    default: de\n    languages:\n      - de\n---\n",
   );
-  gitCommit(tmpWorkspace, "add system");
+  gitCommit(testRoot, "add system");
 
   const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
   mkdirSync(missionDir, { recursive: true });
@@ -92,6 +91,6 @@ systems:
   };
   writeFileSync(join(missionDir, "mission.yaml"), JSON.stringify(manifest, null, 2) + "\n");
 
-  gitCommit(tmpWorkspace, "add mission");
-  return systemDir;
+  gitCommit(testRoot, "add mission");
+  return cacheDir;
 }

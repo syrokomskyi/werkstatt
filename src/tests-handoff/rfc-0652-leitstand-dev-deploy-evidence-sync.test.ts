@@ -12,6 +12,7 @@ import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 const mockState = vi.hoisted(() => ({
   syncCalled: false,
@@ -86,40 +87,8 @@ function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return { flags, argv: [] } as unknown as KernelCommandInput;
 }
 
-function createRegistryWithDevChannel(
-  workspaceRoot: string,
-  systemId: string,
-  missionId: string,
-): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: ${missionId}
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+function createRegistryWithDevChannel(testRoot: string, systemId: string, missionId: string): void {
+  createLeitstandSystem(testRoot, systemId, { currentMission: missionId });
 }
 
 function createWorkpieceDist(workspaceRoot: string, missionId: string): void {
@@ -129,10 +98,13 @@ function createWorkpieceDist(workspaceRoot: string, missionId: string): void {
   writeFileSync(join(distDir, "index.html"), "<html><body>Workpiece</body></html>");
 }
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0652-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0652-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
   mockState.syncCalled = false;
   mockState.syncShouldFail = false;
@@ -140,7 +112,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
@@ -148,7 +120,7 @@ test("leitstand.dev-deploy invokes evidence.sync after axiom.report", async () =
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   const { runLeitstandDevDeploy } = await import("../leitstand/leitstand-commands.ts");
@@ -161,7 +133,7 @@ test("leitstand.dev-deploy does not fail when evidence.sync fails", async () => 
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
   mockState.syncShouldFail = true;
 
@@ -178,7 +150,7 @@ test("leitstand.dev-deploy --json includes evidenceSynced and evidenceSyncError 
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   const { runLeitstandDevDeploy } = await import("../leitstand/leitstand-commands.ts");
@@ -193,7 +165,7 @@ test("leitstand.dev-deploy --skip-evidence-sync skips sync silently", async () =
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createRegistryWithDevChannel(testRoot, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
   const { runLeitstandDevDeploy } = await import("../leitstand/leitstand-commands.ts");

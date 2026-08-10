@@ -37,14 +37,21 @@ vi.mock("../mission/mission-io.ts", () => ({
 }));
 
 // Mock registry-io — provide system state for release commands
-vi.mock("../sternsystem/registry-io.ts", () => ({
-  readSystemState: vi.fn(async (_workspaceRoot: string, _systemId: string) => ({
-    schemaVersion: "system-state/v1",
-    systemId: "test-sys",
-    lastRelease: "test-sys-r000001",
-  })),
-  writeSystemState: vi.fn(),
-}));
+vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../sternsystem/registry-io.ts")>();
+  return {
+    ...actual,
+    resolveCacheClonePath: vi.fn((workspaceRoot: string, systemId: string) =>
+      join(workspaceRoot, "systems-cache", systemId),
+    ),
+    readSystemState: vi.fn(async (_workspaceRoot: string, _systemId: string) => ({
+      schemaVersion: "system-state/v1",
+      systemId: "test-sys",
+      lastRelease: "test-sys-r000001",
+    })),
+    writeSystemState: vi.fn(),
+  };
+});
 
 import { runReleaseStateValidate } from "../release/release-commands.ts";
 import type { ReleaseStateCheck } from "../release/release-commands.ts";
@@ -114,7 +121,7 @@ async function writeBordbuch(
   systemId: string,
   entries: Array<Record<string, unknown>>,
 ): Promise<void> {
-  const bordbuchDir = join(workspaceRoot, "systems", systemId, "bordbuch");
+  const bordbuchDir = join(workspaceRoot, "systems-cache", systemId, "bordbuch");
   await mkdir(bordbuchDir, { recursive: true });
   const fullEntries = entries.map((e, i) => ({
     schemaVersion: "1.0.0",
@@ -535,7 +542,7 @@ describe("release.state.validate", () => {
     });
   });
 
-  describe("check 5: registry-last-release-consistent", () => {
+  describe("check 5: state-last-release-consistent", () => {
     it("passes when registry lastRelease matches promoted release", async () => {
       setMissionManifest("test-sys-m000001", {
         systemId: "test-sys",
@@ -553,7 +560,7 @@ describe("release.state.validate", () => {
         makeContext(workspaceRoot),
       );
 
-      const check = findCheck(getChecks(result), "registry-last-release-consistent");
+      const check = findCheck(getChecks(result), "state-last-release-consistent");
       expect(check?.status).toBe("pass");
     });
 
@@ -574,7 +581,7 @@ describe("release.state.validate", () => {
         makeContext(workspaceRoot),
       );
 
-      const check = findCheck(getChecks(result), "registry-last-release-consistent");
+      const check = findCheck(getChecks(result), "state-last-release-consistent");
       expect(check?.status).toBe("warn");
     });
   });

@@ -33,7 +33,8 @@ const noopLogger = {
 };
 
 function createTempWorkspace(): string {
-  const dir = mkdtempSync(join(tmpdir(), "werkstatt-plugin-test-"));
+  const testRoot = mkdtempSync(join(tmpdir(), "werkstatt-plugin-test-"));
+  const dir = join(testRoot, "workspace");
   mkdirSync(join(dir, "tools"), { recursive: true });
   mkdirSync(join(dir, "systems"), { recursive: true });
   return dir;
@@ -53,6 +54,11 @@ function writeRegistryYaml(workspaceRoot: string, adapters: string[]): void {
   }
   const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-system");
   mkdirSync(cacheDir, { recursive: true });
+  const channels = {
+    dev: { workerName: "test-dev", url: "https://dev.example.com" },
+    alt: { workerName: "test-alt", url: "https://alt.example.com" },
+    main: { workerName: "test-main", url: "https://main.example.com" },
+  };
   const config = {
     schemaVersion: "system-config/v1",
     id: "test-system",
@@ -62,7 +68,7 @@ function writeRegistryYaml(workspaceRoot: string, adapters: string[]): void {
     status: "active",
     registeredAt: "2026-01-01T00:00:00Z",
     notes: "",
-    deployment: { adapter: adapters[0], channels: {} },
+    deployment: { adapter: adapters[0], channels },
   };
   writeFileSync(join(cacheDir, "system-config.yaml"), stringifyYaml(config) + "\n", "utf8");
 }
@@ -110,7 +116,8 @@ describe("werkstatt.plugin.validate", () => {
   });
 
   afterEach(() => {
-    rmSync(workspaceRoot, { recursive: true, force: true });
+    // Remove the testRoot (parent of workspaceRoot) which contains systems-cache
+    rmSync(join(workspaceRoot, ".."), { recursive: true, force: true });
   });
 
   it("PLUGIN-05: tools/kernel.config.ts missing → error, exit 1", async () => {
@@ -218,7 +225,7 @@ describe("werkstatt.plugin.validate", () => {
         makePlugin("werkstatt-site", "astro-typescript-turborepo", ["cloudflare-workers"]),
     });
     writeForgeYaml(workspaceRoot, "astro-typescript-turborepo");
-    writeRegistryYaml(workspaceRoot, ["github-pages"]); // not in plugin
+    writeRegistryYaml(workspaceRoot, ["netlify"]); // not in plugin
 
     const result = await validatePlugin(workspaceRoot, noopLogger);
 
@@ -227,7 +234,7 @@ describe("werkstatt.plugin.validate", () => {
     const plugin04 = result.data.violations.filter((v) => v.ruleId === "PLUGIN-04");
     expect(plugin04).toHaveLength(1);
     expect(plugin04[0]!.severity).toBe("error");
-    expect(plugin04[0]!.message).toContain("github-pages");
+    expect(plugin04[0]!.message).toContain("netlify");
   });
 
   it("Pass case: one plugin, matching profileId, all loaders resolve, adapters present → exit 0", async () => {

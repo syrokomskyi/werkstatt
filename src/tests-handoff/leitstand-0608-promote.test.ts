@@ -15,6 +15,7 @@ import { runLeitstandPromote } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -120,68 +121,12 @@ function readReleaseState(workspaceRoot: string, releaseId: string): string {
   return "";
 }
 
-function createRegistry(workspaceRoot: string, systemId: string): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+function createRegistry(testRoot: string, systemId: string): void {
+  createLeitstandSystem(testRoot, systemId);
 }
 
-function createRegistryWithCloudflareAdapter(workspaceRoot: string, systemId: string): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "cloudflare-workers"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+function createRegistryWithCloudflareAdapter(testRoot: string, systemId: string): void {
+  createLeitstandSystem(testRoot, systemId, { adapter: "cloudflare-workers" });
 }
 
 function _createBehaviorSnapshot(workspaceRoot: string, releaseId: string): void {
@@ -217,21 +162,24 @@ const VALID_BUILD_IDENTITY = {
   targetPlatform: "cloudflare-workers",
 };
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-promo-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-promo-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
 test("leitstand.promote rejects when release state is not alt-deployed", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
-  createRegistry(tmpDir, systemId);
+  createRegistry(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "ready",
@@ -246,7 +194,7 @@ test("leitstand.promote rejects when release state is not alt-deployed", async (
 test("leitstand.promote rejects when build-identity.json is not found at alt URL", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
-  createRegistry(tmpDir, systemId);
+  createRegistry(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "alt-deployed",
@@ -282,7 +230,7 @@ test("leitstand.promote rejects when build-identity.json is not found at alt URL
 test("leitstand.promote rejects on hash mismatch", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
-  createRegistry(tmpDir, systemId);
+  createRegistry(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "alt-deployed",
@@ -322,7 +270,7 @@ test("leitstand.promote rejects on hash mismatch", async () => {
 test("leitstand.promote rejects on releaseId mismatch", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
-  createRegistry(tmpDir, systemId);
+  createRegistry(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "alt-deployed",
@@ -350,7 +298,7 @@ test("leitstand.promote rejects on releaseId mismatch", async () => {
 test("leitstand.promote succeeds and transitions to promoted when all checks pass", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
-  createRegistryWithCloudflareAdapter(tmpDir, systemId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "alt-deployed",
@@ -385,7 +333,7 @@ test("leitstand.promote succeeds and transitions to promoted when all checks pas
 test("RFC-0618: build-identity fetch URL includes cache-buster query param", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
-  createRegistryWithCloudflareAdapter(tmpDir, systemId);
+  createRegistryWithCloudflareAdapter(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "alt-deployed",

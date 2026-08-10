@@ -55,13 +55,9 @@ legalJurisdiction: DE
 `;
 
 beforeEach(async () => {
-  workspaceRoot = await mkdtemp(join(tmpdir(), "sternsystem-register-test-"));
-  await mkdir(join(workspaceRoot, "systems"), { recursive: true });
-  await writeFile(
-    join(workspaceRoot, "systems", "registry.yaml"),
-    'schemaVersion: "1.0.0"\nsystems: []\n',
-    "utf8",
-  );
+  const testRoot = await mkdtemp(join(tmpdir(), "sternsystem-register-test-"));
+  workspaceRoot = join(testRoot, "workspace");
+  await mkdir(workspaceRoot, { recursive: true });
   await mkdir(join(workspaceRoot, "docs", "rfcs"), { recursive: true });
   await writeFile(join(workspaceRoot, "docs", "rfcs", "RFC-0001-test.md"), "", "utf8");
   await writeFile(
@@ -83,7 +79,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await rm(workspaceRoot, { recursive: true, force: true });
+  await rm(join(workspaceRoot, ".."), { recursive: true, force: true });
 });
 
 test("amend fails when system does not exist in registry", async () => {
@@ -92,7 +88,7 @@ test("amend fails when system does not exist in registry", async () => {
       makeInput({ id: "nonexistent", amend: true }),
       makeContext(workspaceRoot),
     ),
-  ).rejects.toThrow(/does not exist in systems\/registry\.yaml/);
+  ).rejects.toThrow(/ENOENT|does not exist|system-config/);
 });
 
 test("amend fails when id is not provided", async () => {
@@ -166,7 +162,8 @@ test("register rolls back registry entry when materialize fails", async () => {
   expect(result.exitCode).toBe(1);
   expect(expectData(result).diagnostics.some((d) => d.includes("failed"))).toBe(true);
 
-  // Registry should be cleaned up (entry removed)
-  const raw = await readFile(join(workspaceRoot, "systems", "registry.yaml"), "utf8");
-  expect(raw).not.toContain("test-site");
+  // systems-cache should be cleaned up (no system-config.yaml for test-site)
+  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-site");
+  const configPath = join(cacheDir, "system-config.yaml");
+  expect(existsSync(configPath)).toBe(false);
 });

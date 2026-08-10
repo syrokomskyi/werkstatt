@@ -26,49 +26,49 @@ function gitCommit(dir: string, msg: string): void {
   execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd: dir, stdio: "pipe" });
 }
 
+let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-adr-0030-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-adr-0030-"));
+  tmpWorkspace = join(testRoot, "workspace");
+  mkdirSync(tmpWorkspace, { recursive: true });
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 function setupWorkspace(): string {
-  gitInit(tmpWorkspace);
+  gitInit(testRoot);
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
-  gitCommit(tmpWorkspace, "initial");
+  gitCommit(testRoot, "initial");
 
-  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: test-system
-    cosmicStar: Vega
-    mirrors:
-      - path: "./systems/test-system"
-        storageType: non-bare
-    pinnedPlatform: "4.5.0"
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: "2026-01-01T00:00:00Z"
-    notes: ""
+  const cacheDir = join(testRoot, "systems-cache", "test-system");
+  mkdirSync(cacheDir, { recursive: true });
+  const configContent = `schemaVersion: system-config/v1
+id: test-system
+cosmicStar: Vega
+mirrors:
+  - path: "../systems-cache/test-system"
+    storageType: non-bare
+pinnedPlatform: "4.5.0"
+status: active
+registeredAt: "2026-01-01T00:00:00Z"
+notes: ""
 `;
-  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
-  gitCommit(tmpWorkspace, "add registry");
+  writeFileSync(join(cacheDir, "system-config.yaml"), configContent);
+  gitCommit(testRoot, "add system config");
 
-  mkdirSync(join(tmpWorkspace, "systems", "test-system"), { recursive: true });
   writeFileSync(
-    join(tmpWorkspace, "systems", "test-system", "system.pin.json"),
+    join(cacheDir, "system.pin.json"),
     JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
   );
 
-  mkdirSync(join(tmpWorkspace, "systems", "test-system", "bordbuch"), { recursive: true });
-  gitCommit(tmpWorkspace, "add system");
+  mkdirSync(join(cacheDir, "bordbuch"), { recursive: true });
+  gitCommit(testRoot, "add system");
 
-  return tmpWorkspace;
+  return testRoot;
 }
 
 test("mission.open throws when bordbuch push fails (no git origin configured)", async () => {
@@ -95,7 +95,7 @@ test("mission.open throws with distinct commit-failure message when git add fail
   // Remove the .git directory so all git operations fail.
   // This makes commitAndPushBordbuch's gitExec("add ...") fail, returning
   // { commitSha: null, pushed: false } — triggering the commit-failure guard.
-  rmSync(join(tmpWorkspace, ".git"), { recursive: true, force: true });
+  rmSync(join(testRoot, ".git"), { recursive: true, force: true });
 
   const input = {
     flags: { system: "test-system", brief: "Test mission", actor: "test-agent" },
@@ -111,17 +111,17 @@ test("mission.open succeeds when commitAndPushBordbuch pushes successfully", asy
   setupWorkspace();
 
   // Set up a bare origin so push succeeds
-  const bareDirName = `${basename(tmpWorkspace)}.git`;
-  const bareDir = join(tmpWorkspace, bareDirName);
-  writeFileSync(join(tmpWorkspace, ".gitignore"), `${bareDirName}/\n`);
-  execSync("git add .gitignore", { cwd: tmpWorkspace, stdio: "pipe" });
-  execSync('git commit -m "add .gitignore"', { cwd: tmpWorkspace, stdio: "pipe" });
+  const bareDirName = `${basename(testRoot)}.git`;
+  const bareDir = join(testRoot, bareDirName);
+  writeFileSync(join(testRoot, ".gitignore"), `${bareDirName}/\n`);
+  execSync("git add .gitignore", { cwd: testRoot, stdio: "pipe" });
+  execSync('git commit -m "add .gitignore"', { cwd: testRoot, stdio: "pipe" });
   execSync(`git init --bare ${JSON.stringify(bareDir)}`, { stdio: "pipe" });
   execSync(`git remote add origin ${JSON.stringify(bareDir)}`, {
-    cwd: tmpWorkspace,
+    cwd: testRoot,
     stdio: "pipe",
   });
-  execSync("git push -u origin HEAD", { cwd: tmpWorkspace, stdio: "pipe" });
+  execSync("git push -u origin HEAD", { cwd: testRoot, stdio: "pipe" });
 
   const input = {
     flags: { system: "test-system", brief: "Test mission", actor: "test-agent" },

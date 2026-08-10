@@ -17,6 +17,7 @@ import { runLeitstandPropagate } from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
 
 vi.mock("node:child_process", () => ({
   execFile: (
@@ -106,36 +107,8 @@ function readReleaseState(workspaceRoot: string, releaseId: string): string {
   return "";
 }
 
-function createRegistry(workspaceRoot: string, systemId: string): void {
-  const registryDir = join(workspaceRoot, "systems");
-  mkdirSync(registryDir, { recursive: true });
-  const registryContent = `schemaVersion: "1.0.0"
-systems:
-  - id: ${systemId}
-    cosmicStar: Acamar
-    mirrors:
-      - path: /tmp/test-cache
-        storageType: non-bare
-    pinnedPlatform: 1.0.0
-    currentMission: null
-    lastRelease: null
-    status: active
-    registeredAt: 2026-01-01T00:00:00.000Z
-    notes: ""
-    deployment:
-      adapter: "null"
-      channels:
-        dev:
-          workerName: test-dev
-          url: https://dev.example.com
-        alt:
-          workerName: test-alt
-          url: https://alt.example.com
-        main:
-          workerName: test-main
-          url: https://main.example.com
-`;
-  writeFileSync(join(registryDir, "registry.yaml"), registryContent);
+function createRegistry(testRoot: string, systemId: string): void {
+  createLeitstandSystem(testRoot, systemId);
 }
 
 function createDistDir(workspaceRoot: string, releaseId: string): string {
@@ -145,23 +118,26 @@ function createDistDir(workspaceRoot: string, releaseId: string): string {
   return distDir;
 }
 
+let testRoot: string;
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-prop-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-prop-"));
+  tmpDir = join(testRoot, "workspace");
+  mkdirSync(tmpDir, { recursive: true });
   // RFC-0634: computeBuildInputHash calls resolveCurrentEcosystem which reads workspaceRoot/package.json
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
 });
 
 afterEach(() => {
-  rmSync(tmpDir, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
 test("leitstand.propagate throws when --channel flag is passed", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
-  createRegistry(tmpDir, systemId);
+  createRegistry(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "dev-deployed",
@@ -178,7 +154,7 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
-  createRegistry(tmpDir, systemId);
+  createRegistry(testRoot, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
     state: "ready",

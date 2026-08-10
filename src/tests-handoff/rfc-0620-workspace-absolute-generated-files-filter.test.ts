@@ -81,18 +81,21 @@ vi.mock("@warpgogol/werkstatt-site/checks", () => ({
   GENERATOR_OWNERSHIP_MAP: mockOwnershipMap,
 }));
 
+let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-rfc-0620-"));
+  testRoot = mkdtempSync(join(process.cwd(), "tmp-rfc-0620-"));
+  tmpWorkspace = join(testRoot, "workspace");
+  mkdirSync(tmpWorkspace, { recursive: true });
 });
 
 afterEach(() => {
-  rmSync(tmpWorkspace, { recursive: true, force: true });
+  rmSync(testRoot, { recursive: true, force: true });
 });
 
 function setupWorkspaceWithGeneratedFiles(): string {
-  const systemDir = createMaterializeWorkspace(tmpWorkspace);
+  const systemDir = createMaterializeWorkspace(testRoot);
 
   // Add bordbuch generated files to cache clone's public/
   const wellKnownDir = join(systemDir, "public", ".well-known");
@@ -111,7 +114,7 @@ function setupWorkspaceWithGeneratedFiles(): string {
 
   // Commit the new files to the cache clone
   execSync("git add -A && git commit -m add-generated", {
-    cwd: tmpWorkspace,
+    cwd: testRoot,
     stdio: "pipe",
   });
 
