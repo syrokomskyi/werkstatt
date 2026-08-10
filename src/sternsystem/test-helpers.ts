@@ -53,6 +53,31 @@ export async function writeSystemConfig(root: string, mirrors: MirrorEntry[]): P
     notes: "",
   };
   await writeFile(join(cacheDir, "system-config.yaml"), stringifyYaml(config) + "\n", "utf8");
+
+  const pin = {
+    schemaVersion: "system-pin/v1",
+    systemId: "test-site",
+    cosmicStar: "Vega",
+    pinnedAt: "2026-01-01T00:00:00Z",
+    platform: {
+      version: "4.5.0",
+      commit: "abcdef0",
+      rfcHead: "RFC-0001",
+      platformSemanticHash:
+        "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    },
+    migratorCursor: [],
+    capabilities: [],
+  };
+  const pinJson = JSON.stringify(pin, null, 2) + "\n";
+  await writeFile(join(cacheDir, "system.pin.json"), pinJson, "utf8");
+
+  // Also write pin to the cache dir resolved from mirrors[0].path (may differ)
+  const mirrorCacheDir = join(root, mirrors[0].path.replace(/^\.\//, ""));
+  if (mirrorCacheDir !== cacheDir) {
+    await mkdir(mirrorCacheDir, { recursive: true });
+    await writeFile(join(mirrorCacheDir, "system.pin.json"), pinJson, "utf8");
+  }
 }
 
 export const BASE_SETUP = async (root: string) => {

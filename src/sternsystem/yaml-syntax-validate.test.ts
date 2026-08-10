@@ -16,16 +16,18 @@ import { stringify as stringifyYaml } from "yaml";
 import { runSternsystemValidate } from "./sternsystem-validate.ts";
 import { makeInput, makeContext, writeSystemConfig, BASE_SETUP } from "./test-helpers.ts";
 
+let testRoot: string;
 let workspaceRoot: string;
 
 beforeEach(async () => {
-  workspaceRoot = await mkdtemp(join(tmpdir(), "yaml-syntax-validate-test-"));
+  testRoot = await mkdtemp(join(tmpdir(), "yaml-syntax-validate-test-"));
+  workspaceRoot = join(testRoot, "workspace");
+  await mkdir(workspaceRoot, { recursive: true });
   await BASE_SETUP(workspaceRoot);
 });
 
 afterEach(async () => {
-  await rm(workspaceRoot, { recursive: true, force: true });
-  await rm(join(workspaceRoot, "..", "systems-cache"), { recursive: true, force: true });
+  await rm(testRoot, { recursive: true, force: true });
 });
 
 test("valid YAML files produce no yaml-syntax-error violations", async () => {
