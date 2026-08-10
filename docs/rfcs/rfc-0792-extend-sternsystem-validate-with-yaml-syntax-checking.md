@@ -179,13 +179,13 @@ Uses the existing `violations` array shape — no new `diagnostics` array:
 
 ## Acceptance criteria
 
-- [ ] `validateYamlFiles` helper implemented in `packages/werkstatt/src/sternsystem/`
-- [ ] `sternsystem.validate` calls `validateYamlFiles` and reports `yaml-syntax-error` violations
-- [ ] Unit test: valid YAML files → no violations
-- [ ] Unit test: broken YAML file → `yaml-syntax-error` violation with file path and line number in message
-- [ ] Unit test: system directory with no YAML files → no error, no violations
-- [ ] Unit test: YAML file in subdirectory → not scanned (top-level only)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `validateYamlFiles` helper implemented in `packages/werkstatt/src/sternsystem/` (evidence: packages/werkstatt/src/sternsystem/sternsystem-validate.ts:119-145)
+- [x] `sternsystem.validate` calls `validateYamlFiles` and reports `yaml-syntax-error` violations (evidence: packages/werkstatt/src/sternsystem/sternsystem-validate.ts:430-432)
+- [x] Unit test: valid YAML files → no violations (evidence: packages/werkstatt/src/sternsystem/yaml-syntax-validate.test.ts:33-46)
+- [x] Unit test: broken YAML file → `yaml-syntax-error` violation with file path and line number in message (evidence: packages/werkstatt/src/sternsystem/yaml-syntax-validate.test.ts:48-62)
+- [x] Unit test: system directory with no YAML files → no error, no violations (evidence: packages/werkstatt/src/sternsystem/yaml-syntax-validate.test.ts:64-71)
+- [x] Unit test: YAML file in subdirectory → not scanned (top-level only) (evidence: packages/werkstatt/src/sternsystem/yaml-syntax-validate.test.ts:73-85)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0792 --json → 0 violations)
 
 ## Implementation notes for agents
 
