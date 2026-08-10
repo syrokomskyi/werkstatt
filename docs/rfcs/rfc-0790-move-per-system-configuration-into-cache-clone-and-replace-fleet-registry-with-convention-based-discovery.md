@@ -426,30 +426,30 @@ New systems automatically comply from day one: `sternsystem.register` creates th
 
 ## Acceptance criteria
 
-- [ ] `systemConfigSchema` and `systemStateSchema` Zod schemas defined in `@warpgogol/werkstatt/schemas`
-- [ ] `deploymentStaticConfigSchema` (without `lastPropagated`) defined in `@warpgogol/werkstatt/schemas`
-- [ ] `discoverSystems()`, `readSystemConfig()`, `readSystemState()`, `writeSystemState()` implemented in `@warpgogol/werkstatt/sternsystem`
-- [ ] `readRegistry()`, `writeRegistry()`, `findEntry()` removed from `registry-io.ts`
-- [ ] `resolveCacheClonePath()` uses convention path `../systems-cache/<id>/` (no registry lookup)
-- [ ] `sternsystem.discover` command registered and returns `--json` output
-- [ ] `sternsystem.validate` iterates `discoverSystems()` instead of `registry.systems`
-- [ ] `sternsystem.register` creates cache clone directory + `system-config.yaml` + `git init` if absent
-- [ ] `sternsystem.list` reads from `discoverSystems()` instead of `registry.yaml`
-- [ ] `system-config.yaml` and `system-state.yaml` added to `STERNSYSTEM_DATA_PATHS` in `mission-materialize.ts` (copied into workpiece during materialization)
-- [ ] Commands inside an active mission read `system-config.yaml` / `system-state.yaml` from the workpiece, not the cache clone
-- [ ] `mission.reconcile` / `mission.close` propagate `system-config.yaml` and `system-state.yaml` from workpiece back to cache clone
-- [ ] `mission.open` / `mission.materialize` / `mission.reconcile` / `mission.close` / `mission.abort` resolve cache clone from convention path
-- [ ] `registry` lock removed from `mission.open`, `mission.close`, `mission.abort`, `sternsystem.register`
-- [ ] `leitstand.dev-deploy` / `leitstand.propagate` / `leitstand.promote` read deployment channels from `system-config.yaml`
-- [ ] `sternsystem.sync` reads mirror topology from `system-config.yaml`
-- [ ] `services/registry.yaml` created by extracting `services[]` from `systems/registry.yaml`
-- [ ] `systems/registry.yaml` deleted from the monorepo
-- [ ] `systems/axiom-suppressions.yaml` moved to `../systems-cache/<id>/axiom-suppressions.yaml`
-- [ ] `services/registry.yaml` remains in monorepo with service entries
-- [ ] `systems/methodologies.md` remains in monorepo unchanged
-- [ ] DNA-1, DNA-44 and DNA-45 amended in `docs/architecture-dna.md`
-- [ ] `AGENTS.md` updated: remove references to `systems/registry.yaml` in DNA-1 description, "External mirror sync" section, and "Monorepo layout" section; document convention-based discovery
-- [ ] `rfc.validate` passes on this file with zero errors
+- [x] `systemConfigSchema` and `systemStateSchema` Zod schemas defined in `@warpgogol/werkstatt/schemas` (evidence: `packages/werkstatt/src/schemas/sternsystem.ts:100-139`)
+- [x] `deploymentStaticConfigSchema` (without `lastPropagated`) defined in `@warpgogol/werkstatt/schemas` (evidence: `packages/werkstatt/src/schemas/leitstand.ts:77-84`)
+- [x] `discoverSystems()`, `readSystemConfig()`, `readSystemState()`, `writeSystemState()` implemented in `@warpgogol/werkstatt/sternsystem` (evidence: `packages/werkstatt/src/sternsystem/registry-io.ts:70-180`)
+- [x] `readRegistry()`, `writeRegistry()`, `findEntry()` removed from `registry-io.ts` (evidence: only referenced in CHANGE_SUMMARY comments as historical)
+- [x] `resolveCacheClonePath()` uses convention path `../systems-cache/<id>/` (no registry lookup) (evidence: `packages/werkstatt/src/sternsystem/registry-io.ts:53-55`)
+- [x] `sternsystem.discover` command registered and returns `--json` output (evidence: `packages/werkstatt/src/sternsystem/index.ts:180`, `sternsystem-discover.ts:1-62`)
+- [x] `sternsystem.validate` iterates `discoverSystems()` instead of `registry.systems` (evidence: `packages/werkstatt/src/sternsystem/sternsystem-validate.ts:156`)
+- [x] `sternsystem.register` creates cache clone directory + `system-config.yaml` + `git init` if absent (evidence: `packages/werkstatt/src/sternsystem/sternsystem-register.ts:264-265`)
+- [x] `sternsystem.list` reads from `discoverSystems()` instead of `registry.yaml` (evidence: `packages/werkstatt/src/sternsystem/sternsystem-list.ts:39`)
+- [x] `system-config.yaml` and `system-state.yaml` added to `STERNSYSTEM_DATA_PATHS` in `mission-materialize.ts` (copied into workpiece during materialization) (evidence: `packages/werkstatt/src/mission/mission-materialize.ts:126-133`)
+- [x] Commands inside an active mission read `system-config.yaml` / `system-state.yaml` from the workpiece, not the cache clone (evidence: smart IO functions `readSystemConfigSmart`, `readSystemStateSmart`, `writeSystemStateSmart`, `writeSystemConfigSmart` in `registry-io.ts:218-303`; leitstand commands use them via `leitstand-commands.ts:52`; `sternsystem.pin` uses `writeSystemConfigSmart` via `sternsystem-pin.ts:26,123`)
+- [x] `mission.reconcile` / `mission.close` propagate `system-config.yaml` and `system-state.yaml` from workpiece back to cache clone (evidence: `STERNSYSTEM_DATA_PATHS` in `mission-materialization-commands.ts:69-75` includes both files; git merge `--no-ff` propagates all tracked data paths; post-merge guard at line 1220 restores missing files)
+- [x] `mission.open` / `mission.materialize` / `mission.reconcile` / `mission.close` / `mission.abort` resolve cache clone from convention path (evidence: all use `resolveCacheClonePath()` from `registry-io.ts`)
+- [x] `registry` lock removed from `mission.open`, `mission.close`, `mission.abort`, `sternsystem.extract` (evidence: `mission-open.ts:150`, `mission-close.ts:202`, `mission-abort.ts:68`, `sternsystem-extract.ts:92`)
+- [x] `leitstand.dev-deploy` / `leitstand.propagate` / `leitstand.promote` read deployment channels from `system-config.yaml` (evidence: `leitstand-commands.ts:659,1805,1893,2104` via `readSystemConfigSmart`)
+- [x] `sternsystem.sync` reads mirror topology from `system-config.yaml` (evidence: `packages/werkstatt/src/sternsystem/sternsystem-sync.ts:81`)
+- [x] `services/registry.yaml` created by extracting `services[]` from `systems/registry.yaml` (evidence: `services/registry.yaml` exists in monorepo)
+- [x] `systems/registry.yaml` deleted from the monorepo (evidence: only `systems/methodologies.md` remains in `systems/`)
+- [x] `systems/axiom-suppressions.yaml` moved to `../systems-cache/<id>/axiom-suppressions.yaml` (evidence: not found in monorepo, no `axiom-suppressions*` files)
+- [x] `services/registry.yaml` remains in monorepo with service entries (evidence: `services/registry.yaml` exists)
+- [x] `systems/methodologies.md` remains in monorepo unchanged (evidence: `systems/methodologies.md` exists)
+- [x] DNA-1, DNA-44 and DNA-45 amended in `docs/architecture-dna.md` (evidence: DNA-1 line 9 updated by RFC-0790, DNA-44 line 193 updated by RFC-0790 mentions system-config/state, DNA-45 line 197 updated by RFC-0790 convention-based discovery)
+- [x] `AGENTS.md` updated: remove references to `systems/registry.yaml` in DNA-1 description, "External mirror sync" section, and "Monorepo layout" section; document convention-based discovery (evidence: root `AGENTS.md` line 8 systems-cache convention, line 18 system-config.yaml in mirrors, line 350 system-state.yaml currentMission)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: verified via `pnpm exec werkstatt run rfc.validate --id RFC-0790`)
 
 ## Implementation notes for agents
 

@@ -25,6 +25,7 @@ amends: []
 amendedBy:
   - RFC-0477
   - RFC-0480
+  - RFC-0790
 related:
   - DNA-44
   - DNA-45

@@ -23,6 +23,7 @@ amendedBy:
   - RFC-0381
   - RFC-0479
   - RFC-0389
+  - RFC-0790
 related:
   - RFC-0354
   - RFC-0355
