@@ -13,10 +13,11 @@
   <item>RFC-0593: add bordbuch.validate pre-flight gate before lock acquisition.</item>
   <item>ADR-0030: verify commitAndPushBordbuch succeeded — throw on commit failure (commitSha null) and push failure (pushed false) with distinct error messages.</item>
   <item>Bug fix: auto-repair orphan-mission-close bordbuch violations before lock acquisition; commit and push repaired bordbuch to avoid dirty cache clone blocking mission.reconcile.</item>
+  <item>RFC-0796: add cleanupStaleMissionEntries pre-flight cleanup before createMissionDirectories; trash stale symlinks and empty dirs, skip non-empty real dirs with warning.</item>
 </CHANGE_SUMMARY>
 */
 
-import { existsSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync } from "node:fs";
 import path from "node:path";
 import type {
   KernelCommandInput,
@@ -46,6 +47,12 @@ import {
   commitWerkstattSideEffects,
 } from "../werkstatt/index.ts";
 import { resolveActor } from "./actor-identity.ts";
+import { trashPath } from "@warpgogol/forge/utils";
+
+export interface StaleEntryCheck {
+  removedPaths: string[];
+  skipped: string[];
+}
 
 export interface MissionOpenData {
   missionId: string;
@@ -55,10 +62,61 @@ export interface MissionOpenData {
   openedAt: string;
   pinAtOpen: string;
   operationId: string;
+  staleEntries: StaleEntryCheck;
 }
 
 const REPAIRABLE_RULES = new Set(["orphan-mission-close"]);
 
+async function cleanupStaleMissionEntries(
+  workspaceRoot: string,
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+): Promise<StaleEntryCheck> {
+  const missionsPath = path.join(workspaceRoot, "missions");
+  const result: StaleEntryCheck = { removedPaths: [], skipped: [] };
+
+  if (!existsSync(missionsPath)) return result;
+
+  // Scan all entries in missions/ root for stale symlinks and empty dirs
+  const entries = readdirSync(missionsPath, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name === "archive") continue;
+    const entryPath = path.join(missionsPath, entry.name);
+    const sourceRel = `missions/${entry.name}`;
+
+    // Use lstatSync to detect symlinks (statSync follows symlinks)
+    let stat;
+    try {
+      stat = lstatSync(entryPath);
+    } catch {
+      continue;
+    }
+
+    if (stat.isSymbolicLink()) {
+      await trashPath(entryPath);
+      result.removedPaths.push(sourceRel);
+      logger.info(`  Cleaned stale symlink: ${sourceRel}`);
+    } else if (stat.isDirectory()) {
+      // Check if directory is empty
+      let isEmpty = true;
+      try {
+        const dirEntries = readdirSync(entryPath);
+        isEmpty = dirEntries.length === 0;
+      } catch {
+        isEmpty = false;
+      }
+      if (isEmpty) {
+        await trashPath(entryPath);
+        result.removedPaths.push(sourceRel);
+        logger.info(`  Cleaned empty directory: ${sourceRel}`);
+      } else {
+        result.skipped.push(sourceRel);
+        logger.warn(`  Skipping non-empty real directory: ${sourceRel}`);
+      }
+    }
+  }
+
+  return result;
+}
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
   return typeof v === "string" ? v : undefined;
@@ -76,7 +134,7 @@ export async function runMissionOpen(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<MissionOpenData>> {
-  const { workspaceRoot } = context;
+  const { workspaceRoot, logger } = context;
   const systemId = flagString(input, "system");
   const brief = flagString(input, "brief");
   const actor = resolveActor(input);
@@ -192,6 +250,11 @@ export async function runMissionOpen(
       );
     }
 
+    // RFC-0796: Pre-flight cleanup of stale symlinks and empty directories
+    // before creating mission directories. Non-empty real directories are
+    // skipped with a warning.
+    const staleEntries = await cleanupStaleMissionEntries(workspaceRoot, logger);
+
     // Create mission directories
     await createMissionDirectories(workspaceRoot, missionId);
 
@@ -265,6 +328,7 @@ export async function runMissionOpen(
         openedAt: now,
         pinAtOpen,
         operationId,
+        staleEntries,
       },
       summary: `[mission.open] opened mission ${missionId} for ${systemId}`,
     };
