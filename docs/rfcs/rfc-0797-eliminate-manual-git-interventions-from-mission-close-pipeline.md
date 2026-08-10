@@ -1,7 +1,7 @@
 ---
 id: RFC-0797
 title: "Eliminate manual git interventions from mission close pipeline"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
