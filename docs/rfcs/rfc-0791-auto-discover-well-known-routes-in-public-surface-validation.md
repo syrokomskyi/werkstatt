@@ -90,13 +90,15 @@ No new helper function. The fix extends the existing `publicPaths` building logi
 // In runPublicSurfaceLint, after building publicPaths from isPublicTextArtifact:
 
 // RFC-0791: Include extensionless .well-known/ files (e.g. api-catalog)
-// that isPublicTextArtifact filters out. Files with extensions are
-// already in publicPaths via the filter above; this only adds the gap.
-const wellKnownFiles = (await context.io.glob(".well-known/**/*", { cwd: app.publicDirectory }))
-  .map(normalizePublicRelPath)
-  .filter((relPath) => !relPath.endsWith("/")); // skip directory entries
-for (const relPath of wellKnownFiles) {
-  publicPaths.add(publicPathFromRelPath(relPath));
+// that isPublicTextArtifact filters out. Node's fs.glob returns both
+// files and directories — use stat to filter out directories.
+const wellKnownEntries = await context.io.glob(".well-known/**/*", { cwd: app.publicDirectory });
+for (const relPath of wellKnownEntries) {
+  const normalized = normalizePublicRelPath(relPath);
+  const stats = await stat(join(app.publicDirectory, normalized));
+  if (stats.isFile()) {
+    publicPaths.add(publicPathFromRelPath(normalized));
+  }
 }
 ```
 
