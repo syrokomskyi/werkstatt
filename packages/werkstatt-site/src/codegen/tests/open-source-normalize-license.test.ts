@@ -1,5 +1,10 @@
 import { test, expect } from "vitest";
-import { normalizeLicense } from "../open-source-page.js";
+import {
+  normalizeLicense,
+  buildRegistryData,
+  type ClassifiedDependency,
+  type OpenSourceLabels,
+} from "../open-source-page.js";
 
 /*
 <MODULE_CONTRACT>
@@ -114,4 +119,79 @@ test("AND expression with one invalid part returns unknown", () => {
   const result = normalizeLicense("(MIT AND FakeLicense)");
   expect(result.status).toBe("unknown");
   expect(result.spdxId).toBeNull();
+});
+
+const stubLabels: OpenSourceLabels = {
+  heading: "Open Source",
+  leadText: "Lead",
+  summaryHeading: "Summary",
+  componentsTotalLabel: "Total",
+  directDependenciesLabel: "Direct",
+  transitiveDependenciesLabel: "Transitive",
+  licensesTotalLabel: "Licenses",
+  componentsWithNoticeLabel: "Notices",
+  licenseDistributionHeading: "Distribution",
+  deploymentMetadataHeading: "Metadata",
+  deploymentIdLabel: "ID",
+  buildTimestampLabel: "Built",
+  commitShaLabel: "SHA",
+  scopeHeading: "Scope",
+  scopeIncludedLabel: "Included",
+  scopeIncludedText: "Included text",
+  scopeExcludedLabel: "Excluded",
+  scopeExcludedText: "Excluded text",
+  downloadsHeading: "Downloads",
+  noticeFileLabel: "Notices",
+  licenseFileLabel: "Licenses",
+  sbomFileLabel: "SBOM",
+  componentTableHeading: "Components",
+  processNoteText: "Note",
+};
+
+const mitDep: ClassifiedDependency = {
+  name: "mit-pkg",
+  version: "1.0.0",
+  license: "MIT",
+  normalizedLicense: { status: "verified", spdxId: "MIT" },
+  scope: "runtime",
+  relationship: "direct",
+};
+
+const unknownDep: ClassifiedDependency = {
+  name: "unknown-pkg",
+  version: "2.0.0",
+  license: "Some-Fake-License",
+  normalizedLicense: { status: "unknown", spdxId: null },
+  scope: "runtime",
+  relationship: "direct",
+};
+
+function parseRegistryJson(json: string): {
+  summary: { licenseDistribution: { license: string }[]; componentsTotal: number };
+  components: { name: string }[];
+} {
+  const jsonStart = json.indexOf("{");
+  return JSON.parse(json.slice(jsonStart));
+}
+
+test("buildRegistryData excludes unknown licenses from licenseDistribution", () => {
+  const json = buildRegistryData([mitDep, unknownDep], stubLabels, "en");
+  const data = parseRegistryJson(json);
+  const licenses = data.summary.licenseDistribution.map((d) => d.license);
+  expect(licenses).not.toContain("UNKNOWN");
+  expect(licenses).toEqual(["MIT"]);
+});
+
+test("buildRegistryData includes unknown-license packages in components array", () => {
+  const json = buildRegistryData([mitDep, unknownDep], stubLabels, "en");
+  const data = parseRegistryJson(json);
+  const componentNames = data.components.map((c) => c.name);
+  expect(componentNames).toContain("unknown-pkg");
+  expect(componentNames).toContain("mit-pkg");
+});
+
+test("buildRegistryData componentsTotal counts all public deps including unknown", () => {
+  const json = buildRegistryData([mitDep, unknownDep], stubLabels, "en");
+  const data = parseRegistryJson(json);
+  expect(data.summary.componentsTotal).toBe(2);
 });

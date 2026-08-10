@@ -48,7 +48,7 @@ type DistributionScope =
 
 type LicenseStatus = "verified" | "normalized" | "unknown";
 
-type ClassifiedDependency = {
+export type ClassifiedDependency = {
   name: string;
   version: string;
   license: string;
@@ -564,7 +564,7 @@ function buildOpenSourcePageManifest(
 
 // ─── JSON data file builder ───────────────────────────────────────────────────
 
-function buildRegistryData(
+export function buildRegistryData(
   deps: ClassifiedDependency[],
   labels: OpenSourceLabels,
   lang: string,
