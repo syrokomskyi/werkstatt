@@ -1,6 +1,6 @@
 ---
 id: RFC-0785
-title: "Add markdown content negotiation for agent requests via Astro middleware"
+title: "Add markdown content negotiation for agent requests via Cloudflare Worker"
 status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
@@ -304,10 +304,10 @@ Accept: text/html
 - [x] Middleware index template amended to chain `markdownNegotiationMiddleware` (evidence: packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/middleware.template.ts:25,37-38)
 - [x] `agent.markdown-negotiation.generate` integrated into `build.prepare` pipeline after `page.markdown.generate` (evidence: packages/werkstatt-site/src/checks/pipelines/build-prepare.ts:112-113,215-216)
 - [x] `agent.enabled: false` skip pattern works — no-op pass-through middleware written so root import always resolves (evidence: packages/werkstatt-site/src/checks/agent/agent-markdown-negotiation.ts:64-76)
-- [ ] `curl -H "Accept: text/markdown" https://warpgogol.com/about/` returns `.md` twin with `Content-Type: text/markdown; charset=utf-8` (requires deploy)
-- [ ] `curl -H "Accept: text/html" https://warpgogol.com/about/` returns HTML (unchanged behavior) (requires deploy)
-- [ ] `Vary: Accept` header present on negotiated markdown responses (requires deploy)
-- [ ] `isitagentready.com` reports markdown content negotiation supported for warpgogol.com after deploy
+- [x] `curl -H "Accept: text/markdown" https://warpgogol.com/notausgang/` returns `.md` twin with `Content-Type: text/markdown; charset=utf-8` (evidence: deployed r000020, verified 2026-08-10)
+- [x] `curl -H "Accept: text/html" https://warpgogol.com/notausgang/` returns HTML with `Vary: Accept` (evidence: deployed r000020, verified 2026-08-10)
+- [x] `Vary: Accept` header present on ALL page responses — both HTML and negotiated markdown (evidence: deployed r000020, verified on dev/alt/main 2026-08-10)
+- [x] `isitagentready.com` reports `contentAccessibility.markdownNegotiation: pass — Site supports Markdown for Agents` for warpgogol.com (evidence: scan performed 2026-08-10)
 - [x] Unit tests for `markdownTwinUrlPath` covering: root path, i18n paths, language roots, trailing slash, nested paths (evidence: packages/werkstatt-site/src/checks/agent/agent-markdown-negotiation.test.ts, 8 tests pass; canonical function also tested in domain/share/tests/twin-path.test.ts)
 - [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0785` exits 0)
 
