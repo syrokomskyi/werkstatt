@@ -24,6 +24,7 @@
   <item>RFC-0734: add CREG-05 enforcement — block close when content drift exists and no apply-result.json; add --skip-content-regression flag.</item>
   <item>RFC-0762: extend CloseReportMirror with synced/syncError; add post-close sternsystem.sync call before state file write.</item>
   <item>Bug fix: push cache clone to origin before mirror sync check to prevent false "out of sync" when commits were created between reconcile and close.</item>
+  <item>RFC-0796: add CloseReportArchive with archived/error; auto-archive terminal missions via mission.archive after close (non-fatal, --skip-auto-archive escape hatch).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -94,11 +95,17 @@ export interface CloseReportReconcile {
   verified: boolean;
 }
 
+export interface CloseReportArchive {
+  archived: boolean;
+  error: string | null;
+}
+
 export interface CloseReport {
   releaseId: string | null;
   git: CloseReportGit;
   mirror: CloseReportMirror;
   reconcile: CloseReportReconcile;
+  archive: CloseReportArchive;
   warnings: Array<{ rule: string; message: string }>;
 }
 
@@ -168,6 +175,7 @@ export async function runMissionClose(
   const actor = resolveActor(input);
   const releaseIdFlag = flagString(input, "release");
   const skipEvidenceSync = flagBoolean(input, "skip-evidence-sync");
+  const skipAutoArchive = flagBoolean(input, "skip-auto-archive");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");
 
@@ -419,6 +427,10 @@ export async function runMissionClose(
       reconcile: {
         reconciledAt: manifest.reconciledAt,
         verified: true,
+      },
+      archive: {
+        archived: false,
+        error: null,
       },
       warnings,
     };
@@ -753,6 +765,43 @@ export async function runMissionClose(
       logger.info(
         `  Warning: failed to write materialization state or copy .cache/: ${err instanceof Error ? err.message : String(err)}`,
       );
+    }
+
+    // RFC-0796: Auto-archive terminal missions after close (non-fatal).
+    // mission.archive scans ALL terminal-state missions in missions/ root, not just
+    // the one being closed. This is intentional — it matches the standalone mission.archive
+    // behavior. Non-fatal: archive failure logs a warning but does not block close —
+    // the mission is already closed (irreversible). The operator can retry mission.archive manually.
+    if (!skipAutoArchive) {
+      try {
+        const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+        logger.info(`  Auto-archiving terminal missions via mission.archive…`);
+        const archiveResult = (await executeKernelCommand({
+          workspaceRoot,
+          commandName: "mission.archive",
+          argv: [`--status=closed`],
+        })) as { exitCode?: number; summary?: string };
+        const archiveExitCode = archiveResult.exitCode ?? 0;
+        if (archiveExitCode !== 0) {
+          const archiveError =
+            archiveResult.summary ?? `mission.archive exited with code ${archiveExitCode}`;
+          logger.warn(
+            `[mission.close] auto-archive failed — run manually: ` +
+              `mission.archive --status closed: ${archiveError}`,
+          );
+          closeReport.archive = { archived: false, error: archiveError };
+        } else {
+          closeReport.archive = { archived: true, error: null };
+          logger.info(`  Terminal missions auto-archived`);
+        }
+      } catch (archiveErr) {
+        const errMsg = archiveErr instanceof Error ? archiveErr.message : String(archiveErr);
+        logger.warn(
+          `[mission.close] auto-archive threw — run manually: ` +
+            `mission.archive --status closed: ${errMsg}`,
+        );
+        closeReport.archive = { archived: false, error: errMsg };
+      }
     }
 
     return {
