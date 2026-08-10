@@ -85,6 +85,7 @@ nonGoals:
 #   - probe: file-contains
 #     path: "AGENTS.md"
 #     pattern: "Some new governance paragraph"
+batch: engine-consolidation
 ---
 
 # RFC-0771: Werkstatt engine core package composition

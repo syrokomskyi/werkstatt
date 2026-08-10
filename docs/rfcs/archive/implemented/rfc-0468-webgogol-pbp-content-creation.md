@@ -78,6 +78,7 @@ nonGoals:
 #     path: "systems/warpgogol-com/src/content/business-profile/de/catalog/policies/delivery-guarantee.md"
 #   - probe: file-exists
 #     path: "systems/warpgogol-com/src/content/business-profile/de/trust/claims/platform-cost-models.md"
+batch: pbp-implementation
 ---
 
 ## Design

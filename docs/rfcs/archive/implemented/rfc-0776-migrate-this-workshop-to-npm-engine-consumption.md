@@ -76,6 +76,7 @@ nonGoals:
 #   - probe: file-contains
 #     path: "AGENTS.md"
 #     pattern: "Some new governance paragraph"
+batch: engine-consolidation
 ---
 
 # RFC-0776: Migrate this workshop to npm engine consumption

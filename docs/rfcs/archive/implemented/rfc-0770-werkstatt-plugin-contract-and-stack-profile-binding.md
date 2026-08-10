@@ -74,6 +74,7 @@ nonGoals:
 #   - probe: file-contains
 #     path: "AGENTS.md"
 #     pattern: "Some new governance paragraph"
+batch: engine-consolidation
 ---
 
 # RFC-0770: Werkstatt plugin contract and stack profile binding

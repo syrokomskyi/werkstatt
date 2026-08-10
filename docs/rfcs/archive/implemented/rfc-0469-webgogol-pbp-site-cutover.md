@@ -81,6 +81,7 @@ nonGoals:
 #       exitCode: 0
 #   - probe: command-registered
 #     name: "pbp.cutover.check"
+batch: pbp-implementation
 ---
 
 ## Design

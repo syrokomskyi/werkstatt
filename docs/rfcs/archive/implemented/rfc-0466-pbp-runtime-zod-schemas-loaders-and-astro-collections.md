@@ -107,6 +107,7 @@ nonGoals:
 #     path: "packages/pbp/src/loaders.ts"
 #   - probe: file-exists
 #     path: "packages/pbp/src/astro.ts"
+batch: pbp-implementation
 ---
 
 ## Design

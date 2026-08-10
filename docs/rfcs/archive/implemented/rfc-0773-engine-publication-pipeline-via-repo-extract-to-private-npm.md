@@ -74,6 +74,7 @@ nonGoals:
 #   - probe: file-contains
 #     path: "AGENTS.md"
 #     pattern: "Some new governance paragraph"
+batch: engine-consolidation
 ---
 
 # RFC-0773: Engine publication pipeline via repo-extract to private npm

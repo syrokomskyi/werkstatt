@@ -85,6 +85,7 @@ nonGoals:
 #       exitCode: 0
 #   - probe: file-exists
 #     path: "packages/pbp/src/compiler/index.ts"
+batch: pbp-implementation
 ---
 
 ## Design
