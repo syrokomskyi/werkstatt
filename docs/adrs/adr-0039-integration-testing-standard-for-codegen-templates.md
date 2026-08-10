@@ -1,12 +1,12 @@
 ---
 id: ADR-0039
 title: "Integration testing standard for codegen templates: post-generation typecheck"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
