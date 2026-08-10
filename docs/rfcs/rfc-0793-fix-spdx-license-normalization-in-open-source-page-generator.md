@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
+enhancedAt: 2026-08-10
 implementedAt:
 closedAt:
 supersedes: []
@@ -23,6 +24,7 @@ amends: []
 amendedBy: []
 related:
   - RFC-0489
+  - RFC-0599
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -102,6 +104,8 @@ The `normalizeLicense` function in `open-source-page.ts` is fixed with four targ
 3. Remove the dead `"Python-2.0": "PSF-2.0"` alias from `LICENSE_ALIASES`.
 4. Exclude dependencies with `normalizedLicense.status === "unknown"` from the `licenseDistribution` array in `buildRegistryData`. These dependencies remain in the component table, SBOM, and THIRD_PARTY_NOTICES — the filter applies only to the distribution chart.
 
+`summary.componentsTotal` continues to count all public dependencies (including those with unknown licenses). The `licenseDistribution` array is a subset of `componentsTotal` — its entries sum to less than or equal to `componentsTotal`, not necessarily equal. This is intentional: the distribution chart shows known license categories, while the summary count reflects the total number of bundled components.
+
 ## Architectural fit
 
 - **Site OS operator model**: Extends the existing `open-source.generate` codegen command. No new command, no new pipeline stage.
@@ -170,6 +174,8 @@ for (const dep of publicDeps) {
 ```
 
 The `components` array, SBOM, and THIRD_PARTY_NOTICES are NOT filtered — they retain all public dependencies including those with unknown licenses.
+
+**OR expression semantics**: The existing `OR` parser returns the first part that resolves to a valid SPDX ID (directly or via alias). For `(MIT OR CC0-1.0)`, it returns `MIT` (first valid). For `(Apache2 OR MIT)`, it returns `Apache-2.0` (first resolvable via alias). The parser does not prefer the most permissive license — it picks the first resolvable one. This matches the existing behavior for non-parenthesized `OR` expressions and is sufficient for the distribution chart, where the goal is to assign each package to a single license category.
 
 ### File system responsibilities
 
