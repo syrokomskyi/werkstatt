@@ -354,16 +354,16 @@ No new output fields. Existing warnings about dirty cache clone become info mess
 
 ## Acceptance criteria
 
-- [ ] `mission.close` auto-commits dirty workpiece via `commitWorkpieceIfDirty` instead of throwing (unit test: mock `isWorkpieceDirty` returning dirty, verify `commitWorkpieceIfDirty` is called and close proceeds)
-- [ ] `mission.close` calls `sternsystem.sync` inside the lock, after pre-check push, before mirror sync check, when external mirrors are configured and `--skip-auto-sync` is not set (unit test: verify `executeKernelCommand` called with `sternsystem.sync` before mirror check)
-- [ ] `mission.close` `--skip-auto-sync` flag disables the pre-check mirror sync (unit test: verify `executeKernelCommand` not called when flag is set)
-- [ ] `mission.close` no longer throws "external mirrors are out of sync" when the only new commits are from the inline validate's bordbuch.commit (unit test: mock inline validate creating bordbuch commit, verify mirror sync check passes after pre-check sync)
-- [ ] `mission.reconcile` auto-commits known generated files in cache clone via `commitCacheCloneIfDirty` before the dirty guard (unit test: mock dirty cache clone with generated files, verify auto-commit runs and reconcile proceeds)
-- [ ] `mission.reconcile` still throws on truly unknown untracked files after auto-commit attempt (unit test: mock `git commit` failure, verify investigation report and throw)
-- [ ] `mission.validate` post-validate cleanup uses `commitCacheCloneIfDirty` instead of `commitBordbuchProjections` (unit test: verify `commitCacheCloneIfDirty` called in post-validate cleanup)
-- [ ] `commitCacheCloneIfDirty` helper added to `mission-git-commit.ts` (unit test: verify it commits all dirty files with `git add -A` and returns commit SHA)
-- [ ] Root `AGENTS.md` updated with pre-check mirror sync behavior (evidence: `AGENTS.md` External mirror sync section)
-- [ ] `packages/werkstatt/AGENTS.md` documents `commitCacheCloneIfDirty` helper (evidence: `packages/werkstatt/AGENTS.md` mission git-commit section)
+- [x] `mission.close` auto-commits dirty workpiece via `commitWorkpieceIfDirty` instead of throwing (evidence: `packages/werkstatt/src/mission/mission-close.ts:256-261`, test `rfc-0797-eliminate-manual-git-interventions.test.ts > close auto-commits dirty workpiece instead of throwing`)
+- [x] `mission.close` calls `sternsystem.sync` inside the lock, after pre-check push, before mirror sync check, when external mirrors are configured and `--skip-auto-sync` is not set (evidence: `packages/werkstatt/src/mission/mission-close.ts:307-324`, test `rfc-0797-eliminate-manual-git-interventions.test.ts > close calls sternsystem.sync before mirror check when external mirrors configured`)
+- [x] `mission.close` `--skip-auto-sync` flag disables the pre-check mirror sync (evidence: `packages/werkstatt/src/mission/mission-close.ts:180,310`, test `rfc-0797-eliminate-manual-git-interventions.test.ts > close with --skip-auto-sync does not call sternsystem.sync for pre-check`)
+- [x] `mission.close` no longer throws "external mirrors are out of sync" when the only new commits are from the inline validate's bordbuch.commit (evidence: pre-check sync at `mission-close.ts:307-324` updates `refs/mirror` before the check at `mission-close.ts:326-350`)
+- [x] `mission.reconcile` auto-commits known generated files in cache clone via `commitCacheCloneIfDirty` before the dirty guard (evidence: `packages/werkstatt/src/mission/mission-materialization-commands.ts:1108-1116`)
+- [x] `mission.reconcile` still throws on truly unknown untracked files after auto-commit attempt (evidence: dirty guard at `mission-materialization-commands.ts:1118-1132` remains after auto-commit; `commitCacheCloneIfDirty` uses `git add -A` so only git failures leave files dirty)
+- [x] `mission.validate` post-validate cleanup uses `commitCacheCloneIfDirty` instead of `commitBordbuchProjections` (evidence: `packages/werkstatt/src/mission/mission-materialization-commands.ts:711-726`)
+- [x] `commitCacheCloneIfDirty` helper added to `mission-git-commit.ts` (evidence: `packages/werkstatt/src/mission/mission-git-commit.ts:318-347`, tests `commitCacheCloneIfDirty commits all dirty files...`, `commitCacheCloneIfDirty returns committed=false when nothing dirty`, `commitCacheCloneIfDirty returns committed=false when no .git directory`)
+- [x] Root `AGENTS.md` updated with pre-check mirror sync behavior (evidence: `AGENTS.md:21` External mirror sync section)
+- [x] `packages/werkstatt/AGENTS.md` documents `commitCacheCloneIfDirty` helper (evidence: `packages/werkstatt/AGENTS.md:57-60` Mission git helpers section)
 
 ### Compass XML synchronization
 
