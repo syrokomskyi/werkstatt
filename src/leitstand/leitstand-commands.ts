@@ -49,7 +49,11 @@ import type {
   PurgeResult,
 } from "@warpgogol/werkstatt/schemas";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
-import { readSystemConfig, readSystemState, writeSystemState } from "../sternsystem/registry-io.ts";
+import {
+  readSystemConfigSmart,
+  readSystemStateSmart,
+  writeSystemStateSmart,
+} from "../sternsystem/registry-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { readReleaseManifest, writeReleaseYaml } from "../release/release-commands.ts";
 import { orchestrateSnap01Recovery } from "../mission/snapshot-auto-regen.ts";
@@ -652,7 +656,7 @@ export async function runLeitstandDevDeploy(
   const channel: Channel = "dev";
 
   // Read system config for dev channel config
-  const config = await readSystemConfig(workspaceRoot, systemId);
+  const config = await readSystemConfigSmart(workspaceRoot, systemId);
   const dep = config.deployment as DeploymentStaticConfig | undefined;
   if (!dep) {
     throw new Error(`[leitstand.dev-deploy] system '${systemId}' has no deployment config`);
@@ -864,7 +868,7 @@ export async function runLeitstandDevDeploy(
   }
 
   // Workpiece path (existing behavior) — requires open mission
-  const systemState = await readSystemState(workspaceRoot, systemId);
+  const systemState = await readSystemStateSmart(workspaceRoot, systemId);
   const missionId = systemState.currentMission as string | undefined;
   if (!missionId) {
     throw new Error(`[leitstand.dev-deploy] system '${systemId}' has no active mission`);
@@ -1798,7 +1802,7 @@ export async function runLeitstandPropagate(
 
   // RFC-0634: Verify dev build-identity.json before deploying to alt
   // Fetch build-identity.json from the dev channel URL and verify against release manifest
-  const configForDev = await readSystemConfig(workspaceRoot, systemId);
+  const configForDev = await readSystemConfigSmart(workspaceRoot, systemId);
   const depForDev = configForDev.deployment as DeploymentStaticConfig | undefined;
   if (!depForDev) {
     throw new Error(`[leitstand.propagate] system '${systemId}' has no deployment config`);
@@ -1886,7 +1890,7 @@ export async function runLeitstandPropagate(
   );
 
   try {
-    const config = await readSystemConfig(workspaceRoot, systemId);
+    const config = await readSystemConfigSmart(workspaceRoot, systemId);
     const dep = config.deployment as DeploymentStaticConfig | undefined;
     if (!dep) {
       throw new Error(`[leitstand.propagate] system '${systemId}' has no deployment config`);
@@ -1988,7 +1992,7 @@ export async function runLeitstandPropagate(
     const healthy = result.state === "succeeded" && healthResult.state === "healthy";
 
     // Update state — per-channel lastPropagated
-    const propState = await readSystemState(workspaceRoot, systemId);
+    const propState = await readSystemStateSmart(workspaceRoot, systemId);
     if (!propState.lastPropagated) {
       propState.lastPropagated = {};
     }
@@ -1999,7 +2003,7 @@ export async function runLeitstandPropagate(
       operationId,
       purgeResult,
     );
-    await writeSystemState(workspaceRoot, systemId, propState);
+    await writeSystemStateSmart(workspaceRoot, systemId, propState);
 
     // RFC-0608: transition release state to alt-deployed on success
     if (result.state === "succeeded") {
@@ -2097,7 +2101,7 @@ export async function runLeitstandPromote(
   );
 
   try {
-    const config = await readSystemConfig(workspaceRoot, systemId);
+    const config = await readSystemConfigSmart(workspaceRoot, systemId);
     const dep = config.deployment as DeploymentStaticConfig | undefined;
     if (!dep) {
       throw new Error(`[leitstand.promote] system '${systemId}' has no deployment config`);
@@ -2276,7 +2280,7 @@ export async function runLeitstandPromote(
     });
 
     // 6. Update state — main channel lastPropagated
-    const promoteState = await readSystemState(workspaceRoot, systemId);
+    const promoteState = await readSystemStateSmart(workspaceRoot, systemId);
     if (!promoteState.lastPropagated) {
       promoteState.lastPropagated = {};
     }
@@ -2287,7 +2291,7 @@ export async function runLeitstandPromote(
       operationId,
       purgeResult,
     );
-    await writeSystemState(workspaceRoot, systemId, promoteState);
+    await writeSystemStateSmart(workspaceRoot, systemId, promoteState);
 
     // 7. Transition release state to promoted on success
     if (result.state === "succeeded") {
@@ -2378,9 +2382,9 @@ export async function runLeitstandStatus(
 
   const channelFilter = flagString(input, "channel");
 
-  const config = await readSystemConfig(workspaceRoot, systemId);
+  const config = await readSystemConfigSmart(workspaceRoot, systemId);
   const dep = config.deployment as DeploymentStaticConfig | undefined;
-  const state = await readSystemState(workspaceRoot, systemId);
+  const state = await readSystemStateSmart(workspaceRoot, systemId);
   const lp = state.lastPropagated;
 
   function channelStatus(c: Channel) {
@@ -2478,13 +2482,13 @@ export async function runLeitstandRollback(
   );
 
   try {
-    const config = await readSystemConfig(workspaceRoot, systemId);
+    const config = await readSystemConfigSmart(workspaceRoot, systemId);
     const dep = config.deployment as DeploymentStaticConfig | undefined;
     if (!dep) {
       throw new Error(`[leitstand.rollback] system '${systemId}' has no deployment config`);
     }
 
-    const rbState = await readSystemState(workspaceRoot, systemId);
+    const rbState = await readSystemStateSmart(workspaceRoot, systemId);
 
     // RFC-0627: Auto-detect channel from current release state
     // Find the current release from any channel's lastPropagated, then read its state
@@ -2577,7 +2581,7 @@ export async function runLeitstandRollback(
       operationId,
       purgeResult,
     );
-    await writeSystemState(workspaceRoot, systemId, rbState);
+    await writeSystemStateSmart(workspaceRoot, systemId, rbState);
 
     // RFC-0627: auto-step release state one step back in the deployment chain
     let newReleaseState = "";
@@ -2654,7 +2658,7 @@ export async function runLeitstandHealth(
 
   const channel = parseChannel(flagString(input, "channel"), "alt");
 
-  const config = await readSystemConfig(workspaceRoot, systemId);
+  const config = await readSystemConfigSmart(workspaceRoot, systemId);
   const dep = config.deployment as DeploymentStaticConfig | undefined;
   if (!dep) {
     throw new Error(`[leitstand.health] system '${systemId}' has no deployment config`);
@@ -2662,7 +2666,7 @@ export async function runLeitstandHealth(
 
   const channelConfig = getChannelConfig(dep, channel);
   const adapter = resolveAdapter(dep.adapter);
-  const healthState = await readSystemState(workspaceRoot, systemId);
+  const healthState = await readSystemStateSmart(workspaceRoot, systemId);
   const releaseId = healthState.lastPropagated?.[channel]?.releaseId ?? "";
 
   const result = await adapter.health({

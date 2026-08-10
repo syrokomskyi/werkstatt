@@ -38,7 +38,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import {
-  readSystemConfig,
+  readSystemConfigSmart,
   readSystemState,
   writeSystemState,
   resolveCacheClonePath,
@@ -199,7 +199,6 @@ export async function runMissionClose(
     );
   }
 
-  await acquireLock(workspaceRoot, "registry", manifest.operationId, "mission.close", actor);
   await acquireLock(
     workspaceRoot,
     `system:${manifest.systemId}`,
@@ -271,7 +270,7 @@ export async function runMissionClose(
     let mirrorInSync = false;
     let recommendation: string | null = null;
 
-    const config = await readSystemConfig(workspaceRoot, manifest.systemId);
+    const config = await readSystemConfigSmart(workspaceRoot, manifest.systemId);
 
     // Pre-check: push cache clone to origin (bare repo) to ensure the bare repo
     // HEAD is current before comparing with the mirror ref. Without this push,
@@ -773,6 +772,5 @@ export async function runMissionClose(
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);
     await releaseLock(workspaceRoot, `system:${manifest.systemId}`);
-    await releaseLock(workspaceRoot, "registry");
   }
 }

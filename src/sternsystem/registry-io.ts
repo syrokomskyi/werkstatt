@@ -215,6 +215,93 @@ export async function discoverSystems(workspaceRoot: string): Promise<DiscoveryR
   return { systems, errors };
 }
 
+// --- RFC-0790: Smart IO (workpiece-aware, falls back to cache clone) ---
+// During an active mission, system-config.yaml and system-state.yaml live in the
+// workpiece. These functions check for an active mission workpiece and read/write
+// there. When no mission is active, they fall back to the cache clone.
+
+async function resolveActiveWorkpieceDir(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<string | null> {
+  // Read state from cache clone to find currentMission
+  const cacheClone = resolveCacheClonePath(workspaceRoot, systemId);
+  const statePath = path.join(cacheClone, "system-state.yaml");
+  if (!existsSync(statePath)) return null;
+
+  try {
+    const raw = await readFile(statePath, "utf8");
+    const parsed = parseYaml(raw);
+    const state = systemStateSchema.parse(parsed);
+    if (!state.currentMission) return null;
+
+    const workpieceDir = resolveWorkpiecePath(workspaceRoot, state.currentMission);
+    if (!existsSync(workpieceDir)) return null;
+    // Verify system-config.yaml exists in workpiece (materialized)
+    if (!existsSync(path.join(workpieceDir, "system-config.yaml"))) return null;
+    return workpieceDir;
+  } catch {
+    return null;
+  }
+}
+
+export async function readSystemConfigSmart(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<SystemConfig> {
+  const workpieceDir = await resolveActiveWorkpieceDir(workspaceRoot, systemId);
+  if (workpieceDir) {
+    return readSystemConfigFromWorkpiece(workpieceDir);
+  }
+  return readSystemConfig(workspaceRoot, systemId);
+}
+
+export async function readSystemStateSmart(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<SystemState> {
+  const workpieceDir = await resolveActiveWorkpieceDir(workspaceRoot, systemId);
+  if (workpieceDir) {
+    const filePath = path.join(workpieceDir, "system-state.yaml");
+    if (existsSync(filePath)) {
+      const raw = await readFile(filePath, "utf8");
+      const parsed = parseYaml(raw);
+      return systemStateSchema.parse(parsed);
+    }
+    // Fallback: read from cache clone if not yet in workpiece
+  }
+  return readSystemState(workspaceRoot, systemId);
+}
+
+export async function writeSystemStateSmart(
+  workspaceRoot: string,
+  systemId: string,
+  state: SystemState,
+): Promise<void> {
+  const workpieceDir = await resolveActiveWorkpieceDir(workspaceRoot, systemId);
+  if (workpieceDir) {
+    await writeSystemStateToWorkpiece(workpieceDir, state);
+    return;
+  }
+  await writeSystemState(workspaceRoot, systemId, state);
+}
+
+export async function writeSystemConfigSmart(
+  workspaceRoot: string,
+  systemId: string,
+  config: SystemConfig,
+): Promise<void> {
+  const workpieceDir = await resolveActiveWorkpieceDir(workspaceRoot, systemId);
+  if (workpieceDir) {
+    const filePath = path.join(workpieceDir, "system-config.yaml");
+    await mkdir(path.dirname(filePath), { recursive: true });
+    const yaml = stringifyYaml(config);
+    await atomicWriteFile(filePath, yaml + "\n");
+    return;
+  }
+  await writeSystemConfig(workspaceRoot, systemId, config);
+}
+
 // --- RFC-0790: Services registry (remains in monorepo) ---
 
 export async function readServicesRegistry(workspaceRoot: string): Promise<ServicesRegistry> {

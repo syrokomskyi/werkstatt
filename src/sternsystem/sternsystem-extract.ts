@@ -89,7 +89,6 @@ export async function runSternsystemExtract(
       ];
 
   const operationId = generateOperationId();
-  await acquireLock(workspaceRoot, "registry", operationId, "sternsystem.extract", "agent");
   await acquireLock(workspaceRoot, `system:${siteId}`, operationId, "sternsystem.extract", "agent");
 
   try {
@@ -173,6 +172,5 @@ export async function runSternsystemExtract(
     };
   } finally {
     await releaseLock(workspaceRoot, `system:${siteId}`);
-    await releaseLock(workspaceRoot, "registry");
   }
 }
