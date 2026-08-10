@@ -137,12 +137,12 @@ The script is an `is:inline` Astro script that runs on every page load. It recei
 
 ## Acceptance criteria
 
-- [ ] `agent-webmcp-script.astro` component exists in `packages/werkstatt-site`
-- [ ] Default layout includes the component when `agent.enabled` is not false
-- [ ] Script registers `action.lead.submit` tool when `document.modelContext` exists
-- [ ] Script registers `knowledge.{domain}.get` tools for each knowledge domain
-- [ ] Script exits silently when `document.modelContext` is undefined
-- [ ] No console errors in browsers without WebMCP support
+- [x] `agent-webmcp-script.astro` component exists in `packages/werkstatt-site` (evidence: packages/werkstatt-site/src/domain/ui/components/agent-webmcp/agent-webmcp-script.astro:1-72, agent-webmcp-script.test.ts:6 tests pass)
+- [x] Default layout includes the component when `agent.enabled` is not false (evidence: packages/werkstatt-site/src/domain/ui/components/layout/layout-component.astro:31,214 — imports and renders <AgentWebmcpScript manifest={agentSurfaceManifest} />)
+- [x] Script registers `action.lead.submit` tool when `document.modelContext` exists (evidence: agent-webmcp-script.astro:49-53, agent-webmcp-script.test.ts:action prefix test)
+- [x] Script registers `knowledge.{domain}.get` tools for each knowledge domain (evidence: agent-webmcp-script.astro:56-62, agent-webmcp-script.test.ts:knowledge prefix test)
+- [x] Script exits silently when `document.modelContext` is undefined (evidence: agent-webmcp-script.astro:42, agent-webmcp-script.test.ts:feature detection guard test)
+- [x] No console errors in browsers without WebMCP support (evidence: agent-webmcp-script.astro:41-42 — silent return on missing modelContext, agent-webmcp-script.test.ts:progressive enhancement guard test)
 
 ## Implementation notes for agents
 
