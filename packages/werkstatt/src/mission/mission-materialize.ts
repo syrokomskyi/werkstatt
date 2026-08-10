@@ -21,13 +21,16 @@
   <item>RFC-0620: replace hardcoded bordbuch file removal with ownership-map-driven filter that excludes all workspace-absolute generated files from STERNSYSTEM_DATA_PATHS copy.</item>
   <item>RFC-0659: add workpiece artifact cache — skip codegen on repeated materialization when cache key (cacheCloneHead + platformVersion + platformSemanticHash) matches.</item>
   <item>Preserve operator-filled .env from old workpiece before atomicMoveDir and restore after — prevents secret loss (CLOUDFLARE_API_TOKEN, R2 keys) on re-materialization.</item>
+  <item>RFC-0796: add checkWorkspaceGlobsForStalePackages pre-flight guard before pnpm install — detects stale package.json workspace references to missing packages.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
+import { glob as fsGlob } from "node:fs/promises";
 import path from "node:path";
 import { execSync } from "node:child_process";
+import { parse as yamlParse } from "yaml";
 import type {
   DiscoveredSiteWorkspace,
   KernelCommandInput,
@@ -101,9 +104,76 @@ export interface MissionMaterializeData {
   artifactCacheHit: boolean;
   artifactCacheKey: string | null;
   artifactCacheSkipped: boolean;
+  workspaceGlobCheck: { stalePackages: string[]; ok: boolean };
 }
 
-// RFC-0659: Artifact cache state file at systems/<id>/.materialization-cache-state.json
+// RFC-0796: Pre-flight guard — check workspace globs for stale package.json references.
+// Detects workspace:* dependencies pointing to packages that no longer exist
+// (e.g. archived mission workpiece directories). Aborts before pnpm install
+// to prevent cryptic resolution failures.
+async function checkWorkspaceGlobsForStalePackages(
+  workspaceRoot: string,
+): Promise<{ stalePackages: string[]; ok: boolean }> {
+  const workspaceYamlPath = path.join(workspaceRoot, "pnpm-workspace.yaml");
+  if (!existsSync(workspaceYamlPath)) {
+    return { stalePackages: [], ok: true };
+  }
+
+  const content = readFileSync(workspaceYamlPath, "utf8");
+  const workspace = yamlParse(content);
+  const patterns: string[] = workspace.packages ?? [];
+
+  // Collect all package.json files matching workspace globs
+  const packageJsonPaths: string[] = [];
+  for (const pattern of patterns) {
+    // Skip negation patterns
+    if (pattern.startsWith("!")) continue;
+    const globPattern = path.join(workspaceRoot, pattern, "package.json");
+    try {
+      for await (const match of fsGlob(globPattern)) {
+        packageJsonPaths.push(match);
+      }
+    } catch {
+      // Glob pattern may not match — skip
+    }
+  }
+
+  // Build set of all package names in the workspace
+  const workspacePackageNames = new Set<string>();
+  for (const pkgJsonPath of packageJsonPaths) {
+    try {
+      const pkgContent = readFileSync(pkgJsonPath, "utf8");
+      const pkg = JSON.parse(pkgContent);
+      if (pkg.name) {
+        workspacePackageNames.add(pkg.name);
+      }
+    } catch {
+      // Can't read package.json — skip
+    }
+  }
+
+  // Check each package.json for workspace:* references to missing packages
+  const stalePackages: string[] = [];
+  for (const pkgJsonPath of packageJsonPaths) {
+    try {
+      const pkgContent = readFileSync(pkgJsonPath, "utf8");
+      const pkg = JSON.parse(pkgContent);
+      const deps = { ...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {}) };
+      for (const [depName, depSpec] of Object.entries(deps)) {
+        if (typeof depSpec === "string" && depSpec.startsWith("workspace:")) {
+          if (!workspacePackageNames.has(depName)) {
+            const relPath = path.relative(workspaceRoot, pkgJsonPath);
+            stalePackages.push(`${relPath} → ${depName} (${depSpec})`);
+          }
+        }
+      }
+    } catch {
+      // Can't read package.json — skip
+    }
+  }
+
+  return { stalePackages, ok: stalePackages.length === 0 };
+}
 interface MaterializationCacheState {
   systemId: string;
   cacheKey: string;
@@ -833,6 +903,7 @@ export async function runMissionMaterialize(
           artifactCacheHit: false,
           artifactCacheKey: null,
           artifactCacheSkipped: false,
+          workspaceGlobCheck: { stalePackages: [], ok: true },
         },
         summary: `[mission.materialize] ${missionId} report-only: ${verdict}`,
       };
@@ -1129,6 +1200,20 @@ export async function runMissionMaterialize(
     process.env["PUBLIC_IMAGE_PROVIDER"] = "build-portable";
     logger.info(`  PUBLIC_IMAGE_PROVIDER set to build-portable in .env files`);
 
+    // RFC-0796: Pre-flight guard — check workspace globs for stale package.json references
+    // before pnpm install. Aborts with clear error if stale references found.
+    const workspaceGlobCheck = await checkWorkspaceGlobsForStalePackages(workspaceRoot);
+    if (!workspaceGlobCheck.ok) {
+      const staleList = workspaceGlobCheck.stalePackages.join("\n  ");
+      throw new Error(
+        `[mission.materialize] stale workspace references detected — pnpm install would fail.\n` +
+          `  Stale packages:\n  ${staleList}\n` +
+          `  Run 'mission.archive --status closed' to move terminal-state missions to archive,\n` +
+          `  then re-run mission.materialize.`,
+      );
+    }
+    logger.info(`  Workspace glob check passed (no stale package references)`);
+
     // Link workpiece into pnpm workspace before build.prepare runs.
     // The fresh workpiece has no node_modules — without this step, workpiece.imports.validate
     // (first step of build.prepare) fails because @warpgogol/* symlinks don't exist yet.
@@ -1388,6 +1473,7 @@ export async function runMissionMaterialize(
       artifactCacheHit,
       artifactCacheKey,
       artifactCacheSkipped,
+      workspaceGlobCheck,
       materializedAt: now,
     };
     await atomicWriteFile(
