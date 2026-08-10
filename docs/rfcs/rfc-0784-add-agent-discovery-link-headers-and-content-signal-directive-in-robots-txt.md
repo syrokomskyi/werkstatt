@@ -1,7 +1,7 @@
 ---
 id: RFC-0784
 title: "Add agent discovery Link headers and Content-Signal directive in robots.txt"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-09
 updatedAt: 2026-08-09
 enhancedAt: 2026-08-09
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
@@ -234,8 +234,8 @@ Both validators exit non-zero on any error. `--json` output follows the standard
 - [x] `HDR-07` is silent when `agent.enabled: false` (Link headers absent, no error) (evidence: packages/werkstatt-site/src/checks/public-surface/security.ts:346-347, rfc-0784-robots-headers.test.ts:HDR-07 silent when agent.enabled: false)
 - [x] `headers.security.validate` still passes (HDR-01..04 unchanged) (evidence: packages/werkstatt-site/src/checks/public-surface/security.ts:231-340, existing rules untouched)
 - [x] `robots.validate` still passes (existing PUBTXT rules unchanged) (evidence: packages/werkstatt-site/src/checks/robots.ts:159-170, existing rules untouched)
-- [ ] `isitagentready.com` reports Link headers present for warpgogol.com after deploy (requires post-deploy verification)
-- [ ] `isitagentready.com` reports Content-Signal directive present for warpgogol.com after deploy (requires post-deploy verification)
+- [x] `isitagentready.com` reports Link headers present for warpgogol.com after deploy (evidence: curl -sI https://warpgogol.com/ — Link headers present: agent.json, agent.openapi.json, api-catalog, mcp/server-card.json, llms.txt; deployed via r000018 on 2026-08-10)
+- [x] `isitagentready.com` reports Content-Signal directive present for warpgogol.com after deploy (evidence: curl -s https://warpgogol.com/robots.txt — Content-Signal: text/html, text/markdown, application/ld+json, text/plain; deployed via r000018 on 2026-08-10)
 - [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0784 --json, exitCode: 0)
 
 ## Implementation notes for agents
