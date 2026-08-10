@@ -1,7 +1,7 @@
 ---
 id: RFC-0786
 title: "Add DNS-AID record generator for agent discovery via DNS TXT records"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-09
-updatedAt: 2026-08-09
+updatedAt: 2026-08-10
 enhancedAt: 2026-08-09
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
