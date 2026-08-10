@@ -295,9 +295,9 @@ export function createOnboardingModule(): KernelModule {
           "Use --dry-run to preview changes.",
         scope: "workspace",
         flags: {
-          app: {
+          site: {
             kind: "string",
-            description: "Reference app name to sync template values from.",
+            description: "Reference site name to sync template values from.",
           },
           files: {
             kind: "string",
@@ -311,10 +311,10 @@ export function createOnboardingModule(): KernelModule {
         supportsAllSites: true,
         mutatesState: true,
         writes: [
-          "packages/os/site-kernel-onboarding/src/templates/package.template.json",
-          "packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs",
+          "packages/werkstatt-site/src/onboarding/templates/package.template.json",
+          "packages/werkstatt-site/src/onboarding/templates/runtime/astro.config.template.mjs",
         ],
-        reads: ["systems/<app>/package.json", "systems/<app>/astro.config.mjs"],
+        reads: ["systems/<site>/package.json", "systems/<site>/astro.config.mjs"],
         cacheable: false,
         execute: runConfigTemplateSync,
       });
