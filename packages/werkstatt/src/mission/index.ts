@@ -124,6 +124,11 @@ export function createMissionModule(): KernelModule {
             kind: "boolean",
             description: "Skip CREG-05 content regression review check (escape hatch, RFC-0734).",
           },
+          "skip-template-sync": {
+            kind: "boolean",
+            description:
+              "Skip auto-sync of template dependencies from workpiece (escape hatch, RFC-0800).",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",

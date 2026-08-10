@@ -101,12 +101,18 @@ export interface CloseReportArchive {
   error: string | null;
 }
 
+export interface CloseReportTemplateSync {
+  synced: boolean;
+  syncError: string | null;
+}
+
 export interface CloseReport {
   releaseId: string | null;
   git: CloseReportGit;
   mirror: CloseReportMirror;
   reconcile: CloseReportReconcile;
   archive: CloseReportArchive;
+  templateSync: CloseReportTemplateSync;
   warnings: Array<{ rule: string; message: string }>;
 }
 
@@ -178,6 +184,7 @@ export async function runMissionClose(
   const skipEvidenceSync = flagBoolean(input, "skip-evidence-sync");
   const skipAutoArchive = flagBoolean(input, "skip-auto-archive");
   const skipAutoSync = flagBoolean(input, "skip-auto-sync");
+  const skipTemplateSync = flagBoolean(input, "skip-template-sync");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");
 
@@ -196,6 +203,38 @@ export async function runMissionClose(
     throw new Error(
       `[mission.close] mission '${missionId}' has not been reconciled — run mission.reconcile first`,
     );
+  }
+
+  // RFC-0800: Auto-sync template dependencies from workpiece to template BEFORE inline validate.
+  // Placed here so the drift check (in SITES_BUILD_CHECK_PIPELINE via mission.validate)
+  // passes after the template is synced. If sync fails (non-fatal), the drift check
+  // catches the residual drift and blocks close — safety net working as intended.
+  // The template file is committed later via commitWerkstattSideEffects.
+  let templateSyncResult: CloseReportTemplateSync = { synced: false, syncError: null };
+  if (!skipTemplateSync) {
+    try {
+      const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+      logger.info(`  Auto-syncing template dependencies from workpiece…`);
+      const syncResult = (await executeKernelCommand({
+        workspaceRoot,
+        commandName: "config.template.sync",
+        argv: [`--site=${manifest.systemId}`],
+      })) as { exitCode?: number; summary?: string };
+      const syncExitCode = syncResult.exitCode ?? 0;
+      if (syncExitCode !== 0) {
+        const syncError =
+          syncResult.summary ?? `config.template.sync exited with code ${syncExitCode}`;
+        logger.warn(`  Template sync failed (non-fatal): ${syncError}`);
+        templateSyncResult = { synced: false, syncError };
+      } else {
+        templateSyncResult = { synced: true, syncError: null };
+        logger.info(`  Template dependencies synced`);
+      }
+    } catch (syncErr) {
+      const errMsg = syncErr instanceof Error ? syncErr.message : String(syncErr);
+      logger.warn(`  Template sync threw (non-fatal): ${errMsg}`);
+      templateSyncResult = { synced: false, syncError: errMsg };
+    }
   }
 
   // RFC-0593: inline validation gate — run mission.validate before acquiring locks.
@@ -455,6 +494,7 @@ export async function runMissionClose(
         archived: false,
         error: null,
       },
+      templateSync: templateSyncResult,
       warnings,
     };
 
@@ -580,9 +620,13 @@ export async function runMissionClose(
     }
 
     // RFC-0580: auto-commit werkstatt side-effects
+    // RFC-0800: include template file path so auto-synced template changes are committed.
     await commitWerkstattSideEffects(
       workspaceRoot,
-      [path.join("missions", missionId, "mission.yaml")],
+      [
+        path.join("missions", missionId, "mission.yaml"),
+        "packages/werkstatt-site/src/onboarding/templates/package.template.json",
+      ],
       `werkstatt: mission.close ${missionId}`,
     );
 
