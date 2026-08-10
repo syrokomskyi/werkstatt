@@ -5,13 +5,13 @@ title: "Agent readiness discovery surface architecture"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-09
-updatedAt: 2026-08-09
-implementedAt:
-closedAt:
+updatedAt: 2026-08-10
+implementedAt: 2026-08-10
+closedAt: 2026-08-10
 supersedes: []
 supersededBy:
 related:
@@ -67,9 +67,10 @@ The agent readiness discovery surface is a multi-layer architecture with the Age
 - **New discovery standards**: When a new agent discovery standard emerges (e.g. `ai.txt`, `agents.txt`), add a new generator + validator pair and wire it into the pipeline via a new RFC amending `build.prepare` and `build.check`.
 - **MCP protocol evolution**: If the MCP Server Card spec (SEP-1649) changes, update `agent.mcp-card.generate` and re-run `build.prepare`.
 - **DNS-AID adoption**: If DNS-AID becomes a widely adopted standard, consider promoting the TXT record to a more structured DNS record type (e.g. SVCB).
-- **Implementation**: This ADR will be stamped `implemented` when RFC-0783 through RFC-0789 are all `implemented`. Reference commits will be listed at that time.
-- **Code-trace (2026-08-09)**: Verified architecture matches codebase for implemented RFCs:
-  - RFC-0783: `buildApiCatalog` in `packages/werkstatt-site/src/domain/share/agent/api-catalog.ts`, `buildMcpServerCard` in `packages/werkstatt-site/src/domain/share/agent/mcp-card.ts`, handlers in `packages/werkstatt-site/src/checks/agent/agent-api-catalog.ts` and `agent-mcp-card.ts`, command table entries in `29-agent-surface.ts`.
-  - RFC-0787: Pipeline wiring confirmed in `build-prepare.ts` (agent generators before `agent.surface.sign`) and `sites-check-author.ts` (validators after `agent.surface.validate`).
-  - RFC-0788: `markdownTwins`/`markdownAlternates` in `sitemap-helpers.ts` and `sitemap.ts`.
-  - Pending: RFC-0784, RFC-0785, RFC-0786, RFC-0789 (all `accepted`, not yet implemented).
+- **Implementation**: All 7 RFCs (0783–0789) are now `implemented`. ADR stamped `implemented` on 2026-08-10.
+- **Code-trace (2026-08-09)**: Verified architecture matches codebase for RFC-0783, 0787, 0788.
+- **Code-trace (2026-08-10)**: Verified architecture matches codebase for RFC-0784, 0785, 0786, 0789:
+  - RFC-0784: `Content-Signal` directive in `robots.ts` and `buildRobotsTxt` (`semantic/robots.ts`), `AGENT_LINK_HEADERS` token in `app-boilerplate.ts`, HDR-07 rule in `security.ts`, test file `rfc-0784-robots-headers.test.ts`.
+  - RFC-0785: `agent-markdown-negotiation.ts` handler, `middleware.template.ts` with `Accept: text/markdown` negotiation, test file `agent-markdown-negotiation.test.ts`.
+  - RFC-0786: `agent-dns-aid.ts` handler, `dns-aid.ts` pure projection (`domain/share/agent/`), `dns-records.ts` schema, test files, command table entries in `29-agent-surface.ts`.
+  - RFC-0789: `llms.ts` generation with agent surface discovery links, `llms-0789.test.ts` tests, `aggregate.ts` integration.
