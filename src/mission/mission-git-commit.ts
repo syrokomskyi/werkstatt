@@ -14,6 +14,7 @@
   <item>RFC-0568: add investigateUntrackedFiles helper and UntrackedFileReport type for cache clone untracked file origin analysis.</item>
   <item>RFC-0594: add pre-commit content validation via runPreCommitValidation based on changed file paths.</item>
   <item>RFC-0644: add commitWorkpieceIfDirty helper for auto-committing dirty workpiece before mission.reconcile.</item>
+  <item>RFC-0797: add commitCacheCloneIfDirty helper for auto-committing all dirty files in cache clone before reconcile dirty guard.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -307,6 +308,37 @@ export function commitWorkpieceIfDirty(
 
   const commitSha = execSync("git rev-parse HEAD", {
     cwd: workpieceDir,
+    stdio: ["pipe", "pipe", "pipe"],
+    encoding: "utf-8",
+  }).trim();
+
+  return { committed: true, commitSha };
+}
+
+export function commitCacheCloneIfDirty(
+  systemDir: string,
+  systemId: string,
+): WorkpieceCommitResult {
+  const dirtyCheck = isWorkpieceDirty(systemDir);
+  if (!dirtyCheck.dirty) {
+    return { committed: false, commitSha: null };
+  }
+
+  execSync("git add -A", {
+    cwd: systemDir,
+    stdio: ["pipe", "pipe", "pipe"],
+    encoding: "utf-8",
+  });
+
+  const commitMessage = `cache-clone: auto-commit generated files before reconcile ${systemId}`;
+  execSync(`git commit --no-verify -m ${JSON.stringify(commitMessage)}`, {
+    cwd: systemDir,
+    stdio: ["pipe", "pipe", "pipe"],
+    encoding: "utf-8",
+  });
+
+  const commitSha = execSync("git rev-parse HEAD", {
+    cwd: systemDir,
     stdio: ["pipe", "pipe", "pipe"],
     encoding: "utf-8",
   }).trim();
