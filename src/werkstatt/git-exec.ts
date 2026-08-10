@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0580: extract gitExec from bordbuch-io.ts into shared utility with allowNonZero option.</item>
   <item>RFC-0646: add gitExecWithRetry companion with RetryOptions for transient-failure resilience.</item>
+  <item>RFC-0794: add optional env parameter to gitExec and gitExecWithRetry for passing environment variables (e.g. ECOSYSTEM_COMMIT=1) to git commands.</item>
 </CHANGE_SUMMARY>
 */
 
