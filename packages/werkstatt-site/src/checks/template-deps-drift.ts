@@ -75,10 +75,7 @@ export async function runTemplateDepsDrift(
       message: "--site <name> is required.",
       fixHint: "Pass --site <system-id> to specify which workpiece to check.",
     });
-    return diagnosticsResult(
-      COMMAND,
-      diagnostics,
-    ) as KernelCommandResult<TemplateDepsDriftData>;
+    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
   }
 
   const templatePath = join(TEMPLATES_DIR, "package.template.json");
@@ -91,12 +88,10 @@ export async function runTemplateDepsDrift(
       ruleId: "TEMPLATE-DEPS-DRIFT-02",
       severity: "error",
       message: `Template file not found: ${templatePath}`,
-      fixHint: "Ensure packages/werkstatt-site/src/onboarding/templates/package.template.json exists.",
+      fixHint:
+        "Ensure packages/werkstatt-site/src/onboarding/templates/package.template.json exists.",
     });
-    return diagnosticsResult(
-      COMMAND,
-      diagnostics,
-    ) as KernelCommandResult<TemplateDepsDriftData>;
+    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
   }
 
   const workpieceDirOverride = readFlag(input, "workpiece-dir");
@@ -112,22 +107,30 @@ export async function runTemplateDepsDrift(
         message: `No missions directory found at ${missionsDir}.`,
         fixHint: "Ensure a mission is open for this site before running template.deps.drift.",
       });
-      return diagnosticsResult(
-        COMMAND,
-        diagnostics,
-      ) as KernelCommandResult<TemplateDepsDriftData>;
+      return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
     }
 
     const { readdir } = await import("node:fs/promises");
     const matchingMissions: string[] = [];
-    try {
-      const entries = await readdir(missionsDir, { withFileTypes: true });
+    const searchDirs = [missionsDir];
+    for (const state of ["archive/closed", "archive/aborted"]) {
+      searchDirs.push(join(missionsDir, state));
+    }
+    for (const searchDir of searchDirs) {
+      if (!(await fileExists(searchDir))) continue;
+      let entries;
+      try {
+        entries = await readdir(searchDir, { withFileTypes: true });
+      } catch {
+        continue;
+      }
       for (const entry of entries) {
         if (!entry.isDirectory()) continue;
-        const candidate = join(missionsDir, entry.name, "workpiece");
+        if (entry.name === "archive") continue;
+        const candidate = join(searchDir, entry.name, "workpiece");
         if (await fileExists(candidate)) {
           let matches = false;
-          const missionFile = join(missionsDir, entry.name, "mission.yaml");
+          const missionFile = join(searchDir, entry.name, "mission.yaml");
           if (await fileExists(missionFile)) {
             try {
               const missionRaw = await readFile(missionFile, "utf-8");
@@ -138,7 +141,7 @@ export async function runTemplateDepsDrift(
             }
           }
           if (!matches) {
-            const systemFile = join(missionsDir, entry.name, "system.json");
+            const systemFile = join(searchDir, entry.name, "system.json");
             if (await fileExists(systemFile)) {
               try {
                 const systemRaw = await readFile(systemFile, "utf-8");
@@ -149,11 +152,9 @@ export async function runTemplateDepsDrift(
               }
             }
           }
-          if (matches) matchingMissions.push(entry.name);
+          if (matches) matchingMissions.push(join(searchDir, entry.name));
         }
       }
-    } catch {
-      // missions dir not readable
     }
 
     if (matchingMissions.length === 0) {
@@ -163,15 +164,12 @@ export async function runTemplateDepsDrift(
         message: `No current mission workpiece found for site '${site}'.`,
         fixHint: `Open a mission for site '${site}' via mission.open, or pass --workpiece-dir to specify the path.`,
       });
-      return diagnosticsResult(
-        COMMAND,
-        diagnostics,
-      ) as KernelCommandResult<TemplateDepsDriftData>;
+      return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
     }
 
     matchingMissions.sort();
     const latest = matchingMissions[matchingMissions.length - 1]!;
-    workpiecePkgPath = join(missionsDir, latest, "workpiece", "package.json");
+    workpiecePkgPath = join(latest, "workpiece", "package.json");
   }
 
   let workpieceRaw: string;
@@ -184,10 +182,7 @@ export async function runTemplateDepsDrift(
       message: `Workpiece package.json not found: ${workpiecePkgPath}`,
       fixHint: "Run mission.materialize to generate the workpiece before checking drift.",
     });
-    return diagnosticsResult(
-      COMMAND,
-      diagnostics,
-    ) as KernelCommandResult<TemplateDepsDriftData>;
+    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
   }
 
   let templatePkg: PackageJson;
@@ -199,12 +194,10 @@ export async function runTemplateDepsDrift(
       ruleId: "TEMPLATE-DEPS-DRIFT-02",
       severity: "error",
       message: `Template package.template.json is not valid JSON: ${templatePath}`,
-      fixHint: "Fix the JSON syntax in packages/werkstatt-site/src/onboarding/templates/package.template.json.",
+      fixHint:
+        "Fix the JSON syntax in packages/werkstatt-site/src/onboarding/templates/package.template.json.",
     });
-    return diagnosticsResult(
-      COMMAND,
-      diagnostics,
-    ) as KernelCommandResult<TemplateDepsDriftData>;
+    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
   }
   try {
     workpiecePkg = JSON.parse(workpieceRaw) as PackageJson;
@@ -215,10 +208,7 @@ export async function runTemplateDepsDrift(
       message: `Workpiece package.json is not valid JSON: ${workpiecePkgPath}`,
       fixHint: "Fix the JSON syntax in the workpiece package.json.",
     });
-    return diagnosticsResult(
-      COMMAND,
-      diagnostics,
-    ) as KernelCommandResult<TemplateDepsDriftData>;
+    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
   }
 
   const sections: Array<"dependencies" | "devDependencies"> = ["dependencies", "devDependencies"];
@@ -252,7 +242,12 @@ export async function runTemplateDepsDrift(
           fixHint: `Run: pnpm exec werkstatt run config.template.sync --site ${site}`,
         });
       } else if (templateVersion !== workpieceVersion) {
-        drift.push({ package: pkg, section, workpieceVersion: workpieceVersion!, templateVersion: templateVersion! });
+        drift.push({
+          package: pkg,
+          section,
+          workpieceVersion: workpieceVersion!,
+          templateVersion: templateVersion!,
+        });
         diagnostics.push({
           ruleId: "TEMPLATE-DEPS-DRIFT-01",
           severity: "error",
@@ -263,8 +258,5 @@ export async function runTemplateDepsDrift(
     }
   }
 
-  return diagnosticsResult(
-    COMMAND,
-    diagnostics,
-  ) as KernelCommandResult<TemplateDepsDriftData>;
+  return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
 }

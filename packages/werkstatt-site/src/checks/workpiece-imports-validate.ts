@@ -100,19 +100,32 @@ export async function runWorkpieceImportsValidate(
     }
 
     // Find mission directory containing a workpiece for this site
+    // Also search archive subdirectories — release.prepare runs on closed missions
     const { readdir } = await import("node:fs/promises");
     let found = false;
     let missionWorkpieceDir: string | null = null;
     const matchingMissions: string[] = [];
-    try {
-      const entries = await readdir(missionsDir, { withFileTypes: true });
+    const searchDirs = [missionsDir];
+    for (const state of ["archive/closed", "archive/aborted"]) {
+      searchDirs.push(join(missionsDir, state));
+    }
+    for (const searchDir of searchDirs) {
+      if (!(await fileExists(searchDir))) continue;
+      let entries;
+      try {
+        entries = await readdir(searchDir, { withFileTypes: true });
+      } catch {
+        continue;
+      }
       for (const entry of entries) {
         if (!entry.isDirectory()) continue;
-        const candidate = join(missionsDir, entry.name, "workpiece");
+        // Skip the "archive" directory itself when scanning missionsDir
+        if (entry.name === "archive") continue;
+        const candidate = join(searchDir, entry.name, "workpiece");
         if (await fileExists(candidate)) {
           let matches = false;
           // Check mission.yaml for systemId (canonical mission metadata)
-          const missionFile = join(missionsDir, entry.name, "mission.yaml");
+          const missionFile = join(searchDir, entry.name, "mission.yaml");
           if (await fileExists(missionFile)) {
             try {
               const missionRaw = await readFile(missionFile, "utf-8");
@@ -124,7 +137,7 @@ export async function runWorkpieceImportsValidate(
           }
           // Fallback: check system.json for id (legacy convention)
           if (!matches) {
-            const systemFile = join(missionsDir, entry.name, "system.json");
+            const systemFile = join(searchDir, entry.name, "system.json");
             if (await fileExists(systemFile)) {
               try {
                 const systemRaw = await readFile(systemFile, "utf-8");
@@ -135,18 +148,16 @@ export async function runWorkpieceImportsValidate(
               }
             }
           }
-          if (matches) matchingMissions.push(entry.name);
+          if (matches) matchingMissions.push(join(searchDir, entry.name));
         }
       }
-    } catch {
-      // missions dir not readable
     }
 
     if (matchingMissions.length > 0) {
       // Pick the latest mission by directory name (mission IDs are sequential)
       matchingMissions.sort();
       const latest = matchingMissions[matchingMissions.length - 1]!;
-      missionWorkpieceDir = join(missionsDir, latest, "workpiece");
+      missionWorkpieceDir = join(latest, "workpiece");
       found = true;
     }
 
