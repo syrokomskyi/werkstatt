@@ -1,12 +1,13 @@
 ---
 id: RFC-0791
 title: "Auto-discover well-known routes in public-surface validation"
-status: draft
+status: accepted
 kind: command
 scope: app
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-10
 updatedAt: 2026-08-10
 enhancedAt: 2026-08-10
