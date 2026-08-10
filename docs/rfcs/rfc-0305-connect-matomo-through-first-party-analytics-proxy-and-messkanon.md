@@ -64,7 +64,7 @@ appsImpacted:
 packagesImpacted:
 - '@warpgogol/growth'
 - '@warpgogol/growth-adapter-matomo'
-- '@warpgogol/ontology'
+- '@warpgogol/werkstatt-site/ontology'
 - '@warpgogol/share'
 - '@warpgogol/site-kernel'
 - '@warpgogol/site-kernel-checks'
