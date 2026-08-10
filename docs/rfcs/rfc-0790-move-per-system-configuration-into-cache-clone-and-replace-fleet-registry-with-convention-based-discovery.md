@@ -1,7 +1,7 @@
 ---
 id: RFC-0790
 title: "Move per-system configuration into cache clone and replace fleet registry with convention-based discovery"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-09
 updatedAt: 2026-08-10
 enhancedAt: 2026-08-09
-implementedAt:
+implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
@@ -27,7 +27,8 @@ amends:
   - RFC-0356
   - RFC-0574
   - RFC-0472
-amendedBy: []
+amendedBy:
+  - RFC-0794
 related:
   - DNA-1
   - DNA-44
