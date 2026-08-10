@@ -133,23 +133,36 @@ const SUPPORTED_LANGS = ["de", "en", "uk"]; // baked from manifest i18n
 /**
  * Content negotiation logic:
  * 1. Only intercept GET requests
- * 2. Check Accept header for text/markdown
- * 3. Filter non-page routes (API, .well-known, static assets)
- * 4. Map request path to .md twin path via canonical markdownTwinUrlPath (RFC-0166 layout: /about/ → /about.md)
- * 5. If twin exists in static assets, fetch it and return with Content-Type: text/markdown
- * 6. Otherwise, call next() to serve the static HTML
+ * 2. Filter non-page routes (API, .well-known, static assets)
+ * 3. Check Accept header for text/markdown
+ * 4. If no markdown requested, serve HTML and add Vary: Accept to prevent CDN cache poisoning
+ * 5. If markdown requested, map path to .md twin via canonical markdownTwinUrlPath (RFC-0166 layout: /about/ → /about.md)
+ * 6. If twin exists, return with Content-Type: text/markdown + Vary: Accept
+ * 7. If twin not found, serve HTML and add Vary: Accept
  */
+function addVaryAccept(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set("Vary", "Accept");
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { request } = context;
   if (request.method !== "GET") return next();
-  const accept = request.headers.get("Accept") ?? "";
-  if (!accept.includes("text/markdown")) return next();
   const url = new URL(request.url);
   if (!isPageRoute(url.pathname)) return next();
+  const accept = request.headers.get("Accept") ?? "";
+  if (!accept.includes("text/markdown")) {
+    const response = await next();
+    return addVaryAccept(response);
+  }
   const twinPath = markdownTwinUrlPath(url.pathname, { supportedLangs: SUPPORTED_LANGS });
   const twinUrl = new URL(twinPath, url.origin);
   const twinResponse = await fetch(twinUrl);
-  if (!twinResponse.ok) return next();
+  if (!twinResponse.ok) {
+    const response = await next();
+    return addVaryAccept(response);
+  }
   const body = await twinResponse.text();
   return new Response(body, {
     status: 200,
@@ -163,21 +176,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 /**
  * Map a page URL pathname to its .md twin path.
- * RFC-0166 generates twins as index.md inside route directories:
- *   /about/  → /about/index.md
+ * Uses canonical markdownTwinUrlPath from @warpgogol/werkstatt-site/share/semantic.
+ * RFC-0166 generates twins as:
+ *   /about/  → /about.md
  *   /        → /index.md
- *   /de/preise/ → /de/preise/index.md
+ *   /de/     → /de/index.md (language root)
+ *   /de/preise/ → /de/preise.md
  */
-function resolveMarkdownTwinPath(pathname: string): string | null {
-  // Skip API routes, .well-known, and static assets
-  if (pathname.startsWith("/api/")) return null;
-  if (pathname.startsWith("/.well-known/")) return null;
+function isPageRoute(pathname: string): boolean {
+  if (pathname.startsWith("/api/")) return false;
+  if (pathname.startsWith("/.well-known/")) return false;
   if (/\.(ico|png|jpg|jpeg|svg|css|js|json|txt|xml|woff|woff2|ttf|otf|webmanifest)$/.test(pathname))
-    return null;
-
-  const trimmed = pathname.replace(/\/$/, "");
-  if (trimmed === "") return "/index.md";
-  return `${trimmed}/index.md`;
+    return false;
+  return true;
 }
 ```
 
