@@ -25,6 +25,7 @@
   <item>RFC-0762: extend CloseReportMirror with synced/syncError; add post-close sternsystem.sync call before state file write.</item>
   <item>Bug fix: push cache clone to origin before mirror sync check to prevent false "out of sync" when commits were created between reconcile and close.</item>
   <item>RFC-0796: add CloseReportArchive with archived/error; auto-archive terminal missions via mission.archive after close (non-fatal, --skip-auto-archive escape hatch).</item>
+  <item>RFC-0797: replace dirty workpiece guard with commitWorkpieceIfDirty auto-commit; add pre-mirror-check sternsystem.sync inside lock with --skip-auto-sync flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -46,7 +47,7 @@ import {
   resolveMirrorPath,
 } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import { isWorkpieceDirty } from "./mission-git-commit.ts";
+import { commitWorkpieceIfDirty } from "./mission-git-commit.ts";
 import { validateBordbuch, type BordbuchViolation } from "../bordbuch/bordbuch-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import {
@@ -176,6 +177,7 @@ export async function runMissionClose(
   const releaseIdFlag = flagString(input, "release");
   const skipEvidenceSync = flagBoolean(input, "skip-evidence-sync");
   const skipAutoArchive = flagBoolean(input, "skip-auto-archive");
+  const skipAutoSync = flagBoolean(input, "skip-auto-sync");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");
 
@@ -251,10 +253,12 @@ export async function runMissionClose(
       });
     }
 
-    const dirtyCheck = isWorkpieceDirty(workpieceDir);
-    if (dirtyCheck.dirty) {
-      throw new Error(
-        `[mission.close] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run close.`,
+    // RFC-0797: Auto-commit dirty workpiece instead of throwing.
+    // Same pattern as mission.reconcile (RFC-0644).
+    const workpieceCommit = commitWorkpieceIfDirty(workpieceDir, missionId);
+    if (workpieceCommit.committed) {
+      logger.info(
+        `  Auto-committed dirty workpiece (${workpieceCommit.commitSha?.slice(0, 8)}) before close`,
       );
     }
 
@@ -297,6 +301,25 @@ export async function runMissionClose(
             `  Could not push cache clone to origin before mirror check: ${pushErr instanceof Error ? pushErr.message : String(pushErr)}`,
           );
         }
+      }
+    }
+
+    // RFC-0797: Pre-mirror-check sync — update refs/mirror to match origin HEAD
+    // after inline validate's bordbuch commits. Prevents false "out of sync" errors.
+    // Must run inside the lock, after the pre-check push, before the mirror sync check.
+    if (!skipAutoSync && config && config.mirrors.length > 2) {
+      try {
+        const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+        logger.info(`  Syncing mirrors before mirror sync check…`);
+        await executeKernelCommand({
+          workspaceRoot,
+          commandName: "sternsystem.sync",
+          argv: [`--id=${manifest.systemId}`],
+        });
+      } catch (syncErr) {
+        logger.warn(
+          `  Pre-check mirror sync failed (non-fatal): ${syncErr instanceof Error ? syncErr.message : String(syncErr)}`,
+        );
       }
     }
 
