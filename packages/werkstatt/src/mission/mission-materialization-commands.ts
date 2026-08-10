@@ -31,6 +31,7 @@
   <item>RFC-0763: add commitBordbuchProjections cleanup on build.prepare failure and validation failure early-return paths to clean bordbuch projections from cache clone on all exit paths. Extract cleanupBordbuchOnFailure helper to avoid duplication.</item>
   <item>Bug fix: post-merge guard — restore system-config.yaml/system-state.yaml if merge silently removed them; commit restored files to avoid leaving cache clone dirty.</item>
   <item>RFC-0796: add validateNoStaleMissionEntries workspace-level advisory check — warns about stale symlinks or terminal-state dirs in missions/ root (non-blocking).</item>
+  <item>RFC-0797: add commitCacheCloneIfDirty auto-commit before dirty cache clone guard in mission.reconcile; replace commitBordbuchProjections with commitCacheCloneIfDirty in post-validate cleanup.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -60,6 +61,7 @@ import {
   isWorkpieceDirty,
   investigateUntrackedFiles,
   commitWorkpieceIfDirty,
+  commitCacheCloneIfDirty,
 } from "./mission-git-commit.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
@@ -706,20 +708,20 @@ export async function runMissionValidate(
     );
   }
 
-  // RFC-0749: post-validation bordbuch cleanup — commit any bordbuch projections
-  // that were regenerated during build.prepare but not committed by bordbuch.commit
-  // (e.g. due to transient git failure). This prevents the RFC-0522 dirty cache clone
-  // warning from firing for bordbuch files and unblocks mission.reconcile.
+  // RFC-0797: post-validation cache clone cleanup — commit ALL generated files
+  // (superset of bordbuch projections). This prevents the RFC-0522 dirty cache clone
+  // warning from firing for any generated file and unblocks mission.reconcile.
   try {
-    const postValidateBordbuch = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
-    if (postValidateBordbuch.committed) {
+    const postValidateCachePath = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
+    const postValidateCache = commitCacheCloneIfDirty(postValidateCachePath, manifest.systemId);
+    if (postValidateCache.committed) {
       logger.info(
-        `  Bordbuch post-validate cleanup: committed ${postValidateBordbuch.filesCommitted.length} file(s)`,
+        `  Cache clone post-validate cleanup: committed generated file(s) (${postValidateCache.commitSha?.slice(0, 8)})`,
       );
     }
   } catch (err) {
     logger.warn(
-      `  Bordbuch post-validate cleanup failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+      `  Cache clone post-validate cleanup failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
     );
   }
 
@@ -1104,6 +1106,15 @@ export async function runMissionReconcile(
     }
 
     if (existsSync(gitDir)) {
+      // RFC-0797: Auto-commit known generated files in cache clone before dirty guard.
+      // The cache clone is entirely generated — no operator edits.
+      const cacheCommit = commitCacheCloneIfDirty(systemDir, manifest.systemId);
+      if (cacheCommit.committed) {
+        logger.info(
+          `  Auto-committed cache clone (${cacheCommit.commitSha?.slice(0, 8)}) before reconcile`,
+        );
+      }
+
       // RFC-0522/RFC-0568: dirty cache clone guard with untracked file investigation
       const cacheDirtyCheck = isWorkpieceDirty(systemDir);
       if (cacheDirtyCheck.dirty) {
