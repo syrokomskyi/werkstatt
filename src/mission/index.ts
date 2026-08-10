@@ -129,6 +129,16 @@ export function createMissionModule(): KernelModule {
             description:
               "Skip auto-sync of template dependencies from workpiece (escape hatch, RFC-0800).",
           },
+          "skip-auto-archive": {
+            kind: "boolean",
+            description:
+              "Skip auto-archiving of terminal missions after close (escape hatch, RFC-0796).",
+          },
+          "skip-auto-sync": {
+            kind: "boolean",
+            description:
+              "Skip pre-mirror-check sternsystem.sync inside close lock (escape hatch, RFC-0797).",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",
