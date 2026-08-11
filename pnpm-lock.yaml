@@ -586,6 +586,10 @@ importers:
         version: 4.120.0(@cloudflare/workers-types@5.20260801.1)
 
   services/matomo-proxy:
+    dependencies:
+      '@warpgogol/werkstatt-site':
+        specifier: workspace:*
+        version: link:../../packages/werkstatt-site
     devDependencies:
       tsx:
         specifier: ^4.20.0
@@ -595,6 +599,10 @@ importers:
         version: 4.118.0(@cloudflare/workers-types@5.20260801.1)
 
   services/maturity-score:
+    dependencies:
+      '@warpgogol/werkstatt-site':
+        specifier: workspace:*
+        version: link:../../packages/werkstatt-site
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20260801.1
@@ -619,6 +627,10 @@ importers:
         version: 4.120.0(@cloudflare/workers-types@5.20260801.1)
 
   services/telegram-alert-bridge:
+    dependencies:
+      '@warpgogol/werkstatt-site':
+        specifier: workspace:*
+        version: link:../../packages/werkstatt-site
     devDependencies:
       wrangler:
         specifier: ^4.118.0
