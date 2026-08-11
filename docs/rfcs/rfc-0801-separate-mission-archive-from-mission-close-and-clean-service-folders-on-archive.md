@@ -209,16 +209,16 @@ async function cleanServiceFolders(workpieceDir: string): Promise<string[]> {
 
 ## Acceptance criteria
 
-- [ ] `mission.close` no longer calls `mission.archive` (auto-archive block removed from `mission-close.ts`)
-- [ ] `--skip-auto-archive` flag removed from `mission.close` and `mission.module.ts` — passing it produces unknown-flag warning
-- [ ] `mission.archive` deletes `node_modules/`, `dist/`, `.astro/`, `.wrangler/`, `.cache/`, `.turbo/` from workpiece before move
-- [ ] `CloseReport.archive` field and `CloseReportArchive` interface removed from `mission-close.ts`
-- [ ] `deploy.md` documents `mission.archive` as explicit post-deploy step (already applied)
-- [ ] AGENTS.md auto-archive note (lines 136-139) updated to reflect explicit archive step
-- [ ] Unit test: `mission.close` does not call `mission.archive`
-- [ ] Unit test: `mission.archive` removes service folders before move
-- [ ] `rfc.validate` passes on this file before merging
-- [ ] RFC-0796 amended by this RFC in frontmatter (`amendedBy` includes RFC-0801)
+- [x] `mission.close` no longer calls `mission.archive` (auto-archive block removed from `mission-close.ts`) (evidence: `mission-close.ts` — auto-archive block deleted, `grep "mission.archive" mission-close.ts` returns 0 results)
+- [x] `--skip-auto-archive` flag removed from `mission.close` and `mission.module.ts` — passing it produces unknown-flag warning (evidence: `mission.module.ts` — flag entry deleted, `grep "skip-auto-archive" mission.module.ts` returns 0 results)
+- [x] `mission.archive` deletes `node_modules/`, `dist/`, `.astro/`, `.wrangler/`, `.cache/`, `.turbo/` from workpiece before move (evidence: `archive.ts` — `SERVICE_FOLDERS` constant + `cleanServiceFolders()` function + call in `moveMissionDir` before `fs.rename`)
+- [x] `CloseReport.archive` field and `CloseReportArchive` interface removed from `mission-close.ts` (evidence: `mission-close.ts` — `CloseReportArchive` interface deleted, `archive` field removed from `CloseReport`)
+- [x] `deploy.md` documents `mission.archive` as explicit post-deploy step (already applied) (evidence: `.devin/workflows/deploy.md:27,145-154`)
+- [x] AGENTS.md auto-archive note (lines 136-139) updated to reflect explicit archive step (evidence: `AGENTS.md:136` — replaced auto-archive note with explicit archive step note)
+- [x] Unit test: `mission.close` does not call `mission.archive` (evidence: `rfc-0801-no-auto-archive.test.ts` — asserts `mockState.archiveCalled === false`)
+- [x] Unit test: `mission.archive` removes service folders before move (evidence: `archive.test.ts` — 3 new tests: service folders deleted, missing workpiece handled, dry-run preserves folders)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0801 --json` returns 0 violations)
+- [x] RFC-0796 amended by this RFC in frontmatter (`amendedBy` includes RFC-0801) (evidence: `rfc-0796-*.md` — `amendedBy: [RFC-0801]`)
 
 ### Compass XML synchronization
 
