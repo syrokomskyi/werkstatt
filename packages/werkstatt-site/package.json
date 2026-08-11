@@ -406,6 +406,10 @@
       "types": "./src/domain/share/scripts/index.ts",
       "default": "./src/domain/share/scripts/index.ts"
     },
+    "./share/scripts/gsap-mountain-journey": {
+      "types": "./src/domain/share/scripts/gsap-mountain-journey.ts",
+      "default": "./src/domain/share/scripts/gsap-mountain-journey.ts"
+    },
     "./share/runtime-context": {
       "types": "./src/domain/share/runtime-context.ts",
       "default": "./src/domain/share/runtime-context.ts"
