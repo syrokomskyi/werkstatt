@@ -15,7 +15,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0807
 related:
   - DNA-1
   - DNA-19
