@@ -34,6 +34,7 @@ Current services:
 - The site/service boundary is `@warpgogol/werkstatt-site/check-core`; do not bypass it with direct site-to-service imports.
 - `findWorkspaceRoot` in `@warpgogol/werkstatt-site/check-core` is Node-only (uses `node:fs`). Cloudflare Workers API routes in the Check Warpgogol site must read `CHECK_WEBGOGOL_WORKSPACE_ROOT` from the environment directly.
 - `services/rate-fetcher-worker` is the Cloudflare Worker for RFC-0744 Rate Fetcher Service. Daily cron fetches exchange rates from external sources (ECB) via `@warpgogol/werkstatt-site/pbp-rate-adapters` and stores observations in Supabase. The site/service boundary is `@warpgogol/werkstatt-site/pbp-rate-adapters`; do not bypass it with direct adapter calls from sites.
+- `services/maturity-score-worker` is the Cloudflare Worker for ADR-0042 Maturity Score Service. Request-triggered Worker that accepts `POST /score` with `{ url }` and returns `{ score }`. The stub implementation returns a deterministic hash-based score (0–100). No env vars consumed by the stub.
 
 Validation:
 

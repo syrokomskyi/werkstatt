@@ -54,14 +54,14 @@ export async function runServiceNamingValidate(
 ): Promise<KernelCommandResult<CheckResult>> {
   const diagnostics: Diagnostic[] = [];
   const { workspaceRoot } = context;
-  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
+  const registryPath = join(workspaceRoot, "services", "registry.yaml");
 
   if (!existsSync(registryPath)) {
     diagnostics.push({
       ruleId: "SVC-NAME-01",
       severity: "error",
-      file: "systems/registry.yaml",
-      message: "Registry file not found at systems/registry.yaml.",
+      file: "services/registry.yaml",
+      message: "Registry file not found at services/registry.yaml.",
     });
     return diagnosticsResult("service.naming.validate", diagnostics);
   }
@@ -75,7 +75,7 @@ export async function runServiceNamingValidate(
     diagnostics.push({
       ruleId: "SVC-NAME-01",
       severity: "error",
-      file: "systems/registry.yaml",
+      file: "services/registry.yaml",
       message: `Failed to parse registry: ${err instanceof Error ? err.message : String(err)}`,
     });
     return diagnosticsResult("service.naming.validate", diagnostics);
@@ -85,7 +85,7 @@ export async function runServiceNamingValidate(
     diagnostics.push({
       ruleId: "SVC-NAME-01",
       severity: "error",
-      file: "systems/registry.yaml",
+      file: "services/registry.yaml",
       message: "No services found in registry.",
     });
     return diagnosticsResult("service.naming.validate", diagnostics);
@@ -99,7 +99,7 @@ export async function runServiceNamingValidate(
       diagnostics.push({
         ruleId: "SVC-NAME-01",
         severity: "error",
-        file: "systems/registry.yaml",
+        file: "services/registry.yaml",
         message: `Service '${id}': workerName '${workerName}' must equal id '${id}'.`,
       });
     }

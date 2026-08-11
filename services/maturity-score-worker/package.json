@@ -1,0 +1,23 @@
+{
+  "name": "@warpgogol/maturity-score-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ADR-0042: Maturity Score Worker. Request-triggered Cloudflare Worker that accepts POST /score with { url } and returns { score }. Initial implementation returns a deterministic stub score.",
+  "main": "src/index.ts",
+  "scripts": {
+    "build:check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260801.1",
+    "wrangler": "^4.118.0"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "architecture",
+      "rationale": "Stub Worker behavior is covered by TypeScript type checking; direct worker-runtime tests are deferred until real HDRI scoring logic is implemented.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

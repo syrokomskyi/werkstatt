@@ -1,0 +1,29 @@
+// ADR-0042: Maturity Score Worker configuration.
+// This file is manually maintained (no generator owns services/ wrangler configs).
+{
+  "name": "maturity-score-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0,
+    "traces": {
+      "enabled": true,
+      "destinations": ["signoz"],
+      "head_sampling_rate": 1.0,
+    },
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1.0,
+      "persist": true,
+      "invocation_logs": true,
+    },
+  },
+  // No secrets required for the stub implementation.
+  // When real HDRI scoring logic is added, declare secrets here:
+  //   MATURITY_SCORE_API_KEY  — API key for external scoring service
+  //
+  // Local testing: wrangler dev
+  // Deploy: wrangler deploy
+}

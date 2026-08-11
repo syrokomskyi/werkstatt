@@ -49,4 +49,14 @@ services:
       at: null
       state: null
       operationId: null
-
+  - id: maturity-score-worker
+    kind: cloudflare-worker
+    workerName: maturity-score-worker
+    hostedBy: studio
+    url: https://maturity-score-worker.syrokomskyi.workers.dev
+    publicEndpoints: true
+    subdomains: []
+    lastDeployed:
+      at: null
+      state: null
+      operationId: null
