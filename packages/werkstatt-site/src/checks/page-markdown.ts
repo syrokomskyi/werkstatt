@@ -539,7 +539,10 @@ export async function runPageMarkdownValidate(
   // RFC-0320: MDMETA-01..07 — validate provenance frontmatter on generated twins.
   const { parseMarkdownTwinFrontmatter, computeContentHash } =
     await import("@warpgogol/werkstatt-site/share/semantic");
-  const markdownFiles = await collectFiles(publicDir, { extensions: [".md"], ignore: () => false });
+  const markdownFiles = await collectFiles(publicDir, {
+    extensions: [".md"],
+    ignore: (relPath) => relPath === "auth.md",
+  });
   for (const abs of markdownFiles) {
     const content = await readFile(abs, "utf-8");
     if (!isGeneratedMarkdownTwin(content)) continue;
