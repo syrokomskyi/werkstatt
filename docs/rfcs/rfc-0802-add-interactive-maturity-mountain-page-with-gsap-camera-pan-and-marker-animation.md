@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
+enhancedAt: 2026-08-11
 implementedAt:
 closedAt:
 supersedes: []
@@ -131,10 +132,12 @@ A new `mountain-journey` section archetype is added to the shared archetype cata
 No new commands. The section is materialized by the existing `section.scaffold` command:
 
 ```sh
-pnpm exec werkstatt run section.scaffold --name mountain-journey --archetype mountain-journey
+pnpm exec werkstatt run section.scaffold --name mountain-journey --slug mountain-journey-section --archetype mountain-journey --cosmicName Prometheus --role maturity-visualization
 ```
 
-After scaffolding, run `archetype.registry.build` to regenerate `index.yaml` and `index.json`. `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/src/page.ts` is registry-derived (RFC-0091) and requires a manual entry for the new cosmic name.
+The cosmic name **Prometheus** is assigned from the PlanetCatalog (`packages/werkstatt-site/src/domain/ontology/cosmic/planet-catalog.ts`). It is currently unassigned — no existing archetype claims it (verified across all 32 section archetype YAMLs). The name is thematically fitting: Prometheus brought knowledge and fire to humanity, paralleling the maturity journey from ignorance to excellence.
+
+After scaffolding, run `archetype.registry.build` to regenerate `index.yaml` and `index.json`. `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/page.ts` is registry-derived (RFC-0091) — no manual entry is needed. The `archetype.registry.build` command auto-discovers the new manifest's `cosmicName` and adds it to the derived import path map.
 
 The new page is added to warpgogol-com by:
 
@@ -145,7 +148,7 @@ The new page is added to warpgogol-com by:
 ### TypeScript contracts
 
 ```ts
-// Archetype propsSchema (Zod shape)
+// Archetype propsSchema (Zod shape) — authored in block frontmatter
 interface MountainJourneyProps {
   // Composed from section-visual + section-header
   backgroundImage: string;              // Asset key for the mountain WebP image
@@ -164,12 +167,15 @@ interface MountainJourneyProps {
     submitLabel: string;                // e.g. "Indizes berechnen" / "Розрахувати індекс"
     errorMessage: string;               // Shown on Worker error
   };
-  workerEndpoint: string;              // URL of the maturity-score Worker
-  cameraInitialZoom: number;            // Initial zoom level (e.g. 2.5 = zoomed in on start)
-  cameraFinalZoom: number;              // Final zoom level (e.g. 1.0 = full mountain visible)
-  animationDuration: number;            // Duration in seconds for marker + camera animation
 }
+
+// DNA-37 / RFC-0035: Section receives SectionProps, props are in pageOverride
+type MountainJourneySectionProps = SectionProps & {
+  pageOverride: MountainJourneyProps;
+};
 ```
+
+Animation parameters (`cameraInitialZoom`, `cameraFinalZoom`, `animationDuration`) are **not** block props — they are constants in `gsap-mountain-journey.ts` with sensible defaults (initialZoom: 2.5, finalZoom: 1.0, duration: 3). Content authors should not need to understand GSAP animation parameters.
 
 ```ts
 // Shared GSAP script: gsap-mountain-journey.ts
@@ -179,19 +185,21 @@ interface MountainJourneyAnimationOptions {
   markerSelector: string;              // Marker element selector
   cameraSelector: string;              // Camera/scene container selector for zoom
   formSelector: string;                // Form element selector
-  workerEndpoint: string;              // POST endpoint for score calculation
-  initialZoom: number;
-  finalZoom: number;
-  duration: number;                    // Animation duration in seconds
+  workerEndpoint: string;              // Resolved from import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT
   prefersReducedMotion?: boolean;
 }
+
+// Animation constants — not configurable per-page
+const CAMERA_INITIAL_ZOOM = 2.5;
+const CAMERA_FINAL_ZOOM = 1.0;
+const ANIMATION_DURATION = 3; // seconds
 
 async function initMountainJourneyAnimation(
   options: MountainJourneyAnimationOptions,
 ): Promise<void>;
 ```
 
-The script dynamically imports `gsap`, `gsap/ScrollTrigger`, and `gsap/MotionPathPlugin`. It registers both plugins. On form submission, it POSTs `{ url: string }` to `workerEndpoint`, receives `{ score: number }`, and animates:
+The script dynamically imports `gsap`, `gsap/ScrollTrigger`, and `gsap/MotionPathPlugin`. It registers both plugins. On form submission, it POSTs `{ url: string }` to `workerEndpoint` (resolved from `import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT` — not authored in block props, so the same content works across dev/alt/main channels), receives `{ score: number }`, and animates:
 
 1. The marker along the route path to `score / 100` of the path length using `gsap.to(marker, { motionPath: { path: routePath, end: score / 100 } })`.
 2. The camera container from `initialZoom` to `finalZoom` using `gsap.to(camera, { scale: finalZoom, duration })`.
@@ -209,12 +217,12 @@ Both animations run simultaneously in the same GSAP timeline. On Worker error, t
 | `packages/werkstatt-site/src/domain/ui/sections/mountain-journey/mountain-journey-section.types.generated.ts` | Generated prop types |
 | `packages/werkstatt-site/src/domain/share/scripts/gsap-mountain-journey.ts` | Shared GSAP script — MotionPathPlugin + camera animation |
 | `packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml` | Archetype catalog entry |
-| `packages/werkstatt-site/src/domain/share/src/page.ts` | `PLANET_IMPORT_PATHS` — add new cosmic name |
+| `packages/werkstatt-site/src/domain/share/page.ts` | `PLANET_IMPORT_PATHS` — auto-derived by `archetype.registry.build` (no manual edit) |
 | `missions/<active>/workpiece/src/content/pages/{de,uk}/reife.md` | Page content files |
 | `missions/<active>/workpiece/src/content/system.md` | Add `reife` page entry |
 | `missions/<active>/workpiece/src/content/navigation/{de,uk}/navigation.md` | Add footer nav entry |
 | `missions/<active>/workpiece/src/content/site/{de,uk}/labels.md` | Add `footer.navIds` entry for `reife` |
-| `missions/<active>/workpiece/public/assets/mountain-journey.webp` | Mountain illustration asset (LFS-tracked) |
+| `missions/<active>/workpiece/public/assets/mountain-journey.webp` | Mountain illustration asset (LFS-tracked — requires new `.gitattributes` pattern, see Rollout) |
 
 ### Output format
 
@@ -234,13 +242,16 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 
 6. **MotionPathPlugin import failure:** If `gsap/MotionPathPlugin` fails to load (network issue, bundle error), the script falls back to `path.getPointAtLength()` for static marker placement and skips the animation.
 
+7. **Worker endpoint abuse:** The POST endpoint accepts `{ url: string }` from any visitor. Mitigation: the Worker validates URL format, enforces a payload size limit (max 2KB), and implements per-IP rate limiting (e.g. 5 requests/minute). CSRF is not required because the endpoint is stateless and does not mutate server state. The Worker returns 429 for rate-limited requests and 400 for invalid payloads.
+
 ## Rollout
 
 - **Default behavior on introduction:** The `mountain-journey` archetype is available to all sites via the standard block-declarative page composition pipeline. No flag day — existing sites are unaffected because they do not reference `type: mountain-journey`.
-- **warpgogol-com adoption:** The page `/reife` is added in a mission workpiece. The mountain WebP asset is committed to the workpiece `public/assets/` directory (LFS-tracked). The page entry is added to `system.md` and navigation.
+- **warpgogol-com adoption:** The page `/reife` is added in a mission workpiece. The mountain WebP asset is committed to the workpiece `public/assets/` directory. A new `.gitattributes` pattern `missions/**/public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text` must be added — the existing `apps/**/*.webp` pattern does not cover mission workpieces. The page entry is added to `system.md` and navigation.
 - **New sites:** Automatically have access to the archetype via the shared catalog. They can use `type: mountain-journey` in any page block configuration.
-- **GSAP MotionPathPlugin:** Registered at runtime by the shared script — no global registration side effects. The plugin is only loaded on pages that contain the `mountain-journey` section (DOM guard in the client script).
-- **Worker endpoint:** The `workerEndpoint` prop is configured per-site in block props. For warpgogol-com, the endpoint points to the maturity-score Worker (covered by a separate ADR). Until the Worker is deployed, the endpoint can point to a stub that returns a fixed score.
+- **GSAP MotionPathPlugin:** Registered at runtime by the shared script — no global registration side effects. The plugin is only loaded on pages that contain the `mountain-journey` section (DOM guard in the client script). MotionPathPlugin adds ~5KB minified+gzipped to the client bundle.
+- **Worker endpoint:** The endpoint URL is resolved from `import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT` at runtime — not authored in block props. This ensures the same content works across dev/alt/main channels. Each deployment channel sets its own endpoint via environment variable. Until the Worker is deployed, the endpoint can point to a stub that returns a fixed score.
+- **Section-level client script vs orchestrator:** The `mountain-journey` section uses a section-level `.client.ts` entry instead of integrating into `OrchestrationOptions` in `orchestrator.ts`. This is justified because: (1) the animation uses MotionPathPlugin + a section-specific SVG path — not a general-purpose motion primitive like reveal/parallax/stagger; (2) the trigger is form submission, not scroll or viewport entry; (3) the orchestrator pattern dispatches based on DOM selectors (`has(selector)`), but the mountain scene's initialization requires section-specific options (route path, marker, camera selectors) that are only known to the section component. General-purpose GSAP scripts (counter, reveal, parallax, stagger) remain in the orchestrator.
 - **Build pipeline integration:** No new pipeline step. The section is validated by existing `page.block.validate` and `mirror.quintet.validate` during `build.check`.
 
 ## Alternatives considered
@@ -267,18 +278,20 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 
 5. **Agent misinterpretation risk.** Agents may confuse this with scroll-driven animation (RFC-0106 pattern). Mitigation: the `nonGoals` section explicitly states "Does not add scroll-driven pin animation" and the Design section describes form-triggered animation.
 
-6. **LFS tracking.** The mountain WebP asset must be LFS-tracked. Mitigation: `.gitattributes` already tracks `*.webp` patterns; the asset is committed to the workpiece `public/assets/` directory.
+6. **LFS tracking.** The mountain WebP asset must be LFS-tracked. The existing `.gitattributes` only tracks `apps/**/*.webp` — mission workpiece assets are not covered. Mitigation: add `missions/**/public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text` to `.gitattributes` before committing the asset.
 
 ## Acceptance criteria
 
 - [ ] `mountain-journey` section archetype created in `packages/werkstatt-site/src/domain/ui/sections/mountain-journey/` with Mirror Quintet files (`.astro`, `.css`, `.client.ts`, `.manifest.yaml`, `.types.generated.ts`)
-- [ ] Archetype catalog entry created at `packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml`
-- [ ] `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/src/page.ts` updated with the new cosmic name
+- [ ] Archetype catalog entry created at `packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml` with `acceptedCosmicNames: [Prometheus]`
+- [ ] `archetype.registry.build` run — `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/page.ts` auto-derived with `Prometheus` (no manual edit)
 - [ ] Shared GSAP script `gsap-mountain-journey.ts` created in `packages/werkstatt-site/src/domain/share/scripts/` with MotionPathPlugin registration and form-triggered animation
 - [ ] Page `reife.md` created in both `de` and `uk` content directories with one `mountain-journey` block
 - [ ] `system.md` updated with `reife` page entry (routes: `de: reife, uk: maturity`)
 - [ ] Footer navigation updated in `navigation.md` and `labels.md` for both languages
+- [ ] `.gitattributes` updated with `missions/**/public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text` pattern
 - [ ] Mountain WebP asset placed in workpiece `public/assets/` and LFS-tracked
+- [ ] Worker endpoint resolved from `import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT` (not block props)
 - [ ] `prefers-reduced-motion: reduce` disables animation and shows full static scene
 - [ ] No-JS fallback: full static SVG scene server-rendered with `<noscript>` message
 - [ ] `pnpm --filter warpgogol-com exec astro check` passes
@@ -289,6 +302,7 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST use `mission.git.commit` to commit edits in the warpgogol-com workpiece — not direct `git commit`.
+- Agents MUST use `ecosystem.commit` (not `git commit`) for platform-scope changes in `packages/werkstatt-site/**` — the pre-commit hook blocks direct `git commit` for `packages/**`.
 - Agents MUST NOT run root `pnpm build` or `turbo run build` — use `pnpm --filter warpgogol-com exec astro check` for scoped typecheck.
 - Agents MUST register MotionPathPlugin in the shared script, not in the section component — the section component only calls `initMountainJourneyAnimation`.
 - Agents MUST NOT hardcode the SVG path `d` attribute or stage positions in the component — these are authored in block props.
