@@ -7,7 +7,10 @@
     "dev": "pnpm run gen:upstreams && wrangler dev",
     "build:check": "pnpm run gen:upstreams && tsc --noEmit",
     "check": "werkstatt run matomo.proxy.validate",
-    "gen:upstreams": "tsx scripts/gen-upstreams.ts"
+    "gen:upstreams": "tsx scripts/gen-upstreams.ts",
+    "deploy:dev": "werkstatt run leitstand.service.dev-deploy --service matomo-proxy",
+    "deploy:prod": "werkstatt run leitstand.service.promote --service matomo-proxy",
+    "rollback": "werkstatt run leitstand.service.rollback --service matomo-proxy"
   },
   "devDependencies": {
     "tsx": "^4.20.0",

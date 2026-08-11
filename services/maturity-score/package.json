@@ -6,7 +6,10 @@
   "description": "ADR-0042: Maturity Score Worker. Request-triggered Cloudflare Worker that accepts POST /score with { url } and returns { score }. Initial implementation returns a deterministic stub score.",
   "main": "src/index.ts",
   "scripts": {
-    "build:check": "tsc --noEmit"
+    "build:check": "tsc --noEmit",
+    "deploy:dev": "werkstatt run leitstand.service.dev-deploy --service maturity-score",
+    "deploy:prod": "werkstatt run leitstand.service.promote --service maturity-score",
+    "rollback": "werkstatt run leitstand.service.rollback --service maturity-score"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260801.1",

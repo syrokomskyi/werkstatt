@@ -6,7 +6,10 @@
   "description": "RFC-0186: Shared Lagebild sync worker. Multi-tenant cron worker that syncs CRM buffer outbox for all clients via tenant registry.",
   "main": "src/index.ts",
   "scripts": {
-    "build:check": "tsc --noEmit"
+    "build:check": "tsc --noEmit",
+    "deploy:dev": "werkstatt run leitstand.service.dev-deploy --service lagebild-sync",
+    "deploy:prod": "werkstatt run leitstand.service.promote --service lagebild-sync",
+    "rollback": "werkstatt run leitstand.service.rollback --service lagebild-sync"
   },
   "dependencies": {
     "@warpgogol/werkstatt-site": "workspace:*"

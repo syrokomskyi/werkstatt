@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:check": "pnpm exec tsc --noEmit"
+    "build:check": "pnpm exec tsc --noEmit",
+    "deploy:dev": "werkstatt run leitstand.service.dev-deploy --service telegram-alert-bridge",
+    "deploy:prod": "werkstatt run leitstand.service.promote --service telegram-alert-bridge",
+    "rollback": "werkstatt run leitstand.service.rollback --service telegram-alert-bridge"
   },
   "devDependencies": {
     "wrangler": "^4.118.0"
