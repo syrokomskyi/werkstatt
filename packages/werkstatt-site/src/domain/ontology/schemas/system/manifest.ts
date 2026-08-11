@@ -182,6 +182,18 @@ export const systemManifestSchema = z.object({
          */
         output: pageOutputSchema.optional(),
 
+        /**
+         * RFC-0803: per-page deployment gating. When production is false,
+         * the page is excluded from production builds (no HTML output, no
+         * sitemap entry, no navigation links, no llms.txt entry). The page
+         * remains visible in astro dev. Defaults to true.
+         */
+        deployment: z
+          .object({
+            production: z.boolean().default(true),
+          })
+          .optional(),
+
         /** RFC-0167: article metadata — when present, the page emits Article JSON-LD. */
         article: articleMetadataSchema.optional(),
 
