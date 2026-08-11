@@ -5,6 +5,7 @@ services:
     workerName: matomo-proxy
     hostedBy: studio
     url: https://matomo-proxy.syrokomskyi.workers.dev
+    workersDevUrl: https://matomo-proxy.syrokomskyi.workers.dev
     publicEndpoints: true
     routes:
       - /_wg/analytics/*
@@ -12,15 +13,14 @@ services:
       - matomo-cloud
     subdomains: []
     lastDeployed:
-      at: null
-      state: null
-      operationId: null
+      at: 2026-08-11T16:34:11.680Z
+      state: failed
+      operationId: op-msovrbb1-dkaf4l95
     lastDevDeployed:
-      at: 2026-08-11T16:13:40.964Z
+      at: 2026-08-11T16:33:37.606Z
       state: succeeded
-      operationId: op-msov0sxe-f11szuk8
+      operationId: op-msovqevd-v6nre3by
     healthCheckPath: /_wg/analytics/health
-    workersDevUrl: https://matomo-proxy-dev.syrokomskyi.workers.dev
   - id: rate-fetcher
     kind: scheduled-worker
     workerName: rate-fetcher
