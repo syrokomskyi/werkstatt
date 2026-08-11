@@ -9,6 +9,7 @@
   <item>RFC-0303 Phase 3: extracted from commands.ts as part of the domain split.</item>
   <item>RFC-0346: integrate env.contract.validate into services.check.run pipeline.</item>
   <item>RFC-0751: integrate service.naming.validate into services.check.run pipeline via executeKernelCommand.</item>
+  <item>RFC-0807: integrate service.otlp.validate into services.check.run pipeline via executeKernelCommand.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -43,9 +44,24 @@ export async function runServicesCheckRun(
     // service.naming.validate may not be registered yet — skip silently
   }
 
+  // RFC-0807: Run service.otlp.validate via executeKernelCommand
+  let otlpDiagnostics: Diagnostic[] = [];
+  try {
+    const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+    const otlpResult = (await executeKernelCommand({
+      workspaceRoot: context.workspaceRoot,
+      commandName: "service.otlp.validate",
+      argv: [],
+    })) as { exitCode: number; data?: { diagnostics?: Diagnostic[] } };
+    otlpDiagnostics = otlpResult.data?.diagnostics ?? [];
+  } catch {
+    // service.otlp.validate may not be registered yet — skip silently
+  }
+
   return diagnosticsResult("services.check.run", [
     ...(workspace.data?.diagnostics ?? []),
     ...(runner.data?.diagnostics ?? []),
     ...namingDiagnostics,
+    ...otlpDiagnostics,
   ]);
 }

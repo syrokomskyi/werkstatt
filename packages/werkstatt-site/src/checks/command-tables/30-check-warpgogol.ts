@@ -37,6 +37,7 @@ import {
   runCheckWarpgogolRunnerValidate,
   runWarpgogolCheckHintsGenerate,
   runWarpgogolCheckHintsValidate,
+  runServiceOtlpValidate,
 } from "@warpgogol/werkstatt-site/checks/check-warpgogol";
 import { runServiceRegistryValidate } from "../services/service-registry-validate.ts";
 import { runServiceNamingValidate } from "../services/service-naming-validate.ts";
@@ -82,6 +83,15 @@ export const CHECK_WEBGOGOL_COMMANDS: CheckCommandEntry[] = [
     ],
     flags: {},
     execute: runServiceNamingValidate,
+  },
+  {
+    name: "service.otlp.validate",
+    description:
+      "Validate OTLP env vars (WARPGOGOL_OTLP_ENDPOINT, WARPGOGOL_OTLP_TOKEN) in all services except observability-stack (RFC-0807).",
+    scope: "workspace",
+    reads: ["services/*/.env.example", "services/*/src/**/*.ts", "services/*/wrangler.jsonc"],
+    flags: {},
+    execute: runServiceOtlpValidate,
   },
   {
     name: "check-warpgogol.runner.validate",

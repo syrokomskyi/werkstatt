@@ -562,4 +562,22 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "YAML file has duplicate mapping key",
     "yaml.parse.validate",
   ),
+
+  // RFC-0807: service OTLP env var compliance.
+  "OTLP-01": rule(
+    "OTLP-01",
+    "WARPGOGOL_OTLP_ENDPOINT missing from .env.example or missing # How to obtain: instruction",
+    "service.otlp.validate",
+  ),
+  "OTLP-02": rule(
+    "OTLP-02",
+    "WARPGOGOL_OTLP_TOKEN missing from .env.example or missing # How to obtain: instruction",
+    "service.otlp.validate",
+  ),
+  "OTLP-03": rule(
+    "OTLP-03",
+    "CF Worker service: OTLP env vars not found in source Env interface declaration",
+    "service.otlp.validate",
+    "warning",
+  ),
 };

@@ -52,6 +52,8 @@ export {
 
 export { runServicesCheckRun } from "./commands/services-check.ts";
 
+export { runServiceOtlpValidate } from "./commands/service-otlp-validate.ts";
+
 export {
   runWarpgogolCheckHintsGenerate,
   runWarpgogolCheckHintsValidate,
