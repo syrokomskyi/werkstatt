@@ -1,4 +1,4 @@
-# Check Warpgogol Runner
+# Check Runner
 
 Node/Playwright backend composition for Check Warpgogol.
 
@@ -7,8 +7,8 @@ It consumes local queue requests from `.check-warpgogol/queue/*.request.json` an
 The matching product UI is `apps/check-warpgogol-com`. That app accepts external URLs through `/api/check-runs`; this runner claims the queued request, captures browser evidence, writes `report.json` and `action-pack.json`, and updates `status.json` for the UI to poll.
 
 ```sh
-pnpm --filter check-warpgogol-runner run:once
-pnpm --filter check-warpgogol-runner dev
+pnpm --filter check-runner run:once
+pnpm --filter check-runner dev
 ```
 
 The reusable contracts and browser capture live in packages. This backend only wires local queue/store execution.

@@ -88,10 +88,7 @@ export const CHECK_WEBGOGOL_COMMANDS: CheckCommandEntry[] = [
     description:
       "Validate the Check Warpgogol Node runner backend and app API boundary (RFC-0304).",
     scope: "workspace",
-    reads: [
-      "services/check-warpgogol-runner/**",
-      "apps/check-warpgogol-com/src/pages/api/check-runs/**",
-    ],
+    reads: ["services/check-runner/**", "apps/check-warpgogol-com/src/pages/api/check-runs/**"],
     flags: {},
     execute: runCheckWarpgogolRunnerValidate,
   },
@@ -183,7 +180,10 @@ export const CHECK_WEBGOGOL_COMMANDS: CheckCommandEntry[] = [
         description: "Regenerate even when audience-review.json already exists.",
       },
     },
-    reads: [".check-warpgogol/runs/**", "packages/werkstatt-site/src/domain/ontology/check-audiences/**"],
+    reads: [
+      ".check-warpgogol/runs/**",
+      "packages/werkstatt-site/src/domain/ontology/check-audiences/**",
+    ],
     writes: [".check-warpgogol/runs/**"],
     execute: runCheckAudienceReviewRun,
   },

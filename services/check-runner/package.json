@@ -1,5 +1,5 @@
 {
-  "name": "check-warpgogol-runner",
+  "name": "check-runner",
   "version": "0.0.0",
   "private": true,
   "type": "module",

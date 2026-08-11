@@ -29,7 +29,7 @@ Every `services/*` project that reads environment variables from `process.env`, 
 
 Current services:
 
-- `services/check-warpgogol-runner` is the Node/Playwright runner for the Check Warpgogol site.
+- `services/check-runner` is the Node/Playwright runner for the Check Warpgogol site.
 - It consumes `.check-warpgogol/queue/*.request.json` and writes `.check-warpgogol/runs/<runId>/` artifacts.
 - The site/service boundary is `@warpgogol/werkstatt-site/check-core`; do not bypass it with direct site-to-service imports.
 - `findWorkspaceRoot` in `@warpgogol/werkstatt-site/check-core` is Node-only (uses `node:fs`). Cloudflare Workers API routes in the Check Warpgogol site must read `CHECK_WEBGOGOL_WORKSPACE_ROOT` from the environment directly.

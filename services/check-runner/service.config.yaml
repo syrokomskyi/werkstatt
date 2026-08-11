@@ -1,4 +1,4 @@
-id: check-warpgogol-runner
+id: check-runner
 kind: node-runner
 ownerApp: check-warpgogol-com
 entry: src/worker.ts

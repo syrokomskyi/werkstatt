@@ -186,11 +186,11 @@ export async function runCheckWarpgogolRunnerValidate(
 ): Promise<KernelCommandResult<CheckResult>> {
   const diagnostics: Diagnostic[] = [];
   const required = [
-    "services/check-warpgogol-runner/package.json",
-    "services/check-warpgogol-runner/service.config.yaml",
-    "services/check-warpgogol-runner/Dockerfile",
-    "services/check-warpgogol-runner/src/worker.ts",
-    "services/check-warpgogol-runner/src/run-once.ts",
+    "services/check-runner/package.json",
+    "services/check-runner/service.config.yaml",
+    "services/check-runner/Dockerfile",
+    "services/check-runner/src/worker.ts",
+    "services/check-runner/src/run-once.ts",
     "packages/check-core/src/run-request.ts",
     "apps/check-warpgogol-com/src/pages/api/check-runs/index.ts",
     "apps/check-warpgogol-com/src/pages/api/check-runs/[runid].ts",
@@ -206,7 +206,7 @@ export async function runCheckWarpgogolRunnerValidate(
       });
     }
   }
-  const packagePath = join(context.workspaceRoot, "services/check-warpgogol-runner/package.json");
+  const packagePath = join(context.workspaceRoot, "services/check-runner/package.json");
   if (await context.io.exists(packagePath)) {
     const pkg = JSON.parse(await context.io.readFile(packagePath)) as {
       dependencies?: Record<string, string>;
@@ -219,14 +219,14 @@ export async function runCheckWarpgogolRunnerValidate(
         diagnostics.push({
           ruleId: "CW-RUNNER-02",
           severity: "error",
-          file: "services/check-warpgogol-runner/package.json",
-          message: `check-warpgogol-runner must depend on ${dep}.`,
+          file: "services/check-runner/package.json",
+          message: `check-runner must depend on ${dep}.`,
           fixHint: `Add ${dep} as a workspace dependency.`,
         });
       }
     }
   }
-  const runnerSources = await context.io.glob("services/check-warpgogol-runner/src/**/*.ts", {
+  const runnerSources = await context.io.glob("services/check-runner/src/**/*.ts", {
     cwd: context.workspaceRoot,
   });
   for (const source of runnerSources) {
@@ -241,7 +241,7 @@ export async function runCheckWarpgogolRunnerValidate(
       });
     }
   }
-  const workerPath = join(context.workspaceRoot, "services/check-warpgogol-runner/src/worker.ts");
+  const workerPath = join(context.workspaceRoot, "services/check-runner/src/worker.ts");
   if (await context.io.exists(workerPath)) {
     const worker = await context.io.readFile(workerPath);
     if (
@@ -251,7 +251,7 @@ export async function runCheckWarpgogolRunnerValidate(
       diagnostics.push({
         ruleId: "CW-RUNNER-04",
         severity: "error",
-        file: "services/check-warpgogol-runner/src/worker.ts",
+        file: "services/check-runner/src/worker.ts",
         message: "Runner worker does not use shared Check Warpgogol run contracts.",
         fixHint:
           "Import run contracts from @warpgogol/werkstatt-site/check-core directly or through run-once.ts.",
@@ -276,7 +276,7 @@ export async function runCheckWarpgogolRunnerValidate(
         severity: "error",
         file,
         message: "App API endpoint imports runner-only code.",
-        fixHint: "Keep browser execution in services/check-warpgogol-runner.",
+        fixHint: "Keep browser execution in services/check-runner.",
       });
     }
   }
