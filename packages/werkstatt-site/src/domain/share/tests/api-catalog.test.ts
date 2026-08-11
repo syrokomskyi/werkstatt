@@ -22,11 +22,14 @@ test("buildApiCatalog: empty manifest yields service-meta + service-doc links", 
     languages: { default: "de", supported: ["de"] },
   });
   const catalog = buildApiCatalog(manifest);
-  const links = catalog[""];
-  expect(links).toHaveLength(2);
-  const hrefs = links.map((l) => l.href);
-  expect(hrefs).toContain("/.well-known/agent.json");
-  expect(hrefs).toContain("/llms.txt");
+  const entry = catalog.linkset[0];
+  expect(entry.anchor).toBe("https://s.example/");
+  const serviceMeta = entry["service-meta"] as { href: string }[];
+  expect(serviceMeta).toHaveLength(1);
+  expect(serviceMeta[0].href).toBe("/.well-known/agent.json");
+  const serviceDoc = entry["service-doc"] as { href: string }[];
+  expect(serviceDoc).toHaveLength(1);
+  expect(serviceDoc[0].href).toBe("/llms.txt");
 });
 
 test("buildApiCatalog: one knowledge ref → one item link", () => {
@@ -39,7 +42,7 @@ test("buildApiCatalog: one knowledge ref → one item link", () => {
     ],
   });
   const catalog = buildApiCatalog(manifest);
-  const itemLinks = catalog[""].filter((l) => l.rel === "item");
+  const itemLinks = catalog.linkset[0]["item"] as { href: string; type: string; title: string }[];
   expect(itemLinks).toHaveLength(1);
   expect(itemLinks[0].href).toBe("/api/agent/v1/offer.json");
   expect(itemLinks[0].type).toBe("application/json");
@@ -54,9 +57,11 @@ test("buildApiCatalog: mcp interface adds service-desc + service links", () => {
     mcp: { url: "/api/agent/mcp", protocolVersion: "2025-06-18" },
   });
   const catalog = buildApiCatalog(manifest);
-  const hrefs = catalog[""].map((l) => l.href);
-  expect(hrefs).toContain("/.well-known/mcp/server-card.json");
-  expect(hrefs).toContain("/api/agent/mcp");
+  const entry = catalog.linkset[0];
+  const descHrefs = (entry["service-desc"] as { href: string }[]).map((l) => l.href);
+  expect(descHrefs).toContain("/.well-known/mcp/server-card.json");
+  const service = entry["service"] as { href: string }[];
+  expect(service[0].href).toBe("/api/agent/mcp");
 });
 
 test("buildApiCatalog: determinism — same input produces identical output", () => {
@@ -75,7 +80,7 @@ test("buildApiCatalog: determinism — same input produces identical output", ()
   expect(JSON.stringify(a)).toBe(JSON.stringify(b));
 });
 
-test("buildApiCatalog: links are sorted by href", () => {
+test("buildApiCatalog: links are sorted by href within each relation", () => {
   const manifest = buildAgentSurfaceManifest({
     site: "s",
     baseUrl: "https://s.example",
@@ -86,7 +91,7 @@ test("buildApiCatalog: links are sorted by href", () => {
     ],
   });
   const catalog = buildApiCatalog(manifest);
-  const hrefs = catalog[""].map((l) => l.href);
-  const sorted = [...hrefs].sort();
-  expect(hrefs).toEqual(sorted);
+  const itemHrefs = (catalog.linkset[0]["item"] as { href: string }[]).map((l) => l.href);
+  const sorted = [...itemHrefs].sort();
+  expect(itemHrefs).toEqual(sorted);
 });

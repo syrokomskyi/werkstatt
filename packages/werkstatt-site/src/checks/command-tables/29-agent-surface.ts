@@ -29,6 +29,7 @@ import { runAgentMarkdownNegotiationGenerate } from "../agent/agent-markdown-neg
 import { runAgentGateFixturesRun } from "../agent/agent-gate-fixtures.ts";
 import { runAgentSurfaceSign, runAgentSurfaceVerify } from "../agent/agent-surface-sign.ts";
 import { runAgentDnsAidGenerate, runAgentDnsAidValidate } from "../agent/agent-dns-aid.ts";
+import { runAgentDiscoveryEndpointsGenerate } from "../agent/agent-discovery-endpoints.ts";
 
 export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
@@ -237,7 +238,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "agent.dns-aid.generate",
     description:
-      "Generate the DNS-AID TXT record declaration in systems-cache/<id>/dns-records.yaml from the Agent Surface Manifest (RFC-0786).",
+      "Generate the DNS-AID SVCB record declaration in systems-cache/<id>/dns-records.yaml from the Agent Surface Manifest (RFC-0786).",
     scope: "app",
     supportsAllSites: true,
     mutatesState: true,
@@ -250,7 +251,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "agent.dns-aid.validate",
     description:
-      "Validate the DNS-AID TXT record declaration against the Agent Surface Manifest and check Cloudflare presence (RFC-0786, AGD-01..04).",
+      "Validate the DNS-AID SVCB record declaration against the Agent Surface Manifest and check Cloudflare presence (RFC-0786, AGD-01..04).",
     scope: "app",
     supportsAllSites: true,
     flags: {},
@@ -271,5 +272,23 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     reads: ["packages/agent-gate/src/**/*.ts"],
     modulePaths: ["agent/agent-gate-fixtures.ts"],
     execute: runAgentGateFixturesRun,
+  },
+  {
+    name: "agent.discovery-endpoints.generate",
+    description:
+      "Generate agent discovery endpoint files: auth.md, agent-skills/index.json, oauth-protected-resource, oauth-authorization-server.",
+    scope: "app",
+    supportsAllSites: true,
+    mutatesState: true,
+    writes: [
+      "<app>/public/auth.md",
+      "<app>/public/.well-known/agent-skills/index.json",
+      "<app>/public/.well-known/oauth-protected-resource",
+      "<app>/public/.well-known/oauth-authorization-server",
+    ],
+    flags: {},
+    reads: ["<app>/src/content/system.md", "<app>/src/agent-surface.generated.yaml"],
+    modulePaths: ["agent/agent-discovery-endpoints.ts"],
+    execute: runAgentDiscoveryEndpointsGenerate,
   },
 ];

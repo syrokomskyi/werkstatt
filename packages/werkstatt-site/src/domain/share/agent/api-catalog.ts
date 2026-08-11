@@ -17,70 +17,61 @@ No I/O — the kernel command loads the manifest and passes it here.
 
 import type { AgentSurfaceManifest } from "./manifest.ts";
 
-/** RFC 9727 linkset+json entry — one per API endpoint or discovery resource. */
+/** RFC 9264 linkset+json link object — no `rel` (it's the key in the linkset entry). */
 export interface ApiCatalogLink {
   href: string;
-  rel: string;
   type: string;
   title?: string;
-  anchor?: string;
 }
 
-/** RFC 9727 linkset document — map of anchor to link array. */
+/** RFC 9264 linkset entry — anchor + relation-keyed link arrays. */
+export interface ApiCatalogEntry {
+  anchor: string;
+  [relation: string]: string | ApiCatalogLink[];
+}
+
+/** RFC 9264 linkset document — top-level `linkset` array. */
 export interface ApiCatalog {
-  [anchor: string]: ApiCatalogLink[];
+  linkset: ApiCatalogEntry[];
 }
 
 /**
- * Pure: project Agent Surface Manifest into RFC 9727 linkset+json.
- * Deterministic — links are sorted by href for byte-identical output (DNA-58).
+ * Pure: project Agent Surface Manifest into RFC 9264 linkset+json.
+ * Deterministic — links within each relation are sorted by href for byte-identical output (DNA-58).
  */
 export function buildApiCatalog(manifest: AgentSurfaceManifest): ApiCatalog {
-  const links: ApiCatalogLink[] = [];
+  const anchor = manifest.baseUrl.replace(/\/+$/, "") + "/";
+  const entry: ApiCatalogEntry = { anchor };
 
-  for (const ref of manifest.knowledge) {
-    links.push({
-      href: ref.url,
-      rel: "item",
-      type: "application/json",
-      title: ref.domain,
-    });
+  const item: ApiCatalogLink[] = manifest.knowledge.map((ref) => ({
+    href: ref.url,
+    type: "application/json",
+    title: ref.domain,
+  }));
+  if (item.length > 0) {
+    item.sort((a, b) => a.href.localeCompare(b.href));
+    entry["item"] = item;
   }
 
-  links.push({
-    href: "/.well-known/agent.json",
-    rel: "service-meta",
-    type: "application/json",
-  });
+  entry["service-meta"] = [{ href: "/.well-known/agent.json", type: "application/json" }];
 
+  const serviceDesc: ApiCatalogLink[] = [];
   if (manifest.interfaces.openapi) {
-    links.push({
-      href: manifest.interfaces.openapi,
-      rel: "service-desc",
-      type: "application/json",
-    });
+    serviceDesc.push({ href: manifest.interfaces.openapi, type: "application/json" });
+  }
+  if (manifest.interfaces.mcp) {
+    serviceDesc.push({ href: "/.well-known/mcp/server-card.json", type: "application/json" });
+  }
+  if (serviceDesc.length > 0) {
+    serviceDesc.sort((a, b) => a.href.localeCompare(b.href));
+    entry["service-desc"] = serviceDesc;
   }
 
   if (manifest.interfaces.mcp) {
-    links.push({
-      href: "/.well-known/mcp/server-card.json",
-      rel: "service-desc",
-      type: "application/json",
-    });
-    links.push({
-      href: manifest.interfaces.mcp.url,
-      rel: "service",
-      type: "application/json",
-    });
+    entry["service"] = [{ href: manifest.interfaces.mcp.url, type: "application/json" }];
   }
 
-  links.push({
-    href: manifest.interfaces.llms,
-    rel: "service-doc",
-    type: "text/plain",
-  });
+  entry["service-doc"] = [{ href: manifest.interfaces.llms, type: "text/plain" }];
 
-  links.sort((a, b) => a.href.localeCompare(b.href));
-
-  return { "": links };
+  return { linkset: [entry] };
 }

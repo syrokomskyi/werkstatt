@@ -68,7 +68,10 @@ export async function runAgentApiCatalogGenerate(
   await context.io.mkdir(join(paths.appDirectory, "public", ".well-known"));
   await context.io.writeFile(catalogPath, json);
 
-  const linkCount = catalog[""].length;
+  const linkCount = Object.values(catalog.linkset[0]).reduce(
+    (sum, val) => sum + (Array.isArray(val) ? val.length : 0),
+    0,
+  );
 
   return {
     data: {
