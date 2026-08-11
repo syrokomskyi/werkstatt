@@ -100,6 +100,38 @@ export function aggregateCollectErrors(
   };
 }
 
+/**
+ * RFC-0809: Build a KernelPipelineReport for collect-errors mode.
+ * Shared between executePipelineForSite and executePipelineForWorkspace
+ * to avoid duplicated post-processing logic.
+ */
+function buildCollectErrorsReport(
+  collected: { failedSteps: string[]; exitCode: number; ok: false },
+  reports: KernelExecutionReport[],
+  pipelineName: string,
+  timing: KernelPipelineTimingSummary,
+  prefix: string,
+  siteName?: string,
+): KernelPipelineReport {
+  for (const name of collected.failedSteps) {
+    const failedReport = reports.find((r) => r.commandName === name);
+    progressLine(`  [FAIL] ${name}: ${failedReport?.summary ?? "failed"}`);
+  }
+  progressLine(
+    `${prefix} pipeline ${pipelineName} — FAILED (${collected.failedSteps.length} step(s) failed, ${formatDuration(timing.totalDurationMs)})`,
+  );
+  return {
+    ...(siteName ? { siteName } : {}),
+    pipelineName,
+    exitCode: collected.exitCode,
+    ok: false,
+    steps: reports,
+    timing,
+    filesModified: aggregateFilesModified(reports),
+    failedSteps: collected.failedSteps,
+  };
+}
+
 // RFC-0732: convert pipeline-level flags record to CLI args for step execution.
 function pipelineFlagsToArgs(flags: Record<string, unknown> | undefined): string[] {
   if (!flags) return [];
@@ -804,23 +836,14 @@ async function executePipelineForSite(
     // RFC-0809: collect-errors mode — aggregate all independent failures.
     const collected = aggregateCollectErrors(sortedResults, options.collectErrors ?? false);
     if (collected) {
-      for (const name of collected.failedSteps) {
-        const failedReport = reports.find((r) => r.commandName === name);
-        progressLine(`  [FAIL] ${name}: ${failedReport?.summary ?? "failed"}`);
-      }
-      progressLine(
-        `[${site.name}] pipeline ${options.pipelineName} — FAILED (${collected.failedSteps.length} step(s) failed, ${formatDuration(timing.totalDurationMs)})`,
-      );
-      return {
-        siteName: site.name,
-        pipelineName: options.pipelineName,
-        exitCode: collected.exitCode,
-        ok: false,
-        steps: reports,
+      return buildCollectErrorsReport(
+        collected,
+        reports,
+        options.pipelineName,
         timing,
-        filesModified: aggregateFilesModified(reports),
-        failedSteps: collected.failedSteps,
-      };
+        `[${site.name}]`,
+        site.name,
+      );
     }
 
     if (failed) {
@@ -1046,22 +1069,13 @@ async function executePipelineForWorkspace(
     // RFC-0809: collect-errors mode — aggregate all independent failures.
     const collected = aggregateCollectErrors(sortedResults, options.collectErrors ?? false);
     if (collected) {
-      for (const name of collected.failedSteps) {
-        const failedReport = reports.find((r) => r.commandName === name);
-        progressLine(`  [FAIL] ${name}: ${failedReport?.summary ?? "failed"}`);
-      }
-      progressLine(
-        `[workspace] pipeline ${options.pipelineName} — FAILED (${collected.failedSteps.length} step(s) failed, ${formatDuration(timing.totalDurationMs)})`,
-      );
-      return {
-        pipelineName: options.pipelineName,
-        exitCode: collected.exitCode,
-        ok: false,
-        steps: reports,
+      return buildCollectErrorsReport(
+        collected,
+        reports,
+        options.pipelineName,
         timing,
-        filesModified: aggregateFilesModified(reports),
-        failedSteps: collected.failedSteps,
-      };
+        `[workspace]`,
+      );
     }
 
     if (failed) {
