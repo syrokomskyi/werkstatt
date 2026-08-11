@@ -20,8 +20,8 @@ function init(): void {
   const scene = document.querySelector<HTMLElement>("[data-mountain-journey-scene]");
   if (!scene) return;
 
-  const workerEndpoint = import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT;
-  if (!workerEndpoint || typeof workerEndpoint !== "string") {
+  const workerEndpoint = scene.dataset.workerEndpoint;
+  if (!workerEndpoint) {
     const errorEl = document.querySelector<HTMLElement>("[data-mountain-journey-error]");
     if (errorEl) errorEl.hidden = false;
     return;

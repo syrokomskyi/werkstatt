@@ -28,6 +28,9 @@ propsSchema:
     - stages
     - form
   properties:
+    workerEndpoint:
+      type: string
+      minLength: 1
     backgroundImage:
       type: string
       minLength: 1

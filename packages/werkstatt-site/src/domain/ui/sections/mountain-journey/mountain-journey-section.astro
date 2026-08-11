@@ -13,6 +13,7 @@
 </CHANGE_SUMMARY>
 */
 
+import "./mountain-journey-section.css";
 import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
 import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
@@ -51,6 +52,7 @@ const { svgViewBox, routePath, stages, form } = props;
     data-route-path={routePath}
     data-view-box-width={svgViewBox.width}
     data-view-box-height={svgViewBox.height}
+    data-worker-endpoint={props.workerEndpoint ?? ""}
   >
     <img
       class="mountain-journey__background"
