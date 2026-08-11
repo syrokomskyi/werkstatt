@@ -202,7 +202,7 @@ export async function discoverSystems(workspaceRoot: string): Promise<DiscoveryR
     if (systemId.startsWith(".")) continue;
 
     try {
-      const config = await readSystemConfig(workspaceRoot, systemId);
+      const config = await readSystemConfigSmart(workspaceRoot, systemId);
       systems.push(config);
     } catch (err) {
       errors.push({
