@@ -1,7 +1,7 @@
 ---
 id: RFC-0801
 title: "Separate mission.archive from mission.close and clean service folders on archive"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
