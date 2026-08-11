@@ -112,7 +112,7 @@ export {
   resolveStagingDir,
 } from "../werkstatt/index.ts";
 
-export { createMissionModule } from "../mission/index.ts";
+export { createMissionModule } from "../mission/mission.module.ts";
 export {
   runWorkpieceRead,
   runWorkpieceWrite,
