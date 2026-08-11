@@ -572,7 +572,7 @@ importers:
         specifier: ^4.23.1
         version: 4.23.1
 
-  services/lagebild-sync-worker:
+  services/lagebild-sync:
     dependencies:
       '@warpgogol/werkstatt-site':
         specifier: workspace:*
@@ -583,7 +583,7 @@ importers:
         version: 5.20260801.1
       wrangler:
         specifier: ^4.118.0
-        version: 4.118.0(@cloudflare/workers-types@5.20260801.1)
+        version: 4.120.0(@cloudflare/workers-types@5.20260801.1)
 
   services/matomo-proxy:
     devDependencies:
@@ -594,18 +594,18 @@ importers:
         specifier: ^4.118.0
         version: 4.118.0(@cloudflare/workers-types@5.20260801.1)
 
-  services/maturity-score-worker:
+  services/maturity-score:
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20260801.1
         version: 5.20260801.1
       wrangler:
         specifier: ^4.118.0
-        version: 4.119.0(@cloudflare/workers-types@5.20260801.1)
+        version: 4.120.0(@cloudflare/workers-types@5.20260801.1)
 
   services/observability-stack: {}
 
-  services/rate-fetcher-worker:
+  services/rate-fetcher:
     dependencies:
       '@warpgogol/werkstatt-site':
         specifier: workspace:*
@@ -616,7 +616,7 @@ importers:
         version: 5.20260801.1
       wrangler:
         specifier: ^4.118.0
-        version: 4.119.0(@cloudflare/workers-types@5.20260801.1)
+        version: 4.120.0(@cloudflare/workers-types@5.20260801.1)
 
   services/telegram-alert-bridge:
     devDependencies:
