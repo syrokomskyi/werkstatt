@@ -54,10 +54,6 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/werkstatt"
   - "@warpgogol/werkstatt-site"
-servicesImpacted:
-  - "lagebild-sync-worker"
-  - "maturity-score-worker"
-  - "rate-fetcher-worker"
 successSignals:
   - "services/* directories have no -worker suffix"
   - "wrangler.jsonc name fields have no -worker suffix"
@@ -259,17 +255,17 @@ No new TypeScript interfaces are introduced — the existing `CheckResult` + `Di
 
 ## Acceptance criteria
 
-- [ ] `services/lagebild-sync-worker/` directory renamed to `services/lagebild-sync/` (evidence: `ls services/lagebild-sync/`)
-- [ ] `services/maturity-score-worker/` directory renamed to `services/maturity-score/` (evidence: `ls services/maturity-score/`)
-- [ ] `services/rate-fetcher-worker/` directory renamed to `services/rate-fetcher/` (evidence: `ls services/rate-fetcher/`)
-- [ ] `package.json` `name` fields updated in all three renamed services (evidence: `grep -r 'lagebild-sync\|maturity-score\|rate-fetcher' services/*/package.json`)
-- [ ] `wrangler.jsonc` `name` fields updated in all three renamed services (evidence: `grep -r '"name"' services/*/wrangler.jsonc`)
-- [ ] `services/registry.yaml` `id`, `workerName`, `url` fields updated (evidence: `grep -v 'worker' services/registry.yaml | grep -E 'id:|workerName:|url:'`)
-- [ ] All hardcoded references in `packages/*` updated (evidence: `grep -rn 'lagebild-sync-worker\|maturity-score-worker\|rate-fetcher-worker' packages/` returns zero results)
-- [ ] SVC-NAME-06 rule added to existing `service.naming.validate` (evidence: `grep SVC-NAME-06 packages/werkstatt-site/src/checks/services/service-naming-validate.ts`)
-- [ ] `service.naming.validate` passes with zero violations after rename (evidence: `pnpm exec werkstatt run service.naming.validate --json` exits 0)
+- [x] `services/lagebild-sync-worker/` directory renamed to `services/lagebild-sync/` (evidence: `ls services/lagebild-sync/`)
+- [x] `services/maturity-score-worker/` directory renamed to `services/maturity-score/` (evidence: `ls services/maturity-score/`)
+- [x] `services/rate-fetcher-worker/` directory renamed to `services/rate-fetcher/` (evidence: `ls services/rate-fetcher/`)
+- [x] `package.json` `name` fields updated in all three renamed services (evidence: `grep -r 'lagebild-sync\|maturity-score\|rate-fetcher' services/*/package.json`)
+- [x] `wrangler.jsonc` `name` fields updated in all three renamed services (evidence: `grep -r '"name"' services/*/wrangler.jsonc`)
+- [x] `services/registry.yaml` `id`, `workerName`, `url` fields updated (evidence: `grep -v 'worker' services/registry.yaml | grep -E 'id:|workerName:|url:'`)
+- [x] All hardcoded references in `packages/*` updated (evidence: `grep -rn 'lagebild-sync-worker\|maturity-score-worker\|rate-fetcher-worker' packages/` returns zero results)
+- [x] SVC-NAME-06 rule added to existing `service.naming.validate` (evidence: `grep SVC-NAME-06 packages/werkstatt-site/src/checks/services/service-naming-validate.ts`)
+- [x] `service.naming.validate` passes with zero violations after rename (evidence: `pnpm exec werkstatt run service.naming.validate --json` exits 0)
 - [ ] Old Cloudflare Workers deleted after new ones deployed (evidence: `npx wrangler deployments list --name lagebild-sync` succeeds, `--name lagebild-sync-worker` fails with 404)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0805 --json` exits 0)
 
 ## Implementation notes for agents
 

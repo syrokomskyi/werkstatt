@@ -16,7 +16,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0805
 related:
   - RFC-0305
   - RFC-0379
