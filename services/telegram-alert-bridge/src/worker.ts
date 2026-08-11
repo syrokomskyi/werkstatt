@@ -11,6 +11,8 @@
 </CHANGE_SUMMARY>
 */
 
+import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+
 interface SignozWebhookPayload {
   alert_name?: string;
   state?: string;
@@ -23,6 +25,8 @@ interface Env {
   BRIDGE_SECRET: string;
   TELEGRAM_BOT_TOKEN: string;
   TELEGRAM_CHAT_ID: string;
+  WARPGOGOL_OTLP_ENDPOINT: string;
+  WARPGOGOL_OTLP_TOKEN: string;
 }
 
 function formatMessage(payload: SignozWebhookPayload): string {
@@ -38,6 +42,14 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const healthUrl = new URL(request.url);
     if (healthUrl.pathname === "/health") {
+      const pusher = createMetricsPusher(
+        { serviceName: "telegram-alert-bridge", layer: "back", environment: "production" },
+        { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+      );
+      if (pusher) {
+        pusher.gaugeSet("warpgogol_back_up", 1, { service: "telegram-alert-bridge" });
+        await pusher.flush();
+      }
       return new Response(JSON.stringify({ status: "ok", service: "telegram-alert-bridge" }), {
         status: 200,
         headers: { "content-type": "application/json" },
@@ -64,6 +76,11 @@ export default {
     const text = formatMessage(payload);
     const tgUrl = `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
+    const pusher = createMetricsPusher(
+      { serviceName: "telegram-alert-bridge", layer: "back", environment: "production" },
+      { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+    );
+
     const tgResponse = await fetch(tgUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -73,6 +90,23 @@ export default {
         parse_mode: "HTML",
       }),
     });
+
+    if (pusher) {
+      const statusClass = `${Math.floor(tgResponse.status / 100)}xx`;
+      pusher.counterAdd("warpgogol_back_requests_total", 1, {
+        service: "telegram-alert-bridge",
+        status_class: statusClass,
+      });
+      if (!tgResponse.ok) {
+        pusher.counterAdd("warpgogol_back_last_error_total", 1, {
+          service: "telegram-alert-bridge",
+        });
+        pusher.gaugeSet("warpgogol_back_up", 0, { service: "telegram-alert-bridge" });
+      } else {
+        pusher.gaugeSet("warpgogol_back_up", 1, { service: "telegram-alert-bridge" });
+      }
+      await pusher.flush();
+    }
 
     if (!tgResponse.ok) {
       return new Response("Upstream error", { status: 502 });

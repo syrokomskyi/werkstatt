@@ -16,7 +16,11 @@ URL hash. The real HDRI scoring logic is deferred.</purpose>
 </CHANGE_SUMMARY>
 */
 
+import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+
 export interface MaturityScoreWorkerEnv {
+  WARPGOGOL_OTLP_ENDPOINT: string;
+  WARPGOGOL_OTLP_TOKEN: string;
   [key: string]: string | undefined;
 }
 
@@ -68,7 +72,7 @@ export function createMaturityScoreWorker() {
   return {
     async fetch(
       request: Request,
-      _env: MaturityScoreWorkerEnv,
+      env: MaturityScoreWorkerEnv,
       _ctx: ExecutionContext,
     ): Promise<Response> {
       const url = new URL(request.url);
@@ -78,6 +82,14 @@ export function createMaturityScoreWorker() {
       }
 
       if (url.pathname === "/health") {
+        const pusher = createMetricsPusher(
+          { serviceName: "maturity-score", layer: "back", environment: "production" },
+          { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+        );
+        if (pusher) {
+          pusher.gaugeSet("warpgogol_back_up", 1, { service: "maturity-score" });
+          await pusher.flush();
+        }
         return json({ status: "ok", service: "maturity-score" }, 200);
       }
 
@@ -130,6 +142,20 @@ export function createMaturityScoreWorker() {
 
       const score = calculateStubScore(requestUrl);
       const response: ScoreResponse = { score };
+
+      const pusher = createMetricsPusher(
+        { serviceName: "maturity-score", layer: "back", environment: "production" },
+        { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+      );
+      if (pusher) {
+        pusher.counterAdd("warpgogol_back_requests_total", 1, {
+          service: "maturity-score",
+          status_class: "2xx",
+        });
+        pusher.gaugeSet("warpgogol_back_up", 1, { service: "maturity-score" });
+        await pusher.flush();
+      }
+
       return json(response, 200);
     },
   };

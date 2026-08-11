@@ -32,6 +32,7 @@ import {
   updateTenantHealth,
   type RegistryClient,
 } from "./tenant-registry.ts";
+import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
 
 /** RFC-0186: Shared Worker env bindings. Includes registry connection + tenant secrets namespace. */
 export interface LagebildSharedWorkerEnv {
@@ -40,6 +41,9 @@ export interface LagebildSharedWorkerEnv {
   LAGEBILD_REGISTRY_API_KEY: string;
   // Optional: override default cron group
   LAGEBILD_CRON_GROUP?: string;
+  // RFC-0807: OTLP metrics push
+  WARPGOGOL_OTLP_ENDPOINT: string;
+  WARPGOGOL_OTLP_TOKEN: string;
   // Tenant secrets are resolved dynamically via sync_tenants.secret_ref fields
   // Pattern: TENANT_{SITE_NAME}_{KIND} injected by wrangler secret put
   [key: string]: string | undefined;
@@ -53,6 +57,11 @@ export function createLagebildSharedSyncWorker() {
       env: LagebildSharedWorkerEnv,
       _ctx: ExecutionContext,
     ): Promise<void> {
+      const pusher = createMetricsPusher(
+        { serviceName: "lagebild-sync", layer: "back", environment: "production" },
+        { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+      );
+
       const registry: RegistryClient = {
         url: env.LAGEBILD_REGISTRY_URL,
         apiKey: env.LAGEBILD_REGISTRY_API_KEY,
@@ -64,15 +73,34 @@ export function createLagebildSharedSyncWorker() {
         tenants = await getEnabledTenants(registry, cronGroup);
       } catch (err) {
         console.error("[lagebild] failed to load tenants:", (err as Error).message);
+        if (pusher) {
+          pusher.gaugeSet("warpgogol_back_up", 0, { service: "lagebild-sync" });
+          pusher.counterAdd("warpgogol_back_last_run_total", 1, {
+            service: "lagebild-sync",
+            status: "failure",
+          });
+          pusher.counterAdd("warpgogol_back_last_error_total", 1, { service: "lagebild-sync" });
+          await pusher.flush();
+        }
         return;
       }
 
       if (tenants.length === 0) {
         console.log("[lagebild] no enabled tenants");
+        if (pusher) {
+          pusher.gaugeSet("warpgogol_back_up", 1, { service: "lagebild-sync" });
+          pusher.counterAdd("warpgogol_back_last_run_total", 1, {
+            service: "lagebild-sync",
+            status: "success",
+          });
+          await pusher.flush();
+        }
         return;
       }
 
       console.log(`[lagebild] processing ${tenants.length} tenants`);
+
+      let hadError = false;
 
       for (const tenant of tenants) {
         const resolved = resolveTenantSecrets(tenant, env);
@@ -95,6 +123,7 @@ export function createLagebildSharedSyncWorker() {
             last_error: null,
           });
         } catch (err) {
+          hadError = true;
           const msg = (err as Error).message;
           console.error(`[lagebild][${tenant.site_name}] tenant failed:`, msg);
           await updateTenantHealth(registry, tenant.tenant_id, {
@@ -103,6 +132,18 @@ export function createLagebildSharedSyncWorker() {
             last_error: msg,
           });
         }
+      }
+
+      if (pusher) {
+        pusher.gaugeSet("warpgogol_back_up", hadError ? 0 : 1, { service: "lagebild-sync" });
+        pusher.counterAdd("warpgogol_back_last_run_total", 1, {
+          service: "lagebild-sync",
+          status: hadError ? "failure" : "success",
+        });
+        if (hadError) {
+          pusher.counterAdd("warpgogol_back_last_error_total", 1, { service: "lagebild-sync" });
+        }
+        await pusher.flush();
       }
     },
   };

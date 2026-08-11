@@ -16,6 +16,9 @@
     "tsx": "^4.20.0",
     "wrangler": "^4.118.0"
   },
+  "dependencies": {
+    "@warpgogol/werkstatt-site": "workspace:*"
+  },
   "gogol": {
     "testSignal": {
       "signal": "skipped",

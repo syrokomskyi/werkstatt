@@ -13,16 +13,44 @@
 */
 
 import { proxyMatomoRequest } from "./proxy.ts";
+import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+
+interface Env {
+  WARPGOGOL_OTLP_ENDPOINT: string;
+  WARPGOGOL_OTLP_TOKEN: string;
+}
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/health" || url.pathname === "/_wg/analytics/health") {
+      const pusher = createMetricsPusher(
+        { serviceName: "matomo-proxy", layer: "back", environment: "production" },
+        { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+      );
+      if (pusher) {
+        pusher.gaugeSet("warpgogol_back_up", 1, { service: "matomo-proxy" });
+        await pusher.flush();
+      }
       return new Response(JSON.stringify({ status: "ok", service: "matomo-proxy" }), {
         status: 200,
         headers: { "content-type": "application/json" },
       });
     }
-    return proxyMatomoRequest(request);
+    const pusher = createMetricsPusher(
+      { serviceName: "matomo-proxy", layer: "back", environment: "production" },
+      { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+    );
+    const response = await proxyMatomoRequest(request);
+    if (pusher) {
+      const statusClass = `${Math.floor(response.status / 100)}xx`;
+      pusher.counterAdd("warpgogol_back_requests_total", 1, {
+        service: "matomo-proxy",
+        status_class: statusClass,
+      });
+      pusher.gaugeSet("warpgogol_back_up", response.ok ? 1 : 0, { service: "matomo-proxy" });
+      await pusher.flush();
+    }
+    return response;
   },
 };
