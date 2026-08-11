@@ -61,6 +61,7 @@ Notable check commands registered by this package:
 - `template.imports.validate` (RFC-0557) — validates template imports against root devDependencies.
 - `workpiece.imports.validate` (RFC-0557) — validates workpiece imports against root node_modules.
 - `template.deps.drift` (RFC-0800) — compares `dependencies` and `devDependencies` between workpiece `package.json` and `package.template.json`. Emits `TEMPLATE-DEPS-DRIFT-01` for version mismatches and `TEMPLATE-DEPS-DRIFT-02` for missing files. Integrated into `SITES_BUILD_CHECK_PIPELINE` as a safety net for the auto-sync in `mission.close`.
+- `deployment.gate.validate` (RFC-0803) — validates that non-gated pages do not reference gated pages in navigation, block props, or breadcrumb parent chains. Emits `GATE-01` (navigation), `GATE-02` (block props), `GATE-03` (parentPageId). Integrated into `SITES_BUILD_CHECK_PIPELINE`.
 
 ## Domain layer (RFC-0775)
 
