@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "totalCount": 57,
+  "totalCount": 58,
   "entries": [
     {
       "id": "approach",
@@ -337,6 +337,18 @@
       ],
       "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/components/media.yaml",
       "layer": "component"
+    },
+    {
+      "id": "mountain-journey",
+      "displayName": "Mountain journey",
+      "semanticRole": "maturity-visualization",
+      "version": "1.0.0",
+      "layoutHint": "single-column",
+      "acceptedCosmicNames": [
+        "Prometheus"
+      ],
+      "sourceFile": "packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml",
+      "layer": "section"
     },
     {
       "id": "nachweis-card",
@@ -706,6 +718,7 @@
     "impact",
     "lead-message-capture",
     "markdown",
+    "maturity-visualization",
     "navigation",
     "open-source-registry",
     "page-metadata-footer",
@@ -844,6 +857,7 @@
     "hero-decision-card": "Phobos",
     "impact": "Ganymede",
     "markdown": "Hyperion",
+    "mountain-journey": "Prometheus",
     "navigation": "Phoebe",
     "notausgang-block": "Telesto",
     "open-source-registry": "Orcus",

@@ -1,0 +1,97 @@
+id: mountain-journey-section
+uniName: mountain-journey-section
+layer: section
+semanticId: mountain-journey
+archetype: mountain-journey
+cosmicName: Prometheus
+role: maturity-visualization
+version: "1.0.0"
+intent:
+  - convert-visitor
+  - establish-identity
+industryFit: []
+contentSchemaKey: mountain-journey-section
+contentTypesPath: "./mountain-journey-section.types.generated.ts"
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - backgroundImage
+    - svgViewBox
+    - routePath
+    - stages
+    - form
+  properties:
+    backgroundImage:
+      type: string
+      minLength: 1
+    svgViewBox:
+      type: object
+      additionalProperties: false
+      required:
+        - width
+        - height
+      properties:
+        width:
+          type: number
+        height:
+          type: number
+    routePath:
+      type: string
+      minLength: 1
+    stages:
+      type: array
+      minItems: 2
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - id
+          - label
+          - scoreRange
+          - description
+          - position
+        properties:
+          id:
+            type: string
+            minLength: 1
+          label:
+            type: string
+            minLength: 1
+          scoreRange:
+            type: string
+            minLength: 1
+          description:
+            type: string
+            minLength: 1
+          position:
+            type: number
+            minimum: 0
+            maximum: 1
+    form:
+      type: object
+      additionalProperties: false
+      required:
+        - inputLabel
+        - inputPlaceholder
+        - submitLabel
+        - errorMessage
+      properties:
+        inputLabel:
+          type: string
+          minLength: 1
+        inputPlaceholder:
+          type: string
+          minLength: 1
+        submitLabel:
+          type: string
+          minLength: 1
+        errorMessage:
+          type: string
+          minLength: 1

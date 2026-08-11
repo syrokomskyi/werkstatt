@@ -176,8 +176,14 @@ export async function discoverManifestPropsInfo(
   workspaceRoot: string,
 ): Promise<ManifestPropsInfo[]> {
   const roots: Array<{ dir: string; layer: "section" | "component" }> = [
-    { dir: join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections"), layer: "section" },
-    { dir: join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "components"), layer: "component" },
+    {
+      dir: join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "sections"),
+      layer: "section",
+    },
+    {
+      dir: join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "components"),
+      layer: "component",
+    },
   ];
 
   const infos: ManifestPropsInfo[] = [];
