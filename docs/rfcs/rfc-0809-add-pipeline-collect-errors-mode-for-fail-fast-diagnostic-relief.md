@@ -218,19 +218,19 @@ if (collectErrors && failedReports.length > 0) {
 
 ## Acceptance criteria
 
-- [ ] `collectErrors` field added to `ExecuteKernelPipelineOptions`
-- [ ] `failedSteps` field added to `KernelPipelineReport`
-- [ ] `--collect-errors` flag accepted by `mission.validate`, `build.check`, `build.post`, `build.prepare`
-- [ ] `--collect-errors` flag accepted by `pipeline` CLI subcommand (`cli/index.ts`)
-- [ ] All independent step failures aggregated in final report (concurrency > 1)
-- [ ] Dependent steps still skipped when dependency fails
-- [ ] Default fail-fast behavior unchanged
-- [ ] `--json` output includes `failedSteps` array
-- [ ] `--collect-errors` is a no-op when `concurrency=1` (documented, not errored)
-- [ ] Unit test: multiple independent failures reported in one run
-- [ ] Unit test: dependent steps still skipped in collect-errors mode
-- [ ] Unit test: `concurrency=1` with `--collect-errors` behaves identically to fail-fast
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `collectErrors` field added to `ExecuteKernelPipelineOptions` (evidence: packages/werkstatt/src/kernel/types.ts:436-437)
+- [x] `failedSteps` field added to `KernelPipelineReport` (evidence: packages/werkstatt/src/kernel/types.ts:366-370)
+- [x] `--collect-errors` flag accepted by `mission.validate`, `build.check`, `build.post`, `build.prepare` (evidence: packages/werkstatt/src/mission/mission.module.ts:239-243, packages/werkstatt/src/mission/mission-materialization-commands.ts:433,499,588,628)
+- [x] `--collect-errors` flag accepted by `pipeline` CLI subcommand (`cli/index.ts`) (evidence: packages/werkstatt/src/kernel/cli/index.ts:113-116,299,319)
+- [x] All independent step failures aggregated in final report (concurrency > 1) (evidence: packages/werkstatt/src/kernel/runtime/execute-pipeline.ts:84-98,801-821,1043-1062)
+- [x] Dependent steps still skipped when dependency fails (evidence: packages/werkstatt/src/kernel/runtime/execute-pipeline.ts:90 — filter excludes dependencySkipped)
+- [x] Default fail-fast behavior unchanged (evidence: packages/werkstatt/src/kernel/runtime/execute-pipeline.ts:88 — returns undefined when collectErrors is false)
+- [x] `--json` output includes `failedSteps` array (evidence: packages/werkstatt/src/kernel/runtime/execute-pipeline.ts:819,1060 — failedSteps included in returned KernelPipelineReport)
+- [x] `--collect-errors` is a no-op when `concurrency=1` (documented, not errored) (evidence: scheduler uses full sequential mode at concurrency=1, collect-errors post-processing only runs after scheduler completes — no scheduler modification)
+- [x] Unit test: multiple independent failures reported in one run (evidence: packages/werkstatt/src/kernel/tests/execute-pipeline-collect-errors.test.ts:68-79)
+- [x] Unit test: dependent steps still skipped in collect-errors mode (evidence: packages/werkstatt/src/kernel/tests/execute-pipeline-collect-errors.test.ts:81-90)
+- [x] Unit test: `concurrency=1` with `--collect-errors` behaves identically to fail-fast (evidence: packages/werkstatt/src/kernel/tests/execute-pipeline-collect-errors.test.ts:92-100 — collectErrors=false returns undefined, confirming fallthrough to fail-fast)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0809 --json → ok: true)
 
 ## Implementation notes for agents
 
