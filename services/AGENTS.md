@@ -14,7 +14,7 @@ Rules:
 - Add reusable runtime contracts to packages before using them from a service.
 - **Test temp directories:** Unit tests that create temp directories (via `mkdtemp`/`mkdtempSync`) MUST use the `tmp-*` naming pattern (e.g. `tmp-runner-XXXX-`). These directories are gitignored via `tmp-*/` in `.gitignore`. Agents MUST clean up `tmp-*` directories they create during a session — the session-end workflow automates this, but agents should also clean up manually if a session is not formally closed.
 
-## Env-and-deploy contract (RFC-0761 / DNA-40)
+## Env-and-deploy contract (RFC-0761 / DNA-40 / RFC-0806)
 
 Every `services/*` project that reads environment variables from `process.env`, a `getEnv()` helper, or a Cloudflare Worker `Env` interface MUST ship a `.env.example` file in its project root.
 
@@ -26,6 +26,19 @@ Every `services/*` project that reads environment variables from `process.env`, 
 - `services/*/package.json` deploy scripts MUST use `--secrets-file .env` and be prefixed with `deploy.preflight`.
 - Services that do not consume environment variables are exempt.
 - Enforced by `env.contract.validate`, `env.local.check`, `deploy.scripts.validate`, and `deploy.preflight`.
+
+### Dev channel (RFC-0806)
+
+Cloudflare Worker services ship a `wrangler.dev.jsonc` config for dev-channel deploys. The dev config uses a `-dev` worker name suffix and `*.workers.dev` URL (no custom routes).
+
+- Services with env vars MUST also ship `.env.dev.example` — same documentation rules as `.env.example`.
+- `deploy.preflight --dev` validates `.env.dev` against `.env.dev.example`.
+- `services/*/package.json` includes three deploy scripts:
+  - `deploy:dev` — proxies to `leitstand.service.dev-deploy --service <id>`
+  - `deploy:prod` — proxies to `leitstand.service.promote --service <id>`
+  - `rollback` — proxies to `leitstand.service.rollback --service <id>`
+- All Cloudflare Worker services MUST implement a `/health` endpoint returning `{"status":"ok","service":"<id>"}` with HTTP 200.
+- The services registry (`services/registry.yaml`) tracks `lastDeployed`, `lastDevDeployed`, and `healthCheckPath` per service.
 
 Current services:
 
