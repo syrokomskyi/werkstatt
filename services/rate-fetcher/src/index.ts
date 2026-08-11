@@ -21,11 +21,14 @@ import {
   registerRateSourceAdapter,
   type RateSourceAdapter,
 } from "@warpgogol/werkstatt-site/pbp-rate-adapters";
+import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
 
 export interface RateFetcherWorkerEnv {
   RATE_FETCHER_SUPABASE_URL: string;
   RATE_FETCHER_SUPABASE_KEY: string;
   RATE_FETCHER_CRON_GROUP?: string;
+  WARPGOGOL_OTLP_ENDPOINT: string;
+  WARPGOGOL_OTLP_TOKEN: string;
   [key: string]: string | undefined;
 }
 
@@ -147,20 +150,44 @@ export function createRateFetcherWorker() {
     ): Promise<void> {
       ensureAdaptersRegistered();
 
+      const pusher = createMetricsPusher(
+        { serviceName: "rate-fetcher", layer: "back", environment: "production" },
+        { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN },
+      );
+
       let sources: RateSourceRow[];
       try {
         sources = await fetchEnabledSources(env);
       } catch (err) {
         console.error("[rate-fetcher] failed to load sources:", (err as Error).message);
+        if (pusher) {
+          pusher.gaugeSet("warpgogol_back_up", 0, { service: "rate-fetcher" });
+          pusher.counterAdd("warpgogol_back_last_run_total", 1, {
+            service: "rate-fetcher",
+            status: "failure",
+          });
+          pusher.counterAdd("warpgogol_back_last_error_total", 1, { service: "rate-fetcher" });
+          await pusher.flush();
+        }
         return;
       }
 
       if (sources.length === 0) {
         console.log("[rate-fetcher] no enabled sources");
+        if (pusher) {
+          pusher.gaugeSet("warpgogol_back_up", 1, { service: "rate-fetcher" });
+          pusher.counterAdd("warpgogol_back_last_run_total", 1, {
+            service: "rate-fetcher",
+            status: "success",
+          });
+          await pusher.flush();
+        }
         return;
       }
 
       console.log(`[rate-fetcher] processing ${sources.length} sources`);
+
+      let hadError = false;
 
       for (const source of sources) {
         const adapter = getRateSourceAdapter(source.adapter) as RateSourceAdapter | undefined;
@@ -227,6 +254,21 @@ export function createRateFetcherWorker() {
         console.log(
           `[rate-fetcher][${source.site_name}] ${successCount}/${pairs.length} pairs fetched`,
         );
+        if (lastError) {
+          hadError = true;
+        }
+      }
+
+      if (pusher) {
+        pusher.gaugeSet("warpgogol_back_up", hadError ? 0 : 1, { service: "rate-fetcher" });
+        pusher.counterAdd("warpgogol_back_last_run_total", 1, {
+          service: "rate-fetcher",
+          status: hadError ? "failure" : "success",
+        });
+        if (hadError) {
+          pusher.counterAdd("warpgogol_back_last_error_total", 1, { service: "rate-fetcher" });
+        }
+        await pusher.flush();
       }
     },
   };
