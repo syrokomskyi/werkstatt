@@ -5,7 +5,7 @@ title: "Agent-generated script directory convention for Forge projects"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: workspace
 decider: architecture
 createdAt: 2026-08-11
