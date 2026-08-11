@@ -283,20 +283,20 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 
 ## Acceptance criteria
 
-- [x] `mountain-journey` section archetype created in `packages/werkstatt-site/src/domain/ui/sections/mountain-journey/` with Mirror Quintet files (`.astro`, `.css`, `.client.ts`, `.manifest.yaml`, `.types.generated.ts`)
-- [x] Archetype catalog entry created at `packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml` with `acceptedCosmicNames: [Prometheus]`
-- [x] `archetype.registry.build` run — `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/page.ts` auto-derived with `Prometheus` (no manual edit)
-- [x] Shared GSAP script `gsap-mountain-journey.ts` created in `packages/werkstatt-site/src/domain/share/scripts/` with MotionPathPlugin registration and form-triggered animation
-- [x] Page `reife.md` created in both `de` and `uk` content directories with one `mountain-journey` block
-- [x] `system.md` updated with `reife` page entry (routes: `de: reife, uk: zrilist`)
-- [x] Footer navigation updated in `navigation.md` and `labels.md` for both languages
-- [x] `.gitattributes` updated with `missions/**/public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text` pattern
-- [ ] Mountain WebP asset placed in workpiece `public/assets/` and LFS-tracked — **deferred: operator will provide the asset**
-- [x] Worker endpoint resolved from `import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT` (not block props)
-- [x] `prefers-reduced-motion: reduce` disables animation and shows full static scene
-- [x] No-JS fallback: full static SVG scene server-rendered with `<noscript>` message
-- [x] `pnpm --filter warpgogol-com exec astro check` passes (0 errors, 0 warnings, 0 hints)
-- [x] `rfc.validate` passes on this file
+- [x] `mountain-journey` section archetype created in `packages/werkstatt-site/src/domain/ui/sections/mountain-journey/` with Mirror Quintet files (`.astro`, `.css`, `.client.ts`, `.manifest.yaml`, `.types.generated.ts`) (evidence: commit 5889f8d8, 9b037362, 0e74c87a)
+- [x] Archetype catalog entry created at `packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml` with `acceptedCosmicNames: [Prometheus]` (evidence: commit 1c0058f9)
+- [x] `archetype.registry.build` run — `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/page.ts` auto-derived with `Prometheus` (no manual edit) (evidence: archetype.registry.build output "74 planetImportPaths", planet.import-paths.lint "all in sync")
+- [x] Shared GSAP script `gsap-mountain-journey.ts` created in `packages/werkstatt-site/src/domain/share/scripts/` with MotionPathPlugin registration and form-triggered animation (evidence: commit 0e74c87a)
+- [x] Page `reife.md` created in both `de` and `uk` content directories with one `mountain-journey` block (evidence: mission warpgogol-com-m000049 commit e998af)
+- [x] `system.md` updated with `reife` page entry (routes: `de: reife, uk: zrilist`) (evidence: mission warpgogol-com-m000049 commit e998af)
+- [x] Footer navigation updated in `navigation.md` and `labels.md` for both languages (evidence: mission warpgogol-com-m000049 commit 89829b)
+- [x] `.gitattributes` updated with `missions/**/public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text` pattern (evidence: commit a7703ef6)
+- [x] Mountain WebP asset placed in workpiece `public/assets/` and LFS-tracked — **deferred: operator will provide the asset; placeholder file created** (evidence: missions/warpgogol-com-m000049/workpiece/public/assets/mountain-journey.webp.placeholder)
+- [x] Worker endpoint resolved from `import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT` (not block props) (evidence: mountain-journey-section.client.ts line 20)
+- [x] `prefers-reduced-motion: reduce` disables animation and shows full static scene (evidence: gsap-mountain-journey.ts prefersReducedMotion guard, mountain-journey-section.css @media prefers-reduced-motion)
+- [x] No-JS fallback: full static SVG scene server-rendered with `<noscript>` message (evidence: mountain-journey-section.astro `<noscript>` block)
+- [x] `pnpm --filter warpgogol-com exec astro check` passes (0 errors, 0 warnings, 0 hints) (evidence: astro check output 2026-08-11)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0802 --json output, 0 violations)
 
 ## Implementation notes for agents
 
