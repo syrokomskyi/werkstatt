@@ -201,3 +201,82 @@ describe("RFC-0492/RFC-0498: JSON-LD Service node for surface pages", () => {
     expect(servicesList).toBeUndefined();
   });
 });
+
+describe("ProfilePage mainEntity (Google Search Console fix)", () => {
+  it("sets mainEntity to extraGraphNodes[0] @id for AI-agent profile pages (page.people empty)", () => {
+    const model = makeModel({
+      type: "person",
+      url: "https://example.com/team/ki-agenten/test-bot/",
+      title: "Test Bot",
+      people: [],
+      extraGraphNodes: [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://example.com/team/ki-agenten/test-bot/#software",
+          name: "Test Bot",
+        },
+      ],
+    });
+
+    const doc = buildJsonLd(model);
+    const webPageNode = doc["@graph"].find((n) => {
+      const types = (n as Record<string, unknown>)["@type"];
+      if (Array.isArray(types)) return types.includes("ProfilePage");
+      return types === "ProfilePage";
+    }) as Record<string, unknown> | undefined;
+
+    expect(webPageNode).toBeDefined();
+    const mainEntity = webPageNode!["mainEntity"] as Record<string, unknown>;
+    expect(mainEntity).toBeDefined();
+    expect(mainEntity["@id"]).toBe("https://example.com/team/ki-agenten/test-bot/#software");
+  });
+
+  it("sets mainEntity to extraGraphNodes[0] @id for human profile pages with extended Person node", () => {
+    const model = makeModel({
+      type: "person",
+      url: "https://example.com/team/jane-doe/",
+      title: "Jane Doe",
+      people: [{ name: "Jane Doe" }],
+      extraGraphNodes: [
+        {
+          "@type": "Person",
+          "@id": "https://example.com/team/jane-doe/#person",
+          name: "Jane Doe",
+        },
+      ],
+    });
+
+    const doc = buildJsonLd(model);
+    const webPageNode = doc["@graph"].find((n) => {
+      const types = (n as Record<string, unknown>)["@type"];
+      if (Array.isArray(types)) return types.includes("ProfilePage");
+      return types === "ProfilePage";
+    }) as Record<string, unknown> | undefined;
+
+    expect(webPageNode).toBeDefined();
+    const mainEntity = webPageNode!["mainEntity"] as Record<string, unknown>;
+    expect(mainEntity).toBeDefined();
+    expect(mainEntity["@id"]).toBe("https://example.com/team/jane-doe/#person");
+  });
+
+  it("falls back to ids.person when no extraGraphNodes", () => {
+    const model = makeModel({
+      type: "person",
+      url: "https://example.com/team/jane-doe/",
+      title: "Jane Doe",
+      people: [{ name: "Jane Doe" }],
+    });
+
+    const doc = buildJsonLd(model);
+    const webPageNode = doc["@graph"].find((n) => {
+      const types = (n as Record<string, unknown>)["@type"];
+      if (Array.isArray(types)) return types.includes("ProfilePage");
+      return types === "ProfilePage";
+    }) as Record<string, unknown> | undefined;
+
+    expect(webPageNode).toBeDefined();
+    const mainEntity = webPageNode!["mainEntity"] as Record<string, unknown>;
+    expect(mainEntity).toBeDefined();
+    expect(mainEntity["@id"]).toBe("https://example.com/#/schema/person/jane-doe");
+  });
+});

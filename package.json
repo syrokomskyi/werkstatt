@@ -2,7 +2,7 @@
   "name": "warpgogol-platform",
   "private": true,
   "type": "module",
-  "version": "5.20.30",
+  "version": "5.20.31",
   "packageManager": "pnpm@11.10.0",
   "engines": {
     "node": ">=22"

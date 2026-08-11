@@ -55,9 +55,14 @@ export function buildWebPageNode(context: JsonLdContext): JsonLdNode {
       ? { mainEntity: { "@id": initiativesListId } }
       : {}),
     // RFC-0200: a profile page's subject is the profiled Person (attached to page.people).
-    ...(page.type === "person" && page.people?.[0]
-      ? { mainEntity: { "@id": ids.person(page.people[0].name) } }
-      : {}),
+    // RFC-0512: for team profile pages, prefer the extended Person/SoftwareApplication node
+    // from extraGraphNodes as mainEntity — this covers AI-agent profiles (where page.people
+    // is empty) and human profiles (where the extended Person node has a different @id).
+    ...(page.type === "person" && page.extraGraphNodes?.[0]
+      ? { mainEntity: { "@id": page.extraGraphNodes[0]["@id"] } }
+      : page.type === "person" && page.people?.[0]
+        ? { mainEntity: { "@id": ids.person(page.people[0].name) } }
+        : {}),
     ...(page.organization.services?.length && servicesListId
       ? { mentions: { "@id": servicesListId } }
       : {}),
