@@ -1,12 +1,13 @@
 ---
 id: RFC-0810
 title: "Add generator ownership cross-check to detect unregistered generator outputs"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
