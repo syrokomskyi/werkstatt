@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Lazy loading refactor: extracted from mission/index.ts to use dynamic imports inside async register().</item>
   <item>RFC-0560: add --actor-from-auth flag to mission.open, mission.close, mission.abort, mission.reconcile; change actor default from 'agent' to 'unknown'.</item>
+  <item>ADR-0041: mission.module.ts is the single source of truth for command flag registration. mission/index.ts is now a pure re-export barrel with no command registrations.</item>
 </CHANGE_SUMMARY>
 */
 
