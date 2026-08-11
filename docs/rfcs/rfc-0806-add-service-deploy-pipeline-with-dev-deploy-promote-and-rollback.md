@@ -1,7 +1,7 @@
 ---
 id: RFC-0806
 title: "Add service deployment pipeline with dev-deploy, promote, and rollback"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
