@@ -142,9 +142,11 @@ export async function createDnsRecord(
   record: {
     type: string;
     name: string;
-    content: string;
+    content?: string;
+    data?: { priority: number; target: string; value: string };
     proxied?: boolean;
     priority?: number;
+    ttl?: number;
     comment?: string;
   },
 ): Promise<CloudflareDnsRecord> {
@@ -181,9 +183,11 @@ export async function updateDnsRecord(
   record: {
     type: string;
     name: string;
-    content: string;
+    content?: string;
+    data?: { priority: number; target: string; value: string };
     proxied?: boolean;
     priority?: number;
+    ttl?: number;
     comment?: string;
   },
 ): Promise<CloudflareDnsRecord> {
