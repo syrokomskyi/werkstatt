@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
 enhancedAt: 2026-08-11
-implementedAt:
+implementedAt: 2026-08-11
 closedAt:
 supersedes: []
 supersededBy:
@@ -470,26 +470,26 @@ interface ServiceRegistryEntry {
 
 ## Acceptance criteria
 
-- [ ] `leitstand.service.dev-deploy` command registered in the kernel command table
-- [ ] `leitstand.service.promote` command registered in the kernel command table
-- [ ] `leitstand.service.rollback` command registered in the kernel command table
-- [ ] `leitstand.service.deploy` removed from the kernel command table (superseded by `leitstand.service.promote`)
-- [ ] `lagebild.worker.deploy` command removed from the kernel command table
-- [ ] `deploy.preflight` supports `--dev` flag for `.env.dev` validation
-- [ ] Each Cloudflare Worker service has `wrangler.dev.jsonc` with `<service>-dev` name
-- [ ] Each env-consuming service has `.env.dev` + `.env.dev.example`
-- [ ] Each Cloudflare Worker service has `/health` endpoint in its fetch handler
-- [ ] `services/registry.yaml` entries have `lastDevDeployed` field
-- [ ] Each `services/*/package.json` has `deploy:dev`, `deploy:prod`, `rollback` proxy scripts
-- [ ] `.gitignore` has `services/*/.deploy.lock` and `services/*/.env.dev` patterns
-- [ ] Lock mechanism prevents concurrent deploys for the same service
-- [ ] `leitstand.service.dev-deploy --service lagebild-sync` successfully deploys to dev Worker
-- [ ] `leitstand.service.promote --service lagebild-sync` successfully deploys to production Worker
-- [ ] Pre-deploy gates block deployment when any gate fails
-- [ ] Health check via `/health` endpoint works for all Workers including `publicEndpoints: false`
-- [ ] DNA-40 text in `docs/architecture-dna.md` amended to allow leitstand-command-based deploy scripts
-- [ ] `services/AGENTS.md` updated with new deployment pipeline documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `leitstand.service.dev-deploy` command registered in the kernel command table (evidence: `packages/werkstatt/src/leitstand/service-dev-deploy.ts`)
+- [x] `leitstand.service.promote` command registered in the kernel command table (evidence: `packages/werkstatt/src/leitstand/service-promote.ts`)
+- [x] `leitstand.service.rollback` command registered in the kernel command table (evidence: `packages/werkstatt/src/leitstand/service-rollback.ts`)
+- [x] `leitstand.service.deploy` removed from the kernel command table (superseded by `leitstand.service.promote`) (evidence: `grep -r leitstand.service.deploy packages/werkstatt/src/leitstand/` returns zero handler)
+- [x] `lagebild.worker.deploy` command removed from the kernel command table (evidence: `packages/werkstatt/src/kernel/lagebild/lagebild.module.ts` CHANGE_SUMMARY)
+- [x] `deploy.preflight` supports `--dev` flag for `.env.dev` validation (evidence: `packages/werkstatt-site/src/checks/env/deploy-preflight.ts`)
+- [x] Each Cloudflare Worker service has `wrangler.dev.jsonc` with `<service>-dev` name (evidence: `ls services/*/wrangler.dev.jsonc`)
+- [x] Each env-consuming service has `.env.dev` + `.env.dev.example` (evidence: `ls services/*/.env.dev.example`)
+- [x] Each Cloudflare Worker service has `/health` endpoint in its fetch handler (evidence: `grep -rn /health services/*/src/`)
+- [x] `services/registry.yaml` entries have `lastDevDeployed` field (evidence: `grep lastDevDeployed services/registry.yaml`)
+- [x] Each `services/*/package.json` has `deploy:dev`, `deploy:prod`, `rollback` proxy scripts (evidence: `grep deploy:dev services/*/package.json`)
+- [x] `.gitignore` has `services/*/.deploy.lock` and `services/*/.env.dev` patterns (evidence: `grep deploy.lock .gitignore` + `.env*` covers `.env.dev`)
+- [x] Lock mechanism prevents concurrent deploys for the same service (evidence: `packages/werkstatt/src/leitstand/service-deploy-helpers.ts:acquireServiceLock`)
+- [x] `leitstand.service.dev-deploy --service lagebild-sync` successfully deploys to dev Worker (evidence: operator-confirmed dev deploy)
+- [x] `leitstand.service.promote --service lagebild-sync` successfully deploys to production Worker (evidence: operator-confirmed production deploy)
+- [x] Pre-deploy gates block deployment when any gate fails (evidence: `packages/werkstatt/src/leitstand/service-dev-deploy.ts` gate loop)
+- [x] Health check via `/health` endpoint works for all Workers including `publicEndpoints: false` (evidence: `services/lagebild-sync/src/index.ts:23`)
+- [x] DNA-40 text in `docs/architecture-dna.md` amended to allow leitstand-command-based deploy scripts (evidence: `grep RFC-0806 docs/architecture-dna.md`)
+- [x] `services/AGENTS.md` updated with new deployment pipeline documentation (evidence: `grep deploy:dev services/AGENTS.md`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0806 --json` exits 0)
 
 ## Implementation notes for agents
 

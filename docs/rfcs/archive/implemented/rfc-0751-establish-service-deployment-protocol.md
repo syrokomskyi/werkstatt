@@ -18,6 +18,7 @@ supersededBy:
 amends: []
 amendedBy:
   - RFC-0805
+  - RFC-0806
 related:
   - RFC-0305
   - RFC-0379
