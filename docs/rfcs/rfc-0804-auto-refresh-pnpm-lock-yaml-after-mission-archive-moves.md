@@ -1,7 +1,7 @@
 ---
 id: RFC-0804
 title: "Auto-refresh pnpm-lock.yaml after mission.archive moves"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
 enhancedAt: 2026-08-11
-implementedAt:
+implementedAt: 2026-08-11
 closedAt:
 supersedes: []
 supersededBy:
