@@ -40,11 +40,11 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: minor
 commands:
-  proposed:
+  proposed: []
+  added:
     - leitstand.service.dev-deploy
     - leitstand.service.promote
     - leitstand.service.rollback
-  added: []
   changed:
     - deploy.preflight
   removed:
