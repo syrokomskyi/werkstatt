@@ -40,6 +40,17 @@ Cloudflare Worker services ship a `wrangler.dev.jsonc` config for dev-channel de
 - All Cloudflare Worker services MUST implement a `/health` endpoint returning `{"status":"ok","service":"<id>"}` with HTTP 200.
 - The services registry (`services/registry.yaml`) tracks `lastDeployed`, `lastDevDeployed`, and `healthCheckPath` per service.
 
+### OTLP metrics push (RFC-0807)
+
+All `services/*` projects MUST push health metrics to SigNoz via OTLP. The `createMetricsPusher` helper from `@warpgogol/werkstatt-site/observability` handles the transport.
+
+- Every service MUST declare `WARPGOGOL_OTLP_ENDPOINT` and `WARPGOGOL_OTLP_TOKEN` in its `.env.example` (and `.env.dev.example` if applicable) with `# How to obtain:` lines.
+- CF Worker services pass the env vars explicitly to `createMetricsPusher`: `createMetricsPusher(resource, { endpoint: env.WARPGOGOL_OTLP_ENDPOINT, token: env.WARPGOGOL_OTLP_TOKEN })`.
+- Node.js services (check-runner, fleet-probe-runner, cf-analytics-poller) auto-resolve from `process.env` — no explicit env arg needed.
+- Required metrics: `warpgogol_back_up` (gauge), `warpgogol_back_last_run_total` (counter), `warpgogol_back_last_error_total` (counter).
+- Enforced by `service.otlp.validate` (OTLP-01, OTLP-02, OTLP-03 rules).
+- The `observability-stack` service is exempt — it is the SigNoz deployment itself.
+
 Current services:
 
 - `services/check-runner` is the Node/Playwright runner for the Check Warpgogol site.
