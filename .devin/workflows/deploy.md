@@ -14,8 +14,17 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
 - Code changes are committed (`mission.git.commit` / `ecosystem.commit`).
 - `mission.validate` has passed.
 - `mission.reconcile` has merged workpiece to cache clone.
-- `mission.close` has closed the mission.
-- `release.prepare` has prepared the release (`releases/<site>-r<NNNNN>/`).
+
+## Full pipeline sequence
+
+```
+mission.validate → mission.reconcile → mission.close
+→ release.prepare → release.ready
+→ leitstand.dev-deploy → leitstand.propagate → leitstand.promote
+→ mission.archive --status=closed
+```
+
+**Important:** `mission.close` does NOT auto-archive (RFC-0801). The workpiece stays in `missions/<id>/workpiece/` with working `node_modules` until `mission.archive` is called explicitly after the deployment pipeline completes.
 
 ## Steps
 
@@ -118,10 +127,11 @@ pnpm exec werkstatt run leitstand.dev-deploy --site <siteId> --release <releaseI
 
 ### `leitstand.propagate` fails with "must be in state 'ready'"
 
-The release must be in `ready` state. Run `release.prepare` first:
+The release must be in `ready` state. Run `release.prepare` then `release.ready`:
 
 ```sh
 pnpm exec werkstatt run release.prepare --site <siteId> --mission <missionId>
+pnpm exec werkstatt run release.ready --release <releaseId>
 ```
 
 ### `leitstand.propagate` fails with "no Axiom evidence found"
@@ -131,3 +141,14 @@ pnpm exec werkstatt run release.prepare --site <siteId> --mission <missionId>
 ### `leitstand.promote` fails with "must be in state 'alt-deployed'"
 
 `leitstand.propagate` must run first to transition the release to `alt-deployed` state.
+
+### `release.prepare` fails with broken `node_modules`
+
+If the mission was archived before `release.prepare` ran, `node_modules` symlinks are broken (pnpm relative paths change with directory depth). Move the mission back:
+
+```sh
+mv missions/archive/closed/<missionId> missions/<missionId>
+pnpm install --no-frozen-lockfile
+```
+
+Then re-run `release.prepare`. To prevent this, always run the full deployment pipeline before `mission.archive` (RFC-0801).
