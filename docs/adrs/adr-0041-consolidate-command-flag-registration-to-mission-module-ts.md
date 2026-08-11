@@ -51,3 +51,8 @@ When adding or changing a flag on any mission command:
 - `index.ts` may need cleanup to remove duplicate command registrations.
 - Other modules (release, leitstand, etc.) should audit for the same pattern and consolidate if found.
 - Adding a flag requires updating only one file, reducing the chance of divergence.
+
+## Evolution
+
+- If other modules (release, leitstand, bordbuch, etc.) are found with the same duplicate registration pattern, consolidate them to their respective `*.module.ts` files following the same principle.
+- If a future RFC introduces a new module type that requires a different registration mechanism, this decision may be superseded by a new ADR.
