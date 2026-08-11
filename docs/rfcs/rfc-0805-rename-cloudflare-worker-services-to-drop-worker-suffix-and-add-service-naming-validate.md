@@ -15,23 +15,25 @@ owners:
 reviewers: []
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
+enhancedAt: 2026-08-11
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0751
 amendedBy: []
 related:
   - DNA-6
   - DNA-40
   - RFC-0186
   - RFC-0744
+  - RFC-0751
   - ADR-0042
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
-  - DNA-6
   - DNA-40
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
@@ -42,25 +44,29 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added: []
+  changed:
     - service.naming.validate
-  added:
-    - service.naming.validate
-  changed: []
   removed: []
 appsImpacted: []
 packagesImpacted:
   - "@warpgogol/werkstatt"
   - "@warpgogol/werkstatt-site"
+servicesImpacted:
+  - "lagebild-sync-worker"
+  - "maturity-score-worker"
+  - "rate-fetcher-worker"
 successSignals:
   - "services/* directories have no -worker suffix"
   - "wrangler.jsonc name fields have no -worker suffix"
   - "package.json name fields have no -worker suffix"
   - "services/registry.yaml id/workerName/url fields have no -worker suffix"
 nonGoals:
-  - "Renaming non-Worker services (check-warpgogol-runner)"
+  - "Renaming services that don't have a -worker suffix (check-warpgogol-runner, cf-analytics-poller, fleet-probe-runner, matomo-proxy, observability-stack, telegram-alert-bridge)"
   - "Renaming Cloudflare account-level configuration"
   - "Changing Worker runtime behavior or code logic"
+  - "Extending DNA-6 to cover services/ — DNA-6 scope is apps/ and packages/ only; the -worker suffix prohibition is a service-specific convention enforced by service.naming.validate, not a DNA invariant"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -110,14 +116,16 @@ Hardcoded references to the old names exist in `packages/werkstatt/src/kernel/la
 
 The three Cloudflare Worker services are renamed to drop the `-worker` suffix: `lagebild-sync-worker` → `lagebild-sync`, `maturity-score-worker` → `maturity-score`, `rate-fetcher-worker` → `rate-fetcher`. The rename covers directory names, `package.json` `name` fields, `wrangler.jsonc` `name` fields, `services/registry.yaml` entries, and all hardcoded references in `packages/*`.
 
-A new `service.naming.validate` command is introduced. It scans every `services/*/` directory and rejects any service whose name (directory, `package.json` `name`, `wrangler.jsonc` `name` when present, or `services/registry.yaml` `id`/`workerName`/`url`) ends with the suffix `-worker`. The command is registered in the `services.check.run` pipeline.
+The existing `service.naming.validate` command (established by RFC-0751) is extended with a new rule: it rejects any service whose `id` in `services/registry.yaml` ends with the suffix `-worker`. Since the existing validator already enforces `workerName === id`, `wrangler.jsonc name === id`, `service.config.yaml id === id`, and `package.json name === id`, checking the registry `id` for the `-worker` suffix transitively covers all derived fields. The command is already registered in the `services.check.run` pipeline (RFC-0751).
+
+RFC-0751 intentionally named these services WITH the `-worker` suffix (renaming `gogol-rate-fetcher` → `rate-fetcher-worker`, `gogol-lagebild-sync` → `lagebild-sync-worker`). This RFC amends RFC-0751: the `-worker` suffix is now considered redundant because the `kind` field in `service.config.yaml` already distinguishes Cloudflare Workers (`scheduled-worker`, `cloudflare-worker`, `proxy-worker`) from Node runners.
 
 ## Architectural fit
 
-- **DNA-6 (kebab-case filenames)** — extends naming convention enforcement to `services/*` directories, prohibiting the `-worker` suffix.
+- **DNA-6 (kebab-case filenames)** — DNA-6 covers `apps/` and `packages/` only, not `services/`. The `-worker` suffix prohibition is a service-specific convention enforced by `service.naming.validate`, not a DNA-6 extension.
 - **DNA-40 (env-and-deploy contract)** — the rename touches `wrangler.jsonc` names and deploy scripts; the env-and-deploy contract remains intact, only the service identity changes.
-- **Site OS operator model** — `service.naming.validate` is a workspace-scope command registered in `services.check.run`, consistent with other service validators.
-- **Scaling Playbook** — applies uniformly: any future service in `services/*` is automatically checked.
+- **Site OS operator model** — `service.naming.validate` is a workspace-scope command registered in `services.check.run` (by RFC-0751), consistent with other service validators.
+- **Scaling Playbook** — applies uniformly: any future service registered in `services/registry.yaml` is automatically checked.
 
 ## Design
 
@@ -128,33 +136,44 @@ pnpm exec werkstatt run service.naming.validate
 pnpm exec werkstatt run service.naming.validate --json
 ```
 
-Workspace-scope command, no `--service` flag. Scans all `services/*/` directories.
+Workspace-scope command, no `--service` flag. Scans all entries in `services/registry.yaml`.
 
 ### TypeScript contracts
 
-```ts
-interface ServiceNamingViolation {
-  service: string;       // directory name (e.g. "lagebild-sync")
-  field: "directory" | "package.json:name" | "wrangler.jsonc:name" | "registry:id" | "registry:workerName" | "registry:url";
-  value: string;         // the offending value
-  message: string;       // human-readable explanation
-}
+The existing `service.naming.validate` returns `KernelCommandResult<CheckResult>` with `Diagnostic[]` (RFC-0751). The new rule follows the same pattern:
 
-interface ServiceNamingValidateResult {
-  command: "service.naming.validate";
-  status: "pass" | "fail";
-  violations: ServiceNamingViolation[];
+```ts
+// New diagnostic emitted by the existing validator
+{
+  ruleId: "SVC-NAME-06",
+  severity: "error",
+  file: "services/registry.yaml",
+  message: "Service '<id>': id must not end with '-worker' suffix. Rename to '<id-without-suffix>'."
 }
 ```
+
+No new TypeScript interfaces are introduced — the existing `CheckResult` + `Diagnostic[]` pattern is reused.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `services/*/` | Scanned: directory name checked for `-worker` suffix |
-| `services/*/package.json` | `name` field checked for `-worker` suffix |
-| `services/*/wrangler.jsonc` | `name` field checked (when file exists) |
-| `services/registry.yaml` | `id`, `workerName`, `url` fields checked for `-worker` suffix |
+| `services/registry.yaml` | `id`, `workerName`, `url` fields updated for all three renamed services |
+| `services/lagebild-sync-worker/` | `git mv` to `services/lagebild-sync/` |
+| `services/lagebild-sync/package.json` | `name` field updated: `@warpgogol/lagebild-sync-worker` → `@warpgogol/lagebild-sync` |
+| `services/lagebild-sync/wrangler.jsonc` | `name` field updated: `lagebild-sync-worker` → `lagebild-sync` |
+| `services/lagebild-sync/service.config.yaml` | `id` field updated: `lagebild-sync-worker` → `lagebild-sync` |
+| `services/lagebild-sync/AGENTS.md` | Service name references updated (deploy script, title, description) |
+| `services/maturity-score-worker/` | `git mv` to `services/maturity-score/` |
+| `services/maturity-score/package.json` | `name` field updated |
+| `services/maturity-score/wrangler.jsonc` | `name` field updated |
+| `services/maturity-score/service.config.yaml` | `id` field updated |
+| `services/maturity-score/AGENTS.md` | Service name references updated |
+| `services/maturity-score/README.md` | Service name references updated |
+| `services/rate-fetcher-worker/` | `git mv` to `services/rate-fetcher/` |
+| `services/rate-fetcher/package.json` | `name` field updated |
+| `services/rate-fetcher/wrangler.jsonc` | `name` field updated |
+| `services/rate-fetcher/service.config.yaml` | `id` field updated |
 | `packages/werkstatt/src/kernel/lagebild/handlers.ts` | Hardcoded `"lagebild-sync-worker"` references updated to `"lagebild-sync"` |
 | `packages/werkstatt/src/kernel/lagebild/env.ts` | `services/lagebild-sync-worker/.env` path updated to `services/lagebild-sync/.env` |
 | `packages/werkstatt-site/src/checks/lagebild.ts` | `services/lagebild-sync-worker` path updated |
@@ -165,6 +184,7 @@ interface ServiceNamingValidateResult {
 | `packages/werkstatt-site/src/domain/pbp-rate-adapters/adapters/ecb.ts` | Comment reference updated |
 | `packages/werkstatt-site/src/domain/pbp-rate-adapters/adapters/frankfurter.ts` | Comment reference updated |
 | `services/AGENTS.md` | Service references updated |
+| `pnpm-lock.yaml` | Regenerated by `pnpm install` after package.json name changes |
 
 ### Output format
 
@@ -172,26 +192,22 @@ interface ServiceNamingValidateResult {
 {
   "command": "service.naming.validate",
   "status": "fail",
-  "violations": [
+  "diagnostics": [
     {
-      "service": "lagebild-sync-worker",
-      "field": "directory",
-      "value": "lagebild-sync-worker",
-      "message": "Service directory name must not end with '-worker' suffix"
+      "ruleId": "SVC-NAME-06",
+      "severity": "error",
+      "file": "services/registry.yaml",
+      "message": "Service 'lagebild-sync-worker': id must not end with '-worker' suffix. Rename to 'lagebild-sync'."
     }
-  ]
+  ],
+  "summary": { "error": 1, "warning": 0, "info": 0 }
 }
 ```
 
 ### Failure modes
 
-- **Directory name ends with `-worker`** — hard fail (SN-01).
-- **`package.json` `name` ends with `-worker`** — hard fail (SN-02).
-- **`wrangler.jsonc` `name` ends with `-worker`** — hard fail (SN-03). Skipped when `wrangler.jsonc` does not exist (non-Worker services like `check-warpgogol-runner`).
-- **`registry.yaml` `id` ends with `-worker`** — hard fail (SN-04).
-- **`registry.yaml` `workerName` ends with `-worker`** — hard fail (SN-05).
-- **`registry.yaml` `url` contains `-worker` before `.workers.dev`** — hard fail (SN-06).
-- **`registry.yaml` entry missing for a `services/*` directory** — warning (SN-07), not a hard fail (the registry may not list all services).
+- **`registry.yaml` `id` ends with `-worker`** — hard fail (SVC-NAME-06). This is the new rule added by this RFC. Since the existing validator (RFC-0751) already enforces `workerName === id`, `wrangler.jsonc name === id`, `service.config.yaml id === id`, and `package.json name === id`, checking the registry `id` for the suffix transitively covers all derived fields.
+- Existing rules from RFC-0751 remain: SVC-NAME-01 (workerName = id), SVC-NAME-02 (wrangler name = id), SVC-NAME-03 (config id = id), SVC-NAME-04 (package.json name = id), SVC-NAME-05 (directory exists).
 - All violations are reported in a single pass; the command exits with code 1 when any hard-fail violation exists.
 
 ## Rollout
@@ -215,15 +231,15 @@ interface ServiceNamingValidateResult {
 3. Delete old Workers from Cloudflare: `npx wrangler delete --name lagebild-sync-worker` (and same for the other two).
 4. Update any external references (Cloudflare Dashboard, monitoring, etc.).
 
-### Phase 3: Register and run validator
+### Phase 3: Extend validator with suffix rule
 
-1. Implement `service.naming.validate` in `packages/werkstatt-site/src/checks/`.
-2. Register in `services.check.run` pipeline.
+1. Add SVC-NAME-06 rule to the existing `service.naming.validate` in `packages/werkstatt-site/src/checks/services/service-naming-validate.ts`.
+2. The command is already registered in `services.check.run` pipeline (RFC-0751) — no new registration needed.
 3. Run `pnpm exec werkstatt run service.naming.validate` — must pass with zero violations.
 
 ### Pipeline integration
 
-`service.naming.validate` runs as part of `services.check.run`, which is the standard pipeline for service workspace changes. It is a hard-fail validator: any `-worker` suffix violation blocks the pipeline.
+`service.naming.validate` already runs as part of `services.check.run` (integrated by RFC-0751). The new SVC-NAME-06 rule is automatically included — no additional pipeline registration is needed.
 
 ## Alternatives considered
 
@@ -249,8 +265,8 @@ interface ServiceNamingValidateResult {
 - [ ] `wrangler.jsonc` `name` fields updated in all three renamed services (evidence: `grep -r '"name"' services/*/wrangler.jsonc`)
 - [ ] `services/registry.yaml` `id`, `workerName`, `url` fields updated (evidence: `grep -v 'worker' services/registry.yaml | grep -E 'id:|workerName:|url:'`)
 - [ ] All hardcoded references in `packages/*` updated (evidence: `grep -rn 'lagebild-sync-worker\|maturity-score-worker\|rate-fetcher-worker' packages/` returns zero results)
-- [ ] `service.naming.validate` command implemented and registered (evidence: `pnpm exec werkstatt run service.naming.validate --json` exits 0)
-- [ ] `service.naming.validate` integrated into `services.check.run` pipeline (evidence: `grep service.naming.validate packages/werkstatt-site/src/checks/`)
+- [ ] SVC-NAME-06 rule added to existing `service.naming.validate` (evidence: `grep SVC-NAME-06 packages/werkstatt-site/src/checks/services/service-naming-validate.ts`)
+- [ ] `service.naming.validate` passes with zero violations after rename (evidence: `pnpm exec werkstatt run service.naming.validate --json` exits 0)
 - [ ] Old Cloudflare Workers deleted after new ones deployed (evidence: `npx wrangler deployments list --name lagebild-sync` succeeds, `--name lagebild-sync-worker` fails with 404)
 - [ ] `rfc.validate` passes on this file before merging
 
@@ -258,7 +274,8 @@ interface ServiceNamingValidateResult {
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
-- Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
+- Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it (RFC-0334).
+- The `services/lagebild-sync-worker/AGENTS.md` deploy script uses the old CLI name `site-kernel` (pre-existing issue from RFC-0776). The rename updates the service name part (`--service lagebild-sync`) but the `site-kernel` → `werkstatt` CLI rename is a separate pre-existing issue.
 - If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0805 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - The rename MUST be done atomically: `git mv` directories, update all references, and run `pnpm install` in a single commit batch. Splitting the rename across commits leaves the workspace in a broken state.
 - After renaming, run `grep -rn 'lagebild-sync-worker\|maturity-score-worker\|rate-fetcher-worker' packages/ services/` to verify zero remaining references (excluding this RFC file and archived docs).
