@@ -1341,7 +1341,7 @@
     "cyrillic-to-translit-js": "^3.2.1",
     "i18n-iso-countries": "^7.14.0",
     "iso-3166-2": "^1.0.0",
-    "astro": "^7.1.6",
+    "astro": "^7.2.0",
     "@noble/ed25519": "^3.1.0",
     "bs58": "^6.0.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
@@ -1361,7 +1361,7 @@
   "devDependencies": {
     "@quantco/pnpm-licenses": "2.4.2",
     "@types/picomatch": "^4.0.3",
-    "astro": "^7.1.6",
+    "astro": "^7.2.0",
     "fast-check": "^4.9.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
