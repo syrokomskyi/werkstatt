@@ -283,20 +283,20 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 
 ## Acceptance criteria
 
-- [ ] `mountain-journey` section archetype created in `packages/werkstatt-site/src/domain/ui/sections/mountain-journey/` with Mirror Quintet files (`.astro`, `.css`, `.client.ts`, `.manifest.yaml`, `.types.generated.ts`)
-- [ ] Archetype catalog entry created at `packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml` with `acceptedCosmicNames: [Prometheus]`
-- [ ] `archetype.registry.build` run — `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/page.ts` auto-derived with `Prometheus` (no manual edit)
-- [ ] Shared GSAP script `gsap-mountain-journey.ts` created in `packages/werkstatt-site/src/domain/share/scripts/` with MotionPathPlugin registration and form-triggered animation
-- [ ] Page `reife.md` created in both `de` and `uk` content directories with one `mountain-journey` block
-- [ ] `system.md` updated with `reife` page entry (routes: `de: reife, uk: maturity`)
-- [ ] Footer navigation updated in `navigation.md` and `labels.md` for both languages
-- [ ] `.gitattributes` updated with `missions/**/public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text` pattern
-- [ ] Mountain WebP asset placed in workpiece `public/assets/` and LFS-tracked
-- [ ] Worker endpoint resolved from `import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT` (not block props)
-- [ ] `prefers-reduced-motion: reduce` disables animation and shows full static scene
-- [ ] No-JS fallback: full static SVG scene server-rendered with `<noscript>` message
-- [ ] `pnpm --filter warpgogol-com exec astro check` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `mountain-journey` section archetype created in `packages/werkstatt-site/src/domain/ui/sections/mountain-journey/` with Mirror Quintet files (`.astro`, `.css`, `.client.ts`, `.manifest.yaml`, `.types.generated.ts`)
+- [x] Archetype catalog entry created at `packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml` with `acceptedCosmicNames: [Prometheus]`
+- [x] `archetype.registry.build` run — `PLANET_IMPORT_PATHS` in `packages/werkstatt-site/src/domain/share/page.ts` auto-derived with `Prometheus` (no manual edit)
+- [x] Shared GSAP script `gsap-mountain-journey.ts` created in `packages/werkstatt-site/src/domain/share/scripts/` with MotionPathPlugin registration and form-triggered animation
+- [x] Page `reife.md` created in both `de` and `uk` content directories with one `mountain-journey` block
+- [x] `system.md` updated with `reife` page entry (routes: `de: reife, uk: zrilist`)
+- [x] Footer navigation updated in `navigation.md` and `labels.md` for both languages
+- [x] `.gitattributes` updated with `missions/**/public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text` pattern
+- [ ] Mountain WebP asset placed in workpiece `public/assets/` and LFS-tracked — **deferred: operator will provide the asset**
+- [x] Worker endpoint resolved from `import.meta.env.PUBLIC_MOUNTAIN_JOURNEY_ENDPOINT` (not block props)
+- [x] `prefers-reduced-motion: reduce` disables animation and shows full static scene
+- [x] No-JS fallback: full static SVG scene server-rendered with `<noscript>` message
+- [x] `pnpm --filter warpgogol-com exec astro check` passes (0 errors, 0 warnings, 0 hints)
+- [x] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
