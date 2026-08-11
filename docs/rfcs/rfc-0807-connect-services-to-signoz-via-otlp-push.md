@@ -1,7 +1,7 @@
 ---
 id: RFC-0807
 title: "Connect all services to SigNoz via OTLP push for health monitoring"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
 enhancedAt: 2026-08-11
-implementedAt:
+implementedAt: 2026-08-11
 closedAt:
 supersedes: []
 supersededBy:
