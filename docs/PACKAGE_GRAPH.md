@@ -66,7 +66,7 @@
 @GOGOL/INTEGRATION-ADAPTER-SUPABASE-CRM
   |
   +-- deps: @warpgogol/integration, @warpgogol/share
-  +-- consumers: @warpgogol/ui, services/lagebild-sync-worker (async Pipedrive sync)
+  +-- consumers: @warpgogol/ui, services/lagebild-sync (async Pipedrive sync)
 
 @GOGOL/CHAT-ADAPTER-NULL
   |

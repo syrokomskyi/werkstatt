@@ -175,8 +175,8 @@
       <kind>package</kind>
       <role>App-agnostic shared utilities: entity-ID normalization, i18n helpers, base schemas (including `claimRecordSchema`/`ClaimRecord` for RFC-0505 ratgeber claim records), browser scripts, `buildPage()`, semantic layer (`SemanticPageType` includes `"collection"` for CollectionPage + ItemList JSON-LD, RFC-0490; `SemanticPageModel` carries optional `surfaceId`/`depth` for depth-gated JSON-LD corrections, RFC-0492; `buildServiceNodes` suppresses org-level Service nodes for depth-1 `website-local` pages and emits industry-specific Service node instead), and integration hub contracts.</role>
     </workspace>
-    <workspace id="service-lagebild-sync-worker">
-      <path>`services/lagebild-sync-worker`</path>
+    <workspace id="service-lagebild-sync">
+      <path>`services/lagebild-sync`</path>
       <kind>service</kind>
       <role>Shared Lagebild CRM sync Worker workspace package, discovered through the `services/*` pnpm workspace glob and represented in the Agent Control Plane as a backend service.</role>
     </workspace>

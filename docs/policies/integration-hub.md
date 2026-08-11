@@ -47,7 +47,7 @@ In `sites-check.run`: `chat.config.validate`, `integration.config.validate`, `in
 
 ## Lagebild shared sync worker (RFC-0186)
 
-The Lagebild CRM buffer sync **must not** use per-site Workers. One shared platform Worker (`services/lagebild-sync-worker/`) serves all clients via a tenant registry (`sync_tenants`).
+The Lagebild CRM buffer sync **must not** use per-site Workers. One shared platform Worker (`services/lagebild-sync/`) serves all clients via a tenant registry (`sync_tenants`).
 
 **Rules:**
 
