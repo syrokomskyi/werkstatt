@@ -107,3 +107,55 @@ status: active
 - **Context:** 2026-08-03 — grilling RFC-0663 plan (dogfood acceptance criterion)
 - **Question:** RFC requires "at least one real duplicate pair promoted end-to-end" but the current monorepo has very few L2 entries across skills. Real duplicates are unlikely. How to handle the dogfood criterion?
 - **Answer:** Conditional dogfood: run detection on the monorepo. If duplicates found, promote with operator approval. If none found, the detection pipeline running end-to-end (detection → doctor report → zero duplicates) serves as evidence. Promotion mechanics are verified by unit tests. Creating artificial test duplicates is not natural and would not test the real promotion path.
+
+### K-0009: Validator command order vs env var addition
+
+```knowledge-entry
+id: K-0009
+layer: L0
+created: 2026-08-11
+status: active
+```
+
+- **Context:** 2026-08-11 — grilling RFC-0807 plan (service.otlp.validate ordering)
+- **Question:** Validator is created in step 4, env vars added in steps 5-6. Pipeline falls between steps 4 and 6. Change order?
+- **Answer:** Keep current order. Validator in step 4, pilot in step 5, remaining in step 6. Pipeline falls between steps 4 and 6 — expected, env vars not yet added. Validator is expected to fail until step 6 completes.
+
+### K-0010: Pusher location for shared worker services
+
+```knowledge-entry
+id: K-0010
+layer: L0
+created: 2026-08-11
+status: active
+```
+
+- **Context:** 2026-08-11 — grilling RFC-0807 plan (lagebild-sync pusher location)
+- **Question:** lagebild-sync delegates to createLagebildSharedSyncWorker in package. Pusher in shared worker (package) or service?
+- **Answer:** Pusher in shared worker (package). Service remains thin wrapper. Add OTLP vars to LagebildSharedWorkerEnv and pusher in shared worker scheduled handler. This follows the services/AGENTS.md rule: "Keep service workspaces thin and deployment-oriented."
+
+### K-0011: OTLP-03 severity for delegated services
+
+```knowledge-entry
+id: K-0011
+layer: L0
+created: 2026-08-11
+status: active
+```
+
+- **Context:** 2026-08-11 — grilling RFC-0807 plan (OTLP-03 for lagebild-sync)
+- **Question:** OTLP-03 greps service source for OTLP vars in Env interface. lagebild-sync delegates to shared worker — env interface in package. Warning or error?
+- **Answer:** Warning for delegated services. Validator scans service source only. If service delegates to shared worker (env interface in package), OTLP-03 is a warning, not an error. Documented exception: lagebild-sync delegates to shared worker, env interface in package.
+
+### K-0012: Node service OTLP token in .env.example
+
+```knowledge-entry
+id: K-0012
+layer: L0
+created: 2026-08-11
+status: active
+```
+
+- **Context:** 2026-08-11 — grilling RFC-0807 plan (Node vs CF Worker OTLP config)
+- **Question:** Node services use internal endpoint without token. CF Workers use public endpoint with token. How to reflect in .env.example?
+- **Answer:** Node: token empty, default endpoint in comment (`# Default: http://otel-collector:4318 (internal)`). CF: token required. Values always empty in .env.example (DNA-40). Default value documented in `# How to obtain:` comment, not in the value.
