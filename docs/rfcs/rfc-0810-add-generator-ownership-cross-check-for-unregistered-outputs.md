@@ -133,7 +133,7 @@ interface OwnershipCrossCheckResult {
 
 - **OWN-XCHECK-01**: An app-scoped `.generate` command has no entry in `GENERATOR_OWNERSHIP_MAP`. Severity: error, exit code 1. Message: `OWN-XCHECK-01: command "agent.discovery-endpoints.generate" has no ownership map entry`.
 - **OWN-XCHECK-02**: An ownership map entry references a command that is not registered. Severity: error, exit code 1. Message: `OWN-XCHECK-02: ownership entry for path "public/foo.json" references unregistered command "foo.generate"`.
-- **OWN-XCHECK-03**: An ownership map entry references a `module` path that does not exist. Severity: warning, exit code 0. Message: `OWN-XCHECK-03: ownership entry for "public/foo.json" points to non-existent module "packages/nonexistent/foo.ts".`.
+- **OWN-XCHECK-03**: An ownership map entry has a missing or non-existent `module` path. Severity: error (if `module` field is absent/empty), warning (if path doesn't exist), exit code 1/0 respectively. Message: `OWN-XCHECK-03: ownership entry for "public/foo.json" has no module path` or `OWN-XCHECK-03: ownership entry for "public/foo.json" points to non-existent module "packages/nonexistent/foo.ts".`. Note: This RFC also makes `module` a required field in the `OwnershipEntry` interface (removing the `?` modifier).
 
 ## Rollout
 
