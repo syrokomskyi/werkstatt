@@ -1,7 +1,7 @@
 ---
 id: ADR-0041
 title: "Consolidate command flag registration to mission.module.ts"
-status: draft
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-11
@@ -35,6 +35,7 @@ This caused a 15-minute debugging delay during the m000047 deployment session: t
 `mission.module.ts` is the single source of truth for command flag registration in the mission module. `index.ts` must not register commands with flags — it may re-export types or functions, but command registration (including flag schemas) lives exclusively in `*.module.ts` files.
 
 When adding or changing a flag on any mission command:
+
 1. Update `mission.module.ts` only.
 2. Do NOT update `index.ts` — it must not contain flag schemas.
 3. Verify with `pnpm exec werkstatt run <command> --help` that the flag appears.
