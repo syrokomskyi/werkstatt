@@ -2,13 +2,14 @@
 id: RFC-0809
 title: "Add pipeline collect-errors mode for fail-fast diagnostic relief"
 status: draft
-kind: architecture
+kind: policy
 scope: workspace
 owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
+enhancedAt: 2026-08-12
 implementedAt:
 closedAt:
 supersedes: []
@@ -18,14 +19,15 @@ amendedBy: []
 related:
   - RFC-0390
   - RFC-0686
-satisfies:
-  - DNA-2
 versionBump: minor
 commands:
   proposed: []
   added: []
   changed:
-    - "pipeline executor (internal)"
+    - "mission.validate"
+    - "build.check"
+    - "build.post"
+    - "build.prepare"
   removed: []
 appsImpacted: []
 packagesImpacted:
@@ -44,6 +46,12 @@ acceptance:
     command: "werkstatt run mission.validate --site warpgogol-com --mission warpgogol-com-m000050 --collect-errors"
     expect:
       exitCode: 0
+      summaryContains: "collect-errors"
+  - probe: run
+    command: "werkstatt run build.check --site warpgogol-com --collect-errors"
+    expect:
+      exitCode: non-zero
+      outputContains: "failedSteps"
 ---
 
 # RFC-0809: Add pipeline collect-errors mode for fail-fast diagnostic relief
@@ -68,7 +76,7 @@ The current `KernelPipelineStep` interface has no `continueOnError` field. The s
 
 The pipeline executor gains a **collect-errors mode** activated by a `--collect-errors` flag on the pipeline-running commands (`mission.validate`, `build.check`, `build.post`, `build.prepare`). In this mode:
 
-1. **All independent steps execute** regardless of other step failures (already the case for concurrency > 1; for concurrency = 1, the sequential chain is broken at failures but independent branches still run).
+1. **All independent steps execute** regardless of other step failures. This is already the case for concurrency > 1 (the default): the scheduler runs independent steps in parallel and skips only dependents of failed steps. For concurrency = 1, the scheduler rebuilds the schedule as fully sequential (`pipeline-scheduler.ts:194-201`), so **collect-errors has no effect** — a failure aborts all remaining steps. This is an accepted limitation; operators wanting collect-errors behavior should use the default concurrency.
 2. **Dependent steps are still skipped** when their dependency fails — this is not changed. If validator B depends on generator A and A fails, B cannot run.
 3. **The caller aggregates all failed reports** and prints a summary table at the end instead of stopping at the first failure.
 4. **Exit code is non-zero** if any step failed.
@@ -77,9 +85,9 @@ The default behavior (fail-fast) is unchanged. Collect-errors is opt-in via `--c
 
 ## Architectural fit
 
-- **DNA-2 (pnpm workspace + Turborepo)**: No change to workspace structure.
 - **RFC-0390 (pipeline cache)**: No change to cache behavior. Cache hits/misses work identically in both modes.
 - **RFC-0686 (dependency-aware concurrency)**: The scheduler already supports dependency-aware execution. Collect-errors mode changes only the **caller's post-processing** of results, not the scheduler itself. The scheduler already executes independent steps in parallel and skips dependents of failed steps.
+- **Concurrency = 1 limitation**: When `concurrency=1`, the scheduler rebuilds the schedule with full sequential implicit dependencies (`pipeline-scheduler.ts:194-201`), making every step depend on the previous one. A failure cascades `markSkippedDueToFailure` to all remaining steps. Collect-errors cannot change this without modifying the scheduler, which is out of scope. The flag is a no-op in concurrency=1 mode.
 
 ## Design
 
@@ -98,8 +106,18 @@ pnpm exec werkstatt run build.check --site warpgogol-com --collect-errors
 export interface ExecuteKernelPipelineOptions {
   // ... existing fields ...
   /** RFC-0809: when true, continue executing independent steps after a failure
-   *  and aggregate all errors in the final report. Default: false (fail-fast). */
+   *  and aggregate all errors in the final report. Default: false (fail-fast).
+   *  No effect when concurrency=1 (scheduler uses full sequential abort-on-failure). */
   collectErrors?: boolean;
+}
+
+// packages/werkstatt/src/kernel/types.ts — extend KernelPipelineReport
+
+export interface KernelPipelineReport {
+  // ... existing fields ...
+  /** RFC-0809: command names of steps that failed (excluding dependency-skipped).
+   *  Present only in collect-errors mode when failures occurred. */
+  failedSteps?: string[];
 }
 ```
 
@@ -107,6 +125,9 @@ export interface ExecuteKernelPipelineOptions {
 // packages/werkstatt/src/kernel/runtime/pipeline-scheduler.ts — no changes needed.
 // The scheduler already executes independent steps and skips dependents.
 // The change is in the caller (execute-pipeline.ts).
+// Note: dependencySkipped is a field on StepExecutionResult, not on
+// KernelExecutionReport. The caller must filter on StepExecutionResult
+// before mapping to reports.
 ```
 
 ```ts
@@ -116,7 +137,12 @@ export interface ExecuteKernelPipelineOptions {
 const failed = reports.find((report) => !report.ok);
 
 // After (collect-errors mode):
-const failedReports = reports.filter((report) => !report.ok && !report.dependencySkipped);
+// Filter on StepExecutionResult (which has dependencySkipped), not on
+// KernelExecutionReport (which does not). Use sortedResults before mapping.
+const failedResults = sortedResults.filter(
+  (r) => !r.report.ok && !r.dependencySkipped,
+);
+const failedReports = failedResults.map((r) => r.report);
 if (collectErrors && failedReports.length > 0) {
   // Print summary table of all failures
   for (const r of failedReports) {
@@ -140,9 +166,11 @@ if (collectErrors && failedReports.length > 0) {
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt/src/kernel/types.ts` | Add `collectErrors` to `ExecuteKernelPipelineOptions` |
-| `packages/werkstatt/src/kernel/runtime/execute-pipeline.ts` | Aggregate failures in post-processing |
-| `packages/werkstatt/src/kernel/cli.ts` (or equivalent) | Accept `--collect-errors` flag and pass to options |
+| `packages/werkstatt/src/kernel/types.ts` | Add `collectErrors` to `ExecuteKernelPipelineOptions`; add `failedSteps` to `KernelPipelineReport` |
+| `packages/werkstatt/src/kernel/runtime/execute-pipeline.ts` | Aggregate failures in post-processing; filter on `StepExecutionResult.dependencySkipped` |
+| `packages/werkstatt/src/kernel/cli/index.ts` | Accept `--collect-errors` flag in `pipeline` subcommand, pass to `executeKernelPipeline` options |
+| `packages/werkstatt/src/mission/mission.module.ts` | Declare `collect-errors` flag on `mission.validate` command |
+| `packages/werkstatt/src/mission/mission-materialization-commands.ts` | Read `--collect-errors` from `input.flags`, pass as `collectErrors: true` to all `executeKernelPipeline` calls |
 
 ### Output format
 
@@ -163,7 +191,8 @@ if (collectErrors && failedReports.length > 0) {
 ### Failure modes
 
 - **Default (no `--collect-errors`)**: Identical to current behavior. First failure stops the pipeline (in concurrency=1 mode) or the caller returns on first failure (in concurrency>1 mode).
-- **With `--collect-errors`**: All independent steps run. Dependent steps are skipped. Summary table lists all failures. Exit code is non-zero.
+- **With `--collect-errors`** (concurrency > 1): All independent steps run. Dependent steps are skipped. Summary table lists all failures. Exit code is non-zero.
+- **With `--collect-errors`** (concurrency = 1): No effect — the scheduler aborts on first failure regardless. The flag is accepted but does not change behavior.
 - **Step timeout**: Treated as failure. In collect-errors mode, the step is reported as failed and independent steps continue.
 
 ## Rollout
@@ -182,19 +211,23 @@ if (collectErrors && failedReports.length > 0) {
 ## Risks
 
 - **Longer pipeline runs in collect-errors mode**: Since independent steps continue after a failure, the total wall-clock time is longer than fail-fast. This is acceptable because the operator saves multiple full reruns.
-- **Confusion about which errors are root causes**: Multiple failures may include cascading errors from dependent steps. The summary table should distinguish "failed" from "skipped (dependency failed)" — this is already tracked via `dependencySkipped` in `StepExecutionResult`.
+- **Confusion about which errors are root causes**: Multiple failures may include cascading errors from dependent steps. The summary table distinguishes "failed" from "skipped (dependency failed)" — `dependencySkipped` is tracked on `StepExecutionResult` (not on `KernelExecutionReport`). The caller filters on `StepExecutionResult.dependencySkipped` before building the `failedSteps` list.
 - **Cache pollution**: Failed steps are not cached (only successful results are cached per RFC-0390). No change needed.
 
 ## Acceptance criteria
 
 - [ ] `collectErrors` field added to `ExecuteKernelPipelineOptions`
-- [ ] `--collect-errors` flag accepted by pipeline-running commands
-- [ ] All independent step failures aggregated in final report
+- [ ] `failedSteps` field added to `KernelPipelineReport`
+- [ ] `--collect-errors` flag accepted by `mission.validate`, `build.check`, `build.post`, `build.prepare`
+- [ ] `--collect-errors` flag accepted by `pipeline` CLI subcommand (`cli/index.ts`)
+- [ ] All independent step failures aggregated in final report (concurrency > 1)
 - [ ] Dependent steps still skipped when dependency fails
 - [ ] Default fail-fast behavior unchanged
 - [ ] `--json` output includes `failedSteps` array
+- [ ] `--collect-errors` is a no-op when `concurrency=1` (documented, not errored)
 - [ ] Unit test: multiple independent failures reported in one run
 - [ ] Unit test: dependent steps still skipped in collect-errors mode
+- [ ] Unit test: `concurrency=1` with `--collect-errors` behaves identically to fail-fast
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -203,4 +236,6 @@ if (collectErrors && failedReports.length > 0) {
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken the default fail-fast behavior.
 - The `--collect-errors` flag is a runner-level option — it MUST NOT be added to `KernelPipelineStep`.
-- When implementing, check that `concurrency = 1` mode (full sequential) also respects collect-errors: the sequential chain should break at failures (so dependent steps are skipped) but independent branches should still execute.
+- **Concurrency = 1**: The scheduler rebuilds the schedule as fully sequential when `concurrency=1` (`pipeline-scheduler.ts:194-201`). `--collect-errors` has no effect in this mode — a failure cascades `markSkippedDueToFailure` to all remaining steps. Do NOT attempt to modify the scheduler for concurrency=1; the flag is a no-op in that mode by design.
+- **Flag flow**: The `--collect-errors` flag is parsed by the CLI (`cli/index.ts` `pipeline` subcommand) or by the `mission.validate` command handler (`mission-materialization-commands.ts`), then passed as `collectErrors: true` in `ExecuteKernelPipelineOptions` to `executeKernelPipeline`. `mission.validate` calls `executeKernelPipeline` three times (build.prepare, build.check, build.post) — the flag must be propagated to all three calls.
+- **Type safety**: `dependencySkipped` exists on `StepExecutionResult` (`pipeline-scheduler.ts:160`), NOT on `KernelExecutionReport`. When filtering failed steps, filter on `sortedResults` (which are `StepExecutionResult[]`) before mapping to `reports` (`KernelExecutionReport[]`).
