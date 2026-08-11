@@ -23,6 +23,7 @@ RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for 
   <item>RFC-0752: add cloudflareZoneId to fleetRegistryEntrySchema, serviceSubdomainSchema + serviceEntrySchema + services[] to fleetRegistrySchema.</item>
   <item>RFC-0751: extend serviceEntrySchema with kind, url, publicEndpoints, routes, upstreams, lastDeployed, healthCheckPath.</item>
   <item>RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for convention-based discovery.</item>
+  <item>RFC-0806: add lastDevDeployed to serviceEntrySchema, add cloudflare-worker to kind enum.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -76,7 +77,7 @@ export const serviceSubdomainSchema = z.object({
 
 export const serviceEntrySchema = z.object({
   id: z.string().regex(kebabRe, "service id must be kebab-case, lowercase, latin-only"),
-  kind: z.enum(["proxy-worker", "scheduled-worker"]),
+  kind: z.enum(["proxy-worker", "scheduled-worker", "cloudflare-worker"]),
   workerName: z.string().min(1, "workerName must be non-empty"),
   hostedBy: z.enum(["studio"]),
   url: z.string().min(1, "url must be non-empty"),
@@ -92,6 +93,14 @@ export const serviceEntrySchema = z.object({
       operationId: z.string().nullable(),
     })
     .default({ at: null, state: null, operationId: null }),
+  lastDevDeployed: z
+    .object({
+      at: z.string().datetime().nullable(),
+      state: z.enum(["succeeded", "failed"]).nullable(),
+      operationId: z.string().nullable(),
+    })
+    .default({ at: null, state: null, operationId: null })
+    .describe("RFC-0806: last dev-channel deployment state"),
   healthCheckPath: z.string().optional(),
 });
 
