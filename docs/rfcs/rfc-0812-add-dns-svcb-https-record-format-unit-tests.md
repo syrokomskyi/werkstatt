@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
+enhancedAt: 2026-08-12
 implementedAt:
 closedAt:
 supersedes: []
@@ -34,9 +35,10 @@ nonGoals:
   - "Integration test hitting real Cloudflare API"
   - "Testing all DNS record types"
   - "Changing the toApiRecord implementation"
+  - "Fixing quoted-value parsing in SVCB/HTTPS content (documented as known issue, fix requires its own RFC)"
 acceptance:
   - probe: run
-    command: "werkstatt run vitest -- packages/werkstatt/src/dns/tests/dns-record-upsert.test.ts"
+    command: "pnpm --filter @warpgogol/werkstatt run test"
     expect:
       exitCode: 0
 ---
@@ -62,24 +64,28 @@ Add unit tests for `toApiRecord` covering:
 1. **SVCB record**: Verify `content`, `data.priority`, `data.target`, `data.value` are correctly parsed from the content string.
 2. **HTTPS record**: Same as SVCB.
 3. **A record**: Verify `content` is passed through, no `data` object.
-4. **TXT record**: Verify `content` is passed through.
-5. **CNAME record**: Verify `content` is passed through.
-6. **Edge cases**: Empty value, missing target, single-part content.
+4. **AAAA record**: Verify `content` is passed through, no `data` object.
+5. **TXT record**: Verify `content` is normalized via `normalizeTxtContent()`, not passed through raw.
+6. **CNAME record**: Verify `content` is passed through.
+7. **Optional fields**: Verify `priority` (non-SVCB), `ttl`, and `comment` are included when present and omitted when absent.
+8. **Edge cases**: Empty value (content `""`), missing target (content `"1"` only — expect `target: "."`, `value: ""`), single-part content.
 
 ## Architectural fit
 
 - This is a pure unit test RFC — no architectural changes.
-- The tests live in `packages/werkstatt/src/dns/tests/` following the existing test placement convention.
+- The tests are colocated at `packages/werkstatt/src/dns/dns-record-upsert.test.ts`, following the existing convention in `packages/werkstatt/src/dns/` (e.g. `dns-helpers.test.ts`, `txt-normalize.test.ts`, `dns-records-schema-validate.test.ts`).
 
 ## Design
 
 ### Test structure
 
 ```ts
-// packages/werkstatt/src/dns/tests/dns-record-upsert.test.ts
+// packages/werkstatt/src/dns/dns-record-upsert.test.ts
 
 import { describe, it, expect } from "vitest";
-// toApiRecord is not currently exported — export it or test via a helper
+import { toApiRecord } from "./dns-record-upsert.ts";
+import type { DnsRecordDeclaration } from "@warpgogol/werkstatt-site/ontology/schemas";
+// toApiRecord is not currently exported — add `export` to the function declaration
 
 describe("toApiRecord", () => {
   describe("SVCB records", () => {
@@ -150,8 +156,8 @@ describe("toApiRecord", () => {
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt/src/dns/dns-record-upsert.ts` | Export `toApiRecord` (if not already exported) |
-| `packages/werkstatt/src/dns/tests/dns-record-upsert.test.ts` | New test file |
+| `packages/werkstatt/src/dns/dns-record-upsert.ts` | Export `toApiRecord` (add `export` keyword to function declaration) |
+| `packages/werkstatt/src/dns/dns-record-upsert.test.ts` | New colocated test file |
 
 ## Rollout
 
@@ -174,10 +180,12 @@ describe("toApiRecord", () => {
 - [ ] Unit test for SVCB record formatting
 - [ ] Unit test for HTTPS record formatting
 - [ ] Unit test for A record formatting
-- [ ] Unit test for TXT record formatting
+- [ ] Unit test for AAAA record formatting
+- [ ] Unit test for TXT record formatting (verify normalized content via `normalizeTxtContent`)
 - [ ] Unit test for CNAME record formatting
-- [ ] Edge case tests (empty value, missing target)
-- [ ] All tests pass with `pnpm exec vitest run`
+- [ ] Unit test for optional fields (`priority`, `ttl`, `comment`) — included when present, omitted when absent
+- [ ] Edge case tests (empty value, missing target, single-part content)
+- [ ] All tests pass with `pnpm --filter @warpgogol/werkstatt run test`
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -185,4 +193,5 @@ describe("toApiRecord", () => {
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - The tests should verify the **current** behavior of `toApiRecord`, not change it.
 - If the current parsing has bugs (e.g. incorrect handling of quoted values), document them in the test as known issues — do not fix them in this RFC. A fix would require its own RFC.
-- The `DnsRecordDeclaration` type used in tests should match the existing type in `dns-record-upsert.ts`.
+- The `DnsRecordDeclaration` type is imported from `@warpgogol/werkstatt-site/ontology/schemas` (not defined locally in `dns-record-upsert.ts`).
+- The current SVCB/HTTPS parsing uses `split(/\s+/)` which does not handle quoted values with spaces (e.g. `alpn="h3 h2"`). Tests should document this as a known issue — do not fix it in this RFC.
