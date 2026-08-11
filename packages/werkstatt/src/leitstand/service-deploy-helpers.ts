@@ -1,0 +1,287 @@
+/*
+<MODULE_CONTRACT>
+<purpose>RFC-0806: Shared types and helpers for the service deployment pipeline
+(dev-deploy, promote, rollback). Extracted from service-deploy.ts to avoid duplication
+across the three new command handlers.</purpose>
+<non-goals>
+  <item>Do not implement command-specific logic — handlers own their step sequence.</item>
+  <item>Do not export types that are only used by a single command handler.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0806: initial extraction of shared service deploy helpers.</item>
+</CHANGE_SUMMARY>
+*/
+
+import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import { spawn } from "node:child_process";
+import type {
+  KernelCommandInput,
+  KernelRuntimeContext,
+} from "@warpgogol/werkstatt/kernel";
+import type { ServiceEntry } from "@warpgogol/werkstatt/schemas";
+import {
+  readServicesRegistry,
+  writeServicesRegistry,
+  findServiceEntry,
+} from "../sternsystem/registry-io.ts";
+import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
+
+export interface PreDeployGateResult {
+  command: string;
+  passed: boolean;
+  summary: string;
+}
+
+export interface ServiceDevDeployData {
+  command: "leitstand.service.dev-deploy";
+  serviceId: string;
+  workerName: string;
+  deployState: "succeeded" | "failed";
+  workersDevUrl: string;
+  healthState: "healthy" | "unhealthy" | "unknown";
+  preDeployGates: PreDeployGateResult[];
+  startedAt: string;
+  completedAt: string;
+  operationId: string;
+}
+
+export interface ServicePromoteData {
+  command: "leitstand.service.promote";
+  serviceId: string;
+  workerName: string;
+  deployState: "succeeded" | "failed";
+  workersDevUrl: string;
+  healthState: "healthy" | "unhealthy" | "unknown";
+  preDeployGates: PreDeployGateResult[];
+  startedAt: string;
+  completedAt: string;
+  operationId: string;
+}
+
+export interface ServiceRollbackData {
+  command: "leitstand.service.rollback";
+  serviceId: string;
+  workerName: string;
+  rollbackState: "succeeded" | "failed";
+  startedAt: string;
+  completedAt: string;
+  operationId: string;
+}
+
+export function flagString(input: KernelCommandInput, key: string): string | undefined {
+  const v = input.flags[key];
+  return typeof v === "string" ? v : undefined;
+}
+
+export function flagBoolean(input: KernelCommandInput, key: string): boolean {
+  const v = input.flags[key];
+  return v === true || v === "true";
+}
+
+export async function runWranglerDeploy(
+  serviceDir: string,
+  configName: string,
+  env: Record<string, string>,
+): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  return new Promise((resolve) => {
+    const child = spawn(
+      "npx",
+      ["--yes", "wrangler", "deploy", "--config", configName],
+      {
+        cwd: serviceDir,
+        env: { ...process.env, ...env },
+        stdio: ["pipe", "pipe", "pipe"],
+      },
+    );
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => {
+      stdout += d.toString();
+    });
+    child.stderr.on("data", (d) => {
+      stderr += d.toString();
+    });
+    child.on("error", () => {
+      resolve({ exitCode: 1, stdout, stderr: "Failed to spawn wrangler" });
+    });
+    child.on("exit", (code) => {
+      resolve({ exitCode: code ?? 1, stdout, stderr });
+    });
+  });
+}
+
+export async function runWranglerRollback(
+  serviceDir: string,
+  env: Record<string, string>,
+): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  return new Promise((resolve) => {
+    const child = spawn("npx", ["--yes", "wrangler", "rollback"], {
+      cwd: serviceDir,
+      env: { ...process.env, ...env },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => {
+      stdout += d.toString();
+    });
+    child.stderr.on("data", (d) => {
+      stderr += d.toString();
+    });
+    child.on("error", () => {
+      resolve({ exitCode: 1, stdout, stderr: "Failed to spawn wrangler" });
+    });
+    child.on("exit", (code) => {
+      resolve({ exitCode: code ?? 1, stdout, stderr });
+    });
+  });
+}
+
+export function extractWorkersDevUrl(stdout: string): string | undefined {
+  const match = stdout.match(/https?:\/\/[^\s]+\.workers\.dev[^\s]*/);
+  return match ? match[0] : undefined;
+}
+
+export async function runHealthCheck(
+  url: string,
+  healthCheckPath: string | undefined,
+): Promise<"healthy" | "unhealthy"> {
+  const checkUrl = url + (healthCheckPath ?? "/health");
+  try {
+    const response = await fetch(checkUrl, { redirect: "follow" });
+    if (response.status < 500) {
+      return "healthy";
+    }
+    return "unhealthy";
+  } catch {
+    return "unhealthy";
+  }
+}
+
+export async function parseEnvFile(envPath: string): Promise<Record<string, string>> {
+  const env: Record<string, string> = {};
+  if (!existsSync(envPath)) return env;
+  const content = await fs.readFile(envPath, "utf8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const value = trimmed
+      .slice(eqIdx + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
+    if (value !== "") env[key] = value;
+  }
+  return env;
+}
+
+export interface PreDeployGateConfig {
+  commandName: string;
+  argv: string[];
+}
+
+export async function runPreDeployGates(
+  workspaceRoot: string,
+  gates: PreDeployGateConfig[],
+  logger: { info: (msg: string) => void },
+): Promise<PreDeployGateResult[]> {
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+  const results: PreDeployGateResult[] = [];
+
+  for (const gate of gates) {
+    logger.info(`[pre-deploy] running ${gate.commandName}…`);
+    const result = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: gate.commandName,
+      argv: gate.argv,
+    })) as { exitCode: number; summary?: string };
+
+    const passed = result.exitCode === 0;
+    results.push({
+      command: gate.commandName,
+      passed,
+      summary: result.summary ?? (passed ? "pass" : "failed"),
+    });
+
+    if (!passed) break;
+  }
+
+  return results;
+}
+
+export async function acquireServiceLock(
+  workspaceRoot: string,
+  serviceId: string,
+  operationId: string,
+  commandName: string,
+): Promise<void> {
+  await acquireLock(
+    workspaceRoot,
+    `service:${serviceId}`,
+    operationId,
+    commandName,
+    "agent",
+  );
+}
+
+export async function releaseServiceLock(
+  workspaceRoot: string,
+  serviceId: string,
+): Promise<void> {
+  await releaseLock(workspaceRoot, `service:${serviceId}`);
+}
+
+export async function recordDevDeployState(
+  workspaceRoot: string,
+  serviceId: string,
+  state: { at: string; state: "succeeded" | "failed"; operationId: string },
+): Promise<void> {
+  const registry = await readServicesRegistry(workspaceRoot);
+  const entry = registry.services.find((s: ServiceEntry) => s.id === serviceId);
+  if (!entry) return;
+  (entry as Record<string, unknown>).lastDevDeployed = {
+    at: state.at,
+    state: state.state,
+    operationId: state.operationId,
+  };
+  await writeServicesRegistry(workspaceRoot, registry);
+}
+
+export async function recordProdDeployState(
+  workspaceRoot: string,
+  serviceId: string,
+  state: { at: string; state: "succeeded" | "failed" | "rolled-back"; operationId: string },
+): Promise<void> {
+  const registry = await readServicesRegistry(workspaceRoot);
+  const entry = registry.services.find((s: ServiceEntry) => s.id === serviceId);
+  if (!entry) return;
+  entry.lastDeployed = {
+    at: state.at,
+    state: state.state === "rolled-back" ? "failed" : state.state,
+    operationId: state.operationId,
+  };
+  await writeServicesRegistry(workspaceRoot, registry);
+}
+
+export async function updateWorkersDevUrl(
+  workspaceRoot: string,
+  serviceId: string,
+  deployedUrl: string,
+): Promise<void> {
+  if (!deployedUrl) return;
+  const registry = await readServicesRegistry(workspaceRoot);
+  const entry = findServiceEntry(registry, serviceId);
+  if (entry && entry.workersDevUrl !== deployedUrl) {
+    entry.workersDevUrl = deployedUrl;
+    await writeServicesRegistry(workspaceRoot, registry);
+  }
+}
+
+export { generateOperationId };
+
+export type { KernelRuntimeContext };
