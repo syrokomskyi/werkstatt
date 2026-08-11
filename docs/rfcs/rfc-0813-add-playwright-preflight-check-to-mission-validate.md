@@ -1,12 +1,13 @@
 ---
 id: RFC-0813
 title: "Add Playwright pre-flight check to mission.validate"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
