@@ -40,4 +40,4 @@ The stub implementation does not consume environment variables. When the real HD
 ## References
 
 - [ADR-0042](../docs/adrs/adr-0042-add-maturity-score-worker-as-new-cloudflare-worker-service.md) — decision record
-- [RFC-0803](../docs/rfcs/rfc-0803-add-interactive-maturity-mountain-page-with-gsap-camera-pan-and-marker-animation.md) — frontend consumer (mountain-journey section)
+- [RFC-0802](../docs/rfcs/rfc-0802-add-interactive-maturity-mountain-page-with-gsap-camera-pan-and-marker-animation.md) — frontend consumer (mountain-journey section)
