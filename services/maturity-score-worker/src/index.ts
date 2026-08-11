@@ -20,10 +20,6 @@ export interface MaturityScoreWorkerEnv {
   [key: string]: string | undefined;
 }
 
-interface ScoreRequest {
-  url: string;
-}
-
 interface ScoreResponse {
   score: number;
 }
@@ -97,28 +93,38 @@ export function createMaturityScoreWorker() {
         );
       }
 
-      let body: ScoreRequest;
+      let body: unknown;
       try {
-        body = (await request.json()) as ScoreRequest;
+        body = await request.json();
       } catch {
         return json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
       }
 
-      if (typeof body.url !== "string" || body.url.length === 0) {
+      if (
+        typeof body !== "object" ||
+        body === null ||
+        typeof (body as Record<string, unknown>).url !== "string" ||
+        ((body as Record<string, unknown>).url as string).length === 0
+      ) {
         return json(
-          { error: "missing_url", message: "Field 'url' is required and must be a non-empty string" },
+          {
+            error: "missing_url",
+            message: "Field 'url' is required and must be a non-empty string",
+          },
           400,
         );
       }
 
-      if (!isValidUrl(body.url)) {
+      const requestUrl = (body as Record<string, unknown>).url as string;
+
+      if (!isValidUrl(requestUrl)) {
         return json(
           { error: "invalid_url", message: "Field 'url' must be a valid http or https URL" },
           400,
         );
       }
 
-      const score = calculateStubScore(body.url);
+      const score = calculateStubScore(requestUrl);
       const response: ScoreResponse = { score };
       return json(response, 200);
     },
