@@ -12,6 +12,7 @@ turborepo:
   - "**/turbo.json"
 cloudflare:
   - "**/wrangler.jsonc"
+  - "**/wrangler.dev.jsonc"
   - "apps/*/.wrangler/deploy/config.json"
 mcp:
   - .mcp.json
