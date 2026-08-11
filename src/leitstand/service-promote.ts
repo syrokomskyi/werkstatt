@@ -15,14 +15,8 @@ lock, wrangler deploy, health check, and prod state recording.</purpose>
 
 import path from "node:path";
 import { existsSync } from "node:fs";
-import type {
-  KernelCommandInput,
-  KernelCommandResult,
-} from "@warpgogol/werkstatt/kernel";
-import {
-  readServicesRegistry,
-  findServiceEntry,
-} from "../sternsystem/registry-io.ts";
+import type { KernelCommandInput, KernelCommandResult } from "@warpgogol/werkstatt/kernel";
+import { readServicesRegistry, findServiceEntry } from "../sternsystem/registry-io.ts";
 import {
   flagString,
   flagBoolean,
@@ -80,8 +74,8 @@ export async function runLeitstandServicePromote(
   try {
     // 1. Pre-deploy gates: service.naming.validate, service.registry.validate, services.check.run, deploy.preflight
     const gates = [
-      { commandName: "service.naming.validate", argv: ["--service", serviceId] },
-      { commandName: "service.registry.validate", argv: ["--service", serviceId] },
+      { commandName: "service.naming.validate", argv: [] },
+      { commandName: "service.registry.validate", argv: [] },
       { commandName: "services.check.run", argv: [] },
       { commandName: "deploy.preflight", argv: ["--service", serviceId] },
     ];
@@ -177,7 +171,8 @@ export async function runLeitstandServicePromote(
         serviceId,
         workerName: serviceEntry.workerName,
         deployState: "failed",
-        workersDevUrl: extractWorkersDevUrl(wranglerResult.stdout) ?? serviceEntry.workersDevUrl ?? "",
+        workersDevUrl:
+          extractWorkersDevUrl(wranglerResult.stdout) ?? serviceEntry.workersDevUrl ?? "",
         healthState: "unknown",
         preDeployGates: gateResults,
         startedAt,
@@ -198,9 +193,7 @@ export async function runLeitstandServicePromote(
     // 6. Health check
     let healthState: "healthy" | "unhealthy" | "unknown" = "unknown";
     if (!skipHealthCheck && serviceEntry.publicEndpoints && deployedUrl) {
-      logger.info(
-        `[leitstand.service.promote] running health check on ${deployedUrl}…`,
-      );
+      logger.info(`[leitstand.service.promote] running health check on ${deployedUrl}…`);
       healthState = await runHealthCheck(deployedUrl, serviceEntry.healthCheckPath);
     } else if (!serviceEntry.publicEndpoints) {
       logger.info(
