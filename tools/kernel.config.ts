@@ -71,6 +71,7 @@
   <item>RFC-0752: Register subdomainModule for subdomain.register, subdomain.validate, subdomain.list.</item>
   <item>RFC-0753: Register dnsModule for dns.record.upsert, dns.record.validate, dns.record.list, dns.record.delete, dns.records.schema.validate.</item>
   <item>RFC-0770: Register werkstatt-plugin module for werkstatt.plugin.validate.</item>
+  <item>RFC-0808: Register forgeNotesModule for note.link.validate, note.frontmatter.validate, note.orphan.detect.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -150,6 +151,7 @@ export default defineKernelConfig({
       (await import("@warpgogol/werkstatt/nachweis-module")).createNachweisModule(),
     "forge-exploration": async () =>
       (await import("@warpgogol/forge/os/exploration")).forgeExplorationModule,
+    "forge-notes": async () => (await import("@warpgogol/forge/os/notes")).forgeNotesModule,
     "werkstatt-site": async () => (await import("@warpgogol/werkstatt-site")).werkstattSitePlugin,
     "werkstatt-plugin": async () =>
       (await import("@warpgogol/werkstatt/os/werkstatt-plugin-module")).forgeWerkstattPluginModule,

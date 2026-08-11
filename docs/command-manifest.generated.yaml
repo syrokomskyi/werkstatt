@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: e67fdedd0350bf3262c7a440a042caccbb68a444214b2b978b9bde921476952d
+  contentHash: 20b291910bd799d0cd05341033c60184d7c5ba52c18253feea44e46f23d9886b
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -15797,6 +15797,66 @@ commands:
         description: Export package path.
     reads:
       - "{--path}/**"
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: note.frontmatter.validate
+    description: Validate frontmatter consistency across an Obsidian vault. Checks
+      for required fields in YAML frontmatter.
+    scope: workspace
+    provider: workspace
+    module: forge-notes
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      vault-dir:
+        kind: string
+        description: "Vault directory relative to workspace root (default: vault)."
+      fields:
+        kind: string
+        description: "Comma-separated list of required fields (default: title)."
+    reads:
+      - vault/**/*.md
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: note.link.validate
+    description: Validate wikilink integrity across an Obsidian vault. Scans
+      [[wikilinks]] and resolves each against the note graph.
+    scope: workspace
+    provider: workspace
+    module: forge-notes
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      vault-dir:
+        kind: string
+        description: "Vault directory relative to workspace root (default: vault)."
+      path:
+        kind: string
+        description: Subdirectory within the vault to scope the scan to.
+    reads:
+      - vault/**/*.md
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: note.orphan.detect
+    description: Detect orphan notes in an Obsidian vault — notes with zero inbound
+      wikilinks. Always exits zero (warnings, not errors).
+    scope: workspace
+    provider: workspace
+    module: forge-notes
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      vault-dir:
+        kind: string
+        description: "Vault directory relative to workspace root (default: vault)."
+    reads:
+      - vault/**/*.md
     writes: []
     validatesOutputs: []
     pipelines: []
