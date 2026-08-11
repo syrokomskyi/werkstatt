@@ -15,15 +15,17 @@
 
 import "./mountain-journey-section.css";
 import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
-import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import { need, cast, resolveImage, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import type { MountainJourneySectionContent } from "./mountain-journey-section.types.generated.ts";
+import { contentAssetImages } from "../../content-assets.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "mountain-journey");
 const props = cast<MountainJourneySectionContent>(pageOverride);
 const { svgViewBox, routePath, stages, form } = props;
+const bgImage = resolveImage(contentAssetImages, props.backgroundImage, { lang });
 ---
 
 <SectionShell
@@ -46,12 +48,11 @@ const { svgViewBox, routePath, stages, form } = props;
     data-worker-endpoint={props.workerEndpoint ?? ""}
   >
     <div class="mountain-journey__visual" data-mountain-journey-visual>
-      <img
-        class="mountain-journey__background"
-        src={props.backgroundImage}
-        alt=""
-        loading="eager"
-      />
+      {
+        bgImage && (
+          <img class="mountain-journey__background" src={bgImage.src} alt="" loading="eager" />
+        )
+      }
       <svg
         class="mountain-journey__overlay"
         viewBox={`0 0 ${svgViewBox.width} ${svgViewBox.height}`}
