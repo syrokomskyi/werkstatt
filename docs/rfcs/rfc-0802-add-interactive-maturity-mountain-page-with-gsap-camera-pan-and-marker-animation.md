@@ -1,5 +1,5 @@
 ---
-id: RFC-0803
+id: RFC-0802
 title: "Add interactive maturity mountain page with GSAP camera pan and marker animation"
 status: draft
 # kind options: architecture | contract | command | policy | deprecation
@@ -84,7 +84,7 @@ nonGoals:
 #     pattern: "Some new governance paragraph"
 ---
 
-# RFC-0803: Add interactive maturity mountain page with GSAP camera pan and marker animation
+# RFC-0802: Add interactive maturity mountain page with GSAP camera pan and marker animation
 
 ## Context
 
@@ -295,4 +295,4 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 - Agents MUST NOT add the page to header navigation — footer only (per operator decision).
 - Agents MUST NOT show numeric score, stage name, or stage description after animation — only the visual marker position.
 - Agents MUST ensure the mountain WebP asset is LFS-tracked before committing.
-- If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0803 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0802 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
