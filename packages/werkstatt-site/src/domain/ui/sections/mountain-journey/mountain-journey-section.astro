@@ -56,14 +56,14 @@ const { svgViewBox, routePath, stages, form } = props;
       class="mountain-journey__background"
       src={props.backgroundImage}
       alt=""
-      loading="lazy"
+      loading="eager"
       width={svgViewBox.width}
       height={svgViewBox.height}
     />
     <svg
       class="mountain-journey__overlay"
       viewBox={`0 0 ${svgViewBox.width} ${svgViewBox.height}`}
-      preserveAspectRatio="xMidYMid meet"
+      preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
     >
       <path
@@ -89,35 +89,36 @@ const { svgViewBox, routePath, stages, form } = props;
             class="mountain-journey__stage"
             data-stage-id={stage.id}
             data-stage-position={stage.position}
+            style={`bottom: ${stage.position * 90 + 5}%;`}
           >
             <span class="mountain-journey__stage-label">{stage.label}</span>
             <span class="mountain-journey__stage-range">{stage.scoreRange}</span>
-            <span class="mountain-journey__stage-description">{stage.description}</span>
           </li>
         ))
       }
     </ul>
+    <form class="mountain-journey__form" data-mountain-journey-form>
+      <label class="mountain-journey__form-label" for="mountain-journey-url">
+        {form.inputLabel}
+      </label>
+      <div class="mountain-journey__form-row">
+        <input
+          class="mountain-journey__form-input"
+          type="url"
+          id="mountain-journey-url"
+          name="url"
+          placeholder={form.inputPlaceholder}
+          required
+        />
+        <button class="mountain-journey__form-submit" type="submit">
+          {form.submitLabel}
+        </button>
+      </div>
+      <p class="mountain-journey__form-error" data-mountain-journey-error role="alert" hidden>
+        {form.errorMessage}
+      </p>
+    </form>
   </div>
-
-  <form class="mountain-journey__form" data-mountain-journey-form>
-    <label class="mountain-journey__form-label" for="mountain-journey-url">
-      {form.inputLabel}
-    </label>
-    <input
-      class="mountain-journey__form-input"
-      type="url"
-      id="mountain-journey-url"
-      name="url"
-      placeholder={form.inputPlaceholder}
-      required
-    />
-    <button class="mountain-journey__form-submit" type="submit">
-      {form.submitLabel}
-    </button>
-    <p class="mountain-journey__form-error" data-mountain-journey-error role="alert" hidden>
-      {form.errorMessage}
-    </p>
-  </form>
 
   <noscript>
     <p class="mountain-journey__noscript">
