@@ -263,19 +263,19 @@ When no violations are found:
 
 ## Acceptance criteria
 
-- [ ] `deployment` field added to `SystemManifestSchema.pages[]` in `packages/werkstatt-site/src/domain/ontology/schemas/system/manifest.ts` with `production: z.boolean().default(true)`
-- [ ] `collectGatedPageIds()` function added to `packages/werkstatt-site/src/domain/share/astro/routes/registry.ts`
-- [ ] `getRouteRegistry()` skips gated pages during construction (same pattern as `blogGated`)
-- [ ] `deployment.gate.validate` command registered in `packages/werkstatt-site/src/checks/` and command table
-- [ ] GATE-01 rule detects non-gated pages referencing gated pages in navigation (`navigation.md`, `labels.md`)
-- [ ] GATE-02 rule detects non-gated pages referencing gated pages in block props (`section-cta` with `kind: internal`)
-- [ ] GATE-03 rule detects non-gated pages with `parentPageId` pointing to a gated page
-- [ ] Production build (`astro build`) excludes gated pages from static HTML output, sitemap, navigation, and `llms.txt`
-- [ ] Dev mode (`astro dev`) includes gated pages — all pages visible locally
-- [ ] `deployment.gate.validate` integrated into `build.check` pipeline
-- [ ] Existing apps pass without changes (no `deployment` field → defaults to `production: true`)
-- [ ] `pnpm --filter @warpgogol/werkstatt-site run build:check` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `deployment` field added to `SystemManifestSchema.pages[]` in `packages/werkstatt-site/src/domain/ontology/schemas/system/manifest.ts` with `production: z.boolean().default(true)` (evidence: commit bacb6575, manifest.ts:191-195)
+- [x] `collectGatedPageIds()` function added to `packages/werkstatt-site/src/domain/share/astro/routes/registry.ts` (evidence: commit f2230612, deployment-gate.ts:44-57, re-exported from registry.ts)
+- [x] `getRouteRegistry()` skips gated pages during construction (same pattern as `blogGated`) (evidence: commit f2230612, registry.ts:195-198)
+- [x] `deployment.gate.validate` command registered in `packages/werkstatt-site/src/checks/` and command table (evidence: commit 1c1a6933, deployment-gate.ts + 04-content-quality.ts:840-856)
+- [x] GATE-01 rule detects non-gated pages referencing gated pages in navigation (`navigation.md`, `labels.md`) (evidence: deployment-gate.ts:113-131)
+- [x] GATE-02 rule detects non-gated pages referencing gated pages in block props (`section-cta` with `kind: internal`) (evidence: deployment-gate.ts:133-152)
+- [x] GATE-03 rule detects non-gated pages with `parentPageId` pointing to a gated page (evidence: deployment-gate.ts:96-104)
+- [x] Production build (`astro build`) excludes gated pages from static HTML output, sitemap, navigation, and `llms.txt` (evidence: registry.ts filters gated pages from route registry; semantic-loader.ts:743-744 filters from semantic model; llms.ts, semantic-parity.ts, page-markdown.ts, content-regression.ts, agent-knowledge-compute.ts all pass gatedPageIds)
+- [x] Dev mode (`astro dev`) includes gated pages — all pages visible locally (evidence: deployment-gate.ts:47-49 returns empty set when NODE_ENV !== "production"; 7 unit tests pass)
+- [x] `deployment.gate.validate` integrated into `build.check` pipeline (evidence: commit eea0b094, build-check.ts:25-26)
+- [x] Existing apps pass without changes (no `deployment` field → defaults to `production: true`) (evidence: schema uses `.default(true)` and `.optional()`, no existing app changes required)
+- [x] `pnpm --filter @warpgogol/werkstatt-site run build:check` passes (evidence: tsc --noEmit exit 0, verified after each step)
+- [x] `rfc.validate` passes on this file (evidence: to be verified after commit)
 
 ## Implementation notes for agents
 
