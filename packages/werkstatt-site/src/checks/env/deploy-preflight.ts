@@ -11,6 +11,7 @@ has no extra keys, and has no empty values. Exits non-zero on any failure, block
 <CHANGE_SUMMARY>
   <item>RFC-0388: initial implementation — deploy.preflight command.</item>
   <item>RFC-0761: remove --env flag, target is always .env for sites and services.</item>
+  <item>RFC-0806: add --dev flag for .env.dev validation (service dev deploys).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -51,6 +52,7 @@ export async function runDeployPreflight(
   const flags = input.flags ?? {};
   const siteName = (flags.site as string) ?? (flags["--site"] as string);
   const serviceName = (flags.service as string) ?? (flags["--service"] as string);
+  const isDev = flags.dev === true || flags["--dev"] === true;
 
   // RFC-0761: --env flag is no longer supported
   const envFlag = (flags.env as string) ?? (flags["--env"] as string);
@@ -72,6 +74,9 @@ export async function runDeployPreflight(
   let examplePath: string;
   let targetLabel: string;
 
+  const envTarget = isDev ? ".env.dev" : ".env";
+  const exampleTarget = isDev ? ".env.dev.example" : ENV_EXAMPLE;
+
   if (siteName) {
     const sites = await discoverSiteWorkspaces(context.workspaceRoot);
     const site = sites.find((s) => s.name === siteName);
@@ -87,13 +92,13 @@ export async function runDeployPreflight(
         summary: `deploy.preflight: site "${siteName}" not found`,
       };
     }
-    targetPath = join(site.directory, ".env");
-    examplePath = join(site.directory, ENV_EXAMPLE);
-    targetLabel = `${siteName}/.env`;
+    targetPath = join(site.directory, envTarget);
+    examplePath = join(site.directory, exampleTarget);
+    targetLabel = `${siteName}/${envTarget}`;
   } else if (serviceName) {
-    targetPath = join(context.workspaceRoot, "services", serviceName, ".env");
-    examplePath = join(context.workspaceRoot, "services", serviceName, ENV_EXAMPLE);
-    targetLabel = `services/${serviceName}/.env`;
+    targetPath = join(context.workspaceRoot, "services", serviceName, envTarget);
+    examplePath = join(context.workspaceRoot, "services", serviceName, exampleTarget);
+    targetLabel = `services/${serviceName}/${envTarget}`;
   } else {
     return {
       data: {

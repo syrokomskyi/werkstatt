@@ -166,12 +166,18 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
         kind: "string",
         description: "Service name (e.g. lagebild-sync). Required for service deploys.",
       },
+      dev: {
+        kind: "boolean",
+        description: "Validate .env.dev instead of .env (for dev deploys). RFC-0806.",
+      },
     },
     reads: [
       "systems/*/.env.example",
       "systems/*/.env",
       "services/*/.env.example",
       "services/*/.env",
+      "services/*/.env.dev.example",
+      "services/*/.env.dev",
     ],
     execute: runDeployPreflight,
   },
