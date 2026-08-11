@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
+enhancedAt: 2026-08-11
 implementedAt:
 closedAt:
 supersedes: []
@@ -100,13 +101,19 @@ Observable symptom: `git status` shows `M pnpm-lock.yaml` with hundreds of delet
 
 ## Decision
 
-`mission.archive` runs `pnpm install` at the workspace root after all directory moves are complete. If `pnpm-lock.yaml` changed, the updated lockfile is committed together with the moved mission directories in a single git commit.
+`mission.archive` gains two new behaviors after all directory moves are complete:
 
-The `pnpm install` step is non-fatal: if it fails (e.g., network issues, lockfile conflicts), `mission.archive` logs a warning and proceeds without committing the lockfile. The operator can run `pnpm install` manually and commit the result.
+1. **Lockfile refresh**: runs `pnpm install` at the workspace root to update `pnpm-lock.yaml` after the workspace structure changed.
+2. **Git commit**: commits the updated `pnpm-lock.yaml` together with the moved mission directories in a single atomic commit. This is a new responsibility — the current handler only moves directories on disk via `fs.rename` without committing.
+
+The `pnpm install` step is non-fatal: if it fails (e.g., network issues, lockfile conflicts), `mission.archive` logs a warning and proceeds without committing. The operator can run `pnpm install` manually and commit the result.
+
+The MODULE_CONTRACT non-goals in `archive.ts` are updated to allow `node:child_process` (for `execSync`) alongside `node:fs` and `yaml`. No `@warpgogol/*` imports are introduced — `node:child_process` is a Node.js built-in.
 
 ## Architectural fit
 
-- **Site OS operator model**: `mission.archive` is a forge command (`packages/forge/os/mission/handlers/archive.ts`). It already uses `execSync` for filesystem operations. Adding `execSync("pnpm install")` is consistent with its existing implementation style.
+- **Site OS operator model**: `mission.archive` is a forge command (`packages/forge/os/mission/handlers/archive.ts`). It currently uses `node:fs/promises` (`fs.rename`) for filesystem operations. Adding `execSync` from `node:child_process` is a new import — the MODULE_CONTRACT non-goals are updated to allow it.
+- **Forge autonomy**: `os/mission/` is not fully autonomous (forge AGENTS.md: "Other `os/` modules may still use dynamic imports where kernel integration is needed"). Adding `node:child_process` does not violate the autonomy guard — it is a Node.js built-in, not an `@warpgogol/*` package.
 - **RFC-0801**: Separated `mission.archive` from `mission.close`. This RFC extends `mission.archive` with lockfile management — a natural complement to the service-folder cleanup that RFC-0801 already added.
 - **No new DNA invariant**: This is a bug fix restoring intended behavior (clean repo state after archive). No new architectural contract is established.
 
@@ -130,9 +137,11 @@ After all directory moves are complete (end of `runMissionArchive`, before the r
 1. **Skip if dry-run**: If `dryRun` is true, skip the lockfile refresh entirely.
 2. **Skip if no moves**: If `moved.length === 0`, skip — no workspace structure changed.
 3. **Run `pnpm install`**: Execute `pnpm install` at `workspaceRoot` with a timeout (120s). Non-fatal: catch errors and log a warning.
-4. **Commit if lockfile changed**: Check `git status --porcelain pnpm-lock.yaml` at `workspaceRoot`. If dirty, stage and commit `pnpm-lock.yaml` + all moved mission directories with message: `chore: refresh pnpm-lock.yaml after mission.archive (N moved)`.
+4. **Commit if lockfile changed**: Check `git status --porcelain pnpm-lock.yaml` at `workspaceRoot`. If dirty, stage `pnpm-lock.yaml` + all changes under `missions/` (using `git add -A` to reliably capture renames) and commit with message: `chore: refresh pnpm-lock.yaml after mission.archive (N moved)`.
 
 ```ts
+import { execSync } from "node:child_process";
+
 // Post-move lockfile refresh
 if (!dryRun && moved.length > 0) {
   try {
@@ -148,17 +157,14 @@ if (!dryRun && moved.length > 0) {
       stdio: ["pipe", "pipe", "pipe"],
     }).trim();
     if (lockfileStatus) {
-      // Stage lockfile + moved directories
-      execSync("git add pnpm-lock.yaml", { cwd: workspaceRoot, stdio: "pipe" });
-      for (const m of moved) {
-        execSync(`git add ${JSON.stringify(m.from)} ${JSON.stringify(m.to)}`, {
-          cwd: workspaceRoot,
-          stdio: "pipe",
-        });
-      }
+      // Stage lockfile + all mission changes (git add -A captures renames reliably)
+      execSync("git add -A missions/ pnpm-lock.yaml", {
+        cwd: workspaceRoot,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
       execSync(
         `git commit -m ${JSON.stringify(`chore: refresh pnpm-lock.yaml after mission.archive (${moved.length} moved)`)}`,
-        { cwd: workspaceRoot, stdio: "pipe" },
+        { cwd: workspaceRoot, stdio: ["pipe", "pipe", "pipe"] },
       );
       logger.info(`  Committed pnpm-lock.yaml refresh (${moved.length} missions archived)`);
     }
@@ -169,6 +175,8 @@ if (!dryRun && moved.length > 0) {
   }
 }
 ```
+
+Note: `git add -A missions/` is used instead of staging individual `m.from`/`m.to` paths because `fs.rename` has already moved the directories — the source paths no longer exist on disk. `git add -A` reliably captures both sides of the rename.
 
 ### File system responsibilities
 
@@ -206,6 +214,8 @@ if (!dryRun && moved.length > 0) {
 - **`pnpm install` latency**: Adds ~10-30s to `mission.archive` execution. Acceptable since archive is a manual, infrequent operation.
 - **Commit scope**: The auto-commit includes moved directories + lockfile. If the operator expected to review moves before committing, they can use `--dry-run` first (existing behavior).
 - **Forge autonomy guard**: `mission.archive` is in `packages/forge`. Adding `execSync("pnpm install")` and `execSync("git ...")` does not import any `@warpgogol/*` packages — it uses `node:child_process` directly. No autonomy guard violation.
+- **Concurrent execution**: Two simultaneous `mission.archive` invocations would both run `pnpm install` concurrently, potentially corrupting `pnpm-lock.yaml`. The existing lock mechanism does not cover archive operations. This risk is acceptable — `mission.archive` is a manual, infrequent command and concurrent invocations are unlikely. If needed, a lock can be added in a future RFC.
+- **`pnpm install` side effects**: `pnpm install` may modify `node_modules/` symlinks across the entire workspace, not just `pnpm-lock.yaml`. If the archived workpiece had unique dependencies not present in any other workspace package, `pnpm install` might remove packages from the shared store. This is benign — the dependencies are no longer needed.
 
 ## Acceptance criteria
 
@@ -221,17 +231,8 @@ if (!dryRun && moved.length > 0) {
 
 ## Implementation notes for agents
 
-<!-- Rules that govern how AI agents interact with this RFC.
-     Be explicit. Agents read this section for behavioral policy.
-
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
-- For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run
-  `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file
-  in the same commit (RFC-0330 amended transition precondition).
-- Agents MUST NOT weaken or remove enforcement rules established by this RFC
-  without a new RFC that supersedes it.
-- If implementation reveals an invariant conflict, run
-  `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"`
-  instead of working around it (RFC-0334).
--->
+- Agents MUST update the MODULE_CONTRACT non-goals in `archive.ts` to allow `node:child_process` alongside `node:fs` and `yaml`.
+- Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
