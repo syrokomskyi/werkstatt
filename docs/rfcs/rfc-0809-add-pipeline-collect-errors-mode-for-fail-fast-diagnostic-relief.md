@@ -1,7 +1,7 @@
 ---
 id: RFC-0809
 title: "Add pipeline collect-errors mode for fail-fast diagnostic relief"
-status: accepted
+status: implemented
 kind: policy
 scope: workspace
 owners:
@@ -9,10 +9,10 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-12
-updatedAt: 2026-08-12
+updatedAt: 2026-08-11
 enhancedAt: 2026-08-12
 acceptedAt: 2026-08-12
-implementedAt:
+implementedAt: 2026-08-11
 closedAt:
 supersedes: []
 supersededBy:
