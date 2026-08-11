@@ -60,8 +60,9 @@ export async function runDnsRecordUpsert(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<DnsRecordUpsertResult>> {
   const { workspaceRoot } = context;
-  const systemId = flagString(input, "system");
-  if (!systemId) throw new Error("[dns.record.upsert] --system is required");
+  const systemId = flagString(input, "system") ?? context.site?.name;
+  if (!systemId)
+    throw new Error("[dns.record.upsert] --system is required (or run in site-scoped context)");
   const dryRun = flagBoolean(input, "dry-run") ?? false;
 
   const declaration = await loadDnsRecordFile(workspaceRoot, systemId);
@@ -147,6 +148,7 @@ function toApiRecord(declared: DnsRecordDeclaration): {
   content: string;
   proxied?: boolean;
   priority?: number;
+  ttl?: number;
   comment?: string;
 } {
   return {
@@ -155,6 +157,7 @@ function toApiRecord(declared: DnsRecordDeclaration): {
     content: declared.type === "TXT" ? normalizeTxtContent(declared.content) : declared.content,
     proxied: declared.proxied ?? false,
     ...(declared.priority !== undefined ? { priority: declared.priority } : {}),
+    ...(declared.ttl !== undefined ? { ttl: declared.ttl } : {}),
     ...(declared.comment ? { comment: declared.comment } : {}),
   };
 }

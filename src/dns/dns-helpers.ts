@@ -86,7 +86,14 @@ export function recordIdentity(record: DnsRecordDeclaration): string {
 
 export function recordsMatch(
   declared: DnsRecordDeclaration,
-  live: { type: string; name: string; content: string; proxied: boolean; priority: number | null },
+  live: {
+    type: string;
+    name: string;
+    content: string;
+    proxied: boolean;
+    priority: number | null;
+    ttl?: number | null;
+  },
 ): boolean {
   if (live.type !== declared.type) return false;
   if (live.name !== declared.name) return false;
@@ -101,6 +108,10 @@ export function recordsMatch(
   if (live.proxied !== declaredProxied) return false;
 
   if (declared.priority !== undefined && declared.priority !== live.priority) {
+    return false;
+  }
+
+  if (declared.ttl !== undefined && live.ttl !== declared.ttl) {
     return false;
   }
 
