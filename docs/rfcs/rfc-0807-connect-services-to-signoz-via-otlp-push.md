@@ -343,14 +343,14 @@ warpgogol_back_queue_depth: defineGauge("warpgogol_back_queue_depth", ["service"
 
 ## Acceptance criteria
 
-- [ ] New `back` metrics declared in `WARPGOGOL_METRIC_REGISTRY`
-- [ ] `METRIC_NAME_PATTERN` includes `back` prefix
-- [ ] `rate-fetcher` pushes metrics to SigNoz (pilot)
-- [ ] All 5 Worker services push metrics to SigNoz
-- [ ] `check-runner` pushes metrics to SigNoz
-- [ ] All services have `WARPGOGOL_OTLP_ENDPOINT` / `WARPGOGOL_OTLP_TOKEN` in `.env.example`
-- [ ] `service.otlp.validate` registered and passing (verifiable via `werkstatt run service.otlp.validate`)
-- [ ] `rfc.validate` passes
+- [x] New `back` metrics declared in `WARPGOGOL_METRIC_REGISTRY` (evidence: `packages/werkstatt-site/src/domain/observability/metric-registry.ts:24-25`, `pnpm --filter @warpgogol/werkstatt-site run test -- metric-registry` — 15 tests pass)
+- [x] `METRIC_NAME_PATTERN` includes `back` prefix (evidence: `packages/werkstatt-site/src/domain/observability/metric-registry.ts:9`)
+- [x] `rate-fetcher` pushes metrics to SigNoz (pilot) (evidence: `services/rate-fetcher/src/index.ts:153-156`, `services/rate-fetcher/.env.example:19-24`)
+- [x] All 5 Worker services push metrics to SigNoz (evidence: `services/rate-fetcher/src/index.ts`, `services/matomo-proxy/src/worker.ts`, `services/telegram-alert-bridge/src/worker.ts`, `services/maturity-score/src/index.ts`, `packages/werkstatt-site/src/domain/integration-adapter-supabase-crm/worker.ts` for lagebild-sync)
+- [x] `check-runner` pushes metrics to SigNoz (evidence: `services/check-runner/src/worker.ts:19-22`)
+- [x] All services have `WARPGOGOL_OTLP_ENDPOINT` / `WARPGOGOL_OTLP_TOKEN` in `.env.example` (evidence: `pnpm exec werkstatt run service.otlp.validate` — exitCode 0, status warn)
+- [x] `service.otlp.validate` registered and passing (evidence: `pnpm exec werkstatt run service.otlp.validate` — exitCode 0, status warn; only OTLP-03 warning for lagebild-sync delegated source)
+- [x] `rfc.validate` passes (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0807` — All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
