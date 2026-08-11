@@ -158,11 +158,17 @@ if (!dryRun && moved.length > 0) {
       stdio: ["pipe", "pipe", "pipe"],
     }).trim();
     if (lockfileStatus) {
-      // Stage lockfile + all mission changes (git add -A captures renames reliably)
-      execSync("git add -A missions/ pnpm-lock.yaml", {
+      // Stage lockfile + each moved mission's paths (targeted, not broad missions/)
+      execSync("git add pnpm-lock.yaml", {
         cwd: workspaceRoot,
         stdio: ["pipe", "pipe", "pipe"],
       });
+      for (const m of moved) {
+        execSync(`git add -A ${JSON.stringify(m.from)} ${JSON.stringify(m.to)}`, {
+          cwd: workspaceRoot,
+          stdio: ["pipe", "pipe", "pipe"],
+        });
+      }
       execSync(
         `git commit -m ${JSON.stringify(`chore: refresh pnpm-lock.yaml after mission.archive (${moved.length} moved)`)}`,
         { cwd: workspaceRoot, stdio: ["pipe", "pipe", "pipe"] },
@@ -177,7 +183,7 @@ if (!dryRun && moved.length > 0) {
 }
 ```
 
-Note: `git add -A missions/` is used instead of staging individual `m.from`/`m.to` paths because `fs.rename` has already moved the directories — the source paths no longer exist on disk. `git add -A` reliably captures both sides of the rename.
+Note: `git add -A <m.from> <m.to>` is used per moved mission rather than a broad `git add -A missions/` to avoid staging unrelated changes from other agents working under `missions/`. The `-A` flag on each path captures both sides of the rename (deletion at source, addition at destination).
 
 ### File system responsibilities
 
