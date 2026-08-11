@@ -40,7 +40,12 @@ import {
 import { byteHash, stableJsonHash } from "@warpgogol/werkstatt/fingerprint";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import type { SemanticBlock, SemanticFaqEntry, SemanticPageModel } from "@warpgogol/werkstatt-site/share/semantic";
+import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
+import type {
+  SemanticBlock,
+  SemanticFaqEntry,
+  SemanticPageModel,
+} from "@warpgogol/werkstatt-site/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
@@ -235,9 +240,11 @@ async function buildSnapshot(
   languages: string[],
   siteUrl: string,
 ): Promise<ContentRegressionSnapshot> {
+  const { manifest } = await loadSystemManifest(contentDir);
+  const gatedPageIds = collectGatedPageIds(manifest.pages ?? []);
   const routes: ContentRegressionRoute[] = [];
   for (const lang of languages) {
-    const semanticSite = await loadSemanticSiteModel({ contentDir, lang, siteUrl });
+    const semanticSite = await loadSemanticSiteModel({ contentDir, lang, siteUrl, gatedPageIds });
     for (const page of semanticSite.pages) {
       routes.push(pageToRoute(page));
     }

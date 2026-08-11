@@ -26,9 +26,14 @@ import type {
 import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse } from "yaml";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/werkstatt-site/content";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
+import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
+import { loadSemanticSiteModel } from "@warpgogol/werkstatt-site/content";
 import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/werkstatt-site/share/semantic";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/canonical-url";
+import {
+  canonicalPageUrl,
+  type CanonicalUrlOptions,
+} from "@warpgogol/werkstatt-site/share/canonical-url";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { includeInLlms, type SurfaceArtifact } from "@warpgogol/werkstatt-site/surface";
 import { loadLazySurfacePages } from "@warpgogol/werkstatt-site/share/astro/surface-routes";
@@ -123,6 +128,7 @@ export async function runLlmsGenerate(
     contentDir,
     lang,
     siteUrl,
+    gatedPageIds: collectGatedPageIds(manifest.pages ?? []),
   });
 
   let llmsTxt = buildLlmsIndex(semanticSite);

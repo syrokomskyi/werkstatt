@@ -26,6 +26,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
+import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { diagnosticsResult } from "./result-helpers.ts";
 
@@ -33,27 +34,6 @@ interface SystemPageView {
   pageId?: string;
   parentPageId?: string;
   deployment?: { production?: boolean };
-}
-
-/**
- * RFC-0803: Reads system.md pages[] and returns pageIds where deployment.production === false.
- * Returns an empty set when process.env.NODE_ENV is not "production" (dev mode) —
- * all pages are visible in dev. Inlined here to avoid importing from share/routes
- * (which pulls astro:content into the module graph and breaks ecosystem.commit).
- */
-function collectGatedPageIds(
-  pages: Array<{ pageId?: string; deployment?: { production?: boolean } }>,
-): Set<string> {
-  if (process.env.NODE_ENV !== "production") {
-    return new Set();
-  }
-  const gated = new Set<string>();
-  for (const page of pages) {
-    if (page.pageId && page.deployment?.production === false) {
-      gated.add(page.pageId);
-    }
-  }
-  return gated;
 }
 
 const TARGET_KEY_RE = /(^|\.)(pageId|ctaTarget|primaryCtaTarget|secondaryCtaTarget|targetPageId)$/;

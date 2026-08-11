@@ -16,6 +16,7 @@ import { getCollection } from "astro:content";
 import { getSurfaceEntries } from "../surface-routes.ts";
 import { getParticipantProfileRoutes } from "../people-routes.ts";
 import { getNachweisRoutes, getNachweisVerifyRoutes } from "../nachweis-routes.ts";
+import { collectGatedPageIds } from "../deployment-gate.ts";
 
 /** Language code (e.g., "de", "en") */
 export type LanguageCode = string;
@@ -104,27 +105,6 @@ function isSitemapExcluded(
 
 /** RFC-0803: Set of pageIds excluded from production builds. */
 export type GatedPageIds = Set<string>;
-
-/**
- * RFC-0803: Reads system.md pages[] and returns pageIds where deployment.production === false.
- * Returns an empty set when process.env.NODE_ENV is not "production" (dev mode) —
- * all pages are visible in dev. Uses process.env.NODE_ENV (not import.meta.env.PROD)
- * because this module is type-checked with tsc --noEmit outside Vite.
- */
-export function collectGatedPageIds(
-  pages: Array<{ pageId?: string; deployment?: { production?: boolean } }>,
-): GatedPageIds {
-  if (process.env.NODE_ENV !== "production") {
-    return new Set();
-  }
-  const gated = new Set<string>();
-  for (const page of pages) {
-    if (page.pageId && page.deployment?.production === false) {
-      gated.add(page.pageId);
-    }
-  }
-  return gated;
-}
 
 /**
  * Load route registry from system.md content collection.

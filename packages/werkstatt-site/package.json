@@ -462,6 +462,10 @@
       "types": "./src/domain/share/astro/surface-routes.ts",
       "default": "./src/domain/share/astro/surface-routes.ts"
     },
+    "./share/astro/deployment-gate": {
+      "types": "./src/domain/share/astro/deployment-gate.ts",
+      "default": "./src/domain/share/astro/deployment-gate.ts"
+    },
     "./share/image-provider": {
       "types": "./src/domain/share/image-provider.ts",
       "default": "./src/domain/share/image-provider.ts"

@@ -21,6 +21,7 @@ import {
   collectMarkdownFiles,
   parseMarkdownFrontmatter,
 } from "@warpgogol/werkstatt-site/content";
+import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
 import {
   formatAgentKnowledge,
   AGENT_KNOWLEDGE_DOMAINS,
@@ -109,6 +110,7 @@ export async function computeKnowledgeEnvelopes(
       contentDir: paths.contentDirectory,
       lang,
       siteUrl,
+      gatedPageIds: collectGatedPageIds(manifest.pages ?? []),
     });
     const org = model.organization;
 

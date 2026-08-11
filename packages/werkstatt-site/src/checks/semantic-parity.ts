@@ -20,6 +20,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/werkstatt-site/content";
+import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
 import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/werkstatt-site/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { passResult, failResult } from "./result-helpers.ts";
@@ -35,7 +36,12 @@ export async function runSemanticParity(
   const { manifest } = await loadSystemManifest(contentDir);
   const lang = defaultLanguageFromManifest(manifest);
 
-  const semanticSite = await loadSemanticSiteModel({ contentDir, lang, siteUrl });
+  const semanticSite = await loadSemanticSiteModel({
+    contentDir,
+    lang,
+    siteUrl,
+    gatedPageIds: collectGatedPageIds(manifest.pages ?? []),
+  });
   const expectedIndex = buildLlmsIndex(semanticSite);
   const expectedFull = buildLlmsFull(semanticSite);
 

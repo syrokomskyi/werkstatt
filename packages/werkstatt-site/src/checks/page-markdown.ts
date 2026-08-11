@@ -32,6 +32,7 @@ import {
   loadSystemManifest,
   createFsSemanticReader,
 } from "@warpgogol/werkstatt-site/content";
+import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
 import {
   buildPageMarkdown,
   markdownTwinRelPath,
@@ -48,7 +49,10 @@ import {
   DOMAIN_BY_PAGE_TYPE,
   SEMANTIC_PAGE_TYPES,
 } from "@warpgogol/werkstatt-site/share/semantic";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/canonical-url";
+import {
+  canonicalPageUrl,
+  type CanonicalUrlOptions,
+} from "@warpgogol/werkstatt-site/share/canonical-url";
 import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { failResult } from "./result-helpers.ts";
@@ -168,8 +172,14 @@ export async function runPageMarkdownGenerate(
 
   let written = 0;
   const seen = new Set<string>();
+  const gatedPageIds = collectGatedPageIds(pages);
   for (const language of languages) {
-    const semanticSite = await loadSemanticSiteModel({ contentDir, lang: language, siteUrl });
+    const semanticSite = await loadSemanticSiteModel({
+      contentDir,
+      lang: language,
+      siteUrl,
+      gatedPageIds,
+    });
     for (const page of semanticSite.pages) {
       const depth = page.output?.llms?.depth ?? "full";
       if (depth !== "full" && depth !== "summary") continue;

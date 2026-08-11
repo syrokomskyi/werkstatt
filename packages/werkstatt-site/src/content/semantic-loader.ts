@@ -61,6 +61,15 @@ export interface SemanticLoaderOptions {
   contentDir: string;
   lang: string;
   siteUrl: string;
+  /**
+   * RFC-0803: pageIds excluded from production builds. When provided,
+   * loadSemanticSiteModel() skips pages whose pageId is in this set.
+   * Callers that should exclude gated pages (llms.generate, semantic.parity,
+   * page.markdown, content.regression, agent.knowledge.compute) pass this;
+   * callers that should process all pages (page.block.validate, material
+   * metadata) do not pass it.
+   */
+  gatedPageIds?: Set<string>;
 }
 
 // ---------------------------------------------------------------------------
@@ -704,7 +713,7 @@ export function createFsSemanticReader(
 export async function loadSemanticSiteModel(
   options: SemanticLoaderOptions,
 ): Promise<SemanticSiteModel> {
-  const { contentDir, lang, siteUrl } = options;
+  const { contentDir, lang, siteUrl, gatedPageIds } = options;
 
   const { manifest } = await loadSystemManifest(contentDir);
   const defaultLang = manifest.i18n?.default ?? "de";
@@ -730,6 +739,9 @@ export async function loadSemanticSiteModel(
     // semanticType. Sitemap inclusion is no longer coupled here — llms
     // inclusion is governed by the resolved output.llms depth.
     if (!page.semanticType) continue;
+
+    // RFC-0803: skip gated pages when the caller provides gatedPageIds
+    if (gatedPageIds?.has(page.pageId as string)) continue;
 
     const output = resolvePageOutput(page.output, {
       semanticType: page.semanticType,
