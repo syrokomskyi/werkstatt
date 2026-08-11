@@ -1,0 +1,42 @@
+id: mountain-journey
+displayName: Mountain journey
+version: 1.0.0
+semanticRole: maturity-visualization
+description: |
+  Interactive maturity mountain with GSAP camera pan and marker animation. Visitors enter a URL, a Worker returns a maturity score, and a marker animates along an SVG route path to the score position. RFC-0802.
+expectedIntents:
+  - convert-visitor
+  - establish-identity
+expectedIndustryFit: []
+layoutHint: single-column
+bodyKind: composite
+acceptedCosmicNames:
+  - Prometheus
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+  shape: |
+    z.object({
+      backgroundImage: z.string().min(1),
+      svgViewBox: z.object({
+        width: z.number().positive(),
+        height: z.number().positive(),
+      }),
+      routePath: z.string().min(1),
+      stages: z.array(z.object({
+        id: z.string().min(1),
+        label: z.string().min(1),
+        scoreRange: z.string().min(1),
+        description: z.string().min(1),
+        position: z.number().min(0).max(1),
+      })).min(2),
+      form: z.object({
+        inputLabel: z.string().min(1),
+        inputPlaceholder: z.string().min(1),
+        submitLabel: z.string().min(1),
+        errorMessage: z.string().min(1),
+      }),
+    }).strict()
+constraints: {}
