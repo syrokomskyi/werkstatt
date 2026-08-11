@@ -1,12 +1,13 @@
 ---
 id: RFC-0811
 title: "Switch page.markdown.validate from blacklist to whitelist scanning"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
