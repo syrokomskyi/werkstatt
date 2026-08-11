@@ -51,6 +51,7 @@ export interface DnsRecordUpsertResult {
     created: number;
     updated: number;
     skipped: number;
+    errors: number;
     total: number;
   };
 }
@@ -93,6 +94,7 @@ export async function runDnsRecordUpsert(
   let updated = 0;
   let skipped = 0;
 
+  let errors = 0;
   for (const declared of declaration.records) {
     const identity = `${declared.type}:${declared.name}`;
     const matching = liveRecords.find((r) => r.type === declared.type && r.name === declared.name);
@@ -116,14 +118,21 @@ export async function runDnsRecordUpsert(
 
     const apiRecord = toApiRecord(declared);
 
-    if (matching) {
-      await updateDnsRecord(zoneId, apiToken, matching.id, apiRecord);
-      updated++;
-      results.push({ identity, action: "updated", recordId: matching.id });
-    } else {
-      const created_record = await createDnsRecord(zoneId, apiToken, apiRecord);
-      created++;
-      results.push({ identity, action: "created", recordId: created_record.id });
+    try {
+      if (matching) {
+        await updateDnsRecord(zoneId, apiToken, matching.id, apiRecord);
+        updated++;
+        results.push({ identity, action: "updated", recordId: matching.id });
+      } else {
+        const created_record = await createDnsRecord(zoneId, apiToken, apiRecord);
+        created++;
+        results.push({ identity, action: "created", recordId: created_record.id });
+      }
+    } catch (err) {
+      errors++;
+      results.push({ identity, action: "skipped", recordId: null });
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[dns.record.upsert] ${identity}: API error — ${msg}`);
     }
   }
 
@@ -135,9 +144,9 @@ export async function runDnsRecordUpsert(
       zone: declaration.zone,
       dryRun,
       results,
-      summary: { created, updated, skipped, total },
+      summary: { created, updated, skipped, total, errors },
     },
-    summary: `[dns.record.upsert] ${systemId}: ${created} created, ${updated} updated, ${skipped} skipped (${total} total)${dryRun ? " [dry-run]" : ""}`,
+    summary: `[dns.record.upsert] ${systemId}: ${created} created, ${updated} updated, ${skipped} skipped, ${errors} error(s) (${total} total)${dryRun ? " [dry-run]" : ""}`,
     nextSteps: [],
   };
 }
@@ -160,6 +169,7 @@ function toApiRecord(declared: DnsRecordDeclaration): {
     return {
       type: declared.type,
       name: declared.name,
+      content: declared.content,
       data: { priority, target, value },
       proxied: declared.proxied ?? false,
       ...(declared.ttl !== undefined ? { ttl: declared.ttl } : {}),
