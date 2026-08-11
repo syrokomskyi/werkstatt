@@ -17,7 +17,7 @@ missions/<missionId>/workpiece/       ◄── active mission workpiece (deploy
 └─ tools/kernel.config.ts             ── kernel pipelines
 
 services/                             ◄── deployable backend runtime compositions
-└─ check-warpgogol-runner              ── Node/Playwright runner for Check Warpgogol runs
+└─ check-runner                   ── Node/Playwright runner for Check Warpgogol runs
 
 packages/                             ◄── all logic lives here
 ├─ ui                                 ── Astro sections + components (cosmicName-tagged)
@@ -68,18 +68,18 @@ If you cloned without running onboarding, invoke the `setup-ecosystem` skill to 
 
 ## Check Warpgogol
 
-The Check Warpgogol product surface (the web app that accepts a URL and displays check reports) is pending re-onboarding as a Sternsystem. The backend runner lives separately in `services/check-warpgogol-runner` and consumes local queue files from `.check-warpgogol/queue`, writing artifacts to `.check-warpgogol/runs/<runId>/`.
+The Check Warpgogol product surface (the web app that accepts a URL and displays check reports) is pending re-onboarding as a Sternsystem. The backend runner lives separately in `services/check-runner` and consumes local queue files from `.check-warpgogol/queue`, writing artifacts to `.check-warpgogol/runs/<runId>/`.
 
 ```sh
 # Backend runner
-pnpm --filter check-warpgogol-runner run:once
-pnpm --filter check-warpgogol-runner dev
+pnpm --filter check-runner run:once
+pnpm --filter check-runner dev
 
 # Backend workspace validators
 pnpm exec werkstatt run services.check.run
 ```
 
-Keep the Check Warpgogol product surface and `services/check-warpgogol-runner` decoupled through shared contracts in `packages/check-core`; the site never imports runner code, and the runner never imports site code.
+Keep the Check Warpgogol product surface and `services/check-runner` decoupled through shared contracts in `packages/check-core`; the site never imports runner code, and the runner never imports site code.
 
 ## Onboarding a new client site
 
