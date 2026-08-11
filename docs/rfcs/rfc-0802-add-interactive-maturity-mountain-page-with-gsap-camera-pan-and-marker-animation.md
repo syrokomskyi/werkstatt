@@ -1,7 +1,7 @@
 ---
 id: RFC-0802
 title: "Add interactive maturity mountain page with GSAP camera pan and marker animation"
-status: implemented
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -297,6 +297,7 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 - [x] No-JS fallback: full static SVG scene server-rendered with `<noscript>` message (evidence: mountain-journey-section.astro `<noscript>` block)
 - [x] `pnpm --filter warpgogol-com exec astro check` passes (0 errors, 0 warnings, 0 hints) (evidence: astro check output 2026-08-11)
 - [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0802 --json output, 0 violations)
+- [ ] Page excluded from production deployment via deployment gating system (pending: RFC for deployment gating not yet created)
 
 ## Implementation notes for agents
 
