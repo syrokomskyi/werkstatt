@@ -41,11 +41,11 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - note.link.validate
     - note.frontmatter.validate
     - note.orphan.detect
-  added: []
   changed: []
   removed: []
 appsImpacted: []
