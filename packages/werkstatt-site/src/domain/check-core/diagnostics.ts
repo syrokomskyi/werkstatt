@@ -160,11 +160,63 @@ const contentSurfaceRules: DiagnosticRule[] = [
   },
 ];
 
+const agentRules: DiagnosticRule[] = [
+  {
+    ruleId: "CW-AGENT-01",
+    collect(page) {
+      return page.agentFeatures.webmcpRegisterTool
+        ? []
+        : [
+            makeDiagnostic(
+              "CW-AGENT-01",
+              "warning",
+              "Page does not register WebMCP tools via document.modelContext.registerTool.",
+              page.url,
+              "Ensure the agent-webmcp-script.astro component is included in the layout and agentSurfaceManifest is passed.",
+            ),
+          ];
+    },
+  },
+  {
+    ruleId: "CW-AGENT-02",
+    collect(page) {
+      return page.agentFeatures.agentManifestLink
+        ? []
+        : [
+            makeDiagnostic(
+              "CW-AGENT-02",
+              "warning",
+              "Page does not advertise an agent.json manifest link in <head>.",
+              page.url,
+              "Add a <link rel='alternate' type='application/json' href='/.well-known/agent.json'> to the page <head>.",
+            ),
+          ];
+    },
+  },
+  {
+    ruleId: "CW-AGENT-03",
+    collect(page) {
+      return page.agentFeatures.llmsTxtLink
+        ? []
+        : [
+            makeDiagnostic(
+              "CW-AGENT-03",
+              "warning",
+              "Page does not link to /llms.txt in <head>.",
+              page.url,
+              "Add a <link href='/llms.txt'> to the page <head>.",
+            ),
+          ];
+    },
+  },
+];
+
 const ALL_RULES = [
   ...technicalRules,
   ...localizationRules,
   ...accessibilityRules,
   ...contentSurfaceRules,
+  ...agentRules,
 ];
 
 export function collectTechnicalDiagnostics(graph: SiteEvidenceGraph): Diagnostic[] {
@@ -201,6 +253,16 @@ export function collectContentSurfaceDiagnostics(graph: SiteEvidenceGraph): Diag
   const diagnostics: Diagnostic[] = [];
   for (const page of graph.pages) {
     for (const rule of contentSurfaceRules) {
+      diagnostics.push(...rule.collect(page));
+    }
+  }
+  return diagnostics;
+}
+
+export function collectAgentDiagnostics(graph: SiteEvidenceGraph): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+  for (const page of graph.pages) {
+    for (const rule of agentRules) {
       diagnostics.push(...rule.collect(page));
     }
   }

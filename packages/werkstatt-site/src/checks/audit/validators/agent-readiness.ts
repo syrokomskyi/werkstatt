@@ -136,6 +136,19 @@ export async function runAuditAgentReadinessValidate(
         }),
       );
     }
+    // RFC-0799: WebMCP — check for document.modelContext.registerTool in rendered HTML.
+    if (!/document\.modelContext/.test(page.html) || !/registerTool/.test(page.html)) {
+      findings.push(
+        finding({
+          ruleId: "agent-readiness.webmcp-missing",
+          severity: "warning",
+          file: page.file,
+          message:
+            "Page does not include WebMCP tool registration (document.modelContext.registerTool).",
+          evidence: [{ kind: "rendered", file: page.file }],
+        }),
+      );
+    }
   }
 
   const result = buildAuditResult({

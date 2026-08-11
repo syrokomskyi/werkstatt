@@ -14,7 +14,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { RawSectionEvidence } from "./dom-extract.ts";
+import type { RawAgentFeatures, RawSectionEvidence } from "./dom-extract.ts";
 
 export interface CapturedPage {
   url: string;
@@ -26,6 +26,7 @@ export interface CapturedPage {
   text: string;
   sections: readonly RawSectionEvidence[];
   links: readonly string[];
+  agentFeatures: RawAgentFeatures;
   screenshots: ReadonlyArray<{ name: string; width: number; height: number; path: string }>;
 }
 

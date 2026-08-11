@@ -23,6 +23,12 @@ export interface RawSectionEvidence {
   html: string;
 }
 
+export interface RawAgentFeatures {
+  webmcpRegisterTool: boolean;
+  agentManifestLink: boolean;
+  llmsTxtLink: boolean;
+}
+
 export interface RawPageEvidence {
   title: string | undefined;
   lang: string | undefined;
@@ -31,6 +37,7 @@ export interface RawPageEvidence {
   text: string;
   sections: RawSectionEvidence[];
   links: string[];
+  agentFeatures: RawAgentFeatures;
 }
 
 export function extractPageEvidenceFromDOM(): RawPageEvidence {
@@ -56,6 +63,17 @@ export function extractPageEvidenceFromDOM(): RawPageEvidence {
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("a[href]"))
     .map((link) => link.href)
     .filter(Boolean);
+  const inlineScripts = Array.from(document.querySelectorAll("script"))
+    .map((s) => s.textContent || "")
+    .join("\n");
+  const webmcpRegisterTool =
+    inlineScripts.includes("document.modelContext") && inlineScripts.includes("registerTool");
+  const headHtml = document.head?.innerHTML || "";
+  const agentManifestLink =
+    /<link[^>]+rel=["']alternate["'][^>]+type=["']application\/json["'][^>]+href=["'][^"']*\.well-known\/agent\.json["']/i.test(
+      headHtml,
+    );
+  const llmsTxtLink = /<link[^>]+href=["'][^"']*\/llms\.txt["']/i.test(headHtml);
   return {
     title: document.title || undefined,
     lang: document.documentElement.lang || undefined,
@@ -64,5 +82,10 @@ export function extractPageEvidenceFromDOM(): RawPageEvidence {
     text: document.body.innerText.replace(/\s+/g, " ").trim(),
     sections,
     links,
+    agentFeatures: {
+      webmcpRegisterTool,
+      agentManifestLink,
+      llmsTxtLink,
+    },
   };
 }

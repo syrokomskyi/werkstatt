@@ -30,6 +30,12 @@ export const sectionEvidenceSchema = z.object({
   htmlHash: z.string(),
 });
 
+export const agentFeaturesSchema = z.object({
+  webmcpRegisterTool: z.boolean(),
+  agentManifestLink: z.boolean(),
+  llmsTxtLink: z.boolean(),
+});
+
 export const pageEvidenceSchema = z.object({
   url: z.string().url(),
   path: z.string().startsWith("/"),
@@ -42,6 +48,7 @@ export const pageEvidenceSchema = z.object({
   sections: z.array(sectionEvidenceSchema),
   viewports: z.array(viewportEvidenceSchema).min(1),
   links: z.array(z.string()),
+  agentFeatures: agentFeaturesSchema,
 });
 
 export const siteEvidenceGraphSchema = z.object({
@@ -55,6 +62,7 @@ export const siteEvidenceGraphSchema = z.object({
 
 export type ViewportEvidence = z.infer<typeof viewportEvidenceSchema>;
 export type SectionEvidence = z.infer<typeof sectionEvidenceSchema>;
+export type AgentFeatures = z.infer<typeof agentFeaturesSchema>;
 export type PageEvidence = z.infer<typeof pageEvidenceSchema>;
 export type SiteEvidenceGraph = z.infer<typeof siteEvidenceGraphSchema>;
 

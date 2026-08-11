@@ -111,5 +111,6 @@ function capturedPageToEvidence(captured: CapturedPage): PageEvidence {
       screenshot: s.path,
     })),
     links: [...captured.links],
+    agentFeatures: captured.agentFeatures,
   };
 }

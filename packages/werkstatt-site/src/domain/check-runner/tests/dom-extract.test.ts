@@ -98,4 +98,38 @@ describe("extractPageEvidenceFromDOM", () => {
     expect(section!.text).not.toContain("\n");
     expect(section!.text).not.toContain("  ");
   });
+
+  test("agentFeatures.webmcpRegisterTool is true when document.modelContext.registerTool is in inline script", () => {
+    setDocument('<head><script>document.modelContext.registerTool({name:"test"})</script></head>');
+    const evidence = extractPageEvidenceFromDOM();
+    expect(evidence.agentFeatures.webmcpRegisterTool).toBe(true);
+  });
+
+  test("agentFeatures.webmcpRegisterTool is false when no modelContext script present", () => {
+    setDocument("<body><p>No script here</p></body>");
+    const evidence = extractPageEvidenceFromDOM();
+    expect(evidence.agentFeatures.webmcpRegisterTool).toBe(false);
+  });
+
+  test("agentFeatures.agentManifestLink is true when link to .well-known/agent.json is in head", () => {
+    setDocument(
+      '<head><link rel="alternate" type="application/json" href="/.well-known/agent.json"></head>',
+    );
+    const evidence = extractPageEvidenceFromDOM();
+    expect(evidence.agentFeatures.agentManifestLink).toBe(true);
+  });
+
+  test("agentFeatures.llmsTxtLink is true when link to /llms.txt is in head", () => {
+    setDocument('<head><link href="/llms.txt"></head>');
+    const evidence = extractPageEvidenceFromDOM();
+    expect(evidence.agentFeatures.llmsTxtLink).toBe(true);
+  });
+
+  test("agentFeatures all false when head is empty", () => {
+    setDocument("<body><p>No agent features</p></body>");
+    const evidence = extractPageEvidenceFromDOM();
+    expect(evidence.agentFeatures.webmcpRegisterTool).toBe(false);
+    expect(evidence.agentFeatures.agentManifestLink).toBe(false);
+    expect(evidence.agentFeatures.llmsTxtLink).toBe(false);
+  });
 });

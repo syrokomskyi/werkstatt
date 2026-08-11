@@ -10,6 +10,7 @@ import {
   collectTechnicalDiagnostics,
   collectLocalizationDiagnostics,
   collectContentSurfaceDiagnostics,
+  collectAgentDiagnostics,
   collectDeterministicDiagnostics,
   containsSecretLikeText,
   makeDiagnostic,
@@ -210,6 +211,11 @@ function makeMinimalGraph(
         ],
         viewports: [{ name: "desktop" as const, width: 1280, height: 720 }],
         links: [],
+        agentFeatures: {
+          webmcpRegisterTool: true,
+          agentManifestLink: true,
+          llmsTxtLink: true,
+        },
       },
     ],
     graphHash: "",
@@ -280,6 +286,11 @@ describe("diagnostics", () => {
           sections: [],
           viewports: [{ name: "desktop", width: 1280, height: 720 }],
           links: [],
+          agentFeatures: {
+            webmcpRegisterTool: true,
+            agentManifestLink: true,
+            llmsTxtLink: true,
+          },
         },
       ],
     } as never);
@@ -302,6 +313,11 @@ describe("diagnostics", () => {
           sections: [],
           viewports: [{ name: "desktop", width: 1280, height: 720 }],
           links: [],
+          agentFeatures: {
+            webmcpRegisterTool: true,
+            agentManifestLink: true,
+            llmsTxtLink: true,
+          },
         },
       ],
     } as never);
@@ -324,6 +340,11 @@ describe("diagnostics", () => {
           sections: [],
           viewports: [{ name: "desktop", width: 1280, height: 720 }],
           links: [],
+          agentFeatures: {
+            webmcpRegisterTool: true,
+            agentManifestLink: true,
+            llmsTxtLink: true,
+          },
         },
       ],
     } as never);
@@ -346,6 +367,11 @@ describe("diagnostics", () => {
           sections: [],
           viewports: [{ name: "desktop", width: 1280, height: 720 }],
           links: [],
+          agentFeatures: {
+            webmcpRegisterTool: true,
+            agentManifestLink: true,
+            llmsTxtLink: true,
+          },
         },
       ],
     } as never);
@@ -356,6 +382,93 @@ describe("diagnostics", () => {
   test("collectDeterministicDiagnostics combines all collectors", () => {
     const graph = makeMinimalGraph();
     const diags = collectDeterministicDiagnostics(graph);
+    expect(diags).toEqual([]);
+  });
+
+  test("collectAgentDiagnostics flags missing WebMCP registerTool", () => {
+    const graph = makeMinimalGraph({
+      pages: [
+        {
+          url: "https://example.com/",
+          path: "/",
+          title: "T",
+          lang: "de",
+          canonical: "https://example.com/",
+          metaDescription: "desc",
+          text: "x".repeat(200),
+          contentHash: "sha256:abc",
+          sections: [],
+          viewports: [{ name: "desktop", width: 1280, height: 720 }],
+          links: [],
+          agentFeatures: {
+            webmcpRegisterTool: false,
+            agentManifestLink: true,
+            llmsTxtLink: true,
+          },
+        },
+      ],
+    } as never);
+    const diags = collectAgentDiagnostics(graph);
+    expect(diags.some((d) => d.ruleId === "CW-AGENT-01")).toBe(true);
+  });
+
+  test("collectAgentDiagnostics flags missing agent.json manifest link", () => {
+    const graph = makeMinimalGraph({
+      pages: [
+        {
+          url: "https://example.com/",
+          path: "/",
+          title: "T",
+          lang: "de",
+          canonical: "https://example.com/",
+          metaDescription: "desc",
+          text: "x".repeat(200),
+          contentHash: "sha256:abc",
+          sections: [],
+          viewports: [{ name: "desktop", width: 1280, height: 720 }],
+          links: [],
+          agentFeatures: {
+            webmcpRegisterTool: true,
+            agentManifestLink: false,
+            llmsTxtLink: true,
+          },
+        },
+      ],
+    } as never);
+    const diags = collectAgentDiagnostics(graph);
+    expect(diags.some((d) => d.ruleId === "CW-AGENT-02")).toBe(true);
+  });
+
+  test("collectAgentDiagnostics flags missing llms.txt link", () => {
+    const graph = makeMinimalGraph({
+      pages: [
+        {
+          url: "https://example.com/",
+          path: "/",
+          title: "T",
+          lang: "de",
+          canonical: "https://example.com/",
+          metaDescription: "desc",
+          text: "x".repeat(200),
+          contentHash: "sha256:abc",
+          sections: [],
+          viewports: [{ name: "desktop", width: 1280, height: 720 }],
+          links: [],
+          agentFeatures: {
+            webmcpRegisterTool: true,
+            agentManifestLink: true,
+            llmsTxtLink: false,
+          },
+        },
+      ],
+    } as never);
+    const diags = collectAgentDiagnostics(graph);
+    expect(diags.some((d) => d.ruleId === "CW-AGENT-03")).toBe(true);
+  });
+
+  test("collectAgentDiagnostics returns empty when all agent features present", () => {
+    const graph = makeMinimalGraph();
+    const diags = collectAgentDiagnostics(graph);
     expect(diags).toEqual([]);
   });
 

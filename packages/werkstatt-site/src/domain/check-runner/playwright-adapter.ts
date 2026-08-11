@@ -72,6 +72,7 @@ export class PlaywrightCaptureAdapter implements BrowserCapturePort {
       text: pageEvidence.text,
       sections: pageEvidence.sections,
       links: pageEvidence.links,
+      agentFeatures: pageEvidence.agentFeatures,
       screenshots,
     };
   }
