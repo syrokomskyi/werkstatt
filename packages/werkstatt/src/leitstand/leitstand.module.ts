@@ -182,6 +182,72 @@ export function createLeitstandModule(): KernelModule {
         cacheable: false,
         execute: runLeitstandHealth,
       });
+
+      const { runLeitstandServiceDevDeploy } = await import("./service-dev-deploy.ts");
+      const { runLeitstandServicePromote } = await import("./service-promote.ts");
+      const { runLeitstandServiceRollback } = await import("./service-rollback.ts");
+      registry.registerCommand({
+        name: "leitstand.service.dev-deploy",
+        description:
+          "Deploy a shared Cloudflare Worker service to the dev channel with pre-deploy gates, lock, and health check (RFC-0806). Flags: --service.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          service: {
+            kind: "string",
+            required: true,
+            description: "Service id from the services: key in services/registry.yaml.",
+          },
+          "skip-health-check": {
+            kind: "boolean",
+            description: "Skip post-deploy health check.",
+          },
+        },
+        writes: ["services/registry.yaml"],
+        reads: ["services/registry.yaml", "services/{service}/**"],
+        execute: runLeitstandServiceDevDeploy,
+      });
+      registry.registerCommand({
+        name: "leitstand.service.promote",
+        description:
+          "Promote a shared Cloudflare Worker service to production with pre-deploy gates, subdomain validation, lock, and health check (RFC-0806). Flags: --service.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          service: {
+            kind: "string",
+            required: true,
+            description: "Service id from the services: key in services/registry.yaml.",
+          },
+          "skip-health-check": {
+            kind: "boolean",
+            description: "Skip post-deploy health check.",
+          },
+        },
+        writes: ["services/registry.yaml"],
+        reads: ["services/registry.yaml", "services/{service}/**"],
+        execute: runLeitstandServicePromote,
+      });
+      registry.registerCommand({
+        name: "leitstand.service.rollback",
+        description:
+          "Rollback a shared Cloudflare Worker service to its previous deployment via wrangler rollback (RFC-0806). Flags: --service.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          service: {
+            kind: "string",
+            required: true,
+            description: "Service id from the services: key in services/registry.yaml.",
+          },
+        },
+        writes: ["services/registry.yaml"],
+        reads: ["services/registry.yaml", "services/{service}/**"],
+        execute: runLeitstandServiceRollback,
+      });
     },
   };
 }
