@@ -123,9 +123,9 @@ export async function runDeploymentGateValidate(
         if (gatedPageIds.has(refPageId)) {
           diagnostics.push({
             ruleId: "GATE-01",
-            severity: "error",
+            severity: "warning",
             file: rel,
-            message: `Navigation file "${rel}" references gated pageId "${refPageId}". Remove the reference or ungate the page.`,
+            message: `Navigation file "${rel}" references gated pageId "${refPageId}". The link will be filtered out of production builds automatically (resolveSemanticTarget returns null for gated pages). Consider removing the reference to keep navigation files clean.`,
             data: { gatedPageId: refPageId, source: "navigation" },
           });
         }
@@ -152,9 +152,9 @@ export async function runDeploymentGateValidate(
       if (gatedPageIds.has(refPageId)) {
         diagnostics.push({
           ruleId: "GATE-02",
-          severity: "error",
+          severity: "warning",
           file: rel,
-          message: `Page content "${rel}" references gated pageId "${refPageId}" in block props. Remove the reference or ungate the page.`,
+          message: `Page content "${rel}" references gated pageId "${refPageId}" in block props. The link will be filtered out of production builds automatically (resolveSemanticTarget returns null for gated pages). Consider removing the reference to keep content clean.`,
           data: { gatedPageId: refPageId, source: "block-props" },
         });
       }
