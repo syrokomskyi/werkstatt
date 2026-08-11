@@ -15,14 +15,8 @@ health check, and dev state recording.</purpose>
 
 import path from "node:path";
 import { existsSync } from "node:fs";
-import type {
-  KernelCommandInput,
-  KernelCommandResult,
-} from "@warpgogol/werkstatt/kernel";
-import {
-  readServicesRegistry,
-  findServiceEntry,
-} from "../sternsystem/registry-io.ts";
+import type { KernelCommandInput, KernelCommandResult } from "@warpgogol/werkstatt/kernel";
+import { readServicesRegistry, findServiceEntry } from "../sternsystem/registry-io.ts";
 import {
   flagString,
   flagBoolean,
@@ -80,8 +74,8 @@ export async function runLeitstandServiceDevDeploy(
   try {
     // 1. Pre-deploy gates: service.naming.validate, service.registry.validate, deploy.preflight --dev
     const gates = [
-      { commandName: "service.naming.validate", argv: ["--service", serviceId] },
-      { commandName: "service.registry.validate", argv: ["--service", serviceId] },
+      { commandName: "service.naming.validate", argv: [] },
+      { commandName: "service.registry.validate", argv: [] },
       { commandName: "deploy.preflight", argv: ["--service", serviceId, "--dev"] },
     ];
 
@@ -148,9 +142,7 @@ export async function runLeitstandServiceDevDeploy(
     // 5. Health check (skip if --skip-health-check or no URL)
     let healthState: "healthy" | "unhealthy" | "unknown" = "unknown";
     if (!skipHealthCheck && deployedUrl) {
-      logger.info(
-        `[leitstand.service.dev-deploy] running health check on ${deployedUrl}…`,
-      );
+      logger.info(`[leitstand.service.dev-deploy] running health check on ${deployedUrl}…`);
       healthState = await runHealthCheck(deployedUrl, serviceEntry.healthCheckPath);
     }
 
