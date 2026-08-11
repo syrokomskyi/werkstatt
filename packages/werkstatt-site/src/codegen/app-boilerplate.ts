@@ -347,6 +347,10 @@ export async function runGeneratePublicInfrastructure(
         '  Link: < /.well-known/agent.openapi.json>; rel="service-desc"; type="application/json"',
         '  Link: < /.well-known/api-catalog>; rel="service-desc"; type="application/linkset+json"',
         '  Link: < /.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"',
+        '  Link: < /.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
+        '  Link: < /.well-known/oauth-protected-resource>; rel="service-desc"; type="application/json"',
+        '  Link: < /.well-known/oauth-authorization-server>; rel="service-desc"; type="application/json"',
+        '  Link: < /auth.md>; rel="service-doc"; type="text/markdown"',
         '  Link: < /llms.txt>; rel="service-doc"; type="text/plain"',
       ].join("\n")
     : "";
