@@ -35,13 +35,10 @@ import { diagnosticsResult } from "./result-helpers.ts";
 // RFC-0375: robots.txt is a Category B (registry-only) file.
 // No GENERATED_MARKER is emitted in the output.
 
-// RFC-0784: default Content-Signal directive — all Werkstatt sites have markdown twins.
-const DEFAULT_CONTENT_SIGNAL: string[] = [
-  "text/html",
-  "text/markdown",
-  "application/ld+json",
-  "text/plain",
-];
+// RFC-0784: default Content-Signal directive — AI usage preferences per
+// Content Signals spec (contentsignals.org / IETF draft-romm-aipref-contentsignals).
+// Werkstatt sites are agent-ready: search and AI input allowed, training disallowed.
+const DEFAULT_CONTENT_SIGNAL: string[] = ["ai-train=no", "search=yes", "ai-input=yes"];
 
 // ---------------------------------------------------------------------------
 // robots.generate

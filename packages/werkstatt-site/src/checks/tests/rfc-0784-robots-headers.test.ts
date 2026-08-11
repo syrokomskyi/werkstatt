@@ -109,18 +109,16 @@ const input: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput
 
 test("buildRobotsTxt: emits Content-Signal when contentSignal is present", () => {
   const policy: RobotsPolicy = {
-    contentSignal: ["text/html", "text/markdown", "application/ld+json", "text/plain"],
+    contentSignal: ["ai-train=no", "search=yes", "ai-input=yes"],
     sitemap: "/sitemap.xml",
   };
   const output = buildRobotsTxt(policy);
-  expect(output).toContain(
-    "Content-Signal: text/html, text/markdown, application/ld+json, text/plain",
-  );
+  expect(output).toContain("Content-Signal: ai-train=no, search=yes, ai-input=yes");
 });
 
 test("buildRobotsTxt: Content-Signal placed after header comment, before User-agent", () => {
   const output = buildRobotsTxt({
-    contentSignal: ["text/html"],
+    contentSignal: ["ai-train=no"],
     sitemap: "/sitemap.xml",
   });
   const csIdx = output.indexOf("Content-Signal:");
@@ -150,9 +148,7 @@ test("robots.generate: passes default contentSignal when absent from manifest", 
   const ctx = makeContext(tmpDir, appDir);
   await runRobotsGenerate(input, ctx);
   const robotsTxt = await fs.readFile(path.join(appDir, "public", "robots.txt"), "utf-8");
-  expect(robotsTxt).toContain(
-    "Content-Signal: text/html, text/markdown, application/ld+json, text/plain",
-  );
+  expect(robotsTxt).toContain("Content-Signal: ai-train=no, search=yes, ai-input=yes");
 });
 
 test("robots.generate: passes custom contentSignal from manifest robots block", async () => {
@@ -169,15 +165,15 @@ agent:
   enabled: true
 robots:
   contentSignal:
-    - text/html
-    - application/json
+    - ai-train=no
+    - search=yes
 ---
 `;
   await writeSystemMd(systemMd);
   const ctx = makeContext(tmpDir, appDir);
   await runRobotsGenerate(input, ctx);
   const robotsTxt = await fs.readFile(path.join(appDir, "public", "robots.txt"), "utf-8");
-  expect(robotsTxt).toContain("Content-Signal: text/html, application/json");
+  expect(robotsTxt).toContain("Content-Signal: ai-train=no, search=yes");
 });
 
 // ---------------------------------------------------------------------------

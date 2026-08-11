@@ -34,6 +34,24 @@
   X-Content-Type-Options: nosniff
   Cache-Control: public, max-age=300
 
+# Agent Skills Index — application/json content type
+/.well-known/agent-skills/index.json
+  Content-Type: application/json; charset=utf-8
+  X-Content-Type-Options: nosniff
+  Cache-Control: public, max-age=300
+
+# OAuth Protected Resource Metadata — application/json content type
+/.well-known/oauth-protected-resource
+  Content-Type: application/json; charset=utf-8
+  X-Content-Type-Options: nosniff
+  Cache-Control: public, max-age=300
+
+# OAuth Authorization Server Metadata — application/json content type
+/.well-known/oauth-authorization-server
+  Content-Type: application/json; charset=utf-8
+  X-Content-Type-Options: nosniff
+  Cache-Control: public, max-age=300
+
 # RFC-0315: /api/agent/v1/* — short freshness, nosniff
 /api/agent/v1/*
   X-Content-Type-Options: nosniff

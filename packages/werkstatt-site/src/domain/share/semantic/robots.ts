@@ -29,7 +29,7 @@ export interface RobotsPolicy {
   crawlerAllowlist?: string[];
   sitemap?: string;
   customRules?: RobotsRule[];
-  /** RFC-0784: Content-Signal directive — declares content types the site offers. */
+  /** RFC-0784: Content-Signal directive — AI usage preferences (ai-train, search, ai-input). */
   contentSignal?: string[];
 }
 
