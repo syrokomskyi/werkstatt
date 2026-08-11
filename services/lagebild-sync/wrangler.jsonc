@@ -1,7 +1,7 @@
 // Project-specific: RFC-0186 Lagebild shared sync worker configuration.
 // This file is manually maintained (no generator owns services/ wrangler configs).
 {
-  "name": "lagebild-sync-worker",
+  "name": "lagebild-sync",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-11",
   "compatibility_flags": ["nodejs_compat"],

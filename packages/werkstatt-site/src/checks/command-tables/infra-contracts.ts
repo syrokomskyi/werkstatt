@@ -164,7 +164,7 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
       },
       service: {
         kind: "string",
-        description: "Service name (e.g. lagebild-sync-worker). Required for service deploys.",
+        description: "Service name (e.g. lagebild-sync). Required for service deploys.",
       },
     },
     reads: [

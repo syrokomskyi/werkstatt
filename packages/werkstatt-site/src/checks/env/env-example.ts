@@ -223,7 +223,7 @@ function renderEnvExample(opts: {
     blocks.push(
       renderBlock(
         "Lagebild CRM Buffer — Supabase (RFC-0186). Site writes leads to buffer;\n" +
-          "# the shared sync worker (services/lagebild-sync-worker) processes them.\n" +
+          "# the shared sync worker (services/lagebild-sync) processes them.\n" +
           "# SUPABASE_BUFFER_SERVICE_KEY: service_role key for buffer_outbox writes.\n" +
           "# SUPABASE_BUFFER_URL: Supabase project REST URL.\n" +
           "#   (If not shown in console: https://<project-id>.supabase.co from Settings → General)\n" +

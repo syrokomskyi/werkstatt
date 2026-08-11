@@ -1,7 +1,7 @@
 // ADR-0042: Maturity Score Worker configuration.
 // This file is manually maintained (no generator owns services/ wrangler configs).
 {
-  "name": "maturity-score-worker",
+  "name": "maturity-score",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-11",
   "compatibility_flags": ["nodejs_compat"],

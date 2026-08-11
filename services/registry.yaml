@@ -16,22 +16,22 @@ services:
       state: null
       operationId: null
     healthCheckPath: /_wg/analytics/health
-  - id: rate-fetcher-worker
+  - id: rate-fetcher
     kind: scheduled-worker
-    workerName: rate-fetcher-worker
+    workerName: rate-fetcher
     hostedBy: studio
-    url: https://rate-fetcher-worker.syrokomskyi.workers.dev
+    url: https://rate-fetcher.syrokomskyi.workers.dev
     publicEndpoints: false
     subdomains: []
     lastDeployed:
       at: null
       state: null
       operationId: null
-  - id: lagebild-sync-worker
+  - id: lagebild-sync
     kind: scheduled-worker
-    workerName: lagebild-sync-worker
+    workerName: lagebild-sync
     hostedBy: studio
-    url: https://lagebild-sync-worker.syrokomskyi.workers.dev
+    url: https://lagebild-sync.syrokomskyi.workers.dev
     publicEndpoints: false
     subdomains: []
     lastDeployed:
@@ -49,11 +49,11 @@ services:
       at: null
       state: null
       operationId: null
-  - id: maturity-score-worker
+  - id: maturity-score
     kind: cloudflare-worker
-    workerName: maturity-score-worker
+    workerName: maturity-score
     hostedBy: studio
-    url: https://maturity-score-worker.syrokomskyi.workers.dev
+    url: https://maturity-score.syrokomskyi.workers.dev
     publicEndpoints: true
     subdomains: []
     lastDeployed:

@@ -4,7 +4,7 @@
 Talks to Supabase sync_tenants registry via PostgREST.</purpose>
 <non-goals>
   <item>Do not validate workspace structure — that is handled by @warpgogol/site-kernel-checks.</item>
-  <item>Do not implement the sync worker itself — that lives in services/lagebild-sync-worker.</item>
+  <item>Do not implement the sync worker itself — that lives in services/lagebild-sync.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -421,17 +421,13 @@ export async function runLagebildWorkerDeploy(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
-  const workerDir = join(
-    context.workspaceRoot ?? process.cwd(),
-    "services",
-    "lagebild-sync-worker",
-  );
+  const workerDir = join(context.workspaceRoot ?? process.cwd(), "services", "lagebild-sync");
 
   // RFC-0388: run deploy.preflight before wrangler deploy
   const { spawnSync } = await import("node:child_process");
   const preflight = spawnSync(
     "npx",
-    ["site-kernel", "run", "deploy.preflight", "--service", "lagebild-sync-worker"],
+    ["site-kernel", "run", "deploy.preflight", "--service", "lagebild-sync"],
     { cwd: context.workspaceRoot ?? process.cwd(), stdio: "inherit" },
   );
   if (preflight.status !== 0) {
@@ -509,7 +505,7 @@ export async function runLagebildValidate(
   }
 
   // Also verify .env.example exists and has no leaked values
-  const envExampleFile = join(workspaceRoot, "services", "lagebild-sync-worker", ".env.example");
+  const envExampleFile = join(workspaceRoot, "services", "lagebild-sync", ".env.example");
   try {
     const fs = await import("node:fs/promises");
     const raw = await fs.readFile(envExampleFile, "utf8");

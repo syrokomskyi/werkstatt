@@ -1,5 +1,5 @@
 {
-  "name": "@warpgogol/rate-fetcher-worker",
+  "name": "@warpgogol/rate-fetcher",
   "version": "0.1.0",
   "private": true,
   "type": "module",

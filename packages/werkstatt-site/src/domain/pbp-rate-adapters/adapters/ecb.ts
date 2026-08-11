@@ -3,7 +3,7 @@
 <purpose>ECB rate source adapter — fetches EUR reference rates from the European Central Bank daily XML feed (RFC-0744).</purpose>
 <non-goals>
   <item>Does not define the RateSourceAdapter interface — that is in src/types.ts.</item>
-  <item>Does not handle scheduling — that is the rate-fetcher-worker service.</item>
+  <item>Does not handle scheduling — that is the rate-fetcher service.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

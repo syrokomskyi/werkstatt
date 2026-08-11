@@ -1,5 +1,5 @@
 {
-  "name": "@warpgogol/lagebild-sync-worker",
+  "name": "@warpgogol/lagebild-sync",
   "version": "0.1.0",
   "private": true,
   "type": "module",

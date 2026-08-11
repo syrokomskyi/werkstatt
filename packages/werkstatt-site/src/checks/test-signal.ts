@@ -84,7 +84,7 @@ const TIER_1_PATTERNS = [
   /^@warpgogol\/site-kernel-/,
   /^@warpgogol\/growth/,
   /^@warpgogol\/chat/,
-  /^@warpgogol\/lagebild-sync-worker$/,
+  /^@warpgogol\/lagebild-sync$/,
 ];
 
 function isIsoDate(value: string | undefined): boolean {
@@ -103,7 +103,11 @@ function isExpiredIsoDate(value: string | undefined): boolean {
 function classifyTier(signal: PackageTestSignal): TestSignalTier {
   if (TIER_0_PACKAGES.has(signal.packageName)) return 0;
   if (signal.directory.startsWith("apps/")) return 3;
-  if (signal.directory === "packages/ui" || signal.packageName === "@warpgogol/werkstatt-site/ontology") return 2;
+  if (
+    signal.directory === "packages/ui" ||
+    signal.packageName === "@warpgogol/werkstatt-site/ontology"
+  )
+    return 2;
   if (TIER_1_PATTERNS.some((pattern) => pattern.test(signal.packageName))) return 1;
   if (signal.directory.startsWith("packages/os/")) return 1;
   return 2;

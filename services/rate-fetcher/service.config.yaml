@@ -1,8 +1,7 @@
-id: lagebild-sync-worker
+id: rate-fetcher
 kind: scheduled-worker
 entry: src/index.ts
 publicEndpoints: false
 usesBrowserAutomation: false
-queues:
-  - lagebild-sync-outbox
+queues: []
 artifacts: []

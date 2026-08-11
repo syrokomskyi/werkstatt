@@ -5,7 +5,7 @@ Frankfurter is a free, no-key API that serves ECB reference rates in JSON format
 API: https://api.frankfurter.dev/v2/rate/{base}/{quote} → { date, base, quote, rate }</purpose>
 <non-goals>
   <item>Does not define the RateSourceAdapter interface — that is in src/types.ts.</item>
-  <item>Does not handle scheduling — that is the rate-fetcher-worker service.</item>
+  <item>Does not handle scheduling — that is the rate-fetcher service.</item>
   <item>Does not fetch historical rates — only the latest daily rate.</item>
 </non-goals>
 </MODULE_CONTRACT>

@@ -1,7 +1,7 @@
-id: rate-fetcher-worker
-kind: scheduled-worker
+id: maturity-score
+kind: cloudflare-worker
 entry: src/index.ts
-publicEndpoints: false
+publicEndpoints: true
 usesBrowserAutomation: false
 queues: []
 artifacts: []

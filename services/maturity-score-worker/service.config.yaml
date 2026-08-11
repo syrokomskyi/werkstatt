@@ -1,7 +1,0 @@
-id: maturity-score-worker
-kind: cloudflare-worker
-entry: src/index.ts
-publicEndpoints: true
-usesBrowserAutomation: false
-queues: []
-artifacts: []

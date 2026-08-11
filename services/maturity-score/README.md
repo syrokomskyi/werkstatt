@@ -1,4 +1,4 @@
-# maturity-score-worker
+# maturity-score
 
 ADR-0042: Maturity Score Worker — a request-triggered Cloudflare Worker that accepts `POST /score` with `{ url: string }` and returns `{ score: number }`.
 

@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0186/RFC-0388: Lagebild shared sync worker validation stub.
-lagebild.validate guards that the services/lagebild-sync-worker package
+lagebild.validate guards that the services/lagebild-sync package
 is present and its required environment variables are documented. No per-site
 Workers are allowed; all sites share the single workspace worker.</purpose>
 <non-goals>
@@ -25,7 +25,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 
-const WORKER_DIR = "services/lagebild-sync-worker";
+const WORKER_DIR = "services/lagebild-sync";
 const SUBSCRIPTIONS_INVOICES_DDL = "supabase/subscriptions-invoices.sql";
 
 export async function runLagebildValidate(

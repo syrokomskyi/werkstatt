@@ -1,5 +1,5 @@
 {
-  "name": "@warpgogol/maturity-score-worker",
+  "name": "@warpgogol/maturity-score",
   "version": "0.1.0",
   "private": true,
   "type": "module",
