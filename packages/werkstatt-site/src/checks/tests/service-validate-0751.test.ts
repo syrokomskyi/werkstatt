@@ -153,6 +153,23 @@ describe("service.naming.validate (RFC-0751)", () => {
   it("passes with scoped package.json name @warpgogol/<id>", async () => {
     writeRegistry(tmpDir, [
       {
+        id: "rate-fetcher",
+        kind: "scheduled-worker",
+        workerName: "rate-fetcher",
+        url: "https://example.workers.dev",
+      },
+    ]);
+    writeServiceConfig(tmpDir, "rate-fetcher", { kind: "scheduled-worker" });
+    writeWrangler(tmpDir, "rate-fetcher", "rate-fetcher");
+    writePackageJson(tmpDir, "rate-fetcher", "@warpgogol/rate-fetcher");
+
+    const result = await runServiceNamingValidate(makeInput(), makeContext(tmpDir));
+    expect(result.exitCode).toBe(0);
+  });
+
+  it("fails when id ends with -worker suffix (SVC-NAME-06, RFC-0805)", async () => {
+    writeRegistry(tmpDir, [
+      {
         id: "rate-fetcher-worker",
         kind: "scheduled-worker",
         workerName: "rate-fetcher-worker",
@@ -162,6 +179,24 @@ describe("service.naming.validate (RFC-0751)", () => {
     writeServiceConfig(tmpDir, "rate-fetcher-worker", { kind: "scheduled-worker" });
     writeWrangler(tmpDir, "rate-fetcher-worker", "rate-fetcher-worker");
     writePackageJson(tmpDir, "rate-fetcher-worker", "@warpgogol/rate-fetcher-worker");
+
+    const result = await runServiceNamingValidate(makeInput(), makeContext(tmpDir));
+    expect(result.exitCode).toBe(1);
+    expect(result.data?.diagnostics?.some((d) => d.ruleId === "SVC-NAME-06")).toBe(true);
+  });
+
+  it("passes when id does not end with -worker suffix", async () => {
+    writeRegistry(tmpDir, [
+      {
+        id: "lagebild-sync",
+        kind: "scheduled-worker",
+        workerName: "lagebild-sync",
+        url: "https://example.workers.dev",
+      },
+    ]);
+    writeServiceConfig(tmpDir, "lagebild-sync", { kind: "scheduled-worker" });
+    writeWrangler(tmpDir, "lagebild-sync", "lagebild-sync");
+    writePackageJson(tmpDir, "lagebild-sync", "@warpgogol/lagebild-sync");
 
     const result = await runServiceNamingValidate(makeInput(), makeContext(tmpDir));
     expect(result.exitCode).toBe(0);

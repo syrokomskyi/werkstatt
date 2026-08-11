@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0751: service.naming.validate — enforces Worker name = service id = directory name = package.json name. Workspace-scoped command.</purpose>
+<purpose>RFC-0751: service.naming.validate — enforces Worker name = service id = directory name = package.json name. RFC-0805: extended with SVC-NAME-06 to reject -worker suffix. Workspace-scoped command.</purpose>
 <non-goals>
   <item>Does not validate registry structure — that is service.registry.validate.</item>
   <item>Does not deploy services — that is leitstand.service.deploy.</item>
@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0751: initial implementation of service.naming.validate command.</item>
+  <item>RFC-0805: add SVC-NAME-06 rule — reject service ids ending with -worker suffix.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -93,6 +94,17 @@ export async function runServiceNamingValidate(
 
   for (const service of services) {
     const { id, workerName } = service;
+
+    // SVC-NAME-06: id must not end with -worker suffix (RFC-0805)
+    if (id.endsWith("-worker")) {
+      const suggestedName = id.slice(0, -"-worker".length);
+      diagnostics.push({
+        ruleId: "SVC-NAME-06",
+        severity: "error",
+        file: "services/registry.yaml",
+        message: `Service '${id}': id must not end with '-worker' suffix. Rename to '${suggestedName}'.`,
+      });
+    }
 
     // SVC-NAME-01: workerName must equal id
     if (workerName !== id) {
