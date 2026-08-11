@@ -5,7 +5,7 @@ title: "Add maturity-score-worker as new Cloudflare Worker service"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: workspace
 decider: architecture
 createdAt: 2026-08-11
@@ -16,7 +16,8 @@ supersedes: []
 supersededBy:
 related:
   - RFC-0803
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0042: Add maturity-score-worker as new Cloudflare Worker service
