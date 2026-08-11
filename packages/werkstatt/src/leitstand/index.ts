@@ -12,6 +12,7 @@
   <item>RFC-0627: add leitstand.deploy for dev channel with Axiom gate; rollback auto-detects channel and auto-steps release state; status/health support dev channel.</item>
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; propagate gate checks published + commitSha + missionId; rollback auto-step removes dev-deployed.</item>
   <item>RFC-0751: add leitstand.service.deploy for shared Cloudflare Worker services.</item>
+  <item>RFC-0806: replace leitstand.service.deploy with dev-deploy, promote, and rollback commands.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,7 +25,9 @@ import {
   runLeitstandRollback,
   runLeitstandHealth,
 } from "./leitstand-commands.ts";
-import { runLeitstandServiceDeploy } from "./service-deploy.ts";
+import { runLeitstandServiceDevDeploy } from "./service-dev-deploy.ts";
+import { runLeitstandServicePromote } from "./service-promote.ts";
+import { runLeitstandServiceRollback } from "./service-rollback.ts";
 
 export {
   runLeitstandDevDeploy,
@@ -40,7 +43,15 @@ export {
   runLeitstandHealth,
   type LeitstandHealthData,
 } from "./leitstand-commands.ts";
-export { runLeitstandServiceDeploy, type ServiceDeployData } from "./service-deploy.ts";
+export { runLeitstandServiceDevDeploy } from "./service-dev-deploy.ts";
+export { runLeitstandServicePromote } from "./service-promote.ts";
+export { runLeitstandServiceRollback } from "./service-rollback.ts";
+export type {
+  PreDeployGateResult,
+  ServiceDevDeployData,
+  ServicePromoteData,
+  ServiceRollbackData,
+} from "./service-deploy-helpers.ts";
 export type {
   DeploymentAdapter,
   CommandRunner,
@@ -177,9 +188,53 @@ export function createLeitstandModule(): KernelModule {
         execute: runLeitstandHealth,
       });
       registry.registerCommand({
-        name: "leitstand.service.deploy",
+        name: "leitstand.service.dev-deploy",
         description:
-          "Deploy a shared Cloudflare Worker service with preflight, subdomain validation, wrangler deploy, and health check (RFC-0751). Flags: --service.",
+          "Deploy a shared Cloudflare Worker service to the dev channel with pre-deploy gates, lock, and health check (RFC-0806). Flags: --service.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          service: {
+            kind: "string",
+            required: true,
+            description: "Service id from the services: key in services/registry.yaml.",
+          },
+          "skip-health-check": {
+            kind: "boolean",
+            description: "Skip post-deploy health check.",
+          },
+        },
+        writes: ["services/registry.yaml"],
+        reads: ["services/registry.yaml", "services/{service}/**"],
+        execute: runLeitstandServiceDevDeploy,
+      });
+      registry.registerCommand({
+        name: "leitstand.service.promote",
+        description:
+          "Promote a shared Cloudflare Worker service to production with pre-deploy gates, subdomain validation, lock, and health check (RFC-0806). Flags: --service.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          service: {
+            kind: "string",
+            required: true,
+            description: "Service id from the services: key in services/registry.yaml.",
+          },
+          "skip-health-check": {
+            kind: "boolean",
+            description: "Skip post-deploy health check.",
+          },
+        },
+        writes: ["services/registry.yaml"],
+        reads: ["services/registry.yaml", "services/{service}/**"],
+        execute: runLeitstandServicePromote,
+      });
+      registry.registerCommand({
+        name: "leitstand.service.rollback",
+        description:
+          "Rollback a shared Cloudflare Worker service to its previous deployment via wrangler rollback (RFC-0806). Flags: --service.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -192,7 +247,7 @@ export function createLeitstandModule(): KernelModule {
         },
         writes: ["services/registry.yaml"],
         reads: ["services/registry.yaml", "services/{service}/**"],
-        execute: runLeitstandServiceDeploy,
+        execute: runLeitstandServiceRollback,
       });
     },
   };

@@ -416,66 +416,6 @@ export async function runLagebildTenantRotateSecret(
   }
 }
 
-/** lagebild.worker.deploy — deploy the shared Worker via wrangler with preflight + --secrets-file .env. */
-export async function runLagebildWorkerDeploy(
-  _input: KernelCommandInput,
-  context: KernelRuntimeContext,
-): Promise<KernelCommandResult> {
-  const workerDir = join(context.workspaceRoot ?? process.cwd(), "services", "lagebild-sync");
-
-  // RFC-0388: run deploy.preflight before wrangler deploy
-  const { spawnSync } = await import("node:child_process");
-  const preflight = spawnSync(
-    "npx",
-    ["site-kernel", "run", "deploy.preflight", "--service", "lagebild-sync"],
-    { cwd: context.workspaceRoot ?? process.cwd(), stdio: "inherit" },
-  );
-  if (preflight.status !== 0) {
-    return {
-      data: {
-        command: "lagebild.worker.deploy",
-        status: "error",
-        message: `deploy.preflight failed (exit ${preflight.status})`,
-      },
-      summary: `lagebild.worker.deploy: deploy.preflight failed (exit ${preflight.status})`,
-      exitCode: preflight.status ?? 1,
-    };
-  }
-
-  const { spawn } = await import("node:child_process");
-  return new Promise((resolve) => {
-    const child = spawn("npx", ["wrangler", "deploy", "--secrets-file", ".env"], {
-      cwd: workerDir,
-      stdio: "inherit",
-    });
-    child.on("close", (code) => {
-      if (code === 0) {
-        resolve({
-          data: { command: "lagebild.worker.deploy", status: "ok" },
-          summary: "lagebild.worker.deploy: deployed",
-        });
-      } else {
-        resolve({
-          data: {
-            command: "lagebild.worker.deploy",
-            status: "error",
-            message: `wrangler deploy exited with code ${code}`,
-          },
-          summary: `lagebild.worker.deploy failed (exit ${code})`,
-          exitCode: code ?? 1,
-        });
-      }
-    });
-    child.on("error", (err) => {
-      resolve({
-        data: { command: "lagebild.worker.deploy", status: "error", message: err.message },
-        summary: `lagebild.worker.deploy failed: ${err.message}`,
-        exitCode: 1,
-      });
-    });
-  });
-}
-
 /** lagebild.validate — check no per-site sync Workers exist; also verify .env.example. */
 export async function runLagebildValidate(
   _input: KernelCommandInput,

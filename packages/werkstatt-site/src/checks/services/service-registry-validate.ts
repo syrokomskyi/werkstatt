@@ -3,7 +3,7 @@
 <purpose>RFC-0751: service.registry.validate — validates services/registry.yaml. Cross-checks each entry with services/<id>/service.config.yaml. Workspace-scoped command.</purpose>
 <non-goals>
   <item>Does not validate Worker names — that is service.naming.validate.</item>
-  <item>Does not deploy services — that is leitstand.service.deploy.</item>
+  <item>Does not deploy services — that is leitstand.service.promote.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

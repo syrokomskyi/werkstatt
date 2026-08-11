@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0186: Initial lagebild module with tenant and worker commands.</item>
   <item>RFC-0388: Remove lagebild.worker.dev.vars.generate and .validate commands. Update lagebild.worker.deploy to use --secrets-file .env. Update lagebild.validate to check .env.example.</item>
+  <item>RFC-0806: Remove lagebild.worker.deploy — replaced by leitstand.service.promote.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,7 +26,6 @@ export const lagebildModule: KernelModule = {
       runLagebildTenantDisable,
       runLagebildTenantStatus,
       runLagebildTenantRotateSecret,
-      runLagebildWorkerDeploy,
       runLagebildValidate,
     } = await import("./handlers.ts");
     registry.registerCommand({
@@ -125,15 +125,6 @@ export const lagebildModule: KernelModule = {
       mutatesState: true,
       cacheable: false,
       execute: runLagebildTenantRotateSecret,
-    });
-
-    registry.registerCommand({
-      name: "lagebild.worker.deploy",
-      description: "RFC-0388: Deploy the shared Lagebild sync Worker with --secrets-file .env.",
-      scope: "workspace",
-      flags: {},
-      cacheable: false,
-      execute: runLagebildWorkerDeploy,
     });
 
     registry.registerCommand({

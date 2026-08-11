@@ -3,7 +3,7 @@
 <purpose>RFC-0751: service.naming.validate — enforces Worker name = service id = directory name = package.json name. RFC-0805: extended with SVC-NAME-06 to reject -worker suffix. Workspace-scoped command.</purpose>
 <non-goals>
   <item>Does not validate registry structure — that is service.registry.validate.</item>
-  <item>Does not deploy services — that is leitstand.service.deploy.</item>
+  <item>Does not deploy services — that is leitstand.service.promote.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
