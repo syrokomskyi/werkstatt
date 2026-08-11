@@ -17,6 +17,7 @@
 
 export interface MountainJourneyAnimationOptions {
   sceneSelector: string;
+  visualSelector: string;
   routeSelector: string;
   markerSelector: string;
   formSelector: string;
@@ -24,9 +25,10 @@ export interface MountainJourneyAnimationOptions {
   workerEndpoint: string;
 }
 
-const CAMERA_INITIAL_ZOOM = 2.5;
+const CAMERA_INITIAL_ZOOM = 3;
 const CAMERA_FINAL_ZOOM = 1.0;
 const ANIMATION_DURATION = 3;
+const DEFAULT_SCORE = 30;
 
 export async function initMountainJourneyAnimation(
   options: MountainJourneyAnimationOptions,
@@ -34,87 +36,97 @@ export async function initMountainJourneyAnimation(
   const scene = document.querySelector<HTMLElement>(options.sceneSelector);
   if (!scene) return;
 
+  const visual = document.querySelector<HTMLElement>(options.visualSelector);
   const route = document.querySelector<SVGPathElement>(options.routeSelector);
   const marker = document.querySelector<SVGCircleElement>(options.markerSelector);
   const form = document.querySelector<HTMLFormElement>(options.formSelector);
   const errorEl = document.querySelector<HTMLElement>(options.errorSelector);
 
-  if (!route || !marker || !form || !errorEl) return;
+  if (!visual || !route || !marker || !form || !errorEl) return;
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const startPoint = route.getPointAtLength(0);
+  marker.setAttribute("cx", String(startPoint.x));
+  marker.setAttribute("cy", String(startPoint.y));
+
+  if (!prefersReducedMotion) {
+    visual.style.transform = `scale(${CAMERA_INITIAL_ZOOM})`;
+  }
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
-    const url = String(formData.get("url") ?? "").trim();
-    if (!url) return;
+    const rawInput = String(formData.get("url") ?? "").trim();
+    if (!rawInput) return;
+
+    const domain = rawInput.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
     errorEl.hidden = true;
 
+    let score: number = DEFAULT_SCORE;
     try {
       const response = await fetch(options.workerEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url: domain }),
       });
 
-      if (!response.ok) {
-        errorEl.hidden = false;
-        return;
+      if (response.ok) {
+        const data = (await response.json()) as { score: number };
+        score = Math.max(0, Math.min(100, data.score));
       }
+    } catch {
+      // CORS or network error — use default score
+    }
 
-      const data = (await response.json()) as { score: number };
-      const score = Math.max(0, Math.min(100, data.score));
+    if (prefersReducedMotion) {
+      placeMarkerAtScore(route, marker, score);
+      return;
+    }
 
-      if (prefersReducedMotion) {
-        placeMarkerAtScore(route, marker, score);
-        scene.style.transform = `scale(${CAMERA_FINAL_ZOOM})`;
-        return;
-      }
+    try {
+      const { gsap } = await import("gsap");
 
-      try {
-        const { gsap } = await import("gsap");
-        const { MotionPathPlugin } = await import("gsap/MotionPathPlugin");
-        gsap.registerPlugin(MotionPathPlugin);
+      const pathLength = route.getTotalLength();
+      const targetLength = (score / 100) * pathLength;
+      const progress = { t: 0 };
 
-        const pathLength = route.getTotalLength();
-        const targetLength = (score / 100) * pathLength;
-        const startPoint = route.getPointAtLength(0);
-        marker.setAttribute("cx", String(startPoint.x));
-        marker.setAttribute("cy", String(startPoint.y));
+      gsap.set(visual, { scale: CAMERA_INITIAL_ZOOM });
 
-        const tl = gsap.timeline();
-        tl.to(marker, {
+      const tl = gsap.timeline();
+      tl.to(
+        progress,
+        {
           duration: ANIMATION_DURATION,
           ease: "power2.inOut",
-          motionPath: {
-            path: route,
-            start: 0,
-            end: score / 100,
+          t: 1,
+          onUpdate: () => {
+            const len = progress.t * targetLength;
+            const pt = route.getPointAtLength(len);
+            marker.setAttribute("cx", String(pt.x));
+            marker.setAttribute("cy", String(pt.y));
           },
-        }, 0);
-        tl.to(scene, {
+        },
+        0,
+      );
+      tl.to(
+        visual,
+        {
           duration: ANIMATION_DURATION,
           ease: "power2.inOut",
           scale: CAMERA_FINAL_ZOOM,
-        }, 0);
-
-        scene.style.transform = `scale(${CAMERA_INITIAL_ZOOM})`;
-      } catch {
-        placeMarkerAtScore(route, marker, score);
-        scene.style.transform = `scale(${CAMERA_FINAL_ZOOM})`;
-      }
-    } catch {
-      errorEl.hidden = false;
+        },
+        0,
+      );
+    } catch (err) {
+      console.error("[mountain-journey] GSAP animation failed:", err);
+      placeMarkerAtScore(route, marker, score);
     }
   });
 }
 
-function placeMarkerAtScore(
-  route: SVGPathElement,
-  marker: SVGCircleElement,
-  score: number,
-): void {
+function placeMarkerAtScore(route: SVGPathElement, marker: SVGCircleElement, score: number): void {
   const pathLength = route.getTotalLength();
   const targetLength = (score / 100) * pathLength;
   const point = route.getPointAtLength(targetLength);

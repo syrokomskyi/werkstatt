@@ -29,6 +29,7 @@ function init(): void {
 
   void initMountainJourneyAnimation({
     sceneSelector: "[data-mountain-journey-scene]",
+    visualSelector: "[data-mountain-journey-visual]",
     routeSelector: "[data-mountain-journey-route]",
     markerSelector: "[data-mountain-journey-marker]",
     formSelector: "[data-mountain-journey-form]",

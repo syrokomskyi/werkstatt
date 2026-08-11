@@ -34,18 +34,9 @@ const { svgViewBox, routePath, stages, form } = props;
   effects={props.effects}
   density={props.density}
   tone={props.tone}
+  containerVariant="full"
   lang={lang}
 >
-  <SectionHeader
-    sectionNumber={sectionNumber}
-    heading={need("header.heading", props.header?.heading)}
-    subheading={props.header?.subheading}
-    align={props.header?.align ?? "left"}
-    level={props.header?.level ?? 2}
-    hideSectionNumber={props.header?.hideSectionNumber}
-    id="mountain-journey-title"
-  />
-
   <div
     class="mountain-journey__scene"
     data-mountain-journey-scene
@@ -54,59 +45,55 @@ const { svgViewBox, routePath, stages, form } = props;
     data-view-box-height={svgViewBox.height}
     data-worker-endpoint={props.workerEndpoint ?? ""}
   >
-    <img
-      class="mountain-journey__background"
-      src={props.backgroundImage}
-      alt=""
-      loading="eager"
-      width={svgViewBox.width}
-      height={svgViewBox.height}
-    />
-    <svg
-      class="mountain-journey__overlay"
-      viewBox={`0 0 ${svgViewBox.width} ${svgViewBox.height}`}
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden="true"
-    >
-      <path
-        class="mountain-journey__route"
-        data-mountain-journey-route
-        d={routePath}
-        fill="none"
-        stroke="currentColor"
-        stroke-width="3"
-        stroke-dasharray="8 4"></path>
-      <circle
-        class="mountain-journey__marker"
-        data-mountain-journey-marker
-        cx="0"
-        cy="0"
-        r="8"
-        fill="currentColor"></circle>
-    </svg>
-    <ul class="mountain-journey__stages">
-      {
-        stages.map((stage) => (
-          <li
-            class="mountain-journey__stage"
-            data-stage-id={stage.id}
-            data-stage-position={stage.position}
-            style={`bottom: ${stage.position * 90 + 5}%;`}
-          >
-            <span class="mountain-journey__stage-label">{stage.label}</span>
-            <span class="mountain-journey__stage-range">{stage.scoreRange}</span>
-          </li>
-        ))
-      }
-    </ul>
+    <div class="mountain-journey__visual" data-mountain-journey-visual>
+      <img
+        class="mountain-journey__background"
+        src={props.backgroundImage}
+        alt=""
+        loading="eager"
+      />
+      <svg
+        class="mountain-journey__overlay"
+        viewBox={`0 0 ${svgViewBox.width} ${svgViewBox.height}`}
+        preserveAspectRatio="xMinYMax slice"
+        aria-hidden="true"
+      >
+        <path
+          class="mountain-journey__route"
+          data-mountain-journey-route
+          d={routePath}
+          fill="none"
+          stroke="#ff0000"
+          stroke-width="4"
+          stroke-dasharray="8 4"
+          vector-effect="non-scaling-stroke"></path>
+        <circle
+          class="mountain-journey__marker"
+          data-mountain-journey-marker
+          cx="0"
+          cy="0"
+          r="12"
+          fill="#ffff00"
+          stroke="#ff0000"
+          stroke-width="2"></circle>
+      </svg>
+    </div>
+    <div class="mountain-journey__header">
+      <SectionHeader
+        sectionNumber={sectionNumber}
+        heading={need("header.heading", props.header?.heading)}
+        subheading={props.header?.subheading}
+        align={props.header?.align ?? "left"}
+        level={props.header?.level ?? 2}
+        hideSectionNumber={props.header?.hideSectionNumber}
+        id="mountain-journey-title"
+      />
+    </div>
     <form class="mountain-journey__form" data-mountain-journey-form>
-      <label class="mountain-journey__form-label" for="mountain-journey-url">
-        {form.inputLabel}
-      </label>
       <div class="mountain-journey__form-row">
         <input
           class="mountain-journey__form-input"
-          type="url"
+          type="text"
           id="mountain-journey-url"
           name="url"
           placeholder={form.inputPlaceholder}

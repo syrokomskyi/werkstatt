@@ -13,15 +13,38 @@
 
 .mountain-journey__scene {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  min-height: 600px;
+  width: 100%;
+  height: calc(100vh - 120px);
+  min-height: 500px;
   overflow: hidden;
-  left: 50%;
-  margin-left: -50vw;
-  transform: scale(2.5);
-  transform-origin: center bottom;
+}
+
+.mountain-journey__visual {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 20% 96%;
   transition: transform 0.1s ease-out;
+}
+
+.section-shell[data-slug="mountain-journey"] {
+  padding-block: 0 !important;
+}
+
+.section-shell[data-slug="mountain-journey"] .section-shell__container {
+  max-width: 100% !important;
+  padding-inline: 0 !important;
+}
+
+.mountain-journey__header {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 3;
+  max-width: 500px;
+  color: #1a1a2e;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.5);
 }
 
 .mountain-journey__background {
@@ -30,7 +53,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: left bottom;
 }
 
 .mountain-journey__overlay {
@@ -39,16 +62,16 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .mountain-journey__route {
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .mountain-journey__marker {
-  transition:
-    cx 0.1s,
-    cy 0.1s;
+  opacity: 1;
 }
 
 .mountain-journey__stages {
@@ -58,6 +81,7 @@
   margin: 0;
   padding: 0;
   pointer-events: none;
+  z-index: 2;
 }
 
 .mountain-journey__stage {
@@ -87,25 +111,27 @@
 
 .mountain-journey__form {
   position: absolute;
-  top: 50%;
-  left: 5%;
+  top: 25%;
+  left: 1.5rem;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  width: min(360px, 90%);
-  padding: 1.25rem 1.5rem;
-  border-radius: var(--radius-lg, 1rem);
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  gap: var(--ds-space-2, 0.5rem);
+  width: min(33vw, 480px);
+  padding: var(--ds-space-5, 1.25rem) var(--ds-space-6, 1.5rem);
+  border-radius: var(--ds-radius-lg, 1rem);
+  background: var(--ds-color-surface, #fff);
+  box-shadow: var(--ds-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.15));
+  z-index: 3;
 }
 
 .mountain-journey__form-label {
   display: block;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #fff;
-  margin-bottom: 0.25rem;
+  font-family: var(--ds-font-body, inherit);
+  font-size: var(--ds-text-sm, 0.9rem);
+  font-weight: 600;
+  color: var(--ds-color-text, #1a1a2e);
+  margin-bottom: var(--ds-space-1, 0.25rem);
 }
 
 .mountain-journey__form-row {
@@ -116,42 +142,63 @@
 .mountain-journey__form-input {
   flex: 1;
   min-width: 0;
-  padding: 0.625rem 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-md, 0.5rem);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 1rem;
+  padding: var(--ds-space-3, 0.625rem) var(--ds-space-4, 0.875rem);
+  border: 1px solid var(--ds-color-border, rgba(0, 0, 0, 0.15));
+  border-radius: var(--ds-radius-sm, 0.375rem);
+  background: var(--ds-color-surface-alt, #f8f8f8);
+  color: var(--ds-color-text, #1a1a2e);
+  font-family: var(--ds-font-body, inherit);
+  font-size: var(--ds-text-base, 1rem);
+  transition: border-color var(--ds-duration-fast, 0.15s) ease;
+}
+
+.mountain-journey__form-input:focus {
+  outline: none;
+  border-color: var(--ds-color-primary, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .mountain-journey__form-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--ds-color-text-muted, rgba(0, 0, 0, 0.4));
 }
 
 .mountain-journey__form-submit {
-  padding: 0.625rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-space-3, 0.625rem) var(--ds-space-5, 1.25rem);
   border: none;
-  border-radius: var(--radius-md, 0.5rem);
-  background: var(--color-primary, #2563eb);
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border-radius: var(--ds-radius-sm, 0.375rem);
+  background: var(--ds-color-cta, var(--ds-color-primary, #2563eb));
+  color: var(--ds-color-cta-text, #fff);
+  font-family: var(--ds-font-body, inherit);
+  font-size: var(--ds-text-sm, 0.9rem);
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s;
+  box-shadow: var(--ds-shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
+  transition:
+    background var(--ds-duration-fast, 0.15s) ease,
+    transform var(--ds-duration-fast, 0.15s) ease;
 }
 
 .mountain-journey__form-submit:hover {
-  filter: brightness(1.15);
+  background: var(--ds-color-cta-hover, var(--ds-color-secondary, #1d4ed8));
+  transform: translateY(-1px);
+}
+
+.mountain-journey__form-submit:focus-visible {
+  outline: 2px solid var(--ds-color-accent, #2563eb);
+  outline-offset: 2px;
 }
 
 .mountain-journey__form-error {
   margin: 0;
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-md, 0.5rem);
-  background: rgba(220, 38, 38, 0.2);
-  color: #fca5a5;
-  font-size: 0.85rem;
+  padding: var(--ds-space-2, 0.5rem) var(--ds-space-3, 0.75rem);
+  border-radius: var(--ds-radius-sm, 0.375rem);
+  background: var(--ds-color-danger-soft, rgba(220, 38, 38, 0.1));
+  color: var(--ds-color-danger, #dc2626);
+  font-size: var(--ds-text-sm, 0.85rem);
 }
 
 .mountain-journey__noscript {
@@ -164,7 +211,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mountain-journey__scene {
+  .mountain-journey__visual {
     transform: scale(1);
     transition: none;
   }
@@ -175,16 +222,17 @@
 }
 
 @media (max-width: 768px) {
-  .mountain-journey__form {
-    top: auto;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(400px, 92%);
-  }
-
   .mountain-journey__stage {
     right: 2%;
-    max-width: 160px;
+    max-width: 140px;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .mountain-journey__stage-label {
+    font-size: 0.8rem;
+  }
+
+  .mountain-journey__stage-range {
+    font-size: 0.7rem;
   }
 }
