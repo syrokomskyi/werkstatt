@@ -15,9 +15,9 @@ implementedAt: 2026-08-10
 closedAt:
 supersedes: []
 supersededBy:
-  - RFC-0801
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0801
 related:
   - DNA-46
   - RFC-0355

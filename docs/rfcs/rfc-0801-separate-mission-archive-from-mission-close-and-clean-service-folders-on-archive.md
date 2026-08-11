@@ -10,12 +10,13 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
+enhancedAt: 2026-08-11
 implementedAt:
 closedAt:
-supersedes:
-  - RFC-0796
+supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0796
 amendedBy: []
 related:
   - DNA-46
@@ -39,6 +40,7 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - "@warpgogol/werkstatt"
+  - "@warpgogol/forge"
 successSignals:
   - "mission.close no longer auto-archives; the operator runs mission.archive explicitly after the release pipeline completes"
   - "mission.archive deletes node_modules/, dist/, .astro/, .wrangler/, .cache/, .turbo/ from each workpiece before moving it to missions/archive/<state>/"
@@ -46,7 +48,6 @@ successSignals:
   - "release.prepare succeeds on a freshly closed mission without broken node_modules"
 nonGoals:
   - "Does not change the mission lifecycle states (open → closed/aborted)"
-  - "Does not remove the --skip-auto-archive flag (kept for backward compatibility but now a no-op)"
   - "Does not change pnpm-workspace.yaml glob patterns"
   - "Does not introduce a new watch-based cleanup daemon"
 ---
@@ -72,6 +73,7 @@ Additionally, archived workpieces retain `node_modules/`, `dist/`, `.astro/`, `.
 ### Service folders in archive waste space and cause confusion
 
 Archived workpieces retain `node_modules/` (with broken symlinks), `dist/`, `.astro/`, `.wrangler/`, `.cache/`, and `.turbo/`. These are:
+
 - Regenerated on `mission.materialize` or build — not needed in archive
 - Broken after the directory move — symlinks point to wrong paths
 - Disk space waste — `node_modules/` alone can be 100+ MB per workpiece
@@ -88,9 +90,9 @@ Archived workpieces retain `node_modules/` (with broken symlinks), `dist/`, `.as
 
 3. **Update deployment workflow** — `deploy.md` documents `mission.archive` as an explicit final step after `leitstand.promote`.
 
-4. **Deprecate `--skip-auto-archive` flag** — the flag remains accepted but is a no-op (auto-archive is removed). This preserves backward compatibility for scripts and muscle memory.
+4. **Remove `--skip-auto-archive` flag** — the flag is removed entirely from `mission.close` and `mission.module.ts`. Auto-archive no longer exists, so the flag has no purpose. Scripts passing `--skip-auto-archive` will receive a standard unknown-flag warning from the kernel flag parser. Forward-only discipline: no no-op shims.
 
-5. **Supersede RFC-0796** — this RFC supersedes the auto-archive portion of RFC-0796. The stale-entry detection and cleanup improvements from RFC-0796 remain in effect.
+5. **Amend RFC-0796** — this RFC amends the auto-archive portion of RFC-0796. The stale-entry detection and cleanup improvements from RFC-0796 remain in effect. Only the auto-archive call from `mission.close` and the `CloseReportArchive` interface are removed.
 
 ## Architectural fit
 
@@ -99,7 +101,7 @@ Archived workpieces retain `node_modules/` (with broken symlinks), `dist/`, `.as
 - **RFC-0355 (Mission lifecycle and Bordbuch)**: No conflict — `mission.close` still transitions state, writes close-report, syncs evidence, and commits side-effects. Only the auto-archive call is removed.
 - **RFC-0480 (Workpiece preservation)**: No conflict — the workpiece is preserved at its original location until the operator explicitly archives it.
 - **RFC-0573 (mission.archive command)**: `mission.archive` remains a standalone command. This RFC adds service-folder cleanup to it.
-- **RFC-0796 (auto-archive)**: Superseded. The stale-entry detection (validator warning, pre-flight cleanup in `mission.open`, `mission.materialize` guard) remains. Only the auto-archive call from `mission.close` is removed.
+- **RFC-0796 (auto-archive)**: Amended. The stale-entry detection (validator warning, pre-flight cleanup in `mission.open`, `mission.materialize` guard) remains. Only the auto-archive call from `mission.close` is removed.
 - **RFC-0797 (auto-commit dirty workpiece)**: No conflict — `commitWorkpieceIfDirty` runs before the (now removed) auto-archive step.
 
 ## Design
@@ -125,13 +127,13 @@ pnpm exec werkstatt run mission.archive --status=closed
 
 #### Remove auto-archive from `mission.close`
 
-```ts
+````ts
 // In mission-close.ts:
 // - Remove the `skipAutoArchive` flag read (line 185)
 // - Remove the auto-archive block (lines 837-872)
 // - Remove `CloseReportArchive` interface and `archive` field from `CloseReport`
-// - Keep `--skip-auto-archive` as an accepted-but-ignored flag for backward compat
-```
+// - Remove `--skip-auto-archive` flag registration from mission.module.ts
+//```
 
 #### Add service-folder cleanup to `mission.archive`
 
@@ -158,31 +160,38 @@ async function cleanServiceFolders(workpieceDir: string): Promise<string[]> {
   }
   return removed;
 }
-```
+````
 
 ### File system responsibilities
 
-| Path | Role |
-|---|---|
+| Path                                    | Role                                     |
+| --------------------------------------- | ---------------------------------------- |
 | `missions/<id>/workpiece/node_modules/` | Deleted by `mission.archive` before move |
-| `missions/<id>/workpiece/dist/` | Deleted by `mission.archive` before move |
-| `missions/<id>/workpiece/.astro/` | Deleted by `mission.archive` before move |
-| `missions/<id>/workpiece/.wrangler/` | Deleted by `mission.archive` before move |
-| `missions/<id>/workpiece/.cache/` | Deleted by `mission.archive` before move |
-| `missions/<id>/workpiece/.turbo/` | Deleted by `mission.archive` before move |
-| `missions/archive/<state>/<id>/` | Destination after cleanup + move |
+| `missions/<id>/workpiece/dist/`         | Deleted by `mission.archive` before move |
+| `missions/<id>/workpiece/.astro/`       | Deleted by `mission.archive` before move |
+| `missions/<id>/workpiece/.wrangler/`    | Deleted by `mission.archive` before move |
+| `missions/<id>/workpiece/.cache/`       | Deleted by `mission.archive` before move |
+| `missions/<id>/workpiece/.turbo/`       | Deleted by `mission.archive` before move |
+| `missions/archive/<state>/<id>/`        | Destination after cleanup + move         |
+
+### Output format
+
+`mission.close --json` — the `closeReport.archive` field is **removed** from the `CloseReport` interface. Consumers that read `closeReport.archive.archived` or `closeReport.archive.error` will see `undefined`. No replacement field — archiving is no longer part of close.
+
+`mission.archive --json` — unchanged output shape (`moved[]`, `skipped[]`, `dryRun`). Service-folder cleanup is logged but does not appear in the JSON output.
 
 ### Failure modes
 
 - **Service folder cleanup failure**: Non-fatal. If `rm` fails for a specific folder (e.g., permission error), log a warning and continue with the archive move. The folder will be moved as-is.
-- **`--skip-auto-archive` on `mission.close`**: Accepted but ignored. Logs a deprecation info message: `--skip-auto-archive is deprecated: mission.close no longer auto-archives (RFC-0801)`.
+- **`--skip-auto-archive` on `mission.close`**: Flag is removed. Passing it produces a standard unknown-flag warning from the kernel flag parser. No custom deprecation message.
 
 ## Rollout
 
 - **Default behavior**: `mission.close` no longer auto-archives. All operators must run `mission.archive` explicitly after deployment.
 - **Existing missions**: Missions already in `missions/archive/closed/` with broken `node_modules` are unaffected — they are already archived. Future archives will clean service folders.
-- **Backward compatibility**: `--skip-auto-archive` flag is accepted but ignored on `mission.close`. Scripts using it will not break.
-- **Workflow update**: `deploy.md` updated to include `mission.archive --status=closed` as the final step.
+- **Backward compatibility**: `--skip-auto-archive` flag is removed from `mission.close`. Scripts passing it will receive an unknown-flag warning. This is forward-only — no no-op shims.
+- **Workflow update**: `deploy.md` already updated to include `mission.archive --status=closed` as the final step (applied alongside the bug fix that motivated this RFC).
+- **AGENTS.md update**: The auto-archive behavior note added by RFC-0796 (AGENTS.md lines 136-139) must be updated to reflect that archiving is now an explicit operator step, not automatic.
 
 ## Alternatives considered
 
@@ -196,19 +205,24 @@ async function cleanServiceFolders(workpieceDir: string): Promise<string[]> {
 
 - **Stale mission directories accumulate** — Without auto-archive, operators may forget to run `mission.archive`. Mitigated by: (a) `mission.validate` stale-entry warning from RFC-0796, (b) `mission.open` pre-flight cleanup from RFC-0796, (c) `deploy.md` documenting archive as an explicit step.
 - **Service folder deletion loses cached state** — If a mission needs to be re-activated after archiving, `mission.materialize` regenerates all service folders. No data loss.
-- **Behavioral change for existing scripts** — Scripts that relied on auto-archive after `mission.close` will need to add an explicit `mission.archive` call. The `--skip-auto-archive` flag remains accepted to avoid CLI errors.
+- **Behavioral change for existing scripts** — Scripts that relied on auto-archive after `mission.close` will need to add an explicit `mission.archive` call. Scripts passing `--skip-auto-archive` will receive an unknown-flag warning. This is forward-only — the flag is removed, not kept as a no-op.
 
 ## Acceptance criteria
 
 - [ ] `mission.close` no longer calls `mission.archive` (auto-archive block removed from `mission-close.ts`)
-- [ ] `--skip-auto-archive` flag accepted but ignored on `mission.close` with deprecation info message
+- [ ] `--skip-auto-archive` flag removed from `mission.close` and `mission.module.ts` — passing it produces unknown-flag warning
 - [ ] `mission.archive` deletes `node_modules/`, `dist/`, `.astro/`, `.wrangler/`, `.cache/`, `.turbo/` from workpiece before move
-- [ ] `CloseReport.archive` field removed or deprecated
-- [ ] `deploy.md` updated with `mission.archive` as explicit post-deploy step
+- [ ] `CloseReport.archive` field and `CloseReportArchive` interface removed from `mission-close.ts`
+- [ ] `deploy.md` documents `mission.archive` as explicit post-deploy step (already applied)
+- [ ] AGENTS.md auto-archive note (lines 136-139) updated to reflect explicit archive step
 - [ ] Unit test: `mission.close` does not call `mission.archive`
 - [ ] Unit test: `mission.archive` removes service folders before move
 - [ ] `rfc.validate` passes on this file before merging
-- [ ] RFC-0796 superseded by this RFC in frontmatter
+- [ ] RFC-0796 amended by this RFC in frontmatter (`amendedBy` includes RFC-0801)
+
+### Compass XML synchronization
+
+No `docs/*.xml` files require synchronization. The mission lifecycle states (open → closed/aborted) are unchanged — separating archive from close is a post-close workflow change, not a lifecycle state change. `docs/development-plan.xml` describes the deployment pipeline sequence, which is already reflected in `deploy.md` (the operational workflow document).
 
 ## Implementation notes for agents
 
