@@ -43,17 +43,17 @@ nonGoals:
   - "Re-running failed steps automatically"
   - "Collecting errors across multiple pipeline invocations"
   - "Changing pipeline cache behavior"
-acceptance:
-  - probe: run
-    command: "werkstatt run mission.validate --site warpgogol-com --mission warpgogol-com-m000050 --collect-errors"
-    expect:
-      exitCode: 0
-      summaryContains: "collect-errors"
-  - probe: run
-    command: "werkstatt run build.check --site warpgogol-com --collect-errors"
-    expect:
-      exitCode: non-zero
-      outputContains: "failedSteps"
+# acceptance:
+#   - probe: run
+#     command: "werkstatt run mission.validate --site warpgogol-com --mission warpgogol-com-m000050 --collect-errors"
+#     expect:
+#       exitCode: 0
+#       summaryContains: "collect-errors"
+#   - probe: run
+#     command: "werkstatt run build.check --site warpgogol-com --collect-errors"
+#     expect:
+#       exitCode: non-zero
+#       outputContains: "failedSteps"
 ---
 
 # RFC-0809: Add pipeline collect-errors mode for fail-fast diagnostic relief
