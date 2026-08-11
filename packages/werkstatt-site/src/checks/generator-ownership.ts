@@ -500,6 +500,32 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-checks/src/agent-knowledge.ts",
   },
 
+  // RFC-0785: Agent discovery endpoint files (auth.md, agent-skills, oauth).
+  {
+    path: "public/auth.md",
+    command: "agent.discovery-endpoints.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-discovery-endpoints.ts",
+  },
+  {
+    path: "public/.well-known/agent-skills/index.json",
+    command: "agent.discovery-endpoints.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-discovery-endpoints.ts",
+  },
+  {
+    path: "public/.well-known/oauth-protected-resource",
+    command: "agent.discovery-endpoints.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-discovery-endpoints.ts",
+  },
+  {
+    path: "public/.well-known/oauth-authorization-server",
+    command: "agent.discovery-endpoints.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-discovery-endpoints.ts",
+  },
+
   // RFC-0290: Agent route JSON bridges (Vite cannot import .yaml directly).
   {
     path: "src/agent-surface.generated.json",
@@ -573,17 +599,20 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   },
 
   // RFC-0473: Bordbuch public projections (unified ledger, workspace-scoped).
+  // conditional: true — these files only exist in the cache clone after bordbuch.generate runs.
   {
     path: "systems/{system}/public/.well-known/bordbuch.json",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    conditional: true,
   },
   {
     path: "systems/{system}/public/.well-known/bordbuch/index.html",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    conditional: true,
   },
   // RFC-0473: Bordbuch public projections (site-relative — committed to workpiece by bordbuch.commit).
   // conditional: true — these files only exist in the workpiece context, not in every site directory.
@@ -650,27 +679,33 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   },
 
   // RFC-0204: Responsive image variants (public outputs).
+  // conditional: true — only generated when source images exist.
   {
     path: "public/_img/**/*.webp",
     command: "image.variants.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/image-variants.ts",
+    conditional: true,
   },
 
   // RFC-0210: Video delivery formats (public outputs).
+  // conditional: true — only generated when source videos exist.
   {
     path: "public/_video/**",
     command: "video.variants.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/video-variants.ts",
+    conditional: true,
   },
 
   // RFC-0234: Living-photo clip delivery (public outputs).
+  // conditional: true — only generated when living-photo sources exist.
   {
     path: "public/_video/live/**",
     command: "live.variants.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/live-variants.ts",
+    conditional: true,
   },
 ];
 
