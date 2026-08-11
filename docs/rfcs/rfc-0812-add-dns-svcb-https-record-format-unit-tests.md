@@ -1,12 +1,13 @@
 ---
 id: RFC-0812
 title: "Add DNS SVCB/HTTPS record format unit tests"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
