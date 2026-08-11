@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>Add typed metric references for compile-time label-key enforcement across all consumers.</item>
   <item>wg-review: correct non-goals, add compile-time registry-coverage assertion.</item>
+  <item>RFC-0807: add back prefix metric refs for service health monitoring.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -111,6 +112,19 @@ export const METRIC_REFS = {
   warpgogol_workers_errors_total: defineCounter("warpgogol_workers_errors_total", [
     "site_id",
   ] as const),
+  warpgogol_back_requests_total: defineCounter("warpgogol_back_requests_total", [
+    "service",
+    "status_class",
+  ] as const),
+  warpgogol_back_up: defineGauge("warpgogol_back_up", ["service"] as const),
+  warpgogol_back_last_run_total: defineCounter("warpgogol_back_last_run_total", [
+    "service",
+    "status",
+  ] as const),
+  warpgogol_back_last_error_total: defineCounter("warpgogol_back_last_error_total", [
+    "service",
+  ] as const),
+  warpgogol_back_queue_depth: defineGauge("warpgogol_back_queue_depth", ["service"] as const),
 } as const;
 
 // Compile-time assertion: every METRIC_REFS key must be a declared registry metric name.

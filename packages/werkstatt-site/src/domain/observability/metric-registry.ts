@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0337: initial implementation with smoke metric only. RFC-0340/0341/0343 append entries.</item>
+  <item>RFC-0807: add back prefix metrics for service health monitoring.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -21,7 +22,7 @@ export interface WarpgogolMetricSpec {
   buckets?: readonly number[];
 }
 
-export const METRIC_NAME_PATTERN = /^warpgogol_(factory|probe|delivery|workers)_[a-z0-9_]+$/;
+export const METRIC_NAME_PATTERN = /^warpgogol_(factory|probe|delivery|workers|back)_[a-z0-9_]+$/;
 
 export const FORBIDDEN_LABEL_KEYS: readonly string[] = [
   "user_id",
@@ -131,6 +132,41 @@ export const WARPGOGOL_METRIC_REGISTRY: readonly WarpgogolMetricSpec[] = [
     kind: "counter",
     help: "Total Cloudflare Worker errors per site (RFC-0343).",
     labelKeys: ["site_id"],
+    unit: "1",
+  },
+  {
+    name: "warpgogol_back_requests_total",
+    kind: "counter",
+    help: "Total HTTP requests served by backend services (RFC-0807).",
+    labelKeys: ["service", "status_class"],
+    unit: "1",
+  },
+  {
+    name: "warpgogol_back_up",
+    kind: "gauge",
+    help: "1 = service self-reports healthy; 0 = unhealthy (RFC-0807).",
+    labelKeys: ["service"],
+    unit: "1",
+  },
+  {
+    name: "warpgogol_back_last_run_total",
+    kind: "counter",
+    help: "Total scheduled runs by outcome (success/failure) (RFC-0807).",
+    labelKeys: ["service", "status"],
+    unit: "1",
+  },
+  {
+    name: "warpgogol_back_last_error_total",
+    kind: "counter",
+    help: "Total errors encountered by the service (RFC-0807).",
+    labelKeys: ["service"],
+    unit: "1",
+  },
+  {
+    name: "warpgogol_back_queue_depth",
+    kind: "gauge",
+    help: "Current queue depth (items pending processing) (RFC-0807).",
+    labelKeys: ["service"],
     unit: "1",
   },
 ];

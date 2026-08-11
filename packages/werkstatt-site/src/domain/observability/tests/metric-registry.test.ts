@@ -34,6 +34,33 @@ describe("WARPGOGOL_METRIC_REGISTRY", () => {
       }
     }
   });
+
+  it("contains all 5 back metrics with correct kinds and labels (RFC-0807)", () => {
+    const requests = findMetricSpec("warpgogol_back_requests_total");
+    expect(requests).toBeDefined();
+    expect(requests?.kind).toBe("counter");
+    expect(requests?.labelKeys).toEqual(["service", "status_class"]);
+
+    const up = findMetricSpec("warpgogol_back_up");
+    expect(up).toBeDefined();
+    expect(up?.kind).toBe("gauge");
+    expect(up?.labelKeys).toEqual(["service"]);
+
+    const lastRun = findMetricSpec("warpgogol_back_last_run_total");
+    expect(lastRun).toBeDefined();
+    expect(lastRun?.kind).toBe("counter");
+    expect(lastRun?.labelKeys).toEqual(["service", "status"]);
+
+    const lastError = findMetricSpec("warpgogol_back_last_error_total");
+    expect(lastError).toBeDefined();
+    expect(lastError?.kind).toBe("counter");
+    expect(lastError?.labelKeys).toEqual(["service"]);
+
+    const queueDepth = findMetricSpec("warpgogol_back_queue_depth");
+    expect(queueDepth).toBeDefined();
+    expect(queueDepth?.kind).toBe("gauge");
+    expect(queueDepth?.labelKeys).toEqual(["service"]);
+  });
 });
 
 describe("isMetricNameValid", () => {
@@ -52,6 +79,14 @@ describe("isMetricNameValid", () => {
 
   it("accepts valid workers metric names", () => {
     expect(isMetricNameValid("warpgogol_workers_errors_total")).toBe(true);
+  });
+
+  it("accepts valid back metric names (RFC-0807)", () => {
+    expect(isMetricNameValid("warpgogol_back_requests_total")).toBe(true);
+    expect(isMetricNameValid("warpgogol_back_up")).toBe(true);
+    expect(isMetricNameValid("warpgogol_back_last_run_total")).toBe(true);
+    expect(isMetricNameValid("warpgogol_back_last_error_total")).toBe(true);
+    expect(isMetricNameValid("warpgogol_back_queue_depth")).toBe(true);
   });
 
   it("rejects names without the warpgogol_ prefix", () => {
