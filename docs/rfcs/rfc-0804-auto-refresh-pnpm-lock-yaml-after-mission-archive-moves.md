@@ -226,15 +226,15 @@ Note: `git add -A <m.from> <m.to>` is used per moved mission rather than a broad
 
 ## Acceptance criteria
 
-- [ ] `mission.archive` runs `pnpm install` at workspace root after all directory moves
-- [ ] `pnpm install` step is non-fatal (warning on failure, archive proceeds)
-- [ ] If `pnpm-lock.yaml` changed, it is committed together with moved directories
-- [ ] Dry-run mode skips the lockfile refresh entirely
-- [ ] No-moves case skips the lockfile refresh (no workspace structure changed)
-- [ ] Unit test: verify `pnpm install` is called after moves (mock `execSync`)
-- [ ] Unit test: verify lockfile commit when `pnpm-lock.yaml` is dirty after install
-- [ ] Unit test: verify non-fatal behavior when `pnpm install` fails
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission.archive` runs `pnpm install` at workspace root after all directory moves (evidence: packages/forge/os/mission/handlers/archive.ts:394-400, archive.test.ts:319-331 "RFC-0804: pnpm install called after moves")
+- [x] `pnpm install` step is non-fatal (warning on failure, archive proceeds) (evidence: packages/forge/os/mission/handlers/archive.ts:423-427, archive.test.ts:352-365 "RFC-0804: pnpm install failure is non-fatal")
+- [x] If `pnpm-lock.yaml` changed, it is committed together with moved directories (evidence: packages/forge/os/mission/handlers/archive.ts:406-422, archive.test.ts:333-350 "RFC-0804: lockfile committed when dirty after install")
+- [x] Dry-run mode skips the lockfile refresh entirely (evidence: packages/forge/os/mission/handlers/archive.ts:394, archive.test.ts:367-378 "RFC-0804: dry-run skips lockfile refresh")
+- [x] No-moves case skips the lockfile refresh (no workspace structure changed) (evidence: packages/forge/os/mission/handlers/archive.ts:394, archive.test.ts:380-390 "RFC-0804: no moves skips lockfile refresh")
+- [x] Unit test: verify `pnpm install` is called after moves (mock `execSync`) (evidence: archive.test.ts:319-331)
+- [x] Unit test: verify lockfile commit when `pnpm-lock.yaml` is dirty after install (evidence: archive.test.ts:333-350)
+- [x] Unit test: verify non-fatal behavior when `pnpm install` fails (evidence: archive.test.ts:352-365)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0804 --json` → zero errors, 2026-08-11)
 
 ## Implementation notes for agents
 
