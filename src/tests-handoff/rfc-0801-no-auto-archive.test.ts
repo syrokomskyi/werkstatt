@@ -1,10 +1,10 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0796: unit tests for mission.close auto-archive behavior — verifies mission.archive is called after close.</purpose>
-  <keywords>RFC-0796, mission.close, auto-archive, mission.archive, skip-auto-archive</keywords>
+  <purpose>RFC-0801: unit tests for mission.close — verifies mission.archive is NOT called after close (auto-archive removed).</purpose>
+  <keywords>RFC-0801, mission.close, auto-archive, mission.archive</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0796: initial tests for auto-archive in mission.close.</item>
+  <item>RFC-0801: rewrite tests — assert mission.archive is NOT called from mission.close; remove --skip-auto-archive and closeReport.archive tests.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,8 +25,6 @@ const mockState = vi.hoisted(() => ({
     summary: "Validation passed",
   },
   archiveCalled: false,
-  archiveArgs: null as { commandName: string; argv: string[] } | null,
-  archiveResult: { exitCode: 0, summary: "archived" },
 }));
 
 vi.mock("../mission/mission-materialization-commands.ts", () => ({
@@ -90,8 +88,6 @@ vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
     executeKernelCommand: vi.fn(async (args: { commandName: string; argv: string[] }) => {
       if (args.commandName === "mission.archive") {
         mockState.archiveCalled = true;
-        mockState.archiveArgs = args;
-        return mockState.archiveResult;
       }
       if (args.commandName === "sternsystem.pin") {
         return {
@@ -122,10 +118,8 @@ function gitCommit(dir: string, msg: string): void {
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-close-autoarchive-"));
+  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-close-no-archive-"));
   mockState.archiveCalled = false;
-  mockState.archiveArgs = null;
-  mockState.archiveResult = { exitCode: 0, summary: "archived" };
 });
 
 afterEach(() => {
@@ -193,35 +187,13 @@ systems:
   gitCommit(tmpWorkspace, "add mission");
 }
 
-test("RFC-0796: mission.close calls mission.archive --status=closed after close", async () => {
+test("RFC-0801: mission.close does NOT call mission.archive after close", async () => {
   setupWorkspace();
 
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   const input = {
     flags: { mission: "test-system-m000001", actor: "test-agent" },
-  } as unknown as KernelCommandInput;
-  const context = {
-    workspaceRoot: tmpWorkspace,
-    logger: { info: () => {}, warn: () => {}, error: () => {} },
-  } as unknown as KernelRuntimeContext;
-
-  const result = await runMissionClose(input, context);
-
-  expect(mockState.archiveCalled).toBe(true);
-  expect(mockState.archiveArgs!.commandName).toBe("mission.archive");
-  expect(mockState.archiveArgs!.argv).toContain("--status=closed");
-  expect(result.data?.closeReport.archive.archived).toBe(true);
-  expect(result.data?.closeReport.archive.error).toBe(null);
-});
-
-test("RFC-0796: --skip-auto-archive skips mission.archive call", async () => {
-  setupWorkspace();
-
-  const { runMissionClose } = await import("../mission/mission-close.ts");
-
-  const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent", "skip-auto-archive": true },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
@@ -231,31 +203,6 @@ test("RFC-0796: --skip-auto-archive skips mission.archive call", async () => {
   const result = await runMissionClose(input, context);
 
   expect(mockState.archiveCalled).toBe(false);
-  // closeReport.archive should still exist with default values
-  expect(result.data?.closeReport.archive).toBeDefined();
-  expect(result.data?.closeReport.archive.archived).toBe(false);
-});
-
-test("RFC-0796: archive failure is non-fatal — close still succeeds", async () => {
-  setupWorkspace();
-
-  mockState.archiveResult = { exitCode: 1, summary: "archive failed: permission denied" };
-
-  const { runMissionClose } = await import("../mission/mission-close.ts");
-
-  const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent" },
-  } as unknown as KernelCommandInput;
-  const context = {
-    workspaceRoot: tmpWorkspace,
-    logger: { info: () => {}, warn: () => {}, error: () => {} },
-  } as unknown as KernelRuntimeContext;
-
-  const result = await runMissionClose(input, context);
-
-  // Close should still succeed
   expect(result.data?.state).toBe("closed");
-  // Archive should be marked as failed
-  expect(result.data?.closeReport.archive.archived).toBe(false);
-  expect(result.data?.closeReport.archive.error).toContain("archive failed");
+  expect(result.data?.closeReport).not.toHaveProperty("archive");
 });
