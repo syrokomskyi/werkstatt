@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
+enhancedAt: 2026-08-11
 implementedAt:
 closedAt:
 supersedes: []
@@ -60,6 +61,8 @@ nonGoals:
   - Full-text search engine (Obsidian handles this natively)
   - Werkstatt plugin implementation (this RFC defines the Forge profile only; a future RFC may add a werkstatt-obsidian plugin)
   - Migration of existing werkstatt content to Obsidian format
+  - Note management skill pack (fo-note-create, fo-note-link, fo-note-refactor) — a future RFC will create these skills
+  - forge doctor integration for workspace directory existence checks — a general feature benefiting all profiles, not specific to obsidian-vault
 batch: obsidian-knowledge-base
 dependsOn: []
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
@@ -170,10 +173,8 @@ workspaceTypes:
     detect:
       glob: "**/*.md"
       contains: "---"
-    skills:
-      - fo-note-create
-      - fo-note-link
-      - fo-note-refactor
+    # Skills (fo-note-create, fo-note-link, fo-note-refactor) will be added
+    # in a future RFC when the note management skill pack is created.
 invariants:
   - id: NOTE-01
     rule: All [[wikilinks]] must resolve to an existing note file
@@ -194,6 +195,7 @@ invariants:
     check:
       kind: path-exclusion
       glob: "vault/**/*.{ts,mjs,js,py,sh}"
+  # NOTE-04 uses an existing check kind (filename-pattern) and needs no schema extension
   - id: NOTE-04
     rule: Note filenames must use kebab-case (lowercase letters, digits, hyphens)
     severity: warning
@@ -240,13 +242,13 @@ install:
 
 ```sh
 # Validate wikilink integrity across the vault
-pnpm exec forge run note.link.validate --json
+pnpm exec forge note.link.validate --json
 
 # Validate frontmatter consistency
-pnpm exec forge run note.frontmatter.validate --json
+pnpm exec forge note.frontmatter.validate --json
 
 # Detect orphan notes (no inbound links)
-pnpm exec forge run note.orphan.detect --json
+pnpm exec forge note.orphan.detect --json
 ```
 
 All three commands operate at workspace scope (no `--app` flag). They scan `vault/**/*.md` and report violations.
@@ -272,7 +274,6 @@ interface FrontmatterViolation {
 interface OrphanReport {
   file: string;       // orphan note path
   inboundLinks: 0;    // always 0 for orphans
-  rule: "NOTE-03";
   severity: "warning";
 }
 ```
@@ -307,6 +308,16 @@ interface OrphanReport {
   ]
 }
 ```
+
+### Schema extension: new invariant check kinds
+
+The proposed profile YAML uses three invariant check kinds that are not in the current `profileInvariantCheckSchema` (which only supports `filename-pattern`, `file-contains`, `file-not-contains`, `attribute-pattern`):
+
+- `link-resolution` — parses `[[wikilinks]]` from note content and resolves each against the note graph. Fundamentally different from `file-contains` (which checks for a pattern in file content, not link graph resolution).
+- `frontmatter-required` — parses YAML frontmatter and checks for specific fields. `file-contains` could partially work (e.g. check for `title:`) but is fragile and doesn't validate YAML structure.
+- `path-exclusion` — checks that no files matching a glob pattern exist in a directory. Different from `file-not-contains` (which checks file contents, not file existence by pattern).
+
+Implementation MUST extend `profileInvariantCheckSchema` in `packages/forge/src/profiles/profile-schema.ts` to accept these three new check kinds. This is a schema extension, not a breaking change — existing profiles are unaffected because the new kinds are additive to the enum.
 
 ### Failure modes
 
@@ -351,7 +362,6 @@ interface OrphanReport {
 - [ ] `note.orphan.detect` reports notes with zero inbound links as warnings
 - [ ] NOTE-03 invariant detects code files placed in `vault/` and reports them as errors
 - [ ] Profile terminology maps `artifact: note`, `module: folder`, `operator: author` correctly
-- [ ] `forge doctor` reports when the profile is active but `vault/` directory is missing
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -362,4 +372,4 @@ interface OrphanReport {
 - Agents MUST NOT create a `werkstatt-obsidian` plugin as part of this RFC — the profile is Forge-only. A separate RFC is required for plugin creation.
 - Agents MUST NOT weaken NOTE-03 (code exclusion from vault) — this is the structural invariant that keeps content and code separated.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0808 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The `scriptDir` field in the profile YAML is a new field not yet in the `stackProfileSchema`. Implementation MUST extend the schema to accept `scriptDir?: string` (optional, default `scripts/`). This is a schema extension, not a breaking change.
+- The `scriptDir` field was already added to `stackProfileSchema` by ADR-0043. No schema extension is needed for it.
