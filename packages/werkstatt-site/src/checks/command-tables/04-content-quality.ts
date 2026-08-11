@@ -66,6 +66,7 @@ import {
 import { runDerivedPricesMaterialize } from "../derived-prices-materialize.ts";
 import { runRateSnapshotResolve } from "../rate-snapshot-resolve.ts";
 import { runCurrencyPricingCompile } from "../currency-pricing-compile.ts";
+import { runDeploymentGateValidate } from "../deployment-gate.ts";
 
 export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
@@ -190,7 +191,10 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/content/**/*.md", "packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml"],
+    reads: [
+      "<app>/src/content/**/*.md",
+      "packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml",
+    ],
     modulePaths: ["content-voice.ts"],
     execute: runContentVoiceLint,
   },
@@ -268,7 +272,10 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/*/package.json", "packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.astro"],
+    reads: [
+      "packages/*/package.json",
+      "packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.astro",
+    ],
     modulePaths: ["astro-exports.ts"],
     execute: runAstroExportsLint,
   },
@@ -835,6 +842,23 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
         description: "Only runs when multi-currency entitlement is active",
       },
     },
+  },
+  {
+    name: "deployment.gate.validate",
+    description:
+      "RFC-0803: validate that non-gated pages do not reference gated pages in navigation, block props, or breadcrumb parent chains.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: [
+      "<app>/src/content/system.md",
+      "<app>/src/content/pages/**/*.md",
+      "<app>/src/content/navigation/**/*.md",
+      "<app>/src/content/site/**/*.md",
+      "<app>/src/content/business/**/*.md",
+    ],
+    modulePaths: ["checks/deployment-gate.ts"],
+    execute: runDeploymentGateValidate,
   },
   {
     name: "source.monitor.run",
