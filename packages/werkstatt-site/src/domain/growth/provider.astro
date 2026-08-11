@@ -85,13 +85,9 @@ const configJson = JSON.stringify(config);
   import { bootGrowthLayer } from "@warpgogol/werkstatt-site/growth/client";
   import { NullAdapter } from "@warpgogol/werkstatt-site/growth/null-adapter";
 
-  const _adapterSpecifiers: Record<string, string> = {
-    matomo: "@warpgogol/werkstatt-site/growth-adapter-matomo",
-  };
-
   const growthLoaders = {
     null: () => Promise.resolve({ default: NullAdapter }),
-    matomo: () => import(/* @vite-ignore */ _adapterSpecifiers["matomo"]!),
+    matomo: () => import("@warpgogol/werkstatt-site/growth-adapter-matomo"),
   };
 
   bootGrowthLayer(growthLoaders).catch((err) => {
