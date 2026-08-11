@@ -218,13 +218,14 @@ When no violations are found:
 
 **Rule codes:**
 
-- `GATE-01` — Non-gated page references a gated page in navigation (`navigation.md` targets, `labels.md` `navIds`/`legalIds`/`transparencyIds`).
-- `GATE-02` — Non-gated page references a gated page in block props (e.g. `section-cta` with `kind: internal` targeting a gated `pageId`).
-- `GATE-03` — Non-gated page has `parentPageId` pointing to a gated page (breadcrumb hierarchy would break in production).
+- `GATE-01` (warning) — Non-gated page references a gated page in navigation (`navigation.md` targets, `labels.md` `navIds`/`legalIds`/`transparencyIds`). The link is automatically filtered out of production builds by `resolveSemanticTarget` returning `null` for gated pages. The warning is informational — no manual removal needed.
+- `GATE-02` (warning) — Non-gated page references a gated page in block props (e.g. `section-cta` with `kind: internal` targeting a gated `pageId`). Same automatic filtering applies.
+- `GATE-03` (error) — Non-gated page has `parentPageId` pointing to a gated page (breadcrumb hierarchy would break in production — not automatically filtered).
 
 ### Failure modes
 
-- **GATE-01 / GATE-02 violations** — the command exits non-zero (`exitCode: 1`). In `--json` mode, violations are returned in the `violations` array. In pretty mode, violations are printed to stderr with file paths and line numbers.
+- **GATE-01 / GATE-02 warnings** — the command does NOT exit non-zero. Warnings are returned in the `violations` array with `severity: "warning"`. These references are automatically filtered at runtime — no action required.
+- **GATE-03 error** — the command exits non-zero (`exitCode: 1`). The breadcrumb hierarchy cannot be automatically filtered — the operator must fix the `parentPageId` reference.
 - **No gated pages** — the command passes trivially (no `deployment.production: false` entries in `system.md`). No overhead for sites that do not use gating.
 - **Missing `system.md`** — the command fails with a standard `KERNEL-CONTEXT-01` error (same as other site-level validators).
 - **Gated page references another gated page** — this is allowed. Gated pages can link to each other; they are all excluded from production together. Only non-gated → gated references are violations.
@@ -257,7 +258,7 @@ When no violations are found:
 
 3. **Agent misinterpretation** — agents may confuse deployment gating with feature flags (DNA-9 violation) or with `retiredRoutes`. Mitigation: the `nonGoals` section explicitly states "Does not add runtime feature flags" and "Does not automatically add retiredRoutes entries." The implementation notes reinforce that gating is build-time only.
 
-4. **False positives in reference safety** — `deployment.gate.validate` may flag references that are intentional (e.g. a "coming soon" link). Mitigation: GATE-01 and GATE-02 are errors, not warnings. If an operator intentionally wants a non-gated page to link to a gated page, they must ungate the target page. There is no "intentional leak" escape hatch — it defeats the purpose of gating.
+4. **Dead references in navigation/content** — `deployment.gate.validate` flags references from non-gated pages to gated pages as GATE-01/GATE-02 **warnings** (not errors). These references are automatically filtered at runtime by `resolveSemanticTarget` returning `null` for gated pages — they produce no broken links in production. The warnings are informational, prompting operators to clean up stale references when convenient. No build failure.
 
 5. **Build pipeline complexity** — `collectGatedPageIds()` is called inside `getRouteRegistry()`, which is already the single source of route topology (DNA-16). Downstream consumers use the filtered registry. The `deployment.gate.validate` validator also calls `collectGatedPageIds()` to check reference leaks. No conditional logic is added to individual generators.
 
@@ -286,6 +287,6 @@ When no violations are found:
 - Agents MUST NOT add runtime feature flags or route-local `if` guards — gating is build-time only, declared in `system.md`.
 - Agents MUST NOT automatically add `retiredRoutes` entries when gateing a page — gating and `retiredRoutes` are orthogonal concepts.
 - Agents MUST NOT gate individual blocks within a page — this RFC covers per-page gating only.
-- Agents MUST NOT add a "coming soon" link from a non-gated page to a gated page — GATE-01/GATE-02 are hard errors with no escape hatch.
+- Agents MUST NOT remove navigation entries or block props referencing gated pages — GATE-01/GATE-02 are warnings. The runtime automatically filters these references via `resolveSemanticTarget` returning `null` for gated pages. No manual cleanup needed.
 - Agents MUST ensure `collectGatedPageIds()` returns an empty set when `process.env.NODE_ENV !== "production"` (dev mode) — all pages are visible in dev. Do NOT use `import.meta.env.PROD` — `registry.ts` is type-checked with `tsc --noEmit` outside Vite, and `import.meta.env` is not typed in that context (per `packages/AGENTS.md`).
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0803 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
