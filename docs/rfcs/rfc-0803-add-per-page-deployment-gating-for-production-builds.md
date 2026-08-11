@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
+enhancedAt: 2026-08-11
 implementedAt:
 closedAt:
 supersedes: []
@@ -106,6 +107,8 @@ The `system.md` page entry schema gains a `deployment.production` boolean field 
 - **DNA-13 (Disabled content must not leak)** — This RFC makes "disabled" a first-class concept for pages. `deployment.gate.validate` enforces that non-gated pages do not reference gated pages, closing the leak vector (navigation links, breadcrumbs, JSON-LD, sitemap).
 - **RFC-0047 (Block-declarative pages)** — Gating is declared in `system.md`, not in page `.md` files or component code. It is a page-level property, not a block-level property. This aligns with the `system.md pages[]` schema as the single source of truth for page metadata.
 - **Site OS operator model** — `deployment.gate.validate` is a check command registered in `packages/werkstatt-site/src/checks/`. It runs in the `build.check` pipeline. No new module is needed — it lives alongside existing page-level validators like `page.block.validate`.
+- **Route sources not affected** — Programmatic Surface routes (DNA-39), person profile routes (RFC-0200), and Nachweis routes (RFC-0708) are folded into the route registry by `getRouteRegistry()`. These route sources do not have `system.md` pages[] entries and therefore cannot be gated by `deployment.production`. Gating applies only to authored `system.md` pages[] entries. If a generated route source needs gating in the future, it would require a separate RFC.
+- **Performance** — `deployment.gate.validate` scans navigation files (`navigation.md`, `labels.md`) and all block props across all page content entries. For a site with N pages and B blocks per page, the cost is O(N × B) prop inspections plus O(1) navigation file reads. This is comparable to existing validators like `content.links.validate` and `page.block.validate` that already scan the same surface. No additional file I/O beyond what `build.check` already performs.
 
 ## Design
 
@@ -124,36 +127,45 @@ Flags: `--site` (required, selects the site workspace), `--json` (optional, mach
 ### TypeScript contracts
 
 ```ts
-// packages/werkstatt-site/src/domain/ontology/schemas/page-entry.ts
+// packages/werkstatt-site/src/domain/ontology/schemas/system/manifest.ts
+// Added to SystemManifestSchema.pages[] entries:
 
-/** Deployment gating configuration for a page entry. */
+/** Deployment gating configuration for a system.md page pin. */
 export interface DeploymentGate {
   /** When false, the page is excluded from production builds. Default: true. */
   production: boolean;
 }
 
-// Extended PageEntrySchema includes optional deployment field:
+// Extended SystemManifestSchema.pages[] entry includes:
 // deployment: z.object({ production: z.boolean().default(true) }).optional()
+// This is a system.md page-level property, NOT a PageEntrySchema (content .md) field.
 ```
 
 ```ts
-// packages/werkstatt-site/src/domain/share/page.ts
+// packages/werkstatt-site/src/domain/share/astro/routes/registry.ts
 
 /** Set of pageIds excluded from production builds. Empty when all pages are deployed. */
 export type GatedPageIds = Set<string>;
 
-/** Reads system.md pages[] and returns pageIds where deployment.production === false. */
-export function collectGatedPageIds(pages: PageEntry[]): GatedPageIds;
+/**
+ * Reads system.md pages[] and returns pageIds where deployment.production === false.
+ * Used by getRouteRegistry() to skip gated pages during registry construction
+ * (same pattern as blogGated and entitlement-based filtering).
+ * Also used by deployment.gate.validate to check reference leaks.
+ */
+export function collectGatedPageIds(
+  pages: Array<{ pageId: string; deployment?: { production?: boolean } }>,
+): GatedPageIds;
 ```
 
 ```ts
 // packages/werkstatt-site/src/checks/deployment-gate.ts
 
 export interface DeploymentGateViolation {
-  rule: "GATE-01" | "GATE-02";
+  rule: "GATE-01" | "GATE-02" | "GATE-03";
   sourcePageId: string;
   gatedPageId: string;
-  referenceType: "navigation" | "block-cta" | "prose-link";
+  referenceType: "navigation" | "block-cta" | "breadcrumb-parent";
   message: string;
 }
 
@@ -167,8 +179,8 @@ export function runDeploymentGateValidate(
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/domain/ontology/schemas/page-entry.ts` | Extended with `deployment` field in `PageEntrySchema` |
-| `packages/werkstatt-site/src/domain/share/page.ts` | `collectGatedPageIds()` function added |
+| `packages/werkstatt-site/src/domain/ontology/schemas/system/manifest.ts` | Extended with `deployment` field in `SystemManifestSchema.pages[]` entries |
+| `packages/werkstatt-site/src/domain/share/astro/routes/registry.ts` | `collectGatedPageIds()` function added; `getRouteRegistry()` skips gated pages during construction |
 | `packages/werkstatt-site/src/checks/deployment-gate.ts` | New validator: `deployment.gate.validate` |
 | `packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts` | Register `deployment.gate.validate` in command table |
 | `packages/werkstatt-site/src/codegen/` | Sitemap, llms.txt generators skip gated pages in production |
@@ -207,6 +219,7 @@ When no violations are found:
 
 - `GATE-01` — Non-gated page references a gated page in navigation (`navigation.md` targets, `labels.md` `navIds`/`legalIds`/`transparencyIds`).
 - `GATE-02` — Non-gated page references a gated page in block props (e.g. `section-cta` with `kind: internal` targeting a gated `pageId`).
+- `GATE-03` — Non-gated page has `parentPageId` pointing to a gated page (breadcrumb hierarchy would break in production).
 
 ### Failure modes
 
@@ -214,6 +227,7 @@ When no violations are found:
 - **No gated pages** — the command passes trivially (no `deployment.production: false` entries in `system.md`). No overhead for sites that do not use gating.
 - **Missing `system.md`** — the command fails with a standard `KERNEL-CONTEXT-01` error (same as other site-level validators).
 - **Gated page references another gated page** — this is allowed. Gated pages can link to each other; they are all excluded from production together. Only non-gated → gated references are violations.
+- **GATE-03: parentPageId chain** — if a non-gated page has `parentPageId` pointing to a gated page, the breadcrumb hierarchy breaks in production. The validator flags this as a GATE-03 violation. The operator must either ungate the parent or change the `parentPageId` to a non-gated page.
 
 ## Rollout
 
@@ -221,7 +235,7 @@ When no violations are found:
 - **Existing apps** — no migration needed. Apps without `deployment.production: false` entries behave exactly as before. The validator passes trivially when no gated pages exist.
 - **New apps** — automatically compliant. The schema accepts the `deployment` field from day one, but it is not required.
 - **Pipeline integration** — `deployment.gate.validate` is registered in the `build.check` pipeline. It runs alongside `page.block.validate` and other content validators. No separate invocation needed.
-- **Build-time filtering** — `collectGatedPageIds()` is called during `build.prepare` and the resulting `Set<string>` is passed to route generation, navigation rendering, sitemap generation, and `llms.txt` generation. In `astro dev` mode (`import.meta.env.PROD === false`), the set is empty — all pages are visible.
+- **Build-time filtering** — `collectGatedPageIds()` is called inside `getRouteRegistry()` to skip gated pages during registry construction, following the same pattern as `blogGated` and entitlement-based filtering. Downstream consumers (sitemap, navigation, `llms.txt`) use the filtered registry — they do not receive the raw `Set<string>`. In dev mode (`process.env.NODE_ENV !== "production"`), the set is empty — all pages are visible. The `process.env.NODE_ENV` check is used instead of `import.meta.env.PROD` because `registry.ts` is a pure TypeScript module type-checked with `tsc --noEmit` outside Vite (per `packages/AGENTS.md`).
 - **Adoption for RFC-0802** — after this RFC is implemented, add `deployment.production: false` to the `reife` page entry in `system.md` (mission `warpgogol-com-m000049`). This gates the page from production while keeping it in the codebase.
 
 ## Alternatives considered
@@ -244,15 +258,17 @@ When no violations are found:
 
 4. **False positives in reference safety** — `deployment.gate.validate` may flag references that are intentional (e.g. a "coming soon" link). Mitigation: GATE-01 and GATE-02 are errors, not warnings. If an operator intentionally wants a non-gated page to link to a gated page, they must ungate the target page. There is no "intentional leak" escape hatch — it defeats the purpose of gating.
 
-5. **Build pipeline complexity** — adding `collectGatedPageIds()` to multiple build stages (route generation, navigation, sitemap, llms.txt) increases coupling. Mitigation: the function is a single utility in `page.ts` with one responsibility. All consumers receive the same `Set<string>`. No conditional logic is added to individual generators — they simply skip entries in the set.
+5. **Build pipeline complexity** — `collectGatedPageIds()` is called inside `getRouteRegistry()`, which is already the single source of route topology (DNA-16). Downstream consumers use the filtered registry. The `deployment.gate.validate` validator also calls `collectGatedPageIds()` to check reference leaks. No conditional logic is added to individual generators.
 
 ## Acceptance criteria
 
-- [ ] `deployment` field added to `PageEntrySchema` in `packages/werkstatt-site/src/domain/ontology/schemas/page-entry.ts` with `production: z.boolean().default(true)`
-- [ ] `collectGatedPageIds()` function added to `packages/werkstatt-site/src/domain/share/page.ts`
+- [ ] `deployment` field added to `SystemManifestSchema.pages[]` in `packages/werkstatt-site/src/domain/ontology/schemas/system/manifest.ts` with `production: z.boolean().default(true)`
+- [ ] `collectGatedPageIds()` function added to `packages/werkstatt-site/src/domain/share/astro/routes/registry.ts`
+- [ ] `getRouteRegistry()` skips gated pages during construction (same pattern as `blogGated`)
 - [ ] `deployment.gate.validate` command registered in `packages/werkstatt-site/src/checks/` and command table
 - [ ] GATE-01 rule detects non-gated pages referencing gated pages in navigation (`navigation.md`, `labels.md`)
 - [ ] GATE-02 rule detects non-gated pages referencing gated pages in block props (`section-cta` with `kind: internal`)
+- [ ] GATE-03 rule detects non-gated pages with `parentPageId` pointing to a gated page
 - [ ] Production build (`astro build`) excludes gated pages from static HTML output, sitemap, navigation, and `llms.txt`
 - [ ] Dev mode (`astro dev`) includes gated pages — all pages visible locally
 - [ ] `deployment.gate.validate` integrated into `build.check` pipeline
@@ -270,5 +286,5 @@ When no violations are found:
 - Agents MUST NOT automatically add `retiredRoutes` entries when gateing a page — gating and `retiredRoutes` are orthogonal concepts.
 - Agents MUST NOT gate individual blocks within a page — this RFC covers per-page gating only.
 - Agents MUST NOT add a "coming soon" link from a non-gated page to a gated page — GATE-01/GATE-02 are hard errors with no escape hatch.
-- Agents MUST ensure `collectGatedPageIds()` returns an empty set when `import.meta.env.PROD` is false (dev mode) — all pages are visible in dev.
+- Agents MUST ensure `collectGatedPageIds()` returns an empty set when `process.env.NODE_ENV !== "production"` (dev mode) — all pages are visible in dev. Do NOT use `import.meta.env.PROD` — `registry.ts` is type-checked with `tsc --noEmit` outside Vite, and `import.meta.env` is not typed in that context (per `packages/AGENTS.md`).
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0803 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
