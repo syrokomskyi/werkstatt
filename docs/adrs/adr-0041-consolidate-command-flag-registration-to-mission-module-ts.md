@@ -1,12 +1,12 @@
 ---
 id: ADR-0041
 title: "Consolidate command flag registration to mission.module.ts"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-11
 updatedAt: 2026-08-11
-implementedAt:
+implementedAt: 2026-08-11
 closedAt:
 supersedes: []
 supersededBy:
