@@ -259,7 +259,7 @@ entries:
     version: 1.0.0
     layoutHint: single-column
     acceptedCosmicNames:
-      - Prometheus
+      - Eris
     sourceFile: packages/werkstatt-site/src/domain/ontology/archetypes/sections/mountain-journey.yaml
     layer: section
   - id: nachweis-card
@@ -603,6 +603,7 @@ planetImportPaths:
   Phobos: "@warpgogol/werkstatt-site/ui/sections/hero-decision-card"
   Ganymede: "@warpgogol/werkstatt-site/ui/sections/impact"
   Hyperion: "@warpgogol/werkstatt-site/ui/sections/markdown"
+  Eris: "@warpgogol/werkstatt-site/ui/sections/mountain-journey"
   Phoebe: "@warpgogol/werkstatt-site/ui/sections/navigation"
   Telesto: "@warpgogol/werkstatt-site/ui/sections/notausgang-block"
   Orcus: "@warpgogol/werkstatt-site/ui/sections/open-source-registry"
@@ -678,7 +679,7 @@ blockTypeToCosmicName:
   hero-decision-card: Phobos
   impact: Ganymede
   markdown: Hyperion
-  mountain-journey: Prometheus
+  mountain-journey: Eris
   navigation: Phoebe
   notausgang-block: Telesto
   open-source-registry: Orcus
@@ -757,6 +758,7 @@ roleByCosmicName:
   Phobos: hero
   Ganymede: impact
   Hyperion: markdown
+  Eris: maturity-visualization
   Phoebe: navigation
   Telesto: exit-clause-disclosure
   Orcus: open-source-registry
