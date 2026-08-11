@@ -54,6 +54,73 @@ export async function initMountainJourneyAnimation(
     visual.style.transform = `scale(${CAMERA_INITIAL_ZOOM})`;
   }
 
+  let activeTl: { kill: () => void } | null = null;
+  let hasAnimated = false;
+
+  const input = form.querySelector<HTMLInputElement>('input[name="url"]');
+  if (input) {
+    input.addEventListener("input", () => {
+      if (!hasAnimated) return;
+      hasAnimated = false;
+      errorEl.hidden = true;
+
+      if (activeTl) {
+        activeTl.kill();
+        activeTl = null;
+      }
+
+      if (prefersReducedMotion) {
+        marker.setAttribute("cx", String(startPoint.x));
+        marker.setAttribute("cy", String(startPoint.y));
+        return;
+      }
+
+      void (async () => {
+        try {
+          const { gsap } = await import("gsap");
+
+          const currentCx = parseFloat(marker.getAttribute("cx") ?? String(startPoint.x));
+          const currentCy = parseFloat(marker.getAttribute("cy") ?? String(startPoint.y));
+          const pathLength = route.getTotalLength();
+          const currentLen = findNearestLength(route, currentCx, currentCy, pathLength);
+
+          const progress = { t: currentLen };
+          const targetLen = 0;
+
+          const tl = gsap.timeline();
+          activeTl = tl;
+          tl.to(
+            progress,
+            {
+              duration: ANIMATION_DURATION,
+              ease: "power2.inOut",
+              t: targetLen,
+              onUpdate: () => {
+                const pt = route.getPointAtLength(progress.t);
+                marker.setAttribute("cx", String(pt.x));
+                marker.setAttribute("cy", String(pt.y));
+              },
+            },
+            0,
+          );
+          tl.to(
+            visual,
+            {
+              duration: ANIMATION_DURATION,
+              ease: "power2.inOut",
+              scale: CAMERA_INITIAL_ZOOM,
+            },
+            0,
+          );
+        } catch (err) {
+          console.error("[mountain-journey] reset animation failed:", err);
+          marker.setAttribute("cx", String(startPoint.x));
+          marker.setAttribute("cy", String(startPoint.y));
+        }
+      })();
+    });
+  }
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -82,19 +149,30 @@ export async function initMountainJourneyAnimation(
 
     if (prefersReducedMotion) {
       placeMarkerAtScore(route, marker, score);
+      hasAnimated = true;
       return;
     }
 
     try {
       const { gsap } = await import("gsap");
 
+      if (activeTl) {
+        activeTl.kill();
+        activeTl = null;
+      }
+
       const pathLength = route.getTotalLength();
       const targetLength = (score / 100) * pathLength;
+      const sp = route.getPointAtLength(0);
+      marker.setAttribute("cx", String(sp.x));
+      marker.setAttribute("cy", String(sp.y));
+
       const progress = { t: 0 };
 
       gsap.set(visual, { scale: CAMERA_INITIAL_ZOOM });
 
       const tl = gsap.timeline();
+      activeTl = tl;
       tl.to(
         progress,
         {
@@ -119,9 +197,11 @@ export async function initMountainJourneyAnimation(
         },
         0,
       );
+      hasAnimated = true;
     } catch (err) {
       console.error("[mountain-journey] GSAP animation failed:", err);
       placeMarkerAtScore(route, marker, score);
+      hasAnimated = true;
     }
   });
 }
@@ -132,4 +212,25 @@ function placeMarkerAtScore(route: SVGPathElement, marker: SVGCircleElement, sco
   const point = route.getPointAtLength(targetLength);
   marker.setAttribute("cx", String(point.x));
   marker.setAttribute("cy", String(point.y));
+}
+
+function findNearestLength(
+  route: SVGPathElement,
+  cx: number,
+  cy: number,
+  pathLength: number,
+): number {
+  let bestLen = 0;
+  let bestDist = Infinity;
+  const samples = 100;
+  for (let i = 0; i <= samples; i++) {
+    const len = (i / samples) * pathLength;
+    const pt = route.getPointAtLength(len);
+    const dist = (pt.x - cx) ** 2 + (pt.y - cy) ** 2;
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestLen = len;
+    }
+  }
+  return bestLen;
 }
