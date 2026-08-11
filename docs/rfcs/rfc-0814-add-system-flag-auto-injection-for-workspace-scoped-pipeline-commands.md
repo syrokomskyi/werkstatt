@@ -1,12 +1,13 @@
 ---
 id: RFC-0814
 title: "Add --system flag auto-injection for workspace-scoped pipeline commands"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
