@@ -45,6 +45,7 @@ export default defineKernelConfig({
       (await import("@warpgogol/werkstatt/handoff")).createBordbuchModule(),
     nachweis: async () =>
       (await import("@warpgogol/werkstatt/handoff")).createNachweisModule(),
+    dns: async () => (await import("@warpgogol/werkstatt/dns-module")).createDnsModule(),
     onboarding: async () =>
       (await import("@warpgogol/werkstatt-site/onboarding")).createOnboardingModule(),
   },
