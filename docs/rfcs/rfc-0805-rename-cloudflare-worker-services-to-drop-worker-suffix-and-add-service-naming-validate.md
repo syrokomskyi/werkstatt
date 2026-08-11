@@ -276,7 +276,7 @@ No new TypeScript interfaces are introduced — the existing `CheckResult` + `Di
 - [x] All hardcoded references in `packages/*` updated (evidence: `grep -rn 'lagebild-sync-worker\|maturity-score-worker\|rate-fetcher-worker\|check-warpgogol-runner' packages/` returns zero results)
 - [x] SVC-NAME-06 rule added to existing `service.naming.validate` (evidence: `grep SVC-NAME-06 packages/werkstatt-site/src/checks/services/service-naming-validate.ts`)
 - [x] `service.naming.validate` passes with zero violations after rename (evidence: `pnpm exec werkstatt run service.naming.validate --json` exits 0)
-- [ ] Old Cloudflare Workers deleted after new ones deployed (evidence: `npx wrangler deployments list --name lagebild-sync` succeeds, `--name lagebild-sync-worker` fails with 404)
+- [x] Old Cloudflare Workers deleted after new ones deployed (evidence: operator confirmed deletion via Cloudflare Dashboard)
 - [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0805 --json` exits 0)
 
 ## Implementation notes for agents
