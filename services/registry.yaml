@@ -15,11 +15,12 @@ services:
       at: null
       state: null
       operationId: null
-    healthCheckPath: /_wg/analytics/health
     lastDevDeployed:
-      at: null
-      state: null
-      operationId: null
+      at: 2026-08-11T16:13:40.964Z
+      state: succeeded
+      operationId: op-msov0sxe-f11szuk8
+    healthCheckPath: /_wg/analytics/health
+    workersDevUrl: https://matomo-proxy-dev.syrokomskyi.workers.dev
   - id: rate-fetcher
     kind: scheduled-worker
     workerName: rate-fetcher
@@ -84,3 +85,4 @@ services:
       state: null
       operationId: null
     healthCheckPath: /health
+
