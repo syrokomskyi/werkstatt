@@ -7,11 +7,13 @@ import {
   parseEnvFile,
   flagString,
   flagBoolean,
+  runBuildCheck,
 } from "./service-deploy-helpers.ts";
 
 describe("extractWorkersDevUrl", () => {
   it("extracts workers.dev URL from wrangler output", () => {
-    const stdout = "Uploaded lagebild-sync-dev (1.2 sec)\n  https://lagebild-sync-dev.syrokomskyi.workers.dev\n";
+    const stdout =
+      "Uploaded lagebild-sync-dev (1.2 sec)\n  https://lagebild-sync-dev.syrokomskyi.workers.dev\n";
     expect(extractWorkersDevUrl(stdout)).toBe("https://lagebild-sync-dev.syrokomskyi.workers.dev");
   });
 
@@ -21,7 +23,9 @@ describe("extractWorkersDevUrl", () => {
 
   it("extracts URL with trailing path", () => {
     const stdout = "Deployed to https://rate-fetcher-dev.syrokomskyi.workers.dev/health";
-    expect(extractWorkersDevUrl(stdout)).toBe("https://rate-fetcher-dev.syrokomskyi.workers.dev/health");
+    expect(extractWorkersDevUrl(stdout)).toBe(
+      "https://rate-fetcher-dev.syrokomskyi.workers.dev/health",
+    );
   });
 });
 
@@ -45,7 +49,7 @@ describe("parseEnvFile", () => {
   it("strips quotes from values", async () => {
     tmpDir = mkdtempSync(join(tmpdir(), "tmp-env-quotes-"));
     const envPath = join(tmpDir, ".env");
-    writeFileSync(envPath, 'KEY1="double quoted"\nKEY2=\'single quoted\'\n');
+    writeFileSync(envPath, "KEY1=\"double quoted\"\nKEY2='single quoted'\n");
     const env = await parseEnvFile(envPath);
     expect(env).toEqual({ KEY1: "double quoted", KEY2: "single quoted" });
     rmSync(tmpDir, { recursive: true });
@@ -54,7 +58,9 @@ describe("parseEnvFile", () => {
 
 describe("flagString", () => {
   it("returns string value", () => {
-    expect(flagString({ flags: { service: "lagebild-sync" } } as never, "service")).toBe("lagebild-sync");
+    expect(flagString({ flags: { service: "lagebild-sync" } } as never, "service")).toBe(
+      "lagebild-sync",
+    );
   });
 
   it("returns undefined for missing flag", () => {
@@ -77,5 +83,36 @@ describe("flagBoolean", () => {
 
   it("returns false for missing flag", () => {
     expect(flagBoolean({ flags: {} } as never, "dev")).toBe(false);
+  });
+});
+
+describe("runBuildCheck", () => {
+  it("passes when build:check exits 0", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "tmp-buildcheck-pass-"));
+    writeFileSync(
+      join(tmpDir, "package.json"),
+      JSON.stringify({
+        name: "test-svc",
+        scripts: { "build:check": 'node -e "process.exit(0)"' },
+      }) + "\n",
+    );
+    const result = await runBuildCheck(tmpDir, { info: () => {} });
+    expect(result.passed).toBe(true);
+    expect(result.command).toBe("build:check");
+    rmSync(tmpDir, { recursive: true });
+  });
+
+  it("fails when build:check exits non-zero", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "tmp-buildcheck-fail-"));
+    writeFileSync(
+      join(tmpDir, "package.json"),
+      JSON.stringify({
+        name: "test-svc",
+        scripts: { "build:check": 'node -e "process.exit(1)"' },
+      }) + "\n",
+    );
+    const result = await runBuildCheck(tmpDir, { info: () => {} });
+    expect(result.passed).toBe(false);
+    rmSync(tmpDir, { recursive: true });
   });
 });

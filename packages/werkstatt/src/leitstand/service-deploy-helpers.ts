@@ -17,10 +17,7 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import type {
-  KernelCommandInput,
-  KernelRuntimeContext,
-} from "@warpgogol/werkstatt/kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import type { ServiceEntry } from "@warpgogol/werkstatt/schemas";
 import {
   readServicesRegistry,
@@ -87,15 +84,11 @@ export async function runWranglerDeploy(
   env: Record<string, string>,
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
   return new Promise((resolve) => {
-    const child = spawn(
-      "npx",
-      ["--yes", "wrangler", "deploy", "--config", configName],
-      {
-        cwd: serviceDir,
-        env: { ...process.env, ...env },
-        stdio: ["pipe", "pipe", "pipe"],
-      },
-    );
+    const child = spawn("npx", ["--yes", "wrangler", "deploy", "--config", configName], {
+      cwd: serviceDir,
+      env: { ...process.env, ...env },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (d) => {
@@ -180,6 +173,41 @@ export async function parseEnvFile(envPath: string): Promise<Record<string, stri
   return env;
 }
 
+export async function runBuildCheck(
+  serviceDir: string,
+  logger: { info: (msg: string) => void },
+): Promise<PreDeployGateResult> {
+  logger.info("[pre-deploy] running build:check (tsc --noEmit)…");
+  const result = await new Promise<{ exitCode: number; stdout: string; stderr: string }>(
+    (resolve) => {
+      const child = spawn("pnpm", ["run", "build:check"], {
+        cwd: serviceDir,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      let stdout = "";
+      let stderr = "";
+      child.stdout.on("data", (d) => {
+        stdout += d.toString();
+      });
+      child.stderr.on("data", (d) => {
+        stderr += d.toString();
+      });
+      child.on("error", () =>
+        resolve({ exitCode: 1, stdout, stderr: "Failed to spawn build:check" }),
+      );
+      child.on("exit", (code) => resolve({ exitCode: code ?? 1, stdout, stderr }));
+    },
+  );
+  return {
+    command: "build:check",
+    passed: result.exitCode === 0,
+    summary:
+      result.exitCode === 0
+        ? "tsc --noEmit: 0 errors"
+        : result.stderr.slice(-200) || result.stdout.slice(-200) || "failed",
+  };
+}
+
 export interface PreDeployGateConfig {
   commandName: string;
   argv: string[];
@@ -220,19 +248,10 @@ export async function acquireServiceLock(
   operationId: string,
   commandName: string,
 ): Promise<void> {
-  await acquireLock(
-    workspaceRoot,
-    `service:${serviceId}`,
-    operationId,
-    commandName,
-    "agent",
-  );
+  await acquireLock(workspaceRoot, `service:${serviceId}`, operationId, commandName, "agent");
 }
 
-export async function releaseServiceLock(
-  workspaceRoot: string,
-  serviceId: string,
-): Promise<void> {
+export async function releaseServiceLock(workspaceRoot: string, serviceId: string): Promise<void> {
   await releaseLock(workspaceRoot, `service:${serviceId}`);
 }
 

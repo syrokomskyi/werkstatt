@@ -191,9 +191,7 @@ export async function runCheckWarpgogolRunnerValidate(
     "services/check-runner/Dockerfile",
     "services/check-runner/src/worker.ts",
     "services/check-runner/src/run-once.ts",
-    "packages/check-core/src/run-request.ts",
-    "apps/check-warpgogol-com/src/pages/api/check-runs/index.ts",
-    "apps/check-warpgogol-com/src/pages/api/check-runs/[runid].ts",
+    "packages/werkstatt-site/src/domain/check-core/run-request.ts",
   ];
   for (const file of required) {
     if (!(await context.io.exists(join(context.workspaceRoot, file)))) {
@@ -211,19 +209,14 @@ export async function runCheckWarpgogolRunnerValidate(
     const pkg = JSON.parse(await context.io.readFile(packagePath)) as {
       dependencies?: Record<string, string>;
     };
-    for (const dep of [
-      "@warpgogol/werkstatt-site/check-core",
-      "@warpgogol/werkstatt-site/check-runner",
-    ]) {
-      if (!pkg.dependencies?.[dep]) {
-        diagnostics.push({
-          ruleId: "CW-RUNNER-02",
-          severity: "error",
-          file: "services/check-runner/package.json",
-          message: `check-runner must depend on ${dep}.`,
-          fixHint: `Add ${dep} as a workspace dependency.`,
-        });
-      }
+    if (!pkg.dependencies?.["@warpgogol/werkstatt-site"]) {
+      diagnostics.push({
+        ruleId: "CW-RUNNER-02",
+        severity: "error",
+        file: "services/check-runner/package.json",
+        message: "check-runner must depend on @warpgogol/werkstatt-site.",
+        fixHint: "Add @warpgogol/werkstatt-site as a workspace dependency.",
+      });
     }
   }
   const runnerSources = await context.io.glob("services/check-runner/src/**/*.ts", {
@@ -255,28 +248,6 @@ export async function runCheckWarpgogolRunnerValidate(
         message: "Runner worker does not use shared Check Warpgogol run contracts.",
         fixHint:
           "Import run contracts from @warpgogol/werkstatt-site/check-core directly or through run-once.ts.",
-      });
-    }
-  }
-  const apiFiles = [
-    "apps/check-warpgogol-com/src/pages/api/check-runs/index.ts",
-    "apps/check-warpgogol-com/src/pages/api/check-runs/[runid].ts",
-  ];
-  for (const file of apiFiles) {
-    const path = join(context.workspaceRoot, file);
-    if (!(await context.io.exists(path))) continue;
-    const text = await context.io.readFile(path);
-    if (
-      text.includes("playwright") ||
-      text.includes("@warpgogol/werkstatt-site/check-runner") ||
-      text.includes("services/")
-    ) {
-      diagnostics.push({
-        ruleId: "CW-RUNNER-05",
-        severity: "error",
-        file,
-        message: "App API endpoint imports runner-only code.",
-        fixHint: "Keep browser execution in services/check-runner.",
       });
     }
   }

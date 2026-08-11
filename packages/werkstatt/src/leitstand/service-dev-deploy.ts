@@ -26,6 +26,7 @@ import {
   runHealthCheck,
   parseEnvFile,
   runPreDeployGates,
+  runBuildCheck,
   acquireServiceLock,
   releaseServiceLock,
   recordDevDeployState,
@@ -72,14 +73,19 @@ export async function runLeitstandServiceDevDeploy(
   await acquireServiceLock(workspaceRoot, serviceId, operationId, "leitstand.service.dev-deploy");
 
   try {
-    // 1. Pre-deploy gates: service.naming.validate, service.registry.validate, deploy.preflight --dev
+    // 1. Pre-deploy gates: service.naming.validate, service.registry.validate, services.check.run, build:check, deploy.preflight --dev
     const gates = [
       { commandName: "service.naming.validate", argv: [] },
       { commandName: "service.registry.validate", argv: [] },
+      { commandName: "services.check.run", argv: [] },
       { commandName: "deploy.preflight", argv: ["--service", serviceId, "--dev"] },
     ];
 
     const gateResults = await runPreDeployGates(workspaceRoot, gates, logger);
+
+    // 1b. build:check gate (not a kernel command — runs pnpm script directly)
+    const buildCheckResult = await runBuildCheck(serviceDir, logger);
+    gateResults.push(buildCheckResult);
     const failedGate = gateResults.find((g) => !g.passed);
     if (failedGate) {
       const failedData: ServiceDevDeployData = {
