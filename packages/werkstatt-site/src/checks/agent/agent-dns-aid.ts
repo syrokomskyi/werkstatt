@@ -434,7 +434,7 @@ async function checkCloudflarePresence(
   if (!zoneId) return;
 
   try {
-    const url = `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=${encodeURIComponent(record.name)}&type=TXT`;
+    const url = `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=${encodeURIComponent(record.name)}&type=SVCB`;
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${apiToken}` },
     });

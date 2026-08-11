@@ -29,19 +29,21 @@ function makeManifest(baseUrl: string): AgentSurfaceManifest {
 }
 
 describe("buildDnsAidRecord (RFC-0786)", () => {
-  it("builds record with _agent.<domain> name", () => {
+  it("builds record with _index._agents.<domain> name", () => {
     const record = buildDnsAidRecord(makeManifest("https://warpgogol.com"));
-    expect(record.name).toBe("_agent.warpgogol.com");
+    expect(record.name).toBe("_index._agents.warpgogol.com");
   });
 
-  it("builds record with TXT type", () => {
+  it("builds record with SVCB type", () => {
     const record = buildDnsAidRecord(makeManifest("https://warpgogol.com"));
-    expect(record.type).toBe("TXT");
+    expect(record.type).toBe("SVCB");
   });
 
-  it("builds content URL pointing to .well-known/agent.json", () => {
+  it("builds SVCB content with alpn and endpoint params", () => {
     const record = buildDnsAidRecord(makeManifest("https://warpgogol.com"));
-    expect(record.content).toBe("https://warpgogol.com/.well-known/agent.json");
+    expect(record.content).toBe(
+      "1 . alpn=h2 endpoint=https://warpgogol.com/.well-known/agent.json",
+    );
   });
 
   it("sets ttl to 3600", () => {
@@ -63,12 +65,16 @@ describe("buildDnsAidRecord (RFC-0786)", () => {
 
   it("extracts domain from URL with port", () => {
     const record = buildDnsAidRecord(makeManifest("http://localhost:3000"));
-    expect(record.name).toBe("_agent.localhost");
-    expect(record.content).toBe("http://localhost:3000/.well-known/agent.json");
+    expect(record.name).toBe("_index._agents.localhost");
+    expect(record.content).toBe(
+      "1 . alpn=h2 endpoint=http://localhost:3000/.well-known/agent.json",
+    );
   });
 
   it("strips trailing slash from baseUrl", () => {
     const record = buildDnsAidRecord(makeManifest("https://warpgogol.com/"));
-    expect(record.content).toBe("https://warpgogol.com/.well-known/agent.json");
+    expect(record.content).toBe(
+      "1 . alpn=h2 endpoint=https://warpgogol.com/.well-known/agent.json",
+    );
   });
 });

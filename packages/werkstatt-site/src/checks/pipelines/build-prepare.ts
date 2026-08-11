@@ -71,14 +71,19 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   // RFC-0286: assemble the Agent Surface Manifest (knowledge/action refs + protocol
   // interfaces) after entitlements and the final page/route set are known.
   { command: "agent.manifest.generate" },
-  // RFC-0786: generate DNS-AID TXT record declaration from the manifest.
+  // RFC-0786: generate DNS-AID SVCB record declaration from the manifest.
   { command: "agent.dns-aid.generate" },
+  // RFC-0753: push DNS records to Cloudflare (requires CLOUDFLARE_API_TOKEN).
+  // dns.record.upsert is workspace-scoped; --site is auto-injected by the pipeline runner.
+  { command: "dns.record.upsert" },
   // RFC-0289: project the manifest into a static OpenAPI 3.1 document.
   { command: "agent.openapi.generate" },
   // RFC-0783: project the manifest into RFC 9727 API Catalog linkset+json.
   { command: "agent.api-catalog.generate" },
   // RFC-0783: project the manifest into SEP-1649 MCP Server Card.
   { command: "agent.mcp-card.generate" },
+  // Generate auth.md, agent-skills/index.json, oauth-protected-resource, oauth-authorization-server.
+  { command: "agent.discovery-endpoints.generate" },
   // RFC-0290: generate the thin Agent Gate route re-exports (needs the manifest's action ids).
   { command: "agent.routes.generate" },
   // RFC-0308: sign agent surface artifacts with detached Ed25519 proofs (no-op without PASSPORT_SIGNING_KEY).

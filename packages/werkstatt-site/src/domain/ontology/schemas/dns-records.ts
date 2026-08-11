@@ -18,7 +18,17 @@ that are synced to Cloudflare via the dns.record.* command family.
 
 import { z } from "zod";
 
-export const dnsRecordTypeSchema = z.enum(["A", "AAAA", "CNAME", "MX", "TXT", "SRV", "CAA"]);
+export const dnsRecordTypeSchema = z.enum([
+  "A",
+  "AAAA",
+  "CNAME",
+  "MX",
+  "TXT",
+  "SRV",
+  "CAA",
+  "SVCB",
+  "HTTPS",
+]);
 
 export const dnsRecordDeclarationSchema = z.object({
   name: z.string().min(1),

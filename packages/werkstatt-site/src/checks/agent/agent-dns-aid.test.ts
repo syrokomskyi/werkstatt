@@ -100,8 +100,10 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
       const content = await readFile(dnsPath, "utf8");
       expect(content).toContain("# BEGIN dns-aid");
       expect(content).toContain("# END dns-aid");
-      expect(content).toContain("_agent.test-site.example.com");
-      expect(content).toContain("https://test-site.example.com/.well-known/agent.json");
+      expect(content).toContain("_index._agents.test-site.example.com");
+      expect(content).toContain("type: SVCB");
+      expect(content).toContain("alpn=h2");
+      expect(content).toContain("endpoint=https://test-site.example.com/.well-known/agent.json");
       expect(content).toContain("ttl: 3600");
     } finally {
       await cleanup();
@@ -137,8 +139,8 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
       expect((result.data as Record<string, unknown>)?.action).toBe("updated");
       const dnsPath = resolveDnsPath(context);
       const content = await readFile(dnsPath, "utf8");
-      expect(content).toContain("_agent.new-domain.com");
-      expect(content).toContain("https://new-domain.com/.well-known/agent.json");
+      expect(content).toContain("_index._agents.new-domain.com");
+      expect(content).toContain("endpoint=https://new-domain.com/.well-known/agent.json");
     } finally {
       await cleanup();
     }
@@ -236,8 +238,8 @@ describe("agent.dns-aid.validate (RFC-0786)", () => {
       const dnsPath = resolveDnsPath(context);
       let content = await readFile(dnsPath, "utf8");
       content = content.replace(
-        "https://test-site.example.com/.well-known/agent.json",
-        "https://wrong-url.com/agent.json",
+        "endpoint=https://test-site.example.com/.well-known/agent.json",
+        "endpoint=https://wrong-url.com/agent.json",
       );
       await writeFile(dnsPath, content);
       const result = await runAgentDnsAidValidate(makeInput(), context);
