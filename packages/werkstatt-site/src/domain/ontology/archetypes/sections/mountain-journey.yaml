@@ -19,6 +19,7 @@ propsSchema:
     - section-header
   shape: |
     z.object({
+      workerEndpoint: z.string().min(1).optional(),
       backgroundImage: z.string().min(1),
       svgViewBox: z.object({
         width: z.number().positive(),
