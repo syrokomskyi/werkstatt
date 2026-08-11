@@ -430,11 +430,13 @@ export async function runMissionValidate(
   // The workpiece is discovered as a site workspace via tryResolveMissionWorkpiece
   // when the registry entry has currentMission set.
   logger.info(`  Running build.prepare pipeline for ${manifest.systemId}…`);
+  const collectErrors = input.flags["collect-errors"] === true;
   const prepareResult = await executeKernelPipeline({
     workspaceRoot,
     pipelineName: "build.prepare",
     siteName: manifest.systemId,
     outputFormat: "pretty",
+    ...(collectErrors ? { collectErrors: true } : {}),
   });
   const prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
   if (!prepareReport.ok) {
@@ -494,6 +496,7 @@ export async function runMissionValidate(
     siteName: manifest.systemId,
     outputFormat: "pretty",
     ...(Object.keys(pipelineFlags).length > 0 ? { flags: pipelineFlags } : {}),
+    ...(collectErrors ? { collectErrors: true } : {}),
   });
 
   const pipelineReport = Array.isArray(pipelineResult) ? pipelineResult[0] : pipelineResult;
@@ -582,6 +585,7 @@ export async function runMissionValidate(
           pipelineName: "build.post",
           siteName: manifest.systemId,
           outputFormat: "pretty",
+          ...(collectErrors ? { collectErrors: true } : {}),
         });
         postPipelineReport = Array.isArray(postResult) ? postResult[0] : postResult;
         if (!postPipelineReport.ok) {
@@ -621,6 +625,7 @@ export async function runMissionValidate(
             pipelineName: "build.post",
             siteName: manifest.systemId,
             outputFormat: "pretty",
+            ...(collectErrors ? { collectErrors: true } : {}),
           });
           const revalidateReport = Array.isArray(revalidateResult)
             ? revalidateResult[0]

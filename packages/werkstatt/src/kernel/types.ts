@@ -363,6 +363,11 @@ export interface KernelPipelineReport {
    * RFC-0326: deduplicated union of all step reports' filesModified arrays.
    */
   filesModified?: string[];
+  /**
+   * RFC-0809: command names of steps that failed (excluding dependency-skipped).
+   * Present only in collect-errors mode when failures occurred.
+   */
+  failedSteps?: string[];
 }
 
 export type PipelineStepStatus = "pass" | "warn" | "fail" | "skipped" | "timeout";
@@ -428,6 +433,8 @@ export interface ExecuteKernelPipelineOptions {
   concurrency?: number;
   /** RFC-0732: pipeline-level flags merged into each step's KernelCommandInput.flags. Step-level flags take precedence. */
   flags?: Record<string, unknown>;
+  /** RFC-0809: when true, continue executing independent steps after a failure and aggregate all errors in the final report. Default: false (fail-fast). No effect when concurrency=1 (scheduler uses full sequential abort-on-failure). */
+  collectErrors?: boolean;
 }
 
 export interface SiteWorkspacesListResult {
