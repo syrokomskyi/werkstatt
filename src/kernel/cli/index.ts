@@ -64,6 +64,7 @@ function consumeCommonFlags(argv: string[]) {
   let force = false;
   let noRegistryCache = false;
   let concurrency: number | undefined;
+  let collectErrors = false;
   let outputFormat: "pretty" | "json" = "pretty";
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -109,6 +110,15 @@ function consumeCommonFlags(argv: string[]) {
       continue;
     }
 
+    if (
+      entry === "--collect-errors" ||
+      entry === "--collect-errors=true" ||
+      entry === "--collect-errors=1"
+    ) {
+      collectErrors = true;
+      continue;
+    }
+
     if (entry === "--concurrency") {
       const value = argv[index + 1];
       const parsed = Number.parseInt(value ?? "", 10);
@@ -137,6 +147,7 @@ function consumeCommonFlags(argv: string[]) {
     force,
     noRegistryCache,
     concurrency,
+    collectErrors,
     outputFormat,
     remaining,
   };
@@ -148,7 +159,7 @@ function printUsage() {
     "werkstatt run <command> [--site <name>] [--all] [--dry-run] [--no-registry-cache] [--json] [-- ...args]",
   );
   console.log(
-    "werkstatt pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--no-registry-cache] [--concurrency N] [--json]",
+    "werkstatt pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--no-registry-cache] [--concurrency N] [--collect-errors] [--json]",
   );
 }
 
@@ -289,6 +300,7 @@ async function main() {
       dryRun,
       force,
       concurrency,
+      collectErrors,
       outputFormat,
       remaining: pipelineRemaining,
     } = consumeCommonFlags(rest);
@@ -308,6 +320,7 @@ async function main() {
       force,
       outputFormat,
       ...(concurrency !== undefined ? { concurrency } : {}),
+      ...(collectErrors ? { collectErrors: true } : {}),
     });
 
     if (outputFormat === "json") {

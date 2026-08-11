@@ -236,6 +236,11 @@ export function createMissionModule(): KernelModule {
             description:
               "RFC-0764: Auto-accept all content regression drift, update golden baseline directly.",
           },
+          "collect-errors": {
+            kind: "boolean",
+            description:
+              "RFC-0809: Continue executing independent steps after a failure and aggregate all errors in the final report.",
+          },
         },
         reads: ["missions/{mission}/**"],
         cacheable: false,

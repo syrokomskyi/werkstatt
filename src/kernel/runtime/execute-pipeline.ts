@@ -19,6 +19,7 @@ producing a KernelPipelineReport with a timing summary (slowest steps, timeout c
   <item>RFC-0687: add transitive cache skip for validator chains — shouldTransitiveSkip checks validatesOutputs against cacheHitCommands; cross-pipeline persistence via .cache/pipeline-cache-hits.json with 30-minute TTL.</item>
   <item>ADR-0022: workspace registry now uses process-lifetime cache via getOrBuildWorkspaceRegistry.</item>
   <item>ADR-0023: reuse CacheLayer SQLite connection across pipeline steps; batch telemetry writes to a single append at pipeline completion; close cache after pipeline run.</item>
+  <item>RFC-0809: add collect-errors mode — aggregate all independent step failures instead of stopping at first failure. Extract aggregateCollectErrors pure function for testability.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -65,9 +66,39 @@ import { executeRegisteredCommand } from "./execute-command.ts";
 import { assertKnownOptionKeys, summarizeLogs } from "./shared.ts";
 import { ensureTargetSites, loadAppRuntime } from "./registry.ts";
 import { getOrBuildWorkspaceRegistry } from "./registry-cache.ts";
-import { buildSchedule, executeScheduledSteps, type ScheduledStep } from "./pipeline-scheduler.ts";
+import {
+  buildSchedule,
+  executeScheduledSteps,
+  type ScheduledStep,
+  type StepExecutionResult,
+} from "./pipeline-scheduler.ts";
 
 const PIPELINE_TIMING_SUMMARY_THRESHOLD_MS = 30_000;
+
+/**
+ * RFC-0809: Pure function for collect-errors post-processing.
+ *
+ * When `collectErrors` is true and there are failed steps (excluding
+ * dependency-skipped ones), returns an object with `failedSteps` (command
+ * names), `exitCode` (from the first failure), and `ok: false`.
+ *
+ * When `collectErrors` is false, or when there are no failures, returns
+ * `undefined` — the caller falls through to existing fail-fast or success
+ * logic.
+ */
+export function aggregateCollectErrors(
+  sortedResults: StepExecutionResult[],
+  collectErrors: boolean,
+): { failedSteps: string[]; exitCode: number; ok: false } | undefined {
+  if (!collectErrors) return undefined;
+  const failedResults = sortedResults.filter((r) => !r.report.ok && !r.dependencySkipped);
+  if (failedResults.length === 0) return undefined;
+  return {
+    failedSteps: failedResults.map((r) => r.report.commandName),
+    exitCode: failedResults[0]!.report.exitCode,
+    ok: false,
+  };
+}
 
 // RFC-0732: convert pipeline-level flags record to CLI args for step execution.
 function pipelineFlagsToArgs(flags: Record<string, unknown> | undefined): string[] {
@@ -770,6 +801,28 @@ async function executePipelineForSite(
       printPipelineTimingSummary(logger, timing);
     }
 
+    // RFC-0809: collect-errors mode — aggregate all independent failures.
+    const collected = aggregateCollectErrors(sortedResults, options.collectErrors ?? false);
+    if (collected) {
+      for (const name of collected.failedSteps) {
+        const failedReport = reports.find((r) => r.commandName === name);
+        progressLine(`  [FAIL] ${name}: ${failedReport?.summary ?? "failed"}`);
+      }
+      progressLine(
+        `[${site.name}] pipeline ${options.pipelineName} — FAILED (${collected.failedSteps.length} step(s) failed, ${formatDuration(timing.totalDurationMs)})`,
+      );
+      return {
+        siteName: site.name,
+        pipelineName: options.pipelineName,
+        exitCode: collected.exitCode,
+        ok: false,
+        steps: reports,
+        timing,
+        filesModified: aggregateFilesModified(reports),
+        failedSteps: collected.failedSteps,
+      };
+    }
+
     if (failed) {
       progressLine(
         `[${site.name}] pipeline ${options.pipelineName} — FAILED at step ${failed.commandName} (${formatDuration(timing.totalDurationMs)})`,
@@ -990,6 +1043,27 @@ async function executePipelineForWorkspace(
       printPipelineTimingSummary(logger, timing);
     }
 
+    // RFC-0809: collect-errors mode — aggregate all independent failures.
+    const collected = aggregateCollectErrors(sortedResults, options.collectErrors ?? false);
+    if (collected) {
+      for (const name of collected.failedSteps) {
+        const failedReport = reports.find((r) => r.commandName === name);
+        progressLine(`  [FAIL] ${name}: ${failedReport?.summary ?? "failed"}`);
+      }
+      progressLine(
+        `[workspace] pipeline ${options.pipelineName} — FAILED (${collected.failedSteps.length} step(s) failed, ${formatDuration(timing.totalDurationMs)})`,
+      );
+      return {
+        pipelineName: options.pipelineName,
+        exitCode: collected.exitCode,
+        ok: false,
+        steps: reports,
+        timing,
+        filesModified: aggregateFilesModified(reports),
+        failedSteps: collected.failedSteps,
+      };
+    }
+
     if (failed) {
       progressLine(
         `[workspace] pipeline ${options.pipelineName} — FAILED at step ${failed.commandName} (${formatDuration(timing.totalDurationMs)})`,
@@ -1033,6 +1107,7 @@ const EXECUTE_KERNEL_PIPELINE_OPTION_KEYS = [
   "siteWorkspace",
   "concurrency",
   "flags",
+  "collectErrors",
 ];
 
 export async function executeKernelPipeline(
