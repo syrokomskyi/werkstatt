@@ -33,7 +33,7 @@ function parseEnvFile(raw: string): Record<string, string> {
 
 /** RFC-0186/RFC-0388: Resolve registry client from process.env or .env file. */
 export async function resolveRegistryClient(workspaceRoot: string): Promise<RegistryClient> {
-  const envPath = join(workspaceRoot, "services", "lagebild-sync-worker", ".env");
+  const envPath = join(workspaceRoot, "services", "lagebild-sync", ".env");
 
   let env: Record<string, string | undefined> = { ...process.env };
 
@@ -50,7 +50,7 @@ export async function resolveRegistryClient(workspaceRoot: string): Promise<Regi
 
   if (!url || !apiKey) {
     throw new Error(
-      `Lagebild registry credentials not found. Set LAGEBILD_REGISTRY_URL and LAGEBILD_REGISTRY_API_KEY in process.env or services/lagebild-sync-worker/.env`,
+      `Lagebild registry credentials not found. Set LAGEBILD_REGISTRY_URL and LAGEBILD_REGISTRY_API_KEY in process.env or services/lagebild-sync/.env`,
     );
   }
 
