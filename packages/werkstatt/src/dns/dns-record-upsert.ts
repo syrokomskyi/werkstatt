@@ -145,12 +145,27 @@ export async function runDnsRecordUpsert(
 function toApiRecord(declared: DnsRecordDeclaration): {
   type: string;
   name: string;
-  content: string;
+  content?: string;
+  data?: { priority: number; target: string; value: string };
   proxied?: boolean;
   priority?: number;
   ttl?: number;
   comment?: string;
 } {
+  if (declared.type === "SVCB" || declared.type === "HTTPS") {
+    const parts = declared.content.split(/\s+/);
+    const priority = parseInt(parts[0] ?? "0", 10);
+    const target = parts[1] ?? ".";
+    const value = parts.slice(2).join(" ");
+    return {
+      type: declared.type,
+      name: declared.name,
+      data: { priority, target, value },
+      proxied: declared.proxied ?? false,
+      ...(declared.ttl !== undefined ? { ttl: declared.ttl } : {}),
+      ...(declared.comment ? { comment: declared.comment } : {}),
+    };
+  }
   return {
     type: declared.type,
     name: declared.name,
