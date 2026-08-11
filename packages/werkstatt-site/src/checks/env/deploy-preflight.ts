@@ -112,6 +112,14 @@ export async function runDeployPreflight(
     };
   }
 
+  // RFC-0806: Services without env vars are exempt — if neither target nor example exists, skip.
+  if (!existsSync(targetPath) && !existsSync(examplePath)) {
+    return passResult(
+      "deploy.preflight",
+      `deploy.preflight: ${targetLabel} skipped (no ${exampleTarget} — service does not consume env vars)`,
+    );
+  }
+
   // Check 1: target file exists
   if (!existsSync(targetPath)) {
     diagnostics.push({
