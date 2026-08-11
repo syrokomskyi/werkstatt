@@ -16,6 +16,10 @@ services:
       state: null
       operationId: null
     healthCheckPath: /_wg/analytics/health
+    lastDevDeployed:
+      at: null
+      state: null
+      operationId: null
   - id: rate-fetcher
     kind: scheduled-worker
     workerName: rate-fetcher
@@ -27,6 +31,11 @@ services:
       at: null
       state: null
       operationId: null
+    lastDevDeployed:
+      at: null
+      state: null
+      operationId: null
+    healthCheckPath: /health
   - id: lagebild-sync
     kind: scheduled-worker
     workerName: lagebild-sync
@@ -38,6 +47,11 @@ services:
       at: null
       state: null
       operationId: null
+    lastDevDeployed:
+      at: null
+      state: null
+      operationId: null
+    healthCheckPath: /health
   - id: telegram-alert-bridge
     kind: proxy-worker
     workerName: telegram-alert-bridge
@@ -49,6 +63,11 @@ services:
       at: null
       state: null
       operationId: null
+    lastDevDeployed:
+      at: null
+      state: null
+      operationId: null
+    healthCheckPath: /health
   - id: maturity-score
     kind: cloudflare-worker
     workerName: maturity-score
@@ -60,3 +79,8 @@ services:
       at: null
       state: null
       operationId: null
+    lastDevDeployed:
+      at: null
+      state: null
+      operationId: null
+    healthCheckPath: /health

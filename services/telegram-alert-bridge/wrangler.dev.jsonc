@@ -1,0 +1,17 @@
+// RFC-0806: Dev Worker config for telegram-alert-bridge.
+// Deploys as telegram-alert-bridge-dev on <account>.workers.dev (no custom routes).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-alert-bridge-dev",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-01-01",
+  "observability": {
+    "logs": {
+      "enabled": true,
+    },
+    "traces": {
+      "enabled": true,
+      "destinations": ["signoz"],
+    },
+  },
+}

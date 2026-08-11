@@ -15,7 +15,14 @@
 import { proxyMatomoRequest } from "./proxy.ts";
 
 export default {
-  fetch(request: Request): Promise<Response> {
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    if (url.pathname === "/health" || url.pathname === "/_wg/analytics/health") {
+      return new Response(JSON.stringify({ status: "ok", service: "matomo-proxy" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
     return proxyMatomoRequest(request);
   },
 };

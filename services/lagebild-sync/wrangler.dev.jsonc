@@ -1,0 +1,15 @@
+// RFC-0806: Dev Worker config for lagebild-sync.
+// Deploys as lagebild-sync-dev on <account>.workers.dev (no custom routes).
+{
+  "name": "lagebild-sync-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0,
+  },
+}

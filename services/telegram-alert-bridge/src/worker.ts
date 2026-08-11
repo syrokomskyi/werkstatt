@@ -36,6 +36,14 @@ function formatMessage(payload: SignozWebhookPayload): string {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const healthUrl = new URL(request.url);
+    if (healthUrl.pathname === "/health") {
+      return new Response(JSON.stringify({ status: "ok", service: "telegram-alert-bridge" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
     if (request.method !== "POST") {
       return new Response("Method not allowed", { status: 405 });
     }

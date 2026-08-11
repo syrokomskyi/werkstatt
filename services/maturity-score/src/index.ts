@@ -77,6 +77,10 @@ export function createMaturityScoreWorker() {
         return new Response(null, { status: 204, headers: CORS_HEADERS });
       }
 
+      if (url.pathname === "/health") {
+        return json({ status: "ok", service: "maturity-score" }, 200);
+      }
+
       if (url.pathname !== "/score") {
         return json({ error: "not_found", message: "Endpoint not found" }, 404);
       }

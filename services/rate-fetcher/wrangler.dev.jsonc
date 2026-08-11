@@ -1,0 +1,15 @@
+// RFC-0806: Dev Worker config for rate-fetcher.
+// Deploys as rate-fetcher-dev on <account>.workers.dev (no custom routes).
+{
+  "name": "rate-fetcher-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0,
+  },
+}

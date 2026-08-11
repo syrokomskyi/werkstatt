@@ -232,4 +232,18 @@ export function createRateFetcherWorker() {
   };
 }
 
-export default createRateFetcherWorker();
+const worker = createRateFetcherWorker();
+
+export default {
+  scheduled: worker.scheduled.bind(worker),
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    if (url.pathname === "/health") {
+      return new Response(JSON.stringify({ status: "ok", service: "rate-fetcher" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    return new Response("Not found", { status: 404 });
+  },
+};

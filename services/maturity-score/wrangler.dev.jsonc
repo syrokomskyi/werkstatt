@@ -1,0 +1,12 @@
+// RFC-0806: Dev Worker config for maturity-score.
+// Deploys as maturity-score-dev on <account>.workers.dev (no custom routes).
+{
+  "name": "maturity-score-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0,
+  },
+}
