@@ -24,7 +24,12 @@ export type {
   LocalizedRouteEntry,
   RouteRegistry,
 } from "./routes/registry.ts";
-export { getRouteRegistry, clearRouteRegistryCache } from "./routes/registry.ts";
+export {
+  getRouteRegistry,
+  clearRouteRegistryCache,
+  collectGatedPageIds,
+} from "./routes/registry.ts";
+export type { GatedPageIds } from "./routes/registry.ts";
 
 export type { RootCanonical } from "./routes/resolve.ts";
 export {

@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0303 Phase 3: extracted from routes.ts as part of the domain split.</item>
   <item>RFC-0708: fold Nachweis detail and verify routes behind the nachweis entitlement gate.</item>
+  <item>RFC-0803: add collectGatedPageIds() and skip gated pages in getRouteRegistry() during production builds.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -101,6 +102,30 @@ function isSitemapExcluded(
   return false;
 }
 
+/** RFC-0803: Set of pageIds excluded from production builds. */
+export type GatedPageIds = Set<string>;
+
+/**
+ * RFC-0803: Reads system.md pages[] and returns pageIds where deployment.production === false.
+ * Returns an empty set when process.env.NODE_ENV is not "production" (dev mode) —
+ * all pages are visible in dev. Uses process.env.NODE_ENV (not import.meta.env.PROD)
+ * because this module is type-checked with tsc --noEmit outside Vite.
+ */
+export function collectGatedPageIds(
+  pages: Array<{ pageId?: string; deployment?: { production?: boolean } }>,
+): GatedPageIds {
+  if (process.env.NODE_ENV !== "production") {
+    return new Set();
+  }
+  const gated = new Set<string>();
+  for (const page of pages) {
+    if (page.pageId && page.deployment?.production === false) {
+      gated.add(page.pageId);
+    }
+  }
+  return gated;
+}
+
 /**
  * Load route registry from system.md content collection.
  * Caches result for subsequent calls during the same build.
@@ -126,16 +151,13 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
         pageId?: string;
         routes?: Record<string, string>;
         anchors?: Record<string, Record<string, string>>;
-        // RFC-0143: sitemap inclusion is declared via output.sitemap
         output?: { sitemap?: boolean | { include?: boolean } };
         cosmicStar?: string;
         semanticType?: string;
-        // RFC-0097: explicit locale opt-in
         locales?: string[];
-        // RFC-0229: parent pageId for the breadcrumb hierarchy
         parentPageId?: string;
-        // Standalone page: rendered by a dedicated .astro file
         standalone?: boolean;
+        deployment?: { production?: boolean };
       }>;
       i18n?: { default?: string; supported?: Record<string, unknown> };
     }
@@ -157,6 +179,9 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
     const entitledFeatures = await readEntitledFeatures();
     const blogGated = entitledFeatures !== null && !entitledFeatures.includes("blog");
 
+    // RFC-0803: collect gated pageIds (empty in dev mode — all pages visible)
+    const gatedPageIds = collectGatedPageIds(pages);
+
     for (const page of pages) {
       if (!page.pageId || !page.routes) {
         console.warn(`[routes] Skipping page without pageId or routes: ${JSON.stringify(page)}`);
@@ -164,6 +189,11 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
       }
 
       if (blogGated && page.semanticType === "article") {
+        continue;
+      }
+
+      // RFC-0803: skip gated pages in production builds
+      if (gatedPageIds.has(page.pageId)) {
         continue;
       }
 
