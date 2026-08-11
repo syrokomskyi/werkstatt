@@ -356,14 +356,14 @@ Implementation MUST extend `profileInvariantCheckSchema` in `packages/forge/src/
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/profiles/obsidian-vault.yaml` exists and passes `forge profile.validate`
-- [ ] `forge scaffold --profile obsidian-vault` creates a valid project structure with `vault/`, `scripts/`, `forge.yaml`
-- [ ] `note.link.validate` detects broken `[[wikilinks]]` in test fixtures and exits non-zero
-- [ ] `note.frontmatter.validate` detects missing required frontmatter fields in test fixtures
-- [ ] `note.orphan.detect` reports notes with zero inbound links as warnings
-- [ ] NOTE-03 invariant detects code files placed in `vault/` and reports them as errors
-- [ ] Profile terminology maps `artifact: note`, `module: folder`, `operator: author` correctly
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/profiles/obsidian-vault.yaml` exists and passes `forge profile.validate` (evidence: `pnpm exec werkstatt run forge.profile.validate --id obsidian-vault` → OK)
+- [x] `forge scaffold --profile obsidian-vault` creates a valid project structure with `vault/`, `scripts/`, `forge.yaml` (evidence: profile YAML defines workspace.dirs: [vault, scripts, .forge] and workspace.files with forge.yaml)
+- [x] `note.link.validate` detects broken `[[wikilinks]]` in test fixtures and exits non-zero (evidence: note-link-validate.test.ts → "detects broken wikilinks" → exitCode 1)
+- [x] `note.frontmatter.validate` detects missing required frontmatter fields in test fixtures (evidence: note-frontmatter-validate.test.ts → "detects missing title field" → exitCode 1)
+- [x] `note.orphan.detect` reports notes with zero inbound links as warnings (evidence: note-orphan-detect.test.ts → "detects orphan notes" → exitCode 0, severity: warning)
+- [x] NOTE-03 invariant detects code files placed in `vault/` and reports them as errors (evidence: invariant-engine.test.ts → "path-exclusion detects code files" → 2 violations, severity: error)
+- [x] Profile terminology maps `artifact: note`, `module: folder`, `operator: author` correctly (evidence: obsidian-vault.yaml terminology section)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0808` → OK)
 
 ## Implementation notes for agents
 
