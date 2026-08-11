@@ -340,6 +340,11 @@ const props = cast<${sectionPascal}SectionContent>(pageOverride);
     id="${slug}-title"
   />
   {/* TODO: bespoke composite layout for ${slug} — implement section-specific content here. */}
+  {/* If this section uses image props (backgroundImage, imageName, portraitImage, etc.),
+       resolve them through resolveImage + contentAssetImages — never use the raw prop as a URL:
+     import { resolveImage } from "@warpgogol/werkstatt-site/share";
+     import { contentAssetImages } from "../../content-assets.ts";
+     const bgImage = resolveImage(contentAssetImages, props.backgroundImage, { lang }); */}
 </SectionShell>
 `;
   }

@@ -206,4 +206,20 @@ describe("generated.stale.validate (RFC-0600)", () => {
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it("green: static asset in public/assets/ is not flagged", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-stale-assets-"));
+    try {
+      const appDir = await createAppDir(root);
+      await mkdir(join(appDir, "public", "assets"), { recursive: true });
+      await writeFile(join(appDir, "public", "assets", "mountain-journey.webp"), "webp", "utf8");
+
+      const result = await runGeneratedStaleValidate(input, ctx(root));
+      expect(result.exitCode).toBe(0);
+      const staleDiags = result.data?.diagnostics.filter((d) => d.ruleId === "STALE-01") ?? [];
+      expect(staleDiags.length).toBe(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
 });

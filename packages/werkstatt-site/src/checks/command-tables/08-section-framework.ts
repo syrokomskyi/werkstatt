@@ -22,6 +22,7 @@ import {
   runSiteBackgroundContractValidate,
   runLayoutOrchestratorLint,
 } from "../section-framework.ts";
+import { runSectionImagePropsValidate } from "../section-image-props.ts";
 import {
   runSectionShellColorTokenLint,
   runSectionShellTokenContractValidate,
@@ -74,7 +75,10 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml", "packages/werkstatt-site/src/domain/ontology/src/**/*.ts"],
+    reads: [
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml",
+      "packages/werkstatt-site/src/domain/ontology/src/**/*.ts",
+    ],
     execute: runSectionBodyContractValidate,
   },
   {
@@ -94,8 +98,21 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro", "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml"],
+    reads: [
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.astro",
+      "packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml",
+    ],
     execute: runSectionImageContractValidate,
+  },
+  {
+    name: "section.image-props.validate",
+    description:
+      "Detect section .astro components that use image props (backgroundImage, imageName, portraitImage, etc.) as raw URLs instead of resolving them through resolveImage + contentAssetImages.",
+    scope: "workspace",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro"],
+    execute: runSectionImagePropsValidate,
   },
   /* RFC-0598: colocated CSS import integrity */
   {
