@@ -4,7 +4,7 @@ date: 2026-08-11
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: 1e5d435f...HEAD
 filesReviewed:
   - packages/forge/os/mission/handlers/archive.ts
@@ -13,9 +13,9 @@ filesReviewed:
 
 # Code Review: 1e5d435f...HEAD (RFC-0804 implementation)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The implementation is clean, minimal, and follows existing patterns (`mission-materialize.ts` uses the same `execSync("pnpm install")` pattern). One finding: the catch block is too broad and the error message is misleading.
+The implementation is clean, minimal, and follows existing patterns (`mission-materialize.ts` uses the same `execSync("pnpm install")` pattern). The one finding from the initial review (misleading error message) has been fixed — the catch block error message was generalized from "pnpm install failed" to "Lockfile refresh failed".
 
 ### Mechanical floor
 
@@ -43,7 +43,7 @@ No issues. Compass scaffolding updated. Variable names are clear. Logging uses `
 
 ### Axis F — Pragmatism
 
-- **Misleading error message** (`archive.ts:423-426`): The catch block wraps the entire lockfile refresh (pnpm install + git status + git add + git commit), but the warning message says "pnpm install failed after archive — lockfile may be stale." If `git commit` fails (e.g., pre-commit hook rejection, git lock), the warning incorrectly attributes the failure to `pnpm install`. The catch block should either (a) be split into separate try/catch blocks for `pnpm install` vs git operations, or (b) use a more generic error message that doesn't assume which step failed.
+No issues. The initial finding (misleading error message in catch block) has been fixed — the error message was generalized from "pnpm install failed" to "Lockfile refresh failed" to correctly cover all failure modes (pnpm install, git add, git commit).
 
 ### Axis G — Blind spots
 
@@ -51,17 +51,17 @@ No issues. Performance, concurrent execution, and side effects are documented in
 
 ### Spec compliance
 
-| Requirement from RFC-0804 | Status | Evidence |
-| --- | --- | --- |
-| Run pnpm install after moves | Done | archive.ts:394-400 |
-| Non-fatal on pnpm install failure | Done | archive.ts:423-427 |
-| Commit lockfile + moved dirs if dirty | Done | archive.ts:406-422 |
-| Dry-run skips refresh | Done | archive.ts:394 |
-| No-moves skips refresh | Done | archive.ts:394 |
-| Unit tests for all paths | Done | archive.test.ts:319-390 (5 tests) |
-| MODULE_CONTRACT updated | Done | archive.ts:12 |
-| CHANGE_SUMMARY updated | Done | archive.ts:20 |
+| Requirement from RFC-0804             | Status | Evidence                          |
+| ------------------------------------- | ------ | --------------------------------- |
+| Run pnpm install after moves          | Done   | archive.ts:394-400                |
+| Non-fatal on pnpm install failure     | Done   | archive.ts:423-427                |
+| Commit lockfile + moved dirs if dirty | Done   | archive.ts:406-422                |
+| Dry-run skips refresh                 | Done   | archive.ts:394                    |
+| No-moves skips refresh                | Done   | archive.ts:394                    |
+| Unit tests for all paths              | Done   | archive.test.ts:319-390 (5 tests) |
+| MODULE_CONTRACT updated               | Done   | archive.ts:12                     |
+| CHANGE_SUMMARY updated                | Done   | archive.ts:20                     |
 
 ### Questions for the author
 
-1. Should the catch block be split to distinguish `pnpm install` failures from `git commit` failures, or should the error message be generalized to "Lockfile refresh failed after archive"?
+None — the single finding has been resolved.
