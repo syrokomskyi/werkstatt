@@ -12,6 +12,7 @@ rendered HTML resolves to an emitted twin.</purpose>
   <item>RFC-0166: initial implementation.</item>
   <item>RFC-0377: emit MarkdownTwinSemanticMeta in generated twin frontmatter.</item>
   <item>RFC-0602: replace volatile buildDate with null for person-slug markdown twins.</item>
+  <item>RFC-0811: switch from blacklist to whitelist scanning via isFileOwnedByCommand.</item>
 </CHANGE_SUMMARY>
 */
 

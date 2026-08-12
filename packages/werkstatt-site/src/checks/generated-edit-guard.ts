@@ -14,6 +14,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0336: initial implementation.</item>
   <item>RFC-0375: extend to Category B (registry-only) files; add binary regeneration exemption.</item>
+  <item>RFC-0811: import pattern-matching utilities from ownership-pattern-match.ts.</item>
 </CHANGE_SUMMARY>
 */
 

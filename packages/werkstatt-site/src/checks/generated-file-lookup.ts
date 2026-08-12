@@ -13,6 +13,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0375: initial implementation.</item>
+  <item>RFC-0811: extract pattern-matching utilities to ownership-pattern-match.ts.</item>
 </CHANGE_SUMMARY>
 */
 import type {

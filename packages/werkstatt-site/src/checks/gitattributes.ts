@@ -15,6 +15,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0336: initial implementation.</item>
+  <item>RFC-0811: import shared pattern-matching utilities from ownership-pattern-match.ts.</item>
 </CHANGE_SUMMARY>
 */
 
