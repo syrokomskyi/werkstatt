@@ -161,6 +161,18 @@ notes: ""
   mkdirSync(join(missionDir, "workpiece"), { recursive: true });
   mkdirSync(join(missionDir, "evidence"), { recursive: true });
 
+  // RFC-0820: Create workpiece git repo with materialize + operator commit
+  gitInit(join(missionDir, "workpiece"));
+  mkdirSync(join(missionDir, "workpiece", "src"), { recursive: true });
+  writeFileSync(join(missionDir, "workpiece", "src", "test.md"), "# test\n");
+  execSync("git add -A", { cwd: join(missionDir, "workpiece"), stdio: "pipe" });
+  execSync('git commit -m "materialize from pin 1.0.0"', {
+    cwd: join(missionDir, "workpiece"),
+    stdio: "pipe",
+  });
+  writeFileSync(join(missionDir, "workpiece", "src", "test.md"), "# changed\n");
+  gitCommit(join(missionDir, "workpiece"), "operator: test changes");
+
   const manifest = {
     schemaVersion: "1.0.0",
     missionId: "test-system-m000001",
@@ -211,7 +223,7 @@ test("mission.close fails when sternsystem.pin fails", async () => {
 
   // Override the mock to return failure for sternsystem.pin
   const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
-  vi.mocked(executeKernelCommand).mockImplementationOnce(async (args: { commandName: string }) => {
+  vi.mocked(executeKernelCommand).mockImplementation(async (args: { commandName: string }) => {
     if (args.commandName === "sternsystem.pin") {
       return { exitCode: 1, data: {}, summary: "pin failed: cache clone missing" } as never;
     }

@@ -149,6 +149,18 @@ notes: ""
   mkdirSync(join(missionDir, "workpiece"), { recursive: true });
   mkdirSync(join(missionDir, "evidence"), { recursive: true });
 
+  // RFC-0820: Create workpiece git repo with materialize + operator commit
+  gitInit(join(missionDir, "workpiece"));
+  mkdirSync(join(missionDir, "workpiece", "src"), { recursive: true });
+  writeFileSync(join(missionDir, "workpiece", "src", "test.md"), "# test\n");
+  execSync("git add -A", { cwd: join(missionDir, "workpiece"), stdio: "pipe" });
+  execSync('git commit -m "materialize from pin 1.0.0"', {
+    cwd: join(missionDir, "workpiece"),
+    stdio: "pipe",
+  });
+  writeFileSync(join(missionDir, "workpiece", "src", "test.md"), "# changed\n");
+  gitCommit(join(missionDir, "workpiece"), "operator: test changes");
+
   const manifest = {
     schemaVersion: "1.0.0",
     missionId: "test-system-m000001",

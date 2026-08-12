@@ -371,7 +371,10 @@ lastRelease: null
   const workpieceDir = join(missionDir, "workpiece");
   gitInit(workpieceDir);
   writeFileSync(join(workpieceDir, "README.md"), "# workpiece\n");
-  gitCommit(workpieceDir, "workpiece initial");
+  gitCommit(workpieceDir, "materialize from pin 1.0.0");
+  // RFC-0820: operator commit to pass zero-commit guard
+  writeFileSync(join(workpieceDir, "README.md"), "# workpiece changed\n");
+  gitCommit(workpieceDir, "operator: test changes");
 
   gitCommit(tmpWorkspace, "add mission");
 }
