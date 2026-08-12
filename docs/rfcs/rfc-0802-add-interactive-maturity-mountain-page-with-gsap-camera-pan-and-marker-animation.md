@@ -297,7 +297,7 @@ Not applicable — this RFC introduces no new CLI command. The section renders H
 - [x] No-JS fallback: full static SVG scene server-rendered with `<noscript>` message (evidence: mountain-journey-section.astro `<noscript>` block)
 - [x] `pnpm --filter warpgogol-com exec astro check` passes (0 errors, 0 warnings, 0 hints) (evidence: astro check output 2026-08-11)
 - [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0802 --json output, 0 violations)
-- [ ] Page excluded from production deployment via deployment gating system (pending: RFC for deployment gating not yet created)
+- [x] Page excluded from production deployment via deployment gating system (evidence: system.md `reife` page has `deployment: production: false`, RFC-0803 deployment gating implemented and archived, deployment.gate.validate command registered)
 
 ## Implementation notes for agents
 
