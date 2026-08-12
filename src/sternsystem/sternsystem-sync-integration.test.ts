@@ -11,6 +11,7 @@
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { execSync } from "node:child_process";
 import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stringify as stringifyYaml } from "yaml";
@@ -252,4 +253,99 @@ test("sync with single mirror (cache only) throws — no bare mirror", async () 
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/no bare mirror configured/);
+});
+
+// RFC-0818: external mirror HEAD must match refs/mirror after sync
+test("sync pushes bordbuch commit to external mirror — external HEAD matches refs/mirror", async () => {
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+    { path: externalDir, storageType: "bare" },
+  ]);
+
+  await writeFile(join(cacheDir, "src/content/system.md"), "# Bordbuch push test\n");
+  git(cacheDir, "add -A");
+  git(cacheDir, 'commit -m "bordbuch-push-test"');
+
+  const result = await runSternsystemSync(
+    makeInput({ id: "test-site", direction: "push" }),
+    makeContext(workspaceRoot),
+  );
+
+  expect(result.exitCode).toBe(0);
+
+  const bareHead = git(bareDir, "rev-parse main");
+  const mirrorRef = git(bareDir, "rev-parse refs/mirror/main");
+  const externalHead = git(externalDir, "rev-parse main");
+
+  expect(mirrorRef).toBe(bareHead);
+  expect(externalHead).toBe(bareHead);
+
+  const externalLog = git(externalDir, "log --oneline");
+  expect(externalLog).toContain("Bordbuch: mirror-sync test-site");
+});
+
+// RFC-0818: bundle mirror must include bordbuch commit
+test("sync creates bundle including bordbuch commit", async () => {
+  const bundleDestDir = join(testRoot, "bundle-dest");
+  await mkdir(bundleDestDir, { recursive: true });
+
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+    { path: join(bundleDestDir, "test.bundle"), storageType: "bundle" },
+  ]);
+
+  await writeFile(join(cacheDir, "src/content/system.md"), "# Bundle bordbuch test\n");
+  git(cacheDir, "add -A");
+  git(cacheDir, 'commit -m "bundle-bordbuch-test"');
+
+  const result = await runSternsystemSync(
+    makeInput({ id: "test-site", direction: "push" }),
+    makeContext(workspaceRoot),
+  );
+
+  expect(result.exitCode).toBe(0);
+
+  const bundlePath = join(bundleDestDir, "test.bundle");
+  expect(existsSync(bundlePath)).toBe(true);
+
+  const cloneDir = join(testRoot, "bundle-clone");
+  git(testRoot, `clone "${bundlePath}" "${cloneDir}"`);
+  const cloneLog = git(cloneDir, "log --oneline");
+  expect(cloneLog).toContain("Bordbuch: mirror-sync test-site");
+});
+
+// RFC-0818: regression test — residual false positive on external push failure
+test("sync with failing external mirror — refs/mirror tracks bare HEAD despite push failure", async () => {
+  const nonExistentMirror = join(testRoot, "nonexistent.git");
+
+  await setupSystemConfig([
+    { path: cacheDir, storageType: "non-bare" },
+    { path: bareDir, storageType: "bare" },
+    { path: externalDir, storageType: "bare" },
+    { path: nonExistentMirror, storageType: "bare" },
+  ]);
+
+  await writeFile(join(cacheDir, "src/content/system.md"), "# Push failure test\n");
+  git(cacheDir, "add -A");
+  git(cacheDir, 'commit -m "push-failure-test"');
+
+  const result = await runSternsystemSync(
+    makeInput({ id: "test-site", direction: "push" }),
+    makeContext(workspaceRoot),
+  );
+
+  expect(result.exitCode).toBe(0);
+
+  const bareHead = git(bareDir, "rev-parse main");
+  const mirrorRef = git(bareDir, "rev-parse refs/mirror/main");
+  const workingExternalHead = git(externalDir, "rev-parse main");
+
+  // refs/mirror matches bare HEAD (includes bordbuch commit)
+  expect(mirrorRef).toBe(bareHead);
+  // The working external mirror also received the bordbuch commit
+  expect(workingExternalHead).toBe(bareHead);
+  // Known residual: the failed external mirror (nonExistentMirror) has N,
+  // but refs/mirror = N+1 — false positive only on push failure, not on every sync.
 });
