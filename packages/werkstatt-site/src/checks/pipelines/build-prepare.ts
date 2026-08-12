@@ -21,6 +21,7 @@
   <item>RFC-0741: added rate-snapshot.resolve, currency-pricing.compile, derived-prices.materialize after entitlements.resolve in both pipelines.</item>
   <item>RFC-0786: added agent.dns-aid.generate after agent.manifest.generate in SITES_BUILD_PREPARE_PIPELINE only.</item>
   <item>RFC-0787: removed agent.api-catalog.generate and agent.mcp-card.generate from SITES_BUILD_PREPARE_DEV_PIPELINE (public/ producers not needed for dev).</item>
+  <item>RFC-0810: added ownership.generator.cross-check before ownership.sync.validate in both pipelines.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -155,6 +156,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "passport.key.ensure" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
   { command: "generated.files.validate" },
+  // RFC-0810: cross-check app-scoped .generate commands have ownership entries
+  { command: "ownership.generator.cross-check" },
   // RFC-0612: detect registry drift between GENERATOR_OWNERSHIP_MAP and files on disk
   { command: "ownership.sync.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
@@ -227,6 +230,8 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   // without it the video section renders nothing in dev. Warm cache makes this ~300ms.
   { command: "video.variants.generate", expectedDurationMs: 180_000, timeoutMs: 1_200_000 },
   { command: "generated.files.validate" },
+  // RFC-0810: cross-check app-scoped .generate commands have ownership entries
+  { command: "ownership.generator.cross-check" },
   // RFC-0612: detect registry drift between GENERATOR_OWNERSHIP_MAP and files on disk
   { command: "ownership.sync.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
