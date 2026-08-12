@@ -248,14 +248,14 @@ The glob pattern for env files is `.env*` with the following exclusions:
 
 ## Acceptance criteria
 
-- [ ] `persistEnvFilesToCacheClone` and `restoreEnvFilesFromCacheClone` implemented in `packages/werkstatt/src/mission/env-persist.ts`
-- [ ] `mission.close` calls `persistEnvFilesToCacheClone` in the final artifact-copy block (alongside `.cache/` copy, lines 687–846) and logs copied file count
-- [ ] `mission.materialize` calls `restoreEnvFilesFromCacheClone` after `atomicMoveDir`, replacing the old-workpiece preservation code (line 1154–1196)
-- [ ] `mission.materialize` logs a warning when no `.env*` files are found in cache clone
-- [ ] `sternsystem.validate` emits `ENV-PERSIST-01` warning when cache clone lacks `.env` but workpiece has one
-- [ ] Unit tests cover: copy, restore, missing files, glob exclusion of `.env.example`
-- [ ] `AGENTS.md` updated with env-persistence policy in the mission lifecycle section
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `persistEnvFilesToCacheClone` and `restoreEnvFilesFromCacheClone` implemented in `packages/werkstatt/src/mission/env-persist.ts` (evidence: packages/werkstatt/src/mission/env-persist.ts:62-118)
+- [x] `mission.close` calls `persistEnvFilesToCacheClone` in the final artifact-copy block (alongside `.cache/` copy, lines 687–846) and logs copied file count (evidence: packages/werkstatt/src/mission/mission-close.ts:727-747)
+- [x] `mission.materialize` calls `restoreEnvFilesFromCacheClone` after `atomicMoveDir`, replacing the old-workpiece preservation code (line 1154–1196) (evidence: packages/werkstatt/src/mission/mission-materialize.ts:1155-1184)
+- [x] `mission.materialize` logs a warning when no `.env*` files are found in cache clone (evidence: packages/werkstatt/src/mission/mission-materialize.ts:1169-1171)
+- [x] `sternsystem.validate` emits `ENV-PERSIST-01` warning when cache clone lacks `.env` but workpiece has one (evidence: packages/werkstatt/src/sternsystem/sternsystem-validate.ts:440-461)
+- [x] Unit tests cover: copy, restore, missing files, glob exclusion of `.env.example` (evidence: packages/werkstatt/src/tests/env-persist.test.ts, 10 tests pass)
+- [x] `AGENTS.md` updated with env-persistence policy in the mission lifecycle section (evidence: AGENTS.md:25-31)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0822 --json → 0 violations)
 
 ## Implementation notes for agents
 
