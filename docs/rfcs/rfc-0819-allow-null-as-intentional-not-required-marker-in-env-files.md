@@ -1,7 +1,7 @@
 ---
 id: RFC-0819
 title: "Allow null as intentional not-required marker in env files"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
-implementedAt:
+implementedAt: 2026-08-12
 closedAt:
 supersedes: []
 supersededBy:
