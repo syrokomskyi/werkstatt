@@ -49,6 +49,7 @@ import { runGeneratedFilesValidate } from "../generated-files-validate.ts";
 import { runGeneratedStaleValidate } from "../generated-stale-validate.ts";
 import { runGeneratedDriftValidate } from "../generated-drift-validate.ts";
 import { runOwnershipSyncValidate } from "../ownership-sync-validate.ts";
+import { runOwnershipGeneratorCrossCheck } from "../ownership-cross-check.ts";
 import { runPropsContractValidate } from "../props-contract.ts";
 import { runOpenSourceValidate } from "../open-source-validate.ts";
 
@@ -228,7 +229,10 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     mutatesState: true,
     writes: ["<app>/src/styles/fonts.imports.css"],
-    reads: ["<app>/src/content/system.md", "packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml"],
+    reads: [
+      "<app>/src/content/system.md",
+      "packages/werkstatt-site/src/domain/ontology/site-families/**/*.yaml",
+    ],
     execute: runFontsImportsGenerate,
   },
   {
@@ -298,7 +302,10 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["uni.registry.yaml", "packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml"],
+    reads: [
+      "uni.registry.yaml",
+      "packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml",
+    ],
     modulePaths: ["registry.ts"],
     execute: runUniRegistryValidate,
   },
@@ -418,7 +425,10 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
-    reads: ["packages/werkstatt-site/src/domain/ontology/constellations/**/*.yaml", "packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml"],
+    reads: [
+      "packages/werkstatt-site/src/domain/ontology/constellations/**/*.yaml",
+      "packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml",
+    ],
     modulePaths: ["archetype.ts", "archetype/constellation.ts", "archetype/shared.ts"],
     execute: runConstellationContractValidate,
   },
@@ -638,6 +648,19 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runOwnershipSyncValidate,
+  },
+  /* RFC-0810: generator ownership cross-check */
+  {
+    name: "ownership.generator.cross-check",
+    description:
+      "Cross-reference app-scoped .generate commands against GENERATOR_OWNERSHIP_MAP. Reports OWN-XCHECK-01 (uncovered), OWN-XCHECK-02 (phantom), OWN-XCHECK-03 (missing module) (RFC-0810).",
+    scope: "workspace",
+    flags: {},
+    supportsAllSites: true,
+    cacheable: false,
+    reads: ["packages/werkstatt-site/src/checks/generator-ownership.ts"],
+    modulePaths: ["ownership-cross-check.ts"],
+    execute: runOwnershipGeneratorCrossCheck,
   },
   /* RFC-0601: content drift detection in generated files */
   {
