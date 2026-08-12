@@ -1,7 +1,7 @@
 ---
 id: RFC-0815
 title: "Add template.peer-deps.validate for onboarding package template integrity"
-status: accepted
+status: implemented
 kind: command
 scope: app
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
-implementedAt:
+implementedAt: 2026-08-12
 closedAt:
 supersedes: []
 supersededBy:
