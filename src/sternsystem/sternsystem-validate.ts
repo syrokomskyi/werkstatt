@@ -45,6 +45,7 @@ import {
   bordbuchFileExists,
   bordbuchPathFor,
 } from "./external-edit-collector.ts";
+import { collectEnvFiles } from "../mission/env-persist.ts";
 
 export interface SternsystemValidateData {
   validated: number;
@@ -148,20 +149,6 @@ async function validateYamlFiles(
   }
 
   return violations;
-}
-
-async function collectEnvFileNames(dir: string): Promise<string[]> {
-  if (!existsSync(dir)) return [];
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  const envFiles: string[] = [];
-  for (const entry of entries) {
-    if (!entry.isFile()) continue;
-    if (!entry.name.startsWith(".env")) continue;
-    if (entry.name === ".env.example") continue;
-    if (/^\.env\..*\.example$/.test(entry.name)) continue;
-    envFiles.push(entry.name);
-  }
-  return envFiles;
 }
 
 export async function runSternsystemValidate(
@@ -453,13 +440,13 @@ export async function runSternsystemValidate(
 
     // RFC-0822: ENV-PERSIST-01 warning — cache clone lacks .env* but workpiece has them
     try {
-      const cacheEnvFiles = await collectEnvFileNames(cacheDir);
+      const cacheEnvFiles = await collectEnvFiles(cacheDir);
       if (cacheEnvFiles.length === 0) {
         const state = await readSystemState(workspaceRoot, entry.id);
         if (state.currentMission) {
           const workpieceDir = resolveWorkpiecePath(workspaceRoot, state.currentMission);
           if (existsSync(workpieceDir)) {
-            const workpieceEnvFiles = await collectEnvFileNames(workpieceDir);
+            const workpieceEnvFiles = await collectEnvFiles(workpieceDir);
             if (workpieceEnvFiles.length > 0) {
               warnings.push({
                 systemId: entry.id,
