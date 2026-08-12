@@ -19,6 +19,7 @@ supersededBy:
 amends: []
 amendedBy:
   - RFC-0761
+  - RFC-0819
 related:
   - DNA-1
   - DNA-2
