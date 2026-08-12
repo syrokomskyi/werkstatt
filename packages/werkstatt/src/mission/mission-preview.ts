@@ -10,6 +10,7 @@
   <item>RFC-0480: extracted mission.preview to its own file; blocking astro dev/preview server; works for closed/aborted missions.</item>
   <item>ADR-0007: run content.ref-index.generate before dev server start to ensure fresh content reference index.</item>
   <item>Pre-dev critical file check: verify content-ref-index, derived-prices, and video-manifest exist before starting dev. Auto-generate missing files via executeKernelCommand. Block with actionable error if generation fails. --skip-prepare flag for fast restarts.</item>
+  <item>RFC-0817: enforce materialization gate — auto-run mission.materialize when materializedAt is null and mission state is open. --skip-prepare does NOT bypass materialization.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -186,6 +187,44 @@ export async function runMissionPreview(
     throw new Error(
       `[mission.preview] workpiece not found for mission '${missionId}' — run mission.materialize first`,
     );
+  }
+
+  // RFC-0817: Materialization gate — if the mission is open and has not been
+  // materialized yet, auto-run mission.materialize before starting the dev server.
+  // This ensures ownership map gaps, generated file issues, and pipeline step
+  // failures are caught at preview time, not hours later at mission.close.
+  // --skip-prepare does NOT bypass this gate — materialization is the formal
+  // lifecycle gate, not a convenience check.
+  if (manifest.state === "open" && !manifest.materializedAt) {
+    logger.info(
+      `  [mission.preview] Mission '${missionId}' is open but not materialized (materializedAt is null). ` +
+        `Auto-running mission.materialize before starting dev server…`,
+    );
+    try {
+      const materializeResult = await executeKernelCommand({
+        workspaceRoot,
+        commandName: "mission.materialize",
+        siteName: manifest.systemId,
+      });
+      const single = Array.isArray(materializeResult) ? materializeResult[0] : materializeResult;
+      if (!single?.ok) {
+        throw new Error(
+          `[mission.preview] mission.materialize failed for mission '${missionId}'. ` +
+            `The dev server cannot start until materialization succeeds. ` +
+            `Fix the error above and re-run mission.preview. ` +
+            `Materialization is the formal lifecycle gate — --skip-prepare does NOT bypass it.`,
+        );
+      }
+      logger.info(`  [mission.preview] Materialization complete.`);
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith("[mission.preview]")) throw err;
+      throw new Error(
+        `[mission.preview] mission.materialize threw for mission '${missionId}': ${err instanceof Error ? err.message : String(err)}. ` +
+          `The dev server cannot start until materialization succeeds. ` +
+          `Fix the error above and re-run mission.preview. ` +
+          `Materialization is the formal lifecycle gate — --skip-prepare does NOT bypass it.`,
+      );
+    }
   }
 
   const cmd = production ? "preview" : "dev";
