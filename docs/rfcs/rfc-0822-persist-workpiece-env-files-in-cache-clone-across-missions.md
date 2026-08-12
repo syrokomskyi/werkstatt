@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
+enhancedAt: 2026-08-12
 implementedAt:
 closedAt:
 supersedes: []
@@ -97,7 +98,7 @@ DNA-46 (Mission lifecycle) and DNA-47 (Materialization) define the mission lifec
 
 ## Decision
 
-`mission.close` copies all `.env*` files from the workpiece to the cache clone (untracked, not committed). `mission.materialize` reads `.env*` files from the cache clone and restores them into the new workpiece after `atomicMoveDir`, replacing the current preservation code that reads from the old workpiece path. `sternsystem.validate` emits a non-blocking `ENV-PERSIST-01` warning when the cache clone lacks `.env` files but a workpiece has them (indicating a close did not preserve secrets).
+`mission.close` copies all `.env*` files from the workpiece to the cache clone (untracked, not committed) as a final step in the existing artifact-copy block (alongside `.cache/` and `.materialization-state.json` copy, lines 687–846 of `mission-close.ts`). `mission.materialize` reads `.env*` files from the cache clone and restores them into the new workpiece after `atomicMoveDir`, replacing the current preservation code that reads from the old workpiece path. After restoring file contents, `PUBLIC_IMAGE_PROVIDER` is set to `build-portable` in each restored `.env` file, preserving the invariant from the current code (line 1191–1195). `sternsystem.validate` emits a non-blocking `ENV-PERSIST-01` warning when the cache clone lacks `.env` files but a workpiece has them (indicating a close did not persist secrets).
 
 ## Architectural fit
 
@@ -148,6 +149,12 @@ async function persistEnvFilesToCacheClone(
  * Called during mission.materialize after atomicMoveDir. Files that do not
  * exist in cache clone are skipped — the workpiece already has .env.example
  * from the staging clone.
+ *
+ * After restoring file contents, each restored .env file has its
+ * PUBLIC_IMAGE_PROVIDER line replaced with `PUBLIC_IMAGE_PROVIDER=build-portable`,
+ * preserving the invariant enforced by the current materialize code (line 1191–1195).
+ * This ensures the build always uses the build-portable image provider regardless
+ * of what the operator may have manually set in the cache clone .env.
  */
 async function restoreEnvFilesFromCacheClone(
   cacheCloneDir: string,
@@ -158,6 +165,7 @@ async function restoreEnvFilesFromCacheClone(
 The glob pattern for env files is `.env*` with the following exclusions:
 
 - `.env.example` — committed template, already in cache clone via git
+- `.env.*.example` (e.g. `.env.dev.example`) — committed templates, already in cache clone via git
 - Skip directories, only copy files
 
 ### File system responsibilities
@@ -192,7 +200,7 @@ The glob pattern for env files is `.env*` with the following exclusions:
   Warning: no .env files found in cache clone — using .env.example template. Operator must fill secrets manually.
 ```
 
-`sternsystem.validate` warning in `--json` output:
+`sternsystem.validate` warning in `--json` output (uses the existing `SternsystemValidateData.warnings` shape `{ systemId, field, message }`):
 
 ```json
 {
@@ -200,7 +208,8 @@ The glob pattern for env files is `.env*` with the following exclusions:
   "status": "ok",
   "warnings": [
     {
-      "rule": "ENV-PERSIST-01",
+      "systemId": "<id>",
+      "field": "ENV-PERSIST-01",
       "message": "Cache clone for system '<id>' has no .env files but workpiece has 1 — run mission.close to persist secrets"
     }
   ]
@@ -239,7 +248,7 @@ The glob pattern for env files is `.env*` with the following exclusions:
 ## Acceptance criteria
 
 - [ ] `persistEnvFilesToCacheClone` and `restoreEnvFilesFromCacheClone` implemented in `packages/werkstatt/src/mission/env-persist.ts`
-- [ ] `mission.close` calls `persistEnvFilesToCacheClone` as a final step and logs copied file count
+- [ ] `mission.close` calls `persistEnvFilesToCacheClone` in the final artifact-copy block (alongside `.cache/` copy, lines 687–846) and logs copied file count
 - [ ] `mission.materialize` calls `restoreEnvFilesFromCacheClone` after `atomicMoveDir`, replacing the old-workpiece preservation code (line 1154–1196)
 - [ ] `mission.materialize` logs a warning when no `.env*` files are found in cache clone
 - [ ] `sternsystem.validate` emits `ENV-PERSIST-01` warning when cache clone lacks `.env` but workpiece has one
