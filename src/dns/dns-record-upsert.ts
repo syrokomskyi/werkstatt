@@ -151,7 +151,7 @@ export async function runDnsRecordUpsert(
   };
 }
 
-function toApiRecord(declared: DnsRecordDeclaration): {
+export function toApiRecord(declared: DnsRecordDeclaration): {
   type: string;
   name: string;
   content?: string;
