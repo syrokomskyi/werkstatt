@@ -164,7 +164,7 @@ importers:
         specifier: ^14.0.1
         version: 14.0.1
       wrangler:
-        specifier: ^4.120.0
+        specifier: ^4.120.1
         version: 4.120.1(@cloudflare/workers-types@5.20260801.1)
 
   packages/forge:
