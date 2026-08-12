@@ -1,22 +1,33 @@
 /*
 <MODULE_CONTRACT>
-<purpose>
-  RFC-0812: Unit tests for toApiRecord covering SVCB, HTTPS, A, AAAA, TXT,
-  CNAME record types, optional fields, and edge cases.
-</purpose>
-<non-goals>
-  <item>Do not test the full dns.record.upsert pipeline — that requires Cloudflare API credentials.</item>
-  <item>Do not fix quoted-value parsing in SVCB/HTTPS content — documented as known issue, requires its own RFC.</item>
-</non-goals>
+  <purpose>
+    RFC-0812: Unit tests for toApiRecord covering SVCB, HTTPS, A, AAAA, TXT,
+    CNAME record types, optional fields, and edge cases.
+    RFC-0817: Unit test for graceful skip when dns-records.yaml is absent.
+  </purpose>
+  <non-goals>
+    <item>Do not test the full dns.record.upsert pipeline — that requires Cloudflare API credentials.</item>
+    <item>Do not fix quoted-value parsing in SVCB/HTTPS content — documented as known issue, requires its own RFC.</item>
+  </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0812: initial unit tests for toApiRecord.</item>
+  <item>RFC-0817: add graceful skip test for missing dns-records.yaml.</item>
 </CHANGE_SUMMARY>
 */
 
-import { describe, it, expect } from "vitest";
-import { toApiRecord } from "./dns-record-upsert.ts";
+import { describe, it, expect, vi } from "vitest";
+import { toApiRecord, runDnsRecordUpsert } from "./dns-record-upsert.ts";
 import type { DnsRecordDeclaration } from "@warpgogol/werkstatt-site/ontology/schemas";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+
+vi.mock("./dns-helpers.ts", async (importOriginal) => {
+  const original = await importOriginal<typeof import("./dns-helpers.ts")>();
+  return {
+    ...original,
+    loadDnsRecordFile: vi.fn().mockResolvedValue(null),
+  };
+});
 
 function rec(
   overrides: Partial<DnsRecordDeclaration> &
@@ -313,5 +324,24 @@ describe("toApiRecord — known issues", () => {
     // Current behavior: split by whitespace, so value is 'alpn="h3' + ' h2"'
     // This is WRONG but documented — a fix requires its own RFC.
     expect(result.data?.value).toBe('alpn="h3 h2"');
+  });
+});
+
+describe("RFC-0817: dns.record.upsert graceful skip", () => {
+  it("returns skip result when dns-records.yaml is absent", async () => {
+    const input = {
+      argv: [],
+      flags: { system: "test-system" },
+    } as unknown as KernelCommandInput;
+
+    const context = {
+      workspaceRoot: "/test",
+    } as unknown as KernelRuntimeContext;
+
+    const result = await runDnsRecordUpsert(input, context);
+    expect(result.data?.summary.total).toBe(0);
+    expect(result.data?.results).toEqual([]);
+    expect(result.summary).toContain("skipped");
+    expect(result.summary).toContain("no dns-records.yaml");
   });
 });

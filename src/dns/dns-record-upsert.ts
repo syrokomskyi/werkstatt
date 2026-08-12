@@ -13,6 +13,7 @@ Supports --dry-run to preview changes without making API calls.
 <CHANGE_SUMMARY>
   <item>RFC-0753: initial dns.record.upsert command handler.</item>
   <item>RFC-0812: export toApiRecord for unit testing.</item>
+  <item>RFC-0817: graceful skip when dns-records.yaml is absent instead of throwing.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -69,10 +70,18 @@ export async function runDnsRecordUpsert(
 
   const declaration = await loadDnsRecordFile(workspaceRoot, systemId);
   if (!declaration) {
-    throw new Error(
-      `[dns.record.upsert] No dns-records.yaml found for system '${systemId}'. ` +
-        `Create systems-cache/${systemId}/dns-records.yaml first.`,
-    );
+    return {
+      data: {
+        command: "dns.record.upsert",
+        systemId,
+        zone: "",
+        dryRun,
+        results: [],
+        summary: { created: 0, updated: 0, skipped: 0, total: 0, errors: 0 },
+      },
+      summary: `[dns.record.upsert] ${systemId}: skipped — no dns-records.yaml found`,
+      nextSteps: [],
+    };
   }
 
   const { systems } = await discoverSystems(workspaceRoot);
