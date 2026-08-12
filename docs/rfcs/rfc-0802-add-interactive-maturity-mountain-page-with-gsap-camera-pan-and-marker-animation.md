@@ -1,7 +1,7 @@
 ---
 id: RFC-0802
 title: "Add interactive maturity mountain page with GSAP camera pan and marker animation"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-11
-updatedAt: 2026-08-11
+updatedAt: 2026-08-12
 enhancedAt: 2026-08-11
-implementedAt: 2026-08-11
+implementedAt: 2026-08-12
 closedAt:
 supersedes: []
 supersededBy:
