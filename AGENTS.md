@@ -22,6 +22,14 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 - `sternsystem.validate` enforces mirror topology rules: `mirrors[0]` must be non-bare, mirror paths must exist, `bundle` storageType must not use git protocols, and no embedded credentials.
 - Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces.
 
+## Env file persistence across missions (RFC-0822)
+
+- `mission.close` copies `.env*` files from the workpiece to the cache clone (untracked, not committed) as a final step. `.env.example` and `.env.*.example` are excluded — they are git-tracked templates.
+- `mission.materialize` restores `.env*` files from the cache clone to the new workpiece after `atomicMoveDir`, replacing the old-workpiece preservation code. `PUBLIC_IMAGE_PROVIDER=build-portable` is enforced during restore.
+- `sternsystem.validate` emits a non-blocking `ENV-PERSIST-01` warning when the cache clone lacks `.env*` files but an active mission workpiece has them.
+- Agents MUST NOT `git add -f` `.env` files in the cache clone — they are untracked artifacts, not git content.
+- External mirrors (`mirrors[2+]`) never receive `.env*` files — they are git remotes, and untracked files do not propagate via `git push`.
+
 ## Werkstatt plugin contract (RFC-0770)
 
 The Werkstatt engine is stack-agnostic. Stack-specific logic (Astro, Phaser, video rendering) is contributed by a **plugin** — an npm package implementing the `werkstatt/plugin@1` contract. The engine and plugin together form a **workshop** (a consumer monorepo).
