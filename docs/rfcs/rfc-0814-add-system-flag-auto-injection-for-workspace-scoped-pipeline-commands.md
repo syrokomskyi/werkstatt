@@ -177,17 +177,17 @@ No new types. The change is internal to `executePipelineForSite` and `executeKer
 
 ## Acceptance criteria
 
-- [ ] `--system` auto-injected for workspace-scoped commands that accept it
-- [ ] `acceptsSystem` check prevents injection for commands without `--system` flag
-- [ ] Deduplication: `--system` not injected if already in step args
-- [ ] `dns.record.upsert` receives `--system` automatically in pipeline
-- [ ] `dns.record.upsert` `--system` flag reverted to `required: true`
-- [ ] `--system` auto-injected in CLI path (`executeKernelCommand`) for workspace commands that accept it
-- [ ] Unit test: workspace command with `--system` flag receives it in pipeline
-- [ ] Unit test: workspace command without `--system` flag is unaffected
-- [ ] Unit test: explicit `--system` in step args is not duplicated
-- [ ] Unit test: CLI invocation `werkstatt run dns.record.upsert --site warpgogol-com` exits 0
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `--system` auto-injected for workspace-scoped commands that accept it (evidence: packages/werkstatt/src/kernel/runtime/execute-pipeline.ts:758-767, system-injection.test.ts test a/e)
+- [x] `acceptsSystem` check prevents injection for commands without `--system` flag (evidence: system-injection.test.ts test b, 8/8 tests pass)
+- [x] Deduplication: `--system` not injected if already in step args (evidence: system-injection.test.ts test c/h, 8/8 tests pass)
+- [x] `dns.record.upsert` receives `--system` automatically in pipeline (evidence: execute-pipeline.ts:758-767, dns.module.ts:38-41 declares system:string required)
+- [x] `dns.record.upsert` `--system` flag reverted to `required: true` (evidence: packages/werkstatt/src/dns/dns.module.ts:38-41)
+- [x] `--system` auto-injected in CLI path (`executeKernelCommand`) for workspace commands that accept it (evidence: packages/werkstatt/src/kernel/runtime/execute-command.ts:405-414, system-injection.test.ts test f)
+- [x] Unit test: workspace command with `--system` flag receives it in pipeline (evidence: system-injection.test.ts test a, 8/8 tests pass)
+- [x] Unit test: workspace command without `--system` flag is unaffected (evidence: system-injection.test.ts test b/g, 8/8 tests pass)
+- [x] Unit test: explicit `--system` in step args is not duplicated (evidence: system-injection.test.ts test c/h, 8/8 tests pass)
+- [x] Unit test: CLI invocation `werkstatt run dns.record.upsert --site warpgogol-com` exits 0 (evidence: rfc.acceptance.run --id RFC-0814, 0 failed probes)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0814, 0 errors)
 
 ## Implementation notes for agents
 

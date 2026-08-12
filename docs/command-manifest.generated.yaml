@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: f2d14ad244de0cd6f10d2379387a30d126942c34ce86ccb708742580c02c5541
+  contentHash: e8aa618b36e5d42f9195883ed5dfffc1a6a58a8c8fe0d6128efbdf29389d5d46
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -4329,7 +4329,9 @@ commands:
     flags:
       system:
         kind: string
-        description: System ID from system-config.yaml. Falls back to site context.
+        required: true
+        description: System ID from system-config.yaml. Auto-injected by pipeline/CLI
+          when --site is provided.
       dry-run:
         kind: boolean
         description: Preview changes without making API calls.
