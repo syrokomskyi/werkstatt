@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0480: extracted mission.preview to its own file; blocking astro dev/preview server; works for closed/aborted missions.</item>
   <item>ADR-0007: run content.ref-index.generate before dev server start to ensure fresh content reference index.</item>
+  <item>Pre-dev critical file check: verify content-ref-index, derived-prices, and video-manifest exist before starting dev. Auto-generate missing files via executeKernelCommand. Block with actionable error if generation fails. --skip-prepare flag for fast restarts.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -21,8 +22,130 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import { runContentRefIndexGenerate } from "@warpgogol/werkstatt-site/codegen";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
+
+interface DevCriticalFile {
+  readonly path: string;
+  readonly command: string;
+  readonly description: string;
+  readonly prerequisites?: readonly string[];
+}
+
+const DEV_CRITICAL_FILES: readonly DevCriticalFile[] = [
+  {
+    path: "src/content-ref-index.generated.yaml",
+    command: "content.ref-index.generate",
+    description: "Content reference index (resolves =(...) formula references in page props)",
+  },
+  {
+    path: "src/derived-prices.generated.json",
+    command: "derived-prices.materialize",
+    description: "Derived prices (currency-aware price display)",
+    prerequisites: ["entitlements.resolve", "rate-snapshot.resolve", "currency-pricing.compile"],
+  },
+  {
+    path: "src/video-manifest.generated.yaml",
+    command: "video.variants.generate",
+    description: "Video manifest (video section rendering)",
+  },
+];
+
+async function ensureDevCriticalFiles(
+  workpiecePath: string,
+  systemId: string,
+  workspaceRoot: string,
+  logger: KernelRuntimeContext["logger"],
+): Promise<void> {
+  const missing: DevCriticalFile[] = [];
+  for (const entry of DEV_CRITICAL_FILES) {
+    const fullPath = path.join(workpiecePath, entry.path);
+    if (!existsSync(fullPath)) {
+      missing.push(entry);
+    }
+  }
+
+  if (missing.length === 0) return;
+
+  logger.info(
+    `  [pre-dev] ${missing.length} critical generated file(s) missing — auto-generating…`,
+  );
+  for (const entry of missing) {
+    logger.info(`    - ${entry.path} (${entry.description})`);
+  }
+
+  for (const entry of missing) {
+    if (entry.prerequisites) {
+      for (const prereq of entry.prerequisites) {
+        logger.info(`  [pre-dev] Running prerequisite: ${prereq}…`);
+        try {
+          const execResult = await executeKernelCommand({
+            workspaceRoot,
+            commandName: prereq,
+            siteName: systemId,
+          });
+          const single = Array.isArray(execResult) ? execResult[0] : execResult;
+          if (!single?.ok) {
+            throw new Error(
+              `[mission.preview] Prerequisite "${prereq}" failed for "${entry.path}". ` +
+                `This file is required for dev: ${entry.description}. ` +
+                `Fix the error above and re-run mission.preview. ` +
+                `To skip this check, use --skip-prepare (not recommended — the dev server will render without ${entry.description}).`,
+            );
+          }
+        } catch (err) {
+          if (err instanceof Error && err.message.startsWith("[mission.preview]")) throw err;
+          throw new Error(
+            `[mission.preview] Prerequisite "${prereq}" threw for "${entry.path}": ${err instanceof Error ? err.message : String(err)}. ` +
+              `This file is required for dev: ${entry.description}. ` +
+              `Fix the error above and re-run mission.preview. ` +
+              `To skip this check, use --skip-prepare (not recommended).`,
+          );
+        }
+      }
+    }
+
+    logger.info(`  [pre-dev] Generating: ${entry.command}…`);
+    try {
+      const execResult = await executeKernelCommand({
+        workspaceRoot,
+        commandName: entry.command,
+        siteName: systemId,
+      });
+      const single = Array.isArray(execResult) ? execResult[0] : execResult;
+      if (!single?.ok) {
+        throw new Error(
+          `[mission.preview] "${entry.command}" failed to generate "${entry.path}". ` +
+            `This file is required for dev: ${entry.description}. ` +
+            `Fix the error above and re-run mission.preview. ` +
+            `To skip this check, use --skip-prepare (not recommended — the dev server will render without ${entry.description}).`,
+        );
+      }
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith("[mission.preview]")) throw err;
+      throw new Error(
+        `[mission.preview] "${entry.command}" threw while generating "${entry.path}": ${err instanceof Error ? err.message : String(err)}. ` +
+          `This file is required for dev: ${entry.description}. ` +
+          `Fix the error above and re-run mission.preview. ` +
+          `To skip this check, use --skip-prepare (not recommended).`,
+      );
+    }
+
+    const fullPath = path.join(workpiecePath, entry.path);
+    if (!existsSync(fullPath)) {
+      throw new Error(
+        `[mission.preview] "${entry.command}" completed but "${entry.path}" was not created. ` +
+          `This file is required for dev: ${entry.description}. ` +
+          `Investigate why the generator did not write the file and re-run mission.preview. ` +
+          `To skip this check, use --skip-prepare (not recommended).`,
+      );
+    }
+    logger.info(`  [pre-dev] OK: ${entry.path}`);
+  }
+
+  logger.info(`  [pre-dev] All critical generated files present.`);
+}
 
 export interface MissionPreviewData {
   missionId: string;
@@ -50,6 +173,7 @@ export async function runMissionPreview(
   const missionId = flagString(input, "mission");
   const port = parseInt(flagString(input, "port") ?? "4321", 10);
   const production = flagBool(input, "production");
+  const skipPrepare = flagBool(input, "skip-prepare");
 
   if (!missionId) throw new Error("[mission.preview] --mission is required");
 
@@ -71,6 +195,20 @@ export async function runMissionPreview(
     cwd: workpiecePath,
     stdio: "ignore",
   });
+
+  if (!skipPrepare) {
+    // Pre-dev critical file check: verify that generated files required for
+    // correct dev rendering exist, and auto-generate them if missing.
+    // This catches issues like missing prices (derived-prices.generated.json)
+    // or missing videos (video-manifest.generated.yaml) before the dev server
+    // starts, preventing silent rendering failures.
+    await ensureDevCriticalFiles(workpiecePath, manifest.systemId, workspaceRoot, logger);
+  } else {
+    logger.warn(
+      `  [mission.preview] --skip-prepare: skipping critical file check. ` +
+        `If prices, videos, or formula references are missing, remove --skip-prepare and re-run.`,
+    );
+  }
 
   // ADR-0007: regenerate content reference index before dev server start
   // so the resolver reads fresh frontmatter values from source files.
