@@ -183,7 +183,7 @@ export async function runDeployPreflight(
         severity: "error",
         file: targetLabel,
         message: `Key "${key}" has an empty value in ${targetLabel}.`,
-        fixHint: `Fill in the value for ${key} in ${targetLabel}.`,
+        fixHint: `Fill in the value for ${key} in ${targetLabel}, or set it to null if this variable is not required for this deployment.`,
       });
     }
   }
