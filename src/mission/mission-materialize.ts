@@ -77,6 +77,7 @@ import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
+import { installWorkpieceCommitHook } from "./workpiece-commit-hook.ts";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../handoff/bundle-io.ts";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
@@ -1349,12 +1350,15 @@ export async function runMissionMaterialize(
         stdio: ["pipe", "pipe", "pipe"],
         env: {
           ...process.env,
+          MISSION_GIT_COMMIT: "1",
           GIT_AUTHOR_NAME: "mission.materialize",
           GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
           GIT_COMMITTER_NAME: "mission.materialize",
           GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
         },
       });
+      // RFC-0821: Install workpiece commit guard hook
+      await installWorkpieceCommitHook(workpieceDir);
       logger.info(`  Git commit created in workpiece (data-only, on top of cloned history)`);
     } else {
       // RFC-0568: Non-git cache clone fallback — use git init (no shared history)
@@ -1375,12 +1379,15 @@ export async function runMissionMaterialize(
         stdio: ["pipe", "pipe", "pipe"],
         env: {
           ...process.env,
+          MISSION_GIT_COMMIT: "1",
           GIT_AUTHOR_NAME: "mission.materialize",
           GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
           GIT_COMMITTER_NAME: "mission.materialize",
           GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
         },
       });
+      // RFC-0821: Install workpiece commit guard hook
+      await installWorkpieceCommitHook(workpieceDir);
       logger.info(
         `  Git initialized in workpiece with initial commit (non-git cache clone fallback)`,
       );

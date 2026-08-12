@@ -28,6 +28,7 @@ function git(cwd: string, args: string): string {
     cwd,
     encoding: "utf-8",
     stdio: ["pipe", "pipe", "pipe"],
+    env: { ...process.env, MISSION_GIT_COMMIT: "1" },
   }).trim();
 }
 
