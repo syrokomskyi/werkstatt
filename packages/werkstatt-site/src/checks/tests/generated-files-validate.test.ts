@@ -216,3 +216,52 @@ describe("generated.files.validate {system} expansion (RFC-0606)", () => {
     }
   });
 });
+
+describe("generated.files.validate conditional entries (RFC-0817)", () => {
+  it("conditional entry does NOT produce GEN-FILES-01 when file is absent", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-files-cond-skip-"));
+    try {
+      const result = await runGeneratedFilesValidate(input, ctx(root));
+      const diagnostics = (result.data?.diagnostics ?? []) as Array<{
+        message: string;
+        ruleId: string;
+      }>;
+
+      // The production GENERATOR_OWNERSHIP_MAP has conditional entries (e.g.
+      // cms-git adapter, build-identity.json). Those entries should NOT produce
+      // GEN-FILES-01 diagnostics even when the files are absent from disk.
+      // The validator skips conditional entries at line 202-204.
+      const conditionalDiags = diagnostics.filter(
+        (d) =>
+          d.ruleId === "GEN-FILES-01" &&
+          (d.message.includes("cms-git") || d.message.includes("build-identity")),
+      );
+      expect(conditionalDiags).toHaveLength(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("non-conditional entry DOES produce GEN-FILES-01 when file is absent", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-files-cond-error-"));
+    try {
+      const result = await runGeneratedFilesValidate(input, ctx(root));
+      const diagnostics = (result.data?.diagnostics ?? []) as Array<{
+        message: string;
+        ruleId: string;
+        severity: string;
+      }>;
+
+      // Non-conditional entries MUST produce GEN-FILES-01 when files are absent.
+      // The first "red" test proves this (exitCode 1). Here we verify that
+      // GEN-FILES-01 errors exist, proving the validator is not silently
+      // skipping all entries — only conditional ones.
+      const genFilesErrors = diagnostics.filter(
+        (d) => d.ruleId === "GEN-FILES-01" && d.severity === "error",
+      );
+      expect(genFilesErrors.length).toBeGreaterThan(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+});
