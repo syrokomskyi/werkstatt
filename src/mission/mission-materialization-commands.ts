@@ -32,6 +32,7 @@
   <item>Bug fix: post-merge guard — restore system-config.yaml/system-state.yaml if merge silently removed them; commit restored files to avoid leaving cache clone dirty.</item>
   <item>RFC-0796: add validateNoStaleMissionEntries workspace-level advisory check — warns about stale symlinks or terminal-state dirs in missions/ root (non-blocking).</item>
   <item>RFC-0797: add commitCacheCloneIfDirty auto-commit before dirty cache clone guard in mission.reconcile; replace commitBordbuchProjections with commitCacheCloneIfDirty in post-validate cleanup.</item>
+  <item>RFC-0820: add zero-transfer warning in mission.reconcile when transferredCommits is zero; add zeroTransferWarning field to reconciliation report.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -1417,6 +1418,17 @@ export async function runMissionReconcile(
         `  Merged ${transferredCommits} commit(s) from workpiece to cache clone (${commitSha.slice(0, 8)})`,
       );
 
+      // RFC-0820 Level 3: Warn when zero commits were transferred.
+      // This is non-blocking (reconcile may legitimately transfer zero on re-runs)
+      // but makes the condition visible to the operator.
+      if (transferredCommits === 0) {
+        logger.warn(
+          `[mission.reconcile] WARNING: Zero commits transferred from workpiece to cache clone.\n` +
+            `  Brief: "${manifest.brief}"\n` +
+            `  If you expected changes, the workpiece may have no operator commits — check mission.git.commit output.\n`,
+        );
+      }
+
       // RFC-0568: Push to origin with retry (non-fatal, 3 attempts, exponential backoff)
       const branch = execSync("git rev-parse --abbrev-ref HEAD", {
         cwd: systemDir,
@@ -1511,6 +1523,7 @@ export async function runMissionReconcile(
       reconciledAt: now,
       mergeCommitSha,
       transferredCommits,
+      zeroTransferWarning: transferredCommits === 0,
       message,
       copiedPaths,
       autoResolvedPaths,

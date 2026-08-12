@@ -15,6 +15,7 @@
   <item>RFC-0594: add pre-commit content validation via runPreCommitValidation based on changed file paths.</item>
   <item>RFC-0644: add commitWorkpieceIfDirty helper for auto-committing dirty workpiece before mission.reconcile.</item>
   <item>RFC-0797: add commitCacheCloneIfDirty helper for auto-committing all dirty files in cache clone before reconcile dirty guard.</item>
+  <item>RFC-0820: add noChanges field to MissionGitCommitData and prominent stderr warning when no changes to commit.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -40,6 +41,7 @@ export interface MissionGitCommitData {
   actorId: string | null;
   signature: string | null;
   preCommitValidation?: PreCommitValidationResult;
+  noChanges?: boolean;
 }
 
 export interface ValidatorMapping {
@@ -426,6 +428,12 @@ export async function runMissionGitCommit(
   }
 
   if (!hasChanges) {
+    process.stderr.write(
+      `[mission.git.commit] WARNING: No changes to commit for mission '${missionId}'.\n` +
+        `  Brief: "${manifest.brief}"\n` +
+        `  If you expected changes, verify your edits were actually written to disk.\n` +
+        `  This is the most common cause of silent mission loss — work reported as done but never persisted.\n`,
+    );
     const data: MissionGitCommitData = {
       missionId,
       commitSha: git(workpieceDir, "rev-parse HEAD"),
@@ -434,6 +442,7 @@ export async function runMissionGitCommit(
       signed: false,
       actorId: null,
       signature: null,
+      noChanges: true,
     };
     return {
       data,

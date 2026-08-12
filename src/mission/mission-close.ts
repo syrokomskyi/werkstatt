@@ -26,6 +26,7 @@
   <item>Bug fix: push cache clone to origin before mirror sync check to prevent false "out of sync" when commits were created between reconcile and close.</item>
   <item>RFC-0801: remove auto-archive from mission.close; remove CloseReportArchive interface and --skip-auto-archive flag.</item>
   <item>RFC-0797: replace dirty workpiece guard with commitWorkpieceIfDirty auto-commit; add pre-mirror-check sternsystem.sync inside lock with --skip-auto-sync flag.</item>
+  <item>RFC-0820: add zero operator commit guard — block close when no commits since materialization; add --allow-no-op override flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -47,7 +48,7 @@ import {
   resolveMirrorPath,
 } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import { commitWorkpieceIfDirty } from "./mission-git-commit.ts";
+import { commitWorkpieceIfDirty, countOperatorCommits } from "./mission-git-commit.ts";
 import { validateBordbuch, type BordbuchViolation } from "../bordbuch/bordbuch-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import {
@@ -178,6 +179,7 @@ export async function runMissionClose(
   const skipEvidenceSync = flagBoolean(input, "skip-evidence-sync");
   const skipAutoSync = flagBoolean(input, "skip-auto-sync");
   const skipTemplateSync = flagBoolean(input, "skip-template-sync");
+  const allowNoOp = flagBoolean(input, "allow-no-op");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");
 
@@ -292,6 +294,26 @@ export async function runMissionClose(
       logger.info(
         `  Auto-committed dirty workpiece (${workpieceCommit.commitSha?.slice(0, 8)}) before close`,
       );
+    }
+
+    // RFC-0820 Level 2: Zero operator commit guard.
+    // Count commits since materialization. If zero, the mission brief was never
+    // fulfilled — block close unless --allow-no-op is explicitly set.
+    if (!allowNoOp) {
+      const operatorCommits = countOperatorCommits(workpieceDir, manifest.migratedAt);
+      if (!operatorCommits.hasOperatorCommits) {
+        throw new Error(
+          `[mission.close] ZERO-COMMIT-GUARD: Mission '${missionId}' has zero operator commits since materialization.\n` +
+            `  Brief: "${manifest.brief}"\n` +
+            `  This means no work was committed to the workpiece — the mission brief was not fulfilled.\n` +
+            `  Possible causes:\n` +
+            `    - Edits were never written to disk (agent reported success without actually editing files)\n` +
+            `    - mission.git.commit returned 'no changes' but the warning was missed\n` +
+            `    - Edits were written to the wrong directory\n` +
+            `  If this is a legitimate no-op mission (e.g., platform-only update, config sync),\n` +
+            `  re-run with --allow-no-op to override this guard.\n`,
+        );
+      }
     }
 
     if (existsSync(path.join(workpieceDir, ".git"))) {

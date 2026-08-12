@@ -137,7 +137,10 @@ test("mission.close refuses when validation fails", async () => {
   const input = {
     flags: { mission: "test-system-m000001", actor: "test-agent" },
   } as unknown as KernelCommandInput;
-  const context = { workspaceRoot: tmpWorkspace } as unknown as KernelRuntimeContext;
+  const context = {
+    workspaceRoot: tmpWorkspace,
+    logger: { info: () => {}, warn: () => {}, error: () => {} },
+  } as unknown as KernelRuntimeContext;
 
   await expect(runMissionClose(input, context)).rejects.toThrow(
     /validation failed for mission 'test-system-m000001'/,
@@ -175,7 +178,10 @@ test("mission.close refuses when state changed during validation (re-check insid
   const input = {
     flags: { mission: "test-system-m000001", actor: "test-agent" },
   } as unknown as KernelCommandInput;
-  const context = { workspaceRoot: tmpWorkspace } as unknown as KernelRuntimeContext;
+  const context = {
+    workspaceRoot: tmpWorkspace,
+    logger: { info: () => {}, warn: () => {}, error: () => {} },
+  } as unknown as KernelRuntimeContext;
 
   await expect(runMissionClose(input, context)).rejects.toThrow(
     /state changed to 'aborted' during validation/,

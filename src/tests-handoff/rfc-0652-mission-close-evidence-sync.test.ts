@@ -117,6 +117,14 @@ function setupWorkspace(options?: {
   mkdirSync(join(missionDir, "workpiece"), { recursive: true });
   mkdirSync(join(missionDir, "evidence"), { recursive: true });
 
+  // RFC-0820: Create workpiece git repo with materialize + operator commit
+  const workpieceDir = join(missionDir, "workpiece");
+  gitInit(workpieceDir);
+  writeFileSync(join(workpieceDir, "README.md"), "# workpiece\n");
+  gitCommit(workpieceDir, "materialize from pin 1.0.0");
+  writeFileSync(join(workpieceDir, "README.md"), "# workpiece changed\n");
+  gitCommit(workpieceDir, "operator: test changes");
+
   if (options?.withAxiomEvidence) {
     const axiomDir = join(missionDir, "evidence", "axiom");
     mkdirSync(axiomDir, { recursive: true });

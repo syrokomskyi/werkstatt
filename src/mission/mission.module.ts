@@ -113,6 +113,11 @@ export function createMissionModule(): KernelModule {
             kind: "boolean",
             description: "RFC-0800: Skip auto-sync of template dependencies from workpiece.",
           },
+          "allow-no-op": {
+            kind: "boolean",
+            description:
+              "RFC-0820: Override zero-commit guard. Allow closing a mission with no operator commits (e.g., platform-only update, config sync).",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",
