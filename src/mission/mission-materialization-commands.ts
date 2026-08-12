@@ -424,6 +424,57 @@ export async function runMissionValidate(
     }
   }
 
+  // RFC-0813: Playwright Chromium pre-flight check — fail fast before expensive
+  // build.prepare + build.check + astro build + build.post cycle.
+  // Skipped on distribution-reuse path (returns early above).
+  try {
+    const preflightResult = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: "playwright.preflight.check",
+      outputFormat: "pretty",
+    })) as { exitCode?: number; summary?: string };
+    if ((preflightResult.exitCode ?? 0) !== 0) {
+      const msg = preflightResult.summary ?? "Playwright Chromium is not installed";
+      logger.info(`  [preflight] ${msg}`);
+      const preflightReport = {
+        schemaVersion: "1.0.0",
+        missionId,
+        contractFull: { passed: false, validators: [] },
+        build: {
+          succeeded: false,
+          routeCount: 0,
+          sitemapHash: "sha256:preflight-failed",
+          failedSteps: [{ name: "playwright.preflight.check", exitCode: 1 }],
+        },
+        distributionReused: false,
+        buildInputHash: null,
+        fullBuildRan: false,
+        validatedAt: new Date().toISOString(),
+      };
+      await atomicWriteFile(
+        path.join(evidenceDir, "validation-report.json"),
+        JSON.stringify(preflightReport, null, 2) + "\n",
+      );
+      return {
+        data: preflightReport as unknown as MissionValidateData,
+        exitCode: 1,
+        summary: `[mission.validate] ${missionId} pre-flight FAILED: Playwright Chromium is not installed`,
+        nextSteps: [
+          {
+            action: `Run: pnpm exec playwright install chromium, then re-run: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
+            kind: "required",
+          },
+        ],
+      };
+    }
+    logger.info(`  Playwright Chromium: pre-flight check passed`);
+  } catch (err) {
+    // Non-fatal: if the check itself throws unexpectedly, log and continue
+    logger.warn(
+      `  Playwright Chromium pre-flight check error (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+
   // RFC-0356 §2: run build.prepare then build.check against the workpiece.
   // build.prepare generates derived artifacts (surface.generated.yaml, etc.)
   // that build.check validators like semantic.targets.validate depend on.
