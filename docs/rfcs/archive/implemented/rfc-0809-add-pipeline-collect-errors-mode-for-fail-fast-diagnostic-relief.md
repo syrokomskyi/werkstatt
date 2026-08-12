@@ -8,11 +8,10 @@ owners:
   - architecture
 reviewers:
   - human:andrii-syrokomskyi
-createdAt: 2026-08-12
-updatedAt: 2026-08-11
+createdAt: 2026-08-11
+updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
-acceptedAt: 2026-08-12
-implementedAt: 2026-08-11
+implementedAt: 2026-08-12
 closedAt:
 supersedes: []
 supersededBy:
