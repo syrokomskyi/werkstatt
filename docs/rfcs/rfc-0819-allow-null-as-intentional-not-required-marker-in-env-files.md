@@ -191,15 +191,15 @@ No new failure modes. `deploy.preflight` continues to:
 
 ## Acceptance criteria
 
-- [ ] `deploy.preflight` DEPLOY-PREFLIGHT-04 `fixHint` includes the `null` suggestion for not-required variables
-- [ ] A `.env` file with `KEY=null` passes `deploy.preflight` without error
-- [ ] A `.env` file with `KEY=` (empty) fails `deploy.preflight` with the updated message mentioning `null`
-- [ ] `.env.example` files with `KEY=null` are still rejected by `env.contract.validate` (ENV-CONTRACT-04) — example files remain empty-only
-- [ ] `docs/policies/agent-surface-ops.md` documents the `null` convention in the Env-and-deploy contract section
-- [ ] Root `AGENTS.md` has a one-line pointer to the `null` convention in the env-and-deploy reference
-- [ ] Root `.env.example` header comment mentions the `null` convention for `.env` files
-- [ ] `deploy.preflight --dev` (`.env.dev` files) also gets the `null` suggestion in DEPLOY-PREFLIGHT-04 — same code path, verify explicitly
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `deploy.preflight` DEPLOY-PREFLIGHT-04 `fixHint` includes the `null` suggestion for not-required variables (evidence: packages/werkstatt-site/src/checks/env/deploy-preflight.ts:186, deploy-preflight-test.test.ts:48)
+- [x] A `.env` file with `KEY=null` passes `deploy.preflight` without error (evidence: deploy-preflight-test.test.ts:51-58)
+- [x] A `.env` file with `KEY=` (empty) fails `deploy.preflight` with the updated message mentioning `null` (evidence: deploy-preflight-test.test.ts:38-48)
+- [x] `.env.example` files with `KEY=null` are still rejected by `env.contract.validate` (ENV-CONTRACT-04) — example files remain empty-only (evidence: packages/werkstatt-site/src/checks/env/env-contract.ts:148, hasValue: value.length > 0 triggers ENV-CONTRACT-04 for any non-empty value including null)
+- [x] `docs/policies/agent-surface-ops.md` documents the `null` convention in the Env-and-deploy contract section (evidence: docs/policies/agent-surface-ops.md:35)
+- [x] Root `AGENTS.md` has a one-line pointer to the `null` convention in the env-and-deploy reference (evidence: AGENTS.md:252)
+- [x] Root `.env.example` header comment mentions the `null` convention for `.env` files (evidence: .env.example:4)
+- [x] `deploy.preflight --dev` (`.env.dev` files) also gets the `null` suggestion in DEPLOY-PREFLIGHT-04 — same code path, verify explicitly (evidence: deploy-preflight-test.test.ts:61-71, deploy-preflight-test.test.ts:74-81)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0819 --json → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
