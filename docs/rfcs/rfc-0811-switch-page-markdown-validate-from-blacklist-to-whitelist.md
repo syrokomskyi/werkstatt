@@ -171,8 +171,8 @@ The whitelist adds one `matchOwnershipEntry` call per `.md` file in `public/`. C
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- Reuse `matchOwnershipEntry` from `generated-file-lookup.ts` for path matching. Do not create a new `matchGlob` utility.
+- Use `isFileOwnedByCommand` from `ownership-pattern-match.ts` for whitelist filtering. This function checks ALL matching ownership entries — if any entry with a different command claims the file, it returns false. This is necessary because `matchOwnershipEntry` returns the first match, which doesn't work when multiple entries match the same path (e.g. `public/{route}.md` and `public/auth.md` both match `auth.md`).
 - The `collectFiles` `ignore` callback receives only the entry filename, not the relative path. Filter after collection, not via the `ignore` callback.
 - Filter ownership entries by `command === "page.markdown.generate"` — not by extension alone. `auth.md` is in the ownership map under `agent.discovery-endpoints.generate` and must be excluded.
-- After implementation, remove the `ignore: (relPath) => relPath === "auth.md"` line — it becomes dead code.
-- The `isGeneratedMarkdownTwin` function (which always returns `true`) does not need to change. With the whitelist, non-twin files are filtered out before the function is reached.
+- The `ignore: (relPath) => relPath === "auth.md"` line was removed — it is dead code with the whitelist.
+- The `isGeneratedMarkdownTwin` function (which always returned `true`) was removed — with the whitelist, non-twin files are filtered out before any content check.
