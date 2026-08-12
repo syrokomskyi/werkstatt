@@ -27,6 +27,7 @@
   <item>RFC-0801: remove auto-archive from mission.close; remove CloseReportArchive interface and --skip-auto-archive flag.</item>
   <item>RFC-0797: replace dirty workpiece guard with commitWorkpieceIfDirty auto-commit; add pre-mirror-check sternsystem.sync inside lock with --skip-auto-sync flag.</item>
   <item>RFC-0820: add zero operator commit guard — block close when no commits since materialization; add --allow-no-op override flag.</item>
+  <item>RFC-0822: persist .env* files to cache clone as final close step.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -58,6 +59,7 @@ import {
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
+import { persistEnvFilesToCacheClone } from "./env-persist.ts";
 
 // RFC-0597: Media cache directories to persist across missions
 const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
@@ -722,8 +724,27 @@ export async function runMissionClose(
         }
       }
 
-      // Copy .cache/video/ and .cache/video-live/ from workpiece to cache clone
+      // RFC-0822: Persist .env* files from workpiece to cache clone (untracked).
+      // Done before .cache/ copy — groups all artifact-copy operations together.
+      // Non-fatal: failure logs a warning but does not block close.
       const workpieceDir = path.join(missionDir, "workpiece");
+      try {
+        const envResult = await persistEnvFilesToCacheClone(workpieceDir, systemDir);
+        if (envResult.copied.length > 0) {
+          logger.info(
+            `  Persisted ${envResult.copied.length} .env file(s) to cache clone: ${envResult.copied.join(", ")}`,
+          );
+        }
+        if (envResult.skipped.length > 0) {
+          logger.warn(`  Warning: failed to persist .env file(s): ${envResult.skipped.join(", ")}`);
+        }
+      } catch (envErr) {
+        logger.warn(
+          `  Warning: failed to persist .env files to cache clone: ${envErr instanceof Error ? envErr.message : String(envErr)}`,
+        );
+      }
+
+      // Copy .cache/video/ and .cache/video-live/ from workpiece to cache clone
       for (const cacheDir of MEDIA_CACHE_DIRS) {
         const srcCache = path.join(workpieceDir, cacheDir);
         if (existsSync(srcCache)) {
