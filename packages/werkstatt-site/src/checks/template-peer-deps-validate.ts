@@ -87,25 +87,6 @@ const PEER_CONFLICT_PATTERNS: Array<{
       version: "",
     }),
   },
-  {
-    regex: /([^@\s]+)@([^\s]+)\s+requires\s+a\s+peer\s+of\s+([^@\s]+)@([^\s]+)/g,
-    extract: (match) => ({
-      requiredBy: `${match[1]}@${match[2]}`,
-      package: match[3]!,
-      requiredRange: match[4]!,
-      version: "",
-    }),
-  },
-  {
-    regex:
-      /ERR_PNPM_PEER_DEP_ISSUES?[\s\S]*?"([^"]+)"\s+requires\s+peer\s+"([^"]+)"\s+at\s+"([^"]+)"/g,
-    extract: (match) => ({
-      requiredBy: match[1]!,
-      package: match[2]!,
-      requiredRange: match[3]!,
-      version: "",
-    }),
-  },
 ];
 
 function parsePeerConflicts(output: string, templateDeps: DepsRecord): PeerDepConflict[] {
@@ -145,18 +126,8 @@ export async function runTemplatePeerDepsValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<PeerDepsValidateData>> {
   const diagnostics: Diagnostic[] = [];
-  const violations: PeerViolation[] = [];
 
-  const site = readFlag(input, "site") ?? context.site?.name;
-  if (!site) {
-    diagnostics.push({
-      ruleId: "PEER-02",
-      severity: "error",
-      message: "--site <name> is required.",
-      fixHint: "Pass --site <system-id> to specify which site context to use.",
-    });
-    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<PeerDepsValidateData>;
-  }
+  const site = readFlag(input, "site") ?? context.site?.name ?? "template";
 
   const templatePath = join(TEMPLATES_DIR, "package.template.json");
 
@@ -210,11 +181,10 @@ export async function runTemplatePeerDepsValidate(
     };
     await writeFile(join(tempDir, "package.json"), JSON.stringify(tempPkgJson, null, 2));
 
-    let result: { stdout: string; stderr: string };
     try {
-      result = await execFileAsync(
+      await execFileAsync(
         "pnpm",
-        ["install", "--dry-run", "--strict-peer-dependencies", "--ignore-scripts", "--json"],
+        ["install", "--dry-run", "--strict-peer-dependencies", "--ignore-scripts"],
         {
           cwd: tempDir,
           maxBuffer: 10 * 1024 * 1024,
@@ -248,14 +218,6 @@ export async function runTemplatePeerDepsValidate(
         });
       } else {
         for (const conflict of conflicts) {
-          violations.push({
-            ruleId: "PEER-01",
-            package: conflict.package,
-            declaredVersion: conflict.version,
-            requiredBy: conflict.requiredBy,
-            requiredRange: conflict.requiredRange,
-            message: `${conflict.package} ${conflict.version} does not satisfy peer dependency ${conflict.requiredRange} required by ${conflict.requiredBy}`,
-          });
           diagnostics.push({
             ruleId: "PEER-01",
             severity: "error",

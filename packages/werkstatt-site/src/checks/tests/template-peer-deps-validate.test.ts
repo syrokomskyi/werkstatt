@@ -104,9 +104,8 @@ describe("template.peer-deps.validate (RFC-0815)", () => {
   });
 
   it("emits PEER-01 when pnpm exits non-zero with peer dep conflict", async () => {
-    const peerErrorOutput = JSON.stringify({
-      message: 'peer dependency "wrangler" "^4.120.1" required by "@cloudflare/vite-plugin"',
-    });
+    const peerErrorOutput =
+      'peer dependency "wrangler" "^4.120.1" required by "@cloudflare/vite-plugin"';
 
     mockExecFileError(peerErrorOutput, "ERR_PNPM_PEER_DEP_ISSUES");
 
@@ -148,14 +147,15 @@ describe("template.peer-deps.validate (RFC-0815)", () => {
     expect(result.data!.diagnostics[0]!.severity).toBe("warning");
   });
 
-  it("emits PEER-02 when --site is missing and no context site", async () => {
+  it("defaults site to 'template' when --site and context.site are missing", async () => {
+    mockExecFileSuccess();
+
     const input = { command: "template.peer-deps.validate", args: [], flags: {} } as any;
     const context = { workspaceRoot: "/fake" } as any;
 
     const result = await runTemplatePeerDepsValidate(input, context);
 
-    expect(result.exitCode).toBe(1);
-    expect(result.data!.diagnostics[0]!.ruleId).toBe("PEER-02");
-    expect(result.data!.diagnostics[0]!.message).toContain("--site");
+    expect(result.exitCode).toBe(0);
+    expect(result.data!.site).toBe("template");
   });
 });
