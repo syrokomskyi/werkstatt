@@ -752,12 +752,21 @@ async function executePipelineForSite(
             // Inject --site for workspace-scoped commands so they receive the site
             // name from the pipeline context (mirrors executeKernelCommand logic).
             const stepArgs = [...(step.args ?? []), ...pipelineFlagsToArgs(options.flags)];
-            if (command.scope === "workspace" && !stepArgs.includes("--site") && site.name) {
+            if (
+              command.scope === "workspace" &&
+              !stepArgs.some((a) => a === "--site" || a.startsWith("--site=")) &&
+              site.name
+            ) {
               stepArgs.push("--site", site.name);
             }
             // RFC-0814: Auto-inject --system for workspace-scoped commands that accept it.
             // The system ID is the same as the site name (RFC-0790 1:1 convention).
-            if (command.scope === "workspace" && !stepArgs.includes("--system") && site.name) {
+            // RFC-0817: Use pattern matching to detect both --system and --system=value formats.
+            if (
+              command.scope === "workspace" &&
+              !stepArgs.some((a) => a === "--system" || a.startsWith("--system=")) &&
+              site.name
+            ) {
               const acceptsSystem =
                 !command.flags ||
                 ("system" in command.flags && command.flags.system.kind === "string");

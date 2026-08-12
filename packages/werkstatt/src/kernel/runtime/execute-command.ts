@@ -399,12 +399,16 @@ export async function executeKernelCommand(
         // consumes --site as a common flag for site selection, but workspace
         // commands need it in their argv for flag resolution.
         const wsArgv = [...argv];
-        if (options.siteName && !wsArgv.includes("--site")) {
+        if (options.siteName && !wsArgv.some((a) => a === "--site" || a.startsWith("--site="))) {
           wsArgv.push("--site", options.siteName);
         }
         // RFC-0814: Auto-inject --system for workspace-scoped commands that accept it.
         // The system ID is the same as the site name (RFC-0790 1:1 convention).
-        if (options.siteName && !wsArgv.includes("--system")) {
+        // RFC-0817: Use pattern matching to detect both --system and --system=value formats.
+        if (
+          options.siteName &&
+          !wsArgv.some((a) => a === "--system" || a.startsWith("--system="))
+        ) {
           const acceptsSystem =
             !wsCommand.flags ||
             ("system" in wsCommand.flags && wsCommand.flags.system.kind === "string");
