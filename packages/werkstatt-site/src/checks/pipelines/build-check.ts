@@ -49,4 +49,6 @@ export const SITES_BUILD_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "content.regression.check" },
   // RFC-0800: template dependency drift — safety net for mission.close auto-sync
   { command: "template.deps.drift" },
+  // RFC-0815: template peer dependency validation — catches peer conflicts before propagation
+  { command: "template.peer-deps.validate" },
 ];

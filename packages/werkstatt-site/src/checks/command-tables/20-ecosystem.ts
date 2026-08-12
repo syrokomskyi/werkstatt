@@ -48,6 +48,7 @@ import { runGateCatalogGenerate, runGateCatalogValidate } from "../gate-catalog.
 import { runTemplateImportsValidate } from "../template-imports-validate.ts";
 import { runWorkpieceImportsValidate } from "../workpiece-imports-validate.ts";
 import { runTemplateDepsDrift } from "../template-deps-drift.ts";
+import { runTemplatePeerDepsValidate } from "../template-peer-deps-validate.ts";
 import { runPlatformCommitDisciplineValidate } from "../platform-commit-discipline.ts";
 
 export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
@@ -166,6 +167,21 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
       "missions/*/workpiece/package.json",
     ],
     execute: runTemplateDepsDrift,
+  },
+  {
+    name: "template.peer-deps.validate",
+    description:
+      "Validate peer dependency constraints in package.template.json by resolving the dependency tree via pnpm install --dry-run --strict-peer-dependencies (RFC-0815).",
+    scope: "app",
+    flags: {
+      site: {
+        kind: "string",
+        required: false,
+        description: "Site id for pipeline context.",
+      },
+    },
+    reads: ["packages/werkstatt-site/src/onboarding/templates/package.template.json"],
+    execute: runTemplatePeerDepsValidate,
   },
   {
     name: "maintenance.debt.report",

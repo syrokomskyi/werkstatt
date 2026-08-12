@@ -178,4 +178,19 @@ export const GOVERNANCE_RULES: Record<string, RuleDescriptor> = {
     "Template or workpiece package.json missing",
     "template.deps.drift",
   ),
+  "PEER-01": rule(
+    "PEER-01",
+    "Peer dependency constraint violated in package template",
+    "template.peer-deps.validate",
+  ),
+  "PEER-02": rule(
+    "PEER-02",
+    "Template file not found or unreadable",
+    "template.peer-deps.validate",
+  ),
+  "PEER-03": rule(
+    "PEER-03",
+    "Dependency resolution failed (registry unreachable or network error)",
+    "template.peer-deps.validate",
+  ),
 };
