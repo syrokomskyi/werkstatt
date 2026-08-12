@@ -18,6 +18,7 @@
   <item>Accepted public-readiness RFCs: register IndexNow, humans.txt, and security.txt generated outputs.</item>
   <item>RFC-0309: register generated public icon and webmanifest outputs.</item>
   <item>RFC-0310: register generated 404 Astro route.</item>
+  <item>RFC-0810: make module field required in OwnershipEntry interface.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -48,8 +49,9 @@ export interface OwnershipEntry {
   /**
    * Repo-relative path to the command's source module (e.g. "packages/os/site-kernel-checks/src/robots.ts").
    * Used by `generated.edit.guard` for Category B owner resolution.
+   * RFC-0810: required — `ownership.generator.cross-check` verifies existence.
    */
-  module?: string;
+  module: string;
   /**
    * When true, the file is only generated under certain conditions (e.g. cms-git adapter,
    * preliminary build-identity.json).
