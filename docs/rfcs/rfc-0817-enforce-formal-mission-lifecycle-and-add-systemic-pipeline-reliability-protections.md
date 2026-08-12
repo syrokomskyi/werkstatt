@@ -30,8 +30,6 @@ commands:
   changed:
     - mission.preview
     - dns.record.upsert
-    - executeKernelCommand
-    - executePipelineForSite
   removed: []
 appsImpacted: []
 packagesImpacted:
@@ -224,7 +222,7 @@ interface DnsRecordUpsertResult {
 
 ## Acceptance criteria
 
-- [x] `mission.preview` auto-runs `mission.materialize` when `materializedAt === null` and mission state is `open` (evidence: packages/werkstatt/src/mission/mission-preview.ts:198-228, mission-preview.test.ts)
+- [x] `mission.preview` auto-runs `mission.materialize` when `materializedAt === null` and mission state is `open` (evidence: packages/werkstatt/src/mission/mission-preview.ts:198-228)
 - [x] `--skip-prepare` does NOT skip materialization (evidence: packages/werkstatt/src/mission/mission-preview.ts:198-228, gate is before skipPrepare check at line 238)
 - [x] `executeKernelCommand` and `executePipelineForSite` auto-inject detects `--system=value` and `--site=value` format and does not double-inject (evidence: packages/werkstatt/src/kernel/runtime/execute-command.ts:402,408, packages/werkstatt/src/kernel/runtime/execute-pipeline.ts:755,761, system-injection.test.ts:199-247)
 - [x] `dns.record.upsert` returns exitCode 0 with skip summary when `dns-records.yaml` is absent (evidence: packages/werkstatt/src/dns/dns-record-upsert.ts:71-83, dns-record-upsert.test.ts:322-347)
