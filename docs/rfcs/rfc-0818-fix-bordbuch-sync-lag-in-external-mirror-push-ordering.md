@@ -192,12 +192,12 @@ git(bareRepoPath, `update-ref refs/mirror/${branchName} ${headSha}`);
 
 ## Acceptance criteria
 
-- [ ] External mirror HEAD matches `refs/mirror/${branch}` after `sternsystem.sync` with external mirrors configured
-- [ ] `refs/mirror/${branch}` matches bare repo HEAD after sync (existing test continues to pass)
-- [ ] Bundle mirrors include the bordbuch commit (bundle HEAD = bare HEAD after sync)
-- [ ] Integration test verifies external mirror HEAD matches `refs/mirror/${branch}`
-- [ ] `sternsystem.sync` non-fatal failure handling unchanged (per-mirror failures still non-fatal)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] External mirror HEAD matches `refs/mirror/${branch}` after `sternsystem.sync` with external mirrors configured (evidence: `packages/werkstatt/src/sternsystem/sternsystem-sync-integration.test.ts:258-285`, test "sync pushes bordbuch commit to external mirror — external HEAD matches refs/mirror")
+- [x] `refs/mirror/${branch}` matches bare repo HEAD after sync (existing test continues to pass) (evidence: `packages/werkstatt/src/sternsystem/sternsystem-sync-integration.test.ts:199-222`, test "sync with external mirrors creates refs/mirror/${branch} matching bare repo HEAD")
+- [x] Bundle mirrors include the bordbuch commit (bundle HEAD = bare HEAD after sync) (evidence: `packages/werkstatt/src/sternsystem/sternsystem-sync-integration.test.ts:288-317`, test "sync creates bundle including bordbuch commit")
+- [x] Integration test verifies external mirror HEAD matches `refs/mirror/${branch}` (evidence: `packages/werkstatt/src/sternsystem/sternsystem-sync-integration.test.ts:258-285`)
+- [x] `sternsystem.sync` non-fatal failure handling unchanged (per-mirror failures still non-fatal) (evidence: `packages/werkstatt/src/sternsystem/sternsystem-sync-integration.test.ts:173-197`, test "sync handles per-mirror failure non-fatally" passes; `packages/werkstatt/src/sternsystem/sternsystem-sync-integration.test.ts:322-354`, regression test "sync with failing external mirror")
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0818` exit 0)
 
 ## Implementation notes for agents
 
