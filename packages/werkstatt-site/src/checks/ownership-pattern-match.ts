@@ -5,15 +5,16 @@
   path resolution. Extracted from generated-file-lookup.ts and
   generated-edit-guard.ts to eliminate triplicated copies of toPosix,
   segmentToRegexSource, ownPatternToExactRegex, normalizeOwnershipPath,
-  expandPlaceholderVariants, and matchOwnershipEntry.
+  expandPlaceholderVariants, and matchOwnershipEntry. Also provides
+  isFileOwnedByCommand for command-scoped whitelist filtering.
 </purpose>
 <non-goals>
-  <item>Do not add new matching logic — this module is a pure extraction of existing utilities.</item>
   <item>gitattributes.ts retains its own expandPlaceholderVariants because its recursive variant construction differs.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0811: initial extraction from generated-file-lookup.ts and generated-edit-guard.ts.</item>
+  <item>RFC-0811: add isFileOwnedByCommand for whitelist filtering in page.markdown.validate.</item>
 </CHANGE_SUMMARY>
 */
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
