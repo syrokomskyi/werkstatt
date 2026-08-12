@@ -32,6 +32,7 @@ Every `systems/*`, `services/*`, and root project that reads environment variabl
 - Every variable in `.env.example` MUST be documented by a preceding `#` comment.
 - Every variable MUST include a `# How to obtain:` instruction line with concrete steps for acquiring its value.
 - Values in `.env.example` MUST stay empty — never commit real secrets.
+- In `.env` files, variables that are listed in `.env.example` but not required for a specific deployment MAY be set to `null` (the literal string) to signal intentional non-configuration. `deploy.preflight` accepts `null` as a valid non-empty value. Services that read a variable marked `null` should treat it as a configuration error, not as an absent value (RFC-0819).
 - `README.md` files MUST NOT duplicate env-variable tables — they reference `.env.example` instead.
 - `systems/*` and `services/*` projects with `.env.example` MUST have `.env` on disk (local development + deploy). It is gitignored.
 - `systems/*/package.json` MUST contain the six canonical deploy scripts: `build:main`, `build:alt`, `deploy:main`, `deploy:alt`, `build:deploy:main`, `build:deploy:alt`.
