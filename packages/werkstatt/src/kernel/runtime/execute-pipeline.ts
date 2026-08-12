@@ -755,6 +755,16 @@ async function executePipelineForSite(
             if (command.scope === "workspace" && !stepArgs.includes("--site") && site.name) {
               stepArgs.push("--site", site.name);
             }
+            // RFC-0814: Auto-inject --system for workspace-scoped commands that accept it.
+            // The system ID is the same as the site name (RFC-0790 1:1 convention).
+            if (command.scope === "workspace" && !stepArgs.includes("--system") && site.name) {
+              const acceptsSystem =
+                !command.flags ||
+                ("system" in command.flags && command.flags.system.kind === "string");
+              if (acceptsSystem) {
+                stepArgs.push("--system", site.name);
+              }
+            }
             report = await executeRegisteredCommand(command, context, stepArgs, {
               timeoutMs: step.timeoutMs,
               expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,

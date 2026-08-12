@@ -402,6 +402,16 @@ export async function executeKernelCommand(
         if (options.siteName && !wsArgv.includes("--site")) {
           wsArgv.push("--site", options.siteName);
         }
+        // RFC-0814: Auto-inject --system for workspace-scoped commands that accept it.
+        // The system ID is the same as the site name (RFC-0790 1:1 convention).
+        if (options.siteName && !wsArgv.includes("--system")) {
+          const acceptsSystem =
+            !wsCommand.flags ||
+            ("system" in wsCommand.flags && wsCommand.flags.system.kind === "string");
+          if (acceptsSystem) {
+            wsArgv.push("--system", options.siteName);
+          }
+        }
         return executeRegisteredCommand(wsCommand, context, wsArgv);
       }
     }

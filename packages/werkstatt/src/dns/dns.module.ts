@@ -37,7 +37,9 @@ export function createDnsModule(): KernelModule {
         flags: {
           system: {
             kind: "string",
-            description: "System ID from system-config.yaml. Falls back to site context.",
+            required: true,
+            description:
+              "System ID from system-config.yaml. Auto-injected by pipeline/CLI when --site is provided.",
           },
           "dry-run": {
             kind: "boolean",
