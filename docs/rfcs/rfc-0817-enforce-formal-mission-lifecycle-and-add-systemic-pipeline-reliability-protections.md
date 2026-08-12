@@ -224,14 +224,14 @@ interface DnsRecordUpsertResult {
 
 ## Acceptance criteria
 
-- [ ] `mission.preview` auto-runs `mission.materialize` when `materializedAt === null` and mission state is `open`
-- [ ] `--skip-prepare` does NOT skip materialization
-- [ ] `executeKernelCommand` and `executePipelineForSite` auto-inject detects `--system=value` and `--site=value` format and does not double-inject
-- [ ] `dns.record.upsert` returns exitCode 0 with skip summary when `dns-records.yaml` is absent
-- [ ] CI workflow (`.github/workflows/ci.yml`) includes `ownership.generator.cross-check`
-- [ ] Unit test validates `GENERATOR_OWNERSHIP_MAP` conditional entries
-- [ ] `AGENTS.md` updated with lifecycle enforcement rule
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission.preview` auto-runs `mission.materialize` when `materializedAt === null` and mission state is `open` (evidence: packages/werkstatt/src/mission/mission-preview.ts:198-228, mission-preview.test.ts)
+- [x] `--skip-prepare` does NOT skip materialization (evidence: packages/werkstatt/src/mission/mission-preview.ts:198-228, gate is before skipPrepare check at line 238)
+- [x] `executeKernelCommand` and `executePipelineForSite` auto-inject detects `--system=value` and `--site=value` format and does not double-inject (evidence: packages/werkstatt/src/kernel/runtime/execute-command.ts:402,408, packages/werkstatt/src/kernel/runtime/execute-pipeline.ts:755,761, system-injection.test.ts:199-247)
+- [x] `dns.record.upsert` returns exitCode 0 with skip summary when `dns-records.yaml` is absent (evidence: packages/werkstatt/src/dns/dns-record-upsert.ts:71-83, dns-record-upsert.test.ts:322-347)
+- [x] CI workflow (`.github/workflows/ci.yml`) includes `ownership.generator.cross-check` (evidence: .github/workflows/ci.yml:63-64)
+- [x] Unit test validates `GENERATOR_OWNERSHIP_MAP` conditional entries (evidence: packages/werkstatt-site/src/checks/tests/generated-files-validate.test.ts:220-267)
+- [x] `AGENTS.md` updated with lifecycle enforcement rule (evidence: AGENTS.md:325-327)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0817 exitCode 0, 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
