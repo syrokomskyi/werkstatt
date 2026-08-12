@@ -12,6 +12,7 @@
   <item>RFC-0561: add owner-format-invalid check and missing-owner notice warning.</item>
   <item>RFC-0648: add branch-convention rule enforcing main as default branch for cache clone and bare repo.</item>
   <item>RFC-0792: add yaml-syntax-error rule for top-level YAML file syntax checking in systems-cache.</item>
+  <item>RFC-0822: add ENV-PERSIST-01 warning when cache clone lacks .env* but active workpiece has them.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +34,9 @@ import {
   hasAppsCollision,
   resolveMirrors,
   resolveMirrorPath,
+  resolveCacheClonePath,
+  resolveWorkpiecePath,
+  readSystemState,
   isGitAccessible,
 } from "./registry-io.ts";
 import { evaluateExternalEditGate } from "./external-edit-guard.ts";
@@ -144,6 +148,20 @@ async function validateYamlFiles(
   }
 
   return violations;
+}
+
+async function collectEnvFileNames(dir: string): Promise<string[]> {
+  if (!existsSync(dir)) return [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const envFiles: string[] = [];
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    if (!entry.name.startsWith(".env")) continue;
+    if (entry.name === ".env.example") continue;
+    if (/^\.env\..*\.example$/.test(entry.name)) continue;
+    envFiles.push(entry.name);
+  }
+  return envFiles;
 }
 
 export async function runSternsystemValidate(
@@ -432,6 +450,29 @@ export async function runSternsystemValidate(
     // RFC-0792: YAML syntax checking for all top-level YAML files in cache clone
     const yamlViolations = await validateYamlFiles(cacheDir, entry.id);
     violations.push(...yamlViolations);
+
+    // RFC-0822: ENV-PERSIST-01 warning — cache clone lacks .env* but workpiece has them
+    try {
+      const cacheEnvFiles = await collectEnvFileNames(cacheDir);
+      if (cacheEnvFiles.length === 0) {
+        const state = await readSystemState(workspaceRoot, entry.id);
+        if (state.currentMission) {
+          const workpieceDir = resolveWorkpiecePath(workspaceRoot, state.currentMission);
+          if (existsSync(workpieceDir)) {
+            const workpieceEnvFiles = await collectEnvFileNames(workpieceDir);
+            if (workpieceEnvFiles.length > 0) {
+              warnings.push({
+                systemId: entry.id,
+                field: "ENV-PERSIST-01",
+                message: `Cache clone for system '${entry.id}' has no .env files but workpiece has ${workpieceEnvFiles.length} — run mission.close to persist secrets`,
+              });
+            }
+          }
+        }
+      }
+    } catch {
+      // Non-fatal — env check skipped
+    }
   }
 
   const validated = systems.length;
