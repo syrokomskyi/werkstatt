@@ -1,7 +1,7 @@
 ---
 id: ADR-0044
 title: "Idempotent kernel command registration for same-handler duplicates"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-12
