@@ -69,3 +69,9 @@ The `werkstatt.autonomy.validate` command enforces DNA-64. It scans `packages/we
 - `@warpgogol/werkstatt-site/passport`, `@warpgogol/werkstatt-site/observability`, `@warpgogol/werkstatt-site/integration`, `@warpgogol/werkstatt-site/surface` (shared infrastructure subpaths)
 
 Excludes: `node_modules/`, `tests/`, `tests-handoff/`, `*.test.ts`, `*.spec.ts`.
+
+## Pre-dev critical file check in mission.preview
+
+`mission.preview` must verify that dev-critical generated files exist before starting the dev server. The check uses `existsSync` (instant, no pipeline overhead) and auto-generates missing files via `executeKernelCommand`. If generation fails, the server launch is blocked with an actionable error message explaining what is missing, why it matters, and how to fix it. The `--skip-prepare` flag bypasses the check for fast restarts when files are known to exist.
+
+Dev-critical files: `src/content-ref-index.generated.yaml`, `src/derived-prices.generated.json`, `src/video-manifest.generated.yaml`. Some generators have prerequisites (e.g. `derived-prices.materialize` requires `entitlements.resolve`, `rate-snapshot.resolve`, `currency-pricing.compile`) — the check runs prerequisites before the owning command.
