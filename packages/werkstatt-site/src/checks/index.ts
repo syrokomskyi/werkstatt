@@ -179,6 +179,12 @@ export {
   type ChromiumInstallStatus,
 } from "./playwright-chromium-ensure.ts";
 
+// RFC-0813: re-export runPlaywrightPreflightCheck for standalone command execution
+export {
+  runPlaywrightPreflightCheck,
+  type PlaywrightPreflightCheckResult,
+} from "./playwright-preflight.ts";
+
 // Axiom adapter: re-export report renderer and types for downstream consumers
 export {
   renderAxiomReportHtml,

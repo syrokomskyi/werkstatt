@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>Merged 33-independent-qa.ts, 34-gitattributes.ts, 36-env-contract.ts, 37-fingerprint.ts, 38-agent-environment.ts, 39-yaml-contract.ts into infra-contracts.ts.</item>
   <item>RFC-0493: added yaml.parse.validate command entry.</item>
+  <item>RFC-0813: added playwright.preflight.check command entry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -32,6 +33,7 @@ import { runYamlContractLint } from "../yaml-contract-lint.ts";
 import { runYamlParseValidate } from "../yaml-parse-validate.ts";
 import { runCommandReadsValidate } from "../command-reads-validate.ts";
 import { runPlaywrightChromiumEnsure } from "../playwright-chromium-ensure.ts";
+import { runPlaywrightPreflightCheck } from "../playwright-preflight.ts";
 import { runMethodologiesValidate } from "../methodologies-validate.ts";
 import { runSuppressionsValidate } from "../suppressions-validate.ts";
 import { runBordbuchCommitParityLint } from "../bordbuch-commit-parity-lint.ts";
@@ -434,6 +436,16 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     supportsAllSites: false,
     execute: runPlaywrightChromiumEnsure,
+  },
+  {
+    name: "playwright.preflight.check",
+    description:
+      "RFC-0813: Pre-flight check for Playwright Chromium. Fails fast (exitCode 1) " +
+      "if Chromium is not launchable. Does not auto-install — use playwright.chromium.ensure " +
+      "for that. Used by mission.validate before build.prepare.",
+    scope: "workspace",
+    supportsAllSites: false,
+    execute: runPlaywrightPreflightCheck,
   },
   {
     name: "methodologies.validate",
