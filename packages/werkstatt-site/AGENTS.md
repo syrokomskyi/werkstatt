@@ -62,6 +62,7 @@ Notable check commands registered by this package:
 - `workpiece.imports.validate` (RFC-0557) — validates workpiece imports against root node_modules.
 - `template.deps.drift` (RFC-0800) — compares `dependencies` and `devDependencies` between workpiece `package.json` and `package.template.json`. Emits `TEMPLATE-DEPS-DRIFT-01` for version mismatches and `TEMPLATE-DEPS-DRIFT-02` for missing files. Integrated into `SITES_BUILD_CHECK_PIPELINE` as a safety net for the auto-sync in `mission.close`.
 - `deployment.gate.validate` (RFC-0803) — validates that non-gated pages do not reference gated pages in navigation, block props, or breadcrumb parent chains. Emits `GATE-01` (navigation), `GATE-02` (block props), `GATE-03` (parentPageId). Integrated into `SITES_BUILD_CHECK_PIPELINE`.
+- `ownership.generator.cross-check` (RFC-0810) — cross-references app-scoped `.generate` commands against `GENERATOR_OWNERSHIP_MAP`. Emits `OWN-XCHECK-01` (uncovered generator), `OWN-XCHECK-02` (phantom command reference), `OWN-XCHECK-03` (missing or non-existent module path). Integrated into `SITES_BUILD_PREPARE_PIPELINE` and `SITES_BUILD_PREPARE_DEV_PIPELINE` before `ownership.sync.validate`.
 
 ## Domain layer (RFC-0775)
 

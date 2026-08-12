@@ -36,6 +36,7 @@ import {
   runMaterialCreditsReport,
   runMaterialCreditsValidate,
 } from "../material-credits.ts";
+import { runGenerateMaterialCreditsPage } from "@warpgogol/werkstatt-site/codegen";
 import { runMaterialMetadataValidate } from "../material-metadata.ts";
 import { runPersonCreate } from "../person-create.ts";
 import { runRootCanonicalValidate } from "../root-canonical.ts";
@@ -357,6 +358,24 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     modulePaths: ["video/video-fallback.ts"],
     execute: runVideoIosFallbackValidate,
   },
+  /* RFC-0220: material credits page generation */
+  {
+    name: "material.credits.generate",
+    description:
+      "Generate material credits pages (pages/{lang}/credits.md, prose/{lang}/credits.md) from *.credits.yaml sidecars (RFC-0220).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    mutatesState: true,
+    cacheable: false,
+    writes: [
+      "<app>/src/content/pages/{lang}/credits.md",
+      "<app>/src/content/prose/{lang}/credits.md",
+    ],
+    reads: ["<app>/src/content/**/*.credits.yaml", "<app>/src/content/system.md"],
+    modulePaths: ["service.ts"],
+    execute: runGenerateMaterialCreditsPage,
+  },
   /* RFC-0220: material credits / provenance governance */
   {
     name: "material.credits.validate",
@@ -555,7 +574,10 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/entitlements.generated.yaml", "packages/werkstatt-site/src/domain/ontology/entitlements/**/*.yaml"],
+    reads: [
+      "<app>/src/entitlements.generated.yaml",
+      "packages/werkstatt-site/src/domain/ontology/entitlements/**/*.yaml",
+    ],
     modulePaths: ["entitlements.ts", "result-helpers.ts"],
     execute: runEntitlementsValidate,
   },

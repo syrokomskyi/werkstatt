@@ -19,6 +19,8 @@
   <item>RFC-0309: register generated public icon and webmanifest outputs.</item>
   <item>RFC-0310: register generated 404 Astro route.</item>
   <item>RFC-0810: make module field required in OwnershipEntry interface.</item>
+  <item>RFC-0810: update all module paths from stale packages/os/ to post-RFC-0776 locations.</item>
+  <item>RFC-0810: add ownership entries for agent.markdown-negotiation.generate, behavior.snapshot.generate, print.pdf.generate, surface.translation.generate, surface.translation.notes.generate, surface.translation.glossary.generate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -47,7 +49,7 @@ export interface OwnershipEntry {
    */
   markerPolicy?: "embedded" | "registry-only";
   /**
-   * Repo-relative path to the command's source module (e.g. "packages/os/site-kernel-checks/src/robots.ts").
+   * Repo-relative path to the command's source module (e.g. "packages/werkstatt-site/src/checks/robots.ts").
    * Used by `generated.edit.guard` for Category B owner resolution.
    * RFC-0810: required — `ownership.generator.cross-check` verifies existence.
    */
@@ -72,55 +74,55 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   {
     path: "src/content/pages/root-redirect.md",
     command: "overlay.pages.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/content/pages/{lang}/cosmic/passport.md",
     command: "overlay.pages.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/content/pages/{lang}/cosmic/star-map.md",
     command: "overlay.pages.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
 
   // routes.generate — RFC-0078 thin runtime entrypoints
   {
     path: "src/pages/index.astro",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/pages/404.astro",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   // RFC-0160: unprefixed default-language page route.
   {
     path: "src/pages/[...slug].astro",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/pages/[lang]/[...slug].astro",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/middleware.ts",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/content.config.ts",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/env.d.ts",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
 
   // api.routes.generate — RFC-0149 section-owned Astro APIRoute re-exports + env schema.
@@ -129,33 +131,33 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   {
     path: "src/pages/api/{route}.ts",
     command: "api.routes.generate",
-    module: "packages/os/site-kernel-codegen/src/api-routes.ts",
+    module: "packages/werkstatt-site/src/codegen/api-routes.ts",
   },
   {
     path: "src/env.schema.generated.mjs",
     command: "api.routes.generate",
-    module: "packages/os/site-kernel-codegen/src/api-routes.ts",
+    module: "packages/werkstatt-site/src/codegen/api-routes.ts",
   },
 
   // env.example.generate — RFC-0168 (Session C): generated, leak-guarded secret template.
   {
     path: ".env.example",
     command: "env.example.generate",
-    module: "packages/os/site-kernel-checks/src/env/env-example.ts",
+    module: "packages/werkstatt-site/src/checks/env/env-example.ts",
   },
 
   // styles.global.generate — RFC-0078 global stylesheet boilerplate
   {
     path: "src/styles/global.css",
     command: "styles.global.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
 
   // scripts.orchestrator.generate — RFC-0078 layout orchestrator
   {
     path: "src/scripts/layout-orchestrator.ts",
     command: "scripts.orchestrator.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
 
   // public.infrastructure.generate — RFC-0078 public static infrastructure
@@ -163,50 +165,50 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/_headers",
     command: "public.infrastructure.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "public/_redirects",
     command: "public.infrastructure.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "public/.assetsignore",
     command: "public.infrastructure.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
 
   // agents.generate — RFC-0079 generated AGENTS.md files
   {
     path: "AGENTS.md",
     command: "agents.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/content/AGENTS.md",
     command: "agents.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
   {
     path: "src/styles/AGENTS.md",
     command: "agents.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
 
   // biome.css.generate — RFC-0025 / RFC-0071 biome-scoped CSS
   {
     path: "src/styles/biome.generated.css",
     command: "biome.css.generate",
-    module: "packages/os/site-kernel-codegen/src/biome-css.ts",
+    module: "packages/werkstatt-site/src/codegen/biome-css.ts",
   },
 
   // RFC-0371: Fontsource CSS imports (biome-driven).
   {
     path: "src/styles/fonts.imports.css",
     command: "fonts.imports.generate",
-    module: "packages/os/site-kernel-codegen/src/fonts-imports.ts",
+    module: "packages/werkstatt-site/src/codegen/fonts-imports.ts",
   },
 
   // RFC-0166: per-page Markdown twins ({route} claims the public *.md twin tree).
@@ -214,27 +216,27 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/index.md",
     command: "page.markdown.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/page-markdown.ts",
+    module: "packages/werkstatt-site/src/checks/page-markdown.ts",
   },
   {
     path: "public/{route}.md",
     command: "page.markdown.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/page-markdown.ts",
+    module: "packages/werkstatt-site/src/checks/page-markdown.ts",
   },
 
   // RFC-0169: resolved subscription entitlements.
   {
     path: "src/entitlements.generated.yaml",
     command: "entitlements.resolve",
-    module: "packages/os/site-kernel-checks/src/entitlements.ts",
+    module: "packages/werkstatt-site/src/checks/entitlements.ts",
   },
 
   // RFC-0213: content freshness ledger (generated by content.freshness.validate).
   {
     path: "src/freshness.generated.yaml",
     command: "content.freshness.validate",
-    module: "packages/os/site-kernel-checks/src/content-freshness.ts",
+    module: "packages/werkstatt-site/src/checks/content-freshness.ts",
   },
 
   // RFC-0165: RSS feed + RFC-0317 JSON Feed.
@@ -242,96 +244,96 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/feed.xml",
     command: "feed.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/feed.ts",
+    module: "packages/werkstatt-site/src/checks/feed.ts",
   },
   {
     path: "public/feed.json",
     command: "feed.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/feed.ts",
+    module: "packages/werkstatt-site/src/checks/feed.ts",
   },
 
   // legal.scaffold — RFC-0096 Impressum / Datenschutz stubs (DE/AT/CH locales only)
   {
     path: "src/content/pages/{lang}/impressum.md",
     command: "legal.scaffold",
-    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+    module: "packages/werkstatt-site/src/codegen/legal-scaffold.ts",
   },
   {
     path: "src/content/pages/{lang}/datenschutz.md",
     command: "legal.scaffold",
-    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+    module: "packages/werkstatt-site/src/codegen/legal-scaffold.ts",
   },
   {
     path: "src/content/prose/{lang}/impressum.md",
     command: "legal.scaffold",
-    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+    module: "packages/werkstatt-site/src/codegen/legal-scaffold.ts",
   },
   {
     path: "src/content/prose/{lang}/datenschutz.md",
     command: "legal.scaffold",
-    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+    module: "packages/werkstatt-site/src/codegen/legal-scaffold.ts",
   },
 
   // i18n.middleware.generate — RFC-0055 language redirect middleware
   {
     path: "src/middleware/language-redirect.ts",
     command: "i18n.middleware.generate",
-    module: "packages/os/site-kernel-codegen/src/service.ts",
+    module: "packages/werkstatt-site/src/codegen/service.ts",
   },
 
   // RFC-0589: retired tombstone middleware (410 Gone handling, routes.generate owned)
   {
     path: "src/middleware/retired-tombstones.ts",
     command: "routes.generate",
-    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+    module: "packages/werkstatt-site/src/codegen/app-boilerplate.ts",
   },
 
   // open-source.generate — RFC-0489 deployment-specific SBOM registry
   {
     path: "src/content/pages/{lang}/open-source.md",
     command: "open-source.generate",
-    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+    module: "packages/werkstatt-site/src/codegen/open-source-page.ts",
   },
   {
     path: "src/content/prose/{lang}/open-source.md",
     command: "open-source.generate",
-    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+    module: "packages/werkstatt-site/src/codegen/open-source-page.ts",
   },
   {
     path: "src/content/data/{lang}/open-source-registry.json",
     command: "open-source.generate",
-    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+    module: "packages/werkstatt-site/src/codegen/open-source-page.ts",
   },
   {
     path: "public/open-source/THIRD_PARTY_NOTICES.txt",
     command: "open-source.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+    module: "packages/werkstatt-site/src/codegen/open-source-page.ts",
   },
   {
     path: "public/open-source/THIRD_PARTY_LICENSES.txt",
     command: "open-source.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+    module: "packages/werkstatt-site/src/codegen/open-source-page.ts",
   },
   {
     path: "public/open-source/sbom.cdx.json",
     command: "open-source.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+    module: "packages/werkstatt-site/src/codegen/open-source-page.ts",
   },
 
   // material.credits.generate — RFC-0220 material credits page
   {
     path: "src/content/pages/{lang}/credits.md",
     command: "material.credits.generate",
-    module: "packages/os/site-kernel-codegen/src/service.ts",
+    module: "packages/werkstatt-site/src/codegen/service.ts",
   },
   {
     path: "src/content/prose/{lang}/credits.md",
     command: "material.credits.generate",
-    module: "packages/os/site-kernel-codegen/src/service.ts",
+    module: "packages/werkstatt-site/src/codegen/service.ts",
   },
 
   // robots.generate — RFC-0052 canonical robots.txt builder (single owner per RFC-0087)
@@ -339,7 +341,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/robots.txt",
     command: "robots.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/robots.ts",
+    module: "packages/werkstatt-site/src/checks/robots.ts",
   },
 
   // sitemap.generate — RFC-0049 sitemap.xml index + sub-sitemaps
@@ -347,13 +349,13 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/sitemap.xml",
     command: "sitemap.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/sitemap.ts",
+    module: "packages/werkstatt-site/src/checks/sitemap.ts",
   },
   {
     path: "public/sitemap-{category}.xml",
     command: "sitemap.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/sitemap.ts",
+    module: "packages/werkstatt-site/src/checks/sitemap.ts",
   },
 
   // llms.generate — RFC-0050 LLM-facing text exports
@@ -361,13 +363,13 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/llms.txt",
     command: "llms.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/llms.ts",
+    module: "packages/werkstatt-site/src/checks/llms.ts",
   },
   {
     path: "public/llms-full.txt",
     command: "llms.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/llms.ts",
+    module: "packages/werkstatt-site/src/checks/llms.ts",
   },
 
   // ai.generate — RFC-0051 AI policy file
@@ -375,7 +377,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/ai.txt",
     command: "ai.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/ai.ts",
+    module: "packages/werkstatt-site/src/checks/ai.ts",
   },
 
   // Accepted public-readiness RFCs.
@@ -383,19 +385,19 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/{app}-indexnow.txt",
     command: "indexnow.key.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/indexnow.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/indexnow.ts",
   },
   {
     path: "public/humans.txt",
     command: "humans.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/humans.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/humans.ts",
   },
   {
     path: "public/.well-known/security.txt",
     command: "security.txt.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/security.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/security.ts",
   },
 
   // RFC-0309: generated installable icon and webmanifest suite.
@@ -403,49 +405,49 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/favicon.svg",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
   {
     path: "public/favicon.ico",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
   {
     path: "public/apple-touch-icon.png",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
   {
     path: "public/icon-192.png",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
   {
     path: "public/icon-512.png",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
   {
     path: "public/icon-maskable-192.png",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
   {
     path: "public/icon-maskable-512.png",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
   {
     path: "public/manifest.webmanifest",
     command: "public.icons.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/public-surface/icons.ts",
+    module: "packages/werkstatt-site/src/checks/public-surface/icons.ts",
   },
 
   // props.types.generate — RFC-0262 manifest propsSchema -> generated TypeScript
@@ -454,12 +456,12 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   {
     path: "packages/werkstatt-site/src/domain/ui/sections/{id}/{id}.types.generated.ts",
     command: "props.types.generate",
-    module: "packages/os/site-kernel-codegen/src/props-types.ts",
+    module: "packages/werkstatt-site/src/codegen/props-types.ts",
   },
   {
     path: "packages/werkstatt-site/src/domain/ui/components/{id}/{id}.types.generated.ts",
     command: "props.types.generate",
-    module: "packages/os/site-kernel-codegen/src/props-types.ts",
+    module: "packages/werkstatt-site/src/codegen/props-types.ts",
   },
 
   // RFC-0286: Agent Surface Manifest — public JSON projection.
@@ -467,7 +469,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/agent.json",
     command: "agent.manifest.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/agent-manifest.ts",
+    module: "packages/werkstatt-site/src/checks/agent/agent-manifest.ts",
   },
 
   // RFC-0289: OpenAPI 3.1 projection.
@@ -475,7 +477,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/agent.openapi.json",
     command: "agent.openapi.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/agent-openapi.ts",
+    module: "packages/werkstatt-site/src/checks/agent/agent-openapi.ts",
   },
 
   // RFC-0783: API Catalog linkset+json (RFC 9727).
@@ -499,7 +501,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/api/agent/v1/*.json",
     command: "agent.knowledge.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/agent-knowledge.ts",
+    module: "packages/werkstatt-site/src/checks/agent/agent-knowledge.ts",
   },
 
   // RFC-0785: Agent discovery endpoint files (auth.md, agent-skills, oauth).
@@ -533,13 +535,13 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "src/agent-surface.generated.json",
     command: "agent.routes.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/agent/agent-routes.ts",
+    module: "packages/werkstatt-site/src/checks/agent/agent-routes.ts",
   },
   {
     path: "src/agent-capabilities.generated.json",
     command: "agent.routes.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/agent/agent-routes.ts",
+    module: "packages/werkstatt-site/src/checks/agent/agent-routes.ts",
   },
 
   // RFC-0192: Programmatic Surface manifest + PSEO pages.
@@ -547,7 +549,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/pseo-manifest.json",
     command: "surface.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/surface/generate.ts",
+    module: "packages/werkstatt-site/src/checks/surface/generate.ts",
   },
 
   // RFC-0198: Surface star-map SVG.
@@ -555,7 +557,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/pseo-star-map.svg",
     command: "surface.starmap",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/surface/starmap.ts",
+    module: "packages/werkstatt-site/src/checks/surface/starmap.ts",
   },
 
   // RFC-0295: Warpgogol check hints.
@@ -563,7 +565,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/warpgogol-check.json",
     command: "warpgogol.check-hints.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-check-warpgogol/src/commands/hints.ts",
+    module: "packages/werkstatt-site/src/checks/check-warpgogol/commands/hints.ts",
   },
 
   // RFC-0634: Preliminary build-identity.json written by leitstand.dev-deploy
@@ -573,7 +575,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/build-identity.json",
     command: "release.prepare",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/release/release-commands.ts",
+    module: "packages/werkstatt/src/release/release-commands.ts",
     conditional: true,
   },
 
@@ -582,7 +584,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/cosmic-passport-key.json",
     command: "passport.key.ensure",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/passport.ts",
+    module: "packages/werkstatt-site/src/checks/passport.ts",
   },
 
   // RFC-0150: OG preview images.
@@ -590,14 +592,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/og-image.png",
     command: "preview.images.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/preview-images.ts",
+    module: "packages/werkstatt-site/src/checks/preview-images.ts",
   },
   // RFC-0603: per-page OG preview images.
   {
     path: "public/preview/{lang}/{slug}.png",
     command: "preview.images.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/preview-images.ts",
+    module: "packages/werkstatt-site/src/checks/preview-images.ts",
   },
 
   // RFC-0473: Bordbuch public projections (unified ledger, workspace-scoped).
@@ -606,14 +608,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "systems/{system}/public/.well-known/bordbuch.json",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    module: "packages/werkstatt/src/bordbuch/bordbuch-generate.ts",
     conditional: true,
   },
   {
     path: "systems/{system}/public/.well-known/bordbuch/index.html",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    module: "packages/werkstatt/src/bordbuch/bordbuch-generate.ts",
     conditional: true,
   },
   // RFC-0473: Bordbuch public projections (site-relative — committed to workpiece by bordbuch.commit).
@@ -623,14 +625,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/bordbuch.json",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    module: "packages/werkstatt/src/bordbuch/bordbuch-generate.ts",
     conditional: true,
   },
   {
     path: "public/.well-known/bordbuch/index.html",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    module: "packages/werkstatt/src/bordbuch/bordbuch-generate.ts",
     conditional: true,
   },
   // RFC-0707: Bordbuch raw event log and status (nachweis workflow artifacts).
@@ -639,14 +641,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/bordbuch/events.ndjson",
     command: "bordbuch.append",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts",
+    module: "packages/werkstatt/src/bordbuch/bordbuch-io.ts",
     conditional: true,
   },
   {
     path: "public/.well-known/bordbuch/status.generated.yaml",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    module: "packages/werkstatt/src/bordbuch/bordbuch-generate.ts",
     conditional: true,
   },
   // RFC-0715: Nachweis public key JSON (N3 cryptographic verification).
@@ -654,14 +656,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/.well-known/nachweis-pubkey.json",
     command: "nachweis.key.ensure",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/nachweis/nachweis-key-ensure.ts",
+    module: "packages/werkstatt/src/nachweis/nachweis-key-ensure.ts",
   },
   // RFC-0707: Nachweis manifest (public index of published records).
   {
     path: "public/nachweise/manifest.json",
     command: "nachweis.manifest.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-handoff/src/nachweis/nachweis-manifest.ts",
+    module: "packages/werkstatt/src/nachweis/nachweis-manifest.ts",
   },
 
   // RFC-0171: Decap CMS admin config (conditional — only for cms-git adapter sites).
@@ -669,14 +671,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/admin/config.yml",
     command: "cms.schema.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/cms.ts",
+    module: "packages/werkstatt-site/src/checks/cms.ts",
     conditional: true,
   },
   {
     path: "public/admin/index.html",
     command: "cms.schema.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/cms.ts",
+    module: "packages/werkstatt-site/src/checks/cms.ts",
     conditional: true,
   },
 
@@ -686,7 +688,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/_img/**/*.webp",
     command: "image.variants.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/image-variants.ts",
+    module: "packages/werkstatt-site/src/checks/image-variants.ts",
     conditional: true,
   },
 
@@ -696,7 +698,7 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/_video/**",
     command: "video.variants.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/video-variants.ts",
+    module: "packages/werkstatt-site/src/checks/video/video-variants.ts",
     conditional: true,
   },
 
@@ -706,7 +708,54 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     path: "public/_video/live/**",
     command: "live.variants.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-checks/src/live-variants.ts",
+    module: "packages/werkstatt-site/src/checks/live-variants.ts",
+    conditional: true,
+  },
+
+  // RFC-0785: Agent markdown negotiation middleware.
+  {
+    path: "src/middleware/markdown-negotiation.ts",
+    command: "agent.markdown-negotiation.generate",
+    module: "packages/werkstatt-site/src/checks/agent/agent-markdown-negotiation.ts",
+  },
+
+  // RFC-0269: Behavior snapshot — deterministic projection of public behavior surface.
+  {
+    path: "behavior.snapshot.generated.yaml",
+    command: "behavior.snapshot.generate",
+    module: "packages/werkstatt-site/src/checks/behavior-snapshot.ts",
+  },
+
+  // RFC-0257 / RFC-0653: PDF generation via Playwright (cache output, conditional).
+  {
+    path: ".cache/pdf/**",
+    command: "print.pdf.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/print-pdf.ts",
+    conditional: true,
+  },
+
+  // RFC-0272: PSEO translation drafts (enriched content, conditional — only for PSEO sites).
+  {
+    path: "src/content/enriched/{blueprint}/{targetLang}/{artifact}.md",
+    command: "surface.translation.generate",
+    module: "packages/werkstatt-site/src/checks/surface-translation.ts",
+    conditional: true,
+  },
+
+  // RFC-0273: Frozen translator notes (enriched content, conditional — only for PSEO sites).
+  {
+    path: "src/content/enriched/_translation-notes/{module}/{targetLang}.md",
+    command: "surface.translation.notes.generate",
+    module: "packages/werkstatt-site/src/checks/surface-translation.ts",
+    conditional: true,
+  },
+
+  // RFC-0273: PSEO translation glossaries (enriched content, conditional — only for PSEO sites).
+  {
+    path: "src/content/enriched/_translation-glossaries/{module}/{targetLang}.yaml",
+    command: "surface.translation.glossary.generate",
+    module: "packages/werkstatt-site/src/checks/surface-translation.ts",
     conditional: true,
   },
 ];

@@ -105,6 +105,7 @@ describe("ownership.generator.cross-check (RFC-0810)", () => {
         description: "test",
         scope: "app",
         provider: "workspace",
+        writes: ["<app>/src/content/pages/uncovered.md"],
       },
     ];
 
@@ -213,6 +214,61 @@ describe("ownership.generator.cross-check (RFC-0810)", () => {
         description: "test",
         scope: "workspace",
         provider: "workspace",
+      },
+    ];
+
+    const result = await runOwnershipGeneratorCrossCheck(input, ctx(root));
+
+    const xcheck01 = result.data!.diagnostics.filter((d) => d.ruleId === "OWN-XCHECK-01");
+    expect(xcheck01).toHaveLength(0);
+  });
+
+  it("green: app-scoped .generate with no writes (delegation boundary) -> no OWN-XCHECK-01", async () => {
+    mockCommands = [
+      {
+        name: "delegation.generate",
+        description: "delegation boundary",
+        scope: "app",
+        provider: "workspace",
+      },
+    ];
+
+    const result = await runOwnershipGeneratorCrossCheck(input, ctx(root));
+
+    const xcheck01 = result.data!.diagnostics.filter((d) => d.ruleId === "OWN-XCHECK-01");
+    expect(xcheck01).toHaveLength(0);
+  });
+
+  it("green: app-scoped .generate whose writes are already covered -> no OWN-XCHECK-01", async () => {
+    mockCommands = [
+      {
+        name: "covered.generate",
+        description: "writes already owned by another command",
+        scope: "app",
+        provider: "workspace",
+        writes: ["<app>/public/robots.txt"],
+      },
+    ];
+    GENERATOR_OWNERSHIP_MAP.push({
+      path: "public/robots.txt",
+      command: "robots.generate",
+      module: "packages/werkstatt-site/src/checks/robots.ts",
+    });
+
+    const result = await runOwnershipGeneratorCrossCheck(input, ctx(root));
+
+    const xcheck01 = result.data!.diagnostics.filter((d) => d.ruleId === "OWN-XCHECK-01");
+    expect(xcheck01).toHaveLength(0);
+  });
+
+  it("green: app-scoped .generate with only non-app writes -> no OWN-XCHECK-01", async () => {
+    mockCommands = [
+      {
+        name: "external.generate",
+        description: "writes outside app",
+        scope: "app",
+        provider: "workspace",
+        writes: ["systems-cache/test/dns-records.yaml"],
       },
     ];
 

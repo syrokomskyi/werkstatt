@@ -14,6 +14,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0810: initial implementation — cross-reference .generate commands against ownership map.</item>
+  <item>RFC-0810: skip delegation boundaries (no writes or writes already covered by other owners).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -47,20 +48,41 @@ export async function runOwnershipGeneratorCrossCheck(
   );
 
   const ownershipCommands = new Set<string>();
+  const ownershipPathsByCommand = new Map<string, string[]>();
+  const ownershipPathToCommands = new Map<string, string[]>();
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
     ownershipCommands.add(entry.command);
+    const paths = ownershipPathsByCommand.get(entry.command) ?? [];
+    paths.push(entry.path);
+    ownershipPathsByCommand.set(entry.command, paths);
+    const cmds = ownershipPathToCommands.get(entry.path) ?? [];
+    cmds.push(entry.command);
+    ownershipPathToCommands.set(entry.path, cmds);
   }
 
   for (const cmd of appGenerateCommands) {
-    if (!ownershipCommands.has(cmd.name)) {
-      diagnostics.push({
-        ruleId: "OWN-XCHECK-01",
-        severity: "error",
-        message: `OWN-XCHECK-01: command "${cmd.name}" has no ownership map entry.`,
-        fixHint: `Add an entry to GENERATOR_OWNERSHIP_MAP in packages/werkstatt-site/src/checks/generator-ownership.ts with command: "${cmd.name}" and the file path(s) it generates.`,
-        data: { command: cmd.name },
-      });
-    }
+    if (ownershipCommands.has(cmd.name)) continue;
+
+    const writes = cmd.writes ?? [];
+    if (writes.length === 0) continue;
+
+    const appWrites = writes.filter((w) => w.startsWith("<app>/"));
+    if (appWrites.length === 0) continue;
+
+    const strippedPaths = appWrites.map((w) => w.replace(/^<app>\//, ""));
+    const allCoveredByOther = strippedPaths.every((p) => {
+      const owners = ownershipPathToCommands.get(p) ?? [];
+      return owners.length > 0 && !owners.includes(cmd.name);
+    });
+    if (allCoveredByOther) continue;
+
+    diagnostics.push({
+      ruleId: "OWN-XCHECK-01",
+      severity: "error",
+      message: `OWN-XCHECK-01: command "${cmd.name}" has no ownership map entry.`,
+      fixHint: `Add an entry to GENERATOR_OWNERSHIP_MAP in packages/werkstatt-site/src/checks/generator-ownership.ts with command: "${cmd.name}" and the file path(s) it generates.`,
+      data: { command: cmd.name },
+    });
   }
 
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
