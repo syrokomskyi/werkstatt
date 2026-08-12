@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type {
-  KernelCommandDefinition,
-} from "../types.ts";
+import type { KernelCommandDefinition } from "../types.ts";
 import type { DiscoveredSiteWorkspace } from "../types.ts";
 
 /*
@@ -10,6 +8,8 @@ import type { DiscoveredSiteWorkspace } from "../types.ts";
     RFC-0814: Unit tests for --system auto-injection in pipeline and CLI paths.
     Verifies that workspace-scoped commands receive --system automatically
     when they declare a `system` string flag or have no flag schema.
+    RFC-0817: Extended to verify --system=value and --site=value formats
+    are detected and not double-injected.
   </purpose>
 </MODULE_CONTRACT>
 */
@@ -49,10 +49,13 @@ function injectSystemPipeline(
   stepArgs: string[],
   siteName: string,
 ): void {
-  if (command.scope === "workspace" && !stepArgs.includes("--system") && siteName) {
+  if (
+    command.scope === "workspace" &&
+    !stepArgs.some((a) => a === "--system" || a.startsWith("--system=")) &&
+    siteName
+  ) {
     const acceptsSystem =
-      !command.flags ||
-      ("system" in command.flags && command.flags.system.kind === "string");
+      !command.flags || ("system" in command.flags && command.flags.system.kind === "string");
     if (acceptsSystem) {
       stepArgs.push("--system", siteName);
     }
@@ -68,10 +71,9 @@ function injectSystemCli(
   wsArgv: string[],
   siteName: string,
 ): void {
-  if (siteName && !wsArgv.includes("--system")) {
+  if (siteName && !wsArgv.some((a) => a === "--system" || a.startsWith("--system="))) {
     const acceptsSystem =
-      !command.flags ||
-      ("system" in command.flags && command.flags.system.kind === "string");
+      !command.flags || ("system" in command.flags && command.flags.system.kind === "string");
     if (acceptsSystem) {
       wsArgv.push("--system", siteName);
     }
@@ -152,7 +154,7 @@ describe("RFC-0814: --system auto-injection in CLI path (executeKernelCommand)",
     const siteName = "warpgogol-com";
     const wsArgv: string[] = [];
 
-    if (siteName && !wsArgv.includes("--site")) {
+    if (siteName && !wsArgv.some((a) => a === "--site" || a.startsWith("--site="))) {
       wsArgv.push("--site", siteName);
     }
     injectSystemCli(cmd, wsArgv, siteName);
@@ -169,7 +171,7 @@ describe("RFC-0814: --system auto-injection in CLI path (executeKernelCommand)",
     const siteName = "warpgogol-com";
     const wsArgv: string[] = [];
 
-    if (siteName && !wsArgv.includes("--site")) {
+    if (siteName && !wsArgv.some((a) => a === "--site" || a.startsWith("--site="))) {
       wsArgv.push("--site", siteName);
     }
     injectSystemCli(cmd, wsArgv, siteName);
@@ -191,5 +193,53 @@ describe("RFC-0814: --system auto-injection in CLI path (executeKernelCommand)",
     expect(systemCount).toBe(1);
     expect(wsArgv).toContain("custom-id");
     expect(wsArgv).not.toContain("warpgogol-com");
+  });
+});
+
+describe("RFC-0817: --system=value and --site=value format detection", () => {
+  it("(i) pipeline: --system=value in step args is not double-injected", () => {
+    const cmd = makeCommand("test.cmd.pipeline-system-eq", {
+      system: makeFlagSpec("string"),
+    });
+    const site = makeSite("warpgogol-com");
+    const stepArgs = ["--system=custom-id"];
+
+    injectSystemPipeline(cmd, stepArgs, site.name);
+
+    const systemCount = stepArgs.filter((a) => a === "--system").length;
+    expect(systemCount).toBe(0);
+    expect(stepArgs).toContain("--system=custom-id");
+    expect(stepArgs).not.toContain("warpgogol-com");
+  });
+
+  it("(j) CLI: --system=value in argv is not double-injected", () => {
+    const cmd = makeCommand("test.cli.system-eq", {
+      system: makeFlagSpec("string"),
+    });
+    const siteName = "warpgogol-com";
+    const wsArgv = ["--system=custom-id"];
+
+    injectSystemCli(cmd, wsArgv, siteName);
+
+    const systemCount = wsArgv.filter((a) => a === "--system").length;
+    expect(systemCount).toBe(0);
+    expect(wsArgv).toContain("--system=custom-id");
+    expect(wsArgv).not.toContain("warpgogol-com");
+  });
+
+  it("(k) CLI: --site=value in argv is not double-injected", () => {
+    const cmd = makeCommand("test.cli.site-eq", {
+      system: makeFlagSpec("string"),
+    });
+    const siteName = "warpgogol-com";
+    const wsArgv = ["--site=custom-site"];
+
+    if (siteName && !wsArgv.some((a) => a === "--site" || a.startsWith("--site="))) {
+      wsArgv.push("--site", siteName);
+    }
+
+    const siteCount = wsArgv.filter((a) => a === "--site").length;
+    expect(siteCount).toBe(0);
+    expect(wsArgv).toContain("--site=custom-site");
   });
 });
