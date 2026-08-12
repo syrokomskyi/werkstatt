@@ -80,7 +80,13 @@ export function loadContentRefIndex(indexPath: string): ContentRefIndex | null {
       return parsed;
     }
     return null;
-  } catch {
+  } catch (err: unknown) {
+    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {
+      console.warn(
+        `[content-ref-index] ${indexPath} not found — formula references =(...) and braceless content references will not resolve. ` +
+          `Run: pnpm exec werkstatt run content.ref-index.generate --site <siteId>`,
+      );
+    }
     return null;
   }
 }

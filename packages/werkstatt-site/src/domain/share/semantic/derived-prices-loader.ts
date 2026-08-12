@@ -23,7 +23,13 @@ export function loadDerivedPrices(
   try {
     raw = readFileSync(filePath, "utf-8");
   } catch (err: unknown) {
-    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {
+      console.warn(
+        `[derived-prices] ${filePath} not found — currency-aware price variants will not render. ` +
+          `Run: pnpm exec werkstatt run derived-prices.materialize --site <siteId>`,
+      );
+      return null;
+    }
     throw err;
   }
   return JSON.parse(raw) as Record<string, DerivedPriceEntry[]>;
