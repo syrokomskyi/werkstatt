@@ -1,12 +1,13 @@
 ---
 id: RFC-0818
 title: "Fix bordbuch sync lag in external mirror push ordering"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
