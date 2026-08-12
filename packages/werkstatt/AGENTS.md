@@ -74,4 +74,6 @@ Excludes: `node_modules/`, `tests/`, `tests-handoff/`, `*.test.ts`, `*.spec.ts`.
 
 `mission.preview` must verify that dev-critical generated files exist before starting the dev server. The check uses `existsSync` (instant, no pipeline overhead) and auto-generates missing files via `executeKernelCommand`. If generation fails, the server launch is blocked with an actionable error message explaining what is missing, why it matters, and how to fix it. The `--skip-prepare` flag bypasses the check for fast restarts when files are known to exist.
 
+RFC-0817: `mission.preview` also enforces a materialization gate before the dev-critical file check. If `materializedAt` is null and mission state is `open`, `mission.materialize` is auto-run. This gate is NOT bypassed by `--skip-prepare` — materialization is the formal lifecycle gate, not a convenience check. Non-open missions (closed, aborted) skip the materialization check.
+
 Dev-critical files: `src/content-ref-index.generated.yaml`, `src/derived-prices.generated.json`, `src/video-manifest.generated.yaml`. Some generators have prerequisites (e.g. `derived-prices.materialize` requires `entitlements.resolve`, `rate-snapshot.resolve`, `currency-pricing.compile`) — the check runs prerequisites before the owning command.
