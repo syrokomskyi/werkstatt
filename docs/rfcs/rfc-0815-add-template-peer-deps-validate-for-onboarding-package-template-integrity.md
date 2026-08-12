@@ -3,12 +3,13 @@ id: RFC-0815
 title: "Add template.peer-deps.validate for onboarding package template integrity"
 status: draft
 kind: command
-scope: workspace
+scope: app
 owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
+enhancedAt: 2026-08-12
 implementedAt:
 closedAt:
 supersedes: []
@@ -37,6 +38,7 @@ nonGoals:
   - "Validating peer dependencies of workpiece package.json (only the template is checked)"
   - "Auto-fixing version mismatches (report-only)"
   - "Checking peer dependencies for non-onboarding templates"
+  - "Checking peer dependencies of workspace:* packages — these are monorepo-internal and not resolved from the npm registry"
 ---
 
 # RFC-0815: Add template.peer-deps.validate for onboarding package template integrity
@@ -70,30 +72,30 @@ The kernel gains a `template.peer-deps.validate` command that resolves the depen
 
 - **RFC-0800 (template.deps.drift):** Complementary. `template.deps.drift` checks workpiece-vs-template version sync. `template.peer-deps.validate` checks internal template consistency. Both run in `SITES_BUILD_CHECK_PIPELINE`.
 - **RFC-0078 (generation-first apps):** The template is the single source of truth for workpiece dependency versions. Validating it at the template level prevents propagation of broken versions to every materialized mission.
-- **DNA-36 (scaffold-generated):** Scaffold quality is only as good as the template it generates from. Peer dependency integrity is a scaffold quality gate.
 
 ## Design
 
 ### CLI surface
 
 ```sh
-# Validate the default template
-pnpm exec werkstatt run template.peer-deps.validate
+# Validate the default template (site context from pipeline)
+pnpm exec werkstatt run template.peer-deps.validate --site warpgogol-com
 
 # Validate with JSON output
-pnpm exec werkstatt run template.peer-deps.validate --json
+pnpm exec werkstatt run template.peer-deps.validate --site warpgogol-com --json
 
 # Validate a specific template file
-pnpm exec werkstatt run template.peer-deps.validate --template packages/werkstatt-site/src/onboarding/templates/package.template.json
+pnpm exec werkstatt run template.peer-deps.validate --site warpgogol-com --template packages/werkstatt-site/src/onboarding/templates/package.template.json
 ```
 
-Scope: `workspace`. No `--site` flag required — the command validates the template, not a specific site.
+Scope: `app`. The `--site` flag is required for pipeline consistency with `SITES_BUILD_CHECK_PIPELINE` (which is per-site). The check itself validates the shared template, not site-specific state — the `--site` flag is used only for pipeline context. The check is idempotent across sites (same template, same result); running it once per site in the pipeline is acceptable redundancy because the cost is dominated by the `pnpm install --dry-run` resolution, which takes 5-10 seconds per site.
 
 ### TypeScript contracts
 
 ```ts
 interface PeerDepsValidateInput {
   flags: {
+    site: string;            // Site context for pipeline integration (required)
     template?: string;       // Path to package.template.json (default: canonical onboarding template)
     json?: boolean;
   };
@@ -118,22 +120,27 @@ interface PeerDepsValidateResult {
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
+| --- | --- |
 | `packages/werkstatt-site/src/onboarding/templates/package.template.json` | Read — the template being validated |
 | `packages/werkstatt-site/src/checks/template-peer-deps-validate.ts` | New validator implementation |
 | `packages/werkstatt-site/src/checks/module.ts` | Command registration |
+| `packages/werkstatt-site/src/checks/pipelines/build-check.ts` | Pipeline integration |
+| `packages/werkstatt-site/AGENTS.md` | Document new check command |
 
 ### Implementation approach
 
 The validator:
 
 1. Reads `package.template.json` and extracts `dependencies` + `devDependencies`.
-2. Runs `pnpm install --dry-run --json` in a temp directory seeded with the template's dependency set to resolve the full dependency tree.
-3. Extracts all `peerDependencies` from the resolved tree.
-4. For each peer dependency, checks whether the version declared in the template satisfies the peer constraint.
-5. Reports violations as `PEER-01` findings.
+2. **Strips `workspace:*` dependencies** — these are monorepo-internal packages (`@warpgogol/forge`, `@warpgogol/werkstatt`, `@warpgogol/werkstatt-site`) that cannot be resolved from the npm registry in a temp directory. Their peer deps are not relevant because they are the platform itself, not external packages.
+3. Creates a temp directory with a minimal `package.json` containing only the remaining (npm registry) dependencies.
+4. Runs `pnpm install --dry-run --json` in the temp directory to resolve the full dependency tree.
+5. Extracts all `peerDependencies` from the resolved tree.
+6. For each peer dependency, checks whether the version declared in the template satisfies the peer constraint. Skips optional peer dependencies that are not in the template's dependency set.
+7. Reports violations as `PEER-01` findings.
+8. Cleans up the temp directory.
 
-Alternative approach (simpler, no temp install): use `pnpm list --depth Infinity --json` on the workspace and filter for the template's declared packages. This avoids a temp directory but requires the workspace to already have the dependencies installed.
+**Alternative approach** (simpler, no temp install): use `pnpm list --depth Infinity --json` on the workspace and filter for the template's declared packages. This avoids a temp directory but has two limitations: (a) the workspace's resolved versions may differ from the template's declared versions if the workspace root `package.json` has different ranges, and (b) `workspace:*` deps in the template resolve to the workspace's own packages, which may have different peer dep constraints than the versions a fresh workpiece would get. The temp-directory approach is preferred because it resolves the template's deps in isolation, matching what a materialized workpiece would experience.
 
 ### Output format
 
@@ -174,20 +181,25 @@ Alternative approach (simpler, no temp install): use `pnpm list --depth Infinity
 - **CI-only check via `pnpm peers check`:** Rejected because it checks the workspace `package.json`, not the template. The template is a non-installable JSON file — `pnpm peers check` cannot target it directly.
 - **Pre-commit hook on `package.template.json`:** Rejected because it requires the committer to have the full dependency tree installed locally. A pipeline validator runs in CI with deterministic resolution.
 - **Manual discipline ("check peer deps when bumping @astrojs/cloudflare"):** Rejected — this is the current approach and it failed on 2026-08-12.
+- **Extending `template.deps.drift` with a `--check-peer-deps` flag:** Rejected because the two checks have different inputs (drift needs workpiece + template; peer-deps needs only template), different outputs (TEMPLATE-DEPS-DRIFT-01 vs PEER-01), and different resolution strategies (string comparison vs. full dep tree resolution). Combining them would require conditional logic and mixed output shapes. Following the existing pattern where each template check is a separate command (`template.imports.validate`, `template.deps.drift`), a separate command is consistent.
 
 ## Risks
 
-- **False positives from optional peer dependencies:** Some packages declare optional peer dependencies that are only relevant when the peer is installed. The validator should skip optional peers that are not in the template's dependency set.
+- **False positives from optional peer dependencies:** Some packages declare optional peer dependencies that are only relevant when the peer is installed. The validator skips optional peers that are not in the template's dependency set.
 - **Registry availability:** `pnpm install --dry-run` requires registry access. In offline CI, the validator falls back to `PEER-03` (warning, not error).
-- **Performance:** Resolving a full dependency tree takes 5-10 seconds. Acceptable for a build-check pipeline step that runs once per build.
+- **Performance:** Resolving a full dependency tree takes 5-10 seconds per site. Since `SITES_BUILD_CHECK_PIPELINE` is per-site, the check runs once per site. With N sites, the total cost is N × 5-10 seconds. This is acceptable because (a) the check is idempotent (same template, same result), (b) the number of sites is small (currently 1), and (c) the check catches conflicts before they propagate to mission workpieces, which would cost significantly more time to debug.
+- **`workspace:*` dependency handling:** The template declares `@warpgogol/forge`, `@warpgogol/werkstatt`, and `@warpgogol/werkstatt-site` as `workspace:*`. These are stripped before resolution because they cannot be resolved from the npm registry in a temp directory. Their peer deps are not checked — they are the platform itself, not external packages.
+- **Temp directory cleanup:** If the validator crashes mid-resolution, the temp directory may be left behind. The validator uses `try/finally` to ensure cleanup. Temp directories are created in the system temp dir (`os.tmpdir()`) with a `peer-deps-validate-` prefix for easy manual cleanup.
 
 ## Acceptance criteria
 
 - [ ] `template.peer-deps.validate` command registered in `packages/werkstatt-site/src/checks/module.ts`
 - [ ] `PEER-01` violation emitted when a peer constraint is violated
 - [ ] `--json` output format documented and stable
-- [ ] Integrated into `SITES_BUILD_CHECK_PIPELINE`
+- [ ] Integrated into `SITES_BUILD_CHECK_PIPELINE` after `template.deps.drift`
+- [ ] `workspace:*` dependencies stripped before resolution (unit test: verify temp `package.json` excludes `workspace:*` deps)
 - [ ] Existing template passes without violations (after the wrangler ^4.120.1 fix)
+- [ ] `packages/werkstatt-site/AGENTS.md` updated with `template.peer-deps.validate` check documentation
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
