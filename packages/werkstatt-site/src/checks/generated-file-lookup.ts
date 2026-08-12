@@ -20,7 +20,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
+import type { OwnershipEntry } from "./generator-ownership.ts";
+import { toPosix, matchOwnershipEntry } from "./ownership-pattern-match.ts";
 
 export interface FileLookupResult {
   command: "generated.file.lookup";
@@ -34,96 +35,6 @@ export interface FileLookupResult {
     detectionMethod: "embedded-marker" | "registry-match" | null;
     module: string | null;
   }>;
-}
-
-function toPosix(path: string): string {
-  return path.replace(/\\/g, "/");
-}
-
-function segmentToRegexSource(segment: string): string {
-  return segment
-    .split("*")
-    .map((literal) => literal.replace(/[.+^${}()|[\]\\]/g, "\\$&"))
-    .join("[^/]*");
-}
-
-function ownPatternToExactRegex(pattern: string): RegExp {
-  const segments = pattern.split("/").filter((s) => s.length > 0);
-  const pieces: string[] = [];
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i];
-    pieces.push(
-      seg === "**" ? (i === segments.length - 1 ? ".*" : "(?:[^/]+/)*") : segmentToRegexSource(seg),
-    );
-  }
-  let source = "^";
-  for (let i = 0; i < pieces.length; i++) {
-    source += pieces[i];
-    const isRecursiveNonLast = segments[i] === "**" && i !== segments.length - 1;
-    if (i < pieces.length - 1 && !isRecursiveNonLast) source += "/";
-  }
-  return new RegExp(`${source}$`);
-}
-
-function normalizeOwnershipPath(rawPath: string): string {
-  const pattern = rawPath.replace(/\\/g, "/");
-  if (
-    pattern.startsWith("packages/") ||
-    pattern.startsWith("docs/") ||
-    pattern.startsWith("apps/")
-  ) {
-    return pattern;
-  }
-  return `apps/*/${pattern}`;
-}
-
-function expandPlaceholderVariants(pattern: string): string[] {
-  const segments = pattern.split("/");
-  const wholeSegmentPlaceholder = (seg: string): boolean => /^\{[a-zA-Z0-9_]+\}$/.test(seg);
-  const embeddedPlaceholder = (seg: string): boolean =>
-    /\{[a-zA-Z0-9_]+\}/.test(seg) && !wholeSegmentPlaceholder(seg);
-
-  const direct = segments
-    .map((seg) => (wholeSegmentPlaceholder(seg) ? "**" : seg.replace(/\{[a-zA-Z0-9_]+\}/g, "*")))
-    .join("/");
-
-  const hasEmbedded = segments.some(embeddedPlaceholder);
-  if (!hasEmbedded) return [direct];
-
-  const recursive = segments
-    .map((seg) => (wholeSegmentPlaceholder(seg) ? "**" : seg.replace(/\{[a-zA-Z0-9_]+\}/g, "**")))
-    .join("/");
-  return [direct, recursive];
-}
-
-function matchOwnershipEntry(relPath: string, app?: string): OwnershipEntry | null {
-  const posixPath = toPosix(relPath);
-
-  for (const entry of GENERATOR_OWNERSHIP_MAP) {
-    const normalized = normalizeOwnershipPath(entry.path);
-    const variants = expandPlaceholderVariants(normalized);
-
-    for (const variant of variants) {
-      const regex = ownPatternToExactRegex(variant);
-      if (regex.test(posixPath)) {
-        return entry;
-      }
-    }
-
-    if (app) {
-      const appPrefixed = `apps/${app}/${entry.path}`;
-      const appNormalized = normalizeOwnershipPath(appPrefixed);
-      const appVariants = expandPlaceholderVariants(appNormalized);
-      for (const variant of appVariants) {
-        const regex = ownPatternToExactRegex(variant);
-        if (regex.test(posixPath)) {
-          return entry;
-        }
-      }
-    }
-  }
-
-  return null;
 }
 
 function resolvePath(rawPath: string, app: string | undefined, _workspaceRoot: string): string {

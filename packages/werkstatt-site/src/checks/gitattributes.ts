@@ -32,6 +32,11 @@ import {
 } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
+import {
+  segmentToRegexSource,
+  ownPatternToExactRegex,
+  normalizeOwnershipPath,
+} from "./ownership-pattern-match.ts";
 import { isGeneratedMarkerTextCandidate } from "@warpgogol/werkstatt/kernel";
 
 const BEGIN_SENTINEL =
@@ -68,32 +73,6 @@ const APP_SCAN_GLOBS = [
 // Pattern derivation
 // ---------------------------------------------------------------------------
 
-function segmentToRegexSource(segment: string): string {
-  return segment
-    .split("*")
-    .map((literal) => literal.replace(/[.+^${}()|[\]\\]/g, "\\$&"))
-    .join("[^/]*");
-}
-
-/** Builds an exact-match regex for one of OUR OWN derived glob patterns (literal / `*` / `**`). */
-function ownPatternToExactRegex(pattern: string): RegExp {
-  const segments = pattern.split("/").filter((s) => s.length > 0);
-  const pieces: string[] = [];
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i];
-    pieces.push(
-      seg === "**" ? (i === segments.length - 1 ? ".*" : "(?:[^/]+/)*") : segmentToRegexSource(seg),
-    );
-  }
-  let source = "^";
-  for (let i = 0; i < pieces.length; i++) {
-    source += pieces[i];
-    const isRecursiveNonLast = segments[i] === "**" && i !== segments.length - 1;
-    if (i < pieces.length - 1 && !isRecursiveNonLast) source += "/";
-  }
-  return new RegExp(`${source}$`);
-}
-
 /** Builds a "matches this entry or anything nested under it" regex for a raw .gitignore line. */
 function gitignoreLineToRegex(rawLine: string): RegExp | null {
   const trimmed = rawLine.trim();
@@ -127,18 +106,6 @@ function normalizeWritesPattern(raw: string): string {
     pattern = `apps/*/${pattern.slice("<app>/".length)}`;
   }
   return pattern;
-}
-
-function normalizeOwnershipPath(rawPath: string): string {
-  const pattern = rawPath.replace(/\\/g, "/");
-  if (
-    pattern.startsWith("packages/") ||
-    pattern.startsWith("docs/") ||
-    pattern.startsWith("apps/")
-  ) {
-    return pattern;
-  }
-  return `apps/*/${pattern}`;
 }
 
 /**
