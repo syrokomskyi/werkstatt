@@ -12,6 +12,7 @@ has no extra keys, and has no empty values. Exits non-zero on any failure, block
   <item>RFC-0388: initial implementation — deploy.preflight command.</item>
   <item>RFC-0761: remove --env flag, target is always .env for sites and services.</item>
   <item>RFC-0806: add --dev flag for .env.dev validation (service dev deploys).</item>
+  <item>RFC-0819: update DEPLOY-PREFLIGHT-04 fixHint to suggest null for not-required variables.</item>
 </CHANGE_SUMMARY>
 */
 
