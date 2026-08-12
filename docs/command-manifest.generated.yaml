@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 97318f1e389ff2b8aab845348bde12c6b0d1c05966b6729363743715fc3429fd
+  contentHash: f2d14ad244de0cd6f10d2379387a30d126942c34ce86ccb708742580c02c5541
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -10165,6 +10165,22 @@ commands:
       Chromium to verify; auto-installs if missing and
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is not set. Used by build.post pipeline
       (step 0) and mission.materialize."
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: playwright.preflight.check
+    description: "RFC-0813: Pre-flight check for Playwright Chromium. Fails fast
+      (exitCode 1) if Chromium is not launchable. Does not auto-install — use
+      playwright.chromium.ensure for that. Used by mission.validate before
+      build.prepare."
     scope: workspace
     provider: workspace
     module: check

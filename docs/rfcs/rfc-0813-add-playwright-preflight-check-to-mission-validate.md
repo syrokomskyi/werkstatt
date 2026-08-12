@@ -164,15 +164,15 @@ async function runPlaywrightPreflightCheck(
 
 ## Acceptance criteria
 
-- [ ] `playwright.preflight.check` command registered in `infra-contracts.ts`
-- [ ] `isChromiumInstalled` async pure function extracted and shared
-- [ ] Runs as first operation inside `runMissionValidate`, after distribution-reuse check, before `build.prepare`
-- [ ] Fails fast with clear error message (including original launch error) when Chromium is missing
-- [ ] Silent pass when Chromium is installed
-- [ ] Skipped on distribution-reuse path (no browser launch when distribution is reused)
-- [ ] Unit test: missing Chromium → exit code 1
-- [ ] Unit test: installed Chromium → exit code 0
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `playwright.preflight.check` command registered in `infra-contracts.ts` (evidence: packages/werkstatt-site/src/checks/command-tables/infra-contracts.ts:439-448, command.manifest.generate 747 commands)
+- [x] `isChromiumInstalled` async pure function extracted and shared (evidence: packages/werkstatt-site/src/checks/playwright-chromium-ensure.ts:46-59, re-exported from checks/index.ts:174)
+- [x] Runs as first operation inside `runMissionValidate`, after distribution-reuse check, before `build.prepare` (evidence: packages/werkstatt/src/mission/mission-materialization-commands.ts:427-476)
+- [x] Fails fast with clear error message (including original launch error) when Chromium is missing (evidence: packages/werkstatt-site/src/checks/playwright-preflight.ts:42-48, summary includes original error)
+- [x] Silent pass when Chromium is installed (evidence: packages/werkstatt-site/src/checks/playwright-preflight.ts:36-40, exitCode 0 + status pass)
+- [x] Skipped on distribution-reuse path (no browser launch when distribution is reused) (evidence: packages/werkstatt/src/mission/mission-materialization-commands.ts:425, preflight block is after the reuse early-return at line 418-422)
+- [x] Unit test: missing Chromium → exit code 1 (evidence: packages/werkstatt-site/src/checks/tests/playwright-preflight.test.ts:56-66, 3/3 tests pass)
+- [x] Unit test: installed Chromium → exit code 0 (evidence: packages/werkstatt-site/src/checks/tests/playwright-preflight.test.ts:42-53, 3/3 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0813, 0 errors)
 
 ## Implementation notes for agents
 
