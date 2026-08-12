@@ -150,6 +150,25 @@ if [ -n "$RFC_DIR_STAGED" ]; then
   fi
 fi
 
+# pnpm-lock.yaml staleness check — block dirty lockfile when missions/ paths are staged
+# Prevents the class of bug where docs.archive moves a mission workpiece out of the
+# pnpm workspace, pnpm-lock.yaml becomes stale, but the commit proceeds without refreshing it.
+MISSION_FILES=$(git diff --cached --name-only -- 'missions/' || true)
+LOCKFILE_STAGED=$(git diff --cached --name-only -- 'pnpm-lock.yaml' || true)
+LOCKFILE_DIRTY=$(git status --porcelain pnpm-lock.yaml 2>/dev/null | head -1 || true)
+
+if [ -n "$MISSION_FILES" ] && [ -z "$LOCKFILE_STAGED" ] && [ -n "$LOCKFILE_DIRTY" ]; then
+  echo "ERROR: pnpm-lock.yaml is stale but not staged — missions/ paths changed without lockfile refresh." >&2
+  echo "" >&2
+  echo "Staged mission files:" >&2
+  echo "$MISSION_FILES" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "Moving mission workpieces in/out of the pnpm workspace changes dependency resolution." >&2
+  echo "Run 'pnpm install' to refresh the lockfile, then stage it:" >&2
+  echo "  pnpm install && git add pnpm-lock.yaml" >&2
+  exit 1
+fi
+
 # Command manifest staleness check (RFC-0646)
 # Warn when command-registration files change without manifest regeneration.
 COMMAND_FILES=$(git diff --cached --name-only -- 'packages/forge/os/core/' 'packages/forge/os/*/core.module.ts' 'tools/kernel.config.ts' || true)
