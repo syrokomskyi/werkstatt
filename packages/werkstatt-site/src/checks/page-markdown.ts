@@ -62,6 +62,7 @@ import {
   resolveSurfaceArticlePage,
   readSurfaceTwinEntries,
 } from "./lib/surface-articles.ts";
+import { matchOwnershipEntry, toPosix } from "./ownership-pattern-match.ts";
 
 /** RFC-0325: article-typed surface pages carry no organization/people/initiatives — the markdown
  * page builder never reads them for semanticType "article" (see buildMarkdownPageSemantic). */
@@ -79,11 +80,6 @@ const DEFAULT_LICENSE_URL = "https://warpgogol.com/ai.txt";
 
 function normalizeRelPath(path: string): string {
   return path.replace(/\\/g, "/");
-}
-
-function isGeneratedMarkdownTwin(_content: string): boolean {
-  // RFC-0375: Category B files no longer carry markers — always treat as generated.
-  return true;
 }
 
 /** RFC-0320: Resolve license URL from ai.txt or system.md. */
@@ -492,8 +488,6 @@ export async function runPageMarkdownGenerate(
     for (const file of markdownFiles) {
       const rel = normalizeRelPath(relative(paths.publicDirectory, file));
       if (seen.has(rel)) continue;
-      const content = await readFile(file, "utf-8");
-      if (!isGeneratedMarkdownTwin(content)) continue;
       await rm(file);
       removed += 1;
     }
@@ -515,6 +509,7 @@ export async function runPageMarkdownValidate(
   const paths = requireAstroSitePaths(context);
   const distDir = join(paths.appDirectory, "dist");
   const publicDir = paths.publicDirectory;
+  const app = context.site?.name;
   const errors: string[] = [];
   const warnings: string[] = [];
   let checked = 0;
@@ -537,15 +532,19 @@ export async function runPageMarkdownValidate(
   }
 
   // RFC-0320: MDMETA-01..07 — validate provenance frontmatter on generated twins.
+  // RFC-0811: whitelist scanning — only validate .md files whose ownership map
+  // entry has command === "page.markdown.generate". Non-twin .md files (e.g.
+  // auth.md owned by agent.discovery-endpoints.generate) are excluded.
   const { parseMarkdownTwinFrontmatter, computeContentHash } =
     await import("@warpgogol/werkstatt-site/share/semantic");
-  const markdownFiles = await collectFiles(publicDir, {
-    extensions: [".md"],
-    ignore: (relPath) => relPath === "auth.md",
+  const allMdFiles = await collectFiles(publicDir, { extensions: [".md"], ignore: () => false });
+  const markdownFiles = allMdFiles.filter((abs) => {
+    const relPath = toPosix(relative(context.workspaceRoot, abs));
+    const entry = matchOwnershipEntry(relPath, app);
+    return entry !== null && entry.command === "page.markdown.generate";
   });
   for (const abs of markdownFiles) {
     const content = await readFile(abs, "utf-8");
-    if (!isGeneratedMarkdownTwin(content)) continue;
 
     // Strip the generated marker comment before parsing frontmatter.
     const stripped = content.replace(/^<!--[\s\S]*?-->\n\n/, "");

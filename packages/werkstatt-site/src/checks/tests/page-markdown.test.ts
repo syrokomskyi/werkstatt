@@ -57,8 +57,8 @@ function ctx(root: string): KernelRuntimeContext {
     workspaceRoot: root,
     site: {
       name: "test-app",
-      directory: root,
-      toolsDirectory: join(root, "tools"),
+      directory: join(root, "apps", "test-app"),
+      toolsDirectory: join(root, "apps", "test-app", "tools"),
     },
     siteExplicit: false,
     logger,
@@ -111,7 +111,7 @@ describe("page.markdown.validate — lastModified null acceptance (RFC-0613)", (
   it("accepts lastModified: null without MDMETA-02 or MDMETA-04", async () => {
     const root = await mkdtemp(join(tmpdir(), "page-md-validate-null-"));
     try {
-      const publicDir = join(root, "public");
+      const publicDir = join(root, "apps", "test-app", "public");
       await mkdir(publicDir, { recursive: true });
       const twin = buildMarkdownTwin(body, makeProvenance(null));
       await writeFile(join(publicDir, "test.md"), twin, "utf8");
@@ -129,7 +129,7 @@ describe("page.markdown.validate — lastModified null acceptance (RFC-0613)", (
   it("accepts lastModified: valid date string without MDMETA-02 or MDMETA-04", async () => {
     const root = await mkdtemp(join(tmpdir(), "page-md-validate-date-"));
     try {
-      const publicDir = join(root, "public");
+      const publicDir = join(root, "apps", "test-app", "public");
       await mkdir(publicDir, { recursive: true });
       const twin = buildMarkdownTwin(body, makeProvenance("2026-07-30"));
       await writeFile(join(publicDir, "test.md"), twin, "utf8");
@@ -147,7 +147,7 @@ describe("page.markdown.validate — lastModified null acceptance (RFC-0613)", (
   it("rejects invalid date string lastModified with MDMETA-04", async () => {
     const root = await mkdtemp(join(tmpdir(), "page-md-validate-invalid-"));
     try {
-      const publicDir = join(root, "public");
+      const publicDir = join(root, "apps", "test-app", "public");
       await mkdir(publicDir, { recursive: true });
       const twin = buildMarkdownTwin(body, makeProvenance("2026-7-4"));
       await writeFile(join(publicDir, "test.md"), twin, "utf8");
@@ -164,7 +164,7 @@ describe("page.markdown.validate — lastModified null acceptance (RFC-0613)", (
   it("rejects missing lastModified field with MDMETA-02", async () => {
     const root = await mkdtemp(join(tmpdir(), "page-md-validate-missing-"));
     try {
-      const publicDir = join(root, "public");
+      const publicDir = join(root, "apps", "test-app", "public");
       await mkdir(publicDir, { recursive: true });
       // Manually construct frontmatter without lastModified field
       const twin = `---
@@ -202,7 +202,7 @@ ${body}`;
   it('accepts quoted "null" lastModified (parser converts to JS null)', async () => {
     const root = await mkdtemp(join(tmpdir(), "page-md-validate-quoted-null-"));
     try {
-      const publicDir = join(root, "public");
+      const publicDir = join(root, "apps", "test-app", "public");
       await mkdir(publicDir, { recursive: true });
       // Manually construct frontmatter with quoted "null" — parser strips quotes
       // and converts to JS null, so validator should accept it
