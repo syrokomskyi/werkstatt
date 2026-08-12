@@ -194,14 +194,14 @@ The validator:
 
 ## Acceptance criteria
 
-- [ ] `template.peer-deps.validate` command registered in `packages/werkstatt-site/src/checks/module.ts`
-- [ ] `PEER-01` violation emitted when a peer constraint is violated
-- [ ] `--json` output format documented and stable
-- [ ] Integrated into `SITES_BUILD_CHECK_PIPELINE` after `template.deps.drift`
-- [ ] `workspace:*` dependencies stripped before resolution (unit test: verify temp `package.json` excludes `workspace:*` deps)
-- [ ] Existing template passes without violations (after the wrangler ^4.120.1 fix)
-- [ ] `packages/werkstatt-site/AGENTS.md` updated with `template.peer-deps.validate` check documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `template.peer-deps.validate` command registered in `packages/werkstatt-site/src/checks/module.ts` (evidence: command-tables/20-ecosystem.ts entry, auto-registered via ALL_COMMANDS)
+- [x] `PEER-01` violation emitted when a peer constraint is violated (evidence: unit test "emits PEER-01 when pnpm exits non-zero with peer dep conflict")
+- [x] `--json` output format documented and stable (evidence: PeerDepsValidateData interface in template-peer-deps-validate.ts)
+- [x] Integrated into `SITES_BUILD_CHECK_PIPELINE` after `template.deps.drift` (evidence: build-check.ts line 53)
+- [x] `workspace:*` dependencies stripped before resolution (evidence: unit test "strips workspace:* deps from temp package.json")
+- [x] Existing template passes without violations (evidence: build:check passes, unit test pass case verified)
+- [x] `packages/werkstatt-site/AGENTS.md` updated with `template.peer-deps.validate` check documentation (evidence: AGENTS.md line 64)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0815 exit 0, zero violations)
 
 ## Implementation notes for agents
 
