@@ -60,6 +60,9 @@ jobs:
       - name: RFC command lifecycle validation
         run: pnpm exec werkstatt run rfc.command-lifecycle.validate --json
 
+      - name: Generator ownership cross-check
+        run: pnpm exec werkstatt run ownership.generator.cross-check --json
+
       - name: App author checks - nicaragua-projekt
         run: pnpm exec werkstatt run apps-check.author --app nicaragua-projekt --json
 

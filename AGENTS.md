@@ -322,6 +322,10 @@ When the operator asks to start a new mission, the agent workflow is:
 
 Agents MUST NOT begin investigating, diagnosing, or fixing the issue immediately after materialization. The operator will provide specific instructions on what to do next. This is non-negotiable workflow discipline that applies to all agents in all IDEs.
 
+### Materialization enforcement in mission.preview (RFC-0817)
+
+`mission.preview` enforces `mission.materialize` before starting the dev server. If `materializedAt` is null and the mission state is `open`, materialize is auto-run. `--skip-prepare` skips the dev-critical file check but NOT materialization. Non-open missions (closed, aborted) skip the materialization check.
+
 ## Deployment pipeline discipline
 
 The deployment pipeline is strictly ordered. Agents MUST NOT skip steps, reorder, or deploy directly to Main.
