@@ -22,6 +22,7 @@
   <item>RFC-0659: add workpiece artifact cache — skip codegen on repeated materialization when cache key (cacheCloneHead + platformVersion + platformSemanticHash) matches.</item>
   <item>Preserve operator-filled .env from old workpiece before atomicMoveDir and restore after — prevents secret loss (CLOUDFLARE_API_TOKEN, R2 keys) on re-materialization.</item>
   <item>RFC-0796: add checkWorkspaceGlobsForStalePackages pre-flight guard before pnpm install — detects stale package.json workspace references to missing packages.</item>
+  <item>RFC-0822: replace old-workpiece .env preservation with restoreEnvFilesFromCacheClone — cache clone is the canonical inter-mission store for secrets.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -74,6 +75,7 @@ import {
   ensureChromium,
 } from "@warpgogol/werkstatt-site/checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
+import { restoreEnvFilesFromCacheClone } from "./env-persist.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
@@ -1151,52 +1153,31 @@ export async function runMissionMaterialize(
       );
     } // end if (!artifactCacheHit) — RFC-0659 artifact cache branch
 
-    // Preserve operator-filled .env files from the old workpiece before
-    // atomicMoveDir replaces it. Without this, re-materialization destroys
-    // secrets (CLOUDFLARE_API_TOKEN, R2_AXIOM_ACCESS_KEY_ID, etc.) that the operator
-    // manually filled in. The new workpiece gets empty .env files from
-    // .env.example — we restore the old values after the move.
-    const envFilesToPreserve = [".env"];
-    const preservedEnv: Record<string, string> = {};
-    for (const envFile of envFilesToPreserve) {
-      const oldEnvPath = path.join(workpieceDir, envFile);
-      if (existsSync(oldEnvPath)) {
-        try {
-          preservedEnv[envFile] = await fs.readFile(oldEnvPath, "utf8");
-        } catch {
-          // Read failed — skip preservation for this file
-        }
-      }
-    }
-
-    // Commit staging → workpiece via atomic rename (replace: true handles
-    // the old workpiece via rename-to-trash, avoiding EBUSY on Windows).
+    // RFC-0822: Restore .env* files from cache clone after atomicMoveDir.
+    // Replaces the old-workpiece preservation code (lines 1154–1196).
+    // The cache clone is the canonical inter-mission store for secrets.
+    // Non-fatal: failure logs a warning, materialize proceeds with .env.example.
     await atomicMoveDir(stagingDir, workpieceDir, { replace: true });
 
-    // Restore preserved .env files, merging operator-filled values over the
-    // empty .env.example template. Then set PUBLIC_IMAGE_PROVIDER=build-portable.
-    // Also set process.env so the kernel command sees it without Astro's dotenv.
-    const envFiles = [".env"];
-    for (const envFile of envFiles) {
-      const envPath = path.join(workpieceDir, envFile);
-      let envContent: string;
-      if (preservedEnv[envFile]) {
-        // Operator had filled-in values — restore them
-        envContent = preservedEnv[envFile];
-      } else if (existsSync(envPath)) {
-        envContent = await fs.readFile(envPath, "utf8");
+    const cacheCloneDir = resolveCacheClonePath(workspaceRoot, manifest.systemId);
+    try {
+      const envResult = await restoreEnvFilesFromCacheClone(cacheCloneDir, workpieceDir);
+      if (envResult.copied.length > 0) {
+        logger.info(
+          `  Restored ${envResult.copied.length} .env file(s) from cache clone: ${envResult.copied.join(", ")}`,
+        );
       } else {
-        continue;
+        logger.warn(
+          `  Warning: no .env files found in cache clone — using .env.example template. Operator must fill secrets manually.`,
+        );
       }
-      envContent = envContent.replace(
-        /^PUBLIC_IMAGE_PROVIDER=.*$/m,
-        "PUBLIC_IMAGE_PROVIDER=build-portable",
+      if (envResult.skipped.length > 0) {
+        logger.warn(`  Warning: failed to restore .env file(s): ${envResult.skipped.join(", ")}`);
+      }
+    } catch (envErr) {
+      logger.warn(
+        `  Warning: failed to restore .env files from cache clone: ${envErr instanceof Error ? envErr.message : String(envErr)}`,
       );
-      await fs.writeFile(envPath, envContent, "utf8");
-    }
-    const preservedCount = Object.keys(preservedEnv).length;
-    if (preservedCount > 0) {
-      logger.info(`  Preserved ${preservedCount} .env file(s) from previous workpiece`);
     }
     process.env["PUBLIC_IMAGE_PROVIDER"] = "build-portable";
     logger.info(`  PUBLIC_IMAGE_PROVIDER set to build-portable in .env files`);
