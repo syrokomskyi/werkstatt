@@ -20,8 +20,12 @@ export class KernelRegistry implements KernelModuleRegistry {
   currentModuleName: string | undefined;
 
   registerCommand(command: KernelCommandDefinition): void {
-    if (this.commands.has(command.name)) {
-      throw new Error(`Kernel command already registered: ${command.name}`);
+    const existing = this.commands.get(command.name);
+    if (existing) {
+      if (existing.execute === command.execute) return;
+      throw new Error(
+        `Kernel command already registered: ${command.name} (conflict between modules)`,
+      );
     }
 
     this.commands.set(command.name, command);

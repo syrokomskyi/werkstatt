@@ -26,7 +26,6 @@ import {
   runBiomeCssGenerate,
   runPropsTypesGenerate,
   runFontsImportsGenerate,
-  runGenerateOpenSourcePage,
   runGenerateMaterialCreditsPage,
 } from "@warpgogol/werkstatt-site/codegen";
 import { runKernelWire } from "@warpgogol/werkstatt/kernel";
@@ -676,28 +675,6 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runGeneratedDriftValidate,
-  },
-  /* RFC-0489: open-source SBOM registry generation */
-  {
-    name: "open-source.generate",
-    description:
-      "Generate open-source registry JSON, CycloneDX SBOM, THIRD_PARTY_NOTICES.txt, THIRD_PARTY_LICENSES.txt, and content pages from production dependencies (RFC-0489).",
-    scope: "app",
-    flags: {},
-    supportsAllSites: true,
-    mutatesState: true,
-    cacheable: false,
-    writes: [
-      "<app>/src/content/pages/{lang}/open-source.md",
-      "<app>/src/content/prose/{lang}/open-source.md",
-      "<app>/src/content/data/{lang}/open-source-registry.json",
-      "<app>/public/open-source/THIRD_PARTY_NOTICES.txt",
-      "<app>/public/open-source/THIRD_PARTY_LICENSES.txt",
-      "<app>/public/open-source/sbom.cdx.json",
-    ],
-    reads: ["<app>/src/content/system.md", "<app>/package.json"],
-    modulePaths: ["open-source-page.ts"],
-    execute: runGenerateOpenSourcePage,
   },
   /* RFC-0489: open-source SBOM registry validation */
   {
