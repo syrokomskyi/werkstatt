@@ -1,7 +1,7 @@
 ---
 id: RFC-0810
 title: "Add generator ownership cross-check to detect unregistered generator outputs"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-12
 updatedAt: 2026-08-12
 enhancedAt: 2026-08-12
-implementedAt:
+implementedAt: 2026-08-12
 closedAt:
 supersedes: []
 supersededBy:
@@ -26,9 +26,9 @@ satisfies:
   - DNA-58
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - "ownership.generator.cross-check"
-  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -158,16 +158,16 @@ interface OwnershipCrossCheckResult {
 
 ## Acceptance criteria
 
-- [ ] `ownership.generator.cross-check` command registered
-- [ ] Cross-references all `.generate` commands against `GENERATOR_OWNERSHIP_MAP`
-- [ ] Reports `OWN-XCHECK-01` for uncovered generators
-- [ ] Reports `OWN-XCHECK-02` for phantom command references
-- [ ] Reports `OWN-XCHECK-03` for non-existent module paths
-- [ ] Integrated into `build.prepare` pipeline before `ownership.sync.validate`
-- [ ] `--json` output format documented and stable
-- [ ] Unit tests for all three failure modes
-- [ ] Existing sites pass without changes (all app-scoped generators have ownership entries)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `ownership.generator.cross-check` command registered (evidence: docs/command-manifest.generated.yaml)
+- [x] Cross-references all `.generate` commands against `GENERATOR_OWNERSHIP_MAP` (evidence: packages/werkstatt-site/src/checks/ownership-cross-check.ts:45-83)
+- [x] Reports `OWN-XCHECK-01` for uncovered generators (evidence: packages/werkstatt-site/src/checks/ownership-cross-check.ts:76-82)
+- [x] Reports `OWN-XCHECK-02` for phantom command references (evidence: packages/werkstatt-site/src/checks/ownership-cross-check.ts:85-98)
+- [x] Reports `OWN-XCHECK-03` for non-existent module paths (evidence: packages/werkstatt-site/src/checks/ownership-cross-check.ts:101-123)
+- [x] Integrated into `build.prepare` pipeline before `ownership.sync.validate` (evidence: packages/werkstatt-site/src/checks/pipelines/build-prepare.ts)
+- [x] `--json` output format documented and stable (evidence: packages/werkstatt-site/src/checks/ownership-cross-check.ts returns diagnosticsResult)
+- [x] Unit tests for all three failure modes (evidence: packages/werkstatt-site/src/checks/tests/ownership-cross-check.test.ts)
+- [x] Existing sites pass without changes (evidence: ownership.generator.cross-check --json reports 0 errors, 0 warnings)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0810 exitCode 0)
 
 ## Implementation notes for agents
 
