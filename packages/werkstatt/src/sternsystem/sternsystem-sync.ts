@@ -11,6 +11,7 @@
   <item>RFC-0472: initial sync command handler.</item>
   <item>RFC-0477: commit and push bordbuch after appending mirror-sync entry.</item>
   <item>RFC-0480: remove pull/both directions — push-only (edits-only-through-missions invariant).</item>
+  <item>RFC-0818: reorder external push + bundle creation to after bordbuch commit so bordbuch entry reaches external mirrors.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -123,6 +124,45 @@ export async function runSternsystemSync(
 
   const warnings: string[] = [];
 
+  // RFC-0818: Capture commitSha (content SHA) BEFORE bordbuch commit — records
+  // what content was synced, not the bordbuch commit itself.
+  let commitSha: string;
+  try {
+    commitSha = git(bareRepoPath, "rev-parse HEAD");
+  } catch {
+    commitSha = "";
+  }
+
+  const syncedAt = new Date().toISOString();
+
+  // RFC-0818: Bordbuch commit happens BEFORE external push so the bordbuch entry
+  // reaches external mirrors and bundles. appendAndCommitBordbuch commits in the
+  // cache clone and pushes to the bare repo, advancing bare HEAD to N+1.
+  try {
+    await appendAndCommitBordbuch(
+      workspaceRoot,
+      id,
+      "mirror-sync",
+      `Mirror sync (${direction}, branch: ${syncAll ? "*" : branchName}) — ${commitSha.slice(0, 12)}`,
+      "sternsystem.sync",
+      {
+        writerRole: "sternsystem",
+        metadata: {
+          mirrorUrls,
+          direction,
+          branch: syncAll ? "*" : branchName,
+          commitSha,
+          result: "ok",
+        },
+      },
+      `Bordbuch: mirror-sync ${id}`,
+    );
+  } catch (err) {
+    logger.error(`[sternsystem.sync] Bordbuch write failed: ${(err as Error).message}`);
+  }
+
+  // RFC-0818: External push moved AFTER bordbuch commit — now includes bordbuch
+  // entry commit in the push to external mirrors.
   for (let i = 0; i < mirrorUrls.length; i++) {
     const mirrorUrl = mirrorUrls[i];
     const remoteName = `mirror-${i}`;
@@ -160,7 +200,8 @@ export async function runSternsystemSync(
     }
   }
 
-  // RFC-0574: bundle mirrors — create git bundle from bare repo and copy to backup endpoints
+  // RFC-0818: Bundle creation moved AFTER bordbuch commit — now includes bordbuch
+  // entry commit in bundles.
   const bundleMirrors = config.mirrors.slice(2).filter((m) => m.storageType === "bundle");
   for (const bundleMirror of bundleMirrors) {
     const bundlePath = path.join(tmpdir(), `${id}-${Date.now()}.bundle`);
@@ -199,43 +240,10 @@ export async function runSternsystemSync(
 
   // RFC-0574: per-mirror failures are non-fatal — sync continues and reports warnings
 
-  let commitSha: string;
-  try {
-    commitSha = git(bareRepoPath, "rev-parse HEAD");
-  } catch {
-    commitSha = "";
-  }
-
-  const syncedAt = new Date().toISOString();
-
-  try {
-    await appendAndCommitBordbuch(
-      workspaceRoot,
-      id,
-      "mirror-sync",
-      `Mirror sync (${direction}, branch: ${syncAll ? "*" : branchName}) — ${commitSha.slice(0, 12)}`,
-      "sternsystem.sync",
-      {
-        writerRole: "sternsystem",
-        metadata: {
-          mirrorUrls,
-          direction,
-          branch: syncAll ? "*" : branchName,
-          commitSha,
-          result: "ok",
-        },
-      },
-      `Bordbuch: mirror-sync ${id}`,
-    );
-  } catch (err) {
-    logger.error(`[sternsystem.sync] Bordbuch write failed: ${(err as Error).message}`);
-  }
-
-  // RFC-0705: Update refs/mirror/${branch} in bare repo to track the last
-  // successfully pushed SHA. This MUST run after the bordbuch commit+push (now
-  // handled atomically by appendAndCommitBordbuch), which pushes the bordbuch
-  // entry commit to the bare repo, advancing HEAD.
-  // mission.close checks this ref to determine if external mirrors are in sync.
+  // RFC-0818: Update refs/mirror/${branch} AFTER bordbuch commit and external
+  // push. Now accurately tracks the SHA that was pushed to external mirrors
+  // (bordbuch commit included). mission.close checks this ref to determine if
+  // external mirrors are in sync.
   if (externalMirrors.length > 0 && !syncAll) {
     try {
       const headSha = git(bareRepoPath, `rev-parse ${branchName}`);
