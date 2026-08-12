@@ -44,5 +44,6 @@ export { resolveMissionEvidenceDir, resolveMissionDir } from "./mission-io.ts";
 export {
   persistEnvFilesToCacheClone,
   restoreEnvFilesFromCacheClone,
+  collectEnvFiles,
   type EnvPersistResult,
 } from "./env-persist.ts";

@@ -25,7 +25,6 @@ export interface EnvPersistResult {
   skipped: string[];
 }
 
-const ENV_GLOB = ".env*";
 const EXCLUDE_PATTERNS = [".env.example", /^\.env\..*\.example$/];
 
 function shouldExclude(filename: string): boolean {
@@ -39,7 +38,7 @@ function shouldExclude(filename: string): boolean {
   return false;
 }
 
-async function collectEnvFiles(dir: string): Promise<string[]> {
+export async function collectEnvFiles(dir: string): Promise<string[]> {
   if (!existsSync(dir)) return [];
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const envFiles: string[] = [];
