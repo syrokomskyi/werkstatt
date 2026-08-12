@@ -1,7 +1,7 @@
 ---
 id: RFC-0817
 title: "Enforce formal mission lifecycle in mission.preview and add systemic pipeline reliability protections"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
