@@ -52,6 +52,28 @@ Tracked patterns (legacy from `apps/**`, retained for historical content): `apps
 
 When adding a `.gitignore` pattern that targets a **top-level** directory or file (e.g. `agents/`, `missions/`, `notausgang-*`), always anchor it with a leading `/` (e.g. `/agents/`, `/notausgang-*`). Without the leading `/`, git treats the pattern as matching any path component at any depth — so `agents/` blocks `docs/agents/` and `packages/os/site-kernel-changelog/src/changelog/agents/` too. This caused 11 source files to be silently excluded from commits (discovered 2026-08-04).
 
+## Commit discipline (RFC-0821)
+
+Agents MUST NEVER use raw `git commit` anywhere in this repository. Two canonical commit commands exist, and they are the only permitted paths:
+
+- **Mission workpiece changes** (`missions/<id>/workpiece/**`): use `mission.git.commit`:
+
+  ```bash
+  pnpm exec werkstatt run mission.git.commit --mission=<missionId> --message="<message>"
+  ```
+
+  This runs pre-commit content validators, supports signed commits, records bordbuch events, and enforces the mission lifecycle (open state check, workpiece existence).
+
+- **Platform-scope changes** (`packages/**`, `integrations/**`, `services/**`, `docs/**`, root config): use `ecosystem.commit`:
+  ```bash
+  pnpm exec werkstatt run ecosystem.commit --message="<message>" [--rfc RFC-XXXX]
+  ```
+  This runs the platform-scope guard, CSS token validation, ENV-CONTRACT checks, pnpm-lock staleness, and version bumping.
+
+The workspace-level `hooks/pre-commit` already blocks raw `git commit` for platform-scope files. Workpiece repos have their own `.git` and are not covered by this hook — the AGENTS.md rule is the primary guard for workpieces, reinforced by a workpiece pre-commit hook installed at materialization time (RFC-0821).
+
+**Rationale**: raw `git commit` bypasses pre-commit validators, bordbuch recording, signed-commit support, and the mission lifecycle. This causes silent mission loss when work is reported as done but never properly persisted through the platform.
+
 ## Forge project configuration (RFC-0391)
 
 `forge.yaml` at the repository root is the machine-readable project configuration for `@warpgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects. The `.forge/` directory (RFC-0733) sits alongside `forge.yaml` and contains project-local governance files: `pinned.yaml` (pinned-files manifest) and `pinned-audit.log` (override audit trail, gitignored).
