@@ -239,3 +239,71 @@ ${body}`;
     }
   });
 });
+
+describe("page.markdown.validate — whitelist scanning (RFC-0811)", () => {
+  it("non-twin .md file in public/ is not flagged", async () => {
+    const root = await mkdtemp(join(tmpdir(), "page-md-whitelist-nontwin-"));
+    try {
+      const publicDir = join(root, "apps", "test-app", "public");
+      await mkdir(publicDir, { recursive: true });
+      await writeFile(join(publicDir, "auth.md"), "# Agent Discovery\n\nNot a twin.", "utf8");
+
+      const result = await runPageMarkdownValidate(input, ctx(root));
+      const errors = errorMessages(result);
+      expect(errors).not.toContain(expect.stringContaining("MDMETA-01"));
+      expect(result.exitCode).toBe(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("twin .md file with missing frontmatter is flagged with MDMETA-01", async () => {
+    const root = await mkdtemp(join(tmpdir(), "page-md-whitelist-missing-fm-"));
+    try {
+      const publicDir = join(root, "apps", "test-app", "public");
+      await mkdir(publicDir, { recursive: true });
+      await writeFile(join(publicDir, "index.md"), "No frontmatter here.\n", "utf8");
+
+      const result = await runPageMarkdownValidate(input, ctx(root));
+      const errors = errorMessages(result);
+      expect(result.exitCode).toBe(1);
+      expect(errors.some((e) => e.includes("MDMETA-01"))).toBe(true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("twin .md file with valid frontmatter passes", async () => {
+    const root = await mkdtemp(join(tmpdir(), "page-md-whitelist-valid-"));
+    try {
+      const publicDir = join(root, "apps", "test-app", "public");
+      await mkdir(publicDir, { recursive: true });
+      const twin = buildMarkdownTwin(body, makeProvenance(null));
+      await writeFile(join(publicDir, "index.md"), twin, "utf8");
+
+      const result = await runPageMarkdownValidate(input, ctx(root));
+      const errors = errorMessages(result);
+      expect(errors).not.toContain(expect.stringContaining("MDMETA"));
+      expect(result.exitCode).toBe(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("twin .md file in subdirectory matching {route} pattern is validated", async () => {
+    const root = await mkdtemp(join(tmpdir(), "page-md-whitelist-subdir-"));
+    try {
+      const publicDir = join(root, "apps", "test-app", "public", "de", "some-page");
+      await mkdir(publicDir, { recursive: true });
+      const twin = buildMarkdownTwin(body, makeProvenance(null));
+      await writeFile(join(publicDir, "index.md"), twin, "utf8");
+
+      const result = await runPageMarkdownValidate(input, ctx(root));
+      const errors = errorMessages(result);
+      expect(errors).not.toContain(expect.stringContaining("MDMETA-01"));
+      expect(result.exitCode).toBe(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+});

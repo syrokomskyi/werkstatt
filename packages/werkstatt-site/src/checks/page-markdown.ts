@@ -62,7 +62,7 @@ import {
   resolveSurfaceArticlePage,
   readSurfaceTwinEntries,
 } from "./lib/surface-articles.ts";
-import { matchOwnershipEntry, toPosix } from "./ownership-pattern-match.ts";
+import { isFileOwnedByCommand, toPosix } from "./ownership-pattern-match.ts";
 
 /** RFC-0325: article-typed surface pages carry no organization/people/initiatives — the markdown
  * page builder never reads them for semanticType "article" (see buildMarkdownPageSemantic). */
@@ -540,8 +540,7 @@ export async function runPageMarkdownValidate(
   const allMdFiles = await collectFiles(publicDir, { extensions: [".md"], ignore: () => false });
   const markdownFiles = allMdFiles.filter((abs) => {
     const relPath = toPosix(relative(context.workspaceRoot, abs));
-    const entry = matchOwnershipEntry(relPath, app);
-    return entry !== null && entry.command === "page.markdown.generate";
+    return isFileOwnedByCommand(relPath, "page.markdown.generate", app);
   });
   for (const abs of markdownFiles) {
     const content = await readFile(abs, "utf-8");

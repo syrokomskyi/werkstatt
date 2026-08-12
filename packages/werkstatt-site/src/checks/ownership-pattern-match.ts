@@ -107,3 +107,45 @@ export function matchOwnershipEntry(relPath: string, app?: string): OwnershipEnt
 
   return null;
 }
+
+export function isFileOwnedByCommand(relPath: string, command: string, app?: string): boolean {
+  const posixPath = toPosix(relPath);
+  let matchesCommand = false;
+
+  for (const entry of GENERATOR_OWNERSHIP_MAP) {
+    const normalized = normalizeOwnershipPath(entry.path);
+    const variants = expandPlaceholderVariants(normalized);
+
+    let matches = false;
+    for (const variant of variants) {
+      const regex = ownPatternToExactRegex(variant);
+      if (regex.test(posixPath)) {
+        matches = true;
+        break;
+      }
+    }
+
+    if (!matches && app) {
+      const appPrefixed = `apps/${app}/${entry.path}`;
+      const appNormalized = normalizeOwnershipPath(appPrefixed);
+      const appVariants = expandPlaceholderVariants(appNormalized);
+      for (const variant of appVariants) {
+        const regex = ownPatternToExactRegex(variant);
+        if (regex.test(posixPath)) {
+          matches = true;
+          break;
+        }
+      }
+    }
+
+    if (matches) {
+      if (entry.command === command) {
+        matchesCommand = true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  return matchesCommand;
+}
