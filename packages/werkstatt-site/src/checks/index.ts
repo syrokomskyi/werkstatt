@@ -23,7 +23,10 @@ export { runSemanticDriftValidation } from "./checks/semantic-drift.ts";
 export { runCompassInventory, runCompassValidation } from "./compass.ts";
 export * from "./compass-change-summary.ts";
 export * from "./compass-audit.ts";
-export { createCompassInventoryEntries, type CompassInventoryEntry } from "@warpgogol/werkstatt/kernel";
+export {
+  createCompassInventoryEntries,
+  type CompassInventoryEntry,
+} from "@warpgogol/werkstatt/kernel";
 
 export * from "./structure.ts";
 
@@ -168,9 +171,12 @@ export { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 export type { OwnershipEntry } from "./generator-ownership.ts";
 
 // RFC-0647: re-export ensureChromium for cross-package import by mission.materialize
+// RFC-0813: re-export isChromiumInstalled for cross-package import by mission.validate
 export {
   ensureChromium,
+  isChromiumInstalled,
   type PlaywrightChromiumEnsureResult,
+  type ChromiumInstallStatus,
 } from "./playwright-chromium-ensure.ts";
 
 // Axiom adapter: re-export report renderer and types for downstream consumers
