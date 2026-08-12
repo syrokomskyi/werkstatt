@@ -12,6 +12,7 @@ Supports --dry-run to preview changes without making API calls.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0753: initial dns.record.upsert command handler.</item>
+  <item>RFC-0812: export toApiRecord for unit testing.</item>
 </CHANGE_SUMMARY>
 */
 
