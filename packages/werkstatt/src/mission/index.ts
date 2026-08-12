@@ -41,3 +41,8 @@ export { runMissionCleanup, type MissionCleanupData } from "./mission-cleanup.ts
 export { resolveActorFromEnv, resolveActor, type ActorIdentity } from "./actor-identity.ts";
 export { createSignedCommit, type SignedCommitResult } from "./signed-commit.ts";
 export { resolveMissionEvidenceDir, resolveMissionDir } from "./mission-io.ts";
+export {
+  persistEnvFilesToCacheClone,
+  restoreEnvFilesFromCacheClone,
+  type EnvPersistResult,
+} from "./env-persist.ts";
