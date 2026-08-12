@@ -758,6 +758,59 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/werkstatt-site/src/checks/surface-translation.ts",
     conditional: true,
   },
+
+  // changelog.generate — changelog index + per-version detail files
+  // conditional: changelog.generate only writes on release days; the file may not exist yet.
+  {
+    path: "CHANGELOG.md",
+    command: "changelog.generate",
+    module: "packages/werkstatt/src/changelog/changelog-command.ts",
+    conditional: true,
+  },
+  {
+    path: "changelogs/changelog-{date}-v{version}.md",
+    command: "changelog.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt/src/changelog/changelog-command.ts",
+    conditional: true,
+  },
+
+  // content.ref-index.generate — RFC-0527 unified content reference index
+  {
+    path: "src/content-ref-index.generated.yaml",
+    command: "content.ref-index.generate",
+    module: "packages/werkstatt-site/src/codegen/content-ref-index-generate.ts",
+  },
+
+  // icons.generate — app-level LordIcon wrapper components + index files
+  {
+    path: "src/components/icons/gen/{id}/{name}.astro",
+    command: "icons.generate",
+    module: "packages/werkstatt-site/src/codegen/service.ts",
+    conditional: true,
+  },
+  {
+    path: "src/components/icons/gen/index.ts",
+    command: "icons.generate",
+    module: "packages/werkstatt-site/src/codegen/service.ts",
+    conditional: true,
+  },
+
+  // integrity.keys.generate — Ed25519 signing key pair for build provenance
+  {
+    path: ".integrity/keys/studio.private.pem",
+    command: "integrity.keys.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt/src/integrity/integrity-commands.ts",
+    conditional: true,
+  },
+  {
+    path: "public/studio.public.pem",
+    command: "integrity.keys.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt/src/integrity/integrity-commands.ts",
+    conditional: true,
+  },
 ];
 
 // ---------------------------------------------------------------------------
