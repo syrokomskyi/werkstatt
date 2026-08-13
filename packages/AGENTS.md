@@ -148,6 +148,8 @@ When you add a new cross-cutting build-time fs/text/workspace helper, add it to 
 
 Compass source-file markup (`MODULE_CONTRACT` + `CHANGE_SUMMARY`, two-block contract per RFC-0348) is required for non-trivial authored files in `packages/` under the same policy as `apps/` — see `docs/source-markup.xml`.
 
+**`MODULE_CONTRACT` accepts only `<purpose>` and `<non-goals>` child elements.** The fields `<keywords>` and `<responsibilities>` are forbidden (COMPASS-FORBIDDEN-01) — `compass.validate` rejects them. Do not add them when writing Compass headers manually.
+
 Use these commands to apply or remove Compass markup across packages (RFC-0015):
 
 ```sh
