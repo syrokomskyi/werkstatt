@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
+enhancedAt: 2026-08-13
 implementedAt:
 closedAt:
 supersedes: []
@@ -39,7 +40,7 @@ successSignals:
 nonGoals:
   - "Do not commit binary derived artifacts (public/_img/**, public/_video/**) — they are large, platform-specific, and regenerated deterministically from the manifest + source hashes."
   - "Do not change the generator or validator logic — only the gitignore policy for the manifest files."
-  - "Do not remove the GENERATED marker from manifest files — they are still generated artifacts that agents must not hand-edit."
+  - "Do not hand-edit the manifest files — they are generated artifacts owned by the generator command (`image.variants.generate` / `video.variants.generate`). Note: the generators do not currently emit a `GENERATED` marker header; adding one is out of scope for this RFC (would require a code change) and can be addressed in a separate RFC."
 ---
 
 # RFC-0834: Commit generated variant manifests for drift detection
@@ -48,8 +49,7 @@ nonGoals:
 
 RFC-0204 (image variants) and RFC-0210 (video variants) both mandate:
 
-> "Do not commit derived variants to git — they are build artifacts regenerated deterministically."
-> "Agents MUST NOT commit generated variants or the manifest; they are gitignored build artifacts carrying the `GENERATED` marker."
+> "Do not commit derived variants to git — they are build artifacts regenerated deterministically." "Agents MUST NOT commit generated variants or the manifest; they are gitignored build artifacts carrying the `GENERATED` marker."
 
 This rule was written when the manifests were JSON files with non-deterministic key ordering. Since then, the image manifest was migrated to YAML (`src/image-variants.generated.yaml`) with stable key ordering and `sourceHash` fields per entry — making it deterministic and reviewable.
 
@@ -81,10 +81,10 @@ Specifically:
 
 ## Architectural fit
 
-- **Generated-file governance (RFC-0078/0081/0087):** The manifest carries the `GENERATED` marker and is owned by a single command (`image.variants.generate` / `video.variants.generate`). Committing it does not change ownership or the regeneration contract — it makes the output visible in review.
+- **Generated-file governance (RFC-0078/0081/0087):** The manifest is owned by a single command (`image.variants.generate` / `video.variants.generate`). Committing it does not change ownership or the regeneration contract — it makes the output visible in review. Note: the generators do not currently emit a `GENERATED` marker header — the YAML is written via `yamlStringify(manifest)` without a comment prefix. The loader (`generated-manifest-loader.ts`) strips a leading `#` comment if present, so a future RFC can add the marker without breaking the loader.
 - **Drift detection pattern:** The platform already commits generated text artifacts (`docs/command-manifest.generated.yaml`, `src/agent-capabilities.generated.json`, etc.) for drift detection. This RFC extends that pattern to variant manifests.
 - **RFC-0830 (image.delivery.validate):** The validator checks rendered HTML for srcset presence. A committed manifest ensures the manifest exists in a cold workpiece, so the provider emits srcset and the validator passes without requiring a pre-build generation step.
-- **Source-hash invalidation (RFC-0204/0210):** The manifest stores `sourceHash` per entry. A committed manifest with a stale hash is detected by `image.variants.validate` (stale-manifest rule) and is also visible as a git diff — two layers of drift detection instead of one.
+- **Source-hash invalidation (RFC-0204/0210):** The manifest stores `sourceHash` per entry. The generator uses this hash for skip-on-match reuse, but `image.variants.validate` and `video.variants.validate` do NOT currently implement a stale-manifest (sourceHash comparison) rule — they only check that referenced variant files exist on disk. A committed manifest with a stale hash is visible as a git diff (the sole drift detection layer). Implementing a stale-manifest validator rule is out of scope for this RFC (would require a code change) and can be addressed in a separate RFC.
 
 ## Design
 
@@ -118,7 +118,7 @@ The generator (`image.variants.generate`, `video.variants.generate`) and validat
 
 - `mission.git.commit` and `ecosystem.commit` will now include the manifest in diffs when it changes.
 - Agents SHOULD commit the manifest alongside source image/video changes in the same commit, so the diff shows both the source change and the manifest update.
-- `image.variants.validate` and `video.variants.validate` continue to enforce manifest freshness in `build.check` — a committed-but-stale manifest still fails validation.
+- `image.variants.validate` and `video.variants.validate` continue to check that referenced variant files exist on disk in `build.check` — a committed manifest with missing variant files still fails validation. Note: these validators do NOT currently detect stale manifests (sourceHash mismatch) — the git diff is the sole drift detection layer for stale hashes.
 
 ## Rollout
 
@@ -126,6 +126,7 @@ The generator (`image.variants.generate`, `video.variants.generate`) and validat
 - Run `image.variants.generate` and `video.variants.generate` in each workpiece to produce the manifest, then commit it.
 - Existing workpieces with tracked `content-ref-index.generated.yaml` are unaffected.
 - No migration script needed — the manifest is generated on the next `build.prepare` run.
+- **Note:** The onboarding template (`gitignore.template`), `docs/policies/content-contracts.md`, and the `amendedBy` fields in RFC-0204 and RFC-0210 were pre-applied during RFC drafting. These changes are correct and will be legitimized when this RFC transitions to `accepted`/`implemented`. The implementation step should verify they are consistent with the final RFC text.
 
 ## Alternatives considered
 
@@ -137,9 +138,9 @@ The generator (`image.variants.generate`, `video.variants.generate`) and validat
 
 ## Risks
 
-- **Merge conflicts on manifest files:** Two missions changing different source images could produce conflicting manifest edits. Mitigated by YAML key ordering (content-relative paths are stable) and the fact that `image.variants.generate` is idempotent — re-running after merge resolves any conflict.
+- **Merge conflicts on manifest files:** Two missions changing different source images could produce conflicting manifest edits. Mitigated by YAML key ordering (content-relative paths are stable) and the fact that `image.variants.generate` is idempotent — re-running after merge resolves any conflict. Edge case: the `byBasename` map uses bare basenames as keys — two missions adding images with the same basename in different content paths would conflict on the same key. Re-running the generator after merge resolves this.
 
-- **Stale committed manifest:** An operator changes a source image but forgets to run the generator. The committed manifest is now stale. Mitigated by `image.variants.validate` (stale-manifest rule) and the git diff itself — the stale manifest is visible in review, unlike the current invisible-stale state.
+- **Stale committed manifest:** An operator changes a source image but forgets to run the generator. The committed manifest is now stale. The stale `sourceHash` is visible as a git diff — the sole drift detection layer. Note: `image.variants.validate` and `video.variants.validate` do NOT currently compare `sourceHash` to source files; implementing a stale-manifest validator rule is out of scope for this RFC.
 
 - **Larger git diffs:** The manifest is ~21KB for 31 source images. This is comparable to other generated artifacts we already commit. Acceptable trade-off for drift visibility.
 
@@ -153,11 +154,12 @@ The generator (`image.variants.generate`, `video.variants.generate`) and validat
 - [ ] RFC-0210 `amendedBy` includes RFC-0834
 - [ ] `docs/policies/content-contracts.md` updated
 - [ ] `rfc.validate` passes
+- [ ] Regression check: `git check-ignore src/image-variants.generated.yaml` returns non-zero (not ignored) in at least one active workpiece
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MUST NOT commit binary derived artifacts (`public/_img/**`, `public/_video/**`) — only the manifest files.
 - Agents SHOULD run `image.variants.generate` / `video.variants.generate` and commit the resulting manifest alongside source asset changes.
-- Agents MUST NOT hand-edit the manifest — it carries the `GENERATED` marker and is owned by the generator command.
-- The `sourceHash` field in each manifest entry is the drift-detection key: a changed source produces a different hash, which `image.variants.validate` detects and which is visible in the git diff.
+- Agents MUST NOT hand-edit the manifest — it is owned by the generator command. (The generators do not currently emit a `GENERATED` marker header; a future RFC may add one.)
+- The `sourceHash` field in each manifest entry is the drift-detection key: a changed source produces a different hash, which is visible in the git diff. Note: `image.variants.validate` and `video.variants.validate` do NOT currently compare `sourceHash` to source files — they only check that referenced variant files exist on disk. The git diff is the sole drift detection layer for stale manifests.
