@@ -147,15 +147,15 @@ The generator (`image.variants.generate`, `video.variants.generate`) and validat
 
 ## Acceptance criteria
 
-- [ ] `src/image-variants.generated.yaml` removed from workpiece `.gitignore`
-- [ ] `src/video-manifest.generated.yaml` removed from workpiece `.gitignore`
-- [ ] `public/_img/` and `public/_video/` remain in workpiece `.gitignore`
-- [ ] Onboarding `.gitignore` template updated
-- [ ] RFC-0204 `amendedBy` includes RFC-0834
-- [ ] RFC-0210 `amendedBy` includes RFC-0834
-- [ ] `docs/policies/content-contracts.md` updated
-- [ ] `rfc.validate` passes
-- [ ] Regression check: `git check-ignore src/image-variants.generated.yaml` returns non-zero (not ignored) in at least one active workpiece
+- [x] `src/image-variants.generated.yaml` removed from workpiece `.gitignore` (evidence: missions/warpgogol-com-m000054/workpiece/.gitignore:32-34, ../systems-cache/warpgogol-com/.gitignore:32-34)
+- [x] `src/video-manifest.generated.yaml` removed from workpiece `.gitignore` (evidence: missions/warpgogol-com-m000054/workpiece/.gitignore:36-38, ../systems-cache/warpgogol-com/.gitignore:36-38)
+- [x] `public/_img/` and `public/_video/` remain in workpiece `.gitignore` (evidence: git check-ignore public/_img/ returns 0, git check-ignore public/_video/ returns 0)
+- [x] Onboarding `.gitignore` template updated (evidence: packages/werkstatt-site/src/onboarding/templates/runtime/gitignore.template:32-38)
+- [x] RFC-0204 `amendedBy` includes RFC-0834 (evidence: docs/rfcs/archive/implemented/rfc-0204-*.md:20)
+- [x] RFC-0210 `amendedBy` includes RFC-0834 (evidence: docs/rfcs/archive/implemented/rfc-0210-*.md:25)
+- [x] `docs/policies/content-contracts.md` updated (evidence: docs/policies/content-contracts.md:110,119,123)
+- [x] `rfc.validate` passes (evidence: rfc.validate --id RFC-0834 exitCode 0)
+- [x] Regression check: `git check-ignore src/image-variants.generated.yaml` returns non-zero (not ignored) in at least one active workpiece (evidence: git check-ignore in missions/warpgogol-com-m000054/workpiece and ../systems-cache/warpgogol-com both return 1)
 
 ## Implementation notes for agents
 
