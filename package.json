@@ -290,6 +290,10 @@
     "./testing/smoke": {
       "types": "./src/testing/smoke/index.ts",
       "default": "./src/testing/smoke/index.ts"
+    },
+    "./testing/integration": {
+      "types": "./src/testing/integration/index.ts",
+      "default": "./src/testing/integration/index.ts"
     }
   },
   "files": ["src", "bin", "os"],

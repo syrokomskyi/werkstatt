@@ -20,6 +20,7 @@ import { spawn } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import type { ServiceEntry } from "@warpgogol/werkstatt/schemas";
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
+import type { IntegrationRunResult } from "@warpgogol/werkstatt/testing/integration";
 import {
   readServicesRegistry,
   writeServicesRegistry,
@@ -41,6 +42,7 @@ export interface ServiceDevDeployData {
   workersDevUrl: string;
   healthState: "healthy" | "unhealthy" | "unknown";
   smokeResult?: SmokeRunResult;
+  integrationResult?: IntegrationRunResult;
   preDeployGates: PreDeployGateResult[];
   startedAt: string;
   completedAt: string;
@@ -332,6 +334,37 @@ export async function runSmokeCheck(
   } catch (err) {
     logger.warn(
       `[smoke] service.smoke.run failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return undefined;
+  }
+}
+
+export async function runIntegrationTests(
+  workspaceRoot: string,
+  serviceId: string,
+  deployedUrl: string,
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+): Promise<IntegrationRunResult | undefined> {
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+  logger.info(
+    `[integration] running service.integration.run for ${serviceId} against ${deployedUrl}…`,
+  );
+  try {
+    const result = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: "service.integration.run",
+      argv: [`--service=${serviceId}`, `--url=${deployedUrl}`],
+    })) as { exitCode?: number; data?: IntegrationRunResult };
+    if (result.data) {
+      return result.data;
+    }
+    logger.warn(
+      `[integration] service.integration.run returned no data (exitCode=${result.exitCode ?? "unknown"})`,
+    );
+    return undefined;
+  } catch (err) {
+    logger.warn(
+      `[integration] service.integration.run failed: ${err instanceof Error ? err.message : String(err)}`,
     );
     return undefined;
   }
