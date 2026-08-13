@@ -434,5 +434,9 @@
       <change-type>Site E2E testing with Playwright (RFC-0828)</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/testing/e2e/run-e2e-tests.test.ts`; run `pnpm --filter @warpgogol/werkstatt build:check` to verify DevDeployResult includes e2eResult field; verify `site.e2e.run` command is registered via `pnpm exec werkstatt run site.e2e.run --site <id> --url <url>` (requires Playwright Chromium installed and a dev-deployed site).</expectation>
     </entry>
+    <entry id="vm-15">
+      <change-type>Test evidence gates for deployment pipeline (RFC-0829)</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/testing/test-evidence.test.ts`; verify `test.evidence.verify` and `test.evidence.list` commands are registered via `pnpm exec werkstatt run test.evidence.verify --target <id> --levels L4,L5 --commit-sha <sha>` and `pnpm exec werkstatt run test.evidence.list --target <id>`; verify `leitstand.propagate` and `leitstand.promote` include testEvidenceVerified in result data; verify `leitstand.service.promote` includes testEvidenceVerified in result data; verify grace period behavior (exit 0 with warnings before 2026-09-10).</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>
