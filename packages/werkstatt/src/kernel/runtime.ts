@@ -20,6 +20,7 @@ export {
   listRegisteredKernelCommandNames,
   listRegisteredKernelCommands,
   listRegisteredKernelPipelines,
+  loadAppRuntime,
 } from "./runtime/registry.ts";
 export { executeKernelCommand } from "./runtime/execute-command.ts";
 export { executeKernelPipeline } from "./runtime/execute-pipeline.ts";

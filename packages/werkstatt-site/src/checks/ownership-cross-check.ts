@@ -26,7 +26,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { listRegisteredKernelCommands } from "@warpgogol/werkstatt/kernel";
+import { listRegisteredKernelCommands, loadAppRuntime } from "@warpgogol/werkstatt/kernel";
 import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
@@ -41,6 +41,28 @@ export async function runOwnershipGeneratorCrossCheck(
   const diagnostics: Diagnostic[] = [];
 
   const registered = await listRegisteredKernelCommands(context.workspaceRoot);
+
+  // When running inside a pipeline for a specific site (e.g. release.prepare
+  // for a closed-mission workpiece), also load that site's app runtime and
+  // merge its commands. Normal site discovery skips closed-mission workpieces
+  // (currentMission is null), so site-level generators like
+  // open-source.generate, changelog.generate, etc. would otherwise be missing
+  // from the registered set, causing false OWN-XCHECK-02 diagnostics.
+  if (context.site?.configPath) {
+    try {
+      const { registry: siteRegistry } = await loadAppRuntime(context.workspaceRoot, context.site);
+      for (const cmdName of siteRegistry.listCommandNames()) {
+        (registered as { name: string; scope: string }[]).push({
+          name: cmdName,
+          scope: "app",
+        } as { name: string; scope: string });
+      }
+    } catch {
+      // Site runtime load failure is non-fatal — the cross-check will still
+      // run against workspace-level commands.
+    }
+  }
+
   const registeredByName = new Set(registered.map((c) => c.name));
 
   const appGenerateCommands = registered.filter(
