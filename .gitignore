@@ -213,6 +213,10 @@ content-validation-report.txt
 # Local scratch output. Durable review reports belong under docs/audits/.
 tmp/
 
+# Playwright test output (screenshots, error-context, .last-run.json)
+test-results/
+playwright-report/
+
 # Test temp directories (mkdtemp patterns like tmp-close-evidence-*, tmp-leitstand-*)
 tmp-*/
 
