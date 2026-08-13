@@ -1,7 +1,7 @@
 ---
 id: RFC-0831
 title: "Add csp.origins.validate for CSP-to-script-origin cross-validation"
-status: accepted
+status: implemented
 kind: command
 scope: app
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
-implementedAt:
+implementedAt: 2026-08-13
 closedAt:
 supersedes: []
 supersededBy:
