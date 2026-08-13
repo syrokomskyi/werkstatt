@@ -64,3 +64,16 @@ Validation:
 
 - Run `pnpm exec werkstatt run check-warpgogol.runner.validate` after changing the runner or the app API boundary.
 - Run `pnpm exec werkstatt run services.check.run` after changing `services/*`, `pnpm-workspace.yaml`, or service import rules.
+
+## Unit tests (RFC-0824 / DNA-66)
+
+Every `services/*` project MUST have at least one unit test.
+
+- **Test location:** Unit tests live in `packages/werkstatt-site/src/testing/unit/services/<service-id>/`.
+- **Per-service vitest config:** Each service has a `vitest.config.ts` that points to its test directory via `resolve(__dirname, "../../packages/werkstatt-site/src/testing/unit/services/<service-id>/**/*.test.ts")`.
+- **`@service` alias:** Each vitest config provides a `@service` resolve alias pointing to the service's `src/` directory. Tests import service modules via `@service/index.ts`, `@service/worker.ts`, `@service/config.ts`, etc.
+- **Test scripts:** Every `services/*/package.json` has `test` (`vitest run`) and `test:watch` (`vitest`) scripts.
+- **Test signal:** Services are classified as tier 1 by `classifyTier` in `test-signal.ts`. The `test.signal.validate` command scans `services/*/package.json` and emits diagnostics for missing or noop test scripts.
+- **Policy enforcement:** `test.signal.policy.validate` enforces that every service has real tests or explicit skipped-test owner/rationale/review metadata. Services with `gogol.testSignal.signal: "skipped"` must provide `owner`, `rationale`, and `reviewAfter` fields.
+- **`service.test.run` command:** Run `pnpm exec werkstatt run service.test.run --service <id>` to execute vitest for a specific service and get structured JSON results.
+- **`turbo run test`:** Service tests are included in `turbo run test` automatically once `test` scripts exist in `package.json`.
