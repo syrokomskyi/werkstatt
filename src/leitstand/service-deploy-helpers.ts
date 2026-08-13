@@ -19,6 +19,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import type { ServiceEntry } from "@warpgogol/werkstatt/schemas";
+import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
 import {
   readServicesRegistry,
   writeServicesRegistry,
@@ -39,6 +40,7 @@ export interface ServiceDevDeployData {
   deployState: "succeeded" | "failed";
   workersDevUrl: string;
   healthState: "healthy" | "unhealthy" | "unknown";
+  smokeResult?: SmokeRunResult;
   preDeployGates: PreDeployGateResult[];
   startedAt: string;
   completedAt: string;
@@ -52,6 +54,7 @@ export interface ServicePromoteData {
   deployState: "succeeded" | "failed";
   workersDevUrl: string;
   healthState: "healthy" | "unhealthy" | "unknown";
+  smokeResult?: SmokeRunResult;
   preDeployGates: PreDeployGateResult[];
   startedAt: string;
   completedAt: string;
@@ -304,3 +307,32 @@ export async function updateWorkersDevUrl(
 export { generateOperationId };
 
 export type { KernelRuntimeContext };
+
+export async function runSmokeCheck(
+  workspaceRoot: string,
+  serviceId: string,
+  deployedUrl: string,
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+): Promise<SmokeRunResult | undefined> {
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+  logger.info(`[smoke] running service.smoke.run for ${serviceId} against ${deployedUrl}…`);
+  try {
+    const result = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: "service.smoke.run",
+      argv: [`--service=${serviceId}`, `--url=${deployedUrl}`],
+    })) as { exitCode?: number; data?: SmokeRunResult };
+    if (result.data) {
+      return result.data;
+    }
+    logger.warn(
+      `[smoke] service.smoke.run returned no data (exitCode=${result.exitCode ?? "unknown"})`,
+    );
+    return undefined;
+  } catch (err) {
+    logger.warn(
+      `[smoke] service.smoke.run failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return undefined;
+  }
+}

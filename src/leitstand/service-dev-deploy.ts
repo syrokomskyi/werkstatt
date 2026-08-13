@@ -27,6 +27,7 @@ import {
   parseEnvFile,
   runPreDeployGates,
   runBuildCheck,
+  runSmokeCheck,
   acquireServiceLock,
   releaseServiceLock,
   recordDevDeployState,
@@ -152,14 +153,20 @@ export async function runLeitstandServiceDevDeploy(
       healthState = await runHealthCheck(deployedUrl, serviceEntry.healthCheckPath);
     }
 
-    // 6. Record dev deploy state
+    // 6. Smoke check (RFC-0825)
+    let smokeResult: ServiceDevDeployData["smokeResult"];
+    if (deployedUrl) {
+      smokeResult = await runSmokeCheck(workspaceRoot, serviceId, deployedUrl, logger);
+    }
+
+    // 7. Record dev deploy state
     await recordDevDeployState(workspaceRoot, serviceId, {
       at: new Date().toISOString(),
       state: "succeeded",
       operationId,
     });
 
-    // 7. Update workersDevUrl in registry if resolved
+    // 8. Update workersDevUrl in registry if resolved
     if (deployedUrl) {
       await updateWorkersDevUrl(workspaceRoot, serviceId, deployedUrl);
     }
@@ -172,6 +179,7 @@ export async function runLeitstandServiceDevDeploy(
       deployState: "succeeded",
       workersDevUrl: deployedUrl,
       healthState,
+      smokeResult,
       preDeployGates: gateResults,
       startedAt,
       completedAt,

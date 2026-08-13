@@ -81,6 +81,7 @@ import {
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
 import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
+import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
 import { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";
 import type { Finding } from "@syrokomskyi/axiom-study";
 import {
@@ -92,6 +93,35 @@ import {
 } from "@warpgogol/werkstatt-site/checks/suppressions-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
+
+async function runSiteSmokeCheck(
+  workspaceRoot: string,
+  systemId: string,
+  deployedUrl: string,
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+): Promise<SmokeRunResult | undefined> {
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+  logger.info(`[smoke] running site.smoke.run for ${systemId} against ${deployedUrl}…`);
+  try {
+    const result = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: "site.smoke.run",
+      argv: [`--site=${systemId}`, `--url=${deployedUrl}`],
+    })) as { exitCode?: number; data?: SmokeRunResult };
+    if (result.data) {
+      return result.data;
+    }
+    logger.warn(
+      `[smoke] site.smoke.run returned no data (exitCode=${result.exitCode ?? "unknown"})`,
+    );
+    return undefined;
+  } catch (err) {
+    logger.warn(
+      `[smoke] site.smoke.run failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return undefined;
+  }
+}
 
 function logCacheDirSize(cacheDir: string, logger: { info: (msg: string) => void }): void {
   try {
@@ -636,6 +666,7 @@ export interface DevDeployResult {
     exitCode: number;
     freshness: FreshnessResult;
   };
+  smokeResult?: SmokeRunResult;
   evidenceSynced: boolean;
   evidenceSyncError: string | null;
   releaseDeployed?: string;
@@ -1567,6 +1598,12 @@ export async function runLeitstandDevDeploy(
 
   logger.info(`[leitstand.dev-deploy] total: ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 
+  // RFC-0825: Post-deploy smoke check (best-effort, non-blocking)
+  let smokeResult: DevDeployResult["smokeResult"];
+  if (result.state === "succeeded" && result.deploymentUrl) {
+    smokeResult = await runSiteSmokeCheck(workspaceRoot, systemId, result.deploymentUrl, logger);
+  }
+
   // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
   return {
     data: {
@@ -1590,6 +1627,7 @@ export async function runLeitstandDevDeploy(
         exitCode: axiomExitCode,
         freshness,
       },
+      smokeResult,
       evidenceSynced,
       evidenceSyncError,
     },
@@ -1610,6 +1648,7 @@ export interface LeitstandPropagateData {
   preflight: { passed: boolean; checks: PreflightCheck[] };
   purgeResult?: PurgeResult;
   health: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] };
+  smokeResult?: SmokeRunResult;
   releaseState: "alt-deployed";
   devBuildIdentityVerified: boolean;
   axiomEvidenceVerified: boolean;
@@ -2035,6 +2074,34 @@ export async function runLeitstandPropagate(
       `[leitstand.propagate] ${releaseId} deployed to ${channel} (${result.state}, health: ${healthResult.state})`,
     );
 
+    // RFC-0825: Post-deploy smoke check — fatal on propagate
+    let smokeResult: LeitstandPropagateData["smokeResult"];
+    if (result.state === "succeeded" && result.deploymentUrl) {
+      smokeResult = await runSiteSmokeCheck(workspaceRoot, systemId, result.deploymentUrl, logger);
+    }
+    if (smokeResult?.status === "fail") {
+      return {
+        data: {
+          systemId,
+          releaseId,
+          channel,
+          state: "failed",
+          deploymentUrl: result.deploymentUrl,
+          startedAt: result.startedAt,
+          completedAt: result.completedAt,
+          preflight: { passed: preflightPassed, checks: preflightChecks },
+          purgeResult,
+          health: { state: healthResult.state, checks: healthResult.checks },
+          smokeResult,
+          releaseState: "alt-deployed",
+          devBuildIdentityVerified,
+          axiomEvidenceVerified: true,
+        },
+        exitCode: 1,
+        summary: `[leitstand.propagate] ${releaseId}: smoke tests failed — propagation blocked`,
+      };
+    }
+
     return {
       data: {
         systemId,
@@ -2047,6 +2114,7 @@ export async function runLeitstandPropagate(
         preflight: { passed: preflightPassed, checks: preflightChecks },
         purgeResult,
         health: { state: healthResult.state, checks: healthResult.checks },
+        smokeResult,
         releaseState: "alt-deployed",
         devBuildIdentityVerified,
         axiomEvidenceVerified: true,
@@ -2068,6 +2136,7 @@ export interface LeitstandPromoteData {
   buildIdentityVerified: boolean;
   purgeResult?: PurgeResult;
   healthState: "healthy" | "unhealthy" | "unknown";
+  smokeResult?: SmokeRunResult;
   releaseState: "promoted";
 }
 
@@ -2325,6 +2394,30 @@ export async function runLeitstandPromote(
       `[leitstand.promote] ${releaseId} promoted to main (${result.state}, health: ${mainHealthResult.state})`,
     );
 
+    // RFC-0825: Post-deploy smoke check — fatal on promote
+    let smokeResult: LeitstandPromoteData["smokeResult"];
+    if (result.state === "succeeded" && result.deploymentUrl) {
+      smokeResult = await runSiteSmokeCheck(workspaceRoot, systemId, result.deploymentUrl, logger);
+    }
+    if (smokeResult?.status === "fail") {
+      return {
+        data: {
+          systemId,
+          releaseId,
+          channel: "main",
+          state: "failed",
+          deploymentUrl: result.deploymentUrl,
+          buildIdentityVerified: true,
+          purgeResult,
+          healthState: mainHealthResult.state,
+          smokeResult,
+          releaseState: "promoted",
+        },
+        exitCode: 1,
+        summary: `[leitstand.promote] ${releaseId}: smoke tests failed — promotion blocked`,
+      };
+    }
+
     return {
       data: {
         systemId,
@@ -2335,6 +2428,7 @@ export async function runLeitstandPromote(
         buildIdentityVerified: true,
         purgeResult,
         healthState: mainHealthResult.state,
+        smokeResult,
         releaseState: "promoted",
       },
       summary: `[leitstand.promote] ${releaseId} promoted to main (${result.state}, health: ${mainHealthResult.state})`,
