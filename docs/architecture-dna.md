@@ -279,3 +279,7 @@ RFCs in a series declare direct implementation dependencies via the `dependsOn` 
 ## DNA-66 · Workshop testing pyramid
 
 The workshop enforces a five-level testing pyramid: L1 unit (pure functions and module internals), L2 integration (service ↔ external API against dev-deployed Workers), L3 contract (site ↔ service API schema validation), L4 end-to-end (Playwright user flows against dev-deployed sites), L5 smoke (post-deploy health and critical-path checks). All test definitions live in `packages/werkstatt-site/src/testing/` — not in `services/*` or mission workpieces — so tests are versioned with the platform and runnable against any deployment. The dev channel (`*.workers.dev` for services, dev-deployed site URL for sites) is the canonical test environment; tests execute against real deployed artifacts, not mocks or local simulators. Deployment pipeline commands (`leitstand.propagate`, `leitstand.promote`, `leitstand.service.promote`) verify test evidence from prior pipeline stages and block promotion when evidence is missing or failed. Established by RFC-0823.
+
+## DNA-67 · Pre-deploy Lighthouse parity gate
+
+Every Lighthouse audit that can be deterministically checked at build time MUST have a build-time validator in the Werkstatt pipeline. This prevents relying on post-deploy Lighthouse runs to catch issues that could be caught earlier. The coverage matrix is maintained in `docs/lighthouse-parity-matrix.yaml`. Enforcement: `lighthouse.validate`, `lighthouse.budget.check`. Established by RFC-0833.

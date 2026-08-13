@@ -1,0 +1,57 @@
+# Lighthouse audit → build-time validator coverage matrix (DNA-67)
+# Maintained as Lighthouse adds new audits. Generated/tracked.
+audits:
+  - audit: first-contentful-paint
+    validators:
+      - image.delivery.validate (RFC-0830)
+      - lighthouse.budget.check (LH-11)
+    status: covered
+  - audit: largest-contentful-paint
+    validators:
+      - image.delivery.validate (RFC-0830)
+      - lighthouse.budget.check (LH-12)
+    status: covered
+  - audit: total-blocking-time
+    validators:
+      - lighthouse.validate (LH-02, LH-03)
+    status: covered
+  - audit: cumulative-layout-shift
+    validators:
+      - lighthouse.validate (LH-09)
+    status: covered
+  - audit: speed-index
+    validators:
+      - image.delivery.validate (RFC-0830)
+      - lighthouse.budget.check (LH-11)
+    status: covered
+  - audit: render-blocking-insight
+    validators:
+      - lighthouse.budget.check (LH-11)
+    status: covered
+  - audit: unused-javascript
+    validators:
+      - lighthouse.budget.check (LH-12)
+    status: covered
+  - audit: forced-reflow-insight
+    validators:
+      - lighthouse.validate (LH-13)
+    status: covered
+  - audit: errors-in-console
+    validators:
+      - csp.origins.validate (RFC-0831)
+    status: covered
+  - audit: inspector-issues
+    validators:
+      - csp.origins.validate (RFC-0831)
+    status: covered
+  - audit: label-content-name-mismatch
+    validators:
+      - a11y.label.in.name.validate (RFC-0832)
+    status: covered
+  - audit: network-dependency-tree-insight
+    validators: []
+    status: gap
+  - audit: image-delivery-insight
+    validators:
+      - image.delivery.validate (RFC-0830)
+    status: covered
