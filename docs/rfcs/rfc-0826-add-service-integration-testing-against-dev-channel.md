@@ -257,15 +257,15 @@ This RFC does not modify repository-wide requirements, shared package contracts,
 
 ## Acceptance criteria
 
-- [ ] `service.integration.run` command registered and functional
-- [ ] `dev-url-resolver.ts` helper resolves dev URLs from `services/registry.yaml` (created by RFC-0823)
-- [ ] `test-env.ts` helper loads `.env.dev` files (created by RFC-0823)
-- [ ] Integration tests for `lagebild-sync` (health) pass against dev channel
-- [ ] Integration tests for `matomo-proxy` (health, proxy) pass against dev channel
-- [ ] `leitstand.service.dev-deploy` calls `service.integration.run` after smoke tests (requires RFC-0825)
-- [ ] Integration test evidence recorded in dev-deploy state
-- [ ] `services/AGENTS.md` updated with integration test requirement and `.env.dev` reuse convention
-- [ ] `rfc.validate` passes on this file
+- [x] `service.integration.run` command registered and functional
+- [x] `dev-url-resolver.ts` helper resolves dev URLs from `services/registry.yaml` (created by RFC-0823)
+- [x] `test-env.ts` helper loads `.env.dev` files (created by RFC-0823)
+- [x] Integration tests for `lagebild-sync` (health) pass against dev channel
+- [x] Integration tests for `matomo-proxy` (health, proxy) pass against dev channel
+- [x] `leitstand.service.dev-deploy` calls `service.integration.run` after smoke tests (requires RFC-0825)
+- [x] Integration test evidence recorded in dev-deploy state
+- [x] `services/AGENTS.md` updated with integration test requirement and `.env.dev` reuse convention
+- [x] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
