@@ -23,8 +23,9 @@ for use by test commands and deployment pipeline gates.</purpose>
 */
 
 import { existsSync } from "node:fs";
-import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { readFile, readdir } from "node:fs/promises";
+import { join } from "node:path";
+import { atomicWriteFile } from "@warpgogol/werkstatt/handoff";
 
 export type TestLevel = "L1" | "L2" | "L3" | "L4" | "L5";
 
@@ -95,14 +96,6 @@ export function resolveEvidenceDir(
     return join(workspaceRoot, "services", options.service, ".test-evidence");
   }
   return join(workspaceRoot, "releases", target, ".test-evidence");
-}
-
-async function atomicWriteFile(targetPath: string, content: string): Promise<void> {
-  const dir = dirname(targetPath);
-  await mkdir(dir, { recursive: true });
-  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}`;
-  await writeFile(tmpPath, content, "utf-8");
-  await rename(tmpPath, targetPath);
 }
 
 export async function recordTestEvidence(

@@ -160,7 +160,6 @@ export async function runLeitstandServicePromote(
 
     // RFC-0829: Test evidence gate — verify L1 (unit), L2 (integration), L5 (smoke) evidence
     {
-      const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
       const { execSync } = await import("node:child_process");
       let commitSha = "";
       try {
@@ -168,36 +167,30 @@ export async function runLeitstandServicePromote(
           cwd: workspaceRoot,
           encoding: "utf-8",
         }).trim();
-      } catch {
-        logger.warn(
-          `[leitstand.service.promote] could not resolve git HEAD — skipping test evidence gate`,
-        );
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        const { GRACE_PERIOD_END } = await import("./test-evidence-gate.js");
+        if (new Date().toISOString() < GRACE_PERIOD_END) {
+          logger.warn(
+            `[leitstand.service.promote] could not resolve git HEAD — skipping test evidence gate: ${errMsg}`,
+          );
+        } else {
+          throw new Error(
+            `[leitstand.service.promote] could not resolve git HEAD — test evidence gate cannot be verified: ${errMsg}`,
+          );
+        }
       }
       if (commitSha) {
-        logger.info(
-          `[leitstand.service.promote] verifying test evidence (L1, L2, L5) for commit ${commitSha}…`,
-        );
-        const evidenceResult = (await executeKernelCommand({
+        const { runTestEvidenceGate } = await import("./test-evidence-gate.js");
+        await runTestEvidenceGate({
           workspaceRoot,
-          commandName: "test.evidence.verify",
-          argv: [`--service=${serviceId}`, `--levels=L1,L2,L5`, `--commit-sha=${commitSha}`],
-        })) as { exitCode?: number; data?: { status: string; summary: string } };
-        if (evidenceResult.data) {
-          if (evidenceResult.data.status === "pass") {
-            logger.info(
-              `[leitstand.service.promote] test evidence: ${evidenceResult.data.summary}`,
-            );
-          } else {
-            logger.warn(
-              `[leitstand.service.promote] test evidence: ${evidenceResult.data.summary}`,
-            );
-            if (evidenceResult.exitCode === 1) {
-              throw new Error(
-                `[leitstand.service.promote] test evidence gate failed: ${evidenceResult.data.summary}`,
-              );
-            }
-          }
-        }
+          commandName: "leitstand.service.promote",
+          target: serviceId,
+          levels: ["L1", "L2", "L5"],
+          commitSha,
+          service: serviceId,
+          logger,
+        });
       }
     }
 

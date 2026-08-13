@@ -1877,32 +1877,16 @@ export async function runLeitstandPropagate(
   // RFC-0829: Test evidence gate — verify L4 (E2E) and L5 (smoke) evidence exists and passed
   // for the release commit SHA. Grace period: failures are warnings until GRACE_PERIOD_END.
   {
-    const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
-    logger.info(
-      `[leitstand.propagate] verifying test evidence (L4, L5) for commit ${releaseCommitSha}…`,
-    );
-    const evidenceResult = (await executeKernelCommand({
+    const { runTestEvidenceGate } = await import("./test-evidence-gate.js");
+    await runTestEvidenceGate({
       workspaceRoot,
-      commandName: "test.evidence.verify",
-      argv: [
-        `--target=${systemId}`,
-        `--levels=L4,L5`,
-        `--commit-sha=${releaseCommitSha}`,
-        `--release-id=${releaseId}`,
-      ],
-    })) as { exitCode?: number; data?: { status: string; summary: string } };
-    if (evidenceResult.data) {
-      if (evidenceResult.data.status === "pass") {
-        logger.info(`[leitstand.propagate] test evidence: ${evidenceResult.data.summary}`);
-      } else {
-        logger.warn(`[leitstand.propagate] test evidence: ${evidenceResult.data.summary}`);
-        if (evidenceResult.exitCode === 1) {
-          throw new Error(
-            `[leitstand.propagate] test evidence gate failed: ${evidenceResult.data.summary}`,
-          );
-        }
-      }
-    }
+      commandName: "leitstand.propagate",
+      target: systemId,
+      levels: ["L4", "L5"],
+      commitSha: releaseCommitSha,
+      releaseId,
+      logger,
+    });
   }
 
   // RFC-0634: Verify dev build-identity.json before deploying to alt
@@ -2319,32 +2303,16 @@ export async function runLeitstandPromote(
     // RFC-0829: Test evidence gate — verify L4 (E2E) and L5 (smoke) evidence
     {
       const releaseCommitSha = releaseManifest.commitSha as string;
-      const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
-      logger.info(
-        `[leitstand.promote] verifying test evidence (L4, L5) for commit ${releaseCommitSha}…`,
-      );
-      const evidenceResult = (await executeKernelCommand({
+      const { runTestEvidenceGate } = await import("./test-evidence-gate.js");
+      await runTestEvidenceGate({
         workspaceRoot,
-        commandName: "test.evidence.verify",
-        argv: [
-          `--target=${systemId}`,
-          `--levels=L4,L5`,
-          `--commit-sha=${releaseCommitSha}`,
-          `--release-id=${releaseId}`,
-        ],
-      })) as { exitCode?: number; data?: { status: string; summary: string } };
-      if (evidenceResult.data) {
-        if (evidenceResult.data.status === "pass") {
-          logger.info(`[leitstand.promote] test evidence: ${evidenceResult.data.summary}`);
-        } else {
-          logger.warn(`[leitstand.promote] test evidence: ${evidenceResult.data.summary}`);
-          if (evidenceResult.exitCode === 1) {
-            throw new Error(
-              `[leitstand.promote] test evidence gate failed: ${evidenceResult.data.summary}`,
-            );
-          }
-        }
-      }
+        commandName: "leitstand.promote",
+        target: systemId,
+        levels: ["L4", "L5"],
+        commitSha: releaseCommitSha,
+        releaseId,
+        logger,
+      });
     }
 
     // 3. Run health check against alt deployment (RFC-0747: retry with backoff)
