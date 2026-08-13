@@ -1686,6 +1686,7 @@ export interface LeitstandPropagateData {
   releaseState: "alt-deployed";
   devBuildIdentityVerified: boolean;
   axiomEvidenceVerified: boolean;
+  testEvidenceVerified: boolean;
 }
 
 export async function runLeitstandPropagate(
@@ -1870,6 +1871,37 @@ export async function runLeitstandPropagate(
       throw new Error(
         `[leitstand.propagate] Axiom verification failed: methodology '${methodology.id}' has ${blockingFindings.length} block-on violation(s). Fix and re-deploy to dev.`,
       );
+    }
+  }
+
+  // RFC-0829: Test evidence gate — verify L4 (E2E) and L5 (smoke) evidence exists and passed
+  // for the release commit SHA. Grace period: failures are warnings until GRACE_PERIOD_END.
+  {
+    const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+    logger.info(
+      `[leitstand.propagate] verifying test evidence (L4, L5) for commit ${releaseCommitSha}…`,
+    );
+    const evidenceResult = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: "test.evidence.verify",
+      argv: [
+        `--target=${systemId}`,
+        `--levels=L4,L5`,
+        `--commit-sha=${releaseCommitSha}`,
+        `--release-id=${releaseId}`,
+      ],
+    })) as { exitCode?: number; data?: { status: string; summary: string } };
+    if (evidenceResult.data) {
+      if (evidenceResult.data.status === "pass") {
+        logger.info(`[leitstand.propagate] test evidence: ${evidenceResult.data.summary}`);
+      } else {
+        logger.warn(`[leitstand.propagate] test evidence: ${evidenceResult.data.summary}`);
+        if (evidenceResult.exitCode === 1) {
+          throw new Error(
+            `[leitstand.propagate] test evidence gate failed: ${evidenceResult.data.summary}`,
+          );
+        }
+      }
     }
   }
 
@@ -2130,6 +2162,7 @@ export async function runLeitstandPropagate(
           releaseState: "alt-deployed",
           devBuildIdentityVerified,
           axiomEvidenceVerified: true,
+          testEvidenceVerified: true,
         },
         exitCode: 1,
         summary: `[leitstand.propagate] ${releaseId}: smoke tests failed — propagation blocked`,
@@ -2152,6 +2185,7 @@ export async function runLeitstandPropagate(
         releaseState: "alt-deployed",
         devBuildIdentityVerified,
         axiomEvidenceVerified: true,
+        testEvidenceVerified: true,
       },
       summary: `[leitstand.propagate] ${releaseId} deployed to ${channel} (${result.state}, health: ${healthResult.state})`,
     };
@@ -2168,6 +2202,7 @@ export interface LeitstandPromoteData {
   state: "succeeded" | "failed";
   deploymentUrl: string;
   buildIdentityVerified: boolean;
+  testEvidenceVerified: boolean;
   purgeResult?: PurgeResult;
   healthState: "healthy" | "unhealthy" | "unknown";
   smokeResult?: SmokeRunResult;
@@ -2280,6 +2315,37 @@ export async function runLeitstandPromote(
       }
     }
     logger.success(`  Build identity verified for ${releaseId}`);
+
+    // RFC-0829: Test evidence gate — verify L4 (E2E) and L5 (smoke) evidence
+    {
+      const releaseCommitSha = releaseManifest.commitSha as string;
+      const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+      logger.info(
+        `[leitstand.promote] verifying test evidence (L4, L5) for commit ${releaseCommitSha}…`,
+      );
+      const evidenceResult = (await executeKernelCommand({
+        workspaceRoot,
+        commandName: "test.evidence.verify",
+        argv: [
+          `--target=${systemId}`,
+          `--levels=L4,L5`,
+          `--commit-sha=${releaseCommitSha}`,
+          `--release-id=${releaseId}`,
+        ],
+      })) as { exitCode?: number; data?: { status: string; summary: string } };
+      if (evidenceResult.data) {
+        if (evidenceResult.data.status === "pass") {
+          logger.info(`[leitstand.promote] test evidence: ${evidenceResult.data.summary}`);
+        } else {
+          logger.warn(`[leitstand.promote] test evidence: ${evidenceResult.data.summary}`);
+          if (evidenceResult.exitCode === 1) {
+            throw new Error(
+              `[leitstand.promote] test evidence gate failed: ${evidenceResult.data.summary}`,
+            );
+          }
+        }
+      }
+    }
 
     // 3. Run health check against alt deployment (RFC-0747: retry with backoff)
     let altHealthResult: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] } = {
@@ -2442,6 +2508,7 @@ export async function runLeitstandPromote(
           state: "failed",
           deploymentUrl: result.deploymentUrl,
           buildIdentityVerified: true,
+          testEvidenceVerified: true,
           purgeResult,
           healthState: mainHealthResult.state,
           smokeResult,
@@ -2460,6 +2527,7 @@ export async function runLeitstandPromote(
         state: result.state as "succeeded" | "failed",
         deploymentUrl: result.deploymentUrl,
         buildIdentityVerified: true,
+        testEvidenceVerified: true,
         purgeResult,
         healthState: mainHealthResult.state,
         smokeResult,
