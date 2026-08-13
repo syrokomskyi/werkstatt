@@ -153,8 +153,9 @@ export function originMatchesSource(
 
     if (source === "*") return true;
 
+    const sourceToParse = /^https?:\/\//i.test(source) ? source : `https://${source}`;
     try {
-      const parsedSource = new URL(source);
+      const parsedSource = new URL(sourceToParse);
       const sourceOrigin = `${parsedSource.protocol}//${parsedSource.host}`;
       if (origin === sourceOrigin) return true;
     } catch {
