@@ -26,10 +26,13 @@ import markdownNegotiationMiddleware from "./middleware/markdown-negotiation";
 import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/werkstatt-site/share/text-normalize";
 import { loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const devNormalize = import.meta.env.DEV
   ? createDevNormalizeMiddleware(
-      resolveNormalizeConfig(loadSystemManifestSync(resolve(__dirname, "content")).manifest),
+      resolveNormalizeConfig(
+        loadSystemManifestSync(
+          resolve(dirname(fileURLToPath(import.meta.url)), "content"),
+        ).manifest,
+      ),
     )
   : null;
 
