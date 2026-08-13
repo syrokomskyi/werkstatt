@@ -12,8 +12,9 @@
 */
 
 import { execFile } from "node:child_process";
-import { readdir } from "node:fs/promises";
+import { readdir, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { promisify } from "node:util";
 import type {
   KernelCommandInput,
@@ -123,20 +124,43 @@ export async function runServiceTestRun(
 
   const serviceDir = join(context.workspaceRoot, "services", service);
   const startMs = Date.now();
+  const jsonOutputFile = join(tmpdir(), `service-test-run-${service}-${Date.now()}.json`);
 
   try {
-    const { stdout } = await execFileAsync(
-      "pnpm",
-      ["--filter", service, "run", "test", "--", "--reporter=json"],
-      {
-        cwd: context.workspaceRoot,
-        maxBuffer: 10 * 1024 * 1024,
-        env: { ...process.env, CI: "true" },
-      },
-    );
+    try {
+      await execFileAsync(
+        "pnpm",
+        [
+          "--filter",
+          service,
+          "exec",
+          "vitest",
+          "run",
+          "--reporter=json",
+          `--outputFile=${jsonOutputFile}`,
+        ],
+        {
+          cwd: serviceDir,
+          maxBuffer: 10 * 1024 * 1024,
+          env: { ...process.env, CI: "true" },
+        },
+      );
+    } catch (err) {
+      const error = err as { stdout?: string; message?: string };
+      // vitest exits non-zero on test failures, but the JSON file is still written
+      if (!error.stdout && !error.message?.includes("exit")) {
+        throw err;
+      }
+    }
 
     const durationMs = Date.now() - startMs;
-    const parsed = JSON.parse(stdout) as VitestJsonResult;
+    let jsonContent: string;
+    try {
+      jsonContent = await readFile(jsonOutputFile, "utf-8");
+    } catch {
+      throw new Error(`vitest JSON output file not found: ${jsonOutputFile}`);
+    }
+    const parsed = JSON.parse(jsonContent) as VitestJsonResult;
     const failures: ServiceTestRunResult["failures"] = [];
     for (const suite of parsed.testResults) {
       for (const assertion of suite.assertionResults) {
@@ -167,17 +191,12 @@ export async function runServiceTestRun(
     };
   } catch (err) {
     const durationMs = Date.now() - startMs;
-    const error = err as { stdout?: string; message?: string };
-    let parsed: VitestJsonResult | null = null;
-    if (error.stdout) {
-      try {
-        parsed = JSON.parse(error.stdout) as VitestJsonResult;
-      } catch {
-        // vitest may output non-JSON on crash
-      }
-    }
+    const error = err as { message?: string };
 
-    if (parsed) {
+    // Try to read the JSON output file even on error (vitest writes it before exiting)
+    try {
+      const jsonContent = await readFile(jsonOutputFile, "utf-8");
+      const parsed = JSON.parse(jsonContent) as VitestJsonResult;
       const failures: ServiceTestRunResult["failures"] = [];
       for (const suite of parsed.testResults) {
         for (const assertion of suite.assertionResults) {
@@ -204,6 +223,8 @@ export async function runServiceTestRun(
         exitCode: 1,
         summary: `service.test.run: ${parsed.numPassedTests} passed, ${parsed.numFailedTests} failed (${service})`,
       };
+    } catch {
+      // JSON file not readable — return generic error
     }
 
     return {
@@ -219,5 +240,7 @@ export async function runServiceTestRun(
       exitCode: 1,
       summary: `service.test.run failed for "${service}": ${error.message ?? "unknown error"}`,
     };
+  } finally {
+    await rm(jsonOutputFile, { force: true }).catch(() => {});
   }
 }
