@@ -17,6 +17,7 @@ import {
   runDistGeneratedMarkerStrip,
   runDistGeneratedMarkerValidate,
 } from "../dist-generated-marker.ts";
+import { runImageDeliveryValidate } from "../image-delivery.ts";
 import { runDistHtmlStructureValidate } from "../dist-html-structure.ts";
 import { runBlogValidate } from "../blog.ts";
 import { runArticleDepthValidate } from "../article-depth.ts";
@@ -113,6 +114,22 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/dist/client/**/*.html", "<app>/dist/client/sitemap-images.xml"],
     modulePaths: ["sitemap-images.ts", "result-helpers.ts", "lib/astro-site-url.ts"],
     execute: runSitemapImagesValidate,
+  },
+  /* RFC-0830: responsive image delivery validation */
+  {
+    name: "image.delivery.validate",
+    description:
+      "RFC-0830: scan rendered HTML for responsive srcset, compression budget, and LCP image optimization attributes.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: [
+      "<app>/dist/client/**/*.html",
+      "<app>/dist/client/_img/**/*.webp",
+      "<app>/src/image-delivery.config.yaml",
+    ],
+    modulePaths: ["image-delivery.ts"],
+    execute: runImageDeliveryValidate,
   },
   /* RFC-0185: strip generated markers from dist/client */
   {

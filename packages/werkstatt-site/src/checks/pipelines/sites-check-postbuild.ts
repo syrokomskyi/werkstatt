@@ -54,6 +54,8 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "dist.content-references.validate" },
   // RFC-0152: fail if HTML references an /_astro/* asset missing from dist/client (404 guard)
   { command: "cloudflare.assets.validate" },
+  // RFC-0830: responsive srcset, compression budget, LCP image optimization
+  { command: "image.delivery.validate" },
   // RFC-0185: distribution artifacts must not expose the generated ownership marker
   { command: "dist.generated-marker.validate" },
   // RFC-0269: golden behavior snapshot drift check — must run before build-post's
