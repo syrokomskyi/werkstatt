@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
+enhancedAt: 2026-08-13
 implementedAt:
 closedAt:
 supersedes: []
@@ -18,7 +19,6 @@ amendedBy: []
 related:
   - RFC-0315
   - RFC-0305
-  - DNA-57
 satisfies: []
 versionBump: patch
 commands:
@@ -40,6 +40,9 @@ nonGoals:
   - "Does not generate or modify CSP headers — validation only"
   - "Does not validate CSP nonce or hash-source correctness — only origin coverage"
   - "Does not check inline script CSP (unsafe-inline is a separate concern)"
+  - "Does not scan bundled JS files in dist/client/_astro/*.js for connect-src origins — minified JS scanning is fragile and out of scope"
+  - "Does not check <iframe src> against frame-src — Astro sites don't use iframes for first-party content"
+  - "Does not check <link rel=preconnect> or <link rel=dns-prefetch> — these are hints, not resource loads, and don't require CSP coverage"
 ---
 
 # RFC-0831: Add csp.origins.validate for CSP-to-script-origin cross-validation
@@ -55,6 +58,7 @@ The Lighthouse report for `warpgogol.com` (2026-08-13) shows **Best Practices sc
 Both failures share a single root cause: the CSP `script-src` directive is `'self' 'unsafe-inline'` but the site loads scripts from `matomo-proxy.warpgogol.com`, which is not included in `script-src`.
 
 The existing `headers.security.validate` (RFC-0315, HDR-02) checks that:
+
 - CSP has required directives (`default-src`, `script-src`, `img-src`, etc.)
 - CSP contains no wildcard (`*`) sources
 - CSP has `upgrade-insecure-requests`
@@ -79,7 +83,6 @@ The kernel gains a `csp.origins.validate` command that cross-references CSP sour
 
 ## Architectural fit
 
-- **DNA-57** (Dev/prod egress parity) — This RFC extends the egress parity invariant to include CSP coverage: every origin the site connects to in production must be explicitly allowed by CSP.
 - **RFC-0315** (headers.security.validate HDR-01..04) — This RFC is complementary. HDR-02 checks CSP syntax and directive presence. `csp.origins.validate` checks CSP semantic completeness (origin coverage).
 - **RFC-0305** (Matomo first-party proxy) — The Matomo proxy origin (`matomo-proxy.warpgogol.com`) must be in CSP. This RFC catches missing proxy origins automatically.
 - **Site OS operator model** — Post-build validator, scope `app`. Runs after `headers.security.validate` and after `astro build` produces rendered HTML.
@@ -89,11 +92,11 @@ The kernel gains a `csp.origins.validate` command that cross-references CSP sour
 ### CLI surface
 
 ```sh
-pnpm exec werkstatt run csp.origins.validate --app warpgogol-com
+pnpm exec werkstatt run csp.origins.validate
 pnpm exec werkstatt run csp.origins.validate --all --json
 ```
 
-Post-build command. Scope: `app`. Runs after `astro build` produces `dist/client/` and after `headers.security.validate` has confirmed CSP is present.
+Post-build command. Scope: `app`, `supportsAllSites: true`, `flags: {}`. The kernel resolves the target site from context (same convention as `headers.security.validate`). Use `--all` to run across all sites. Runs after `astro build` produces `dist/client/` and after `headers.security.validate` has confirmed CSP is present.
 
 ### TypeScript contracts
 
@@ -125,6 +128,7 @@ interface CspOriginResult {
 Every external origin in a `<script src="...">` element in rendered HTML MUST be listed in the CSP `script-src` directive (or `default-src` as fallback).
 
 Origin matching rules:
+
 - `'self'` matches the site's own origin
 - Exact origin match (scheme + host + port)
 - Wildcard subdomain (`*.warpgogol.com`) matches `matomo-proxy.warpgogol.com`
@@ -170,14 +174,19 @@ The validator scans all `.html` files in `dist/client/`:
 1. **Script origins**: `<script src="https://...">` (external scripts only, not inline)
 2. **Style origins**: `<link rel="stylesheet" href="https://...">`
 3. **Image origins**: `<img src="https://...">` (external images only, not `/_astro/` or `/_img/` which are same-origin)
-4. **Connect origins**: `fetch("https://...")` and `new URL("https://...")` patterns in inline `<script>` blocks
+4. **Connect origins**: `fetch("https://...")` and `new URL("https://...")` patterns in inline `<script>` blocks in HTML only (not bundled `.js` files — see nonGoals)
+5. **Module script origins**: `<script type="module" src="https://...">` (covered by CSP-ORIGIN-01, same as classic scripts)
+6. **Preload origins**: `<link rel="preload" as="script" href="https://...">` (covered by CSP-ORIGIN-01)
+7. **Srcset origins**: `<img srcset="https://...">` and `<source srcset="https://...">` in `<picture>` elements (covered by CSP-ORIGIN-03)
 
 Same-origin resources (starting with `/` or matching the site origin) are skipped — `'self'` covers them.
+
+**Performance note**: The validator scans all `.html` files in `dist/client/`. For a site with N pages, this is N file reads + N parse5 parses + NquerySelector traversals. Typical sites (10-100 pages) complete in <500ms. The scan is I/O-bound, not CPU-bound.
 
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
+| --- | --- |
 | `public/_headers` | CSP source — parsed for directive source lists |
 | `dist/client/**/*.html` | Scanned for external origins |
 | `packages/werkstatt-site/src/checks/csp-origins.ts` | New validator module |
@@ -214,13 +223,16 @@ Same-origin resources (starting with `/` or matching the site origin) are skippe
 - `warning`-severity findings → logged, `exitCode: 0`.
 - Missing `public/_headers` → skip with `status: "pass"` (headers.security.validate already fails).
 - Missing `dist/client/` → skip with `status: "pass"` (no build output).
+- Empty `dist/client/` (new site with no content) → skip with `status: "pass"` (no pages to scan).
 - CSP header not found in `_headers` → skip with `status: "pass"` (headers.security.validate already fails on HDR-01).
 - Malformed CSP → `warning`, skip origin cross-referencing for that directive.
+
+**Suppression**: Findings can be suppressed via `suppressions-config.yaml` (same mechanism as other check commands). Suppressed findings are logged as `info` but do not affect `exitCode`.
 
 ## Rollout
 
 - **Default behavior**: `csp.origins.validate` runs in `SITES_CHECK_POSTBUILD_PIPELINE` after `headers.security.validate` (which already runs in `SITES_CHECK_AUTHOR_PIPELINE`) and after `cloudflare.assets.validate`.
-- **Existing apps**: First run will flag any missing origins. Sites must add missing origins to CSP in `public/_headers`. For `warpgogol.com`, add `matomo-proxy.warpgogol.com` to `script-src`.
+- **Existing apps**: First run will flag any missing origins. Sites must add missing origins to CSP in `public/_headers` and, if the CSP is generated from a template, in `_headers.template`. For `warpgogol.com`, add `matomo-proxy.warpgogol.com` to `script-src`.
 - **New apps**: Automatically compliant if CSP is generated from the infrastructure template (which should include all known origins).
 - **Grace period**: None. Missing script origins in CSP is a functional bug (scripts are blocked in production). `error` from day one.
 - **Deprecation**: None. `headers.security.validate` (syntax) and `csp.origins.validate` (semantic completeness) are complementary.
@@ -252,7 +264,7 @@ Same-origin resources (starting with `/` or matching the site origin) are skippe
 - [ ] Unit tests with fixture HTML containing external script origins
 - [ ] `warpgogol.com` passes `csp.origins.validate` after adding `matomo-proxy.warpgogol.com` to CSP
 - [ ] `rfc.validate` passes on this file before merging
-- [ ] `AGENTS.md` updated with CSP origin completeness contract
+- [ ] `packages/werkstatt-site/AGENTS.md` updated with `csp.origins.validate` entry in the "Check commands" section
 
 ## Implementation notes for agents
 
