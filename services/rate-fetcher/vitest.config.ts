@@ -10,4 +10,9 @@ export default defineConfig({
       ),
     ],
   },
+  resolve: {
+    alias: {
+      "@service": resolve(__dirname, "src"),
+    },
+  },
 });
