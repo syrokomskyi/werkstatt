@@ -63,7 +63,7 @@ const DOM_WRITE_REGEX =
 const LAYOUT_READ_REGEX =
   /\.(getBoundingClientRect|getClientRects|offsetWidth|offsetHeight|offsetTop|offsetLeft|clientWidth|clientHeight|clientTop|clientLeft|scrollTop|scrollLeft|scrollWidth|scrollHeight)\b/;
 
-function detectForcedReflow(
+export function detectForcedReflow(
   content: string,
 ): { line: number; readProp: string; writeStmt: string }[] {
   const lines = content.split(/\r?\n/);
@@ -92,7 +92,7 @@ function detectForcedReflow(
   return results;
 }
 
-async function detectRenderBlockingCss(
+export async function detectRenderBlockingCss(
   htmlContent: string,
   distClientDir: string,
   inlineStylesheets: string | undefined,
@@ -141,7 +141,7 @@ async function detectRenderBlockingCss(
   return results;
 }
 
-async function buildJsReferenceGraph(
+export async function buildJsReferenceGraph(
   htmlFiles: string[],
   distClientDir: string,
 ): Promise<{ unreferenced: string[] }> {
@@ -165,9 +165,10 @@ async function buildJsReferenceGraph(
     const jsFile = queue.shift()!;
     try {
       const content = await readFile(jsFile, "utf8");
-      const importRegex = /(?:import\s*\(\s*["']([^"']+)["']\s*\)|from\s*["']([^"']+)["'])/g;
+      const importRegex =
+        /(?:import\s*\(\s*["']([^"']+)["']\s*\)|import\s*["']([^"']+)["']|from\s*["']([^"']+)["'])/g;
       for (const match of content.matchAll(importRegex)) {
-        const importPath = match[1] ?? match[2];
+        const importPath = match[1] ?? match[2] ?? match[3];
         if (!importPath) continue;
         if (!importPath.startsWith(".") && !importPath.startsWith("/")) continue;
         const resolved = join(dirname(jsFile), importPath).replace(/\\/g, "/");
