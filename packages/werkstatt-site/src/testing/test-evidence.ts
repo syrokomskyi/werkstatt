@@ -3,15 +3,6 @@
 <purpose>RFC-0829: Test evidence types, storage helpers, verification and listing logic.
 Provides recordTestEvidence, verifyTestEvidence, listTestEvidence, and resolveEvidenceDir
 for use by test commands and deployment pipeline gates.</purpose>
-<keywords>test, evidence, verify, list, record, gate, deployment</keywords>
-<responsibilities>
-  <item>Defines TestEvidence, TestEvidenceVerifyResult, TestEvidenceListResult types.</item>
-  <item>Resolves evidence directories for sites (releases/release-id/.test-evidence/) and services (services/service-id/.test-evidence/).</item>
-  <item>Records evidence JSON files atomically (temp file + rename).</item>
-  <item>Verifies evidence exists, passed, and commitSha matches for requested levels.</item>
-  <item>Lists all evidence files for a target.</item>
-  <item>Implements grace period: before GRACE_PERIOD_END, failures are warnings (exit 0).</item>
-</responsibilities>
 <non-goals>
   <item>Do not register kernel commands — that lives in testing/module.ts.</item>
   <item>Do not integrate with deployment pipelines — that lives in leitstand commands.</item>
@@ -19,6 +10,7 @@ for use by test commands and deployment pipeline gates.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0829: initial test evidence module with types, helpers, verify, list, record.</item>
+  <item>RFC-0829 review: replace local atomicWriteFile with import from @warpgogol/werkstatt/handoff.</item>
 </CHANGE_SUMMARY>
 */
 
