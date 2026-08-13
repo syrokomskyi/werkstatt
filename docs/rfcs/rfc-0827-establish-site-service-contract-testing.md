@@ -1,7 +1,7 @@
 ---
 id: RFC-0827
 title: "Establish site-service contract testing"
-status: accepted
+status: implemented
 kind: contract
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
-implementedAt:
+implementedAt: 2026-08-13
 closedAt:
 supersedes: []
 supersededBy:
