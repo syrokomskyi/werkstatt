@@ -355,7 +355,7 @@ The coverage matrix is maintained in `docs/lighthouse-parity-matrix.yaml` (gener
 - [x] Unit tests for LH-11 (fixture HTML with render-blocking CSS) (evidence: packages/werkstatt-site/src/checks/tests/lighthouse.test.ts:91-142)
 - [x] Unit tests for LH-12 (fixture JS with unused exports) (evidence: packages/werkstatt-site/src/checks/tests/lighthouse.test.ts:145-193)
 - [x] Unit tests for LH-13 (fixture TS with reflow pattern) (evidence: packages/werkstatt-site/src/checks/tests/lighthouse.test.ts:39-87)
-- [ ] `warpgogol.com` passes all lighthouse validators after fixing CSS, JS, and reflow
+- [x] `warpgogol.com` passes all lighthouse validators after fixing CSS, JS, and reflow (evidence: lighthouse.validate OK, lighthouse.budget.check OK — total JS: 1529.6KB; fixes: preload-then-swap CSS pattern in layout-component.astro, orphaned JS chunk cleanup plugin in astro.config.mjs, vendor-react manualChunks removal)
 - [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate output — All 1 RFC(s) passed validation)
 - [x] `AGENTS.md` updated with LH-11..13 rules and DNA-67 (evidence: packages/werkstatt-site/AGENTS.md:78-80)
 
