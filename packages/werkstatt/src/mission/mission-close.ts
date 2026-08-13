@@ -620,7 +620,7 @@ export async function runMissionClose(
     // RFC-0703: Commit system.pin.json to cache clone after pin
     try {
       const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
-      gitExec(systemDir, "add system.pin.json");
+      gitExec(systemDir, "add system.pin.json system-config.yaml");
       gitExec(
         systemDir,
         `commit -m ${JSON.stringify(`chore: auto-pin platform version for ${missionId}`)}`,
