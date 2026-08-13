@@ -27,6 +27,7 @@ import {
   parseEnvFile,
   runPreDeployGates,
   runBuildCheck,
+  runSmokeCheck,
   acquireServiceLock,
   releaseServiceLock,
   recordProdDeployState,
@@ -206,14 +207,45 @@ export async function runLeitstandServicePromote(
       );
     }
 
-    // 7. Record prod deploy state
+    // 7. Smoke check (RFC-0825) — fatal on promote
+    let smokeResult: ServicePromoteData["smokeResult"];
+    if (deployedUrl) {
+      smokeResult = await runSmokeCheck(workspaceRoot, serviceId, deployedUrl, logger);
+    }
+    if (smokeResult?.status === "fail") {
+      await recordProdDeployState(workspaceRoot, serviceId, {
+        at: new Date().toISOString(),
+        state: "failed",
+        operationId,
+      });
+      const failedData: ServicePromoteData = {
+        command: "leitstand.service.promote",
+        serviceId,
+        workerName: serviceEntry.workerName,
+        deployState: "failed",
+        workersDevUrl: deployedUrl,
+        healthState,
+        smokeResult,
+        preDeployGates: gateResults,
+        startedAt,
+        completedAt: new Date().toISOString(),
+        operationId,
+      };
+      return {
+        data: failedData,
+        exitCode: 1,
+        summary: `[leitstand.service.promote] ${serviceId}: smoke tests failed — promotion blocked`,
+      };
+    }
+
+    // 8. Record prod deploy state
     await recordProdDeployState(workspaceRoot, serviceId, {
       at: new Date().toISOString(),
       state: "succeeded",
       operationId,
     });
 
-    // 8. Update workersDevUrl in registry if resolved
+    // 9. Update workersDevUrl in registry if resolved
     if (deployedUrl && deployedUrl !== serviceEntry.workersDevUrl) {
       await updateWorkersDevUrl(workspaceRoot, serviceId, deployedUrl);
     }
@@ -226,6 +258,7 @@ export async function runLeitstandServicePromote(
       deployState: "succeeded",
       workersDevUrl: deployedUrl,
       healthState,
+      smokeResult,
       preDeployGates: gateResults,
       startedAt,
       completedAt,

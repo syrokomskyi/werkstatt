@@ -19,6 +19,9 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `@warpgogol/werkstatt-site/checks/check-warpgogol` | `./src/checks/check-warpgogol/index.ts` |
 | `@warpgogol/werkstatt-site/onboarding`             | `./src/onboarding/index.ts`             |
 | `@warpgogol/werkstatt-site/onboarding/module`      | `./src/onboarding/module.ts`            |
+| `@warpgogol/werkstatt-site/testing`                | `./src/testing/index.ts`                |
+| `@warpgogol/werkstatt-site/testing/module`         | `./src/testing/module.ts`               |
+| `@warpgogol/werkstatt-site/testing/smoke`          | `./src/testing/smoke/index.ts`          |
 | `@warpgogol/werkstatt-site/audit`                  | `./src/audit/index.ts`                  |
 | `@warpgogol/werkstatt-site/changelog`              | `./src/changelog/index.ts`              |
 | `@warpgogol/werkstatt-site/deploy`                 | `./src/deploy/index.ts`                 |
@@ -53,6 +56,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `src/checks/check-warpgogol/` | `site-kernel-check-warpgogol` | `moduleLoaders` (check-warpgogol ecosystem) |
 | `src/deploy/` | `site-kernel-deploy` | `deployAdapters` |
 | `src/changelog/` | `site-kernel-changelog` renderers | `moduleLoaders` |
+| `src/testing/` | RFC-0825: post-deploy smoke testing | `moduleLoaders` (smoke run commands) |
 
 ## Check commands
 

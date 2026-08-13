@@ -286,6 +286,10 @@
     "./workshop-module": {
       "types": "./src/workshop/workshop.module.ts",
       "default": "./src/workshop/workshop.module.ts"
+    },
+    "./testing/smoke": {
+      "types": "./src/testing/smoke/index.ts",
+      "default": "./src/testing/smoke/index.ts"
     }
   },
   "files": ["src", "bin", "os"],

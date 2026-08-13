@@ -1,13 +1,14 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Loads test environment variables from .env.test files for integration, E2E, and smoke tests.</purpose>
+<purpose>Loads dev environment variables from .env.dev files for integration, E2E, and smoke tests. Reuses existing dev credentials (RFC-0806) — no separate .env.test file.</purpose>
 <non-goals>
-  <item>Does not load production .env files — test env only.</item>
+  <item>Does not load production .env files — dev env only.</item>
   <item>Does not validate env var presence — callers check for required keys.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0823: initial implementation of test env loader for the testing pyramid helpers.</item>
+  <item>RFC-0826: changed from .env.test to .env.dev reuse convention; added loadServiceDevEnv.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -64,9 +65,7 @@ export function getTestEnv(key: string, workspaceRoot: string): string {
   const env = loadTestEnv(workspaceRoot);
   const value = env[key];
   if (value === undefined) {
-    throw new Error(
-      `[test-env] Environment variable "${key}" not found in .env.test`,
-    );
+    throw new Error(`[test-env] Environment variable "${key}" not found in .env.test`);
   }
   return value;
 }

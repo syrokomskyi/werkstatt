@@ -1,0 +1,8 @@
+export { createTestingModule } from "./module.ts";
+export {
+  runSmokeChecks,
+  runSmokeChecksOrSkip,
+  SmokeConfigNotFoundError,
+  SmokeEntryNotFoundError,
+} from "./smoke/smoke-runner.ts";
+export type { ServiceSmokeYaml, SiteSmokeYaml } from "./smoke/smoke-runner.ts";

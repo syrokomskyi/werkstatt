@@ -1,0 +1,30 @@
+# RFC-0825: Site smoke test definitions
+# Each site declares paths to verify after deployment.
+# The smoke runner fetches each path and checks status + optional body assertion.
+
+sites:
+  warpgogol-com:
+    paths:
+      - path: /
+        method: GET
+        expectStatus: 200
+        expectBodyContains: <!DOCTYPE html
+        timeoutMs: 10000
+
+      - path: /en
+        method: GET
+        expectStatus: 200
+        expectBodyContains: <!DOCTYPE html
+        timeoutMs: 10000
+
+      - path: /impressum
+        method: GET
+        expectStatus: 200
+        expectBodyContains: <!DOCTYPE html
+        timeoutMs: 10000
+
+      - path: /datenschutz
+        method: GET
+        expectStatus: 200
+        expectBodyContains: <!DOCTYPE html
+        timeoutMs: 10000

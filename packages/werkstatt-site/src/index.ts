@@ -35,6 +35,8 @@ export const werkstattSitePlugin: WerkstattPlugin = {
       (await import("./checks/module.ts")).createStandardCheckModule(),
     onboarding: async (): Promise<KernelModule> =>
       (await import("./onboarding/module.ts")).createOnboardingModule(),
+    testing: async (): Promise<KernelModule> =>
+      (await import("./testing/module.ts")).createTestingModule(),
   },
   deployAdapters: {
     "cloudflare-workers": async () => {

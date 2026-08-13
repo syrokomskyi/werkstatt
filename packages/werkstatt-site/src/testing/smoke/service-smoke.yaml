@@ -1,0 +1,44 @@
+# RFC-0825: Service smoke test definitions
+# Each service declares endpoints to verify after deployment.
+# The smoke runner fetches each endpoint and checks status + optional body assertion.
+
+services:
+  matomo-proxy:
+    endpoints:
+      - path: /_wg/analytics/health
+        method: GET
+        expectStatus: 200
+        expectBodyContains: ok
+        timeoutMs: 5000
+
+  rate-fetcher:
+    endpoints:
+      - path: /health
+        method: GET
+        expectStatus: 200
+        expectBodyContains: ok
+        timeoutMs: 5000
+
+  lagebild-sync:
+    endpoints:
+      - path: /health
+        method: GET
+        expectStatus: 200
+        expectBodyContains: ok
+        timeoutMs: 5000
+
+  telegram-alert-bridge:
+    endpoints:
+      - path: /health
+        method: GET
+        expectStatus: 200
+        expectBodyContains: ok
+        timeoutMs: 5000
+
+  maturity-score:
+    endpoints:
+      - path: /health
+        method: GET
+        expectStatus: 200
+        expectBodyContains: ok
+        timeoutMs: 5000

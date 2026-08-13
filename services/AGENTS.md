@@ -40,6 +40,16 @@ Cloudflare Worker services ship a `wrangler.dev.jsonc` config for dev-channel de
 - All Cloudflare Worker services MUST implement a `/health` endpoint returning `{"status":"ok","service":"<id>"}` with HTTP 200.
 - The services registry (`services/registry.yaml`) tracks `lastDeployed`, `lastDevDeployed`, and `healthCheckPath` per service.
 
+### Post-deploy smoke testing (RFC-0825)
+
+After successful deployment, `leitstand.service.dev-deploy` and `leitstand.service.promote` automatically run `service.smoke.run` against the deployed URL. Smoke test definitions are declarative YAML in `packages/werkstatt-site/src/testing/smoke/service-smoke.yaml`.
+
+- Each service declares a list of `endpoints` with `path`, `method`, `expectStatus`, optional `expectBodyContains`, and `timeoutMs`.
+- The smoke runner uses `fetch` with `AbortController` for per-endpoint timeouts.
+- Results are included in the deploy result data as `smokeResult` (best-effort, non-blocking — failures are logged as warnings, not fatal).
+- Missing service entries in the YAML cause the smoke check to be skipped (not an error).
+- Run manually: `pnpm exec werkstatt run service.smoke.run --service <id> --url <url>`.
+
 ### OTLP metrics push (RFC-0807)
 
 All `services/*` projects MUST push health metrics to SigNoz via OTLP. The `createMetricsPusher` helper from `@warpgogol/werkstatt-site/observability` handles the transport.

@@ -1311,6 +1311,18 @@
     "./ui": {
       "types": "./src/domain/ui/index.ts",
       "default": "./src/domain/ui/index.ts"
+    },
+    "./testing": {
+      "types": "./src/testing/index.ts",
+      "default": "./src/testing/index.ts"
+    },
+    "./testing/module": {
+      "types": "./src/testing/module.ts",
+      "default": "./src/testing/module.ts"
+    },
+    "./testing/smoke": {
+      "types": "./src/testing/smoke/index.ts",
+      "default": "./src/testing/smoke/index.ts"
     }
   },
   "files": ["src"],
