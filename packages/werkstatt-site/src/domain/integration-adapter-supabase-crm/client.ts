@@ -377,6 +377,7 @@ export class SupabaseCrmBufferClient implements CrmBufferWriter, CrmBufferReader
       payload: t.payload,
       max_retries: t.maxRetries ?? 5,
       status: "pending",
+      scheduled_at: new Date().toISOString(),
     }));
     // ON CONFLICT (tenant_id, op, payload_hash, status) DO NOTHING
     const result = (await rest(

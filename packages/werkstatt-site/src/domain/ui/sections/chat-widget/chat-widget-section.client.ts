@@ -26,8 +26,10 @@ const ADAPTER_LOADERS: ChatAdapterLoaders = {
 };
 
 function init(): void {
-  const launcher = document.querySelector<HTMLElement>("[data-chat-launcher]");
-  if (launcher) bindChatLauncher(launcher, ADAPTER_LOADERS);
+  const launchers = document.querySelectorAll<HTMLElement>("[data-chat-launcher]");
+  for (const launcher of launchers) {
+    bindChatLauncher(launcher, ADAPTER_LOADERS);
+  }
 }
 
 if (document.readyState === "loading") {

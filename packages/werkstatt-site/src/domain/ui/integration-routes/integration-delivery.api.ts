@@ -39,8 +39,10 @@ import {
   SUPABASE_BUFFER_SERVICE_KEY,
   SUPABASE_BUFFER_TENANT_ID,
 } from "astro:env/server";
-import { env as cfEnv } from "cloudflare:workers";
-import { createDeliveryHandler, type IntegrationSecrets } from "@warpgogol/werkstatt-site/integration";
+import {
+  createDeliveryHandler,
+  type IntegrationSecrets,
+} from "@warpgogol/werkstatt-site/integration";
 import { supabaseBufferDestinationAdapter } from "@warpgogol/werkstatt-site/integration-adapter-supabase-crm";
 
 /** RFC-0181: channel + CRM secrets bag from astro:env/server (client tokens). */
@@ -64,6 +66,20 @@ interface EmailRoutingEnv {
   SEND_EMAIL?: { send(message: unknown): Promise<void> };
 }
 
+// cloudflare:workers is only available in the Cloudflare Workers runtime.
+// In Astro dev mode (Node.js) the import fails — resolve lazily so the route
+// still loads; SEND_EMAIL is undefined in dev (email routing is a production binding).
+async function resolveEmailBinding(): Promise<
+  { send(message: unknown): Promise<void> } | undefined
+> {
+  try {
+    const { env } = await import("cloudflare:workers");
+    return (env as unknown as EmailRoutingEnv).SEND_EMAIL;
+  } catch {
+    return undefined;
+  }
+}
+
 const handler = createDeliveryHandler({
   qstashCurrentSigningKey: UPSTASH_QSTASH_CURRENT_SIGNING_KEY,
   qstashNextSigningKey: UPSTASH_QSTASH_NEXT_SIGNING_KEY,
@@ -74,7 +90,7 @@ const handler = createDeliveryHandler({
   email: {
     to: INTEGRATION_EMAIL_TO,
     from: INTEGRATION_EMAIL_FROM,
-    sendBinding: (cfEnv as unknown as EmailRoutingEnv).SEND_EMAIL,
+    sendBinding: await resolveEmailBinding(),
   },
 });
 

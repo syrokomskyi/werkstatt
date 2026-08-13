@@ -42,7 +42,7 @@ services:
     workerName: lagebild-sync
     hostedBy: studio
     url: https://lagebild-sync.syrokomskyi.workers.dev
-    workersDevUrl: https://lagebild-sync.syrokomskyi.workers.dev
+    workersDevUrl: https://lagebild-sync-dev.syrokomskyi.workers.dev
     publicEndpoints: false
     subdomains: []
     lastDeployed:
@@ -50,9 +50,9 @@ services:
       state: succeeded
       operationId: op-msow0jse-vi9381kl
     lastDevDeployed:
-      at: 2026-08-11T16:41:09.894Z
+      at: 2026-08-12T13:15:29.050Z
       state: succeeded
-      operationId: op-msow0309-ppapyk8t
+      operationId: op-msq42pia-5kisqlo5
     healthCheckPath: /health
   - id: telegram-alert-bridge
     kind: proxy-worker

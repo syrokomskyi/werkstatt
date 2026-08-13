@@ -24,7 +24,11 @@ form no longer delivers synchronously; the exchange is standardized on the queue
 
 import type { APIRoute } from "astro";
 import { UPSTASH_QSTASH_URL, UPSTASH_QSTASH_TOKEN } from "astro:env/server";
-import { buildQstashPublish, QSTASH_EU_BASE, type IntegrationEvent } from "@warpgogol/werkstatt-site/integration";
+import {
+  buildQstashPublish,
+  QSTASH_EU_BASE,
+  type IntegrationEvent,
+} from "@warpgogol/werkstatt-site/integration";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../../section-api-utils.ts";
 
 const EMAIL_EXTRACT_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -79,7 +83,7 @@ export const POST: APIRoute = async ({ request }) => {
     eventId: crypto.randomUUID(),
     kind: "lead",
     source: formId,
-    locale: request.headers.get("accept-language")?.split(",")[0] ?? "",
+    locale: request.headers.get("accept-language")?.split(",")[0]?.trim() || "de",
     occurredAt: new Date().toISOString(),
     contact,
     payload: { message, ...(referrer ? { referrer } : {}) },
@@ -88,7 +92,9 @@ export const POST: APIRoute = async ({ request }) => {
   if (!UPSTASH_QSTASH_TOKEN) {
     return json({ ok: false, error: "delivery-not-configured" }, 503);
   }
-  const callbackUrl = new URL(CALLBACK_PATH, request.url).toString();
+  const siteUrl =
+    import.meta.env.PUBLIC_SITE_URL ?? import.meta.env.SITE ?? new URL(request.url).origin;
+  const callbackUrl = new URL(CALLBACK_PATH, siteUrl).toString();
   const response = await fetch(
     buildQstashPublish(event, {
       token: UPSTASH_QSTASH_TOKEN,

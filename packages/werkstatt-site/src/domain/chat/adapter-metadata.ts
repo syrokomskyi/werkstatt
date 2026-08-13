@@ -28,7 +28,7 @@ export const CHAT_ADAPTER_METADATA: Readonly<Record<ChatAdapterId, ChatAdapterMe
   null: {},
   uchat: {
     requiredOptions: [["widgetId", "scriptUrl"]],
-    vendorOrigins: ["uchat.com.au"],
+    vendorOrigins: ["uchat.com.au", "sdk.dfktv2.com"],
   },
 };
 

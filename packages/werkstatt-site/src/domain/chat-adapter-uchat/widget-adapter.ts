@@ -26,7 +26,9 @@ import type {
 
 /** UChat exposes a global once its popup widget script has booted. */
 interface UChatWindow extends Window {
-  // The popup script auto-mounts a launcher bubble; these are best-effort openers.
+  // UChat popup.js loads sdk.js asynchronously, which sets window.chatbotSDK.
+  chatbotSDK?: { open?: () => void; toggle?: () => void; show?: () => void };
+  // Legacy globals (kept for backward compatibility).
   uchat?: { open?: () => void; toggle?: () => void };
   UChatWidget?: { open?: () => void };
 }
@@ -34,7 +36,7 @@ interface UChatWindow extends Window {
 const UCHAT_SCRIPT_ID = "uchat-widget-script";
 
 /** Public origins the UChat adapter loads from (for consent.activation.validate). */
-const UCHAT_VENDOR_ORIGINS = ["uchat.com.au"] as const;
+const UCHAT_VENDOR_ORIGINS = ["uchat.com.au", "sdk.dfktv2.com"] as const;
 
 /**
  * Resolve the widget script URL from public options.
@@ -49,6 +51,25 @@ function resolveScriptUrl(options: Record<string, string>): string | null {
   const widgetId = options.widgetId;
   if (!widgetId) return null;
   return `https://www.uchat.com.au/js/widget/${encodeURIComponent(widgetId)}/popup.js`;
+}
+
+/**
+ * Poll for window.chatbotSDK to appear (UChat popup.js loads sdk.js asynchronously).
+ * Resolves after the SDK is available or after timeoutMs, whichever comes first.
+ */
+function waitForChatbotSDK(timeoutMs: number): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") return resolve();
+    const w = window as UChatWindow;
+    if (w.chatbotSDK) return resolve();
+    const start = Date.now();
+    const interval = setInterval(() => {
+      if (w.chatbotSDK || Date.now() - start >= timeoutMs) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 100);
+  });
 }
 
 let _injected = false;
@@ -90,6 +111,9 @@ const UChatWidgetAdapter: ChatWidgetAdapter = {
     });
     if (!ok) return "error";
     _injected = true;
+    // UChat popup.js loads sdk.js asynchronously which sets window.chatbotSDK.
+    // Wait briefly for the SDK to appear so open() can use it on first click.
+    await waitForChatbotSDK(3000);
     return "ready";
   },
 
@@ -97,10 +121,20 @@ const UChatWidgetAdapter: ChatWidgetAdapter = {
     if (typeof window === "undefined") return "no-global";
     if (!_injected) return "not-ready";
     const w = window as UChatWindow;
-    const opener = w.uchat?.open ?? w.uchat?.toggle ?? w.UChatWidget?.open;
-    if (!opener) return "no-global";
-    opener.call(w.uchat ?? w.UChatWidget);
-    return "opened";
+    const sdk = w.chatbotSDK;
+    const opener = sdk?.open ?? sdk?.toggle ?? sdk?.show;
+    if (opener) {
+      opener.call(sdk);
+      return "opened";
+    }
+    // Legacy globals (backward compatibility)
+    const legacyOpener = w.uchat?.open ?? w.uchat?.toggle ?? w.UChatWidget?.open;
+    if (legacyOpener) {
+      legacyOpener.call(w.uchat ?? w.UChatWidget);
+      return "opened";
+    }
+    // SDK not yet ready — popup.js auto-mounts a launcher bubble the visitor can click.
+    return "no-global";
   },
 };
 

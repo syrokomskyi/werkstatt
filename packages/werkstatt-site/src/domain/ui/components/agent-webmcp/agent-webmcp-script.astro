@@ -33,10 +33,11 @@ interface Props {
 
 const { manifest } = Astro.props as Props;
 const manifestJson = manifest ? JSON.stringify(manifest) : "null";
+const isDev = import.meta.env.DEV;
 ---
 
 {manifest && (
-  <script is:inline define:vars={{ manifestJson }}>
+  <script is:inline define:vars={{ manifestJson, isDev }}>
     (function () {
       var mc = document.modelContext;
       if (!mc || typeof mc.registerTool !== "function") return;
@@ -62,7 +63,7 @@ const manifestJson = manifest ? JSON.stringify(manifest) : "null";
           });
         }
       } catch (e) {
-        if (import.meta && import.meta.env && import.meta.env.DEV) {
+        if (isDev) {
           console.warn("[agent-webmcp] Failed to register tools:", e);
         }
       }

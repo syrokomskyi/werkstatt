@@ -155,10 +155,13 @@ export function createDeliveryHandler(
     const signature = request.headers.get("upstash-signature") ?? "";
     const body = await request.text();
 
+    const verifyUrl = import.meta.env.PUBLIC_SITE_URL
+      ? new URL(new URL(request.url).pathname, import.meta.env.PUBLIC_SITE_URL).toString()
+      : request.url;
     const valid = await verifyQstashSignature(
       signature,
       body,
-      request.url,
+      verifyUrl,
       config.qstashCurrentSigningKey,
       config.qstashNextSigningKey ?? "",
     );
