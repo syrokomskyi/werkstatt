@@ -122,3 +122,18 @@ RFC-0776 completed the import sweep. All packages and services now import from `
 ## Generated file loader rules
 
 - **Loaders of generated files MUST emit `console.warn` on ENOENT with actionable fix instructions.** Loaders like `loadContentRefIndex` and `loadDerivedPrices` return `null` when the generated file is missing. Without a warning, the failure is silent — prices disappear, formula references stop resolving, and the developer has no idea why. Always include the file path, what breaks without it, and the command to regenerate it (e.g. `pnpm exec werkstatt run content.ref-index.generate --site <siteId>`). This is the safety net for direct `astro dev` runs that bypass `mission.preview`'s pre-dev check.
+
+## Testing directory (RFC-0823, DNA-66)
+
+The `src/testing/` directory hosts all workshop test definitions for the five-level testing pyramid:
+
+| Subdirectory | Level | Contents |
+| --- | --- | --- |
+| `src/testing/unit/` | L1 | Unit tests for service internals |
+| `src/testing/integration/` | L2 | Integration tests against dev-deployed Workers |
+| `src/testing/contract/` | L3 | Zod contract schemas and bidirectional validation tests |
+| `src/testing/e2e/` | L4 | Playwright E2E tests against dev-deployed sites |
+| `src/testing/smoke/` | L5 | Smoke endpoint definitions (YAML) |
+| `src/testing/helpers/` | — | Shared helpers: `dev-url-resolver.ts`, `test-env.ts`, `wait-for-deploy.ts` |
+
+Tests are versioned with the platform and runnable against any deployment. The dev channel is the canonical test environment. Individual test levels are implemented by downstream RFCs 0824–0829.
