@@ -10,7 +10,7 @@ test.describe("Robots and sitemap", () => {
   });
 
   test("sitemap.xml is accessible", async ({ request }) => {
-    const response = await request.get("/sitemap-index.xml");
+    const response = await request.get("/sitemap.xml");
     expect(response.status()).toBe(200);
 
     const body = await response.text();
