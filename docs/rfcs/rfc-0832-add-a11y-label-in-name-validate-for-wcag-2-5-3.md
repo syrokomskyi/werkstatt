@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
+enhancedAt: 2026-08-13
 implementedAt:
 closedAt:
 supersedes: []
@@ -57,6 +58,7 @@ The Lighthouse report for `warpgogol.com` (2026-08-13) shows **Accessibility sco
 The visible text is "Situation beschreiben" but the accessible name (from `aria-label`) is "Anfrage an Warpgogol senden". The accessible name does not include the visible text, violating **WCAG 2.5.3 Label in Name** (Level A).
 
 While this audit currently has weight 0 (experimental) and does not affect the Accessibility score, it is a real accessibility issue:
+
 - Voice control users who say "click Situation beschreiben" cannot activate the link because the accessible name doesn't contain that text.
 - The audit may be promoted to a weighted audit in future Lighthouse versions.
 
@@ -76,11 +78,11 @@ Reference failure mode:
 
 ## Decision
 
-The kernel gains an `a11y.label-in-name.validate` command that scans rendered HTML in `dist/client/` for elements with `aria-label` and checks that the accessible name includes the element's visible text content.
+The kernel gains an `a11y.label-in-name.validate` command that scans all rendered HTML in `dist/client/` for **interactive elements** with `aria-label` and checks that the accessible name includes the element's visible text content. Only interactive elements (`<a>`, `<button>`, `<input>`, `<select>`, `<textarea>` and elements with interactive ARIA roles) are checked — WCAG 2.5.3 applies to "user interface components with labels", not to landmark elements like `<nav aria-label>` where the label names the navigation region.
 
 ## Architectural fit
 
-- **RFC-0690/0696** (surface.heading-uniqueness.validate) — This RFC follows the same pattern: post-build HTML scanning using parse5, surface-page filtering, Diagnostic output via `diagnosticsResult`.
+- **RFC-0690/0696** (surface.heading-uniqueness.validate) — This RFC follows the same pattern: post-build HTML scanning using parse5, Diagnostic output via `diagnosticsResult`. Unlike heading-uniqueness which filters by surface pages, this validator scans all HTML in `dist/client/` because WCAG 2.5.3 applies to all pages.
 - **Site OS operator model** — Post-build validator, scope `app`. Runs after `astro build` produces rendered HTML.
 - **WCAG 2.5.3** (Label in Name, Level A) — This RFC enforces the WCAG requirement at build time, preventing the need for post-deploy Lighthouse audits to catch it.
 
@@ -124,13 +126,15 @@ interface LabelInNameResult {
 
 **A11Y-LIN-01: Accessible name must include visible text**
 
-For every element with an `aria-label` attribute in rendered HTML:
+For every **interactive element** with an `aria-label` attribute in rendered HTML:
 
 1. Extract the visible text content (all text nodes, concatenated, trimmed, normalized whitespace).
 2. Extract the accessible name (the `aria-label` attribute value, trimmed).
 3. Check that the visible text is contained within the accessible name (case-insensitive, after whitespace normalization).
 
-If the visible text is empty (no text content), skip the element (no mismatch possible).
+**Interactive elements** are: `<a>`, `<button>`, `<input>`, `<select>`, `<textarea>`, and elements with interactive ARIA roles (`role="button"`, `role="link"`, `role="checkbox"`, `role="radio"`, `role="tab"`, `role="menuitem"`, `role="option"`, `role="switch"`, `role="textbox"`).
+
+If the visible text is empty (no text content, e.g. icon-only buttons), skip the element (no mismatch possible).
 
 If the visible text is not contained in the accessible name, report A11Y-LIN-01.
 
@@ -147,17 +151,19 @@ if visibleText.length > 0 && !accessibleName.includes(visibleText):
 ```
 
 **Exceptions:**
+
 - Elements with `aria-hidden="true"` — not exposed to assistive technology
-- Elements with `role="img"` or `role="presentation"` — visible text is decorative
 - `<input>` elements with `type="hidden"` — not visible
 - SVG elements — visible text is often not the accessible name
+- Non-interactive elements (`<nav>`, `<main>`, `<aside>`, `<header>`, `<footer>`, `<section>`, `<div>`, `<span>`) — WCAG 2.5.3 applies to user interface components, not landmark/structural elements where `aria-label` names the region
 
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
-| `dist/client/**/*.html` | Scanned for elements with `aria-label` |
+| --- | --- |
+| `dist/client/**/*.html` | Scanned for interactive elements with `aria-label` |
 | `packages/werkstatt-site/src/checks/a11y-label-in-name.ts` | New validator module |
+| `packages/werkstatt-site/AGENTS.md` | Check commands section updated with `a11y.label-in-name.validate` entry |
 
 ### Output format
 
@@ -193,8 +199,8 @@ if visibleText.length > 0 && !accessibleName.includes(visibleText):
 
 ## Rollout
 
-- **Default behavior**: `a11y.label-in-name.validate` runs in `SITES_CHECK_POSTBUILD_PIPELINE` after `surface.heading-uniqueness.validate` (both are post-build HTML scanners).
-- **Existing apps**: First run will flag any aria-label/text mismatches. Sites must either:
+- **Default behavior**: `a11y.label-in-name.validate` runs in `SITES_CHECK_POSTBUILD_PIPELINE` after `surface.heading-uniqueness.validate` (both are post-build HTML scanners). Scans all `.html` files in `dist/client/`, not just surface pages — WCAG 2.5.3 applies to all pages.
+- **Existing apps**: First run will flag any aria-label/text mismatches on interactive elements. The codebase audit found 1 known violation (the CTA link in Context). Sites must either:
   1. Update `aria-label` to include the visible text (e.g. "Situation beschreiben — Anfrage an Warpgogol senden"), OR
   2. Remove `aria-label` entirely and let the visible text be the accessible name, OR
   3. Add `aria-hidden="true"` if the visible text is decorative (rare case).
@@ -216,19 +222,21 @@ if visibleText.length > 0 && !accessibleName.includes(visibleText):
 
 - **False positives from dynamic text** — If JavaScript modifies text content after render, the static HTML scan may see different text than what's displayed. Mitigated by the fact that Astro SSG produces the final HTML at build time for static sites.
 - **False positives from icon-only elements** — Elements with icons (SVG) and no text content are skipped (visible text is empty). If an icon has a `title` or `aria-label`, that's a different check.
+- **False positives from landmark elements** — `<nav aria-label="Main navigation">` contains link text that is not part of the aria-label. Mitigated by restricting the check to interactive elements only (per WCAG 2.5.3 "user interface components with labels"). Landmark and structural elements are not checked.
 - **Agent confusion** — Agents may try to fix A11Y-LIN-01 by removing `aria-label` entirely, which may break other accessibility contracts. Mitigated by the `fixHint` suggesting both options (include visible text in aria-label OR remove aria-label).
+- **Performance** — Scanning all `.html` files in `dist/client/` for interactive elements with `aria-label` is a simple DOM traversal. Typical site has ~20–40 HTML pages; scan completes in <1s per site. Negligible compared to `astro build` itself.
 
 ## Acceptance criteria
 
 - [ ] `a11y.label-in-name.validate` command registered in command table with scope `app`
-- [ ] A11Y-LIN-01 rule implemented with correct matching logic
-- [ ] Exception cases handled (aria-hidden, role=img, input hidden, SVG)
+- [ ] A11Y-LIN-01 rule implemented with correct matching logic (interactive elements only)
+- [ ] Exception cases handled (aria-hidden, input hidden, SVG, non-interactive/landmark elements)
 - [ ] `a11y.label-in-name.validate` integrated into `SITES_CHECK_POSTBUILD_PIPELINE`
 - [ ] `--json` output format documented and stable
-- [ ] Unit tests with fixture HTML (passing and failing cases)
+- [ ] Unit tests with fixture HTML (passing and failing cases, including nav landmark false-positive guard)
 - [ ] `warpgogol.com` passes `a11y.label-in-name.validate` after fixing the CTA link
 - [ ] `rfc.validate` passes on this file before merging
-- [ ] `AGENTS.md` updated with label-in-name contract
+- [ ] `packages/werkstatt-site/AGENTS.md` Check commands section updated with `a11y.label-in-name.validate` entry
 
 ## Implementation notes for agents
 
@@ -237,4 +245,4 @@ if visibleText.length > 0 && !accessibleName.includes(visibleText):
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0832` and commit the evidence file in the same commit.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0832 --reason "..." --invariant "DNA-N"` instead of working around it.
-- Implementation follows the `surface.heading-uniqueness.validate` pattern (parse5, surface artifact route filtering, diagnosticsResult).
+- Implementation follows the `surface.heading-uniqueness.validate` pattern (parse5, diagnosticsResult) but without surface-page filtering — scans all HTML in `dist/client/`.
