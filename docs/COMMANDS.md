@@ -11,10 +11,11 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 758. Raw manifest entries: 758.
+Generated command rows: 759. Raw manifest entries: 759.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
+| `a11y.label-in-name.validate` | workspace | app | no | no | RFC-0832: scan rendered HTML in dist/client/ for interactive elements with aria-label and check that the accessible name includes the visible text (WCAG 2.5.3 Label in Name). Checks <a>, <button>, <input>, <select>, <textarea> and elements with interactive ARIA roles. Skips landmark elements like <nav aria-label>. |
 | `adr.archive` | workspace | workspace | yes | no | Move terminal-status ADR files (implemented, rejected, superseded) into docs/adrs/archive/<status>/ subdirectories. Bidirectional: moves non-terminal files found in subdirectories back to root. Use --dry-run to preview. Use --status to filter to a single terminal status. Prefer the docs.archive umbrella command unless you need to archive only ADRs. |
 | `adr.create` | workspace | workspace | yes | no | Create a new ADR draft from the template. Pass --title "Short title" (required). Optional: --scope, --decider, --status, --related. Always creates status: proposed unless overridden. AI agents are allowed to use this command. |
 | `adr.implement.stamp` | workspace | workspace | yes | no | Atomically transition an ADR from accepted/proposed to implemented. Validates preconditions (status, implementation commit, file cleanliness, concurrent safety) and mutates frontmatter in one atomic write. Use --dry-run to preview without mutating. |
