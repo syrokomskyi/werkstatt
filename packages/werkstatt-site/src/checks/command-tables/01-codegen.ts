@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0262: register props.types.generate and props.contract.validate.</item>
+  <item>RFC-0827: register contract.validate and contract.list for site-service contract testing.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -53,6 +54,7 @@ import { runOwnershipSyncValidate } from "../ownership-sync-validate.ts";
 import { runOwnershipGeneratorCrossCheck } from "../ownership-cross-check.ts";
 import { runPropsContractValidate } from "../props-contract.ts";
 import { runOpenSourceValidate } from "../open-source-validate.ts";
+import { runContractValidate, runContractList } from "../../testing/contract/contract-validator.ts";
 
 export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
@@ -693,5 +695,29 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     ],
     modulePaths: ["open-source-validate.ts", "result-helpers.ts", "lib/file-exists.ts"],
     execute: runOpenSourceValidate,
+  },
+  {
+    name: "contract.validate",
+    description:
+      "RFC-0827: validate site-service contract schemas are valid Zod, have both request and response, and are referenced by site and service code (CONTRACT-01..05).",
+    scope: "workspace",
+    flags: {},
+    reads: [
+      "packages/werkstatt-site/src/testing/contract/**/*.ts",
+      "packages/werkstatt-site/src/domain/**/*.ts",
+      "services/*/src/**/*.ts",
+    ],
+    modulePaths: ["testing/contract/contract-validator.ts", "result-helpers.ts"],
+    execute: runContractValidate,
+  },
+  {
+    name: "contract.list",
+    description:
+      "RFC-0827: list all registered site-service contracts with id, name, direction, version, and description.",
+    scope: "workspace",
+    flags: {},
+    cacheable: false,
+    modulePaths: ["testing/contract/contract-validator.ts"],
+    execute: runContractList,
   },
 ];

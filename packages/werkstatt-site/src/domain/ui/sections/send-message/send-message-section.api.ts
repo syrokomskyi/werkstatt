@@ -17,6 +17,7 @@ form no longer delivers synchronously; the exchange is standardized on the queue
   <item>RFC-0514: accept structured email/phone as top-level fields; remove regex extraction.</item>
   <item>RFC-0567: accept and forward referrer field in IntegrationEvent payload.</item>
   <item>RFC-0572: revert to regex extraction from message body; remove top-level email/phone fields.</item>
+  <item>RFC-0827: validate request body with SendMessageRequestSchema from testing/contract.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,6 +30,7 @@ import {
   QSTASH_EU_BASE,
   type IntegrationEvent,
 } from "@warpgogol/werkstatt-site/integration";
+import { SendMessageRequestSchema } from "@warpgogol/werkstatt-site/testing/contract";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../../section-api-utils.ts";
 
 const EMAIL_EXTRACT_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -60,16 +62,21 @@ function normalizeFormId(value: unknown): string {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  let payload: SendMessageBody;
+  let raw: unknown;
   try {
-    payload = (await request.json()) as SendMessageBody;
+    raw = await request.json();
   } catch {
     return json({ ok: false, error: "invalid-json" }, 400);
   }
 
-  const message = normalizeString(payload.message);
-  const formId = normalizeFormId(payload.formId);
-  const referrer = normalizeString(payload.referrer);
+  const parsed = SendMessageRequestSchema.safeParse(raw);
+  if (!parsed.success) {
+    return json({ ok: false, error: "invalid-body" }, 400);
+  }
+
+  const message = normalizeString(parsed.data.message);
+  const formId = normalizeFormId(parsed.data.formId);
+  const referrer = normalizeString(parsed.data.referrer);
 
   if (message.length < 1) return json({ ok: false, error: "empty-message" }, 400);
   if (message.length > MAX_MESSAGE_LENGTH)

@@ -22,6 +22,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `@warpgogol/werkstatt-site/testing`                | `./src/testing/index.ts`                |
 | `@warpgogol/werkstatt-site/testing/module`         | `./src/testing/module.ts`               |
 | `@warpgogol/werkstatt-site/testing/smoke`          | `./src/testing/smoke/index.ts`          |
+| `@warpgogol/werkstatt-site/testing/contract`       | `./src/testing/contract/index.ts`       |
 | `@warpgogol/werkstatt-site/audit`                  | `./src/audit/index.ts`                  |
 | `@warpgogol/werkstatt-site/changelog`              | `./src/changelog/index.ts`              |
 | `@warpgogol/werkstatt-site/deploy`                 | `./src/deploy/index.ts`                 |
@@ -56,7 +57,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `src/checks/check-warpgogol/` | `site-kernel-check-warpgogol` | `moduleLoaders` (check-warpgogol ecosystem) |
 | `src/deploy/` | `site-kernel-deploy` | `deployAdapters` |
 | `src/changelog/` | `site-kernel-changelog` renderers | `moduleLoaders` |
-| `src/testing/` | RFC-0825: post-deploy smoke testing | `moduleLoaders` (smoke run commands) |
+| `src/testing/` | RFC-0825: post-deploy smoke testing, RFC-0827: site-service contract testing | `moduleLoaders` (smoke run commands, contract validate/list) |
 
 ## Check commands
 
@@ -68,6 +69,8 @@ Notable check commands registered by this package:
 - `template.peer-deps.validate` (RFC-0815) — validates peer dependency constraints in `package.template.json` by resolving the dependency tree via `pnpm install --dry-run --strict-peer-dependencies` in a temp directory. Strips `workspace:*` deps before resolution. Emits `PEER-01` (peer constraint violated), `PEER-02` (template missing), `PEER-03` (resolution failed, warning). Integrated into `SITES_BUILD_CHECK_PIPELINE` after `template.deps.drift`.
 - `deployment.gate.validate` (RFC-0803) — validates that non-gated pages do not reference gated pages in navigation, block props, or breadcrumb parent chains. Emits `GATE-01` (navigation), `GATE-02` (block props), `GATE-03` (parentPageId). Integrated into `SITES_BUILD_CHECK_PIPELINE`.
 - `ownership.generator.cross-check` (RFC-0810) — cross-references app-scoped `.generate` commands against `GENERATOR_OWNERSHIP_MAP`. Emits `OWN-XCHECK-01` (uncovered generator), `OWN-XCHECK-02` (phantom command reference), `OWN-XCHECK-03` (missing or non-existent module path). Integrated into `SITES_BUILD_PREPARE_PIPELINE` and `SITES_BUILD_PREPARE_DEV_PIPELINE` before `ownership.sync.validate`.
+- `contract.validate` (RFC-0827) — validates site-service contract schemas are valid Zod, have both request and response, and are referenced by both site-side and service-side code. Emits CONTRACT-01 (invalid Zod), CONTRACT-02 (missing schema), CONTRACT-03 (site-side not referenced, warning), CONTRACT-04 (service-side not referenced, warning), CONTRACT-05 (one-sided reference, warning). Integrated into `PACKAGES_CHECK_PIPELINE`.
+- `contract.list` (RFC-0827) — lists all registered site-service contracts with id, name, direction, version, and description.
 
 ## Domain layer (RFC-0775)
 

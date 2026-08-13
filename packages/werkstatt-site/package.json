@@ -1327,6 +1327,10 @@
     "./testing/integration": {
       "types": "./src/testing/integration/index.ts",
       "default": "./src/testing/integration/index.ts"
+    },
+    "./testing/contract": {
+      "types": "./src/testing/contract/index.ts",
+      "default": "./src/testing/contract/index.ts"
     }
   },
   "files": ["src"],

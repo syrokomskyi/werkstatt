@@ -147,6 +147,8 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "check.fixture.lint" },
   // RFC-0262: manifest propsSchema is the single authored prop contract for packages/ui.
   { command: "props.contract.validate" },
+  // RFC-0827: site-service contract schemas are valid Zod and referenced by both sides.
+  { command: "contract.validate" },
   // RFC-0305: analytics ontology, binding, proxy, and offline fleet-control scaffolding.
   { command: "analytics.messkanon.validate" },
   { command: "analytics.binding.validate" },

@@ -19,13 +19,13 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Architecture review: extracted delivery callback logic from chat-widget-section.delivery.api.ts.</item>
+  <item>RFC-0827: import IntegrationRouteRequestSchema from testing/contract for event validation.</item>
 </CHANGE_SUMMARY>
 */
 
 // @ai-invariant: read secrets only from injected values; never return or log them.
 
 import {
-  IntegrationEventSchema,
   deliverEvent,
   routeEventToReady,
   restRedisLedger,
@@ -34,6 +34,7 @@ import {
   type IntegrationSecrets,
   type DestinationAdapter,
 } from "./index.ts";
+import { IntegrationRouteRequestSchema } from "@warpgogol/werkstatt-site/testing/contract";
 
 /** Secrets + email config injected by the caller (from astro:env/server). */
 export interface DeliveryHandlerConfig {
@@ -173,7 +174,7 @@ export function createDeliveryHandler(
     } catch {
       return json({ ok: false, error: "invalid-json" }, 400);
     }
-    const parsed = IntegrationEventSchema.safeParse(raw);
+    const parsed = IntegrationRouteRequestSchema.safeParse(raw);
     if (!parsed.success) return json({ ok: false, error: "invalid-event" }, 422);
     const event = parsed.data;
 
