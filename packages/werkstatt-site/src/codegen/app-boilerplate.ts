@@ -15,6 +15,7 @@
   <item>RFC-0310: routes.generate emits the generated shared 404 route.</item>
   <item>RFC-0318: public.infrastructure.generate merges generated retired-surface redirects.</item>
   <item>RFC-0784: public.infrastructure.generate resolves {{AGENT_LINK_HEADERS}} token based on agent.enabled flag.</item>
+  <item>CSP fix: public.infrastructure.generate resolves {{CSP_SCRIPT_SRC_EXTRA}} token from growth.vendor.options.proxyBaseUrl to allow cross-origin analytics script loads.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -302,6 +303,21 @@ export async function runGenerateAgentsDocs(
   ]);
 }
 
+function resolveCspScriptSrcExtra(manifest: Record<string, unknown>, siteDomain: string): string {
+  const growth = manifest.growth as { vendor?: { options?: Record<string, string> } } | undefined;
+  const proxyBaseUrl = growth?.vendor?.options?.["proxyBaseUrl"];
+  if (!proxyBaseUrl) return "";
+
+  try {
+    const parsed = new URL(proxyBaseUrl);
+    const siteHost = siteDomain.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+    if (parsed.hostname === siteHost) return "";
+    return ` ${parsed.origin}`;
+  } catch {
+    return "";
+  }
+}
+
 export async function runGeneratePublicInfrastructure(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -355,6 +371,11 @@ export async function runGeneratePublicInfrastructure(
       ].join("\n")
     : "";
 
+  const cspScriptSrcExtra = resolveCspScriptSrcExtra(
+    manifest as unknown as Record<string, unknown>,
+    domain,
+  );
+
   const tokens: Record<string, string> = {
     DOMAIN: domain,
     DEFAULT_LANG: defaultLang,
@@ -370,6 +391,7 @@ export async function runGeneratePublicInfrastructure(
       filePath: "public/_headers",
     }).trimEnd(),
     AGENT_LINK_HEADERS: agentLinkHeaders,
+    CSP_SCRIPT_SRC_EXTRA: cspScriptSrcExtra,
   };
   // robots.txt is owned by `robots.generate` (RFC-0052) — the build pipeline's
   // canonical builder reads identity.domain + system.md robots: block.
