@@ -15,6 +15,7 @@
     <item>Red: ownership entry with non-existent module path -> OWN-XCHECK-03 warning.</item>
     <item>Green: all commands covered, all modules exist -> clean pass, exitCode 0.</item>
     <item>Green: workspace-scoped .generate command with no entry -> no OWN-XCHECK-01.</item>
+    <item>Green: ownership entry for site-only command (loaded via context.site) -> no OWN-XCHECK-02 (regression for closed-mission workpiece fix).</item>
   </responsibilities>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -58,12 +59,22 @@ function ctx(root: string): KernelRuntimeContext {
 }
 
 let mockCommands: KernelRegisteredCommandInfo[] = [];
+let mockSiteCommandNames: string[] = [];
+let mockLoadAppRuntimeThrow = false;
 
 vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
   return {
     ...actual,
     listRegisteredKernelCommands: vi.fn(async () => mockCommands),
+    loadAppRuntime: vi.fn(async () => {
+      if (mockLoadAppRuntimeThrow) throw new Error("mock load failure");
+      return {
+        registry: {
+          listCommandNames: () => mockSiteCommandNames,
+        },
+      };
+    }),
   };
 });
 
@@ -91,6 +102,8 @@ describe("ownership.generator.cross-check (RFC-0810)", () => {
   beforeEach(async () => {
     root = await mkdtemp(join(tmpdir(), "own-xcheck-"));
     mockCommands = [];
+    mockSiteCommandNames = [];
+    mockLoadAppRuntimeThrow = false;
     (GENERATOR_OWNERSHIP_MAP as unknown[]).length = 0;
   });
 
@@ -276,5 +289,59 @@ describe("ownership.generator.cross-check (RFC-0810)", () => {
 
     const xcheck01 = result.data!.diagnostics.filter((d) => d.ruleId === "OWN-XCHECK-01");
     expect(xcheck01).toHaveLength(0);
+  });
+
+  it("green: ownership entry for site-only command (context.site) -> no OWN-XCHECK-02 (regression for closed-mission fix)", async () => {
+    // Simulates release.prepare for a closed mission: workspace-level discovery
+    // returns no app commands (currentMission is null), but context.site points
+    // to the workpiece whose module templates register site-level generators.
+    mockCommands = [];
+    mockSiteCommandNames = ["open-source.generate"];
+    GENERATOR_OWNERSHIP_MAP.push({
+      path: "public/open-source/sbom.cdx.json",
+      command: "open-source.generate",
+      module: "packages/werkstatt-site/src/codegen/open-source-page.ts",
+    });
+
+    const siteCtx: KernelRuntimeContext = {
+      ...ctx(root),
+      site: {
+        name: "warpgogol-com",
+        directory: join(root, "workpiece"),
+        toolsDirectory: join(root, "workpiece", "tools"),
+        configPath: join(root, "workpiece", "tools", "kernel.config.ts"),
+      },
+    } as unknown as KernelRuntimeContext;
+
+    const result = await runOwnershipGeneratorCrossCheck(input, siteCtx);
+
+    const xcheck02 = result.data!.diagnostics.filter((d) => d.ruleId === "OWN-XCHECK-02");
+    expect(xcheck02).toHaveLength(0);
+  });
+
+  it("green: loadAppRuntime failure is non-fatal -> OWN-XCHECK-02 still fires for truly phantom commands", async () => {
+    mockCommands = [];
+    mockLoadAppRuntimeThrow = true;
+    GENERATOR_OWNERSHIP_MAP.push({
+      path: "public/foo.json",
+      command: "phantom.generate",
+      module: "packages/test/foo.ts",
+    });
+
+    const siteCtx: KernelRuntimeContext = {
+      ...ctx(root),
+      site: {
+        name: "test-site",
+        directory: join(root, "workpiece"),
+        toolsDirectory: join(root, "workpiece", "tools"),
+        configPath: join(root, "workpiece", "tools", "kernel.config.ts"),
+      },
+    } as unknown as KernelRuntimeContext;
+
+    const result = await runOwnershipGeneratorCrossCheck(input, siteCtx);
+
+    const xcheck02 = result.data!.diagnostics.filter((d) => d.ruleId === "OWN-XCHECK-02");
+    expect(xcheck02).toHaveLength(1);
+    expect(result.exitCode).toBe(1);
   });
 });
