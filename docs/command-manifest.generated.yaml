@@ -7,8 +7,26 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 2fd3d6ac4c06fef34b100f9af0721c04629111a823d776cb17c932c964aaf729
+  contentHash: fe8cf5b0eb2e3aa031a39b30366098d8d1e7ff6ec74468be4ea7074dc4975b43
 commands:
+  - name: a11y.label-in-name.validate
+    description: "RFC-0832: scan rendered HTML in dist/client/ for interactive
+      elements with aria-label and check that the accessible name includes the
+      visible text (WCAG 2.5.3 Label in Name). Checks <a>, <button>, <input>,
+      <select>, <textarea> and elements with interactive ARIA roles. Skips
+      landmark elements like <nav aria-label>."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - <app>/dist/client/**/*.html
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
       into docs/adrs/archive/<status>/ subdirectories. Bidirectional: moves

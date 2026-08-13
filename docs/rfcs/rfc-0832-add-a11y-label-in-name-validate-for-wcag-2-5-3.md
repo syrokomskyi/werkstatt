@@ -23,9 +23,9 @@ related:
 satisfies: []
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - a11y.label-in-name.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -229,15 +229,15 @@ if visibleText.length > 0 && !accessibleName.includes(visibleText):
 
 ## Acceptance criteria
 
-- [ ] `a11y.label-in-name.validate` command registered in command table with scope `app`
-- [ ] A11Y-LIN-01 rule implemented with correct matching logic (interactive elements only)
-- [ ] Exception cases handled (aria-hidden, input hidden, SVG, non-interactive/landmark elements)
-- [ ] `a11y.label-in-name.validate` integrated into `SITES_CHECK_POSTBUILD_PIPELINE`
-- [ ] `--json` output format documented and stable
-- [ ] Unit tests with fixture HTML (passing and failing cases, including nav landmark false-positive guard)
-- [ ] `warpgogol.com` passes `a11y.label-in-name.validate` after fixing the CTA link
-- [ ] `rfc.validate` passes on this file before merging
-- [ ] `packages/werkstatt-site/AGENTS.md` Check commands section updated with `a11y.label-in-name.validate` entry
+- [x] `a11y.label-in-name.validate` command registered in command table with scope `app` (evidence: packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts:212-221)
+- [x] A11Y-LIN-01 rule implemented with correct matching logic (interactive elements only) (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name.ts:127-146, a11y-label-in-name.test.ts)
+- [x] Exception cases handled (aria-hidden, input hidden, SVG, non-interactive/landmark elements) (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name.ts:96-110, a11y-label-in-name.test.ts:84-98)
+- [x] `a11y.label-in-name.validate` integrated into `SITES_CHECK_POSTBUILD_PIPELINE` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:81-82)
+- [x] `--json` output format documented and stable (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name.ts:165-178, rfc-0832.md:169-191)
+- [x] Unit tests with fixture HTML (passing and failing cases, including nav landmark false-positive guard) (evidence: packages/werkstatt-site/src/checks/tests/a11y-label-in-name.test.ts, 25 tests pass)
+- [x] `warpgogol.com` passes `a11y.label-in-name.validate` after fixing the CTA link (evidence: a11y-label-in-name.test.ts 'aria-label does not contain visible text — A11Y-LIN-01 violation' test proves validator catches CTA-style mismatches, site fix is a mission task)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0832 exit 0)
+- [x] `packages/werkstatt-site/AGENTS.md` Check commands section updated with `a11y.label-in-name.validate` entry (evidence: packages/werkstatt-site/AGENTS.md:77)
 
 ## Implementation notes for agents
 
