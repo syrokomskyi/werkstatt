@@ -23,7 +23,7 @@
 import { join, resolve } from "node:path";
 import { readFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { parse, type DefaultTreeAdapterMap } from "parse5";
+import { parse } from "parse5";
 import picomatch from "picomatch";
 import { parse as yamlParse } from "yaml";
 import type {
@@ -33,17 +33,13 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { collectRenderedHtml } from "./audit/validators/helpers.ts";
-
-type TreeNode = DefaultTreeAdapterMap["node"];
-type TreeParentNode = DefaultTreeAdapterMap["parentNode"];
-
-interface ElementNode {
-  nodeName: string;
-  tagName: string;
-  attrs: Array<{ name: string; value: string }>;
-  childNodes: TreeNode[];
-  sourceCodeLocation?: { startLine?: number };
-}
+import {
+  type ElementNode,
+  type TreeParentNode,
+  isElementNode,
+  hasChildNodes,
+  getAttr,
+} from "./dom-helpers.ts";
 
 const COMMAND = "image.delivery.validate";
 
@@ -80,24 +76,12 @@ interface DeliveryConfig {
   overrides: ConfigOverride[];
 }
 
-function isElementNode(node: unknown): node is ElementNode {
-  return node !== null && typeof node === "object" && "tagName" in node;
-}
-
-function hasChildNodes(node: TreeNode): node is TreeParentNode {
-  return node !== null && typeof node === "object" && "childNodes" in node;
-}
-
-function getAttr(el: ElementNode, name: string): string | undefined {
-  return el.attrs?.find((a: { name: string; value: string }) => a.name === name)?.value;
+function isSvgSrc(src: string): boolean {
+  return src.toLowerCase().endsWith(".svg") || src.startsWith("data:image/svg");
 }
 
 function countWidthDescriptors(srcset: string): number {
   return srcset.split(",").filter((s) => s.trim().endsWith("w")).length;
-}
-
-function isSvgSrc(src: string): boolean {
-  return src.toLowerCase().endsWith(".svg") || src.startsWith("data:image/svg");
 }
 
 function computeBudget(servedWidth: number, servedHeight: number): number {

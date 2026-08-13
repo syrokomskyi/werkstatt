@@ -24,7 +24,7 @@
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { parse, type DefaultTreeAdapterMap } from "parse5";
+import { parse } from "parse5";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -33,17 +33,14 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { collectRenderedHtml } from "./audit/validators/helpers.ts";
-
-type TreeNode = DefaultTreeAdapterMap["node"];
-type TreeParentNode = DefaultTreeAdapterMap["parentNode"];
-
-interface ElementNode {
-  nodeName: string;
-  tagName: string;
-  attrs: Array<{ name: string; value: string }>;
-  childNodes: TreeNode[];
-  sourceCodeLocation?: { startLine?: number };
-}
+import {
+  type ElementNode,
+  type TreeParentNode,
+  isElementNode,
+  hasChildNodes,
+  getAttr,
+  getTextContent,
+} from "./dom-helpers.ts";
 
 const COMMAND = "csp.origins.validate";
 
@@ -75,18 +72,6 @@ interface ExtractedOrigin {
   kind: OriginKind;
   file: string;
   line: number;
-}
-
-function isElementNode(node: unknown): node is ElementNode {
-  return node !== null && typeof node === "object" && "tagName" in node;
-}
-
-function hasChildNodes(node: TreeNode): node is TreeParentNode {
-  return node !== null && typeof node === "object" && "childNodes" in node;
-}
-
-function getAttr(el: ElementNode, name: string): string | undefined {
-  return el.attrs?.find((a: { name: string; value: string }) => a.name === name)?.value;
 }
 
 // ─── CSP parsing ───────────────────────────────────────────────────────────
@@ -214,19 +199,6 @@ function extractConnectOriginsFromScript(text: string): string[] {
     if (origin) origins.push(origin);
   }
   return origins;
-}
-
-function getTextContent(node: TreeParentNode): string {
-  if (!node.childNodes) return "";
-  let text = "";
-  for (const child of node.childNodes) {
-    if (child.nodeName === "#text") {
-      text += (child as { value?: string }).value ?? "";
-    } else if (hasChildNodes(child)) {
-      text += getTextContent(child);
-    }
-  }
-  return text;
 }
 
 export function extractOriginsFromHtml(html: string, filePath: string): ExtractedOrigin[] {

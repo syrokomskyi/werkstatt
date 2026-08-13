@@ -67,7 +67,13 @@ const input = testInput();
 interface CspResultData {
   command: string;
   status: string;
-  findings: Array<{ rule: string; severity: string; message: string; origin: string; directive: string }>;
+  findings: Array<{
+    rule: string;
+    severity: string;
+    message: string;
+    origin: string;
+    directive: string;
+  }>;
   cspDirectives: Record<string, string[]>;
   checkedOrigins: number;
 }
@@ -93,7 +99,9 @@ describe("parseCsp", () => {
   });
 
   it("parses multiple directives", () => {
-    const csp = parseCsp("default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data:");
+    const csp = parseCsp(
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data:",
+    );
     expect(csp.get("default-src")).toEqual(["'self'"]);
     expect(csp.get("script-src")).toEqual(["'self'", "'unsafe-inline'"]);
     expect(csp.get("img-src")).toEqual(["'self'", "data:"]);
@@ -119,7 +127,9 @@ describe("parseCsp", () => {
 
 describe("originMatchesSource", () => {
   it("matches 'self' with site origin", () => {
-    expect(originMatchesSource("https://example.com", ["'self'"], "https://example.com")).toBe(true);
+    expect(originMatchesSource("https://example.com", ["'self'"], "https://example.com")).toBe(
+      true,
+    );
   });
 
   it("does not match 'self' when site origin is undefined", () => {
@@ -128,22 +138,34 @@ describe("originMatchesSource", () => {
 
   it("matches exact origin", () => {
     expect(
-      originMatchesSource("https://matomo.example.com", ["https://matomo.example.com"], "https://example.com"),
+      originMatchesSource(
+        "https://matomo.example.com",
+        ["https://matomo.example.com"],
+        "https://example.com",
+      ),
     ).toBe(true);
   });
 
   it("matches wildcard subdomain", () => {
     expect(
-      originMatchesSource("https://matomo-proxy.example.com", ["*.example.com"], "https://example.com"),
+      originMatchesSource(
+        "https://matomo-proxy.example.com",
+        ["*.example.com"],
+        "https://example.com",
+      ),
     ).toBe(true);
   });
 
   it("matches wildcard subdomain for exact domain", () => {
-    expect(originMatchesSource("https://example.com", ["*.example.com"], "https://example.com")).toBe(true);
+    expect(
+      originMatchesSource("https://example.com", ["*.example.com"], "https://example.com"),
+    ).toBe(true);
   });
 
   it("does not match 'none'", () => {
-    expect(originMatchesSource("https://example.com", ["'none'"], "https://example.com")).toBe(false);
+    expect(originMatchesSource("https://example.com", ["'none'"], "https://example.com")).toBe(
+      false,
+    );
   });
 
   it("matches bare wildcard *", () => {
@@ -151,11 +173,15 @@ describe("originMatchesSource", () => {
   });
 
   it("does not match keyword tokens as origins", () => {
-    expect(originMatchesSource("https://example.com", ["'unsafe-inline'"], "https://example.com")).toBe(false);
+    expect(
+      originMatchesSource("https://example.com", ["'unsafe-inline'"], "https://example.com"),
+    ).toBe(false);
   });
 
   it("returns false for undefined sources", () => {
-    expect(originMatchesSource("https://example.com", undefined, "https://example.com")).toBe(false);
+    expect(originMatchesSource("https://example.com", undefined, "https://example.com")).toBe(
+      false,
+    );
   });
 
   it("returns false for empty sources", () => {
@@ -286,6 +312,7 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
 
   it("skips with pass when dist/client/ has no HTML files", async () => {
     await writeHeaders("Content-Security-Policy: script-src 'self'\n");
+    await writeSystemMd("example.com");
     const result = await runCspOriginsValidate(input, ctx());
     const data = getData(result);
     expect(data.status).toBe("pass");
@@ -293,7 +320,10 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
   });
 
   it("emits CSP-ORIGIN-01 error for missing script origin", async () => {
-    await writeHeaders("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'\n");
+    await writeHeaders(
+      "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'\n",
+    );
+    await writeSystemMd("example.com");
     await writeHtml(
       "index.html",
       `<html><body><script src="https://matomo-proxy.example.com/lib.js"></script></body></html>`,
@@ -313,6 +343,7 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
     await writeHeaders(
       "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' matomo-proxy.example.com\n",
     );
+    await writeSystemMd("example.com");
     await writeHtml(
       "index.html",
       `<html><body><script src="https://matomo-proxy.example.com/lib.js"></script></body></html>`,
@@ -327,6 +358,7 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
     await writeHeaders(
       "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' *.example.com\n",
     );
+    await writeSystemMd("example.com");
     await writeHtml(
       "index.html",
       `<html><body><script src="https://matomo-proxy.example.com/lib.js"></script></body></html>`,
@@ -337,9 +369,8 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
   });
 
   it("passes when script origin is covered by default-src fallback", async () => {
-    await writeHeaders(
-      "Content-Security-Policy: default-src 'self' matomo-proxy.example.com\n",
-    );
+    await writeHeaders("Content-Security-Policy: default-src 'self' matomo-proxy.example.com\n");
+    await writeSystemMd("example.com");
     await writeHtml(
       "index.html",
       `<html><body><script src="https://matomo-proxy.example.com/lib.js"></script></body></html>`,
@@ -351,6 +382,7 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
 
   it("emits CSP-ORIGIN-02 error for missing style origin", async () => {
     await writeHeaders("Content-Security-Policy: default-src 'self'; style-src 'self'\n");
+    await writeSystemMd("example.com");
     await writeHtml(
       "index.html",
       `<html><head><link rel="stylesheet" href="https://cdn.example.com/style.css"></head></html>`,
@@ -366,6 +398,7 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
 
   it("emits CSP-ORIGIN-03 warning for missing image origin (exitCode 0)", async () => {
     await writeHeaders("Content-Security-Policy: default-src 'self'; img-src 'self' data:\n");
+    await writeSystemMd("example.com");
     await writeHtml(
       "index.html",
       `<html><body><img src="https://cdn.example.com/img.png"></body></html>`,
@@ -380,6 +413,7 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
 
   it("emits CSP-ORIGIN-04 error for missing connect origin in fetch()", async () => {
     await writeHeaders("Content-Security-Policy: default-src 'self'; connect-src 'self'\n");
+    await writeSystemMd("example.com");
     await writeHtml(
       "index.html",
       `<html><body><script>fetch("https://api.example.com/data");</script></body></html>`,
@@ -395,6 +429,7 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
 
   it("deduplicates findings for the same origin across multiple files", async () => {
     await writeHeaders("Content-Security-Policy: default-src 'self'; script-src 'self'\n");
+    await writeSystemMd("example.com");
     const html = `<html><body><script src="https://cdn.example.com/lib.js"></script></body></html>`;
     await writeHtml("page1.html", html);
     await writeHtml("page2.html", html);
@@ -405,7 +440,10 @@ describe("runCspOriginsValidate (RFC-0831)", () => {
   });
 
   it("includes parsed cspDirectives in result", async () => {
-    await writeHeaders("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'\n");
+    await writeHeaders(
+      "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'\n",
+    );
+    await writeSystemMd("example.com");
     await writeHtml("index.html", "<html></html>");
     const result = await runCspOriginsValidate(input, ctx());
     const data = getData(result);
