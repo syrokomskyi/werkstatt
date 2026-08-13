@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 3d540c32d2dbd47f6931ef8d6448aae7b53e717a758fac5ca51d38ba16fb08eb
+  contentHash: 2fd3d6ac4c06fef34b100f9af0721c04629111a823d776cb17c932c964aaf729
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -3631,6 +3631,22 @@ commands:
     validatesOutputs: []
     pipelines:
       - packages.check
+  - name: csp.origins.validate
+    description: Cross-reference CSP source lists against actual external origins in
+      rendered HTML (RFC-0831).
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - <app>/public/_headers
+      - <app>/dist/client/**/*.html
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: css.important.lint
     description: Lint CSS files for forbidden !important declarations to maintain
       cascade hygiene.
@@ -6752,6 +6768,23 @@ commands:
         description: Credential id to verify.
     reads:
       - werkstatt.identity.json
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: image.delivery.validate
+    description: "RFC-0830: scan rendered HTML for responsive srcset, compression
+      budget, and LCP image optimization attributes."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - <app>/dist/client/**/*.html
+      - <app>/dist/client/**/*.{webp,png,jpeg,jpg}
+      - <app>/src/image-delivery.config.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
