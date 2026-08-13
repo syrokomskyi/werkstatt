@@ -6,13 +6,16 @@
   "scripts": {
     "build:check": "pnpm exec tsc --noEmit",
     "run:once": "tsx src/run-once.ts",
-    "health": "tsx src/run-once.ts"
+    "health": "tsx src/run-once.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@warpgogol/werkstatt-site": "workspace:*"
   },
   "devDependencies": {
-    "tsx": "^4.23.1"
+    "tsx": "^4.23.1",
+    "vitest": "^4.1.10"
   },
   "gogol": {
     "testSignal": {

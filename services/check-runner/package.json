@@ -7,13 +7,16 @@
     "dev": "tsx src/worker.ts",
     "run:once": "tsx src/run-once.ts",
     "build:check": "tsc --noEmit",
-    "check": "werkstatt run check-warpgogol.runner.validate"
+    "check": "werkstatt run check-warpgogol.runner.validate",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@warpgogol/werkstatt-site": "workspace:*"
   },
   "devDependencies": {
-    "tsx": "^4.23.1"
+    "tsx": "^4.23.1",
+    "vitest": "^4.1.10"
   },
   "gogol": {
     "testSignal": {

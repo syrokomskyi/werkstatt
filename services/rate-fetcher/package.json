@@ -7,6 +7,8 @@
   "main": "src/index.ts",
   "scripts": {
     "build:check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "deploy:dev": "werkstatt run leitstand.service.dev-deploy --service rate-fetcher",
     "deploy:prod": "werkstatt run leitstand.service.promote --service rate-fetcher",
     "rollback": "werkstatt run leitstand.service.rollback --service rate-fetcher"
@@ -16,7 +18,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260801.1",
-    "wrangler": "^4.118.0"
+    "wrangler": "^4.118.0",
+    "vitest": "^4.1.10"
   },
   "gogol": {
     "testSignal": {
