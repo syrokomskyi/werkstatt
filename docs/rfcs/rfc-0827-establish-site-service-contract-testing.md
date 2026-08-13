@@ -301,13 +301,13 @@ This means contract validation runs in CI (`pnpm exec werkstatt run packages-che
 
 ## Acceptance criteria
 
-- [ ] `contract.validate` command registered and functional
-- [ ] `contract.list` command registered and functional
-- [ ] Zod schemas defined for all 7 initial contracts
-- [ ] `send-message` and `integration-route` handlers import and use contract schemas
-- [ ] `contract.validate` integrated into `PACKAGES_CHECK_PIPELINE`
-- [ ] `contract.validate` passes with zero violations (after initial adoption)
-- [ ] `rfc.validate` passes on this file
+- [x] `contract.validate` command registered and functional
+- [x] `contract.list` command registered and functional
+- [x] Zod schemas defined for all 7 initial contracts
+- [x] `send-message` and `integration-route` handlers import and use contract schemas
+- [x] `contract.validate` integrated into `PACKAGES_CHECK_PIPELINE`
+- [x] `contract.validate` passes with zero violations (after initial adoption)
+- [x] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
