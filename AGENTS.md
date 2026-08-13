@@ -88,6 +88,8 @@ The workspace-level `hooks/pre-commit` already blocks raw `git commit` for platf
 
 **Rationale**: raw `git commit` bypasses pre-commit validators, bordbuch recording, signed-commit support, and the mission lifecycle. This causes silent mission loss when work is reported as done but never properly persisted through the platform.
 
+**Clean-trees verification (RFC-0821 supplement)**: Before sending a response to the operator, agents MUST run `bash scripts/check-clean-trees.sh` from the repo root. This script checks the werkstatt monorepo, all active mission workpieces, and all Sternsystem cache clones for uncommitted changes. If any tree is dirty, the agent MUST commit via the canonical commands above before responding. The `fo-step-commit` skill automates this check. The `hooks/pre-user-prompt.sh` hook enforces it at session-end by running the same script and blocking the prompt with dirty-tree details.
+
 ## Forge project configuration (RFC-0391)
 
 `forge.yaml` at the repository root is the machine-readable project configuration for `@warpgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects. The `.forge/` directory (RFC-0733) sits alongside `forge.yaml` and contains project-local governance files: `pinned.yaml` (pinned-files manifest) and `pinned-audit.log` (override audit trail, gitignored).

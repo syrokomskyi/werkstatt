@@ -1,9 +1,11 @@
 #!/bin/bash
-# Windsurf pre_user_prompt hook: session-end protocol enforcement.
+# Windsurf pre_user_prompt hook: session-end protocol enforcement + dirty-tree guard.
 #
-# Scans the user's prompt for session-end trigger phrases. If found, blocks
-# the prompt (exit 2) and injects a stderr message that the agent sees,
-# forcing it to invoke fo-session-retro before producing any output.
+# 1. Scans the user's prompt for session-end trigger phrases. If found, blocks
+#    the prompt (exit 2) and injects a stderr message that the agent sees,
+#    forcing it to invoke fo-session-retro before producing any output.
+# 2. On session-end, also runs check-clean-trees.sh and includes dirty-tree
+#    warnings in the blocked message so the agent commits before closing.
 #
 # JSON payload on stdin:
 #   { agent_action_name, trajectory_id, execution_id, timestamp, tool_info: { user_prompt, cwd } }
@@ -60,10 +62,23 @@ DO NOT produce a closing summary, "сессия завершена" message, or 
 output. The closing block must come from fo-session-retro's report.
 
 Protocol steps:
-1. Verify clean working tree (rtk git status)
+1. Verify clean working trees — run: bash scripts/check-clean-trees.sh
+   If dirty: commit via ecosystem.commit (platform) and/or mission.git.commit (workpiece)
+   BEFORE invoking fo-session-retro.
 2. Verify RFC implementation status
 3. Invoke fo-session-retro via the skill tool
 4. The retro skill's report IS the session-end output
 EOF
+
+# Run check-clean-trees.sh and append results to stderr if dirty
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || echo "")"
+if [ -n "$repo_root" ] && [ -x "$repo_root/scripts/check-clean-trees.sh" ]; then
+  tree_output="$("$repo_root/scripts/check-clean-trees.sh" 2>&1 || true)"
+  if [ -n "$tree_output" ]; then
+    echo "" >&2
+    echo "$tree_output" >&2
+    echo "COMMIT THESE CHANGES BEFORE PROCEEDING WITH SESSION-END." >&2
+  fi
+fi
 
 exit 2
