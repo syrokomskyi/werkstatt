@@ -133,6 +133,20 @@ describe("detectRenderBlockingCss (LH-11)", () => {
     const findings = await detectRenderBlockingCss(html, distClientDir, undefined);
     expect(findings.length).toBe(0);
   });
+
+  it("does not flag stylesheet inside noscript fallback", async () => {
+    const distClientDir = join(tmpRoot, "dist", "client");
+    await mkdir(distClientDir, { recursive: true });
+    const largeCss = "x".repeat(5 * 1024);
+    await writeFile(join(distClientDir, "large.css"), largeCss, "utf8");
+
+    const html = `<html><head>
+<link rel="preload" as="style" href="/large.css" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/large.css"></noscript>
+</head><body></body></html>`;
+    const findings = await detectRenderBlockingCss(html, distClientDir, undefined);
+    expect(findings.length).toBe(0);
+  });
 });
 
 // ─── LH-12: buildJsReferenceGraph ───────────────────────────────────────────
@@ -166,7 +180,7 @@ describe("buildJsReferenceGraph (LH-12)", () => {
     await mkdir(astroDir, { recursive: true });
 
     await writeFile(join(astroDir, "main.js"), 'import "./helper.js";', "utf8");
-    await writeFile(join(astroDir, "helper.js"), 'export const x = 1;', "utf8");
+    await writeFile(join(astroDir, "helper.js"), "export const x = 1;", "utf8");
 
     const htmlPath = join(distClientDir, "index.html");
     await writeFile(

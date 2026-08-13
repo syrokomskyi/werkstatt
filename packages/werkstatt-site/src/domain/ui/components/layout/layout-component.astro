@@ -136,8 +136,14 @@ const robotsContent = robots ?? robotsFromOutput;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <link rel="preload" as="style" href={globalStylesheetUrl} fetchpriority="high" />
-    <link rel="stylesheet" href={globalStylesheetUrl} />
+    <link
+      rel="preload"
+      as="style"
+      href={globalStylesheetUrl}
+      fetchpriority="high"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href={globalStylesheetUrl} /></noscript>
     {description && <meta name="description" content={description} />}
     {robotsContent && <meta name="robots" content={robotsContent} />}
     <link rel="canonical" href={canonicalUrl} />

@@ -99,9 +99,10 @@ export async function detectRenderBlockingCss(
 ): Promise<{ line: number; href: string; sizeKb: number; severity: "error" | "warning" }[]> {
   const results: { line: number; href: string; sizeKb: number; severity: "error" | "warning" }[] =
     [];
+  const strippedContent = htmlContent.replace(/<noscript>[\s\S]*?<\/noscript>/gi, "");
   const linkRegex = /<link\s+[^>]*rel=["']stylesheet["'][^>]*>/gi;
 
-  for (const match of htmlContent.matchAll(linkRegex)) {
+  for (const match of strippedContent.matchAll(linkRegex)) {
     const tag = match[0];
     const matchIndex = match.index ?? 0;
 
