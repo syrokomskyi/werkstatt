@@ -9,6 +9,7 @@ Reads E2E_BASE_URL from env (set by site.e2e.run command handler).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0828: initial Playwright E2E config.</item>
+  <item>RFC-0828: add testIgnore for run-e2e-tests.test.ts (vitest unit test).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -16,6 +17,7 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: ".",
+  testIgnore: ["run-e2e-tests.test.ts"],
   timeout: 60_000,
   expect: { timeout: 10_000 },
   retries: 1,
@@ -30,5 +32,7 @@ export default defineConfig({
       use: { browserName: "chromium" },
     },
   ],
-  reporter: process.env.E2E_JSON_OUTPUT ? [["json", { outputFile: process.env.E2E_JSON_OUTPUT }]] : "list",
+  reporter: process.env.E2E_JSON_OUTPUT
+    ? [["json", { outputFile: process.env.E2E_JSON_OUTPUT }]]
+    : "list",
 });

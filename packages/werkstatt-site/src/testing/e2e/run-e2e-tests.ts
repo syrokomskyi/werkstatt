@@ -127,10 +127,10 @@ export async function runSiteE2eTests(
       const jsonContent = await readFile(jsonOutputPath, "utf8");
       const parsed = JSON.parse(jsonContent) as {
         stats?: {
-          total?: number;
-          passed?: number;
-          failed?: number;
-          suites?: number;
+          expected?: number;
+          unexpected?: number;
+          skipped?: number;
+          flaky?: number;
         };
         suites?: Array<{
           suites?: Array<{
@@ -144,9 +144,9 @@ export async function runSiteE2eTests(
           }>;
         }>;
       };
-      testFiles = parsed.stats?.suites ?? 0;
-      testsPassed = parsed.stats?.passed ?? 0;
-      testsFailed = parsed.stats?.failed ?? 0;
+      testFiles = parsed.suites?.length ?? 0;
+      testsPassed = parsed.stats?.expected ?? 0;
+      testsFailed = parsed.stats?.unexpected ?? 0;
 
       if (testsFailed > 0 && parsed.suites) {
         failures = [];
