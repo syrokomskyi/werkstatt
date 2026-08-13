@@ -1,7 +1,7 @@
 ---
 id: RFC-0833
 title: "Extend lighthouse validators with render-blocking, unused-JS, and forced-reflow detection"
-status: accepted
+status: implemented
 kind: architecture
 scope: app
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
-implementedAt:
+implementedAt: 2026-08-13
 closedAt:
 supersedes: []
 supersededBy:
