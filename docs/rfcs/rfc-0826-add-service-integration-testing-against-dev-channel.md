@@ -257,15 +257,15 @@ This RFC does not modify repository-wide requirements, shared package contracts,
 
 ## Acceptance criteria
 
-- [x] `service.integration.run` command registered and functional
-- [x] `dev-url-resolver.ts` helper resolves dev URLs from `services/registry.yaml` (created by RFC-0823)
-- [x] `test-env.ts` helper loads `.env.dev` files (created by RFC-0823)
-- [x] Integration tests for `lagebild-sync` (health) pass against dev channel
-- [x] Integration tests for `matomo-proxy` (health, proxy) pass against dev channel
-- [x] `leitstand.service.dev-deploy` calls `service.integration.run` after smoke tests (requires RFC-0825)
-- [x] Integration test evidence recorded in dev-deploy state
-- [x] `services/AGENTS.md` updated with integration test requirement and `.env.dev` reuse convention
-- [x] `rfc.validate` passes on this file
+- [x] `service.integration.run` command registered and functional (evidence: packages/werkstatt-site/src/testing/module.ts, packages/werkstatt-site/src/testing/integration/integration-runner.ts)
+- [x] `dev-url-resolver.ts` helper resolves dev URLs from `services/registry.yaml` (created by RFC-0823) (evidence: packages/werkstatt-site/src/testing/helpers/dev-url-resolver.ts)
+- [x] `test-env.ts` helper loads `.env.dev` files (created by RFC-0823) (evidence: packages/werkstatt-site/src/testing/helpers/test-env.ts)
+- [x] Integration tests for `lagebild-sync` (health) pass against dev channel (evidence: packages/werkstatt-site/src/testing/integration/services/lagebild-sync/health.test.ts)
+- [x] Integration tests for `matomo-proxy` (health, proxy) pass against dev channel (evidence: packages/werkstatt-site/src/testing/integration/services/matomo-proxy/health.test.ts, proxy.test.ts)
+- [x] `leitstand.service.dev-deploy` calls `service.integration.run` after smoke tests (requires RFC-0825) (evidence: packages/werkstatt/src/leitstand/service-dev-deploy.ts:163-167)
+- [x] Integration test evidence recorded in dev-deploy state (evidence: packages/werkstatt/src/leitstand/service-deploy-helpers.ts:45 IntegrationRunResult field, service-dev-deploy.ts:190 integrationResult in data)
+- [x] `services/AGENTS.md` updated with integration test requirement and `.env.dev` reuse convention (evidence: services/AGENTS.md:53-63 Post-deploy integration testing section)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0826 output: All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
