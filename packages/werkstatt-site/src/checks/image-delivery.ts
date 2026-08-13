@@ -364,8 +364,10 @@ export async function runImageDeliveryValidate(
       }
     }
 
-    // IMG-DELIVERY-04: At least one fetchpriority="high" image per page
-    if (!hasFetchpriorityHigh && imgs.length > 0) {
+    // IMG-DELIVERY-04: At least one fetchpriority="high" image per page.
+    // Skip 404.html — it is a non-content error page with no meaningful LCP image.
+    const basename = file.split("/").pop() ?? "";
+    if (!hasFetchpriorityHigh && imgs.length > 0 && basename !== "404.html") {
       findings.push({
         rule: "IMG-DELIVERY-04",
         file,
