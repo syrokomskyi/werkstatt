@@ -196,6 +196,7 @@ dist
 .env*
 !.env.example
 !.env.dev.example
+.dev.vars
 services/*/.deploy.lock
 
 ### Astro ###
