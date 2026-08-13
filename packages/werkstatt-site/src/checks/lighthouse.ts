@@ -9,9 +9,11 @@
 <CHANGE_SUMMARY>
   <item>Enhance Compass scaffolding to improve navigability and maintainability of performance validation and budget checks.</item>
   <item>Distinguish lazy hls.light/Plyr feature-video chunks from route bundles under LH-10.</item>
+  <item>RFC-0833: add LH-13 forced reflow detection to lighthouse.validate.</item>
+  <item>RFC-0833: add LH-11 render-blocking CSS and LH-12 unreferenced JS detection to lighthouse.budget.check.</item>
 </CHANGE_SUMMARY> */
 
-import { join, relative } from "node:path";
+import { join, relative, dirname } from "node:path";
 import { readFile, stat } from "node:fs/promises";
 import type {
   KernelCommandInput,
@@ -53,7 +55,154 @@ async function collectFilesByExtension(dirPath: string, extensions: string[]): P
   });
 }
 
-async function findAstroConfig(appDirectory: string): Promise<{ output?: string } | null> {
+const RENDER_BLOCKING_THRESHOLD_KB = 4;
+
+const DOM_WRITE_REGEX =
+  /(?:appendChild|insertBefore|removeChild|innerHTML\s*=|textContent\s*=|style\.\w+\s*=|classList\.(?:add|remove|toggle))/;
+
+const LAYOUT_READ_REGEX =
+  /\.(getBoundingClientRect|getClientRects|offsetWidth|offsetHeight|offsetTop|offsetLeft|clientWidth|clientHeight|clientTop|clientLeft|scrollTop|scrollLeft|scrollWidth|scrollHeight)\b/;
+
+function detectForcedReflow(
+  content: string,
+): { line: number; readProp: string; writeStmt: string }[] {
+  const lines = content.split(/\r?\n/);
+  const results: { line: number; readProp: string; writeStmt: string }[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const writeMatch = line.match(DOM_WRITE_REGEX);
+    if (!writeMatch) continue;
+
+    const windowEnd = Math.min(i + 10, lines.length);
+    for (let j = i + 1; j < windowEnd; j++) {
+      const checkLine = lines[j];
+      if (/requestAnimationFrame/.test(checkLine)) break;
+      const readMatch = checkLine.match(LAYOUT_READ_REGEX);
+      if (readMatch) {
+        results.push({
+          line: i + 1,
+          readProp: readMatch[1],
+          writeStmt: writeMatch[0],
+        });
+        break;
+      }
+    }
+  }
+  return results;
+}
+
+async function detectRenderBlockingCss(
+  htmlContent: string,
+  distClientDir: string,
+  inlineStylesheets: string | undefined,
+): Promise<{ line: number; href: string; sizeKb: number; severity: "error" | "warning" }[]> {
+  const results: { line: number; href: string; sizeKb: number; severity: "error" | "warning" }[] =
+    [];
+  const linkRegex = /<link\s+[^>]*rel=["']stylesheet["'][^>]*>/gi;
+
+  for (const match of htmlContent.matchAll(linkRegex)) {
+    const tag = match[0];
+    const matchIndex = match.index ?? 0;
+
+    if (/media=["']print["']/i.test(tag)) continue;
+    if (/rel=["']preload["']/i.test(tag)) continue;
+
+    const hrefMatch = tag.match(/href=["']([^"']+)["']/i);
+    if (!hrefMatch) continue;
+    const href = hrefMatch[1];
+
+    const cssPath = join(distClientDir, href.replace(/^\//, ""));
+    const { line } = getLineColumn(htmlContent, matchIndex);
+
+    let sizeKb = 0;
+    try {
+      const stats = await stat(cssPath);
+      sizeKb = stats.size / 1024;
+    } catch {
+      results.push({ line, href, sizeKb: 0, severity: "warning" });
+      continue;
+    }
+
+    if (
+      (inlineStylesheets === "auto" || inlineStylesheets === "always") &&
+      sizeKb <= RENDER_BLOCKING_THRESHOLD_KB
+    ) {
+      continue;
+    }
+
+    results.push({
+      line,
+      href,
+      sizeKb,
+      severity: sizeKb > RENDER_BLOCKING_THRESHOLD_KB ? "error" : "warning",
+    });
+  }
+  return results;
+}
+
+async function buildJsReferenceGraph(
+  htmlFiles: string[],
+  distClientDir: string,
+): Promise<{ unreferenced: string[] }> {
+  const referenced = new Set<string>();
+  const queue: string[] = [];
+  const scriptSrcRegex = /<script\s+[^>]*src=["']([^"']+\.js)["'][^>]*>/gi;
+
+  for (const htmlFile of htmlFiles) {
+    const content = await readFile(htmlFile, "utf8");
+    for (const match of content.matchAll(scriptSrcRegex)) {
+      const src = match[1];
+      const jsPath = join(distClientDir, src.replace(/^\//, "")).replace(/\\/g, "/");
+      if (!referenced.has(jsPath)) {
+        referenced.add(jsPath);
+        queue.push(jsPath);
+      }
+    }
+  }
+
+  while (queue.length > 0) {
+    const jsFile = queue.shift()!;
+    try {
+      const content = await readFile(jsFile, "utf8");
+      const importRegex = /(?:import\s*\(\s*["']([^"']+)["']\s*\)|from\s*["']([^"']+)["'])/g;
+      for (const match of content.matchAll(importRegex)) {
+        const importPath = match[1] ?? match[2];
+        if (!importPath) continue;
+        if (!importPath.startsWith(".") && !importPath.startsWith("/")) continue;
+        const resolved = join(dirname(jsFile), importPath).replace(/\\/g, "/");
+        if (!referenced.has(resolved)) {
+          referenced.add(resolved);
+          queue.push(resolved);
+        }
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  const astroDir = join(distClientDir, "_astro");
+  let allJsFiles: string[] = [];
+  try {
+    allJsFiles = await collectFilesByExtension(astroDir, [".js"]);
+  } catch {
+    // _astro directory doesn't exist
+  }
+
+  const unreferenced: string[] = [];
+  for (const jsFile of allJsFiles) {
+    const normalized = jsFile.replace(/\\/g, "/");
+    if (!referenced.has(normalized)) {
+      unreferenced.push(jsFile);
+    }
+  }
+
+  return { unreferenced };
+}
+
+async function findAstroConfig(
+  appDirectory: string,
+): Promise<{ output?: string; inlineStylesheets?: string } | null> {
   const configPaths = [
     join(appDirectory, "astro.config.mjs"),
     join(appDirectory, "astro.config.ts"),
@@ -63,9 +212,9 @@ async function findAstroConfig(appDirectory: string): Promise<{ output?: string 
   for (const configPath of configPaths) {
     try {
       const content = await readFile(configPath, "utf8");
-      // Extract output mode from config
       const outputMatch = content.match(/output\s*:\s*['"]([^'"]+)['"]/);
-      return { output: outputMatch?.[1] };
+      const inlineMatch = content.match(/inlineStylesheets\s*:\s*['"]([^'"]+)['"]/);
+      return { output: outputMatch?.[1], inlineStylesheets: inlineMatch?.[1] };
     } catch {
       continue;
     }
@@ -132,6 +281,27 @@ export async function runLighthouseValidation(
         message: `Synchronous import of heavy library '${match[1]}' — use dynamic import() instead`,
         severity: "error",
       });
+    }
+  }
+
+  // RFC-0833 LH-13: Check .astro inline scripts for forced reflow patterns
+  for (const filePath of astroFiles) {
+    const content = await readFile(filePath, "utf8");
+    const relativePath = relative(paths.appDirectory, filePath).replace(/\\/g, "/");
+    const inlineScriptRegex = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi;
+    for (const scriptMatch of content.matchAll(inlineScriptRegex)) {
+      const scriptContent = scriptMatch[1];
+      const reflowFindings = detectForcedReflow(scriptContent);
+      for (const rf of reflowFindings) {
+        const { line: scriptLine } = getLineColumn(content, scriptMatch.index ?? 0);
+        findings.push({
+          filePath: relativePath,
+          line: scriptLine + rf.line - 1,
+          rule: "LH-13",
+          message: `Forced reflow: ${rf.writeStmt} followed by ${rf.readProp}() without requestAnimationFrame separator`,
+          severity: "warning",
+        });
+      }
     }
   }
 
@@ -274,6 +444,18 @@ export async function runLighthouseValidation(
         });
       }
     }
+
+    // RFC-0833 LH-13: Check for forced reflow patterns (read-after-write without rAF)
+    const reflowFindings = detectForcedReflow(content);
+    for (const rf of reflowFindings) {
+      findings.push({
+        filePath: relativePath,
+        line: rf.line,
+        rule: "LH-13",
+        message: `Forced reflow: ${rf.writeStmt} followed by ${rf.readProp}() without requestAnimationFrame separator`,
+        severity: "warning",
+      });
+    }
   }
 
   // Output findings
@@ -368,9 +550,52 @@ export async function runLighthouseBudgetCheck(
     }
   }
 
+  // RFC-0833 LH-11: Render-blocking CSS detection
+  const astroConfig = await findAstroConfig(paths.appDirectory);
+  const distClientDir = join(distDir, "client");
+  const htmlFiles = await collectFilesByExtension(distDir, [".html"]);
+  for (const htmlFile of htmlFiles) {
+    const htmlContent = await readFile(htmlFile, "utf8");
+    const relativePath = relative(paths.appDirectory, htmlFile).replace(/\\/g, "/");
+    const cssFindings = await detectRenderBlockingCss(
+      htmlContent,
+      distClientDir,
+      astroConfig?.inlineStylesheets,
+    );
+    for (const cf of cssFindings) {
+      findings.push({
+        filePath: relativePath,
+        line: cf.line,
+        rule: "LH-11",
+        message: `Render-blocking CSS: ${cf.href} (${cf.sizeKb.toFixed(1)}KB) — use inlineStylesheets: 'auto' or preload pattern`,
+        severity: cf.severity,
+      });
+      if (cf.severity === "error") violations++;
+    }
+  }
+
+  // RFC-0833 LH-12: Unreferenced JS bundle detection
+  const { unreferenced } = await buildJsReferenceGraph(htmlFiles, distClientDir);
+  for (const unreferencedFile of unreferenced) {
+    const relativePath = relative(paths.appDirectory, unreferencedFile).replace(/\\/g, "/");
+    findings.push({
+      filePath: relativePath,
+      line: 1,
+      rule: "LH-12",
+      message: `Unreferenced JS bundle — not imported by any HTML page or referenced JS file`,
+      severity: "error",
+    });
+    violations++;
+  }
+
   // Output findings
   for (const finding of findings) {
-    context.logger.error(`[${finding.rule}] ${finding.filePath} — ${finding.message}`);
+    const message = `[${finding.rule}] ${finding.filePath} — ${finding.message}`;
+    if (finding.severity === "error") {
+      context.logger.error(message);
+    } else {
+      context.logger.warn(message);
+    }
   }
 
   const totalSizeKb = totalSize / 1024;
@@ -415,6 +640,6 @@ export async function runLighthouseBudgetCheck(
     summary:
       violations === 0
         ? `[lighthouse.budget.check] OK — total JS: ${totalSizeKb.toFixed(1)}KB`
-        : `[lighthouse.budget.check] ${violations} bundle(s) exceed budget`,
+        : `[lighthouse.budget.check] ${violations} violation(s) detected`,
   };
 }
