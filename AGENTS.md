@@ -775,3 +775,17 @@ The Werkstatt engine is a family of private npm packages developed in this monor
 | 5 | RFC-0777, RFC-0778, RFC-0779 | Game plugin; video plugin; consumer workshop scaffolding |
 
 Waves execute sequentially; RFCs inside a wave may proceed in parallel. Implementation happens in separate sessions, one RFC at a time.
+
+## Workshop testing architecture (RFC-0823, DNA-66)
+
+The workshop enforces a five-level testing pyramid (DNA-66):
+
+| Level | What | Where tests live | When they run |
+| --- | --- | --- | --- |
+| L1 Unit | Pure functions, module internals | `packages/werkstatt-site/src/testing/unit/` | `build.check`, CI, pre-commit |
+| L2 Integration | Service ↔ external API | `packages/werkstatt-site/src/testing/integration/` | CI, `service.dev-deploy` |
+| L3 Contract | Site ↔ service API schemas | `packages/werkstatt-site/src/testing/contract/` | `build.check`, CI, pre-deploy gate |
+| L4 E2E | Playwright user flows | `packages/werkstatt-site/src/testing/e2e/` | `leitstand.dev-deploy` |
+| L5 Smoke | Health + critical path post-deploy | `packages/werkstatt-site/src/testing/smoke/` | After every deploy |
+
+All test definitions live in `packages/werkstatt-site/src/testing/` — not in `services/*` or mission workpieces. The dev channel is the canonical test environment. Downstream RFCs 0824–0829 implement individual levels and pipeline gates.

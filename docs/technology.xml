@@ -191,6 +191,10 @@
       <name>fast-check</name>
       <role>Property-based testing library for pure functions with verifiable algebraic properties (DNA-41). PBT files use the `.pbt.test.ts` suffix.</role>
     </entry>
+    <entry id="test-03">
+      <name>testing-pyramid</name>
+      <role>Five-level testing pyramid (DNA-66, RFC-0823): L1 unit (vitest), L2 integration (vitest against dev-deployed Workers), L3 contract (Zod schema validation), L4 E2E (Playwright against dev-deployed sites), L5 smoke (post-deploy health checks). All test definitions live in `packages/werkstatt-site/src/testing/`. The dev channel is the canonical test environment.</role>
+    </entry>
   </testing-stack>
 
   <dependency-rules>
