@@ -580,6 +580,8 @@ export async function runLighthouseBudgetCheck(
   const { unreferenced } = await buildJsReferenceGraph(htmlFiles, distClientDir);
   for (const unreferencedFile of unreferenced) {
     const relativePath = relative(paths.appDirectory, unreferencedFile).replace(/\\/g, "/");
+    const isIgnored = ignorePatterns.some((pattern) => relativePath.includes(pattern));
+    if (isIgnored) continue;
     findings.push({
       filePath: relativePath,
       line: 1,
