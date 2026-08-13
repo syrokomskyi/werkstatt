@@ -345,19 +345,19 @@ The coverage matrix is maintained in `docs/lighthouse-parity-matrix.yaml` (gener
 
 ## Acceptance criteria
 
-- [ ] LH-11 rule implemented in `lighthouse.budget.check`
-- [ ] LH-12 rule implemented in `lighthouse.budget.check`
-- [ ] LH-13 rule implemented in `lighthouse.validate`
-- [ ] `astro.config.mjs` `inlineStylesheets` setting respected by LH-11
-- [ ] `docs/lighthouse-parity-matrix.yaml` created with coverage matrix
-- [ ] DNA-67 entry appended to `docs/architecture-dna.md`
-- [ ] `dna.registry.validate` passes with DNA-67
-- [ ] Unit tests for LH-11 (fixture HTML with render-blocking CSS)
-- [ ] Unit tests for LH-12 (fixture JS with unused exports)
-- [ ] Unit tests for LH-13 (fixture TS with reflow pattern)
+- [x] LH-11 rule implemented in `lighthouse.budget.check` (evidence: packages/werkstatt-site/src/checks/lighthouse.ts:543-561)
+- [x] LH-12 rule implemented in `lighthouse.budget.check` (evidence: packages/werkstatt-site/src/checks/lighthouse.ts:563-575)
+- [x] LH-13 rule implemented in `lighthouse.validate` (evidence: packages/werkstatt-site/src/checks/lighthouse.ts:438-448, 277-296)
+- [x] `astro.config.mjs` `inlineStylesheets` setting respected by LH-11 (evidence: packages/werkstatt-site/src/checks/lighthouse.ts:195-213, 122-124)
+- [x] `docs/lighthouse-parity-matrix.yaml` created with coverage matrix (evidence: docs/lighthouse-parity-matrix.yaml)
+- [x] DNA-67 entry appended to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:283-285)
+- [x] `dna.registry.validate` passes with DNA-67 (evidence: dna.registry.validate output — 0 error(s), 30 warning(s))
+- [x] Unit tests for LH-11 (fixture HTML with render-blocking CSS) (evidence: packages/werkstatt-site/src/checks/tests/lighthouse.test.ts:91-142)
+- [x] Unit tests for LH-12 (fixture JS with unused exports) (evidence: packages/werkstatt-site/src/checks/tests/lighthouse.test.ts:145-193)
+- [x] Unit tests for LH-13 (fixture TS with reflow pattern) (evidence: packages/werkstatt-site/src/checks/tests/lighthouse.test.ts:39-87)
 - [ ] `warpgogol.com` passes all lighthouse validators after fixing CSS, JS, and reflow
-- [ ] `rfc.validate` passes on this file before merging
-- [ ] `AGENTS.md` updated with LH-11..13 rules and DNA-67
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate output — All 1 RFC(s) passed validation)
+- [x] `AGENTS.md` updated with LH-11..13 rules and DNA-67 (evidence: packages/werkstatt-site/AGENTS.md:78-80)
 
 ## Implementation notes for agents
 
