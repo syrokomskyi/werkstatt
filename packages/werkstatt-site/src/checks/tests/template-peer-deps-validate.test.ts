@@ -9,32 +9,47 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 </MODULE_CONTRACT>
 */
 
-vi.mock("node:child_process", () => ({
-  execFile: vi.fn(),
-}));
+const mockExecFile = vi.fn();
+const mockReadFile = vi.fn();
+const mockWriteFile = vi.fn();
+const mockMkdtemp = vi.fn().mockResolvedValue("/tmp/peer-deps-validate-xxx");
+const mockRm = vi.fn().mockResolvedValue(undefined);
+
+vi.mock("node:child_process", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:child_process")>();
+  return {
+    ...actual,
+    execFile: mockExecFile,
+    default: { ...actual, execFile: mockExecFile },
+  };
+});
 
 vi.mock("node:fs/promises", () => ({
-  mkdtemp: vi.fn().mockResolvedValue("/tmp/peer-deps-validate-xxx"),
-  readFile: vi.fn(),
-  writeFile: vi.fn().mockResolvedValue(undefined),
-  rm: vi.fn().mockResolvedValue(undefined),
+  mkdtemp: mockMkdtemp,
+  readFile: mockReadFile,
+  writeFile: mockWriteFile,
+  rm: mockRm,
+  default: {
+    mkdtemp: mockMkdtemp,
+    readFile: mockReadFile,
+    writeFile: mockWriteFile,
+    rm: mockRm,
+  },
 }));
 
-vi.mock("node:os", () => ({
-  tmpdir: vi.fn().mockReturnValue("/tmp"),
-}));
+vi.mock("node:os", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:os")>();
+  return {
+    ...actual,
+    tmpdir: vi.fn().mockReturnValue("/tmp"),
+  };
+});
 
 vi.mock("../../onboarding/templates.ts", () => ({
   TEMPLATES_DIR: "/fake/templates",
 }));
 
 const { runTemplatePeerDepsValidate } = await import("../template-peer-deps-validate.ts");
-const { execFile } = await import("node:child_process");
-const { readFile, writeFile } = await import("node:fs/promises");
-
-const mockExecFile = vi.mocked(execFile);
-const mockReadFile = vi.mocked(readFile);
-const mockWriteFile = vi.mocked(writeFile);
 
 function makeInput(site: string = "test-site") {
   return {
@@ -82,12 +97,15 @@ const TEMPLATE_WITH_WORKSPACE_DEPS = JSON.stringify({
 
 describe("template.peer-deps.validate (RFC-0815)", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockExecFile.mockReset();
+    mockReadFile.mockReset();
+    mockWriteFile.mockReset();
+    mockMkdtemp.mockReset();
+    mockRm.mockReset();
     mockReadFile.mockResolvedValue(TEMPLATE_WITH_WORKSPACE_DEPS);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
+    mockWriteFile.mockResolvedValue(undefined);
+    mockMkdtemp.mockResolvedValue("/tmp/peer-deps-validate-xxx");
+    mockRm.mockResolvedValue(undefined);
   });
 
   it("strips workspace:* deps from temp package.json", async () => {
@@ -95,7 +113,7 @@ describe("template.peer-deps.validate (RFC-0815)", () => {
 
     await runTemplatePeerDepsValidate(makeInput(), makeContext());
 
-    const writtenContent = JSON.parse(mockWriteFile.mock.calls[0]![1] as string);
+    const writtenContent = JSON.parse(mockWriteFile.mock.calls[0]?.[1] as string);
     expect(writtenContent.dependencies).not.toHaveProperty("@warpgogol/forge");
     expect(writtenContent.dependencies).not.toHaveProperty("@warpgogol/werkstatt");
     expect(writtenContent.dependencies).not.toHaveProperty("@warpgogol/werkstatt-site");

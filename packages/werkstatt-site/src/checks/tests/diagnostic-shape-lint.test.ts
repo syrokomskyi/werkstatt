@@ -26,7 +26,7 @@ const logger = {
   },
 };
 
-const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks", "src"];
+const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks"];
 const BASELINE_REL = [...CHECKS_SRC, "diagnostics", "dsl04-baseline.generated.yaml"];
 
 function ctx(
@@ -76,7 +76,7 @@ const SHIM_SOURCE = `
 
 describe("diagnostic.shape.lint DSL-04 (RFC-0261)", () => {
   it("passes when the shim-using module is listed in the baseline", async () => {
-    const root = await setupFixture(SHIM_SOURCE, ["packages/os/site-kernel-checks/src/sample.ts"]);
+    const root = await setupFixture(SHIM_SOURCE, ["packages/werkstatt-site/src/checks/sample.ts"]);
     const { input, context } = ctx(root);
     const result = await runDiagnosticShapeLint(input, context);
     expect(result.exitCode ?? 0).toBe(0);

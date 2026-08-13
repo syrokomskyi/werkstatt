@@ -20,7 +20,7 @@ import {
 </MODULE_CONTRACT>
 */
 
-const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks", "src"];
+const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks"];
 
 async function setupCommandTableFixture(tableSource: string): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "check-fixture-lint-"));
@@ -45,7 +45,7 @@ describe("check.fixture.lint: resolveCommandModules (RFC-0261)", () => {
     `);
     const modules = await resolveCommandModules(root);
     expect(modules.get("sample.validate")).toBe(
-      "packages/os/site-kernel-checks/src/sample-validate.ts",
+      "packages/werkstatt-site/src/checks/sample-validate.ts",
     );
     await rm(root, { recursive: true, force: true });
   });
@@ -72,7 +72,7 @@ describe("check.fixture.lint: coverage decision + diagnostics (RFC-0261)", () =>
   it("declared: a fully covered command produces no diagnostic", () => {
     const entries = computeFixtureCoverage(
       ["sample.validate"],
-      new Map([["sample.validate", "packages/os/site-kernel-checks/src/sample.ts"]]),
+      new Map([["sample.validate", "packages/werkstatt-site/src/checks/sample.ts"]]),
       [
         {
           name: "sample.test.ts",
@@ -88,7 +88,7 @@ describe("check.fixture.lint: coverage decision + diagnostics (RFC-0261)", () =>
   it("CHECK-FIX-01: an uncovered command (no importing test file) fails", () => {
     const entries = computeFixtureCoverage(
       ["sample.validate"],
-      new Map([["sample.validate", "packages/os/site-kernel-checks/src/sample.ts"]]),
+      new Map([["sample.validate", "packages/werkstatt-site/src/checks/sample.ts"]]),
       [],
     );
     const diagnostics = buildFixtureCoverageDiagnostics(entries, new Set());
@@ -99,7 +99,7 @@ describe("check.fixture.lint: coverage decision + diagnostics (RFC-0261)", () =>
   it("CHECK-FIX-02: a covering test with only a fail fixture (no pass fixture) fails", () => {
     const entries = computeFixtureCoverage(
       ["sample.validate"],
-      new Map([["sample.validate", "packages/os/site-kernel-checks/src/sample.ts"]]),
+      new Map([["sample.validate", "packages/werkstatt-site/src/checks/sample.ts"]]),
       [
         {
           name: "sample.test.ts",
@@ -127,7 +127,7 @@ describe("check.fixture.lint: coverage decision + diagnostics (RFC-0261)", () =>
   it("legacy: a baselined uncovered command is silently accepted (shrink-only ratchet)", () => {
     const entries = computeFixtureCoverage(
       ["legacy.validate"],
-      new Map([["legacy.validate", "packages/os/site-kernel-checks/src/legacy.ts"]]),
+      new Map([["legacy.validate", "packages/werkstatt-site/src/checks/legacy.ts"]]),
       [],
     );
     const diagnostics = buildFixtureCoverageDiagnostics(entries, new Set(["legacy.validate"]));

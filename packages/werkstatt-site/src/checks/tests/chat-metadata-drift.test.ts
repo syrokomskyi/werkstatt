@@ -25,7 +25,7 @@ function checkData(result: Awaited<ReturnType<typeof runChatMetadataDriftValidat
 }
 
 async function writeUchatAdapter(root: string, vendorOrigins: string): Promise<void> {
-  const dir = join(root, "packages", "chat-adapter-uchat", "src");
+  const dir = join(root, "packages", "werkstatt-site", "src", "domain", "chat-adapter-uchat");
   await mkdir(dir, { recursive: true });
   await writeFile(
     join(dir, "widget-adapter.ts"),
@@ -58,7 +58,7 @@ describe("chat.metadata.drift.validate", () => {
   it("passes when adapter metadata matches the catalog", async () => {
     const root = await mkdtemp(join(tmpdir(), "chat-meta-pass-"));
     try {
-      await writeUchatAdapter(root, '"uchat.com.au"');
+      await writeUchatAdapter(root, '"uchat.com.au", "sdk.dfktv2.com"');
       const result = await runChatMetadataDriftValidate(input, ctx(root));
       expect(result.exitCode).toBe(0);
       expect(checkData(result).status).toBe("pass");

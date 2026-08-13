@@ -55,7 +55,7 @@ describe("extractWorkspaceImports", () => {
     const source = `import { foo } from "@warpgogol/werkstatt/kernel";`;
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@warpgogol/werkstatt/kernel");
+    expect(imports[0].package).toBe("@warpgogol/werkstatt");
     expect(imports[0].line).toBe(1);
   });
 
@@ -70,7 +70,7 @@ describe("extractWorkspaceImports", () => {
     const source = `const mod = await import("@warpgogol/werkstatt/integrity");`;
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@warpgogol/werkstatt/integrity");
+    expect(imports[0].package).toBe("@warpgogol/werkstatt");
   });
 
   it("extracts dynamic @warpgogol import() specifiers", () => {
@@ -89,8 +89,8 @@ describe("extractWorkspaceImports", () => {
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(3);
     expect(imports.map((i) => i.package)).toEqual([
-      "@warpgogol/werkstatt/kernel",
-      "@warpgogol/werkstatt-site/share",
+      "@warpgogol/werkstatt",
+      "@warpgogol/werkstatt-site",
       "@warpgogol/forge",
     ]);
   });
@@ -109,7 +109,7 @@ describe("extractWorkspaceImports", () => {
     const source = `import { {{COMPONENT_NAME}} } from "@warpgogol/werkstatt/kernel";`;
     const imports = extractWorkspaceImports(source, "test.template.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@warpgogol/werkstatt/kernel");
+    expect(imports[0].package).toBe("@warpgogol/werkstatt");
   });
 
   it("reports correct line numbers", () => {
@@ -155,7 +155,7 @@ describe("runTemplateImportsValidate", () => {
       join(tempDir, "package.json"),
       JSON.stringify({
         name: "test-workspace",
-        devDependencies: { "@warpgogol/werkstatt/kernel": "workspace:*" },
+        devDependencies: { "@warpgogol/werkstatt": "workspace:*" },
       }),
     );
     await writeFile(join(tempDir, "pnpm-workspace.yaml"), "packages:\n  - packages/*\n");
@@ -191,8 +191,8 @@ describe("runTemplateImportsValidate", () => {
       JSON.stringify({
         name: "test-workspace",
         devDependencies: {
-          "@warpgogol/werkstatt/kernel": "workspace:*",
-          "@warpgogol/werkstatt-site/share": "workspace:*",
+          "@warpgogol/werkstatt": "workspace:*",
+          "@warpgogol/werkstatt-site": "workspace:*",
         },
       }),
     );

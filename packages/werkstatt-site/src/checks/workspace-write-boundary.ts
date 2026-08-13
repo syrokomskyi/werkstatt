@@ -6,7 +6,7 @@
   single-owner invariant: every kernel command that writes a file outside its
   target app directory (workspace root, docs/, packages/werkstatt-site/src/domain/ontology/) MUST be
   declared on SHARED_WRITE_ALLOWLIST and MUST write through writeFileAtomic
-  or the writeFileIfChanged wrapper from @warpgogol/site-kernel — never a raw
+  or the writeFileIfChanged wrapper from @warpgogol/werkstatt/kernel — never a raw
   node:fs/promises writeFile/writeFileSync.
 </purpose>
 <non-goals>
@@ -57,42 +57,42 @@ export const SHARED_WRITE_ALLOWLIST: SharedWriteEntry[] = [
   {
     command: "uni.registry.build",
     outputs: ["uni.registry.yaml"],
-    module: "packages/os/site-kernel-checks/src/registry.ts",
+    module: "packages/werkstatt-site/src/checks/registry.ts",
   },
   {
     command: "archetype.registry.build",
     outputs: ["packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml"],
-    module: "packages/os/site-kernel-checks/src/archetype/registry-build.ts",
+    module: "packages/werkstatt-site/src/checks/archetype/registry-build.ts",
   },
   {
     command: "gitattributes.generate",
     outputs: [".gitattributes"],
-    module: "packages/os/site-kernel-checks/src/gitattributes.ts",
+    module: "packages/werkstatt-site/src/checks/gitattributes.ts",
   },
   {
     command: "fleet.sites.generate",
     outputs: ["fleet/fleet.sites.yaml"],
-    module: "packages/os/site-kernel-checks/src/fleet-sites-generate.ts",
+    module: "packages/werkstatt-site/src/checks/fleet-sites-generate.ts",
   },
   {
     command: "ecosystem.manifest.generate",
     outputs: ["docs/ecosystem.generated.yaml"],
-    module: "packages/os/site-kernel-checks/src/ecosystem/manifest-commands.ts",
+    module: "packages/werkstatt-site/src/checks/ecosystem/manifest-commands.ts",
   },
   {
     command: "maintenance.debt.queue.generate",
     outputs: ["docs/maintenance-debt.queues.generated.yaml", "docs/maintenance-debt/queues/{file}"],
-    module: "packages/os/site-kernel-checks/src/maintenance/maintenance-debt-queue.ts",
+    module: "packages/werkstatt-site/src/checks/maintenance/maintenance-debt-queue.ts",
   },
   {
     command: "funnel.statechart.generate",
     outputs: ["docs/specs/visitor-funnel/state-chart.generated.md"],
-    module: "packages/os/site-kernel-checks/src/funnel-statechart.ts",
+    module: "packages/werkstatt-site/src/checks/funnel-statechart.ts",
   },
   {
     command: "pipeline.budget.generate",
     outputs: ["docs/pipeline-budgets.generated.yaml"],
-    module: "packages/os/site-kernel/src/pipeline-budgets.ts",
+    module: "packages/werkstatt/src/kernel/pipeline-budgets.ts",
   },
   {
     command: "rfc.verification.emit",
@@ -124,7 +124,7 @@ export const SHARED_WRITE_ALLOWLIST: SharedWriteEntry[] = [
   {
     command: "gate.catalog.generate",
     outputs: ["docs/gate-catalog.generated.yaml"],
-    module: "packages/os/site-kernel-checks/src/gate-catalog.ts",
+    module: "packages/werkstatt-site/src/checks/gate-catalog.ts",
   },
   // RFC-0604: bordbuch.generate writes to systems/{system}/public/.well-known/
   {
@@ -134,13 +134,25 @@ export const SHARED_WRITE_ALLOWLIST: SharedWriteEntry[] = [
       "systems/{system}/public/.well-known/bordbuch/index.html",
       "systems/{system}/public/.well-known/bordbuch/status.yaml",
     ],
-    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    module: "packages/werkstatt/src/bordbuch/bordbuch-generate.ts",
   },
   // RFC-0604/RFC-0605: passport.key.ensure writes to public/.well-known/
   {
     command: "passport.key.ensure",
     outputs: ["public/.well-known/cosmic-passport-key.json"],
-    module: "packages/os/site-kernel-checks/src/passport.ts",
+    module: "packages/werkstatt-site/src/checks/passport.ts",
+  },
+  // RFC-0269: behavior.snapshot.generate writes to workspace root
+  {
+    command: "behavior.snapshot.generate",
+    outputs: ["behavior.snapshot.generated.yaml"],
+    module: "packages/werkstatt-site/src/checks/behavior-snapshot.ts",
+  },
+  // RFC-0257/RFC-0653: print.pdf.generate writes to .cache/pdf/
+  {
+    command: "print.pdf.generate",
+    outputs: [".cache/pdf/**"],
+    module: "packages/werkstatt-site/src/checks/print-pdf.ts",
   },
 ];
 
@@ -196,7 +208,7 @@ export function runWsWrite01(
       ruleId: "WS-WRITE-01",
       severity: "error",
       message: `Command \`${entry.command}\` (reachable from an APPS_* pipeline) writes \`${entry.path}\`, which is outside apps/<app>/, but is not declared on SHARED_WRITE_ALLOWLIST.`,
-      fixHint: `Add a SharedWriteEntry for \`${entry.command}\` to SHARED_WRITE_ALLOWLIST in packages/os/site-kernel-checks/src/workspace-write-boundary.ts, and migrate its write to writeFileAtomic from @warpgogol/site-kernel (RFC-0258).`,
+      fixHint: `Add a SharedWriteEntry for \`${entry.command}\` to SHARED_WRITE_ALLOWLIST in packages/werkstatt-site/src/checks/workspace-write-boundary.ts, and migrate its write to writeFileAtomic from @warpgogol/werkstatt/kernel (RFC-0258).`,
     });
   }
 
@@ -207,13 +219,13 @@ export function runWsWrite01(
 // WS-WRITE-02: allowlisted module doesn't use an atomic write primitive
 // ---------------------------------------------------------------------------
 
-// RFC-0270: a module that itself lives inside packages/os/site-kernel/src (the
+// RFC-0270: a module that itself lives inside packages/werkstatt/src/kernel (the
 // package that defines writeFileAtomic) cannot import it via the "@warpgogol/werkstatt/kernel"
 // package specifier — it imports the sibling ./fs-atomic.ts source file directly.
 // RFC-0345: writeFileIfChanged is also accepted because it delegates the actual
 // write to writeFileAtomic while avoiding unchanged-file churn.
 const ATOMIC_IMPORT_PATTERN =
-  /import\s*\{[^}]*\b(writeFileAtomic|writeFileIfChanged)\b[^}]*\}\s*from\s*["'](@warpgogol\/site-kernel|\.{1,2}\/(.*\/)?fs-(atomic|idempotent)\.ts)["']/;
+  /import\s*\{[^}]*\b(writeFileAtomic|writeFileIfChanged)\b[^}]*\}\s*from\s*["'](@warpgogol\/werkstatt\/kernel|\.{1,2}\/(.*\/)?fs-(atomic|idempotent)\.ts)["']/;
 const RAW_WRITE_CALL_PATTERN = /\bwriteFileSync?\s*\(/;
 
 /** @internal exported for fixture tests — production callers use the default allowlist. */

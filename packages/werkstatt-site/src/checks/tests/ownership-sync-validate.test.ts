@@ -86,6 +86,7 @@ vi.mock("../generator-ownership.ts", () => ({
       conditional: true,
     },
   ],
+  runGeneratorOwnershipLint: () => [],
 }));
 
 import { runOwnershipSyncValidate } from "../ownership-sync-validate.ts";

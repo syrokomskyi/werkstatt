@@ -64,8 +64,12 @@ async function fixture(
   const root = await mkdtemp(join(tmpdir(), "dns-aid-"));
   const appDir = join(root, "apps", "test-site");
   const systemsDir = join(root, "systems", "test-site");
+  const cacheCloneDir = join(root, "..", "systems-cache", "test-site");
+  // Clean up any leftover cache clone from previous test runs
+  await rm(cacheCloneDir, { recursive: true, force: true });
   await mkdir(join(appDir, "src", "content"), { recursive: true });
   await mkdir(systemsDir, { recursive: true });
+  await mkdir(cacheCloneDir, { recursive: true });
   await writeFile(join(appDir, "src", "content", "system.md"), systemMdContent);
   await writeFile(join(appDir, "src", "agent-surface.generated.yaml"), manifestContent);
 
@@ -85,6 +89,7 @@ async function fixture(
     context,
     cleanup: async () => {
       await rm(root, { recursive: true, force: true });
+      await rm(join(root, "..", "systems-cache", "test-site"), { recursive: true, force: true });
     },
   };
 }

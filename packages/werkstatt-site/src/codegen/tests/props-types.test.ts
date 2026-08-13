@@ -76,7 +76,7 @@ async function fixtureWorkspace(
   id: string,
 ): Promise<string> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "props-types-"));
-  const dir = path.join(root, "packages", "werkstatt-site", "src", "domain", "ui", "src", layer, id);
+  const dir = path.join(root, "packages", "werkstatt-site", "src", "domain", "ui", layer, id);
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, `${id}.manifest.yaml`), manifestYaml, "utf8");
   return root;
@@ -133,8 +133,10 @@ test("runPropsTypesGenerate: writes a generated file, updates contentTypesPath, 
   const generatedPath = path.join(
     root,
     "packages",
-    "ui",
+    "werkstatt-site",
     "src",
+    "domain",
+    "ui",
     "sections",
     "sample-section",
     "sample-section.types.generated.ts",
@@ -149,8 +151,10 @@ test("runPropsTypesGenerate: writes a generated file, updates contentTypesPath, 
     path.join(
       root,
       "packages",
-      "ui",
+      "werkstatt-site",
       "src",
+      "domain",
+      "ui",
       "sections",
       "sample-section",
       "sample-section.manifest.yaml",

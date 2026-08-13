@@ -11,7 +11,7 @@ sites:
         expectBodyContains: <!DOCTYPE html
         timeoutMs: 10000
 
-      - path: /en
+      - path: /uk
         method: GET
         expectStatus: 200
         expectBodyContains: <!DOCTYPE html

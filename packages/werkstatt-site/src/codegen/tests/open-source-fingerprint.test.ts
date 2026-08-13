@@ -34,15 +34,20 @@ vi.mock("node:child_process", async (importOriginal) => {
   return {
     ...actual,
     execFileSync: mockExecFileSync,
+    default: { ...actual, execFileSync: mockExecFileSync },
   };
 });
 
 // Mock @quantco/pnpm-licenses bin resolution
-vi.mock("node:module", () => ({
-  createRequire: () => ({
-    resolve: () => "/mocked/pnpm-licenses/dist/index.mjs",
-  }),
-}));
+vi.mock("node:module", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:module")>();
+  return {
+    ...actual,
+    createRequire: () => ({
+      resolve: () => "/mocked/pnpm-licenses/dist/index.mjs",
+    }),
+  };
+});
 
 // Track whether regeneration logic was invoked (execFileSync called = regeneration happened)
 function resetMocks() {

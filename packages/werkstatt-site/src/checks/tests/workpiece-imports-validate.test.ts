@@ -107,13 +107,13 @@ describe("runWorkpieceImportsValidate", () => {
       ].join("\n"),
     );
 
-    // Create node_modules with only @warpgogol/site-kernel
+    // Create node_modules with only @warpgogol/werkstatt
     const nodeModulesDir = join(workpieceDir, "node_modules", "@warpgogol");
     await mkdir(nodeModulesDir, { recursive: true });
-    await mkdir(join(nodeModulesDir, "site-kernel"));
+    await mkdir(join(nodeModulesDir, "werkstatt"));
     await writeFile(
-      join(nodeModulesDir, "site-kernel", "package.json"),
-      '{"name":"@warpgogol/werkstatt/kernel"}',
+      join(nodeModulesDir, "werkstatt", "package.json"),
+      '{"name":"@warpgogol/werkstatt"}',
     );
 
     const result = await runWorkpieceImportsValidate(
@@ -143,13 +143,13 @@ describe("runWorkpieceImportsValidate", () => {
     // Create node_modules with both packages
     const wgDir = join(workpieceDir, "node_modules", "@warpgogol");
     await mkdir(wgDir, { recursive: true });
-    await mkdir(join(wgDir, "site-kernel"));
+    await mkdir(join(wgDir, "werkstatt"));
+    await writeFile(join(wgDir, "werkstatt", "package.json"), '{"name":"@warpgogol/werkstatt"}');
+    await mkdir(join(wgDir, "werkstatt-site"));
     await writeFile(
-      join(wgDir, "site-kernel", "package.json"),
-      '{"name":"@warpgogol/werkstatt/kernel"}',
+      join(wgDir, "werkstatt-site", "package.json"),
+      '{"name":"@warpgogol/werkstatt-site"}',
     );
-    await mkdir(join(wgDir, "share"));
-    await writeFile(join(wgDir, "share", "package.json"), '{"name":"@warpgogol/werkstatt-site/share"}');
 
     const result = await runWorkpieceImportsValidate(
       makeInput({ site: "test-site", "workpiece-dir": "missions/m01/workpiece" }),

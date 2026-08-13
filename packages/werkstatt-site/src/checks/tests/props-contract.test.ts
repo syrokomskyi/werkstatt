@@ -64,7 +64,16 @@ propsSchema:
 
 async function fixtureWorkspace(manifestYaml: string): Promise<{ root: string; dir: string }> {
   const root = await mkdtemp(join(tmpdir(), "props-contract-"));
-  const dir = join(root, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections", "sample-section");
+  const dir = join(
+    root,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ui",
+    "sections",
+    "sample-section",
+  );
   await mkdir(dir, { recursive: true });
   await writeFile(join(dir, "sample-section.manifest.yaml"), manifestYaml, "utf8");
   return { root, dir };

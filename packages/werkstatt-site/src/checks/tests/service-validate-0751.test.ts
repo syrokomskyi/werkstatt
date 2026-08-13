@@ -234,7 +234,8 @@ describe("service.registry.validate (RFC-0751)", () => {
   });
 
   it("fails when services key is missing", async () => {
-    writeFileSync(join(tmpDir, "systems", "registry.yaml"), "schemaVersion: 1.0.0\nsystems: []\n");
+    mkdirSync(join(tmpDir, "services"), { recursive: true });
+    writeFileSync(join(tmpDir, "services", "registry.yaml"), "schemaVersion: 1.0.0\nsystems: []\n");
 
     const result = await runServiceRegistryValidate(makeInput(), makeContext(tmpDir));
     expect(result.exitCode).toBe(1);

@@ -29,12 +29,12 @@ import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { ALL_COMMANDS } from "./command-tables/index.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 
-const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks", "src"];
+const CHECKS_SRC = ["packages", "werkstatt-site", "src", "checks"];
 const COMMAND_TABLES_DIR = [...CHECKS_SRC, "command-tables"];
 const TESTS_DIR = [...CHECKS_SRC, "tests"];
 
 const BASELINE_PATH =
-  "packages/os/site-kernel-checks/src/check-fixture-lint.baseline.generated.yaml";
+  "packages/werkstatt-site/src/checks/check-fixture-lint.baseline.generated.yaml";
 
 interface CheckFixtureLintBaseline {
   rule: "CHECK-FIX";
@@ -59,7 +59,7 @@ function toPosixPath(value: string): string {
 }
 
 /**
- * Parse every packages/os/site-kernel-checks/src/command-tables/*.ts file into a
+ * Parse every packages/werkstatt-site/src/checks/command-tables/*.ts file into a
  * command-name -> implementing-module-path map. A command is only resolved when
  * its `execute:` value can be traced to an import from another module (an
  * inline arrow-function `execute` cannot be traced this way and resolves to null).
@@ -181,7 +181,7 @@ export function buildFixtureCoverageDiagnostics(
         ruleId: "CHECK-FIX-01",
         severity: "error",
         file: entry.module,
-        message: `${entry.command} has no covering test file under packages/os/site-kernel-checks/src/tests/.`,
+        message: `${entry.command} has no covering test file under packages/werkstatt-site/src/checks/tests/.`,
         fixHint: `Add a test file importing ${entry.module} with at least one failing fixture and one passing fixture.`,
         data: { command: entry.command },
       });
@@ -191,7 +191,7 @@ export function buildFixtureCoverageDiagnostics(
         severity: "error",
         file: entry.module,
         message: `${entry.command}: covering test "${entry.testFile}" lacks a ${!entry.hasFailFixture ? "fail" : "pass"} fixture.`,
-        fixHint: `Add a ${!entry.hasFailFixture ? "failing" : "passing"} fixture case to packages/os/site-kernel-checks/src/tests/${entry.testFile}.`,
+        fixHint: `Add a ${!entry.hasFailFixture ? "failing" : "passing"} fixture case to packages/werkstatt-site/src/checks/tests/${entry.testFile}.`,
         data: { command: entry.command, testFile: entry.testFile },
       });
     }

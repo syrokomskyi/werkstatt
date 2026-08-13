@@ -99,8 +99,10 @@ export async function runChatMetadataDriftValidate(
     const adapterPath = join(
       context.workspaceRoot,
       "packages",
-      `chat-adapter-${adapterId}`,
+      "werkstatt-site",
       "src",
+      "domain",
+      `chat-adapter-${adapterId}`,
       "widget-adapter.ts",
     );
 

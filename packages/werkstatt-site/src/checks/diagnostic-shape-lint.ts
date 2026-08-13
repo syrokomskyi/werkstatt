@@ -52,7 +52,7 @@ const SHIM_CALL_PATTERN = /\b(resultFromViolations|failResult)\s*\(/;
 const EXEMPT_FILES = new Set(["result-helpers.ts", "diagnostic-shape-lint.ts", "diagnostics"]);
 
 const DSL04_BASELINE_PATH =
-  "packages/os/site-kernel-checks/src/diagnostics/dsl04-baseline.generated.yaml";
+  "packages/werkstatt-site/src/checks/diagnostics/dsl04-baseline.generated.yaml";
 
 interface Dsl04Baseline {
   rule: "DSL-04";
@@ -81,7 +81,7 @@ export async function runDiagnosticShapeLint(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult | { file: string; files: number }>> {
-  const checksDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "checks", "src");
+  const checksDir = join(context.workspaceRoot, "packages", "werkstatt-site", "src", "checks");
 
   let files: string[];
   try {
@@ -95,8 +95,8 @@ export async function runDiagnosticShapeLint(
       {
         ruleId: "DSL-01",
         severity: "error",
-        message: `Could not read site-kernel-checks/src/: ${(err as Error).message}`,
-        fixHint: "Ensure packages/os/site-kernel-checks/src/ exists and is readable.",
+        message: `Could not read checks/src/: ${(err as Error).message}`,
+        fixHint: "Ensure packages/werkstatt-site/src/checks/ exists and is readable.",
       },
     ]);
   }
@@ -106,7 +106,7 @@ export async function runDiagnosticShapeLint(
   for (const name of files) {
     if (EXEMPT_FILES.has(name)) continue;
     if (SHIM_CALL_PATTERN.test(await readFile(join(checksDir, name), "utf8").catch(() => ""))) {
-      shimUsers.push(`packages/os/site-kernel-checks/src/${name}`);
+      shimUsers.push(`packages/werkstatt-site/src/checks/${name}`);
     }
   }
 
@@ -142,7 +142,7 @@ export async function runDiagnosticShapeLint(
 
   for (const name of files) {
     if (EXEMPT_FILES.has(name)) continue;
-    const relName = `site-kernel-checks/src/${name}`;
+    const relName = `checks/${name}`;
 
     let content: string;
     try {
@@ -174,7 +174,7 @@ export async function runDiagnosticShapeLint(
               message: `ruleId "${id}" is not registered in diagnostics/rules.ts.`,
               file: relName,
               line: i + 1,
-              fixHint: `Add "${id}" to DIAGNOSTIC_RULES in packages/os/site-kernel-checks/src/diagnostics/rules.ts.`,
+              fixHint: `Add "${id}" to DIAGNOSTIC_RULES in packages/werkstatt-site/src/checks/diagnostics/rules.ts.`,
               data: { ruleId: id },
             });
           }

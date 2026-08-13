@@ -25,7 +25,11 @@ import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 describe("workspace.write.boundary.lint (RFC-0258)", () => {
   it("WS-WRITE-01: flags an undeclared workspace-shared write reachable from an APPS_* pipeline", () => {
     const ownershipMap: OwnershipEntry[] = [
-      { path: "docs/undeclared-shared-output.json", command: "undeclared.shared.generate" },
+      {
+        path: "docs/undeclared-shared-output.json",
+        command: "undeclared.shared.generate",
+        module: "packages/test/sample.ts",
+      },
     ];
     const reachable = new Set(["undeclared.shared.generate"]);
 
@@ -38,7 +42,11 @@ describe("workspace.write.boundary.lint (RFC-0258)", () => {
 
   it("WS-WRITE-01: does not flag an app-relative path even when reachable and unallowlisted", () => {
     const ownershipMap: OwnershipEntry[] = [
-      { path: "src/pages/index.astro", command: "routes.generate" },
+      {
+        path: "src/pages/index.astro",
+        command: "routes.generate",
+        module: "packages/test/routes.ts",
+      },
     ];
     const reachable = new Set(["routes.generate"]);
 
@@ -47,7 +55,11 @@ describe("workspace.write.boundary.lint (RFC-0258)", () => {
 
   it("WS-WRITE-01: does not flag a command absent from any APPS_* pipeline", () => {
     const ownershipMap: OwnershipEntry[] = [
-      { path: "docs/some-output.json", command: "not.reachable.generate" },
+      {
+        path: "docs/some-output.json",
+        command: "not.reachable.generate",
+        module: "packages/test/not-reachable.ts",
+      },
     ];
 
     expect(runWsWrite01(ownershipMap, SHARED_WRITE_ALLOWLIST, new Set())).toHaveLength(0);

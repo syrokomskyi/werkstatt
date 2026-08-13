@@ -11,9 +11,14 @@ import {
 // Mock child_process.spawn to avoid actually running vitest
 const mockSpawn = vi.fn();
 
-vi.mock("node:child_process", () => ({
-  spawn: (...args: unknown[]) => mockSpawn(...args),
-}));
+vi.mock("node:child_process", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:child_process")>();
+  return {
+    ...actual,
+    spawn: (...args: unknown[]) => mockSpawn(...args),
+    default: { ...actual, spawn: (...args: unknown[]) => mockSpawn(...args) },
+  };
+});
 
 describe("integration-runner", () => {
   let tmpWorkspace: string;
@@ -75,9 +80,11 @@ describe("integration-runner", () => {
 
     mockSpawn.mockImplementation((_cmd, _args, _opts) => {
       const child = {
-        stdout: { on: (event: string, cb: (d: Buffer) => void) => {
-          if (event === "data") cb(Buffer.from(fakeJsonOutput));
-        }},
+        stdout: {
+          on: (event: string, cb: (d: Buffer) => void) => {
+            if (event === "data") cb(Buffer.from(fakeJsonOutput));
+          },
+        },
         stderr: { on: () => {} },
         on: (event: string, cb: (code?: number) => void) => {
           if (event === "exit") cb(0);
@@ -119,9 +126,11 @@ describe("integration-runner", () => {
 
     mockSpawn.mockImplementation((_cmd, _args, _opts) => {
       const child = {
-        stdout: { on: (event: string, cb: (d: Buffer) => void) => {
-          if (event === "data") cb(Buffer.from(fakeJsonOutput));
-        }},
+        stdout: {
+          on: (event: string, cb: (d: Buffer) => void) => {
+            if (event === "data") cb(Buffer.from(fakeJsonOutput));
+          },
+        },
         stderr: { on: () => {} },
         on: (event: string, cb: (code?: number) => void) => {
           if (event === "exit") cb(1);

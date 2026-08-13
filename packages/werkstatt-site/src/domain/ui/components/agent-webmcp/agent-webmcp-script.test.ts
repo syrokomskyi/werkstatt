@@ -14,23 +14,22 @@ import { join } from "node:path";
  */
 
 describe("agent-webmcp-script.astro (RFC-0799)", () => {
-  const astroSource = readFileSync(
-    join(import.meta.dirname, "agent-webmcp-script.astro"),
-    "utf8",
-  );
+  const astroSource = readFileSync(join(import.meta.dirname, "agent-webmcp-script.astro"), "utf8");
 
   test("component renders nothing when manifest is null (progressive enhancement guard)", () => {
     expect(astroSource).toContain("{manifest && (");
-    expect(astroSource).toContain("<script is:inline define:vars={{ manifestJson }}");
+    expect(astroSource).toContain("<script is:inline define:vars={{ manifestJson, isDev }}");
   });
 
   test("component serializes manifest to JSON in frontmatter", () => {
-    expect(astroSource).toContain("const manifestJson = manifest ? JSON.stringify(manifest) : \"null\"");
+    expect(astroSource).toContain(
+      'const manifestJson = manifest ? JSON.stringify(manifest) : "null"',
+    );
   });
 
   test("script contains document.modelContext feature detection guard", () => {
     expect(astroSource).toContain("var mc = document.modelContext");
-    expect(astroSource).toContain("if (!mc || typeof mc.registerTool !== \"function\") return");
+    expect(astroSource).toContain('if (!mc || typeof mc.registerTool !== "function") return');
   });
 
   test("script registers action tools with action. prefix", () => {
@@ -45,7 +44,7 @@ describe("agent-webmcp-script.astro (RFC-0799)", () => {
   test("script wraps registration in try/catch with dev-mode console.warn guard", () => {
     expect(astroSource).toContain("try {");
     expect(astroSource).toContain("} catch (e)");
-    expect(astroSource).toContain("import.meta && import.meta.env && import.meta.env.DEV");
+    expect(astroSource).toContain("define:vars={{ manifestJson, isDev }}");
     expect(astroSource).toContain("console.warn");
   });
 });

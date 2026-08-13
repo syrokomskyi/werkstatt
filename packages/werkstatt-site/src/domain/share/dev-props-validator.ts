@@ -47,7 +47,7 @@ async function resolvePackagesUiRoot(): Promise<string | null> {
       for (let depth = 0; depth < 12; depth += 1) {
         try {
           await stat(join(dir, "pnpm-workspace.yaml"));
-          return join(dir, "packages", "werkstatt-site", "src", "domain", "ui", "src");
+          return join(dir, "packages", "werkstatt-site", "src", "domain", "ui");
         } catch {
           const parent = dirname(dir);
           if (parent === dir) return null;

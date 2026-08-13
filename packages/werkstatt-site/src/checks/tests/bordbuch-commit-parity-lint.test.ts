@@ -95,15 +95,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
 
   it("green fixture: whitelisted bordbuch-commit-helper.ts is not flagged", async () => {
     await writeFile(
-      join(
-        root,
-        "packages",
-        "os",
-        "site-kernel-handoff",
-        "src",
-        "bordbuch",
-        "bordbuch-commit-helper.ts",
-      ),
+      join(root, "packages", "werkstatt", "src", "bordbuch", "bordbuch-commit-helper.ts"),
       'import { appendBordbuchEntry } from "./bordbuch-io.ts";\n',
     );
 
@@ -116,16 +108,7 @@ describe("bordbuch.commit.parity.lint (RFC-0750)", () => {
       recursive: true,
     });
     await writeFile(
-      join(
-        root,
-        "packages",
-        "os",
-        "site-kernel-handoff",
-        "src",
-        "bordbuch",
-        "tests",
-        "helper.test.ts",
-      ),
+      join(root, "packages", "werkstatt", "src", "bordbuch", "tests", "helper.test.ts"),
       'import { appendBordbuchEntry } from "../bordbuch-io.ts";\n',
     );
 
