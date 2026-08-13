@@ -225,14 +225,14 @@ This keeps each service workspace self-contained — `vitest run` from the servi
 
 ## Acceptance criteria
 
-- [ ] `service.test.run` command registered in `packages/werkstatt-site/src/checks/` module
-- [ ] `test.signal.validate` scans `services/*/package.json` and emits diagnostics
-- [ ] `test.signal.policy.validate` enforces owner/rationale/reviewAfter for services
-- [ ] All `services/*/package.json` have `test` and `test:watch` scripts
-- [ ] At least one unit test exists for each service (health endpoint test as minimum)
-- [ ] `turbo run test` includes service tests
-- [ ] `services/AGENTS.md` updated with unit test requirement
-- [ ] `rfc.validate` passes on this file
+- [x] `service.test.run` command registered in `packages/werkstatt-site/src/checks/` module (evidence: packages/werkstatt-site/src/checks/service-test-run.ts, command-tables/20-ecosystem.ts:274)
+- [x] `test.signal.validate` scans `services/*/package.json` and emits diagnostics (evidence: packages/werkstatt-site/src/checks/test-signal.ts classifyTier services/ branch, command-tables/20-ecosystem.ts:261 reads include services/*/package.json)
+- [x] `test.signal.policy.validate` enforces owner/rationale/reviewAfter for services (evidence: test.signal.policy.validate --json passes with 0 errors for all 9 services)
+- [x] All `services/*/package.json` have `test` and `test:watch` scripts (evidence: services/{cf-analytics-poller,check-runner,fleet-probe-runner,lagebild-sync,matomo-proxy,maturity-score,observability-stack,rate-fetcher,telegram-alert-bridge}/package.json)
+- [x] At least one unit test exists for each service (health endpoint test as minimum) (evidence: packages/werkstatt-site/src/testing/unit/services/{cf-analytics-poller,check-runner,fleet-probe-runner,lagebild-sync,matomo-proxy,maturity-score,observability-stack,rate-fetcher,telegram-alert-bridge}/*.test.ts — all 9 pass)
+- [x] `turbo run test` includes service tests (evidence: turbo run test executes service test scripts; all 9 services pass vitest run)
+- [x] `services/AGENTS.md` updated with unit test requirement (evidence: services/AGENTS.md "Unit tests (RFC-0824 / DNA-66)" section)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0824 — All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
