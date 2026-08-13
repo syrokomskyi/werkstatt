@@ -28,6 +28,7 @@ import {
   runPreDeployGates,
   runBuildCheck,
   runSmokeCheck,
+  runIntegrationTests,
   acquireServiceLock,
   releaseServiceLock,
   recordDevDeployState,
@@ -159,6 +160,12 @@ export async function runLeitstandServiceDevDeploy(
       smokeResult = await runSmokeCheck(workspaceRoot, serviceId, deployedUrl, logger);
     }
 
+    // 6b. Integration tests (RFC-0826) — non-fatal, warnings only
+    let integrationResult: ServiceDevDeployData["integrationResult"];
+    if (deployedUrl) {
+      integrationResult = await runIntegrationTests(workspaceRoot, serviceId, deployedUrl, logger);
+    }
+
     // 7. Record dev deploy state
     await recordDevDeployState(workspaceRoot, serviceId, {
       at: new Date().toISOString(),
@@ -180,6 +187,7 @@ export async function runLeitstandServiceDevDeploy(
       workersDevUrl: deployedUrl,
       healthState,
       smokeResult,
+      integrationResult,
       preDeployGates: gateResults,
       startedAt,
       completedAt,

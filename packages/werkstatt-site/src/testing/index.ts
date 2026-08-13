@@ -6,3 +6,8 @@ export {
   SmokeEntryNotFoundError,
 } from "./smoke/smoke-runner.ts";
 export type { ServiceSmokeYaml, SiteSmokeYaml } from "./smoke/smoke-runner.ts";
+export {
+  runServiceIntegrationTests,
+  resolveIntegrationTestDir,
+  IntegrationTestDirNotFoundError,
+} from "./integration/integration-runner.ts";

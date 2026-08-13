@@ -1,20 +1,23 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0825: Testing module — registers service.smoke.run and site.smoke.run
-kernel commands. Delegates to the smoke runner in smoke/smoke-runner.ts.</purpose>
-<keywords>smoke, testing, module, kernel, commands</keywords>
+<purpose>RFC-0825 + RFC-0826: Testing module — registers service.smoke.run,
+site.smoke.run, and service.integration.run kernel commands. Delegates to the
+smoke runner and integration runner.</purpose>
+<keywords>smoke, integration, testing, module, kernel, commands</keywords>
 <responsibilities>
-  <item>Registers service.smoke.run and site.smoke.run commands.</item>
+  <item>Registers service.smoke.run, site.smoke.run, and service.integration.run commands.</item>
   <item>Resolves YAML definition file paths relative to this module.</item>
-  <item>Returns structured SmokeRunResult via KernelCommandResult.data.</item>
+  <item>Returns structured SmokeRunResult / IntegrationRunResult via KernelCommandResult.data.</item>
 </responsibilities>
 <non-goals>
   <item>Do not implement fetch logic — that lives in smoke-runner.ts.</item>
+  <item>Do not implement vitest spawning — that lives in integration-runner.ts.</item>
   <item>Do not integrate with deployment pipelines — that lives in leitstand commands.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0825: initial testing module with smoke test commands.</item>
+  <item>RFC-0826: added service.integration.run command for vitest-based integration tests.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,7 +29,16 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
-import { runSmokeChecks, SmokeConfigNotFoundError, SmokeEntryNotFoundError } from "./smoke/smoke-runner.ts";
+import type { IntegrationRunResult } from "@warpgogol/werkstatt/testing/integration";
+import {
+  runSmokeChecks,
+  SmokeConfigNotFoundError,
+  SmokeEntryNotFoundError,
+} from "./smoke/smoke-runner.ts";
+import {
+  runServiceIntegrationTests,
+  IntegrationTestDirNotFoundError,
+} from "./integration/integration-runner.ts";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -160,6 +172,66 @@ async function runSiteSmoke(
   }
 }
 
+async function runServiceIntegration(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<IntegrationRunResult>> {
+  const service = input.flags.service as string | undefined;
+  const url = input.flags.url as string | undefined;
+
+  if (!service) {
+    return {
+      exitCode: 1,
+      summary: "service.integration.run: --service is required",
+    };
+  }
+  if (!url) {
+    return {
+      exitCode: 1,
+      summary: "service.integration.run: --url is required",
+    };
+  }
+
+  context.logger.info(
+    `[service.integration.run] running integration tests for ${service} against ${url}…`,
+  );
+
+  try {
+    const result = await runServiceIntegrationTests(
+      service,
+      context.workspaceRoot,
+      url,
+      context.logger,
+    );
+
+    if (result.status === "skipped") {
+      return {
+        data: result,
+        exitCode: 0,
+        summary: `service.integration.run: skipped (no integration tests for ${service})`,
+      };
+    }
+
+    return {
+      data: result,
+      exitCode: result.status === "pass" ? 0 : 1,
+      summary:
+        result.status === "pass"
+          ? `service.integration.run: ${result.summary.passed}/${result.summary.total} test(s) passed`
+          : `service.integration.run: ${result.summary.failed}/${result.summary.total} test(s) failed`,
+    };
+  } catch (err) {
+    if (err instanceof IntegrationTestDirNotFoundError) {
+      context.logger.warn(`[service.integration.run] ${err.message}`);
+      return {
+        exitCode: 0,
+        summary: `service.integration.run: skipped (no integration test directory for ${service})`,
+      };
+    }
+    throw err;
+  }
+}
+
 export function createTestingModule(): KernelModule {
   return {
     name: "testing",
@@ -191,8 +263,7 @@ export function createTestingModule(): KernelModule {
 
       registry.registerCommand({
         name: "site.smoke.run",
-        description:
-          "Run post-deploy smoke tests for a site (RFC-0825). Flags: --site, --url.",
+        description: "Run post-deploy smoke tests for a site (RFC-0825). Flags: --site, --url.",
         scope: "workspace",
         supportsAllSites: false,
         cacheable: false,
@@ -212,6 +283,32 @@ export function createTestingModule(): KernelModule {
         reads: ["packages/werkstatt-site/src/testing/smoke/site-smoke.yaml"],
         execute: runSiteSmoke,
       } satisfies KernelCommandDefinition<SmokeRunResult>);
+
+      registry.registerCommand({
+        name: "service.integration.run",
+        description:
+          "Run vitest-based integration tests for a service against a dev-deployed URL (RFC-0826). Flags: --service, --url.",
+        scope: "workspace",
+        supportsAllSites: false,
+        cacheable: false,
+        requiresNetwork: true,
+        flags: {
+          service: {
+            kind: "string",
+            required: true,
+            description: "Service id from services/registry.yaml.",
+          },
+          url: {
+            kind: "string",
+            required: true,
+            description: "Base URL of the dev-deployed Worker (e.g. https://example.workers.dev).",
+          },
+        },
+        reads: [
+          "packages/werkstatt-site/src/testing/integration/services/<service-id>/**/*.test.ts",
+        ],
+        execute: runServiceIntegration,
+      } satisfies KernelCommandDefinition<IntegrationRunResult>);
     },
   };
 }

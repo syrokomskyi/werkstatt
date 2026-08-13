@@ -50,6 +50,18 @@ After successful deployment, `leitstand.service.dev-deploy` and `leitstand.servi
 - Missing service entries in the YAML cause the smoke check to be skipped (not an error).
 - Run manually: `pnpm exec werkstatt run service.smoke.run --service <id> --url <url>`.
 
+### Post-deploy integration testing (RFC-0826)
+
+After smoke tests, `leitstand.service.dev-deploy` automatically runs `service.integration.run` against the dev-deployed URL. Integration tests are vitest-based test files in `packages/werkstatt-site/src/testing/integration/services/<service-id>/`.
+
+- Integration tests hit real external APIs using credentials from `services/<service-id>/.env.dev` (RFC-0806 reuse — no separate `.env.test`).
+- Tests are guarded by `describe.skipIf(!process.env.RUN_INTEGRATION_TESTS)` so they are skipped by default in normal vitest runs.
+- The integration runner sets `RUN_INTEGRATION_TESTS=1`, `INTEGRATION_TEST_URL`, and `INTEGRATION_TEST_SERVICE` env vars when spawning vitest.
+- Results are included in the deploy result data as `integrationResult` (best-effort, non-blocking — failures are logged as warnings, not fatal).
+- Missing integration test directories cause the check to be skipped (not an error).
+- Integration tests are NOT run in CI — they require dev-deployed Workers with real credentials.
+- Run manually: `pnpm exec werkstatt run service.integration.run --service <id> --url <url>`.
+
 ### OTLP metrics push (RFC-0807)
 
 All `services/*` projects MUST push health metrics to SigNoz via OTLP. The `createMetricsPusher` helper from `@warpgogol/werkstatt-site/observability` handles the transport.

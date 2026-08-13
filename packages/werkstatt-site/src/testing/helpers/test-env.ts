@@ -45,27 +45,44 @@ function parseEnvFile(content: string): Record<string, string> {
 }
 
 /**
- * Loads test environment variables from `.env.test` in the package root.
+ * Loads dev environment variables from `.env.dev` in the workspace root.
+ * Reuses existing dev credentials (RFC-0806) — no separate .env.test file.
  *
- * @returns A record of key-value pairs from the .env.test file.
- * @throws if `.env.test` does not exist or a variable is missing.
+ * @returns A record of key-value pairs from the .env.dev file.
+ * @throws if `.env.dev` does not exist.
  */
 export function loadTestEnv(workspaceRoot: string): Record<string, string> {
-  const envPath = resolve(workspaceRoot, ".env.test");
+  const envPath = resolve(workspaceRoot, ".env.dev");
   const raw = readFileSync(envPath, "utf-8");
   return parseEnvFile(raw);
 }
 
 /**
- * Loads test environment variables and returns the value for a specific key.
+ * Loads dev environment variables from `services/<serviceId>/.env.dev`.
+ * Reuses existing dev credentials (RFC-0806) — no separate .env.test file.
  *
- * @throws if `.env.test` does not exist or the key is missing.
+ * @returns A record of key-value pairs from the service .env.dev file.
+ * @throws if `.env.dev` does not exist.
+ */
+export function loadServiceDevEnv(
+  serviceId: string,
+  workspaceRoot: string,
+): Record<string, string> {
+  const envPath = resolve(workspaceRoot, "services", serviceId, ".env.dev");
+  const raw = readFileSync(envPath, "utf-8");
+  return parseEnvFile(raw);
+}
+
+/**
+ * Loads dev environment variables and returns the value for a specific key.
+ *
+ * @throws if `.env.dev` does not exist or the key is missing.
  */
 export function getTestEnv(key: string, workspaceRoot: string): string {
   const env = loadTestEnv(workspaceRoot);
   const value = env[key];
   if (value === undefined) {
-    throw new Error(`[test-env] Environment variable "${key}" not found in .env.test`);
+    throw new Error(`[test-env] Environment variable "${key}" not found in .env.dev`);
   }
   return value;
 }
