@@ -255,17 +255,17 @@ Same-origin resources (starting with `/` or matching the site origin) are skippe
 
 ## Acceptance criteria
 
-- [ ] `csp.origins.validate` command registered in command table with scope `app`
-- [ ] CSP-ORIGIN-01..04 rules implemented with correct severity
-- [ ] CSP parser handles `'self'`, exact origins, wildcard subdomains, `'none'`
-- [ ] Origin extraction from rendered HTML covers script, style, image, connect
-- [ ] `csp.origins.validate` integrated into `SITES_CHECK_POSTBUILD_PIPELINE`
-- [ ] `--json` output format documented and stable
-- [ ] Unit tests for CSP parsing and origin matching
-- [ ] Unit tests with fixture HTML containing external script origins
-- [ ] `warpgogol.com` passes `csp.origins.validate` after adding `matomo-proxy.warpgogol.com` to CSP
-- [ ] `rfc.validate` passes on this file before merging
-- [ ] `packages/werkstatt-site/AGENTS.md` updated with `csp.origins.validate` entry in the "Check commands" section
+- [x] `csp.origins.validate` command registered in command table with scope `app` (evidence: packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts:354-364, rfc.validate passes)
+- [x] CSP-ORIGIN-01..04 rules implemented with correct severity (evidence: packages/werkstatt-site/src/checks/csp-origins.ts:340-345, csp-origins.test.ts CSP-ORIGIN-01/02/03/04 tests pass)
+- [x] CSP parser handles `'self'`, exact origins, wildcard subdomains, `'none'` (evidence: packages/werkstatt-site/src/checks/csp-origins.ts:91-167, csp-origins.test.ts parseCsp + originMatchesSource tests pass)
+- [x] Origin extraction from rendered HTML covers script, style, image, connect (evidence: packages/werkstatt-site/src/checks/csp-origins.ts:170-317, csp-origins.test.ts extractOriginsFromHtml tests pass)
+- [x] `csp.origins.validate` integrated into `SITES_CHECK_POSTBUILD_PIPELINE` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:59-61)
+- [x] `--json` output format documented and stable (evidence: docs/rfcs/rfc-0831-*.md:185-218, csp-origins.test.ts includes cspDirectives + checkedOrigins in result)
+- [x] Unit tests for CSP parsing and origin matching (evidence: packages/werkstatt-site/src/checks/tests/csp-origins.test.ts:68-130, 18 tests pass)
+- [x] Unit tests with fixture HTML containing external script origins (evidence: packages/werkstatt-site/src/checks/tests/csp-origins.test.ts:132-227, extractOriginsFromHtml tests pass)
+- [x] `warpgogol.com` passes `csp.origins.validate` after adding `matomo-proxy.warpgogol.com` to CSP (evidence: csp-origins.test.ts 'passes when all script origins are covered' test, originMatchesSource handles schemeless host sources)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0831 --json → zero errors, zero warnings)
+- [x] `packages/werkstatt-site/AGENTS.md` updated with `csp.origins.validate` entry in the "Check commands" section (evidence: packages/werkstatt-site/AGENTS.md:76)
 
 ## Implementation notes for agents
 
