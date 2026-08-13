@@ -23,7 +23,8 @@ Spawns `pnpm exec playwright test` as a child process with E2E_BASE_URL env var.
 */
 
 import { existsSync, readdirSync } from "node:fs";
-import { homedir } from "node:os";
+import { readFile, unlink } from "node:fs/promises";
+import { homedir, tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
@@ -79,7 +80,7 @@ export async function runSiteE2eTests(
 
   logger.info(`[site.e2e.run] running E2E tests for ${siteId} against ${resolvedUrl}…`);
 
-  const jsonOutputPath = join(workspaceRoot, `.e2e-result-${siteId}-${Date.now()}.json`);
+  const jsonOutputPath = join(tmpdir(), `.e2e-result-${siteId}-${Date.now()}.json`);
   const childEnv: Record<string, string> = {
     ...process.env,
     E2E_BASE_URL: resolvedUrl,
@@ -123,9 +124,7 @@ export async function runSiteE2eTests(
 
   if (existsSync(jsonOutputPath)) {
     try {
-      const jsonContent = await import("node:fs/promises").then((m) =>
-        m.readFile(jsonOutputPath, "utf8"),
-      );
+      const jsonContent = await readFile(jsonOutputPath, "utf8");
       const parsed = JSON.parse(jsonContent) as {
         stats?: {
           total?: number;
@@ -174,14 +173,20 @@ export async function runSiteE2eTests(
     }
 
     try {
-      await import("node:fs/promises").then((m) => m.unlink(jsonOutputPath));
+      await unlink(jsonOutputPath);
     } catch {
       // Non-fatal — temp file cleanup
     }
   }
 
   const status: SiteE2eRunResult["status"] =
-    testsFailed > 0 ? "fail" : testsPassed > 0 ? "pass" : "skipped";
+    testsFailed > 0
+      ? "fail"
+      : testsPassed > 0
+        ? "pass"
+        : result.exitCode !== 0
+          ? "fail"
+          : "skipped";
 
   logger.info(
     `[site.e2e.run] ${siteId}: ${testsPassed} passed, ${testsFailed} failed (${testFiles} files, ${durationMs}ms)`,
