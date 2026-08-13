@@ -107,7 +107,7 @@ On zones without Cloudflare Image Transformations, opt an app into the **build-p
 
 **How it works:**
 
-1. `image.variants.generate` (`build.prepare`) runs `sharp` on all `src/content/**/assets/**/*.webp` sources, writes `public/_img/<name>/<width>.webp` variants, and emits `src/image-variants.generated.json` (GENERATED-marked, gitignored).
+1. `image.variants.generate` (`build.prepare`) runs `sharp` on all `src/content/**/assets/**/*.webp` sources, writes `public/_img/<name>/<width>.webp` variants, and emits `src/image-variants.generated.yaml` (GENERATED-marked, committed for drift detection — see RFC-0834).
 2. At Astro build time, `packages/ui/src/image-provider-init.ts` (side-effect import from `content-assets.ts`) reads the manifest and installs `createBuildPortableProvider(manifest)` as the active provider.
 3. `image.variants.validate` (`build.check`) confirms all listed variants exist on disk.
 4. Every `<ResponsiveImage>` and `<LivePhoto>` then emits `srcset="/_img/<name>/320.webp 320w, …"` without any Cloudflare zone feature required.
@@ -116,11 +116,11 @@ On zones without Cloudflare Image Transformations, opt an app into the **build-p
 
 - Do NOT run `sharp` at request time (RFC-0149 — workerd has no filesystem).
 - Do NOT call `setDefaultImageProvider` in app code — the init side-effect handles it.
-- Do NOT commit `public/_img/` or `src/image-variants.generated.json` — they are gitignored build artifacts.
+- Do NOT commit `public/_img/` — binary variants are gitignored build artifacts. The manifest (`src/image-variants.generated.yaml`) IS committed for drift detection (RFC-0834).
 - Manifest keys are content-relative paths (`/src/content/.../portrait.webp`); Astro-hashed `/_astro/<name>.<hash>.webp` descriptors are resolved via `byBasename` (Vite hashes are base64url, not hex — regex `/\.[a-zA-Z0-9_-]{8}$/`).
 - **Derived-artifact invalidation (hard rule):** `image.variants.generate` MUST store a `sourceHash` (SHA-256 hex of the source WebP bytes) inside `ImageVariantEntry` and purge + regenerate `public/_img/` variants whenever the source hash changes. Existence-based skip (`if (fileExists) skip`) is forbidden — it silently serves stale derived artifacts when a content asset is replaced. Same contract as `video.variants.generate` (RFC-0210).
 
-See [RFC-0204](../rfcs/rfc-0204-build-portable-image-provider-with-pre-generated-responsive-variants.md) for full specification.
+See [RFC-0204](../rfcs/rfc-0204-build-portable-image-provider-with-pre-generated-responsive-variants.md) for full specification, and [RFC-0834](../rfcs/rfc-0834-commit-generated-variant-manifests-for-drift-detection.md) for the manifest commit policy amendment.
 
 ## Derived Artifact Invalidation Contract
 

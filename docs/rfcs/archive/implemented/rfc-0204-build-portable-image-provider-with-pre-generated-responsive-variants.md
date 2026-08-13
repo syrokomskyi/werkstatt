@@ -17,6 +17,7 @@ amends:
   - RFC-0152
 amendedBy:
   - RFC-0376
+  - RFC-0834
 related:
   - RFC-0141
   - RFC-0149
