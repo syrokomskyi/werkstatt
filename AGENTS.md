@@ -333,6 +333,7 @@ Rules:
 - Before sending any response to the operator, verify via `git status` that no uncommitted changes from the current session remain. If any exist, commit first.
 - **Session-start pre-flight (NON-NEGOTIABLE, RFC-0575):** At the start of `fo-idea-implement` and `fo-fix` skill pipelines, the agent MUST run `git status --short` in the werkstatt root and in each active mission workpiece (if any). If foreign uncommitted changes are found, the agent MUST: (1) report them to the operator, (2) never modify, stage, or discard them, (3) stage only its own files by explicit path, (4) verify `git diff --cached --name-only` before every commit excludes foreign files.
 - **Git hook activation (RFC-0534).** The pre-commit hook at `hooks/pre-commit` requires `git config core.hooksPath hooks/` to be active. Agents MUST invoke the `setup-ecosystem` skill when setting up a new development environment or after cloning the repository without onboarding. The `onboard` skill's Prepare step checks and configures this automatically for new onboarding.
+- **Playwright Chromium pre-check:** `mission.validate` requires Playwright Chromium for pre-flight checks. At session start, verify Chromium is installed: `ls ~/.cache/ms-playwright/chromium* 2>/dev/null`. If absent, run `pnpm exec playwright install chromium` before any `mission.validate` or `leitstand.dev-deploy` invocation. This prevents a mid-pipeline failure that costs a full restart cycle.
 
 ## Site content editing rule (non-negotiable)
 
@@ -341,6 +342,20 @@ All site content changes — markdown, YAML, frontmatter, prose, business-profil
 - The cache clone and mirrors are read-only for agents. They are updated exclusively through `mission.reconcile` and `mission.close` pipeline steps.
 - If no mission is open, the agent MUST ask the operator to open one (`mission.open --system <id> --brief "<brief>"`) before making any content changes.
 - This rule applies to all agents in all IDEs. Violating it breaks the audit trail and bypasses the mission lifecycle.
+
+### Content lookup architecture
+
+When searching for text to translate or fix on a page, agents MUST follow this lookup sequence:
+
+1. **Find the page file:** `src/content/pages/{lang}/{slug}.md` — the page markdown defines blocks with `heading` text and `type`.
+2. **Identify the block type:** Each block has a `type` (e.g. `people`, `trust-strip`, `markdown`, `comparison-cards`, `price-card`). The type determines where the displayed text lives.
+3. **Trace to the content source by type:**
+   - `people` → `src/content/people/{lang}/{slug}.md` (fields: `statement`, `bio`, `role`, `responsibility`, `authority`)
+   - `markdown` → `src/content/prose/{lang}/{contentRef}.md` (from `props.contentRef`)
+   - `trust-strip`, `comparison-cards`, `price-card`, `notausgang-block`, `ownership-block`, `controlled-responsibility-block`, `transparency`, `audience-cards`, `hero-decision-card`, `final-cta` → text is inline in the page markdown `props` (items, rows, cards, heading, subheading)
+   - `video-section` → `src/content/prose/{lang}/{contentRef}.md` for body text; heading/subheading inline
+
+Agents MUST NOT search package source code (`packages/**`) for page display text — section components in `packages/**` contain only rendering logic and localized label constants for human profile pages (`HUMAN_PROFILE_LABELS` in `resolve-route.ts`), not site page content.
 
 ## Mission lifecycle discipline
 
@@ -351,6 +366,16 @@ When the operator asks to start a new mission, the agent workflow is:
 3. **STOP** — wait for further commands from the operator.
 
 Agents MUST NOT begin investigating, diagnosing, or fixing the issue immediately after materialization. The operator will provide specific instructions on what to do next. This is non-negotiable workflow discipline that applies to all agents in all IDEs.
+
+### Reconcile sequence (NON-NEGOTIABLE)
+
+`mission.reconcile` requires a passed `mission.validate`. The correct sequence is:
+
+1. `mission.validate --mission <missionId>` — runs full build pipeline (3-4 min)
+2. If validation warns about uncommitted generated files: `mission.git.commit --mission <missionId> --message "chore: regenerate artifacts from build.prepare validation"`
+3. `mission.reconcile --mission <missionId>` — merges workpiece commits into cache clone, syncs mirrors
+
+Agents MUST NOT skip step 1. Running reconcile without validation fails with "mission has not passed validation". Agents MUST commit any generated artifacts from step 1 before proceeding to step 3 — reconcile blocks on uncommitted workpiece changes.
 
 ### Materialization enforcement in mission.preview (RFC-0817)
 
