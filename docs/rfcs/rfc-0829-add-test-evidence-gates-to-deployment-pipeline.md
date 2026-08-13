@@ -372,16 +372,16 @@ async function recordTestEvidence(
 
 ## Acceptance criteria
 
-- [ ] `test.evidence.verify` command registered and functional
-- [ ] `test.evidence.list` command registered and functional
-- [ ] Test evidence recording integrated into `service.smoke.run`, `service.integration.run`, `site.smoke.run`, `site.e2e.run`
-- [ ] `leitstand.propagate` verifies L4+L5 evidence before deploying to alt
-- [ ] `leitstand.promote` verifies L4+L5 evidence before deploying to main
-- [ ] `leitstand.service.promote` verifies L1+L2+L5 evidence before promoting to prod
-- [ ] Gate failures produce clear error messages with remediation instructions
-- [ ] `services/registry.yaml` unchanged (evidence timestamps live in evidence files)
-- [ ] Grace period documented in `AGENTS.md` and `services/AGENTS.md`
-- [ ] `rfc.validate` passes on this file
+- [x] `test.evidence.verify` command registered and functional (evidence: packages/werkstatt-site/src/testing/module.ts:632)
+- [x] `test.evidence.list` command registered and functional (evidence: packages/werkstatt-site/src/testing/module.ts:683)
+- [x] Test evidence recording integrated into `service.smoke.run`, `service.integration.run`, `site.smoke.run`, `site.e2e.run` (evidence: packages/werkstatt-site/src/testing/module.ts:100,285,191,358)
+- [x] `leitstand.propagate` verifies L4+L5 evidence before deploying to alt (evidence: packages/werkstatt/src/leitstand/leitstand-commands.ts:1876)
+- [x] `leitstand.promote` verifies L4+L5 evidence before deploying to main (evidence: packages/werkstatt/src/leitstand/leitstand-commands.ts:2319)
+- [x] `leitstand.service.promote` verifies L1+L2+L5 evidence before promoting to prod (evidence: packages/werkstatt/src/leitstand/service-promote.ts:159)
+- [x] Gate failures produce clear error messages with remediation instructions (evidence: packages/werkstatt-site/src/testing/test-evidence.ts:194-209)
+- [x] `services/registry.yaml` unchanged (evidence timestamps live in evidence files) (evidence: services/registry.yaml)
+- [x] Grace period documented in `AGENTS.md` and `services/AGENTS.md` (evidence: services/AGENTS.md:103, AGENTS.md)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate output)
 
 ## Implementation notes for agents
 

@@ -789,3 +789,10 @@ The workshop enforces a five-level testing pyramid (DNA-66):
 | L5 Smoke | Health + critical path post-deploy | `packages/werkstatt-site/src/testing/smoke/` | After every deploy |
 
 All test definitions live in `packages/werkstatt-site/src/testing/` — not in `services/*` or mission workpieces. The dev channel is the canonical test environment. Downstream RFCs 0824–0829 implement individual levels and pipeline gates.
+
+### Test evidence gates (RFC-0829)
+
+Deployment commands (`leitstand.propagate`, `leitstand.promote`, `leitstand.service.promote`) verify test evidence before proceeding. Test commands record structured JSON evidence when `--commit-sha` is provided.
+
+- **Grace period:** Until 2026-09-10, gate failures produce warnings (exit 0) instead of fatal errors. After 2026-09-10, failures block deployment.
+- See `services/AGENTS.md` for full details on evidence storage, verification commands, and deployment gate integration.
