@@ -255,19 +255,19 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
   {
     name: "test.signal.validate",
     description:
-      "Classify each pnpm workspace package test script as real, noop, absent, or skipped (RFC-0249).",
+      "Classify each pnpm workspace package test script as real, noop, absent, or skipped (RFC-0249, RFC-0824).",
     scope: "workspace",
     flags: {},
-    reads: ["packages/*/package.json", "packages/*/turbo.json"],
+    reads: ["packages/*/package.json", "packages/*/turbo.json", "services/*/package.json"],
     execute: runTestSignalValidate,
   },
   {
     name: "test.signal.policy.validate",
     description:
-      "Validate that every workspace package has real tests or explicit skipped-test owner/rationale/review metadata (RFC-0251).",
+      "Validate that every workspace package has real tests or explicit skipped-test owner/rationale/review metadata (RFC-0251, RFC-0824).",
     scope: "workspace",
     flags: {},
-    reads: ["packages/*/package.json", "packages/*/turbo.json"],
+    reads: ["packages/*/package.json", "packages/*/turbo.json", "services/*/package.json"],
     execute: runTestSignalPolicyValidate,
   },
   {
