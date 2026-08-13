@@ -76,6 +76,7 @@ function gradientCss(layer: Extract<SiteBackgroundConfig["layers"][number], { ki
       if (layer.kind === "image") {
         const fitClass = `site-background__image--${layer.fit ?? "cover"}`;
         const parallaxSpeed = layer.parallax?.speed ?? 0.4;
+        const loadingMode = layer.loading ?? "lazy";
         return (
           <div class="site-background__layer site-background__layer--image">
             {"imageMeta" in layer && layer.imageMeta && (
@@ -83,7 +84,8 @@ function gradientCss(layer: Extract<SiteBackgroundConfig["layers"][number], { ki
                 image={layer.imageMeta}
                 alt=""
                 class={["site-background__image", fitClass].filter(Boolean).join(" ")}
-                loading={layer.loading ?? "lazy"}
+                loading={loadingMode}
+                fetchpriority={loadingMode === "eager" ? "high" : undefined}
                 data-parallax-speed={layer.parallax ? String(parallaxSpeed) : undefined}
                 lang={lang}
               />
