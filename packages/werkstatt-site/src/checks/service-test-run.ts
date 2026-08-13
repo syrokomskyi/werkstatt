@@ -59,6 +59,22 @@ interface VitestJsonResult {
   }[];
 }
 
+function extractFailures(parsed: VitestJsonResult): NonNullable<ServiceTestRunResult["failures"]> {
+  const failures: ServiceTestRunResult["failures"] = [];
+  for (const suite of parsed.testResults) {
+    for (const assertion of suite.assertionResults) {
+      if (assertion.status === "failed") {
+        failures.push({
+          testName: assertion.fullName,
+          message: assertion.failureMessages?.join("\n") ?? "",
+          file: suite.name,
+        });
+      }
+    }
+  }
+  return failures;
+}
+
 export async function runServiceTestRun(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -122,9 +138,11 @@ export async function runServiceTestRun(
     };
   }
 
-  const serviceDir = join(context.workspaceRoot, "services", service);
   const startMs = Date.now();
-  const jsonOutputFile = join(tmpdir(), `service-test-run-${service}-${Date.now()}.json`);
+  const jsonOutputFile = join(
+    tmpdir(),
+    `service-test-run-${service}-${Date.now()}-${process.pid}.json`,
+  );
 
   try {
     try {
@@ -140,17 +158,14 @@ export async function runServiceTestRun(
           `--outputFile=${jsonOutputFile}`,
         ],
         {
-          cwd: serviceDir,
+          cwd: context.workspaceRoot,
           maxBuffer: 10 * 1024 * 1024,
           env: { ...process.env, CI: "true" },
         },
       );
-    } catch (err) {
-      const error = err as { stdout?: string; message?: string };
+    } catch {
       // vitest exits non-zero on test failures, but the JSON file is still written
-      if (!error.stdout && !error.message?.includes("exit")) {
-        throw err;
-      }
+      // — proceed to read the output file regardless of the exec error
     }
 
     const durationMs = Date.now() - startMs;
@@ -161,18 +176,7 @@ export async function runServiceTestRun(
       throw new Error(`vitest JSON output file not found: ${jsonOutputFile}`);
     }
     const parsed = JSON.parse(jsonContent) as VitestJsonResult;
-    const failures: ServiceTestRunResult["failures"] = [];
-    for (const suite of parsed.testResults) {
-      for (const assertion of suite.assertionResults) {
-        if (assertion.status === "failed") {
-          failures.push({
-            testName: assertion.fullName,
-            message: assertion.failureMessages?.join("\n") ?? "",
-            file: suite.name,
-          });
-        }
-      }
-    }
+    const failures = extractFailures(parsed);
 
     const status: "pass" | "fail" = parsed.numFailedTests > 0 ? "fail" : "pass";
     return {
@@ -197,18 +201,7 @@ export async function runServiceTestRun(
     try {
       const jsonContent = await readFile(jsonOutputFile, "utf-8");
       const parsed = JSON.parse(jsonContent) as VitestJsonResult;
-      const failures: ServiceTestRunResult["failures"] = [];
-      for (const suite of parsed.testResults) {
-        for (const assertion of suite.assertionResults) {
-          if (assertion.status === "failed") {
-            failures.push({
-              testName: assertion.fullName,
-              message: assertion.failureMessages?.join("\n") ?? "",
-              file: suite.name,
-            });
-          }
-        }
-      }
+      const failures = extractFailures(parsed);
       return {
         data: {
           command: "service.test.run",
