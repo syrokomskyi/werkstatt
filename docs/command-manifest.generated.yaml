@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 5c1bc5d3e2e3188462acf6fe40f24cd5aa7718e191e52a70e6b751a2c8c7fdbb
+  contentHash: 175052d56ff4df6f5b2d419daef0f5e8e0d4cfd1e775878ba92fa5f9a981e1c3
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -3496,6 +3496,39 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: contract.list
+    description: "RFC-0827: list all registered site-service contracts with id,
+      name, direction, version, and description."
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: contract.validate
+    description: "RFC-0827: validate site-service contract schemas are valid Zod,
+      have both request and response, and are referenced by site and service
+      code (CONTRACT-01..05)."
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - packages/werkstatt-site/src/testing/contract/**/*.ts
+      - packages/werkstatt-site/src/domain/**/*.ts
+      - services/*/src/**/*.ts
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
   - name: cosmic.catalog.validate
     description: "Validate every cosmicName in every manifest.yaml is a member of
       the correct closed catalog for its layer: star→page, planet→section,
@@ -11895,6 +11928,29 @@ commands:
       - <app>/dist/client/sitemap*.xml
       - <app>/public/robots.txt
       - <app>/public/llms.txt
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: service.integration.run
+    description: "Run vitest-based integration tests for a service against a
+      dev-deployed URL (RFC-0826). Flags: --service, --url."
+    scope: workspace
+    provider: workspace
+    module: testing
+    mutatesState: false
+    requiresNetwork: true
+    timeoutMs: null
+    flags:
+      service:
+        kind: string
+        required: true
+        description: Service id from services/registry.yaml.
+      url:
+        kind: string
+        required: true
+        description: Base URL of the dev-deployed Worker (e.g. https://example.workers.dev).
+    reads:
+      - packages/werkstatt-site/src/testing/integration/services/<service-id>/**/*.test.ts
     writes: []
     validatesOutputs: []
     pipelines: []
