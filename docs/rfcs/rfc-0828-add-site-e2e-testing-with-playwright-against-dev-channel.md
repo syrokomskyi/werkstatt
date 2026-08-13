@@ -1,12 +1,13 @@
 ---
 id: RFC-0828
 title: "Add site E2E testing with Playwright against dev channel"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
