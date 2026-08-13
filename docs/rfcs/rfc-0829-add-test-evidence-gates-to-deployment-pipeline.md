@@ -1,12 +1,13 @@
 ---
 id: RFC-0829
 title: "Add test evidence gates to deployment pipeline"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
