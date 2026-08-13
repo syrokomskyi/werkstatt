@@ -56,6 +56,10 @@ This repository uses **Git LFS** for media files. Ensure `git lfs install` has b
 
 Tracked patterns (legacy from `apps/**`, retained for historical content): `apps/**/*.mp4`, `apps/**/*.webm`, `apps/**/*.png`, `apps/**/*.jpg`, `apps/**/*.jpeg`, `apps/**/*.webp`. New site media should be colocated under `missions/*/workpiece/public/**` or `systems/<id>/public/**`.
 
+## Handoff documents
+
+Handoff documents MUST be saved in `docs/handoffs/` (declared as `paths.handoffsDir` in `forge.yaml`), NOT in the OS temp directory (`/tmp/`). The `fo-handoff` skill resolves the target directory from `forge.yaml`. Filename pattern: `handoff-YYYY-MM-DD-session-<brief-description>.md`. After saving, commit the handoff document via `ecosystem.commit`.
+
 ## .gitignore anchoring
 
 When adding a `.gitignore` pattern that targets a **top-level** directory or file (e.g. `agents/`, `missions/`, `notausgang-*`), always anchor it with a leading `/` (e.g. `/agents/`, `/notausgang-*`). Without the leading `/`, git treats the pattern as matching any path component at any depth — so `agents/` blocks `docs/agents/` and `packages/os/site-kernel-changelog/src/changelog/agents/` too. This caused 11 source files to be silently excluded from commits (discovered 2026-08-04).
