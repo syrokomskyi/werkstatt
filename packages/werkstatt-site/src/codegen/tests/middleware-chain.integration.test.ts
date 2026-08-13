@@ -186,6 +186,30 @@ test("ADR-0039: middleware chain templates typecheck together", () => {
   }
 });
 
+test("middleware template guards fileURLToPath inside DEV check (CF Workers regression)", () => {
+  const tmpDir = setupTempProject();
+  try {
+    generateMiddlewareChain(tmpDir);
+    const middlewareContent = fs.readFileSync(path.join(tmpDir, "src", "middleware.ts"), "utf8");
+
+    // fileURLToPath(import.meta.url) must NOT appear outside of a DEV guard.
+    // In Cloudflare Workers, import.meta.url is undefined → TypeError at module load.
+    const lines = middlewareContent.split("\n");
+    let inDevBranch = false;
+    let foundUnguardedFileURLToPath = false;
+    for (const line of lines) {
+      if (line.includes("import.meta.env.DEV")) inDevBranch = true;
+      if (line.includes("fileURLToPath(import.meta.url)") && !inDevBranch) {
+        foundUnguardedFileURLToPath = true;
+        break;
+      }
+    }
+    expect(foundUnguardedFileURLToPath).toBe(false);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
 test("ADR-0039: integration test catches missing default export (regression guard)", () => {
   const tmpDir = setupTempProject();
   try {
