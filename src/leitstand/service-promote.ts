@@ -10,6 +10,7 @@ lock, wrangler deploy, health check, and prod state recording.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0806: initial promote command handler (replaces leitstand.service.deploy).</item>
+  <item>RFC-0829: add test evidence gate (L1+L2+L5) via shared runTestEvidenceGate helper; throw after grace period if git HEAD unresolvable.</item>
 </CHANGE_SUMMARY>
 */
 

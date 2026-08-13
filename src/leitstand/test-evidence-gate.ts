@@ -2,12 +2,6 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0829: Shared test evidence gate helper for leitstand deployment commands.
 Wraps executeKernelCommand calls to test.evidence.verify, eliminating duplicated gate logic.</purpose>
-<keywords>test, evidence, gate, leitstand, deployment, verify</keywords>
-<responsibilities>
-  <item>Provides runTestEvidenceGate helper that calls test.evidence.verify via executeKernelCommand.</item>
-  <item>Logs pass/fail status with command context.</item>
-  <item>Throws on fatal gate failure (exitCode 1) to block deployment.</item>
-</responsibilities>
 <non-goals>
   <item>Does not define test evidence types or storage — those live in @warpgogol/werkstatt-site/testing.</item>
   <item>Does not register kernel commands.</item>
