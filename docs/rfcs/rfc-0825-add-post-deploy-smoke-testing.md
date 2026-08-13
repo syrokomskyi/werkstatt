@@ -1,7 +1,7 @@
 ---
 id: RFC-0825
 title: "Add post-deploy smoke testing"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
-implementedAt:
+implementedAt: 2026-08-13
 closedAt:
 supersedes: []
 supersededBy:
@@ -290,18 +290,18 @@ interface SmokeCheckResult {
 
 ## Acceptance criteria
 
-- [ ] `service.smoke.run` command registered and functional
-- [ ] `site.smoke.run` command registered and functional
-- [ ] `service-smoke.yaml` created with entries for all existing services
-- [ ] `site-smoke.yaml` created with entries for warpgogol-com
-- [ ] `leitstand.service.dev-deploy` calls `service.smoke.run` after health check
-- [ ] `leitstand.service.promote` calls `service.smoke.run` and blocks on failure
-- [ ] `leitstand.dev-deploy` calls `site.smoke.run` after Axiom
-- [ ] `leitstand.propagate` calls `site.smoke.run` and blocks on failure
-- [ ] `leitstand.promote` calls `site.smoke.run` and blocks on failure
-- [ ] Smoke evidence recorded in deployment state (`smokeResult` field in `ServiceDevDeployData`/`ServicePromoteData` and site deploy state)
-- [ ] Unit tests for `smoke-runner.ts` covering status-code matching, body-contains logic, timeout handling, and missing-YAML-file behavior
-- [ ] `rfc.validate` passes on this file
+- [x] `service.smoke.run` command registered and functional (evidence: `packages/werkstatt-site/src/testing/module.ts` registers `service.smoke.run` command)
+- [x] `site.smoke.run` command registered and functional (evidence: `packages/werkstatt-site/src/testing/module.ts` registers `site.smoke.run` command)
+- [x] `service-smoke.yaml` created with entries for all existing services (evidence: `packages/werkstatt-site/src/testing/smoke/service-smoke.yaml` covers all 5 registry services)
+- [x] `site-smoke.yaml` created with entries for warpgogol-com (evidence: `packages/werkstatt-site/src/testing/smoke/site-smoke.yaml` contains warpgogol-com entry)
+- [x] `leitstand.service.dev-deploy` calls `service.smoke.run` after health check (evidence: `packages/werkstatt/src/leitstand/service-dev-deploy.ts` step 6)
+- [x] `leitstand.service.promote` calls `service.smoke.run` and blocks on failure (evidence: `packages/werkstatt/src/leitstand/service-promote.ts` step 7 returns exitCode 1 on smoke fail)
+- [x] `leitstand.dev-deploy` calls `site.smoke.run` after Axiom (evidence: `packages/werkstatt/src/leitstand/leitstand-commands.ts` runLeitstandDevDeploy post-Axiom smoke step)
+- [x] `leitstand.propagate` calls `site.smoke.run` and blocks on failure (evidence: `packages/werkstatt/src/leitstand/leitstand-commands.ts` runLeitstandPropagate returns exitCode 1 on smoke fail)
+- [x] `leitstand.promote` calls `site.smoke.run` and blocks on failure (evidence: `packages/werkstatt/src/leitstand/leitstand-commands.ts` runLeitstandPromote returns exitCode 1 on smoke fail)
+- [x] Smoke evidence recorded in deployment state (evidence: `smokeResult` field in `ServiceDevDeployData`, `ServicePromoteData`, `DevDeployResult`, `LeitstandPropagateData`, `LeitstandPromoteData`)
+- [x] Unit tests for `smoke-runner.ts` covering status-code matching, body-contains logic, timeout handling, and missing-YAML-file behavior (evidence: `packages/werkstatt-site/src/testing/smoke/smoke-runner.test.ts` 11 tests passing)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0825` passes with 0 errors)
 
 ## Implementation notes for agents
 

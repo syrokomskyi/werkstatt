@@ -42,6 +42,8 @@
   <entry key="nachweis.*">Registers workspace nachweis commands: nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw (RFC-0707).</entry>
   <entry key="exploration.*">Registers workspace exploration note commands: exploration.list, exploration.show, exploration.archive (RFC-0710).</entry>
   <entry key="werkstatt.plugin.validate">Registers workspace plugin contract validation command (RFC-0770).</entry>
+  <entry key="service.smoke.run">RFC-0825: post-deploy smoke tests for services.</entry>
+  <entry key="site.smoke.run">RFC-0825: post-deploy smoke tests for sites.</entry>
 </MODULE_MAP>
 <CHANGE_SUMMARY>
   <item>Initial workspace-level kernel configuration.</item>
@@ -111,6 +113,8 @@ export default defineKernelConfig({
       (await import("@warpgogol/werkstatt/observability/module")).observabilityModule,
     onboarding: async () =>
       (await import("@warpgogol/werkstatt-site/onboarding/module")).createOnboardingModule(),
+    testing: async () =>
+      (await import("@warpgogol/werkstatt-site/testing/module")).createTestingModule(),
     handoff: async () =>
       (await import("@warpgogol/werkstatt/handoff-module")).createHandoffModule(),
     sternsystem: async () =>

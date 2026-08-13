@@ -426,5 +426,9 @@
       <change-type>Content regression gate changes (RFC-0732, RFC-0734)</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt-site/checks build:check` and `pnpm --filter @warpgogol/werkstatt-site/checks test`; run `pnpm exec werkstatt run content.regression.check --site <site-id>` to verify resolved content drift detection (CREG-01 error for content drift, CREG-02 error for route set mismatch, CREG-03 warning for cold start); run `pnpm exec werkstatt run content.regression.review.generate --site <site-id>` to generate review.yaml; run `pnpm exec werkstatt run content.regression.apply --site <site-id> --review <path>` to apply decisions (CREG-04 error for workpiece mismatch); run `mission.close` to verify CREG-05 blocks unreviewed drift.</expectation>
     </entry>
+    <entry id="vm-13">
+      <change-type>Post-deploy smoke testing changes (RFC-0825)</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/testing/smoke/smoke-runner.test.ts`; run `pnpm --filter @warpgogol/werkstatt build:check` to verify deploy data types; run `pnpm exec werkstatt run service.smoke.run --service <id> --url <url>` and `pnpm exec werkstatt run site.smoke.run --site <id> --url <url>` to verify smoke commands are registered and execute correctly.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>
