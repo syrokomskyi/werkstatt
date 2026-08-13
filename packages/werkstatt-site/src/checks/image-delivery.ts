@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  [RFC-0830] Post-build validator that scans rendered HTML in dist/client/ for
+  RFC-0830: Post-build validator that scans rendered HTML in dist/client/ for
   all <img> elements and validates responsive delivery (srcset presence),
   compression budgets, and LCP image optimization attributes.
   Rules: IMG-DELIVERY-01 (srcset), IMG-DELIVERY-02 (compression budget),
@@ -22,7 +22,7 @@
 import { join, resolve } from "node:path";
 import { readFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { parse } from "parse5";
+import { parse, type DefaultTreeAdapterMap } from "parse5";
 import picomatch from "picomatch";
 import { parse as yamlParse } from "yaml";
 import type {
@@ -33,10 +33,16 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { collectRenderedHtml } from "./audit/validators/helpers.ts";
 
-/* eslint-disable @typescript-eslint/no-explicit-any -- parse5 tree types conflict with DOM lib */
-type TreeNode = any;
-type TreeParentNode = any;
-type TreeElementNode = any;
+type TreeNode = DefaultTreeAdapterMap["node"];
+type TreeParentNode = DefaultTreeAdapterMap["parentNode"];
+
+interface ElementNode {
+  nodeName: string;
+  tagName: string;
+  attrs: Array<{ name: string; value: string }>;
+  childNodes: TreeNode[];
+  sourceCodeLocation?: { startLine?: number };
+}
 
 const COMMAND = "image.delivery.validate";
 
@@ -73,15 +79,15 @@ interface DeliveryConfig {
   overrides: ConfigOverride[];
 }
 
-function isElementNode(node: TreeNode): node is TreeElementNode {
-  return node && typeof node === "object" && "tagName" in node && node.tagName !== undefined;
+function isElementNode(node: unknown): node is ElementNode {
+  return node !== null && typeof node === "object" && "tagName" in node;
 }
 
 function hasChildNodes(node: TreeNode): node is TreeParentNode {
-  return node && typeof node === "object" && "childNodes" in node;
+  return node !== null && typeof node === "object" && "childNodes" in node;
 }
 
-function getAttr(el: TreeElementNode, name: string): string | undefined {
+function getAttr(el: ElementNode, name: string): string | undefined {
   return el.attrs?.find((a: { name: string; value: string }) => a.name === name)?.value;
 }
 
@@ -189,10 +195,8 @@ function isRuleSkipped(config: DeliveryConfig | null, src: string, rule: string)
   });
 }
 
-function collectImgElements(
-  document: TreeParentNode,
-): Array<{ el: TreeElementNode; line: number }> {
-  const results: Array<{ el: TreeElementNode; line: number }> = [];
+function collectImgElements(document: TreeParentNode): Array<{ el: ElementNode; line: number }> {
+  const results: Array<{ el: ElementNode; line: number }> = [];
 
   function walk(node: TreeParentNode): void {
     const children = node.childNodes;

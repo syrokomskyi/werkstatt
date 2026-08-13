@@ -125,7 +125,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: [
       "<app>/dist/client/**/*.html",
-      "<app>/dist/client/_img/**/*.webp",
+      "<app>/dist/client/**/*.{webp,png,jpeg,jpg}",
       "<app>/src/image-delivery.config.yaml",
     ],
     modulePaths: ["image-delivery.ts"],
