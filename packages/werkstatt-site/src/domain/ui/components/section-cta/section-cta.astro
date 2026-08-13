@@ -60,6 +60,13 @@ if (target.kind === "internal") {
 }
 
 const Icon = icon ? await loadVendorIcon(icon) : null;
+
+// WCAG 2.5.3 Label in Name: if ariaLabel is set but doesn't contain the visible
+// label text, prepend the label so the accessible name includes the visible text.
+const resolvedAriaLabel =
+  ariaLabel && label && !ariaLabel.toLowerCase().includes(label.toLowerCase())
+    ? `${label} — ${ariaLabel}`
+    : ariaLabel;
 ---
 
 {
@@ -73,7 +80,7 @@ const Icon = icon ? await loadVendorIcon(icon) : null;
         { "section-cta--full-width": fullWidth },
         extraClass,
       ]}
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       rel={rel}
       {...externalAttrs}
     >

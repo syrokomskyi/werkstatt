@@ -80,6 +80,26 @@ const secondaryCtaHref =
     ? await resolveSemanticTarget({ kind: "internal", pageId: secondaryCtaTarget }, lang)
     : null);
 
+// WCAG 2.5.3 Label in Name: if ariaLabel is set but doesn't contain the visible
+// label text, prepend the label so the accessible name includes the visible text.
+function resolveLabelInName(
+  ariaLabel: string | undefined,
+  label: string | undefined,
+): string | undefined {
+  if (!ariaLabel || !label) return ariaLabel;
+  if (ariaLabel.toLowerCase().includes(label.toLowerCase())) return ariaLabel;
+  return `${label} — ${ariaLabel}`;
+}
+
+const resolvedCtaPrimaryAriaLabel = resolveLabelInName(
+  props.ctaPrimaryAriaLabel,
+  props.ctaPrimaryLabel,
+);
+const resolvedCtaSecondaryAriaLabel = resolveLabelInName(
+  props.ctaSecondaryAriaLabel,
+  props.ctaSecondaryLabel,
+);
+
 // RFC-0167: a universal hero renders without stats (e.g. a text-only legal hero).
 // No placeholder default — an empty stats array simply omits the stats block.
 const stats = props.stats ?? [];
@@ -191,7 +211,7 @@ const portraitImageClass = [
             <a
               href={primaryCtaHref}
               class="btn btn--primary hero__cta"
-              aria-label={props.ctaPrimaryAriaLabel}
+              aria-label={resolvedCtaPrimaryAriaLabel}
             >
               {props.ctaPrimaryLabel}
             </a>
@@ -202,7 +222,7 @@ const portraitImageClass = [
             <a
               href={secondaryCtaHref}
               class="btn btn--secondary hero__cta-secondary"
-              aria-label={props.ctaSecondaryAriaLabel}
+              aria-label={resolvedCtaSecondaryAriaLabel}
             >
               {props.ctaSecondaryLabel}
             </a>
