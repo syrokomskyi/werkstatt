@@ -119,7 +119,7 @@ interface LabelInNameResult {
   command: "a11y.label-in-name.validate";
   status: "pass" | "fail";
   diagnostics: LabelInNameDiagnostic[];
-  checkedElements: number;
+  summary: { error: number; warning: number; info: number };
 }
 ```
 
@@ -187,7 +187,7 @@ if visibleText.length > 0 && !accessibleName.includes(visibleText):
       }
     }
   ],
-  "checkedElements": 15
+  "summary": { "error": 1, "warning": 0, "info": 0 }
 }
 ```
 
