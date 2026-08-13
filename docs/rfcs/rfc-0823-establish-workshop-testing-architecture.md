@@ -11,7 +11,6 @@ reviewers:
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
-acceptedAt: 2026-08-13
 implementedAt:
 closedAt:
 supersedes: []
