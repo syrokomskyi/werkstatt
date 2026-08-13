@@ -51,9 +51,18 @@ const brandImage = content.brandImage
 // RFC-0160: home link is unprefixed for the default language, prefixed otherwise.
 const { defaultLanguage } = await getRouteRegistry();
 const homeHref = localizeUrl(activeLang, "", { defaultLanguage });
+
+// WCAG 2.5.3 Label in Name: if brandAriaLabel is set but doesn't contain the
+// visible brandLabel text, prepend the label so the accessible name includes it.
+const resolvedBrandAriaLabel =
+  content.brandAriaLabel &&
+  content.brandLabel &&
+  !content.brandAriaLabel.toLowerCase().includes(content.brandLabel.toLowerCase())
+    ? `${content.brandLabel} — ${content.brandAriaLabel}`
+    : content.brandAriaLabel;
 ---
 
-<a href={homeHref} class="brand-label" aria-label={content.brandAriaLabel}>
+<a href={homeHref} class="brand-label" aria-label={resolvedBrandAriaLabel}>
   {
     brandImage ? (
       <ResponsiveImage
