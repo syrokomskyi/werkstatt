@@ -23,6 +23,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `@warpgogol/werkstatt-site/testing/module`         | `./src/testing/module.ts`               |
 | `@warpgogol/werkstatt-site/testing/smoke`          | `./src/testing/smoke/index.ts`          |
 | `@warpgogol/werkstatt-site/testing/contract`       | `./src/testing/contract/index.ts`       |
+| `@warpgogol/werkstatt-site/testing/e2e`            | `./src/testing/e2e/run-e2e-tests.ts`    |
 | `@warpgogol/werkstatt-site/audit`                  | `./src/audit/index.ts`                  |
 | `@warpgogol/werkstatt-site/changelog`              | `./src/changelog/index.ts`              |
 | `@warpgogol/werkstatt-site/deploy`                 | `./src/deploy/index.ts`                 |
@@ -57,7 +58,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `src/checks/check-warpgogol/` | `site-kernel-check-warpgogol` | `moduleLoaders` (check-warpgogol ecosystem) |
 | `src/deploy/` | `site-kernel-deploy` | `deployAdapters` |
 | `src/changelog/` | `site-kernel-changelog` renderers | `moduleLoaders` |
-| `src/testing/` | RFC-0825: post-deploy smoke testing, RFC-0827: site-service contract testing | `moduleLoaders` (smoke run commands, contract validate/list) |
+| `src/testing/` | RFC-0825: post-deploy smoke testing, RFC-0827: site-service contract testing, RFC-0828: site E2E testing with Playwright | `moduleLoaders` (smoke run commands, contract validate/list, E2E run command) |
 
 ## Check commands
 

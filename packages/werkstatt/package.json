@@ -294,6 +294,10 @@
     "./testing/integration": {
       "types": "./src/testing/integration/index.ts",
       "default": "./src/testing/integration/index.ts"
+    },
+    "./testing/e2e": {
+      "types": "./src/testing/e2e/index.ts",
+      "default": "./src/testing/e2e/index.ts"
     }
   },
   "files": ["src", "bin", "os"],

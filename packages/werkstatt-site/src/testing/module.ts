@@ -1,23 +1,25 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0825 + RFC-0826: Testing module — registers service.smoke.run,
-site.smoke.run, and service.integration.run kernel commands. Delegates to the
-smoke runner and integration runner.</purpose>
-<keywords>smoke, integration, testing, module, kernel, commands</keywords>
+<purpose>RFC-0825 + RFC-0826 + RFC-0828: Testing module — registers service.smoke.run,
+site.smoke.run, service.integration.run, and site.e2e.run kernel commands. Delegates to the
+smoke runner, integration runner, and E2E runner.</purpose>
+<keywords>smoke, integration, e2e, testing, module, kernel, commands</keywords>
 <responsibilities>
-  <item>Registers service.smoke.run, site.smoke.run, and service.integration.run commands.</item>
+  <item>Registers service.smoke.run, site.smoke.run, service.integration.run, and site.e2e.run commands.</item>
   <item>Resolves YAML definition file paths relative to this module.</item>
-  <item>Returns structured SmokeRunResult / IntegrationRunResult via KernelCommandResult.data.</item>
+  <item>Returns structured SmokeRunResult / IntegrationRunResult / SiteE2eRunResult via KernelCommandResult.data.</item>
 </responsibilities>
 <non-goals>
   <item>Do not implement fetch logic — that lives in smoke-runner.ts.</item>
   <item>Do not implement vitest spawning — that lives in integration-runner.ts.</item>
+  <item>Do not implement Playwright spawning — that lives in e2e/run-e2e-tests.ts.</item>
   <item>Do not integrate with deployment pipelines — that lives in leitstand commands.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0825: initial testing module with smoke test commands.</item>
   <item>RFC-0826: added service.integration.run command for vitest-based integration tests.</item>
+  <item>RFC-0828: added site.e2e.run command for Playwright E2E tests against dev channel.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -30,6 +32,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
 import type { IntegrationRunResult } from "@warpgogol/werkstatt/testing/integration";
+import type { SiteE2eRunResult } from "@warpgogol/werkstatt/testing/e2e";
 import {
   runSmokeChecks,
   SmokeConfigNotFoundError,
@@ -39,6 +42,7 @@ import {
   runServiceIntegrationTests,
   IntegrationTestDirNotFoundError,
 } from "./integration/integration-runner.ts";
+import { runSiteE2eTests, ChromiumNotInstalledError } from "./e2e/run-e2e-tests.ts";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -232,6 +236,55 @@ async function runServiceIntegration(
   }
 }
 
+async function runSiteE2e(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<SiteE2eRunResult>> {
+  const site = (input.flags.site as string | undefined) ?? context.site?.name;
+  const url = input.flags.url as string | undefined;
+
+  if (!site) {
+    return {
+      exitCode: 1,
+      summary: "site.e2e.run: --site is required",
+    };
+  }
+
+  context.logger.info(
+    `[site.e2e.run] running E2E tests for ${site}${url ? ` against ${url}` : " (resolving URL)"}…`,
+  );
+
+  try {
+    const result = await runSiteE2eTests(site, context.workspaceRoot, url, context.logger);
+
+    if (result.status === "skipped") {
+      return {
+        data: result,
+        exitCode: 0,
+        summary: `site.e2e.run: skipped (no E2E tests for ${site})`,
+      };
+    }
+
+    return {
+      data: result,
+      exitCode: result.status === "pass" ? 0 : 1,
+      summary:
+        result.status === "pass"
+          ? `site.e2e.run: ${result.testsPassed} test(s) passed`
+          : `site.e2e.run: ${result.testsFailed}/${result.testsPassed + result.testsFailed} test(s) failed`,
+    };
+  } catch (err) {
+    if (err instanceof ChromiumNotInstalledError) {
+      context.logger.warn(`[site.e2e.run] ${err.message}`);
+      return {
+        exitCode: 1,
+        summary: `site.e2e.run: Chromium not installed — run \`pnpm exec playwright install chromium\``,
+      };
+    }
+    throw err;
+  }
+}
+
 export function createTestingModule(): KernelModule {
   return {
     name: "testing",
@@ -309,6 +362,34 @@ export function createTestingModule(): KernelModule {
         ],
         execute: runServiceIntegration,
       } satisfies KernelCommandDefinition<IntegrationRunResult>);
+
+      registry.registerCommand({
+        name: "site.e2e.run",
+        description:
+          "Run Playwright E2E tests for a site against a dev-deployed URL (RFC-0828). " +
+          "Flags: --site (required), --url (optional, resolved from fleet if not provided).",
+        scope: "workspace",
+        supportsAllSites: true,
+        cacheable: false,
+        requiresNetwork: true,
+        longRunning: true,
+        flags: {
+          site: {
+            kind: "string",
+            required: true,
+            description: "Sternsystem id.",
+          },
+          url: {
+            kind: "string",
+            required: false,
+            description:
+              "Base URL to test against (e.g. https://example.workers.dev). " +
+              "If not provided, resolved from fleet/fleet.sites.yaml.",
+          },
+        },
+        reads: ["packages/werkstatt-site/src/testing/e2e/*.test.ts"],
+        execute: runSiteE2e,
+      } satisfies KernelCommandDefinition<SiteE2eRunResult>);
     },
   };
 }

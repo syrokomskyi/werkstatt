@@ -82,6 +82,7 @@ import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-stor
 import { execSync } from "node:child_process";
 import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
+import type { SiteE2eRunResult } from "@warpgogol/werkstatt/testing/e2e";
 import { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";
 import type { Finding } from "@syrokomskyi/axiom-study";
 import {
@@ -119,6 +120,31 @@ async function runSiteSmokeCheck(
     logger.warn(
       `[smoke] site.smoke.run failed: ${err instanceof Error ? err.message : String(err)}`,
     );
+    return undefined;
+  }
+}
+
+async function runSiteE2eCheck(
+  workspaceRoot: string,
+  systemId: string,
+  deployedUrl: string,
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+): Promise<SiteE2eRunResult | undefined> {
+  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+  logger.info(`[e2e] running site.e2e.run for ${systemId} against ${deployedUrl}…`);
+  try {
+    const result = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: "site.e2e.run",
+      argv: [`--site=${systemId}`, `--url=${deployedUrl}`],
+    })) as { exitCode?: number; data?: SiteE2eRunResult };
+    if (result.data) {
+      return result.data;
+    }
+    logger.warn(`[e2e] site.e2e.run returned no data (exitCode=${result.exitCode ?? "unknown"})`);
+    return undefined;
+  } catch (err) {
+    logger.warn(`[e2e] site.e2e.run failed: ${err instanceof Error ? err.message : String(err)}`);
     return undefined;
   }
 }
@@ -667,6 +693,7 @@ export interface DevDeployResult {
     freshness: FreshnessResult;
   };
   smokeResult?: SmokeRunResult;
+  e2eResult?: SiteE2eRunResult;
   evidenceSynced: boolean;
   evidenceSyncError: string | null;
   releaseDeployed?: string;
@@ -1604,6 +1631,12 @@ export async function runLeitstandDevDeploy(
     smokeResult = await runSiteSmokeCheck(workspaceRoot, systemId, result.deploymentUrl, logger);
   }
 
+  // RFC-0828: Post-deploy E2E check (best-effort, non-blocking warning on dev-deploy)
+  let e2eResult: DevDeployResult["e2eResult"];
+  if (result.state === "succeeded" && result.deploymentUrl) {
+    e2eResult = await runSiteE2eCheck(workspaceRoot, systemId, result.deploymentUrl, logger);
+  }
+
   // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
   return {
     data: {
@@ -1628,6 +1661,7 @@ export async function runLeitstandDevDeploy(
         freshness,
       },
       smokeResult,
+      e2eResult,
       evidenceSynced,
       evidenceSyncError,
     },

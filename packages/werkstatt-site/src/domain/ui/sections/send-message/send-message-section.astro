@@ -19,7 +19,12 @@
 
 import { getEntry } from "astro:content";
 import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
-import { cast, need, resolveSectionAnchor, getSiteSectionLabels } from "@warpgogol/werkstatt-site/share";
+import {
+  cast,
+  need,
+  resolveSectionAnchor,
+  getSiteSectionLabels,
+} from "@warpgogol/werkstatt-site/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import TodoListIcon from "../../icons/gen/lordicon/doodle-outline/t/to-do-list-hover-icon.astro";
@@ -121,6 +126,7 @@ const hasChecklist = checklistItems.length > 0;
     <form
       class="send-message__form"
       data-send-message-form
+      data-testid="contact-form"
       autocomplete="off"
       data-endpoint={endpoint}
       data-form-id={formId}
@@ -166,6 +172,7 @@ const hasChecklist = checklistItems.length > 0;
           name="contact-message"
           autocomplete="off"
           data-send-message-textarea
+          data-testid="contact-message"
           placeholder={resolveLabel("placeholder", "")}
           aria-describedby="send-message-hint"></textarea>
       </label>
@@ -233,6 +240,7 @@ const hasChecklist = checklistItems.length > 0;
           class="send-message__button"
           type="submit"
           data-send-message-submit
+          data-testid="contact-submit"
           data-default-label={resolveLabel("buttonLabel", "")}
         >
           {resolveLabel("buttonLabel", "")}
@@ -240,13 +248,23 @@ const hasChecklist = checklistItems.length > 0;
       </div>
     </form>
 
-    <div class="send-message__success" data-send-message-success hidden>
+    <div
+      class="send-message__success"
+      data-send-message-success
+      data-testid="contact-success"
+      hidden
+    >
       {resolveLabel("successMessage", "")}
     </div>
 
     {
       fallbackEmail && (
-        <div class="send-message__fallback" data-send-message-fallback hidden>
+        <div
+          class="send-message__fallback"
+          data-send-message-fallback
+          data-testid="contact-error"
+          hidden
+        >
           <p class="send-message__fallback-error">{resolveLabel("errorMessage", "")}</p>
           {resolveLabel("fallbackEmailLabel", "") && (
             <p class="send-message__fallback-lead">{resolveLabel("fallbackEmailLabel", "")}</p>

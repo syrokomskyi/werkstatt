@@ -1331,6 +1331,10 @@
     "./testing/contract": {
       "types": "./src/testing/contract/index.ts",
       "default": "./src/testing/contract/index.ts"
+    },
+    "./testing/e2e": {
+      "types": "./src/testing/e2e/run-e2e-tests.ts",
+      "default": "./src/testing/e2e/run-e2e-tests.ts"
     }
   },
   "files": ["src"],

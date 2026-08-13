@@ -11,3 +11,8 @@ export {
   resolveIntegrationTestDir,
   IntegrationTestDirNotFoundError,
 } from "./integration/integration-runner.ts";
+export {
+  runSiteE2eTests,
+  ensureChromiumInstalled,
+  ChromiumNotInstalledError,
+} from "./e2e/run-e2e-tests.ts";
