@@ -306,16 +306,16 @@ function ensureChromium(): void {
 
 ## Acceptance criteria
 
-- [ ] `site.e2e.run` command registered and functional
-- [ ] `playwright.e2e.config.ts` created
-- [ ] Chromium pre-check integrated into `site.e2e.run`
-- [ ] `contact-form.test.ts` passes against dev-deployed warpgogol-com
-- [ ] `navigation.test.ts` passes against dev-deployed warpgogol-com
-- [ ] `api-routes.test.ts` passes against dev-deployed warpgogol-com
-- [ ] `robots-sitemap.test.ts` passes against dev-deployed warpgogol-com
-- [ ] `leitstand.dev-deploy` calls `site.e2e.run` after Axiom + smoke
-- [ ] E2E test evidence recorded in dev-deploy state
-- [ ] `rfc.validate` passes on this file
+- [x] `site.e2e.run` command registered and functional (evidence: packages/werkstatt-site/src/testing/module.ts:366-392)
+- [x] `playwright.e2e.config.ts` created (evidence: packages/werkstatt-site/src/testing/e2e/playwright.e2e.config.ts)
+- [x] Chromium pre-check integrated into `site.e2e.run` (evidence: packages/werkstatt-site/src/testing/e2e/run-e2e-tests.ts:ensureChromiumInstalled)
+- [ ] `contact-form.test.ts` passes against dev-deployed warpgogol-com (requires runtime verification by operator)
+- [ ] `navigation.test.ts` passes against dev-deployed warpgogol-com (requires runtime verification by operator)
+- [ ] `api-routes.test.ts` passes against dev-deployed warpgogol-com (requires runtime verification by operator)
+- [ ] `robots-sitemap.test.ts` passes against dev-deployed warpgogol-com (requires runtime verification by operator)
+- [x] `leitstand.dev-deploy` calls `site.e2e.run` after Axiom + smoke (evidence: packages/werkstatt/src/leitstand/leitstand-commands.ts:1634-1638)
+- [x] E2E test evidence recorded in dev-deploy state (evidence: packages/werkstatt/src/leitstand/leitstand-commands.ts:671 — e2eResult field in DevDeployResult)
+- [x] `rfc.validate` passes on this file (evidence: verified during audit phase)
 
 ## Implementation notes for agents
 
