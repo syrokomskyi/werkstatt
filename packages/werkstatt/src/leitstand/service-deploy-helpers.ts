@@ -58,6 +58,7 @@ export interface ServicePromoteData {
   healthState: "healthy" | "unhealthy" | "unknown";
   smokeResult?: SmokeRunResult;
   preDeployGates: PreDeployGateResult[];
+  testEvidenceVerified: boolean;
   startedAt: string;
   completedAt: string;
   operationId: string;

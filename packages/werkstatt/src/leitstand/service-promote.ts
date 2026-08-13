@@ -97,6 +97,7 @@ export async function runLeitstandServicePromote(
         workersDevUrl: serviceEntry.workersDevUrl ?? "",
         healthState: "unknown",
         preDeployGates: gateResults,
+        testEvidenceVerified: false,
         startedAt,
         completedAt: new Date().toISOString(),
         operationId,
@@ -138,6 +139,7 @@ export async function runLeitstandServicePromote(
               workersDevUrl: serviceEntry.workersDevUrl ?? "",
               healthState: "unknown",
               preDeployGates: gateResults,
+              testEvidenceVerified: false,
               startedAt,
               completedAt: new Date().toISOString(),
               operationId,
@@ -153,6 +155,49 @@ export async function runLeitstandServicePromote(
         logger.warn(
           `[leitstand.service.promote] subdomain.validate not available — skipping subdomain validation`,
         );
+      }
+    }
+
+    // RFC-0829: Test evidence gate — verify L1 (unit), L2 (integration), L5 (smoke) evidence
+    {
+      const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+      const { execSync } = await import("node:child_process");
+      let commitSha = "";
+      try {
+        commitSha = execSync("git rev-parse HEAD", {
+          cwd: workspaceRoot,
+          encoding: "utf-8",
+        }).trim();
+      } catch {
+        logger.warn(
+          `[leitstand.service.promote] could not resolve git HEAD — skipping test evidence gate`,
+        );
+      }
+      if (commitSha) {
+        logger.info(
+          `[leitstand.service.promote] verifying test evidence (L1, L2, L5) for commit ${commitSha}…`,
+        );
+        const evidenceResult = (await executeKernelCommand({
+          workspaceRoot,
+          commandName: "test.evidence.verify",
+          argv: [`--service=${serviceId}`, `--levels=L1,L2,L5`, `--commit-sha=${commitSha}`],
+        })) as { exitCode?: number; data?: { status: string; summary: string } };
+        if (evidenceResult.data) {
+          if (evidenceResult.data.status === "pass") {
+            logger.info(
+              `[leitstand.service.promote] test evidence: ${evidenceResult.data.summary}`,
+            );
+          } else {
+            logger.warn(
+              `[leitstand.service.promote] test evidence: ${evidenceResult.data.summary}`,
+            );
+            if (evidenceResult.exitCode === 1) {
+              throw new Error(
+                `[leitstand.service.promote] test evidence gate failed: ${evidenceResult.data.summary}`,
+              );
+            }
+          }
+        }
       }
     }
 
@@ -181,6 +226,7 @@ export async function runLeitstandServicePromote(
           extractWorkersDevUrl(wranglerResult.stdout) ?? serviceEntry.workersDevUrl ?? "",
         healthState: "unknown",
         preDeployGates: gateResults,
+        testEvidenceVerified: true,
         startedAt,
         completedAt: new Date().toISOString(),
         operationId,
@@ -227,6 +273,7 @@ export async function runLeitstandServicePromote(
         healthState,
         smokeResult,
         preDeployGates: gateResults,
+        testEvidenceVerified: true,
         startedAt,
         completedAt: new Date().toISOString(),
         operationId,
@@ -260,6 +307,7 @@ export async function runLeitstandServicePromote(
       healthState,
       smokeResult,
       preDeployGates: gateResults,
+      testEvidenceVerified: true,
       startedAt,
       completedAt,
       operationId,

@@ -16,3 +16,19 @@ export {
   ensureChromiumInstalled,
   ChromiumNotInstalledError,
 } from "./e2e/run-e2e-tests.ts";
+export {
+  recordTestEvidence,
+  verifyTestEvidence,
+  listTestEvidence,
+  resolveEvidenceDir,
+  GRACE_PERIOD_END,
+} from "./test-evidence.ts";
+export type {
+  TestLevel,
+  TestEvidence,
+  TestFailure,
+  TestEvidenceLevelResult,
+  TestEvidenceVerifyResult,
+  TestEvidenceListEntry,
+  TestEvidenceListResult,
+} from "./test-evidence.ts";

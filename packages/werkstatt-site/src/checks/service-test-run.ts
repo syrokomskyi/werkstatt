@@ -21,6 +21,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
+import { recordTestEvidence, type TestEvidence } from "../testing/test-evidence.ts";
 
 const execFileAsync = promisify(execFile);
 
@@ -179,6 +180,30 @@ export async function runServiceTestRun(
     const failures = extractFailures(parsed);
 
     const status: "pass" | "fail" = parsed.numFailedTests > 0 ? "fail" : "pass";
+
+    const commitSha = input.flags["commit-sha"] as string | undefined;
+    if (commitSha) {
+      try {
+        const evidence: TestEvidence = {
+          testRunId: `service-test-${service}-${Date.now()}`,
+          level: "L1",
+          targetId: service,
+          commitSha,
+          passed: status === "pass",
+          durationMs,
+          timestamp: new Date().toISOString(),
+          failures: failures.map((f) => ({
+            testName: f.testName,
+            message: f.message,
+            file: f.file,
+          })),
+        };
+        await recordTestEvidence(context.workspaceRoot, service, evidence, { service });
+      } catch {
+        // Best-effort — evidence recording failure should not block test reporting
+      }
+    }
+
     return {
       data: {
         command: "service.test.run",

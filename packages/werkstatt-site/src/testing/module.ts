@@ -1,18 +1,20 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0825 + RFC-0826 + RFC-0828: Testing module — registers service.smoke.run,
-site.smoke.run, service.integration.run, and site.e2e.run kernel commands. Delegates to the
-smoke runner, integration runner, and E2E runner.</purpose>
-<keywords>smoke, integration, e2e, testing, module, kernel, commands</keywords>
+<purpose>RFC-0825 + RFC-0826 + RFC-0828 + RFC-0829: Testing module — registers service.smoke.run,
+site.smoke.run, service.integration.run, site.e2e.run, test.evidence.verify, and test.evidence.list
+kernel commands. Delegates to the smoke runner, integration runner, E2E runner, and test-evidence module.</purpose>
+<keywords>smoke, integration, e2e, testing, module, kernel, commands, evidence</keywords>
 <responsibilities>
-  <item>Registers service.smoke.run, site.smoke.run, service.integration.run, and site.e2e.run commands.</item>
+  <item>Registers service.smoke.run, site.smoke.run, service.integration.run, site.e2e.run commands.</item>
+  <item>Registers test.evidence.verify and test.evidence.list commands (RFC-0829).</item>
   <item>Resolves YAML definition file paths relative to this module.</item>
-  <item>Returns structured SmokeRunResult / IntegrationRunResult / SiteE2eRunResult via KernelCommandResult.data.</item>
+  <item>Returns structured SmokeRunResult / IntegrationRunResult / SiteE2eRunResult / TestEvidenceVerifyResult / TestEvidenceListResult via KernelCommandResult.data.</item>
 </responsibilities>
 <non-goals>
   <item>Do not implement fetch logic — that lives in smoke-runner.ts.</item>
   <item>Do not implement vitest spawning — that lives in integration-runner.ts.</item>
   <item>Do not implement Playwright spawning — that lives in e2e/run-e2e-tests.ts.</item>
+  <item>Do not implement evidence storage logic — that lives in test-evidence.ts.</item>
   <item>Do not integrate with deployment pipelines — that lives in leitstand commands.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -20,6 +22,7 @@ smoke runner, integration runner, and E2E runner.</purpose>
   <item>RFC-0825: initial testing module with smoke test commands.</item>
   <item>RFC-0826: added service.integration.run command for vitest-based integration tests.</item>
   <item>RFC-0828: added site.e2e.run command for Playwright E2E tests against dev channel.</item>
+  <item>RFC-0829: added test.evidence.verify and test.evidence.list commands.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +36,12 @@ import type {
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
 import type { IntegrationRunResult } from "@warpgogol/werkstatt/testing/integration";
 import type { SiteE2eRunResult } from "@warpgogol/werkstatt/testing/e2e";
+import type {
+  TestEvidenceVerifyResult,
+  TestEvidenceListResult,
+  TestEvidence,
+} from "./test-evidence.ts";
+import { verifyTestEvidence, listTestEvidence, recordTestEvidence } from "./test-evidence.ts";
 import {
   runSmokeChecks,
   SmokeConfigNotFoundError,
@@ -70,6 +79,8 @@ async function runServiceSmoke(
     };
   }
 
+  const commitSha = input.flags["commit-sha"] as string | undefined;
+
   context.logger.info(`[service.smoke.run] running smoke tests for ${service} against ${url}…`);
 
   try {
@@ -85,6 +96,33 @@ async function runServiceSmoke(
     context.logger.info(
       `[service.smoke.run] ${result.status === "pass" ? "all passed" : `${failed.length} check(s) failed`} (${result.durationMs}ms)`,
     );
+
+    if (commitSha) {
+      try {
+        const evidence: TestEvidence = {
+          testRunId: `service-smoke-${service}-${Date.now()}`,
+          level: "L5",
+          targetId: service,
+          commitSha,
+          passed: result.status === "pass",
+          durationMs: result.durationMs,
+          timestamp: new Date().toISOString(),
+          failures: failed.map((c) => ({
+            testName: `${c.method} ${c.path}`,
+            message: c.error ?? "failed",
+            file: c.path,
+          })),
+        };
+        await recordTestEvidence(context.workspaceRoot, service, evidence, { service });
+        context.logger.info(
+          `[service.smoke.run] recorded L5 evidence for ${service} (commit ${commitSha})`,
+        );
+      } catch (err) {
+        context.logger.warn(
+          `[service.smoke.run] failed to record evidence: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
 
     return {
       data: result,
@@ -133,6 +171,9 @@ async function runSiteSmoke(
     };
   }
 
+  const commitSha = input.flags["commit-sha"] as string | undefined;
+  const releaseId = input.flags["release-id"] as string | undefined;
+
   context.logger.info(`[site.smoke.run] running smoke tests for ${site} against ${url}…`);
 
   try {
@@ -148,6 +189,33 @@ async function runSiteSmoke(
     context.logger.info(
       `[site.smoke.run] ${result.status === "pass" ? "all passed" : `${failed.length} check(s) failed`} (${result.durationMs}ms)`,
     );
+
+    if (commitSha) {
+      try {
+        const evidence: TestEvidence = {
+          testRunId: `site-smoke-${site}-${Date.now()}`,
+          level: "L5",
+          targetId: site,
+          commitSha,
+          passed: result.status === "pass",
+          durationMs: result.durationMs,
+          timestamp: new Date().toISOString(),
+          failures: failed.map((c) => ({
+            testName: `${c.method} ${c.path}`,
+            message: c.error ?? "failed",
+            file: c.path,
+          })),
+        };
+        await recordTestEvidence(context.workspaceRoot, site, evidence, { releaseId });
+        context.logger.info(
+          `[site.smoke.run] recorded L5 evidence for ${site} (commit ${commitSha})`,
+        );
+      } catch (err) {
+        context.logger.warn(
+          `[site.smoke.run] failed to record evidence: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
 
     return {
       data: result,
@@ -196,6 +264,8 @@ async function runServiceIntegration(
     };
   }
 
+  const commitSha = input.flags["commit-sha"] as string | undefined;
+
   context.logger.info(
     `[service.integration.run] running integration tests for ${service} against ${url}…`,
   );
@@ -214,6 +284,29 @@ async function runServiceIntegration(
         exitCode: 0,
         summary: `service.integration.run: skipped (no integration tests for ${service})`,
       };
+    }
+
+    if (commitSha) {
+      try {
+        const evidence: TestEvidence = {
+          testRunId: `service-integration-${service}-${Date.now()}`,
+          level: "L2",
+          targetId: service,
+          commitSha,
+          passed: result.status === "pass",
+          durationMs: result.durationMs,
+          timestamp: new Date().toISOString(),
+          failures: [],
+        };
+        await recordTestEvidence(context.workspaceRoot, service, evidence, { service });
+        context.logger.info(
+          `[service.integration.run] recorded L2 evidence for ${service} (commit ${commitSha})`,
+        );
+      } catch (err) {
+        context.logger.warn(
+          `[service.integration.run] failed to record evidence: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
     }
 
     return {
@@ -250,6 +343,9 @@ async function runSiteE2e(
     };
   }
 
+  const commitSha = input.flags["commit-sha"] as string | undefined;
+  const releaseId = input.flags["release-id"] as string | undefined;
+
   context.logger.info(
     `[site.e2e.run] running E2E tests for ${site}${url ? ` against ${url}` : " (resolving URL)"}…`,
   );
@@ -263,6 +359,29 @@ async function runSiteE2e(
         exitCode: 0,
         summary: `site.e2e.run: skipped (no E2E tests for ${site})`,
       };
+    }
+
+    if (commitSha) {
+      try {
+        const evidence: TestEvidence = {
+          testRunId: `site-e2e-${site}-${Date.now()}`,
+          level: "L4",
+          targetId: site,
+          commitSha,
+          passed: result.status === "pass",
+          durationMs: result.durationMs,
+          timestamp: new Date().toISOString(),
+          failures: result.failures ?? [],
+        };
+        await recordTestEvidence(context.workspaceRoot, site, evidence, { releaseId });
+        context.logger.info(
+          `[site.e2e.run] recorded L4 evidence for ${site} (commit ${commitSha})`,
+        );
+      } catch (err) {
+        context.logger.warn(
+          `[site.e2e.run] failed to record evidence: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
     }
 
     return {
@@ -283,6 +402,96 @@ async function runSiteE2e(
     }
     throw err;
   }
+}
+
+async function runTestEvidenceVerify(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<TestEvidenceVerifyResult>> {
+  const target = (input.flags.target as string | undefined) ?? "";
+  const service = input.flags.service as string | undefined;
+  const releaseId = input.flags["release-id"] as string | undefined;
+  const levelsStr = input.flags.levels as string | undefined;
+  const commitSha = input.flags["commit-sha"] as string | undefined;
+
+  const effectiveTarget = target || service || "";
+  if (!effectiveTarget) {
+    return {
+      exitCode: 1,
+      summary: "test.evidence.verify: --target or --service is required",
+    };
+  }
+  if (!levelsStr) {
+    return {
+      exitCode: 1,
+      summary: "test.evidence.verify: --levels is required (e.g. L4,L5)",
+    };
+  }
+  if (!commitSha) {
+    return {
+      exitCode: 1,
+      summary: "test.evidence.verify: --commit-sha is required",
+    };
+  }
+
+  const levels = levelsStr
+    .split(",")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  context.logger.info(
+    `[test.evidence.verify] verifying ${levels.join(",")} evidence for ${effectiveTarget} (commit ${commitSha})…`,
+  );
+
+  const result = await verifyTestEvidence(
+    context.workspaceRoot,
+    effectiveTarget,
+    levels,
+    commitSha,
+    service ? { service } : { releaseId: releaseId ?? target },
+  );
+
+  context.logger.info(`[test.evidence.verify] ${result.summary}`);
+
+  return {
+    data: result,
+    exitCode: result.status === "pass" ? 0 : 1,
+    summary: result.summary,
+  };
+}
+
+async function runTestEvidenceList(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<TestEvidenceListResult>> {
+  const target = (input.flags.target as string | undefined) ?? "";
+  const service = input.flags.service as string | undefined;
+
+  const effectiveTarget = target || service || "";
+  if (!effectiveTarget) {
+    return {
+      exitCode: 1,
+      summary: "test.evidence.list: --target or --service is required",
+    };
+  }
+
+  context.logger.info(`[test.evidence.list] listing evidence for ${effectiveTarget}…`);
+
+  const result = await listTestEvidence(
+    context.workspaceRoot,
+    effectiveTarget,
+    service ? { service } : { releaseId: target },
+  );
+
+  context.logger.info(
+    `[test.evidence.list] found ${result.evidence.length} evidence file(s) for ${effectiveTarget}`,
+  );
+
+  return {
+    data: result,
+    exitCode: 0,
+    summary: `test.evidence.list: ${result.evidence.length} evidence file(s) for ${effectiveTarget}`,
+  };
 }
 
 export function createTestingModule(): KernelModule {
@@ -309,6 +518,12 @@ export function createTestingModule(): KernelModule {
             required: true,
             description: "Base URL to test against (e.g. https://example.workers.dev).",
           },
+          "commit-sha": {
+            kind: "string",
+            required: false,
+            description:
+              "Commit SHA for evidence recording (RFC-0829). If provided, L5 evidence is recorded.",
+          },
         },
         reads: ["packages/werkstatt-site/src/testing/smoke/service-smoke.yaml"],
         execute: runServiceSmoke,
@@ -331,6 +546,18 @@ export function createTestingModule(): KernelModule {
             kind: "string",
             required: true,
             description: "Base URL to test against (e.g. https://example.com).",
+          },
+          "commit-sha": {
+            kind: "string",
+            required: false,
+            description:
+              "Commit SHA for evidence recording (RFC-0829). If provided, L5 evidence is recorded.",
+          },
+          "release-id": {
+            kind: "string",
+            required: false,
+            description:
+              "Release id for evidence storage path (releases/<release-id>/.test-evidence/).",
           },
         },
         reads: ["packages/werkstatt-site/src/testing/smoke/site-smoke.yaml"],
@@ -355,6 +582,12 @@ export function createTestingModule(): KernelModule {
             kind: "string",
             required: true,
             description: "Base URL of the dev-deployed Worker (e.g. https://example.workers.dev).",
+          },
+          "commit-sha": {
+            kind: "string",
+            required: false,
+            description:
+              "Commit SHA for evidence recording (RFC-0829). If provided, L2 evidence is recorded.",
           },
         },
         reads: [
@@ -386,10 +619,94 @@ export function createTestingModule(): KernelModule {
               "Base URL to test against (e.g. https://example.workers.dev). " +
               "If not provided, resolved from fleet/fleet.sites.yaml.",
           },
+          "commit-sha": {
+            kind: "string",
+            required: false,
+            description:
+              "Commit SHA for evidence recording (RFC-0829). If provided, L4 evidence is recorded.",
+          },
+          "release-id": {
+            kind: "string",
+            required: false,
+            description:
+              "Release id for evidence storage path (releases/<release-id>/.test-evidence/).",
+          },
         },
         reads: ["packages/werkstatt-site/src/testing/e2e/*.test.ts"],
         execute: runSiteE2e,
       } satisfies KernelCommandDefinition<SiteE2eRunResult>);
+
+      registry.registerCommand({
+        name: "test.evidence.verify",
+        description:
+          "Verify that test evidence exists and passed for a target (RFC-0829). " +
+          "Flags: --target (site) or --service, --levels (e.g. L4,L5), --commit-sha.",
+        scope: "workspace",
+        supportsAllSites: false,
+        cacheable: false,
+        flags: {
+          target: {
+            kind: "string",
+            required: false,
+            description:
+              "Site id (Sternsystem id). Used for site evidence (releases/<release-id>/.test-evidence/).",
+          },
+          service: {
+            kind: "string",
+            required: false,
+            description:
+              "Service id. Used for service evidence (services/<service-id>/.test-evidence/).",
+          },
+          levels: {
+            kind: "string",
+            required: true,
+            description: "Comma-separated test levels to verify (e.g. L4,L5 for E2E+smoke).",
+          },
+          "commit-sha": {
+            kind: "string",
+            required: true,
+            description: "Commit SHA that evidence must match.",
+          },
+          "release-id": {
+            kind: "string",
+            required: false,
+            description:
+              "Release id for evidence storage path (releases/<release-id>/.test-evidence/). Defaults to --target value.",
+          },
+        },
+        reads: [
+          "releases/<release-id>/.test-evidence/*.json",
+          "services/<service-id>/.test-evidence/*.json",
+        ],
+        execute: runTestEvidenceVerify,
+      } satisfies KernelCommandDefinition<TestEvidenceVerifyResult>);
+
+      registry.registerCommand({
+        name: "test.evidence.list",
+        description:
+          "List all test evidence files for a target (RFC-0829). " +
+          "Flags: --target (site) or --service.",
+        scope: "workspace",
+        supportsAllSites: false,
+        cacheable: false,
+        flags: {
+          target: {
+            kind: "string",
+            required: false,
+            description: "Site id (Sternsystem id).",
+          },
+          service: {
+            kind: "string",
+            required: false,
+            description: "Service id.",
+          },
+        },
+        reads: [
+          "releases/<release-id>/.test-evidence/*.json",
+          "services/<service-id>/.test-evidence/*.json",
+        ],
+        execute: runTestEvidenceList,
+      } satisfies KernelCommandDefinition<TestEvidenceListResult>);
     },
   };
 }

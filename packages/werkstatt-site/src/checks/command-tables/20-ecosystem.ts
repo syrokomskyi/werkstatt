@@ -281,6 +281,12 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
         required: true,
         description: "Service id (e.g. lagebild-sync).",
       },
+      "commit-sha": {
+        kind: "string",
+        required: false,
+        description:
+          "Commit SHA for evidence recording (RFC-0829). If provided, L1 evidence is recorded.",
+      },
     },
     reads: [
       "services/*/package.json",

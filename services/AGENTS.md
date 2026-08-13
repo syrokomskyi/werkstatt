@@ -99,3 +99,17 @@ Every `services/*` project MUST have at least one unit test.
 - **Policy enforcement:** `test.signal.policy.validate` enforces that every service has real tests or explicit skipped-test owner/rationale/review metadata. Services with `gogol.testSignal.signal: "skipped"` must provide `owner`, `rationale`, and `reviewAfter` fields.
 - **`service.test.run` command:** Run `pnpm exec werkstatt run service.test.run --service <id>` to execute vitest for a specific service and get structured JSON results.
 - **`turbo run test`:** Service tests are included in `turbo run test` automatically once `test` scripts exist in `package.json`.
+
+## Test evidence gates (RFC-0829)
+
+Deployment commands verify test evidence before proceeding. Test commands record structured JSON evidence files when `--commit-sha` is provided.
+
+- **Evidence storage:** `services/<service-id>/.test-evidence/<level>.json` for services, `releases/<release-id>/.test-evidence/<level>.json` for sites.
+- **Test levels:** L1 (unit), L2 (integration), L3 (contract), L4 (E2E), L5 (smoke).
+- **Evidence recording:** Test commands (`service.test.run`, `service.smoke.run`, `site.smoke.run`, `service.integration.run`, `site.e2e.run`) accept `--commit-sha` and optionally `--release-id`. When provided, they write evidence JSON after test completion.
+- **Evidence verification:** `test.evidence.verify --service <id> --levels L1,L2,L5 --commit-sha <sha>` checks that evidence exists, passed, and commit SHA matches. `test.evidence.list --service <id>` lists all evidence files.
+- **Deployment gates:**
+  - `leitstand.propagate` verifies L4+L5 evidence for the release commit SHA.
+  - `leitstand.promote` verifies L4+L5 evidence for the release commit SHA.
+  - `leitstand.service.promote` verifies L1+L2+L5 evidence for the current git HEAD commit SHA.
+- **Grace period:** Until 2026-09-10, gate failures produce warnings (exit 0, `gracePeriod: true` in result) instead of fatal errors. After 2026-09-10, failures block deployment.
