@@ -14,6 +14,14 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
 - Code changes are committed (`mission.git.commit` / `ecosystem.commit`).
 - `mission.validate` has passed.
 - `mission.reconcile` has merged workpiece to cache clone.
+- **Playwright Chromium installed** — `mission.validate` and `leitstand.dev-deploy` require it for pre-flight checks. Verify:
+  ```sh
+  ls ~/.cache/ms-playwright/chromium* 2>/dev/null
+  ```
+  If absent, run before any validate/deploy:
+  ```sh
+  pnpm exec playwright install chromium
+  ```
 
 ## Full pipeline sequence
 
@@ -21,7 +29,7 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
 mission.validate → mission.reconcile → mission.close
 → release.prepare → release.ready
 → leitstand.dev-deploy → leitstand.propagate → leitstand.promote
-→ mission.archive --status=closed
+→ mission.archive --status=closed --site <siteId>
 ```
 
 **Important:** `mission.close` does NOT auto-archive (RFC-0801). The workpiece stays in `missions/<id>/workpiece/` with working `node_modules` until `mission.archive` is called explicitly after the deployment pipeline completes.
@@ -141,6 +149,20 @@ pnpm exec werkstatt run release.ready --release <releaseId>
 ### `leitstand.promote` fails with "must be in state 'alt-deployed'"
 
 `leitstand.propagate` must run first to transition the release to `alt-deployed` state.
+
+### `release.prepare` fails with OWN-XCHECK-02 (phantom command references)
+
+If `ownership.generator.cross-check` reports `OWN-XCHECK-02` for commands like `open-source.generate`, `changelog.generate`, `content.ref-index.generate`, `integrity.keys.generate` during `release.prepare` for a closed mission, this means the cross-check is not loading the workpiece's app runtime.
+
+**Root cause:** After `mission.close`, `currentMission` is `null`, so normal site discovery skips the workpiece. The cross-check must load commands from `context.site` (the workpiece passed by `release.prepare`). This was fixed in platform 5.45.15 — if it recurs, check that `ownership.generator.cross-check` loads `context.site`'s app runtime via `loadAppRuntime`.
+
+### `mission.archive` fails with "Unknown flag --mission"
+
+`mission.archive` takes `--site <siteId>`, not `--mission <missionId>`:
+
+```sh
+pnpm exec werkstatt run mission.archive --status=closed --site <siteId>
+```
 
 ### `release.prepare` fails with broken `node_modules`
 
