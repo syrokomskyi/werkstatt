@@ -80,6 +80,8 @@ Agents MUST NEVER use raw `git commit` anywhere in this repository. Two canonica
 
 The workspace-level `hooks/pre-commit` already blocks raw `git commit` for platform-scope files. Workpiece repos have their own `.git` and are not covered by this hook — the AGENTS.md rule is the primary guard for workpieces, reinforced by a workpiece pre-commit hook installed at materialization time (RFC-0821).
 
+**`git commit --no-verify` on closed missions is a LAST RESORT ONLY.** `mission.git.commit` fails on closed missions (state: `closed`). If workpiece changes are needed after close, prefer: (1) reopen the mission, or (2) ask the operator to reopen it. Only use `git commit --no-verify` as a last resort when reopening is not feasible — it bypasses pre-commit validators and bordbuch recording. Never use `--no-verify` routinely or as a convenience shortcut.
+
 **Rationale**: raw `git commit` bypasses pre-commit validators, bordbuch recording, signed-commit support, and the mission lifecycle. This causes silent mission loss when work is reported as done but never properly persisted through the platform.
 
 ## Forge project configuration (RFC-0391)
