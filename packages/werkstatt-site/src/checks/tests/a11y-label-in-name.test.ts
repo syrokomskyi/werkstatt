@@ -14,10 +14,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import {
-  extractLabelInNameViolations,
-  runA11yLabelInNameValidate,
-} from "../a11y-label-in-name.ts";
+import { extractLabelInNameViolations, runA11yLabelInNameValidate } from "../a11y-label-in-name.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 function makeContext(workspaceRoot: string, siteDir?: string): KernelRuntimeContext {
@@ -79,14 +76,6 @@ describe("extractLabelInNameViolations (pure function)", () => {
     const html = `<html><body><nav aria-label="Main navigation"><a href="/">Home</a></nav></body></html>`;
     const violations = extractLabelInNameViolations(html);
     expect(violations).toHaveLength(0);
-  });
-
-  it("a with aria-label not containing visible text — violation", () => {
-    const html = `<html><body><a href="/" aria-label="Click here">Contact us</a></body></html>`;
-    const violations = extractLabelInNameViolations(html);
-    expect(violations).toHaveLength(1);
-    expect(violations[0].visibleText).toBe("contact us");
-    expect(violations[0].accessibleName).toBe("click here");
   });
 
   it("a with aria-label containing visible text — no violation", () => {

@@ -100,7 +100,7 @@ function isHiddenInput(element: TreeElementNode): boolean {
 
 function isSvgElement(node: TreeNode): boolean {
   if (!isElementNode(node)) return false;
-  return node.tagName === "svg" || node.tagName === "SVG";
+  return node.tagName === "svg";
 }
 
 function collectTextContent(node: TreeNode): string {
