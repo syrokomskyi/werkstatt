@@ -13,6 +13,8 @@ implementedAt: 2026-04-14
 closedAt:
 supersedes: []
 supersededBy:
+amendedBy:
+  - RFC-0833
 related:
   - RFC-0001
   - RFC-0005

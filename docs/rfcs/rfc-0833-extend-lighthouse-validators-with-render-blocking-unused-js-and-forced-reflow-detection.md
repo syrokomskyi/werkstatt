@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
+enhancedAt: 2026-08-13
 implementedAt:
 closedAt:
 supersedes: []
@@ -20,9 +21,9 @@ related:
   - RFC-0006
   - RFC-0204
   - DNA-15
-  - DNA-58
 satisfies:
   - DNA-15
+  - DNA-67
 versionBump: minor
 commands:
   proposed: []
@@ -123,7 +124,7 @@ Additionally, this RFC establishes **DNA-67: Pre-deploy Lighthouse parity gate**
 - It does NOT have `media="print"` or `media` with a non-matching query
 - It is NOT inlined (external URL)
 
-**Astro `inlineStylesheets` check:** The validator also reads `astro.config.mjs` for the `build.inlineStylesheets` setting. If set to `"auto"` or `"always"`, small stylesheets are inlined automatically and the check is relaxed for sheets under the `inlineStylesheets` threshold.
+**Astro `inlineStylesheets` check:** The validator reads `astro.config.mjs` for the `build.inlineStylesheets` setting. If set to `"auto"` or `"always"`, small stylesheets are inlined automatically and the check is relaxed for sheets under the inline threshold. The default Astro threshold is 4 KB; if a custom `inlineStylesheets` threshold is specified in the config, the validator uses that value. The existing `findAstroConfig` function in `lighthouse.ts` must be extended to extract the `build.inlineStylesheets` setting in addition to `output`.
 
 **Rule:**
 
@@ -141,29 +142,30 @@ For each <link rel="stylesheet"> in dist/client/**/*.html:
 
 **Where:** `lighthouse.budget.check` (post-build, scans `dist/client/_astro/*.js`)
 
-**What:** Estimates the unused-to-total ratio of each route bundle by analyzing export usage. The validator:
+**What:** Detects JavaScript bundles in `dist/client/_astro/` that are not referenced by any HTML page or by any other referenced bundle. The validator uses a reference-graph approach (no AST parsing):
 
-1. For each `.js` file in `dist/client/_astro/`, parse the AST to identify exported symbols.
-2. Scan all `.html` files in `dist/client/` for references to those exports (via `<script>` import chains).
-3. Exports not referenced by any HTML page are "unused".
-4. Calculate `unusedRatio = unusedBytes / totalBytes` (estimated from export sizes).
+1. Collect all `.html` files in `dist/client/`.
+2. For each `.html` file, extract `<script type="module" src="...">` references to `.js` files.
+3. Build a reference graph: HTML → JS, and JS → JS (via `import` statements in the JS source, detected via regex for `import("...")` and `from "..."` patterns).
+4. Mark all JS files reachable from any HTML file as "referenced".
+5. Unreferenced JS files are 100% unused → `unusedRatio = 1.0`.
+6. Referenced JS files are not flagged — partial unusedness requires runtime coverage data (future RFC).
 
-**Simplified approach (no AST parsing):** For each JS bundle, check if it's imported by any HTML page. If a bundle is imported but its exports are not called (heuristic: no matching function call patterns in inline scripts), flag it. This is a conservative estimate — false positives are possible but false negatives are unlikely.
+**Scope limitation:** This approach detects completely unreferenced bundles only. Partially unused bundles (e.g., a 58 KB bundle with 49% unused exports) will not be flagged without AST-based analysis or runtime coverage data. This is a deliberate trade-off: false positives are impossible (unreferenced bundles are definitely unused), false negatives are possible (partially unused bundles pass). AST-based analysis is deferred to a future RFC.
 
 **Rule:**
 
 ```
 For each .js in dist/client/_astro/:
-  unusedRatio = estimateUnusedRatio(file, htmlFiles)
-  if unusedRatio > 0.40:
-    report LH-12 (error)
-  elif unusedRatio > 0.25:
-    report LH-12 (warning)
+  if not referenced by any HTML file and not imported by any referenced JS file:
+    report LH-12 (error, unusedRatio = 1.0)
 ```
 
-**Severity:** `error` for > 40% unused. `warning` for 25–40% unused.
+**Note:** Partial unusedness detection (> 40% unused in a referenced bundle) is deferred to a future RFC with AST-based analysis. LH-12 in this RFC detects only completely unreferenced bundles.
 
-**Fix hint:** "Tree-shake unused exports, use dynamic import() for route-specific code, or split the bundle into smaller chunks."
+**Severity:** `error` for completely unreferenced bundles (100% unused). Partial unusedness thresholds (40%, 25%) are reserved for the future AST-based RFC.
+
+**Fix hint:** "Remove the unreferenced bundle from the build output, or add an import path so it is loaded by the pages that need it."
 
 ### LH-13: Forced reflow pattern detection
 
@@ -235,7 +237,7 @@ interface LighthouseFinding {
 | `dist/client/_astro/*.js` | Analyzed for unused JS ratio (LH-12) |
 | `src/scripts/**/*.ts` | Scanned for forced reflow patterns (LH-13) |
 | `src/**/*.astro` (inline scripts) | Scanned for forced reflow patterns (LH-13) |
-| `astro.config.mjs` | Read for `inlineStylesheets` setting (LH-11) |
+| `astro.config.mjs` | Read for `inlineStylesheets` setting (LH-11). The existing `findAstroConfig` function must be extended to extract `build.inlineStylesheets`. |
 | `packages/werkstatt-site/src/checks/lighthouse.ts` | Extended with LH-11..13 |
 
 ### Output format
@@ -270,8 +272,9 @@ Extends existing `lighthouse.validate` and `lighthouse.budget.check` output:
 
 - LH-11 `error` → `exitCode: 1` (render-blocking CSS > 4 KB)
 - LH-11 `warning` → logged (render-blocking CSS ≤ 4 KB)
-- LH-12 `error` → `exitCode: 1` (> 40% unused)
-- LH-12 `warning` → logged (25–40% unused)
+- LH-12 `error` → `exitCode: 1` (completely unreferenced bundle)
+- LH-12 partial unusedness → not checked in this RFC (deferred to future AST-based RFC)
+- LH-12 and LH-10 are independent rules: a bundle may pass LH-10 (under 300 KB) but fail LH-12 (unreferenced), or fail both. Each rule reports separately.
 - LH-13 `warning` → logged (forced reflow pattern detected)
 - Missing `dist/client/` → skip LH-11 and LH-12 (no build output)
 - Missing `src/scripts/` → skip LH-13 (no scripts to scan)
@@ -334,7 +337,7 @@ The coverage matrix is maintained in `docs/lighthouse-parity-matrix.yaml` (gener
 
 ## Risks
 
-- **LH-12 false positives** — The unused JS heuristic may flag bundles that are used by dynamically loaded routes not in the initial HTML. Mitigated by scanning all HTML files in `dist/client/`, not just the index.
+- **LH-12 false positives** — Unreferenced bundles are definitely unused, so false positives are impossible. However, SPA-only routes (client-side routing without static HTML) may have JS bundles that appear unreferenced but are loaded at runtime. Mitigated by: LH-12 applies only to static-generated HTML pages; SPA-only routes are exempt. Astro static sites generate HTML for every route, so this exemption is rarely needed.
 - **LH-13 false positives** — The reflow pattern detector may flag code that intentionally reads layout after write (e.g., measurement code). Mitigated by `warning` severity and the `requestAnimationFrame` exception.
 - **LH-11 Astro inlineStylesheets interaction** — Astro's `inlineStylesheets: 'auto'` inlines sheets under a size threshold (default 4 KB). The validator must respect this threshold to avoid false positives. Mitigated by reading the Astro config.
 - **DNA-67 maintenance burden** — The coverage matrix must be updated as Lighthouse adds new audits. Mitigated by making the matrix a generated file that can be cross-referenced with Lighthouse's audit list.
