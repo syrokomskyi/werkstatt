@@ -1,12 +1,13 @@
 ---
 id: RFC-0830
 title: "Add image.delivery.validate for responsive srcset and compression enforcement"
-status: draft
+status: accepted
 kind: command
 scope: app
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
