@@ -17,6 +17,7 @@
   <item>RFC-0557: register template.imports.validate and workpiece.imports.validate.</item>
   <item>RFC-0703: register platform.commit.discipline.validate.</item>
   <item>RFC-0754: update ecosystem.commit description for auto-detect and split-commit behavior.</item>
+  <item>RFC-0824: register service.test.run command.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -43,6 +44,7 @@ import {
   runMaintenanceDebtQueueValidate,
 } from "../maintenance/maintenance-debt-queue.ts";
 import { runTestSignalPolicyValidate, runTestSignalValidate } from "../test-signal.ts";
+import { runServiceTestRun } from "../service-test-run.ts";
 import { runWorkspaceWriteBoundaryLint } from "../workspace-write-boundary.ts";
 import { runGateCatalogGenerate, runGateCatalogValidate } from "../gate-catalog.ts";
 import { runTemplateImportsValidate } from "../template-imports-validate.ts";
@@ -267,6 +269,26 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: ["packages/*/package.json", "packages/*/turbo.json"],
     execute: runTestSignalPolicyValidate,
+  },
+  {
+    name: "service.test.run",
+    description:
+      "Run vitest unit tests for a specific service and return structured results (RFC-0824).",
+    scope: "workspace",
+    flags: {
+      service: {
+        kind: "string",
+        required: true,
+        description: "Service id (e.g. lagebild-sync).",
+      },
+    },
+    reads: [
+      "services/*/package.json",
+      "services/*/vitest.config.ts",
+      "packages/werkstatt-site/src/testing/unit/services/**/*.test.ts",
+    ],
+    cacheable: false,
+    execute: runServiceTestRun,
   },
   {
     name: "ci.local.validate",
