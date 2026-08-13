@@ -206,14 +206,14 @@ Each RFC is independently implementable in a single session. RFCs 0824–0828 ca
 
 ## Acceptance criteria
 
-- [ ] DNA-66 invariant added to `docs/architecture-dna.md`
-- [ ] `packages/werkstatt-site/src/testing/` directory structure created with level subdirectories
-- [ ] `packages/werkstatt-site/src/testing/helpers/dev-url-resolver.ts` implemented
-- [ ] `packages/werkstatt-site/src/testing/helpers/test-env.ts` implemented
-- [ ] `packages/werkstatt-site/src/testing/helpers/wait-for-deploy.ts` implemented
-- [ ] Downstream RFCs (0824–0829) created with `batch: testing-architecture` and correct `dependsOn` chains
-- [ ] `rfc.validate` passes on all created RFCs
-- [ ] `AGENTS.md` updated with testing architecture reference
+- [x] DNA-66 invariant added to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:279, `grep DNA-66 docs/architecture-dna.md`)
+- [x] `packages/werkstatt-site/src/testing/` directory structure created with level subdirectories (evidence: packages/werkstatt-site/src/testing/{unit,integration,contract,e2e,smoke,helpers}/ exist)
+- [x] `packages/werkstatt-site/src/testing/helpers/dev-url-resolver.ts` implemented (evidence: packages/werkstatt-site/src/testing/helpers/dev-url-resolver.ts, tsc --noEmit passes)
+- [x] `packages/werkstatt-site/src/testing/helpers/test-env.ts` implemented (evidence: packages/werkstatt-site/src/testing/helpers/test-env.ts, tsc --noEmit passes)
+- [x] `packages/werkstatt-site/src/testing/helpers/wait-for-deploy.ts` implemented (evidence: packages/werkstatt-site/src/testing/helpers/wait-for-deploy.ts, tsc --noEmit passes)
+- [x] Downstream RFCs (0824–0829) created with `batch: testing-architecture` and correct `dependsOn` chains (evidence: `grep batch: docs/rfcs/rfc-082[4-9]*.md` returns testing-architecture for all six, dependsOn verified)
+- [x] `rfc.validate` passes on all created RFCs (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0823` — 0 errors, 0 warnings)
+- [x] `AGENTS.md` updated with testing architecture reference (evidence: AGENTS.md:779, packages/werkstatt-site/AGENTS.md:126, docs/technology.xml:194)
 
 ## Implementation notes for agents
 
