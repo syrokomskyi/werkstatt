@@ -301,13 +301,13 @@ This means contract validation runs in CI (`pnpm exec werkstatt run packages-che
 
 ## Acceptance criteria
 
-- [x] `contract.validate` command registered and functional
-- [x] `contract.list` command registered and functional
-- [x] Zod schemas defined for all 7 initial contracts
-- [x] `send-message` and `integration-route` handlers import and use contract schemas
-- [x] `contract.validate` integrated into `PACKAGES_CHECK_PIPELINE`
-- [x] `contract.validate` passes with zero violations (after initial adoption)
-- [x] `rfc.validate` passes on this file
+- [x] `contract.validate` command registered and functional (evidence: packages/werkstatt-site/src/checks/command-tables/01-codegen.ts:699-711, contract.validate --json passes with 0 errors)
+- [x] `contract.list` command registered and functional (evidence: packages/werkstatt-site/src/checks/command-tables/01-codegen.ts:713-722, contract.list --json returns 7 contracts)
+- [x] Zod schemas defined for all 7 initial contracts (evidence: packages/werkstatt-site/src/testing/contract/{send-message,integration-route,health,rate-fetch,maturity-score,matomo-proxy,telegram-alert}.contract.ts)
+- [x] `send-message` and `integration-route` handlers import and use contract schemas (evidence: packages/werkstatt-site/src/domain/ui/sections/send-message/send-message-section.api.ts:33 imports SendMessageRequestSchema, packages/werkstatt-site/src/domain/integration/delivery-handler.ts:37 imports IntegrationRouteRequestSchema)
+- [x] `contract.validate` integrated into `PACKAGES_CHECK_PIPELINE` (evidence: packages/werkstatt-site/src/checks/pipelines/packages-check.ts:151 after props.contract.validate)
+- [x] `contract.validate` passes with zero violations (after initial adoption) (evidence: contract.validate --json passes with 0 errors, 14 warnings during grace period)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec werkstatt run rfc.validate --id RFC-0827 passes with 0 errors)
 
 ## Implementation notes for agents
 
