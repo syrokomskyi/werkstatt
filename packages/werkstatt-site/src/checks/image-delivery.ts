@@ -16,6 +16,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0830: initial implementation — image.delivery.validate with IMG-DELIVERY-01, IMG-DELIVERY-02, IMG-DELIVERY-04 rules and image-delivery.config.yaml escape hatch.</item>
+  <item>RFC-0830: review fix — replace any types with DefaultTreeAdapterMap + local ElementNode interface, fix MODULE_CONTRACT bracket convention.</item>
 </CHANGE_SUMMARY>
 */
 
