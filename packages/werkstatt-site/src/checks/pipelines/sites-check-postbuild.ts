@@ -56,6 +56,9 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "cloudflare.assets.validate" },
   // RFC-0830: responsive srcset, compression budget, LCP image optimization
   { command: "image.delivery.validate" },
+  // RFC-0831: CSP origin completeness — cross-reference CSP source lists
+  // against actual external origins in rendered HTML.
+  { command: "csp.origins.validate" },
   // RFC-0185: distribution artifacts must not expose the generated ownership marker
   { command: "dist.generated-marker.validate" },
   // RFC-0269: golden behavior snapshot drift check — must run before build-post's

@@ -36,6 +36,7 @@ import {
   runSecurityTxtGenerate,
   runSecurityTxtValidate,
 } from "../public-surface.ts";
+import { runCspOriginsValidate } from "../csp-origins.ts";
 
 export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
@@ -349,5 +350,16 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/public/_headers"],
     modulePaths: ["public-surface/security.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runHeadersSecurityValidate,
+  },
+  {
+    name: "csp.origins.validate",
+    description:
+      "Cross-reference CSP source lists against actual external origins in rendered HTML (RFC-0831).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/public/_headers", "<app>/dist/client/**/*.html"],
+    modulePaths: ["csp-origins.ts"],
+    execute: runCspOriginsValidate,
   },
 ];
