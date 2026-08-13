@@ -24,6 +24,7 @@ import { runSurfaceIntersectionValidate } from "../surface-intersection-validate
 import { runSurfaceIntersectionReport } from "../surface-intersection-report.ts";
 import { runSurfaceMediaLeakageValidate } from "../surface-media-leakage-validate.ts";
 import { runSurfaceHeadingUniquenessValidate } from "../surface-heading-uniqueness.ts";
+import { runA11yLabelInNameValidate } from "../a11y-label-in-name.ts";
 import { runRatgeberHubValidate } from "../ratgeber-hub-validate.ts";
 import { runRatgeberArticleValidate } from "../ratgeber-article-validate.ts";
 import { runRatgeberProvenanceValidate } from "../ratgeber-provenance-validate.ts";
@@ -115,7 +116,10 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/surface.generated.yaml", "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml"],
+    reads: [
+      "<app>/src/surface.generated.yaml",
+      "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml",
+    ],
     modulePaths: ["surface-hub-validate.ts"],
     execute: runSurfaceHubValidate,
     gate: {
@@ -135,7 +139,10 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/content/surface/industries/**/*.md", "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml"],
+    reads: [
+      "<app>/src/content/surface/industries/**/*.md",
+      "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml",
+    ],
     modulePaths: ["surface-industry-validate.ts"],
     execute: runSurfaceIndustryValidate,
     gate: {
@@ -155,7 +162,10 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/content/surface/services/**/*.md", "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml"],
+    reads: [
+      "<app>/src/content/surface/services/**/*.md",
+      "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml",
+    ],
     modulePaths: ["surface-service-validate.ts"],
     execute: runSurfaceServiceValidate,
   },
@@ -207,6 +217,17 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     reads: ["<app>/dist/client/**/*.html", "<app>/src/surface.generated.yaml"],
     modulePaths: ["surface-heading-uniqueness.ts"],
     execute: runSurfaceHeadingUniquenessValidate,
+  },
+  {
+    name: "a11y.label-in-name.validate",
+    description:
+      "RFC-0832: scan rendered HTML in dist/client/ for interactive elements with aria-label and check that the accessible name includes the visible text (WCAG 2.5.3 Label in Name). Checks <a>, <button>, <input>, <select>, <textarea> and elements with interactive ARIA roles. Skips landmark elements like <nav aria-label>.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html"],
+    modulePaths: ["a11y-label-in-name.ts"],
+    execute: runA11yLabelInNameValidate,
   },
   {
     name: "ratgeber.hub.validate",
@@ -302,7 +323,10 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/surface.generated.yaml", "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml"],
+    reads: [
+      "<app>/src/surface.generated.yaml",
+      "packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml",
+    ],
     execute: runSurfaceDuplicateContentReport,
   },
   /* RFC-0271 */

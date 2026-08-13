@@ -78,4 +78,6 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "surface.media-leakage.validate" },
   // RFC-0690: duplicate section heading check on surface pages.
   { command: "surface.heading-uniqueness.validate" },
+  // RFC-0832: WCAG 2.5.3 Label in Name — accessible name must include visible text.
+  { command: "a11y.label-in-name.validate" },
 ];
