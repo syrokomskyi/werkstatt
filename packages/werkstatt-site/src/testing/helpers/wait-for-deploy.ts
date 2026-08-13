@@ -39,13 +39,14 @@ export async function waitForDeploy(
 
   while (Date.now() < deadline) {
     try {
-      const response = await fetch(url, { redirect: "follow" });
+      const response = await fetch(url, {
+        redirect: "follow",
+        signal: AbortSignal.timeout(intervalMs),
+      });
       if (response.ok) {
         return;
       }
-      lastError = new Error(
-        `[wait-for-deploy] ${url} returned HTTP ${response.status}`,
-      );
+      lastError = new Error(`[wait-for-deploy] ${url} returned HTTP ${response.status}`);
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
     }

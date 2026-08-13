@@ -27,7 +27,6 @@ interface ServiceRegistry {
 
 interface FleetSitesEntry {
   site: string;
-  path: string;
 }
 
 interface FleetSites {
@@ -42,10 +41,7 @@ interface FleetSites {
  *
  * @throws if the service is not found in the registry.
  */
-export function resolveServiceDevUrl(
-  serviceId: string,
-  workspaceRoot: string,
-): string {
+export function resolveServiceDevUrl(serviceId: string, workspaceRoot: string): string {
   const registryPath = resolve(workspaceRoot, "services/registry.yaml");
   const raw = readFileSync(registryPath, "utf-8");
   const registry = parseYaml(raw) as ServiceRegistry;
@@ -70,26 +66,23 @@ export function resolveServiceDevUrl(
 /**
  * Resolves the dev-deployed site URL for a registered Sternsystem.
  *
- * Reads `fleet/fleet.sites.yaml` from the workspace root and constructs
- * the dev channel URL. The dev URL pattern is `https://<site-id>.warpgogol.workers.dev`
- * (or the configured dev domain).
+ * Reads `fleet/fleet.sites.yaml` from the workspace root to verify the site
+ * exists, then constructs the dev channel URL using the configured dev domain.
+ * The dev domain defaults to `warpgogol.workers.dev` but can be overridden
+ * via the `WORKSHOP_DEV_DOMAIN` environment variable.
  *
  * @throws if the site is not found in the fleet registry.
  */
-export function resolveSiteDevUrl(
-  siteId: string,
-  workspaceRoot: string,
-): string {
+export function resolveSiteDevUrl(siteId: string, workspaceRoot: string): string {
   const fleetPath = resolve(workspaceRoot, "fleet/fleet.sites.yaml");
   const raw = readFileSync(fleetPath, "utf-8");
   const fleet = parseYaml(raw) as FleetSites;
 
   const entry = fleet.sites.find((s) => s.site === siteId);
   if (!entry) {
-    throw new Error(
-      `[dev-url-resolver] Site "${siteId}" not found in fleet/fleet.sites.yaml`,
-    );
+    throw new Error(`[dev-url-resolver] Site "${siteId}" not found in fleet/fleet.sites.yaml`);
   }
 
-  return `https://${siteId}.warpgogol.workers.dev`;
+  const devDomain = process.env["WORKSHOP_DEV_DOMAIN"] ?? "warpgogol.workers.dev";
+  return `https://${siteId}.${devDomain}`;
 }
