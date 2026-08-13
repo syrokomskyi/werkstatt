@@ -73,6 +73,7 @@ Notable check commands registered by this package:
 - `contract.validate` (RFC-0827) — validates site-service contract schemas are valid Zod, have both request and response, and are referenced by both site-side and service-side code. Emits CONTRACT-01 (invalid Zod), CONTRACT-02 (missing schema), CONTRACT-03 (site-side not referenced, warning), CONTRACT-04 (service-side not referenced, warning), CONTRACT-05 (one-sided reference, warning). Integrated into `PACKAGES_CHECK_PIPELINE`.
 - `contract.list` (RFC-0827) — lists all registered site-service contracts with id, name, direction, version, and description.
 - `image.delivery.validate` (RFC-0830) — scans rendered HTML in dist/client/ for responsive srcset presence (IMG-DELIVERY-01), compression budget (IMG-DELIVERY-02), and LCP image optimization attributes via fetchpriority marker (IMG-DELIVERY-04). Supports `image-delivery.config.yaml` escape hatch for per-image rule overrides. Integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `cloudflare.assets.validate`.
+- `csp.origins.validate` (RFC-0831) — cross-references CSP source lists against actual external origins in rendered HTML. Emits CSP-ORIGIN-01 (script origin missing from script-src, error), CSP-ORIGIN-02 (style origin missing from style-src, error), CSP-ORIGIN-03 (image origin missing from img-src, warning), CSP-ORIGIN-04 (connect origin missing from connect-src, error). Integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `image.delivery.validate`.
 
 ## Domain layer (RFC-0775)
 
