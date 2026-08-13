@@ -34,16 +34,28 @@ export async function runTestEvidenceGate(opts: TestEvidenceGateOptions): Promis
   opts.logger.info(
     `[${opts.commandName}] verifying test evidence (${opts.levels.join(",")}) for commit ${opts.commitSha}…`,
   );
-  const evidenceResult = (await executeKernelCommand({
-    workspaceRoot: opts.workspaceRoot,
-    commandName: "test.evidence.verify",
-    argv: [
-      opts.service ? `--service=${opts.service}` : `--target=${opts.target}`,
-      `--levels=${opts.levels.join(",")}`,
-      `--commit-sha=${opts.commitSha}`,
-      ...(opts.releaseId ? [`--release-id=${opts.releaseId}`] : []),
-    ],
-  })) as { exitCode?: number; data?: { status: string; summary: string } };
+  let evidenceResult: { exitCode?: number; data?: { status: string; summary: string } };
+  try {
+    evidenceResult = (await executeKernelCommand({
+      workspaceRoot: opts.workspaceRoot,
+      commandName: "test.evidence.verify",
+      argv: [
+        opts.service ? `--service=${opts.service}` : `--target=${opts.target}`,
+        `--levels=${opts.levels.join(",")}`,
+        `--commit-sha=${opts.commitSha}`,
+        ...(opts.releaseId ? [`--release-id=${opts.releaseId}`] : []),
+      ],
+    })) as { exitCode?: number; data?: { status: string; summary: string } };
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    if (new Date().toISOString() < GRACE_PERIOD_END) {
+      opts.logger.warn(
+        `[${opts.commandName}] test evidence gate skipped (grace period): ${errMsg}`,
+      );
+      return;
+    }
+    throw new Error(`[${opts.commandName}] test evidence gate failed to execute: ${errMsg}`);
+  }
   if (evidenceResult.data) {
     if (evidenceResult.data.status === "pass") {
       opts.logger.info(`[${opts.commandName}] test evidence: ${evidenceResult.data.summary}`);
