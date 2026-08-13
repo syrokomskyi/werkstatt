@@ -1,12 +1,13 @@
 ---
 id: RFC-0834
 title: "Commit generated variant manifests for drift detection"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
