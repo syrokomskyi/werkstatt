@@ -1,15 +1,17 @@
 ---
 id: RFC-0823
 title: "Establish workshop testing architecture"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
 enhancedAt: 2026-08-13
+acceptedAt: 2026-08-13
 implementedAt:
 closedAt:
 supersedes: []
