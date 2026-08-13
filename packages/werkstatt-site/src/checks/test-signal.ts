@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0249: add explicit package-level test signal classification for the autonomous package quality gate.</item>
   <item>RFC-0251: add skipped-test owner/rationale/review metadata and a policy validator.</item>
+  <item>RFC-0824: extend classifyTier with services/ branch (tier 1) so test.signal.validate covers services.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -103,6 +104,7 @@ function isExpiredIsoDate(value: string | undefined): boolean {
 function classifyTier(signal: PackageTestSignal): TestSignalTier {
   if (TIER_0_PACKAGES.has(signal.packageName)) return 0;
   if (signal.directory.startsWith("apps/")) return 3;
+  if (signal.directory.startsWith("services/")) return 1;
   if (
     signal.directory === "packages/ui" ||
     signal.packageName === "@warpgogol/werkstatt-site/ontology"
