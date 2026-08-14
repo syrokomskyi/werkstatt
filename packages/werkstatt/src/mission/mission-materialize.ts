@@ -76,6 +76,7 @@ import {
 } from "@warpgogol/werkstatt-site/checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { restoreEnvFilesFromCacheClone } from "./env-persist.ts";
+import { restoreOperatorConfigFiles } from "./operator-config-files.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
@@ -1183,6 +1184,27 @@ export async function runMissionMaterialize(
     }
     process.env["PUBLIC_IMAGE_PROVIDER"] = "build-portable";
     logger.info(`  PUBLIC_IMAGE_PROVIDER set to build-portable in .env files`);
+
+    // RFC-0840: Restore operator config files from cache clone after atomicMoveDir.
+    // Done after .env* restoration — same pattern, different file set.
+    // Non-fatal: failure logs a warning, materialize proceeds without the files.
+    try {
+      const operatorConfigResult = await restoreOperatorConfigFiles(cacheCloneDir, workpieceDir);
+      if (operatorConfigResult.copied.length > 0) {
+        logger.info(
+          `  Restored ${operatorConfigResult.copied.length} operator config file(s) from cache clone: ${operatorConfigResult.copied.join(", ")}`,
+        );
+      }
+      if (operatorConfigResult.skipped.length > 0) {
+        logger.warn(
+          `  Warning: failed to restore operator config file(s): ${operatorConfigResult.skipped.join(", ")}`,
+        );
+      }
+    } catch (operatorConfigErr) {
+      logger.warn(
+        `  Warning: failed to restore operator config files from cache clone: ${operatorConfigErr instanceof Error ? operatorConfigErr.message : String(operatorConfigErr)}`,
+      );
+    }
 
     // RFC-0796: Pre-flight guard — check workspace globs for stale package.json references
     // before pnpm install. Aborts with clear error if stale references found.

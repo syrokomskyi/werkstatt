@@ -60,6 +60,7 @@ import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werksta
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
 import { persistEnvFilesToCacheClone } from "./env-persist.ts";
+import { persistOperatorConfigFiles } from "./operator-config-files.ts";
 
 // RFC-0597: Media cache directories to persist across missions
 const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
@@ -741,6 +742,27 @@ export async function runMissionClose(
       } catch (envErr) {
         logger.warn(
           `  Warning: failed to persist .env files to cache clone: ${envErr instanceof Error ? envErr.message : String(envErr)}`,
+        );
+      }
+
+      // RFC-0840: Persist operator config files from workpiece to cache clone (untracked).
+      // Done after .env* persistence — same pattern, different file set.
+      // Non-fatal: failure logs a warning but does not block close.
+      try {
+        const operatorConfigResult = await persistOperatorConfigFiles(workpieceDir, systemDir);
+        if (operatorConfigResult.copied.length > 0) {
+          logger.info(
+            `  Persisted ${operatorConfigResult.copied.length} operator config file(s) to cache clone: ${operatorConfigResult.copied.join(", ")}`,
+          );
+        }
+        if (operatorConfigResult.skipped.length > 0) {
+          logger.warn(
+            `  Warning: failed to persist operator config file(s): ${operatorConfigResult.skipped.join(", ")}`,
+          );
+        }
+      } catch (operatorConfigErr) {
+        logger.warn(
+          `  Warning: failed to persist operator config files to cache clone: ${operatorConfigErr instanceof Error ? operatorConfigErr.message : String(operatorConfigErr)}`,
         );
       }
 

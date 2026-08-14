@@ -199,4 +199,6 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "bordbuch.commit.parity.lint", args: ["--mode", "warning"] },
   // RFC-0753: schema-only validation of DNS record declaration files.
   { command: "dns.records.schema.validate" },
+  // RFC-0840: validate OPERATOR_CONFIG_FILES list is in sync with actual workpiece/cache clone files.
+  { command: "materialize.config.validate" },
 ];
