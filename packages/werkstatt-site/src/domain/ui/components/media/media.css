@@ -9,6 +9,7 @@
   <item>RFC-0210: introduced media presentation styles.</item>
   <item>Feature player posters now cover the frame without exposing Plyr's black background at fractional sizes.</item>
   <item>Fullscreen mode uses object-fit: contain so the entire video is visible on mobile portrait and landscape without cropping.</item>
+  <item>Fullscreen elements now get explicit 100vw/100vh dimensions to prevent overflow on mobile browsers where height: 100% resolves to the video's intrinsic height.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -58,16 +59,34 @@
     background-size: cover !important;
   }
 
-  /* Fullscreen: switch to contain so the entire video is visible without cropping.
-     On portrait phones `cover` crops the sides heavily; in landscape it crops top/bottom.
-     `contain` letterboxes instead, preserving the full frame in every orientation. */
+  /* Fullscreen: force viewport dimensions so the video doesn't overflow mobile screens.
+     `height: 100%` can resolve to the video's intrinsic height (e.g. 1080px) on some
+     mobile browsers when the fullscreen containing block lacks an explicit height,
+     causing the video to overflow the screen by 2× or more. `100vw` / `100vh` are
+     viewport-relative and don't depend on the containing block. `!important` is
+     required because Plyr CSS is unlayered. */
   .media__video:fullscreen,
   .media__video:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
     object-fit: contain;
+  }
+
+  .plyr:fullscreen,
+  .plyr:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    background: #000 !important;
   }
 
   .plyr:fullscreen .media__video,
   .plyr:-webkit-full-screen .media__video {
+    width: 100% !important;
+    height: 100% !important;
     object-fit: contain;
   }
 }
