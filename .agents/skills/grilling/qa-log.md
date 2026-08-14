@@ -328,3 +328,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, certification operator UX
 - **Question:** Should agents run certification manually before deployment, or should deployment transitions orchestrate it automatically?
 - **Answer:** Deployment transitions automatically invoke their certification gate through one goal-oriented `release.certify --release=<id> --gate=<dev-deploy|propagate-alt|promote-main>` entrypoint. The run executes only missing/stale producers, accepts evidence, evaluates the decision, syncs the dossier, is idempotent and resumable, and uses one release+gate lock. Explicit `release.certify` remains available for early checks, while deployment always re-verifies the current decision and dossier hash. Read-only status, integrity verification, and profile validation commands provide inspection; no deploy bypass flags exist.
+
+### K-0026: Read-only certification with agent-ready remediation packs
+
+```knowledge-entry
+id: K-0026
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, certification remediation UX
+- **Question:** May certification mutate the candidate to repair failures, and what output must a non-pass result provide?
+- **Answer:** Certification is read-only with respect to source, content, and build artifacts and writes only dossier, telemetry, and reports. Every non-pass produces canonical `CertificationActionPack@1` tasks classified as product fix, infrastructure retry, or policy defect. Tasks contain stable requirement/dimension/gate identity, priority and dependencies, blocking rationale, precise evidence and file/URL/DOM/screenshot anchors, bounded repair instructions, and exact verification commands; JSON is canonical and Markdown/HTML are projections. Product fixes create a new candidate and dossier, infrastructure retries may resume the same candidate, and policy defects require a separate normative profile/producer change.
