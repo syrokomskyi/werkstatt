@@ -211,3 +211,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
 - **Question:** May an agent bypass, suppress, or downgrade a required certification requirement to promote a new release?
 - **Answer:** No runtime agent waiver exists for required Alt/Main requirements: no force, skip-gate, grace-period, or automatic required-to-advisory downgrade. Suppressions apply only to advisory diagnostics. A required false positive must be fixed in its producer or through a normative, versioned certification-profile change that invalidates prior evidence and triggers recertification. Infrastructure unavailability remains `incomplete`. The only bypass-like operation is rollback to a previously certified immutable artifact, which is recovery rather than promotion of a new candidate.
+
+### K-0017: Mandatory quality dimensions for the site certification profile
+
+```knowledge-entry
+id: K-0017
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, site certification profile v1
+- **Question:** Which quality dimensions must the first site certification profile cover before Main promotion?
+- **Answer:** The profile must cover nine dimensions: candidate integrity; business truth and compliance; editorial quality and localization; information architecture and discoverability; UX and conversion; visual quality and accessibility; performance and runtime correctness; security and operational readiness; and independent qualitative evaluation. Each dimension must have at least one applicable required evidence item before Main. A genuinely irrelevant dimension requires explicit, verifiable `not-applicable` evidence; silent omission is invalid.
