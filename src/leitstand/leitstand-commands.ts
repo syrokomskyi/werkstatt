@@ -342,9 +342,10 @@ export interface FreshnessResult {
 const FRESHNESS_MAX_ATTEMPTS = 5;
 const FRESHNESS_BACKOFF_DELAYS_MS = [3_000, 6_000, 12_000, 24_000];
 
-// RFC-0747: Retry constants for alt health check in leitstand.promote.
-const ALT_HEALTH_MAX_ATTEMPTS = 3;
-const ALT_HEALTH_BACKOFF_DELAYS_MS = [3_000, 6_000];
+// Shared health check retry constants (RFC-0747, RFC-0846).
+// Used by leitstand.dev-deploy (dev health) and leitstand.promote (alt health).
+const HEALTH_CHECK_MAX_ATTEMPTS = 3;
+const HEALTH_CHECK_BACKOFF_DELAYS_MS = [3_000, 6_000];
 
 // RFC-0649 / RFC-0657: Verify CDN freshness by fetching build-identity.json from the CDN URL
 // and comparing distTreeHash against the local build-identity. Retries up to 5 times with
@@ -2344,11 +2345,11 @@ export async function runLeitstandPromote(
       state: "unhealthy",
       checks: [],
     };
-    for (let attempt = 1; attempt <= ALT_HEALTH_MAX_ATTEMPTS; attempt++) {
+    for (let attempt = 1; attempt <= HEALTH_CHECK_MAX_ATTEMPTS; attempt++) {
       if (attempt > 1) {
-        const delayMs = ALT_HEALTH_BACKOFF_DELAYS_MS[attempt - 2];
+        const delayMs = HEALTH_CHECK_BACKOFF_DELAYS_MS[attempt - 2];
         logger.info(
-          `  Alt health retry ${attempt}/${ALT_HEALTH_MAX_ATTEMPTS} after ${delayMs / 1000}s...`,
+          `  Alt health retry ${attempt}/${HEALTH_CHECK_MAX_ATTEMPTS} after ${delayMs / 1000}s...`,
         );
         await sleep(delayMs);
       }
@@ -2361,14 +2362,14 @@ export async function runLeitstandPromote(
         workspaceRoot,
       });
       if (altHealthResult.state === "healthy") break;
-      if (attempt < ALT_HEALTH_MAX_ATTEMPTS) {
+      if (attempt < HEALTH_CHECK_MAX_ATTEMPTS) {
         logger.warn(`  Alt health check: ${altHealthResult.state} — will retry...`);
       }
     }
 
     if (altHealthResult.state !== "healthy") {
       throw new Error(
-        `[leitstand.promote] alt deployment is not healthy after ${ALT_HEALTH_MAX_ATTEMPTS} attempts (state: ${altHealthResult.state}). Cannot promote to main.`,
+        `[leitstand.promote] alt deployment is not healthy after ${HEALTH_CHECK_MAX_ATTEMPTS} attempts (state: ${altHealthResult.state}). Cannot promote to main.`,
       );
     }
 
