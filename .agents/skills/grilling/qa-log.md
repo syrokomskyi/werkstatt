@@ -315,3 +315,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, single-site cleanup
 - **Question:** May old release and archived-mission data be removed to simplify the clean cutover?
 - **Answer:** Yes, through a separate post-cutover cleanup RFC after the active mission is archived and the first new release is `main-certified`. Preserve compact immutable audit history—IDs, states, commit hashes, relationships, digests, Bordbuch, git history, normative documents, transcripts, manifests, and material incident/validation/close reports—while removing obsolete workpieces, heavy evidence/snapshots, staging directories, and old release payloads. Cleanup must use a dedicated idempotent command with dry-run, exact allow-list, mirror/source verification, tombstones, and a final report; never manual recursive deletion.
+
+### K-0025: Automatic idempotent certification orchestration in deploy transitions
+
+```knowledge-entry
+id: K-0025
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, certification operator UX
+- **Question:** Should agents run certification manually before deployment, or should deployment transitions orchestrate it automatically?
+- **Answer:** Deployment transitions automatically invoke their certification gate through one goal-oriented `release.certify --release=<id> --gate=<dev-deploy|propagate-alt|promote-main>` entrypoint. The run executes only missing/stale producers, accepts evidence, evaluates the decision, syncs the dossier, is idempotent and resumable, and uses one release+gate lock. Explicit `release.certify` remains available for early checks, while deployment always re-verifies the current decision and dossier hash. Read-only status, integrity verification, and profile validation commands provide inspection; no deploy bypass flags exist.
