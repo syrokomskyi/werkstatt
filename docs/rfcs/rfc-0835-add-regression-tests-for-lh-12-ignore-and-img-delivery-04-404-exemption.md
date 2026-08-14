@@ -143,13 +143,13 @@ Add regression tests to the existing test files that verify the specific behavio
 
 ## Acceptance criteria
 
-- [ ] Test 1 added to `lighthouse.test.ts`: LH-12 respects `.lighthouse-budget-ignore`
-- [ ] Test 2 added to `image-delivery.test.ts`: IMG-DELIVERY-04 skips page-level check for `404.html`
-- [ ] Test 3 added to `image-delivery.test.ts`: IMG-DELIVERY-04 per-image check still runs on `404.html`
-- [ ] All new tests pass on the current codebase
-- [ ] `pnpm exec vitest run packages/werkstatt-site/src/checks/tests/lighthouse.test.ts` passes
-- [ ] `pnpm exec vitest run packages/werkstatt-site/src/checks/tests/image-delivery.test.ts` passes
-- [ ] `rfc.validate` passes on this file before merging
+- [x] Test 1 added to `lighthouse.test.ts`: LH-12 respects `.lighthouse-budget-ignore` (evidence: packages/werkstatt-site/src/checks/tests/lighthouse.test.ts:212-265, 2 test cases pass)
+- [x] Test 2 added to `image-delivery.test.ts`: IMG-DELIVERY-04 skips page-level check for `404.html` (evidence: packages/werkstatt-site/src/checks/tests/image-delivery.test.ts:242-253, page-level exemption test passes)
+- [x] Test 3 added to `image-delivery.test.ts`: IMG-DELIVERY-04 per-image check still runs on `404.html` (evidence: packages/werkstatt-site/src/checks/tests/image-delivery.test.ts:256-268, per-image attribute check test passes)
+- [x] All new tests pass on the current codebase (evidence: pnpm --filter @warpgogol/werkstatt-site run test — 2509 tests passed, 5 skipped, 0 failed)
+- [x] `pnpm exec vitest run packages/werkstatt-site/src/checks/tests/lighthouse.test.ts` passes (evidence: included in full suite run, all lighthouse.test.ts tests pass)
+- [x] `pnpm exec vitest run packages/werkstatt-site/src/checks/tests/image-delivery.test.ts` passes (evidence: included in full suite run, all image-delivery.test.ts tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0835 --json → status: pass, exitCode: 0)
 
 ## Implementation notes for agents
 
