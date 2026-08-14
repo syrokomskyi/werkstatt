@@ -326,6 +326,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "tokens.ds.lint" },
   { command: "tokens.colors.lint" },
   { command: "css.important.lint" },
+  // RFC-0837: mobile layout CSS anti-patterns
+  { command: "css.mobile-layout.lint", args: ["--mode=warning"] },
   // RFC-0071: advisory — surface biome-coverage gaps without blocking the build
   { command: "biome.coverage.hint" },
   // Content naming and mirroring

@@ -144,6 +144,9 @@ export { runDeployPreflight } from "./env/deploy-preflight.ts";
 // CSS important lint
 export { runCssImportantLint } from "./css-important-lint.ts";
 
+// RFC-0837: Mobile layout CSS anti-pattern lint
+export { runCssMobileLayoutLint } from "./css-mobile-layout-lint.ts";
+
 // RFC-0150: Preview images validation and generation
 export { runPreviewImagesValidate, runPreviewImagesGenerate } from "./preview-images.ts";
 

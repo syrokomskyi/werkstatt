@@ -36,6 +36,7 @@ import { runShareI18nLint } from "../share-i18n.ts";
 import { runUiSilentDefaultsLint } from "../ui-silent-defaults.ts";
 import { runContentLinksValidate } from "../content-links.ts";
 import { runCssImportantLint } from "../css-important-lint.ts";
+import { runCssMobileLayoutLint } from "../css-mobile-layout-lint.ts";
 import { runGeneratorOwnershipLint } from "../generator-ownership.ts";
 import { runAstroExportsLint } from "../astro-exports.ts";
 import { runImportExtensionsLint } from "../import-extensions.ts";
@@ -240,6 +241,22 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/src/styles/**/*.css"],
     modulePaths: ["css-important-lint.ts"],
     execute: runCssImportantLint,
+  },
+  {
+    name: "css.mobile-layout.lint",
+    description:
+      "Lint CSS and Astro inline styles for mobile layout anti-patterns (100vh, 100vw, fixed widths, negative margins, fixed-position overflow, nowrap without overflow-wrap).",
+    scope: "app",
+    flags: { mode: { kind: "string", description: "error (default) or warning" } },
+    supportsAllSites: true,
+    reads: [
+      "<app>/src/styles/**/*.css",
+      "<app>/src/pages/**/*.astro",
+      "packages/werkstatt-site/src/domain/ui/**/*.css",
+      "packages/werkstatt-site/src/domain/ui/**/*.astro",
+    ],
+    modulePaths: ["css-mobile-layout-lint.ts"],
+    execute: runCssMobileLayoutLint,
   },
   /* RFC-0071 */
   {
