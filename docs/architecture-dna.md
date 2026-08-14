@@ -299,3 +299,7 @@ Validators that load configuration from non-obvious paths MUST emit a warning di
 ## DNA-73 · Sequential deployment pipeline enforcement
 
 Deployment commands (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`) MUST reject the `--all` CLI flag — deployment is always per-site, per-release. Each command MUST log its target channel and URL before executing. The pipeline is strictly sequential: `ready → dev-deployed → alt-deployed → main-deployed`. `leitstand.propagate` hardcodes channel `alt` (no `--channel` flag); `leitstand.promote` hardcodes channel `main`. The `leitstand.pipeline.check` command provides operators with pipeline state inspection. Established by RFC-0842.
+
+## DNA-69 · Playwright mobile layout stability checks
+
+Every site route MUST pass Playwright-based geometric assertions in mobile emulation: no horizontal overflow (`scrollWidth ≤ clientWidth`), stable layout after portrait→landscape rotation (element geometry delta ≤ 5px), and CLS < 0.1. The validator operates without baselines — it asserts invariants directly, not by comparing against stored snapshots. Runs in `SITES_CHECK_POSTBUILD_PIPELINE` after `lighthouse.budget.check`. Enforcement: `mobile.layout.check`. Established by RFC-0838.

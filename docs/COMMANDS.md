@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 782. Raw manifest entries: 1388.
+Generated command rows: 783. Raw manifest entries: 1390.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -466,6 +466,7 @@ Generated command rows: 782. Raw manifest entries: 1388.
 | `mission.reconcile` | workspace | workspace | yes | no | Reconcile validated Werkstück data changes to the Sternsystem repo (RFC-0356). |
 | `mission.status` | workspace | workspace | no | no | Print mission manifest and Bordbuch entries (RFC-0355). |
 | `mission.validate` | workspace | workspace | no | no | Validate the materialized Werkstück (RFC-0356). |
+| `mobile.layout.check` | site:warpgogol-com, workspace | app | no | no | RFC-0838: Playwright mobile layout stability checks — horizontal overflow, rotation stability, CLS. |
 | `nachweis.approve` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0714: Record human approval, verification level, and legal content check in a Bordbuch entry. Operator-invoked only. |
 | `nachweis.consent.update` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0707: Update PBP Consent entity status and append nachweis-consent Bordbuch entry. |
 | `nachweis.ingest` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0707: Ingest a PDF evidence document — compute SHA-256, upload to R2, append Bordbuch entry. |
