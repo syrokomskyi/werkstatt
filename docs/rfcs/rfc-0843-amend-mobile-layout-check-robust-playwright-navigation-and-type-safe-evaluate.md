@@ -250,22 +250,22 @@ diagnostics.push({
 
 ## Acceptance criteria
 
-- [ ] `evaluateInPage<T>` wrapper defined in `packages/werkstatt-site/src/checks/playwright-utils.ts`
-- [ ] `blockExternalRequests` and `isExternalUrl` utilities defined in the same file
-- [ ] `isExternalUrl` handles `data:` and `blob:` URLs as non-external
-- [ ] `mobile-layout-check.ts` uses shared utilities (refactored from inline code)
-- [ ] `mobile-layout-check.ts` `result.timeout` field is `true` only for real timeouts, not all errors
-- [ ] `print-pdf.ts` uses `waitUntil: "load"` with `blockExternalRequests` instead of `networkidle`
-- [ ] `print-pdf.ts` uses `browser.newContext()` + `context.newPage()` (not `browser.newPage()` directly)
-- [ ] `print-pdf.ts` has `page.waitForTimeout(2000)` after `goto` for font/layout settling
-- [ ] `independent-qa.ts` uses `waitUntil: "load"` with `blockExternalRequests` instead of `networkidle`
-- [ ] `independent-qa.ts` uses `browser.newContext()` + `context.newPage()` (not `browser.newPage()` directly)
-- [ ] MOBILE-GEO-04 diagnostic distinguishes timeouts from other failures
-- [ ] Unit tests for `playwright-utils.ts` (evaluateInPage, blockExternalRequests, isExternalUrl)
-- [ ] Unit test for MOBILE-GEO-04 non-timeout error message
-- [ ] No `networkidle` references remain in `packages/werkstatt-site/src/checks/` or `packages/werkstatt-site/src/domain/check-runner/`
-- [ ] Existing `mobile-layout-check.test.ts` tests pass
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `evaluateInPage<T>` wrapper defined in `packages/werkstatt-site/src/checks/playwright-utils.ts` (evidence: playwright-utils.ts:24-26)
+- [x] `blockExternalRequests` and `isExternalUrl` utilities defined in the same file (evidence: playwright-utils.ts:31-33, 43-52)
+- [x] `isExternalUrl` handles `data:` and `blob:` URLs as non-external (evidence: playwright-utils.ts:32-33, test playwright-utils.test.ts:44-47)
+- [x] `mobile-layout-check.ts` uses shared utilities (refactored from inline code) (evidence: mobile-layout-check.ts:376, 401, 417, 439)
+- [x] `mobile-layout-check.ts` `result.timeout` field is `true` only for real timeouts, not all errors (evidence: mobile-layout-check.ts:460-461)
+- [x] `print-pdf.ts` uses `waitUntil: "load"` with `blockExternalRequests` instead of `networkidle` (evidence: print-pdf.ts:257, 263)
+- [x] `print-pdf.ts` uses `browser.newContext()` + `context.newPage()` (not `browser.newPage()` directly) (evidence: print-pdf.ts:256, 261)
+- [x] `print-pdf.ts` has `page.waitForTimeout(2000)` after `goto` for font/layout settling (evidence: print-pdf.ts:264)
+- [x] `independent-qa.ts` uses `waitUntil: "load"` with `blockExternalRequests` instead of `networkidle` (evidence: independent-qa.ts:297, 315)
+- [x] `independent-qa.ts` uses `browser.newContext()` + `context.newPage()` (not `browser.newPage()` directly) (evidence: independent-qa.ts:296, 305)
+- [x] MOBILE-GEO-04 diagnostic distinguishes timeouts from other failures (evidence: mobile-layout-check.ts:467-469)
+- [x] Unit tests for `playwright-utils.ts` (evaluateInPage, blockExternalRequests, isExternalUrl) (evidence: playwright-utils.test.ts — 10 tests pass)
+- [x] Unit test for MOBILE-GEO-04 non-timeout error message (evidence: mobile-layout-check.test.ts:233-256)
+- [x] No `networkidle` references remain in `packages/werkstatt-site/src/checks/` or `packages/werkstatt-site/src/domain/check-runner/` (evidence: grep — zero results)
+- [x] Existing `mobile-layout-check.test.ts` tests pass (evidence: 20/20 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate — zero errors)
 
 ## Implementation notes for agents
 
