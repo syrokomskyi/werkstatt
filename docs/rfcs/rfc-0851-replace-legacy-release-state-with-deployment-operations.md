@@ -32,8 +32,10 @@ related:
   - RFC-0829
   - RFC-0848
   - RFC-0849
+  - RFC-0852
+  - RFC-0853
 dependsOn:
-  - RFC-0849
+  - RFC-0853
 batch: werkstatt-release-certification-cert-001
 satisfies:
   - DNA-48
@@ -84,7 +86,7 @@ acceptance:
 
 The current code and normative documents describe incompatible release state machines: `prepared → ready → alt-deployed → promoted`, `prepared → published → alt-deployed → promoted`, and `ready → dev-deployed → alt-deployed → main-deployed`. Handlers also write values that their schema does not declare. These models conflate immutable artifact readiness, mutable deployment progress, rollback history, certification decisions, and current public health.
 
-RFC-0848 was therefore split. RFC-0849 defines strict state/event contracts; this RFC is the one-session forward-only cutover that changes release manifests and blocks old deployment execution. RFC-0850 can proceed independently after RFC-0849. RFC-0848 integrates both.
+RFC-0848 was therefore split. RFC-0849 defines canonical bytes, RFC-0852 defines canonical Diagnostic, and RFC-0853 defines strict state/event contracts. This RFC is the one-session forward-only cutover that changes release manifests and blocks old deployment execution. RFC-0850 can proceed independently after RFC-0853. RFC-0848 integrates both.
 
 The operator accepts temporary deployment unavailability until CERT-007. The serving public site stays online, but this repository must not claim or execute a successful new deployment through obsolete semantics.
 
@@ -199,7 +201,7 @@ Tests spy on the first boundary in each handler and prove zero calls. The shared
 | Path | Responsibility |
 |---|---|
 | `packages/werkstatt/src/schemas/release.ts` | Strict artifact-only release manifest/state |
-| `packages/werkstatt/src/certification/contracts/state.ts` | Deployment operation state/event contracts from RFC-0849 |
+| `packages/werkstatt/src/certification/contracts/state.ts` | Deployment operation state/event contracts from RFC-0853 |
 | `packages/werkstatt/src/certification/state-machine.ts` | Pure complete artifact/deployment transition tables |
 | `packages/werkstatt/src/certification/transition-block.ts` | Shared side-effect-free `CERT-TRANSITION-01` result |
 | `packages/werkstatt/src/release/**` | Typed manifest I/O, legacy diagnostics, artifact-ready commands, rollback block |
@@ -246,7 +248,7 @@ Required transition/legacy diagnostics have zero intended false positives and no
 
 ## Rollout
 
-1. Consume RFC-0849 state contracts and add exhaustive pure transition tables.
+1. Consume RFC-0853 state contracts and add exhaustive pure transition tables.
 2. Replace release schema/manual YAML parsing and update prepare/ready/validate/list/state tests together.
 3. Install the shared block in release rollback and all listed Leitstand handlers before side effects.
 4. Add service-command and provider-zero-call regressions.
@@ -299,7 +301,7 @@ Rejected: the certification specification and single-site cutover target site de
 
 ## Implementation notes for agents
 
-- Implement only after RFC-0849 is `implemented` and this RFC is `accepted`; draft text grants no authority.
+- Implement only after RFC-0853 is `implemented` and this RFC is `accepted`; draft text grants no authority.
 - Complete only this state/transition boundary. Do not implement authority, certification orchestration, real deployment, monitoring, rollback execution, or cleanup.
 - Preserve current public Main. Do not invoke a provider, edit a Sternsystem mirror, delete a release, or touch a mission workpiece during implementation/tests.
 - Fix the owning schema/handler source, not generated command docs; regenerate projections from owners.

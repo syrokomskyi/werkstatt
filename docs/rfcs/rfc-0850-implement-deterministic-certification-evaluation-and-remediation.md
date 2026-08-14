@@ -20,8 +20,10 @@ related:
   - RFC-0362
   - RFC-0848
   - RFC-0849
+  - RFC-0852
+  - RFC-0853
 dependsOn:
-  - RFC-0849
+  - RFC-0853
 batch: werkstatt-release-certification-cert-001
 satisfies:
   - DNA-51
@@ -41,7 +43,7 @@ successSignals:
   - "Evaluation of the maximum supported profile/evidence cut obeys the declared non-quadratic complexity contract."
   - "Every non-pass decision yields a deterministic anchored remediation pack or fails decision construction explicitly."
 nonGoals:
-  - "This RFC does not define runtime schemas or identity bytes; RFC-0849 owns them."
+  - "This RFC does not define runtime schemas or identity bytes; RFC-0849, RFC-0852, and RFC-0853 own those prerequisites."
   - "This RFC does not read/write dossiers, assign authority sequences, verify signatures, run producers, expose commands, or deploy artifacts."
   - "This RFC does not replace release/deployment state or block legacy commands; RFC-0851 owns that transition."
 acceptance:
@@ -57,7 +59,7 @@ acceptance:
 
 ## Context
 
-RFC-0849 supplies strict parsed contracts and immutable identities. CERT-001 also requires executable laws for selecting admitted evidence, freezing an evaluation cut, computing coverage/status, constructing remediation, and hashing ordered dossier history. Those laws were separated from RFC-0849 so a single implementation session can remain pure and bounded.
+RFC-0849 supplies canonical bytes, RFC-0852 supplies canonical Diagnostic, and RFC-0853 supplies strict parsed certification contracts and immutable identities. CERT-001 also requires executable laws for selecting admitted evidence, freezing an evaluation cut, computing coverage/status, constructing remediation, and hashing ordered dossier history. Those laws remain separate so a single implementation session can stay pure and bounded.
 
 Normative sources are `werkstatt-release-certification/contracts.md#aggregation-laws`, `verification.md`, ADR-003/004/011/012/018, and AMD-001/004/006. Storage and Certification Authority behavior remain CERT-003/CERT-004; these functions operate only on already parsed values supplied by a caller.
 
@@ -160,7 +162,7 @@ A dependency cycle, missing anchor, generic/unbounded instruction, missing repro
 
 ### Dossier hashing
 
-`computeDossierEventHash()` hashes the RFC-0849 explicit event identity payload. `computeDossierRoot(candidateId, orderedEventHashes)` binds exact order; reordering/insertion/removal/prior-hash changes alter the root, while storage location and projection timestamps do not. This RFC does not read event files or append roots.
+`computeDossierEventHash()` hashes the RFC-0853 explicit event identity payload. `computeDossierRoot(candidateId, orderedEventHashes)` binds exact order; reordering/insertion/removal/prior-hash changes alter the root, while storage location and projection timestamps do not. This RFC does not read event files or append roots.
 
 ### File system responsibilities
 
@@ -199,7 +201,7 @@ Required evaluation has zero suppression and zero intended false positives. A co
 5. Implement ordered dossier hashes and public exports.
 6. Run the maximum-size deterministic stress fixture and advisory benchmark.
 
-Every step is pure and independently testable. RFC-0851 may be implemented after RFC-0849 without waiting for this RFC, but RFC-0848 integration waits for both.
+Every step is pure and independently testable. RFC-0851 may be implemented after RFC-0853 without waiting for this RFC, but RFC-0848 integration waits for both.
 
 ## Alternatives considered
 
@@ -242,7 +244,7 @@ Rejected: vague tasks encourage agents to guess. An authoritative non-pass witho
 
 ## Implementation notes for agents
 
-- Implement only after RFC-0849 is `implemented` and this RFC is `accepted`; draft text grants no authority.
+- Implement only after RFC-0853 is `implemented` and this RFC is `accepted`; draft text grants no authority.
 - Complete only this pure evaluation boundary in the session. Do not add commands, storage, authority credentials, producers, state cutover, deployment, or rendering.
 - Build the evidence index once and pass it to selection. Any `requirements.map(... evidence.filter ...)`-style full nested scan violates this RFC.
 - Never use process exit, diagnostic emptiness, timeout, catch/fallback, or limit overflow as pass.

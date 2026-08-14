@@ -25,9 +25,14 @@ related:
   - RFC-0362
   - RFC-0363
   - RFC-0849
+  - RFC-0852
+  - RFC-0853
   - RFC-0850
   - RFC-0851
 dependsOn:
+  - RFC-0849
+  - RFC-0852
+  - RFC-0853
   - RFC-0850
   - RFC-0851
 batch: werkstatt-release-certification-cert-001
@@ -47,7 +52,7 @@ packagesImpacted:
   - "@warpgogol/werkstatt"
   - "@warpgogol/werkstatt-site"
 successSignals:
-  - "RFC-0849, RFC-0850, and RFC-0851 are implemented independently, and one integration suite proves their public contracts compose without a second authority or compatibility path."
+  - "RFC-0849 through RFC-0853 are implemented independently, and one integration suite proves their public contracts compose without a second authority or compatibility path."
   - "Equivalent parsed evidence at the same authority cut yields the same identities, decision, action pack, dossier root, and state consequence across package boundaries."
   - "No legacy state/evidence/command result can enter the certification namespace or authorize deployment."
   - "Every affected normative, agent-facing, command, Compass, and generated surface describes one separated artifact/operation/certification model."
@@ -71,7 +76,7 @@ The initial RFC-0848 draft correctly selected strict contracts, authority-ordere
 1. it changed DNA-48/DNA-49/DNA-73 without a formal superseding owner;
 2. it combined several independently testable architectural changes into one session-sized document for an agent expected to implement it alone.
 
-The operator confirmed a complete reset of prior certification authority, temporary deployment unavailability, and decomposition by execution boundary. This enhanced RFC is therefore the CERT-001 integration contract. Its three child RFCs are independently accepted, planned, implemented, audited, and verified before this RFC can be implemented.
+The operator confirmed a complete reset of prior certification authority, temporary deployment unavailability, and decomposition by execution boundary. A second semantic audit then proved that the first contracts child still combined three independent blast radii. This enhanced RFC is therefore the CERT-001 integration contract. Its five child RFCs are independently accepted, planned, implemented, audited, and verified before this RFC can be implemented.
 
 Normative model sources remain the complete `werkstatt-release-certification` snapshot plus accepted amendments AMD-001 through AMD-006. This RFC states cross-module laws and ownership; child RFCs carry executable detail without duplicating spec field tables.
 
@@ -83,15 +88,15 @@ CERT-001 needs one final binary checkpoint proving that the strict contract, pur
 
 ## Decision
 
-CERT-001 is implemented as four dependency-ordered RFCs: RFC-0849 owns strict runtime contracts and identities, RFC-0850 owns bounded deterministic evaluation/remediation, RFC-0851 owns formal legacy release/deployment supersession and the fail-closed command transition, and RFC-0848 owns only cross-module integration laws, package-boundary verification, and final normative/agent/generated-surface consistency.
+CERT-001 is implemented as six dependency-ordered RFCs: RFC-0849 owns bounded canonical JSON; RFC-0852 owns the forward-only Diagnostic cutover; RFC-0853 owns strict certification schemas and explicit identity builders; RFC-0850 owns bounded deterministic evaluation/remediation; RFC-0851 owns formal legacy release/deployment supersession and the fail-closed command transition; and RFC-0848 owns only cross-module integration laws, package-boundary verification, and final normative/agent/generated-surface consistency.
 
-RFC-0848 cannot be implemented until RFC-0850 and RFC-0851 are implemented; their direct dependency on RFC-0849 makes all three child boundaries mandatory. No child may be partially reimplemented or bypassed in the integration session.
+RFC-0848 cannot be implemented until all five child RFCs are implemented. RFC-0852 depends on RFC-0849; RFC-0853 depends on both; RFC-0850 and RFC-0851 depend on RFC-0853. No child may be partially reimplemented or bypassed in the integration session.
 
 ## Architectural fit
 
 ### DNA-53 — one fingerprint authority
 
-Integration proves every candidate, policy, evidence, decision, action-pack, dossier, and state-event identity flows through the RFC-0849 canonical fingerprint surface. No child or plugin hashes certification values independently.
+Integration proves every RFC-0853 candidate, policy, evidence, decision, action-pack, dossier, and state-event identity flows through the RFC-0849 canonical fingerprint surface. No child or plugin hashes certification values independently.
 
 ### DNA-64 — engine/plugin/workshop boundary
 
@@ -111,12 +116,14 @@ Locks, idempotency, atomic writes, artifact storage, fingerprinting, adapters, b
 
 | Order | RFC | One-session responsibility | Completion boundary |
 |---:|---|---|---|
-| 1 | RFC-0849 | Diagnostic ownership, canonical JSON, strict schemas, explicit identities | both packages compile; contract/identity properties pass |
-| 2a | RFC-0850 | evidence index/selection, aggregation, action packs, dossier hashes | pure bounded tests/stress fixture pass |
-| 2b | RFC-0851 | artifact/deployment state split, strict release manifest, legacy command block, supersession | changed commands fail before side effects; DNA/docs regenerated |
-| 3 | RFC-0848 | cross-module integration, source-boundary and surface-consistency verification | all integrated laws and repository governance checks pass |
+| 1 | RFC-0849 | bounded canonical snapshot, bytes, hash, Unicode and resource limits | engine fingerprint tests/fixtures and DNA-53 correction pass |
+| 2 | RFC-0852 | engine Diagnostic ownership, canonical/redacted data, legacy alias removal | engine/site packages compile; schema/boundary tests pass |
+| 3 | RFC-0853 | strict certification schemas, public subpath, explicit identity payload builders | traceability and identity sensitivity properties pass |
+| 4a | RFC-0850 | evidence index/selection, aggregation, action packs, dossier hashes | pure bounded tests/stress fixture pass |
+| 4b | RFC-0851 | artifact/deployment state split, strict release manifest, legacy command block, supersession | changed commands fail before side effects; DNA/docs regenerated |
+| 5 | RFC-0848 | cross-module integration, source-boundary and surface-consistency verification | all integrated laws and repository governance checks pass |
 
-RFC-0850 and RFC-0851 may be implemented in either order after RFC-0849. Each receives its own audit, architecture acceptance, plan, implementation, review, and fix cycle. RFC-0848 receives no child code changes except corrections required by an actual integration defect; such a defect is fixed in its owning child module and verified here.
+RFC-0850 and RFC-0851 may be implemented in either order after RFC-0853. Each child receives its own audit, architecture acceptance, plan, implementation, review, and fix cycle. RFC-0848 receives no child code changes except corrections required by an actual integration defect; such a defect is fixed in its owning child module and verified here.
 
 ### CLI surface
 
@@ -148,8 +155,8 @@ bash scripts/check-clean-trees.sh
 
 The integration suite uses only public child APIs and synthetic fixtures. It proves:
 
-1. all values are parsed by RFC-0849 before identity/evaluation/state use;
-2. recomputed candidate/policy/evidence identities are exactly those consumed by RFC-0850;
+1. all Diagnostic and certification values are parsed by RFC-0852/RFC-0853 and snapshotted by RFC-0849 before identity/evaluation/state use;
+2. RFC-0853 recomputed candidate/policy/evidence identities are exactly those consumed by RFC-0850;
 3. one immutable evaluation cut and authority admission order determine selection;
 4. decision/action-pack identities are invariant under equivalent input permutations;
 5. dossier root changes under event insertion/removal/reorder and is location-independent;
@@ -157,7 +164,7 @@ The integration suite uses only public child APIs and synthetic fixtures. It pro
 7. deployment operations bind the same candidate/decision/root and cannot mutate artifact readiness;
 8. legacy states/evidence/result shapes fail strict parsing and cannot be adapted;
 9. the transition block executes before every old site command side effect;
-10. site Diagnostic values parse through the engine-owned schema and engine source has no plugin import.
+10. site Diagnostic values parse through the RFC-0852 engine-owned schema and engine source has no plugin import.
 
 ### Scale and false-positive contract
 
@@ -171,8 +178,8 @@ All required schema, identity, aggregation, legacy, and transition diagnostics h
 |---|---|
 | `packages/werkstatt/src/tests/certification-foundation.integration.test.ts` | Cross-child identity/evaluation/state and negative legacy laws |
 | `packages/werkstatt/src/certification/index.ts` | Verify deliberate public surface; fix ownership only in child RFC if incorrect |
-| `packages/werkstatt/package.json` | Verify certification export created by RFC-0849 |
-| `packages/werkstatt-site/src/checks/audit/types.ts` | Verify core Diagnostic consumption created by RFC-0849 |
+| `packages/werkstatt/package.json` | Verify certification export created by RFC-0853 |
+| `packages/werkstatt-site/src/checks/audit/types.ts` | Verify core Diagnostic consumption created by RFC-0852 |
 | `docs/architecture-dna.md` | Verify RFC-0851 DNA-48/49/73 and existing DNA-53/64 agree |
 | `docs/command-manifest.generated.yaml` and `docs/COMMANDS.md` | Verify RFC-0851 command behavior projection |
 | `docs/ecosystem.generated.yaml` | Verify regenerated ecosystem projection |
@@ -187,7 +194,7 @@ The final CERT-001 integration evidence must review every file below. “No chan
 |---|---|
 | `docs/requirements.xml` | one fail-closed certification authority; reusable checks are non-authorizing |
 | `docs/technology.xml` | strict Zod/canonical identity and engine/plugin placement |
-| `docs/development-plan.xml` | four-RFC CERT-001 implementation order and blocked transition |
+| `docs/development-plan.xml` | six-RFC CERT-001 implementation order and blocked transition |
 | `docs/knowledge-graph.xml` | ownership/relationships among contracts, evaluation, release, Leitstand, plugin |
 | `docs/verification-plan.xml` | property/state/stress/integration/zero-side-effect evidence |
 | `docs/source-markup.xml` | source contract requirements for new high-risk certification modules |
@@ -210,7 +217,9 @@ Stable integration-only test labels use `CERT-INTEGRATION-*`; production code mu
 | Failure | Required response |
 |---|---|
 | Child RFC not implemented | `rfc.implement.stamp` dependency block; do not start integration |
-| Schema/type/identity drift | fix RFC-0849-owned source and rerun its tests |
+| Canonical byte/domain drift | fix RFC-0849-owned source and rerun its tests |
+| Diagnostic ownership/schema drift | fix RFC-0852-owned source and rerun both package boundaries |
+| Certification schema/type/identity drift | fix RFC-0853-owned source and rerun its traceability/identity tests |
 | Selection/decision/action drift or complexity breach | fix RFC-0850-owned source; no wrapper workaround |
 | Legacy state/command/DNA drift | fix RFC-0851-owned source; no alias or bypass |
 | Spec contradiction discovered | create accepted spec amendment before code change |
@@ -220,11 +229,12 @@ Stable integration-only test labels use `CERT-INTEGRATION-*`; production code mu
 ## Rollout
 
 1. Audit, enhance, accept, plan, implement, review, and fix RFC-0849.
-2. Do the same independently for RFC-0850 and RFC-0851 after RFC-0849; do not combine their implementation commits/sessions.
-3. Confirm all child acceptance evidence and implemented statuses.
-4. Add/run the cross-module integration suite without reimplementing child logic.
-5. Review and synchronize the exact Compass/AGENTS/generated map.
-6. Emit RFC-0848 verification evidence and only then request implementation stamping.
+2. Do the same for RFC-0852 after RFC-0849 and RFC-0853 after RFC-0852; never combine their sessions.
+3. Do the same independently for RFC-0850 and RFC-0851 after RFC-0853; they may proceed in either order but not one combined session.
+4. Confirm all five child acceptance artifacts and implemented statuses.
+5. Add/run the cross-module integration suite without reimplementing child logic.
+6. Review and synchronize the exact Compass/AGENTS/generated map.
+7. Emit RFC-0848 verification evidence and only then request implementation stamping.
 
 The current site may continue serving throughout. New site deployments are unavailable after RFC-0851 and remain unavailable until CERT-007. This accepted operational gap never permits a broken package build, partial child stamp, or legacy success fallback.
 
@@ -232,7 +242,7 @@ The current site may continue serving throughout. New site deployments are unava
 
 ### Keep the original monolithic RFC
 
-Rejected after audit and operator grilling. It crossed four execution boundaries and was unsafe for one less capable agent session.
+Rejected after two audits and operator grilling. It crossed six execution boundaries and was unsafe for one less capable agent session.
 
 ### Make RFC-0848 an umbrella with no executable checkpoint
 
@@ -254,14 +264,14 @@ Rejected. They remain useful producers/mechanisms only after later profiles and 
 
 - **Premature parent stamp:** mitigated by `dependsOn` and evidence checking all child statuses.
 - **Duplicate child logic in integration:** mitigated by public-API-only tests and ownership-specific failure instructions.
-- **Normative drift across four RFCs:** mitigated by one batch id, explicit dependency table, spec citations, and final surface scan.
+- **Normative drift across six RFCs:** mitigated by one batch id, explicit dependency table, spec citations, and final surface scan.
 - **False green from retained infrastructure:** mitigated by negative tests proving no adapter/check/archive/result opens a gate without a certification decision.
 - **Performance wrapper regression:** mitigated by maximum-size integration fixture plus RFC-0850 operation-count contract.
 - **Agent confusion about outage:** mitigated by exact statement that only deployment availability may be broken; builds/tests/contracts remain hard gates.
 
 ## Acceptance criteria
 
-- [ ] RFC-0849, RFC-0850, and RFC-0851 are `implemented`, their verification artifacts exist, and no acceptance criterion remains unchecked.
+- [ ] RFC-0849, RFC-0850, RFC-0851, RFC-0852, and RFC-0853 are `implemented`, their verification artifacts exist, and no acceptance criterion remains unchecked.
 - [ ] The integration suite uses public child APIs and proves all ten cross-module laws, including negative legacy/non-authority cases.
 - [ ] The maximum-size integration fixture respects canonical/evaluation/task limits and non-quadratic operation bounds without truncation.
 - [ ] Required diagnostics have no suppression/bypass and confirmed contract defects route to normative correction rather than fallback pass.
@@ -274,10 +284,10 @@ Rejected. They remain useful producers/mechanisms only after later profiles and 
 
 ## Implementation notes for agents
 
-- Implement only after RFC-0850 and RFC-0851 are both `implemented` and RFC-0848 is `accepted`. Draft text grants no code authority.
+- Implement only after RFC-0849 through RFC-0853 are all `implemented` and RFC-0848 is `accepted`. Draft text grants no code authority.
 - This session is integration-only. Do not redo child work or combine it with another CERT node.
 - If a test exposes a defect, fix it in the child owner and rerun that child's complete validation before returning here. Do not add adapters, aliases, coercions, fallback passes, duplicate schemas, or wrapper reimplementations.
-- Read the full certification snapshot/amendments and all three child RFCs before editing.
+- Read the full certification snapshot/amendments and all five child RFCs before editing.
 - Do not invoke providers, deploy, edit mirrors/workpieces, migrate evidence, or delete legacy artifacts.
 - Run the exact Compass/agent map; never choose “applicable files” ad hoc and never hand-edit generated projections.
 - Follow RFC-0230 for agent-facing/public surfaces, RFC-0330 for acceptance-probe evidence, RFC-0334 for invariant conflict escalation, and RFC-0476 for verified stamping.
