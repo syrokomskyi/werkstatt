@@ -406,3 +406,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
 - **Question:** How should environment/configuration identity be bound without turning the identical Dev, Alt, and Main artifact into three different release candidates or allowing target drift after certification?
 - **Answer:** Candidate identity contains `buildConfigHash` for build-affecting inputs and `deploymentPlanHash` for the intended adapter, channel targets/domains, binding contract, and public runtime contract. Each environment-specific evidence envelope and deployment operation separately records the actually observed `environmentIdentityHash`. A plan/observation mismatch is `stale`. Secret values are never stored or directly hashed; environment identity uses safe provider reference/version/presence metadata or a keyed non-reversible fingerprint. Thus one immutable candidate/artifact moves through all channels while deployment topology and runtime drift remain detectable.
+
+### K-0032: Separate Certification Authority trust boundary
+
+```knowledge-entry
+id: K-0032
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
+- **Question:** What prevents an author agent with workspace access from fabricating evidence, rewriting a local dossier and hash chain, or using certification/deployment credentials directly while keeping the workflow agent-only?
+- **Answer:** Introduce a separate trusted `Certification Authority` executor. Author/evaluator agents may request producer runs and submit typed results but cannot sign decisions, append the authoritative dossier, or access authority signing, durable-write, or deployment credentials. The authority independently verifies candidate/profile/evidence, aggregates, atomically appends, durably replicates, and signs the exact decision/root/operation authorization. Deployment accepts only a current signature from the registered issuer for the exact candidate/gate/root/target. Local reports without authority are explicitly non-authoritative and open no gate. The first adapter may be a CI/Worker executor, while the engine contract remains provider-neutral; authority unavailability is `incomplete`, never a bypass.
