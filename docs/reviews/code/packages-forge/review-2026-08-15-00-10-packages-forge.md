@@ -19,13 +19,17 @@ filesReviewed:
   - packages/forge/src/tests/knowledge-pbt.test.ts
   - packages/forge/src/tests/compact.test.ts
   - packages/forge/src/tests/upgrade.test.ts
+  - packages/forge/package.json
+  - packages/forge/extract.config.yaml
+  - packages/forge/AGENTS.md
+  - packages/forge/skills/shared/knowledge/learned-principles.md
 ---
 
-# Code Review: жизненный цикл Forge knowledge против RFC-0660…RFC-0663
+# Code Review: жизненный цикл Forge knowledge против RFC-0524 и RFC-0660…RFC-0663
 
 ### Verdict: Needs revision
 
-Новый RFC не требуется. Проверяемые контракты уже приняты в RFC-0660…RFC-0663, но текущая реализация им не соответствует в пяти местах. Наиболее опасные отклонения — отсутствие бюджета shared-слоя, полная пересериализация файлов без побайтовой сохранности и неатомарная последовательность записи live/archive. Они делают maintenance-команды внешне успешными, но не гарантируют сохранность знания и не обнаруживают фактическое переполнение общей памяти агентов.
+Новый RFC не требуется. Проверяемые контракты уже приняты в RFC-0524 и RFC-0660…RFC-0663, но текущая реализация им не соответствует в шести местах. Наиболее опасные отклонения — отсутствие бюджета shared-слоя, полная пересериализация файлов без побайтовой сохранности, неатомарная последовательность записи live/archive и отсутствие границы между накопленным knowledge и npm payload. Они делают maintenance-команды внешне успешными, но не гарантируют сохранность знания, не обнаруживают фактическое переполнение общей памяти агентов и могут опубликовать project-specific context.
 
 Этот review является implementation-ready fix brief. Следующий агент должен исправить перечисленные расхождения в существующих контрактах, не создавать новый RFC, не ослаблять acceptance criteria архивных RFC и не добавлять compatibility path.
 
@@ -130,14 +134,14 @@ filesReviewed:
 **Acceptance evidence.**
 
 - Failure-injection tests для stage/write/rename live и archive, включая failure между archive и live commit.
-- После каждого injected failure объединение live + archive содержит каждый исходный ID ровно один раз или полностью сохраняет исходное состояние; ни loss, ни duplicate не допускаются.
-- Повторный запуск после failure сходится к ожидаемому результату.
+- После любого injected failure ни один исходный ID не потерян. Допустимое crash residue — временная копия одного ID и в archive, и в live после успешного archive rename и до live rename; это состояние должно быть явно помечено как `recoveryRequired`, а не как success.
+- Повторный запуск после failure обязан распознать уже добавленный archive ID, не дублировать его повторно и сходиться к состоянию «ровно одна копия в archive, ни одной в live».
 - Test invalid existing archive: exit non-zero, оба файла byte-identical исходным.
 - В production path нет `writeFileSync` для compaction mutations.
 
 #### F4 — Medium: same-version upgrade не может восстановить managed drift
 
-**Нормативная основа.** RFC-0663 делает shared knowledge частью forge create/upgrade synchronization. Managed artifacts должны сходиться к bundled source без требования создавать проект заново.
+**Нормативная основа.** RFC-0524 определяет разные authority boundaries: в Forge monorepo `packages/forge/skills/**` является source of truth, а `.agents/skills/**` — read-only mirror; npm-потребитель получает пустые templates и накапливает project-specific knowledge локально. RFC-0663 распространяет эту модель на shared knowledge. Следовательно, upgrade должен восстанавливать managed instructions, но не уничтожать consumer-owned knowledge state.
 
 **Evidence.**
 
@@ -150,17 +154,22 @@ filesReviewed:
 
 **Required fix.**
 
-1. При одинаковой версии всё равно выполнить read-only drift comparison managed artifacts. Возвращать `noop` только если они byte-identical bundled sources и обязательные destinations присутствуют.
-2. При drift синхронизировать только Forge-owned outputs (`.agents/skills/**` и иные уже объявленные managed artifacts). Не перезаписывать operator-owned config/content.
-3. Если продукту нужен явный режим, добавить его только если существующий command contract действительно не позволяет convergence; предпочтительный минимальный вариант — безопасный repair внутри обычного `forge.upgrade` без нового command.
-4. Исправить doctor hints на точную исполнимую команду `forge.upgrade` (с flag, только если он реально введён и протестирован).
-5. Dry-run обязан показать planned repairs, не писать файлы и не маскировать drift как noop.
+1. При одинаковой версии всё равно выполнить read-only drift comparison managed artifacts. Возвращать `noop` только при отсутствии разрешённых repairs.
+2. В Forge monorepo синхронизировать `SKILL.md` и knowledge из canonical `packages/forge/skills/**` в read-only `.agents` mirror.
+3. В npm-consumer синхронизировать `SKILL.md`, но existing knowledge files в `.agents/skills/**` считать project-owned mutable state: не перезаписывать их bundled empty templates; разрешено только scaffold missing file.
+4. Pack skills сохраняют существующую source → runtime mirror модель, потому что их canonical source расположен в самом consumer workspace.
+5. Не перезаписывать operator-owned config/content вне перечисленных managed paths.
+6. Если продукту нужен явный режим, добавить его только если существующий command contract действительно не позволяет convergence; предпочтительный минимальный вариант — безопасный repair внутри обычного `forge.upgrade` без нового command.
+7. Исправить doctor hints на точную исполнимую команду `forge.upgrade` (с flag, только если он реально введён и протестирован).
+8. Dry-run обязан показать planned repairs, не писать файлы и не маскировать drift как noop.
 
 **Acceptance evidence.**
 
 - Same version + clean managed tree → `noop`, ноль writes.
-- Same version + stale local skill → файл восстановлен, result перечисляет update.
-- Same version + stale/missing shared knowledge destination → восстановлен из canonical source.
+- Same version + stale `SKILL.md` → instruction-файл восстановлен, result перечисляет update.
+- Monorepo + stale knowledge mirror → восстановлен из canonical source.
+- Npm consumer + modified existing local/shared knowledge → байты knowledge не меняются.
+- Npm consumer + missing local/shared knowledge → создаётся structured-empty template, существующие соседние state files не меняются.
 - Same version + dry-run drift → planned update виден, bytes не меняются.
 - Operator-owned файл рядом с managed outputs остаётся byte-identical.
 - Doctor hint запускается в fixture project и действительно устраняет предупреждение.
@@ -188,6 +197,37 @@ filesReviewed:
 - Successful mutation test: write flags соответствуют реально заменённым файлам.
 - Injected failure test: failed target не помечен как written.
 
+#### F6 — High: npm tarball не отделяет накопленное project knowledge от portable templates
+
+**Нормативная основа.** RFC-0524 и RFC-0660 требуют, чтобы накопленные Q&A/patterns/principles оставались project-specific, а npm consumers получали structured-empty templates. RFC-0663 повторяет это требование для shared layer.
+
+**Evidence.**
+
+- `packages/forge/package.json` включает весь каталог `skills/` в npm `files`.
+- Внутри `packages/forge/skills/**` уже есть накопленные structured entries, включая shared-файл длиной 5316 символов.
+- В package directory нет `.npmignore`/pack staging rule, исключающего накопленные `qa-log.md`, `fix-patterns.md`, `learned-principles.md` и archive companions.
+- `packages/forge/extract.config.yaml` также не содержит knowledge sanitization.
+- `packages/forge/AGENTS.md` описывает несуществующие `prepublishOnly`/publish-check scripts, которых нет в текущем `package.json`, поэтому документация не является исполнимым guardrail.
+
+**Impact.** Следующий `pnpm publish` может перенести внутреннюю историю решений, project context и потенциально чувствительные сведения всем npm consumers. Это privacy и supply-chain defect, а не косметический packaging drift.
+
+**Required fix.**
+
+1. Сохранить monorepo source files как canonical accumulated knowledge; не обнулять их ради публикации.
+2. Внутри публикуемого `skills/` исключить только cumulative filenames и archive companions через package-local pack filter. Knowledge-adjacent reference files (`mocking.md`, `pbt-guide.md` и подобные) должны продолжить поставляться.
+3. Поставлять три canonical structured-empty templates (L0/L1/L2) из `src/onboarding/templates/knowledge/`; `forge.create`/`forge.upgrade` используют их, когда cumulative source отсутствует в npm package.
+4. Добавить tarball inspection test: создать настоящий pack artifact в temporary directory, распаковать/прочитать manifest, доказать отсутствие accumulated entries и затем создать consumer fixture, где все declared knowledge destinations существуют и содержат zero entries.
+5. Pack/publish validation должна fail closed до network publication. Никакой sanitizer не должен временно переписывать tracked source files.
+6. Обновить Forge publication instructions так, чтобы они соответствовали реальным scripts и canonical commit discipline; npm publication остаётся только по явной команде оператора.
+
+**Acceptance evidence.**
+
+- Tarball не содержит ни одного source cumulative/archive файла с project entries.
+- Установленный tarball + `forge.create` создаёт все declared local/shared knowledge files как валидные structured-empty документы.
+- Knowledge-adjacent markdown по-прежнему присутствует в tarball.
+- `npm/pnpm pack` failure или validation failure не изменяет tracked working tree.
+- Secret scan запускается на фактическом tarball payload, а не только на source tree.
+
 ### Axis A — Structural correctness
 
 **Needs revision.** F2, F3 и F5 нарушают базовую корректность mutation lifecycle: serializer меняет больше требуемого, pair write не транзакционен, result не отражает реальный side effect.
@@ -198,7 +238,7 @@ filesReviewed:
 
 ### Axis C — Ecosystem fit
 
-**Needs revision.** F1 оставляет shared source вне governance pipeline; F4 разрывает canonical bundle → synced consumer convergence. Validator, doctor и upgrade дают разные представления одного managed state.
+**Needs revision.** F1 оставляет shared source вне governance pipeline; F4 смешивает monorepo mirror и npm-consumer state; F6 не отделяет накопленное project knowledge от publishable templates. Validator, doctor, upgrade и pack дают разные представления одного managed state.
 
 ### Axis D — Forward-only compliance
 
@@ -210,7 +250,7 @@ filesReviewed:
 
 ### Axis F — Pragmatism
 
-**Needs revision.** В репозитории уже есть atomic-write primitive, но compaction его обходит. Минимальное решение — переиспользовать общий collector/budget calculator и существующую synchronization surface, а не вводить новый command или новый RFC.
+**Needs revision.** В репозитории уже есть atomic-write primitive, но compaction его обходит. Минимальное решение — переиспользовать общий collector/budget calculator, существующую synchronization surface и package-local pack filtering, а не вводить новый Werkstatt command или новый RFC.
 
 ### Axis G — Blind spots
 
@@ -228,20 +268,22 @@ filesReviewed:
 | RFC-0662: truthful per-file mutation report | Missing | `written: true` без actions |
 | RFC-0663: shared default budget 4096 и `budgets.shared` override | Missing | Тип, schema, resolver и collectors не содержат shared budget |
 | RFC-0663: shared knowledge синхронизируется upgrade | Partial | Синхронизируется только при изменении version marker; repair drift невозможен |
+| RFC-0524/RFC-0660/RFC-0663: npm ships structured-empty knowledge templates | Missing | `skills/` pack allowlist включает accumulated source files без sanitization |
 
 ### Рекомендуемый порядок реализации
 
-1. Сначала F2: определить raw-segment/targeted-writer contract и закрыть его table tests + PBT. Без этого compaction нельзя безопасно чинить.
-2. Затем F3 и F5 вместе: построить prospective pair, атомарно commit-ить и честно репортить side effects.
-3. Затем F1: расширить typed budget contract и подключить shared source единым collector path.
-4. Затем F4: сделать upgrade convergent при same version и заменить doctor hints.
-5. После каждого шага запустить scoped tests и `build:check`; в конце — полный `pnpm --filter @warpgogol/forge test`, `forge.skill.validate`, `forge.doctor`, `forge.validate`, `ecosystem.manifest.validate` и `command.manifest.validate`/генерацию только если command metadata действительно изменена.
-6. Перед stamp/архивацией ничего не менять в RFC-0660…0663. Если реализация обнаружит настоящее новое архитектурное решение, остановиться и классифицировать только эту delta через `fo-idea`.
+1. Сначала F2: реализовать source spans + targeted edit writer и закрыть его table tests + PBT. Без этого compaction нельзя безопасно чинить.
+2. Затем F3 и F5 вместе: archive-first idempotent convergence, атомарные per-file writes и честный report.
+3. Затем F1: расширить typed budget contract и подключить shared authority ровно один раз.
+4. Затем F4 и F6 вместе: разделить monorepo mirror/npm state, сделать upgrade convergent и закрыть tarball boundary.
+5. Завершить отдельной integration verification session по implementation runbook packets.
+6. После каждого шага запустить scoped tests и `build:check`; в конце — полный `pnpm --filter @warpgogol/forge test`, `forge.skill.validate`, `forge.doctor`, `forge.validate`, `ecosystem.manifest.validate` и `command.manifest.validate`/генерацию только если command metadata действительно изменена.
+7. Перед stamp/архивацией ничего не менять в RFC-0524, RFC-0660…0663. Если реализация обнаружит настоящее новое архитектурное решение, остановиться и классифицировать только эту delta через `fo-idea`.
 
-### Questions for the author
+### Resolved implementation decisions
 
-1. Какой internal representation выбран для побайтовой сохранности: raw segment spans в parser или targeted patch writer? В implementation plan должен быть один путь, не два экспериментальных.
-2. Подтверждено ли, что shared budget считается ровно один раз на workspace и не агрегируется по числу consumers?
-3. Как доказана pair consistency при падении между archive и live rename: safe ordering, rollback или иной конкретный protocol?
-4. Может ли обычный `forge.upgrade` безопасно стать convergent repair surface без нового flag? Если нет, требуется явное доказательство несовместимости существующего contract до архитектурной эскалации.
-
+1. Parser сохраняет raw source и character-offset spans; compaction применяет targeted edits. Полная пересериализация существующего документа запрещена.
+2. Shared budget считается ровно один раз на workspace и не агрегируется по числу consumers.
+3. Pair protocol — archive-first atomic write + idempotent merge по entry ID + live atomic write. Crash-window duplicate допустим только как явно неуспешное recoverable state; повторный запуск обязан завершить перенос без второго append.
+4. Обычный `forge.upgrade` является convergent repair surface без нового flag, но учитывает authority mode: monorepo mirrors можно перезаписывать, npm-consumer knowledge state — нельзя.
+5. Накопленное source knowledge остаётся в monorepo; npm tarball фильтрует cumulative files и восстанавливает structured-empty destinations из отдельного template set.
