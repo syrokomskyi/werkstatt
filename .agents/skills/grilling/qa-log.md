@@ -796,3 +796,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Should Werkstatt embed Cordis as its production runtime substrate or implement its own bounded component runtime using Cordis only as a semantic reference?
 - **Answer:** Do not add Cordis as a production dependency. Use its lifecycle and composability semantics as reference material and conformance scenarios, while Werkstatt owns versioned capability contracts, four explicit effect classes, the protected Law Kernel, isolation tiers, deterministic teardown, and integration with missions, evidence, and promotion.
+
+### K-0062: Permit operational unavailability during the forward-only program
+
+```knowledge-entry
+id: K-0062
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Must the legacy deployment path remain operational until an atomic final replacement, or may the platform be unavailable while the unified transition is incomplete?
+- **Answer:** The transition is stricter and forward-only: the platform may remain operationally broken until the whole program is implemented. Do not preserve the legacy deployment authority, add compatibility shims, or optimize sequencing around temporary availability. Intermediate unavailable states must be explicit program states, and only the completed new runtime, certification authority, and deployment path restore supported operation.
