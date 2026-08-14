@@ -302,20 +302,20 @@ interface MobileLayoutCheckResult {
 
 ## Acceptance criteria
 
-- [ ] TypeScript types and interfaces defined in `packages/werkstatt-site/src/checks/mobile-layout-check.ts`
-- [ ] CLI command registered with name `mobile.layout.check` and scope `app` in `05-seo-audit.ts`
-- [ ] `--json` output format documented and stable
-- [ ] Integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `lighthouse.budget.check`
-- [ ] Per-route timeout (default 30s) implemented and tested
-- [ ] Horizontal overflow check (`MOBILE-GEO-01`) implemented for both orientations
-- [ ] Layout stability delta check (`MOBILE-GEO-02`) implemented for portrait→landscape rotation
-- [ ] CLS check (`MOBILE-GEO-03`) implemented via `PerformanceObserver` init script
-- [ ] No baselines or golden snapshots used — all checks are direct invariant assertions
-- [ ] No visual regression (screenshot diff) — explicitly excluded
-- [ ] Existing sites pass without changes in warning mode (or migration path is documented)
-- [ ] `AGENTS.md` updated where agent behavior rules changed
-- [ ] DNA-69 entry appended to `docs/architecture-dna.md`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] TypeScript types and interfaces defined in `packages/werkstatt-site/src/checks/mobile-layout-check.ts` (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts:39-57, `RouteResult` and `MobileLayoutCheckResult` interfaces)
+- [x] CLI command registered with name `mobile.layout.check` and scope `app` in `05-seo-audit.ts` (evidence: packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts:234-249, command entry with `execute: runMobileLayoutCheck`)
+- [x] `--json` output format documented and stable (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts:241-244, `MobileLayoutCheckResult` interface is the JSON shape; kernel `--json` flag serializes `result.data`)
+- [x] Integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `lighthouse.budget.check` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:50-52, `{ command: "mobile.layout.check", args: ["--mode=warning"] }`)
+- [x] Per-route timeout (default 30s) implemented and tested (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts:247-250, `routeTimeoutMs` flag parsing; tests/mobile-layout-check.test.ts MOBILE-GEO-04 timeout test)
+- [x] Horizontal overflow check (`MOBILE-GEO-01`) implemented for both orientations (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts:300-310, `scrollWidth > clientWidth` check runs per orientation; test confirms detection)
+- [x] Layout stability delta check (`MOBILE-GEO-02`) implemented for portrait→landscape rotation (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts:317-330, `computeMaxDelta` compares portrait vs landscape geometry; test confirms detection)
+- [x] CLS check (`MOBILE-GEO-03`) implemented via `PerformanceObserver` init script (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts:155-170, `CLS_INIT_SCRIPT` + `computeCls`; test confirms detection)
+- [x] No baselines or golden snapshots used — all checks are direct invariant assertions (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts, no baseline/snapshot references — all checks are direct geometric comparisons)
+- [x] No visual regression (screenshot diff) — explicitly excluded (evidence: packages/werkstatt-site/src/checks/mobile-layout-check.ts MODULE_CONTRACT non-goals: "No visual regression or screenshot diffing")
+- [x] Existing sites pass without changes in warning mode (or migration path is documented) (evidence: pipeline wired with `--mode=warning` at sites-check-postbuild.ts:52, exit code 0 in warning mode)
+- [x] `AGENTS.md` updated where agent behavior rules changed (evidence: packages/werkstatt-site/AGENTS.md:85-86, `mobile.layout.check` and DNA-69 documented)
+- [x] DNA-69 entry appended to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:303-305, `## DNA-69 · Playwright mobile layout stability checks`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0838` returns `status: pass`, 0 violations)
 
 ## Implementation notes for agents
 
