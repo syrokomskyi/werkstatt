@@ -809,3 +809,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Must the legacy deployment path remain operational until an atomic final replacement, or may the platform be unavailable while the unified transition is incomplete?
 - **Answer:** The transition is stricter and forward-only: the platform may remain operationally broken until the whole program is implemented. Do not preserve the legacy deployment authority, add compatibility shims, or optimize sequencing around temporary availability. Intermediate unavailable states must be explicit program states, and only the completed new runtime, certification authority, and deployment path restore supported operation.
+
+### K-0063: Allow only explicit transition failures between packets
+
+```knowledge-entry
+id: K-0063
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Does permitted transition breakage include arbitrary compilation, test, schema, and validator failures between packets?
+- **Answer:** No. Product runtime and deployment may be unavailable, but every packet must be internally complete and green under its declared verification contract. A global check may fail only through an explicitly enumerated transition diagnostic assigned to a later packet; unexplained TypeScript errors, failing owned tests, partial schemas or state, and unrelated validator regressions block handoff.
