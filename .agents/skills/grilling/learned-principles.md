@@ -94,3 +94,59 @@ status: active
 
 - **Condition:** A migration design is accumulating compatibility paths for hypothetical consumers or legacy estates that do not exist in the actual deployment scope.
 - **Recommended answer:** Prefer the smallest safe migration that fits the real estate. For a replaceable single target, use a clean cutover and preserve only the audit history that remains valuable; do not build generic legacy infrastructure without a concrete consumer.
+
+### K-0007: Integrity requires an independent authority
+
+```knowledge-entry
+id: K-0007
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** An agent or process that creates an artifact can also write its evidence, recompute its hash chain, or access the credentials that authorize the consequential transition.
+- **Recommended answer:** Put authoritative append, signing, and operation authorization behind a separate least-privilege authority boundary. A self-consistent hash chain detects corruption only relative to a trusted root; it does not prove who was entitled to issue that root.
+
+### K-0008: Historical verification preserves policy bytes
+
+```knowledge-entry
+id: K-0008
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** A durable decision depends on schemas, policy rules, rubrics, producer declarations, toolchains, or issuer material that can change after the decision.
+- **Recommended answer:** Store the exact semantic policy inputs as a content-addressed immutable bundle and bind its root to the decision subject. A hash or version string without the hashed bytes is insufficient for independent historical interpretation and verification.
+
+### K-0009: Distributed evidence uses authority order and immutable cuts
+
+```knowledge-entry
+id: K-0009
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** Concurrent, retried, remote, or scheduled producers can return out of order, with clock skew, duplication, or after a decision has already been made.
+- **Recommended answer:** Order admitted results by a monotonic authority sequence and freeze every decision at an explicit evaluation cut. Producer timestamps describe observation and freshness, never precedence; late results create a new decision or incident instead of changing history.
+
+### K-0010: Bootstrap safety does not create legacy authority
+
+```knowledge-entry
+id: K-0010
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** A clean migration needs a recovery path to pre-migration state, but importing or retroactively approving that state would undermine the new authority model.
+- **Recommended answer:** Permit an exact, narrow, one-time rollback-only bootstrap target with explicit closure conditions. Never let bootstrap evidence satisfy forward gates, acquire the new certified status, or survive as an indefinite compatibility path.
