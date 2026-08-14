@@ -71,6 +71,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `persistOperatorConfigFiles(workpieceDir, cacheCloneDir)` (RFC-0840): copies each file in `OPERATOR_CONFIG_FILES` from workpiece to cache clone (untracked). Uses `path.join` with subpath entries. Non-fatal on failure. Used by `mission.close` after `persistEnvFilesToCacheClone`.
 - `restoreOperatorConfigFiles(cacheCloneDir, workpieceDir)` (RFC-0840): restores each file from cache clone to workpiece after `atomicMoveDir`. Creates parent directories with `mkdir { recursive: true }`. Does NOT modify file contents. Non-fatal on failure. Used by `mission.materialize` after `restoreEnvFilesFromCacheClone`.
 - `materialize.config.validate` (RFC-0840): workspace-scope check command in `PACKAGES_CHECK_PIPELINE`. Emits MAT-CONFIG-01 (warning: unrecognized operator file in workpiece root or `src/`) and MAT-CONFIG-02 (error: dead entry in `OPERATOR_CONFIG_FILES` not found in any workpiece or cache clone).
+- `workpiece.config.presence.check` (RFC-0844): pre-build gate in `mission.validate` that verifies all `OPERATOR_CONFIG_FILES` entries are present in the active workpiece before the build pipeline starts. Runs before the Playwright Chromium pre-flight (RFC-0813). Returns `status: "fail"` with restore commands for each missing file. Non-fatal if the check command itself throws. Skipped on distribution-reuse path.
 
 ## Autonomy guard
 
