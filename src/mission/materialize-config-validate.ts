@@ -48,31 +48,12 @@ const BOILERPLATE_FILES = new Set([
   "CHANGELOG.md",
   "AGENTS.md",
   "README.md",
-]);
-
-const BOILERPLATE_DIRS = new Set([
-  "node_modules",
-  "dist",
-  ".astro",
-  ".turbo",
-  ".wrangler",
-  ".cache",
-  ".integrity",
-  ".surface-cache",
-  ".git",
-  ".github",
-  "changelogs",
-  "provenance",
-  "public",
-  "src",
-  "missions",
-  "systems-cache",
+  "content.config.ts",
 ]);
 
 const GENERATED_PATTERNS = [
   /\.generated\.ya?ml$/,
   /\.generated\.json$/,
-  /^content\.config\.ts$/,
   /^content-ref-index\.generated\.yaml$/,
 ];
 
@@ -88,16 +69,8 @@ function isBoilerplate(name: string): boolean {
   return BOILERPLATE_FILES.has(name);
 }
 
-function isBoilerplateDir(name: string): boolean {
-  return BOILERPLATE_DIRS.has(name);
-}
-
 function isOperatorConfigEntry(name: string): boolean {
   return OPERATOR_CONFIG_FILES.some((entry) => entry === name || entry.endsWith(`/${name}`));
-}
-
-function isDataPath(name: string): boolean {
-  return STERNSYSTEM_DATA_PATHS.some((p) => p === name || p.startsWith(`${name}/`));
 }
 
 export async function runMaterializeConfigValidate(
