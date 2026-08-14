@@ -770,3 +770,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** May independent program packets execute in parallel, or must every packet be handed to a fresh agent and completed sequentially?
 - **Answer:** Do not parallelize any program packet. Execute exactly one packet at a time with one agent that is assumed to have no prior-session memory. Each packet starts only after its dependency commit and handoff have been verified; ambiguous or non-passing completion blocks the next packet.
+
+### K-0060: Keep production self-extension disabled until authority exists
+
+```knowledge-entry
+id: K-0060
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** May dynamic or agent-written components activate in the production runtime before the complete certification and promotion authority exists?
+- **Answer:** No. Early packets may exercise lifecycle components only inside a bounded conformance harness. Production activation remains absent or fails closed until Certification Authority, capability grants, isolation, immutable candidate identity, rollback, quarantine, and a kill switch are all operational and verified.
