@@ -79,8 +79,6 @@ const MIME_TYPES: Record<string, string> = {
   ".xml": "application/xml",
 };
 
-const KEY_ELEMENTS = ["header", "main", "footer"] as const;
-
 // ─── Static server ───────────────────────────────────────────────────────────
 
 function createStaticServer(rootDir: string): Server {
@@ -192,10 +190,9 @@ interface ElementGeometry {
   height: number;
 }
 
-const GEOMETRY_SCRIPT = `
-() => {
-  const results = [];
-  const tags = ${JSON.stringify([...KEY_ELEMENTS])};
+function measureGeometry(): ElementGeometry[] {
+  const results: ElementGeometry[] = [];
+  const tags = ["header", "main", "footer"];
   for (const tag of tags) {
     const el = document.querySelector(tag);
     if (el) {
@@ -203,14 +200,19 @@ const GEOMETRY_SCRIPT = `
       results.push({ tag, x: rect.x, y: rect.y, width: rect.width, height: rect.height });
     }
   }
-  const section = document.querySelector('[data-section]');
+  const section = document.querySelector("[data-section]");
   if (section) {
     const rect = section.getBoundingClientRect();
-    results.push({ tag: '[data-section]', x: rect.x, y: rect.y, width: rect.width, height: rect.height });
+    results.push({
+      tag: "[data-section]",
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+    });
   }
   return results;
 }
-`;
 
 function computeMaxDelta(
   portrait: ElementGeometry[],
@@ -439,7 +441,7 @@ export async function runMobileLayoutCheck(
             }
 
             // Geometry measurement for MOBILE-GEO-02
-            const geometry = await page.evaluate<ElementGeometry[]>(GEOMETRY_SCRIPT);
+            const geometry = await page.evaluate<ElementGeometry[]>(measureGeometry);
             if (orientation === "portrait") {
               portraitGeometry = geometry;
             } else {
@@ -461,11 +463,12 @@ export async function runMobileLayoutCheck(
             result.passed = false;
             result.timeout = true;
             timedOut = true;
+            const errMsg = err instanceof Error ? err.message : String(err);
             diagnostics.push({
               ruleId: "MOBILE-GEO-04",
               severity: "error",
               file: `apps/${siteName}/dist/client${route}`,
-              message: `Route timed out after ${routeTimeoutMs}ms in ${orientation}: ${String(err)}`,
+              message: `Route failed in ${orientation}: ${errMsg}`,
             });
           }
 
