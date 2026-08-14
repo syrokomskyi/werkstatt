@@ -198,3 +198,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
 - **Question:** If the authoring agent cannot approve its own qualitative work and the workflow uses agents only, who supplies approval evidence?
 - **Answer:** A separate read-only Evaluator Agent run, with a clean context and a versioned rubric, evaluates rendered pages, screenshots, source content/claims, and the business brief and emits structured qualitative evidence. The deterministic Certification Engine—not the evaluator—computes the gate decision. One evaluator is sufficient for ordinary releases; critical or borderline cases require consensus from two independent evaluator runs. The process requires no human approver, and the authoring agent cannot submit its own approving qualitative evidence.
+
+### K-0016: No agent waivers for required certification requirements
+
+```knowledge-entry
+id: K-0016
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
+- **Question:** May an agent bypass, suppress, or downgrade a required certification requirement to promote a new release?
+- **Answer:** No runtime agent waiver exists for required Alt/Main requirements: no force, skip-gate, grace-period, or automatic required-to-advisory downgrade. Suppressions apply only to advisory diagnostics. A required false positive must be fixed in its producer or through a normative, versioned certification-profile change that invalidates prior evidence and triggers recertification. Infrastructure unavailability remains `incomplete`. The only bypass-like operation is rollback to a previously certified immutable artifact, which is recovery rather than promotion of a new candidate.
