@@ -284,6 +284,10 @@ The workshop enforces a five-level testing pyramid: L1 unit (pure functions and 
 
 Every Lighthouse audit that can be deterministically checked at build time MUST have a build-time validator in the Werkstatt pipeline. This prevents relying on post-deploy Lighthouse runs to catch issues that could be caught earlier. The coverage matrix is maintained in `docs/lighthouse-parity-matrix.yaml`. Enforcement: `lighthouse.validate`, `lighthouse.budget.check`. Established by RFC-0833.
 
+## DNA-68 · Mobile layout CSS anti-patterns
+
+CSS and Astro inline styles MUST NOT use mobile layout anti-patterns that cause horizontal overflow or layout shift on mobile devices. Six rules (MOBILE-CSS-01..06) detect: `100vh` without `100dvh` fallback, `100vw` with padding/border, fixed widths >380px without `max-width: 100%`, negative margins on root containers, `position: fixed` elements wider than 430px, and `white-space: nowrap` without `overflow-wrap`/`word-break`. Rules inside `@media (min-width: ...)` blocks are suppressed. Enforcement: `css.mobile-layout.lint` in `SITES_CHECK_AUTHOR_PIPELINE` (warning mode during initial rollout). Established by RFC-0837.
+
 ## DNA-71 · Operator config file persistence
 
 Root-level operator config files (`.lighthouse-budget-ignore`, `image-delivery.config.yaml`, `live-video-manifest.generated.yaml`, `dns-records.yaml`) are untracked artifacts persisted between workpiece and cache clone during `mission.close` / `mission.materialize`, following the same pattern as `.env*` files (RFC-0822). The `OPERATOR_CONFIG_FILES` constant declares the canonical list. `mission.close` persists them to the cache clone (untracked); `mission.materialize` restores them after `atomicMoveDir`. The `materialize.config.validate` check command verifies the list stays in sync. Established by RFC-0840.

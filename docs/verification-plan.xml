@@ -438,5 +438,9 @@
       <change-type>Test evidence gates for deployment pipeline (RFC-0829)</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/testing/test-evidence.test.ts`; verify `test.evidence.verify` and `test.evidence.list` commands are registered via `pnpm exec werkstatt run test.evidence.verify --target <id> --levels L4,L5 --commit-sha <sha>` and `pnpm exec werkstatt run test.evidence.list --target <id>`; verify `leitstand.propagate` and `leitstand.promote` include testEvidenceVerified in result data; verify `leitstand.service.promote` includes testEvidenceVerified in result data; verify grace period behavior (exit 0 with warnings before 2026-09-10).</expectation>
     </entry>
+    <entry id="vm-16">
+      <change-type>Static CSS analysis for mobile layout anti-patterns (RFC-0837)</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/css-mobile-layout-lint.test.ts`; verify `css.mobile-layout.lint` command is registered via `pnpm exec werkstatt run css.mobile-layout.lint --site <id> --json`; verify warning mode exits 0 with violations via `pnpm exec werkstatt run css.mobile-layout.lint --site <id> --mode=warning --json`; verify the command runs in `SITES_CHECK_AUTHOR_PIPELINE` via `pnpm exec werkstatt run sites-check.author --site <id>`.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

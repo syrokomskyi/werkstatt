@@ -394,6 +394,20 @@
           blocks or inline `style=` attributes (except in `api/`,
           `sitemaps/`, `robots/` subdirectories).</behaviour>
       </command>
+
+      <command id="v-css-mobile-layout">
+        <name>css.mobile-layout.lint</name>
+        <scope>app</scope>
+        <pipeline>SITES_CHECK_AUTHOR_PIPELINE</pipeline>
+        <behaviour>Scans `.css` files and `.astro` inline `<style>` blocks
+          for six mobile layout anti-patterns (MOBILE-CSS-01..06): `100vh`
+          without `100dvh` fallback, `100vw` with padding/border, fixed
+          widths >380px without `max-width: 100%`, negative margins on root
+          containers, `position: fixed` wider than 430px, `white-space:
+          nowrap` without `overflow-wrap`/`word-break`. Rules inside
+          `@media (min-width: ...)` are suppressed. Supports `--mode
+          warning` (exit 0) and `--mode error` (exit 1, default).</behaviour>
+      </command>
     </command-table>
 
     <pipeline-seat>
