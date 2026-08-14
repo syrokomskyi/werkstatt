@@ -432,3 +432,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
 - **Question:** How can an old certification decision remain independently verifiable after the installed plugin, profile, evidence schemas, rubric, producer modules, toolchain, or authority issuer registry have changed?
 - **Answer:** Candidate creation materializes a content-addressed durable `CertificationPolicyBundleV1` containing the canonical profile/resolved requirements, evidence schemas, rubric/risk/calibration manifest, producer declarations and source hashes, engine/plugin/toolchain manifests, deployment plan, retention policy, and then-current issuer public verification material. Its root hash contributes to `candidateId`. Historical verification uses this bundle rather than current installed code. Compact policy/schema/rubric/manifests/public keys are retained indefinitely; executable producer/container artifacts may follow bounded retention because cryptographic decision verification does not require re-execution.
+
+### K-0034: Authority-ordered evidence selection with immutable evaluation cuts
+
+```knowledge-entry
+id: K-0034
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
+- **Question:** How is “newest compatible evidence” selected deterministically when producers run concurrently, retry, have clock skew, or return after a gate/health operation has already closed?
+- **Answer:** Every run has `certificationOperationId`, every attempt has `producerAttemptId`, and the authority assigns each admitted evidence record a monotonic dossier `admissionSequence`. Decisions select the latest compatible record by admission sequence and freeze an `evaluationCutSequence`; producer timestamps never determine ordering. Evidence cannot be admitted into a closed operation, and late results append a late-result incident rather than shadowing evidence. New evidence requires a new immutable decision. TTL uses authority time with bounded signed producer-clock checks. Continuous monitoring also uses stable `scheduleWindowId` values so duplicate or late deliveries cannot alter another window.
