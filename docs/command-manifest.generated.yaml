@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 5eaf47fc4b3565364aafa94db5ee67703c7776a37577f52dcd2723ac233b161c
+  contentHash: d15da4328fb7cec043ef10190fcca70006de56e7cce0f9bcf4cc0cb16ceb6490
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -13311,6 +13311,27 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: leitstand.pipeline.check
+    description: "Inspect deployment pipeline state for a release (RFC-0842). Flags:
+      --release."
+    scope: workspace
+    provider: workspace
+    module: leitstand
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      release:
+        kind: string
+        required: true
+        description: Release id to inspect.
+    reads:
+      - releases/{release}/**
+      - systems-cache/{system}/system-config.yaml
+      - systems-cache/{system}/system-state.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: leitstand.promote
     description: "Promote a verified alt-deployed release to the main channel with
       live build-identity verification (RFC-0608). Flags: --release."
@@ -14122,6 +14143,24 @@ commands:
     validatesOutputs: []
     pipelines:
       - build.prepare
+  - name: materialize.config.validate
+    description: Validate OPERATOR_CONFIG_FILES list is in sync with actual
+      workpiece/cache clone files (RFC-0840).
+    scope: workspace
+    provider: workspace
+    module: mission
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - missions/*/workpiece/*
+      - missions/*/workpiece/src/*
+      - systems-cache/*/
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
   - name: matomo.export.validate
     description: Validate Matomo Notausgang analytics export package scaffolding (RFC-0305).
     scope: workspace
@@ -14974,6 +15013,48 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: mobile.layout.check
+    description: "RFC-0838: Playwright mobile layout stability checks — horizontal
+      overflow, rotation stability, CLS."
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a634
+      mode:
+        kind: string
+        description: error (default) or warning
+      route-timeout:
+        kind: string
+        description: Per-route timeout in ms (default 30000)
+      stability-delta:
+        kind: string
+        description: Layout shift threshold in px (default 5)
+    reads: &a635
+      - <app>/dist/client/**/*.html
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.post
+      - check
+  - name: mobile.layout.check
+    description: "RFC-0838: Playwright mobile layout stability checks — horizontal
+      overflow, rotation stability, CLS."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a634
+    reads: *a635
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.post
+      - check
   - name: nachweis.approve
     description: "RFC-0714: Record human approval, verification level, and legal
       content check in a Bordbuch entry. Operator-invoked only."
@@ -15689,8 +15770,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a634 {}
-    reads: &a635
+    flags: &a636 {}
+    reads: &a637
       - <app>/src/components/**
     writes: []
     validatesOutputs: []
@@ -15706,8 +15787,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a634
-    reads: *a635
+    flags: *a636
+    reads: *a637
     writes: []
     validatesOutputs: []
     pipelines:
@@ -15721,8 +15802,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a636 {}
-    reads: &a637
+    flags: &a638 {}
+    reads: &a639
       - <app>/src/content/pages/**/*.md
     writes: []
     validatesOutputs: []
@@ -15737,8 +15818,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a636
-    reads: *a637
+    flags: *a638
+    reads: *a639
     writes: []
     validatesOutputs: []
     pipelines:
@@ -15799,8 +15880,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a638 {}
-    reads: &a639
+    flags: &a640 {}
+    reads: &a641
       - <app>/src/layouts/**
     writes: []
     validatesOutputs: []
@@ -15816,8 +15897,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a638
-    reads: *a639
+    flags: *a640
+    reads: *a641
     writes: []
     validatesOutputs: []
     pipelines:
@@ -15832,8 +15913,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a640 {}
-    reads: &a641
+    flags: &a642 {}
+    reads: &a643
       - <app>/src/pages/**/*.astro
     writes: []
     validatesOutputs: []
@@ -15849,8 +15930,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a640
-    reads: *a641
+    flags: *a642
+    reads: *a643
     writes: []
     validatesOutputs: []
     pipelines:
@@ -15865,11 +15946,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a642
+    flags: &a644
       system:
         kind: string
         description: Limit validation to one system id.
-    reads: &a643
+    reads: &a645
       - systems/registry.yaml
       - systems/*/system.pin.json
       - fleet/fleet.sites.yaml
@@ -15885,8 +15966,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a642
-    reads: *a643
+    flags: *a644
+    reads: *a645
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -15899,8 +15980,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a644 {}
-    reads: &a645
+    flags: &a646 {}
+    reads: &a647
       - <app>/src/styles/**
     writes: []
     validatesOutputs: []
@@ -15916,8 +15997,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a644
-    reads: *a645
+    flags: *a646
+    reads: *a647
     writes: []
     validatesOutputs: []
     pipelines:
@@ -15933,8 +16014,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a646 {}
-    reads: &a647
+    flags: &a648 {}
+    reads: &a649
       - <app>/src/components/**
       - <app>/src/pages/**
       - <app>/src/styles/**
@@ -15953,8 +16034,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a646
-    reads: *a647
+    flags: *a648
+    reads: *a649
     writes: []
     validatesOutputs: []
     pipelines:
@@ -15969,11 +16050,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a648
+    flags: &a650
       json:
         kind: boolean
         description: Emit machine-readable JSON output.
-    reads: &a649
+    reads: &a651
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
     writes: []
@@ -15990,8 +16071,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a648
-    reads: *a649
+    flags: *a650
+    reads: *a651
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16007,7 +16088,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a650 {}
+    flags: &a652 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -16024,7 +16105,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a650
+    flags: *a652
     reads: []
     writes: []
     validatesOutputs: []
@@ -16041,8 +16122,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a651 {}
-    reads: &a652
+    flags: &a653 {}
+    reads: &a654
       - <app>/dist/client/**/*.html
     writes: []
     validatesOutputs: []
@@ -16059,8 +16140,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a651
-    reads: *a652
+    flags: *a653
+    reads: *a654
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16075,10 +16156,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a653 {}
-    reads: &a654
+    flags: &a655 {}
+    reads: &a656
       - <app>/src/content/system.md
-    writes: &a655
+    writes: &a657
       - <app>/src/pages/404.astro
     validatesOutputs: []
     pipelines:
@@ -16093,9 +16174,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a653
-    reads: *a654
-    writes: *a655
+    flags: *a655
+    reads: *a656
+    writes: *a657
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -16110,8 +16191,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a656 {}
-    reads: &a657
+    flags: &a658 {}
+    reads: &a659
       - <app>/src/pages/404.astro
     writes: []
     validatesOutputs: []
@@ -16128,8 +16209,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a656
-    reads: *a657
+    flags: *a658
+    reads: *a659
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16430,8 +16511,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a658 {}
-    reads: &a659
+    flags: &a660 {}
+    reads: &a661
       - <app>/src/content/offers/**/*.md
       - <app>/src/content/system.md
     writes: []
@@ -16448,8 +16529,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a658
-    reads: *a659
+    flags: *a660
+    reads: *a661
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16464,8 +16545,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a660 {}
-    reads: &a661
+    flags: &a662 {}
+    reads: &a663
       - <app>/src/content/offers/**/*.md
       - <app>/src/content/system.md
     writes: []
@@ -16482,8 +16563,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a660
-    reads: *a661
+    flags: *a662
+    reads: *a663
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16541,8 +16622,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a662 {}
-    reads: &a663
+    flags: &a664 {}
+    reads: &a665
       - packages/os/site-kernel-checks/src/**/*.ts
       - packages/os/site-kernel/src/**/*.ts
     writes: []
@@ -16559,8 +16640,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a662
-    reads: *a663
+    flags: *a664
+    reads: *a665
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16596,8 +16677,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a664 {}
-    reads: &a665
+    flags: &a666 {}
+    reads: &a667
       - <app>/src/content/data/{lang}/open-source-registry.json
       - <app>/public/open-source/sbom.cdx.json
       - <app>/public/open-source/THIRD_PARTY_NOTICES.txt
@@ -16617,8 +16698,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a664
-    reads: *a665
+    flags: *a666
+    reads: *a667
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16632,10 +16713,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a666 {}
-    reads: &a667
+    flags: &a668 {}
+    reads: &a669
       - <app>/src/content/system.md
-    writes: &a668
+    writes: &a670
       - <app>/src/content/pages/root-redirect.md
       - <app>/src/content/pages/{lang}/cosmic/passport.md
       - <app>/src/content/pages/{lang}/cosmic/star-map.md
@@ -16652,9 +16733,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a666
-    reads: *a667
-    writes: *a668
+    flags: *a668
+    reads: *a669
+    writes: *a670
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -16669,8 +16750,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a669 {}
-    reads: &a670
+    flags: &a671 {}
+    reads: &a672
       - packages/werkstatt-site/src/checks/generator-ownership.ts
     writes: []
     validatesOutputs: []
@@ -16687,8 +16768,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a669
-    reads: *a670
+    flags: *a671
+    reads: *a672
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16703,7 +16784,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a671
+    flags: &a673
       app:
         kind: string
         description: App id for app-scoped path resolution.
@@ -16724,7 +16805,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a671
+    flags: *a673
     reads: []
     writes: []
     validatesOutputs: []
@@ -16810,8 +16891,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a672 {}
-    reads: &a673
+    flags: &a674 {}
+    reads: &a675
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
       - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
@@ -16831,8 +16912,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a672
-    reads: *a673
+    flags: *a674
+    reads: *a675
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16848,8 +16929,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a674 {}
-    reads: &a675
+    flags: &a676 {}
+    reads: &a677
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
     writes: []
@@ -16865,8 +16946,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a674
-    reads: *a675
+    flags: *a676
+    reads: *a677
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -16880,8 +16961,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a676 {}
-    reads: &a677
+    flags: &a678 {}
+    reads: &a679
       - <app>/src/content/pages/**/*.md
     writes: []
     validatesOutputs: []
@@ -16898,8 +16979,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a676
-    reads: *a677
+    flags: *a678
+    reads: *a679
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16914,11 +16995,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a678 {}
-    reads: &a679
+    flags: &a680 {}
+    reads: &a681
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
-    writes: &a680
+    writes: &a682
       - <app>/public/index.md
       - <app>/public/{route}.md
     validatesOutputs: []
@@ -16933,9 +17014,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a678
-    reads: *a679
-    writes: *a680
+    flags: *a680
+    reads: *a681
+    writes: *a682
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -16948,8 +17029,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a681 {}
-    reads: &a682
+    flags: &a683 {}
+    reads: &a684
       - <app>/dist/client/**/*.html
       - <app>/public/**/*.md
     writes: []
@@ -16966,8 +17047,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a681
-    reads: *a682
+    flags: *a683
+    reads: *a684
     writes: []
     validatesOutputs: []
     pipelines:
@@ -16983,8 +17064,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a683 {}
-    reads: &a684
+    flags: &a685 {}
+    reads: &a686
       - packages/share/src/page/**/*.ts
     writes: []
     validatesOutputs: []
@@ -17001,8 +17082,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a683
-    reads: *a684
+    flags: *a685
+    reads: *a686
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17018,8 +17099,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a685 {}
-    reads: &a686
+    flags: &a687 {}
+    reads: &a688
       - <app>/src/content/system.md
       - packages/werkstatt-site/src/domain/ui/components/**/*.manifest.yaml
     writes: []
@@ -17037,8 +17118,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a685
-    reads: *a686
+    flags: *a687
+    reads: *a688
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17055,8 +17136,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a687 {}
-    reads: &a688
+    flags: &a689 {}
+    reads: &a690
       - <app>/src/content/people/**/*.md
       - <app>/src/content/prose/**/*.md
       - <app>/src/content/system.md
@@ -17076,8 +17157,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a687
-    reads: *a688
+    flags: *a689
+    reads: *a690
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17095,8 +17176,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a689 {}
-    reads: &a690
+    flags: &a691 {}
+    reads: &a692
       - <app>/dist/team/**/*.json
     writes: []
     validatesOutputs: []
@@ -17115,8 +17196,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a689
-    reads: *a690
+    flags: *a691
+    reads: *a692
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17134,8 +17215,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a691 {}
-    reads: &a692
+    flags: &a693 {}
+    reads: &a694
       - <app>/src/content/people/**/*.md
       - <app>/src/content/prose/**/*.md
       - <app>/src/content/system.md
@@ -17156,8 +17237,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a691
-    reads: *a692
+    flags: *a693
+    reads: *a694
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17175,8 +17256,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a693 {}
-    reads: &a694
+    flags: &a695 {}
+    reads: &a696
       - <app>/src/content/people/**/*.md
     writes: []
     validatesOutputs: []
@@ -17195,8 +17276,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a693
-    reads: *a694
+    flags: *a695
+    reads: *a696
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17212,9 +17293,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a695 {}
+    flags: &a697 {}
     reads: []
-    writes: &a696
+    writes: &a698
       - <app>/dist/.well-known/cosmic-passport.json
     validatesOutputs: []
     pipelines:
@@ -17231,9 +17312,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a695
+    flags: *a697
     reads: []
-    writes: *a696
+    writes: *a698
     validatesOutputs: []
     pipelines:
       - build.check
@@ -17249,13 +17330,13 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a697
+    flags: &a699
       private-key-out:
         kind: string
         description: File path to write the private key to (only when a new key is
           created). File is created with 0600 permissions.
     reads: []
-    writes: &a698
+    writes: &a700
       - <app>/public/.well-known/cosmic-passport-key.json
     validatesOutputs: []
     pipelines:
@@ -17270,9 +17351,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a697
+    flags: *a699
     reads: []
-    writes: *a698
+    writes: *a700
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -17286,12 +17367,12 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a699
+    flags: &a701
       existingKey:
         kind: boolean
         description: Rotate from an existing passport key instead of initial creation.
     reads: []
-    writes: &a700
+    writes: &a702
       - <app>/public/.well-known/cosmic-passport-key.json
     validatesOutputs: []
     pipelines: []
@@ -17305,9 +17386,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a699
+    flags: *a701
     reads: []
-    writes: *a700
+    writes: *a702
     validatesOutputs: []
     pipelines: []
   - name: passport.verify
@@ -17320,8 +17401,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a701 {}
-    reads: &a702
+    flags: &a703 {}
+    reads: &a704
       - <app>/dist/.well-known/cosmic-passport.json
       - <app>/public/.well-known/cosmic-passport-key.json
       - <app>/src/content/system.md
@@ -17340,8 +17421,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a701
-    reads: *a702
+    flags: *a703
+    reads: *a704
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17356,8 +17437,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a703 {}
-    reads: &a704
+    flags: &a705 {}
+    reads: &a706
       - <site>/src/content/business-profile/**/*.md
     writes: []
     validatesOutputs: []
@@ -17373,8 +17454,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a703
-    reads: *a704
+    flags: *a705
+    reads: *a706
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17390,8 +17471,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a705 {}
-    reads: &a706
+    flags: &a707 {}
+    reads: &a708
       - <site>/src/content/business-profile/owner-decision-register.yaml
       - <site>/src/content/business-profile/migration-coverage-report.yaml
     writes: []
@@ -17409,8 +17490,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a705
-    reads: *a706
+    flags: *a707
+    reads: *a708
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17426,8 +17507,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a707 {}
-    reads: &a708
+    flags: &a709 {}
+    reads: &a710
       - <app>/src/content/business-profile/**/*.md
       - packages/pbp/src/**/*.ts
     writes: []
@@ -17445,8 +17526,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a707
-    reads: *a708
+    flags: *a709
+    reads: *a710
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17462,7 +17543,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a709
+    flags: &a711
       slug:
         kind: string
         description: Slug to create.
@@ -17476,7 +17557,7 @@ commands:
         kind: boolean
         description: Create the companion page artifact.
     reads: []
-    writes: &a710
+    writes: &a712
       - <app>/src/content/people/{lang}/{slug}.md
     validatesOutputs: []
     pipelines: []
@@ -17490,9 +17571,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a709
+    flags: *a711
     reads: []
-    writes: *a710
+    writes: *a712
     validatesOutputs: []
     pipelines: []
   - name: pinned.init
@@ -17581,14 +17662,14 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 1800000
-    flags: &a711
+    flags: &a713
       app:
         kind: string
         description: App target name (alternative to --site <name>).
-    reads: &a712
+    reads: &a714
       - <app>/dist/**
       - <app>/.astro/**
-    writes: &a713
+    writes: &a715
       - <app>/dist/**
       - <app>/.astro/**
       - <app>/public/_img/**
@@ -17609,9 +17690,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 1800000
-    flags: *a711
-    reads: *a712
-    writes: *a713
+    flags: *a713
+    reads: *a714
+    writes: *a715
     validatesOutputs: []
     pipelines: []
   - name: pipeline.dependencies.validate
@@ -17619,46 +17700,46 @@ commands:
       checks for missing references, forward references, duplicate command
       names, and circular dependencies."
     scope: workspace
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a714 {}
-    reads: &a715
-      - packages/os/site-kernel-checks/src/**/*.ts
-      - packages/os/site-kernel/src/**/*.ts
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-  - name: pipeline.dependencies.validate
-    description: "RFC-0686: validate dependsOn fields in all standard pipelines —
-      checks for missing references, forward references, duplicate command
-      names, and circular dependencies."
-    scope: workspace
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a714
-    reads: *a715
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-  - name: pipeline.idempotency.smoke
-    description: Run SITES_BUILD_PREPARE_PIPELINE twice for the target app and
-      assert the second pass writes zero new bytes. Catches non-deterministic
-      generators. Slow — opt-in via packages-check.run or CI (RFC-0087 Wave 2).
-    scope: app
     provider: site:warpgogol-com
     module: check
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
     flags: &a716 {}
+    reads: &a717
+      - packages/os/site-kernel-checks/src/**/*.ts
+      - packages/os/site-kernel/src/**/*.ts
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+  - name: pipeline.dependencies.validate
+    description: "RFC-0686: validate dependsOn fields in all standard pipelines —
+      checks for missing references, forward references, duplicate command
+      names, and circular dependencies."
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a716
+    reads: *a717
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+  - name: pipeline.idempotency.smoke
+    description: Run SITES_BUILD_PREPARE_PIPELINE twice for the target app and
+      assert the second pass writes zero new bytes. Catches non-deterministic
+      generators. Slow — opt-in via packages-check.run or CI (RFC-0087 Wave 2).
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a718 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -17673,7 +17754,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a716
+    flags: *a718
     reads: []
     writes: []
     validatesOutputs: []
@@ -17681,38 +17762,6 @@ commands:
   - name: pipeline.log.hygiene.validate
     description: "Validate structured pipeline log hygiene: raw console noise,
       fallback dedupe keys, and allowlist rationales (RFC-0254)."
-    scope: workspace
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a717 {}
-    reads: &a718
-      - packages/os/site-kernel/src/**/*.ts
-      - packages/os/site-kernel-checks/src/**/*.ts
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - packages.check
-  - name: pipeline.log.hygiene.validate
-    description: "Validate structured pipeline log hygiene: raw console noise,
-      fallback dedupe keys, and allowlist rationales (RFC-0254)."
-    scope: workspace
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a717
-    reads: *a718
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - packages.check
-  - name: pipeline.timeout.validate
-    description: Validate Site OS command and pipeline timeout metadata in warning
-      mode for missing long-running budgets (RFC-0255).
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -17721,15 +17770,15 @@ commands:
     timeoutMs: null
     flags: &a719 {}
     reads: &a720
-      - packages/os/site-kernel-checks/src/**/*.ts
       - packages/os/site-kernel/src/**/*.ts
+      - packages/os/site-kernel-checks/src/**/*.ts
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
-  - name: pipeline.timeout.validate
-    description: Validate Site OS command and pipeline timeout metadata in warning
-      mode for missing long-running budgets (RFC-0255).
+  - name: pipeline.log.hygiene.validate
+    description: "Validate structured pipeline log hygiene: raw console noise,
+      fallback dedupe keys, and allowlist rationales (RFC-0254)."
     scope: workspace
     provider: workspace
     module: check
@@ -17742,6 +17791,38 @@ commands:
     validatesOutputs: []
     pipelines:
       - packages.check
+  - name: pipeline.timeout.validate
+    description: Validate Site OS command and pipeline timeout metadata in warning
+      mode for missing long-running budgets (RFC-0255).
+    scope: workspace
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a721 {}
+    reads: &a722
+      - packages/os/site-kernel-checks/src/**/*.ts
+      - packages/os/site-kernel/src/**/*.ts
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
+  - name: pipeline.timeout.validate
+    description: Validate Site OS command and pipeline timeout metadata in warning
+      mode for missing long-running budgets (RFC-0255).
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a721
+    reads: *a722
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
   - name: pipeline.timing.report
     description: Report Site OS pipeline timing telemetry support and configured
       standard pipeline timing metadata (RFC-0255).
@@ -17751,7 +17832,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a721 {}
+    flags: &a723 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -17765,7 +17846,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a721
+    flags: *a723
     reads: []
     writes: []
     validatesOutputs: []
@@ -17807,8 +17888,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a722 {}
-    reads: &a723
+    flags: &a724 {}
+    reads: &a725
       - packages/werkstatt-site/src/domain/ontology/archetypes/**/*.yaml
       - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
@@ -17824,8 +17905,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a722
-    reads: *a723
+    flags: *a724
+    reads: *a725
     writes: []
     validatesOutputs: []
     pipelines:
@@ -17840,12 +17921,12 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a724
+    flags: &a726
       base:
         kind: string
         required: true
         description: Base git ref for the commit range (e.g. origin/main).
-    reads: &a725
+    reads: &a727
       - .git
       - packages/**
       - integrations/**
@@ -17863,8 +17944,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a724
-    reads: *a725
+    flags: *a726
+    reads: *a727
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -17970,18 +18051,18 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a726
+    flags: &a728
       force-normalize:
         kind: boolean
         description: Re-render existing preview cards when source text needs normalization.
       forceNormalize:
         kind: boolean
         description: Legacy camelCase alias for --force-normalize.
-    reads: &a727
+    reads: &a729
       - <app>/src/content/system.md
       - <app>/src/content/**/*.md
       - packages/werkstatt-site/src/domain/ontology/biomes/**/*.yaml
-    writes: &a728
+    writes: &a730
       - <app>/public/preview/**
       - <app>/public/og-image.png
     validatesOutputs: []
@@ -17996,9 +18077,9 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a726
-    reads: *a727
-    writes: *a728
+    flags: *a728
+    reads: *a729
+    writes: *a730
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -18012,8 +18093,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a729 {}
-    reads: &a730
+    flags: &a731 {}
+    reads: &a732
       - <app>/public/og-image.png
       - <app>/src/content/system.md
     writes: []
@@ -18031,8 +18112,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a729
-    reads: *a730
+    flags: *a731
+    reads: *a732
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18047,8 +18128,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a731 {}
-    reads: &a732
+    flags: &a733 {}
+    reads: &a734
       - <app>/src/content/system.md
       - <app>/src/content/**/*.md
     writes: []
@@ -18064,8 +18145,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a731
-    reads: *a732
+    flags: *a733
+    reads: *a734
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18079,8 +18160,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a733 {}
-    reads: &a734
+    flags: &a735 {}
+    reads: &a736
       - packages/werkstatt-site/src/domain/ui/**/*.css
       - packages/werkstatt-site/src/domain/ui/**/*.scss
     writes: []
@@ -18096,8 +18177,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a733
-    reads: *a734
+    flags: *a735
+    reads: *a736
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18112,10 +18193,10 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a735 {}
-    reads: &a736
+    flags: &a737 {}
+    reads: &a738
       - <app>/.cache/pdf/**/*.pdf
-    writes: &a737
+    writes: &a739
       - <app>/dist/client/_print/**
     validatesOutputs: []
     pipelines:
@@ -18130,9 +18211,9 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a735
-    reads: *a736
-    writes: *a737
+    flags: *a737
+    reads: *a738
+    writes: *a739
     validatesOutputs: []
     pipelines:
       - build.post
@@ -18147,12 +18228,12 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a738 {}
-    reads: &a739
+    flags: &a740 {}
+    reads: &a741
       - <app>/src/content/system.md
       - <app>/src/content/**/*.md
       - <app>/dist/client/**/*.html
-    writes: &a740
+    writes: &a742
       - <app>/.cache/pdf/**
     validatesOutputs: []
     pipelines:
@@ -18168,9 +18249,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a738
-    reads: *a739
-    writes: *a740
+    flags: *a740
+    reads: *a741
+    writes: *a742
     validatesOutputs: []
     pipelines:
       - build.post
@@ -18184,8 +18265,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a741 {}
-    reads: &a742
+    flags: &a743 {}
+    reads: &a744
       - <app>/dist/client/_print/**/*.pdf
       - <app>/src/content/system.md
     writes: []
@@ -18202,8 +18283,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a741
-    reads: *a742
+    flags: *a743
+    reads: *a744
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18218,8 +18299,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a743 {}
-    reads: &a744
+    flags: &a745 {}
+    reads: &a746
       - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml
       - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.types.generated.ts
     writes: []
@@ -18236,8 +18317,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a743
-    reads: *a744
+    flags: *a745
+    reads: *a746
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18253,13 +18334,13 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a745
+    flags: &a747
       dry-run:
         kind: boolean
         description: Report what would be written without touching the filesystem.
-    reads: &a746
+    reads: &a748
       - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.manifest.yaml
-    writes: &a747
+    writes: &a749
       - packages/werkstatt-site/src/domain/ui/sections/{id}/{id}.types.generated.ts
       - packages/werkstatt-site/src/domain/ui/components/{id}/{id}.types.generated.ts
     validatesOutputs: []
@@ -18275,9 +18356,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a745
-    reads: *a746
-    writes: *a747
+    flags: *a747
+    reads: *a748
+    writes: *a749
     validatesOutputs: []
     pipelines: []
   - name: pseo.experiment.plan
@@ -18290,54 +18371,20 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a748
+    flags: &a750
       module:
         kind: string
         description: "Programmatic Surface module id (default: pseo)."
-    reads: &a749
-      - <app>/src/content/system.md
-      - <app>/src/surface/**/*.yaml
-    writes: []
-    validatesOutputs: []
-    pipelines: []
-  - name: pseo.experiment.plan
-    description: Read PSEO module context and declared experiments from system.md;
-      emit a structured experiment plan with proof-gate thresholds (RFC-0277).
-      Offline, read-only — the plan is a proposal, not auto-execution.
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a748
-    reads: *a749
-    writes: []
-    validatesOutputs: []
-    pipelines: []
-  - name: pseo.product.validate
-    description: "Validate customer-facing copy for forbidden PSEO promises: index
-      budget as SKU, guaranteed indexation/rankings/leads, destructive downgrade
-      policy, and missing Notausgang/export statements for PSEO records
-      (RFC-0277)."
-    scope: app
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a750 {}
     reads: &a751
       - <app>/src/content/system.md
       - <app>/src/surface/**/*.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
-  - name: pseo.product.validate
-    description: "Validate customer-facing copy for forbidden PSEO promises: index
-      budget as SKU, guaranteed indexation/rankings/leads, destructive downgrade
-      policy, and missing Notausgang/export statements for PSEO records
-      (RFC-0277)."
+  - name: pseo.experiment.plan
+    description: Read PSEO module context and declared experiments from system.md;
+      emit a structured experiment plan with proof-gate thresholds (RFC-0277).
+      Offline, read-only — the plan is a proposal, not auto-execution.
     scope: app
     provider: workspace
     module: check
@@ -18349,6 +18396,40 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: pseo.product.validate
+    description: "Validate customer-facing copy for forbidden PSEO promises: index
+      budget as SKU, guaranteed indexation/rankings/leads, destructive downgrade
+      policy, and missing Notausgang/export statements for PSEO records
+      (RFC-0277)."
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a752 {}
+    reads: &a753
+      - <app>/src/content/system.md
+      - <app>/src/surface/**/*.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: pseo.product.validate
+    description: "Validate customer-facing copy for forbidden PSEO promises: index
+      budget as SKU, guaranteed indexation/rankings/leads, destructive downgrade
+      policy, and missing Notausgang/export statements for PSEO records
+      (RFC-0277)."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a752
+    reads: *a753
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: pseo.proof.validate
     description: Validate managed PSEO proof inputs by reading generated demand-map
       and evidence-join artifacts; reports explicit not-enough-data instead of
@@ -18359,11 +18440,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a752
+    flags: &a754
       blueprint:
         kind: string
         description: Limit proof input validation to one Blueprint id.
-    reads: &a753
+    reads: &a755
       - <app>/src/surface.generated.yaml
       - <app>/src/surface/**/*.yaml
     writes: []
@@ -18375,44 +18456,6 @@ commands:
     description: Validate managed PSEO proof inputs by reading generated demand-map
       and evidence-join artifacts; reports explicit not-enough-data instead of
       guessing (RFC-0277/RFC-0280).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a752
-    reads: *a753
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: pseo.validate
-    description: "Programmatic Surface quality gate (RFC-0194): per surface, fail
-      when the thin-page share exceeds maxThinShare, the indexable count exceeds
-      the sitemap budget, or a generated slug collides with an authored page.
-      Skips when the artifact is absent."
-    scope: app
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a754 {}
-    reads: &a755
-      - <app>/src/surface.generated.yaml
-      - <app>/src/content/system.md
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: pseo.validate
-    description: "Programmatic Surface quality gate (RFC-0194): per surface, fail
-      when the thin-page share exceeds maxThinShare, the indexable count exceeds
-      the sitemap budget, or a generated slug collides with an authored page.
-      Skips when the artifact is absent."
     scope: app
     provider: workspace
     module: check
@@ -18426,9 +18469,11 @@ commands:
     pipelines:
       - build.check
       - check
-  - name: public.artifact.generate
-    description: Aggregate public artifact generation boundary. Dedicated generators
-      own the actual files (RFC-0307).
+  - name: pseo.validate
+    description: "Programmatic Surface quality gate (RFC-0194): per surface, fail
+      when the thin-page share exceeds maxThinShare, the indexable count exceeds
+      the sitemap budget, or a generated slug collides with an authored page.
+      Skips when the artifact is absent."
     scope: app
     provider: site:warpgogol-com
     module: check
@@ -18436,6 +18481,42 @@ commands:
     requiresNetwork: false
     timeoutMs: null
     flags: &a756 {}
+    reads: &a757
+      - <app>/src/surface.generated.yaml
+      - <app>/src/content/system.md
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
+  - name: pseo.validate
+    description: "Programmatic Surface quality gate (RFC-0194): per surface, fail
+      when the thin-page share exceeds maxThinShare, the indexable count exceeds
+      the sitemap budget, or a generated slug collides with an authored page.
+      Skips when the artifact is absent."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a756
+    reads: *a757
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
+  - name: public.artifact.generate
+    description: Aggregate public artifact generation boundary. Dedicated generators
+      own the actual files (RFC-0307).
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a758 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -18450,7 +18531,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a756
+    flags: *a758
     reads: []
     writes: []
     validatesOutputs: []
@@ -18459,39 +18540,6 @@ commands:
   - name: public.artifact.validate
     description: Validate required generated public artifacts are present and
       internally consistent (RFC-0307).
-    scope: app
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a757 {}
-    reads: &a758
-      - <app>/public/**
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: public.artifact.validate
-    description: Validate required generated public artifacts are present and
-      internally consistent (RFC-0307).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a757
-    reads: *a758
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: public.declaration.validate
-    description: Validate public declarations do not contradict each other and do
-      not ship placeholders (RFC-0315).
     scope: app
     provider: site:warpgogol-com
     module: check
@@ -18506,6 +18554,39 @@ commands:
     pipelines:
       - build.check
       - check
+  - name: public.artifact.validate
+    description: Validate required generated public artifacts are present and
+      internally consistent (RFC-0307).
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a759
+    reads: *a760
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
+  - name: public.declaration.validate
+    description: Validate public declarations do not contradict each other and do
+      not ship placeholders (RFC-0315).
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a761 {}
+    reads: &a762
+      - <app>/public/**
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
   - name: public.declaration.validate
     description: Validate public declarations do not contradict each other and do
       not ship placeholders (RFC-0315).
@@ -18515,8 +18596,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a759
-    reads: *a760
+    flags: *a761
+    reads: *a762
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18531,11 +18612,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a761 {}
-    reads: &a762
+    flags: &a763 {}
+    reads: &a764
       - <app>/src/content/system.md
       - <app>/src/content/favicon.svg
-    writes: &a763
+    writes: &a765
       - <app>/public/favicon.svg
       - <app>/public/favicon.ico
       - <app>/public/apple-touch-icon.png
@@ -18558,9 +18639,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a761
-    reads: *a762
-    writes: *a763
+    flags: *a763
+    reads: *a764
+    writes: *a765
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -18574,8 +18655,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a764 {}
-    reads: &a765
+    flags: &a766 {}
+    reads: &a767
       - <app>/public/favicon.svg
       - <app>/public/manifest.webmanifest
       - <app>/public/icon-*.png
@@ -18594,8 +18675,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a764
-    reads: *a765
+    flags: *a766
+    reads: *a767
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18610,13 +18691,13 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a766
+    flags: &a768
       domain:
         kind: string
         description: Public domain used when generating infrastructure files.
-    reads: &a767
+    reads: &a769
       - <app>/src/content/system.md
-    writes: &a768
+    writes: &a770
       - <app>/public/_headers
       - <app>/public/_redirects
       - <app>/public/.assetsignore
@@ -18633,9 +18714,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a766
-    reads: *a767
-    writes: *a768
+    flags: *a768
+    reads: *a769
+    writes: *a770
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -18649,13 +18730,13 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a769
+    flags: &a771
       dry-run:
         kind: boolean
         description: Report stale managed public artifacts without deleting them.
-    reads: &a770
+    reads: &a772
       - <app>/public/**
-    writes: &a771
+    writes: &a773
       - <app>/public/**/*.md
       - <app>/public/**
     validatesOutputs: []
@@ -18670,9 +18751,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a769
-    reads: *a770
-    writes: *a771
+    flags: *a771
+    reads: *a772
+    writes: *a773
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -18685,8 +18766,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a772 {}
-    reads: &a773
+    flags: &a774 {}
+    reads: &a775
       - <app>/public/**
     writes: []
     validatesOutputs: []
@@ -18702,8 +18783,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a772
-    reads: *a773
+    flags: *a774
+    reads: *a775
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18718,8 +18799,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a774 {}
-    reads: &a775
+    flags: &a776 {}
+    reads: &a777
       - <app>/public/**
     writes: []
     validatesOutputs: []
@@ -18735,8 +18816,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a774
-    reads: *a775
+    flags: *a776
+    reads: *a777
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18751,7 +18832,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a776 {}
+    flags: &a778 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -18765,7 +18846,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a776
+    flags: *a778
     reads: []
     writes: []
     validatesOutputs: []
@@ -18782,11 +18863,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a777
+    flags: &a779
       rfc:
         kind: string
         description: Restrict to a single RFC's page probes (e.g. --rfc RFC-0322).
-    reads: &a778
+    reads: &a780
       - <app>/dist/client/**
       - docs/rfcs/**/*.md
     writes: []
@@ -18806,8 +18887,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a777
-    reads: *a778
+    flags: *a779
+    reads: *a780
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18823,7 +18904,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a779
+    flags: &a781
       system:
         kind: string
         description: Sternsystem ID.
@@ -18833,9 +18914,9 @@ commands:
       dev:
         kind: boolean
         description: Dev mode — external mode is skipped with a warning.
-    reads: &a780
+    reads: &a782
       - <app>/src/content/business-profile/**/*.md
-    writes: &a781
+    writes: &a783
       - <app>/src/content/business-profile/rate-snapshots/**/*.md
     validatesOutputs: []
     pipelines:
@@ -18851,9 +18932,9 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a779
-    reads: *a780
-    writes: *a781
+    flags: *a781
+    reads: *a782
+    writes: *a783
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -18870,8 +18951,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a782 {}
-    reads: &a783
+    flags: &a784 {}
+    reads: &a785
       - <app>/src/content/surface/articles/**/*.md
       - <app>/src/content/prose/**/ratgeber-*.md
     writes: []
@@ -18889,8 +18970,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a782
-    reads: *a783
+    flags: *a784
+    reads: *a785
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -18905,8 +18986,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a784 {}
-    reads: &a785
+    flags: &a786 {}
+    reads: &a787
       - <app>/src/content/surface/claims/**/*.md
       - <app>/src/content/surface/articles/**/*.md
       - integrations/truth-sources/*.yaml
@@ -18924,8 +19005,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a784
-    reads: *a785
+    flags: *a786
+    reads: *a787
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -18940,8 +19021,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a786 {}
-    reads: &a787
+    flags: &a788 {}
+    reads: &a789
       - <app>/src/surface.generated.yaml
       - <app>/src/content/surface/articles/**/*.md
       - <app>/src/content/surface/article-categories/**/*.md
@@ -18962,8 +19043,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a786
-    reads: *a787
+    flags: *a788
+    reads: *a789
     writes: []
     validatesOutputs: []
     pipelines:
@@ -18982,8 +19063,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a788 {}
-    reads: &a789
+    flags: &a790 {}
+    reads: &a791
       - <app>/src/content/prose/**/ratgeber-redaktion.md
       - <app>/src/content/surface/articles/**/*.md
       - <app>/src/surface.generated.yaml
@@ -19003,8 +19084,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a788
-    reads: *a789
+    flags: *a790
+    reads: *a791
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -19020,8 +19101,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a790 {}
-    reads: &a791
+    flags: &a792 {}
+    reads: &a793
       - <app>/src/content/surface/articles/**/*.md
       - <app>/src/content/surface/authors/**/*.md
       - <app>/src/content/surface/claims/**/*.md
@@ -19042,8 +19123,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a790
-    reads: *a791
+    flags: *a792
+    reads: *a793
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -19056,8 +19137,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a792 {}
-    reads: &a793
+    flags: &a794 {}
+    reads: &a795
       - <app>/public/_redirects
       - <app>/dist/client/**/*.html
     writes: []
@@ -19075,8 +19156,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a792
-    reads: *a793
+    flags: *a794
+    reads: *a795
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20047,10 +20128,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a794 {}
-    reads: &a795
+    flags: &a796 {}
+    reads: &a797
       - <app>/src/content/system.md
-    writes: &a796
+    writes: &a798
       - <app>/public/robots.txt
     validatesOutputs: []
     pipelines:
@@ -20064,9 +20145,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a794
-    reads: *a795
-    writes: *a796
+    flags: *a796
+    reads: *a797
+    writes: *a798
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -20078,8 +20159,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a797 {}
-    reads: &a798
+    flags: &a799 {}
+    reads: &a800
       - <app>/dist/client/**/*.html
       - <app>/dist/client/sitemap*.xml
     writes: []
@@ -20095,8 +20176,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a797
-    reads: *a798
+    flags: *a799
+    reads: *a800
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20111,8 +20192,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a799 {}
-    reads: &a800
+    flags: &a801 {}
+    reads: &a802
       - <app>/public/robots.txt
     writes: []
     validatesOutputs: []
@@ -20126,8 +20207,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a799
-    reads: *a800
+    flags: *a801
+    reads: *a802
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -20141,8 +20222,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a801 {}
-    reads: &a802
+    flags: &a803 {}
+    reads: &a804
       - <app>/src/pages/index.astro
       - <app>/src/content/system.md
     writes: []
@@ -20158,8 +20239,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a801
-    reads: *a802
+    flags: *a803
+    reads: *a804
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -20172,8 +20253,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a803 {}
-    reads: &a804
+    flags: &a805 {}
+    reads: &a806
       - <app>/src/pages/**/*.astro
     writes: []
     validatesOutputs: []
@@ -20189,8 +20270,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a803
-    reads: *a804
+    flags: *a805
+    reads: *a806
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20206,8 +20287,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a805 {}
-    reads: &a806
+    flags: &a807 {}
+    reads: &a808
       - <app>/src/content/system.md
       - <app>/src/pages/**/*.astro
     writes: []
@@ -20225,8 +20306,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a805
-    reads: *a806
+    flags: *a807
+    reads: *a808
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20241,10 +20322,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a807 {}
-    reads: &a808
+    flags: &a809 {}
+    reads: &a810
       - <app>/src/content/system.md
-    writes: &a809
+    writes: &a811
       - <app>/src/pages/index.astro
       - <app>/src/pages/404.astro
       - <app>/src/pages/[...slug].astro
@@ -20265,9 +20346,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a807
-    reads: *a808
-    writes: *a809
+    flags: *a809
+    reads: *a810
+    writes: *a811
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -20281,8 +20362,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a810 {}
-    reads: &a811
+    flags: &a812 {}
+    reads: &a813
       - packages/share/src/**/*.ts
       - packages/werkstatt-site/src/domain/ui/**/*.ts
     writes: []
@@ -20299,8 +20380,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a810
-    reads: *a811
+    flags: *a812
+    reads: *a813
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20315,8 +20396,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a812 {}
-    reads: &a813
+    flags: &a814 {}
+    reads: &a815
       - packages/os/site-kernel-checks/src/**/*.ts
     writes: []
     validatesOutputs: []
@@ -20331,8 +20412,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a812
-    reads: *a813
+    flags: *a814
+    reads: *a815
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20347,8 +20428,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a814 {}
-    reads: &a815
+    flags: &a816 {}
+    reads: &a817
       - <app>/src/content/schemas/**/*.ts
     writes: []
     validatesOutputs: []
@@ -20365,8 +20446,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a814
-    reads: *a815
+    flags: *a816
+    reads: *a817
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20381,10 +20462,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a816 {}
-    reads: &a817
+    flags: &a818 {}
+    reads: &a819
       - <app>/src/content/system.md
-    writes: &a818
+    writes: &a820
       - <app>/src/scripts/layout-orchestrator.ts
     validatesOutputs: []
     pipelines:
@@ -20399,9 +20480,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a816
-    reads: *a817
-    writes: *a818
+    flags: *a818
+    reads: *a819
+    writes: *a820
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -20415,8 +20496,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a819 {}
-    reads: &a820
+    flags: &a821 {}
+    reads: &a822
       - <app>/src/pages/**/*.astro
       - <app>/src/components/**/*.astro
     writes: []
@@ -20433,8 +20514,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a819
-    reads: *a820
+    flags: *a821
+    reads: *a822
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20451,8 +20532,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a821 {}
-    reads: &a822
+    flags: &a823 {}
+    reads: &a824
       - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
     validatesOutputs: []
@@ -20469,8 +20550,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a821
-    reads: *a822
+    flags: *a823
+    reads: *a824
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20485,8 +20566,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a823 {}
-    reads: &a824
+    flags: &a825 {}
+    reads: &a826
       - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
       - packages/werkstatt-site/src/domain/ontology/src/**/*.ts
     writes: []
@@ -20503,8 +20584,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a823
-    reads: *a824
+    flags: *a825
+    reads: *a826
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20519,8 +20600,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a825 {}
-    reads: &a826
+    flags: &a827 {}
+    reads: &a828
       - packages/werkstatt-site/src/domain/ui/sections/**
     writes: []
     validatesOutputs: []
@@ -20536,8 +20617,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a825
-    reads: *a826
+    flags: *a827
+    reads: *a828
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20554,8 +20635,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a827 {}
-    reads: &a828
+    flags: &a829 {}
+    reads: &a830
       - packages/werkstatt-site/src/domain/ui/sections/**/*.css
       - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
       - packages/werkstatt-site/src/domain/ui/components/**/*.css
@@ -20576,8 +20657,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a827
-    reads: *a828
+    flags: *a829
+    reads: *a830
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20592,8 +20673,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a829 {}
-    reads: &a830
+    flags: &a831 {}
+    reads: &a832
       - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
@@ -20609,8 +20690,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a829
-    reads: *a830
+    flags: *a831
+    reads: *a832
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20624,8 +20705,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a831 {}
-    reads: &a832
+    flags: &a833 {}
+    reads: &a834
       - packages/werkstatt-site/src/domain/ui/**/*.ts
       - packages/werkstatt-site/src/domain/ui/**/*.tsx
     writes: []
@@ -20641,49 +20722,16 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a831
-    reads: *a832
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - packages.check
-  - name: section.header.contract.validate
-    description: Validate every section uses <SectionHeader> for headings; raw
-      <h1>/<h2> with section-heading classes inside
-      packages/werkstatt-site/src/domain/ui/sections are rejected (RFC-0102).
-    scope: workspace
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a833 {}
-    reads: &a834
-      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - packages.check
-  - name: section.header.contract.validate
-    description: Validate every section uses <SectionHeader> for headings; raw
-      <h1>/<h2> with section-heading classes inside
-      packages/werkstatt-site/src/domain/ui/sections are rejected (RFC-0102).
-    scope: workspace
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
     flags: *a833
     reads: *a834
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
-  - name: section.image-props.validate
-    description: Detect section .astro components that use image props
-      (backgroundImage, imageName, portraitImage, etc.) as raw URLs instead of
-      resolving them through resolveImage + contentAssetImages.
+  - name: section.header.contract.validate
+    description: Validate every section uses <SectionHeader> for headings; raw
+      <h1>/<h2> with section-heading classes inside
+      packages/werkstatt-site/src/domain/ui/sections are rejected (RFC-0102).
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -20697,6 +20745,39 @@ commands:
     validatesOutputs: []
     pipelines:
       - packages.check
+  - name: section.header.contract.validate
+    description: Validate every section uses <SectionHeader> for headings; raw
+      <h1>/<h2> with section-heading classes inside
+      packages/werkstatt-site/src/domain/ui/sections are rejected (RFC-0102).
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a835
+    reads: *a836
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
+  - name: section.image-props.validate
+    description: Detect section .astro components that use image props
+      (backgroundImage, imageName, portraitImage, etc.) as raw URLs instead of
+      resolving them through resolveImage + contentAssetImages.
+    scope: workspace
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a837 {}
+    reads: &a838
+      - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
   - name: section.image-props.validate
     description: Detect section .astro components that use image props
       (backgroundImage, imageName, portraitImage, etc.) as raw URLs instead of
@@ -20707,8 +20788,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a835
-    reads: *a836
+    flags: *a837
+    reads: *a838
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20723,8 +20804,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a837 {}
-    reads: &a838
+    flags: &a839 {}
+    reads: &a840
       - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
       - packages/werkstatt-site/src/domain/ui/sections/**/*.manifest.yaml
     writes: []
@@ -20741,8 +20822,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a837
-    reads: *a838
+    flags: *a839
+    reads: *a840
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20756,8 +20837,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a839 {}
-    reads: &a840
+    flags: &a841 {}
+    reads: &a842
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
     writes: []
@@ -20774,8 +20855,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a839
-    reads: *a840
+    flags: *a841
+    reads: *a842
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20791,8 +20872,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a841 {}
-    reads: &a842
+    flags: &a843 {}
+    reads: &a844
       - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
@@ -20808,8 +20889,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a841
-    reads: *a842
+    flags: *a843
+    reads: *a844
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20823,7 +20904,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a843
+    flags: &a845
       name:
         kind: string
         description: Entity or scaffold name.
@@ -20840,7 +20921,7 @@ commands:
         kind: string
         description: Semantic role for the scaffolded section/component.
     reads: []
-    writes: &a844
+    writes: &a846
       - packages/werkstatt-site/src/domain/ui/sections/{section-id}/**
     validatesOutputs: []
     pipelines: []
@@ -20853,9 +20934,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a843
+    flags: *a845
     reads: []
-    writes: *a844
+    writes: *a846
     validatesOutputs: []
     pipelines: []
   - name: section.shell.contract.validate
@@ -20869,8 +20950,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a845 {}
-    reads: &a846
+    flags: &a847 {}
+    reads: &a848
       - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
@@ -20887,8 +20968,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a845
-    reads: *a846
+    flags: *a847
+    reads: *a848
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20902,7 +20983,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a847 {}
+    flags: &a849 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -20916,7 +20997,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a847
+    flags: *a849
     reads: []
     writes: []
     validatesOutputs: []
@@ -20930,10 +21011,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a848 {}
-    reads: &a849
+    flags: &a850 {}
+    reads: &a851
       - <app>/src/content/system.md
-    writes: &a850
+    writes: &a852
       - <app>/public/.well-known/security.txt
     validatesOutputs: []
     pipelines:
@@ -20948,9 +21029,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a848
-    reads: *a849
-    writes: *a850
+    flags: *a850
+    reads: *a851
+    writes: *a852
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -20964,8 +21045,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a851 {}
-    reads: &a852
+    flags: &a853 {}
+    reads: &a854
       - <app>/public/.well-known/security.txt
     writes: []
     validatesOutputs: []
@@ -20981,8 +21062,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a851
-    reads: *a852
+    flags: *a853
+    reads: *a854
     writes: []
     validatesOutputs: []
     pipelines:
@@ -20996,8 +21077,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a853 {}
-    reads: &a854
+    flags: &a855 {}
+    reads: &a856
       - <app>/src/content/pages/**/*.md
     writes: []
     validatesOutputs: []
@@ -21012,8 +21093,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a853
-    reads: *a854
+    flags: *a855
+    reads: *a856
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21044,8 +21125,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a855 {}
-    reads: &a856
+    flags: &a857 {}
+    reads: &a858
       - <app>/public/llms.txt
       - <app>/public/llms-full.txt
       - <app>/src/content/system.md
@@ -21062,8 +21143,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a855
-    reads: *a856
+    flags: *a857
+    reads: *a858
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -21076,8 +21157,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a857 {}
-    reads: &a858
+    flags: &a859 {}
+    reads: &a860
       - <app>/src/content/system.md
       - <app>/src/content/**/*.md
     writes: []
@@ -21094,8 +21175,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a857
-    reads: *a858
+    flags: *a859
+    reads: *a860
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21110,8 +21191,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a859 {}
-    reads: &a860
+    flags: &a861 {}
+    reads: &a862
       - <app>/dist/client/**/*.html
       - <app>/src/content/system.md
     writes: []
@@ -21128,39 +21209,6 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a859
-    reads: *a860
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.post
-      - check
-  - name: seo.meta.validate
-    description: Validate rendered Open Graph / Twitter Card meta on every indexable
-      page; og:url must match canonical (RFC-0162).
-    scope: app
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a861 {}
-    reads: &a862
-      - <app>/dist/client/**/*.html
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.post
-      - check
-  - name: seo.meta.validate
-    description: Validate rendered Open Graph / Twitter Card meta on every indexable
-      page; og:url must match canonical (RFC-0162).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
     flags: *a861
     reads: *a862
     writes: []
@@ -21168,9 +21216,9 @@ commands:
     pipelines:
       - build.post
       - check
-  - name: seo.structured-data.validate
-    description: Validate rendered JSON-LD blocks against required structured data
-      declarations (RFC-0074).
+  - name: seo.meta.validate
+    description: Validate rendered Open Graph / Twitter Card meta on every indexable
+      page; og:url must match canonical (RFC-0162).
     scope: app
     provider: site:warpgogol-com
     module: check
@@ -21185,6 +21233,39 @@ commands:
     pipelines:
       - build.post
       - check
+  - name: seo.meta.validate
+    description: Validate rendered Open Graph / Twitter Card meta on every indexable
+      page; og:url must match canonical (RFC-0162).
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a863
+    reads: *a864
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.post
+      - check
+  - name: seo.structured-data.validate
+    description: Validate rendered JSON-LD blocks against required structured data
+      declarations (RFC-0074).
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a865 {}
+    reads: &a866
+      - <app>/dist/client/**/*.html
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.post
+      - check
   - name: seo.structured-data.validate
     description: Validate rendered JSON-LD blocks against required structured data
       declarations (RFC-0074).
@@ -21194,8 +21275,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a863
-    reads: *a864
+    flags: *a865
+    reads: *a866
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21210,8 +21291,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a865 {}
-    reads: &a866
+    flags: &a867 {}
+    reads: &a868
       - <app>/dist/client/**/*.html
       - <app>/dist/client/sitemap*.xml
       - <app>/public/robots.txt
@@ -21230,8 +21311,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a865
-    reads: *a866
+    flags: *a867
+    reads: *a868
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21274,8 +21355,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a867 {}
-    reads: &a868
+    flags: &a869 {}
+    reads: &a870
       - systems/registry.yaml
       - services/*/wrangler.jsonc
       - services/*/service.config.yaml
@@ -21292,8 +21373,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a867
-    reads: *a868
+    flags: *a869
+    reads: *a870
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -21307,8 +21388,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a869 {}
-    reads: &a870
+    flags: &a871 {}
+    reads: &a872
       - services/*/.env.example
       - services/*/src/**/*.ts
       - services/*/wrangler.jsonc
@@ -21325,8 +21406,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a869
-    reads: *a870
+    flags: *a871
+    reads: *a872
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -21339,8 +21420,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a871 {}
-    reads: &a872
+    flags: &a873 {}
+    reads: &a874
       - systems/registry.yaml
       - services/*/service.config.yaml
       - services/*/wrangler.jsonc
@@ -21356,8 +21437,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a871
-    reads: *a872
+    flags: *a873
+    reads: *a874
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -21398,7 +21479,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a873
+    flags: &a875
       service:
         kind: string
         required: true
@@ -21408,7 +21489,7 @@ commands:
         required: false
         description: Commit SHA for evidence recording (RFC-0829). If provided, L1
           evidence is recorded.
-    reads: &a874
+    reads: &a876
       - services/*/package.json
       - services/*/vitest.config.ts
       - packages/werkstatt-site/src/testing/unit/services/**/*.test.ts
@@ -21424,8 +21505,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a873
-    reads: *a874
+    flags: *a875
+    reads: *a876
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -21437,8 +21518,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a875 {}
-    reads: &a876
+    flags: &a877 {}
+    reads: &a878
       - pnpm-workspace.yaml
       - services/**
       - apps/**/*.ts
@@ -21453,8 +21534,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a875
-    reads: *a876
+    flags: *a877
+    reads: *a878
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -21467,8 +21548,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a877 {}
-    reads: &a878
+    flags: &a879 {}
+    reads: &a880
       - <app>/src/content/services/**/*.md
       - <app>/src/content/system.md
     writes: []
@@ -21484,8 +21565,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a877
-    reads: *a878
+    flags: *a879
+    reads: *a880
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21499,8 +21580,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a879 {}
-    reads: &a880
+    flags: &a881 {}
+    reads: &a882
       - pnpm-workspace.yaml
       - services/**
       - apps/**/*.ts
@@ -21516,8 +21597,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a879
-    reads: *a880
+    flags: *a881
+    reads: *a882
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -21635,11 +21716,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a881
+    flags: &a883
       path:
         kind: string
         description: Override the default scan path.
-    reads: &a882
+    reads: &a884
       - packages/share/src/**/*.ts
     writes: []
     validatesOutputs: []
@@ -21654,8 +21735,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a881
-    reads: *a882
+    flags: *a883
+    reads: *a884
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21670,11 +21751,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a883
+    flags: &a885
       app:
         kind: string
         description: Target a specific app by name.
-    reads: &a884
+    reads: &a886
       - <app>/src/**/*.ts
       - <app>/src/**/*.tsx
       - packages/share/src/**/*.ts
@@ -21693,8 +21774,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a883
-    reads: *a884
+    flags: *a885
+    reads: *a886
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21709,8 +21790,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a885 {}
-    reads: &a886
+    flags: &a887 {}
+    reads: &a888
       - packages/werkstatt-site/src/domain/ui/sections/**/*.astro
     writes: []
     validatesOutputs: []
@@ -21725,8 +21806,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a885
-    reads: *a886
+    flags: *a887
+    reads: *a888
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21740,8 +21821,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a887 {}
-    reads: &a888
+    flags: &a889 {}
+    reads: &a890
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
     writes: []
@@ -21758,8 +21839,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a887
-    reads: *a888
+    flags: *a889
+    reads: *a890
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21775,7 +21856,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a889 {}
+    flags: &a891 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -21790,7 +21871,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a889
+    flags: *a891
     reads: []
     writes: []
     validatesOutputs: []
@@ -21805,8 +21886,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a890 {}
-    reads: &a891
+    flags: &a892 {}
+    reads: &a893
       - packages/werkstatt-site/src/domain/ontology/src/**/*.ts
     writes: []
     validatesOutputs: []
@@ -21822,8 +21903,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a890
-    reads: *a891
+    flags: *a892
+    reads: *a893
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21837,8 +21918,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a892 {}
-    reads: &a893
+    flags: &a894 {}
+    reads: &a895
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
     writes: []
@@ -21855,8 +21936,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a892
-    reads: *a893
+    flags: *a894
+    reads: *a895
     writes: []
     validatesOutputs: []
     pipelines:
@@ -21938,11 +22019,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a894 {}
-    reads: &a895
+    flags: &a896 {}
+    reads: &a897
       - <app>/src/content/system.md
       - <app>/dist/client/**/*.html
-    writes: &a896
+    writes: &a898
       - <app>/public/sitemap.xml
       - <app>/public/sitemap-*.xml
     validatesOutputs: []
@@ -21957,9 +22038,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a894
-    reads: *a895
-    writes: *a896
+    flags: *a896
+    reads: *a897
+    writes: *a898
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -21973,8 +22054,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a897 {}
-    reads: &a898
+    flags: &a899 {}
+    reads: &a900
       - <app>/dist/client/sitemap*.xml
       - <app>/dist/client/**/*.html
       - <app>/src/content/system.md
@@ -21991,8 +22072,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a897
-    reads: *a898
+    flags: *a899
+    reads: *a900
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -22112,8 +22193,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a899 {}
-    reads: &a900
+    flags: &a901 {}
+    reads: &a902
       - integrations/truth-sources/*.yaml
       - <app>/src/content/**/*.claims.yaml
     writes: []
@@ -22131,8 +22212,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a899
-    reads: *a900
+    flags: *a901
+    reads: *a902
     writes: []
     validatesOutputs: []
     pipelines:
@@ -22147,7 +22228,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a901 {}
+    flags: &a903 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -22161,88 +22242,28 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a901
-    reads: []
-    writes: []
-    validatesOutputs: []
-    pipelines: []
-  - name: source.monitor.status
-    description: Show registered/enabled Truth Monitor sources and their current
-      state (RFC-0214).
-    scope: workspace
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a902 {}
-    reads: []
-    writes: []
-    validatesOutputs: []
-    pipelines: []
-  - name: source.monitor.status
-    description: Show registered/enabled Truth Monitor sources and their current
-      state (RFC-0214).
-    scope: workspace
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a902
-    reads: []
-    writes: []
-    validatesOutputs: []
-    pipelines: []
-  - name: source.monitor.tenant.add
-    description: Register a source descriptor in the Truth Monitor registry
-      (disabled by default) (RFC-0214).
-    scope: workspace
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a903
-      source:
-        kind: string
-        description: Source descriptor id or source label.
-    reads: []
-    writes: []
-    validatesOutputs: []
-    pipelines: []
-  - name: source.monitor.tenant.add
-    description: Register a source descriptor in the Truth Monitor registry
-      (disabled by default) (RFC-0214).
-    scope: workspace
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
     flags: *a903
     reads: []
     writes: []
     validatesOutputs: []
     pipelines: []
-  - name: source.monitor.tenant.disable
-    description: Disable monitoring for a registered source descriptor (RFC-0214).
+  - name: source.monitor.status
+    description: Show registered/enabled Truth Monitor sources and their current
+      state (RFC-0214).
     scope: workspace
     provider: site:warpgogol-com
     module: check
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a904
-      source:
-        kind: string
-        description: Source descriptor id or source label.
+    flags: &a904 {}
     reads: []
     writes: []
     validatesOutputs: []
     pipelines: []
-  - name: source.monitor.tenant.disable
-    description: Disable monitoring for a registered source descriptor (RFC-0214).
+  - name: source.monitor.status
+    description: Show registered/enabled Truth Monitor sources and their current
+      state (RFC-0214).
     scope: workspace
     provider: workspace
     module: check
@@ -22254,8 +22275,9 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
-  - name: source.monitor.tenant.enable
-    description: Enable monitoring for a registered source descriptor (RFC-0214).
+  - name: source.monitor.tenant.add
+    description: Register a source descriptor in the Truth Monitor registry
+      (disabled by default) (RFC-0214).
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -22270,6 +22292,65 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: source.monitor.tenant.add
+    description: Register a source descriptor in the Truth Monitor registry
+      (disabled by default) (RFC-0214).
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a905
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: source.monitor.tenant.disable
+    description: Disable monitoring for a registered source descriptor (RFC-0214).
+    scope: workspace
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a906
+      source:
+        kind: string
+        description: Source descriptor id or source label.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: source.monitor.tenant.disable
+    description: Disable monitoring for a registered source descriptor (RFC-0214).
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a906
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: source.monitor.tenant.enable
+    description: Enable monitoring for a registered source descriptor (RFC-0214).
+    scope: workspace
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a907
+      source:
+        kind: string
+        description: Source descriptor id or source label.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: source.monitor.tenant.enable
     description: Enable monitoring for a registered source descriptor (RFC-0214).
     scope: workspace
@@ -22278,7 +22359,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a905
+    flags: *a907
     reads: []
     writes: []
     validatesOutputs: []
@@ -22441,11 +22522,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a906
+    flags: &a908
       depth:
         kind: string
         description: Star-map render depth, usually 3 or 4.
-    reads: &a907
+    reads: &a909
       - <app>/src/content/system.md
       - uni.registry.yaml
     writes: []
@@ -22463,8 +22544,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a906
-    reads: *a907
+    flags: *a908
+    reads: *a909
     writes: []
     validatesOutputs: []
     pipelines:
@@ -22664,11 +22745,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a908
+    flags: &a910
       json:
         kind: boolean
         description: Emit machine-readable JSON output.
-    reads: &a909
+    reads: &a911
       - <app>/src/pages/**/*.astro
       - packages/werkstatt-site/src/domain/ui/sections/navigation-section/**/*.astro
     writes: []
@@ -22685,8 +22766,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a908
-    reads: *a909
+    flags: *a910
+    reads: *a911
     writes: []
     validatesOutputs: []
     pipelines:
@@ -22701,10 +22782,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a910 {}
-    reads: &a911
+    flags: &a912 {}
+    reads: &a913
       - <app>/src/content/system.md
-    writes: &a912
+    writes: &a914
       - <app>/src/styles/global.css
     validatesOutputs: []
     pipelines:
@@ -22719,9 +22800,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a910
-    reads: *a911
-    writes: *a912
+    flags: *a912
+    reads: *a913
+    writes: *a914
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -22801,14 +22882,14 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a913
+    flags: &a915
       json:
         kind: boolean
         description: Output JSON result.
-    reads: &a914
+    reads: &a916
       - systems/axiom-suppressions.yaml
       - missions/*/evidence/axiom/study-run.json
-    writes: &a915 []
+    writes: &a917 []
     validatesOutputs: []
     pipelines:
       - packages.check
@@ -22828,9 +22909,9 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a913
-    reads: *a914
-    writes: *a915
+    flags: *a915
+    reads: *a916
+    writes: *a917
     validatesOutputs: []
     pipelines:
       - packages.check
@@ -22843,16 +22924,16 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a916
+    flags: &a918
       page-id:
         kind: string
         description: Surface page id.
       field:
         kind: string
         description: Surface field id.
-    reads: &a917
+    reads: &a919
       - <app>/src/content/enriched/**/*.md
-    writes: &a918
+    writes: &a920
       - <app>/src/content/enriched/{blueprint}/{lang}/{artifact}.md
     validatesOutputs: []
     pipelines: []
@@ -22865,9 +22946,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a916
-    reads: *a917
-    writes: *a918
+    flags: *a918
+    reads: *a919
+    writes: *a920
     validatesOutputs: []
     pipelines: []
   - name: surface.breaker.evaluate
@@ -22879,11 +22960,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a919 {}
-    reads: &a920
+    flags: &a921 {}
+    reads: &a922
       - <app>/src/surface/visibility/outcomes.generated.yaml
       - <app>/src/surface/autonomy.state.yaml
-    writes: &a921
+    writes: &a923
       - <app>/src/surface/freeze.generated.yaml
       - <app>/src/surface/breaker.log.ndjson
       - <app>/src/surface/autonomy.state.yaml
@@ -22903,9 +22984,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a919
-    reads: *a920
-    writes: *a921
+    flags: *a921
+    reads: *a922
+    writes: *a923
     validatesOutputs: []
     pipelines:
       - build.check
@@ -22920,8 +23001,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a922 {}
-    reads: &a923
+    flags: &a924 {}
+    reads: &a925
       - <app>/src/content/system.md
       - <app>/src/surface/**/*.yaml
     writes: []
@@ -22939,8 +23020,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a922
-    reads: *a923
+    flags: *a924
+    reads: *a925
     writes: []
     validatesOutputs: []
     pipelines:
@@ -22978,8 +23059,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a924 {}
-    reads: &a925
+    flags: &a926 {}
+    reads: &a927
       - <app>/src/surface.generated.yaml
       - <app>/src/content/surface/cities/**/*.md
       - <app>/src/content/surface/demands/**/*.md
@@ -23001,8 +23082,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a924
-    reads: *a925
+    flags: *a926
+    reads: *a927
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23019,8 +23100,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a926 {}
-    reads: &a927
+    flags: &a928 {}
+    reads: &a929
       - <app>/src/surface.generated.yaml
       - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
@@ -23039,8 +23120,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a926
-    reads: *a927
+    flags: *a928
+    reads: *a929
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23055,11 +23136,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a928
+    flags: &a930
       blueprint:
         kind: string
         description: Limit validation to one Blueprint id.
-    reads: &a929
+    reads: &a931
       - <app>/src/surface.generated.yaml
     writes: []
     validatesOutputs: []
@@ -23075,8 +23156,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a928
-    reads: *a929
+    flags: *a930
+    reads: *a931
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23091,7 +23172,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a930
+    flags: &a932
       regenerate:
         kind: boolean
         description: Regenerate existing output.
@@ -23105,7 +23186,7 @@ commands:
         kind: string
         description: Language code.
     reads: []
-    writes: &a931
+    writes: &a933
       - <app>/src/content/enriched/{blueprint}/{lang}/{artifact}.md
     validatesOutputs: []
     pipelines: []
@@ -23118,9 +23199,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a930
+    flags: *a932
     reads: []
-    writes: *a931
+    writes: *a933
     validatesOutputs: []
     pipelines: []
   - name: surface.enrich.review
@@ -23134,16 +23215,16 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a932
+    flags: &a934
       approve-all:
         kind: boolean
         description: Approve all pending review items.
       approve:
         kind: string
         description: Approve the selected review item.
-    reads: &a933
+    reads: &a935
       - <app>/src/content/enriched/**/*.md
-    writes: &a934
+    writes: &a936
       - <app>/src/content/enriched/{blueprint}/{lang}/{artifact}.md
     validatesOutputs: []
     pipelines: []
@@ -23158,9 +23239,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a932
-    reads: *a933
-    writes: *a934
+    flags: *a934
+    reads: *a935
+    writes: *a936
     validatesOutputs: []
     pipelines: []
   - name: surface.evidence.join
@@ -23172,16 +23253,16 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a935
+    flags: &a937
       blueprint:
         kind: string
         description: Limit the command to one Blueprint id.
       lang:
         kind: string
         description: Language code.
-    reads: &a936
+    reads: &a938
       - <app>/src/content/surface/werk-records/**/*.md
-    writes: &a937
+    writes: &a939
       - <app>/src/surface/evidence-join.generated.yaml
     validatesOutputs: []
     pipelines: []
@@ -23194,9 +23275,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a935
-    reads: *a936
-    writes: *a937
+    flags: *a937
+    reads: *a938
+    writes: *a939
     validatesOutputs: []
     pipelines: []
   - name: surface.evidence.validate
@@ -23209,11 +23290,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a938
+    flags: &a940
       blueprint:
         kind: string
         description: Limit validation to one Blueprint id.
-    reads: &a939
+    reads: &a941
       - <app>/src/surface.generated.yaml
       - <app>/src/surface/**/*.yaml
     writes: []
@@ -23231,8 +23312,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a938
-    reads: *a939
+    flags: *a940
+    reads: *a941
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23247,7 +23328,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a940 {}
+    flags: &a942 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -23263,7 +23344,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a940
+    flags: *a942
     reads: []
     writes: []
     validatesOutputs: []
@@ -23280,11 +23361,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a941 {}
-    reads: &a942
+    flags: &a943 {}
+    reads: &a944
       - <app>/src/content/system.md
       - <app>/src/surface/**/*.yaml
-    writes: &a943
+    writes: &a945
       - <app>/src/surface.generated.yaml
       - <app>/public/.well-known/pseo-manifest.json
       - <app>/src/surface/states/*.state.yaml
@@ -23305,9 +23386,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a941
-    reads: *a942
-    writes: *a943
+    flags: *a943
+    reads: *a944
+    writes: *a945
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -23323,8 +23404,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a944 {}
-    reads: &a945
+    flags: &a946 {}
+    reads: &a947
       - <app>/dist/client/**/*.html
       - <app>/src/surface.generated.yaml
     writes: []
@@ -23343,8 +23424,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a944
-    reads: *a945
+    flags: *a946
+    reads: *a947
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23360,8 +23441,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a946 {}
-    reads: &a947
+    flags: &a948 {}
+    reads: &a949
       - <app>/src/surface.generated.yaml
       - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
@@ -23379,8 +23460,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a946
-    reads: *a947
+    flags: *a948
+    reads: *a949
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23396,8 +23477,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a948 {}
-    reads: &a949
+    flags: &a950 {}
+    reads: &a951
       - <app>/src/content/surface/industries/**/*.md
       - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
@@ -23415,40 +23496,6 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a948
-    reads: *a949
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: surface.intersection.report
-    description: "RFC-0497: advisory diagnostic report listing depth-5 intersection
-      records, their publication status, and empty gate fields. Always exits 0."
-    scope: app
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a950 {}
-    reads: &a951
-      - <app>/src/content/surface/intersections/**/*.md
-      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: surface.intersection.report
-    description: "RFC-0497: advisory diagnostic report listing depth-5 intersection
-      records, their publication status, and empty gate fields. Always exits 0."
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
     flags: *a950
     reads: *a951
     writes: []
@@ -23456,10 +23503,9 @@ commands:
     pipelines:
       - build.check
       - check
-  - name: surface.intersection.validate
-    description: "RFC-0497: validate depth-5 intersection records — minimum gate
-      (field counts), similarity thresholds (shingle-based pairwise), and
-      substance independence test (token-count delta vs parent pages)."
+  - name: surface.intersection.report
+    description: "RFC-0497: advisory diagnostic report listing depth-5 intersection
+      records, their publication status, and empty gate fields. Always exits 0."
     scope: app
     provider: site:warpgogol-com
     module: check
@@ -23475,6 +23521,41 @@ commands:
     pipelines:
       - build.check
       - check
+  - name: surface.intersection.report
+    description: "RFC-0497: advisory diagnostic report listing depth-5 intersection
+      records, their publication status, and empty gate fields. Always exits 0."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a952
+    reads: *a953
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
+  - name: surface.intersection.validate
+    description: "RFC-0497: validate depth-5 intersection records — minimum gate
+      (field counts), similarity thresholds (shingle-based pairwise), and
+      substance independence test (token-count delta vs parent pages)."
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a954 {}
+    reads: &a955
+      - <app>/src/content/surface/intersections/**/*.md
+      - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
   - name: surface.intersection.validate
     description: "RFC-0497: validate depth-5 intersection records — minimum gate
       (field counts), similarity thresholds (shingle-based pairwise), and
@@ -23485,8 +23566,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a952
-    reads: *a953
+    flags: *a954
+    reads: *a955
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23502,8 +23583,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a954 {}
-    reads: &a955
+    flags: &a956 {}
+    reads: &a957
       - <app>/dist/client/**/*.html
       - <app>/src/surface.generated.yaml
     writes: []
@@ -23521,8 +23602,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a954
-    reads: *a955
+    flags: *a956
+    reads: *a957
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23537,10 +23618,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a956 {}
-    reads: &a957
+    flags: &a958 {}
+    reads: &a959
       - <app>/src/surface/review.log.ndjson
-    writes: &a958
+    writes: &a960
       - <app>/src/surface/autonomy.calibration.ndjson
     validatesOutputs: []
     pipelines: []
@@ -23553,9 +23634,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a956
-    reads: *a957
-    writes: *a958
+    flags: *a958
+    reads: *a959
+    writes: *a960
     validatesOutputs: []
     pipelines: []
   - name: surface.review.run
@@ -23568,7 +23649,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a959
+    flags: &a961
       artifact:
         kind: string
         description: Artifact reference to review or route.
@@ -23588,7 +23669,7 @@ commands:
         kind: string
         description: Version recorded with the review.
     reads: []
-    writes: &a960
+    writes: &a962
       - <app>/src/surface/review.log.ndjson
     validatesOutputs: []
     pipelines: []
@@ -23602,9 +23683,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a959
+    flags: *a961
     reads: []
-    writes: *a960
+    writes: *a962
     validatesOutputs: []
     pipelines: []
   - name: surface.review.validate
@@ -23616,8 +23697,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a961 {}
-    reads: &a962
+    flags: &a963 {}
+    reads: &a964
       - <app>/src/surface/review.log.ndjson
     writes: []
     validatesOutputs: []
@@ -23633,8 +23714,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a961
-    reads: *a962
+    flags: *a963
+    reads: *a964
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23649,13 +23730,13 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a963
+    flags: &a965
       to:
         kind: string
         description: Target value.
-    reads: &a964
+    reads: &a966
       - <app>/src/surface/rollback-plan.generated.yaml
-    writes: &a965
+    writes: &a967
       - <app>/src/surface/states/pointer.yaml
       - <app>/src/surface/breaker.log.ndjson
       - <app>/src/bordbuch/**
@@ -23671,9 +23752,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a963
-    reads: *a964
-    writes: *a965
+    flags: *a965
+    reads: *a966
+    writes: *a967
     validatesOutputs: []
     pipelines: []
   - name: surface.rollback.plan
@@ -23685,14 +23766,14 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a966
+    flags: &a968
       to:
         kind: string
         description: Target value.
-    reads: &a967
+    reads: &a969
       - <app>/src/surface/states/pointer.yaml
       - <app>/src/surface/breaker.log.ndjson
-    writes: &a968
+    writes: &a970
       - <app>/src/surface/rollback-plan.generated.yaml
     validatesOutputs: []
     pipelines: []
@@ -23705,9 +23786,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a966
-    reads: *a967
-    writes: *a968
+    flags: *a968
+    reads: *a969
+    writes: *a970
     validatesOutputs: []
     pipelines: []
   - name: surface.service.validate
@@ -23720,8 +23801,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a969 {}
-    reads: &a970
+    flags: &a971 {}
+    reads: &a972
       - <app>/src/content/surface/services/**/*.md
       - packages/werkstatt-site/src/domain/ontology/blueprints/*.yaml
     writes: []
@@ -23739,8 +23820,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a969
-    reads: *a970
+    flags: *a971
+    reads: *a972
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23755,10 +23836,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a971 {}
-    reads: &a972
+    flags: &a973 {}
+    reads: &a974
       - <app>/src/surface.generated.yaml
-    writes: &a973
+    writes: &a975
       - <app>/public/.well-known/pseo-star-map.svg
     validatesOutputs: []
     pipelines:
@@ -23773,9 +23854,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a971
-    reads: *a972
-    writes: *a973
+    flags: *a973
+    reads: *a974
+    writes: *a975
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -23790,12 +23871,12 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a974
+    flags: &a976
       regenerate-outdated:
         kind: boolean
         description: Regenerate only outdated translation artifacts.
     reads: []
-    writes: &a975
+    writes: &a977
       - <app>/src/content/enriched/{blueprint}/{targetLang}/{artifact}.md
     validatesOutputs: []
     pipelines: []
@@ -23809,9 +23890,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a974
+    flags: *a976
     reads: []
-    writes: *a975
+    writes: *a977
     validatesOutputs: []
     pipelines: []
   - name: surface.translation.glossary.generate
@@ -23823,7 +23904,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a976
+    flags: &a978
       module:
         kind: string
         description: Programmatic Surface module id.
@@ -23831,7 +23912,7 @@ commands:
         kind: string
         description: Target language code.
     reads: []
-    writes: &a977
+    writes: &a979
       - <app>/src/content/enriched/_translation-glossaries/{module}/{targetLang}.yaml
     validatesOutputs: []
     pipelines: []
@@ -23844,9 +23925,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a976
+    flags: *a978
     reads: []
-    writes: *a977
+    writes: *a979
     validatesOutputs: []
     pipelines: []
   - name: surface.translation.glossary.validate
@@ -23858,11 +23939,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a978
+    flags: &a980
       module:
         kind: string
         description: Programmatic Surface module id.
-    reads: &a979
+    reads: &a981
       - <app>/src/content/enriched/**/*.glossary.yaml
     writes: []
     validatesOutputs: []
@@ -23878,8 +23959,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a978
-    reads: *a979
+    flags: *a980
+    reads: *a981
     writes: []
     validatesOutputs: []
     pipelines:
@@ -23894,12 +23975,12 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a980
+    flags: &a982
       regenerate:
         kind: boolean
         description: Regenerate existing output.
     reads: []
-    writes: &a981
+    writes: &a983
       - <app>/src/content/enriched/_translation-notes/{module}/{targetLang}.md
     validatesOutputs: []
     pipelines: []
@@ -23912,9 +23993,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a980
+    flags: *a982
     reads: []
-    writes: *a981
+    writes: *a983
     validatesOutputs: []
     pipelines: []
   - name: surface.translation.notes.review
@@ -23925,12 +24006,12 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a982
+    flags: &a984
       approve:
         kind: boolean
         description: Approve the selected review item.
     reads: []
-    writes: &a983
+    writes: &a985
       - <app>/src/content/enriched/_translation-notes/{module}/{targetLang}.md
     validatesOutputs: []
     pipelines: []
@@ -23942,9 +24023,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a982
+    flags: *a984
     reads: []
-    writes: *a983
+    writes: *a985
     validatesOutputs: []
     pipelines: []
   - name: surface.translation.notes.validate
@@ -23956,11 +24037,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a984
+    flags: &a986
       module:
         kind: string
         description: Programmatic Surface module id.
-    reads: &a985
+    reads: &a987
       - <app>/src/content/enriched/_translation-notes/**/*.md
     writes: []
     validatesOutputs: []
@@ -23976,39 +24057,6 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a984
-    reads: *a985
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: surface.translation.qa.validate
-    description: Validate deterministic PSEO translation QA invariants such as
-      numeric echo checks and human-review gates (RFC-0272).
-    scope: app
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a986 {}
-    reads: &a987
-      - <app>/src/content/enriched/**/*.md
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-      - check
-  - name: surface.translation.qa.validate
-    description: Validate deterministic PSEO translation QA invariants such as
-      numeric echo checks and human-review gates (RFC-0272).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
     flags: *a986
     reads: *a987
     writes: []
@@ -24016,9 +24064,9 @@ commands:
     pipelines:
       - build.check
       - check
-  - name: surface.translation.validate
-    description: Validate PSEO translated artifact lineage, sourceHash freshness,
-      note/glossary ids, and target approval gates (RFC-0272).
+  - name: surface.translation.qa.validate
+    description: Validate deterministic PSEO translation QA invariants such as
+      numeric echo checks and human-review gates (RFC-0272).
     scope: app
     provider: site:warpgogol-com
     module: check
@@ -24033,6 +24081,39 @@ commands:
     pipelines:
       - build.check
       - check
+  - name: surface.translation.qa.validate
+    description: Validate deterministic PSEO translation QA invariants such as
+      numeric echo checks and human-review gates (RFC-0272).
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a988
+    reads: *a989
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
+  - name: surface.translation.validate
+    description: Validate PSEO translated artifact lineage, sourceHash freshness,
+      note/glossary ids, and target approval gates (RFC-0272).
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a990 {}
+    reads: &a991
+      - <app>/src/content/enriched/**/*.md
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+      - check
   - name: surface.translation.validate
     description: Validate PSEO translated artifact lineage, sourceHash freshness,
       note/glossary ids, and target approval gates (RFC-0272).
@@ -24042,8 +24123,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a988
-    reads: *a989
+    flags: *a990
+    reads: *a991
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24059,8 +24140,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a990 {}
-    reads: &a991
+    flags: &a992 {}
+    reads: &a993
       - <app>/src/surface.generated.yaml
       - <app>/src/content/system.md
     writes: []
@@ -24078,8 +24159,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a990
-    reads: *a991
+    flags: *a992
+    reads: *a993
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24171,7 +24252,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a992
+    flags: &a994
       app:
         kind: string
         description: App name to use when no app context is active.
@@ -24182,7 +24263,7 @@ commands:
         kind: string
         description: Output file path.
     reads: []
-    writes: &a993
+    writes: &a995
       - <app>/src/content/system.md
     validatesOutputs: []
     pipelines: []
@@ -24195,9 +24276,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a992
+    flags: *a994
     reads: []
-    writes: *a993
+    writes: *a995
     validatesOutputs: []
     pipelines: []
   - name: system.manifest.validate
@@ -24211,8 +24292,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a994 {}
-    reads: &a995
+    flags: &a996 {}
+    reads: &a997
       - <app>/src/content/system.md
     writes: []
     validatesOutputs: []
@@ -24230,8 +24311,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a994
-    reads: *a995
+    flags: *a996
+    reads: *a997
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24248,8 +24329,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a996 {}
-    reads: &a997
+    flags: &a998 {}
+    reads: &a999
       - <app>/src/content/people/**/*.md
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
@@ -24271,8 +24352,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a996
-    reads: *a997
+    flags: *a998
+    reads: *a999
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24290,8 +24371,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a998 {}
-    reads: &a999
+    flags: &a1000 {}
+    reads: &a1001
       - <app>/src/content/system.md
       - <app>/src/content/pages/**/*.md
       - <app>/src/content/navigation/**/*.md
@@ -24312,8 +24393,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a998
-    reads: *a999
+    flags: *a1000
+    reads: *a1001
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24331,8 +24412,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1000 {}
-    reads: &a1001
+    flags: &a1002 {}
+    reads: &a1003
       - <app>/src/content/people/**/*.md
     writes: []
     validatesOutputs: []
@@ -24351,8 +24432,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1000
-    reads: *a1001
+    flags: *a1002
+    reads: *a1003
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24367,7 +24448,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1002
+    flags: &a1004
       site:
         kind: string
         required: false
@@ -24376,7 +24457,7 @@ commands:
         kind: string
         required: false
         description: Override workpiece directory path (relative to workspace root).
-    reads: &a1003
+    reads: &a1005
       - packages/werkstatt-site/src/onboarding/templates/package.template.json
       - missions/*/workpiece/package.json
     writes: []
@@ -24392,8 +24473,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1002
-    reads: *a1003
+    flags: *a1004
+    reads: *a1005
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24408,8 +24489,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1004 {}
-    reads: &a1005
+    flags: &a1006 {}
+    reads: &a1007
       - packages/os/*/src/templates/**/*.template.*
       - package.json
       - pnpm-lock.yaml
@@ -24427,8 +24508,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1004
-    reads: *a1005
+    flags: *a1006
+    reads: *a1007
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24443,12 +24524,12 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1006
+    flags: &a1008
       site:
         kind: string
         required: false
         description: Site id for pipeline context.
-    reads: &a1007
+    reads: &a1009
       - packages/werkstatt-site/src/onboarding/templates/package.template.json
     writes: []
     validatesOutputs: []
@@ -24464,8 +24545,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1006
-    reads: *a1007
+    flags: *a1008
+    reads: *a1009
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24543,8 +24624,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1008 {}
-    reads: &a1009
+    flags: &a1010 {}
+    reads: &a1011
       - packages/*/package.json
       - packages/*/turbo.json
       - services/*/package.json
@@ -24561,8 +24642,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1008
-    reads: *a1009
+    flags: *a1010
+    reads: *a1011
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24576,8 +24657,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1010 {}
-    reads: &a1011
+    flags: &a1012 {}
+    reads: &a1013
       - packages/*/package.json
       - packages/*/turbo.json
       - services/*/package.json
@@ -24594,8 +24675,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1010
-    reads: *a1011
+    flags: *a1012
+    reads: *a1013
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24613,8 +24694,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1012 {}
-    reads: &a1013
+    flags: &a1014 {}
+    reads: &a1015
       - <app>/dist/client/**/*.html
       - <app>/dist/client/**/*.txt
       - <app>/dist/client/**/*.md
@@ -24637,8 +24718,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1012
-    reads: *a1013
+    flags: *a1014
+    reads: *a1015
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24653,11 +24734,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1014
+    flags: &a1016
       app:
         kind: string
         description: App name to use when no app context is active.
-    reads: &a1015
+    reads: &a1017
       - <app>/src/content/**/*.md
       - <app>/src/content/**/*.yaml
     writes: []
@@ -24675,8 +24756,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1014
-    reads: *a1015
+    flags: *a1016
+    reads: *a1017
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24692,7 +24773,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1016 {}
+    flags: &a1018 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -24707,7 +24788,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1016
+    flags: *a1018
     reads: []
     writes: []
     validatesOutputs: []
@@ -24722,8 +24803,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1017 {}
-    reads: &a1018
+    flags: &a1019 {}
+    reads: &a1020
       - <app>/dist/client/**/*.html
       - <app>/dist/client/**/*.txt
       - <app>/dist/client/**/*.md
@@ -24744,8 +24825,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1017
-    reads: *a1018
+    flags: *a1019
+    reads: *a1020
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24759,8 +24840,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1019 {}
-    reads: &a1020
+    flags: &a1021 {}
+    reads: &a1022
       - <app>/src/pages/**/*.astro
     writes: []
     validatesOutputs: []
@@ -24773,8 +24854,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1019
-    reads: *a1020
+    flags: *a1021
+    reads: *a1022
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -24789,8 +24870,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1021 {}
-    reads: &a1022
+    flags: &a1023 {}
+    reads: &a1024
       - packages/tokens/src/tokens.css
       - packages/tokens/src/**/*.ts
     writes: []
@@ -24808,8 +24889,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1021
-    reads: *a1022
+    flags: *a1023
+    reads: *a1024
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24823,8 +24904,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1023 {}
-    reads: &a1024
+    flags: &a1025 {}
+    reads: &a1026
       - <app>/src/styles/**/*.css
       - packages/werkstatt-site/src/domain/ui/**/*.css
     writes: []
@@ -24841,8 +24922,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1023
-    reads: *a1024
+    flags: *a1025
+    reads: *a1026
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24860,8 +24941,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1025 {}
-    reads: &a1026
+    flags: &a1027 {}
+    reads: &a1028
       - packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css
     writes: []
     validatesOutputs: []
@@ -24879,8 +24960,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1025
-    reads: *a1026
+    flags: *a1027
+    reads: *a1028
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24893,8 +24974,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1027 {}
-    reads: &a1028
+    flags: &a1029 {}
+    reads: &a1030
       - <app>/src/styles/**/*.css
     writes: []
     validatesOutputs: []
@@ -24909,8 +24990,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1027
-    reads: *a1028
+    flags: *a1029
+    reads: *a1030
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24926,8 +25007,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1029 {}
-    reads: &a1030
+    flags: &a1031 {}
+    reads: &a1032
       - packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}/**/*.css
       - packages/tokens/src/**/*.ts
     writes: []
@@ -24944,8 +25025,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1029
-    reads: *a1030
+    flags: *a1031
+    reads: *a1032
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24959,8 +25040,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1031 {}
-    reads: &a1032
+    flags: &a1033 {}
+    reads: &a1034
       - <app>/src/content/system.md
       - <app>/src/content/**/*.md
     writes: []
@@ -24977,8 +25058,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1031
-    reads: *a1032
+    flags: *a1033
+    reads: *a1034
     writes: []
     validatesOutputs: []
     pipelines:
@@ -24994,8 +25075,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1033 {}
-    reads: &a1034
+    flags: &a1035 {}
+    reads: &a1036
       - packages/*/tsconfig.json
       - tsconfig/*.json
     writes: []
@@ -25012,52 +25093,16 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1033
-    reads: *a1034
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - packages.check
-  - name: ui.i18n.lint
-    description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
-      for hardcoded human-readable strings and non-trivial resolveLabel
-      fallbacks (RFC-0189).
-    scope: workspace
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a1035
-      path:
-        kind: string
-        description: Override the default scan path.
-    reads: &a1036
-      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - packages.check
-  - name: ui.i18n.lint
-    description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
-      for hardcoded human-readable strings and non-trivial resolveLabel
-      fallbacks (RFC-0189).
-    scope: workspace
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
     flags: *a1035
     reads: *a1036
     writes: []
     validatesOutputs: []
     pipelines:
       - packages.check
-  - name: ui.silent-defaults.lint
+  - name: ui.i18n.lint
     description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
-      for silent empty-string fallbacks (?? "", = "", defaultContent) on
-      UI-visible text props (RFC-0205).
+      for hardcoded human-readable strings and non-trivial resolveLabel
+      fallbacks (RFC-0189).
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -25074,6 +25119,42 @@ commands:
     validatesOutputs: []
     pipelines:
       - packages.check
+  - name: ui.i18n.lint
+    description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
+      for hardcoded human-readable strings and non-trivial resolveLabel
+      fallbacks (RFC-0189).
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a1037
+    reads: *a1038
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
+  - name: ui.silent-defaults.lint
+    description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
+      for silent empty-string fallbacks (?? "", = "", defaultContent) on
+      UI-visible text props (RFC-0205).
+    scope: workspace
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a1039
+      path:
+        kind: string
+        description: Override the default scan path.
+    reads: &a1040
+      - packages/werkstatt-site/src/domain/ui/{sections,components}/**/*.astro
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
   - name: ui.silent-defaults.lint
     description: Scan packages/werkstatt-site/src/domain/ui/{sections,components}/
       for silent empty-string fallbacks (?? "", = "", defaultContent) on
@@ -25084,8 +25165,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1037
-    reads: *a1038
+    flags: *a1039
+    reads: *a1040
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25100,11 +25181,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1039 {}
-    reads: &a1040
+    flags: &a1041 {}
+    reads: &a1042
       - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml
       - <app>/src/content/system.md
-    writes: &a1041
+    writes: &a1043
       - uni.registry.yaml
     validatesOutputs: []
     pipelines:
@@ -25120,9 +25201,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1039
-    reads: *a1040
-    writes: *a1041
+    flags: *a1041
+    reads: *a1042
+    writes: *a1043
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -25136,8 +25217,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1042 {}
-    reads: &a1043
+    flags: &a1044 {}
+    reads: &a1045
       - uni.registry.yaml
       - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml
     writes: []
@@ -25155,8 +25236,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1042
-    reads: *a1043
+    flags: *a1044
+    reads: *a1045
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25174,11 +25255,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 300000
-    flags: &a1044 {}
-    reads: &a1045
+    flags: &a1046 {}
+    reads: &a1047
       - <app>/dist/client/**/*.html
       - <app>/src/video-manifest.generated.yaml
-    writes: &a1046
+    writes: &a1048
       - <app>/dist/client/_astro/**
     validatesOutputs: []
     pipelines:
@@ -25194,9 +25275,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 300000
-    flags: *a1044
-    reads: *a1045
-    writes: *a1046
+    flags: *a1046
+    reads: *a1047
+    writes: *a1048
     validatesOutputs: []
     pipelines:
       - build.post
@@ -25211,8 +25292,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1047 {}
-    reads: &a1048
+    flags: &a1049 {}
+    reads: &a1050
       - <app>/src/video-manifest.generated.yaml
       - <app>/src/live-video-manifest.generated.yaml
     writes: []
@@ -25230,8 +25311,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1047
-    reads: *a1048
+    flags: *a1049
+    reads: *a1050
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25246,8 +25327,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1049 {}
-    reads: &a1050
+    flags: &a1051 {}
+    reads: &a1052
       - <app>/src/content/system.md
       - <app>/src/video-manifest.generated.yaml
     writes: []
@@ -25265,8 +25346,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1049
-    reads: *a1050
+    flags: *a1051
+    reads: *a1052
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25282,11 +25363,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 1200000
-    flags: &a1051 {}
-    reads: &a1052
+    flags: &a1053 {}
+    reads: &a1054
       - <app>/src/content/system.md
       - <app>/public/**/*.{mp4,webm,mov}
-    writes: &a1053
+    writes: &a1055
       - <app>/src/video-manifest.generated.yaml
       - <app>/public/_video/**
       - <app>/.cache/video/**
@@ -25304,9 +25385,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 1200000
-    flags: *a1051
-    reads: *a1052
-    writes: *a1053
+    flags: *a1053
+    reads: *a1054
+    writes: *a1055
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -25321,8 +25402,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1054 {}
-    reads: &a1055
+    flags: &a1056 {}
+    reads: &a1057
       - <app>/src/video-manifest.generated.yaml
       - <app>/public/_video/**
     writes: []
@@ -25339,8 +25420,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1054
-    reads: *a1055
+    flags: *a1056
+    reads: *a1057
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25354,10 +25435,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1056 {}
-    reads: &a1057
+    flags: &a1058 {}
+    reads: &a1059
       - <app>/src/surface/visibility/*.snapshot.json
-    writes: &a1058
+    writes: &a1060
       - <app>/src/surface/visibility/outcomes.generated.yaml
     validatesOutputs: []
     pipelines:
@@ -25372,9 +25453,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1056
-    reads: *a1057
-    writes: *a1058
+    flags: *a1058
+    reads: *a1059
+    writes: *a1060
     validatesOutputs: []
     pipelines:
       - build.check
@@ -25388,8 +25469,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1059 {}
-    reads: &a1060
+    flags: &a1061 {}
+    reads: &a1062
       - <app>/src/content/**/*.md
       - <app>/src/content/**/*.yaml
     writes: []
@@ -25406,8 +25487,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1059
-    reads: *a1060
+    flags: *a1061
+    reads: *a1062
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25422,7 +25503,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1061
+    flags: &a1063
       input:
         kind: string
         description: Input file path.
@@ -25430,7 +25511,7 @@ commands:
         kind: string
         description: Source descriptor id or source label.
     reads: []
-    writes: &a1062
+    writes: &a1064
       - <app>/src/surface/visibility/*.snapshot.json
     validatesOutputs: []
     pipelines: []
@@ -25443,9 +25524,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1061
+    flags: *a1063
     reads: []
-    writes: *a1062
+    writes: *a1064
     validatesOutputs: []
     pipelines: []
   - name: visibility.reconcile
@@ -25457,10 +25538,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1063 {}
-    reads: &a1064
+    flags: &a1065 {}
+    reads: &a1066
       - <app>/src/surface/visibility/*.snapshot.json
-    writes: &a1065
+    writes: &a1067
       - <app>/src/surface/visibility/outcomes.generated.yaml
     validatesOutputs: []
     pipelines:
@@ -25475,9 +25556,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1063
-    reads: *a1064
-    writes: *a1065
+    flags: *a1065
+    reads: *a1066
+    writes: *a1067
     validatesOutputs: []
     pipelines:
       - build.check
@@ -25488,42 +25569,6 @@ commands:
       last/first block) gate the build; VIS-BG-03 (adjacent duplicate
       background) warns. Federates RFC-0203 Diagnostics under the `visual`
       domain (RFC-0233)."
-    scope: app
-    provider: site:warpgogol-com
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a1066 {}
-    reads: &a1067
-      - <app>/src/content/system.md
-      - <app>/src/content/**/*.md
-      - <app>/src/content/**/*.yaml
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-  - name: visual.contract.validate
-    description: "Per-app: enforce Tier-1 positional visual invariants over authored
-      pages in page context. VIS-BG-01/02 (edge-merge fade must be on the
-      last/first block) gate the build; VIS-BG-03 (adjacent duplicate
-      background) warns. Federates RFC-0203 Diagnostics under the `visual`
-      domain (RFC-0233)."
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a1066
-    reads: *a1067
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-  - name: visual.report
-    description: "Per-app: report the full visual posture (all visual findings incl.
-      warnings) without gating the build. Advisory — always exits 0 (RFC-0233)."
     scope: app
     provider: site:warpgogol-com
     module: check
@@ -25537,6 +25582,42 @@ commands:
       - <app>/src/content/**/*.yaml
     writes: []
     validatesOutputs: []
+    pipelines:
+      - build.check
+  - name: visual.contract.validate
+    description: "Per-app: enforce Tier-1 positional visual invariants over authored
+      pages in page context. VIS-BG-01/02 (edge-merge fade must be on the
+      last/first block) gate the build; VIS-BG-03 (adjacent duplicate
+      background) warns. Federates RFC-0203 Diagnostics under the `visual`
+      domain (RFC-0233)."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a1068
+    reads: *a1069
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+  - name: visual.report
+    description: "Per-app: report the full visual posture (all visual findings incl.
+      warnings) without gating the build. Advisory — always exits 0 (RFC-0233)."
+    scope: app
+    provider: site:warpgogol-com
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a1070 {}
+    reads: &a1071
+      - <app>/src/content/system.md
+      - <app>/src/content/**/*.md
+      - <app>/src/content/**/*.yaml
+    writes: []
+    validatesOutputs: []
     pipelines: []
   - name: visual.report
     description: "Per-app: report the full visual posture (all visual findings incl.
@@ -25547,8 +25628,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1068
-    reads: *a1069
+    flags: *a1070
+    reads: *a1071
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -25562,7 +25643,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1070 {}
+    flags: &a1072 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -25577,7 +25658,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1070
+    flags: *a1072
     reads: []
     writes: []
     validatesOutputs: []
@@ -25591,8 +25672,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1071 {}
-    reads: &a1072
+    flags: &a1073 {}
+    reads: &a1074
       - packages/os/site-kernel-checks/src/**/*.ts
     writes: []
     validatesOutputs: []
@@ -25607,8 +25688,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1071
-    reads: *a1072
+    flags: *a1073
+    reads: *a1074
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25622,10 +25703,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1073 {}
-    reads: &a1074
+    flags: &a1075 {}
+    reads: &a1076
       - <app>/src/content/system.md
-    writes: &a1075
+    writes: &a1077
       - <app>/public/.well-known/warpgogol-check.json
     validatesOutputs: []
     pipelines:
@@ -25639,9 +25720,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1073
-    reads: *a1074
-    writes: *a1075
+    flags: *a1075
+    reads: *a1076
+    writes: *a1077
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -25654,8 +25735,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1076 {}
-    reads: &a1077
+    flags: &a1078 {}
+    reads: &a1079
       - <app>/public/.well-known/warpgogol-check.json
     writes: []
     validatesOutputs: []
@@ -25669,8 +25750,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1076
-    reads: *a1077
+    flags: *a1078
+    reads: *a1079
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -25683,8 +25764,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1078 {}
-    reads: &a1079
+    flags: &a1080 {}
+    reads: &a1081
       - <app>/src/content/surface/werk-records/**/*.md
     writes: []
     validatesOutputs: []
@@ -25700,8 +25781,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1078
-    reads: *a1079
+    flags: *a1080
+    reads: *a1081
     writes: []
     validatesOutputs: []
     pipelines:
@@ -25860,11 +25941,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1080
+    flags: &a1082
       strict:
         kind: boolean
         description: Treat missing Wikidata QIDs as errors instead of warnings.
-    reads: &a1081
+    reads: &a1083
       - <app>/src/content/business-profile/**/*.md
       - <app>/src/content/business-profile/{lang}/claims/*.md
       - <app>/src/content/business-profile/{lang}/evidence-sources/*.md
@@ -25882,8 +25963,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1080
-    reads: *a1081
+    flags: *a1082
+    reads: *a1083
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -25994,8 +26075,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1082 {}
-    reads: &a1083
+    flags: &a1084 {}
+    reads: &a1085
       - missions/*/workpiece/tools/**/*.ts
       - missions/*/workpiece/src/**/*.{ts,mjs,astro}
       - node_modules/@warpgogol/*
@@ -26014,8 +26095,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1082
-    reads: *a1083
+    flags: *a1084
+    reads: *a1085
     writes: []
     validatesOutputs: []
     pipelines:
@@ -26117,8 +26198,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1084 {}
-    reads: &a1085
+    flags: &a1086 {}
+    reads: &a1087
       - pnpm-workspace.yaml
       - packages/*/package.json
     writes: []
@@ -26134,8 +26215,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1084
-    reads: *a1085
+    flags: *a1086
+    reads: *a1087
     writes: []
     validatesOutputs: []
     pipelines:
@@ -26149,8 +26230,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1086 {}
-    reads: &a1087
+    flags: &a1088 {}
+    reads: &a1089
       - pnpm-workspace.yaml
       - turbo.json
       - packages/*/package.json
@@ -26167,8 +26248,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1086
-    reads: *a1087
+    flags: *a1088
+    reads: *a1089
     writes: []
     validatesOutputs: []
     pipelines:
@@ -26183,8 +26264,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1088 {}
-    reads: &a1089
+    flags: &a1090 {}
+    reads: &a1091
       - packages/os/site-kernel/src/**/*.ts
       - packages/os/site-kernel-checks/src/**/*.ts
       - packages/forge/os/**/*.ts
@@ -26202,8 +26283,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1088
-    reads: *a1089
+    flags: *a1090
+    reads: *a1091
     writes: []
     validatesOutputs: []
     pipelines:
@@ -26220,8 +26301,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1090 {}
-    reads: &a1091
+    flags: &a1092 {}
+    reads: &a1093
       - yaml-contract.whitelist.yaml
       - "**/*.json"
       - "**/*.jsonc"
@@ -26244,8 +26325,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1090
-    reads: *a1091
+    flags: *a1092
+    reads: *a1093
     writes: []
     validatesOutputs: []
     pipelines:
@@ -26260,8 +26341,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1092 {}
-    reads: &a1093
+    flags: &a1094 {}
+    reads: &a1095
       - "**/*.yaml"
     writes: []
     validatesOutputs: []
@@ -26278,8 +26359,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1092
-    reads: *a1093
+    flags: *a1094
+    reads: *a1095
     writes: []
     validatesOutputs: []
     pipelines:

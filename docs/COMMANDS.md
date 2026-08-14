@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 783. Raw manifest entries: 1390.
+Generated command rows: 785. Raw manifest entries: 1392.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -412,6 +412,7 @@ Generated command rows: 783. Raw manifest entries: 1390.
 | `legal.translation.validate` | site:warpgogol-com, workspace | app | no | no | Validate the RFC-0174 binding-language policy: every page `translation` block is internally consistent (status enum, binding never disabled, mandatory notice on while a locale is unofficial, binding-language file present, disabled locales have a fallback). |
 | `leitstand.dev-deploy` | workspace | workspace | no | no | Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --site. |
 | `leitstand.health` | workspace | workspace | no | no | Run health checks against a deployed channel (RFC-0379). Flags: --site, [--channel dev\|alt\|main]. |
+| `leitstand.pipeline.check` | workspace | workspace | no | no | Inspect deployment pipeline state for a release (RFC-0842). Flags: --release. |
 | `leitstand.promote` | workspace | workspace | yes | no | Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --release. |
 | `leitstand.propagate` | workspace | workspace | yes | no | Deploy a published release with verified Axiom evidence to the alt channel (RFC-0628). Flags: --release. |
 | `leitstand.rollback` | workspace | workspace | yes | no | Rollback to the previous published release; auto-detects channel from release state and auto-steps release state (RFC-0628). Flags: --site, [--to-release]. |
@@ -439,6 +440,7 @@ Generated command rows: 783. Raw manifest entries: 1390.
 | `material.credits.validate` | site:warpgogol-com, workspace | app | no | no | Validate RFC-0220 material credit sidecars for published media/materials and require a routed credits page. |
 | `material.metadata.validate` | site:warpgogol-com, workspace | app | no | no | Validate RFC-0528 embedded IPTC/XMP metadata on derived image/video variants discovered through manifests. Diagnostics META-01..04. Gracefully skips when exiftool is unavailable. |
 | `material.metadata.write` | site:warpgogol-com | app | yes | no | Write IPTC/XMP metadata (title, copyright, creator, artist, comment, WebStatement, encoder) into derived image/video variants from manifests. Uses MaterialCredit sidecars with content reference resolution and SemanticSiteProfile fallback. Gracefully skips when exiftool is unavailable (RFC-0528). |
+| `materialize.config.validate` | workspace | workspace | no | no | Validate OPERATOR_CONFIG_FILES list is in sync with actual workpiece/cache clone files (RFC-0840). |
 | `matomo.export.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate Matomo Notausgang analytics export package scaffolding (RFC-0305). |
 | `matomo.provision.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate offline Matomo provisioning registry and plan scaffolding (RFC-0305). |
 | `matomo.proxy.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate the first-party Matomo proxy backend composition and proxy source policy (RFC-0305). |
