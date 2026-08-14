@@ -1,7 +1,7 @@
 ---
 id: RFC-0835
 title: "Add regression tests for LH-12 ignore patterns and IMG-DELIVERY-04 404.html exemption"
-status: draft
+status: accepted
 kind: contract
 scope: workspace
 owners:
