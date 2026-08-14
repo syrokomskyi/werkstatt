@@ -1,12 +1,13 @@
 ---
 id: RFC-0837
 title: "Add static CSS analysis for mobile layout anti-patterns"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
 enhancedAt: 2026-08-14
