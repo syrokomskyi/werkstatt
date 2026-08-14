@@ -159,3 +159,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
 - **Question:** Should certification be one final flag, separate certificates per channel, or one dossier with stage-specific gate decisions?
 - **Answer:** Each immutable release candidate has one append-only certification dossier containing immutable, environment-bound evidence records and separate `dev-deploy`, `propagate-alt`, and `promote-main` decisions. Every decision uses `pass`, `fail`, `incomplete`, or `stale`; only the current `pass` for the relevant gate permits its transition. Re-runs append evidence and a new decision instead of overwriting history, while later gates may consume the required earlier evidence chain.
+
+### K-0013: Versioned certification profile as the normative gate policy
+
+```knowledge-entry
+id: K-0013
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
+- **Question:** What is the authoritative source for the required checks at each certification gate?
+- **Answer:** Each stack plugin supplies one declarative, versioned certification profile as the sole normative source for gate composition. Every requirement has a stable id, applicability, gate placement, required/conditional/advisory classification, expected evidence type and producer, permitted environment, freshness and candidate-binding rules, timeout/retry policy, recovery diagnostic, and normative RFC/DNA/spec reference. The engine rejects structurally invalid profiles, and the profile hash is bound into candidate identity so policy cannot change invisibly after evidence collection.
