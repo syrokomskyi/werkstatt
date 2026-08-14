@@ -10,7 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
-enhancedAt:
+enhancedAt: 2026-08-14
 implementedAt:
 closedAt:
 supersedes: []
@@ -57,6 +57,7 @@ During deployment of mission `warpgogol-com-m000055`, `image.delivery.validate` 
 The `image.delivery.validate` command (RFC-0830) loads its override config from a hardcoded path: `join(paths.srcDirectory, "image-delivery.config.yaml")`. If the file does not exist at that path, `loadDeliveryConfig` returns an empty config with no warnings. The validator then runs all rules against all images with no overrides applied.
 
 This is a silent failure mode:
+
 - The operator creates the file in the workpiece root (a natural assumption — many config files live at the root).
 - The validator ignores it completely.
 - All override rules are silently inactive.
@@ -112,14 +113,19 @@ logger.info(
 ### Summary output change
 
 The validator summary changes from:
+
 ```
 image.delivery.validate: 377 finding(s), 122 image(s) checked
 ```
+
 to:
+
 ```
 image.delivery.validate: 378 finding(s), 122 image(s) checked (config: src/image-delivery.config.yaml)
 ```
+
 or:
+
 ```
 image.delivery.validate: 377 finding(s), 122 image(s) checked (config: not found)
 ```
