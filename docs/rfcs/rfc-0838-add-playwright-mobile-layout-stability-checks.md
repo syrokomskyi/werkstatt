@@ -1,7 +1,7 @@
 ---
 id: RFC-0838
 title: "Add Playwright mobile layout stability checks"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
 enhancedAt: 2026-08-14
-implementedAt:
+implementedAt: 2026-08-14
 closedAt:
 supersedes: []
 supersededBy:
