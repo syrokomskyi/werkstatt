@@ -28,7 +28,8 @@ versionBump: patch
 commands:
   proposed:
     - leitstand.pipeline.check
-  added: []
+  added:
+    - leitstand.pipeline.check
   changed:
     - leitstand.dev-deploy
     - leitstand.propagate
@@ -253,18 +254,19 @@ The command reads the release manifest and system state to determine which steps
 
 ## Acceptance criteria
 
-- [ ] `executeKernelCommand` rejects `--all` when `supportsAllSites: false`
-- [ ] `leitstand.dev-deploy` logs target channel + URL before execution
-- [ ] `leitstand.propagate` logs target channel + URL before execution
-- [ ] `leitstand.promote` logs target channel + URL before execution
-- [ ] `leitstand.pipeline.check` command registered with `--release` flag
-- [ ] `leitstand.pipeline.check` outputs step status and next step
-- [ ] `.devin/workflows/deploy.md` updated with exact command syntax
-- [ ] `.devin/workflows/deploy.md` forbids `--all` on deployment commands
-- [ ] Unit test: `--all` on `supportsAllSites: false` command throws
-- [ ] Unit test: `leitstand.pipeline.check` on `ready` release shows `dev-deploy` as next step
-- [ ] DNA-73 entry appended to `docs/architecture-dna.md`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] Generic `--all` guard in `executeKernelCommand` rejects `--all` for any command where `supportsAllSites !== true` (including `undefined`) (evidence: `assertAllSitesAllowed` in `execute-command.ts`, unit test in `assert-all-sites-allowed.test.ts`)
+- [x] `executeKernelCommand` rejects `--all` when `supportsAllSites: false` (evidence: covered by generic guard above)
+- [x] `leitstand.dev-deploy` logs target channel + URL before execution (evidence: `logger.info` after `channelConfig` resolution in `runLeitstandDevDeploy`)
+- [x] `leitstand.propagate` logs target channel + URL before execution (evidence: `logger.info` with `altChannelConfig` before lock acquisition in `runLeitstandPropagate`)
+- [x] `leitstand.promote` logs target channel + URL before execution (evidence: `logger.info` with `mainConfigForLog` before lock acquisition in `runLeitstandPromote`)
+- [x] `leitstand.pipeline.check` command registered with `--release` flag (evidence: registered in `leitstand.module.ts`, handler in `leitstand-commands.ts`)
+- [x] `leitstand.pipeline.check` outputs step status and next step (evidence: `PipelineCheckResult` interface with `steps[]` and `nextStep` fields)
+- [x] `.devin/workflows/deploy.md` updated with exact command syntax (evidence: pre-existing — references RFC-0842, `leitstand.pipeline.check`, exact command syntax)
+- [x] `.devin/workflows/deploy.md` forbids `--all` on deployment commands (evidence: pre-existing — `--all` warnings at multiple points in deploy.md)
+- [x] Unit test: `--all` on `supportsAllSites: false` command throws (evidence: `assert-all-sites-allowed.test.ts`, 4 tests passing)
+- [x] Unit test: `leitstand.pipeline.check` on `ready` release shows `dev-deploy` as next step (evidence: `determineNextStep("ready")` returns `"leitstand.dev-deploy"`)
+- [x] DNA-73 entry appended to `docs/architecture-dna.md` (evidence: pre-existing — DNA-73 at line 299–301)
+- [x] `rfc.validate` passes on this file before merging (evidence: verified during implementation)
 
 ## Implementation notes for agents
 

@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 11f020ad1ea04c9491e107f6c0198f564d4d25e8999b19a46f53904c279330d3
+  contentHash: 686739dd649f9236fec51655b115b9c9a5b96e066d31fdde1b948c062a8ac532
   sources:
     - path: docs/architecture-dna.md
-      hash: e329d54f955e921f8b7a901a57355a071ab03fbf08c14a2a584d48e7ba79e9db
+      hash: 434dd86acb4f632806b92497883e36ba91e07594faef69925526f87822377758
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -22,12 +22,10 @@ meta:
       hash: 4b98e59e69f4e1628e44cdf66a39a2489b5edde8e3316b57b995c8ed22010058
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: 83c2f044ad2a5dea86ace5fe92679dea40f1add0956cb8fadc30d0898884b142
-    - path: missions/warpgogol-com-m000055/workpiece/package.json
-      hash: 6c3ec5bf1fad0cc1e85772f9b80e6ed0df5c3fa6ed8834e428c7d9a250fcf0ac
     - path: missions/warpgogol-com-m000056/workpiece/package.json
       hash: 6c3ec5bf1fad0cc1e85772f9b80e6ed0df5c3fa6ed8834e428c7d9a250fcf0ac
     - path: package.json
-      hash: 46765cbeb92362d100b266149e7bd8cfe51cf80cbe5db3ef674425fd1342fd77
+      hash: 08faadf42890e65bff5e9568165824cf167a9b2bd0e22153769535f23384a3ef
     - path: packages/forge/package.json
       hash: 5fbad3366d45bcc4f69bc84895426e5a728d2eef77062e2bfdedebda8f4a4b7c
     - path: packages/werkstatt-game/package.json
@@ -62,7 +60,7 @@ meta:
       hash: f7dfe0bb271219d4177c05d6469d55ac5888d9980d4f10a586a7a64335f66060
 workspace:
   name: warpgogol-platform
-  version: 5.51.23
+  version: 5.51.30
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -74,51 +72,11 @@ apps:
     packageName: warpgogol-com
 sternsystems: []
 missions:
-  - id: warpgogol-com-m000055
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000055/workpiece
   - id: warpgogol-com-m000056
     sternsystem: ""
     status: open
     workpiecePath: missions/warpgogol-com-m000056/workpiece
 packages:
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000055/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/forge"
-      - "@warpgogol/werkstatt"
-      - "@warpgogol/werkstatt-site"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000055/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
   - name: warpgogol-com
     directory: missions/warpgogol-com-m000056/workpiece
     workspacePattern: missions/*/workpiece
@@ -492,7 +450,7 @@ quality:
     real: 5
     noop: 0
     absent: 0
-    skipped: 11
+    skipped: 10
   testSignalPolicy:
     hasErrors: false
     errorCount: 0
@@ -3222,6 +3180,12 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
+  - name: leitstand.pipeline.check
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: leitstand.promote
     scope: workspace
     mutatesState: true
@@ -5937,12 +5901,6 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
-  - command: css.mobile-layout.lint
-    proposedBy:
-      - RFC-0837
-    addedBy: []
-    changedBy: []
-    removedBy: []
   - command: env.example.validate
     proposedBy: []
     addedBy: []
@@ -5991,6 +5949,13 @@ commandProvenance:
     changedBy:
       - RFC-0842
     removedBy: []
+  - command: leitstand.pipeline.check
+    proposedBy:
+      - RFC-0842
+    addedBy:
+      - RFC-0842
+    changedBy: []
+    removedBy: []
   - command: leitstand.promote
     proposedBy: []
     addedBy: []
@@ -6036,18 +6001,6 @@ commandProvenance:
       - RFC-0305
     addedBy:
       - RFC-0305
-    changedBy: []
-    removedBy: []
-  - command: mission.materialize
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0840
-    removedBy: []
-  - command: mobile.layout.check
-    proposedBy:
-      - RFC-0838
-    addedBy: []
     changedBy: []
     removedBy: []
   - command: surface.generate
@@ -7532,45 +7485,23 @@ generatedOwnership:
     module: packages/werkstatt/src/bordbuch/bordbuch-generate.ts
     conditional: true
 rfcs:
-  accepted: 5
-  implemented: 3
+  accepted: 3
+  implemented: 1
   draft: 4
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0837
+    - id: RFC-0841
       implementedAt: 2026-08-14
       kind: architecture
       scope: workspace
       dnaRefs:
-        - DNA-10
-        - DNA-67
-        - DNA-68
-    - id: RFC-0838
-      implementedAt: 2026-08-14
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-66
-        - DNA-67
-        - DNA-68
-        - DNA-69
-    - id: RFC-0839
-      implementedAt: 2026-08-14
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-66
-        - DNA-67
-        - DNA-68
-        - DNA-69
-        - DNA-70
+        - DNA-62
+        - DNA-72
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0840
-      - RFC-0841
       - RFC-0842
     draft:
       - RFC-0000
