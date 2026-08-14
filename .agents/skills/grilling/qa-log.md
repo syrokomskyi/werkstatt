@@ -263,3 +263,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
 - **Question:** What provenance and integrity guarantees must every certification evidence record provide?
 - **Answer:** The engine defines one `EvidenceEnvelope@1` containing requirement/candidate/environment identity, registered producer identity plus version/source hash, run and timestamp data, normalized input hashes, status, diagnostics, payload/artifact hashes, and redaction metadata. Producers submit results through the engine rather than writing dossiers directly. Evidence is content-addressed, appended through a hash-chained manifest, and every gate decision records the evidence IDs and resulting dossier-root hash. Remote producers use registered workload-identity attestations; local results receive an engine attestation bound to command and module hash. Manual files, unknown producers, broken signatures/chains, or unsafe secret-bearing payloads cannot certify a gate.
+
+### K-0021: Location-independent dossier identity with durable replication
+
+```knowledge-entry
+id: K-0021
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
+- **Question:** Where is the authoritative certification dossier stored, and what durability is required before promotion?
+- **Answer:** The logical dossier is identified by its root hash rather than by a filesystem path or bucket. Authoring and Dev use a local content-addressed cache; before Alt the complete dossier must be replicated through a provider-neutral adapter to a durable object store (R2 may be the current adapter). Uploads require read-after-write size/digest verification and immutable digest keys. Alt/Main require a verified durable replica, while release state stores the root hash and safe locators only. Local loss is recoverable from durable storage; missing or unavailable durable evidence produces `incomplete`.
