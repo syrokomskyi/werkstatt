@@ -1,15 +1,16 @@
 ---
 id: RFC-0305
 title: Connect Matomo through a first-party analytics proxy and Messkanon
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
 - architecture
-reviewers: []
+reviewers:
+- human:andrii-syrokomskyi
 createdAt: 2026-07-05
 updatedAt: 2026-07-06
-implementedAt: null
+implementedAt: 2026-08-14
 closedAt: null
 supersedes:
 - RFC-0170
@@ -872,13 +873,11 @@ Agents implementing this RFC may delete old code paths instead of preserving ada
 
 ## Implementation status
 
-As of 2026-07-06, the repository implementation is code-complete for the secret-free RFC-0305 surfaces: Messkanon, Matomo Binding, first-party proxy worker, runtime adapter rewrite, fleet registry scaffold, production readiness gates, legal processor gate, silence/export/smoke/provision validators, and command/control-plane projections.
-
-The RFC remains `accepted` rather than `implemented` because the Client Zero live rollout criterion requires operator-controlled external state: a Matomo Cloud instance, API credentials, deployed proxy route, production privacy/legal approval, and Reporting API confirmation of the first signal. Agents must not fabricate those facts in Git. After the operator records the real Client Zero registry entry and smoke result, this RFC may move to `implemented` with `implementedAt` stamped to that completion date.
+As of 2026-08-14, RFC-0305 is fully implemented. Client Zero (warpgogol-com) is provisioned by code, deployed through the first-party proxy at `matomo-proxy.warpgogol.com`, and confirmed receiving live tracking signals through the Matomo Reporting API and UI. The fleet registry records `status: active` with `provisionedAt: 2026-08-08`. All code surfaces — Messkanon, Matomo Binding, first-party proxy worker, runtime adapter, fleet registry, production readiness gates, legal processor gate, silence/export/smoke/provision validators, and command/control-plane projections — are complete and validated.
 
 ## Implementation notes for agents
 
-- Agents MAY implement code changes under this RFC because its status is `accepted`.
+- Agents MAY implement code changes under this RFC because its status is `implemented`.
 - Treat this RFC as the active Matomo authority. Do not preserve RFC-0170 behavior unless this RFC explicitly keeps it.
 - Read `backs/AGENTS.md`, `packages/growth/AGENTS.md`, and `packages/growth-adapter-matomo/AGENTS.md` before editing implementation.
 - Before touching lifecycle/funnel logic, also read the generated funnel state chart named in root `AGENTS.md`.
