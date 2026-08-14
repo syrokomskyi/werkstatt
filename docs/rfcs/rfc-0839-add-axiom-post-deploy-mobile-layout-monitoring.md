@@ -1,12 +1,13 @@
 ---
 id: RFC-0839
 title: "Add Axiom post-deploy mobile layout monitoring"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
 enhancedAt: 2026-08-14
