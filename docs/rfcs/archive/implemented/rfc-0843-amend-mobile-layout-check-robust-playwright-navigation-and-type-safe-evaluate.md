@@ -22,7 +22,8 @@ related:
   - DNA-69
   - RFC-0838
   - RFC-0647
-satisfies: []
+satisfies:
+  - DNA-69
 versionBump: patch
 commands:
   proposed: []
