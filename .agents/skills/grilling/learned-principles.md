@@ -206,3 +206,17 @@ status: active
 
 - **Condition:** A JavaScript value contributes to a durable content identity, authority decision, signature payload, or append-only history.
 - **Recommended answer:** Convert untrusted input first into a bounded, detached, immutable, engine-branded canonical snapshot. Reject ambiguous Unicode, unstable traversal, non-canonical values, and limit overflow before hashing. Keep canonical byte/hash operations deterministic and total over accepted snapshots rather than traversing arbitrary caller-owned objects.
+
+### K-0015: Permanent formats profile standards instead of imitating them
+
+```knowledge-entry
+id: K-0015
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** An internal permanent byte, signature, identity, or interchange format substantially overlaps a mature external standard.
+- **Recommended answer:** Name and pin the exact standard plus independent conformance vectors, then define project-specific restrictions as an explicit narrower profile. Do not create an unnamed almost-equivalent algorithm whose compatibility and edge cases the project must maintain alone.

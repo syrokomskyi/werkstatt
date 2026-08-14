@@ -614,3 +614,81 @@ status: active
 - **Context:** 2026-08-14 — RFC-0849 enhancement grilling meta-analysis
 - **Question:** Should the repeated canonicalization decisions be promoted to a reusable active L2 principle?
 - **Answer:** Yes. Permanent identities must canonicalize only detached, bounded, immutable, branded snapshots; ambiguous Unicode, unstable traversal, and limit overflow are rejected before hashing, and byte/hash operations over accepted snapshots are deterministic and total.
+
+### K-0048: Canonical JSON exposes only an object-root authority API
+
+```knowledge-entry
+id: K-0048
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement after the bounded canonical JSON audit
+- **Question:** Should canonical-json@1 support scalar and array roots through an opaque wrapper, or expose only the object-root shape used by certification identities and Diagnostic data?
+- **Answer:** Expose only an engine-created, runtime-branded `CanonicalJsonObjectV1` root. Nested values may use the complete accepted JSON subset, including scalars and arrays. Do not add a wrapper/unwrapping API for root shapes with no current authority consumer.
+
+### K-0049: Canonical JSON uses a strict RFC 8785 profile
+
+```knowledge-entry
+id: K-0049
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement after the bounded canonical JSON audit
+- **Question:** Should canonical-json@1 invent and freeze its own number/string/key algorithm or use RFC 8785 JCS as its normative byte foundation?
+- **Answer:** Use RFC 8785 JCS as the normative byte foundation and freeze its official number vectors. Add stricter Werkstatt domain constraints: an object-only root, negative-zero and unsafe-integer rejection, hard resource limits, and detached runtime branding.
+
+### K-0050: Canonical failure paths never expose object keys
+
+```knowledge-entry
+id: K-0050
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement after the bounded canonical JSON audit
+- **Question:** How should canonical failures locate an invalid nested value without leaking a secret or personal value used as an object key?
+- **Answer:** Never include raw object keys in a failure. Use array indices and deterministic object-key ordinals after JCS sorting, plus an explicit omitted-segment count for a bounded tail. Messages also omit rejected values and source keys.
+
+### K-0051: Werkstatt targets Node 24 without a Node 22 compatibility matrix
+
+```knowledge-entry
+id: K-0051
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement, runtime reproducibility boundary
+- **Question:** Should canonical vectors be verified on both Node 22 and Node 24 because the root package currently declares Node >=22?
+- **Answer:** No. Move the ecosystem fully to Node 24 and retain no Node 22 compatibility contract. Canonical reproducibility is proved on the single supported Node 24 line against independent frozen RFC 8785 vectors; future runtime changes require explicit validation and migration.
+
+### K-0052: Canonical JSON rejects unsafe integer values
+
+```knowledge-entry
+id: K-0052
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement after selecting RFC 8785 JCS
+- **Question:** May canonical-json@1 accept integral IEEE-754 values outside JavaScript's safe integer range merely because JCS can serialize their resulting double deterministically?
+- **Answer:** No. Reject every integral number for which `Number.isSafeInteger(value)` is false. Exact large integers, money, and decimal quantities use schema-declared strings; finite non-integral numbers remain allowed under RFC 8785 serialization.
+
+### K-0053: Permanent formats profile standards instead of imitating them
+
+```knowledge-entry
+id: K-0053
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement grilling meta-analysis
+- **Question:** Should the repeated decision to base permanent canonical bytes on a named external standard plus stricter local constraints become an active reusable L2 principle?
+- **Answer:** Yes. Pin the exact standard and independent vectors, state local restrictions as an explicit narrower profile, and avoid maintaining an unnamed almost-equivalent permanent algorithm.
