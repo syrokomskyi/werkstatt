@@ -10,6 +10,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Architecture review 2026-07-14: extract Playwright-specific capture into adapter behind BrowserCapturePort.</item>
+  <item>RFC-0843: adopt evaluateInPage wrapper for type-safe page.evaluate calls.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -17,6 +18,7 @@ import { mkdir } from "node:fs/promises";
 import { join, posix } from "node:path";
 import { extractPageEvidenceFromDOM } from "./dom-extract.ts";
 import type { BrowserCapturePort, CapturedPage } from "./browser-capture-port.ts";
+import { evaluateInPage } from "../../checks/playwright-utils.ts";
 
 const VIEWPORTS = [
   { name: "desktop" as const, width: 1440, height: 1100 },
@@ -46,7 +48,7 @@ export class PlaywrightCaptureAdapter implements BrowserCapturePort {
     const context = await browser.newContext({ viewport: VIEWPORTS[0] });
     const page = await context.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 20_000 });
-    const pageEvidence = await page.evaluate(extractPageEvidenceFromDOM);
+    const pageEvidence = await evaluateInPage(page, extractPageEvidenceFromDOM);
     const screenshots: { name: string; width: number; height: number; path: string }[] = [];
     for (const viewport of VIEWPORTS) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
