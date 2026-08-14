@@ -1,7 +1,7 @@
 ---
 id: RFC-0846
 title: "Health check retry with backoff for leitstand.dev-deploy"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
