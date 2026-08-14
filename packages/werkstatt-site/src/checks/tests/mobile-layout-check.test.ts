@@ -230,6 +230,31 @@ describe("mobile.layout.check", () => {
     expect(data.diagnostics.some((d) => d.ruleId === "MOBILE-GEO-04")).toBe(true);
   });
 
+  it("MOBILE-GEO-04 non-timeout error: message contains actual error, timeout is false", async () => {
+    await writeFile(
+      join(distClient, "index.html"),
+      "<!DOCTYPE html><html><body>Home</body></html>",
+    );
+
+    setupMockBrowser([
+      makeMockPage({ gotoReject: new Error("portrait is not iterable") }),
+      makeMockPage({ gotoReject: new Error("portrait is not iterable") }),
+    ]);
+
+    const result = await runMobileLayoutCheck(
+      testInput(),
+      makeTestSiteContext(workspaceRoot, appDir),
+    );
+
+    expect(result.exitCode).toBe(1);
+    const data = unwrapData(result);
+    const diag = data.diagnostics.find((d) => d.ruleId === "MOBILE-GEO-04");
+    expect(diag).toBeDefined();
+    expect(diag!.message).toContain("portrait is not iterable");
+    expect(diag!.message).not.toContain("timed out");
+    expect(data.routeResults.every((r: any) => r.timeout === false)).toBe(true);
+  });
+
   it("emits MOBILE-GEO-03 when CLS exceeds threshold", async () => {
     await writeFile(
       join(distClient, "index.html"),

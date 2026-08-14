@@ -14,6 +14,7 @@ print.pdf.validate verifies that all expected PDFs exist and are non-empty.
 <CHANGE_SUMMARY>
   <item>RFC-0257: Initial creation — PDF generation and validation commands.</item>
   <item>RFC-0653: print.pdf.generate writes to .cache/pdf/<hash>/ with .done marker + manifest.json; add print.pdf.copy command.</item>
+  <item>RFC-0843: replace networkidle with load + blockExternalRequests, use browser.newContext(), add 2s settle wait, adopt evaluateInPage wrapper.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content
 import { stableJsonHash, byteHash } from "@warpgogol/werkstatt/fingerprint";
 import type { PrintPdfGenerateResult } from "@warpgogol/werkstatt-site/share/schemas/print";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
+import { blockExternalRequests, evaluateInPage } from "./playwright-utils.ts";
 
 // ---------------------------------------------------------------------------
 // print.pdf.generate
@@ -251,15 +253,20 @@ export async function runPrintPdfGenerate(
     const playwright = await import("playwright");
     browser = await playwright.chromium.launch({ headless: true });
 
+    const baseUrl = `http://127.0.0.1:${port}`;
+    const context = await browser.newContext();
+    await blockExternalRequests(context, baseUrl);
+
     for (const target of toGenerate) {
       try {
-        const page = await browser.newPage();
-        const url = `http://127.0.0.1:${port}${target.route}?print`;
-        await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+        const page = await context.newPage();
+        const url = `${baseUrl}${target.route}?print`;
+        await page.goto(url, { waitUntil: "load", timeout: 30000 });
+        await page.waitForTimeout(2000);
 
         // Expand details if configured
         if (target.printCfg?.expandDetails !== false) {
-          await page.evaluate(() => {
+          await evaluateInPage(page, () => {
             document.querySelectorAll("details").forEach((d) => {
               (d as HTMLDetailsElement).open = true;
             });
@@ -299,6 +306,7 @@ export async function runPrintPdfGenerate(
         errors.push({ route: target.route, error: (err as Error).message ?? String(err) });
       }
     }
+    await context.close().catch(() => {});
   } catch (err: unknown) {
     return {
       exitCode: 1,

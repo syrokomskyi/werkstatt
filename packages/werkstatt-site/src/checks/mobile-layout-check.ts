@@ -14,6 +14,7 @@ geometric invariants directly.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0838: initial implementation with four geometric rules (MOBILE-GEO-01..04).</item>
+  <item>RFC-0843: refactor to shared playwright-utils (blockExternalRequests, evaluateInPage), fix result.timeout to only flag real timeouts.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,6 +30,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { ensureChromium } from "./playwright-chromium-ensure.ts";
+import { blockExternalRequests, evaluateInPage } from "./playwright-utils.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -372,14 +374,7 @@ export async function runMobileLayoutCheck(
           // beacons, CDN fonts, pulse endpoints) must not cause network timeouts
           // or non-deterministic layout shifts. Only requests to the local static
           // server are allowed; everything else is aborted immediately.
-          await ctx.route("**/*", (route) => {
-            const reqUrl = route.request().url();
-            if (reqUrl.startsWith(baseUrl)) {
-              route.continue();
-            } else {
-              route.abort();
-            }
-          });
+          await blockExternalRequests(ctx, baseUrl);
 
           const page = await ctx.newPage();
 
@@ -404,7 +399,7 @@ export async function runMobileLayoutCheck(
             await page.waitForTimeout(SETTLE_WAIT_MS);
 
             // MOBILE-GEO-01: horizontal overflow
-            const dims = await page.evaluate(() => ({
+            const dims = await evaluateInPage(page, () => ({
               scrollWidth: document.documentElement.scrollWidth,
               clientWidth: document.documentElement.clientWidth,
             }));
@@ -420,7 +415,8 @@ export async function runMobileLayoutCheck(
             }
 
             // MOBILE-GEO-03: CLS
-            const clsEntries = await page.evaluate(
+            const clsEntries = await evaluateInPage(
+              page,
               () =>
                 (
                   window as unknown as {
@@ -441,7 +437,7 @@ export async function runMobileLayoutCheck(
             }
 
             // Geometry measurement for MOBILE-GEO-02
-            const geometry = await page.evaluate<ElementGeometry[]>(measureGeometry);
+            const geometry = await evaluateInPage<ElementGeometry[]>(page, measureGeometry);
             if (orientation === "portrait") {
               portraitGeometry = geometry;
             } else {
@@ -461,14 +457,17 @@ export async function runMobileLayoutCheck(
             }
           } catch (err) {
             result.passed = false;
-            result.timeout = true;
-            timedOut = true;
             const errMsg = err instanceof Error ? err.message : String(err);
+            const isTimeout = errMsg.toLowerCase().includes("timeout");
+            result.timeout = isTimeout;
+            timedOut = isTimeout;
             diagnostics.push({
               ruleId: "MOBILE-GEO-04",
               severity: "error",
               file: `apps/${siteName}/dist/client${route}`,
-              message: `Route failed in ${orientation}: ${errMsg}`,
+              message: isTimeout
+                ? `Route timed out in ${orientation} after ${routeTimeoutMs}ms: ${errMsg}`
+                : `Route failed in ${orientation}: ${errMsg}`,
             });
           }
 

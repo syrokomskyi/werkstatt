@@ -13,6 +13,7 @@ Reads ONLY dist/client bytes and RFC frontmatter — never app/package source.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0333: initial implementation.</item>
+  <item>RFC-0843: replace networkidle with load + blockExternalRequests, use browser.newContext(), adopt evaluateInPage wrapper.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -35,6 +36,7 @@ import {
   type RuntimeHealthState,
   toDeterministicContext,
 } from "@syrokomskyi/axiom-study";
+import { blockExternalRequests, evaluateInPage } from "./playwright-utils.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -293,13 +295,16 @@ export async function runIndependentQa(
     const diagnostics: Diagnostic[] = [];
     const executions: PageProbeExecution[] = [];
 
+    const context = await browser.newContext();
+    await blockExternalRequests(context, baseUrl);
+
     try {
       for (const { rfcId, rfcFile, probe } of collected) {
         const start = Date.now();
         const failures: PageProbeExecution["failures"] = [];
         const consoleErrors: string[] = [];
 
-        const page = await browser.newPage();
+        const page = await context.newPage();
         page.on("console", (msg: import("playwright").ConsoleMessage) => {
           if (msg.type() === "error") {
             consoleErrors.push(msg.text());
@@ -309,7 +314,7 @@ export async function runIndependentQa(
         const expectedStatus = probe.expectStatus ?? 200;
         try {
           const response = await page.goto(`${baseUrl}${probe.path}`, {
-            waitUntil: "networkidle",
+            waitUntil: "load",
             timeout: 30000,
           });
 
@@ -339,7 +344,7 @@ export async function runIndependentQa(
           }
 
           if (probe.textPattern && failures.length === 0) {
-            const bodyText = await page.evaluate(() => document.body.innerText);
+            const bodyText = await evaluateInPage(page, () => document.body.innerText);
             const re = new RegExp(probe.textPattern!, "m");
             if (!re.test(bodyText)) {
               failures.push({
@@ -390,6 +395,7 @@ export async function runIndependentQa(
         }
       }
     } finally {
+      await context.close().catch(() => {});
       await browser.close();
     }
 
