@@ -6,6 +6,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0628: replace leitstand.deploy tests with leitstand.dev-deploy tests; update propagate gate tests (published + commitSha + missionId); update rollback auto-step tests (remove dev-deployed).</item>
   <item>RFC-0634: add package.json to temp workspace for computeBuildInputHash compatibility.</item>
+  <item>RFC-0846: add retry behavior tests for dev health check in release path (4 tests: success on first attempt, success on retry, fail all attempts, retry on unknown state).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -44,6 +45,28 @@ vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
       data: { findings: { errors: 0, warnings: 0 } },
       summary: "mission.check: pass",
     })),
+  };
+});
+
+// RFC-0846: Mock cloudflare-workers adapter to control health check responses in release path tests.
+const mockHealthFn = vi.fn();
+const mockPropagateFn = vi.fn();
+vi.mock("../leitstand/adapters/index.ts", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../leitstand/adapters/index.ts")>();
+  return {
+    ...original,
+    createCloudflareWorkersAdapter: () => ({
+      propagate: mockPropagateFn,
+      health: mockHealthFn,
+      rollback: vi.fn(async (input: { url: string }) => ({
+        state: "succeeded" as const,
+        deploymentUrl: input.url,
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        healthChecks: [],
+      })),
+      getLimits: () => ({ maxDistSizeMb: 100 }),
+    }),
   };
 });
 
@@ -103,6 +126,7 @@ function createRegistryWithChannels(
   options?: {
     currentMission?: string;
     lastPropagated?: Record<string, { releaseId: string; state: string; healthy: boolean }>;
+    adapter?: "null" | "cloudflare-workers";
   },
 ): void {
   let lastPropagatedYaml: string | undefined;
@@ -122,6 +146,7 @@ function createRegistryWithChannels(
   createLeitstandSystem(testRoot, systemId, {
     currentMission: options?.currentMission,
     lastPropagated: lastPropagatedYaml,
+    adapter: options?.adapter,
   });
 }
 
@@ -190,6 +215,8 @@ beforeEach(() => {
 afterEach(() => {
   rmSync(testRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
+  mockHealthFn.mockReset();
+  mockPropagateFn.mockReset();
 });
 
 // --- leitstand.dev-deploy tests ---
@@ -304,6 +331,128 @@ test("RFC-0653: leitstand.dev-deploy --force-build bypasses cache", async () => 
   expect(data?.buildSkipped).toBe(false);
   expect(data?.buildState).toBe("succeeded");
 }, 15_000);
+
+// --- RFC-0846: dev health check retry tests (release path) ---
+
+function createReleaseForDeploy(workspaceRoot: string, releaseId: string, systemId: string): void {
+  writeReleaseManifest(workspaceRoot, releaseId, {
+    schemaVersion: "1.0.0",
+    releaseId,
+    systemId,
+    missionId: "test-sys-m000001",
+    state: "ready",
+    commitSha: "abc123def456",
+  });
+  createDistDir(workspaceRoot, releaseId);
+}
+
+function makeMockPropagateResult(): {
+  state: "succeeded";
+  deploymentUrl: string;
+  startedAt: string;
+  completedAt: string;
+  healthChecks: never[];
+} {
+  const now = new Date().toISOString();
+  return {
+    state: "succeeded",
+    deploymentUrl: "https://dev.example.com",
+    startedAt: now,
+    completedAt: now,
+    healthChecks: [],
+  };
+}
+
+test("RFC-0846: dev health check succeeds on first attempt — no retry", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+
+  createRegistryWithChannels(testRoot, systemId, { adapter: "cloudflare-workers" });
+  createReleaseForDeploy(tmpDir, releaseId, systemId);
+
+  mockPropagateFn.mockResolvedValue(makeMockPropagateResult());
+  mockHealthFn.mockResolvedValue({ state: "healthy", checks: [] });
+
+  const result = await runLeitstandDevDeploy(
+    makeInput({ site: systemId, release: releaseId }),
+    makeContext(tmpDir),
+  );
+
+  expect(mockHealthFn).toHaveBeenCalledTimes(1);
+  expect(result.summary).not.toContain("attempts");
+  expect(result.summary).toContain("health: healthy");
+  expect(result.exitCode).toBe(0);
+}, 30_000);
+
+test("RFC-0846: dev health check succeeds on second attempt — 1 retry", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+
+  createRegistryWithChannels(testRoot, systemId, { adapter: "cloudflare-workers" });
+  createReleaseForDeploy(tmpDir, releaseId, systemId);
+
+  mockPropagateFn.mockResolvedValue(makeMockPropagateResult());
+  mockHealthFn
+    .mockResolvedValueOnce({ state: "unhealthy", checks: [] })
+    .mockResolvedValueOnce({ state: "healthy", checks: [] });
+
+  const result = await runLeitstandDevDeploy(
+    makeInput({ site: systemId, release: releaseId }),
+    makeContext(tmpDir),
+  );
+
+  expect(mockHealthFn).toHaveBeenCalledTimes(2);
+  expect(result.summary).toContain("(2 attempts)");
+  expect(result.summary).toContain("health: healthy");
+  expect(result.exitCode).toBe(0);
+}, 30_000);
+
+test("RFC-0846: dev health check fails all 3 attempts — Axiom skipped", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+
+  createRegistryWithChannels(testRoot, systemId, { adapter: "cloudflare-workers" });
+  createReleaseForDeploy(tmpDir, releaseId, systemId);
+
+  mockPropagateFn.mockResolvedValue(makeMockPropagateResult());
+  mockHealthFn.mockResolvedValue({ state: "unhealthy", checks: [] });
+
+  const result = await runLeitstandDevDeploy(
+    makeInput({ site: systemId, release: releaseId }),
+    makeContext(tmpDir),
+  );
+
+  expect(mockHealthFn).toHaveBeenCalledTimes(3);
+  expect(result.summary).toContain("(3 attempts)");
+  expect(result.summary).toContain("(unhealthy)");
+  const data = result.data as unknown as Record<string, unknown> | undefined;
+  expect(data?.axiom).toBeDefined();
+  const axiom = data?.axiom as Record<string, unknown> | undefined;
+  expect(axiom?.status).toBe("not-run");
+}, 30_000);
+
+test("RFC-0846: dev health check retries on unknown state then succeeds", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+
+  createRegistryWithChannels(testRoot, systemId, { adapter: "cloudflare-workers" });
+  createReleaseForDeploy(tmpDir, releaseId, systemId);
+
+  mockPropagateFn.mockResolvedValue(makeMockPropagateResult());
+  mockHealthFn
+    .mockResolvedValueOnce({ state: "unknown", checks: [] })
+    .mockResolvedValueOnce({ state: "healthy", checks: [] });
+
+  const result = await runLeitstandDevDeploy(
+    makeInput({ site: systemId, release: releaseId }),
+    makeContext(tmpDir),
+  );
+
+  expect(mockHealthFn).toHaveBeenCalledTimes(2);
+  expect(result.summary).toContain("(2 attempts)");
+  expect(result.summary).toContain("health: healthy");
+  expect(result.exitCode).toBe(0);
+}, 30_000);
 
 // --- leitstand.propagate Axiom gate tests (RFC-0628: ready + commitSha + missionId) ---
 
