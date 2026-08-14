@@ -18,3 +18,11 @@ Concrete principles distilled from past grilling sessions. Each principle has a 
 - **confirmations:** 1
 - **status:** active
 - **Added:** 2026-08-15
+
+## Establish authority before enabling self-evolution
+
+- **Condition:** A system will activate agent-written, third-party, or otherwise dynamically supplied code.
+- **Recommended answer:** Implement and independently verify a non-self-modifiable admission authority, sandbox boundary, immutable identity, evidence pipeline, rollback, quarantine, and kill switch before production activation. Until every control exists, dynamic code is limited to a bounded test harness and missing protection fails closed.
+- **confirmations:** 1
+- **status:** active
+- **Added:** 2026-08-15

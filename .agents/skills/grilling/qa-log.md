@@ -926,3 +926,16 @@ status: active
 - **Context:** 2026-08-15 — grilling meta-analysis for the combined agent runtime and certification program
 - **Question:** Should the rule that multi-step transitions are designed for the weakest independent executor become an active reusable principle?
 - **Answer:** Yes. Future programs should default to one sequential index and self-contained, hash-bound, fail-closed packets with explicit prerequisites, file boundaries, validations, and completion reports.
+
+### K-0072: Promote authority-before-evolution ordering to L2
+
+```knowledge-entry
+id: K-0072
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — grilling meta-analysis for the combined agent runtime and certification program
+- **Question:** Should the rule that independent authority must exist before self-evolution becomes available be an active reusable principle?
+- **Answer:** Yes. A non-self-modifiable admission authority, real sandbox, immutable identity, evidence, rollback, quarantine, and kill switch must be implemented and verified before production activation of dynamic code; earlier execution is test-harness-only and fails closed.
