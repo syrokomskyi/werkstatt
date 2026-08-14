@@ -766,9 +766,31 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
 
   // RFC-0138: resolve {collection.file.field} references in block props before the
   // resolved props are handed to section components as pageOverride.
+  const resolvedBlocks = await substituteBlockPropReferences(blocks, lang, fileSlug, defaultLang);
+
+  // UI toggle: swap primary/secondary columns in split-list blocks when
+  // system.md declares `ui.responsibilityBlock.swapOrder: true`.
+  const swapOrder = systemData?.ui?.responsibilityBlock?.swapOrder === true;
+  const finalBlocks = swapOrder
+    ? resolvedBlocks.map((block) => {
+        const props = block.props as Record<string, unknown>;
+        const body = props?.body as Record<string, unknown> | undefined;
+        if (body?.kind !== "split-list") return block;
+        const swappedBody = { ...body };
+        const tmpItems = swappedBody.primaryItems;
+        swappedBody.primaryItems = swappedBody.secondaryItems;
+        swappedBody.secondaryItems = tmpItems;
+        if (swappedBody.labels) {
+          const labels = swappedBody.labels as { primary: string; secondary: string };
+          swappedBody.labels = { primary: labels.secondary, secondary: labels.primary };
+        }
+        return { ...block, props: { ...props, body: swappedBody } };
+      })
+    : resolvedBlocks;
+
   const page: ResolvedPage = {
     ...builtPage,
-    blocks: await substituteBlockPropReferences(blocks, lang, fileSlug, defaultLang),
+    blocks: finalBlocks,
   };
 
   const alternateLinks = await getAlternateLinks(pageId, siteUrl);

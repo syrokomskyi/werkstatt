@@ -97,6 +97,12 @@ export interface SystemManifest {
   businessModel?: "b2b-only";
   /** RFC-0487/RFC-0509: Retired page routes — 410 Gone tombstones or 301 redirects. */
   retiredRoutes?: Array<{ slug: string; status: 410 } | { slug: string; status: 301; to: string }>;
+  /** UI-level rendering toggles for split-list column order. */
+  ui?: {
+    responsibilityBlock?: {
+      swapOrder?: boolean;
+    };
+  };
 }
 
 export interface SystemManifestLoadResult {

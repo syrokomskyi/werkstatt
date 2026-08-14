@@ -465,6 +465,23 @@ export const systemManifestSchema = z.object({
     )
     .optional()
     .default([]),
+
+  /**
+   * UI-level rendering toggles. Currently controls the column order of
+   * controlled-responsibility-block sections (split-list body). When
+   * `responsibilityBlock.swapOrder` is true, the page handler swaps
+   * primaryItems/secondaryItems and labels.primary/labels.secondary at
+   * render time. Default false = render as authored in content.
+   */
+  ui: z
+    .object({
+      responsibilityBlock: z
+        .object({
+          swapOrder: z.boolean().optional().default(false),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export type SystemManifest = z.infer<typeof systemManifestSchema>;
