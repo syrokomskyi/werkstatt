@@ -230,18 +230,18 @@ try {
 
 ## Acceptance criteria
 
-- [ ] `workpiece.config.presence.check` command handler defined in `packages/werkstatt/src/mission/workpiece-config-presence-check.ts`
-- [ ] Command registered in `mission.module.ts` with name `workpiece.config.presence.check` and scope `workspace`
-- [ ] `mission.validate` calls the presence check before Playwright pre-flight and before `build.prepare`
-- [ ] Missing files produce exit code 1 with restore commands in the output
-- [ ] All files present produces exit code 0 with <100ms execution time
-- [ ] Unit test: missing `.lighthouse-budget-ignore` fails with correct restore command
-- [ ] Unit test: missing `src/image-delivery.config.yaml` fails with correct restore command
-- [ ] Unit test: all files present passes
-- [ ] Unit test: workpiece directory not found fails with clear error
-- [ ] Presence check is skipped on the distribution-reuse path (same as RFC-0813)
-- [ ] `mission.validate` fails within seconds when files are missing (not after 10+ minute build)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `workpiece.config.presence.check` command handler defined in `packages/werkstatt/src/mission/workpiece-config-presence-check.ts` (evidence: packages/werkstatt/src/mission/workpiece-config-presence-check.ts:62-118, runWorkpieceConfigPresenceCheck)
+- [x] Command registered in `mission.module.ts` with name `workpiece.config.presence.check` and scope `workspace` (evidence: packages/werkstatt/src/mission/mission.module.ts:419-431, registry.registerCommand)
+- [x] `mission.validate` calls the presence check before Playwright pre-flight and before `build.prepare` (evidence: packages/werkstatt/src/mission/mission-materialization-commands.ts:428-482, presence check block before RFC-0813 block at line 484)
+- [x] Missing files produce exit code 1 with restore commands in the output (evidence: packages/werkstatt/src/mission/workpiece-config-presence-check.ts:104-112, missing array with restoreCommand)
+- [x] All files present produces exit code 0 with <100ms execution time (evidence: workpiece-config-presence-check.test.ts, all-files-present test passes in 12ms total for 6 tests)
+- [x] Unit test: missing `.lighthouse-budget-ignore` fails with correct restore command (evidence: packages/werkstatt/src/mission/workpiece-config-presence-check.test.ts:44-63, test 'missing .lighthouse-budget-ignore fails with correct restore command')
+- [x] Unit test: missing `src/image-delivery.config.yaml` fails with correct restore command (evidence: packages/werkstatt/src/mission/workpiece-config-presence-check.test.ts:66-85, test 'missing src/image-delivery.config.yaml fails with mkdir -p in restore command')
+- [x] Unit test: all files present passes (evidence: packages/werkstatt/src/mission/workpiece-config-presence-check.test.ts:88-105, test 'all files present passes')
+- [x] Unit test: workpiece directory not found fails with clear error (evidence: packages/werkstatt/src/mission/workpiece-config-presence-check.test.ts:108-121, test 'workpiece directory not found fails with clear error')
+- [x] Presence check is skipped on the distribution-reuse path (same as RFC-0813) (evidence: packages/werkstatt/src/mission/mission-materialization-commands.ts:428-430, comment 'Skipped on distribution-reuse path (returns early above)' — code placement after early-return at line 426)
+- [x] `mission.validate` fails within seconds when files are missing (not after 10+ minute build) (evidence: packages/werkstatt/src/mission/mission-materialization-commands.ts:438-474, early return with exitCode 1 before build.prepare at line 535)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0844 --json, exitCode 0, status pass)
 
 ## Implementation notes for agents
 
