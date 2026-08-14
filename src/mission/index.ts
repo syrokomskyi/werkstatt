@@ -54,3 +54,7 @@ export {
   type OperatorConfigPersistResult,
 } from "./operator-config-files.ts";
 export { runMaterializeConfigValidate } from "./materialize-config-validate.ts";
+export {
+  runWorkpieceConfigPresenceCheck,
+  type WorkpieceConfigPresenceResult,
+} from "./workpiece-config-presence-check.ts";
