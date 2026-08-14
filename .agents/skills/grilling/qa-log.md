@@ -354,3 +354,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, qualitative certification
 - **Question:** Which releases require one evaluator versus two, and how is evaluator disagreement handled?
 - **Answer:** Ordinary changes require one isolated evaluator. Critical changes require two isolated evaluator runs with distinct evaluator identities and, where possible, different model families/providers; critical includes the first certified cutover and changes to business identity/offerings/prices/claims, legal/privacy/data collection, auth/payments/forms/integrations, locales, site-wide navigation/layout/CTA, public agent/action surfaces, security headers, or DNS. Borderline confidence/threshold/ambiguity or high-severity advisory outcomes automatically trigger a second evaluator. Evaluators cannot see each other's outputs. Two passes yield pass, two failures yield fail, and disagreement, missing evaluation, or insufficient independence yields `incomplete`. Risk rules and thresholds live in the versioned profile.
+
+### K-0028: Continuous certification health after Main publication
+
+```knowledge-entry
+id: K-0028
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, continuous certification
+- **Question:** Does `main-certified` remain valid forever, or must environment-sensitive evidence be refreshed after publication?
+- **Answer:** Historical `main-certified` decisions remain immutable while a separate current `certificationHealth` state is maintained as `current`, `degraded`, or `revoked`. Environment-independent evidence remains valid until candidate/profile identity changes; DNS, external integrations, runtime, security headers, performance, and freshness use profile-defined TTLs and schedules. Monitoring appends evidence and health decisions. Non-critical non-pass outcomes degrade health, open incident/action packs, retry, and block new promotions; critical regressions revoke health. Each requirement declares `retry`, `incident-only`, or `rollback`, and rollback is forbidden when it cannot remedy a shared external outage. Passing refreshes restore `current` without erasing history.
