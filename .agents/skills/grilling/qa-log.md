@@ -731,3 +731,16 @@ status: active
 - **Context:** 2026-08-14 — RFC-0854 enhancement, current Sternsystem cutover
 - **Question:** May the replaceable single site republish directly to Main, or must it prove the Node 24 build/deploy path through Alt first?
 - **Answer:** Require `Alt deploy → Alt smoke pass → Main deploy → Main smoke pass`. Any non-pass stops the transition and blocks RFC completion; the single-site topology does not justify bypassing the available staging proof.
+
+### K-0057: One program cutover with bounded execution packets
+
+```knowledge-entry
+id: K-0057
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Should the combined transition be one monolithic implementation RFC or one program charter with an atomic cutover and multiple dependency-ordered execution packets?
+- **Answer:** Use one program charter and one forward-only cutover, but decompose execution into small, independently verifiable child RFCs and work packets. Each packet must define exact inputs, owned files, forbidden changes, observable outputs, validation commands, failure semantics, and a clean handoff so a less capable agent can complete it without reconstructing the whole architecture.
