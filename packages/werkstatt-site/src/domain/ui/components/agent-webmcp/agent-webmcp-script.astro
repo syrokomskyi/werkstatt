@@ -39,7 +39,7 @@ const isDev = import.meta.env.DEV;
 {manifest && (
   <script is:inline define:vars={{ manifestJson, isDev }}>
     (function () {
-      var mc = document.modelContext;
+      var mc = navigator.modelContext;
       if (!mc || typeof mc.registerTool !== "function") return;
       try {
         var manifest = JSON.parse(manifestJson);

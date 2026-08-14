@@ -40,7 +40,7 @@ async function writeFileIfChanged(
 }
 
 function buildAuthMd(domain: string): string {
-  return `# Agent Registration
+  return `# auth.md
 
 This site supports AI agent discovery via standard protocols.
 
@@ -97,9 +97,7 @@ function buildAgentSkillsIndex(
   const skills: AgentSkillEntry[] = [];
 
   for (const ref of manifest.knowledge) {
-    const digest = createHash("sha256")
-      .update(`${ref.url}:${ref.schema}`)
-      .digest("hex");
+    const digest = createHash("sha256").update(`${ref.url}:${ref.schema}`).digest("hex");
     skills.push({
       name: ref.domain,
       type: "skill-md",
@@ -189,7 +187,11 @@ export async function runAgentDiscoveryEndpointsGenerate(
       if (await context.io.exists(f)) await context.io.rm(f);
     }
     return {
-      data: { command: "agent.discovery-endpoints.generate", status: "skip", site: context.site?.name },
+      data: {
+        command: "agent.discovery-endpoints.generate",
+        status: "skip",
+        site: context.site?.name,
+      },
       exitCode: 0,
       summary: "agent.discovery-endpoints.generate: skipped — agent.enabled is false",
     };
