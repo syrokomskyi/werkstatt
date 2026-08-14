@@ -49,7 +49,11 @@ import {
   resolveMirrorPath,
 } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import { commitWorkpieceIfDirty, countOperatorCommits } from "./mission-git-commit.ts";
+import {
+  commitWorkpieceIfDirty,
+  countOperatorCommits,
+  cacheCloneCommit,
+} from "./mission-git-commit.ts";
 import { validateBordbuch, type BordbuchViolation } from "../bordbuch/bordbuch-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import {
@@ -162,12 +166,13 @@ async function runInlineValidate(
   return { passed: false, failures, report: result.data ?? null };
 }
 
-function gitExec(cwd: string, args: string): string {
+function gitExec(cwd: string, args: string, options?: { env?: NodeJS.ProcessEnv }): string {
   return execSync(`git ${args}`, {
     cwd,
     encoding: "utf-8",
     stdio: ["pipe", "pipe", "pipe"],
     timeout: 30_000,
+    ...(options?.env ? { env: options.env } : {}),
   }).trim();
 }
 
@@ -622,10 +627,7 @@ export async function runMissionClose(
     try {
       const systemDir = await resolveCacheClonePath(workspaceRoot, manifest.systemId);
       gitExec(systemDir, "add system.pin.json system-config.yaml");
-      gitExec(
-        systemDir,
-        `commit -m ${JSON.stringify(`chore: auto-pin platform version for ${missionId}`)}`,
-      );
+      cacheCloneCommit(systemDir, `chore: auto-pin platform version for ${missionId}`);
       logger.info(`  Committed system.pin.json to cache clone`);
     } catch (pinCommitError) {
       logger.warn(
@@ -715,10 +717,7 @@ export async function runMissionClose(
         // Commit .materialization-state.json to prevent dirty cache clone (RFC-0597 fix)
         try {
           gitExec(systemDir, "add .materialization-state.json");
-          gitExec(
-            systemDir,
-            `commit -m ${JSON.stringify(`chore: update materialization state for ${missionId}`)}`,
-          );
+          cacheCloneCommit(systemDir, `chore: update materialization state for ${missionId}`);
           logger.info(`  Committed .materialization-state.json to cache clone`);
         } catch {
           // Nothing to commit or git not available — non-fatal

@@ -36,6 +36,7 @@ export {
   type WorkpieceDirtyResult,
   investigateUntrackedFiles,
   type UntrackedFileReport,
+  cacheCloneCommit,
 } from "./mission-git-commit.ts";
 export { runMissionCleanup, type MissionCleanupData } from "./mission-cleanup.ts";
 export { resolveActorFromEnv, resolveActor, type ActorIdentity } from "./actor-identity.ts";

@@ -330,6 +330,31 @@ export function commitCacheCloneIfDirty(
   );
 }
 
+/**
+ * Centralized cache-clone git commit helper (RFC-0821).
+ *
+ * Always passes MISSION_GIT_COMMIT=1 to bypass the cache-clone pre-commit hook.
+ * Use this instead of raw execSync("git commit ...") or gitExec(..., "commit ...")
+ * when committing to a Sternsystem cache clone.
+ *
+ * @param systemDir - cache clone directory path
+ * @param message - commit message
+ * @param options.noEdit - use --no-edit (for merge commits)
+ */
+export function cacheCloneCommit(
+  systemDir: string,
+  message: string,
+  options?: { noEdit?: boolean },
+): string {
+  const commitArgs = options?.noEdit ? "--no-edit" : `-m ${JSON.stringify(message)}`;
+  return execSync(`git commit ${commitArgs}`, {
+    cwd: systemDir,
+    encoding: "utf-8",
+    stdio: ["pipe", "pipe", "pipe"],
+    env: { ...process.env, MISSION_GIT_COMMIT: "1" },
+  }).trim();
+}
+
 export function isWorkpieceDirty(workpieceDir: string): WorkpieceDirtyResult {
   if (!existsSync(path.join(workpieceDir, ".git"))) {
     return { dirty: false, fileCount: 0, files: [] };

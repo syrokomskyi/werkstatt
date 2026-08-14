@@ -63,6 +63,7 @@ import {
   investigateUntrackedFiles,
   commitWorkpieceIfDirty,
   commitCacheCloneIfDirty,
+  cacheCloneCommit,
 } from "./mission-git-commit.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
@@ -78,6 +79,18 @@ const STERNSYSTEM_DATA_PATHS = [
   "provenance",
   "system-config.yaml",
   "system-state.yaml",
+];
+
+/**
+ * Files that exist only in the cache clone (not in workpiece git).
+ * During mission.reconcile merge, these cause modify/delete conflicts.
+ * They are auto-resolved by keeping the cache clone version (ours).
+ * Add new cache-clone-only files here instead of modifying isAutoResolvablePath.
+ */
+const CACHE_CLONE_ONLY_PATHS: readonly string[] = [
+  "bordbuch/",
+  "public/.well-known/bordbuch",
+  "dns-records.yaml",
 ];
 
 // RFC-0763: shared helper for bordbuch cleanup on failure paths.
@@ -1350,12 +1363,15 @@ export async function runMissionReconcile(
           // git status failed — fall through to existing error
         }
 
-        const isBordbuchPath = (p: string) =>
-          p.startsWith("bordbuch/") || p.startsWith("public/.well-known/bordbuch");
-        const allBordbuch = conflictedPaths.length > 0 && conflictedPaths.every(isBordbuchPath);
+        const isAutoResolvablePath = (p: string) =>
+          CACHE_CLONE_ONLY_PATHS.some((pattern) =>
+            pattern.endsWith("/") ? p.startsWith(pattern) : p === pattern,
+          );
+        const allAutoResolvable =
+          conflictedPaths.length > 0 && conflictedPaths.every(isAutoResolvablePath);
 
-        if (allBordbuch) {
-          // Auto-resolve: keep cache clone's bordbuch (ours)
+        if (allAutoResolvable) {
+          // Auto-resolve: keep cache clone version (ours) for cache-clone-only files
           try {
             // Restore bordbuch files that git auto-resolved as deletions (RFC-0658 guard blocks deletion)
             if (bordbuchDeletedPaths.length > 0) {
@@ -1382,13 +1398,11 @@ export async function runMissionReconcile(
               stdio: "pipe",
               encoding: "utf-8",
             });
-            execSync("git commit --no-edit", {
-              cwd: systemDir,
-              stdio: "pipe",
-              encoding: "utf-8",
-            });
+            cacheCloneCommit(systemDir, "", { noEdit: true });
             autoResolvedPaths = conflictedPaths;
-            logger.info(`  Auto-resolved bordbuch/ conflict (kept cache clone version)`);
+            logger.info(
+              `  Auto-resolved ${autoResolvedPaths.length} cache-clone-only conflict(s) (kept cache clone version)`,
+            );
           } catch (resolveErr) {
             // Auto-resolution failed — abort merge and throw
             abortMerge(systemDir);
@@ -1443,11 +1457,7 @@ export async function runMissionReconcile(
           stdio: "pipe",
           encoding: "utf-8",
         });
-        execSync(`git commit -m ${JSON.stringify("restore critical config files after merge")}`, {
-          cwd: systemDir,
-          stdio: "pipe",
-          encoding: "utf-8",
-        });
+        cacheCloneCommit(systemDir, "restore critical config files after merge");
         logger.info(`  Committed ${restoredFiles.length} restored config file(s)`);
       }
 

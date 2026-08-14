@@ -30,6 +30,7 @@ import {
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import { gitExec } from "../werkstatt/git-exec.ts";
+import { cacheCloneCommit } from "../mission/mission-git-commit.ts";
 
 const BORDBUCH_PATH = path.join("bordbuch", "events.ndjson");
 
@@ -380,7 +381,7 @@ export async function commitAndPushBordbuch(
 
   let commitSha: string | null = null;
   try {
-    gitExec(systemDir, `commit -m ${JSON.stringify(message)}`);
+    cacheCloneCommit(systemDir, message);
     commitSha = gitExec(systemDir, "rev-parse HEAD");
   } catch {
     return { commitSha: null, pushed: false, error: null };

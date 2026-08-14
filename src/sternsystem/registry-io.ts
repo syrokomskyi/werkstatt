@@ -25,6 +25,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { gitExec } from "../werkstatt/git-exec.js";
+import { cacheCloneCommit } from "../mission/mission-git-commit.js";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import {
   systemConfigSchema,
@@ -157,10 +158,7 @@ export async function writeSystemState(
         cwd: cacheClone,
         stdio: ["pipe", "pipe", "pipe"],
       });
-      execSync(`git commit -m "system-state: update ${systemId}"`, {
-        cwd: cacheClone,
-        stdio: ["pipe", "pipe", "pipe"],
-      });
+      cacheCloneCommit(cacheClone, `system-state: update ${systemId}`);
     } catch {
       // Git commit may fail if nothing changed — non-fatal
     }
