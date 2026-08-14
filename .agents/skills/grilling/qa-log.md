@@ -783,3 +783,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** May dynamic or agent-written components activate in the production runtime before the complete certification and promotion authority exists?
 - **Answer:** No. Early packets may exercise lifecycle components only inside a bounded conformance harness. Production activation remains absent or fails closed until Certification Authority, capability grants, isolation, immutable candidate identity, rollback, quarantine, and a kill switch are all operational and verified.
+
+### K-0061: Treat Cordis as a reference rather than a runtime dependency
+
+```knowledge-entry
+id: K-0061
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Should Werkstatt embed Cordis as its production runtime substrate or implement its own bounded component runtime using Cordis only as a semantic reference?
+- **Answer:** Do not add Cordis as a production dependency. Use its lifecycle and composability semantics as reference material and conformance scenarios, while Werkstatt owns versioned capability contracts, four explicit effect classes, the protected Law Kernel, isolation tiers, deterministic teardown, and integration with missions, evidence, and promotion.
