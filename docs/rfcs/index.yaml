@@ -1,6 +1,6 @@
 command: rfc.index.generate
-generatedAt: 2026-08-12
-count: 795
+generatedAt: 2026-08-14
+count: 817
 entries:
   - id: RFC-0001
     title: Introduce RFC governance process
@@ -89,7 +89,8 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0833
     related:
       - RFC-0001
       - RFC-0005
@@ -3861,6 +3862,7 @@ entries:
       - RFC-0152
     amendedBy:
       - RFC-0376
+      - RFC-0834
     related:
       - RFC-0141
       - RFC-0149
@@ -4007,6 +4009,7 @@ entries:
       - RFC-0526
       - RFC-0528
       - RFC-0591
+      - RFC-0834
     related:
       - DNA-04
       - DNA-15
@@ -7791,6 +7794,7 @@ entries:
     amends: []
     amendedBy:
       - RFC-0761
+      - RFC-0819
     related:
       - DNA-1
       - DNA-2
@@ -15689,8 +15693,387 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0817
     related:
       - RFC-0790
       - RFC-0260
     file: docs/rfcs/archive/implemented/rfc-0814-add-system-flag-auto-injection-for-workspace-scoped-pipeline-commands.md
+  - id: RFC-0815
+    title: Add template.peer-deps.validate for onboarding package template integrity
+    status: implemented
+    kind: command
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0800
+      - RFC-0078
+    file: docs/rfcs/archive/implemented/rfc-0815-add-template-peer-deps-validate-for-onboarding-package-template-integrity.md
+  - id: RFC-0816
+    title: Prevent duplicate kernel command registration from crashing build pipelines
+    status: implemented
+    kind: fix
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0489
+      - RFC-0785
+    file: docs/rfcs/archive/implemented/rfc-0816-prevent-duplicate-command-registration-crash.md
+  - id: RFC-0817
+    title: Enforce formal mission lifecycle in mission.preview and add systemic
+      pipeline reliability protections
+    status: implemented
+    kind: policy
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0814
+    amendedBy: []
+    related:
+      - RFC-0480
+      - RFC-0810
+      - RFC-0753
+    file: docs/rfcs/archive/implemented/rfc-0817-enforce-formal-mission-lifecycle-and-add-systemic-pipeline-reliability-protections.md
+  - id: RFC-0818
+    title: Fix bordbuch sync lag in external mirror push ordering
+    status: implemented
+    kind: policy
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0477
+      - RFC-0472
+    amendedBy: []
+    related:
+      - RFC-0574
+      - RFC-0705
+      - RFC-0762
+      - RFC-0797
+    file: docs/rfcs/archive/implemented/rfc-0818-fix-bordbuch-sync-lag-in-external-mirror-push-ordering.md
+  - id: RFC-0819
+    title: Allow null as intentional not-required marker in env files
+    status: implemented
+    kind: policy
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0388
+    amendedBy: []
+    related:
+      - DNA-40
+      - RFC-0388
+      - RFC-0761
+    file: docs/rfcs/archive/implemented/rfc-0819-allow-null-as-intentional-not-required-marker-in-env-files.md
+  - id: RFC-0820
+    title: Prevent silent no-op mission loss — three-level guard against uncommitted
+      work
+    status: implemented
+    kind: fix
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0480
+      - RFC-0644
+      - RFC-0797
+    file: docs/rfcs/archive/implemented/rfc-0820-prevent-silent-no-op-mission-loss.md
+  - id: RFC-0821
+    title: Enforce commit discipline — block raw git commit in workpieces
+    status: implemented
+    kind: fix
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0480
+      - RFC-0820
+    file: docs/rfcs/archive/implemented/rfc-0821-enforce-commit-discipline.md
+  - id: RFC-0822
+    title: Persist workpiece env files in cache clone across missions
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-12
+    implementedAt: 2026-08-12
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related: []
+    file: docs/rfcs/archive/implemented/rfc-0822-persist-workpiece-env-files-in-cache-clone-across-missions.md
+  - id: RFC-0823
+    title: Establish workshop testing architecture
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-41
+      - DNA-64
+      - RFC-0249
+      - RFC-0251
+      - RFC-0347
+      - RFC-0806
+    file: docs/rfcs/archive/implemented/rfc-0823-establish-workshop-testing-architecture.md
+  - id: RFC-0824
+    title: Add service unit test foundation
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-41
+      - DNA-66
+      - RFC-0249
+      - RFC-0251
+      - RFC-0823
+    file: docs/rfcs/archive/implemented/rfc-0824-add-service-unit-test-foundation.md
+  - id: RFC-0825
+    title: Add post-deploy smoke testing
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-66
+      - RFC-0806
+      - RFC-0823
+    file: docs/rfcs/archive/implemented/rfc-0825-add-post-deploy-smoke-testing.md
+  - id: RFC-0826
+    title: Add service integration testing against dev channel
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-66
+      - RFC-0806
+      - RFC-0823
+      - RFC-0824
+      - RFC-0825
+    file: docs/rfcs/archive/implemented/rfc-0826-add-service-integration-testing-against-dev-channel.md
+  - id: RFC-0827
+    title: Establish site-service contract testing
+    status: implemented
+    kind: contract
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-66
+      - RFC-0181
+      - RFC-0823
+      - RFC-0826
+    file: docs/rfcs/archive/implemented/rfc-0827-establish-site-service-contract-testing.md
+  - id: RFC-0828
+    title: Add site E2E testing with Playwright against dev channel
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-66
+      - RFC-0813
+      - RFC-0823
+      - RFC-0825
+    file: docs/rfcs/archive/implemented/rfc-0828-add-site-e2e-testing-with-playwright-against-dev-channel.md
+  - id: RFC-0829
+    title: Add test evidence gates to deployment pipeline
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-66
+      - RFC-0608
+      - RFC-0628
+      - RFC-0806
+      - RFC-0823
+      - RFC-0824
+      - RFC-0825
+      - RFC-0826
+      - RFC-0827
+      - RFC-0828
+    file: docs/rfcs/archive/implemented/rfc-0829-add-test-evidence-gates-to-deployment-pipeline.md
+  - id: RFC-0830
+    title: Add image.delivery.validate for responsive srcset and compression
+      enforcement
+    status: implemented
+    kind: command
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0204
+      - RFC-0043
+      - RFC-0053
+      - RFC-0172
+      - DNA-4
+      - DNA-58
+    file: docs/rfcs/archive/implemented/rfc-0830-add-image-delivery-validate-for-responsive-srcset-and-compression-enforcement.md
+  - id: RFC-0831
+    title: Add csp.origins.validate for CSP-to-script-origin cross-validation
+    status: implemented
+    kind: command
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0315
+      - RFC-0305
+    file: docs/rfcs/archive/implemented/rfc-0831-add-csp-origins-validate-for-csp-to-script-origin-cross-validation.md
+  - id: RFC-0832
+    title: Add a11y.label-in-name.validate for WCAG 2.5.3 Label in Name
+    status: implemented
+    kind: command
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0690
+      - RFC-0696
+    file: docs/rfcs/archive/implemented/rfc-0832-add-a11y-label-in-name-validate-for-wcag-2-5-3.md
+  - id: RFC-0833
+    title: Extend lighthouse validators with render-blocking, unused-JS, and
+      forced-reflow detection
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0006
+    amendedBy: []
+    related:
+      - RFC-0006
+      - RFC-0204
+      - DNA-15
+    file: docs/rfcs/archive/implemented/rfc-0833-extend-lighthouse-validators-with-render-blocking-unused-js-and-forced-reflow-detection.md
+  - id: RFC-0834
+    title: Commit generated variant manifests for drift detection
+    status: implemented
+    kind: policy
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-13
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0204
+      - RFC-0210
+    amendedBy: []
+    related:
+      - RFC-0078
+      - RFC-0081
+      - RFC-0087
+      - RFC-0830
+    file: docs/rfcs/archive/implemented/rfc-0834-commit-generated-variant-manifests-for-drift-detection.md
+  - id: RFC-0834
+    title: Add component-level WCAG 2.5.3 Label in Name validator
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0832
+      - ADR-0047
+      - DNA-67
+    file: docs/rfcs/rfc-0834-add-component-level-wcag-2-5-3-label-in-name-validator.md
+  - id: RFC-0835
+    title: Add regression tests for LH-12 ignore patterns and IMG-DELIVERY-04
+      404.html exemption
+    status: draft
+    kind: contract
+    createdAt: 2026-08-13
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - ADR-0045
+      - ADR-0046
+      - RFC-0833
+      - RFC-0830
+    file: docs/rfcs/rfc-0835-add-regression-tests-for-lh-12-ignore-and-img-delivery-04-404-exemption.md
