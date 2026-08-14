@@ -1,7 +1,7 @@
 ---
 id: RFC-0844
 title: "Pre-build operator config presence check — fail fast before expensive build cycle"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
 enhancedAt: 2026-08-14
-implementedAt:
+implementedAt: 2026-08-14
 closedAt:
 supersedes: []
 supersededBy:
