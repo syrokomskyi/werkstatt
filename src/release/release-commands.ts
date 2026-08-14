@@ -18,6 +18,7 @@
   <item>RFC-0655: sync close-report.json releaseId after writing mission.yaml; add release.state.validate command.</item>
   <item>RFC-0656: add dist.determinism.validate command; switch release.prepare distTreeHash to mode: "stable".</item>
   <item>Fix: correct resolveStagingDir call to use workspaceRoot instead of releasesBase; write release.yaml directly into stagingDir and remove redundant re-write after atomicMoveDir.</item>
+  <item>RFC-0845: add Playwright Chromium pre-flight check before build.prepare (after distribution-reuse check) — fail fast with actionable error when Chromium is not installed.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -49,6 +50,7 @@ import {
   runBehaviorSnapshotDiff,
 } from "../behavior-snapshot/behavior-snapshot-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
+import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -290,6 +292,35 @@ export async function runReleasePrepare(
           toolsDirectory: path.join(workpieceDir, "tools"),
           configPath: path.join(workpieceDir, "tools", "kernel.config.ts"),
         };
+
+        // RFC-0845: Playwright Chromium pre-flight check — fail fast before expensive
+        // build.prepare → astro build → build.post cycle.
+        // Skipped on distribution-reuse path (canReuseDistribution branch above).
+        let preflightFailed = false;
+        try {
+          const preflightResult = (await executeKernelCommand({
+            workspaceRoot,
+            commandName: "playwright.preflight.check",
+            outputFormat: "pretty",
+          })) as { exitCode?: number; summary?: string };
+          if ((preflightResult.exitCode ?? 0) !== 0) {
+            const msg = preflightResult.summary ?? "Playwright Chromium is not installed";
+            logger.info(`  [preflight] ${msg}`);
+            preflightFailed = true;
+          } else {
+            logger.info(`  Playwright Chromium: pre-flight check passed`);
+          }
+        } catch (err) {
+          // Non-fatal: if the check itself throws unexpectedly, log and continue
+          logger.warn(
+            `  Playwright Chromium pre-flight check error (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+        if (preflightFailed) {
+          throw new Error(
+            `[release.prepare] pre-flight FAILED: Playwright Chromium is not installed. Run: pnpm exec playwright install chromium, then re-run: pnpm exec werkstatt run release.prepare --mission ${missionId}`,
+          );
+        }
 
         logger.info(`  Running build.prepare pipeline for ${systemId}…`);
         try {
