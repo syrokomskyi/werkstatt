@@ -1,7 +1,7 @@
 ---
 id: RFC-0844
 title: "Pre-build operator config presence check — fail fast before expensive build cycle"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
