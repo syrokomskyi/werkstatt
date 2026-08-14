@@ -9,7 +9,8 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-13
-updatedAt: 2026-08-13
+updatedAt: 2026-08-14
+enhancedAt: 2026-08-14
 implementedAt:
 closedAt:
 supersedes: []
@@ -74,13 +75,16 @@ Add regression tests to the existing test files that verify the specific behavio
 **File**: `packages/werkstatt-site/src/checks/tests/lighthouse.test.ts`
 
 **Setup**:
-- Create a temp `dist/client/` with:
-  - `index.html` referencing `/_astro/referenced.js` via `<script src>`
-  - `_astro/referenced.js` (minimal valid JS)
-  - `_astro/orphan.js` (not referenced by any HTML or JS)
-- Create a `.lighthouse-budget-ignore` file containing `orphan`
+
+- Use `makeTestSiteContext` from `./helpers.ts` to build a `KernelRuntimeContext` with `appDir` as `context.site.directory`.
+- Create `dist/client/_astro/` with:
+  - `referenced.js` (minimal valid JS)
+  - `orphan.js` (not referenced by any HTML or JS)
+- Create `dist/client/index.html` referencing `/_astro/referenced.js` via `<script src>`
+- Create `.lighthouse-budget-ignore` in `appDir` (not `dist/`) containing `orphan`
 
 **Assertions**:
+
 - `runLighthouseBudgetCheck` returns `exitCode: 0` (no violations)
 - No LH-12 finding for `orphan.js`
 - LH-12 finding IS produced for `orphan.js` when `.lighthouse-budget-ignore` is absent or doesn't match
@@ -92,12 +96,14 @@ Add regression tests to the existing test files that verify the specific behavio
 **File**: `packages/werkstatt-site/src/checks/tests/image-delivery.test.ts`
 
 **Setup**:
+
 - Create a temp `dist/client/` with:
   - `404.html` containing `<img src="/logo.webp" width="200" height="50" loading="eager" decoding="async" />` (no `fetchpriority="high"`)
   - `index.html` with the same content
   - `logo.webp` (small valid webp)
 
 **Assertions**:
+
 - `runImageDeliveryValidate` produces NO IMG-DELIVERY-04 page-level error for `404.html`
 - `runImageDeliveryValidate` DOES produce IMG-DELIVERY-04 page-level error for `index.html` (same content, different filename)
 - Per-image IMG-DELIVERY-04 check still runs on 404.html (if an image on 404.html has `fetchpriority="high"` but missing `decoding="async"`, it should still error)
@@ -109,9 +115,11 @@ Add regression tests to the existing test files that verify the specific behavio
 **File**: `packages/werkstatt-site/src/checks/tests/image-delivery.test.ts`
 
 **Setup**:
+
 - Create `404.html` with `<img src="/hero.webp" srcset="..." width="800" height="600" loading="eager" fetchpriority="high" />` (missing `decoding="async"`)
 
 **Assertions**:
+
 - `runImageDeliveryValidate` produces an IMG-DELIVERY-04 per-image error for `404.html` (the per-image check is NOT skipped, only the page-level check is)
 
 **Test name**: `"IMG-DELIVERY-04: per-image attribute check still runs on 404.html"`
@@ -130,7 +138,8 @@ Add regression tests to the existing test files that verify the specific behavio
 ## Risks
 
 - **Test isolation**: The tests create temp directories and must clean up after themselves. Use the existing `beforeEach`/`afterEach` patterns in the test files.
-- **Flakiness**: The `.lighthouse-budget-ignore` file must be created in the correct location (`appDirectory`) for the test to work. Follow the existing pattern in `lighthouse.test.ts` for setting up the app directory.
+- **Flakiness**: The `.lighthouse-budget-ignore` file must be created in the correct location (`appDirectory`) for the test to work. Test 1 calls `runLighthouseBudgetCheck` which requires a `KernelRuntimeContext` — use the `makeTestSiteContext` pattern from `image-delivery.test.ts` (not the helper-direct pattern in `lighthouse.test.ts`, which only tests exported functions without a context).
+- **LH-10/LH-11 interference**: `runLighthouseBudgetCheck` also runs LH-10 (bundle size) and LH-11 (render-blocking CSS). The minimal test JS files (a few bytes each) are well under the 300KB LH-10 budget, and the test HTML has no `<link rel="stylesheet">` so LH-11 produces zero findings. The test should filter findings by `rule === "LH-12"` to assert only on the relevant rule.
 
 ## Acceptance criteria
 
