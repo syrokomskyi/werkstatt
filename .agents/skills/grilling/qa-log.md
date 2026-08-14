@@ -107,3 +107,16 @@ status: active
 - **Context:** 2026-08-03 — grilling RFC-0663 plan (dogfood acceptance criterion)
 - **Question:** RFC requires "at least one real duplicate pair promoted end-to-end" but the current monorepo has very few L2 entries across skills. Real duplicates are unlikely. How to handle the dogfood criterion?
 - **Answer:** Conditional dogfood: run detection on the monorepo. If duplicates found, promote with operator approval. If none found, the detection pipeline running end-to-end (detection → doctor report → zero duplicates) serves as evidence. Promotion mechanics are verified by unit tests. Creating artificial test duplicates is not natural and would not test the real promotion path.
+
+### K-0009: Certification semantics for missing or stale evidence
+
+```knowledge-entry
+id: K-0009
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
+- **Question:** How should release certification represent required evidence that is absent, outdated, or belongs to a different commit, configuration, or toolchain?
+- **Answer:** Certification uses explicit `pass`, `fail`, `incomplete`, and `stale` states. Missing evidence must never be synthesized as success. Local authoring may continue with `incomplete` evidence so that content creation remains possible, but Alt/Main transitions require `pass`; `fail`, `incomplete`, and `stale` all block publication.
