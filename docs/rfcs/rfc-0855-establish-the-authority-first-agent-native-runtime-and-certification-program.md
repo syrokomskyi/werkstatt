@@ -1,12 +1,13 @@
 ---
 id: RFC-0855
 title: "Establish the authority-first agent-native runtime and certification program"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
