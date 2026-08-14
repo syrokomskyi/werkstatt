@@ -1,7 +1,7 @@
 ---
 id: RFC-0841
 title: "Add image-delivery.config.yaml location diagnostic"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
 enhancedAt: 2026-08-14
-implementedAt:
+implementedAt: 2026-08-14
 closedAt:
 supersedes: []
 supersededBy:
