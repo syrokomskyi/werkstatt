@@ -150,3 +150,45 @@ status: active
 
 - **Condition:** A clean migration needs a recovery path to pre-migration state, but importing or retroactively approving that state would undermine the new authority model.
 - **Recommended answer:** Permit an exact, narrow, one-time rollback-only bootstrap target with explicit closure conditions. Never let bootstrap evidence satisfy forward gates, acquire the new certified status, or survive as an indefinite compatibility path.
+
+### K-0011: Documents are execution boundaries
+
+```knowledge-entry
+id: K-0011
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** An implementation document is expected to be executed by a less capable agent in one isolated session, but its scope combines several independently testable architectural changes.
+- **Recommended answer:** Decompose the work into dependency-ordered documents that each leave the affected packages compiling and pass their own bounded validation. Keep a final integration document for cross-module laws instead of making one agent carry the whole program at once.
+
+### K-0012: Supersede decision authority, preserve useful mechanisms deliberately
+
+```knowledge-entry
+id: K-0012
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** A new authority model replaces older normative decisions while some underlying storage, hashing, validation, transport, or adapter mechanisms remain technically useful.
+- **Recommended answer:** Supersede the old contract's right to authorize outcomes and state explicitly which mechanisms remain reusable but non-authorizing. Never let retained infrastructure imply that the old decision path is still valid.
+
+### K-0013: Deterministic aggregators need scale contracts
+
+```knowledge-entry
+id: K-0013
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** A deterministic evaluator, selector, or aggregator consumes potentially growing collections and its result gates a consequential transition.
+- **Recommended answer:** Specify hard input limits, time and memory complexity, and a deterministic stress fixture. Reject overflow explicitly without truncation or synthesized success, and forbid nested full scans when an indexed or single-pass design is available.
