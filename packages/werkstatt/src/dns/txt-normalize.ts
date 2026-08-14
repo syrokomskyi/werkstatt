@@ -12,6 +12,7 @@ declared and live records.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0753: initial TXT normalization utility — normalizeTxtContent.</item>
+  <item>Fix: add ensureTxtQuoted — wraps TXT content in double quotes for Cloudflare API payload.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,4 +23,20 @@ export function normalizeTxtContent(content: string): string {
     .replace(/\\([.;()"])|(["'])/g, "$1$2")
     .trim()
     .replace(/\s+/g, " ");
+}
+
+export function ensureTxtQuoted(content: string): string {
+  let stripped = content.trim();
+  if (
+    stripped.length >= 2 &&
+    ((stripped.startsWith('"') && stripped.endsWith('"')) ||
+      (stripped.startsWith("'") && stripped.endsWith("'")))
+  ) {
+    stripped = stripped.slice(1, -1);
+  }
+  stripped = stripped
+    .replace(/\\([.;()"])|(["'])/g, "$1$2")
+    .trim()
+    .replace(/\s+/g, " ");
+  return `"${stripped.replace(/"/g, '\\"')}"`;
 }

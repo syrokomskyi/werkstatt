@@ -8,7 +8,7 @@
 */
 
 import { test, expect } from "vitest";
-import { normalizeTxtContent } from "./txt-normalize.ts";
+import { normalizeTxtContent, ensureTxtQuoted } from "./txt-normalize.ts";
 
 test("normalizeTxtContent: strips surrounding double quotes", () => {
   expect(normalizeTxtContent('"v=spf1 include:_spf.mx.cloudflare.net ~all"')).toBe(
@@ -38,4 +38,24 @@ test("normalizeTxtContent: handles already-normalized content", () => {
 
 test("normalizeTxtContent: trims leading/trailing whitespace", () => {
   expect(normalizeTxtContent('  "v=spf1 ~all"  ')).toBe("v=spf1 ~all");
+});
+
+test("ensureTxtQuoted: wraps unquoted content in double quotes", () => {
+  expect(ensureTxtQuoted("v=spf1 -all")).toBe('"v=spf1 -all"');
+});
+
+test("ensureTxtQuoted: re-quotes already-quoted content consistently", () => {
+  expect(ensureTxtQuoted('"v=spf1 -all"')).toBe('"v=spf1 -all"');
+});
+
+test("ensureTxtQuoted: escapes internal double quotes", () => {
+  expect(ensureTxtQuoted('v=spf1 "include:_spf"')).toBe('"v=spf1 \\"include:_spf\\""');
+});
+
+test("ensureTxtQuoted: collapses whitespace before quoting", () => {
+  expect(ensureTxtQuoted("v=spf1  include:_spf   ~all")).toBe('"v=spf1 include:_spf ~all"');
+});
+
+test("ensureTxtQuoted: handles empty string", () => {
+  expect(ensureTxtQuoted("")).toBe('""');
 });
