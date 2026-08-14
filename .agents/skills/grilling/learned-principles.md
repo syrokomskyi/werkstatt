@@ -192,3 +192,17 @@ status: active
 
 - **Condition:** A deterministic evaluator, selector, or aggregator consumes potentially growing collections and its result gates a consequential transition.
 - **Recommended answer:** Specify hard input limits, time and memory complexity, and a deterministic stress fixture. Reject overflow explicitly without truncation or synthesized success, and forbid nested full scans when an indexed or single-pass design is available.
+
+### K-0014: Canonical identities require a closed snapshot boundary
+
+```knowledge-entry
+id: K-0014
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** A JavaScript value contributes to a durable content identity, authority decision, signature payload, or append-only history.
+- **Recommended answer:** Convert untrusted input first into a bounded, detached, immutable, engine-branded canonical snapshot. Reject ambiguous Unicode, unstable traversal, non-canonical values, and limit overflow before hashing. Keep canonical byte/hash operations deterministic and total over accepted snapshots rather than traversing arbitrary caller-owned objects.

@@ -523,3 +523,94 @@ status: active
 - **Context:** 2026-08-14 — RFC-0848 enhancement after semantic audit, certification performance contract
 - **Question:** Which hard input limits and algorithmic bounds must prevent a weak implementation from introducing unbounded or quadratic certification evaluation?
 - **Answer:** A certification profile contains at most 1,000 requirements, one evaluation cut admits at most 10,000 evidence records, one action pack contains at most 1,000 tasks, and canonical JSON input is at most 8 MiB with depth at most 64. Evidence selection and aggregation must run in `O(E + R log R)` time and `O(E + R)` memory; a per-requirement full evidence scan is forbidden. Tests include a deterministic 1,000-requirement/10,000-evidence stress fixture. Limit overflow emits an explicit `incomplete` or contract diagnostic without truncation. Timing benchmarks remain advisory rather than flaky CI gates.
+
+### K-0041: Split canonicalization, Diagnostic ownership, and certification contracts
+
+```knowledge-entry
+id: K-0041
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement after semantic audit, execution boundaries for less capable agents
+- **Question:** Should RFC-0849 continue to combine canonical JSON, Diagnostic ownership, and all certification schemas/identities?
+- **Answer:** No. RFC-0849 owns only bounded canonical JSON; RFC-0852 owns the forward-only engine Diagnostic cutover; RFC-0853 owns strict certification schemas and explicit identity builders. RFC-0850 and RFC-0851 depend on RFC-0853, and RFC-0848 remains the final integration boundary.
+
+### K-0042: Canonical identity uses an engine-created immutable snapshot
+
+```knowledge-entry
+id: K-0042
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement, hostile JavaScript input boundary
+- **Question:** What exact value may the canonical byte/hash functions accept when arbitrary objects and Proxy traps cannot be proven stable?
+- **Answer:** Only an opaque `CanonicalJsonValueV1` produced by an engine-owned snapshot builder. The builder traverses once, copies permitted data into detached structures, deep-freezes it, and registers an internal non-exported brand. External/file/network values first pass a strict schema and snapshot creation. Proxy trap failures become typed failures; the contract does not claim that JavaScript can identify every Proxy.
+
+### K-0043: Reject lone UTF-16 surrogates before canonicalization
+
+```knowledge-entry
+id: K-0043
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement, Unicode collision safety
+- **Question:** How should canonical JSON handle unpaired UTF-16 surrogate code units?
+- **Answer:** Reject them in every string and object key with `CERT-CANONICAL-UNICODE-01`. Valid Unicode is preserved without NFC/NFKC normalization. Collision and boundary fixtures prove distinct JavaScript strings cannot silently collapse through UTF-8 replacement behavior.
+
+### K-0044: Persisted diagnostics are canonical and redacted by construction
+
+```knowledge-entry
+id: K-0044
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement, Diagnostic identity and privacy boundary
+- **Question:** Which Diagnostic fields participate in evidence identity, and how can every valid Diagnostic also be safely persisted and hashed?
+- **Answer:** The complete strict Diagnostic participates in evidence identity. Remove legacy `id`, `blockId`, and `suggestion`; replace arbitrary `data` with bounded `CanonicalJsonObjectV1`; bound all strings, collections, and total encoded size; require safe relative paths and pre-redacted URLs/snippets/messages/fix hints/data; reject credentials, absolute paths, and unresolved secret/PII exposure.
+
+### K-0045: Separate recoverable snapshot failures from total byte/hash operations
+
+```knowledge-entry
+id: K-0045
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement, throw-versus-return contract
+- **Question:** Where do canonicalization failures occur, and may canonical byte/hash entrypoints throw?
+- **Answer:** `snapshotCanonicalJsonV1(unknown)` returns a discriminated typed result for domain, Unicode, traversal, and limit failures. `canonicalJsonBytesV1` and `canonicalJsonHashV1` are total and non-throwing over a valid branded snapshot. Explicit Zod `.parse()` may throw by its ordinary contract; recoverable public boundaries use `safeParse` or typed results.
+
+### K-0046: Bound canonical JSON traversal as well as encoded output
+
+```knowledge-entry
+id: K-0046
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement, canonicalization denial-of-service limits
+- **Question:** Which structural limits supplement the existing 8 MiB/depth-64 output contract?
+- **Answer:** Limit one document to 250,000 nodes, 10,000 keys per object, 100,000 items per array, 1 MiB UTF-8 bytes per string, 1 KiB UTF-8 bytes per key, depth 64, and 8 MiB canonical bytes. Enforce limits during snapshot traversal, never truncate, return `CERT-CANONICAL-LIMIT-01`, and account for byte, node, sorted-key, and depth memory explicitly.
+
+### K-0047: Canonical identities require a closed snapshot boundary
+
+```knowledge-entry
+id: K-0047
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0849 enhancement grilling meta-analysis
+- **Question:** Should the repeated canonicalization decisions be promoted to a reusable active L2 principle?
+- **Answer:** Yes. Permanent identities must canonicalize only detached, bounded, immutable, branded snapshots; ambiguous Unicode, unstable traversal, and limit overflow are rejected before hashing, and byte/hash operations over accepted snapshots are deterministic and total.
