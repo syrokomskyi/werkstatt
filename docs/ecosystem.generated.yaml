@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 3f50fb084fe3c60c3d0bcbefdcd6a90c558c1ec74710a0e51d51641fa108d24a
+  contentHash: 519dcfd44dd7dbcb4819b8911ff3fc3721e20cf24e434cdafa8e468060cbdb4f
   sources:
     - path: docs/architecture-dna.md
-      hash: c3f669818a9deb83b9b4d9aeea1be5f0dd2c08d62ff31d43114a5d4a866be32c
+      hash: 2d5d4a04760a8b97ce876e4826cd2abc83383353f14ffb1be9447f4f532c21c6
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -22,10 +22,10 @@ meta:
       hash: 4b98e59e69f4e1628e44cdf66a39a2489b5edde8e3316b57b995c8ed22010058
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: 83c2f044ad2a5dea86ace5fe92679dea40f1add0956cb8fadc30d0898884b142
-    - path: missions/warpgogol-com-m000053/workpiece/package.json
+    - path: missions/warpgogol-com-m000054/workpiece/package.json
       hash: 6c3ec5bf1fad0cc1e85772f9b80e6ed0df5c3fa6ed8834e428c7d9a250fcf0ac
     - path: package.json
-      hash: f6c510431fa6c4ff93d55114e1c8de98327aeb5a7cc60e437544c67ff9732130
+      hash: 0ed56d831e838d7f600c412e4dd80ab688b01ee00c5087adefd175c0b4fdf05f
     - path: packages/forge/package.json
       hash: 5fbad3366d45bcc4f69bc84895426e5a728d2eef77062e2bfdedebda8f4a4b7c
     - path: packages/werkstatt-game/package.json
@@ -60,7 +60,7 @@ meta:
       hash: f7dfe0bb271219d4177c05d6469d55ac5888d9980d4f10a586a7a64335f66060
 workspace:
   name: warpgogol-platform
-  version: 5.46.0
+  version: 5.51.8
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -69,13 +69,13 @@ workspace:
 apps: []
 sternsystems: []
 missions:
-  - id: warpgogol-com-m000053
+  - id: warpgogol-com-m000054
     sternsystem: ""
     status: open
-    workpiecePath: missions/warpgogol-com-m000053/workpiece
+    workpiecePath: missions/warpgogol-com-m000054/workpiece
 packages:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000053/workpiece
+    directory: missions/warpgogol-com-m000054/workpiece
     workspacePattern: missions/*/workpiece
     kind: mission
     dependencies:
@@ -99,7 +99,7 @@ packages:
       - zod
     testSignal:
       packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000053/workpiece
+      directory: missions/warpgogol-com-m000054/workpiece
       signal: skipped
       evidence: App author/build checks currently cover the deployable site; direct
         app unit tests are deferred until an app-level smoke-test harness lands.
@@ -459,6 +459,18 @@ quality:
     newItems: 0
     expiredItems: 0
 commands:
+  - name: a11y.label-in-name.component.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - workspace
+  - name: a11y.label-in-name.validate
+    scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - workspace
   - name: adr.archive
     scope: workspace
     mutatesState: true
@@ -1566,6 +1578,12 @@ commands:
       - workspace
   - name: cosmic.name.unique
     scope: workspace
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - workspace
+  - name: csp.origins.validate
+    scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
@@ -5102,6 +5120,12 @@ commands:
     providers:
       - workspace
 commandProvenance:
+  - command: a11y.label-in-name.component.validate
+    proposedBy: []
+    addedBy:
+      - RFC-0836
+    changedBy: []
+    removedBy: []
   - command: analytics.binding.validate
     proposedBy:
       - RFC-0305
@@ -5152,12 +5176,6 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
-  - command: image.delivery.validate
-    proposedBy:
-      - RFC-0830
-    addedBy: []
-    changedBy: []
-    removedBy: []
   - command: integration.config.validate
     proposedBy: []
     addedBy: []
@@ -5169,18 +5187,6 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0305
-    removedBy: []
-  - command: lighthouse.budget.check
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0833
-    removedBy: []
-  - command: lighthouse.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0833
     removedBy: []
   - command: matomo.export.validate
     proposedBy:
@@ -5467,6 +5473,7 @@ pipelines:
       - dist.content-references.validate
       - cloudflare.assets.validate
       - image.delivery.validate
+      - csp.origins.validate
       - dist.generated-marker.validate
       - behavior.snapshot.validate
       - compass.audit.validate
@@ -5474,6 +5481,7 @@ pipelines:
       - text.normalize.validate
       - surface.media-leakage.validate
       - surface.heading-uniqueness.validate
+      - a11y.label-in-name.validate
       - behavior.snapshot.generate
       - print.pdf.generate
       - print.pdf.copy
@@ -5675,6 +5683,7 @@ pipelines:
       - section.cta.contract.validate
       - section.image.contract.validate
       - section.image-props.validate
+      - a11y.label-in-name.component.validate
       - section.css.import.validate
       - tokens.colors.section-shell.lint
       - tokens.section-shell.contract.validate
@@ -5777,6 +5786,7 @@ pipelines:
       - section.cta.contract.validate
       - section.image.contract.validate
       - section.image-props.validate
+      - a11y.label-in-name.component.validate
       - section.css.import.validate
       - tokens.colors.section-shell.lint
       - tokens.section-shell.contract.validate
@@ -6047,6 +6057,7 @@ pipelines:
       - dist.content-references.validate
       - cloudflare.assets.validate
       - image.delivery.validate
+      - csp.origins.validate
       - dist.generated-marker.validate
       - behavior.snapshot.validate
       - compass.audit.validate
@@ -6054,6 +6065,7 @@ pipelines:
       - text.normalize.validate
       - surface.media-leakage.validate
       - surface.heading-uniqueness.validate
+      - a11y.label-in-name.validate
     executableFromRoot: false
   - name: sites-check.run
     scope: app
@@ -6271,6 +6283,7 @@ pipelines:
       - dist.content-references.validate
       - cloudflare.assets.validate
       - image.delivery.validate
+      - csp.origins.validate
       - dist.generated-marker.validate
       - behavior.snapshot.validate
       - compass.audit.validate
@@ -6278,6 +6291,7 @@ pipelines:
       - text.normalize.validate
       - surface.media-leakage.validate
       - surface.heading-uniqueness.validate
+      - a11y.label-in-name.validate
     executableFromRoot: false
 generatedOwnership:
   - path: .cache/pdf/**
@@ -6683,26 +6697,18 @@ generatedOwnership:
     module: packages/werkstatt/src/bordbuch/bordbuch-generate.ts
     conditional: true
 rfcs:
-  accepted: 5
-  implemented: 1
+  accepted: 4
+  implemented: 0
   draft: 4
   reviewing: 0
 baseline:
-  implementedRfcs:
-    - id: RFC-0830
-      implementedAt: 2026-08-13
-      kind: command
-      scope: app
-      dnaRefs:
-        - DNA-4
-        - DNA-58
+  implementedRfcs: []
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0831
-      - RFC-0832
-      - RFC-0833
+      - RFC-0835
+      - RFC-0836
     draft:
       - RFC-0000
       - RFC-0383
@@ -7041,4 +7047,9 @@ baseline:
       title: Workshop testing pyramid
       provenance: rfc
       establishingRfc: RFC-0823
+      status: active
+    - id: DNA-67
+      title: Pre-deploy Lighthouse parity gate
+      provenance: rfc
+      establishingRfc: RFC-0833
       status: active

@@ -212,16 +212,16 @@ No visible text expression → no violation. The aria-label is the sole accessib
 
 ## Acceptance criteria
 
-- [ ] `a11y.label-in-name.component.validate` command registered in command table
-- [ ] Scans all `.astro` files in `packages/werkstatt-site/src/domain/ui/**/*.astro`
-- [ ] Detects `aria-label={...}` + visible text `{...}` on same interactive element where aria-label doesn't reference the visible text variable
-- [ ] Reports A11Y-LIN-COMP-01 with file, line, element, expressions, and fix hint
-- [ ] Exits with code 1 on violations, 0 on clean
-- [ ] Integrated into `PACKAGES_CHECK_PIPELINE` after `section.image-props.validate`
-- [ ] Unit tests in `a11y-label-in-name-component.test.ts` covering: violation, safe pattern (merged label), icon-only button (no violation), non-interactive element (no violation), multi-line aria-label expression
-- [ ] Existing codebase passes (after the 5.51.6 fixes to `section-cta.astro`, `hero-section.astro`, and ADR-0047 fix to `brand-label-component.astro`)
-- [ ] `AGENTS.md` updated with the new check in the check commands list
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `a11y.label-in-name.component.validate` command registered in command table (evidence: packages/werkstatt-site/src/checks/command-tables/08-section-framework.ts:119-128)
+- [x] Scans all `.astro` files in `packages/werkstatt-site/src/domain/ui/**/*.astro` (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:113-120, collectFiles on uiDir)
+- [x] Detects `aria-label={...}` + visible text `{...}` on same interactive element where aria-label doesn't reference the visible text variable (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:155-196, extractComponentLabelInNameViolations)
+- [x] Reports A11Y-LIN-COMP-01 with file, line, element, expressions, and fix hint (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:186-195, Diagnostic with ruleId/severity/file/line/data)
+- [x] Exits with code 1 on violations, 0 on clean (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:198-204, diagnosticsResult returns exitCode 1 when errors > 0)
+- [x] Integrated into `PACKAGES_CHECK_PIPELINE` after `section.image-props.validate` (evidence: packages/werkstatt-site/src/checks/pipelines/packages-check.ts:110-111)
+- [x] Unit tests in `a11y-label-in-name-component.test.ts` covering: violation, safe pattern (merged label), icon-only button (no violation), non-interactive element (no violation), multi-line aria-label expression (evidence: packages/werkstatt-site/src/checks/tests/a11y-label-in-name-component.test.ts, 16 tests pass)
+- [x] Existing codebase passes (after the 5.51.6 fixes to `section-cta.astro`, `hero-section.astro`, and ADR-0047 fix to `brand-label-component.astro`) (evidence: `pnpm exec werkstatt run a11y.label-in-name.component.validate` exits 0)
+- [x] `AGENTS.md` updated with the new check in the check commands list (evidence: packages/werkstatt-site/AGENTS.md:78)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0836 --json` status: pass)
 
 ## Implementation notes for agents
 
