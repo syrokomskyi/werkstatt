@@ -822,3 +822,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Does permitted transition breakage include arbitrary compilation, test, schema, and validator failures between packets?
 - **Answer:** No. Product runtime and deployment may be unavailable, but every packet must be internally complete and green under its declared verification contract. A global check may fail only through an explicitly enumerated transition diagnostic assigned to a later packet; unexplained TypeScript errors, failing owned tests, partial schemas or state, and unrelated validator regressions block handoff.
+
+### K-0064: Isolate untrusted components behind a real sandbox adapter
+
+```knowledge-entry
+id: K-0064
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Which isolation boundary applies to trusted first-party components versus agent-written or third-party components?
+- **Answer:** Trusted, versioned first-party components may execute in-process. Agent-written and third-party components execute only through a provider-neutral sandbox adapter with deny-by-default capability RPC. A plain subprocess, `worker_threads`, and `node:vm` are not security boundaries; agent-written activation stays disabled until a real sandbox adapter is implemented and certified.
