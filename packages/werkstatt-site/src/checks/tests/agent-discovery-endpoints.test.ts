@@ -142,7 +142,7 @@ test("generate: writes all four discovery endpoint files", async () => {
 
   // auth.md
   const authMd = await fs.readFile(path.join(appDir, "public", "auth.md"), "utf-8");
-  expect(authMd).toContain("Agent Registration");
+  expect(authMd).toContain("auth.md");
   expect(authMd).toContain("test.example");
 
   // agent-skills/index.json
@@ -206,15 +206,15 @@ test("generate: skip when agent.enabled is false and remove stale files", async 
   const result = await runAgentDiscoveryEndpointsGenerate(input, makeContext(tmpDir, appDir));
   expect(result.exitCode).toBe(0);
   expect(existsSync(path.join(appDir, "public", "auth.md"))).toBe(false);
-  expect(
-    existsSync(path.join(appDir, "public", ".well-known", "agent-skills", "index.json")),
-  ).toBe(false);
-  expect(
-    existsSync(path.join(appDir, "public", ".well-known", "oauth-protected-resource")),
-  ).toBe(false);
-  expect(
-    existsSync(path.join(appDir, "public", ".well-known", "oauth-authorization-server")),
-  ).toBe(false);
+  expect(existsSync(path.join(appDir, "public", ".well-known", "agent-skills", "index.json"))).toBe(
+    false,
+  );
+  expect(existsSync(path.join(appDir, "public", ".well-known", "oauth-protected-resource"))).toBe(
+    false,
+  );
+  expect(existsSync(path.join(appDir, "public", ".well-known", "oauth-authorization-server"))).toBe(
+    false,
+  );
 });
 
 test("generate: is idempotent — second run produces identical output", async () => {
