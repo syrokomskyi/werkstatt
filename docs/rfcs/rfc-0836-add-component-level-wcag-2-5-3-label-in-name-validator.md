@@ -1,5 +1,5 @@
 ---
-id: RFC-0834
+id: RFC-0836
 title: "Add component-level WCAG 2.5.3 Label in Name validator"
 status: draft
 kind: architecture
@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-13
 updatedAt: 2026-08-13
+enhancedAt: 2026-08-13
 implementedAt:
 closedAt:
 supersedes: []
@@ -41,7 +42,7 @@ nonGoals:
   - "Do not validate server-only (.ts) files — only .astro component source"
 ---
 
-# RFC-0834: Add component-level WCAG 2.5.3 Label in Name validator
+# RFC-0836: Add component-level WCAG 2.5.3 Label in Name validator
 
 ## Context
 
@@ -74,19 +75,19 @@ The kernel gains an `a11y.label-in-name.component.validate` command that scans `
 
 ## Architectural fit
 
-- **Architecture DNA (DNA-67)**: Extends the pre-deploy Lighthouse parity gate by adding a build-time validator that catches WCAG 2.5.3 violations at component authoring time, before the build runs. This is complementary to the post-build `a11y.label-in-name.validate` (RFC-0832) — the component-level check is a fast static analysis, the post-build check is the final gate on rendered output.
+- **Architecture DNA (DNA-67)**: Satisfies DNA-67 by adding an early static analysis for the same Lighthouse audit (`label-content-name-mismatch`) already covered by `a11y.label-in-name.validate` (RFC-0832) in the coverage matrix (`docs/lighthouse-parity-matrix.yaml`). This RFC does not add a new entry to the coverage matrix — it adds a pre-build component-level check that catches the same WCAG 2.5.3 violation at authoring time, before the build runs. The post-build `a11y.label-in-name.validate` (RFC-0832) remains the final gate on rendered output.
 - **Component Contracts**: Formalizes that interactive components with separate `ariaLabel` and `label` props must merge them — the accessible name must include the visible text.
-- **Site OS operator model**: New command registered in the `SITES_CHECK_AUTHOR_PIPELINE` (pre-build), not `SITES_CHECK_POSTBUILD_PIPELINE`. This catches violations before the build runs, not after.
+- **Pipeline placement**: Workspace-scoped command registered in `PACKAGES_CHECK_PIPELINE` (not `SITES_CHECK_AUTHOR_PIPELINE`). This follows the precedent of `section.image-props.validate` — a workspace-scoped component validator that scans the same `packages/werkstatt-site/src/domain/ui/**/*.astro` files in `PACKAGES_CHECK_PIPELINE`. The command scans shared package components, not per-site content.
 
 ## Design
 
 ### CLI surface
 
 ```sh
-pnpm exec werkstatt run a11y.label-in-name.component.validate --site warpgogol-com
+pnpm exec werkstatt run a11y.label-in-name.component.validate
 ```
 
-Scope: workspace. Scans `packages/werkstatt-site/src/domain/ui/**/*.astro` (components and sections).
+Scope: workspace. Scans `packages/werkstatt-site/src/domain/ui/**/*.astro` (components and sections). No `--site` flag — the command scans shared package components, not per-site content.
 
 ### TypeScript contracts
 
@@ -126,6 +127,8 @@ The validator parses `.astro` files using a regex-based approach (not a full AST
 1. Extract the `aria-label={...}` expression (if present).
 2. Extract visible text expressions within the element (children like `{label}`, `{props.xxxLabel}`, `{content.xxxLabel}`).
 3. If both are present and the aria-label expression does not reference the same variable as the visible text, emit A11Y-LIN-COMP-01.
+
+**Safe pattern recognition for `resolveLabelInName` helper (ADR-0047):** If the aria-label expression contains a call to `resolveLabelInName(...)` or any expression that references the visible text variable name (e.g., `resolvedAriaLabel` where `resolvedAriaLabel` is derived from `label`), the element is considered safe — no violation. The validator checks for the visible text variable name appearing anywhere in the aria-label expression, not just exact equality. This recognizes the canonical merge pattern from ADR-0047: `resolvedAriaLabel = ariaLabel && label && !ariaLabel.includes(label) ? \`${label} — ${ariaLabel}\` : ariaLabel`.
 
 **Safe pattern (no violation):**
 
@@ -190,14 +193,15 @@ No visible text expression → no violation. The aria-label is the sole accessib
 ## Rollout
 
 - **Default behavior**: Error from day one. This is a static analysis check — there is no "grace period" needed because it runs at authoring time, not at build time. Components that violate the check must be fixed before they are committed.
-- **Pipeline integration**: Added to `SITES_CHECK_AUTHOR_PIPELINE` (pre-build), after `lighthouse.validate` and before `content.references.validate`. This ensures component-level a11y issues are caught before the build runs.
-- **Existing apps**: All existing apps must pass. The component fixes already applied in platform 5.51.6 (`section-cta.astro`, `hero-section.astro`) ensure the current codebase is clean.
-- **New apps**: Automatically compliant — the check runs in the author pipeline for all sites.
+- **Pipeline integration**: Added to `PACKAGES_CHECK_PIPELINE` after `section.image-props.validate` (both are workspace-scoped component validators scanning `packages/werkstatt-site/src/domain/ui/**/*.astro`).
+- **Existing codebase**: All components in `packages/werkstatt-site/src/domain/ui/` must pass. The component fixes already applied in platform 5.51.6 (`section-cta.astro`, `hero-section.astro`) and ADR-0047 (`brand-label-component.astro`) ensure the current codebase is clean.
+- **New components**: Automatically compliant — the check runs in `PACKAGES_CHECK_PIPELINE` for all changes to shared UI components.
 
 ## Alternatives considered
 
 - **AST-based parser for .astro files**: Rejected — `.astro` is not a standard language with a production-grade parser available as an npm package. A regex-based approach is sufficient for the common patterns (`aria-label={...}` + visible text) and the post-build validator remains the final gate.
 - **Extending the post-build validator only**: Rejected — the post-build validator catches violations after a ~60s build cycle. The component-level check catches them at authoring time, saving build cycles.
+- **Extending `section.image-props.validate`**: Rejected — that validator checks image prop usage (`src={props.xxx}` without `resolveImage`), a different rule type. Mixing aria-label/text parity checks into it would violate single-responsibility and complicate the rule set. A dedicated validator is cleaner.
 - **Lint rule in eslint**: Rejected — `.astro` files are not linted by eslint in this codebase. Adding eslint support for `.astro` would be a larger effort than a dedicated validator.
 
 ## Risks
@@ -213,9 +217,9 @@ No visible text expression → no violation. The aria-label is the sole accessib
 - [ ] Detects `aria-label={...}` + visible text `{...}` on same interactive element where aria-label doesn't reference the visible text variable
 - [ ] Reports A11Y-LIN-COMP-01 with file, line, element, expressions, and fix hint
 - [ ] Exits with code 1 on violations, 0 on clean
-- [ ] Integrated into `SITES_CHECK_AUTHOR_PIPELINE`
+- [ ] Integrated into `PACKAGES_CHECK_PIPELINE` after `section.image-props.validate`
 - [ ] Unit tests in `a11y-label-in-name-component.test.ts` covering: violation, safe pattern (merged label), icon-only button (no violation), non-interactive element (no violation), multi-line aria-label expression
-- [ ] Existing codebase passes (after the 5.51.6 fixes to `section-cta.astro` and `hero-section.astro`)
+- [ ] Existing codebase passes (after the 5.51.6 fixes to `section-cta.astro`, `hero-section.astro`, and ADR-0047 fix to `brand-label-component.astro`)
 - [ ] `AGENTS.md` updated with the new check in the check commands list
 - [ ] `rfc.validate` passes on this file before merging
 
@@ -223,7 +227,7 @@ No visible text expression → no violation. The aria-label is the sole accessib
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
-- For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0834` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
+- For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `pnpm exec werkstatt run rfc.verification.emit --id RFC-0836` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
-- If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0834 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id RFC-0836 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - The validator MUST NOT replace the post-build `a11y.label-in-name.validate` (RFC-0832). Both validators run — the component-level check is a fast pre-build static analysis, the post-build check is the final gate on rendered HTML.

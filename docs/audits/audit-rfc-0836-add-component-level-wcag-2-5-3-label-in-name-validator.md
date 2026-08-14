@@ -1,6 +1,6 @@
 ---
-rfcId: RFC-0834
-auditId: AUDIT-RFC-0834-01
+rfcId: RFC-0836
+auditId: AUDIT-RFC-0836-01
 date: 2026-08-13
 auditor:
   skill: fo-idea-audit
@@ -8,7 +8,7 @@ auditor:
 verdict: needs-revision
 ---
 
-# Audit: RFC-0834
+# Audit: RFC-0836
 
 ## Verdict: Needs revision
 
@@ -35,6 +35,7 @@ verdict: needs-revision
 ## Axis C — Ecosystem fit
 
 **Finding C1 — Scope/pipeline mismatch (CRITICAL).** `scope: workspace` (строка 6) противоречит:
+
 - CLI `--site warpgogol-com` (строка 86) — workspace-scoped команды не принимают per-site флаги.
 - Pipeline `SITES_CHECK_AUTHOR_PIPELINE` (строка 79, 193) — это per-site pipeline (scope: app). Workspace-scoped команды должны быть в `PACKAGES_CHECK_PIPELINE` (`packages/werkstatt-site/src/checks/pipelines/packages-check.ts`).
 
