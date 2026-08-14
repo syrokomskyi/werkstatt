@@ -185,3 +185,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
 - **Question:** How should individual requirement outcomes aggregate into a stage-gate decision?
 - **Answer:** Applicability is evaluated explicitly; a conditional requirement that does not apply records `not-applicable` plus its reason. Fresh required failures produce `fail`; candidate/policy identity mismatches produce `stale`; missing evidence, timeouts, producer crashes, infrastructure unavailability, malformed output, or unclassified results produce `incomplete`. A gate passes only when every applicable required requirement has a current `pass`; advisory results remain visible but do not change status. Mixed problems use top-level precedence `fail` → `stale` → `incomplete` → `pass`, while all non-pass states block Alt/Main.
+
+### K-0015: Agent-only independent qualitative evaluation
+
+```knowledge-entry
+id: K-0015
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
+- **Question:** If the authoring agent cannot approve its own qualitative work and the workflow uses agents only, who supplies approval evidence?
+- **Answer:** A separate read-only Evaluator Agent run, with a clean context and a versioned rubric, evaluates rendered pages, screenshots, source content/claims, and the business brief and emits structured qualitative evidence. The deterministic Certification Engine—not the evaluator—computes the gate decision. One evaluator is sufficient for ordinary releases; critical or borderline cases require consensus from two independent evaluator runs. The process requires no human approver, and the authoring agent cannot submit its own approving qualitative evidence.
