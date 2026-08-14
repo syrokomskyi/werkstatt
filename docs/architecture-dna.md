@@ -290,7 +290,7 @@ CSS and Astro inline styles MUST NOT use mobile layout anti-patterns that cause 
 
 ## DNA-71 · Operator config file persistence
 
-Root-level operator config files (`.lighthouse-budget-ignore`, `image-delivery.config.yaml`, `live-video-manifest.generated.yaml`, `dns-records.yaml`) are untracked artifacts persisted between workpiece and cache clone during `mission.close` / `mission.materialize`, following the same pattern as `.env*` files (RFC-0822). The `OPERATOR_CONFIG_FILES` constant declares the canonical list. `mission.close` persists them to the cache clone (untracked); `mission.materialize` restores them after `atomicMoveDir`. The `materialize.config.validate` check command verifies the list stays in sync. Established by RFC-0840.
+Operator config files (`.lighthouse-budget-ignore` at root, `src/image-delivery.config.yaml` in `src/`) are untracked artifacts persisted between workpiece and cache clone during `mission.close` / `mission.materialize`, following the same pattern as `.env*` files (RFC-0822). The `OPERATOR_CONFIG_FILES` constant declares the canonical list using path-based entries (not just filenames) to support files in subdirectories. `mission.close` persists them to the cache clone (untracked); `mission.materialize` restores them after `atomicMoveDir`. The `materialize.config.validate` workspace-scope check command (in `PACKAGES_CHECK_PIPELINE`) verifies the list stays in sync — MAT-CONFIG-01 warns about unrecognized operator files, MAT-CONFIG-02 errors on dead entries. Established by RFC-0840.
 
 ## DNA-72 · Validator config location diagnostics
 

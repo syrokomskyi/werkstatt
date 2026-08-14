@@ -188,16 +188,16 @@ A new check command that:
 
 ## Acceptance criteria
 
-- [ ] `OPERATOR_CONFIG_FILES` constant defined in `operator-config-files.ts`
-- [ ] `persistOperatorConfigFiles` function implemented and tested
-- [ ] `restoreOperatorConfigFiles` function implemented and tested
-- [ ] `mission.close` calls `persistOperatorConfigFiles` after `persistEnvFilesToCacheClone`
-- [ ] `mission.materialize` calls `restoreOperatorConfigFiles` after `restoreEnvFilesFromCacheClone`
-- [ ] `materialize.config.validate` check command registered and wired into `SITES_CHECK_PIPELINE`
-- [ ] Unit test: re-materialization preserves `.lighthouse-budget-ignore` from cache clone
-- [ ] Unit test: `mission.close` persists `image-delivery.config.yaml` to cache clone
-- [ ] DNA-71 entry appended to `docs/architecture-dna.md`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `OPERATOR_CONFIG_FILES` constant defined in `operator-config-files.ts` (evidence: `packages/werkstatt/src/mission/operator-config-files.ts`)
+- [x] `persistOperatorConfigFiles` function implemented and tested (evidence: `operator-config-files.ts` + `operator-config-files.test.ts` — 7 tests pass)
+- [x] `restoreOperatorConfigFiles` function implemented and tested (evidence: `operator-config-files.ts` + `operator-config-files.test.ts` — 7 tests pass)
+- [x] `mission.close` calls `persistOperatorConfigFiles` after `persistEnvFilesToCacheClone` (evidence: `mission-close.ts:748-767`)
+- [x] `mission.materialize` calls `restoreOperatorConfigFiles` after `restoreEnvFilesFromCacheClone` (evidence: `mission-materialize.ts:1188-1207`)
+- [x] `materialize.config.validate` check command registered and wired into `PACKAGES_CHECK_PIPELINE` (evidence: `mission.module.ts:406-415` + `packages-check.ts:202-203`. Deviation: audit revised from `SITES_CHECK_PIPELINE` to `PACKAGES_CHECK_PIPELINE` — workspace-scope validator scanning all workpieces, not per-site)
+- [x] Unit test: re-materialization preserves `.lighthouse-budget-ignore` from cache clone (evidence: `operator-config-files.test.ts` — restoreOperatorConfigFiles test)
+- [x] Unit test: `mission.close` persists `image-delivery.config.yaml` to cache clone (evidence: `operator-config-files.test.ts` — persistOperatorConfigFiles test with src/image-delivery.config.yaml)
+- [x] DNA-71 entry verified in `docs/architecture-dna.md` (evidence: `docs/architecture-dna.md:291-293`, updated with revised file list)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0840` — pass)
 
 ## Implementation notes for agents
 

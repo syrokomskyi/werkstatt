@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 451e7fa516b0b1e2b323c7c88a4d6b0d4d539c8aa2b618d45cb7e7fb06bffecb
+  contentHash: 11f020ad1ea04c9491e107f6c0198f564d4d25e8999b19a46f53904c279330d3
   sources:
     - path: docs/architecture-dna.md
-      hash: 3ad0f0bbeeea4710232b649061fcb91272f73fa4b1992b0ec0f11477ef47affb
+      hash: e329d54f955e921f8b7a901a57355a071ab03fbf08c14a2a584d48e7ba79e9db
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -27,7 +27,7 @@ meta:
     - path: missions/warpgogol-com-m000056/workpiece/package.json
       hash: 6c3ec5bf1fad0cc1e85772f9b80e6ed0df5c3fa6ed8834e428c7d9a250fcf0ac
     - path: package.json
-      hash: 9d8ea3a7ca7cd52b6f024e6c852f5b4cf704e010b40fab58df0383403a1105bd
+      hash: 46765cbeb92362d100b266149e7bd8cfe51cf80cbe5db3ef674425fd1342fd77
     - path: packages/forge/package.json
       hash: 5fbad3366d45bcc4f69bc84895426e5a728d2eef77062e2bfdedebda8f4a4b7c
     - path: packages/werkstatt-game/package.json
@@ -62,7 +62,7 @@ meta:
       hash: f7dfe0bb271219d4177c05d6469d55ac5888d9980d4f10a586a7a64335f66060
 workspace:
   name: warpgogol-platform
-  version: 5.51.22
+  version: 5.51.23
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -3403,6 +3403,12 @@ commands:
     supportsAllSites: false
     providers:
       - site
+  - name: materialize.config.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - workspace
   - name: matomo.export.validate
     scope: workspace
     mutatesState: false
@@ -6556,6 +6562,7 @@ pipelines:
       - suppressions.validate
       - bordbuch.commit.parity.lint
       - dns.records.schema.validate
+      - materialize.config.validate
     executableFromRoot: true
   - name: packages.check
     scope: workspace
@@ -6659,6 +6666,7 @@ pipelines:
       - suppressions.validate
       - bordbuch.commit.parity.lint
       - dns.records.schema.validate
+      - materialize.config.validate
     executableFromRoot: true
   - name: sites-check.author
     scope: app
@@ -7524,8 +7532,8 @@ generatedOwnership:
     module: packages/werkstatt/src/bordbuch/bordbuch-generate.ts
     conditional: true
 rfcs:
-  accepted: 7
-  implemented: 1
+  accepted: 5
+  implemented: 3
   draft: 4
   reviewing: 0
 baseline:
@@ -7538,12 +7546,29 @@ baseline:
         - DNA-10
         - DNA-67
         - DNA-68
+    - id: RFC-0838
+      implementedAt: 2026-08-14
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-66
+        - DNA-67
+        - DNA-68
+        - DNA-69
+    - id: RFC-0839
+      implementedAt: 2026-08-14
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-66
+        - DNA-67
+        - DNA-68
+        - DNA-69
+        - DNA-70
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0838
-      - RFC-0839
       - RFC-0840
       - RFC-0841
       - RFC-0842
@@ -7900,6 +7925,11 @@ baseline:
       title: Playwright mobile layout stability checks
       provenance: rfc
       establishingRfc: RFC-0838
+      status: active
+    - id: DNA-70
+      title: Axiom post-deploy mobile layout monitoring
+      provenance: rfc
+      establishingRfc: RFC-0839
       status: active
     - id: DNA-71
       title: Operator config file persistence
