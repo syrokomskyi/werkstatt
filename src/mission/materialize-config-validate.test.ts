@@ -137,6 +137,27 @@ test("MAT-CONFIG-02: entry found in workpiece does NOT emit error", async () => 
   expect(errors).toHaveLength(0);
 });
 
+test("MAT-CONFIG-01: env.d.ts, middleware.ts, and *.generated.mjs do NOT emit warnings", async () => {
+  const wpDir = path.join(tmpDir, "missions", "m001", "workpiece");
+  const srcDir = path.join(wpDir, "src");
+  await fs.mkdir(srcDir, { recursive: true });
+  await fs.writeFile(
+    path.join(srcDir, "env.d.ts"),
+    '/// <reference types="astro/client" />\n',
+    "utf8",
+  );
+  await fs.writeFile(path.join(srcDir, "middleware.ts"), "export default {};\n", "utf8");
+  await fs.writeFile(path.join(srcDir, "env.schema.generated.mjs"), "export {};\n", "utf8");
+
+  const result = await runMaterializeConfigValidate(
+    { flags: {}, args: [] } as never,
+    makeContext(tmpDir),
+  );
+
+  const warnings = result.data!.diagnostics.filter((d) => d.ruleId === "MAT-CONFIG-01");
+  expect(warnings).toHaveLength(0);
+});
+
 test("clean case: all files recognized, no warnings or errors", async () => {
   const wpDir = path.join(tmpDir, "missions", "m001", "workpiece");
   await fs.mkdir(wpDir, { recursive: true });

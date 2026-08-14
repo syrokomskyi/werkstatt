@@ -49,6 +49,8 @@ const BOILERPLATE_FILES = new Set([
   "AGENTS.md",
   "README.md",
   "content.config.ts",
+  "env.d.ts",
+  "middleware.ts",
 ]);
 
 const GENERATED_PATTERNS = [
@@ -139,6 +141,7 @@ export async function runMaterializeConfigValidate(
         const srcPath = `src/${entry.name}`;
         if (OPERATOR_CONFIG_FILES.includes(srcPath as never)) continue;
         if (isBoilerplate(entry.name)) continue;
+        if (entry.name.endsWith(".generated.mjs")) continue;
         diagnostics.push({
           ruleId: "MAT-CONFIG-01",
           severity: "warning",
