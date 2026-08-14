@@ -8,6 +8,8 @@ import {
   tryLoadMethodologiesConfig,
   methodologiesConfigSchema,
   METHODOLOGIES_CONFIG_PATH,
+  KNOWN_INSTRUMENT_TYPES,
+  KNOWN_METHODOLOGY_IDS,
 } from "../methodologies-config.ts";
 
 const VALID_CONFIG = `---
@@ -154,6 +156,34 @@ gate:
       expect(config.gate.allowIncomplete).toBe(true);
       expect(config.gate.requireEvidence).toBe(true);
       expect(config.gate.minCoverage).toBe(1.0);
+    });
+  });
+
+  describe("RFC-0839: mobile-layout instrument type", () => {
+    it("accepts mobile-layout as instrument type", () => {
+      const config = methodologiesConfigSchema.parse({
+        instruments: [{ id: "mobile-layout-browser", type: "mobile-layout", params: {} }],
+        methodologies: [
+          {
+            id: "mobile-layout-stability",
+            instrument: "mobile-layout-browser",
+            active: false,
+            blockOn: ["high", "critical"],
+          },
+        ],
+        gate: { aggregation: "all-must-pass" },
+      });
+      expect(config.instruments[0].type).toBe("mobile-layout");
+      expect(config.methodologies[0].id).toBe("mobile-layout-stability");
+      expect(config.methodologies[0].active).toBe(false);
+    });
+
+    it("includes mobile-layout in KNOWN_INSTRUMENT_TYPES", () => {
+      expect(KNOWN_INSTRUMENT_TYPES).toContain("mobile-layout");
+    });
+
+    it("includes mobile-layout-stability in KNOWN_METHODOLOGY_IDS", () => {
+      expect(KNOWN_METHODOLOGY_IDS).toContain("mobile-layout-stability");
     });
   });
 });

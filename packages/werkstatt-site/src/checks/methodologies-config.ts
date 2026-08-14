@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0665: initial implementation of methodologies config schema and loader.</item>
   <item>Migrated isBlockingFinding to re-export from @syrokomskyi/axiom-factory-app/run/report.</item>
+  <item>RFC-0839: added mobile-layout instrument type and mobile-layout-stability methodology ID.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ export const instrumentConfigSchema = z.object({
     "visual-regression",
     "privacy-consent",
     "multilingual-consistency",
+    "mobile-layout",
   ]),
   params: z.record(z.string(), z.unknown()).default({}),
 });
@@ -68,6 +70,7 @@ export const KNOWN_METHODOLOGY_IDS = [
   "security-headers",
   "performance-vitals",
   "visual-regression",
+  "mobile-layout-stability",
 ] as const;
 
 export const KNOWN_INSTRUMENT_TYPES = [
@@ -79,6 +82,7 @@ export const KNOWN_INSTRUMENT_TYPES = [
   "visual-regression",
   "privacy-consent",
   "multilingual-consistency",
+  "mobile-layout",
 ] as const;
 
 export function parseMethodologiesConfig(content: string): MethodologiesConfig {
