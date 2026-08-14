@@ -65,6 +65,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `restoreEnvFilesFromCacheClone(cacheCloneDir, workpieceDir)` (RFC-0822): restores `.env*` files from cache clone to workpiece after `atomicMoveDir`. Replaces `PUBLIC_IMAGE_PROVIDER` with `build-portable`. Used by `mission.materialize`. Non-fatal on failure.
 - `sternsystem.validate` emits `ENV-PERSIST-01` warning when cache clone lacks `.env*` but active workpiece has them.
 
+## Operator config file persistence (RFC-0840)
+
+- `OPERATOR_CONFIG_FILES` constant in `operator-config-files.ts` declares the canonical list of operator config files to persist: `[".lighthouse-budget-ignore", "src/image-delivery.config.yaml"]`. Entries are path-based (not just filenames) to support files in subdirectories. Adding a new file requires a superseding RFC.
+- `persistOperatorConfigFiles(workpieceDir, cacheCloneDir)` (RFC-0840): copies each file in `OPERATOR_CONFIG_FILES` from workpiece to cache clone (untracked). Uses `path.join` with subpath entries. Non-fatal on failure. Used by `mission.close` after `persistEnvFilesToCacheClone`.
+- `restoreOperatorConfigFiles(cacheCloneDir, workpieceDir)` (RFC-0840): restores each file from cache clone to workpiece after `atomicMoveDir`. Creates parent directories with `mkdir { recursive: true }`. Does NOT modify file contents. Non-fatal on failure. Used by `mission.materialize` after `restoreEnvFilesFromCacheClone`.
+- `materialize.config.validate` (RFC-0840): workspace-scope check command in `PACKAGES_CHECK_PIPELINE`. Emits MAT-CONFIG-01 (warning: unrecognized operator file in workpiece root or `src/`) and MAT-CONFIG-02 (error: dead entry in `OPERATOR_CONFIG_FILES` not found in any workpiece or cache clone).
+
 ## Autonomy guard
 
 The `werkstatt.autonomy.validate` command enforces DNA-64. It scans `packages/werkstatt/src/**` for `@warpgogol/*` import specifiers. Exemptions:

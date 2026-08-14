@@ -34,6 +34,7 @@ export function createMissionModule(): KernelModule {
         await import("./mission-materialization-commands.ts");
       const { runWorkpieceRead } = await import("../workpiece/workpiece-read.ts");
       const { runWorkpieceWrite } = await import("../workpiece/workpiece-write.ts");
+      const { runMaterializeConfigValidate } = await import("./materialize-config-validate.ts");
       registry.registerCommand({
         name: "mission.open",
         description: "Open a new mission for a Sternsystem (RFC-0355).",
@@ -401,6 +402,16 @@ export function createMissionModule(): KernelModule {
         reads: ["missions/{mission}/workpiece/src/content/system.md"],
         cacheable: false,
         execute: runWorkpieceWrite,
+      });
+      registry.registerCommand({
+        name: "materialize.config.validate",
+        description:
+          "Validate OPERATOR_CONFIG_FILES list is in sync with actual workpiece/cache clone files (RFC-0840).",
+        scope: "workspace",
+        supportsAllSites: true,
+        reads: ["missions/*/workpiece/*", "missions/*/workpiece/src/*", "systems-cache/*/"],
+        cacheable: false,
+        execute: runMaterializeConfigValidate,
       });
     },
   };

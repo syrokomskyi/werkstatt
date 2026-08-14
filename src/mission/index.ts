@@ -47,3 +47,10 @@ export {
   collectEnvFiles,
   type EnvPersistResult,
 } from "./env-persist.ts";
+export {
+  OPERATOR_CONFIG_FILES,
+  persistOperatorConfigFiles,
+  restoreOperatorConfigFiles,
+  type OperatorConfigPersistResult,
+} from "./operator-config-files.ts";
+export { runMaterializeConfigValidate } from "./materialize-config-validate.ts";
