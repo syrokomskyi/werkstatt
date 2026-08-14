@@ -70,6 +70,7 @@ import { resolveActor } from "./actor-identity.ts";
 import { resolveCacheClonePath, readSystemConfig } from "../sternsystem/registry-io.ts";
 import { orchestrateSnap01Recovery } from "./snapshot-auto-regen.ts";
 import { commitBordbuchProjections } from "../bordbuch/bordbuch-commit.ts";
+import type { WorkpieceConfigPresenceResult } from "./workpiece-config-presence-check.ts";
 
 const STERNSYSTEM_DATA_PATHS = [
   "src/content",
@@ -423,6 +424,62 @@ export async function runMissionValidate(
         };
       }
     }
+  }
+
+  // RFC-0844: Operator config presence check — fail fast before expensive build.
+  // Runs BEFORE Playwright pre-flight (existsSync <10ms vs browser launch ~100-500ms).
+  // Skipped on distribution-reuse path (returns early above).
+  try {
+    const presenceResult = (await executeKernelCommand({
+      workspaceRoot,
+      commandName: "workpiece.config.presence.check",
+      argv: [`--mission=${missionId}`],
+      outputFormat: "pretty",
+    })) as { exitCode?: number; data?: WorkpieceConfigPresenceResult };
+    if ((presenceResult.exitCode ?? 0) !== 0) {
+      const missing = presenceResult.data?.missing ?? [];
+      const missingFiles = missing.map((m) => m.file).join(", ");
+      logger.info(`  [preflight] Missing operator config files: ${missingFiles}`);
+      for (const m of missing) {
+        logger.info(`    Restore: ${m.restoreCommand}`);
+      }
+      const preflightReport = {
+        schemaVersion: "1.0.0",
+        missionId,
+        contractFull: { passed: false, validators: [] },
+        build: {
+          succeeded: false,
+          routeCount: 0,
+          sitemapHash: "sha256:config-presence-failed",
+          failedSteps: [{ name: "workpiece.config.presence.check", exitCode: 1 }],
+        },
+        distributionReused: false,
+        buildInputHash: null,
+        fullBuildRan: false,
+        validatedAt: new Date().toISOString(),
+      };
+      await atomicWriteFile(
+        path.join(evidenceDir, "validation-report.json"),
+        JSON.stringify(preflightReport, null, 2) + "\n",
+      );
+      return {
+        data: preflightReport as unknown as MissionValidateData,
+        exitCode: 1,
+        summary: `[mission.validate] ${missionId} pre-flight FAILED: missing operator config files (${missingFiles})`,
+        nextSteps: [
+          {
+            action: `Restore missing files:\n${missing.map((m) => m.restoreCommand).join("\n")}\nThen re-run: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
+            kind: "required",
+          },
+        ],
+      };
+    }
+    logger.info(`  Operator config files: all present`);
+  } catch (err) {
+    // Non-fatal: if the check itself throws unexpectedly, log and continue
+    logger.warn(
+      `  Operator config presence check error (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 
   // RFC-0813: Playwright Chromium pre-flight check — fail fast before expensive

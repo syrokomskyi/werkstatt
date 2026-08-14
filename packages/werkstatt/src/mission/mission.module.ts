@@ -35,6 +35,8 @@ export function createMissionModule(): KernelModule {
       const { runWorkpieceRead } = await import("../workpiece/workpiece-read.ts");
       const { runWorkpieceWrite } = await import("../workpiece/workpiece-write.ts");
       const { runMaterializeConfigValidate } = await import("./materialize-config-validate.ts");
+      const { runWorkpieceConfigPresenceCheck } =
+        await import("./workpiece-config-presence-check.ts");
       registry.registerCommand({
         name: "mission.open",
         description: "Open a new mission for a Sternsystem (RFC-0355).",
@@ -412,6 +414,19 @@ export function createMissionModule(): KernelModule {
         reads: ["missions/*/workpiece/*", "missions/*/workpiece/src/*", "systems-cache/*/"],
         cacheable: false,
         execute: runMaterializeConfigValidate,
+      });
+      registry.registerCommand({
+        name: "workpiece.config.presence.check",
+        description:
+          "Verify OPERATOR_CONFIG_FILES are present in the active workpiece before build (RFC-0844).",
+        scope: "workspace",
+        supportsAllSites: false,
+        flags: {
+          mission: { kind: "string", required: true, description: "Mission id." },
+        },
+        reads: ["missions/{mission}/workpiece/*", "missions/{mission}/workpiece/src/*"],
+        cacheable: false,
+        execute: runWorkpieceConfigPresenceCheck,
       });
     },
   };
