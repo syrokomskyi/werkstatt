@@ -939,3 +939,16 @@ status: active
 - **Context:** 2026-08-15 — grilling meta-analysis for the combined agent runtime and certification program
 - **Question:** Should the rule that independent authority must exist before self-evolution becomes available be an active reusable principle?
 - **Answer:** Yes. A non-self-modifiable admission authority, real sandbox, immutable identity, evidence, rollback, quarantine, and kill switch must be implemented and verified before production activation of dynamic code; earlier execution is test-harness-only and fails closed.
+
+### K-0073: Promote bounded forward-only breakage to L2
+
+```knowledge-entry
+id: K-0073
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — grilling meta-analysis for the combined agent runtime and certification program
+- **Question:** Should the distinction between permitted operational unavailability and forbidden indeterminate breakage become an active reusable principle?
+- **Answer:** Yes. Every forward-only packet remains internally complete and green under its declared checks; only enumerated transition diagnostics may remain, while unexplained compilation, test, schema, state, or validator failures block handoff.

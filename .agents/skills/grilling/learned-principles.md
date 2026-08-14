@@ -26,3 +26,11 @@ Concrete principles distilled from past grilling sessions. Each principle has a 
 - **confirmations:** 1
 - **status:** active
 - **Added:** 2026-08-15
+
+## Bound forward-only breakage with explicit transition diagnostics
+
+- **Condition:** A forward-only architectural cutover intentionally permits temporary operational unavailability.
+- **Recommended answer:** Keep every intermediate packet internally complete and require its declared verification contract to pass. Permit only enumerated transition diagnostics assigned to later packets; unexplained compilation, test, schema, state, or validator failures block handoff.
+- **confirmations:** 1
+- **status:** active
+- **Added:** 2026-08-15
