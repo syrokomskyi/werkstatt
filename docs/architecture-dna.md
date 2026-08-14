@@ -294,7 +294,7 @@ Operator config files (`.lighthouse-budget-ignore` at root, `src/image-delivery.
 
 ## DNA-72 · Validator config location diagnostics
 
-Validators that load configuration from non-obvious paths MUST emit a warning diagnostic when the config file is found in a likely-but-wrong location. This prevents silent failures where the operator creates a config file in the wrong directory and the validator ignores it. The first instance is `IMG-DELIVERY-CONFIG-01` (warning when `image-delivery.config.yaml` is in workpiece root but not in `src/`). Established by RFC-0841.
+Validators that load configuration from non-obvious paths MUST emit a warning diagnostic when the config file is found in a likely-but-wrong location. This prevents silent failures where the operator creates a config file in the wrong directory and the validator ignores it. The first instance is `IMG-DELIVERY-CONFIG-02` (warning when `image-delivery.config.yaml` is in workpiece root but not in `src/`). Established by RFC-0841.
 
 ## DNA-73 · Sequential deployment pipeline enforcement
 
