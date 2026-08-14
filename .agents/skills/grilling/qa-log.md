@@ -913,3 +913,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** What artifact contract lets a less capable agent execute one program step without reconstructing the architecture or silently drifting from it?
 - **Answer:** Maintain one program index as the sole execution order and pair every child RFC with one self-contained implementation packet. The packet binds the exact prerequisite commit and normative source hashes; lists required reads, goals, non-goals, allowed and forbidden files, exact contracts, ordered edits, validations with expected results, allowed transition diagnostics, rollback, and a completion-report template. Any clarification marker, hash mismatch, or allow-list escape blocks execution and returns the packet for preparation.
+
+### K-0071: Promote weakest-executor transition design to L2
+
+```knowledge-entry
+id: K-0071
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — grilling meta-analysis for the combined agent runtime and certification program
+- **Question:** Should the rule that multi-step transitions are designed for the weakest independent executor become an active reusable principle?
+- **Answer:** Yes. Future programs should default to one sequential index and self-contained, hash-bound, fail-closed packets with explicit prerequisites, file boundaries, validations, and completion reports.
