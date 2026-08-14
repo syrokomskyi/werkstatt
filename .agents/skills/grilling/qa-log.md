@@ -237,3 +237,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, site certification profile v1
 - **Question:** How should required evidence be distributed across Authoring, Dev, Alt, and Main?
 - **Answer:** Authoring may remain `incomplete`. The `dev-deploy` gate requires a pass for all pre-deploy evidence available from immutable source/content/artifact identity, build, schemas, business truth, authored content, and static safety contracts. Dev then produces rendered, browser, integration, performance, accessibility, and independent-evaluator evidence; `propagate-alt` requires all nine quality dimensions covered from Dev. Alt rechecks environment-dependent URL/DNS/routes, headers, integrations, runtime, screenshots, and qualitative evidence; `promote-main` reuses still-current environment-independent evidence and requires current Alt evidence for environment-dependent requirements. Cross-environment reuse is forbidden unless the profile explicitly classifies the evidence as environment-independent.
+
+### K-0019: Transactional Main verification and automatic rollback
+
+```knowledge-entry
+id: K-0019
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
+- **Question:** What should happen when required checks can only run after Main traffic is switched?
+- **Answer:** Main promotion enters `main-verifying`, preferably after isolated slot/preview verification, and becomes `main-certified` only after required Main smoke, build-identity, critical route/form, header, and health evidence passes. Any required `fail`, `stale`, or `incomplete` invalidates the promotion and automatically rolls traffic back to the last immutable `main-certified` artifact. The restored version receives its own health verification and incident evidence. Missing prior certified artifacts or failed rollback produces a critical incident and must never be reported as successful publication.
