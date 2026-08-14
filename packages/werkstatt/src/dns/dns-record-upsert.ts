@@ -179,7 +179,6 @@ export function toApiRecord(declared: DnsRecordDeclaration): {
     return {
       type: declared.type,
       name: declared.name,
-      content: declared.content,
       data: { priority, target, value },
       proxied: declared.proxied ?? false,
       ...(declared.ttl !== undefined ? { ttl: declared.ttl } : {}),
