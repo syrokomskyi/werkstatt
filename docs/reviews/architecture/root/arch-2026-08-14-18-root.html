@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture review — Werkstatt ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam { border-style: dashed; }
+      .leak { color: #dc2626; }
+      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; }
+      .diagram { min-height: 320px; }
+      .arrow { color: #64748b; font-size: 1.35rem; line-height: 1; }
+      .leak-arrow { color: #dc2626; font-size: 1.35rem; line-height: 1; }
+      code { overflow-wrap: anywhere; }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-6xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-6">
+        <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Architecture review</p>
+            <h1 class="mt-2 text-4xl font-semibold tracking-tight">Werkstatt ecosystem</h1>
+          </div>
+          <p class="font-mono text-sm text-slate-500">2026-08-14 · repository root</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div class="rounded-xl border border-slate-200 bg-white p-4"><div class="text-2xl font-semibold">162</div><div class="text-xs uppercase tracking-wider text-slate-500">session files</div></div>
+          <div class="rounded-xl border border-red-200 bg-red-50 p-4"><div class="text-2xl font-semibold text-red-700">161</div><div class="text-xs uppercase tracking-wider text-red-700">empty summaries</div></div>
+          <div class="rounded-xl border border-amber-200 bg-amber-50 p-4"><div class="text-2xl font-semibold text-amber-800">765</div><div class="text-xs uppercase tracking-wider text-amber-800">command interfaces</div></div>
+          <div class="rounded-xl border border-red-200 bg-red-50 p-4"><div class="text-2xl font-semibold text-red-700">1,421</div><div class="text-xs uppercase tracking-wider text-red-700">Compass failures now</div></div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
+          <span class="inline-flex items-center gap-2"><span class="h-4 w-7 rounded border border-slate-500 bg-white"></span>solid box = module</span>
+          <span class="inline-flex items-center gap-2"><span class="h-4 w-7 rounded border-2 border-dashed border-slate-400"></span>dashed line = seam</span>
+          <span class="inline-flex items-center gap-2"><span class="text-red-600">→</span>red arrow = leakage</span>
+          <span class="inline-flex items-center gap-2"><span class="h-4 w-7 rounded bg-slate-900"></span>dark box = deep module</span>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+        <article id="candidate-certification" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="text-2xl font-semibold">1. Collapse readiness into one release certification module</h2>
+              <div class="mt-3 flex gap-2"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">local-substitutable</span></div>
+            </div>
+            <span class="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">Green can mean “evidence missing”</span>
+          </div>
+
+          <div>
+            <h3 class="text-xs uppercase tracking-wider text-slate-500">Files</h3>
+            <div class="mt-2 grid gap-1 font-mono text-sm text-slate-700 md:grid-cols-2">
+              <code>packages/werkstatt-site/src/checks/contract-full.ts</code>
+              <code>packages/werkstatt-site/src/checks/pipelines/*.ts</code>
+              <code>packages/werkstatt-site/src/domain/nebula/collect.ts</code>
+              <code>packages/werkstatt-site/src/checks/passport.ts</code>
+              <code>packages/werkstatt-site/src/checks/app-qa.ts</code>
+              <code>packages/werkstatt-site/src/checks/check-warpgogol/commands/deploy.ts</code>
+            </div>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4">
+              <p class="text-xs uppercase tracking-wider text-slate-500">Before · competing readiness</p>
+              <div class="mt-5 grid grid-cols-2 gap-3 text-center text-xs">
+                <div class="rounded border border-slate-400 bg-white p-3">app.contract.full<br><span class="text-slate-500">37 validators</span></div>
+                <div class="rounded border border-slate-400 bg-white p-3">mission.validate<br><span class="text-slate-500">build pipelines</span></div>
+                <div class="rounded border border-slate-400 bg-white p-3">Nebula<br><span class="text-red-600">passing stubs</span></div>
+                <div class="rounded border border-slate-400 bg-white p-3">Check Warpgogol<br><span class="text-red-600">report incomplete</span></div>
+              </div>
+              <div class="mt-5 flex justify-center gap-5"><span class="leak-arrow">↘</span><span class="leak-arrow">↙</span></div>
+              <div class="mx-auto mt-2 w-3/4 rounded border-2 border-red-400 bg-red-50 p-3 text-center text-sm text-red-800">Release decision must interpret missing, warning, cached, and stale evidence</div>
+            </div>
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4">
+              <p class="text-xs uppercase tracking-wider text-slate-500">After · one deep certification module</p>
+              <div class="mx-auto mt-5 w-4/5 rounded border-2 border-dashed border-slate-400 p-2 text-center text-xs text-slate-500">small certification seam</div>
+              <div class="arrow text-center">↓</div>
+              <div class="deep mx-auto w-4/5 rounded-xl p-5 text-center">
+                <div class="text-xs uppercase tracking-wider text-slate-300">Release certification module</div>
+                <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+                  <span class="rounded bg-slate-700 p-2">evidence completeness</span><span class="rounded bg-slate-700 p-2">content judgment</span>
+                  <span class="rounded bg-slate-700 p-2">rendered quality</span><span class="rounded bg-slate-700 p-2">provenance</span>
+                </div>
+              </div>
+              <div class="arrow text-center">↓</div>
+              <div class="mx-auto w-3/5 rounded border border-emerald-500 bg-emerald-50 p-3 text-center text-sm text-emerald-800">One auditable verdict</div>
+            </div>
+          </div>
+
+          <div class="grid gap-5 md:grid-cols-2">
+            <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Problem</h3><p class="mt-2 text-sm">The readiness interface leaks phase ordering, warning policy, artifact freshness, and missing-evidence interpretation to every caller; <code>nebula.score.compute</code> currently substitutes all-passing inputs when four evidence artifacts are absent.</p></div>
+            <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Solution</h3><p class="mt-2 text-sm">Concentrate evidence collection, completeness policy, deterministic checks, rendered checks, qualitative audits, and the final release verdict inside one deep module; incomplete required evidence must be an explicit non-pass state.</p></div>
+          </div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Wins</h3><ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4"><li>locality: one verdict policy</li><li>leverage: every release inherits it</li><li>tests cross one seam</li><li>missing evidence stays visible</li></ul></div>
+          <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"><strong>ADR / DNA callout:</strong> DNA-35 names <code>app.contract.full</code> as canonical. The friction is strong enough to revisit that decision because the implementation is no longer the actual full readiness path.</div>
+        </article>
+
+        <article id="candidate-lifecycle" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div><h2 class="text-2xl font-semibold">2. Deepen Mission lifecycle mutations into a transaction module</h2><div class="mt-3 flex gap-2"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">in-process</span></div></div>
+            <span class="rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">36 sessions mention dirty or lost state</span>
+          </div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Files</h3><div class="mt-2 grid gap-1 font-mono text-sm text-slate-700 md:grid-cols-2"><code>packages/werkstatt/src/mission/mission-close.ts</code><code>packages/werkstatt/src/mission/mission-open.ts</code><code>packages/werkstatt/src/mission/mission-materialize.ts</code><code>packages/werkstatt/src/mission/mission-materialization-commands.ts</code><code>packages/werkstatt/src/sternsystem/</code><code>scripts/check-clean-trees.sh</code></div></div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">Before · caller-visible choreography</p><div class="mt-5 space-y-2 text-center text-xs"><div class="rounded border bg-white p-2">validate</div><div class="arrow">↓</div><div class="rounded border bg-white p-2">commit workpiece</div><div class="arrow">↓</div><div class="rounded border bg-white p-2">push cache + mirrors</div><div class="arrow">↓</div><div class="rounded border bg-white p-2">write state + copy artifacts</div><div class="mt-3 flex justify-around text-red-600"><span>partial commit ↗</span><span>warning ↘</span></div></div></div>
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">After · journaled transaction</p><div class="mx-auto mt-5 w-4/5 rounded border-2 border-dashed border-slate-400 p-2 text-center text-xs text-slate-500">lifecycle seam</div><div class="arrow text-center">↓</div><div class="deep mx-auto w-4/5 rounded-xl p-5 text-center"><div class="text-xs uppercase tracking-wider text-slate-300">Mission transaction module</div><div class="mt-4 space-y-2 text-xs"><div class="rounded bg-slate-700 p-2">preconditions + effect journal</div><div class="rounded bg-slate-700 p-2">idempotent steps + compensation</div><div class="rounded bg-slate-700 p-2">clean-tree postcondition</div></div></div></div>
+          </div>
+          <div class="grid gap-5 md:grid-cols-2"><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Problem</h3><p class="mt-2 text-sm">A single lifecycle action mutates the workpiece, cache clone, monorepo state, Bordbuch, evidence, and mirrors through long implementations with many best-effort catches. Historical fixes repeatedly add one missing commit, push, cleanup, or retry at a time.</p></div><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Solution</h3><p class="mt-2 text-sm">Move cross-tree effects behind a journaled transaction module with declared preconditions, idempotent effects, compensation rules, and a mandatory postcondition proving every touched tree and mirror has the intended state.</p></div></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Wins</h3><ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4"><li>locality: effects in one module</li><li>leverage: every Mission transition</li><li>failure-path tests survive</li><li>retries become deterministic</li></ul></div>
+        </article>
+
+        <article id="candidate-verification" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-2xl font-semibold">3. Turn verification failures into baselined change evidence</h2><div class="mt-3 flex gap-2"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">local-substitutable</span></div></div><span class="rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">23 sessions adjudicate “pre-existing” failures</span></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Files</h3><div class="mt-2 grid gap-1 font-mono text-sm text-slate-700 md:grid-cols-2"><code>packages/werkstatt-site/src/testing/test-evidence.ts</code><code>packages/werkstatt-site/src/checks/maintenance-debt*.ts</code><code>packages/werkstatt-site/src/checks/pipelines/packages-check.ts</code><code>packages/werkstatt/src/leitstand/leitstand-commands.ts</code><code>docs/sessions/*.md</code></div></div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">Before · manual attribution</p><div class="mt-7 grid grid-cols-3 gap-2 text-center text-xs"><div class="rounded border bg-white p-3">head test</div><div class="rounded border bg-white p-3">stash / base</div><div class="rounded border bg-white p-3">agent judgment</div></div><div class="mt-7 text-center leak-arrow">↘ &nbsp; ? &nbsp; ↙</div><div class="mx-auto mt-3 w-2/3 rounded border border-red-400 bg-red-50 p-3 text-center text-red-800">new regression or old debt?</div></div>
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">After · comparative evidence</p><div class="mx-auto mt-5 w-4/5 rounded border-2 border-dashed border-slate-400 p-2 text-center text-xs text-slate-500">verification seam</div><div class="arrow text-center">↓</div><div class="deep mx-auto w-4/5 rounded-xl p-5 text-center"><div class="text-xs uppercase tracking-wider text-slate-300">Change verification module</div><div class="mt-4 grid grid-cols-2 gap-2 text-xs"><span class="rounded bg-slate-700 p-2">base fingerprints</span><span class="rounded bg-slate-700 p-2">head fingerprints</span><span class="rounded bg-slate-700 p-2">known debt</span><span class="rounded bg-slate-700 p-2">introduced failures</span></div></div></div>
+          </div>
+          <div class="grid gap-5 md:grid-cols-2"><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Problem</h3><p class="mt-2 text-sm">The verification interface returns a red suite but not whether the change introduced the failures. Agents repeatedly use stash experiments and prose claims, while current test evidence proves selected L4/L5 runs and maintenance debt baselines only advisory diagnostics.</p></div><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Solution</h3><p class="mt-2 text-sm">Concentrate base/head execution, stable failure fingerprinting, known-debt ownership, and regression classification inside one comparative evidence module; new fingerprints block, unchanged fingerprints remain explicit debt.</p></div></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Wins</h3><ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4"><li>locality: attribution is computed</li><li>leverage: all scoped checks</li><li>tests assert failure identity</li><li>no stash-based proof</li></ul></div>
+        </article>
+
+        <article id="candidate-session-memory" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-2xl font-semibold">4. Deepen session memory into an operational learning module</h2><div class="mt-3 flex gap-2"><span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">Worth exploring</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">in-process</span></div></div><span class="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">Validation passes nearly empty records</span></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Files</h3><div class="mt-2 grid gap-1 font-mono text-sm text-slate-700 md:grid-cols-2"><code>packages/forge/os/session/handlers/save.ts</code><code>packages/forge/os/session/handlers/validate.ts</code><code>packages/forge/os/session/types.ts</code><code>.agents/skills/fo-session-save/SKILL.md</code><code>.agents/skills/fo-session-retro/SKILL.md</code><code>docs/sessions/</code></div></div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">Before · shallow records</p><div class="mt-5 space-y-3"><div class="rounded border bg-white p-3 text-sm">ATIF → regex extraction</div><div class="arrow text-center">↓</div><div class="grid grid-cols-2 gap-2 text-center text-xs"><div class="rounded border border-red-300 bg-red-50 p-3">summary: ""<br>161 / 162</div><div class="rounded border border-red-300 bg-red-50 p-3">duration: null<br>162 / 162</div><div class="rounded border bg-white p-3">commits: []<br>60 / 162</div><div class="rounded border bg-white p-3">failure class<br>absent</div></div><div class="mt-3 rounded border-2 border-dashed border-slate-400 p-2 text-center text-xs">optional semantic skill seam</div></div></div>
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">After · searchable learning</p><div class="mx-auto mt-5 w-4/5 rounded border-2 border-dashed border-slate-400 p-2 text-center text-xs text-slate-500">ingestion seam</div><div class="arrow text-center">↓</div><div class="deep mx-auto w-4/5 rounded-xl p-5 text-center"><div class="text-xs uppercase tracking-wider text-slate-300">Session learning module</div><div class="mt-4 space-y-2 text-xs"><div class="rounded bg-slate-700 p-2">provenance + deduplication</div><div class="rounded bg-slate-700 p-2">failure taxonomy + decisions</div><div class="rounded bg-slate-700 p-2">trend and recurrence queries</div></div></div></div>
+          </div>
+          <div class="grid gap-5 md:grid-cols-2"><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Problem</h3><p class="mt-2 text-sm">The stored session interface exposes transcripts without dependable chronology, outcomes, decisions, or failure taxonomy. Semantic enrichment is optional, one raw file remains unprocessed, and <code>session.validate</code> accepts empty summaries and null duration.</p></div><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Solution</h3><p class="mt-2 text-sm">Make ingestion, provenance, deduplication, outcome extraction, failure classification, and recurrence queries one deep module; retain the transcript as evidence while requiring a minimal semantic record before the session becomes queryable.</p></div></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Wins</h3><ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4"><li>locality: learning is automatic</li><li>leverage: every future session</li><li>tests use malformed transcripts</li><li>recurrence becomes measurable</li></ul></div>
+        </article>
+
+        <article id="candidate-truth" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-2xl font-semibold">5. Collapse the agent truth plane into one semantic projection module</h2><div class="mt-3 flex gap-2"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">in-process</span></div></div><span class="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">Normative and generated truth disagree</span></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Files</h3><div class="mt-2 grid gap-1 font-mono text-sm text-slate-700 md:grid-cols-2"><code>AGENTS.md</code><code>docs/{requirements,technology,verification-plan}.xml</code><code>docs/architecture-dna.md</code><code>docs/ecosystem.generated.yaml</code><code>docs/command-manifest.generated.yaml</code><code>packages/werkstatt-site/src/checks/ecosystem/</code></div></div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">Before · conflicting truth modules</p><div class="mt-5 grid grid-cols-2 gap-3 text-center text-xs"><div class="rounded border bg-white p-3">AGENTS<br><span class="text-slate-500">current topology</span></div><div class="rounded border border-red-300 bg-red-50 p-3">Compass XML<br><span class="text-red-600">retired paths</span></div><div class="rounded border border-red-300 bg-red-50 p-3">ecosystem projection<br><span class="text-red-600">drift now</span></div><div class="rounded border bg-white p-3">command projection<br><span class="text-slate-500">765 entries</span></div></div><div class="mt-6 flex justify-around text-red-600"><span>agent ↗</span><span>agent ↑</span><span>agent ↖</span></div></div>
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">After · intent plus compiled projection</p><div class="mx-auto mt-5 w-4/5 rounded border border-slate-400 bg-white p-3 text-center text-sm">hand-authored intent + registries</div><div class="arrow text-center">↓</div><div class="deep mx-auto w-4/5 rounded-xl p-5 text-center"><div class="text-xs uppercase tracking-wider text-slate-300">Semantic projection module</div><div class="mt-4 grid grid-cols-2 gap-2 text-xs"><span class="rounded bg-slate-700 p-2">referential checks</span><span class="rounded bg-slate-700 p-2">task views</span><span class="rounded bg-slate-700 p-2">topology</span><span class="rounded bg-slate-700 p-2">verification policy</span></div></div><div class="arrow text-center">↓</div><div class="mx-auto w-3/5 rounded border border-emerald-500 bg-emerald-50 p-3 text-center text-sm text-emerald-800">one fresh agent context</div></div>
+          </div>
+          <div class="grid gap-5 md:grid-cols-2"><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Problem</h3><p class="mt-2 text-sm">Agents must reconcile hand-written rules, XML contracts, DNA, generated ecosystem state, and a very large command projection. The current XML still names retired <code>apps/*</code> and deleted package paths, while the ecosystem and fleet drift guards currently fail.</p></div><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Solution</h3><p class="mt-2 text-sm">Keep architectural intent authored, but concentrate topology extraction, referential validation, freshness, and task-scoped context rendering in one semantic projection module with a single provenance chain.</p></div></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Wins</h3><ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4"><li>locality: truth drift concentrates</li><li>leverage: every agent task</li><li>tests compare live registries</li><li>less context ambiguity</li></ul></div>
+        </article>
+
+        <article id="candidate-command-surface" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-2xl font-semibold">6. Deepen command discovery behind goal-oriented capabilities</h2><div class="mt-3 flex gap-2"><span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">Worth exploring</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">ports &amp; adapters</span></div></div><span class="rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">449 flat pipeline steps across four lists</span></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Files</h3><div class="mt-2 grid gap-1 font-mono text-sm text-slate-700 md:grid-cols-2"><code>tools/kernel.config.ts</code><code>packages/werkstatt/src/kernel/</code><code>packages/werkstatt-site/src/checks/command-tables/</code><code>packages/werkstatt-site/src/checks/pipelines/</code><code>docs/command-manifest.generated.yaml</code><code>docs/ecosystem.generated.yaml</code></div></div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">Before · large public interface</p><div class="mt-5 rounded border-2 border-dashed border-red-400 bg-red-50 p-4 text-center"><div class="text-3xl font-semibold text-red-700">765</div><div class="text-xs uppercase tracking-wider text-red-700">commands, flags, ordering facts</div><div class="mt-4 grid grid-cols-4 gap-1 text-[10px] text-slate-600"><span class="rounded bg-white p-2">generate</span><span class="rounded bg-white p-2">validate</span><span class="rounded bg-white p-2">check</span><span class="rounded bg-white p-2">commit</span><span class="rounded bg-white p-2">emit</span><span class="rounded bg-white p-2">sync</span><span class="rounded bg-white p-2">stamp</span><span class="rounded bg-white p-2">promote</span></div></div><div class="mt-4 text-center text-sm text-red-700">agent must choose exact command + flags</div></div>
+            <div class="diagram rounded-xl border border-slate-200 bg-stone-50 p-4"><p class="text-xs uppercase tracking-wider text-slate-500">After · small capability interface</p><div class="mx-auto mt-5 w-4/5 rounded border-2 border-dashed border-slate-400 p-2 text-center text-xs text-slate-500">goal seam</div><div class="arrow text-center">↓</div><div class="deep mx-auto w-4/5 rounded-xl p-5 text-center"><div class="text-xs uppercase tracking-wider text-slate-300">Capability module</div><div class="mt-4 grid grid-cols-2 gap-2 text-xs"><span class="rounded bg-slate-700 p-2">author</span><span class="rounded bg-slate-700 p-2">inspect</span><span class="rounded bg-slate-700 p-2">certify</span><span class="rounded bg-slate-700 p-2">release</span></div><div class="mt-3 text-xs text-slate-300">low-level commands remain internal adapters</div></div></div>
+          </div>
+          <div class="grid gap-5 md:grid-cols-2"><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Problem</h3><p class="mt-2 text-sm">The command registry offers high implementation power but a shallow interface: callers must know hundreds of names, phase distinctions, flags, aliases, generators, and ordering constraints. Sessions repeatedly show wrong flags, wrong manifests, and manual command recovery.</p></div><div><h3 class="text-xs uppercase tracking-wider text-slate-500">Solution</h3><p class="mt-2 text-sm">Place a small goal-oriented capability module at the external seam and keep exact commands as internal adapters selected from declared reads, writes, gates, and prerequisites.</p></div></div>
+          <div><h3 class="text-xs uppercase tracking-wider text-slate-500">Wins</h3><ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4"><li>depth: fewer caller facts</li><li>leverage: one intent, many steps</li><li>locality: ordering stays internal</li><li>adapter tests cover routing</li></ul></div>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-2xl border border-emerald-300 bg-emerald-50 p-8">
+        <p class="text-xs uppercase tracking-[0.22em] text-emerald-800">Top recommendation</p>
+        <h2 class="mt-3 text-3xl font-semibold"><a class="underline decoration-emerald-400 underline-offset-4" href="#candidate-certification">Collapse readiness into one release certification module</a></h2>
+        <p class="mt-4 max-w-4xl text-emerald-950">This has the highest leverage because it converts every structural, content, accessibility, performance, visual, and qualitative check into one honest release decision. Today the quality interface can report success while core evidence is missing; fixing that seam improves every site produced by Werkstatt before the next release reaches the internet.</p>
+      </section>
+
+      <footer class="border-t border-slate-200 pt-6 text-xs text-slate-500">
+        Evidence snapshot: 162 session files; 36 dirty/lost-state mentions; 23 pre-existing-failure mentions; 6 session-end contract-violation files; 161 empty summaries; 60 empty commit lists; one unprocessed raw session; 765 registered commands; 190 author-check steps; 35 postbuild steps; 124 prepare steps; 100 package-check steps. Live checks on 2026-08-14: ecosystem manifest drift, fleet surface drift, 1,421 non-compliant Compass files, four CHANGE_SUMMARY failures.
+      </footer>
+    </main>
+  </body>
+</html>
