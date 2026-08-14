@@ -510,3 +510,16 @@ status: active
 - **Context:** 2026-08-14 — RFC-0848 enhancement after semantic audit, clean certification reset
 - **Question:** Which prior RFCs lose normative authority immediately, and which existing mechanisms remain reusable without being allowed to certify publication?
 - **Answer:** RFC-0848 fully supersedes RFC-0357, RFC-0358, RFC-0608, RFC-0627, RFC-0628, and RFC-0842 because their release/deployment authority and state machines conflict with the new artifact/operation/certification separation. Diagnostic, consistency locks, fingerprinting, artifact storage, deploy adapters, freshness primitives, evidence archives, the testing pyramid, validators, and release-ready reliability remain reusable infrastructure, but none may independently authorize a deployment. Later CERT RFCs explicitly reconnect or supersede their affected authority behavior.
+
+### K-0040: Bound deterministic certification workloads explicitly
+
+```knowledge-entry
+id: K-0040
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0848 enhancement after semantic audit, certification performance contract
+- **Question:** Which hard input limits and algorithmic bounds must prevent a weak implementation from introducing unbounded or quadratic certification evaluation?
+- **Answer:** A certification profile contains at most 1,000 requirements, one evaluation cut admits at most 10,000 evidence records, one action pack contains at most 1,000 tasks, and canonical JSON input is at most 8 MiB with depth at most 64. Evidence selection and aggregation must run in `O(E + R log R)` time and `O(E + R)` memory; a per-requirement full evidence scan is forbidden. Tests include a deterministic 1,000-requirement/10,000-evidence stress fixture. Limit overflow emits an explicit `incomplete` or contract diagnostic without truncation. Timing benchmarks remain advisory rather than flaky CI gates.
