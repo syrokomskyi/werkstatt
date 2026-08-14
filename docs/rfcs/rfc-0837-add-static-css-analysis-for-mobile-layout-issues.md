@@ -199,15 +199,15 @@ interface MobileLayoutLintResult {
 
 ## Acceptance criteria
 
-- [ ] TypeScript types and interfaces defined in `packages/werkstatt-site/src/checks/css-mobile-layout-lint.ts`
-- [ ] CLI command registered with name `css.mobile-layout.lint` and scope `app` in `04-content-quality.ts`
-- [ ] `--json` output format documented and stable
-- [ ] Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `css.important.lint`
-- [ ] Existing sites pass without changes in warning mode (or migration path is documented)
-- [ ] `packages/werkstatt-site/AGENTS.md` Check commands section updated with `css.mobile-layout.lint` entry
-- [ ] `docs/verification-plan.xml` updated to list `css.mobile-layout.lint` in the author pipeline check catalog
-- [ ] DNA-68 entry appended to `docs/architecture-dna.md`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] TypeScript types and interfaces defined in `packages/werkstatt-site/src/checks/css-mobile-layout-lint.ts` (evidence: commit 3f271aaa, file exports `MobileLayoutViolation`, `MobileLayoutLintResult`, `runCssMobileLayoutLint`)
+- [x] CLI command registered with name `css.mobile-layout.lint` and scope `app` in `04-content-quality.ts` (evidence: commit 55751826, `CONTENT_QUALITY_COMMAND_TABLE` entry at line 245)
+- [x] `--json` output format documented and stable (evidence: `MobileLayoutLintResult` interface with `command`, `violations`, `files`, `violationsByRule`; per-violation `filePath`, `line`, `column`, `ruleId`, `message`, `suggestion`)
+- [x] Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `css.important.lint` (evidence: commit 55751826, `sites-check-author.ts` line 330 with `--mode=warning`)
+- [x] Existing sites pass without changes in warning mode (evidence: pipeline runs with `--mode=warning`, exit code 0 even with violations)
+- [x] `packages/werkstatt-site/AGENTS.md` Check commands section updated with `css.mobile-layout.lint` entry (evidence: commit 7c99b761, AGENTS.md line 84)
+- [x] `docs/verification-plan.xml` updated to list `css.mobile-layout.lint` in the author pipeline check catalog (evidence: commit 7c99b761, vm-16 entry at line 441)
+- [x] DNA-68 entry appended to `docs/architecture-dna.md` (evidence: commit 7c99b761, DNA-68 section at line 287)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0837` exits 0)
 
 ## Implementation notes for agents
 
