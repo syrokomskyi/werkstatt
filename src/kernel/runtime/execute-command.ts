@@ -16,6 +16,7 @@ resolves a workspace-scoped or app-scoped command from CLI options and runs it.
   <item>RFC-0579: propagate nextSteps from KernelCommandResult to KernelExecutionReport and render as "Next steps:" block in pretty mode.</item>
   <item>RFC-0635: inject force from context into input.flags.force so command handlers can read --force without declaring it in their flag schema.</item>
   <item>ADR-0022: workspace registry now uses process-lifetime cache via getOrBuildWorkspaceRegistry.</item>
+  <item>RFC-0842: add assertAllSitesAllowed guard — rejects --all for commands where supportsAllSites is not true (covers false and undefined).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -314,6 +315,20 @@ export async function executeRegisteredCommand(
   }
 }
 
+/**
+ * RFC-0842: Guard that rejects --all for commands where supportsAllSites is not true.
+ * Covers both `false` (explicit opt-out) and `undefined` (safer default — reject).
+ * Exported for unit testing.
+ */
+export function assertAllSitesAllowed(command: KernelCommandDefinition, allSites: boolean): void {
+  if (allSites && command.supportsAllSites !== true) {
+    throw new Error(
+      `Command '${command.name}' does not support --all (supportsAllSites is not true). ` +
+        `Use --site <siteId> to target a specific site.`,
+    );
+  }
+}
+
 const EXECUTE_KERNEL_COMMAND_OPTION_KEYS = [
   "workspaceRoot",
   "commandName",
@@ -378,6 +393,7 @@ export async function executeKernelCommand(
       }
 
       if (wsCommand && wsCommand.scope === "workspace") {
+        assertAllSitesAllowed(wsCommand, options.allSites ?? false);
         const logger = createKernelLogger(outputFormat);
         const { io, intents } = createDefaultIO();
         const context: KernelRuntimeContext = {
@@ -439,6 +455,7 @@ export async function executeKernelCommand(
   // for commands that are already available from the workspace registry (the
   // vast majority of app-scoped commands from createStandardCheckModule).
   if (wsCommand) {
+    assertAllSitesAllowed(wsCommand, options.allSites ?? false);
     for (const site of targetSites) {
       const logger = createKernelLogger(outputFormat);
       const { io, intents } = createDefaultIO();
@@ -497,6 +514,8 @@ export async function executeKernelCommand(
         `Kernel command \`${options.commandName}\` is not registered for site \`${site.name}\`.`,
       );
     }
+
+    assertAllSitesAllowed(command, options.allSites ?? false);
 
     const logger = createKernelLogger(outputFormat);
     const { io, intents } = createDefaultIO();
