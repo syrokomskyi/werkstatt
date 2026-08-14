@@ -861,3 +861,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Should release and capability evolution share one candidate schema and lifecycle?
 - **Answer:** No. `ReleaseCandidate` and `CapabilityCandidate` are distinct closed schemas and lifecycles over shared content-addressed storage, evidence-envelope, evaluation, and promotion primitives. The active runtime is an immutable `ResolvedComponentSet`; every release certificate binds its exact component-set hash, and capability promotion creates a new set that invalidates runtime-identity-dependent evidence.
+
+### K-0067: Classify every component effect under a closed four-class model
+
+```knowledge-entry
+id: K-0067
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** How must the runtime classify component effects so external operations are not falsely treated as reversible?
+- **Answer:** Use the closed classes `revertible`, `transactional`, `compensatable`, and `irreversible-emission`. Revertible effects require disposer, LIFO teardown, and quiescence; transactional effects require prepare/commit/abort plus an idempotency key; compensatable effects require an explicit compensation and equivalence evidence; irreversible emissions remain withheld until the commit boundary and are never described as rollback-safe. Unknown or misclassified effects block activation, and a capability candidate introducing a new external-effect type cannot be auto-promoted before its policy is separately accepted.
