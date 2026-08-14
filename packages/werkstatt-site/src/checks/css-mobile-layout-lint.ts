@@ -84,7 +84,6 @@ const ROOT_SELECTORS = new Set(["body", "main", "html", ":root"]);
 interface CssRule {
   selector: string;
   body: string;
-  startLine: number;
   startOffset: number;
 }
 
@@ -130,11 +129,10 @@ function parseCssRules(source: string, baseLine: number, baseOffset: number): Cs
 
     const selector = source.slice(i, braceStart).trim();
     const body = source.slice(braceStart + 1, braceEnd);
-    const startLine = baseLine + source.slice(0, i).split("\n").length - 1;
     const startOffset = baseOffset + i;
 
     if (selector) {
-      rules.push({ selector, body, startLine, startOffset });
+      rules.push({ selector, body, startOffset });
     }
 
     i = braceEnd + 1;
@@ -221,16 +219,12 @@ function detectViolations(
   }
 
   if (hasProperty(body, "height") && /100vh/i.test(body) && !/100dvh/i.test(body)) {
-    violations.push(
-      makeViolation(relativePath, fullSource, rule.startOffset, rule, "MOBILE-CSS-01"),
-    );
+    violations.push(makeViolation(relativePath, fullSource, rule.startOffset, "MOBILE-CSS-01"));
   }
 
   if (hasProperty(body, "width") && /100vw/i.test(body)) {
     if (hasProperty(body, "padding") || hasProperty(body, "border")) {
-      violations.push(
-        makeViolation(relativePath, fullSource, rule.startOffset, rule, "MOBILE-CSS-02"),
-      );
+      violations.push(makeViolation(relativePath, fullSource, rule.startOffset, "MOBILE-CSS-02"));
     }
   }
 
@@ -239,9 +233,7 @@ function detectViolations(
     if (widthValue) {
       const px = getNumericValue(widthValue);
       if (px !== null && px > 380 && !hasProperty(body, "max-width")) {
-        violations.push(
-          makeViolation(relativePath, fullSource, rule.startOffset, rule, "MOBILE-CSS-03"),
-        );
+        violations.push(makeViolation(relativePath, fullSource, rule.startOffset, "MOBILE-CSS-03"));
       }
     }
   }
@@ -257,9 +249,7 @@ function detectViolations(
     if (marginValue) {
       const hasNegative = /-\d/.test(marginValue);
       if (hasNegative) {
-        violations.push(
-          makeViolation(relativePath, fullSource, rule.startOffset, rule, "MOBILE-CSS-04"),
-        );
+        violations.push(makeViolation(relativePath, fullSource, rule.startOffset, "MOBILE-CSS-04"));
       }
     }
   }
@@ -269,18 +259,14 @@ function detectViolations(
     if (widthValue) {
       const px = getNumericValue(widthValue);
       if (px !== null && px > 430) {
-        violations.push(
-          makeViolation(relativePath, fullSource, rule.startOffset, rule, "MOBILE-CSS-05"),
-        );
+        violations.push(makeViolation(relativePath, fullSource, rule.startOffset, "MOBILE-CSS-05"));
       }
     }
   }
 
   if (/white-space\s*:\s*nowrap/i.test(body)) {
     if (!hasProperty(body, "overflow-wrap") && !hasProperty(body, "word-break")) {
-      violations.push(
-        makeViolation(relativePath, fullSource, rule.startOffset, rule, "MOBILE-CSS-06"),
-      );
+      violations.push(makeViolation(relativePath, fullSource, rule.startOffset, "MOBILE-CSS-06"));
     }
   }
 
@@ -291,7 +277,6 @@ function makeViolation(
   relativePath: string,
   fullSource: string,
   ruleOffset: number,
-  _rule: CssRule,
   ruleId: string,
 ): MobileLayoutViolation {
   const { line, column } = getLineColumn(fullSource, ruleOffset);
@@ -306,49 +291,50 @@ function makeViolation(
   };
 }
 
+async function collectAndRead(
+  dir: string,
+  ext: string,
+  basePath: string,
+  logger: { warn: (msg: string) => void },
+): Promise<Array<{ path: string; content: string; relativePath: string }>> {
+  let files: string[];
+  try {
+    files = await collectFiles(dir, { extensions: [ext] });
+  } catch {
+    return [];
+  }
+
+  const results: Array<{ path: string; content: string; relativePath: string }> = [];
+  for (const filePath of files) {
+    const content = await readFile(filePath, "utf-8").catch((err) => {
+      logger.warn(`[css.mobile-layout.lint] Failed to read ${filePath}: ${err}`);
+      return "";
+    });
+    if (!content) continue;
+    const relativePath = relative(basePath, filePath).replace(/\\/g, "/");
+    results.push({ path: filePath, content, relativePath });
+  }
+  return results;
+}
+
 async function collectAllFiles(
   appDir: string,
   workspaceRoot: string,
+  logger: { warn: (msg: string) => void },
 ): Promise<{
   files: Array<{ path: string; content: string; relativePath: string }>;
   count: number;
 }> {
-  const results: Array<{ path: string; content: string; relativePath: string }> = [];
-
   const appStylesDir = join(appDir, "src", "styles");
-  const appCssFiles = await collectFiles(appStylesDir, { extensions: [".css"] });
-  for (const filePath of appCssFiles) {
-    const content = await readFile(filePath, "utf-8").catch(() => "");
-    if (!content) continue;
-    const relativePath = relative(appDir, filePath).replace(/\\/g, "/");
-    results.push({ path: filePath, content, relativePath });
-  }
-
   const appPagesDir = join(appDir, "src", "pages");
-  const appAstroFiles = await collectFiles(appPagesDir, { extensions: [".astro"] });
-  for (const filePath of appAstroFiles) {
-    const content = await readFile(filePath, "utf-8").catch(() => "");
-    if (!content) continue;
-    const relativePath = relative(appDir, filePath).replace(/\\/g, "/");
-    results.push({ path: filePath, content, relativePath });
-  }
-
   const uiDir = resolve(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui");
-  const uiCssFiles = await collectFiles(uiDir, { extensions: [".css"] });
-  for (const filePath of uiCssFiles) {
-    const content = await readFile(filePath, "utf-8").catch(() => "");
-    if (!content) continue;
-    const relativePath = relative(workspaceRoot, filePath).replace(/\\/g, "/");
-    results.push({ path: filePath, content, relativePath });
-  }
 
-  const uiAstroFiles = await collectFiles(uiDir, { extensions: [".astro"] });
-  for (const filePath of uiAstroFiles) {
-    const content = await readFile(filePath, "utf-8").catch(() => "");
-    if (!content) continue;
-    const relativePath = relative(workspaceRoot, filePath).replace(/\\/g, "/");
-    results.push({ path: filePath, content, relativePath });
-  }
+  const results = [
+    ...(await collectAndRead(appStylesDir, ".css", appDir, logger)),
+    ...(await collectAndRead(appPagesDir, ".astro", appDir, logger)),
+    ...(await collectAndRead(uiDir, ".css", workspaceRoot, logger)),
+    ...(await collectAndRead(uiDir, ".astro", workspaceRoot, logger)),
+  ];
 
   return { files: results, count: results.length };
 }
@@ -388,7 +374,11 @@ export async function runCssMobileLayoutLint(
   const isWarningMode = mode === "warning";
 
   const paths = requireAstroSitePaths(context);
-  const { files, count } = await collectAllFiles(paths.appDirectory, context.workspaceRoot);
+  const { files, count } = await collectAllFiles(
+    paths.appDirectory,
+    context.workspaceRoot,
+    context.logger,
+  );
 
   const allViolations: MobileLayoutViolation[] = [];
 
