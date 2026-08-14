@@ -87,6 +87,7 @@
     display: block;
     --section-image-fade-width: 20%;
     max-height: 50vh;
+    max-height: 50dvh;
     width: auto;
     /* Preserve the source aspect ratio for every orientation: height always follows
        width, and `contain` letterboxes rather than stretches if a box is ever imposed
@@ -285,6 +286,7 @@
   @media (min-width: 960px) {
     .hero__portrait-image {
       max-height: 80vh;
+      max-height: 80dvh;
     }
   }
 
@@ -307,6 +309,7 @@
     width: 100%;
     height: auto;
     max-height: 42vh;
+    max-height: 42dvh;
     object-fit: cover;
     border-radius: var(--ds-radius-2);
   }

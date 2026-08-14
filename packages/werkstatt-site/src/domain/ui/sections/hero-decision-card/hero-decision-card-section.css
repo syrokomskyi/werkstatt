@@ -26,6 +26,7 @@
      the first child of <main>. */
   main > .section-shell[data-slug="hero-decision-card"]:first-of-type {
     min-height: 100vh;
+    min-height: 100dvh;
   }
 
   .section-shell[data-slug="hero-decision-card"] .section-shell__container {

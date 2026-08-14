@@ -61,6 +61,7 @@ spotlight (ported from the former founder-trust-card).</purpose>
     width: 100%;
     height: auto;
     max-height: 90vh;
+    max-height: 90dvh;
     object-fit: contain;
     object-position: center;
     display: block;
