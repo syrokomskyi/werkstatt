@@ -497,3 +497,16 @@ status: active
 - **Context:** 2026-08-14 — RFC-0848 enhancement after semantic audit, implementation by less capable agents
 - **Question:** Should CERT-001 remain one large implementation RFC, or be decomposed so each document can be implemented safely by a separate agent session?
 - **Answer:** Keep RFC-0848 as the integration contract for CERT-001 and split implementation into three dependent RFCs: strict runtime contracts/Diagnostic ownership/canonical JSON/identity; deterministic evidence selection/aggregation/dossier/action packs; and release/deployment state replacement with the fail-closed legacy command boundary. Each child RFC must compile and pass its own tests independently. RFC-0848 completes only after all three children are implemented and its cross-module integration checks pass.
+
+### K-0039: Supersede legacy release and deployment authority without rebuilding infrastructure
+
+```knowledge-entry
+id: K-0039
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0848 enhancement after semantic audit, clean certification reset
+- **Question:** Which prior RFCs lose normative authority immediately, and which existing mechanisms remain reusable without being allowed to certify publication?
+- **Answer:** RFC-0848 fully supersedes RFC-0357, RFC-0358, RFC-0608, RFC-0627, RFC-0628, and RFC-0842 because their release/deployment authority and state machines conflict with the new artifact/operation/certification separation. Diagnostic, consistency locks, fingerprinting, artifact storage, deploy adapters, freshness primitives, evidence archives, the testing pyramid, validators, and release-ready reliability remain reusable infrastructure, but none may independently authorize a deployment. Later CERT RFCs explicitly reconnect or supersede their affected authority behavior.
