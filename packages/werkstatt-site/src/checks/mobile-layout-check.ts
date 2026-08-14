@@ -364,6 +364,21 @@ export async function runMobileLayoutCheck(
             isMobile: true,
             hasTouch: true,
           });
+
+          // Block all external requests. mobile.layout.check tests geometric
+          // invariants of locally-built HTML/CSS — external resources (analytics
+          // beacons, CDN fonts, pulse endpoints) must not cause network timeouts
+          // or non-deterministic layout shifts. Only requests to the local static
+          // server are allowed; everything else is aborted immediately.
+          await ctx.route("**/*", (route) => {
+            const reqUrl = route.request().url();
+            if (reqUrl.startsWith(baseUrl)) {
+              route.continue();
+            } else {
+              route.abort();
+            }
+          });
+
           const page = await ctx.newPage();
 
           await page.addInitScript(CLS_INIT_SCRIPT);
@@ -380,7 +395,7 @@ export async function runMobileLayoutCheck(
 
           try {
             await page.goto(`${baseUrl}${route}`, {
-              waitUntil: "networkidle",
+              waitUntil: "load",
               timeout: routeTimeoutMs,
             });
 

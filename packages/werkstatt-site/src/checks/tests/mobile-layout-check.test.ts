@@ -83,6 +83,7 @@ function setupMockBrowser(pages: ReturnType<typeof makeMockPage>[]) {
       pageIndex++;
       return Promise.resolve(page);
     }),
+    route: vi.fn().mockResolvedValue(undefined),
     close: vi.fn().mockResolvedValue(undefined),
   };
   const browser = {
@@ -276,5 +277,24 @@ describe("mobile.layout.check", () => {
     expect(result.exitCode).toBe(1);
     const data = unwrapData(result);
     expect(data.diagnostics.some((d) => d.ruleId === "MOBILE-GEO-02")).toBe(true);
+  });
+
+  it("sets up external request blocking via ctx.route() for each context", async () => {
+    await writeFile(
+      join(distClient, "index.html"),
+      "<!DOCTYPE html><html><body>Home</body></html>",
+    );
+
+    const browser = setupMockBrowser([makeMockPage({}), makeMockPage({})]);
+
+    await runMobileLayoutCheck(testInput(), makeTestSiteContext(workspaceRoot, appDir));
+
+    // 1 route × 2 orientations = 2 contexts, each must have route() called
+    const newContextCalls = browser.newContext.mock.results;
+    expect(newContextCalls.length).toBe(2);
+    for (const callResult of newContextCalls) {
+      const ctx = await callResult.value;
+      expect(ctx.route).toHaveBeenCalled();
+    }
   });
 });
