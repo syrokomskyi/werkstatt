@@ -835,3 +835,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Which isolation boundary applies to trusted first-party components versus agent-written or third-party components?
 - **Answer:** Trusted, versioned first-party components may execute in-process. Agent-written and third-party components execute only through a provider-neutral sandbox adapter with deny-by-default capability RPC. A plain subprocess, `worker_threads`, and `node:vm` are not security boundaries; agent-written activation stays disabled until a real sandbox adapter is implemented and certified.
+
+### K-0065: Keep the Law Kernel small and non-self-modifiable
+
+```knowledge-entry
+id: K-0065
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Which capabilities belong to the protected Law Kernel and therefore cannot be replaced by a running component?
+- **Answer:** The closed Law Kernel owns canonical and immutable identities, capability grants, sandbox admission, locks, idempotency, activation transactions, authoritative dossier/artifact append, Certification Authority, independent evaluation admission, promotion, deployment authorization, rollback, quarantine, kill switch, and audit/Bordbuch integrity. Commands, validators, producers, evaluators, adapters, probes, schedulers, and prompt/tool surfaces remain replaceable components but cannot change their own admission rules.
