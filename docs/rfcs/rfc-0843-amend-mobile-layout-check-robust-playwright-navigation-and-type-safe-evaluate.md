@@ -1,7 +1,7 @@
 ---
 id: RFC-0843
 title: "Amend mobile.layout.check — robust Playwright navigation and type-safe evaluate"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
