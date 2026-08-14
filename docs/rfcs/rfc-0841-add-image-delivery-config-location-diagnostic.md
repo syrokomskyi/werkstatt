@@ -36,7 +36,7 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/werkstatt-site"
 successSignals:
-  - "`image.delivery.validate` emits `IMG-DELIVERY-CONFIG-01` (warning) when `image-delivery.config.yaml` is found in the workpiece root but not in `src/`."
+  - "`image.delivery.validate` emits `IMG-DELIVERY-CONFIG-02` (warning) when `image-delivery.config.yaml` is found in the workpiece root but not in `src/`."
   - "`image.delivery.validate` logs the resolved config path (or 'not found') in its summary output."
   - "Operators no longer silently lose override configuration due to placing the file in the wrong directory."
   - "DNA-72 is established in `docs/architecture-dna.md` and `dna.registry.validate` passes."
@@ -67,7 +67,7 @@ This is a silent failure mode:
 
 Add a location diagnostic to `image.delivery.validate`:
 
-1. **Check for misplaced config:** Before loading the config from `src/`, check if `image-delivery.config.yaml` exists in the workpiece root (`paths.appDirectory`). If it exists at the root but NOT in `src/`, emit `IMG-DELIVERY-CONFIG-01` (warning).
+1. **Check for misplaced config:** Before loading the config from `src/`, check if `image-delivery.config.yaml` exists in the workpiece root (`paths.appDirectory`). If it exists at the root but NOT in `src/`, emit `IMG-DELIVERY-CONFIG-02` (warning).
 
 2. **Log resolved config path:** Include the resolved config path (or "not found") in the validator's summary output, so operators can verify which file is being loaded.
 
@@ -79,11 +79,11 @@ Add a location diagnostic to `image.delivery.validate`:
 
 ## Design
 
-### `IMG-DELIVERY-CONFIG-01` rule
+### `IMG-DELIVERY-CONFIG-02` rule
 
 | Rule ID | Check | Severity | Message |
 | --- | --- | --- | --- |
-| `IMG-DELIVERY-CONFIG-01` | Config file found in workpiece root but not in `src/` | warning | `image-delivery.config.yaml` found at workpiece root but validator reads from `src/image-delivery.config.yaml`. Move the file to `src/` to apply overrides. |
+| `IMG-DELIVERY-CONFIG-02` | Config file found in workpiece root but not in `src/` | warning | `image-delivery.config.yaml` found at workpiece root but validator reads from `src/image-delivery.config.yaml`. Move the file to `src/` to apply overrides. |
 
 ### Implementation
 
@@ -95,7 +95,7 @@ const srcConfigPath = join(paths.srcDirectory, "image-delivery.config.yaml");
 
 if (existsSync(rootConfigPath) && !existsSync(srcConfigPath)) {
   findings.push({
-    rule: "IMG-DELIVERY-CONFIG-01",
+    rule: "IMG-DELIVERY-CONFIG-02",
     file: rootConfigPath,
     line: 0,
     src: "",
@@ -141,13 +141,13 @@ image.delivery.validate: 377 finding(s), 122 image(s) checked (config: not found
 - **Config file in both root and `src/`:** No warning — the `src/` location is used correctly. The root copy is ignored (operator should delete it).
 - **Config file in neither location:** No warning — no overrides are configured, which is a valid state.
 - **Config file only in `src/`:** No warning — correct location.
-- **Config file only in root:** `IMG-DELIVERY-CONFIG-01` warning emitted.
+- **Config file only in root:** `IMG-DELIVERY-CONFIG-02` warning emitted.
 
 ## Rollout
 
 1. Add the root-location check to `runImageDeliveryValidate`.
 2. Add the config path to the summary output.
-3. Update the `image-delivery.test.ts` with a test case for `IMG-DELIVERY-CONFIG-01`.
+3. Update the `image-delivery.test.ts` with a test case for `IMG-DELIVERY-CONFIG-02`.
 
 No pipeline changes needed — `image.delivery.validate` is already in `SITES_CHECK_POSTBUILD_PIPELINE`.
 
