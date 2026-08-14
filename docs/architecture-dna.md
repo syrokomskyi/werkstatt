@@ -303,3 +303,7 @@ Deployment commands (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.p
 ## DNA-69 · Playwright mobile layout stability checks
 
 Every site route MUST pass Playwright-based geometric assertions in mobile emulation: no horizontal overflow (`scrollWidth ≤ clientWidth`), stable layout after portrait→landscape rotation (element geometry delta ≤ 5px), and CLS < 0.1. The validator operates without baselines — it asserts invariants directly, not by comparing against stored snapshots. Runs in `SITES_CHECK_POSTBUILD_PIPELINE` after `lighthouse.budget.check`. Enforcement: `mobile.layout.check`. Established by RFC-0838.
+
+## DNA-70 · Axiom post-deploy mobile layout monitoring
+
+The workshop extends Axiom post-deploy monitoring with a `mobile-layout` instrument type and `mobile-layout-stability` methodology. This is the L5 (post-deploy) layer of the three-layer mobile layout validation strategy (RFC-0837 static CSS, RFC-0838 Playwright pre-deploy, RFC-0839 Axiom post-deploy). The methodology runs against live URLs after deployment and checks horizontal overflow, orientation stability, address bar shift, and CLS on real device presets. The instrument implementation lives in `@syrokomskyi/axiom-factory-app` (external expert); the Werkstatt side is limited to schema extension, config declaration, and documentation. Enforcement: `mission.check`, `methodologies.validate`. Established by RFC-0839.

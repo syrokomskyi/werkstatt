@@ -442,5 +442,9 @@
       <change-type>Static CSS analysis for mobile layout anti-patterns (RFC-0837)</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/css-mobile-layout-lint.test.ts`; verify `css.mobile-layout.lint` command is registered via `pnpm exec werkstatt run css.mobile-layout.lint --site <id> --json`; verify warning mode exits 0 with violations via `pnpm exec werkstatt run css.mobile-layout.lint --site <id> --mode=warning --json`; verify the command runs in `SITES_CHECK_AUTHOR_PIPELINE` via `pnpm exec werkstatt run sites-check.author --site <id>`.</expectation>
     </entry>
+    <entry id="vm-17">
+      <change-type>Axiom post-deploy mobile layout monitoring (RFC-0839)</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/methodologies-config.test.ts`; verify `methodologies.validate` passes with 9 instruments and 9 methodologies via `pnpm exec werkstatt run methodologies.validate`; verify `mobile-layout` is accepted as instrument type and `mobile-layout-stability` is accepted as methodology id; verify `dna.registry.validate` passes with DNA-70 registered.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

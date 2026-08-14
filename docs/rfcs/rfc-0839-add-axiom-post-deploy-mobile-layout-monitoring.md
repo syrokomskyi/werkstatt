@@ -40,7 +40,7 @@ packagesImpacted:
   - "@warpgogol/werkstatt-site"
 successSignals:
   - "A new Axiom instrument type `mobile-layout` is defined in `systems/methodologies.md` and registered in the instrument config schema."
-  - "A new Axiom methodology `mobile-layout-stability` is declared in `systems/methodologies.md` with `active: true` and `blockOn: [high, critical]`."
+  - "A new Axiom methodology `mobile-layout-stability` is declared in `systems/methodologies.md` with `active: false` and `blockOn: [high, critical]`."
   - "The `mission.check` command passes the mobile-layout methodology configuration to `runAxiomCheck` alongside existing methodologies."
   - "Axiom findings from the mobile-layout instrument are surfaced in the mission check result and the HTML report with rule IDs prefixed `MOBILE-AXIOM-*`."
   - "The methodology config schema (`methodologies-config.ts`) is extended to accept `mobile-layout` as a valid instrument type."
