@@ -380,3 +380,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
 - **Question:** How is the post-switch proof between a pre-switch `promote-main: pass` gate decision and the final `main-certified` state represented without overloading either the gate decision or mutable current health?
 - **Answer:** Add an immutable `MainVerificationDecisionV1` dossier event. It binds the candidate, pre-switch promotion decision and dossier root, deployment operation and target slot, exact Main evidence IDs, status, rollback decision/result, and before/after dossier roots. `main-certified` is allowed only when this decision is `pass` and its resulting dossier root has a verified durable replica. Continuous health begins afterward and never substitutes for Main verification.
+
+### K-0030: One-time bootstrap rollback target for the first certified cutover
+
+```knowledge-entry
+id: K-0030
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
+- **Question:** How can the first clean cutover be reversible when the currently serving legacy production artifact is intentionally not retroactively certified and no previous new-system `main-certified` candidate exists yet?
+- **Answer:** CERT-009 may register one exact `bootstrap rollback target` consisting of the current provider deployment snapshot or provider-native rollback slot. The target must have verified identity, availability, restoration capability, and a rehearsal before traffic switching, but it is never labeled `main-certified` and its evidence cannot satisfy any candidate gate or future promotion. It is eligible only to undo the first certified cutover. If no recoverable target can be proved, cutover remains `incomplete`. Cleanup protects it until the new candidate has a passing Main verification decision, a verified durable dossier, one successful continuous-health window, and a committed cutover marker; all later rollbacks require prior certified candidates.
