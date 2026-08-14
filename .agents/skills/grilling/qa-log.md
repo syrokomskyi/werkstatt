@@ -289,3 +289,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
 - **Question:** How long must certification records and heavy evidence artifacts be retained?
 - **Answer:** Compact audit records—candidate identity, profile, decisions, metadata/digests, diagnostic summaries, incidents, and rollback chain—are retained indefinitely. Full `main-certified` dossiers remain while active or rollback-eligible plus 24 months after supersession; unsuccessful-candidate evidence remains 180 days. Heavy screenshots/video/traces/full logs remain 12 months for certified releases and 90 days for unsuccessful runs. Current releases, rollback targets, open incidents, and audit holds are exempt from garbage collection. Payload deletion appends a hash-chained tombstone with digest, reason, policy version, and timestamp.
+
+### K-0023: Clean single-site republish instead of legacy migration
+
+```knowledge-entry
+id: K-0023
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, certification rollout
+- **Question:** How should the existing production estate migrate when this workshop operates only one site and can republish it?
+- **Answer:** Use a clean republish rather than generic legacy infrastructure. Keep the current site serving during rollout without labeling it certified; do not import old evidence or add bootstrap/legacy commands. Create a fresh candidate from current source, run the complete Dev → Alt → Main certification chain, and switch atomically or through an isolated slot. Remove the transition mode after the first `main-certified` release. Activate the new gate and remove the old grace behavior only after all required producers, evaluator agents, and durable storage are operational.
