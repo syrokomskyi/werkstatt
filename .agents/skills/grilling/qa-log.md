@@ -744,3 +744,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Should the combined transition be one monolithic implementation RFC or one program charter with an atomic cutover and multiple dependency-ordered execution packets?
 - **Answer:** Use one program charter and one forward-only cutover, but decompose execution into small, independently verifiable child RFCs and work packets. Each packet must define exact inputs, owned files, forbidden changes, observable outputs, validation commands, failure semantics, and a clean handoff so a less capable agent can complete it without reconstructing the whole architecture.
+
+### K-0058: Reuse draft certification RFCs under the combined program
+
+```knowledge-entry
+id: K-0058
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Should the existing draft RFC-0848 through RFC-0854 be discarded and recreated, or reused under the new program charter?
+- **Answer:** Preserve the existing drafts without parallel duplicates. Keep RFC-0854, RFC-0849, and RFC-0852 as independent no-regret prerequisites; subordinate RFC-0848, RFC-0850, RFC-0851, and RFC-0853 to the new program charter and revise their static plugin/runtime seams. Give agents one updated dependency graph and one normative transition path.
