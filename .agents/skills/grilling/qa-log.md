@@ -874,3 +874,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** How must the runtime classify component effects so external operations are not falsely treated as reversible?
 - **Answer:** Use the closed classes `revertible`, `transactional`, `compensatable`, and `irreversible-emission`. Revertible effects require disposer, LIFO teardown, and quiescence; transactional effects require prepare/commit/abort plus an idempotency key; compensatable effects require an explicit compensation and equivalence evidence; irreversible emissions remain withheld until the commit boundary and are never described as rollback-safe. Unknown or misclassified effects block activation, and a capability candidate introducing a new external-effect type cannot be auto-promoted before its policy is separately accepted.
+
+### K-0068: Use one transactional component lifecycle with dependency-aware draining
+
+```knowledge-entry
+id: K-0068
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Which component lifecycle and provider-replacement ordering must every runtime implementation enforce?
+- **Answer:** Use the closed lifecycle `declared → waiting → loading → active → draining → unloading → disposed`, with explicit `failed` and `quarantined` states. Provider replacement first blocks new calls, drains dependents in reverse topological order, completes or cancels in-flight work only at declared boundaries, unwinds effects in LIFO order, and activates the new provider transactionally. Failure restores the prior component set or quarantines the candidate; silent pending, force unload, and partially active graphs are forbidden.
