@@ -172,3 +172,103 @@ The key architectural decision is to replace `werkstatt/plugin@1` as the runtime
 - Are dynamic components scoped per command invocation, mission, agent session, workshop process, or fleet? The runtime likely needs all scopes explicitly.
 - Should the first implementation depend on Cordis or use it only as a reference model? A bounded conformance and performance spike should answer this before the program RFC chooses a dependency.
 - How are external-effect compensations verified, especially for deployments and DNS where rollback may restore configuration but not erase prior observation?
+
+## Follow-up: sequencing with the release certification program (2026-08-15)
+
+### Question
+
+The accepted `werkstatt-release-certification` specification and draft RFC-0848 through RFC-0854 now describe a substantially more reliable release pipeline. The sequencing question is whether to implement that program unchanged before the agent-native runtime, discard it and start with the runtime, or revise both designs before either creates a static implementation boundary.
+
+### Commit and document findings
+
+- The certification work is still cheap to redirect. The specification snapshot is accepted, but RFC-0848 through RFC-0854 are all `draft`; the branch contains design, audit, grilling, and decomposition work rather than an implemented certification runtime.
+- The certification design already defines most of the proposed Law Kernel: immutable candidate identity, canonical bytes, strict diagnostics, deterministic fail-closed decisions, append-only dossiers, durable evidence, locks, idempotency, transactional Main verification, rollback, current health, action packs, and independent evaluator agents.
+- The specification makes evaluation read-only and requires another agent to perform remediation. This is directly aligned with candidate generation followed by independent verification and promotion.
+- The profile already declares producer identity, module or command binding, version source, timeout, retries, freshness, environment, and remediation. This is a useful precursor to a capability manifest.
+- The incompatible seam is runtime composition. The accepted specification assumes exactly one active stack plugin, statically registered commands/modules, a closed hook contract, and producer existence validated against the boot registry.
+- `ReleaseCandidate` and an agent-generated `CapabilityCandidate` are different subjects. They may share canonical identity, dossier, evaluation, and promotion primitives, but must not share one schema or lifecycle accidentally.
+- RFC-0853 would freeze the first permanent `@1` certification identities around `pluginId`, `pluginVersion`, `profileId`, and `profileHash` without a resolved dynamic component-set identity. Implementing it unchanged would force either an early `@2` or an incomplete compatibility field later.
+- RFC-0851 deliberately blocks legacy deployment commands until CERT-007. Implementing that block before resolving the runtime architecture would extend deployment unavailability across an additional architectural program.
+- CERT-002, CERT-004, CERT-005, CERT-007, and CERT-008 are the highest-collision nodes: profile activation, producer resolution, orchestration, deployment integration, and monitoring are precisely the surfaces a dynamic component runtime must own.
+
+### Reuse and collision map
+
+| Certification work | Agent-native reuse | Required change before implementation |
+|---|---|---|
+| RFC-0854 Node 24 cutover | Direct, no-regret runtime foundation | None caused by dynamic composition |
+| RFC-0849 canonical JSON | Direct Law Kernel identity primitive | None; keep it domain-neutral |
+| RFC-0852 canonical Diagnostic | Direct cross-component result contract | None or only naming-level review |
+| RFC-0853 certification schemas and identities | Most schemas remain useful | Bind evidence and decisions to an immutable resolved component/capability set; keep release and capability candidates distinct |
+| RFC-0850 deterministic evaluation/action packs | Direct promotion/evaluation primitive | Parameterize over revised identity inputs; do not bind execution to static registry objects |
+| RFC-0851 artifact/deployment state separation | Direct external-operation primitive | Bind operations to authorization plus resolved component set; avoid activating the deployment block too early |
+| CERT-002 profile | Strong policy model | Make policy Law-Kernel-owned at activation while resolving versioned producer capabilities dynamically |
+| CERT-003 dossier/storage | Direct Law Kernel substrate | Generalize storage envelopes carefully enough to store capability candidate evidence without conflating dossier types |
+| CERT-004 orchestrator | Useful certification coordinator | Execute through a lifecycle/capability runtime rather than direct static command/module lookup |
+| CERT-005/006 producers and evaluators | First production component graph | Package producers as immutable, permission-bounded components; preserve evaluator isolation |
+| CERT-007/008 deploy and monitor | Direct transactional/continuous evidence model | Make adapters, probes, and schedulers lifecycle-managed capabilities; keep authorization in the Law Kernel |
+| CERT-009/010 cutover and cleanup | Still required | Perform one combined forward-only cutover rather than a static-certification cutover followed by a runtime cutover |
+
+### Options
+
+#### Option A: implement certification unchanged, then rewrite the runtime
+
+- **Approach:** Complete CERT-001 through CERT-010 against the current one-plugin/static-registry model, then start the component/evolution program.
+- **Trade-offs:** Produces a strong certification authority before autonomous runtime work, and most pure domain/storage logic remains reusable. It freezes static producer and plugin assumptions into schemas, commands, integration tests, generated surfaces, and deployment wiring; causes two major cutovers; and may extend the RFC-0851 deployment outage.
+- **DNA alignment:** Strong on DNA-48, DNA-49, DNA-51, DNA-52, DNA-53, DNA-59, and DNA-73; deliberately entrenches the current DNA-64 wording that the later program must supersede.
+- **Blockers:** None beyond the current RFC acceptance/implementation sequence, but later requires a new runtime program and certification `@2` review.
+- **Estimated effort:** Large now plus large later. Transition difficulty after completion is large, not because certification is wasted, but because runtime integration must be replaced after it has been hardened.
+
+#### Option B: discard certification and implement dynamic self-evolution first
+
+- **Approach:** Stop the certification program and build dynamic components, sandboxing, hot activation, and promotion from a new design.
+- **Trade-offs:** Avoids static runtime investment. It discards a mature truth/authority design and creates the exact unsafe condition the Law Kernel is meant to prevent: agent-generated code exists before immutable evidence, deterministic admission, independent evaluation, rollback authority, and durable audit are available.
+- **DNA alignment:** Advances a successor to DNA-64 but postpones the strongest existing DNA-46..53/59/73 safety mechanisms.
+- **Blockers:** Protected-kernel boundary, component identity, isolation, effect semantics, evaluation authority, and durable promotion must all be solved before agent-written code can be enabled.
+- **Estimated effort:** Very large and highest risk.
+
+#### Option C: treat certification as the first Law Kernel consumer and revise the seam now
+
+- **Approach:** Preserve the accepted certification semantics, pause unchanged implementation at the architecture-dependent boundary, define the agent-native component runtime and shared candidate/promotion primitives, amend the certification specification, then implement both in a dependency order that uses certification as the first production workload of the runtime.
+- **Trade-offs:** Retains almost all design investment and avoids two cutovers. It requires another architecture pass before most certification code starts, and the combined dependency graph must be kept disciplined so the dynamic-runtime scope does not swallow the pure certification foundation.
+- **DNA alignment:** Preserves DNA-46..53, DNA-59, and DNA-73 while explicitly superseding the static composition clause of DNA-64. It turns the certification authority into the protected Law Kernel rather than a later integration bolted onto dynamic code.
+- **Blockers:** A program RFC for component/runtime semantics, a certification-spec amendment, explicit Law Kernel boundary, distinct release/capability candidate schemas, and a revised dependency graph.
+- **Estimated effort:** Large overall, but medium transition overhead and the least discarded implementation.
+
+#### Option D: implement only no-regret certification prerequisites, then decide
+
+- **Approach:** Implement RFC-0854, RFC-0849, and RFC-0852, then pause before RFC-0853.
+- **Trade-offs:** Delivers useful platform primitives without freezing static producer orchestration. It is a safe short runway but not a complete architecture decision; leaving the decision unresolved after these RFCs merely postpones the same fork.
+- **DNA alignment:** Strengthens DNA-53 and DNA-64's engine-owned contracts without deciding the successor runtime composition model.
+- **Blockers:** RFC acceptance and the Node 24 host/runtime cutover. The architecture decision remains mandatory before RFC-0853.
+- **Estimated effort:** Medium as an initial tranche; large program still follows.
+
+### Recommendation
+
+Choose **Option C**, using Option D as its first implementation tranche rather than as a postponement tactic.
+
+Stop the current documentation session without implementing the certification RFC set unchanged. Preserve its commits. The next architecture session should not rewrite the quality pipeline from zero; it should create the missing superordinate runtime decision and amend only the static seam.
+
+Recommended dependency order:
+
+1. **No-regret primitives:** accept and implement RFC-0854, then RFC-0849, then RFC-0852.
+2. **Runtime contract before permanent certification identities:** define Law Kernel, component manifest, versioned provides/requires, capability grants, effect classes, fiber lifecycle, isolation tiers, candidate store, and activation transaction; supersede RFC-0770/current DNA-64 composition wording.
+3. **Specification reconciliation:** amend release certification so the immutable policy bundle resolves producer capabilities to an exact component-set hash. Keep the certification profile immutable during a decision and outside a candidate component's authority.
+4. **Revised certification foundation:** enhance RFC-0853, RFC-0850, RFC-0851, and RFC-0848 against the resolved runtime contract, then implement them. Delay RFC-0851's command block until a bounded path to restored CERT-007 deployment exists.
+5. **Shared durable authority:** implement dossier/storage and capability-package artifact storage with distinct schemas over shared content-addressed primitives.
+6. **Certification as the first runtime vertical slice:** implement CERT-002 through CERT-006 with trusted/read-only components first. Exercise load, dependency resolution, cancellation, timeout, unload, quarantine, and deterministic result ingestion.
+7. **External-effect authority:** implement CERT-007 and CERT-008 with transactional/compensatable effect semantics for adapters, probes, schedulers, rollback, and incidents.
+8. **Enable evolution only after authority exists:** expose agent candidate generation, shadow execution, canary activation, automatic demotion, and evidence-backed promotion. Agent-written host code remains disabled before this point.
+9. **One cutover:** combine the certification cutover with the component-runtime cutover, then run cleanup once the new Main and runtime identities are both proven.
+
+### Consequences of the recommendation
+
+- The certification design is not sunk work; it becomes the trust substrate for self-modification.
+- There is one permanent cutover instead of static certification followed by dynamic runtime migration.
+- Pure identity, schema, evaluation, storage, and evidence modules remain small and independently implementable; the runtime program does not get permission to absorb them into a framework rewrite.
+- Dynamic components cannot alter the certification profile, evidence admission, evaluator-independence rules, promotion thresholds, or the code that grants their capabilities.
+- A release certificate records the exact resolved component set that produced and judged it. Reloading a producer implementation creates new evidence identity and normally a new decision, not a silent continuation.
+- Temporary component experiments may occur earlier for trusted development components, but autonomous agent-written activation remains off until the complete authority/promotion loop is executable.
+
+### Decision checkpoint
+
+The irreversible threshold is **RFC-0853**, not RFC-0854. Node 24, bounded canonical bytes, and the canonical Diagnostic are safe foundations. Before certification `@1` candidate/evidence/decision identities are implemented, Werkstatt must decide how an immutable resolved component graph participates in identity and authority. Before CERT-004, it must decide how producers execute through lifecycle-managed capabilities. Before RFC-0851, it must bound the period during which site deployment is intentionally unavailable.
