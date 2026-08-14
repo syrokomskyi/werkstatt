@@ -393,3 +393,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
 - **Question:** How can the first clean cutover be reversible when the currently serving legacy production artifact is intentionally not retroactively certified and no previous new-system `main-certified` candidate exists yet?
 - **Answer:** CERT-009 may register one exact `bootstrap rollback target` consisting of the current provider deployment snapshot or provider-native rollback slot. The target must have verified identity, availability, restoration capability, and a rehearsal before traffic switching, but it is never labeled `main-certified` and its evidence cannot satisfy any candidate gate or future promotion. It is eligible only to undo the first certified cutover. If no recoverable target can be proved, cutover remains `incomplete`. Cleanup protects it until the new candidate has a passing Main verification decision, a verified durable dossier, one successful continuous-health window, and a committed cutover marker; all later rollbacks require prior certified candidates.
+
+### K-0031: Separate build identity, deployment plan, and observed environment identity
+
+```knowledge-entry
+id: K-0031
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
+- **Question:** How should environment/configuration identity be bound without turning the identical Dev, Alt, and Main artifact into three different release candidates or allowing target drift after certification?
+- **Answer:** Candidate identity contains `buildConfigHash` for build-affecting inputs and `deploymentPlanHash` for the intended adapter, channel targets/domains, binding contract, and public runtime contract. Each environment-specific evidence envelope and deployment operation separately records the actually observed `environmentIdentityHash`. A plan/observation mismatch is `stale`. Secret values are never stored or directly hashed; environment identity uses safe provider reference/version/presence metadata or a keyed non-reversible fingerprint. Thus one immutable candidate/artifact moves through all channels while deployment topology and runtime drift remain detectable.
