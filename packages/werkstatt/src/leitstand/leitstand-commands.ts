@@ -841,15 +841,36 @@ export async function runLeitstandDevDeploy(
       await sleep(6_000);
     }
 
-    // Run health verification after deploy
-    const healthResult = await adapter.health({
-      systemId,
-      channel,
-      deploymentUrl: channelConfig.url,
-      releaseId,
-      expectedBehaviorSnapshotHash: (releaseManifest.behaviorSnapshotHash as string) ?? "",
-      workspaceRoot,
-    });
+    // RFC-0846: Retry health check with backoff (same pattern as RFC-0747 alt health check).
+    // Exceptions from adapter.health() propagate immediately — no retry on exceptions.
+    // Only `unhealthy` and `unknown` states trigger retry.
+    let healthResult: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] } = {
+      state: "unhealthy",
+      checks: [],
+    };
+    let healthAttempts = 0;
+    for (let attempt = 1; attempt <= HEALTH_CHECK_MAX_ATTEMPTS; attempt++) {
+      if (attempt > 1) {
+        const delayMs = HEALTH_CHECK_BACKOFF_DELAYS_MS[attempt - 2];
+        logger.info(
+          `  Dev health retry ${attempt}/${HEALTH_CHECK_MAX_ATTEMPTS} after ${delayMs / 1000}s...`,
+        );
+        await sleep(delayMs);
+      }
+      healthResult = await adapter.health({
+        systemId,
+        channel,
+        deploymentUrl: channelConfig.url,
+        releaseId,
+        expectedBehaviorSnapshotHash: (releaseManifest.behaviorSnapshotHash as string) ?? "",
+        workspaceRoot,
+      });
+      healthAttempts = attempt;
+      if (healthResult.state === "healthy") break;
+      if (attempt < HEALTH_CHECK_MAX_ATTEMPTS) {
+        logger.warn(`  Dev health check: ${healthResult.state} — will retry...`);
+      }
+    }
 
     const releaseMissionId = (releaseManifest.missionId as string) ?? "";
     const releaseCommitSha = (releaseManifest.commitSha as string) ?? "";
@@ -928,7 +949,7 @@ export async function runLeitstandDevDeploy(
         releaseDeployed: releaseId,
       },
       exitCode: deployResult.state === "succeeded" && axiomStatus !== "fail" ? 0 : 1,
-      summary: `[leitstand.dev-deploy] ${systemId}: release ${releaseId} deployed to dev (${deployResult.state}), health: ${healthResult.state}, axiom: ${axiomStatus}${healthy ? "" : " (unhealthy)"}`,
+      summary: `[leitstand.dev-deploy] ${systemId}: release ${releaseId} deployed to dev (${deployResult.state}), health: ${healthResult.state}${healthy ? "" : " (unhealthy)"}${healthAttempts > 1 ? ` (${healthAttempts} attempts)` : ""}, axiom: ${axiomStatus}`,
     };
   }
 
