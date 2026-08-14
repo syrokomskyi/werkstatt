@@ -1,7 +1,7 @@
 ---
 id: RFC-0845
 title: "Extend Playwright pre-flight to release.prepare and add download retry"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
