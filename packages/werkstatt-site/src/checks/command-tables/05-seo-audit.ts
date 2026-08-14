@@ -28,6 +28,7 @@ import {
 import { runAuditLlm } from "../audit-llm.ts";
 import { runAppQaValidate } from "../app-qa.ts";
 import { runLighthouseValidation, runLighthouseBudgetCheck } from "../lighthouse.ts";
+import { runMobileLayoutCheck } from "../mobile-layout-check.ts";
 
 export const SEO_AUDIT_COMMANDS: CheckCommandEntry[] = [
   {
@@ -229,5 +230,24 @@ export const SEO_AUDIT_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runLighthouseBudgetCheck,
+  },
+  {
+    name: "mobile.layout.check",
+    description:
+      "RFC-0838: Playwright mobile layout stability checks — horizontal overflow, rotation stability, CLS.",
+    scope: "app",
+    flags: {
+      mode: { kind: "string", description: "error (default) or warning" },
+      "route-timeout": { kind: "string", description: "Per-route timeout in ms (default 30000)" },
+      "stability-delta": {
+        kind: "string",
+        description: "Layout shift threshold in px (default 5)",
+      },
+    },
+    supportsAllSites: true,
+    cacheable: false,
+    reads: ["<app>/dist/client/**/*.html"],
+    modulePaths: ["checks/mobile-layout-check.ts"],
+    execute: runMobileLayoutCheck,
   },
 ];

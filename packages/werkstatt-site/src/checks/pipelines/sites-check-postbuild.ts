@@ -47,6 +47,9 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "dist.sitemap.images.validate" },
   { command: "passport.verify" },
   { command: "lighthouse.budget.check" },
+  // RFC-0838: Playwright mobile layout stability checks — horizontal overflow,
+  // rotation stability, CLS. Runs after lighthouse.budget.check.
+  { command: "mobile.layout.check", args: ["--mode=warning"] },
   { command: "generated.marker.validate", args: ["--phase=postbuild"] },
   // RFC-0095: catch missing required section props that leaked NEED_THIS_X markers into HTML
   { command: "need.markers.validate" },
