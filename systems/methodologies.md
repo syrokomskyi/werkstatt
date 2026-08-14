@@ -29,6 +29,9 @@ instruments:
   - id: multilingual-consistency
     type: multilingual-consistency
     params: {}
+  - id: mobile-layout-browser
+    type: mobile-layout
+    params: {}
 
 methodologies:
   - id: automated-web-accessibility
@@ -63,6 +66,10 @@ methodologies:
     instrument: visual-regression
     active: false
     blockOn: [critical]
+  - id: mobile-layout-stability
+    instrument: mobile-layout-browser
+    active: false
+    blockOn: [high, critical]
 
 gate:
   aggregation: all-must-pass
