@@ -239,6 +239,35 @@ describe("image.delivery.validate (RFC-0830)", () => {
     expect(lcpFindings[0]!.severity).toBe("error");
   });
 
+  it("IMG-DELIVERY-04: 404.html is exempt from page-level LCP check (ADR-0046)", async () => {
+    await writeImage("logo.webp", 100, 100);
+    await writeHtml(
+      "404.html",
+      `<html><body><img src="/logo.webp" width="100" height="100" loading="lazy" decoding="async" /></body></html>`,
+    );
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const pageLevelFindings = getFindings(data).filter(
+      (f) => f.rule === "IMG-DELIVERY-04" && f.message.includes("No <img> with fetchpriority"),
+    );
+    expect(pageLevelFindings).toHaveLength(0);
+  });
+
+  it("IMG-DELIVERY-04: per-image attribute check still runs on 404.html (ADR-0046)", async () => {
+    await writeImage("hero.webp", 800, 600);
+    await writeHtml(
+      "404.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="eager" fetchpriority="high" /></body></html>`,
+    );
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const perImageFindings = getFindings(data).filter(
+      (f) =>
+        f.rule === "IMG-DELIVERY-04" && f.severity === "error" && f.message.includes("decoding"),
+    );
+    expect(perImageFindings.length).toBeGreaterThanOrEqual(1);
+  });
+
   // --- Config ---
 
   it("config: valid override skips IMG-DELIVERY-01 for matching src", async () => {

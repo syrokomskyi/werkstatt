@@ -19,7 +19,9 @@ import {
   detectForcedReflow,
   detectRenderBlockingCss,
   buildJsReferenceGraph,
+  runLighthouseBudgetCheck,
 } from "../lighthouse.ts";
+import { makeTestSiteContext, testInput, unwrapData } from "./helpers.ts";
 
 let tmpRoot: string;
 
@@ -202,5 +204,63 @@ describe("buildJsReferenceGraph (LH-12)", () => {
 
     const { unreferenced } = await buildJsReferenceGraph([htmlPath], distClientDir);
     expect(unreferenced.length).toBe(0);
+  });
+});
+
+// ─── LH-12: runLighthouseBudgetCheck ignore patterns (ADR-0045) ─────────────
+
+describe("runLighthouseBudgetCheck LH-12 ignore patterns (ADR-0045)", () => {
+  it("LH-12: .lighthouse-budget-ignore suppresses unreferenced JS false positive", async () => {
+    const appDir = join(tmpRoot, "test-app");
+    const distDir = join(appDir, "dist");
+    const clientDir = join(distDir, "client");
+    const astroDir = join(clientDir, "_astro");
+    await mkdir(astroDir, { recursive: true });
+
+    await writeFile(join(astroDir, "referenced.js"), 'console.log("ok");', "utf8");
+    await writeFile(join(astroDir, "orphan.js"), 'console.log("orphan");', "utf8");
+
+    const htmlPath = join(clientDir, "index.html");
+    await writeFile(
+      htmlPath,
+      `<html><head><script type="module" src="/_astro/referenced.js"></script></head><body></body></html>`,
+      "utf8",
+    );
+
+    await writeFile(join(appDir, ".lighthouse-budget-ignore"), "orphan", "utf8");
+
+    const result = await runLighthouseBudgetCheck(
+      testInput(),
+      makeTestSiteContext(tmpRoot, appDir, "test-app"),
+    );
+    expect(result.exitCode).toBe(0);
+    const data = unwrapData(result) as { violations: number };
+    expect(data.violations).toBe(0);
+  });
+
+  it("LH-12: unreferenced JS flagged when no ignore file exists", async () => {
+    const appDir = join(tmpRoot, "test-app");
+    const distDir = join(appDir, "dist");
+    const clientDir = join(distDir, "client");
+    const astroDir = join(clientDir, "_astro");
+    await mkdir(astroDir, { recursive: true });
+
+    await writeFile(join(astroDir, "referenced.js"), 'console.log("ok");', "utf8");
+    await writeFile(join(astroDir, "orphan.js"), 'console.log("orphan");', "utf8");
+
+    const htmlPath = join(clientDir, "index.html");
+    await writeFile(
+      htmlPath,
+      `<html><head><script type="module" src="/_astro/referenced.js"></script></head><body></body></html>`,
+      "utf8",
+    );
+
+    const result = await runLighthouseBudgetCheck(
+      testInput(),
+      makeTestSiteContext(tmpRoot, appDir, "test-app"),
+    );
+    expect(result.exitCode).toBe(1);
+    const data = unwrapData(result) as { violations: number };
+    expect(data.violations).toBeGreaterThanOrEqual(1);
   });
 });
