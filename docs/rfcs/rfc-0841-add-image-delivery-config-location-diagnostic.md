@@ -163,14 +163,14 @@ No pipeline changes needed — `image.delivery.validate` is already in `SITES_CH
 
 ## Acceptance criteria
 
-- [ ] `IMG-DELIVERY-CONFIG-01` warning emitted when config is in root but not in `src/`
-- [ ] Config path logged in validator summary output
-- [ ] Unit test: config in root only → `IMG-DELIVERY-CONFIG-01` warning
-- [ ] Unit test: config in `src/` only → no warning
-- [ ] Unit test: config in both → no warning (src/ takes precedence)
-- [ ] Unit test: config in neither → no warning
-- [ ] DNA-72 entry appended to `docs/architecture-dna.md`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `IMG-DELIVERY-CONFIG-01` warning emitted when config is in root but not in `src/` (evidence: packages/werkstatt-site/src/checks/image-delivery.ts:243-256, implemented as `IMG-DELIVERY-CONFIG-02` per grilling decision; test: image-delivery.test.ts "IMG-DELIVERY-CONFIG-02: warns when config is in root but not in src/")
+- [x] Config path logged in validator summary output (evidence: packages/werkstatt-site/src/checks/image-delivery.ts:413-418, summary includes `(config: ${configPathLabel})`)
+- [x] Unit test: config in root only → `IMG-DELIVERY-CONFIG-01` warning (evidence: image-delivery.test.ts "IMG-DELIVERY-CONFIG-02: warns when config is in root but not in src/")
+- [x] Unit test: config in `src/` only → no warning (evidence: image-delivery.test.ts "IMG-DELIVERY-CONFIG-02: no warning when config is in src/ only")
+- [x] Unit test: config in both → no warning (src/ takes precedence) (evidence: image-delivery.test.ts "IMG-DELIVERY-CONFIG-02: no warning when config is in both root and src/")
+- [x] Unit test: config in neither → no warning (evidence: image-delivery.test.ts "IMG-DELIVERY-CONFIG-02: no warning when config is in neither location")
+- [x] DNA-72 entry appended to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:295-297, DNA-72 entry references `IMG-DELIVERY-CONFIG-02`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0841` — zero violations)
 
 ## Implementation notes for agents
 
