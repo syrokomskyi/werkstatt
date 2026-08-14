@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0210: introduced media presentation styles.</item>
   <item>Feature player posters now cover the frame without exposing Plyr's black background at fractional sizes.</item>
+  <item>Fullscreen mode uses object-fit: contain so the entire video is visible on mobile portrait and landscape without cropping.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -55,5 +56,18 @@
      Media primitive's cover behavior. `!important` is required because Plyr CSS is unlayered. */
   .media--feature .plyr__poster {
     background-size: cover !important;
+  }
+
+  /* Fullscreen: switch to contain so the entire video is visible without cropping.
+     On portrait phones `cover` crops the sides heavily; in landscape it crops top/bottom.
+     `contain` letterboxes instead, preserving the full frame in every orientation. */
+  .media__video:fullscreen,
+  .media__video:-webkit-full-screen {
+    object-fit: contain;
+  }
+
+  .plyr:fullscreen .media__video,
+  .plyr:-webkit-full-screen .media__video {
+    object-fit: contain;
   }
 }
