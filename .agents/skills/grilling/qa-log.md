@@ -887,3 +887,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Which component lifecycle and provider-replacement ordering must every runtime implementation enforce?
 - **Answer:** Use the closed lifecycle `declared → waiting → loading → active → draining → unloading → disposed`, with explicit `failed` and `quarantined` states. Provider replacement first blocks new calls, drains dependents in reverse topological order, completes or cancels in-flight work only at declared boundaries, unwinds effects in LIFO order, and activates the new provider transactionally. Failure restores the prior component set or quarantines the candidate; silent pending, force unload, and partially active graphs are forbidden.
+
+### K-0069: Require independent multi-layer capability promotion evidence
+
+```knowledge-entry
+id: K-0069
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** What evidence must a capability candidate satisfy before promotion into the active component set?
+- **Answer:** Require a deterministic conformance suite, held-out scenarios unavailable to the authoring agent, regression comparison with the current component set, and an independent evaluator agent. Then require shadow execution, bounded canary activation, and an observation window. Any non-pass rolls back or quarantines; unknown is `incomplete`. Automatic promotion is allowed only within a pre-accepted policy, while permission changes, Law Kernel changes, and new external-effect types require a separate architecture decision.
