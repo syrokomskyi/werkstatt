@@ -229,18 +229,18 @@ When no retries were needed, the summary is unchanged: `health: healthy, axiom: 
 
 ## Acceptance criteria
 
-- [x] Health check retry loop added to `leitstand.dev-deploy` with 3 attempts and 3s/6s backoff
-- [x] Retry breaks early when health check returns "healthy"
-- [x] Axiom runs when health check succeeds on any retry attempt
-- [x] Axiom is skipped when all 3 attempts return "unhealthy" (same as current behavior)
-- [x] Summary includes attempt count when retries were needed
-- [x] Shared constants extracted via forward-only rename (`ALT_HEALTH_*` → `HEALTH_CHECK_*`) with all references in `leitstand.promote` updated
-- [x] Unit test: health succeeds on first attempt (no retry)
-- [x] Unit test: health succeeds on second attempt (1 retry with 3s delay)
-- [x] Unit test: health fails all 3 attempts (Axiom skipped)
-- [x] Unit test: Axiom runs after successful retry
-- [x] Existing `leitstand.dev-deploy` tests pass
-- [x] `rfc.validate` passes on this file before merging
+- [x] Health check retry loop added to `leitstand.dev-deploy` with 3 attempts and 3s/6s backoff (evidence: `packages/werkstatt/src/leitstand/leitstand-commands.ts:844-873`, commit `ed6fc9c0`)
+- [x] Retry breaks early when health check returns "healthy" (evidence: `leitstand-commands.ts:869` `if (healthResult.state === "healthy") break;`, test "succeeds on first attempt")
+- [x] Axiom runs when health check succeeds on any retry attempt (evidence: test "Axiom runs after successful health check retry" asserts `axiom: pass` in summary)
+- [x] Axiom is skipped when all 3 attempts return "unhealthy" (same as current behavior) (evidence: test "fails all 3 attempts" asserts `axiom.status` is `not-run`)
+- [x] Summary includes attempt count when retries were needed (evidence: `leitstand-commands.ts:942-953`, tests assert `(2 attempts)` / `(3 attempts)`)
+- [x] Shared constants extracted via forward-only rename (`ALT_HEALTH_*` → `HEALTH_CHECK_*`) with all references in `leitstand.promote` updated (evidence: `leitstand-commands.ts:340-341`, no `ALT_HEALTH` references remain)
+- [x] Unit test: health succeeds on first attempt (no retry) (evidence: `leitstand-0628-dev-deploy.test.ts` test "succeeds on first attempt")
+- [x] Unit test: health succeeds on second attempt (1 retry with 3s delay) (evidence: `leitstand-0628-dev-deploy.test.ts` test "succeeds on second attempt")
+- [x] Unit test: health fails all 3 attempts (Axiom skipped) (evidence: `leitstand-0628-dev-deploy.test.ts` test "fails all 3 attempts")
+- [x] Unit test: Axiom runs after successful retry (evidence: `leitstand-0628-dev-deploy.test.ts` test "Axiom runs after successful health check retry")
+- [x] Existing `leitstand.dev-deploy` tests pass (evidence: 23/23 tests pass in `leitstand-0628-dev-deploy.test.ts`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0846` returns `ok: true`)
 
 ## Implementation notes for agents
 
