@@ -6,10 +6,9 @@ Curated project context (RFC-0664). This file is versioned — daily logs in `da
 
 <!-- What is being worked on right now. One to three bullets max. -->
 
-- RFC-0760 (vidpovidalni-rekomendatsiyi UK-only page) implemented and archived. UK-only sitemap exclusion verified.
-- RFC-0717 (remove stale Nachweis surface module blueprint references) implemented and archived. Cache clone synced via mission.reconcile.
-- `@warpgogol/forge@0.17.0` published to NPM — creative operator README guide + Windows CI job for forge tests.
-- RFC-0698 (auto-commit generated artifacts after dev-deploy) implemented and archived.
+- RFC-0839 (Axiom post-deploy mobile layout monitoring) implemented, reviewed, stamped, and activated. Methodology `mobile-layout-stability` is `active: true` in `systems/methodologies.md`. Capture-side implemented by Axiom expert (RFC-0093 in pipelines repo).
+- RFC-0840 (preserve root-level operator config files during materialization) implemented by operator.
+- Mobile layout validation three-layer strategy complete: RFC-0837 (static CSS), RFC-0838 (Playwright pre-deploy), RFC-0839 (Axiom post-deploy).
 
 ## Decisions in flight
 
@@ -31,3 +30,4 @@ Curated project context (RFC-0664). This file is versioned — daily logs in `da
 - Sitemap files in mission workpieces can be stale copies from the cache clone (`../systems-cache/<id>/public/sitemap-*.xml`). If a page is missing from sitemap after a build, run `sitemap.generate` manually from the workpiece directory to regenerate. The root cause is often stale artifacts, not a code bug. Discovered 2026-08-08 during RFC-0760 implementation.
 - RFC acceptance criteria can reference props that don't exist in the archetype schema. RFC-0760 criterion `service-metadata-block includes stats[]` references a prop absent from the archetype (RFC-0759 uses `.strict()` schema). Dynamic counts are handled by `dynamic-status-block` per RFC-0759 rollout. When stamping, mark such criteria checked with an explanatory note. Discovered 2026-08-08 during RFC-0760 implementation.
 - `ecosystem.commit` post-commit hook runs `pnpm install`, which can leave `pnpm-lock.yaml` and `package.template.json` dirty after the commit. Always check `git status` after a series of `ecosystem.commit` calls and commit any residual lockfile/template changes. Discovered 2026-08-10 during RFC-0800 implementation.
+- Axiom package architecture (confirmed by expert 2026-08-14): `@syrokomskyi/axiom-study` = instrument layer (pure functions, state schema, runner — DNA-1 strict leaf), `@syrokomskyi/axiom-methodology` = orchestration layer (orchestrator, fixtures, finding-projection), `@syrokomskyi/axiom-factory-app` = app layer (calls `runActiveMethodologies()` from axiom-methodology). These are different packages at different layers, NOT renamings. RFC references to `axiom-factory-app` are correct — the app layer delegates internally to axiom-methodology → axiom-study. No amending RFC needed when an instrument lives in `axiom-study` but the RFC references `axiom-factory-app`. Call chain: factory-app → axiom-methodology (orchestrator) → axiom-study (instrument).
