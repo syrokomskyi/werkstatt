@@ -848,3 +848,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Which capabilities belong to the protected Law Kernel and therefore cannot be replaced by a running component?
 - **Answer:** The closed Law Kernel owns canonical and immutable identities, capability grants, sandbox admission, locks, idempotency, activation transactions, authoritative dossier/artifact append, Certification Authority, independent evaluation admission, promotion, deployment authorization, rollback, quarantine, kill switch, and audit/Bordbuch integrity. Commands, validators, producers, evaluators, adapters, probes, schedulers, and prompt/tool surfaces remain replaceable components but cannot change their own admission rules.
+
+### K-0066: Separate release and capability candidate identities
+
+```knowledge-entry
+id: K-0066
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** Should release and capability evolution share one candidate schema and lifecycle?
+- **Answer:** No. `ReleaseCandidate` and `CapabilityCandidate` are distinct closed schemas and lifecycles over shared content-addressed storage, evidence-envelope, evaluation, and promotion primitives. The active runtime is an immutable `ResolvedComponentSet`; every release certificate binds its exact component-set hash, and capability promotion creates a new set that invalidates runtime-identity-dependent evidence.
