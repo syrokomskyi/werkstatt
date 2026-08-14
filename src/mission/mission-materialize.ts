@@ -82,6 +82,7 @@ import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { installWorkpieceCommitHook } from "./workpiece-commit-hook.ts";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../handoff/bundle-io.ts";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import { compareSemver } from "@warpgogol/werkstatt/kernel";
 import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 export interface MissionMaterializeData {
@@ -866,10 +867,11 @@ export async function runMissionMaterialize(
     let verdict: "in-sync" | "catch-up" | "refuse-downgrade" = "in-sync";
     let message = `in sync at ${pinVersion}; no migration needed.`;
 
-    if (pinVersion > platformVersion) {
+    const order = compareSemver(pinVersion, platformVersion);
+    if (order > 0) {
       verdict = "refuse-downgrade";
       message = `platform (${platformVersion}) is older than pin (${pinVersion}) — update the platform and retry`;
-    } else if (pinVersion < platformVersion) {
+    } else if (order < 0) {
       verdict = "catch-up";
       message = `catch-up from ${pinVersion} to ${platformVersion} required`;
     }
