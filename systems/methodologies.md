@@ -68,7 +68,7 @@ methodologies:
     blockOn: [critical]
   - id: mobile-layout-stability
     instrument: mobile-layout-browser
-    active: false
+    active: true
     blockOn: [high, critical]
 
 gate:
