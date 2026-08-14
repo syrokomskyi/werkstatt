@@ -692,3 +692,29 @@ status: active
 - **Context:** 2026-08-14 — RFC-0849 enhancement grilling meta-analysis
 - **Question:** Should the repeated decision to base permanent canonical bytes on a named external standard plus stricter local constraints become an active reusable L2 principle?
 - **Answer:** Yes. Pin the exact standard and independent vectors, state local restrictions as an explicit narrower profile, and avoid maintaining an unnamed almost-equivalent permanent algorithm.
+
+### K-0054: Agent-run Node 24 bootstrap before repository cutover
+
+```knowledge-entry
+id: K-0054
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0854 enhancement after the Node 24 ecosystem audit
+- **Question:** May the implementing agent install and activate Node 24 on the Ubuntu host before changing repository engine enforcement, even though Werkstatt itself must not auto-download or fall back to another runtime?
+- **Answer:** Yes. Runtime provisioning is an explicit step-zero environment bootstrap performed by the implementing agent before any repository mutation, not product fallback behavior. The agent re-verifies Node and pnpm under Node 24; if provisioning or verification fails, it stops without changing repository files.
+
+### K-0055: Forge uses a real major boundary for the Node 24-only contract
+
+```knowledge-entry
+id: K-0055
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0854 enhancement after the Node 24 ecosystem audit
+- **Question:** Which independent Forge version represents removal of Node 20/22 support, and how is it separated from publication?
+- **Answer:** Bump `@warpgogol/forge` from `0.28.0` to `1.0.0`, set `forge.syncedVersion` to the same value, and require a standalone Node 24 tarball smoke test. Implementation records the version but does not publish; npm publication remains a separate explicit operator command.

@@ -220,3 +220,17 @@ status: active
 
 - **Condition:** An internal permanent byte, signature, identity, or interchange format substantially overlaps a mature external standard.
 - **Recommended answer:** Name and pin the exact standard plus independent conformance vectors, then define project-specific restrictions as an explicit narrower profile. Do not create an unnamed almost-equivalent algorithm whose compatibility and edge cases the project must maintain alone.
+
+### K-0016: Cutover enforcement starts after executor bootstrap
+
+```knowledge-entry
+id: K-0016
+layer: L2
+created: 2026-08-14
+lastConfirmedAt: 2026-08-14
+confirmations: 1
+status: active
+```
+
+- **Condition:** A cutover removes an old runtime or toolchain and introduces fail-closed enforcement while the executor environment still uses the old version.
+- **Recommended answer:** Provision and verify the executor environment before any repository mutation, then enable the new enforcement. If bootstrap fails, stop with a clean repository. Explicit environment provisioning is not a product fallback or compatibility path.
