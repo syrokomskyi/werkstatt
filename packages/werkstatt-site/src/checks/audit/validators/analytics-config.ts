@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303 Phase 3: extracted from audit-validators.ts as part of the domain split.</item>
+  <item>RFC-0847: add analytics-config.proxy-subdomain-registered check — cross-references proxyBaseUrl hostname against services/registry.yaml subdomains.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -17,6 +18,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
+import { readServicesRegistry } from "@warpgogol/werkstatt/sternsystem";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
 import type { AuditFinding } from "../types.ts";
 import { pathExists } from "../../content-discipline.ts";
@@ -27,6 +29,28 @@ import {
   MATOMO_REGISTRY_PATH,
   parseYaml,
 } from "./helpers.ts";
+
+export function extractProxyHostname(proxyBaseUrl: string): string | null {
+  try {
+    const parsed = new URL(proxyBaseUrl);
+    return parsed.hostname;
+  } catch {
+    return null;
+  }
+}
+
+export function isDevHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".workers.dev");
+}
+
+export function isProxySubdomainRegistered(
+  proxyBaseUrl: string,
+  registeredDomains: string[],
+): boolean {
+  const hostname = extractProxyHostname(proxyBaseUrl);
+  if (!hostname || isDevHostname(hostname)) return true;
+  return registeredDomains.includes(hostname);
+}
 
 export async function runAnalyticsConfigValidate(
   _input: KernelCommandInput,
@@ -119,6 +143,33 @@ export async function runAnalyticsConfigValidate(
           ],
         }),
       );
+    }
+
+    // RFC-0847: cross-reference proxyBaseUrl hostname against services/registry.yaml subdomains
+    if (options["proxyBaseUrl"]) {
+      try {
+        const registry = await readServicesRegistry(context.workspaceRoot);
+        const allSubdomainDomains = registry.services.flatMap(
+          (s) => s.subdomains?.map((sd) => sd.domain) ?? [],
+        );
+        if (!isProxySubdomainRegistered(options["proxyBaseUrl"], allSubdomainDomains)) {
+          const hostname = extractProxyHostname(options["proxyBaseUrl"]);
+          findings.push(
+            finding({
+              ruleId: "analytics-config.proxy-subdomain-registered",
+              severity: "error",
+              file: "services/registry.yaml",
+              message: `proxyBaseUrl hostname '${hostname}' is not declared in any service subdomains in services/registry.yaml (RFC-0847). Add it to the corresponding service's subdomains array so subdomain.register can provision DNS and Workers Route.`,
+              evidence: [
+                { kind: "config", file: "src/content/system.md", snippet: options["proxyBaseUrl"] },
+                { kind: "config", file: "services/registry.yaml", snippet: hostname ?? undefined },
+              ],
+            }),
+          );
+        }
+      } catch {
+        // Non-fatal: skip if registry cannot be read
+      }
     }
     if (options["privacyProfile"] && options["privacyProfile"] !== "bannerfrei-v1") {
       findings.push(

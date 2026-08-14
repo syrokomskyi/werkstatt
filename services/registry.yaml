@@ -11,7 +11,9 @@ services:
       - /_wg/analytics/*
     upstreams:
       - matomo-cloud
-    subdomains: []
+    subdomains:
+      - domain: matomo-proxy.warpgogol.com
+        zone: warpgogol.com
     lastDeployed:
       at: 2026-08-11T16:34:11.680Z
       state: failed
@@ -86,4 +88,3 @@ services:
       state: null
       operationId: null
     healthCheckPath: /health
-
