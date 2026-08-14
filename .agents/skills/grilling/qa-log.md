@@ -367,3 +367,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, continuous certification
 - **Question:** Does `main-certified` remain valid forever, or must environment-sensitive evidence be refreshed after publication?
 - **Answer:** Historical `main-certified` decisions remain immutable while a separate current `certificationHealth` state is maintained as `current`, `degraded`, or `revoked`. Environment-independent evidence remains valid until candidate/profile identity changes; DNS, external integrations, runtime, security headers, performance, and freshness use profile-defined TTLs and schedules. Monitoring appends evidence and health decisions. Non-critical non-pass outcomes degrade health, open incident/action packs, retry, and block new promotions; critical regressions revoke health. Each requirement declares `retry`, `incident-only`, or `rollback`, and rollback is forbidden when it cannot remedy a shared external outage. Passing refreshes restore `current` without erasing history.
+
+### K-0029: Explicit immutable Main verification decision after traffic switch
+
+```knowledge-entry
+id: K-0029
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
+- **Question:** How is the post-switch proof between a pre-switch `promote-main: pass` gate decision and the final `main-certified` state represented without overloading either the gate decision or mutable current health?
+- **Answer:** Add an immutable `MainVerificationDecisionV1` dossier event. It binds the candidate, pre-switch promotion decision and dossier root, deployment operation and target slot, exact Main evidence IDs, status, rollback decision/result, and before/after dossier roots. `main-certified` is allowed only when this decision is `pass` and its resulting dossier root has a verified durable replica. Continuous health begins afterward and never substitutes for Main verification.
