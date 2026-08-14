@@ -1,7 +1,7 @@
 ---
 id: RFC-0836
 title: "Add component-level WCAG 2.5.3 Label in Name validator"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
