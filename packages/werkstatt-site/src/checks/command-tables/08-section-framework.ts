@@ -23,6 +23,7 @@ import {
   runLayoutOrchestratorLint,
 } from "../section-framework.ts";
 import { runSectionImagePropsValidate } from "../section-image-props.ts";
+import { runA11yLabelInNameComponentValidate } from "../a11y-label-in-name-component.ts";
 import {
   runSectionShellColorTokenLint,
   runSectionShellTokenContractValidate,
@@ -113,6 +114,17 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["packages/werkstatt-site/src/domain/ui/sections/**/*.astro"],
     execute: runSectionImagePropsValidate,
+  },
+  /* RFC-0836: WCAG 2.5.3 Label in Name — component-level aria-label/visible text parity check */
+  {
+    name: "a11y.label-in-name.component.validate",
+    description:
+      "RFC-0836: scan .astro component source files in packages/werkstatt-site/src/domain/ui/ for interactive elements where aria-label={...} and visible text {...} are both present but the aria-label expression does not reference the visible text variable (WCAG 2.5.3 Label in Name). Emits A11Y-LIN-COMP-01 (error) for mismatches. Recognizes resolveLabelInName helper and merged-label patterns as safe.",
+    scope: "workspace",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["packages/werkstatt-site/src/domain/ui/**/*.astro"],
+    execute: runA11yLabelInNameComponentValidate,
   },
   /* RFC-0598: colocated CSS import integrity */
   {

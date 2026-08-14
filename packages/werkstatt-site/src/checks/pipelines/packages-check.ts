@@ -107,6 +107,8 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "section.cta.contract.validate" },
   { command: "section.image.contract.validate" },
   { command: "section.image-props.validate" },
+  // RFC-0836: WCAG 2.5.3 Label in Name — component-level aria-label/visible text parity check
+  { command: "a11y.label-in-name.component.validate" },
   // RFC-0598: colocated CSS import integrity
   { command: "section.css.import.validate" },
   // RFC-0122: section-framework component CSS token contract
