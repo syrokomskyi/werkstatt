@@ -284,18 +284,18 @@ Example finding in `study-run.json`:
 
 ## Acceptance criteria
 
-- [ ] `methodologies-config.ts` schema extended with `mobile-layout` instrument type
-- [ ] `KNOWN_INSTRUMENT_TYPES` array includes `mobile-layout`
-- [ ] `KNOWN_METHODOLOGY_IDS` array includes `mobile-layout-stability`
-- [ ] `systems/methodologies.md` declares `mobile-layout-browser` instrument and `mobile-layout-stability` methodology
-- [ ] Methodology initially set to `active: false` (activated after external implementation)
-- [ ] Verify that `mission.check` picks up the new methodology config without code changes by running `methodologies.validate` (existing `mapMethodologiesConfig` is generic)
-- [ ] Instrument contract (rule IDs, finding shape, parameters) documented for external expert
-- [ ] `methodologies.validate` passes with the new config
-- [ ] `docs/verification-plan.xml` updated to include `mobile-layout-stability` methodology
-- [ ] No `AGENTS.md` updates required (this RFC does not change agent behavior rules — it is a config/schema extension only)
-- [ ] DNA-70 entry appended to `docs/architecture-dna.md`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `methodologies-config.ts` schema extended with `mobile-layout` instrument type (evidence: packages/werkstatt-site/src/checks/methodologies-config.ts:31, instrumentConfigSchema z.enum includes "mobile-layout")
+- [x] `KNOWN_INSTRUMENT_TYPES` array includes `mobile-layout` (evidence: packages/werkstatt-site/src/checks/methodologies-config.ts:84, KNOWN_INSTRUMENT_TYPES includes "mobile-layout")
+- [x] `KNOWN_METHODOLOGY_IDS` array includes `mobile-layout-stability` (evidence: packages/werkstatt-site/src/checks/methodologies-config.ts:72, KNOWN_METHODOLOGY_IDS includes "mobile-layout-stability")
+- [x] `systems/methodologies.md` declares `mobile-layout-browser` instrument and `mobile-layout-stability` methodology (evidence: systems/methodologies.md:32-34,69-72)
+- [x] Methodology initially set to `active: false` (activated after external implementation) (evidence: systems/methodologies.md:71, active: false)
+- [x] Verify that `mission.check` picks up the new methodology config without code changes by running `methodologies.validate` (existing `mapMethodologiesConfig` is generic) (evidence: methodologies.validate output — 9 instruments, 9 methodologies, 6 active)
+- [x] Instrument contract (rule IDs, finding shape, parameters) documented for external expert (evidence: docs/rfcs/rfc-0839-add-axiom-post-deploy-mobile-layout-monitoring.md § Design — rule IDs MOBILE-AXIOM-01..05, finding shape, device presets documented)
+- [x] `methodologies.validate` passes with the new config (evidence: methodologies.validate — pass, 9 instrument(s), 9 methodology(s))
+- [x] `docs/verification-plan.xml` updated to include `mobile-layout-stability` methodology (evidence: docs/verification-plan.xml:445-448, vm-17 entry)
+- [x] No `AGENTS.md` updates required (this RFC does not change agent behavior rules — it is a config/schema extension only) (evidence: no AGENTS.md files modified in implementation commits)
+- [x] DNA-70 entry appended to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:307-309, DNA-70 entry)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0839 — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
