@@ -20,7 +20,7 @@ enhancedAt: 2026-07-31
 implementedAt: 2026-07-31
 closedAt:
 supersedes: []
-supersededBy:
+supersededBy: RFC-0851
 amends:
   - RFC-0608
 amendedBy:

@@ -14,7 +14,7 @@ enhancedAt: 2026-07-30
 implementedAt: 2026-07-30
 closedAt: null
 supersedes: []
-supersededBy: null
+supersededBy: RFC-0851
 amends:
 - RFC-0358
 amendedBy:
