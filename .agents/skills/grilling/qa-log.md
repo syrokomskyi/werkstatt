@@ -445,3 +445,42 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
 - **Question:** How is “newest compatible evidence” selected deterministically when producers run concurrently, retry, have clock skew, or return after a gate/health operation has already closed?
 - **Answer:** Every run has `certificationOperationId`, every attempt has `producerAttemptId`, and the authority assigns each admitted evidence record a monotonic dossier `admissionSequence`. Decisions select the latest compatible record by admission sequence and freeze an `evaluationCutSequence`; producer timestamps never determine ordering. Evidence cannot be admitted into a closed operation, and late results append a late-result incident rather than shadowing evidence. New evidence requires a new immutable decision. TTL uses authority time with bounded signed producer-clock checks. Continuous monitoring also uses stable `scheduleWindowId` values so duplicate or late deliveries cannot alter another window.
+
+### K-0035: Core owns the runtime Diagnostic schema through a forward-only cutover
+
+```knowledge-entry
+id: K-0035
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — CERT-001 RFC-level grilling, canonical diagnostic dependency
+- **Question:** Where must the strict runtime schema for `Diagnostic[]` live so the stack-agnostic certification engine can validate evidence without importing or duplicating the site plugin contract?
+- **Answer:** Move `diagnosticSchema`, `diagnosticEvidenceSchema`, and their inferred types into the Werkstatt engine schema layer; kernel types and the site plugin import/re-export the engine-owned contract. The migration is a forward-only clean cut: no duplicate implementation, deprecated compatibility aliases, dual-read/dual-write, or temporary success fallback. The operator accepts that the wider project may remain operationally unavailable while the full certification transition is implemented, provided every landed core contract is internally complete, type-safe, and tested.
+
+### K-0036: Separate artifact, deployment-operation, and certification state machines
+
+```knowledge-entry
+id: K-0036
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — CERT-001 RFC-level grilling, conflicting release-state vocabularies
+- **Question:** How should CERT-001 reconcile the incompatible `published/promoted`, `ready/main-deployed`, and command-written state vocabularies without continuing to conflate artifact readiness, deployment history, and production health?
+- **Answer:** Replace the single overloaded release state with three contracts: `ReleaseArtifactState = prepared | ready`; append-only per-channel `DeploymentOperationState = planned | authorized | deploying | deployed | verifying | succeeded | failed | rollback-authorized | rolling-back | rolled-back`; and certification represented by immutable gate/Main decisions plus separate current health. Remove legacy deployment labels from release manifest without aliases or translation. Until CERT-007 wires the new deployment workflow, any old command that cannot operate truthfully against the new model fails closed with an explicit transition diagnostic rather than using legacy semantics.
+
+### K-0037: Certification starts from a clean namespace and strict canonicalization
+
+```knowledge-entry
+id: K-0037
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — CERT-001 RFC-level grilling, identity canonicalization and legacy evidence
+- **Question:** Must the new certification identity preserve or migrate any prior readiness/certification evidence, and should it reuse the permissive general-purpose stable JSON hash contract?
+- **Answer:** No prior readiness report, test-evidence file, quality score, or release-state claim is imported or treated as authoritative certification. The new `@1` certification namespace starts clean, with no legacy readers, aliases, dual-write, or evidence migration; old material is non-authoritative history until post-cutover cleanup. Certification uses new strict `canonicalJsonBytesV1`/`canonicalJsonHashV1` APIs that reject non-JSON and ambiguous values and record `werkstatt/canonical-json@1`. Existing `stableJsonHash` behavior remains unchanged only for unrelated cache/platform consumers, preventing accidental global hash churn.
