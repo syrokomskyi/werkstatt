@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0830: initial test suite — IMG-DELIVERY-01, IMG-DELIVERY-02, IMG-DELIVERY-04, config, skip-on-missing-dist.</item>
+  <item>RFC-0841: add IMG-DELIVERY-CONFIG-02 location diagnostic tests (root only, src only, both, neither).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -49,6 +50,10 @@ async function writeImage(name: string, width: number, height: number): Promise<
 
 async function writeConfig(yaml: string): Promise<void> {
   await writeFile(join(srcDir, "image-delivery.config.yaml"), yaml, "utf8");
+}
+
+async function writeRootConfig(yaml: string): Promise<void> {
+  await writeFile(join(appDir, "image-delivery.config.yaml"), yaml, "utf8");
 }
 
 function ctx(): KernelRuntimeContext {
@@ -312,6 +317,58 @@ overrides:
     const data = getData(result);
     const configFindings = getFindings(data).filter((f) => f.rule === "IMG-DELIVERY-CONFIG-01");
     expect(configFindings).toHaveLength(0);
+  });
+
+  // --- IMG-DELIVERY-CONFIG-02 (RFC-0841: location diagnostic) ---
+
+  it("IMG-DELIVERY-CONFIG-02: warns when config is in root but not in src/", async () => {
+    await writeRootConfig(`overrides: []`);
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="eager" fetchpriority="high" decoding="async" /></body></html>`,
+    );
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const locationFindings = getFindings(data).filter((f) => f.rule === "IMG-DELIVERY-CONFIG-02");
+    expect(locationFindings).toHaveLength(1);
+    expect(locationFindings[0]!.severity).toBe("warning");
+    expect(locationFindings[0]!.message).toContain("workpiece root");
+  });
+
+  it("IMG-DELIVERY-CONFIG-02: no warning when config is in src/ only", async () => {
+    await writeConfig(`overrides: []`);
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="eager" fetchpriority="high" decoding="async" /></body></html>`,
+    );
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const locationFindings = getFindings(data).filter((f) => f.rule === "IMG-DELIVERY-CONFIG-02");
+    expect(locationFindings).toHaveLength(0);
+  });
+
+  it("IMG-DELIVERY-CONFIG-02: no warning when config is in both root and src/", async () => {
+    await writeRootConfig(`overrides: []`);
+    await writeConfig(`overrides: []`);
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="eager" fetchpriority="high" decoding="async" /></body></html>`,
+    );
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const locationFindings = getFindings(data).filter((f) => f.rule === "IMG-DELIVERY-CONFIG-02");
+    expect(locationFindings).toHaveLength(0);
+  });
+
+  it("IMG-DELIVERY-CONFIG-02: no warning when config is in neither location", async () => {
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="eager" fetchpriority="high" decoding="async" /></body></html>`,
+    );
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const locationFindings = getFindings(data).filter((f) => f.rule === "IMG-DELIVERY-CONFIG-02");
+    expect(locationFindings).toHaveLength(0);
   });
 
   // --- JSON output shape ---

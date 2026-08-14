@@ -18,6 +18,7 @@
   <item>RFC-0830: initial implementation — image.delivery.validate with IMG-DELIVERY-01, IMG-DELIVERY-02, IMG-DELIVERY-04 rules and image-delivery.config.yaml escape hatch.</item>
   <item>RFC-0830: review fix — replace any types with DefaultTreeAdapterMap + local ElementNode interface, fix MODULE_CONTRACT bracket convention.</item>
   <item>RFC-0831: extract shared DOM helpers (isElementNode, hasChildNodes, getAttr, ElementNode) into checks/dom-helpers.ts to eliminate duplication with csp-origins.ts.</item>
+  <item>RFC-0841: add IMG-DELIVERY-CONFIG-02 location diagnostic (warning when config is in workpiece root but not in src/) and log resolved config path in summary.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -45,7 +46,12 @@ import {
 const COMMAND = "image.delivery.validate";
 
 interface ImageDeliveryFinding {
-  rule: "IMG-DELIVERY-01" | "IMG-DELIVERY-02" | "IMG-DELIVERY-04" | "IMG-DELIVERY-CONFIG-01";
+  rule:
+    | "IMG-DELIVERY-01"
+    | "IMG-DELIVERY-02"
+    | "IMG-DELIVERY-04"
+    | "IMG-DELIVERY-CONFIG-01"
+    | "IMG-DELIVERY-CONFIG-02";
   file: string;
   line: number;
   src: string;
@@ -218,7 +224,8 @@ export async function runImageDeliveryValidate(
 ): Promise<KernelCommandResult> {
   const paths = requireAstroSitePaths(ctx);
   const distDir = join(paths.appDirectory, "dist", "client");
-  const configPath = join(paths.srcDirectory, "image-delivery.config.yaml");
+  const srcConfigPath = join(paths.srcDirectory, "image-delivery.config.yaml");
+  const rootConfigPath = join(paths.appDirectory, "image-delivery.config.yaml");
 
   if (!existsSync(distDir)) {
     return {
@@ -233,8 +240,23 @@ export async function runImageDeliveryValidate(
     };
   }
 
-  const { config, warnings: configWarnings } = await loadDeliveryConfig(configPath);
-  const findings: ImageDeliveryFinding[] = [...configWarnings];
+  // RFC-0841: Location diagnostic — warn if config is in workpiece root but not in src/
+  const findings: ImageDeliveryFinding[] = [];
+  if (existsSync(rootConfigPath) && !existsSync(srcConfigPath)) {
+    findings.push({
+      rule: "IMG-DELIVERY-CONFIG-02",
+      file: rootConfigPath,
+      line: 0,
+      src: "",
+      severity: "warning",
+      message:
+        "image-delivery.config.yaml found at workpiece root but validator reads from src/image-delivery.config.yaml. Move the file to src/ to apply overrides.",
+      fixHint: "Move image-delivery.config.yaml from workpiece root to src/",
+    });
+  }
+
+  const { config, warnings: configWarnings } = await loadDeliveryConfig(srcConfigPath);
+  findings.push(...configWarnings);
 
   const htmlFiles = await collectRenderedHtml(distDir);
   let checkedImages = 0;
@@ -388,9 +410,11 @@ export async function runImageDeliveryValidate(
     checkedImages,
   };
 
+  const configPathLabel = existsSync(srcConfigPath) ? srcConfigPath : "not found";
+
   return {
     data: result,
     exitCode: hasErrors ? 1 : 0,
-    summary: `${COMMAND}: ${findings.length} finding(s), ${checkedImages} image(s) checked`,
+    summary: `${COMMAND}: ${findings.length} finding(s), ${checkedImages} image(s) checked (config: ${configPathLabel})`,
   };
 }
