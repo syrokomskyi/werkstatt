@@ -250,3 +250,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
 - **Question:** What should happen when required checks can only run after Main traffic is switched?
 - **Answer:** Main promotion enters `main-verifying`, preferably after isolated slot/preview verification, and becomes `main-certified` only after required Main smoke, build-identity, critical route/form, header, and health evidence passes. Any required `fail`, `stale`, or `incomplete` invalidates the promotion and automatically rolls traffic back to the last immutable `main-certified` artifact. The restored version receives its own health verification and incident evidence. Missing prior certified artifacts or failed rollback produces a critical incident and must never be reported as successful publication.
+
+### K-0020: Provenance and tamper evidence for certification records
+
+```knowledge-entry
+id: K-0020
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, release certification module
+- **Question:** What provenance and integrity guarantees must every certification evidence record provide?
+- **Answer:** The engine defines one `EvidenceEnvelope@1` containing requirement/candidate/environment identity, registered producer identity plus version/source hash, run and timestamp data, normalized input hashes, status, diagnostics, payload/artifact hashes, and redaction metadata. Producers submit results through the engine rather than writing dossiers directly. Evidence is content-addressed, appended through a hash-chained manifest, and every gate decision records the evidence IDs and resulting dossier-root hash. Remote producers use registered workload-identity attestations; local results receive an engine attestation bound to command and module hash. Manual files, unknown producers, broken signatures/chains, or unsafe secret-bearing payloads cannot certify a gate.
