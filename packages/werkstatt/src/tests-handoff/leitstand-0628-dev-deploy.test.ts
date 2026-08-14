@@ -454,6 +454,50 @@ test("RFC-0846: dev health check retries on unknown state then succeeds", async 
   expect(result.exitCode).toBe(0);
 }, 30_000);
 
+test("RFC-0846: Axiom runs after successful health check retry", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+  const mockDistTreeHash = "abc123hash";
+
+  createRegistryWithChannels(testRoot, systemId, { adapter: "cloudflare-workers" });
+  writeReleaseManifest(tmpDir, releaseId, {
+    schemaVersion: "1.0.0",
+    releaseId,
+    systemId,
+    missionId: "test-sys-m000001",
+    state: "ready",
+    commitSha: "abc123def456",
+    distTreeHash: mockDistTreeHash,
+  });
+  createDistDir(tmpDir, releaseId);
+
+  mockPropagateFn.mockResolvedValue(makeMockPropagateResult());
+  mockHealthFn
+    .mockResolvedValueOnce({ state: "unhealthy", checks: [] })
+    .mockResolvedValueOnce({ state: "healthy", checks: [] });
+
+  // Mock fetch so verifyFreshness succeeds — CDN returns matching distTreeHash
+  const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response(JSON.stringify({ distTreeHash: mockDistTreeHash }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    }),
+  );
+
+  const result = await runLeitstandDevDeploy(
+    makeInput({ site: systemId, release: releaseId }),
+    makeContext(tmpDir),
+  );
+
+  fetchSpy.mockRestore();
+
+  expect(mockHealthFn).toHaveBeenCalledTimes(2);
+  expect(result.summary).toContain("(2 attempts)");
+  expect(result.summary).toContain("health: healthy");
+  expect(result.summary).toContain("axiom: pass");
+  expect(result.exitCode).toBe(0);
+}, 30_000);
+
 // --- leitstand.propagate Axiom gate tests (RFC-0628: ready + commitSha + missionId) ---
 
 test("leitstand.propagate rejects release not in ready state", async () => {
