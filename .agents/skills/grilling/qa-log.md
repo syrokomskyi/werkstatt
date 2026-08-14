@@ -419,3 +419,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
 - **Question:** What prevents an author agent with workspace access from fabricating evidence, rewriting a local dossier and hash chain, or using certification/deployment credentials directly while keeping the workflow agent-only?
 - **Answer:** Introduce a separate trusted `Certification Authority` executor. Author/evaluator agents may request producer runs and submit typed results but cannot sign decisions, append the authoritative dossier, or access authority signing, durable-write, or deployment credentials. The authority independently verifies candidate/profile/evidence, aggregates, atomically appends, durably replicates, and signs the exact decision/root/operation authorization. Deployment accepts only a current signature from the registered issuer for the exact candidate/gate/root/target. Local reports without authority are explicitly non-authoritative and open no gate. The first adapter may be a CI/Worker executor, while the engine contract remains provider-neutral; authority unavailability is `incomplete`, never a bypass.
+
+### K-0033: Immutable policy bundle for historical certification verification
+
+```knowledge-entry
+id: K-0033
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, specification-level grilling
+- **Question:** How can an old certification decision remain independently verifiable after the installed plugin, profile, evidence schemas, rubric, producer modules, toolchain, or authority issuer registry have changed?
+- **Answer:** Candidate creation materializes a content-addressed durable `CertificationPolicyBundleV1` containing the canonical profile/resolved requirements, evidence schemas, rubric/risk/calibration manifest, producer declarations and source hashes, engine/plugin/toolchain manifests, deployment plan, retention policy, and then-current issuer public verification material. Its root hash contributes to `candidateId`. Historical verification uses this bundle rather than current installed code. Compact policy/schema/rubric/manifests/public keys are retained indefinitely; executable producer/container artifacts may follow bounded retention because cryptographic decision verification does not require re-execution.
