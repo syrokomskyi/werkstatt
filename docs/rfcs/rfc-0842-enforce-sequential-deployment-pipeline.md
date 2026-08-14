@@ -10,7 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
-enhancedAt:
+enhancedAt: 2026-08-14
 implementedAt:
 closedAt:
 supersedes: []
@@ -80,6 +80,7 @@ None of the three deployment commands log their target channel and URL before st
 ### 3. Workflow documentation lacks exact command syntax
 
 The `.devin/workflows/deploy.md` workflow documents the pipeline steps but does not include:
+
 - The `--release` flag for `leitstand.dev-deploy` after mission close.
 - The fact that `leitstand.propagate` does NOT accept `--site` (it reads `systemId` from the release manifest).
 - The fact that `--all` must NOT be used on deployment commands.
@@ -132,6 +133,7 @@ pnpm exec werkstatt run leitstand.pipeline.check --release <releaseId>
 ```
 
 Output:
+
 ```
 Release: warpgogol-com-r000026
 State:   ready
@@ -151,6 +153,7 @@ This gives operators a clear view of where the release is in the pipeline and wh
 ### 4. Update deploy.md workflow
 
 Update `.devin/workflows/deploy.md` with:
+
 - Exact command syntax for each step (all required flags).
 - State transition diagram.
 - Explicit "NEVER use `--all` on deployment commands" in forbidden actions.
@@ -210,9 +213,9 @@ The command reads the release manifest and system state to determine which steps
 
 ### Flag schema for `leitstand.pipeline.check`
 
-| Flag | Kind | Required | Description |
-| --- | --- | --- | --- |
-| `--release` | string | yes | Release ID to check. |
+| Flag        | Kind   | Required | Description          |
+| ----------- | ------ | -------- | -------------------- |
+| `--release` | string | yes      | Release ID to check. |
 
 ### File system responsibilities
 
