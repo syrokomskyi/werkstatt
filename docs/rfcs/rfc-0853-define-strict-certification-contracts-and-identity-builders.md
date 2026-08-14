@@ -142,7 +142,7 @@ Implementation first creates a checked test fixture listing every normative top-
 
 ```ts
 type IdentityBuildResultV1<TPayload> =
-  | { ok: true; payload: TPayload; canonical: CanonicalJsonValueV1; digest: Sha256Digest }
+  | { ok: true; payload: TPayload; canonical: CanonicalJsonObjectV1; digest: Sha256Digest }
   | { ok: false; diagnostic: CertificationIdentityDiagnosticV1 };
 
 function buildReleaseCandidateIdentityV1(input: ReleaseCandidateV1): IdentityBuildResultV1<ReleaseCandidateIdentityPayloadV1>;
