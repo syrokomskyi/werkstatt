@@ -74,11 +74,7 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
   ```sh
   pnpm exec playwright install chromium
   ```
-- **Root-level config files present** — `.lighthouse-budget-ignore`, `image-delivery.config.yaml` (in `src/`), `dns-records.yaml` must exist in the workpiece if the site requires them. These are persisted to the cache clone by `mission.close` and restored by `mission.materialize` (RFC-0840). If missing after materialization, copy them from the cache clone:
-  ```sh
-  cp ../systems-cache/<siteId>/.lighthouse-budget-ignore missions/<missionId>/workpiece/
-  cp ../systems-cache/<siteId>/dns-records.yaml missions/<missionId>/workpiece/
-  ```
+- **Root-level config files present** — `.lighthouse-budget-ignore`, `image-delivery.config.yaml` (in `src/`), `dns-records.yaml` must exist in the workpiece if the site requires them. These are persisted to the cache clone by `mission.close` and restored by `mission.materialize` (RFC-0840). `dns-records.yaml` lives in the cache clone and is read from there by DNS commands — it does not need to be in the workpiece.
 
 ## Steps
 
@@ -197,7 +193,7 @@ pnpm exec werkstatt run mission.archive --status=closed --site <siteId>
 
 ### `.lighthouse-budget-ignore` missing after materialization
 
-`mission.materialize` replaces the workpiece via `atomicMoveDir`. Root-level config files are not in `STERNSYSTEM_DATA_PATHS` and are lost. RFC-0840 will fix this by persisting/restoring these files automatically. Until then, copy manually from the cache clone:
+`mission.materialize` replaces the workpiece via `atomicMoveDir`. Root-level config files are not in `STERNSYSTEM_DATA_PATHS` but are now automatically persisted/restored by RFC-0840 (`persistOperatorConfigFiles` / `restoreOperatorConfigFiles`). If the file is still missing after materialization, copy it manually from the cache clone:
 
 ```sh
 cp ../systems-cache/<siteId>/.lighthouse-budget-ignore missions/<missionId>/workpiece/
@@ -207,7 +203,7 @@ Then commit via `mission.git.commit`.
 
 ### `image.delivery.validate` errors despite `image-delivery.config.yaml` existing
 
-The config file must be in `src/`, not the workpiece root. The validator reads from `srcDirectory/image-delivery.config.yaml` (RFC-0830). If the file is in the root, it is silently ignored (RFC-0841 will add a diagnostic). Move it:
+The config file must be in `src/`, not the workpiece root. The validator reads from `srcDirectory/image-delivery.config.yaml` (RFC-0830). If the file is in the root, the validator emits `IMG-DELIVERY-CONFIG-02` warning (RFC-0841, implemented). Move it:
 
 ```sh
 mv missions/<missionId>/workpiece/image-delivery.config.yaml missions/<missionId>/workpiece/src/image-delivery.config.yaml
