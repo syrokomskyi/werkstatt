@@ -242,17 +242,17 @@ This RFC changes `release.prepare` behavior. `docs/verification-plan.xml` may ne
 
 ## Acceptance criteria
 
-- [ ] `ensureChromium` retries `preflightChromium` up to 3 times with 2s/4s exponential backoff
-- [ ] `ensureChromium` throws the last error after all retries are exhausted
-- [ ] `ensureChromium` does not retry when Chromium is already installed (fast path)
-- [ ] `release.prepare` calls `playwright.preflight.check` before any build steps
-- [ ] `release.prepare` fails fast with actionable error message when Chromium is not installed
-- [ ] `release.prepare` pre-flight is non-fatal if the check itself throws (same pattern as RFC-0813)
-- [ ] Unit test: retry succeeds on second attempt
-- [ ] Unit test: retry exhausts all 3 attempts and throws
-- [ ] Unit test: no retry when already installed
-- [ ] Existing `playwright-chromium-ensure.test.ts` tests pass (updated for retry behavior)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `ensureChromium` retries `preflightChromium` up to 3 times with 2s/4s exponential backoff (evidence: packages/werkstatt-site/src/checks/playwright-chromium-ensure.ts:70-71, ENSURE_CHROMIUM_MAX_ATTEMPTS=3, ENSURE_CHROMIUM_BACKOFF_DELAYS_MS=[2_000, 4_000])
+- [x] `ensureChromium` throws the last error after all retries are exhausted (evidence: packages/werkstatt-site/src/checks/playwright-chromium-ensure.ts:110, throw lastError)
+- [x] `ensureChromium` does not retry when Chromium is already installed (fast path) (evidence: packages/werkstatt-site/src/checks/playwright-chromium-ensure.ts:81-85, isChromiumInstalled early return)
+- [x] `release.prepare` calls `playwright.preflight.check` before any build steps (evidence: packages/werkstatt/src/release/release-commands.ts:296-323, pre-flight inserted before build.prepare at line 325)
+- [x] `release.prepare` fails fast with actionable error message when Chromium is not installed (evidence: packages/werkstatt/src/release/release-commands.ts:319-323, throw with install command and re-run instructions)
+- [x] `release.prepare` pre-flight is non-fatal if the check itself throws (same pattern as RFC-0813) (evidence: packages/werkstatt/src/release/release-commands.ts:313-318, catch block logs warning and continues)
+- [x] Unit test: retry succeeds on second attempt (evidence: packages/werkstatt-site/src/checks/tests/playwright-chromium-ensure.test.ts:72-88, "retries preflightChromium and succeeds on second attempt")
+- [x] Unit test: retry exhausts all 3 attempts and throws (evidence: packages/werkstatt-site/src/checks/tests/playwright-chromium-ensure.test.ts:109-118, "throws after all 3 retry attempts fail")
+- [x] Unit test: no retry when already installed (evidence: packages/werkstatt-site/src/checks/tests/playwright-chromium-ensure.test.ts:120-127, "does not retry when Chromium is already installed")
+- [x] Existing `playwright-chromium-ensure.test.ts` tests pass (updated for retry behavior) (evidence: vitest run — 9/9 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0845 — 0 violations, exitCode 0)
 
 ## Implementation notes for agents
 
