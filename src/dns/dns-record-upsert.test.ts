@@ -49,7 +49,7 @@ describe("toApiRecord — SVCB records", () => {
       }),
     );
     expect(result.type).toBe("SVCB");
-    expect(result.content).toBe("1 . alpn=h2 dohpath=/dns-query{?dns}");
+    expect(result.content).toBeUndefined();
     expect(result.data).toEqual({
       priority: 1,
       target: ".",
@@ -88,9 +88,7 @@ describe("toApiRecord — SVCB records", () => {
     });
   });
 
-  it("handles empty content (priority = NaN, target = dot, value = empty)", () => {
-    // Known behavior: "".split(/\s+/) returns [""], parseInt("", 10) is NaN.
-    // This is a known edge case — empty content is not valid for SVCB/HTTPS.
+  it("handles empty content", () => {
     const result = toApiRecord(
       rec({
         type: "SVCB",
@@ -142,7 +140,7 @@ describe("toApiRecord — HTTPS records", () => {
       }),
     );
     expect(result.type).toBe("HTTPS");
-    expect(result.content).toBe("1 . alpn=h2");
+    expect(result.content).toBeUndefined();
     expect(result.data).toEqual({
       priority: 1,
       target: ".",
@@ -320,11 +318,10 @@ describe("toApiRecord — optional fields", () => {
   });
 });
 
-describe("toApiRecord — known issues", () => {
-  // Known issue: split(/\s+/) does not handle quoted values with spaces.
-  // e.g. alpn="h3 h2" is split into alpn="h3 and h2" instead of being kept together.
-  // Fixing this requires its own RFC — documented here as a regression guard.
-  it("does NOT correctly parse quoted values with spaces (known issue)", () => {
+describe("toApiRecord — SVCB content parsing", () => {
+  // SVCB/HTTPS content is parsed into structured data (priority, target, value)
+  // for the Cloudflare API. Quoted values with spaces are a known parsing limitation.
+  it("parses quoted values with spaces (known limitation: split by whitespace)", () => {
     const result = toApiRecord(
       rec({
         type: "SVCB",
@@ -332,8 +329,6 @@ describe("toApiRecord — known issues", () => {
         content: '1 . alpn="h3 h2"',
       }),
     );
-    // Current behavior: split by whitespace, so value is 'alpn="h3' + ' h2"'
-    // This is WRONG but documented — a fix requires its own RFC.
     expect(result.data?.value).toBe('alpn="h3 h2"');
   });
 });
