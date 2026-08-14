@@ -1,0 +1,8 @@
+schema: forge/spec-integrity@1
+files:
+  overview.md: sha256:a24ca7d8ec3e13d0b344c529957e5d545e98ba50f35137aa694ea824b7f0d24b
+  decisions.md: sha256:b3e53922a2067085d2ed981ad1f85c7f09f6a838c4135ad1438aa89d1f3efdcf
+  contracts.md: sha256:52821bdbb0c3b31f3b5028c980217b78667714dcb8ea7f304c667fcf691f5cdc
+  site-profile-v1.md: sha256:dcd8c4cb7c09970c47903a73cb98ca4e9e833e56765f26986e0e0e160ac2dd5f
+  roadmap.md: sha256:8f865be251815db43b91523dde746338876f1dd468d2721b438c6522049aa145
+  verification.md: sha256:f22db50a2d9b31fd8cf8997e9b13ab8cb671087a1c33a0dd264403eafe715f50

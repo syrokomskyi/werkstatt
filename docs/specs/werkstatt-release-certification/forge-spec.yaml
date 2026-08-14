@@ -1,0 +1,161 @@
+schema: forge/spec@1
+id: werkstatt-release-certification
+title: Werkstatt Release Certification System
+version: "1.0"
+status: accepted
+reviewers:
+  - human:andrii-syrokomskyi
+sourceNote: "Authored in-repository through fo-idea escalation and operator grilling on 2026-08-14."
+vendoredAt: 2026-08-14
+documents:
+  overview: overview.md
+  decisions: decisions.md
+  contracts: contracts.md
+  site-profile-v1: site-profile-v1.md
+  roadmap: roadmap.md
+  verification: verification.md
+decisions:
+  - id: ADR-001
+    title: Missing or stale evidence is never success
+    status: accepted
+    rationale: A publication authority must distinguish fail, stale, incomplete, and pass; absence can never authorize a transition.
+  - id: ADR-002
+    title: Certification applies to an immutable release candidate
+    status: accepted
+    rationale: Quality evidence is meaningful only when bound to exact source, content, artifact, profile, toolchain, and configuration identity.
+  - id: ADR-003
+    title: The engine owns certification lifecycle; the plugin owns stack policy
+    status: accepted
+    rationale: Cross-stack lifecycle and integrity remain reusable while concrete site checks remain owned by the active stack plugin.
+  - id: ADR-004
+    title: One append-only dossier contains stage-specific decisions
+    status: accepted
+    rationale: A single tamper-evident history avoids disconnected certificates while preserving explicit decisions for each transition.
+  - id: ADR-005
+    title: A versioned certification profile is the normative gate policy
+    status: accepted
+    rationale: Declarative, hashed policy makes applicability, producers, freshness, remediation, and coverage reviewable and reproducible.
+  - id: ADR-006
+    title: Aggregation is deterministic and preserves failure class
+    status: accepted
+    rationale: Fixed precedence and explicit applicability prevent warning counts, ordering, or absent results from creating false success.
+  - id: ADR-007
+    title: Independent evaluator agents supply qualitative evidence
+    status: accepted
+    rationale: Site quality needs judgment, but the authoring agent must not certify its own mutable work.
+  - id: ADR-008
+    title: Required requirements have no runtime waiver
+    status: accepted
+    rationale: Grace, force, skip, and manual approval paths would make required policy optional exactly when it matters.
+  - id: ADR-009
+    title: Site Profile v1 covers nine mandatory quality dimensions
+    status: accepted
+    rationale: Technical validity alone cannot establish truthful, usable, accessible, performant, secure, and editorially strong publication quality.
+  - id: ADR-010
+    title: Evidence is collected in the environment where it is meaningful
+    status: accepted
+    rationale: Build facts may be reusable, but runtime, DNS, TLS, interaction, browser, and performance truth are environment-specific.
+  - id: ADR-011
+    title: Main promotion is transactional and verified after switch
+    status: accepted
+    rationale: Provider acceptance or traffic switching is not proof that the intended candidate works publicly; Main needs verification and recovery.
+  - id: ADR-012
+    title: Evidence uses a common provenance envelope and tamper-evident chain
+    status: accepted
+    rationale: Heterogeneous producers need one admission, provenance, redaction, payload, and integrity contract.
+  - id: ADR-013
+    title: Dossier identity is location-independent and requires durable replication
+    status: accepted
+    rationale: Local paths are not identity and local-only evidence cannot reliably authorize Alt or Main.
+  - id: ADR-014
+    title: Certification records use tiered retention with tombstones
+    status: accepted
+    rationale: Compact audit history should survive while expensive payload retention follows operational value and protected references.
+  - id: ADR-015
+    title: Rollout uses a clean single-site republish
+    status: accepted
+    rationale: With one site, recreating authoritative evidence is safer and simpler than importing ambiguous legacy certification state.
+  - id: ADR-016
+    title: Bulky legacy artifacts are removed only after certified cutover
+    status: accepted
+    rationale: Cleanup can reclaim the observed large estate, but only after new Main truth exists and durable audit/protected data are proven.
+  - id: ADR-017
+    title: Deployment automatically orchestrates certification
+    status: accepted
+    rationale: One goal-oriented command and automatic deployment integration prevent agents from assembling partial gate sequences incorrectly.
+  - id: ADR-018
+    title: Certification is read-only and emits agent-ready action packs
+    status: accepted
+    rationale: Evaluation must not mutate its subject; another agent needs precise, anchored, verifiable remediation instructions.
+  - id: ADR-019
+    title: Evaluator count is risk-routed and disagreement is incomplete
+    status: accepted
+    rationale: Ordinary work needs one review, critical or borderline work needs two independent views, and unresolved disagreement is not success.
+  - id: ADR-020
+    title: Historical certification and current health are separate
+    status: accepted
+    rationale: An immutable promotion decision and mutable public health answer different questions and must both remain truthful.
+rfcs:
+  - id: CERT-001
+    title: Core certification domain and deterministic decisions
+    dependsOn: []
+    wave: 1
+    sources: [overview, decisions, contracts, verification]
+  - id: CERT-002
+    title: Versioned plugin certification profile
+    dependsOn: [CERT-001]
+    wave: 1
+    sources: [decisions, contracts, site-profile-v1, roadmap, verification]
+  - id: CERT-003
+    title: Content-addressed dossier repository, durable storage, and retention
+    dependsOn: [CERT-001]
+    wave: 1
+    sources: [decisions, contracts, roadmap, verification]
+  - id: CERT-004
+    title: Certification orchestrator and command surface
+    dependsOn: [CERT-001, CERT-002, CERT-003]
+    wave: 2
+    sources: [contracts, roadmap, verification]
+  - id: CERT-005
+    title: Site Profile v1 deterministic producers and false-pass removal
+    dependsOn: [CERT-002, CERT-004]
+    wave: 2
+    sources: [overview, decisions, site-profile-v1, roadmap, verification]
+  - id: CERT-006
+    title: Independent evaluator agents and qualitative consensus
+    dependsOn: [CERT-001, CERT-002, CERT-005]
+    wave: 2
+    sources: [decisions, contracts, site-profile-v1, roadmap, verification]
+  - id: CERT-007
+    title: Deployment gates, Main verification, and rollback
+    dependsOn: [CERT-004, CERT-005, CERT-006]
+    wave: 3
+    sources: [overview, decisions, contracts, site-profile-v1, roadmap, verification]
+  - id: CERT-008
+    title: Continuous certification health and drift response
+    dependsOn: [CERT-004, CERT-007]
+    wave: 3
+    sources: [decisions, contracts, site-profile-v1, roadmap, verification]
+  - id: CERT-009
+    title: Single-site clean cutover
+    dependsOn: [CERT-005, CERT-006, CERT-007, CERT-008]
+    wave: 4
+    sources: [overview, decisions, roadmap, verification]
+  - id: CERT-010
+    title: Post-cutover legacy artifact cleanup
+    dependsOn: [CERT-009]
+    wave: 4
+    sources: [decisions, contracts, roadmap, verification]
+waves:
+  - id: 1
+    name: Foundation
+    goal: Establish immutable identity, deterministic decisions, profile policy, and durable evidence storage.
+  - id: 2
+    name: Orchestration and site quality
+    goal: Run complete deterministic and independent qualitative certification for real site candidates.
+  - id: 3
+    name: Deployment and ongoing truth
+    goal: Make certification authoritative for channel transitions and current Main health.
+  - id: 4
+    name: Clean migration and estate reduction
+    goal: Republish the sole site through the new system, then remove only proven-obsolete heavy legacy material.
