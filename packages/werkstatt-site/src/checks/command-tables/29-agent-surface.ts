@@ -192,11 +192,11 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "agent.markdown-negotiation.generate",
     description:
-      "Generate Astro middleware for Accept-header-based markdown content negotiation (RFC-0785). Writes a no-op pass-through when agent.enabled is false.",
+      "Generate Astro middleware + Cloudflare Worker entry point for Accept-header-based markdown content negotiation (RFC-0785). Writes no-op pass-through files when agent.enabled is false.",
     scope: "app",
     supportsAllSites: true,
     mutatesState: true,
-    writes: ["<app>/src/middleware/markdown-negotiation.ts"],
+    writes: ["<app>/src/middleware/markdown-negotiation.ts", "<app>/src/worker.ts"],
     flags: {},
     reads: ["<app>/src/content/system.md"],
     modulePaths: ["agent/agent-markdown-negotiation.ts"],

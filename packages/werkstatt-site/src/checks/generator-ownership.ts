@@ -712,9 +712,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     conditional: true,
   },
 
-  // RFC-0785: Agent markdown negotiation middleware.
+  // RFC-0785: Agent markdown negotiation middleware + Worker entry point.
   {
     path: "src/middleware/markdown-negotiation.ts",
+    command: "agent.markdown-negotiation.generate",
+    module: "packages/werkstatt-site/src/checks/agent/agent-markdown-negotiation.ts",
+  },
+  {
+    path: "src/worker.ts",
     command: "agent.markdown-negotiation.generate",
     module: "packages/werkstatt-site/src/checks/agent/agent-markdown-negotiation.ts",
   },
