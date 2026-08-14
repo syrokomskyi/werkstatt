@@ -91,3 +91,11 @@ Excludes: `node_modules/`, `tests/`, `tests-handoff/`, `*.test.ts`, `*.spec.ts`.
 RFC-0817: `mission.preview` also enforces a materialization gate before the dev-critical file check. If `materializedAt` is null and mission state is `open`, `mission.materialize` is auto-run. This gate is NOT bypassed by `--skip-prepare` — materialization is the formal lifecycle gate, not a convenience check. Non-open missions (closed, aborted) skip the materialization check.
 
 Dev-critical files: `src/content-ref-index.generated.yaml`, `src/derived-prices.generated.json`, `src/video-manifest.generated.yaml`. Some generators have prerequisites (e.g. `derived-prices.materialize` requires `entitlements.resolve`, `rate-snapshot.resolve`, `currency-pricing.compile`) — the check runs prerequisites before the owning command.
+
+## Cache-clone commit guard (RFC-0821)
+
+`installBordbuchPreCommitHook` (RFC-0658) installs a **combined pre-commit hook** in cache clones that includes both the bordbuch integrity guard and a **commit guard** that blocks direct `git commit` unless the `MISSION_GIT_COMMIT=1` environment variable is set. `mission.git.commit` sets this variable; raw `git commit` does not.
+
+This is the only **hard guard** preventing agents from directly committing to Sternsystem cache clones. AGENTS.md rules are soft guards — they rely on agent compliance. The pre-commit hook is enforced by git itself and cannot be bypassed without `--no-verify` (which AGENTS.md already restricts to last-resort use on closed missions).
+
+Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guard. If a file needs to be committed to a cache clone, use `mission.git.commit` or open a mission and work through the workpiece.
