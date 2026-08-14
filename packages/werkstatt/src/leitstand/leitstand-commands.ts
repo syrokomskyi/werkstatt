@@ -30,6 +30,7 @@
   <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; skips build, axiom checks, and auto-commit; resolves secrets from releases/&lt;id&gt;/.env; resolves wrangler from workspace root node_modules/.bin; adds releaseDeployed field to DevDeployResult.</item>
   <item>RFC-0747: add retry loop (3 attempts, 3s/6s backoff) to alt health check in leitstand.promote to handle CDN propagation delays.</item>
   <item>RFC-0829: add test evidence gates (L4+L5) to propagate and promote via shared runTestEvidenceGate helper.</item>
+  <item>RFC-0842: add target channel + URL logging to dev-deploy, propagate, and promote before lock acquisition.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -723,6 +724,10 @@ export async function runLeitstandDevDeploy(
 
   const channelConfig = getChannelConfig(dep, channel);
   const adapter = resolveAdapter(dep.adapter);
+
+  logger.info(
+    `[leitstand.dev-deploy] Target: channel=dev url=${channelConfig.url} system=${systemId}`,
+  );
 
   // RFC-0700: Release path — deploy from releases/<id>/dist/ without open mission
   if (releaseId) {
@@ -1898,6 +1903,11 @@ export async function runLeitstandPropagate(
     throw new Error(`[leitstand.propagate] system '${systemId}' has no deployment config`);
   }
   const devChannelConfig = getChannelConfig(depForDev, "dev");
+  // RFC-0842: Log target channel + URL before lock acquisition.
+  const altChannelConfig = getChannelConfig(depForDev, "alt");
+  logger.info(
+    `[leitstand.propagate] Target: channel=alt url=${altChannelConfig.url} system=${systemId} release=${releaseId}`,
+  );
   const devBuildIdentityUrl = `${devChannelConfig.url}/.well-known/build-identity.json?cb=${Date.now()}`;
   logger.info(`  Fetching dev build-identity from ${devBuildIdentityUrl}...`);
   let devBuildIdentityVerified = false;
@@ -2214,6 +2224,19 @@ export async function runLeitstandPromote(
 
   const systemId = releaseManifest.systemId as string;
   const operationId = generateOperationId();
+
+  // RFC-0842: Log target channel + URL before lock acquisition.
+  {
+    const configForLog = await readSystemConfigSmart(workspaceRoot, systemId);
+    const depForLog = configForLog.deployment as DeploymentStaticConfig | undefined;
+    if (!depForLog) {
+      throw new Error(`[leitstand.promote] system '${systemId}' has no deployment config`);
+    }
+    const mainConfigForLog = getChannelConfig(depForLog, "main");
+    logger.info(
+      `[leitstand.promote] Target: channel=main url=${mainConfigForLog.url} system=${systemId} release=${releaseId}`,
+    );
+  }
 
   await acquireLock(
     workspaceRoot,
