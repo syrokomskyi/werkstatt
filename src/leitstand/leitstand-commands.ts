@@ -2873,3 +2873,121 @@ export async function runLeitstandHealth(
     summary: `[leitstand.health] ${systemId} ${channel}: ${result.state}`,
   };
 }
+
+export interface PipelineCheckResult {
+  command: "leitstand.pipeline.check";
+  releaseId: string;
+  systemId: string;
+  releaseState: string;
+  steps: Array<{
+    step: string;
+    status: "done" | "pending" | "blocked";
+    detail?: string;
+  }>;
+  nextStep: string | null;
+}
+
+const PIPELINE_STATE_ORDER: ReadonlyArray<string> = [
+  "prepared",
+  "ready",
+  "dev-deployed",
+  "alt-deployed",
+  "main-deployed",
+  "promoted",
+];
+
+function releaseStateIndex(state: string): number {
+  const idx = PIPELINE_STATE_ORDER.indexOf(state);
+  return idx;
+}
+
+function determineNextStep(releaseState: string): string {
+  switch (releaseState) {
+    case "prepared":
+      return "release.ready";
+    case "ready":
+      return "leitstand.dev-deploy";
+    case "dev-deployed":
+      return "leitstand.propagate";
+    case "alt-deployed":
+      return "leitstand.promote";
+    case "main-deployed":
+    case "promoted":
+      return "mission.archive";
+    case "rolled-back":
+      return "release.prepare";
+    default:
+      return "release.prepare";
+  }
+}
+
+export async function runLeitstandPipelineCheck(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<PipelineCheckResult>> {
+  const { workspaceRoot, logger } = context;
+  const releaseId = flagString(input, "release");
+  if (!releaseId) {
+    throw new Error("[leitstand.pipeline.check] --release is required");
+  }
+
+  const releaseDir = path.join(workspaceRoot, "releases", releaseId);
+  const releaseManifestPath = path.join(releaseDir, "release.yaml");
+  if (!existsSync(releaseManifestPath)) {
+    throw new Error(`[leitstand.pipeline.check] release '${releaseId}' not found`);
+  }
+
+  const releaseManifest = await readReleaseManifest(workspaceRoot, releaseId);
+  const systemId = (releaseManifest.systemId as string) ?? "<unknown>";
+  const releaseState = (releaseManifest.state as string) ?? "missing";
+
+  const stateIdx = releaseStateIndex(releaseState);
+  const isRolledBack = releaseState === "rolled-back";
+  const isUnknown = stateIdx === -1 && !isRolledBack;
+
+  const steps: PipelineCheckResult["steps"] = [
+    {
+      step: "release.prepare",
+      status: isUnknown ? "blocked" : "done",
+      detail: isUnknown ? `unknown state '${releaseState}'` : undefined,
+    },
+    {
+      step: "release.ready",
+      status: stateIdx >= releaseStateIndex("ready") ? "done" : "pending",
+    },
+    {
+      step: "leitstand.dev-deploy",
+      status: stateIdx >= releaseStateIndex("dev-deployed") ? "done" : "pending",
+    },
+    {
+      step: "leitstand.propagate",
+      status: stateIdx >= releaseStateIndex("alt-deployed") ? "done" : "pending",
+    },
+    {
+      step: "leitstand.promote",
+      status:
+        stateIdx >= releaseStateIndex("main-deployed") || releaseState === "promoted"
+          ? "done"
+          : "pending",
+    },
+  ];
+
+  const nextStep = determineNextStep(releaseState);
+
+  logger.info(`[leitstand.pipeline.check] Release: ${releaseId}`);
+  logger.info(`  System: ${systemId}`);
+  logger.info(`  State:  ${releaseState}`);
+  logger.info(`  Next:   ${nextStep}`);
+
+  return {
+    data: {
+      command: "leitstand.pipeline.check",
+      releaseId,
+      systemId,
+      releaseState,
+      steps,
+      nextStep,
+    },
+    summary: `[leitstand.pipeline.check] ${releaseId}: state=${releaseState}, next=${nextStep}`,
+  };
+}
