@@ -36,7 +36,7 @@ import {
   resolveDnsEnv,
   recordsMatch,
 } from "./dns-helpers.ts";
-import { normalizeTxtContent } from "./txt-normalize.ts";
+import { ensureTxtQuoted } from "./txt-normalize.ts";
 import type { DnsRecordDeclaration } from "@warpgogol/werkstatt-site/ontology/schemas";
 
 export interface DnsRecordUpsertResult {
@@ -189,7 +189,7 @@ export function toApiRecord(declared: DnsRecordDeclaration): {
   return {
     type: declared.type,
     name: declared.name,
-    content: declared.type === "TXT" ? normalizeTxtContent(declared.content) : declared.content,
+    content: declared.type === "TXT" ? ensureTxtQuoted(declared.content) : declared.content,
     proxied: declared.proxied ?? false,
     ...(declared.priority !== undefined ? { priority: declared.priority } : {}),
     ...(declared.ttl !== undefined ? { ttl: declared.ttl } : {}),

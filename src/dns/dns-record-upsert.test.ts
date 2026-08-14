@@ -199,19 +199,7 @@ describe("toApiRecord — AAAA records", () => {
 });
 
 describe("toApiRecord — TXT records", () => {
-  it("normalizes content via normalizeTxtContent (strips surrounding quotes)", () => {
-    const result = toApiRecord(
-      rec({
-        type: "TXT",
-        name: "example.com",
-        content: '"v=spf1 -all"',
-      }),
-    );
-    expect(result.content).toBe("v=spf1 -all");
-    expect(result.data).toBeUndefined();
-  });
-
-  it("passes through unquoted TXT content", () => {
+  it("wraps unquoted TXT content in double quotes", () => {
     const result = toApiRecord(
       rec({
         type: "TXT",
@@ -219,7 +207,30 @@ describe("toApiRecord — TXT records", () => {
         content: "v=spf1 -all",
       }),
     );
-    expect(result.content).toBe("v=spf1 -all");
+    expect(result.content).toBe('"v=spf1 -all"');
+    expect(result.data).toBeUndefined();
+  });
+
+  it("preserves already-quoted TXT content (re-quotes consistently)", () => {
+    const result = toApiRecord(
+      rec({
+        type: "TXT",
+        name: "example.com",
+        content: '"v=spf1 -all"',
+      }),
+    );
+    expect(result.content).toBe('"v=spf1 -all"');
+  });
+
+  it("escapes internal double quotes in TXT content", () => {
+    const result = toApiRecord(
+      rec({
+        type: "TXT",
+        name: "example.com",
+        content: 'v=spf1 "include:_spf"',
+      }),
+    );
+    expect(result.content).toBe('"v=spf1 \\"include:_spf\\""');
   });
 });
 

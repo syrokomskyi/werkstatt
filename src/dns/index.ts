@@ -12,7 +12,7 @@ RFC-0753: Barrel export for DNS record management commands.
 </CHANGE_SUMMARY>
 */
 
-export { normalizeTxtContent } from "./txt-normalize.ts";
+export { normalizeTxtContent, ensureTxtQuoted } from "./txt-normalize.ts";
 export {
   flagString,
   flagBoolean,
