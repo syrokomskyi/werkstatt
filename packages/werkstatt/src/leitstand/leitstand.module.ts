@@ -11,6 +11,7 @@
   <item>RFC-0627: add leitstand.deploy; update rollback (auto-detect channel); update status/health for dev channel.</item>
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; propagate gate checks published + commitSha + missionId; rollback auto-step removes dev-deployed.</item>
   <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; update reads to include releases/{release}/**.</item>
+  <item>RFC-0842: add leitstand.pipeline.check command for release pipeline state inspection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ export function createLeitstandModule(): KernelModule {
         runLeitstandStatus,
         runLeitstandRollback,
         runLeitstandHealth,
+        runLeitstandPipelineCheck,
       } = await import("./leitstand-commands.ts");
       registry.registerCommand({
         name: "leitstand.dev-deploy",
@@ -181,6 +183,27 @@ export function createLeitstandModule(): KernelModule {
         },
         cacheable: false,
         execute: runLeitstandHealth,
+      });
+      registry.registerCommand({
+        name: "leitstand.pipeline.check",
+        description:
+          "Inspect deployment pipeline state for a release (RFC-0842). Flags: --release.",
+        scope: "workspace",
+        supportsAllSites: false,
+        flags: {
+          release: {
+            kind: "string",
+            required: true,
+            description: "Release id to inspect.",
+          },
+        },
+        reads: [
+          "releases/{release}/**",
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
+        cacheable: false,
+        execute: runLeitstandPipelineCheck,
       });
 
       const { runLeitstandServiceDevDeploy } = await import("./service-dev-deploy.ts");

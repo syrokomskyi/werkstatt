@@ -13,6 +13,7 @@
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; propagate gate checks published + commitSha + missionId; rollback auto-step removes dev-deployed.</item>
   <item>RFC-0751: add leitstand.service.deploy for shared Cloudflare Worker services.</item>
   <item>RFC-0806: replace leitstand.service.deploy with dev-deploy, promote, and rollback commands.</item>
+  <item>RFC-0842: add leitstand.pipeline.check command for release pipeline state inspection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -41,6 +42,8 @@ export {
   type LeitstandRollbackData,
   runLeitstandHealth,
   type LeitstandHealthData,
+  runLeitstandPipelineCheck,
+  type PipelineCheckResult,
 } from "./leitstand-commands.ts";
 export { runLeitstandServiceDevDeploy } from "./service-dev-deploy.ts";
 export { runLeitstandServicePromote } from "./service-promote.ts";
