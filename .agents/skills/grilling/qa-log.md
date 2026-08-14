@@ -757,3 +757,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** Should the existing draft RFC-0848 through RFC-0854 be discarded and recreated, or reused under the new program charter?
 - **Answer:** Preserve the existing drafts without parallel duplicates. Keep RFC-0854, RFC-0849, and RFC-0852 as independent no-regret prerequisites; subordinate RFC-0848, RFC-0850, RFC-0851, and RFC-0853 to the new program charter and revise their static plugin/runtime seams. Give agents one updated dependency graph and one normative transition path.
+
+### K-0059: Fully sequential execution by context-independent agents
+
+```knowledge-entry
+id: K-0059
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** May independent program packets execute in parallel, or must every packet be handed to a fresh agent and completed sequentially?
+- **Answer:** Do not parallelize any program packet. Execute exactly one packet at a time with one agent that is assumed to have no prior-session memory. Each packet starts only after its dependency commit and handoff have been verified; ambiguous or non-passing completion blocks the next packet.
