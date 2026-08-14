@@ -16,7 +16,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0844
 related:
   - DNA-44
   - DNA-62

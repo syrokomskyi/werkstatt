@@ -26,9 +26,9 @@ related:
 satisfies: []
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - workpiece.config.presence.check
-  added: []
   changed:
     - mission.validate
   removed: []
