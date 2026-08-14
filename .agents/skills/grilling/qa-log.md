@@ -900,3 +900,16 @@ status: active
 - **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
 - **Question:** What evidence must a capability candidate satisfy before promotion into the active component set?
 - **Answer:** Require a deterministic conformance suite, held-out scenarios unavailable to the authoring agent, regression comparison with the current component set, and an independent evaluator agent. Then require shadow execution, bounded canary activation, and an observation window. Any non-pass rolls back or quarantines; unknown is `incomplete`. Automatic promotion is allowed only within a pre-accepted policy, while permission changes, Law Kernel changes, and new external-effect types require a separate architecture decision.
+
+### K-0070: Hand weak agents self-contained hash-bound execution packets
+
+```knowledge-entry
+id: K-0070
+layer: L0
+created: 2026-08-15
+status: active
+```
+
+- **Context:** 2026-08-15 — combined release-certification and agent-native runtime transition for less capable implementing agents
+- **Question:** What artifact contract lets a less capable agent execute one program step without reconstructing the architecture or silently drifting from it?
+- **Answer:** Maintain one program index as the sole execution order and pair every child RFC with one self-contained implementation packet. The packet binds the exact prerequisite commit and normative source hashes; lists required reads, goals, non-goals, allowed and forbidden files, exact contracts, ordered edits, validations with expected results, allowed transition diagnostics, rollback, and a completion-report template. Any clarification marker, hash mismatch, or allow-list escape blocks execution and returns the packet for preparation.
