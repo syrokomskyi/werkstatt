@@ -8,6 +8,58 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
 
 **NEVER call `wrangler deploy` directly.** All deployments MUST go through `leitstand.*` commands, which enforce Axiom gates, build-identity verification, and release state transitions.
 
+## Pipeline overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    MISSION LIFECYCLE                             │
+│  mission.validate → mission.reconcile → mission.close            │
+│  Release state: (none) ────────────────────► ready              │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    RELEASE LIFECYCLE                              │
+│  release.prepare → release.ready                                  │
+│  Release state: ready ────────────────────► ready (confirmed)    │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  leitstand.dev-deploy                                             │
+│  Channel: dev    Release state: ready ─────► dev-deployed        │
+│  Axiom evidence generated (commitSha + missionId match)          │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  leitstand.propagate                                              │
+│  Channel: alt    Release state: dev-deployed ─► alt-deployed     │
+│  Axiom evidence gate (commitSha + missionId match)               │
+│  Dev build-identity verification (fetch dev build-identity.json) │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  leitstand.promote                                                │
+│  Channel: main   Release state: alt-deployed ─► main-deployed    │
+│  Live build-identity verification (alt vs main)                   │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  mission.archive --status=closed --site <siteId>                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key rules:**
+
+- `leitstand.propagate` ALWAYS deploys to the **alt** channel only (hardcoded, RFC-0628). There is no `--channel` flag.
+- `leitstand.promote` ALWAYS deploys to the **main** channel only.
+- The `--all` CLI flag MUST NEVER be used on deployment commands (RFC-0842).
+- `leitstand.propagate` reads `systemId` from the release manifest — `--site` is not needed.
+- `mission.close` does NOT auto-archive (RFC-0801). The workpiece stays in `missions/<id>/workpiece/` with working `node_modules` until `mission.archive` is called explicitly after the deployment pipeline completes.
+
 ## Prerequisites
 
 - Mission is open and materialized.
@@ -22,17 +74,11 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
   ```sh
   pnpm exec playwright install chromium
   ```
-
-## Full pipeline sequence
-
-```
-mission.validate → mission.reconcile → mission.close
-→ release.prepare → release.ready
-→ leitstand.dev-deploy → leitstand.propagate → leitstand.promote
-→ mission.archive --status=closed --site <siteId>
-```
-
-**Important:** `mission.close` does NOT auto-archive (RFC-0801). The workpiece stays in `missions/<id>/workpiece/` with working `node_modules` until `mission.archive` is called explicitly after the deployment pipeline completes.
+- **Root-level config files present** — `.lighthouse-budget-ignore`, `image-delivery.config.yaml` (in `src/`), `dns-records.yaml` must exist in the workpiece if the site requires them. These are persisted to the cache clone by `mission.close` and restored by `mission.materialize` (RFC-0840). If missing after materialization, copy them from the cache clone:
+  ```sh
+  cp ../systems-cache/<siteId>/.lighthouse-budget-ignore missions/<missionId>/workpiece/
+  cp ../systems-cache/<siteId>/dns-records.yaml missions/<missionId>/workpiece/
+  ```
 
 ## Steps
 
@@ -52,37 +98,69 @@ Stop the server when done:
 pkill -f "astro dev"
 ```
 
-### 2. Dev-deploy — deploy to dev channel with Axiom gate
+### 2. Mission lifecycle — validate, reconcile, close
+
+```sh
+pnpm exec werkstatt run mission.validate --mission <missionId>
+pnpm exec werkstatt run mission.reconcile --mission <missionId>
+pnpm exec werkstatt run mission.close --mission <missionId>
+```
+
+After `mission.close`, the mission is closed and the workpiece is no longer "active". The release must be prepared from the closed mission.
+
+### 3. Release — prepare and ready
+
+```sh
+pnpm exec werkstatt run release.prepare --site <siteId> --mission <missionId>
+pnpm exec werkstatt run release.ready --release <releaseId>
+```
+
+The release is now in `ready` state. Verify with:
+
+```sh
+pnpm exec werkstatt run leitstand.pipeline.check --release <releaseId>
+```
+
+### 4. Dev-deploy — deploy to dev channel with Axiom gate
 
 `leitstand.dev-deploy` deploys the workpiece to the dev channel and runs Axiom verification automatically. It builds the workpiece, deploys to the dev worker, purges CDN, verifies freshness, and runs `mission.check`.
 
-For a workpiece (active mission):
-
-```sh
-pnpm exec werkstatt run leitstand.dev-deploy --site <siteId>
-```
-
-For an existing release (no active mission required):
+**After `mission.close`, the mission is no longer active.** The `--release` flag is REQUIRED to specify which release to deploy:
 
 ```sh
 pnpm exec werkstatt run leitstand.dev-deploy --site <siteId> --release <releaseId>
 ```
 
+Do NOT use `--all`. The `--all` flag is rejected on deployment commands (RFC-0842).
+
 Review the Axiom findings in the output. If there are blocking findings, fix them before proceeding.
 
-### 3. Propagate — deploy to alt channel
+Release state transitions: `ready` → `dev-deployed`.
 
-`leitstand.propagate` deploys a verified release to the alt channel. It requires Axiom evidence from dev-deploy (commitSha + missionId match).
+### 5. Propagate — deploy to alt channel
+
+`leitstand.propagate` deploys a verified release to the **alt** channel only (hardcoded, RFC-0628). It requires:
+
+- Release in `ready` state (confirmed by `release.ready`).
+- Axiom evidence from dev-deploy (commitSha + missionId match).
+- Dev build-identity verification (fetches dev `build-identity.json`).
 
 ```sh
 pnpm exec werkstatt run leitstand.propagate --release <releaseId>
 ```
 
+**Do NOT pass `--site`** — `leitstand.propagate` reads `systemId` from the release manifest. **Do NOT pass `--all`** — the `--all` flag is rejected on deployment commands (RFC-0842). **Do NOT pass `--channel`** — the `--channel` flag was removed (RFC-0628). The channel is always `alt`.
+
+Release state transitions: `ready` → `alt-deployed`.
+
 The site is now live on the alt domain. The operator verifies it before proceeding to Main.
 
-### 4. Promote — promote to main channel
+### 6. Promote — promote to main channel
 
-`leitstand.promote` promotes an alt-deployed release to the main channel. It requires the release to be in `alt-deployed` state and verifies build-identity.
+`leitstand.promote` promotes an alt-deployed release to the **main** channel only. It requires:
+
+- Release in `alt-deployed` state.
+- Live build-identity verification (alt vs main).
 
 **Only after Alt is verified by the operator.**
 
@@ -90,17 +168,60 @@ The site is now live on the alt domain. The operator verifies it before proceedi
 pnpm exec werkstatt run leitstand.promote --release <releaseId>
 ```
 
+**Do NOT pass `--all`** — the `--all` flag is rejected on deployment commands (RFC-0842).
+
+Release state transitions: `alt-deployed` → `main-deployed`.
+
+### 7. Archive — clean up
+
+After the main deployment is verified, archive the mission:
+
+```sh
+pnpm exec werkstatt run mission.archive --status=closed --site <siteId>
+```
+
 ## Forbidden actions
 
 - **NEVER call `wrangler deploy` directly.** This bypasses the pipeline. All deployments MUST go through `leitstand.*` commands.
+- **NEVER use `--all` on deployment commands** (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`). Deployment is always per-site, per-release. The `--all` flag is rejected by the command runner (RFC-0842).
+- **NEVER use `--channel` on `leitstand.propagate`.** The flag was removed (RFC-0628). The channel is hardcoded to `alt`. Use `leitstand.promote` for main deployment.
 - **NEVER deploy to Main without first deploying to Alt and verifying.** `leitstand.promote` enforces this by requiring `alt-deployed` state.
 - **NEVER skip Axiom verification.** `leitstand.dev-deploy` runs Axiom automatically. `leitstand.propagate` requires Axiom evidence.
 - **NEVER skip Dev verification.**
 - **NEVER create workarounds** — no symlinks to node_modules, no manual dist copies, no custom wrangler configs, no `--config` pointing to cache clone, no copying `.env.*` files manually. If the pipeline fails, investigate the root cause and fix it — do not bypass.
 - **NEVER use `pnpm --filter <site> run deploy:main`** — this resolves to ALL workpiece directories matching the site name, not the release directory.
 - **NEVER run `wrangler deploy` from cache clone, werkstatt root, or workpiece directory.** These all fail for different reasons (no node_modules, pnpm strict isolation, package-specifier main field). Use `leitstand.*` commands instead.
+- **NEVER restore build outputs (`image-variants.generated.yaml`, `derived-prices.generated.json`) from the cache clone to the workpiece.** These are build artifacts regenerated by `build.prepare`. Restoring them before a build causes `material.metadata.write` failures (referenced files don't exist yet).
 
 ## Common issues
+
+### `.lighthouse-budget-ignore` missing after materialization
+
+`mission.materialize` replaces the workpiece via `atomicMoveDir`. Root-level config files are not in `STERNSYSTEM_DATA_PATHS` and are lost. RFC-0840 will fix this by persisting/restoring these files automatically. Until then, copy manually from the cache clone:
+
+```sh
+cp ../systems-cache/<siteId>/.lighthouse-budget-ignore missions/<missionId>/workpiece/
+```
+
+Then commit via `mission.git.commit`.
+
+### `image.delivery.validate` errors despite `image-delivery.config.yaml` existing
+
+The config file must be in `src/`, not the workpiece root. The validator reads from `srcDirectory/image-delivery.config.yaml` (RFC-0830). If the file is in the root, it is silently ignored (RFC-0841 will add a diagnostic). Move it:
+
+```sh
+mv missions/<missionId>/workpiece/image-delivery.config.yaml missions/<missionId>/workpiece/src/image-delivery.config.yaml
+```
+
+### `material.metadata.write` fails with "derived-prices.generated.json not found"
+
+This occurs when `image-variants.generated.yaml` (a build output) is restored from the cache clone before a build runs. The manifest references image files that don't exist yet. Remove the restored build output:
+
+```sh
+rm -f missions/<missionId>/workpiece/src/image-variants.generated.yaml
+```
+
+Then re-run `mission.validate` — the build will regenerate it.
 
 ### `derived-prices.generated.json` blocks `mission.close`
 
@@ -127,10 +248,18 @@ Commit all generated artifacts via `mission.git.commit`, then re-run `mission.cl
 
 ### `leitstand.dev-deploy` fails with "no active mission"
 
-If the mission is already closed, use `--release` to deploy an existing release:
+After `mission.close`, the mission is closed and no longer active. The `--release` flag is REQUIRED:
 
 ```sh
 pnpm exec werkstatt run leitstand.dev-deploy --site <siteId> --release <releaseId>
+```
+
+### `leitstand.propagate` fails with "Unexpected positional argument" or "Unknown flag '--channel'"
+
+`leitstand.propagate` does NOT accept `--channel` (removed in RFC-0628) or `--site` (read from release manifest). The only required flag is `--release`:
+
+```sh
+pnpm exec werkstatt run leitstand.propagate --release <releaseId>
 ```
 
 ### `leitstand.propagate` fails with "must be in state 'ready'"

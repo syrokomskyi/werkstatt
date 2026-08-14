@@ -5,18 +5,29 @@ date: 2026-08-14
 auditor:
   skill: fo-idea-audit
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: resolved
 ---
 
 # Audit: RFC-0839
 
-## Verdict: Needs revision
+## Verdict: Resolved
 
-The RFC is well-structured and follows the existing Axiom methodology pattern correctly. However, it has a contradictory `commands.changed` entry, missing cross-RFC dependency declaration, vague DNA-66 level mapping, and unspecified Compass sync obligations.
+All findings were addressed in the enhanced version of RFC-0839 (`enhancedAt: 2026-08-14`).
+
+## Resolution summary
+
+1. **`commands.changed` contradiction** — Fixed: `commands.changed` is now `[]`. The RFC body correctly states no code change is needed to `mission.check`.
+2. **Acceptance criterion reworded** — Fixed: criterion now reads "Verify that `mission.check` picks up the new methodology config without code changes by running `methodologies.validate`".
+3. **Missing `dependsOn`** — Fixed: `dependsOn: [RFC-0837, RFC-0838]` added to frontmatter.
+4. **"L5-adjacent" imprecision** — Fixed: RFC now says "Extends DNA-66 (workshop testing pyramid) L5 (post-deploy health and critical-path checks)".
+5. **Compass sync** — Fixed: dedicated "Compass sync" section added, identifying `docs/verification-plan.xml` as the file to update.
+6. **AGENTS.md scope** — Fixed: acceptance criterion now states "No `AGENTS.md` updates required (this RFC does not change agent behavior rules)".
+7. **Error handling one-sidedness** — Fixed: "Error handling for unimplemented instrument" section now specifies both the Werkstatt-side adapter behavior (existing try/catch → `missionCheckFailResult`) and the external expert's instrument dispatcher contract.
 
 ## Mechanical validation (rfc.validate)
 
 Pass with 2 warnings:
+
 - V-18: `related "DNA-68"` is not defined in `docs/architecture-dna.md` (expected — RFC-0837 is draft)
 - V-18: `related "DNA-69"` is not defined in `docs/architecture-dna.md` (expected — RFC-0838 is draft)
 

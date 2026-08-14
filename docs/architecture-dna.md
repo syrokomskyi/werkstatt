@@ -283,3 +283,15 @@ The workshop enforces a five-level testing pyramid: L1 unit (pure functions and 
 ## DNA-67 · Pre-deploy Lighthouse parity gate
 
 Every Lighthouse audit that can be deterministically checked at build time MUST have a build-time validator in the Werkstatt pipeline. This prevents relying on post-deploy Lighthouse runs to catch issues that could be caught earlier. The coverage matrix is maintained in `docs/lighthouse-parity-matrix.yaml`. Enforcement: `lighthouse.validate`, `lighthouse.budget.check`. Established by RFC-0833.
+
+## DNA-71 · Operator config file persistence
+
+Root-level operator config files (`.lighthouse-budget-ignore`, `image-delivery.config.yaml`, `live-video-manifest.generated.yaml`, `dns-records.yaml`) are untracked artifacts persisted between workpiece and cache clone during `mission.close` / `mission.materialize`, following the same pattern as `.env*` files (RFC-0822). The `OPERATOR_CONFIG_FILES` constant declares the canonical list. `mission.close` persists them to the cache clone (untracked); `mission.materialize` restores them after `atomicMoveDir`. The `materialize.config.validate` check command verifies the list stays in sync. Established by RFC-0840.
+
+## DNA-72 · Validator config location diagnostics
+
+Validators that load configuration from non-obvious paths MUST emit a warning diagnostic when the config file is found in a likely-but-wrong location. This prevents silent failures where the operator creates a config file in the wrong directory and the validator ignores it. The first instance is `IMG-DELIVERY-CONFIG-01` (warning when `image-delivery.config.yaml` is in workpiece root but not in `src/`). Established by RFC-0841.
+
+## DNA-73 · Sequential deployment pipeline enforcement
+
+Deployment commands (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`) MUST reject the `--all` CLI flag — deployment is always per-site, per-release. Each command MUST log its target channel and URL before executing. The pipeline is strictly sequential: `ready → dev-deployed → alt-deployed → main-deployed`. `leitstand.propagate` hardcodes channel `alt` (no `--channel` flag); `leitstand.promote` hardcodes channel `main`. The `leitstand.pipeline.check` command provides operators with pipeline state inspection. Established by RFC-0842.
