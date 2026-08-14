@@ -60,13 +60,13 @@ function resolveDnsRecordsPath(context: KernelRuntimeContext): string {
 
 function formatDnsAidYaml(record: DnsAidRecord): string {
   return [
-    BEGIN_MARKER,
-    `- name: ${record.name}`,
-    `  type: ${record.type}`,
-    `  content: "${record.content}"`,
-    `  ttl: ${record.ttl}`,
-    `  proxied: ${record.proxied}`,
-    END_MARKER,
+    `  ${BEGIN_MARKER}`,
+    `  - name: ${record.name}`,
+    `    type: ${record.type}`,
+    `    content: "${record.content}"`,
+    `    ttl: ${record.ttl}`,
+    `    proxied: ${record.proxied}`,
+    `  ${END_MARKER}`,
   ].join("\n");
 }
 
@@ -99,9 +99,11 @@ function replaceDnsAidSection(text: string, newSection: string): string {
       }
     }
     if (lastRecordIdx !== -1) {
-      // Find the end of this record block (next non-indented line or EOF)
+      // Find the end of this record block (next line with ≤2-space indent or EOF)
+      // Record properties have 4-space indent under a 2-space indented '- name:' entry.
+      // Lines with 2-space indent or less (e.g. next '- name:', comments, or top-level keys) mark the end.
       let insertIdx = lastRecordIdx + 1;
-      while (insertIdx < lines.length && lines[insertIdx].match(/^\s{2}\S/)) {
+      while (insertIdx < lines.length && lines[insertIdx].match(/^\s{4}\S/)) {
         insertIdx++;
       }
       lines.splice(insertIdx, 0, newSection);

@@ -302,3 +302,62 @@ describe("agent.dns-aid.validate (RFC-0786)", () => {
     }
   });
 });
+
+describe("agent.dns-aid YAML indentation regression (RFC-0786)", () => {
+  it("generated dns-records.yaml parses as valid YAML", async () => {
+    const { parse: parseYaml } = await import("yaml");
+    const { context, cleanup } = await fixture();
+    try {
+      await runAgentDnsAidGenerate(makeInput(), context);
+      const dnsPath = resolveDnsPath(context);
+      const content = await readFile(dnsPath, "utf8");
+      const parsed = parseYaml(content);
+      expect(parsed).toBeTruthy();
+      expect(parsed.kind).toBe("dns-records");
+      expect(parsed.records).toBeInstanceOf(Array);
+      expect(parsed.records.length).toBeGreaterThan(0);
+      const svcb = parsed.records.find((r: { type: string }) => r.type === "SVCB");
+      expect(svcb).toBeTruthy();
+      expect(svcb.name).toContain("_index._agents");
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("inserts DNS-AID section into existing dns-records.yaml with 2-space indented records and produces valid YAML", async () => {
+    const { parse: parseYaml } = await import("yaml");
+    const { context, cleanup } = await fixture();
+    try {
+      const dnsPath = resolveDnsPath(context);
+      const existingContent = `kind: dns-records
+schemaVersion: 1
+zone: test-site.example.com
+updatedAt: 2026-01-01
+records:
+  - name: _agent.test-site.example.com
+    type: TXT
+    content: "https://test-site.example.com/.well-known/agent.json"
+    ttl: 3600
+    proxied: false
+`;
+      await context.io.writeFile(dnsPath, existingContent);
+
+      const result = await runAgentDnsAidGenerate(makeInput(), context);
+      expect(result.exitCode).toBe(0);
+      const action = (result.data as Record<string, unknown>)?.action;
+      expect(["created", "updated"]).toContain(action);
+
+      const content = await readFile(dnsPath, "utf8");
+      const parsed = parseYaml(content);
+      expect(parsed).toBeTruthy();
+      expect(parsed.records).toBeInstanceOf(Array);
+      expect(parsed.records.length).toBe(2);
+      const svcb = parsed.records.find((r: { type: string }) => r.type === "SVCB");
+      expect(svcb).toBeTruthy();
+      const txt = parsed.records.find((r: { type: string }) => r.type === "TXT");
+      expect(txt).toBeTruthy();
+    } finally {
+      await cleanup();
+    }
+  });
+});
