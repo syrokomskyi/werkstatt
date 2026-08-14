@@ -17,8 +17,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createDefaultIO } from "@warpgogol/werkstatt/kernel";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
-import { runA11yLabelInNameComponentValidate } from "../a11y-label-in-name-component.ts";
-import { extractComponentLabelInNameViolations } from "../a11y-label-in-name-component.ts";
+import {
+  runA11yLabelInNameComponentValidate,
+  extractComponentLabelInNameViolations,
+} from "../a11y-label-in-name-component.ts";
 
 const logger = {
   section() {},

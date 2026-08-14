@@ -13,6 +13,7 @@ a11y.label-in-name.validate (RFC-0832).
   <item>Do not validate CSS or non-interactive elements.</item>
   <item>Do not validate server-only .ts files — only .astro component source.</item>
   <item>Do not parse .astro as a full AST — regex-based approach is sufficient for common patterns.</item>
+  <item>Do not handle multi-line aria-label expressions — extractBraceExpression operates on a single line. Multi-line brace expressions in aria-label are rare in the current codebase.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -48,7 +49,6 @@ export interface ComponentLabelInNameFinding {
   element: string;
   ariaLabelExpr: string;
   visibleTextExpr: string;
-  severity: "error";
   message: string;
   fixHint: string;
 }
@@ -182,7 +182,6 @@ export function extractComponentLabelInNameViolations(
           element: tagName,
           ariaLabelExpr: `{${ariaLabelExpr}}`,
           visibleTextExpr: `{${visibleTextExpr}}`,
-          severity: "error",
           message: MESSAGE,
           fixHint: FIX_HINT,
         });
