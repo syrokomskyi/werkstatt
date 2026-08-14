@@ -108,7 +108,8 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
       expect(content).toContain("_index._agents.test-site.example.com");
       expect(content).toContain("type: SVCB");
       expect(content).toContain("alpn=h2");
-      expect(content).toContain("endpoint=https://test-site.example.com/.well-known/agent.json");
+      expect(content).toContain("port=443");
+      expect(content).toContain("test-site.example.com alpn=h2 port=443");
       expect(content).toContain("ttl: 3600");
     } finally {
       await cleanup();
@@ -145,7 +146,7 @@ describe("agent.dns-aid.generate (RFC-0786)", () => {
       const dnsPath = resolveDnsPath(context);
       const content = await readFile(dnsPath, "utf8");
       expect(content).toContain("_index._agents.new-domain.com");
-      expect(content).toContain("endpoint=https://new-domain.com/.well-known/agent.json");
+      expect(content).toContain("new-domain.com alpn=h2 port=443");
     } finally {
       await cleanup();
     }
@@ -243,8 +244,8 @@ describe("agent.dns-aid.validate (RFC-0786)", () => {
       const dnsPath = resolveDnsPath(context);
       let content = await readFile(dnsPath, "utf8");
       content = content.replace(
-        "endpoint=https://test-site.example.com/.well-known/agent.json",
-        "endpoint=https://wrong-url.com/agent.json",
+        "test-site.example.com alpn=h2 port=443",
+        "wrong-host.com alpn=h2 port=443",
       );
       await writeFile(dnsPath, content);
       const result = await runAgentDnsAidValidate(makeInput(), context);

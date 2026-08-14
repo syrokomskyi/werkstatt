@@ -39,11 +39,9 @@ describe("buildDnsAidRecord (RFC-0786)", () => {
     expect(record.type).toBe("SVCB");
   });
 
-  it("builds SVCB content with alpn and endpoint params", () => {
+  it("builds SVCB content with target, alpn and port params (RFC 9460)", () => {
     const record = buildDnsAidRecord(makeManifest("https://warpgogol.com"));
-    expect(record.content).toBe(
-      "1 . alpn=h2 endpoint=https://warpgogol.com/.well-known/agent.json",
-    );
+    expect(record.content).toBe("1 warpgogol.com alpn=h2 port=443");
   });
 
   it("sets ttl to 3600", () => {
@@ -66,15 +64,11 @@ describe("buildDnsAidRecord (RFC-0786)", () => {
   it("extracts domain from URL with port", () => {
     const record = buildDnsAidRecord(makeManifest("http://localhost:3000"));
     expect(record.name).toBe("_index._agents.localhost");
-    expect(record.content).toBe(
-      "1 . alpn=h2 endpoint=http://localhost:3000/.well-known/agent.json",
-    );
+    expect(record.content).toBe("1 localhost alpn=h2 port=443");
   });
 
   it("strips trailing slash from baseUrl", () => {
     const record = buildDnsAidRecord(makeManifest("https://warpgogol.com/"));
-    expect(record.content).toBe(
-      "1 . alpn=h2 endpoint=https://warpgogol.com/.well-known/agent.json",
-    );
+    expect(record.content).toBe("1 warpgogol.com alpn=h2 port=443");
   });
 });
