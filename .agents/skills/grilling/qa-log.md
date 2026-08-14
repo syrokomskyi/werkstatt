@@ -302,3 +302,16 @@ status: active
 - **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, certification rollout
 - **Question:** How should the existing production estate migrate when this workshop operates only one site and can republish it?
 - **Answer:** Use a clean republish rather than generic legacy infrastructure. Keep the current site serving during rollout without labeling it certified; do not import old evidence or add bootstrap/legacy commands. Create a fresh candidate from current source, run the complete Dev → Alt → Main certification chain, and switch atomically or through an isolated slot. Remove the transition mode after the first `main-certified` release. Activate the new gate and remove the old grace behavior only after all required producers, evaluator agents, and durable storage are operational.
+
+### K-0024: Post-cutover removal of bulky legacy operational artifacts
+
+```knowledge-entry
+id: K-0024
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — Werkstatt quality-hardening architecture program, single-site cleanup
+- **Question:** May old release and archived-mission data be removed to simplify the clean cutover?
+- **Answer:** Yes, through a separate post-cutover cleanup RFC after the active mission is archived and the first new release is `main-certified`. Preserve compact immutable audit history—IDs, states, commit hashes, relationships, digests, Bordbuch, git history, normative documents, transcripts, manifests, and material incident/validation/close reports—while removing obsolete workpieces, heavy evidence/snapshots, staging directories, and old release payloads. Cleanup must use a dedicated idempotent command with dry-run, exact allow-list, mirror/source verification, tombstones, and a final report; never manual recursive deletion.
