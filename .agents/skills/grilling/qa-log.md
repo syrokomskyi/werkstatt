@@ -484,3 +484,16 @@ status: active
 - **Context:** 2026-08-14 — CERT-001 RFC-level grilling, identity canonicalization and legacy evidence
 - **Question:** Must the new certification identity preserve or migrate any prior readiness/certification evidence, and should it reuse the permissive general-purpose stable JSON hash contract?
 - **Answer:** No prior readiness report, test-evidence file, quality score, or release-state claim is imported or treated as authoritative certification. The new `@1` certification namespace starts clean, with no legacy readers, aliases, dual-write, or evidence migration; old material is non-authoritative history until post-cutover cleanup. Certification uses new strict `canonicalJsonBytesV1`/`canonicalJsonHashV1` APIs that reject non-JSON and ambiguous values and record `werkstatt/canonical-json@1`. Existing `stableJsonHash` behavior remains unchanged only for unrelated cache/platform consumers, preventing accidental global hash churn.
+
+### K-0038: Decompose CERT-001 into one-session implementation RFCs
+
+```knowledge-entry
+id: K-0038
+layer: L0
+created: 2026-08-14
+status: active
+```
+
+- **Context:** 2026-08-14 — RFC-0848 enhancement after semantic audit, implementation by less capable agents
+- **Question:** Should CERT-001 remain one large implementation RFC, or be decomposed so each document can be implemented safely by a separate agent session?
+- **Answer:** Keep RFC-0848 as the integration contract for CERT-001 and split implementation into three dependent RFCs: strict runtime contracts/Diagnostic ownership/canonical JSON/identity; deterministic evidence selection/aggregation/dossier/action packs; and release/deployment state replacement with the fail-closed legacy command boundary. Each child RFC must compile and pass its own tests independently. RFC-0848 completes only after all three children are implemented and its cross-module integration checks pass.
