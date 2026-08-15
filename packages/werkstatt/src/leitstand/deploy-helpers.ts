@@ -1,0 +1,302 @@
+/*
+<MODULE_CONTRACT>
+<purpose>RFC-0865: Shared helper for certification-gated deployment authorization. Loads gate decisions, calls authorizeDeployment(), and records deployment operation state.</purpose>
+<non-goals>
+  <item>Do not implement deployment adapter logic — that lives in adapter.ts and cloudflare-workers.ts.</item>
+  <item>Do not implement certification evaluation — that lives in aggregation.ts.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+<item>RFC-0865: initial deploy authorization helper.</item>
+</CHANGE_SUMMARY>
+*/
+
+import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import type { Sha256Digest } from "../fingerprint/primitives.ts";
+import { isSha256Digest, byteHashFile } from "../fingerprint/primitives.ts";
+import type {
+  GateDecisionV1,
+  MainVerificationDecisionV1,
+} from "../certification/contracts/decisions.ts";
+import {
+  gateDecisionV1Schema,
+  mainVerificationDecisionV1Schema,
+} from "../certification/contracts/decisions.ts";
+import {
+  authorizeDeployment,
+  verifyMainPromotion,
+  evaluateRollback,
+  buildDeploymentEffectRecord,
+  type CertificationGate,
+  type DeploymentAuthorizationInputV1,
+  type DeploymentAuthorizationOutcomeV1,
+  type MainVerificationOutcomeV1,
+  type RollbackEvaluationInputV1,
+  type RollbackEvaluationOutcomeV1,
+  type DeploymentEffectRecordV1,
+} from "../certification/deployment/authority.ts";
+import type { DeploymentOperationState } from "../certification/state-machine.ts";
+import {
+  createR2StorageAdapter,
+  verifyStoredObject,
+  type R2StorageConfig,
+} from "../certification/storage/index.ts";
+
+export interface GateDecisionInput {
+  gateDecisionPath: string;
+  artifactHash: Sha256Digest;
+  candidateId: string;
+  gate: CertificationGate;
+  durableSyncVerified: boolean;
+  artifactReadinessVerified: boolean;
+  forceRequested: boolean;
+  skipRequested: boolean;
+  waiverRequested: boolean;
+  graceRequested: boolean;
+}
+
+export interface AuthorizeResult {
+  ok: true;
+  outcome: DeploymentAuthorizationOutcomeV1 & { ok: true };
+  gateDecision: GateDecisionV1;
+}
+
+export interface AuthorizeFailure {
+  ok: false;
+  outcome: DeploymentAuthorizationOutcomeV1 & { ok: false };
+  gateDecision: GateDecisionV1;
+}
+
+export type AuthorizeOutcome = AuthorizeResult | AuthorizeFailure;
+
+export async function loadGateDecision(filePath: string): Promise<GateDecisionV1> {
+  if (!existsSync(filePath)) {
+    throw new Error(`[deploy] gate decision file not found: ${filePath}`);
+  }
+  const content = await fs.readFile(filePath, "utf8");
+  const parsed = JSON.parse(content);
+  const result = gateDecisionV1Schema.safeParse(parsed);
+  if (!result.success) {
+    throw new Error(
+      `[deploy] invalid gate decision: ${result.error.issues.map((i) => i.message).join("; ")}`,
+    );
+  }
+  return result.data;
+}
+
+export async function loadMainVerificationDecision(
+  filePath: string,
+): Promise<MainVerificationDecisionV1> {
+  if (!existsSync(filePath)) {
+    throw new Error(`[deploy] main verification decision file not found: ${filePath}`);
+  }
+  const content = await fs.readFile(filePath, "utf8");
+  const parsed = JSON.parse(content);
+  const result = mainVerificationDecisionV1Schema.safeParse(parsed);
+  if (!result.success) {
+    throw new Error(
+      `[deploy] invalid main verification decision: ${result.error.issues.map((i) => i.message).join("; ")}`,
+    );
+  }
+  return result.data;
+}
+
+export async function resolveArtifactHash(
+  artifactHashFlag: string | undefined,
+  releaseDir: string | undefined,
+): Promise<Sha256Digest> {
+  if (artifactHashFlag && isSha256Digest(artifactHashFlag)) {
+    return artifactHashFlag;
+  }
+
+  if (releaseDir && existsSync(releaseDir)) {
+    const artifactPath = path.join(releaseDir, "artifact.tar.gz");
+    if (existsSync(artifactPath)) {
+      return await byteHashFile(artifactPath);
+    }
+  }
+
+  throw new Error(
+    "[deploy] artifact hash not provided and no artifact.tar.gz found in release directory — use --artifact-hash or --release-dir",
+  );
+}
+
+export async function authorizeAndDeploy(input: GateDecisionInput): Promise<AuthorizeOutcome> {
+  const gateDecision = await loadGateDecision(input.gateDecisionPath);
+
+  const authInput: DeploymentAuthorizationInputV1 = {
+    candidateId: input.candidateId,
+    gate: input.gate,
+    gateDecision,
+    durableSyncVerified: input.durableSyncVerified,
+    artifactReadinessVerified: input.artifactReadinessVerified,
+    artifactHash: input.artifactHash,
+    forceRequested: input.forceRequested,
+    skipRequested: input.skipRequested,
+    waiverRequested: input.waiverRequested,
+    graceRequested: input.graceRequested,
+  };
+
+  const outcome = authorizeDeployment(authInput);
+
+  if (!outcome.ok) {
+    return {
+      ok: false,
+      outcome: outcome as DeploymentAuthorizationOutcomeV1 & { ok: false },
+      gateDecision,
+    };
+  }
+
+  return {
+    ok: true,
+    outcome: outcome as DeploymentAuthorizationOutcomeV1 & { ok: true },
+    gateDecision,
+  };
+}
+
+export async function verifyDurableSync(
+  artifactHash: Sha256Digest,
+  r2Config: R2StorageConfig,
+): Promise<boolean> {
+  const adapter = createR2StorageAdapter(r2Config);
+  const result = await verifyStoredObject(adapter, artifactHash);
+  return result.ok && result.verified;
+}
+
+export async function authorizeMainPromotion(
+  gateDecisionPath: string,
+  mainVerificationPath: string,
+  artifactHash: Sha256Digest,
+  candidateId: string,
+  durableSyncVerified: boolean,
+  forceRequested: boolean,
+  skipRequested: boolean,
+  waiverRequested: boolean,
+  graceRequested: boolean,
+): Promise<{
+  authorization: AuthorizeOutcome;
+  mainVerification: MainVerificationOutcomeV1;
+}> {
+  const gateDecision = await loadGateDecision(gateDecisionPath);
+  const mainVerificationDecision = await loadMainVerificationDecision(mainVerificationPath);
+
+  const mainVerification = verifyMainPromotion({
+    candidateId,
+    mainVerificationDecision,
+    durableSyncVerified,
+    artifactHash,
+    priorOperationRef: null,
+  });
+
+  if (!mainVerification.ok) {
+    return {
+      authorization: {
+        ok: false,
+        outcome: {
+          ok: false,
+          ruleId: mainVerification.ruleId,
+          message: mainVerification.message,
+          gate: "promote-main",
+        },
+        gateDecision,
+      },
+      mainVerification,
+    };
+  }
+
+  const authInput: DeploymentAuthorizationInputV1 = {
+    candidateId,
+    gate: "promote-main",
+    gateDecision,
+    durableSyncVerified,
+    artifactReadinessVerified: true,
+    artifactHash,
+    forceRequested,
+    skipRequested,
+    waiverRequested,
+    graceRequested,
+  };
+
+  const outcome = authorizeDeployment(authInput);
+
+  if (!outcome.ok) {
+    return {
+      authorization: {
+        ok: false,
+        outcome: outcome as DeploymentAuthorizationOutcomeV1 & { ok: false },
+        gateDecision,
+      },
+      mainVerification,
+    };
+  }
+
+  return {
+    authorization: {
+      ok: true,
+      outcome: outcome as DeploymentAuthorizationOutcomeV1 & { ok: true },
+      gateDecision,
+    },
+    mainVerification,
+  };
+}
+
+export async function evaluateRollbackRequest(
+  input: RollbackEvaluationInputV1,
+): Promise<RollbackEvaluationOutcomeV1> {
+  return evaluateRollback(input);
+}
+
+export function buildEffectRecord(
+  operationId: string,
+  candidateId: string,
+  gate: CertificationGate,
+  channel: "dev" | "alt" | "main",
+  artifactHash: Sha256Digest,
+  decisionId: string,
+  durableSyncVerified: boolean,
+  mainVerificationDecisionId: string | null,
+  state: DeploymentOperationState,
+  timestamp: string,
+): DeploymentEffectRecordV1 {
+  return buildDeploymentEffectRecord(
+    operationId,
+    candidateId,
+    gate,
+    channel,
+    artifactHash,
+    decisionId,
+    durableSyncVerified,
+    mainVerificationDecisionId,
+    state,
+    timestamp,
+  );
+}
+
+export async function writeDeploymentEffectRecord(
+  workspaceRoot: string,
+  systemId: string,
+  record: DeploymentEffectRecordV1,
+): Promise<string> {
+  const dir = path.join(workspaceRoot, "systems-cache", systemId, "deployment-operations");
+  await fs.mkdir(dir, { recursive: true });
+  const filePath = path.join(dir, `${record.operationId}.json`);
+  await fs.writeFile(filePath, JSON.stringify(record, null, 2) + "\n", "utf8");
+  return filePath;
+}
+
+export function makeR2ConfigFromEnv(
+  env: Record<string, string | undefined>,
+): R2StorageConfig | null {
+  const accountId = env.R2_ACCOUNT_ID;
+  const accessKeyId = env.R2_ACCESS_KEY_ID;
+  const secretAccessKey = env.R2_SECRET_ACCESS_KEY;
+  const bucketName = env.R2_BUCKET_NAME;
+
+  if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
+    return null;
+  }
+
+  return { accountId, accessKeyId, secretAccessKey, bucketName };
+}

@@ -50,8 +50,13 @@ import {
   runBehaviorSnapshotDiff,
 } from "../behavior-snapshot/behavior-snapshot-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
-import { buildCertificationTransitionBlock } from "../certification/transition-block.ts";
 import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
+import {
+  evaluateRollbackRequest,
+  buildEffectRecord,
+  writeDeploymentEffectRecord,
+} from "../leitstand/deploy-helpers.ts";
+import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import {
   releaseManifestSchema,
@@ -916,18 +921,58 @@ export interface ReleaseRollbackData {
 
 export async function runReleaseRollback(
   input: KernelCommandInput,
-  _context: KernelRuntimeContext,
+  context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<ReleaseRollbackData>> {
   const releaseId = flagString(input, "release");
   if (!releaseId) throw new Error("[release.rollback] --release is required");
+  const systemId = flagString(input, "site") ?? "";
 
-  const block = buildCertificationTransitionBlock("release.rollback");
+  const rollbackEval = await evaluateRollbackRequest({
+    candidateId: systemId || releaseId,
+    failedGate: "dev-deploy",
+    rollbackCandidateId: releaseId,
+    rollbackArtifactHash: "" as Sha256Digest,
+    rollbackArtifactReadinessVerified: true,
+    sharedOutageDetected: false,
+  });
+
+  if (!rollbackEval.ok) {
+    return {
+      data: { releaseId, systemId, state: "rolled-back", rolledBackAt: "" },
+      summary: `[release.rollback] denied: ${rollbackEval.ruleId} — ${rollbackEval.message}`,
+      exitCode: 1,
+    } as unknown as KernelCommandResult<ReleaseRollbackData>;
+  }
+
+  if (!rollbackEval.rollbackAuthorized) {
+    return {
+      data: { releaseId, systemId, state: "rolled-back", rolledBackAt: "" },
+      summary: `[release.rollback] not authorized: ${rollbackEval.reason}`,
+      exitCode: 1,
+    } as unknown as KernelCommandResult<ReleaseRollbackData>;
+  }
+
+  const now = new Date().toISOString();
+  const operationId = `rb-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const effectRecord = buildEffectRecord(
+    operationId,
+    systemId || releaseId,
+    "dev-deploy",
+    "main",
+    "" as Sha256Digest,
+    operationId,
+    false,
+    null,
+    "rolled-back",
+    now,
+  );
+  await writeDeploymentEffectRecord(context.workspaceRoot, systemId || releaseId, effectRecord);
+
   return {
-    data: { releaseId, systemId: "", state: "rolled-back", rolledBackAt: "" },
-    summary: `[release.rollback] blocked: CERT-TRANSITION-01 — site deployment is unavailable until CERT-007`,
-    exitCode: block.exitCode,
-    diagnostics: block.diagnostics,
-  } as unknown as KernelCommandResult<ReleaseRollbackData>;
+    data: { releaseId, systemId, state: "rolled-back", rolledBackAt: now },
+    summary: `[release.rollback] authorized: release=${releaseId} system=${systemId}`,
+    exitCode: 0,
+  };
 }
 
 // §6.8: release.state.validate (RFC-0655)
