@@ -141,14 +141,14 @@ pnpm exec werkstatt run leitstand.certify \
   --release warpgogol-com-r000008
 ```
 
-Produces a `GateDecisionV1` JSON file at the conventional path `releases/{releaseId}/gate-decision-{gate}.json` by:
+Produces a `GateDecisionV1` JSON file at the conventional path `systems-cache/{systemId}/gate-decisions/{releaseId}-{gate}.json` by:
 
 1. Loading the `astroCertificationProfile`
 2. Registering the `astro-mission-check` producer handler (wraps `mission.check`) — skipped when no open mission exists (status: `incomplete`)
 3. Planning producer execution via `planProducers`
 4. Executing producers via `executeProducers`
 5. Evaluating evidence via `evaluateCertificationDecision`
-6. Writing `GateDecisionV1` to `releases/{releaseId}/gate-decision-{gate}.json` (overwrites on retry — idempotent)
+6. Writing `GateDecisionV1` to `systems-cache/{systemId}/gate-decisions/{releaseId}-{gate}.json` (overwrites on retry — idempotent). This path is outside the release artifact store (DNA-52 immutability preserved).
 
 Deploy commands (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`) look up the gate decision at the conventional path by default. `--gate-decision` remains as an override flag for non-standard paths.
 
@@ -172,7 +172,7 @@ pnpm exec werkstatt run leitstand.promote \
   --main-verification-decision /tmp/main-verification.json
 ```
 
-Deploy commands resolve the gate decision at `releases/{releaseId}/gate-decision-{gate}.json` by default. `--gate-decision <path>` overrides the conventional path for non-standard workflows.
+Deploy commands resolve the gate decision at `systems-cache/{systemId}/gate-decisions/{releaseId}-{gate}.json` by default. `--gate-decision <path>` overrides the conventional path for non-standard workflows.
 
 ### TypeScript contracts
 
@@ -193,7 +193,7 @@ interface CertifyResult {
   gate: string;
   decisionId: string;
   status: "pass" | "fail" | "stale" | "incomplete";
-  outputPath: string; // releases/{releaseId}/gate-decision-{gate}.json
+  outputPath: string; // systems-cache/{systemId}/gate-decisions/{releaseId}-{gate}.json
   producerCount: number;
   evidenceCount: number;
 }
@@ -241,7 +241,7 @@ Phases (in order, parameterized by `channel: "dev" | "alt" | "main"`):
 1. **Build** — `pnpm build` with build-skip cache (RFC-0653). Writes preliminary `build-identity.json` to `public/.well-known/` before build (RFC-0634).
 2. **Wrangler deploy** — `adapter.propagate()` via `createCloudflareWorkersAdapter()`. Extracts deployment URL from wrangler stdout.
 3. **Build-identity finalization** — Computes `distTreeHash` via `fingerprintTree`, writes final `build-identity.json` to `dist/client/.well-known/` (RFC-0634).
-4. **CDN cache purge** — `runPurgeStep()` using `CLOUDFLARE_ZONE_ID` + `CLOUDFLARE_API_TOKEN` from env (RFC-0624). Fatal for cloudflare-workers adapter if purge fails (RFC-0649).
+4. **CDN cache purge** — `runPurgeStep()` using `CLOUDFLARE_ZONE_ID` + `CLOUDFLARE_API_TOKEN` from env (RFC-0624). Fatal for cloudflare-workers adapter if purge fails (RFC-0649). Skipped for dev channel when deployment URL is `*.workers.dev` (no CDN in front of dev).
 5. **Freshness verification** — `verifyFreshness()` fetches `build-identity.json` from CDN URL, compares `distTreeHash` (RFC-0649). Retries 5× with exponential backoff. Failure stops pipeline.
 6. **Health check** — `adapter.health()` probes live deployment routes (RFC-0379). Retries 3× with backoff (RFC-0747).
 7. **mission.check** (channel === "dev" only) — `runMissionCheckWithResilience()` with timeout + retry (RFC-0668). Passes `--commit-sha` and `--base-url`. Skipped when no open mission exists (release-only deploy, RFC-0700).
@@ -277,7 +277,7 @@ Phases (in order, parameterized by `channel: "dev" | "alt" | "main"`):
   "gate": "dev",
   "decisionId": "dec-2026-08-15-...",
   "status": "pass",
-  "outputPath": "/tmp/gate-decision-dev.json",
+  "outputPath": "systems-cache/warpgogol-com/gate-decisions/warpgogol-com-r000008-dev.json",
   "producerCount": 1,
   "evidenceCount": 1
 }
@@ -316,6 +316,28 @@ Phases (in order, parameterized by `channel: "dev" | "alt" | "main"`):
   "evidenceSyncError": null
 }
 ```
+
+### Channel-specific phase differences
+
+| Phase | Dev | Alt | Main |
+| --- | --- | --- | --- |
+| 4. CDN cache purge | Skipped (`*.workers.dev` has no CDN) | Fatal if purge fails | Fatal if purge fails |
+| 5. Freshness | Skipped (no CDN) | Required (5 retries) | Required (5 retries) |
+| 7. mission.check | Required (with resilience) | — | — |
+| 8. Axiom evidence gate | — | Required | — |
+| 9. Main verification | — | — | Required |
+| 10. Evidence sync | Best-effort | Best-effort | Best-effort |
+
+### Partial failure recovery
+
+When a phase fails after wrangler deploy (phase 2) has succeeded, the deployment is live but the pipeline is incomplete. The effect record is updated to `failed` with the failing phase and `deploymentUrl` populated. The operator is responsible for manual recovery:
+
+- **Health check failure (phase 6):** Deployment is live but unhealthy. Operator investigates the deployment URL, fixes the issue, and re-runs the deploy command (build-skip cache may skip rebuild). Auto-rollback is NOT attempted — health failures may be transient (CDN propagation delay) and auto-rollback would discard a potentially valid deployment.
+- **mission.check failure (phase 7, dev only):** Deployment is live but content violations detected. Operator fixes content, commits, and re-runs dev-deploy. The mission.check producer in the next `leitstand.certify` run will re-evaluate.
+- **Axiom evidence gate failure (phase 8, alt only):** Deployment is live but evidence mismatch. Operator verifies `commitSha` and `missionId` in evidence files, fixes if needed, and re-runs propagate.
+- **Freshness failure (phase 5):** Deployment is live but CDN serves stale content. Operator waits for CDN propagation and re-runs freshness check (or re-runs the deploy command).
+
+The effect record `state` field tracks: `authorized` → `deploying` → `deployed` | `failed` | `failed-stale`. The `failingPhase` field in the effect record metadata records which phase failed for debugging.
 
 ### Failure modes
 
@@ -405,14 +427,21 @@ After `evaluateRollbackRequest()` returns `rollbackAuthorized: true`, execute `a
 - [ ] `leitstand.pipeline.check` reads real deployment state from `DeploymentEffectRecordV1` entries instead of hardcoding `releaseState: "ready"` and all steps as `"pending"`
 - [ ] `leitstand.propagate` module registration declares `--gate-decision` as a flag
 - [ ] `leitstand.promote` module registration declares `--gate-decision` and `--main-verification-decision` as flags
-- [ ] `leitstand.certify` writes `GateDecisionV1` to conventional path `releases/{releaseId}/gate-decision-{gate}.json`
-- [ ] Deploy commands (`dev-deploy`, `propagate`, `promote`) resolve gate decision at conventional path by default, `--gate-decision` overrides
+- [ ] `leitstand.certify` writes `GateDecisionV1` to conventional path `systems-cache/{systemId}/gate-decisions/{releaseId}-{gate}.json` (outside release artifact store, DNA-52 preserved)
+- [ ] Deploy commands (`dev-deploy`, `propagate`, `promote`) resolve gate decision at `systems-cache/{systemId}/gate-decisions/{releaseId}-{gate}.json` by default, `--gate-decision` overrides
 - [ ] `leitstand.certify` works without open mission (skips mission-check producer, status: `incomplete`)
+- [ ] `leitstand.certify` reads dev deployment URL from effect records for `--base-url` (not user-supplied) to prevent spoofing
+- [ ] Effect record includes `failingPhase` metadata when deploy pipeline fails mid-execution
+- [ ] Dev channel skips CDN cache purge and freshness verification (no CDN in front of `*.workers.dev`)
 - [ ] `docs/verification-plan.xml` and `docs/development-plan.xml` synchronized with restored deploy execution steps
 - [ ] `deploy-execution.ts` extracted as shared phase pipeline
 - [ ] `certify.ts` implemented as new command handler
 - [ ] `AGENTS.md` updated with `leitstand.certify` command and deploy pipeline description
 - [ ] `rfc.validate` passes on this file before merging
+
+### URL verification in certify
+
+`leitstand.certify` passes `--base-url` to `mission.check` via the `astro-mission-check` producer. The base URL MUST be the actual dev deployment URL from the latest dev effect record (not a user-supplied URL). This prevents spoofing: if an attacker poisons DNS or provides a wrong URL, the gate decision attests to the wrong deployment. The certify command reads the dev deployment URL from `systems-cache/{systemId}/deployment-operations/` effect records. If no dev effect record exists (first deploy), certify requires `--base-url` flag and logs a warning.
 
 ## Implementation notes for agents
 
