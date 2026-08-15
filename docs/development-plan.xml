@@ -300,6 +300,22 @@
           Resolution is deterministic under input permutation. 71 tests pass.
         </description>
       </deliverable>
+      <deliverable id="del-0861">
+        <name>RFC-0861 Runtime reflection and conformance harness</name>
+        <status>implemented</status>
+        <description>
+          Added read-only, policy-filtered live capability catalog in `packages/werkstatt/src/component-runtime/reflection.ts`:
+          `CapabilityCatalogV1` with canonically ordered, exact-set-bound, caller-filtered entries. Catalog omits
+          secrets, raw grants, private state, credentials, prompts, executable bytes, and authority material —
+          enforced by `assertNoForbiddenFields` and negative tests. Added scenario/result contracts in
+          `conformance.ts`: `ConformanceScenarioV1`, `ConformanceResultV1` (always `testOnly: true`, no
+          admission/promotion decision). Added test-only conformance harness in `testing/harness.ts`:
+          `runConformanceScenario` with guards rejecting non-test mode (CONFORMANCE-01), untrusted fixtures
+          (CONFORMANCE-02), unpinned artifacts (CONFORMANCE-03), and hash mismatches (CONFORMANCE-04). Fixtures
+          are embedded, hash-pinned, and trusted. Subpath exports added for reflection, conformance, and testing.
+          28 tests pass.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

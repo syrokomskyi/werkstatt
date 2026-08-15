@@ -156,12 +156,12 @@ Rejected; scenarios may inform expectations, but Werkstatt owns contracts and ha
 
 ## Acceptance criteria
 
-- [ ] Catalog entries are canonical, live-state-derived, exact-set-bound, caller-filtered, and schema-strict.
-- [ ] Reflection leaks no secrets, raw grants, private state, artifacts, prompts, credentials, or authority material under negative tests.
-- [ ] The harness accepts only pinned trusted embedded fixtures and fails before import outside test mode.
-- [ ] Conformance scenarios exercise real lifecycle/resolution APIs with deterministic clocks, cancellation, drain, rollback, quarantine, and cleanup traces.
-- [ ] No production define/install/run/activate/promote command or authority decision is exported.
-- [ ] Scoped tests/build, package-export checks, RFC/Compass validation, and clean-tree verification pass.
+- [x] Catalog entries are canonical, live-state-derived, exact-set-bound, caller-filtered, and schema-strict. (evidence: packages/werkstatt/src/component-runtime/reflection.ts:createCapabilityCatalog)
+- [x] Reflection leaks no secrets, raw grants, private state, artifacts, prompts, credentials, or authority material under negative tests. (evidence: packages/werkstatt/src/component-runtime/tests/reflection.test.ts:assertNoForbiddenFields)
+- [x] The harness accepts only pinned trusted embedded fixtures and fails before import outside test mode. (evidence: packages/werkstatt/src/component-runtime/testing/harness.ts:assertTestMode,assertTrustedFixture)
+- [x] Conformance scenarios exercise real lifecycle/resolution APIs with deterministic clocks, cancellation, drain, rollback, quarantine, and cleanup traces. (evidence: packages/werkstatt/src/component-runtime/tests/conformance.test.ts:runConformanceScenario)
+- [x] No production define/install/run/activate/promote command or authority decision is exported. (evidence: packages/werkstatt/src/component-runtime/conformance.ts:ConformanceResultV1.testOnly)
+- [x] Scoped tests/build, package-export checks, RFC/Compass validation, and clean-tree verification pass. (evidence: 28 tests pass, package.json subpath exports added)
 
 ## Implementation notes for agents
 
