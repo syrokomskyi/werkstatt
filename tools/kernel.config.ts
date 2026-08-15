@@ -156,6 +156,7 @@ export default defineKernelConfig({
     "forge-exploration": async () =>
       (await import("@warpgogol/forge/os/exploration")).forgeExplorationModule,
     "forge-notes": async () => (await import("@warpgogol/forge/os/notes")).forgeNotesModule,
+    "forge-program": async () => (await import("@warpgogol/forge/os/program")).forgeProgramModule,
     "werkstatt-site": async () => (await import("@warpgogol/werkstatt-site")).werkstattSitePlugin,
     "werkstatt-plugin": async () =>
       (await import("@warpgogol/werkstatt/os/werkstatt-plugin-module")).forgeWerkstattPluginModule,

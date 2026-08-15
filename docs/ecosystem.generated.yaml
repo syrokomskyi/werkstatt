@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 94cde98965e1c303a5568441d8b4e86dfb182f2b83feb40ef63f85be254e2713
+  contentHash: a2da119086c015d53a1a26cc84071fd013cbf03dcef1740ef817fe300723d385
   sources:
     - path: docs/architecture-dna.md
       hash: 1f817ac52ca6c86112629a56ac717e39b564612c94e70f2b24461f4238e94953
@@ -25,7 +25,7 @@ meta:
     - path: package.json
       hash: e8de823d29ab444228de5ec5e2fdac84c9eaeb9c6c08a1ab2d94e5991db65be6
     - path: packages/forge/package.json
-      hash: 5fbad3366d45bcc4f69bc84895426e5a728d2eef77062e2bfdedebda8f4a4b7c
+      hash: 712d9e1ecbfb3e3f5319014458fbef46bb187518e5175378744bae5b8ecd3e7f
     - path: packages/werkstatt-game/package.json
       hash: 813b21c14e2a60167f6b809552a97189f4d6d3f8a6f3ee328f4ea6411e19284c
     - path: packages/werkstatt-site/package.json
@@ -55,7 +55,7 @@ meta:
     - path: services/telegram-alert-bridge/package.json
       hash: 71816ff8d2f8fdb4fcfdfad734a635ef006f18414e26484a88eb6cebc29e0af8
     - path: tools/kernel.config.ts
-      hash: f7dfe0bb271219d4177c05d6469d55ac5888d9980d4f10a586a7a64335f66060
+      hash: 08b456e4efb8f242b3076a9bcf9247999df2d4e5d0103e15f7e456216f847208
 workspace:
   name: warpgogol-platform
   version: 5.51.56
@@ -3624,6 +3624,30 @@ commands:
     supportsAllSites: true
     providers:
       - workspace
+  - name: program.packet.complete
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: program.packet.lease
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: program.packet.seal
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: program.packet.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: props.contract.validate
     scope: workspace
     mutatesState: false
@@ -5155,6 +5179,30 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0851
+    removedBy: []
+  - command: program.packet.complete
+    proposedBy:
+      - RFC-0856
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: program.packet.lease
+    proposedBy:
+      - RFC-0856
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: program.packet.seal
+    proposedBy:
+      - RFC-0856
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: program.packet.validate
+    proposedBy:
+      - RFC-0856
+    addedBy: []
+    changedBy: []
     removedBy: []
   - command: release.list
     proposedBy: []
