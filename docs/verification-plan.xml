@@ -490,5 +490,9 @@
       <change-type>RFC-0864 governed capability evolution controller changes</change-type>
       <expectation>Run `vitest` on `evolution-controller.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `rfc.validate --id RFC-0864`. Verify forward-only sequence enforces defined → tested → shadowed → canary → promoted; reducer rejects stage mismatches, invalid forward transitions, sequence conflicts, and idempotency replays; kill switch denies all transitions; rollback and quarantine create compensating actions; guards reject forbidden self-change scopes, evidence hash mismatches, expired authority, shadow side effects, canary boundary violations, and evidence poisoning; controller inspects, defines candidates, requests transitions, and activates kill switch.</expectation>
     </entry>
+    <entry id="vm-29">
+      <change-type>CERT-007 deployment effect authority changes</change-type>
+      <expectation>Run `vitest` on `certification-deployment-authority.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify gate requirements enforce no force/skip/waiver/grace; `authorizeDeployment` rejects unknown gates, force, skip, waiver, grace, candidate mismatch, non-pass gate decision, missing artifact readiness, and missing durable sync for Alt/Main; `verifyMainPromotion` rejects candidate mismatch, non-pass verification, and missing durable sync; `evaluateRollback` denies rollback during shared outage, when artifact is not ready, or when target is the same candidate; `evaluateCrashRecovery` resumes verification, restarts deployment, or quarantines with ambiguous state detection; `buildDeploymentEffectRecord` produces deterministic hash for same input and different hash for different input.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

@@ -489,6 +489,13 @@
           Implement `packages/werkstatt/src/evolution/` with contracts (candidates, stages, five-layer evidence bundles, transition records), reducer (monotonic forward-only transitions, idempotency, sequence, kill switch, compensating actions), guards (self-change boundary, evidence immutability, authority expiry, shadow side effects, canary boundaries, evidence poisoning), and controller (inspect/define/transition/kill-switch orchestration). 43 tests covering forward-only sequence, stage transitions, idempotency replay, kill switch, rollback/quarantine compensating actions, self-change boundary, evidence poisoning, canary boundaries, and controller lifecycle.
         </description>
       </deliverable>
+      <deliverable id="del-210">
+        <name>CERT-007: Deployment effect authority</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/certification/deployment/authority.ts` with deployment gate requirements (no force/skip/waiver/grace), deployment authorization (gate decision pass, artifact readiness, durable sync for Alt/Main), main verification (post-switch certification with durable sync), rollback evaluation (shared outage detection, artifact readiness, same-candidate denial), crash recovery (resume-verification, restart-deployment, quarantine actions with ambiguous state detection), and deployment effect records (deterministic hash). 42 tests covering gate requirements, authorization with all bypass rejections, main verification, rollback evaluation, crash recovery scenarios, effect record hashing, and utility functions.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
