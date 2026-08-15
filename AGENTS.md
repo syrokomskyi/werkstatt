@@ -87,6 +87,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `validateCertificationProfileV1` validates: plugin/profile binding against active plugin and `forge.yaml`, duplicate requirement/producer IDs, producer registration and command existence, nine-dimension Main gate coverage, continuous-health freshness TTL/schedule, rollback drift-action eligibility, and evaluator policy consistency.
 - No producer execution, deployment decisions, I/O, clock, env, or plugin imports exist in this module.
 
+### Authority and durable storage (CERT-003, packet 150)
+
+- `packages/werkstatt/src/certification/authority/` owns the issuer registry with idempotent add, conflicting-key rejection (`CERT-AUTHORITY-01`), attestation verification (`CERT-AUTHORITY-02`/`CERT-AUTHORITY-03`), and signed decision/root verification against registered issuers.
+- `packages/werkstatt/src/certification/storage/` owns the content-addressed dossier repository with append-only event chain, `previousEventHash` chain validation (`CERT-DOSSIER-01`/`CERT-DOSSIER-02`), root hash recomputation via RFC-0849, chain-break detection (`CERT-DOSSIER-04`), and root reference building.
+- The storage adapter interface is provider-neutral: `putObject`, `headObject`, `getObject`, `appendAuditRecord`. An in-memory adapter is provided for testing. `verifyStoredObject` checks existence and size (`CERT-STORAGE-01`/`CERT-STORAGE-02`).
+- Retention GC checks protected references (`current`, `rollback-target`, `open-incident`, `audit-hold`), age thresholds (certified vs unsuccessful), and creates tombstones before deletion. Durable replica verification rejects root hash mismatch (`CERT-STORAGE-03`).
+- No R2 adapter, producer orchestration, deployment commands, or I/O imports exist in this module.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
