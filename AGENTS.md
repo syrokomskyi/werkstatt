@@ -153,6 +153,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `checkLegacyStateProhibition` enforces no runtime command reads legacy release certification, grace, or mission artifacts for success. `verifyMarkerIntegrity` detects tampering via hash recomputation.
 - `isBootstrapExceptionClosed` and `isRollbackTargetProtected` enforce bootstrap rollback target protection until the exception is closed, and permanent protection for prior-certified targets. No legacy state import, no cutover without complete certification path.
 
+### Post-cutover legacy artifact cleanup (CERT-010, packet 240)
+
+- `packages/werkstatt/src/certification/cleanup/legacy-artifacts.ts` owns the post-cutover legacy artifact cleanup — idempotent inventory/plan/apply command for removing proven-obsolete heavy payloads.
+- `CleanupInventoryV1` records legacy + protected artifacts with byte counts and deterministic hash. `CleanupPlanV1` binds paths to delete/protect with total bytes to free and plan hash. `CleanupTombstoneV1` records each deletion. `CleanupReportV1` reports freed bytes, remaining protected, mirror verification, and recovery possibility.
+- `verifyCleanupPrerequisites` enforces cutover marker (`CERT-CLEANUP-01`), bootstrap exception closed (`CERT-CLEANUP-02`), main-certified candidate (`CERT-CLEANUP-03`/`04`), durable dossier (`CERT-CLEANUP-05`), mirrors (`CERT-CLEANUP-06`), rollback references (`CERT-CLEANUP-07`).
+- `validatePlan` rejects plan hash drift (`CERT-CLEANUP-08`), inventory hash drift (`CERT-CLEANUP-09`), unknown paths (`CERT-CLEANUP-10`), and protected paths in deletion plan (`CERT-CLEANUP-11`). `checkPathSafety` rejects symlinks outside allowed roots.
+- Dry-run is default; apply requires exact plan hash. `isSafeNoOp` detects idempotent re-apply. `verifyReportIntegrity` validates freed bytes match tombstone sum. No deletion without cutover marker, no deletion of protected artifacts, no silent plan drift.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
