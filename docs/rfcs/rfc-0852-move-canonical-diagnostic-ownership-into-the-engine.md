@@ -1,7 +1,7 @@
 ---
 id: RFC-0852
 title: "Move canonical Diagnostic ownership into the engine"
-status: accepted
+status: implemented
 kind: contract
 scope: workspace
 owners:
@@ -9,9 +9,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-14
-updatedAt: 2026-08-14
+updatedAt: 2026-08-15
 enhancedAt: 2026-08-14
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:

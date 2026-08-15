@@ -1,16 +1,16 @@
 ---
 id: RFC-0854
 title: "Standardize the ecosystem on Node 24"
-status: accepted
+status: implemented
 kind: policy
 scope: workspace
 owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-14
-updatedAt: 2026-08-14
+updatedAt: 2026-08-15
 enhancedAt: 2026-08-14
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:

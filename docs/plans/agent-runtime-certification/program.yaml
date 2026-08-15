@@ -121,14 +121,14 @@ packets:
   - order: 100
     packetId: 100-certification-contracts-and-identities
     file: 100-certification-contracts-and-identities.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0853
     decisionKind: rfc
     resolvedRfc: RFC-0853
     dependsOnPacket: 090-isolation-contract
     baseCommit: 25ea6b44ffd8034866aa8a838547dcaa486e9545
     sealCommit: null
-    completion: null
+    completion: b72493b96546777473492820625b65a8269dc517
   - order: 110
     packetId: 110-deterministic-evaluation
     file: 110-deterministic-evaluation.md

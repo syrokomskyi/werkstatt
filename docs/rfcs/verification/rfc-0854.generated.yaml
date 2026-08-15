@@ -6,11 +6,11 @@
 rfcId: RFC-0854
 title: Standardize the ecosystem on Node 24
 rfcStatus: accepted
-emittedAt: 2026-08-15T11:49:46.895Z
-commit: b72493b96546777473492820625b65a8269dc517
-workingTreeDirty: true
+emittedAt: 2026-08-15T11:54:09.230Z
+commit: c1313ad2cd4850702193475bb81a39516ce761c5
+workingTreeDirty: false
 kernelVersion: unknown
-rfcFileHash: c02001cd7203fa9dada93ecc3b305050dd22c9b1d231957859f65f501623b50a
+rfcFileHash: f01ea350ecd0b12c42929dd2f0905484f38bc2ae46153e72739fcbbc2ab40813
 acceptanceHash: 98758fd04142998582e6cf7948241f4f8a4bac06de4ac5a73950e74748b18d6d
 probes:
   - probe:
@@ -45,8 +45,8 @@ probes:
       probe: file-contains
       path: packages/werkstatt/src/workshop/templates.ts
       pattern: 'node-version: "24"'
-    ok: false
-    detail: pattern not found
+    ok: true
+    detail: pattern found
     durationMs: 0
   - probe:
       probe: file-contains
@@ -55,5 +55,5 @@ probes:
     ok: true
     detail: pattern found
     durationMs: 0
-overall: fail
+overall: pass
 
