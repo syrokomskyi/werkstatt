@@ -12,6 +12,7 @@
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; propagate gate checks published + commitSha + missionId; rollback auto-step removes dev-deployed.</item>
   <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; update reads to include releases/{release}/**.</item>
   <item>RFC-0842: add leitstand.pipeline.check command for release pipeline state inspection.</item>
+  <item>RFC-0866: add leitstand.certify command; add --gate-decision, --candidate-id, --artifact-hash flags to dev-deploy, propagate, promote.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,6 +32,7 @@ export function createLeitstandModule(): KernelModule {
         runLeitstandHealth,
         runLeitstandPipelineCheck,
       } = await import("./leitstand-commands.ts");
+      const { runLeitstandCertify } = await import("./certify.ts");
       registry.registerCommand({
         name: "leitstand.dev-deploy",
         description:
@@ -57,6 +59,20 @@ export function createLeitstandModule(): KernelModule {
             kind: "boolean",
             description: "RFC-0653: Force pnpm build even when build-skip cache matches.",
           },
+          "gate-decision": {
+            kind: "string",
+            required: true,
+            description: "RFC-0866: Path to GateDecisionV1 JSON file.",
+          },
+          "candidate-id": {
+            kind: "string",
+            description: "RFC-0866: Release candidate id (defaults to --site).",
+          },
+          "artifact-hash": {
+            kind: "string",
+            required: true,
+            description: "RFC-0866: Artifact hash (sha256:... format).",
+          },
         },
         writes: ["missions/{mission}/evidence/axiom/**"],
         reads: [
@@ -81,6 +97,20 @@ export function createLeitstandModule(): KernelModule {
             required: true,
             description:
               "Published release id with verified Axiom evidence (commitSha + missionId match).",
+          },
+          "gate-decision": {
+            kind: "string",
+            required: true,
+            description: "RFC-0866: Path to GateDecisionV1 JSON file.",
+          },
+          "candidate-id": {
+            kind: "string",
+            description: "RFC-0866: Release candidate id (defaults to --site).",
+          },
+          "artifact-hash": {
+            kind: "string",
+            required: true,
+            description: "RFC-0866: Artifact hash (sha256:... format).",
           },
         },
         writes: [
@@ -108,6 +138,25 @@ export function createLeitstandModule(): KernelModule {
             kind: "string",
             required: true,
             description: "Alt-deployed release id to promote.",
+          },
+          "gate-decision": {
+            kind: "string",
+            required: true,
+            description: "RFC-0866: Path to GateDecisionV1 JSON file.",
+          },
+          "main-verification-decision": {
+            kind: "string",
+            required: true,
+            description: "RFC-0866: Path to MainVerificationDecisionV1 JSON file.",
+          },
+          "candidate-id": {
+            kind: "string",
+            description: "RFC-0866: Release candidate id (defaults to --site).",
+          },
+          "artifact-hash": {
+            kind: "string",
+            required: true,
+            description: "RFC-0866: Artifact hash (sha256:... format).",
           },
         },
         writes: [
@@ -204,6 +253,47 @@ export function createLeitstandModule(): KernelModule {
         ],
         cacheable: false,
         execute: runLeitstandPipelineCheck,
+      });
+      registry.registerCommand({
+        name: "leitstand.certify",
+        description:
+          "Produce a GateDecisionV1 JSON file via certification orchestration (RFC-0866). Flags: --site, --gate, --release, --artifact-hash.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: false,
+        flags: {
+          site: {
+            kind: "string",
+            required: true,
+            description: "Sternsystem id.",
+          },
+          gate: {
+            kind: "string",
+            required: true,
+            description: "Certification gate: dev, alt, or main.",
+          },
+          release: {
+            kind: "string",
+            required: true,
+            description: "Release id.",
+          },
+          "candidate-id": {
+            kind: "string",
+            description: "Release candidate id (defaults to --site).",
+          },
+          "artifact-hash": {
+            kind: "string",
+            required: true,
+            description: "Artifact hash (sha256:... format).",
+          },
+        },
+        writes: ["systems-cache/{system}/gate-decisions/**"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
+        cacheable: false,
+        execute: runLeitstandCertify,
       });
 
       const { runLeitstandServiceDevDeploy } = await import("./service-dev-deploy.ts");
