@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 220-continuous-health-and-demotion
-state: draft
+state: sealed
 governingDecision: werkstatt-release-certification/CERT-008
 decisionKind: spec-node
 resolvedRfc: null

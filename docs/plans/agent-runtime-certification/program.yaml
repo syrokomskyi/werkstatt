@@ -253,12 +253,12 @@ packets:
   - order: 220
     packetId: 220-continuous-health-and-demotion
     file: 220-continuous-health-and-demotion.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/CERT-008
     decisionKind: spec-node
     resolvedRfc: null
     dependsOnPacket: 210-deployment-effect-authority
-    baseCommit: null
+    baseCommit: 29b156ef
     sealCommit: null
     completion: null
   - order: 230
