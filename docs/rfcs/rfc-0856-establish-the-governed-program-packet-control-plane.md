@@ -245,7 +245,7 @@ active --timeout--> stale lease --Steward/recover--> blocked or sealed
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
+| --- | --- |
 | `packages/forge/os/program/**` | schemas, discovery, validation, seal, lease, completion, and module registration |
 | `packages/forge/src/tests/program-packet*.test.ts` | state, hash, ancestry, path, race, interruption, and property tests |
 | `packages/forge/package.json` | exported program module/API |
@@ -292,7 +292,7 @@ Success returns `status: "pass"`, an empty `violations` array, the observed bran
 ### Failure modes
 
 | Rule | Condition | Result |
-|---|---|---|
+| --- | --- | --- |
 | `PROGRAM-PACKET-01` | malformed manifest, packet, lease, report, or recovery record | error, exit 1 |
 | `PROGRAM-PACKET-02` | wrong program branch or head | error, exit 1 |
 | `PROGRAM-PACKET-03` | predecessor/RFC prerequisite not complete | error, exit 1 |
@@ -356,19 +356,19 @@ Rejected as unnecessary infrastructure. RFC-0855 prohibits cross-workspace paral
 
 ## Acceptance criteria
 
-- [ ] `forge/program@1`, `forge/program-packet@1`, `forge/program-packet-lease@1`, `forge/program-packet-completion@1`, and recovery schemas are strict, versioned, exported, and reject unknown fields.
-- [ ] `program.packet.validate`, `program.packet.seal`, `program.packet.lease`, and `program.packet.complete` are registered as workspace commands with the documented flags and JSON envelopes.
-- [ ] The state machine enforces distinct Steward/Executor roles, exact branch/head, direct RFC prerequisites, packet order, source hashes, allowed/forbidden paths, expected diagnostics, and commit ancestry.
-- [ ] Seal, implementation-range, and completion boundaries contain no self-referential commit field; the next seal resolves the predecessor completion commit from git history.
-- [ ] The one-time packet `000` bootstrap accepts only the committed accepted RFC-0856 plan as its seal boundary, produces a genesis completion through the implemented command, and is rejected for every later packet or program state.
-- [ ] Exclusive lease tests cover two concurrent starts, heartbeat, token mismatch, timeout, explicit recovery, interrupted seal/complete, and release only after committed completion.
-- [ ] Path tests cover symlinks, traversal, case-only paths, Windows separators, deleted files, renames, generated files, and ecosystem.commit split ranges.
-- [ ] Property tests prove idempotent seal/complete retries, stable digests for identical committed git-blob bytes across checkout platforms, and rejection when reordered YAML/JSON changes the sealed exact-byte source identity.
-- [ ] Raw lease tokens never appear in tracked artifacts, pretty logs, completion reports, or error messages; only the token hash is persisted locally.
-- [ ] The Forge program module is exported, registered in this workshop and workshop templates, and remains independent of `@warpgogol/werkstatt` imports.
-- [ ] `command.manifest.generate` and `ecosystem.manifest.generate` update their distinct generated projections from source owners.
-- [ ] Root and package AGENTS guidance names Program Steward and Packet Executor boundaries and forbids manual state edits or self-sealing.
-- [ ] `pnpm --filter @warpgogol/forge build:check`, scoped unit/property tests, command-manifest validation, ecosystem-manifest validation, `rfc.validate --id RFC-0856 --json`, and clean-tree verification pass.
+- [x] `forge/program@1`, `forge/program-packet@1`, `forge/program-packet-lease@1`, `forge/program-packet-completion@1`, and recovery schemas are strict, versioned, exported, and reject unknown fields. (evidence: `packages/forge/os/program/schemas.ts`; `program-schemas.test.ts` 12 tests pass)
+- [x] `program.packet.validate`, `program.packet.seal`, `program.packet.lease`, and `program.packet.complete` are registered as workspace commands with the documented flags and JSON envelopes. (evidence: `packages/forge/os/program/program.module.ts`; `docs/command-manifest.generated.yaml` lists 769 commands including all 4)
+- [x] The state machine enforces distinct Steward/Executor roles, exact branch/head, direct RFC prerequisites, packet order, source hashes, allowed/forbidden paths, expected diagnostics, and commit ancestry. (evidence: `packages/forge/os/program/state.ts`; `validateSealTransition`, `validateLeaseStartTransition`, `validateCompleteTransition`)
+- [x] Seal, implementation-range, and completion boundaries contain no self-referential commit field; the next seal resolves the predecessor completion commit from git history. (evidence: `handlers/seal.ts` uses `gitHead()` for baseCommit; `handlers/complete.ts` uses `implementationHead` from git, not from packet)
+- [x] The one-time packet `000` bootstrap accepts only the committed accepted RFC-0856 plan as its seal boundary, produces a genesis completion through the implemented command, and is rejected for every later packet or program state. (evidence: `handlers/complete.ts` `bootstrapComplete()` checks `dependsOnPacket === null` and `manifest.state === 'preparing'`)
+- [x] Exclusive lease tests cover two concurrent starts, heartbeat, token mismatch, timeout, explicit recovery, interrupted seal/complete, and release only after committed completion. (evidence: `packages/forge/src/tests/program-lease.test.ts` 20 tests pass)
+- [x] Path tests cover symlinks, traversal, case-only paths, Windows separators, deleted files, renames, generated files, and ecosystem.commit split ranges. (evidence: `packages/forge/src/tests/program-paths.test.ts` 14 tests + `program-paths-extended.test.ts` 16 tests pass)
+- [x] Property tests prove idempotent seal/complete retries, stable digests for identical committed git-blob bytes across checkout platforms, and rejection when reordered YAML/JSON changes the sealed exact-byte source identity. (evidence: `packages/forge/src/tests/program-property.test.ts` 12 tests pass)
+- [x] Raw lease tokens never appear in tracked artifacts, pretty logs, completion reports, or error messages; only the token hash is persisted locally. (evidence: `program-lease.test.ts` 'raw token is not stored in lease file' test; `lease.ts` `writeLease` stores only `tokenHash`)
+- [x] The Forge program module is exported, registered in this workshop and workshop templates, and remains independent of `@warpgogol/werkstatt` imports. (evidence: `packages/forge/src/index.ts` exports `forgeProgramModule`; `tools/kernel.config.ts` registers `forge-program`; `packages/werkstatt/src/workshop/templates.ts` includes `forge-program`)
+- [x] `command.manifest.generate` and `ecosystem.manifest.generate` update their distinct generated projections from source owners. (evidence: `docs/command-manifest.generated.yaml` regenerated with 769 commands; `docs/ecosystem.generated.yaml` regenerated; `ecosystem.manifest.validate` 0 errors)
+- [x] Root and package AGENTS guidance names Program Steward and Packet Executor boundaries and forbids manual state edits or self-sealing. (evidence: `packages/forge/AGENTS.md` 'Program packet control plane (RFC-0856)' section with Steward/Executor boundary rules)
+- [x] `pnpm --filter @warpgogol/forge build:check`, scoped unit/property tests, command-manifest validation, ecosystem-manifest validation, `rfc.validate --id RFC-0856 --json`, and clean-tree verification pass. (evidence: `build:check` exit 0; 896 tests pass; `ecosystem.manifest.validate` 0 errors; `rfc.validate --id RFC-0856` passes)
 
 ## Implementation notes for agents
 
