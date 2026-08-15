@@ -97,6 +97,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `activation.ts` exports `ActivationTransaction` — bounded set transition with prepare/commit/abort, prior-set drain in reverse dependency order, quarantine on incomplete rollback.
 - No resolver, sandbox, certification, or production activation occurs. Packet 070 supplies resolution; packet 230 performs production cutover.
 
+### Deterministic component resolution and reconciliation (RFC-0860)
+
+- `packages/werkstatt/src/component-runtime/resolver.ts` owns pure deterministic dependency resolution: validates manifests, checks artifact availability, verifies admitted grants, matches required capabilities by namespace/compatibility/schema identity, rejects zero/multiple providers, detects cycles, topologically sorts with canonical component-ID tie-breaking, computes graph/set identities through RFC-0858.
+- `packages/werkstatt/src/component-runtime/reconciliation.ts` owns pure desired-state diff and transaction orchestration: computes stop/drain/unload/load/activate plans, detects no-op (unchanged setHash), drives RFC-0859 activation transaction.
+- `packages/werkstatt/src/component-runtime/resolution-proof.ts` exports bounded proof/diagnostics types: `ResolutionProofV1`, `ResolutionViolationV1` with codes `RESOLUTION-01` through `RESOLUTION-08`.
+- Resolution is deterministic under input permutation. Missing, incompatible, ambiguous, cyclic, unadmitted, or artifact-mismatched graphs are blocked before lifecycle mutation.
+- No package/network discovery, fallback providers, cycle tolerance, or plugin adapters. Production activation remains absent until packet 230.
+
 ## Mission git helpers
 
 - `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.
