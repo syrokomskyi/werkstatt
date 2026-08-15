@@ -129,7 +129,7 @@ rfcs:
       - verification
     materializedAs: RFC-0848
   - id: CERT-002
-    title: Versioned plugin certification profile
+    title: Versioned resolved-component-set certification profile (as amended by AMD-007)
     dependsOn:
       - CERT-001
     wave: 1
@@ -212,7 +212,7 @@ rfcs:
       - roadmap
       - verification
   - id: CERT-009
-    title: Single-site clean cutover
+    title: Combined runtime-and-certification cutover (as amended by AMD-007)
     dependsOn:
       - CERT-005
       - CERT-006

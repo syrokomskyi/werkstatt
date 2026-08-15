@@ -2,16 +2,17 @@
 schema: forge/spec-amendment@1
 id: AMD-007
 title: Component-runtime identity and sequential certification reconciliation
-status: proposed
+status: accepted
 createdAt: 2026-08-15
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 targets:
   - kind: section
     document: overview
     anchor: target-architecture
   - kind: section
     document: contracts
-    anchor: candidate-identity
+    anchor: runtime-identity-binding
   - kind: section
     document: roadmap
     anchor: implementation-roadmap
