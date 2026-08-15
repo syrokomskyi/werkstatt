@@ -91,9 +91,9 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 
 - `packages/werkstatt/src/certification/authority/` owns the issuer registry with idempotent add, conflicting-key rejection (`CERT-AUTHORITY-01`), attestation verification (`CERT-AUTHORITY-02`/`CERT-AUTHORITY-03`), and signed decision/root verification against registered issuers.
 - `packages/werkstatt/src/certification/storage/` owns the content-addressed dossier repository with append-only event chain, `previousEventHash` chain validation (`CERT-DOSSIER-01`/`CERT-DOSSIER-02`), root hash recomputation via RFC-0849, chain-break detection (`CERT-DOSSIER-04`), and root reference building.
-- The storage adapter interface is provider-neutral: `putObject`, `headObject`, `getObject`, `appendAuditRecord`. An in-memory adapter is provided for testing. `verifyStoredObject` checks existence and size (`CERT-STORAGE-01`/`CERT-STORAGE-02`).
+- The storage adapter interface is provider-neutral: `putObject`, `headObject`, `getObject`, `appendAuditRecord`. An in-memory adapter is provided for testing. An R2 durable storage adapter (`packages/werkstatt/src/certification/storage/r2-adapter.ts`) is implemented for Cloudflare R2 (RFC-0865). `verifyStoredObject` checks existence and size (`CERT-STORAGE-01`/`CERT-STORAGE-02`).
 - Retention GC checks protected references (`current`, `rollback-target`, `open-incident`, `audit-hold`), age thresholds (certified vs unsuccessful), and creates tombstones before deletion. Durable replica verification rejects root hash mismatch (`CERT-STORAGE-03`).
-- No R2 adapter, producer orchestration, deployment commands, or I/O imports exist in this module.
+- No producer orchestration, deployment commands, or I/O imports exist in this module.
 
 ### Certification orchestration and command surface (CERT-004, packet 160)
 

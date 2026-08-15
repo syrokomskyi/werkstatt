@@ -1152,20 +1152,6 @@ export interface LeitstandRollbackData {
   releaseState: string;
 }
 
-function detectChannelFromState(releaseState: string): Channel {
-  if (releaseState === "promoted") return "main";
-  if (releaseState === "alt-deployed") return "alt";
-  throw new Error(
-    `[leitstand.rollback] cannot rollback release in state '${releaseState}' — expected 'promoted' or 'alt-deployed'`,
-  );
-}
-
-function autoStepReleaseState(currentState: string): string {
-  if (currentState === "promoted") return "alt-deployed";
-  if (currentState === "alt-deployed") return "ready";
-  return "ready";
-}
-
 export async function runLeitstandRollback(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -1242,7 +1228,7 @@ export async function runLeitstandRollback(
       rolledBackTo: toReleaseId,
       state: "succeeded",
       deploymentUrl: "",
-      releaseState: autoStepReleaseState("promoted"),
+      releaseState: "ready",
     },
     summary: `[leitstand.rollback] authorized: candidate=${systemId} channel=${channel} to=${toReleaseId}`,
     exitCode: 0,
@@ -1290,35 +1276,12 @@ export interface PipelineCheckResult {
   nextStep: string | null;
 }
 
-const PIPELINE_STATE_ORDER: ReadonlyArray<string> = [
-  "prepared",
-  "ready",
-  "dev-deployed",
-  "alt-deployed",
-  "main-deployed",
-  "promoted",
-];
-
-function releaseStateIndex(state: string): number {
-  const idx = PIPELINE_STATE_ORDER.indexOf(state);
-  return idx;
-}
-
 function determineNextStep(releaseState: string): string {
   switch (releaseState) {
     case "prepared":
       return "release.ready";
     case "ready":
       return "leitstand.dev-deploy";
-    case "dev-deployed":
-      return "leitstand.propagate";
-    case "alt-deployed":
-      return "leitstand.promote";
-    case "main-deployed":
-    case "promoted":
-      return "mission.archive";
-    case "rolled-back":
-      return "release.prepare";
     default:
       return "release.prepare";
   }
