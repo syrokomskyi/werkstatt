@@ -242,12 +242,12 @@ packets:
   - order: 210
     packetId: 210-deployment-effect-authority
     file: 210-deployment-effect-authority.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/CERT-007
     decisionKind: spec-node
     resolvedRfc: null
     dependsOnPacket: 200-evolution-controller
-    baseCommit: null
+    baseCommit: 480a64c0
     sealCommit: null
     completion: null
   - order: 220
