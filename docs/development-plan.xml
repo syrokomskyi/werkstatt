@@ -482,6 +482,13 @@
           Implement `packages/werkstatt/src/capability-artifacts/` with immutable content-addressed artifact store (size/media-type policy, immutability, hash verification) and provider admission store (pass-only, stale conformance rejection). Implement `packages/werkstatt/src/isolation/broker/` with deny-by-default capability bridge (ambient host access rejection, policy/grant enforcement, size/concurrency limits, redacted audit). Implement `packages/werkstatt/src/isolation/providers/` with fake sandbox adapter implementing IsolationAdapterV1 with all 12 required property evidence. 30 tests covering artifact publish/verify, provider admission, broker registration/invocation/denial, and sandbox workload lifecycle.
         </description>
       </deliverable>
+      <deliverable id="del-200">
+        <name>RFC-0864: Governed capability evolution controller</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/evolution/` with contracts (candidates, stages, five-layer evidence bundles, transition records), reducer (monotonic forward-only transitions, idempotency, sequence, kill switch, compensating actions), guards (self-change boundary, evidence immutability, authority expiry, shadow side effects, canary boundaries, evidence poisoning), and controller (inspect/define/transition/kill-switch orchestration). 43 tests covering forward-only sequence, stage transitions, idempotency replay, kill switch, rollback/quarantine compensating actions, self-change boundary, evidence poisoning, canary boundaries, and controller lifecycle.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
