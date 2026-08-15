@@ -1,0 +1,46 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "050-component-and-capability-contracts",
+  "baseCommit": "5987d0633fe6d69ea5b7762305620385a4e0e548",
+  "sealCommit": "44edb8d0968a46d5ee463f726b84624d0cc64c78",
+  "implementationCommits": [
+    "85e403ecb201a9bd915b8cdf1c581d11852821c5"
+  ],
+  "implementationHead": "85e403ecb201a9bd915b8cdf1c581d11852821c5",
+  "changedFiles": [
+    "docs/architecture-dna.md",
+    "docs/development-plan.xml",
+    "docs/requirements.xml",
+    "docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/package.json",
+    "packages/werkstatt/src/component/contracts.ts",
+    "packages/werkstatt/src/component/identity.ts",
+    "packages/werkstatt/src/component/index.ts",
+    "packages/werkstatt/src/component/schemas.ts",
+    "packages/werkstatt/src/component/tests/component-contracts.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass",
+      "evidenceDigest": "sha256:e255d8258a4487a5d78f315824f483fd0d7027abda0fe237cd6dfe977cbb3435"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass",
+      "evidenceDigest": "sha256:eba2fd95b0a630791a84fd2d98af517f873f59066a3c3bf8da067ada5b1c51eb"
+    },
+    {
+      "command": "pnpm exec werkstatt run rfc.validate --id RFC-0858",
+      "status": "pass",
+      "evidenceDigest": "sha256:397a219ae138b52b92a6f230a68caade5269b34ed4692f49a7968b279e84993c"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}
