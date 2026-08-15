@@ -31,6 +31,7 @@
   <item>RFC-0747: add retry loop (3 attempts, 3s/6s backoff) to alt health check in leitstand.promote to handle CDN propagation delays.</item>
   <item>RFC-0829: add test evidence gates (L4+L5) to propagate and promote via shared runTestEvidenceGate helper.</item>
   <item>RFC-0842: add target channel + URL logging to dev-deploy, propagate, and promote before lock acquisition.</item>
+  <item>RFC-0866: wire executeDeployPhases into dev-deploy, propagate, promote; add failingPhase to result types.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -713,6 +714,7 @@ export interface DevDeployResult {
   evidenceSynced: boolean;
   evidenceSyncError: string | null;
   releaseDeployed?: string;
+  failingPhase?: string;
 }
 
 export async function runLeitstandDevDeploy(
@@ -790,19 +792,65 @@ export async function runLeitstandDevDeploy(
   );
   await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
 
+  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
+  if (!systemConfig.deployment) {
+    throw new Error(
+      `[leitstand.dev-deploy] system '${systemId}' has no deployment config in system-config.yaml`,
+    );
+  }
+  const adapter = resolveAdapter(systemConfig.deployment.adapter);
+  const channelConfig = systemConfig.deployment.channels.dev;
+  const secretsFilePath = channelConfig?.secretsFile
+    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
+    : undefined;
+
+  const { executeDeployPhases } = await import("./deploy-execution.ts");
+  const deployResult = await executeDeployPhases(
+    {
+      systemId,
+      releaseId,
+      candidateId,
+      artifactHash,
+      authResult,
+      workspaceRoot: context.workspaceRoot,
+      systemConfig: systemConfig.deployment,
+      adapter,
+      operationId,
+      gateDecisionPath,
+      secretsFilePath,
+      skipEvidenceSync: Boolean(flagString(input, "skip-evidence-sync")),
+      forceBuild: Boolean(input.flags["force-build"]),
+    },
+    "dev",
+  );
+
   return {
     data: {
+      command: "leitstand.dev-deploy",
       systemId,
-      channel: "dev",
-      releaseId: releaseId ?? "",
-      deploymentUrl: "",
-      state: "succeeded",
-      buildIdentityVerified: true,
-      testEvidenceVerified: true,
+      missionId: "",
+      commitSha: "",
+      buildState: deployResult.failingPhase === "build" ? "failed" : "succeeded",
+      buildSkipped: deployResult.buildSkipped,
+      deployState: deployResult.failingPhase ? "failed" : "succeeded",
+      deploymentUrl: deployResult.deploymentUrl,
+      buildIdentity: deployResult.buildIdentity,
+      axiom: {
+        status: "not-run" as const,
+        errors: 0,
+        warnings: 0,
+        exitCode: 0,
+        freshness: deployResult.freshness,
+      },
+      evidenceSynced: deployResult.evidenceSynced,
+      evidenceSyncError: deployResult.evidenceSyncError,
+      releaseDeployed: releaseId,
+      failingPhase: deployResult.failingPhase,
     },
-    summary: `[leitstand.dev-deploy] authorized: candidate=${candidateId} gate=dev-deploy decision=${authResult.outcome.decisionId}`,
-    exitCode: 0,
-    diagnostics: [],
+    summary: deployResult.failingPhase
+      ? `[leitstand.dev-deploy] failed at phase: ${deployResult.failingPhase}`
+      : `[leitstand.dev-deploy] deployed to dev: ${deployResult.deploymentUrl}`,
+    exitCode: deployResult.failingPhase ? 1 : 0,
   } as unknown as KernelCommandResult<DevDeployResult>;
 }
 
@@ -823,6 +871,7 @@ export interface LeitstandPropagateData {
   devBuildIdentityVerified: boolean;
   axiomEvidenceVerified: boolean;
   testEvidenceVerified: boolean;
+  failingPhase?: string;
 }
 
 export async function runLeitstandPropagate(
@@ -905,25 +954,61 @@ export async function runLeitstandPropagate(
   );
   await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
 
+  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
+  if (!systemConfig.deployment) {
+    throw new Error(
+      `[leitstand.propagate] system '${systemId}' has no deployment config in system-config.yaml`,
+    );
+  }
+  const adapter = resolveAdapter(systemConfig.deployment.adapter);
+  const channelConfig = systemConfig.deployment.channels.alt;
+  const secretsFilePath = channelConfig?.secretsFile
+    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
+    : undefined;
+
+  const { executeDeployPhases } = await import("./deploy-execution.ts");
+  const deployResult = await executeDeployPhases(
+    {
+      systemId,
+      releaseId,
+      candidateId,
+      artifactHash,
+      authResult,
+      workspaceRoot: context.workspaceRoot,
+      systemConfig: systemConfig.deployment,
+      adapter,
+      operationId,
+      gateDecisionPath,
+      secretsFilePath,
+    },
+    "alt",
+  );
+
   return {
     data: {
       releaseId,
       systemId,
       channel: "alt",
-      deploymentUrl: "",
-      state: "succeeded",
+      deploymentUrl: deployResult.deploymentUrl,
+      state: deployResult.failingPhase ? "failed" : "succeeded",
       startedAt: now,
-      completedAt: now,
-      preflight: { passed: true, checks: [] },
-      health: { state: "unknown", checks: [] },
+      completedAt: new Date().toISOString(),
+      preflight: { passed: !deployResult.failingPhase, checks: [] },
+      health: {
+        state: deployResult.healthState,
+        checks: deployResult.healthChecks,
+      },
+      purgeResult: deployResult.purgeResult,
       releaseState: "alt-deployed",
-      devBuildIdentityVerified: true,
-      axiomEvidenceVerified: true,
-      testEvidenceVerified: true,
+      devBuildIdentityVerified: deployResult.freshness.verified,
+      axiomEvidenceVerified: !deployResult.failingPhase,
+      testEvidenceVerified: deployResult.evidenceSynced,
+      failingPhase: deployResult.failingPhase,
     },
-    summary: `[leitstand.propagate] authorized: candidate=${candidateId} gate=propagate-alt durableSync=${durableSyncVerified} decision=${authResult.outcome.decisionId}`,
-    exitCode: 0,
-    diagnostics: [],
+    summary: deployResult.failingPhase
+      ? `[leitstand.propagate] failed at phase: ${deployResult.failingPhase}`
+      : `[leitstand.propagate] deployed to alt: ${deployResult.deploymentUrl}`,
+    exitCode: deployResult.failingPhase ? 1 : 0,
   } as unknown as KernelCommandResult<LeitstandPropagateData>;
 }
 
@@ -940,6 +1025,7 @@ export interface LeitstandPromoteData {
   healthState: "healthy" | "unhealthy" | "unknown";
   smokeResult?: SmokeRunResult;
   releaseState: "promoted";
+  failingPhase?: string;
 }
 
 export async function runLeitstandPromote(
@@ -1030,21 +1116,54 @@ export async function runLeitstandPromote(
   );
   await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
 
+  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
+  if (!systemConfig.deployment) {
+    throw new Error(
+      `[leitstand.promote] system '${systemId}' has no deployment config in system-config.yaml`,
+    );
+  }
+  const adapter = resolveAdapter(systemConfig.deployment.adapter);
+  const channelConfig = systemConfig.deployment.channels.main;
+  const secretsFilePath = channelConfig?.secretsFile
+    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
+    : undefined;
+
+  const { executeDeployPhases } = await import("./deploy-execution.ts");
+  const deployResult = await executeDeployPhases(
+    {
+      systemId,
+      releaseId,
+      candidateId,
+      artifactHash,
+      authResult: authorization,
+      workspaceRoot: context.workspaceRoot,
+      systemConfig: systemConfig.deployment,
+      adapter,
+      operationId,
+      gateDecisionPath,
+      secretsFilePath,
+    },
+    "main",
+  );
+
   return {
     data: {
       releaseId,
       systemId,
       channel: "main",
-      deploymentUrl: "",
-      state: "succeeded",
-      buildIdentityVerified: true,
-      testEvidenceVerified: true,
-      healthState: "unknown",
+      deploymentUrl: deployResult.deploymentUrl,
+      state: deployResult.failingPhase ? "failed" : "succeeded",
+      buildIdentityVerified: deployResult.freshness.verified,
+      testEvidenceVerified: deployResult.evidenceSynced,
+      purgeResult: deployResult.purgeResult,
+      healthState: deployResult.healthState,
       releaseState: "promoted",
+      failingPhase: deployResult.failingPhase,
     },
-    summary: `[leitstand.promote] authorized: candidate=${candidateId} gate=promote-main durableSync=${durableSyncVerified} mainVerification=${mainVerificationDecisionId} decision=${authorization.outcome.decisionId}`,
-    exitCode: 0,
-    diagnostics: [],
+    summary: deployResult.failingPhase
+      ? `[leitstand.promote] failed at phase: ${deployResult.failingPhase}`
+      : `[leitstand.promote] promoted to main: ${deployResult.deploymentUrl}`,
+    exitCode: deployResult.failingPhase ? 1 : 0,
   } as unknown as KernelCommandResult<LeitstandPromoteData>;
 }
 
