@@ -115,6 +115,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Evaluator execution checks isolation (`CERT-EVAL-11`), registration (`CERT-EVAL-12`), handler crashes and invalid payloads (`CERT-EVAL-13`). Coverage manifest builds from routes/states/viewports and deterministic evidence.
 - No evaluator-led mutation, human approval, or I/O imports exist in this module.
 
+### Capability artifacts and sandbox (RFC-0863, packet 190)
+
+- `packages/werkstatt/src/capability-artifacts/` owns the immutable content-addressed artifact store — publication with size/media-type policy (`CERT-ARTIFACT-01`/`CERT-ARTIFACT-02`), immutability (`CERT-ARTIFACT-03`), hash verification (`CERT-ARTIFACT-04`/`CERT-ARTIFACT-05`), and provider admission store (`CERT-ARTIFACT-06` non-pass, `CERT-ARTIFACT-07` stale conformance).
+- `packages/werkstatt/src/isolation/broker/` owns the deny-by-default capability bridge — ambient host access rejection (`CERT-BROKER-01` fs/net/process/env/credential/descriptor/ipc/host-object), duplicate capability rejection (`CERT-BROKER-02`), policy/grant enforcement, request/response size limits, concurrency limits, and redacted audit entries.
+- `packages/werkstatt/src/isolation/providers/` owns concrete sandbox adapter implementations with all 12 required `IsolationPropertyEvidenceV1` properties. The fake sandbox adapter is for testing only.
+- No evolution controller, canary promotion, production agent capability, or provider-specific manifest field is introduced.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
