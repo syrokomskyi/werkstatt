@@ -1,7 +1,7 @@
 ---
 id: RFC-0769
 title: "Werkstatt engine program charter and terminology"
-status: implemented
+status: superseded
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -15,12 +15,12 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-09
-updatedAt: 2026-08-09
+updatedAt: 2026-08-15
 enhancedAt: 2026-08-09
 implementedAt: 2026-08-09
-closedAt:
+closedAt: 2026-08-15
 supersedes: []
-supersededBy:
+supersededBy: RFC-0855
 amends: []
 amendedBy: []
 related:
