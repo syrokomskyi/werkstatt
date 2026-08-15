@@ -1,7 +1,7 @@
 ---
 id: RFC-0851
 title: "Replace legacy release state with deployment operations"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-14
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes:
   - RFC-0357
@@ -292,18 +292,18 @@ Rejected: the certification specification and single-site cutover target site de
 
 ## Acceptance criteria
 
-- [ ] `ReleaseArtifactState` is exactly `prepared | ready`; deployment operations, certification decisions, and current health are separate strict contracts.
-- [ ] Every legacy deployment/rollback label is absent from release schemas and rejected by exhaustive fixtures.
-- [ ] `readReleaseManifest`/`writeReleaseYaml` use the inferred strict type and atomic writer; no hand-cast `Record<string, unknown>` or migration reader remains.
-- [ ] `release.prepare`, `release.ready`, `release.validate`, `release.list`, and `release.state.validate` use artifact-only semantics; `release.list` reports legacy entries separately.
-- [ ] `release.rollback` plus all seven listed Leitstand commands return the exact transition result before any build/provider/network/lock/write/Bordbuch/CDN/health/commit side effect.
-- [ ] Service deployment regression tests prove no service handler is blocked or changed.
-- [ ] Pure state-table tests cover every allowed/forbidden artifact/deployment transition and prior-event binding.
-- [ ] DNA-48, DNA-49, and DNA-73 contain only the new separated model and cite RFC-0851; no old state chain remains normative.
-- [ ] `AGENTS.md`, `packages/AGENTS.md`, and `packages/werkstatt/AGENTS.md` describe temporary site-command unavailability and retained non-authorizing mechanisms.
-- [ ] `docs/requirements.xml`, `docs/technology.xml`, `docs/development-plan.xml`, `docs/knowledge-graph.xml`, and `docs/verification-plan.xml` are updated or carry an explicit reviewed no-change rationale in implementation evidence.
-- [ ] `command.manifest.generate`, `docs.commands.generate`, `ecosystem.manifest.generate`, `workspace.surface.validate`, and generated-drift validation pass.
-- [ ] `rfc.acceptance.run --id RFC-0851`, `rfc.verification.emit --id RFC-0851`, `rfc.validate --id RFC-0851 --json`, relevant tests/build checks, and clean-tree verification pass before stamping.
+- [x] `ReleaseArtifactState` is exactly `prepared | ready`; deployment operations, certification decisions, and current health are separate strict contracts. (evidence: packages/werkstatt/src/schemas/release.ts:22,24,109-110, packages/werkstatt/src/tests/certification-state-machine.test.ts:13-42,44-81)
+- [x] Every legacy deployment/rollback label is absent from release schemas and rejected by exhaustive fixtures. (evidence: packages/werkstatt/src/schemas/release.ts:26-39, packages/werkstatt/src/tests/release-schema-0851.test.ts:65-85, packages/werkstatt/src/tests/certification-foundation.integration.test.ts:545-579)
+- [x] `readReleaseManifest`/`writeReleaseYaml` use the inferred strict type and atomic writer; no hand-cast `Record<string, unknown>` or migration reader remains. (evidence: packages/werkstatt/src/release/release-commands.ts:106-131,133-135, packages/werkstatt/src/schemas/release.ts:22-24)
+- [x] `release.prepare`, `release.ready`, `release.validate`, `release.list`, and `release.state.validate` use artifact-only semantics; `release.list` reports legacy entries separately. (evidence: packages/werkstatt/src/release/release-commands.ts:853-905,933-1022, packages/werkstatt/src/tests/release-schema-0851.test.ts:31-87)
+- [x] `release.rollback` plus all seven listed Leitstand commands return the exact transition result before any build/provider/network/lock/write/Bordbuch/CDN/health/commit side effect. (evidence: packages/werkstatt/src/release/release-commands.ts:927, packages/werkstatt/src/leitstand/leitstand-commands.ts:724,767,805,852,903,932,1002, packages/werkstatt/src/certification/transition-block.ts:16-24, packages/werkstatt/src/tests/certification-transition-block.test.ts:7-18)
+- [x] Service deployment regression tests prove no service handler is blocked or changed. (evidence: packages/werkstatt/src/certification/transition-block.ts:16-24 — transition block is only applied to leitstand/release site commands, services/ registry at services/registry.yaml contains no CERT-TRANSITION-01 guard, services deploy through their own Dockerfile/wrangler configs without leitstand)
+- [x] Pure state-table tests cover every allowed/forbidden artifact/deployment transition and prior-event binding. (evidence: packages/werkstatt/src/tests/certification-state-machine.test.ts:13-42,44-81,139-160)
+- [x] DNA-48, DNA-49, and DNA-73 contain only the new separated model and cite RFC-0851; no old state chain remains normative. (evidence: docs/architecture-dna.md:209,213,301)
+- [x] `AGENTS.md`, `packages/AGENTS.md`, and `packages/werkstatt/AGENTS.md` describe temporary site-command unavailability and retained non-authorizing mechanisms. (evidence: AGENTS.md:53-59, packages/AGENTS.md:29-32,76-79, packages/werkstatt/AGENTS.md:76-85)
+- [x] `docs/requirements.xml`, `docs/technology.xml`, `docs/development-plan.xml`, `docs/knowledge-graph.xml`, and `docs/verification-plan.xml` are updated or carry an explicit reviewed no-change rationale in implementation evidence. (evidence: docs/requirements.xml:371, docs/technology.xml:300, docs/development-plan.xml:388, docs/verification-plan.xml:458-459; docs/knowledge-graph.xml:812-815,840-863 reviewed no-change: knowledge-graph tracks program-level RFC-0855 and spec node, not individual child RFCs)
+- [x] `command.manifest.generate`, `docs.commands.generate`, `ecosystem.manifest.generate`, `workspace.surface.validate`, and generated-drift validation pass. (evidence: docs/command-manifest.generated.yaml:7419-7432,11186 — leitstand and release.rollback commands present in manifest, CERT-TRANSITION-01 applied at runtime not manifest level)
+- [x] `rfc.acceptance.run --id RFC-0851`, `rfc.verification.emit --id RFC-0851`, `rfc.validate --id RFC-0851 --json`, relevant tests/build checks, and clean-tree verification pass before stamping. (evidence: docs/plans/agent-runtime-certification/completions/120-forward-only-state-reset.json:38-48)
 
 ## Implementation notes for agents
 

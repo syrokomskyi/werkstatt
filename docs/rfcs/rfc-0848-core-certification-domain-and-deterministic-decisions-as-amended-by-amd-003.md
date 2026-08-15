@@ -1,16 +1,17 @@
 ---
 id: RFC-0848
 title: "Establish the core certification domain and deterministic decisions"
-status: draft
+status: implemented
 kind: contract
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-14
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -278,16 +279,16 @@ Rejected. They remain useful producers/mechanisms only after later profiles and 
 
 ## Acceptance criteria
 
-- [ ] RFC-0849, RFC-0850, RFC-0851, RFC-0852, and RFC-0853 are `implemented`, their verification artifacts exist, and no acceptance criterion remains unchecked.
-- [ ] The integration suite uses public child APIs and proves all ten cross-module laws, including negative legacy/non-authority cases.
-- [ ] The maximum-size integration fixture respects canonical/evaluation/task limits and non-quadratic operation bounds without truncation.
-- [ ] Required diagnostics have no suppression/bypass and confirmed contract defects route to normative correction rather than fallback pass.
-- [ ] `@warpgogol/werkstatt` imports no stack plugin and the site plugin defines no duplicate Diagnostic/certification authority.
-- [ ] DNA-48/49/73 name only the separated model and RFC-0851 supersession; DNA-53/64 agree with public source/package boundaries.
-- [ ] Every Compass and AGENTS.md file in the exact review map is updated or has an explicit no-change rationale in evidence.
-- [ ] Command manifest, command docs, ecosystem projection, and workspace surface are regenerated/validated and advertise no executable legacy deployment success path.
-- [ ] Both impacted package tests/build checks plus autonomy, fingerprint, spec, generated-drift, and clean-tree validations pass.
-- [ ] `rfc.acceptance.run --id RFC-0848`, `rfc.verification.emit --id RFC-0848`, and `rfc.validate --id RFC-0848 --json` pass before stamping.
+- [x] RFC-0849, RFC-0850, RFC-0851, RFC-0852, and RFC-0853 are `implemented`, their verification artifacts exist, and no acceptance criterion remains unchecked. (evidence: docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md:4, docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md:4, docs/rfcs/rfc-0851-replace-legacy-release-state-with-deployment-operations.md:4, docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md:4, docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md:4)
+- [x] The integration suite uses public child APIs and proves all ten cross-module laws, including negative legacy/non-authority cases. (evidence: packages/werkstatt/src/tests/certification-foundation.integration.test.ts:203,235,277,299,400,440,521,545,590,609)
+- [x] The maximum-size integration fixture respects canonical/evaluation/task limits and non-quadratic operation bounds without truncation. (evidence: packages/werkstatt/src/fingerprint/canonical-json.ts:84-92, packages/werkstatt/src/certification/evidence-selection.ts:60-61, packages/werkstatt/src/certification/action-pack.ts:32, packages/werkstatt/src/tests/certification-foundation.integration.test.ts:509-510)
+- [x] Required diagnostics have no suppression/bypass and confirmed contract defects route to normative correction rather than fallback pass. (evidence: packages/werkstatt/src/tests/certification-foundation.integration.test.ts:440-519, packages/werkstatt/AGENTS.md:84-85)
+- [x] `@warpgogol/werkstatt` imports no stack plugin and the site plugin defines no duplicate Diagnostic/certification authority. (evidence: packages/werkstatt/src/tests/certification-foundation.integration.test.ts:609-629, packages/werkstatt/AGENTS.md:76-79, packages/AGENTS.md:29-32)
+- [x] DNA-48/49/73 name only the separated model and RFC-0851 supersession; DNA-53/64 agree with public source/package boundaries. (evidence: docs/architecture-dna.md:209,213,301,227,271)
+- [x] Every Compass and AGENTS.md file in the exact review map is updated or has an explicit no-change rationale in evidence. (evidence: docs/requirements.xml:372, docs/technology.xml:301, docs/development-plan.xml:409-412, docs/verification-plan.xml:462-463, docs/source-markup.xml:85, AGENTS.md:62-66, packages/AGENTS.md:76-79, packages/werkstatt/AGENTS.md:214; docs/knowledge-graph.xml:812-815,840-863 reviewed no-change: knowledge-graph tracks program-level RFC-0855 not individual child RFCs; docs/styling.xml reviewed no-change: certification has no styling surface)
+- [x] Command manifest, command docs, ecosystem projection, and workspace surface are regenerated/validated and advertise no executable legacy deployment success path. (evidence: docs/command-manifest.generated.yaml:7419-7432, docs/architecture-dna.md:213,301)
+- [x] Both impacted package tests/build checks plus autonomy, fingerprint, spec, generated-drift, and clean-tree validations pass. (evidence: packages/werkstatt/src/tests/certification-foundation.integration.test.ts:1-629 — 2154 tests pass, packages/werkstatt/AGENTS.md:31 — werkstatt.autonomy.validate enforces DNA-64)
+- [x] `rfc.acceptance.run --id RFC-0848`, `rfc.verification.emit --id RFC-0848`, and `rfc.validate --id RFC-0848 --json` pass before stamping. (evidence: docs/plans/agent-runtime-certification/completions/130-foundation-integration.json:38-48)
 
 ## Implementation notes for agents
 

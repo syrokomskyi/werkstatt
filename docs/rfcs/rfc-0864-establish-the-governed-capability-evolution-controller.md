@@ -1,15 +1,16 @@
 ---
 id: RFC-0864
 title: "Establish the governed capability evolution controller"
-status: draft
+status: implemented
 kind: architecture
 scope: workspace
 owners: [architecture]
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -171,14 +172,14 @@ Rejected because a replaceable capability must not expand its own authority or r
 
 ## Acceptance criteria
 
-- [ ] Candidate and evidence schemas are strict, immutable, content-addressed, lineage-bound, and reject unknown or contradictory fields.
-- [ ] A pure reducer enforces the declared forward-only stages, idempotency, sequence checks, replay safety, and explicit compensating transitions.
-- [ ] Test, shadow, canary, observation, promotion, rollback, quarantine, and kill-switch behaviors have deterministic, crash, race, poisoning, and threshold tests.
-- [ ] Shadow cannot create authoritative effects; canary authority is bounded by population, time, budget, effect, policy, and automatic abort thresholds.
-- [ ] Promotion requires passing definition, evaluation, observation, authority, and artifact evidence; missing or stale evidence cannot be waived.
-- [ ] The controller cannot change Law Kernel, permissions, effect/isolation contracts, canonical identities/diagnostics, controller code, or evaluator policy.
-- [ ] Rollback and quarantine preserve append-only lineage and exact artifact/evidence identity.
-- [ ] Scoped tests/build, RFC/Compass validation, secret scan, and clean-tree verification pass.
+- [x] Candidate and evidence schemas are strict, immutable, content-addressed, lineage-bound, and reject unknown or contradictory fields. (evidence: packages/werkstatt/src/evolution/contracts.ts:3-21,31,104-119,171-183, packages/werkstatt/src/tests/evolution-controller.test.ts:228-265)
+- [x] A pure reducer enforces the declared forward-only stages, idempotency, sequence checks, replay safety, and explicit compensating transitions. (evidence: packages/werkstatt/src/evolution/reducer.ts:50-174,126-153, packages/werkstatt/src/tests/evolution-controller.test.ts:267-465)
+- [x] Test, shadow, canary, observation, promotion, rollback, quarantine, and kill-switch behaviors have deterministic, crash, race, poisoning, and threshold tests. (evidence: packages/werkstatt/src/tests/evolution-controller.test.ts:294-465,493-560, packages/werkstatt/src/evolution/guards.ts:71-177)
+- [x] Shadow cannot create authoritative effects; canary authority is bounded by population, time, budget, effect, policy, and automatic abort thresholds. (evidence: packages/werkstatt/src/evolution/guards.ts:99-100,119-136, packages/werkstatt/src/tests/evolution-controller.test.ts:509-537)
+- [x] Promotion requires passing definition, evaluation, observation, authority, and artifact evidence; missing or stale evidence cannot be waived. (evidence: packages/werkstatt/src/evolution/reducer.ts:120, packages/werkstatt/src/tests/evolution-controller.test.ts:379-406)
+- [x] The controller cannot change Law Kernel, permissions, effect/isolation contracts, canonical identities/diagnostics, controller code, or evaluator policy. (evidence: packages/werkstatt/src/evolution/guards.ts:19-36, packages/werkstatt/src/tests/evolution-controller.test.ts:468-480,578-586)
+- [x] Rollback and quarantine preserve append-only lineage and exact artifact/evidence identity. (evidence: packages/werkstatt/src/evolution/reducer.ts:126-153, packages/werkstatt/src/tests/evolution-controller.test.ts:407-438)
+- [x] Scoped tests/build, RFC/Compass validation, secret scan, and clean-tree verification pass. (evidence: docs/plans/agent-runtime-certification/completions/200-evolution-controller.json:38-48, packages/werkstatt/src/tests/evolution-controller.test.ts:1-625 — 48 tests pass)
 
 ## Implementation notes for agents
 

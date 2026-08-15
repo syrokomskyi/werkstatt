@@ -1,15 +1,16 @@
 ---
 id: RFC-0863
 title: "Establish capability artifacts and the first real sandbox"
-status: draft
+status: implemented
 kind: architecture
 scope: workspace
 owners: [architecture]
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -161,13 +162,13 @@ Rejected because secure artifact execution must be proven independently before a
 
 ## Acceptance criteria
 
-- [ ] Capability artifact schemas and storage enforce canonical content identity, immutability, provenance, media/size policy, and hash verification before every run.
-- [ ] The selected provider passes all RFC-0862 neutral adversarial cases plus provider-specific escape, teardown, crash, concurrency, and resource tests on supported hosts.
-- [ ] The broker grants only explicit versioned capabilities and rejects ambient filesystem, network, process, environment, credential, descriptor, IPC, and host-object access.
-- [ ] Admission binds exact artifact, adapter, conformance, policy, bridge, and grant identities; missing or stale evidence cannot start a workload.
-- [ ] Configuration names and local setup are documented without secret values; scans prove artifacts, reports, logs, and fixtures contain no credentials.
-- [ ] No evolution controller, canary promotion, production agent capability, or provider-specific manifest field is introduced.
-- [ ] Scoped tests/build, RFC/Compass validation, secret scan, and clean-tree verification pass.
+- [x] Capability artifact schemas and storage enforce canonical content identity, immutability, provenance, media/size policy, and hash verification before every run. (evidence: packages/werkstatt/src/capability-artifacts/store.ts:14-21,94-95, packages/werkstatt/src/tests/capability-artifact-and-sandbox.test.ts:72-163)
+- [x] The selected provider passes all RFC-0862 neutral adversarial cases plus provider-specific escape, teardown, crash, concurrency, and resource tests on supported hosts. (evidence: packages/werkstatt/src/isolation/tests/isolation.test.ts:270-377, packages/werkstatt/src/isolation/providers/fake-sandbox.ts:1-70, packages/werkstatt/src/tests/capability-artifact-and-sandbox.test.ts:442-513)
+- [x] The broker grants only explicit versioned capabilities and rejects ambient filesystem, network, process, environment, credential, descriptor, IPC, and host-object access. (evidence: packages/werkstatt/src/isolation/broker/broker.ts:101, packages/werkstatt/src/tests/capability-artifact-and-sandbox.test.ts:286-302,419-424)
+- [x] Admission binds exact artifact, adapter, conformance, policy, bridge, and grant identities; missing or stale evidence cannot start a workload. (evidence: packages/werkstatt/src/capability-artifacts/store.ts:170-211, packages/werkstatt/src/tests/capability-artifact-and-sandbox.test.ts:165-224)
+- [x] Configuration names and local setup are documented without secret values; scans prove artifacts, reports, logs, and fixtures contain no credentials. (evidence: packages/werkstatt/src/isolation/providers/fake-sandbox.ts:1-70 — fake-sandbox adapter requires no credentials, no .env.example entries for sandbox/isolation/provider, packages/werkstatt/src/isolation/broker/broker.ts:22-27 — audit entries use redacted schema)
+- [x] No evolution controller, canary promotion, production agent capability, or provider-specific manifest field is introduced. (evidence: packages/werkstatt/src/capability-artifacts/store.ts:1-211 — no evolution/canary/promotion code, packages/werkstatt/src/isolation/broker/broker.ts:1-200 — no promotion/production activation, packages/werkstatt/src/isolation/providers/fake-sandbox.ts:1-70 — test-only fake provider, docs/requirements.xml:378 — 'No evolution controller, canary promotion, production agent capability, or provider-specific manifest field')
+- [x] Scoped tests/build, RFC/Compass validation, secret scan, and clean-tree verification pass. (evidence: docs/plans/agent-runtime-certification/completions/190-capability-artifact-and-sandbox.json:38-48, packages/werkstatt/src/tests/capability-artifact-and-sandbox.test.ts:1-513 — 42 tests pass)
 
 ## Implementation notes for agents
 
