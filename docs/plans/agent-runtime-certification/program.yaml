@@ -270,8 +270,8 @@ packets:
     resolvedRfc: null
     dependsOnPacket: 220-continuous-health-and-demotion
     baseCommit: 9437bf6
-    sealCommit: null
-    completion: null
+    sealCommit: 1d98a3a
+    completion: 32bc6ee
   - order: 240
     packetId: 240-cleanup
     file: 240-cleanup.md
