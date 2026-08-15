@@ -8,6 +8,8 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
 <item>RFC-0865: initial deploy authorization helper.</item>
+<item>RFC-0866 fix: add resolveGateDecisionPath helper for conventional gate-decision path resolution.</item>
+<item>RFC-0866 fix D-2: writeDeploymentEffectRecord accepts optional deploymentUrl for effect-record URL discovery.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -278,11 +280,13 @@ export async function writeDeploymentEffectRecord(
   workspaceRoot: string,
   systemId: string,
   record: DeploymentEffectRecordV1,
+  deploymentUrl?: string,
 ): Promise<string> {
   const dir = path.join(workspaceRoot, "systems-cache", systemId, "deployment-operations");
   await fs.mkdir(dir, { recursive: true });
   const filePath = path.join(dir, `${record.operationId}.json`);
-  await fs.writeFile(filePath, JSON.stringify(record, null, 2) + "\n", "utf8");
+  const payload = deploymentUrl ? { ...record, deploymentUrl } : record;
+  await fs.writeFile(filePath, JSON.stringify(payload, null, 2) + "\n", "utf8");
   return filePath;
 }
 
@@ -299,4 +303,21 @@ export function makeR2ConfigFromEnv(
   }
 
   return { accountId, accessKeyId, secretAccessKey, bucketName };
+}
+
+export function resolveGateDecisionPath(
+  workspaceRoot: string,
+  systemId: string,
+  releaseId: string,
+  gate: "dev" | "alt" | "main",
+  override?: string,
+): string {
+  if (override) return override;
+  return path.join(
+    workspaceRoot,
+    "systems-cache",
+    systemId,
+    "gate-decisions",
+    `${releaseId}-${gate}.json`,
+  );
 }

@@ -105,6 +105,7 @@ import {
   writeDeploymentEffectRecord,
   makeR2ConfigFromEnv,
   resolveArtifactHash,
+  resolveGateDecisionPath,
   type AuthorizeOutcome,
 } from "./deploy-helpers.ts";
 import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
@@ -688,6 +689,41 @@ function buildLastPropagatedEntry(
 }
 
 // §5.0: leitstand.dev-deploy (RFC-0628: workpiece-based dev deploy with Axiom verification gate)
+
+interface PreparedDeployContext {
+  adapter: DeploymentAdapter;
+  systemConfig: DeploymentStaticConfig;
+  secretsFilePath: string | undefined;
+}
+
+async function prepareDeployContext(
+  workspaceRoot: string,
+  systemId: string,
+  commandName: string,
+): Promise<PreparedDeployContext> {
+  const systemConfig = await readSystemConfigSmart(workspaceRoot, systemId);
+  if (!systemConfig.deployment) {
+    throw new Error(
+      `[${commandName}] system '${systemId}' has no deployment config in system-config.yaml`,
+    );
+  }
+  const adapter = resolveAdapter(systemConfig.deployment.adapter);
+  return {
+    adapter,
+    systemConfig: systemConfig.deployment,
+    secretsFilePath: undefined,
+  };
+}
+
+function resolveSecretsFilePath(
+  workspaceRoot: string,
+  channelConfig: DeploymentChannel | undefined,
+): string | undefined {
+  return channelConfig?.secretsFile
+    ? path.join(workspaceRoot, channelConfig.secretsFile)
+    : undefined;
+}
+
 export interface DevDeployResult {
   command: "leitstand.dev-deploy";
   systemId: string;
@@ -724,15 +760,20 @@ export async function runLeitstandDevDeploy(
   const systemId = flagString(input, "site");
   if (!systemId) throw new Error("[leitstand.dev-deploy] --site is required");
   const releaseId = flagString(input, "release");
-  const gateDecisionPath = flagString(input, "gate-decision");
+  const gateDecisionFlag = flagString(input, "gate-decision");
   const candidateId = flagString(input, "candidate-id") ?? systemId;
   const artifactHashFlag = flagString(input, "artifact-hash");
 
-  if (!gateDecisionPath) {
-    throw new Error(
-      "[leitstand.dev-deploy] --gate-decision is required (path to GateDecisionV1 JSON)",
-    );
+  if (!releaseId) {
+    throw new Error("[leitstand.dev-deploy] --release is required");
   }
+  const gateDecisionPath = resolveGateDecisionPath(
+    context.workspaceRoot,
+    systemId,
+    releaseId,
+    "dev",
+    gateDecisionFlag,
+  );
 
   const releaseDir = releaseId
     ? path.join(context.workspaceRoot, "releases", releaseId)
@@ -792,17 +833,13 @@ export async function runLeitstandDevDeploy(
   );
   await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
 
-  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
-  if (!systemConfig.deployment) {
-    throw new Error(
-      `[leitstand.dev-deploy] system '${systemId}' has no deployment config in system-config.yaml`,
-    );
-  }
-  const adapter = resolveAdapter(systemConfig.deployment.adapter);
-  const channelConfig = systemConfig.deployment.channels.dev;
-  const secretsFilePath = channelConfig?.secretsFile
-    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
-    : undefined;
+  const { adapter, systemConfig: depConfig } = await prepareDeployContext(
+    context.workspaceRoot,
+    systemId,
+    "leitstand.dev-deploy",
+  );
+  const channelConfig = depConfig.channels.dev;
+  const secretsFilePath = resolveSecretsFilePath(context.workspaceRoot, channelConfig);
 
   const { executeDeployPhases } = await import("./deploy-execution.ts");
   const deployResult = await executeDeployPhases(
@@ -813,7 +850,7 @@ export async function runLeitstandDevDeploy(
       artifactHash,
       authResult,
       workspaceRoot: context.workspaceRoot,
-      systemConfig: systemConfig.deployment,
+      systemConfig: depConfig,
       adapter,
       operationId,
       gateDecisionPath,
@@ -882,15 +919,17 @@ export async function runLeitstandPropagate(
   if (!releaseId) throw new Error("[leitstand.propagate] --release is required");
   const systemId = flagString(input, "site");
   if (!systemId) throw new Error("[leitstand.propagate] --site is required");
-  const gateDecisionPath = flagString(input, "gate-decision");
+  const gateDecisionFlag = flagString(input, "gate-decision");
   const candidateId = flagString(input, "candidate-id") ?? systemId;
   const artifactHashFlag = flagString(input, "artifact-hash");
 
-  if (!gateDecisionPath) {
-    throw new Error(
-      "[leitstand.propagate] --gate-decision is required (path to GateDecisionV1 JSON)",
-    );
-  }
+  const gateDecisionPath = resolveGateDecisionPath(
+    context.workspaceRoot,
+    systemId,
+    releaseId,
+    "alt",
+    gateDecisionFlag,
+  );
 
   const releaseDir = path.join(context.workspaceRoot, "releases", releaseId);
   const artifactHash = await resolveArtifactHash(artifactHashFlag, releaseDir);
@@ -954,17 +993,13 @@ export async function runLeitstandPropagate(
   );
   await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
 
-  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
-  if (!systemConfig.deployment) {
-    throw new Error(
-      `[leitstand.propagate] system '${systemId}' has no deployment config in system-config.yaml`,
-    );
-  }
-  const adapter = resolveAdapter(systemConfig.deployment.adapter);
-  const channelConfig = systemConfig.deployment.channels.alt;
-  const secretsFilePath = channelConfig?.secretsFile
-    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
-    : undefined;
+  const { adapter, systemConfig: depConfig } = await prepareDeployContext(
+    context.workspaceRoot,
+    systemId,
+    "leitstand.propagate",
+  );
+  const channelConfig = depConfig.channels.alt;
+  const secretsFilePath = resolveSecretsFilePath(context.workspaceRoot, channelConfig);
 
   const { executeDeployPhases } = await import("./deploy-execution.ts");
   const deployResult = await executeDeployPhases(
@@ -975,7 +1010,7 @@ export async function runLeitstandPropagate(
       artifactHash,
       authResult,
       workspaceRoot: context.workspaceRoot,
-      systemConfig: systemConfig.deployment,
+      systemConfig: depConfig,
       adapter,
       operationId,
       gateDecisionPath,
@@ -1036,21 +1071,23 @@ export async function runLeitstandPromote(
   if (!releaseId) throw new Error("[leitstand.promote] --release is required");
   const systemId = flagString(input, "site");
   if (!systemId) throw new Error("[leitstand.promote] --site is required");
-  const gateDecisionPath = flagString(input, "gate-decision");
+  const gateDecisionFlag = flagString(input, "gate-decision");
   const mainVerificationPath = flagString(input, "main-verification-decision");
   const candidateId = flagString(input, "candidate-id") ?? systemId;
   const artifactHashFlag = flagString(input, "artifact-hash");
 
-  if (!gateDecisionPath) {
-    throw new Error(
-      "[leitstand.promote] --gate-decision is required (path to GateDecisionV1 JSON)",
-    );
-  }
   if (!mainVerificationPath) {
     throw new Error(
       "[leitstand.promote] --main-verification-decision is required (path to MainVerificationDecisionV1 JSON)",
     );
   }
+  const gateDecisionPath = resolveGateDecisionPath(
+    context.workspaceRoot,
+    systemId,
+    releaseId,
+    "main",
+    gateDecisionFlag,
+  );
 
   const releaseDir = path.join(context.workspaceRoot, "releases", releaseId);
   const artifactHash = await resolveArtifactHash(artifactHashFlag, releaseDir);
@@ -1116,17 +1153,13 @@ export async function runLeitstandPromote(
   );
   await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
 
-  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
-  if (!systemConfig.deployment) {
-    throw new Error(
-      `[leitstand.promote] system '${systemId}' has no deployment config in system-config.yaml`,
-    );
-  }
-  const adapter = resolveAdapter(systemConfig.deployment.adapter);
-  const channelConfig = systemConfig.deployment.channels.main;
-  const secretsFilePath = channelConfig?.secretsFile
-    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
-    : undefined;
+  const { adapter, systemConfig: depConfig } = await prepareDeployContext(
+    context.workspaceRoot,
+    systemId,
+    "leitstand.promote",
+  );
+  const channelConfig = depConfig.channels.main;
+  const secretsFilePath = resolveSecretsFilePath(context.workspaceRoot, channelConfig);
 
   const { executeDeployPhases } = await import("./deploy-execution.ts");
   const deployResult = await executeDeployPhases(
@@ -1137,7 +1170,7 @@ export async function runLeitstandPromote(
       artifactHash,
       authResult: authorization,
       workspaceRoot: context.workspaceRoot,
-      systemConfig: systemConfig.deployment,
+      systemConfig: depConfig,
       adapter,
       operationId,
       gateDecisionPath,

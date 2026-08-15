@@ -61,8 +61,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "gate-decision": {
             kind: "string",
-            required: true,
-            description: "RFC-0866: Path to GateDecisionV1 JSON file.",
+            description:
+              "RFC-0866: Path to GateDecisionV1 JSON file. Defaults to systems-cache/{system}/gate-decisions/{release}-dev.json.",
           },
           "candidate-id": {
             kind: "string",
@@ -100,8 +100,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "gate-decision": {
             kind: "string",
-            required: true,
-            description: "RFC-0866: Path to GateDecisionV1 JSON file.",
+            description:
+              "RFC-0866: Path to GateDecisionV1 JSON file. Defaults to systems-cache/{system}/gate-decisions/{release}-alt.json.",
           },
           "candidate-id": {
             kind: "string",
@@ -141,8 +141,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "gate-decision": {
             kind: "string",
-            required: true,
-            description: "RFC-0866: Path to GateDecisionV1 JSON file.",
+            description:
+              "RFC-0866: Path to GateDecisionV1 JSON file. Defaults to systems-cache/{system}/gate-decisions/{release}-main.json.",
           },
           "main-verification-decision": {
             kind: "string",
@@ -285,6 +285,11 @@ export function createLeitstandModule(): KernelModule {
             kind: "string",
             required: true,
             description: "Artifact hash (sha256:... format).",
+          },
+          "base-url": {
+            kind: "string",
+            description:
+              "RFC-0866: Dev deployment URL for mission-check producer. Defaults to latest dev effect record URL.",
           },
         },
         writes: ["systems-cache/{system}/gate-decisions/**"],
