@@ -2,53 +2,54 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 070-resolution-and-reconciliation
-state: draft
+state: sealed
 governingDecision: RFC-0860
 decisionKind: rfc
 resolvedRfc: RFC-0860
 dependsOnPacket: 060-fiber-and-effect-runtime
-baseCommit: 9cac732d487fd7f7205061dec37e93ace474c9b6
+baseCommit: 7d912aff316b4105c27e9b2115f35b1122cd580f
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md"
+  - path: docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md
     sha256: f27605f68f70e74efe7973b76d3b4341c3d82b128d439ade4206a9c06e4adb4d
 allowedFiles:
-  - "packages/werkstatt/src/component-runtime/resolver.ts"
-  - "packages/werkstatt/src/component-runtime/reconciliation.ts"
-  - "packages/werkstatt/src/component-runtime/resolution-proof.ts"
-  - "packages/werkstatt/src/component-runtime/tests/resolver*.test.ts"
-  - "packages/werkstatt/src/component-runtime/tests/reconciliation*.test.ts"
-  - "docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md"
-  - "docs/rfcs/verification/**"
-  - "docs/architecture-dna.md"
-  - "docs/requirements.xml"
-  - "docs/technology.xml"
-  - "docs/development-plan.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/verification-plan.xml"
-  - "docs/source-markup.xml"
-  - "AGENTS.md"
-  - "packages/AGENTS.md"
-  - "packages/werkstatt/AGENTS.md"
+  - packages/werkstatt/src/component-runtime/resolver.ts
+  - packages/werkstatt/src/component-runtime/reconciliation.ts
+  - packages/werkstatt/src/component-runtime/resolution-proof.ts
+  - packages/werkstatt/src/component-runtime/tests/resolver*.test.ts
+  - packages/werkstatt/src/component-runtime/tests/reconciliation*.test.ts
+  - docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md
+  - docs/rfcs/verification/**
+  - docs/architecture-dna.md
+  - docs/requirements.xml
+  - docs/technology.xml
+  - docs/development-plan.xml
+  - docs/knowledge-graph.xml
+  - docs/verification-plan.xml
+  - docs/source-markup.xml
+  - AGENTS.md
+  - packages/AGENTS.md
+  - packages/werkstatt/AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0860"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0860
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 070: Resolution and reconciliation
 

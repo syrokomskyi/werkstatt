@@ -88,12 +88,12 @@ packets:
   - order: 70
     packetId: 070-resolution-and-reconciliation
     file: 070-resolution-and-reconciliation.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0860
     decisionKind: rfc
     resolvedRfc: RFC-0860
     dependsOnPacket: 060-fiber-and-effect-runtime
-    baseCommit: 9cac732d487fd7f7205061dec37e93ace474c9b6
+    baseCommit: 7d912aff316b4105c27e9b2115f35b1122cd580f
     sealCommit: null
     completion: null
   - order: 80
