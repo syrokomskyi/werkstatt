@@ -1,7 +1,7 @@
 ---
 id: RFC-0859
 title: "Establish the lifecycle fiber and effect runtime"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners: [architecture]
@@ -10,7 +10,7 @@ reviewers:
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -166,12 +166,12 @@ Rejected because five coarse hooks do not own individual registrations/resources
 
 ## Acceptance criteria
 
-- [ ] The closed lifecycle rejects every invalid transition and reaches no partially active state under injected failure.
-- [ ] Structured fibers own all child operations/resources and propagate cancellation only at declared boundaries.
-- [ ] Drain stops new calls, waits boundedly for quiescence, and unwinds dependents/providers and effects in deterministic reverse/LIFO order.
-- [ ] All four effect classes enforce their distinct prepare/commit/abort/dispose/compensate/withhold laws, with unknown classes rejected.
-- [ ] Activation failure restores the exact prior set or yields quarantine plus critical incident; it never reports success after incomplete rollback.
-- [ ] Exhaustive state tests, property/stress tests, scoped build, RFC/Compass validation, and clean-tree checks pass.
+- [x] The closed lifecycle rejects every invalid transition and reaches no partially active state under injected failure. (evidence: packages/werkstatt/src/component-runtime/tests/lifecycle.test.ts:38-65)
+- [x] Structured fibers own all child operations/resources and propagate cancellation only at declared boundaries. (evidence: packages/werkstatt/src/component-runtime/tests/fiber.test.ts:100-112)
+- [x] Drain stops new calls, waits boundedly for quiescence, and unwinds dependents/providers and effects in deterministic reverse/LIFO order. (evidence: packages/werkstatt/src/component-runtime/tests/fiber.test.ts:46-65,80-87)
+- [x] All four effect classes enforce their distinct prepare/commit/abort/dispose/compensate/withhold laws, with unknown classes rejected. (evidence: packages/werkstatt/src/component-runtime/tests/effects.test.ts:14-119)
+- [x] Activation failure restores the exact prior set or yields quarantine plus critical incident; it never reports success after incomplete rollback. (evidence: packages/werkstatt/src/component-runtime/tests/activation.test.ts:60-78)
+- [x] Exhaustive state tests, property/stress tests, scoped build, RFC/Compass validation, and clean-tree checks pass. (evidence: packages/werkstatt/src/component-runtime/tests/ 51 tests pass)
 
 ## Implementation notes for agents
 

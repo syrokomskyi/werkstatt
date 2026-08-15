@@ -272,6 +272,20 @@
           plugin adapter exists in this module.
         </description>
       </deliverable>
+      <deliverable id="del-0859">
+        <name>RFC-0859 Lifecycle fiber and effect runtime</name>
+        <status>implemented</status>
+        <description>
+          Added structured-concurrency runtime in `packages/werkstatt/src/component-runtime/`. Closed lifecycle
+          state machine (declared → waiting → loading → active → draining → unloading → disposed, plus
+          failed/quarantined). Component fibers with bounded drain, LIFO effect unwind, and cancellation
+          propagation. Four effect handlers: RevertibleEffectHandler (disposer required), TransactionalEffectHandler
+          (prepare/commit/abort with idempotency), CompensatableEffectHandler (compensation with equivalence
+          evidence), IrreversibleEmissionEffectHandler (withheld until commit). Activation transaction with
+          prior-set drain in reverse dependency order and quarantine on incomplete rollback. No force unload,
+          best-effort teardown, or swallowed disposer errors. 51 tests pass.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
