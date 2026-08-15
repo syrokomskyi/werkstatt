@@ -307,3 +307,7 @@ Every site route MUST pass Playwright-based geometric assertions in mobile emula
 ## DNA-70 · Axiom post-deploy mobile layout monitoring
 
 The workshop extends Axiom post-deploy monitoring with a `mobile-layout` instrument type and `mobile-layout-stability` methodology. This is the L5 (post-deploy) layer of the three-layer mobile layout validation strategy (RFC-0837 static CSS, RFC-0838 Playwright pre-deploy, RFC-0839 Axiom post-deploy). The methodology runs against live URLs after deployment and checks horizontal overflow, orientation stability, address bar shift, and CLS on real device presets. The instrument implementation lives in `@syrokomskyi/axiom-factory-app` (external expert); the Werkstatt side is limited to schema extension, config declaration, and documentation. Enforcement: `mission.check`, `methodologies.validate`. Established by RFC-0839.
+
+## DNA-74 · Canonical Diagnostic schema ownership
+
+`packages/werkstatt/src/schemas/diagnostic.ts` is the sole owner of `DiagnosticSeverity`, `DiagnosticEvidence`, and `Diagnostic` strict Zod schemas and inferred types. `kernel/types.ts` re-exports these types (type-only). No package may redeclare, duplicate, or alias these types. Legacy aliases (`auditSeveritySchema`, `auditEvidenceSchema`, `auditFindingSchema`, `AuditFinding`) and deprecated fields (`id`, `blockId`, `suggestion`) are removed; no compatibility alias or parser may be reintroduced. The `data` field accepts only runtime-branded `CanonicalJsonObjectV1` (RFC-0849). Established by RFC-0852.

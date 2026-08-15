@@ -246,6 +246,18 @@
           and a rehearsed global kill-switch with per-site freeze projection.
         </description>
       </deliverable>
+      <deliverable id="del-0852">
+        <name>RFC-0852 Canonical Diagnostic schema ownership</name>
+        <status>implemented</status>
+        <description>
+          Moved canonical Diagnostic schema ownership from the site plugin into the engine.
+          `packages/werkstatt/src/schemas/diagnostic.ts` is the sole owner of DiagnosticSeverity,
+          DiagnosticEvidence, and Diagnostic strict Zod schemas and inferred types.
+          Removed legacy aliases (auditSeveritySchema, auditEvidenceSchema, auditFindingSchema,
+          AuditFinding) and deprecated fields (id, blockId, suggestion) repository-wide.
+          The data field accepts only runtime-branded CanonicalJsonObjectV1 (RFC-0849).
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

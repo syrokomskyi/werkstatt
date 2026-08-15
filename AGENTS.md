@@ -37,7 +37,7 @@ The checked-in runtime still uses the `werkstatt/plugin@1` contract described be
 - Agents MUST NOT implement RFC-0855 children from an accepted/draft document alone. Implementation requires the exact sealed packet, predecessor completion commit, governing decision status, source hashes, fixed branch, clean trees, and exclusive RFC-0856 lease.
 - Packets 000–240 execute sequentially with parallelism 1. Do not combine, reorder, pre-implement, or privately prepare later packets.
 - During the transition the repository may intentionally be unable to build or deploy. Do not restore a compatibility plugin path, downgrade a validation, or widen a packet to make an intermediate state green.
-- The Law Kernel, canonical identity/Diagnostic, effect authority, isolation admission, and program governance remain engine-owned. Stack packages contribute profile-selected capabilities and never become engine dependencies.
+- The Law Kernel, canonical identity/Diagnostic, effect authority, isolation admission, and program governance remain engine-owned. Stack packages contribute profile-selected capabilities and never become engine dependencies. RFC-0852 (packet 030) completed the canonical Diagnostic cutover: `packages/werkstatt/src/schemas/diagnostic.ts` is the sole schema/type owner; legacy aliases (`AuditFinding`, `auditSeveritySchema`, `auditEvidenceSchema`, `auditFindingSchema`) and deprecated fields (`id`, `blockId`, `suggestion`) are removed.
 - Agent-written or third-party executable artifacts remain disabled until packets 190 and 200 complete; evaluator outputs in packet 180 are untrusted data, not executable authority.
 
 Current pre-cutover code facts:

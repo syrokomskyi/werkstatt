@@ -2,62 +2,63 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 030-canonical-diagnostic
-state: draft
+state: sealed
 governingDecision: RFC-0852
 decisionKind: rfc
 resolvedRfc: RFC-0852
 dependsOnPacket: 020-canonical-identity-bytes
-baseCommit: afa9d28c322d4f8cbd102e19c27907f116cfb42f
+baseCommit: 7de9b5e9fddb5ef77739ba7e2227a2428c5f584d
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md"
+  - path: docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md
     sha256: b4f71b7f31d016a8d417819a725c793bd60e6279d00fe9f3af12f0de4ef44433
 allowedFiles:
-  - "packages/werkstatt/src/schemas/diagnostic.ts"
-  - "packages/werkstatt/src/schemas/index.ts"
-  - "packages/werkstatt/src/kernel/types.ts"
-  - "packages/werkstatt/package.json"
-  - "packages/werkstatt-site/src/checks/audit/types.ts"
-  - "packages/werkstatt-site/src/checks/**"
-  - "packages/werkstatt/src/tests/diagnostic-schema.test.ts"
-  - "packages/werkstatt-site/src/checks/tests/diagnostic-contract.test.ts"
-  - "docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md"
-  - "docs/rfcs/verification/**"
-  - "docs/architecture-dna.md"
-  - "docs/requirements.xml"
-  - "docs/technology.xml"
-  - "docs/development-plan.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/verification-plan.xml"
-  - "docs/source-markup.xml"
-  - "AGENTS.md"
-  - "packages/AGENTS.md"
-  - "packages/werkstatt/AGENTS.md"
+  - packages/werkstatt/src/schemas/diagnostic.ts
+  - packages/werkstatt/src/schemas/index.ts
+  - packages/werkstatt/src/kernel/types.ts
+  - packages/werkstatt/package.json
+  - packages/werkstatt-site/src/checks/audit/types.ts
+  - packages/werkstatt-site/src/checks/**
+  - packages/werkstatt/src/tests/diagnostic-schema.test.ts
+  - packages/werkstatt-site/src/checks/tests/diagnostic-contract.test.ts
+  - docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md
+  - docs/rfcs/verification/**
+  - docs/architecture-dna.md
+  - docs/requirements.xml
+  - docs/technology.xml
+  - docs/development-plan.xml
+  - docs/knowledge-graph.xml
+  - docs/verification-plan.xml
+  - docs/source-markup.xml
+  - AGENTS.md
+  - packages/AGENTS.md
+  - packages/werkstatt/AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt-site test"
+  - command: pnpm --filter @warpgogol/werkstatt-site test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt-site build"
+  - command: pnpm --filter @warpgogol/werkstatt-site build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0852"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0852
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 030: Canonical Diagnostic
 

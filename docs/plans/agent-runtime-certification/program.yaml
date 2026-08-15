@@ -44,12 +44,12 @@ packets:
   - order: 30
     packetId: 030-canonical-diagnostic
     file: 030-canonical-diagnostic.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0852
     decisionKind: rfc
     resolvedRfc: RFC-0852
     dependsOnPacket: 020-canonical-identity-bytes
-    baseCommit: afa9d28c322d4f8cbd102e19c27907f116cfb42f
+    baseCommit: 7de9b5e9fddb5ef77739ba7e2227a2428c5f584d
     sealCommit: null
     completion: null
   - order: 40
