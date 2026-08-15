@@ -19,6 +19,7 @@ allowedFiles:
   - packages/werkstatt/src/component-runtime/testing/**
   - packages/werkstatt/src/component-runtime/tests/conformance*.test.ts
   - packages/werkstatt/src/component-runtime/tests/reflection*.test.ts
+  - docs/plans/agent-runtime-certification/080-reflection-and-conformance-harness.md
   - packages/werkstatt/package.json
   - docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
   - docs/rfcs/verification/**
