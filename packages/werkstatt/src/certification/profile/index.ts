@@ -44,11 +44,7 @@ export {
   profileSourceRefV1Schema,
 } from "./schemas.ts";
 
-export type {
-  ProfileHashResultV1,
-  ProfileHashFailureV1,
-  ProfileHashOutcomeV1,
-} from "./hash.ts";
+export type { ProfileHashResultV1, ProfileHashFailureV1, ProfileHashOutcomeV1 } from "./hash.ts";
 
 export { hashCertificationProfileV1 } from "./hash.ts";
 
@@ -59,3 +55,5 @@ export type {
 } from "./validate.ts";
 
 export { validateCertificationProfileV1 } from "./validate.ts";
+
+export { astroCertificationProfile } from "./astro-profile.ts";
