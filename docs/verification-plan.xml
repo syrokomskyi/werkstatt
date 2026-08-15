@@ -470,5 +470,9 @@
       <change-type>CERT-003 authority and durable storage changes</change-type>
       <expectation>Run `vitest` on `certification-authority.test.ts` and `certification-storage.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify issuer registry rejects conflicting keys, attestation verification rejects unregistered issuers and key mismatches, dossier repository rejects chain breaks, root hash is location-independent, retention GC respects protected references and age thresholds, and durable replica verification rejects root hash mismatch.</expectation>
     </entry>
+    <entry id="vm-24">
+      <change-type>CERT-004 certification orchestration and command surface changes</change-type>
+      <expectation>Run `vitest` on `certification-orchestration.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify producer dependency planning rejects cycles, duplicates, and unknown dependencies; gate lock manager rejects concurrent locks and allows idempotent re-acquire; producer execution respects bounded parallelism, timeout, retry, and emits progress events; resume point computation correctly identifies completed batches; `getCertificationStatus` returns candidate identity, decisions, coverage, and next required action; `verifyCertification` recomputes candidate ID, dossier root, and detects integrity violations.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

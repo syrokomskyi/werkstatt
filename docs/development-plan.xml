@@ -454,6 +454,13 @@
           durable replica verification.
         </description>
       </deliverable>
+      <deliverable id="del-160">
+        <name>CERT-004: Certification orchestrator and command surface</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/certification/orchestration/` with producer dependency planning (topological sort, cycle detection), gate lock manager (mutual exclusion, idempotent re-acquire), producer execution with bounded parallelism, timeout, retry, cancellation, progress events, and resume point computation. Implement `packages/werkstatt/src/certification/commands/` with read-only `getCertificationStatus` and `verifyCertification`. 22 tests covering planning, locking, execution, retry, progress, resume, status, and verification.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
