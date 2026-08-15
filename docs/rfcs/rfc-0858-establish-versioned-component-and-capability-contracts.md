@@ -9,7 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
-enhancedAt:
+enhancedAt: 2026-08-15
 implementedAt:
 closedAt:
 supersedes: []
