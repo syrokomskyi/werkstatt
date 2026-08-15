@@ -32,6 +32,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `@warpgogol/werkstatt/agent-gate` | `./src/agent-gate/index.ts` |
 | `@warpgogol/werkstatt/changelog` | `./src/changelog/index.ts` |
 | `@warpgogol/werkstatt/schemas` | `./src/schemas/index.ts` |
+| `@warpgogol/werkstatt/component` | `./src/component/index.ts` |
 | `@warpgogol/werkstatt/handoff` | `./src/handoff/index.ts` |
 | `@warpgogol/werkstatt/workshop` | `./src/workshop/index.ts` |
 | `@warpgogol/werkstatt/workshop-module` | `./src/workshop/workshop.module.ts` |
@@ -78,6 +79,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - The engine owns the Law Kernel, component graph, lifecycle fibers, effects, resolved-set identity, isolation admission, certification authority, and evolution reducer. Stack-profile packages provide capabilities through contracts and must never be imported into the engine.
 - Do not add adapters for `werkstatt/plugin@1`, force unload, ambient authority, local certification fallback, mutable capability artifacts, or ungoverned production activation.
 - An intentionally broken intermediate repository is permitted by RFC-0855. Never widen the packet or restore retired authority merely to recover a green build.
+
+### Component and capability contracts (RFC-0858)
+
+- `packages/werkstatt/src/component/` owns strict versioned contracts for immutable component artifacts, namespaced capability provides/requires, attenuated grants, closed effect declarations, isolation requirements, lifecycle-owned resources, and canonical resolved-component-set identity.
+- `contracts.ts` exports TypeScript interfaces; `schemas.ts` exports Zod runtime schemas with `.strict()` validation; `identity.ts` computes canonical hashes via the existing fingerprint authority (`snapshotCanonicalJsonObjectV1` + `canonicalJsonHashV1`); `index.ts` provides narrow public exports.
+- Unknown fields, invalid identities, duplicate provides, Law Kernel reserved grant scopes (`certify`, `administer`), resource owner mismatches, and unknown effect/isolation/grant/resource types fail with `COMPONENT-CONTRACT-01` through `COMPONENT-CONTRACT-07`.
+- `computeSetHash` is input-order invariant and sensitive to every semantic field change. `verifySetHashStrict` detects set-hash mismatch (`COMPONENT-CONTRACT-07`).
+- No registry, loader, sandbox, plugin adapter, or activation behavior exists in this module. Later packets implement lifecycle and resolution against these types.
 
 ## Mission git helpers
 

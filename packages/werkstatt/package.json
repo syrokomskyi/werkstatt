@@ -279,6 +279,10 @@
       "types": "./src/schemas/index.ts",
       "default": "./src/schemas/index.ts"
     },
+    "./component": {
+      "types": "./src/component/index.ts",
+      "default": "./src/component/index.ts"
+    },
     "./workshop": {
       "types": "./src/workshop/index.ts",
       "default": "./src/workshop/index.ts"
