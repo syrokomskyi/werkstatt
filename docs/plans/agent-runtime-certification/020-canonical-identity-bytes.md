@@ -7,7 +7,7 @@ governingDecision: RFC-0849
 decisionKind: rfc
 resolvedRfc: RFC-0849
 dependsOnPacket: 010-node-24
-baseCommit: null
+baseCommit: 799e7db56986309b0e9cbbe0675bbf2d5cea053e
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
