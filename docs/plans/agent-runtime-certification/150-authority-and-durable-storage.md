@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 150-authority-and-durable-storage
-state: draft
+state: sealed
 governingDecision: werkstatt-release-certification/CERT-003
 decisionKind: spec-node
 resolvedRfc: null

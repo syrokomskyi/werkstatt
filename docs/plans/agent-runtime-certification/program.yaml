@@ -171,17 +171,17 @@ packets:
     resolvedRfc: null
     dependsOnPacket: 130-foundation-integration
     baseCommit: fb76f54d
-    sealCommit: null
-    completion: null
+    sealCommit: 931fbdfa
+    completion: 978c2fc3
   - order: 150
     packetId: 150-authority-and-durable-storage
     file: 150-authority-and-durable-storage.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/CERT-003
     decisionKind: spec-node
     resolvedRfc: null
     dependsOnPacket: 140-resolved-certification-profile
-    baseCommit: null
+    baseCommit: 978c2fc3
     sealCommit: null
     completion: null
   - order: 160
