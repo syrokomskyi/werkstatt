@@ -2,53 +2,54 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 080-reflection-and-conformance-harness
-state: draft
+state: sealed
 governingDecision: RFC-0861
 decisionKind: rfc
 resolvedRfc: RFC-0861
 dependsOnPacket: 070-resolution-and-reconciliation
-baseCommit: c2364eeddf78df1fdab73923957a9bf073ef7675
+baseCommit: e85f033778abdd552379209be37fff24e4d1c415
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md"
+  - path: docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
     sha256: 705c415bae5c9370a9f2cfff1c7828902fb5f5aa1ee42e16edd0f161c3c8624d
 allowedFiles:
-  - "packages/werkstatt/src/component-runtime/reflection.ts"
-  - "packages/werkstatt/src/component-runtime/conformance.ts"
-  - "packages/werkstatt/src/component-runtime/testing/**"
-  - "packages/werkstatt/src/component-runtime/tests/conformance*.test.ts"
-  - "packages/werkstatt/package.json"
-  - "docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md"
-  - "docs/rfcs/verification/**"
-  - "docs/architecture-dna.md"
-  - "docs/requirements.xml"
-  - "docs/technology.xml"
-  - "docs/development-plan.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/verification-plan.xml"
-  - "docs/source-markup.xml"
-  - "AGENTS.md"
-  - "packages/AGENTS.md"
-  - "packages/werkstatt/AGENTS.md"
+  - packages/werkstatt/src/component-runtime/reflection.ts
+  - packages/werkstatt/src/component-runtime/conformance.ts
+  - packages/werkstatt/src/component-runtime/testing/**
+  - packages/werkstatt/src/component-runtime/tests/conformance*.test.ts
+  - packages/werkstatt/package.json
+  - docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
+  - docs/rfcs/verification/**
+  - docs/architecture-dna.md
+  - docs/requirements.xml
+  - docs/technology.xml
+  - docs/development-plan.xml
+  - docs/knowledge-graph.xml
+  - docs/verification-plan.xml
+  - docs/source-markup.xml
+  - AGENTS.md
+  - packages/AGENTS.md
+  - packages/werkstatt/AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0861"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0861
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 080: Reflection and conformance harness
 

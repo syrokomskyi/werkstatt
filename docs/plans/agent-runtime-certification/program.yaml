@@ -99,12 +99,12 @@ packets:
   - order: 80
     packetId: 080-reflection-and-conformance-harness
     file: 080-reflection-and-conformance-harness.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0861
     decisionKind: rfc
     resolvedRfc: RFC-0861
     dependsOnPacket: 070-resolution-and-reconciliation
-    baseCommit: c2364eeddf78df1fdab73923957a9bf073ef7675
+    baseCommit: e85f033778abdd552379209be37fff24e4d1c415
     sealCommit: null
     completion: null
   - order: 90
