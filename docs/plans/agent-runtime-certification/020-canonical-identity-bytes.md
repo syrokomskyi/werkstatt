@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 020-canonical-identity-bytes
-state: sealed
+state: completed
 governingDecision: RFC-0849
 decisionKind: rfc
 resolvedRfc: RFC-0849

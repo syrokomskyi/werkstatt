@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 100-certification-contracts-and-identities
-state: sealed
+state: completed
 governingDecision: RFC-0853
 decisionKind: rfc
 resolvedRfc: RFC-0853

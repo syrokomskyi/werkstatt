@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 040-specification-reconciliation
-state: sealed
+state: completed
 governingDecision: werkstatt-release-certification/AMD-007
 decisionKind: spec-amendment
 resolvedRfc: null

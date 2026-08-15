@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 120-forward-only-state-reset
-state: sealed
+state: completed
 governingDecision: RFC-0851
 decisionKind: rfc
 resolvedRfc: RFC-0851

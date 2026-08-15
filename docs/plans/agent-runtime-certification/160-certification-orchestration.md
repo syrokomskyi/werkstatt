@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 160-certification-orchestration
-state: sealed
+state: completed
 governingDecision: werkstatt-release-certification/CERT-004
 decisionKind: spec-node
 resolvedRfc: null

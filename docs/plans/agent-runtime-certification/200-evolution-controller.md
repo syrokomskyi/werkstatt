@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 200-evolution-controller
-state: sealed
+state: completed
 governingDecision: RFC-0864
 decisionKind: rfc
 resolvedRfc: RFC-0864

@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 210-deployment-effect-authority
-state: sealed
+state: completed
 governingDecision: werkstatt-release-certification/CERT-007
 decisionKind: spec-node
 resolvedRfc: null

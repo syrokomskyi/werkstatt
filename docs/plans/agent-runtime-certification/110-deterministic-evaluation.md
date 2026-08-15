@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 110-deterministic-evaluation
-state: sealed
+state: completed
 governingDecision: RFC-0850
 decisionKind: rfc
 resolvedRfc: RFC-0850

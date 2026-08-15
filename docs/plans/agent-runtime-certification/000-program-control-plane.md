@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 000-program-control-plane
-state: draft
+state: completed
 governingDecision: RFC-0856
 decisionKind: rfc
 resolvedRfc: RFC-0856

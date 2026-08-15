@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 240-cleanup
-state: sealed
+state: completed
 governingDecision: werkstatt-release-certification/CERT-010
 decisionKind: spec-node
 resolvedRfc: null

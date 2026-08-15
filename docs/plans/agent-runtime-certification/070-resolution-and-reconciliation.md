@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 070-resolution-and-reconciliation
-state: sealed
+state: completed
 governingDecision: RFC-0860
 decisionKind: rfc
 resolvedRfc: RFC-0860

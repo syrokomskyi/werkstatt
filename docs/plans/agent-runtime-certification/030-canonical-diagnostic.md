@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 030-canonical-diagnostic
-state: sealed
+state: completed
 governingDecision: RFC-0852
 decisionKind: rfc
 resolvedRfc: RFC-0852

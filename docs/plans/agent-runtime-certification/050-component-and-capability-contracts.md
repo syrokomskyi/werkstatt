@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 050-component-and-capability-contracts
-state: sealed
+state: completed
 governingDecision: RFC-0858
 decisionKind: rfc
 resolvedRfc: RFC-0858

@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 090-isolation-contract
-state: sealed
+state: completed
 governingDecision: RFC-0862
 decisionKind: rfc
 resolvedRfc: RFC-0862

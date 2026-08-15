@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 060-fiber-and-effect-runtime
-state: sealed
+state: completed
 governingDecision: RFC-0859
 decisionKind: rfc
 resolvedRfc: RFC-0859

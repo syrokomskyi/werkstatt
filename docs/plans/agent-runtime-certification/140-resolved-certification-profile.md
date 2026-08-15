@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 140-resolved-certification-profile
-state: sealed
+state: completed
 governingDecision: werkstatt-release-certification/CERT-002
 decisionKind: spec-node
 resolvedRfc: null

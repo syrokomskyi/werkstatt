@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 180-independent-evaluators
-state: sealed
+state: completed
 governingDecision: werkstatt-release-certification/CERT-006
 decisionKind: spec-node
 resolvedRfc: null

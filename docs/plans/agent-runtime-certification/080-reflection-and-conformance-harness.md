@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 080-reflection-and-conformance-harness
-state: sealed
+state: completed
 governingDecision: RFC-0861
 decisionKind: rfc
 resolvedRfc: RFC-0861
