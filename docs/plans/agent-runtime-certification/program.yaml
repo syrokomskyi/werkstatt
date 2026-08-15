@@ -182,17 +182,17 @@ packets:
     resolvedRfc: null
     dependsOnPacket: 140-resolved-certification-profile
     baseCommit: 978c2fc3
-    sealCommit: null
-    completion: null
+    sealCommit: fceb571a
+    completion: 47f6b076
   - order: 160
     packetId: 160-certification-orchestration
     file: 160-certification-orchestration.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/CERT-004
     decisionKind: spec-node
     resolvedRfc: null
     dependsOnPacket: 150-authority-and-durable-storage
-    baseCommit: null
+    baseCommit: 47f6b076
     sealCommit: null
     completion: null
   - order: 170
