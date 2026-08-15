@@ -1,0 +1,43 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "240-cleanup",
+  "baseCommit": "32bc6ee",
+  "sealCommit": "f2c66e8",
+  "implementationCommits": [
+    "fd0219bc",
+    "ab996679"
+  ],
+  "implementationHead": "ab99667",
+  "changedFiles": [
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/240-cleanup.md",
+    "docs/platform-version-log.generated.yaml",
+    "docs/requirements.xml",
+    "docs/technology.xml",
+    "docs/verification-plan.xml",
+    "package.json",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/src/certification/cleanup/legacy-artifacts.ts",
+    "packages/werkstatt/src/tests/certification-legacy-artifacts-cleanup.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification",
+      "status": "pass"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}

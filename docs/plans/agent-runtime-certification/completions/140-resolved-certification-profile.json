@@ -1,0 +1,47 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "140-resolved-certification-profile",
+  "baseCommit": "fb76f54d",
+  "sealCommit": "931fbdfa",
+  "implementationCommits": [
+    "f0254879",
+    "978c2fc3"
+  ],
+  "implementationHead": "978c2fc3",
+  "changedFiles": [
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/140-resolved-certification-profile.md",
+    "docs/platform-version-log.generated.yaml",
+    "docs/requirements.xml",
+    "docs/technology.xml",
+    "docs/verification-plan.xml",
+    "package.json",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/src/certification/index.ts",
+    "packages/werkstatt/src/certification/profile/hash.ts",
+    "packages/werkstatt/src/certification/profile/index.ts",
+    "packages/werkstatt/src/certification/profile/schemas.ts",
+    "packages/werkstatt/src/certification/profile/validate.ts",
+    "packages/werkstatt/src/tests/certification-profile.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification",
+      "status": "pass"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}

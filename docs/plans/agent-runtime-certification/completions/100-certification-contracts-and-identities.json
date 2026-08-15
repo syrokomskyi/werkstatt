@@ -1,0 +1,57 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "100-certification-contracts-and-identities",
+  "baseCommit": "25ea6b44ffd8034866aa8a838547dcaa486e9545",
+  "sealCommit": "0bd8be29",
+  "implementationCommits": [
+    "5e5bba36",
+    "b72493b9"
+  ],
+  "implementationHead": "b72493b96546777473492820625b65a8269dc517",
+  "changedFiles": [
+    "docs/architecture-dna.md",
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/100-certification-contracts-and-identities.md",
+    "docs/platform-version-log.generated.yaml",
+    "docs/requirements.xml",
+    "docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md",
+    "docs/technology.xml",
+    "package.json",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/package.json",
+    "packages/werkstatt/src/certification/contracts/action-pack.ts",
+    "packages/werkstatt/src/certification/contracts/authority.ts",
+    "packages/werkstatt/src/certification/contracts/candidate.ts",
+    "packages/werkstatt/src/certification/contracts/decisions.ts",
+    "packages/werkstatt/src/certification/contracts/dossier.ts",
+    "packages/werkstatt/src/certification/contracts/evidence.ts",
+    "packages/werkstatt/src/certification/contracts/identifiers.ts",
+    "packages/werkstatt/src/certification/contracts/index.ts",
+    "packages/werkstatt/src/certification/contracts/policy-bundle.ts",
+    "packages/werkstatt/src/certification/contracts/state.ts",
+    "packages/werkstatt/src/certification/identity.ts",
+    "packages/werkstatt/src/certification/index.ts",
+    "packages/werkstatt/src/tests/certification-contracts.test.ts",
+    "packages/werkstatt/src/tests/certification-identity.pbt.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification",
+      "status": "pass"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}

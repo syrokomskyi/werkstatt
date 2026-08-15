@@ -1,0 +1,44 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "170-deterministic-site-producers",
+  "baseCommit": "a4c7086e",
+  "sealCommit": "3c2aa503",
+  "implementationCommits": [
+    "cff299f6",
+    "ad5e3f32"
+  ],
+  "implementationHead": "ad5e3f32",
+  "changedFiles": [
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/170-deterministic-site-producers.md",
+    "docs/platform-version-log.generated.yaml",
+    "docs/requirements.xml",
+    "docs/technology.xml",
+    "docs/verification-plan.xml",
+    "package.json",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/src/certification/producers/index.ts",
+    "packages/werkstatt/src/certification/producers/registry.ts",
+    "packages/werkstatt/src/tests/certification-producers.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification",
+      "status": "pass"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "110-deterministic-evaluation",
+  "baseCommit": "0d5acb1e84f05557f85e58d84ce7801f01a3be46",
+  "sealCommit": "f88aec9d",
+  "implementationCommits": [
+    "8b86cbe0",
+    "6225cbe6"
+  ],
+  "implementationHead": "6225cbe61cfa1eb9f0617171bad8d5c964437b2b",
+  "changedFiles": [
+    "docs/architecture-dna.md",
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/110-deterministic-evaluation.md",
+    "docs/platform-version-log.generated.yaml",
+    "docs/requirements.xml",
+    "docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md",
+    "docs/technology.xml",
+    "package.json",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/src/certification/action-pack.ts",
+    "packages/werkstatt/src/certification/aggregation.ts",
+    "packages/werkstatt/src/certification/dossier-hash.ts",
+    "packages/werkstatt/src/certification/evidence-selection.ts",
+    "packages/werkstatt/src/certification/index.ts",
+    "packages/werkstatt/src/tests/certification-evaluation.pbt.test.ts",
+    "packages/werkstatt/src/tests/certification-evaluation.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification",
+      "status": "pass"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}

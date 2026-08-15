@@ -1,0 +1,44 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "180-independent-evaluators",
+  "baseCommit": "ad5e3f32",
+  "sealCommit": "c0c28ea4",
+  "implementationCommits": [
+    "b9001b7d",
+    "e8317f9e"
+  ],
+  "implementationHead": "e8317f9e",
+  "changedFiles": [
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/180-independent-evaluators.md",
+    "docs/platform-version-log.generated.yaml",
+    "docs/requirements.xml",
+    "docs/technology.xml",
+    "docs/verification-plan.xml",
+    "package.json",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/src/certification/evaluators/index.ts",
+    "packages/werkstatt/src/certification/evaluators/registry.ts",
+    "packages/werkstatt/src/tests/certification-evaluators.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification",
+      "status": "pass"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "190-capability-artifact-and-sandbox",
+  "baseCommit": "e8317f9e",
+  "sealCommit": "72c76722",
+  "implementationCommits": [
+    "a5fb01aa",
+    "2791a247"
+  ],
+  "implementationHead": "2791a247",
+  "changedFiles": [
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/190-capability-artifact-and-sandbox.md",
+    "docs/platform-version-log.generated.yaml",
+    "docs/requirements.xml",
+    "docs/technology.xml",
+    "docs/verification-plan.xml",
+    "package.json",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/src/capability-artifacts/index.ts",
+    "packages/werkstatt/src/capability-artifacts/store.ts",
+    "packages/werkstatt/src/isolation/broker/broker.ts",
+    "packages/werkstatt/src/isolation/broker/index.ts",
+    "packages/werkstatt/src/isolation/providers/fake-sandbox.ts",
+    "packages/werkstatt/src/isolation/providers/index.ts",
+    "packages/werkstatt/src/tests/capability-artifact-and-sandbox.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass"
+    },
+    {
+      "command": "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification",
+      "status": "pass"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}
