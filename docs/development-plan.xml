@@ -316,6 +316,24 @@
           28 tests pass.
         </description>
       </deliverable>
+      <deliverable id="del-0862">
+        <name>RFC-0862 Provider-neutral isolation contract</name>
+        <status>implemented</status>
+        <description>
+          Added provider-neutral isolation adapter contract in `packages/werkstatt/src/isolation/contracts.ts`:
+          `IsolationAdapterV1`, `SandboxedWorkloadCreateV1`, `SandboxedWorkloadV1`, `CapabilityBridgeRequestV1`/
+          `ResponseV1`, `TerminationReportV1`, `AttenuatedGrantSetV1`, `WorkloadLimitsV1`,
+          `IsolationPropertyEvidenceV1` with twelve required security properties. Workloads receive no ambient
+          filesystem, network, process, environment, clock, randomness, credential, IPC, or host-object access.
+          Added strict Zod schemas in `schemas.ts` with `.strict()` validation — unknown fields, invalid grants,
+          replay, confused identity, and all bound violations rejected. Added adversarial conformance suite in
+          `conformance.ts`: `runIsolationConformance` covering filesystem/network/process/env/credential/descriptor
+          escape, resource exhaustion, workload separation, teardown, crash, bridge confusion/replay. `node:vm`,
+          `worker_threads`, and ordinary subprocesses fail the security-tier contract by definition. Missing property
+          evidence returns `incomplete`, never `pass`. Subpath exports added for contracts, schemas, and conformance.
+          27 tests pass.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

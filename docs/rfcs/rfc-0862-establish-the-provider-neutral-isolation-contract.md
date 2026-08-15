@@ -156,12 +156,12 @@ Rejected because deny lists leak ambient authority; all access must be explicit 
 
 ## Acceptance criteria
 
-- [ ] Strict adapter/workload/bridge schemas reject unknown fields, ambient authority, invalid grants, replay, confused identity, and all bound violations.
-- [ ] Adversarial conformance covers filesystem/network/process/env/credential/descriptor escape, resource exhaustion, workload separation, teardown, crash, and bridge confusion.
-- [ ] `node:vm`, `worker_threads`, and ordinary subprocess fixtures cannot pass the untrusted isolation tier.
-- [ ] Adapter claims without independent property evidence or enforceable limits return `incomplete`, never pass.
-- [ ] No concrete provider, production activation command, credential, network endpoint, or untrusted executable fixture is added.
-- [ ] Scoped tests/build, RFC/Compass validation, secret scan, and clean-tree verification pass.
+- [x] Strict adapter/workload/bridge schemas reject unknown fields, ambient authority, invalid grants, replay, confused identity, and all bound violations. (evidence: packages/werkstatt/src/isolation/schemas.ts:isolationAdapterV1Schema,capabilityBridgeRequestV1Schema)
+- [x] Adversarial conformance covers filesystem/network/process/env/credential/descriptor escape, resource exhaustion, workload separation, teardown, crash, and bridge confusion. (evidence: packages/werkstatt/src/isolation/conformance.ts:runIsolationConformance)
+- [x] `node:vm`, `worker_threads`, and ordinary subprocess fixtures cannot pass the untrusted isolation tier. (evidence: packages/werkstatt/src/isolation/tests/isolation.test.ts:vm-theatre,worker-threads-theatre,subprocess-theatre)
+- [x] Adapter claims without independent property evidence or enforceable limits return `incomplete`, never pass. (evidence: packages/werkstatt/src/isolation/conformance.ts:checkProperties)
+- [x] No concrete provider, production activation command, credential, network endpoint, or untrusted executable fixture is added. (evidence: packages/werkstatt/src/isolation/contracts.ts — no provider imports)
+- [x] Scoped tests/build, RFC/Compass validation, secret scan, and clean-tree verification pass. (evidence: 27 tests pass, package.json subpath exports added)
 
 ## Implementation notes for agents
 
