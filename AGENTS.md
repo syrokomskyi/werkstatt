@@ -108,6 +108,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Producer execution constructs evidence envelopes from handler results, rejecting unregistered producers (`CERT-PRODUCER-09`), handler crashes (`CERT-PRODUCER-10`), and false-pass results (`CERT-PRODUCER-11`).
 - No site-specific producer implementations, deployment commands, or I/O imports exist in this module.
 
+### Independent evaluator agents and qualitative consensus (CERT-006, packet 180)
+
+- `packages/werkstatt/src/certification/evaluators/` owns the independent evaluator framework — evaluator registry with duplicate rejection (`CERT-EVAL-01`), risk routing (ordinary/critical/borderline with dimension-matched rules, 1 evaluator for ordinary, 2 for critical/borderline), evaluator isolation rejecting self-review (`CERT-EVAL-02`) and duplicate identities (`CERT-EVAL-03`).
+- Consensus aggregation maps pass/pass → pass, fail/fail → fail, disagreement/missing → incomplete (`CERT-EVAL-05`). Payload validation rejects bundle hash mismatch (`CERT-EVAL-07`), rubric mismatch (`CERT-EVAL-08`), out-of-range confidence (`CERT-EVAL-09`), unknown criteria and empty rationale (`CERT-EVAL-10`).
+- Evaluator execution checks isolation (`CERT-EVAL-11`), registration (`CERT-EVAL-12`), handler crashes and invalid payloads (`CERT-EVAL-13`). Coverage manifest builds from routes/states/viewports and deterministic evidence.
+- No evaluator-led mutation, human approval, or I/O imports exist in this module.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
