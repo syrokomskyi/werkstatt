@@ -334,6 +334,31 @@
           27 tests pass.
         </description>
       </deliverable>
+      <deliverable id="del-0853">
+        <name>RFC-0853 Certification contracts and identity builders</name>
+        <status>implemented</status>
+        <description>
+          Added strict Zod schemas and inferred types for all CERT-001 certification objects in
+          `packages/werkstatt/src/certification/contracts/`: identifiers (digests, candidate/evidence/decision/
+          action/event/operation/attempt IDs, authority sequences, timestamps, gate channels, environments,
+          certification statuses, safe paths/locators), release candidates (build config, deployment plan,
+          observed environment), policy bundles (producer/rubric/toolchain/issuer manifests, resolved requirements,
+          risk policy, retention), evidence envelopes (payload descriptors, redaction reports, attestation statements,
+          authority admissions, evidence results with RFC-0852 Diagnostics), dossier events (evidence-admitted,
+          decision-recorded, incident, tombstone, manifest-projection, root-reference), decisions (gate, main
+          verification, certification health with coverage reports and selected evidence), action packs (tasks,
+          anchors, dependencies), authority artifacts (issuer registry, attestation verification, signed
+          decision/root, operation authorization, non-authoritative preview), and deployment operation state/events.
+          All schemas use `.strict()` validation — unknown fields fail without coercion.
+          Added explicit identity builders in `identity.ts`: nine builders (release candidate, policy bundle,
+          evidence, dossier event, gate decision, main verification, health decision, action pack, deployment
+          operation event) that construct fresh payload objects field-by-field, snapshot through RFC-0849
+          `snapshotCanonicalJsonObjectV1`, and hash through `canonicalJsonHashV1`. Identity payloads include only
+          semantic fields — excluded fields do not affect digests. Evidence identity enforces redaction closure
+          (CERT-REDACTION-01 on unresolved redaction). Subpath export `@warpgogol/werkstatt/certification` added.
+          70 tests pass (42 contract + 28 identity PBT).
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

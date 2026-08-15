@@ -286,6 +286,12 @@
       <rule>Release candidates and capability candidates remain distinct content-addressed artifacts.</rule>
       <rule>Promotion requires deterministic, held-out, regression, independent evaluation, shadow, canary, and observation evidence under Law Kernel authority.</rule>
     </security-plane>
+    <certification-plane>
+      <rule>Strict Zod schemas with `.strict()` validation own all CERT-001 certification object types; no parallel interfaces or compatibility aliases.</rule>
+      <rule>Identity builders construct fresh payloads field-by-field, snapshot through RFC-0849, and hash through the engine fingerprint owner; no clone/delete or generic hash.</rule>
+      <rule>Evidence identity enforces redaction closure before construction; unresolved secrets or PII fail with CERT-REDACTION-01.</rule>
+      <rule>No evaluation algorithms, state cutover, storage, commands, producers, adapters, authority execution, or deployment logic exists in the contracts module.</rule>
+    </certification-plane>
     <transition>Current `werkstatt/plugin@1` source remains until packet 230; no compatibility adapter is introduced.</transition>
   </agent-runtime-architecture>
 

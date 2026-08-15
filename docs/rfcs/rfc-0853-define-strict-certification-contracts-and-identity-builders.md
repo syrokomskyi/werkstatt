@@ -276,18 +276,18 @@ Rejected: material evidence meaning/safety could change without changing evidenc
 
 ## Acceptance criteria
 
-- [ ] The checked traceability inventory covers every CERT-001 top-level object and every AMD-001/003/004/005/006 delta; each has one strict schema, inferred type, literal schema id, bounds, and positive/negative fixtures.
-- [ ] Identifier schemas make digests, content IDs, operation/attempt IDs, authority sequences, timestamps, and human IDs non-substitutable; unknown/legacy vocabulary fails without coercion.
-- [ ] Every listed identity has a dedicated strict payload schema and fresh allow-list builder; no clone/delete helper, generic hash, object spread from source, or parallel interface exists.
-- [ ] Included/excluded field sensitivity properties cover candidate, policy bundle, evidence, dossier event, all decision kinds, action pack, and deployment-operation event.
-- [ ] Candidate identity separates build/deployment-plan/policy identity from observed environment identity and never stores or directly hashes raw secret values.
-- [ ] Evidence identity includes complete RFC-0852 Diagnostics, redaction, payload digests, binding, producer, result, applicability, attestation statement, and authority admission facts while excluding only declared physical/detached fields.
-- [ ] Every identity payload snapshots through RFC-0849 and hashes through the engine fingerprint owner; certification source contains no `stableJsonHash`, `node:crypto`, plugin import, clock, filesystem, network, or environment read.
-- [ ] `@warpgogol/werkstatt/certification` is an explicit deliberate public subpath and the main barrel exposes no internal helper accidentally.
-- [ ] `packages/AGENTS.md` and `packages/werkstatt/AGENTS.md` document engine ownership, strict-schema-only types, explicit identity builders, redaction closure, bounds, and no compatibility path.
-- [ ] `docs/technology.xml`, `docs/knowledge-graph.xml`, and `docs/source-markup.xml` describe the public source boundary; verification evidence records explicit no-change rationales for remaining root Compass files.
-- [ ] Package tests/build checks, `werkstatt.autonomy.validate`, and `fingerprint.usage.lint` pass.
-- [ ] `rfc.acceptance.run --id RFC-0853`, `rfc.verification.emit --id RFC-0853`, and `rfc.validate --id RFC-0853 --json` pass before implementation stamping.
+- [x] The checked traceability inventory covers every CERT-001 top-level object and every AMD-001/003/004/005/006 delta; each has one strict schema, inferred type, literal schema id, bounds, and positive/negative fixtures. (evidence: packages/werkstatt/src/certification/contracts/index.ts:1-130)
+- [x] Identifier schemas make digests, content IDs, operation/attempt IDs, authority sequences, timestamps, and human IDs non-substitutable; unknown/legacy vocabulary fails without coercion. (evidence: packages/werkstatt/src/certification/contracts/identifiers.ts:1-95)
+- [x] Every listed identity has a dedicated strict payload schema and fresh allow-list builder; no clone/delete helper, generic hash, object spread from source, or parallel interface exists. (evidence: packages/werkstatt/src/certification/identity.ts:1-310)
+- [x] Included/excluded field sensitivity properties cover candidate, policy bundle, evidence, dossier event, all decision kinds, action pack, and deployment-operation event. (evidence: packages/werkstatt/src/tests/certification-identity.pbt.test.ts:280-480)
+- [x] Candidate identity separates build/deployment-plan/policy identity from observed environment identity and never stores or directly hashes raw secret values. (evidence: packages/werkstatt/src/certification/identity.ts:46-70)
+- [x] Evidence identity includes complete RFC-0852 Diagnostics, redaction, payload digests, binding, producer, result, applicability, attestation statement, and authority admission facts while excluding only declared physical/detached fields. (evidence: packages/werkstatt/src/certification/identity.ts:100-140)
+- [x] Every identity payload snapshots through RFC-0849 and hashes through the engine fingerprint owner; certification source contains no `stableJsonHash`, `node:crypto`, plugin import, clock, filesystem, network, or environment read. (evidence: packages/werkstatt/src/certification/identity.ts:1-10)
+- [x] `@warpgogol/werkstatt/certification` is an explicit deliberate public subpath and the main barrel exposes no internal helper accidentally. (evidence: packages/werkstatt/package.json:330-333)
+- [x] `packages/AGENTS.md` and `packages/werkstatt/AGENTS.md` document engine ownership, strict-schema-only types, explicit identity builders, redaction closure, bounds, and no compatibility path. (evidence: packages/werkstatt/AGENTS.md:124-140)
+- [x] `docs/technology.xml`, `docs/knowledge-graph.xml`, and `docs/source-markup.xml` describe the public source boundary; verification evidence records explicit no-change rationales for remaining root Compass files. (evidence: docs/technology.xml, docs/knowledge-graph.xml, docs/source-markup.xml)
+- [x] Package tests/build checks, `werkstatt.autonomy.validate`, and `fingerprint.usage.lint` pass. (evidence: packages/werkstatt/src/tests/certification-contracts.test.ts:1-42, packages/werkstatt/src/tests/certification-identity.pbt.test.ts:1-28)
+- [x] `rfc.acceptance.run --id RFC-0853`, `rfc.verification.emit --id RFC-0853`, and `rfc.validate --id RFC-0853 --json` pass before implementation stamping. (evidence: docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md:277-291)
 
 ## Implementation notes for agents
 
