@@ -122,6 +122,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `packages/werkstatt/src/isolation/providers/` owns concrete sandbox adapter implementations with all 12 required `IsolationPropertyEvidenceV1` properties. The fake sandbox adapter is for testing only.
 - No evolution controller, canary promotion, production agent capability, or provider-specific manifest field is introduced.
 
+### Governed capability evolution controller (RFC-0864, packet 200)
+
+- `packages/werkstatt/src/evolution/contracts.ts` owns candidates, stages, five-layer evidence bundles (definition, evaluation, observation, authority, artifact), transition records, and compensating actions. All are immutable, content-addressed, and lineage-bound.
+- `packages/werkstatt/src/evolution/reducer.ts` owns the monotonic transition reducer — forward-only sequence `defined → tested → shadowed → canary → promoted` with rollback and quarantine as compensating transitions. Enforces idempotency keys, sequence numbers, kill switch (`CERT-EVO-01`), and evidence requirements per stage.
+- `packages/werkstatt/src/evolution/guards.ts` owns Law Kernel, evidence, boundary, and kill-switch checks — self-change boundary for forbidden scopes (`CERT-EVO-GUARD-01`), evidence immutability (`CERT-EVO-GUARD-02`/`03`), authority expiry (`CERT-EVO-GUARD-05`), shadow side effects (`CERT-EVO-GUARD-06`), canary boundaries (`CERT-EVO-GUARD-07`/`08`/`09`), and evidence poisoning (`CERT-EVO-GUARD-10`/`11`).
+- `packages/werkstatt/src/evolution/controller.ts` owns inspect/define/evaluate/observe orchestration. The controller cannot change Law Kernel, permissions, effect/isolation contracts, canonical identities/diagnostics, controller code, or evaluator policy.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
