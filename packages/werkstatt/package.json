@@ -302,6 +302,18 @@
     "./testing/e2e": {
       "types": "./src/testing/e2e/index.ts",
       "default": "./src/testing/e2e/index.ts"
+    },
+    "./component-runtime/reflection": {
+      "types": "./src/component-runtime/reflection.ts",
+      "default": "./src/component-runtime/reflection.ts"
+    },
+    "./component-runtime/conformance": {
+      "types": "./src/component-runtime/conformance.ts",
+      "default": "./src/component-runtime/conformance.ts"
+    },
+    "./component-runtime/testing": {
+      "types": "./src/component-runtime/testing/harness.ts",
+      "default": "./src/component-runtime/testing/harness.ts"
     }
   },
   "files": ["src", "bin", "os"],
