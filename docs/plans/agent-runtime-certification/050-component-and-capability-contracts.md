@@ -2,54 +2,55 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 050-component-and-capability-contracts
-state: draft
+state: sealed
 governingDecision: RFC-0858
 decisionKind: rfc
 resolvedRfc: RFC-0858
 dependsOnPacket: 040-specification-reconciliation
-baseCommit: c531d216d0785c3061785ffdad008a1a10af7d2e
+baseCommit: 5987d0633fe6d69ea5b7762305620385a4e0e548
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md"
+  - path: docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md
     sha256: bdece4557c5ec7e2d97ff790e93365fe1f6d4cf6eaab2ace3cc4dd33c5f6d8e8
 allowedFiles:
-  - "packages/werkstatt/src/component/contracts.ts"
-  - "packages/werkstatt/src/component/schemas.ts"
-  - "packages/werkstatt/src/component/identity.ts"
-  - "packages/werkstatt/src/component/index.ts"
-  - "packages/werkstatt/src/component/tests/**"
-  - "packages/werkstatt/package.json"
-  - "docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md"
-  - "docs/rfcs/verification/**"
-  - "docs/architecture-dna.md"
-  - "docs/requirements.xml"
-  - "docs/technology.xml"
-  - "docs/development-plan.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/verification-plan.xml"
-  - "docs/source-markup.xml"
-  - "AGENTS.md"
-  - "packages/AGENTS.md"
-  - "packages/werkstatt/AGENTS.md"
+  - packages/werkstatt/src/component/contracts.ts
+  - packages/werkstatt/src/component/schemas.ts
+  - packages/werkstatt/src/component/identity.ts
+  - packages/werkstatt/src/component/index.ts
+  - packages/werkstatt/src/component/tests/**
+  - packages/werkstatt/package.json
+  - docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md
+  - docs/rfcs/verification/**
+  - docs/architecture-dna.md
+  - docs/requirements.xml
+  - docs/technology.xml
+  - docs/development-plan.xml
+  - docs/knowledge-graph.xml
+  - docs/verification-plan.xml
+  - docs/source-markup.xml
+  - AGENTS.md
+  - packages/AGENTS.md
+  - packages/werkstatt/AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0858"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0858
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 050: Component and capability contracts
 

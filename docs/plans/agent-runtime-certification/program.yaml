@@ -66,12 +66,12 @@ packets:
   - order: 50
     packetId: 050-component-and-capability-contracts
     file: 050-component-and-capability-contracts.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0858
     decisionKind: rfc
     resolvedRfc: RFC-0858
     dependsOnPacket: 040-specification-reconciliation
-    baseCommit: c531d216d0785c3061785ffdad008a1a10af7d2e
+    baseCommit: 5987d0633fe6d69ea5b7762305620385a4e0e548
     sealCommit: null
     completion: null
   - order: 60
