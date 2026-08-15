@@ -1,174 +1,22 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0608/RFC-0627: tests for leitstand.rollback release state transitions — auto-detect channel, auto-step state.</purpose>
-  <keywords>RFC-0608, RFC-0627, leitstand, rollback, state-machine, test</keywords>
+  <purpose>RFC-0851: leitstand.rollback blocked by CERT-TRANSITION-01 during certification transition.</purpose>
+  <keywords>RFC-0851, CERT-TRANSITION-01, leitstand, rollback, transition-block, test</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0608: add tests for leitstand.rollback release state transitions.</item>
-  <item>RFC-0627: update tests for auto-detect channel and auto-step state behavior.</item>
+  <item>RFC-0851: replace legacy rollback tests with transition-block assertion.</item>
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { test, expect } from "vitest";
 import { runLeitstandRollback } from "../leitstand/leitstand-commands.ts";
-import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
-import { expectData } from "./helpers/kernel-result-helpers.ts";
-import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
+import { expectTransitionBlock } from "./helpers/transition-block-helpers.ts";
 
-vi.mock("node:child_process", () => ({
-  execFile: (
-    _cmd: string,
-    _args: string[],
-    _opts: unknown,
-    cb: (err: Error | null, stdout: string, stderr: string) => void,
-  ) => cb(null, "3.99.0", ""),
-}));
+const context = { workspaceRoot: "/tmp", logger: { info: () => {}, success: () => {}, warn: () => {}, error: () => {}, debug: () => {} } } as unknown as KernelRuntimeContext;
 
-function makeContext(workspaceRoot: string): KernelRuntimeContext {
-  return {
-    workspaceRoot,
-    logger: {
-      info: () => {},
-      success: () => {},
-      warn: () => {},
-      error: () => {},
-      debug: () => {},
-    },
-    flags: {},
-    env: {},
-  } as unknown as KernelRuntimeContext;
-}
-
-function makeInput(flags: Record<string, string>): KernelCommandInput {
-  return { flags, argv: [] };
-}
-
-function writeReleaseManifest(
-  workspaceRoot: string,
-  releaseId: string,
-  fields: Record<string, unknown>,
-): void {
-  const releaseDir = join(workspaceRoot, "releases", releaseId);
-  mkdirSync(releaseDir, { recursive: true });
-  const lines: string[] = [];
-  for (const [key, value] of Object.entries(fields)) {
-    if (value === null) {
-      lines.push(`${key}: null`);
-    } else if (typeof value === "string") {
-      lines.push(`${key}: ${value}`);
-    } else if (typeof value === "boolean" || typeof value === "number") {
-      lines.push(`${key}: ${value}`);
-    } else {
-      lines.push(`${key}: ${JSON.stringify(value)}`);
-    }
-  }
-  writeFileSync(join(releaseDir, "release.yaml"), lines.join("\n") + "\n");
-}
-
-function readReleaseState(workspaceRoot: string, releaseId: string): string {
-  const content = readFileSync(join(workspaceRoot, "releases", releaseId, "release.yaml"), "utf8");
-  for (const line of content.split("\n")) {
-    const match = line.match(/^state:\s*(.*)$/);
-    if (match) return match[1];
-  }
-  return "";
-}
-
-function createRegistryWithLastPropagated(
-  testRoot: string,
-  systemId: string,
-  channel: string,
-  releaseId: string,
-): void {
-  const lastPropagated = `  ${channel}:
-    releaseId: ${releaseId}
-    at: 2026-01-01T00:00:00.000Z
-    healthy: true
-    state: succeeded
-    operationId: op-123
-    leaseExpiresAt: null
-`;
-  createLeitstandSystem(testRoot, systemId, { lastPropagated });
-}
-
-function createDistDir(workspaceRoot: string, releaseId: string): string {
-  const distDir = join(workspaceRoot, "releases", releaseId, "dist");
-  mkdirSync(distDir, { recursive: true });
-  writeFileSync(join(distDir, "index.html"), "<html><body>Hello</body></html>");
-  return distDir;
-}
-
-let testRoot: string;
-let tmpDir: string;
-
-beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-rb-"));
-  tmpDir = join(testRoot, "workspace");
-  mkdirSync(tmpDir, { recursive: true });
-});
-
-afterEach(() => {
-  rmSync(testRoot, { recursive: true, force: true });
-  vi.restoreAllMocks();
-});
-
-test("leitstand.rollback auto-detects main from promoted, steps to alt-deployed", async () => {
-  const systemId = "test-sys";
-  const currentRelease = "test-sys-r000002";
-  const targetRelease = "test-sys-r000001";
-
-  createRegistryWithLastPropagated(testRoot, systemId, "main", currentRelease);
-  writeReleaseManifest(tmpDir, currentRelease, {
-    systemId,
-    state: "promoted",
-    missionId: "test-sys-m000001",
-  });
-  writeReleaseManifest(tmpDir, targetRelease, {
-    systemId,
-    state: "ready",
-    missionId: "test-sys-m000001",
-  });
-  const distDir = createDistDir(tmpDir, targetRelease);
-  await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
-
-  const result = await runLeitstandRollback(
-    makeInput({ site: systemId, "to-release": targetRelease }),
-    makeContext(tmpDir),
-  );
-
-  expect(expectData(result).state).toBe("succeeded");
-  expect(expectData(result).channel).toBe("main");
-  expect(readReleaseState(tmpDir, currentRelease)).toBe("alt-deployed");
-});
-
-test("leitstand.rollback auto-detects alt from alt-deployed, steps to published", async () => {
-  const systemId = "test-sys";
-  const currentRelease = "test-sys-r000002";
-  const targetRelease = "test-sys-r000001";
-
-  createRegistryWithLastPropagated(testRoot, systemId, "alt", currentRelease);
-  writeReleaseManifest(tmpDir, currentRelease, {
-    systemId,
-    state: "alt-deployed",
-    missionId: "test-sys-m000001",
-  });
-  writeReleaseManifest(tmpDir, targetRelease, {
-    systemId,
-    state: "ready",
-    missionId: "test-sys-m000001",
-  });
-  const distDir = createDistDir(tmpDir, targetRelease);
-  await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
-
-  const result = await runLeitstandRollback(
-    makeInput({ site: systemId, "to-release": targetRelease }),
-    makeContext(tmpDir),
-  );
-
-  expect(expectData(result).state).toBe("succeeded");
-  expect(expectData(result).channel).toBe("alt");
-  expect(readReleaseState(tmpDir, currentRelease)).toBe("ready");
+test("leitstand.rollback blocked by CERT-TRANSITION-01", async () => {
+  const input: KernelCommandInput = { flags: { site: "test-sys" }, argv: [] };
+  const result = await runLeitstandRollback(input, context);
+  expectTransitionBlock(result, "leitstand.rollback");
 });

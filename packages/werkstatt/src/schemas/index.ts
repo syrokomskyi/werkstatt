@@ -102,9 +102,12 @@ export type { MaterializationReport, ValidationReport, AuthoredDiff } from "./ma
 export { releaseArtifactManifestSchema, releaseArtifactRefSchema } from "./artifact-store.ts";
 export type { ReleaseArtifactManifest, ReleaseArtifactRef } from "./artifact-store.ts";
 
-// RFC-0357: Release discipline and behavior snapshot schemas.
+// RFC-0357/RFC-0851: Release discipline and behavior snapshot schemas.
 export {
+  releaseArtifactStateSchema,
   releaseStateSchema,
+  legacyReleaseStateSchema,
+  legacyReleaseDiagnosticSchema,
   releaseManifestSchema,
   releaseArtifactRefSchema as releaseArtifactRefSchemaV2,
   behaviorSnapshotDifferenceSchema,
@@ -112,7 +115,10 @@ export {
   buildIdentitySchema,
 } from "./release.ts";
 export type {
+  ReleaseArtifactState,
   ReleaseState,
+  LegacyReleaseState,
+  LegacyReleaseDiagnostic,
   ReleaseManifest,
   BuildIdentity,
   BehaviorSnapshotDifference,
