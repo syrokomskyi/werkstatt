@@ -9,10 +9,10 @@ export type {
   StorageVerifyOutcomeV1,
 } from "./adapter.ts";
 
-export {
-  createInMemoryStorageAdapter,
-  verifyStoredObject,
-} from "./adapter.ts";
+export { createInMemoryStorageAdapter, verifyStoredObject } from "./adapter.ts";
+
+export type { R2StorageConfig } from "./r2-adapter.ts";
+export { createR2StorageAdapter } from "./r2-adapter.ts";
 
 export type {
   DossierRepositoryV1,
@@ -47,8 +47,4 @@ export type {
   DurableReplicaVerifyOutcomeV1,
 } from "./retention.ts";
 
-export {
-  checkRetentionGc,
-  createTombstone,
-  verifyDurableReplica,
-} from "./retention.ts";
+export { checkRetentionGc, createTombstone, verifyDurableReplica } from "./retention.ts";
