@@ -396,13 +396,15 @@
           `packages/werkstatt/src/release/release-commands.ts` to use strict
           `releaseManifestSchema` validation via the `yaml` package; manifests with legacy
           states throw `LegacyReleaseError`. Updated `release.list` to report valid releases
-          separately from `legacyInvalid` entries. Blocked all Leitstand commands
+          separately from `legacyInvalid` entries. Initially blocked all Leitstand commands
           (dev-deploy, propagate, promote, status, rollback, health, pipeline.check) and
           `release.rollback` with `CERT-TRANSITION-01` via
           `buildCertificationTransitionBlock` in
           `packages/werkstatt/src/certification/transition-block.ts`. Updated all affected
           tests to use YAML serialization and strict schema fields. Updated DNA-48, DNA-49,
-          and DNA-73 in `docs/architecture-dna.md`.
+          and DNA-73 in `docs/architecture-dna.md`. The `CERT-TRANSITION-01` block was
+          subsequently removed by RFC-0865, which reconnected all 8 commands to
+          `authorizeDeployment()`/`verifyMainPromotion()`/`evaluateRollback()`.
         </description>
       </deliverable>
       <deliverable id="del-0848">
@@ -515,6 +517,13 @@
         <status>done</status>
         <description>
           Implement `packages/werkstatt/src/certification/cleanup/legacy-artifacts.ts` with idempotent inventory/plan/apply command for post-cutover legacy artifact cleanup. CleanupInventoryV1 (legacy + protected artifacts with byte counts and deterministic hash), CleanupPlanV1 (paths to delete/protect, total bytes to free, plan hash), CleanupTombstoneV1 (per-deletion record), CleanupReportV1 (freed bytes, remaining protected, mirror verification, recovery possibility). verifyCleanupPrerequisites enforces cutover marker, bootstrap exception closure, main-certified candidate match, durable dossier, mirrors, rollback references (CERT-CLEANUP-01..07). validatePlan rejects plan hash drift, inventory hash drift, unknown paths, and protected paths in deletion plan (CERT-CLEANUP-08..11). checkPathSafety rejects symlinks outside allowed roots. isSafeNoOp detects idempotent re-apply. verifyReportIntegrity validates freed bytes match tombstone sum. 31 tests covering prerequisites, inventory, plan, validation, tombstones, reports, no-op detection, integrity, and path safety.
+        </description>
+      </deliverable>
+      <deliverable id="del-0865">
+        <name>RFC-0865: Connect CERT-007 deployment authority to Leitstand command surface</name>
+        <status>implemented</status>
+        <description>
+          Rewrote all 8 deployment commands (leitstand.dev-deploy, leitstand.propagate, leitstand.promote, leitstand.status, leitstand.rollback, leitstand.health, leitstand.pipeline.check, release.rollback) to call authorizeDeployment(), verifyMainPromotion(), and evaluateRollback() from packages/werkstatt/src/certification/deployment/authority.ts via packages/werkstatt/src/leitstand/deploy-helpers.ts. Removed buildCertificationTransitionBlock imports from leitstand-commands.ts and release-commands.ts. Implemented R2 durable storage adapter (packages/werkstatt/src/certification/storage/r2-adapter.ts) for Alt/Main gate durable sync verification. Implemented minimal Astro certification profile (packages/werkstatt/src/certification/profile/astro-profile.ts) with 9 dimension coverage. Deleted PIPELINE_STATE_ORDER, detectChannelFromState, autoStepReleaseState, releaseStateIndex from leitstand-commands.ts; simplified determineNextStep to artifact-only states. Updated AGENTS.md, packages/werkstatt/AGENTS.md, docs/architecture-dna.md (DNA-49, DNA-73). 29 tests across deploy-helpers, r2-adapter, and astro-profile test files; 12 tests across 11 updated leitstand handoff test files.
         </description>
       </deliverable>
     </phase>

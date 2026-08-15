@@ -460,7 +460,7 @@
     </entry>
     <entry id="vm-20">
       <change-type>RFC-0851 release state transition or manifest schema changes</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/werkstatt test`, `pnpm --filter @warpgogol/werkstatt build`, `pnpm exec werkstatt run rfc.validate --id RFC-0851`, and all release/leitstand handoff tests. Verify that release manifests with legacy states throw `LegacyReleaseError`, `release.list` separates `legacyInvalid` entries, all Leitstand commands and `release.rollback` return `CERT-TRANSITION-01`, and no `--force`/`--legacy`/`--skip-certification` flag exists.</expectation>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt test`, `pnpm --filter @warpgogol/werkstatt build`, `pnpm exec werkstatt run rfc.validate --id RFC-0851`, and all release/leitstand handoff tests. Verify that release manifests with legacy states throw `LegacyReleaseError`, `release.list` separates `legacyInvalid` entries, all Leitstand commands and `release.rollback` call `authorizeDeployment()`/`verifyMainPromotion()`/`evaluateRollback()` via `deploy-helpers.ts` (RFC-0865), and no `--force`/`--legacy`/`--skip-certification` flag exists.</expectation>
     </entry>
     <entry id="vm-21">
       <change-type>RFC-0848 cross-module integration suite changes</change-type>
@@ -509,6 +509,10 @@
     <entry id="vm-32">
       <change-type>CERT-010 post-cutover legacy artifact cleanup changes</change-type>
       <expectation>Run `vitest` on `certification-legacy-artifacts-cleanup.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify `verifyCleanupPrerequisites` rejects missing cutover marker, open bootstrap exception, missing/mismatched main-certified candidate, unverified dossier/mirrors/rollback references; `buildInventory` produces deterministic hash with correct byte totals; `buildPlan` includes only allowed-for-deletion paths; `validatePlan` rejects plan hash drift, inventory hash drift, unknown paths, and protected paths in deletion plan; `buildTombstone` records per-deletion metadata; `buildReport` computes freed bytes from tombstones; `isSafeNoOp` detects idempotent re-apply; `verifyReportIntegrity` validates freed bytes match tombstone sum; `checkPathSafety` rejects symlinks outside allowed roots.</expectation>
+    </entry>
+    <entry id="vm-33">
+      <change-type>RFC-0865 Leitstand deployment command unblocking or deploy-helpers changes</change-type>
+      <expectation>Run `vitest` on `deploy-helpers.test.ts`, `r2-adapter.test.ts`, `astro-profile.test.ts`, and all `tests-handoff/leitstand-*.test.ts` files, `tsc --noEmit` for `@warpgogol/werkstatt`, and `rfc.validate --id RFC-0865`. Verify `leitstand.dev-deploy` calls `authorizeDeployment(gate: "dev-deploy")`, `leitstand.propagate` calls `authorizeDeployment(gate: "propagate-alt")` with R2 durable sync, `leitstand.promote` calls `verifyMainPromotion()`, `leitstand.rollback` and `release.rollback` call `evaluateRollback()`, `leitstand.status`/`leitstand.health`/`leitstand.pipeline.check` return successfully, `buildCertificationTransitionBlock` is not imported in `leitstand-commands.ts` or `release-commands.ts`, and `PIPELINE_STATE_ORDER`/`detectChannelFromState`/`autoStepReleaseState` are deleted.</expectation>
     </entry>
   </change-validation-matrix>
 </verification-plan>

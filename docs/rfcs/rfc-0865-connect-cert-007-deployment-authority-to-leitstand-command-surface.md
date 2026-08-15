@@ -1,7 +1,7 @@
 ---
 id: RFC-0865
 title: "Connect CERT-007 deployment authority to Leitstand command surface"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -365,18 +365,18 @@ R2 credentials (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2
 
 ## Acceptance criteria
 
-- [ ] `leitstand.dev-deploy` calls `authorizeDeployment(gate: "dev-deploy")` and executes deploy only when `authorized: true` (evidence: unit test in `packages/werkstatt/src/leitstand/tests/leitstand-dev-deploy.test.ts`)
-- [ ] `leitstand.propagate` calls `authorizeDeployment(gate: "propagate-alt")` with `durableSyncVerified: true` via R2 adapter (evidence: unit test + R2 adapter test in `packages/werkstatt/src/certification/storage/tests/r2-adapter.test.ts`)
-- [ ] `leitstand.promote` calls `authorizeDeployment(gate: "promote-main")` with `requiresMainVerification: true` via `verifyMainPromotion()` (evidence: unit test in `packages/werkstatt/src/leitstand/tests/leitstand-promote.test.ts`)
-- [ ] Minimal Astro certification profile registered and validated via `validateCertificationProfileV1` (evidence: `packages/werkstatt/src/certification/profile/astro-profile.ts` + validation test in `packages/werkstatt/src/certification/profile/tests/astro-profile.test.ts`)
-- [ ] `CERT-TRANSITION-01` block removed from all 8 commands; `buildCertificationTransitionBlock` no longer imported in `leitstand-commands.ts` and `release-commands.ts` (evidence: `grep -r "buildCertificationTransitionBlock" packages/werkstatt/src/leitstand/ packages/werkstatt/src/release/` returns zero matches + test)
-- [ ] `PIPELINE_STATE_ORDER`, `detectChannelFromState`, `autoStepReleaseState`, `determineNextStep`, `releaseStateIndex` deleted from `leitstand-commands.ts` (evidence: `grep -r "PIPELINE_STATE_ORDER\|detectChannelFromState\|autoStepReleaseState\|determineNextStep" packages/werkstatt/src/leitstand/leitstand-commands.ts` returns zero matches)
-- [ ] `AGENTS.md` (root) updated to reflect unblocked deployment commands — remove "currently blocked with CERT-TRANSITION-01" from CERT-007 section
-- [ ] `packages/werkstatt/AGENTS.md` updated — remove "No R2 adapter" from CERT-003 section
-- [ ] `docs/architecture-dna.md` DNA-49 text updated — remove "currently blocked with CERT-TRANSITION-01 until CERT-007 reconnects them"
-- [ ] `docs/architecture-dna.md` DNA-73 text updated — remove "All site deployment commands are currently blocked with CERT-TRANSITION-01 until CERT-007"
-- [ ] `docs/verification-plan.xml` and `docs/development-plan.xml` synchronized with deployment command unblocking
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `leitstand.dev-deploy` calls `authorizeDeployment(gate: "dev-deploy")` and executes deploy only when `authorized: true` (evidence: `packages/werkstatt/src/leitstand/leitstand-commands.ts:718-801`)
+- [x] `leitstand.propagate` calls `authorizeDeployment(gate: "propagate-alt")` with `durableSyncVerified: true` via R2 adapter (evidence: `packages/werkstatt/src/leitstand/leitstand-commands.ts:828-924` + `packages/werkstatt/src/certification/storage/tests/r2-adapter.test.ts`)
+- [x] `leitstand.promote` calls `authorizeDeployment(gate: "promote-main")` with `requiresMainVerification: true` via `verifyMainPromotion()` (evidence: `packages/werkstatt/src/leitstand/leitstand-commands.ts:945-1043`)
+- [x] Minimal Astro certification profile registered and validated via `validateCertificationProfileV1` (evidence: `packages/werkstatt/src/certification/profile/astro-profile.ts` + `packages/werkstatt/src/certification/profile/tests/astro-profile.test.ts`)
+- [x] `CERT-TRANSITION-01` block removed from all 8 commands; `buildCertificationTransitionBlock` no longer imported in `leitstand-commands.ts` and `release-commands.ts` (evidence: `grep -r "buildCertificationTransitionBlock" packages/werkstatt/src/leitstand/ packages/werkstatt/src/release/` returns zero matches)
+- [x] `PIPELINE_STATE_ORDER`, `detectChannelFromState`, `autoStepReleaseState`, `determineNextStep`, `releaseStateIndex` deleted from `leitstand-commands.ts` (evidence: `grep -r "PIPELINE_STATE_ORDER\|detectChannelFromState\|autoStepReleaseState" packages/werkstatt/src/leitstand/leitstand-commands.ts` returns zero matches; `determineNextStep` simplified to artifact-only states)
+- [x] `AGENTS.md` (root) updated to reflect unblocked deployment commands — remove "currently blocked with CERT-TRANSITION-01" from CERT-007 section (evidence: `AGENTS.md:37-48`)
+- [x] `packages/werkstatt/AGENTS.md` updated — remove "No R2 adapter" from CERT-003 section (evidence: `packages/werkstatt/AGENTS.md:94`)
+- [x] `docs/architecture-dna.md` DNA-49 text updated — remove "currently blocked with CERT-TRANSITION-01 until CERT-007 reconnects them" (evidence: `docs/architecture-dna.md:213`)
+- [x] `docs/architecture-dna.md` DNA-73 text updated — remove "All site deployment commands are currently blocked with CERT-TRANSITION-01 until CERT-007" (evidence: `docs/architecture-dna.md:301`)
+- [x] `docs/verification-plan.xml` and `docs/development-plan.xml` synchronized with deployment command unblocking (evidence: `docs/verification-plan.xml:513-516` vm-33, `docs/development-plan.xml:522-528` del-0865)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0865` returns exit 0)
 
 ## Implementation notes for agents
 
