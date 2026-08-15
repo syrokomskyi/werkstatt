@@ -7,12 +7,12 @@ governingDecision: RFC-0858
 decisionKind: rfc
 resolvedRfc: RFC-0858
 dependsOnPacket: 040-specification-reconciliation
-baseCommit: null
+baseCommit: c531d216d0785c3061785ffdad008a1a10af7d2e
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md"
-    sha256: 6d75771fcf1379f47555296de73a2f643b65625f640e3cb37c19b50e532eb647
+    sha256: bdece4557c5ec7e2d97ff790e93365fe1f6d4cf6eaab2ace3cc4dd33c5f6d8e8
 allowedFiles:
   - "packages/werkstatt/src/component/contracts.ts"
   - "packages/werkstatt/src/component/schemas.ts"

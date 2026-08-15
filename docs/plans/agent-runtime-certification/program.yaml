@@ -71,7 +71,7 @@ packets:
     decisionKind: rfc
     resolvedRfc: RFC-0858
     dependsOnPacket: 040-specification-reconciliation
-    baseCommit: null
+    baseCommit: c531d216d0785c3061785ffdad008a1a10af7d2e
     sealCommit: null
     completion: null
   - order: 60
