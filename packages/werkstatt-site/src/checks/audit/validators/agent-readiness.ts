@@ -17,7 +17,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, getAuditPageInfo, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import { pathExists } from "../../content-discipline.ts";
 import {
   collectRenderedHtml,
@@ -34,7 +34,7 @@ export async function runAuditAgentReadinessValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
   const publicPaths = ["llms.txt", "llms-full.txt", "ai.txt"];
   for (const file of publicPaths) {
     if (!(await pathExists(join(audit.publicDirectory, file)))) {

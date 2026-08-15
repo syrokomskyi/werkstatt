@@ -20,7 +20,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { readServicesRegistry } from "@warpgogol/werkstatt/sternsystem";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import { pathExists } from "../../content-discipline.ts";
 import {
   finding,
@@ -58,7 +58,7 @@ export async function runAnalyticsConfigValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
   const analyticsConfigPath = join(audit.onboardingComposeDirectory, "analytics-config.yaml");
   if (!(await pathExists(analyticsConfigPath))) {
     findings.push(

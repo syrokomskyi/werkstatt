@@ -22,12 +22,11 @@ import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import {
   auditLlmCacheEntrySchema,
   auditResultSchema,
-  type AuditFinding,
   type AuditLlmCacheEntry,
   type AuditLlmKind,
   type AuditResult,
-  type AuditSeverity,
 } from "./types.ts";
+import type { Diagnostic, DiagnosticSeverity } from "./types.ts";
 import { getContentDisciplinePaths, pathExists } from "../content-discipline.ts";
 
 interface FamilyYaml {
@@ -87,7 +86,7 @@ export interface AuditPageInfo {
   structuredData: string[];
 }
 
-export function summarizeAuditFindings(findings: AuditFinding[]): Record<AuditSeverity, number> {
+export function summarizeAuditFindings(findings: Diagnostic[]): Record<DiagnosticSeverity, number> {
   return {
     error: findings.filter((finding) => finding.severity === "error").length,
     warning: findings.filter((finding) => finding.severity === "warning").length,
@@ -98,7 +97,7 @@ export function summarizeAuditFindings(findings: AuditFinding[]): Record<AuditSe
 export function buildAuditResult(params: {
   command: string;
   app: string;
-  findings: AuditFinding[];
+  findings: Diagnostic[];
   runtimeMs: number;
   kind?: string;
   cacheStats?: { hits: number; misses: number };

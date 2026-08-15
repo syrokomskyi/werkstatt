@@ -17,7 +17,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import { pathExists } from "../../content-discipline.ts";
 import { finding } from "./helpers.ts";
 
@@ -27,7 +27,7 @@ export async function runInfraBriefValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
   const infraPath = join(audit.onboardingScaffoldDirectory, "infra-config.yaml");
   const wranglerPath = join(audit.appDirectory, "wrangler.jsonc");
   const workflowDir = join(audit.appDirectory, "..", "..", ".github", "workflows");

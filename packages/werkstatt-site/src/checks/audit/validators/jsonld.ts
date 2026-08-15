@@ -20,7 +20,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import {
   collectRenderedHtml,
   extractAllJsonLdNodes,
@@ -42,7 +42,7 @@ export async function runJsonLdUrlValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
 
   const htmlFiles = await collectRenderedHtml(audit.distDirectory);
   if (htmlFiles.length === 0) {
@@ -126,7 +126,7 @@ export async function runJsonLdParityValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
 
   const defaultLang = defaultLanguageFromManifest(audit.systemManifest);
   let socials: unknown;

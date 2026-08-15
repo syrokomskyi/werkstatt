@@ -23,7 +23,7 @@ import { jsonldTypes, type JsonldSurfacePolicyEntry } from "@warpgogol/werkstatt
 import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import { parse as yamlParse } from "yaml";
 import { buildAuditResult, getAuditPageInfo, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import {
   collectRenderedHtml,
   escapeRegExp,
@@ -64,7 +64,7 @@ export async function runSeoStructuredDataValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
   const htmlFiles = await collectRenderedHtml(audit.distDirectory);
   // Required JSON-LD types are resolved PER PAGE, not globally. The family
   // agent-readiness baseline (e.g. [Organization, FAQPage, Service]) applies to

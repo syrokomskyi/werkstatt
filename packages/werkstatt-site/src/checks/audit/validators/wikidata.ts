@@ -28,7 +28,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import { collectRenderedHtml, extractJsonLdGraph, finding, jsonLdNodeHasType } from "./helpers.ts";
 
 // ---------------------------------------------------------------------------
@@ -112,7 +112,7 @@ export function validateQidPresence(
   entityType: "business" | "brand" | "legal-identity",
   externalIds: ExternalIdentifiers | undefined,
   contentFile: string,
-): AuditFinding | null {
+): Diagnostic | null {
   const ruleId: WikidataValidationRule =
     entityType === "business"
       ? "wikidata.business-missing-qid"
@@ -146,9 +146,9 @@ export function validateQidPresence(
 export function validateUrlConstruction(
   externalIds: ExternalIdentifiers | undefined,
   contentFile: string,
-): AuditFinding[] {
+): Diagnostic[] {
   if (!externalIds) return [];
-  const results: AuditFinding[] = [];
+  const results: Diagnostic[] = [];
   for (const [key, id] of Object.entries(externalIds)) {
     const url = constructSameAsUrl(id);
     if (!isValidHttpsUrl(url)) {
@@ -169,7 +169,7 @@ export function validateUrlConstruction(
 export function validateLegalIdentityLegalName(
   legalName: string | undefined,
   contentFile: string,
-): AuditFinding | null {
+): Diagnostic | null {
   if (!legalName || legalName.trim() === "") {
     return finding({
       ruleId: "wikidata.legalidentity-missing-legalname",
@@ -193,7 +193,7 @@ export function validateProjectionParity(
   renderedSameAsUrls: string[],
   contentFile: string,
   renderedFile: string,
-): AuditFinding[] {
+): Diagnostic[] {
   if (pbpSameAsUrls.length === 0) return [];
   const renderedSet = new Set(renderedSameAsUrls);
   const missing = pbpSameAsUrls.filter((url) => !renderedSet.has(url));
@@ -216,7 +216,7 @@ export function validateNotabilityEvidence(
   hasQid: boolean,
   evidenceSources: EvidenceSourceRecord[],
   contentFile: string,
-): AuditFinding | null {
+): Diagnostic | null {
   if (!hasQid) return null;
   const hasExternal = evidenceSources.some((es) => NOTABILITY_EVIDENCE_KINDS.includes(es.kind));
   if (hasExternal) return null;
@@ -233,8 +233,8 @@ export function validateNotabilityEvidence(
 export function validateClaimEvidenceCoverage(
   claims: ClaimRecord[],
   contentDir: string,
-): AuditFinding[] {
-  const results: AuditFinding[] = [];
+): Diagnostic[] {
+  const results: Diagnostic[] = [];
   for (const claim of claims) {
     if (claim.claimClass !== "factual") continue;
     const hasRefs = claim.evidenceRefs && Object.keys(claim.evidenceRefs).length > 0;
@@ -258,8 +258,8 @@ export function validateEvidenceReferences(
   claims: ClaimRecord[],
   evidenceSourceIds: Set<string>,
   contentDir: string,
-): AuditFinding[] {
-  const results: AuditFinding[] = [];
+): Diagnostic[] {
+  const results: Diagnostic[] = [];
   for (const claim of claims) {
     if (!claim.evidenceRefs) continue;
     for (const [key, ref] of Object.entries(claim.evidenceRefs)) {
@@ -283,8 +283,8 @@ export function validateEvidenceReferences(
 export function validateEvidenceSourceUrls(
   evidenceSources: EvidenceSourceRecord[],
   contentDir: string,
-): AuditFinding[] {
-  const results: AuditFinding[] = [];
+): Diagnostic[] {
+  const results: Diagnostic[] = [];
   for (const es of evidenceSources) {
     const hasUrl =
       es.items && Object.values(es.items).some((item) => item.url && item.url.trim() !== "");
@@ -304,7 +304,7 @@ export function validateEvidenceSourceUrls(
   return results;
 }
 
-function escalateStrictWarnings(findings: AuditFinding[], strict: boolean): AuditFinding[] {
+function escalateStrictWarnings(findings: Diagnostic[], strict: boolean): Diagnostic[] {
   if (!strict) return findings;
   return findings.map((f) =>
     STRICT_ESCALATION_RULES.includes(f.ruleId) ? { ...f, severity: "error" as const } : f,
@@ -388,7 +388,7 @@ export async function runWikidataValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
   const strict = input.flags.strict === true;
 
   const defaultLang = defaultLanguageFromManifest(audit.systemManifest);

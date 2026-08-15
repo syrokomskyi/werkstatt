@@ -18,7 +18,7 @@ import { parseOnboardingArtifactPayload } from "@warpgogol/werkstatt-site/share/
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { normalizeAuditPath } from "../helpers.ts";
 export { normalizeAuditPath };
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 
 /**
  * Permissive Zod schema used to pass the RFC-0082 helper's signature for audit
@@ -36,11 +36,8 @@ export function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function finding(params: Omit<AuditFinding, "id"> & { id?: string }): AuditFinding {
-  return {
-    id: params.id ?? `f-${Math.random().toString(16).slice(2, 8)}`,
-    ...params,
-  };
+export function finding(params: Diagnostic): Diagnostic {
+  return params;
 }
 
 export const MATOMO_REGISTRY_PATH = join(

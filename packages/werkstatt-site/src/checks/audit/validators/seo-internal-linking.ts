@@ -18,7 +18,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import { pathExists } from "../../content-discipline.ts";
 import { collectRenderedHtml, finding, parseYaml } from "./helpers.ts";
 
@@ -28,7 +28,7 @@ export async function runSeoInternalLinkingValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
   const linkingPlanPath = join(audit.onboardingComposeDirectory, "linking-plan.yaml");
   const linkingPlan = (await pathExists(linkingPlanPath))
     ? (parseYaml(await readFile(linkingPlanPath, "utf8")) as Record<string, unknown>)

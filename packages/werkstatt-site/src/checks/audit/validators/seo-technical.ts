@@ -21,7 +21,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import { escapeXml, finding } from "./helpers.ts";
 
 export async function runSeoTechnicalValidate(
@@ -30,7 +30,7 @@ export async function runSeoTechnicalValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
   const system = (await loadSystemManifest(audit.contentDirectory)).manifest;
   // RFC-0143: sitemap inclusion is declared via output.sitemap.
   // Narrow locally to the fields we read rather than `as any`.

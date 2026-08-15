@@ -18,7 +18,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
-import type { AuditFinding } from "../types.ts";
+import type { Diagnostic } from "../types.ts";
 import {
   collectRenderedHtml,
   extractMetaContent,
@@ -37,7 +37,7 @@ export async function runRobotsPageValidate(
 ): Promise<KernelCommandResult> {
   const started = Date.now();
   const audit = await loadAuditAppContext(context);
-  const findings: AuditFinding[] = [];
+  const findings: Diagnostic[] = [];
 
   const htmlFiles = await collectRenderedHtml(audit.distDirectory);
   if (htmlFiles.length === 0) {

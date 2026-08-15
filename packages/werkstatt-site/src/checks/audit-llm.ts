@@ -36,8 +36,8 @@ import {
 import {
   auditLlmKindSchema,
   auditResultSchema,
-  type AuditFinding,
   type AuditLlmKind,
+  type Diagnostic,
 } from "./audit/types.ts";
 import { parseVoiceProfileFile } from "@warpgogol/werkstatt-site/share/content-discipline";
 import { pathExists } from "./content-discipline.ts";
@@ -50,11 +50,9 @@ const RULE_FILE_BY_KIND: Partial<Record<AuditLlmKind, string>> = {
 const auditLlmResponseSchema = z.object({
   findings: z.array(
     z.object({
-      id: z.string(),
       ruleId: z.string(),
       severity: z.enum(["info", "warn", "error"]),
       file: z.string().nullable(),
-      blockId: z.string().nullable(),
       line: z.number().int().positive().nullable(),
       message: z.string(),
       evidence: z.array(
@@ -67,21 +65,18 @@ const auditLlmResponseSchema = z.object({
           snippet: z.string().nullable(),
         }),
       ),
-      suggestion: z.string().nullable(),
     }),
   ),
 });
 
 function normalizeFindings(
   findings: z.infer<typeof auditLlmResponseSchema>["findings"],
-): AuditFinding[] {
+): Diagnostic[] {
   return findings.map((finding) => ({
-    id: finding.id,
     ruleId: finding.ruleId,
     // RFC-0203: normalize the legacy LLM "warn" spelling into canonical "warning".
     severity: finding.severity === "warn" ? "warning" : finding.severity,
     file: finding.file ?? undefined,
-    blockId: finding.blockId ?? undefined,
     line: finding.line ?? undefined,
     message: finding.message,
     evidence: finding.evidence.map((evidence) => ({
@@ -92,7 +87,6 @@ function normalizeFindings(
       url: evidence.url ?? undefined,
       snippet: evidence.snippet ?? undefined,
     })),
-    suggestion: finding.suggestion ?? undefined,
   }));
 }
 
@@ -147,7 +141,6 @@ export async function runAuditLlm(
       app: audit.siteName,
       findings: [
         {
-          id: "f-missing-archetype",
           ruleId: "audit-llm.missing-archetype",
           severity: "error",
           message: "audit.llm.run --kind=archetype-lens requires --archetype.",
@@ -169,7 +162,6 @@ export async function runAuditLlm(
       app: audit.siteName,
       findings: [
         {
-          id: "f-missing-prompt",
           ruleId: "audit-llm.missing-prompt-template",
           severity: "error",
           message: error instanceof Error ? error.message : String(error),
@@ -209,7 +201,6 @@ export async function runAuditLlm(
       app: audit.siteName,
       findings: [
         {
-          id: "f-missing-rules",
           ruleId: "audit-llm.missing-rule-file",
           severity: "error",
           file: rulesPath,
@@ -257,7 +248,6 @@ export async function runAuditLlm(
       app: audit.siteName,
       findings: [
         {
-          id: "f-provider-missing",
           ruleId: "audit-llm.provider-not-configured",
           severity: "error",
           message:
@@ -283,7 +273,6 @@ export async function runAuditLlm(
       app: audit.siteName,
       findings: [
         {
-          id: "f-missing-voice-profile",
           ruleId: "audit-llm.missing-voice-profile",
           severity: "error",
           file: voiceProfilePath,
@@ -313,7 +302,7 @@ export async function runAuditLlm(
     renderedMachineReadableContent: sanitizeAuditPromptText(llmsFull),
   };
 
-  let findings: AuditFinding[] | null = null;
+  let findings: Diagnostic[] | null = null;
   try {
     const model = buildClient(llmRuntime);
     let lastError: unknown;
@@ -347,7 +336,6 @@ export async function runAuditLlm(
       app: audit.siteName,
       findings: [
         {
-          id: "f-provider-failed",
           ruleId: "audit-llm.provider-failure",
           severity: "error",
           message: (error as Error).message,

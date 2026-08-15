@@ -38,6 +38,11 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 
 ## Ownership boundaries
 
+### Canonical Diagnostic schema (RFC-0852)
+
+- `packages/werkstatt/src/schemas/diagnostic.ts` is the sole owner of `DiagnosticSeverity`, `DiagnosticEvidence`, and `Diagnostic` strict Zod schemas and inferred types. All packages MUST import diagnostic schemas from `@warpgogol/werkstatt/schemas` — no package may redeclare, duplicate, or alias these types.
+- Legacy aliases (`auditSeveritySchema`, `auditEvidenceSchema`, `auditFindingSchema`, `AuditFinding`) and deprecated fields (`id`, `blockId`, `suggestion`) are removed. No compatibility alias, parser, or dual schema may be reintroduced.
+
 ### RFC-0855 transition boundary
 
 RFC-0855 supersedes the one-plugin architecture as the target but does not authorize immediate source edits. Follow `docs/plans/agent-runtime-certification/program.yaml` one sealed packet at a time. Current `werkstatt/plugin@1` files remain truthful pre-cutover code facts until packet 230 removes them; do not add new dependencies or compatibility layers around that contract. Engine-owned component graph, lifecycle, grants/effects, isolation, certification, and evolution contracts belong in `@warpgogol/werkstatt`; stack packages contribute profile-selected capabilities without engine back-imports. A package change outside the active packet allow-list is forbidden even when it appears necessary for compilation.

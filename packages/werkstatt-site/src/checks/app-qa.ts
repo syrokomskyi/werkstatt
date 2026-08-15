@@ -25,7 +25,7 @@ import {
   buildAuditResult,
   renderAuditReportMarkdown,
 } from "./audit/helpers.ts";
-import { type AuditFinding, type AuditResult } from "./audit/types.ts";
+import { type Diagnostic, type AuditResult } from "./audit/types.ts";
 
 // RFC-0085: author-phase deterministic audits — safe to run without
 // apps/<id>/dist/. These mirror the deterministic subset of
@@ -136,8 +136,7 @@ export async function runAppQaValidate(
   }
 
   if (phaseData) {
-    const phaseFindings: AuditFinding[] = (phaseData.findings ?? []).map((finding, index) => ({
-      id: `onboarding-phase-${index + 1}`,
+    const phaseFindings: Diagnostic[] = (phaseData.findings ?? []).map((finding) => ({
       ruleId: finding.ruleId,
       // RFC-0203: normalize the upstream phase "warn" spelling into "warning".
       severity: finding.severity === "warn" ? "warning" : finding.severity,
