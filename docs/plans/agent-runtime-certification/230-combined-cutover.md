@@ -43,6 +43,12 @@ allowedFiles:
   - "AGENTS.md"
   - "packages/AGENTS.md"
   - "packages/werkstatt/AGENTS.md"
+  - "package.json"
+  - "packages/werkstatt/package.json"
+  - "packages/werkstatt-site/package.json"
+  - "packages/werkstatt-game/package.json"
+  - "packages/werkstatt-video/package.json"
+  - "packages/forge/package.json"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -137,7 +143,7 @@ Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, im
 
 1. Re-run decision, status, hash, branch, ancestry, lease, dirty-tree, and path-policy checks.
 2. Inspect each allowed owner and its history before replacement or deletion; record current symbols in preparation evidence.
-3. Implement schema/type owners, then pure state/effect logic, then adapters/integration, preserving authority and dependency inversion.
+3. Implement schema/type owners, then pure state/effect logic, then adapters/integration, preserving authority and dependency inversion. Bump platform major version from 5 to 6 in root `package.json` and all package `package.json` files (breaking change: old plugin contract removed, new component-runtime active).
 4. Reject unknown, stale, unavailable, replayed, excessive, or unauthorized input fail-closed; add no fallback or suppression.
 5. Add deterministic positive, negative, boundary, property, crash/replay, and recovery tests proportional to risk.
 6. Update named owner docs and agent/Compass surfaces; regenerate projections only from generators.
