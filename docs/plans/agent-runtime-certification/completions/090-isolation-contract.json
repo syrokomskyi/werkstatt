@@ -1,0 +1,45 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "090-isolation-contract",
+  "baseCommit": "3c4a6fbc5c7d9cf42ba2a1a2a880d08c657be635",
+  "sealCommit": "60d79f22c37b330856e769dc30f54d1d9f1d711d",
+  "implementationCommits": [
+    "bf2a20d5e7fb2f230133527075818d2a9c86c9c7"
+  ],
+  "implementationHead": "bf2a20d5e7fb2f230133527075818d2a9c86c9c7",
+  "changedFiles": [
+    "docs/architecture-dna.md",
+    "docs/development-plan.xml",
+    "docs/requirements.xml",
+    "docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/package.json",
+    "packages/werkstatt/src/isolation/conformance.ts",
+    "packages/werkstatt/src/isolation/contracts.ts",
+    "packages/werkstatt/src/isolation/schemas.ts",
+    "packages/werkstatt/src/isolation/tests/isolation.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass",
+      "evidenceDigest": "sha256:e255d8258a4487a5d78f315824f483fd0d7027abda0fe237cd6dfe977cbb3435"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass",
+      "evidenceDigest": "sha256:eba2fd95b0a630791a84fd2d98af517f873f59066a3c3bf8da067ada5b1c51eb"
+    },
+    {
+      "command": "pnpm exec werkstatt run rfc.validate --id RFC-0862",
+      "status": "pass",
+      "evidenceDigest": "sha256:f5d57955c31a1bd9fdd62ad3cab37419d19ab37ff7187ebd1258fe5ebe0985a1"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}
