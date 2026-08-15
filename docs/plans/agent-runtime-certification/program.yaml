@@ -104,7 +104,7 @@ packets:
     decisionKind: rfc
     resolvedRfc: RFC-0861
     dependsOnPacket: 070-resolution-and-reconciliation
-    baseCommit: null
+    baseCommit: c2364eeddf78df1fdab73923957a9bf073ef7675
     sealCommit: null
     completion: null
   - order: 90

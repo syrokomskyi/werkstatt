@@ -7,12 +7,12 @@ governingDecision: RFC-0861
 decisionKind: rfc
 resolvedRfc: RFC-0861
 dependsOnPacket: 070-resolution-and-reconciliation
-baseCommit: null
+baseCommit: c2364eeddf78df1fdab73923957a9bf073ef7675
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md"
-    sha256: a30533e6310d8e5ffc97132496c9db49b28e1e7a9f194fb803ff68c86ee3894e
+    sha256: 705c415bae5c9370a9f2cfff1c7828902fb5f5aa1ee42e16edd0f161c3c8624d
 allowedFiles:
   - "packages/werkstatt/src/component-runtime/reflection.ts"
   - "packages/werkstatt/src/component-runtime/conformance.ts"
