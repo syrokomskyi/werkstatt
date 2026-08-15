@@ -314,6 +314,18 @@
     "./component-runtime/testing": {
       "types": "./src/component-runtime/testing/harness.ts",
       "default": "./src/component-runtime/testing/harness.ts"
+    },
+    "./isolation/contracts": {
+      "types": "./src/isolation/contracts.ts",
+      "default": "./src/isolation/contracts.ts"
+    },
+    "./isolation/schemas": {
+      "types": "./src/isolation/schemas.ts",
+      "default": "./src/isolation/schemas.ts"
+    },
+    "./isolation/conformance": {
+      "types": "./src/isolation/conformance.ts",
+      "default": "./src/isolation/conformance.ts"
     }
   },
   "files": ["src", "bin", "os"],
