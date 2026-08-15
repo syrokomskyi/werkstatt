@@ -279,7 +279,7 @@ jobs:
           version: 10
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: "24"
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
