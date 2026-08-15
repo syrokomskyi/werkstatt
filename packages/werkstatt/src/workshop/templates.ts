@@ -102,6 +102,7 @@ export default defineKernelConfig({
     "forge-mission": async () => (await import("@warpgogol/forge/os/mission-module")).forgeMissionModule,
     "forge-spec": async () => (await import("@warpgogol/forge/os/spec-module")).forgeSpecModule,
     "forge-exploration": async () => (await import("@warpgogol/forge/os/exploration")).forgeExplorationModule,
+    "forge-program": async () => (await import("@warpgogol/forge/os/program")).forgeProgramModule,
     "forge-werkstatt": async () => (await import("@warpgogol/forge/os/werkstatt")).forgeWerkstattModule,
     mission: async () => (await import("@warpgogol/werkstatt/mission-module")).createMissionModule(),
     sternsystem: async () => (await import("@warpgogol/werkstatt/sternsystem-module")).createSternsystemModule(),
