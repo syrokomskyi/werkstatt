@@ -33,12 +33,12 @@ packets:
   - order: 20
     packetId: 020-canonical-identity-bytes
     file: 020-canonical-identity-bytes.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0849
     decisionKind: rfc
     resolvedRfc: RFC-0849
     dependsOnPacket: 010-node-24
-    baseCommit: 799e7db56986309b0e9cbbe0675bbf2d5cea053e
+    baseCommit: 95298fefbe874cb76ab65c0bfe37148183208950
     sealCommit: null
     completion: null
   - order: 30

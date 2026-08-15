@@ -2,54 +2,55 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 020-canonical-identity-bytes
-state: draft
+state: sealed
 governingDecision: RFC-0849
 decisionKind: rfc
 resolvedRfc: RFC-0849
 dependsOnPacket: 010-node-24
-baseCommit: 799e7db56986309b0e9cbbe0675bbf2d5cea053e
+baseCommit: 95298fefbe874cb76ab65c0bfe37148183208950
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md"
+  - path: docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md
     sha256: f838dae5004a1ecfae084cf223b03195a1fa69785b3ab74d28401ffb108fbe27
 allowedFiles:
-  - "packages/werkstatt/src/fingerprint/primitives.ts"
-  - "packages/werkstatt/src/fingerprint/canonical-json.ts"
-  - "packages/werkstatt/src/fingerprint/index.ts"
-  - "packages/werkstatt/src/tests/canonical-json.test.ts"
-  - "packages/werkstatt/src/tests/canonical-json.pbt.test.ts"
-  - "packages/werkstatt/src/tests/fixtures/canonical-json-v1/**"
-  - "docs/architecture-dna.md"
-  - "packages/werkstatt/AGENTS.md"
-  - "docs/technology.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/source-markup.xml"
-  - "docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md"
-  - "docs/rfcs/verification/**"
-  - "docs/requirements.xml"
-  - "docs/development-plan.xml"
-  - "docs/verification-plan.xml"
-  - "AGENTS.md"
-  - "packages/AGENTS.md"
+  - packages/werkstatt/src/fingerprint/primitives.ts
+  - packages/werkstatt/src/fingerprint/canonical-json.ts
+  - packages/werkstatt/src/fingerprint/index.ts
+  - packages/werkstatt/src/tests/canonical-json.test.ts
+  - packages/werkstatt/src/tests/canonical-json.pbt.test.ts
+  - packages/werkstatt/src/tests/fixtures/canonical-json-v1/**
+  - docs/architecture-dna.md
+  - packages/werkstatt/AGENTS.md
+  - docs/technology.xml
+  - docs/knowledge-graph.xml
+  - docs/source-markup.xml
+  - docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md
+  - docs/rfcs/verification/**
+  - docs/requirements.xml
+  - docs/development-plan.xml
+  - docs/verification-plan.xml
+  - AGENTS.md
+  - packages/AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0849"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0849
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 020: Canonical identity bytes
 

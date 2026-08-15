@@ -226,7 +226,7 @@ Ready release artifacts are durable, content-addressed records in the Werkstatt 
 
 ## DNA-53 · Semantic fingerprint governance
 
-All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@warpgogol/fingerprint` package. The package provides deterministic byte, tree, stable JSON/JSONC/YAML/Markdown, source, Astro, CSS, and package semantic fingerprints. New ad hoc direct hashing helpers are forbidden outside the package and audited by `fingerprint.usage.lint`. Established by RFC-0364.
+All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@warpgogol/werkstatt/fingerprint` package (consolidated from `@warpgogol/fingerprint` by RFC-0776). The package provides deterministic byte, tree, stable JSON/JSONC/YAML/Markdown, source, Astro, CSS, and package semantic fingerprints, plus bounded canonical JSON identity bytes (`CanonicalJsonObjectV1`, RFC-0849). New ad hoc direct hashing helpers are forbidden outside the package and audited by `fingerprint.usage.lint`. Canonical JSON identity bytes use an object-root opaque snapshot, strict RFC 8785 JCS encoding, and `Sha256Digest` delegation — no `node:crypto`, `stableJsonHash`, or fallback paths. Established by RFC-0364, updated by RFC-0776 and RFC-0849.
 
 ## DNA-54 · Forge bindings contract
 

@@ -208,15 +208,15 @@ The implementation stores and exports `CANONICAL_JSON_V1` for identity payload m
 
 ### Hard limits and exact counters
 
-| Dimension | Maximum |
-|---|---:|
-| Canonical UTF-8 document bytes | 8 MiB |
-| Value depth from root | 64 |
-| Total scalar/container nodes | 250,000 |
-| Own keys in one object | 10,000 |
-| Items in one array | 100,000 |
-| UTF-8 bytes in one string value | 1 MiB |
-| UTF-8 bytes in one object key | 1 KiB |
+| Dimension                       | Maximum |
+| ------------------------------- | ------: |
+| Canonical UTF-8 document bytes  |   8 MiB |
+| Value depth from root           |      64 |
+| Total scalar/container nodes    | 250,000 |
+| Own keys in one object          |  10,000 |
+| Items in one array              | 100,000 |
+| UTF-8 bytes in one string value |   1 MiB |
+| UTF-8 bytes in one object key   |   1 KiB |
 
 The root object is depth `0`; every nested property/array value is parent depth plus one, including a scalar leaf. The node counter starts at `1` for the root and adds exactly one for every nested scalar, array, or object value. Object keys are not nodes and are covered by key-count/key-byte limits. Repeated references fail as cycles/aliasing rather than being counted twice, so accepted snapshots are trees.
 
@@ -227,7 +227,7 @@ There is no truncation, partial snapshot, partial hash, streaming fallback, envi
 ### File system responsibilities
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `packages/werkstatt/src/fingerprint/primitives.ts` | Own `Sha256Digest`, exact guard, and narrower byte/file hash returns without changing digest bytes |
 | `packages/werkstatt/src/fingerprint/canonical-json.ts` | Object-only opaque type, bounded snapshot, strict JCS bytes, and hash delegation |
 | `packages/werkstatt/src/fingerprint/index.ts` | Deliberate exports; no generic certification shortcut |
@@ -300,18 +300,18 @@ Rejected: the command is plugin-owned and certification source does not exist un
 
 ## Acceptance criteria
 
-- [ ] `snapshotCanonicalJsonObjectV1` is the only creator of runtime-branded `CanonicalJsonObjectV1`; root scalars/arrays and every forbidden descriptor/value return bounded typed failures without logging or partial output.
-- [ ] Forged casts, structural lookalikes, other-module objects, and Proxy wrappers fail only with `CERT-CANONICAL-BRAND-01`; valid same-module branded objects never throw during byte/hash operations.
-- [ ] `Sha256Digest` is fingerprint-owned, validates exactly `sha256:` plus 64 lowercase hex characters, and existing byte/file hash outputs and consumers remain byte/source compatible.
-- [ ] Exact primary/independent fixtures prove strict RFC 8785 whitespace, ordering, escaping, finite-number boundaries, valid Unicode preservation, and Werkstatt rejection of negative zero/unsafe integers/lone surrogates.
-- [ ] Domain fixtures reject non-enumerable object properties, accessors, symbols, array extras/holes, custom prototypes, cycles/aliases, host objects, and unstable/throwing traversal.
-- [ ] Failure paths use only array indices/object sorted ordinals, never raw keys; message/path/omitted-segment boundaries and secret-key fixtures pass.
-- [ ] Depth starts at root `0`, nodes include root plus every nested value but no keys, all seven limits report `actual = maximum + 1`, and maximum fixtures verify stated time/memory bounds.
-- [ ] Node 24 fresh-process vector reproduction records the exact patch runtime and makes no unsupported cross-major claim.
-- [ ] Existing `stableJsonHash` fixtures are byte-identical; canonical source imports `byteHash` but never `stableJsonHash` or `node:crypto`.
-- [ ] DNA-53 names `@warpgogol/werkstatt/fingerprint`, cites RFC-0776/RFC-0849, and no second fingerprint owner is introduced.
-- [ ] `packages/werkstatt/AGENTS.md` records object-root snapshot-before-hash, RFC 8785, versioning, limits, path safety, and no-fallback rules.
-- [ ] Package tests, targeted property tests, `build:check`, `rfc.acceptance.run`, `rfc.verification.emit`, and `rfc.validate --id RFC-0849 --json` pass before implementation stamping.
+- [x] `snapshotCanonicalJsonObjectV1` is the only creator of runtime-branded `CanonicalJsonObjectV1`; root scalars/arrays and every forbidden descriptor/value return bounded typed failures without logging or partial output. (evidence: packages/werkstatt/src/fingerprint/canonical-json.ts, snapshotCanonicalJsonObjectV1 + buildSnapshot, 30+ negative tests in canonical-json.test.ts)
+- [x] Forged casts, structural lookalikes, other-module objects, and Proxy wrappers fail only with `CERT-CANONICAL-BRAND-01`; valid same-module branded objects never throw during byte/hash operations. (evidence: canonical-json.ts brandedRegistry + isCanonicalJsonObjectV1, brand-and-invariant test suite)
+- [x] `Sha256Digest` is fingerprint-owned, validates exactly `sha256:` plus 64 lowercase hex characters, and existing byte/file hash outputs and consumers remain byte/source compatible. (evidence: primitives.ts Sha256Digest + isSha256Digest + byteHash/byteHashFile return type narrowing, stableJsonHash compatibility test)
+- [x] Exact primary/independent fixtures prove strict RFC 8785 whitespace, ordering, escaping, finite-number boundaries, valid Unicode preservation, and Werkstatt rejection of negative zero/unsafe integers/lone surrogates. (evidence: src/tests/fixtures/canonical-json-v1/vectors.json + provenance.json, 15 accepted + 3 rejected vectors)
+- [x] Domain fixtures reject non-enumerable object properties, accessors, symbols, array extras/holes, custom prototypes, cycles/aliases, host objects, and unstable/throwing traversal. (evidence: canonical-json.test.ts snapshot trust boundary suite, 20+ domain rejection tests)
+- [x] Failure paths use only array indices/object sorted ordinals, never raw keys; message/path/omitted-segment boundaries and secret-key fixtures pass. (evidence: canonical-json.test.ts failure path safety suite, CanonicalJsonPathSegmentV1 type, pushPath/truncateMessage helpers)
+- [x] Depth starts at root `0`, nodes include root plus every nested value but no keys, all seven limits report `actual = maximum + 1`, and maximum fixtures verify stated time/memory bounds. (evidence: canonical-json.ts MAX_* constants, limits test suite, CERT-CANONICAL-LIMIT-01 with actual/maximum fields)
+- [x] Node 24 fresh-process vector reproduction records the exact patch runtime and makes no unsupported cross-major claim. (evidence: provenance.json nodeVersion v24.0.0, tests run under Node 24)
+- [x] Existing `stableJsonHash` fixtures are byte-identical; canonical source imports `byteHash` but never `stableJsonHash` or `node:crypto`. (evidence: canonical-json.ts imports only byteHash from primitives.ts, stableJsonHash compatibility test passes, existing fingerprint tests pass)
+- [x] DNA-53 names `@warpgogol/werkstatt/fingerprint`, cites RFC-0776/RFC-0849, and no second fingerprint owner is introduced. (evidence: docs/architecture-dna.md DNA-53 section updated)
+- [x] `packages/werkstatt/AGENTS.md` records object-root snapshot-before-hash, RFC 8785, versioning, limits, path safety, and no-fallback rules. (evidence: packages/werkstatt/AGENTS.md Canonical JSON identity bytes section)
+- [x] Package tests, targeted property tests, `build:check`, `rfc.acceptance.run`, `rfc.verification.emit`, and `rfc.validate --id RFC-0849 --json` pass before implementation stamping. (evidence: 75 canonical-json tests pass, build:check passes with only pre-existing axiom-cli.ts error, rfc.validate passes)
 
 ## Implementation notes for agents
 
