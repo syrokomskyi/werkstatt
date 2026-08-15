@@ -30,17 +30,32 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 - Agents MUST NOT `git add -f` `.env` files in the cache clone — they are untracked artifacts, not git content.
 - External mirrors (`mirrors[2+]`) never receive `.env*` files — they are git remotes, and untracked files do not propagate via `git push`.
 
-## Legacy plugin contract and accepted component-runtime transition (RFC-0770, RFC-0855)
+## Certification program status (RFC-0855, RFC-0857)
 
-The checked-in runtime still uses the `werkstatt/plugin@1` contract described below. RFC-0855 supersedes RFC-0769/RFC-0770 as architectural authority and replaces this runtime, strictly through `docs/plans/agent-runtime-certification/program.yaml`, with one stack profile resolving an immutable graph of independently lifecycle-managed components. Until packet 230 completes, treat the plugin facts below as current-code facts, not as the target architecture.
+All 25 packets (000–240) of the agent-runtime-certification program are **completed** (`docs/plans/agent-runtime-certification/program.yaml` → `state: completed`). The certification domain (RFC-0848), canonical JSON identity (RFC-0849), deterministic evaluation (RFC-0850), deployment operations (RFC-0851), canonical Diagnostic (RFC-0852), strict contracts (RFC-0853), Node 24 cutover (RFC-0854), program charter (RFC-0855), control plane (RFC-0856), JIT materialization (RFC-0857), component contracts (RFC-0858), lifecycle runtime (RFC-0859), resolution (RFC-0860), reflection (RFC-0861), isolation (RFC-0862), capability artifacts (RFC-0863), and evolution controller (RFC-0864) are all `implemented`.
 
-- Agents MUST NOT implement RFC-0855 children from an accepted/draft document alone. Implementation requires the exact sealed packet, predecessor completion commit, governing decision status, source hashes, fixed branch, clean trees, and exclusive RFC-0856 lease.
-- Packets 000–240 execute sequentially with parallelism 1. Do not combine, reorder, pre-implement, or privately prepare later packets.
-- During the transition the repository may intentionally be unable to build or deploy. Do not restore a compatibility plugin path, downgrade a validation, or widen a packet to make an intermediate state green.
+### What agents CAN do
+
+- **Missions**: `mission.materialize`, `mission.validate`, `mission.reconcile`, `mission.close`, `mission.git.commit` — all work normally.
+- **Content and code**: editing workpiece files, `packages/*`, `services/*` — all work normally.
+- **Build pipeline**: `build.prepare`, `build.check`, `astro build` — all work normally.
+- **Git**: `mission.git.commit` (workpiece), `ecosystem.commit` (platform) — both work.
+- **Validation**: `mission.validate`, `sternsystem.validate`, `werkstatt.plugin.validate` — all work.
+
+### What agents CANNOT do
+
+- **Deploy**: `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.rollback`, `leitstand.health`, `leitstand.pipeline.check`, and `release.rollback` are all **blocked** with `CERT-TRANSITION-01` (`status: "incomplete"`, `requiredNode: "CERT-007"`). Deployment will be unblocked when CERT-007 (deployment effect authority, packet 210 — implemented) is connected to the Leitstand command surface as signed certification authority. This reconnection is a future task, not yet scoped.
+- **Do NOT attempt to bypass** the transition block, restore legacy deployment commands, or introduce compatibility readers for old release state labels.
+
+### Legacy plugin contract (still in code, architecturally superseded)
+
+The checked-in runtime still uses the `werkstatt/plugin@1` contract. The certification program is complete, but the plugin entry has not yet been removed from code. Treat the plugin facts below as **legacy code facts** — they describe what the code does today, not the target architecture. Future removal of the plugin entry requires a superseding RFC.
+
 - The Law Kernel, canonical identity/Diagnostic, effect authority, isolation admission, and program governance remain engine-owned. Stack packages contribute profile-selected capabilities and never become engine dependencies. RFC-0852 (packet 030) completed the canonical Diagnostic cutover: `packages/werkstatt/src/schemas/diagnostic.ts` is the sole schema/type owner; legacy aliases (`AuditFinding`, `auditSeveritySchema`, `auditEvidenceSchema`, `auditFindingSchema`) and deprecated fields (`id`, `blockId`, `suggestion`) are removed.
-- Agent-written or third-party executable artifacts remain disabled until packets 190 and 200 complete; evaluator outputs in packet 180 are untrusted data, not executable authority.
+- Agent-written or third-party executable artifacts (capability artifacts, sandbox, evolution controller) are implemented (packets 190, 200) but not yet connected to production activation. Evaluator outputs (packet 180) are untrusted data, not executable authority, until the full deployment authority path is wired.
+- Do not add adapters for `werkstatt/plugin@1`, force unload, ambient authority, local certification fallback, mutable capability artifacts, or ungoverned production activation.
 
-Current pre-cutover code facts:
+Legacy plugin code facts:
 
 - **Plugin contract:** `WerkstattPlugin` interface in `packages/werkstatt/src/plugin-contract.ts`. A plugin declares `schema: "werkstatt/plugin@1"`, an `id`, a `profileId` (matching a Forge stack profile), `moduleLoaders`, optional `pipelines`, `deployAdapters`, `hooks`, `paths`, and `invariants`.
 - **One plugin per workshop:** The engine refuses to start with zero or multiple plugins. `PluginRegistry.resolve()` throws if the count is not exactly one.
