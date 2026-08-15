@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
+enhancedAt: 2026-08-15
 implementedAt:
 closedAt:
 supersedes: []
@@ -180,24 +181,60 @@ if (!result.ok) {
 ```
 
 ```ts
-// R2 durable storage adapter — new
-interface R2StorageAdapter {
-  putObject(key: string, data: Uint8Array): Promise<void>;
-  headObject(key: string): Promise<{ size: number } | null>;
-  getObject(key: string): Promise<Uint8Array | null>;
-  appendAuditRecord(key: string, record: Uint8Array): Promise<void>;
+// R2 durable storage adapter — implements existing CertificationStorageAdapterV1
+// from packages/werkstatt/src/certification/storage/adapter.ts:21-27
+// Content-addressed (digest-keyed), not string-keyed.
+import type {
+  CertificationStorageAdapterV1,
+  StoragePutInputV1,
+  StoragePutResultV1,
+  StorageHeadResultV1,
+} from "../certification/storage/adapter.ts";
+
+export function createR2StorageAdapter(config: {
+  accountId: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  bucketName: string;
+}): CertificationStorageAdapterV1 {
+  // putObject(input: StoragePutInputV1): digest-keyed, not string-keyed
+  // headObject(digest: Sha256Digest): check existence by content hash
+  // getObject(digest: Sha256Digest): retrieve by content hash
+  // appendAuditRecord(record: Uint8Array): append to audit log
+  // ...
 }
 ```
 
 ```ts
-// Minimal Astro certification profile — new
+// Minimal Astro certification profile — matches CertificationProfileV1 schema
+// from packages/werkstatt/src/certification/profile/schemas.ts:223-240
 const astroProfile: CertificationProfileV1 = {
   schema: "werkstatt/certification-profile@1",
-  profileId: "astro-typescript-turborepo",
-  producers: [/* Axiom checks, smoke test, E2E */],
-  requirements: [/* dev-deploy gate requirements */],
-  evaluators: [/* ordinary-risk evaluator */],
-  // ...
+  id: "astro-site-profile",
+  version: "1.0.0",
+  plugin: {
+    id: "werkstatt-site",
+    profileId: "astro-typescript-turborepo",
+  },
+  dimensions: [
+    "candidate-integrity",
+    "business-truth-compliance",
+    "editorial-localization",
+    "information-architecture-discoverability",
+    "ux-conversion",
+    "visual-accessibility",
+    "performance-runtime",
+    "security-operational-readiness",
+    "independent-qualitative-evaluation",
+  ],
+  producers: {
+    "axiom-checks": { /* kernel-command producer */ },
+    "site-smoke": { /* kernel-command producer */ },
+    "site-e2e": { /* kernel-command producer */ },
+  },
+  requirements: [/* dev-deploy gate requirements with mandatory: true */],
+  evaluatorPolicy: { ordinaryEvaluators: 1, criticalEvaluators: 1, borderlineEvaluators: 1, confidenceMargin: 50 },
+  retentionPolicy: { minRetentionDays: 30, maxRetentionDays: 365, tombstoneAfterDays: 365 },
 };
 ```
 
@@ -210,7 +247,7 @@ const astroProfile: CertificationProfileV1 = {
 | `packages/werkstatt/src/certification/transition-block.ts` | Remove `buildCertificationTransitionBlock` imports from Leitstand/release; file may remain for type exports |
 | `packages/werkstatt/src/certification/storage/r2-adapter.ts` | New R2 durable storage adapter |
 | `packages/werkstatt/src/certification/profile/astro-profile.ts` | New minimal Astro certification profile |
-| `packages/werkstatt-site/src/deploy/` | Deploy adapter (existing, called from restored Leitstand logic) |
+| `packages/werkstatt-site/src/deploy/` | Deploy adapter — `client-export.ts` and `infrastructure-generate.ts` exist; wrangler deploy, cache purge, and health check logic MUST be written from scratch (old code was deleted in commit `30bc3c6f`) |
 | `packages/werkstatt-site/src/testing/smoke/` | Smoke test producer (existing, registered in profile) |
 | `packages/werkstatt-site/src/testing/e2e/` | E2E test producer (existing, registered in profile) |
 
@@ -257,6 +294,38 @@ When authorization fails:
 }
 ```
 
+### Gate decision production flow
+
+Each deployment command produces a `GateDecisionV1` before calling `authorizeDeployment()`:
+
+1. **Command invocation** — e.g. `leitstand.dev-deploy --site <id> --release <id>`
+2. **Orchestrator** — `planProducers()` builds topological execution plan from the Astro certification profile's producers
+3. **Producer execution** — `executeProducers()` runs each producer (Axiom checks, smoke tests, E2E), collecting `EvidenceEnvelopeV1[]`
+4. **Evaluation** — `evaluateCertificationDecision()` in `packages/werkstatt/src/certification/aggregation.ts` takes `CertificationEvaluationInputV1` (policyBundle, evidence, evaluationCutSequence, authorityTime, gate) and returns `CertificationEvaluationResultV1` with `status: "pass" | "fail" | "stale" | "incomplete"`
+5. **Gate decision construction** — build `GateDecisionV1` (schema in `packages/werkstatt/src/certification/contracts/decisions.ts:33-48`) from the evaluation result: `decisionId`, `candidateId`, `policyBundleRoot`, `gate`, `evaluationCut`, `selectedEvidence`, `status`, `coverage`, `reasons`, `actionPackRef`, `decidedAt`
+6. **Authorization** — `authorizeDeployment()` in `packages/werkstatt/src/certification/deployment/authority.ts` takes the `GateDecisionV1` and returns `DeploymentAuthorizationOutcomeV1`
+7. **Deploy** — if `result.ok && result.authorized`, execute deploy logic
+
+### Deploy logic source
+
+The old 2123-line Leitstand code was deleted in commit `30bc3c6f`. `packages/werkstatt-site/src/deploy/` currently contains only `client-export.ts` (file export) and `infrastructure-generate.ts` (infrastructure resolution). Wrangler deploy, cache purge, and health check logic MUST be written from scratch — not copied from git history. The rewrite goes through `authorizeDeployment()` as a mandatory gate.
+
+### Legacy state cleanup
+
+The following legacy state references in `leitstand-commands.ts` MUST be deleted in Step 4/5:
+
+- `PIPELINE_STATE_ORDER` array (line 951-958) — contains legacy states `dev-deployed`, `alt-deployed`, `main-deployed`, `promoted`
+- `detectChannelFromState()` function (line 870-876) — uses legacy state labels
+- `autoStepReleaseState()` function (line 878-882) — uses legacy state labels
+- `determineNextStep()` function (line 965-983) — uses legacy state labels
+- `releaseStateIndex()` function (line 960-963) — indexes into `PIPELINE_STATE_ORDER`
+
+`leitstand.pipeline.check` reads from `DeploymentOperationState` event chain instead of legacy release state.
+
+### R2 credential documentation
+
+R2 credentials (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`) are injected from `systems/registry.yaml` channel config — same pattern as existing deploy adapters. These env vars MUST be documented in `.env.example` files for services that invoke deployment commands. Unit tests use the in-memory storage adapter (`createInMemoryStorageAdapter`) — no real R2 credentials needed for tests.
+
 ### Failure modes
 
 | Rule ID | Condition | Behavior |
@@ -295,12 +364,17 @@ When authorization fails:
 
 ## Acceptance criteria
 
-- [ ] `leitstand.dev-deploy` calls `authorizeDeployment(gate: "dev-deploy")` and executes deploy only when `authorized: true` (evidence: unit test + integration test)
-- [ ] `leitstand.propagate` calls `authorizeDeployment(gate: "propagate-alt")` with `durableSyncVerified: true` via R2 adapter (evidence: unit test + R2 adapter test)
-- [ ] `leitstand.promote` calls `authorizeDeployment(gate: "promote-main")` with `requiresMainVerification: true` via `verifyMainPromotion()` (evidence: unit test)
-- [ ] Minimal Astro certification profile registered and validated via `validateCertificationProfileV1` (evidence: profile file + validation test)
-- [ ] `CERT-TRANSITION-01` block removed from all 8 commands; `buildCertificationTransitionBlock` no longer imported in `leitstand-commands.ts` and `release-commands.ts` (evidence: grep + test)
-- [ ] `AGENTS.md` updated to reflect unblocked deployment commands
+- [ ] `leitstand.dev-deploy` calls `authorizeDeployment(gate: "dev-deploy")` and executes deploy only when `authorized: true` (evidence: unit test in `packages/werkstatt/src/leitstand/tests/leitstand-dev-deploy.test.ts`)
+- [ ] `leitstand.propagate` calls `authorizeDeployment(gate: "propagate-alt")` with `durableSyncVerified: true` via R2 adapter (evidence: unit test + R2 adapter test in `packages/werkstatt/src/certification/storage/tests/r2-adapter.test.ts`)
+- [ ] `leitstand.promote` calls `authorizeDeployment(gate: "promote-main")` with `requiresMainVerification: true` via `verifyMainPromotion()` (evidence: unit test in `packages/werkstatt/src/leitstand/tests/leitstand-promote.test.ts`)
+- [ ] Minimal Astro certification profile registered and validated via `validateCertificationProfileV1` (evidence: `packages/werkstatt/src/certification/profile/astro-profile.ts` + validation test in `packages/werkstatt/src/certification/profile/tests/astro-profile.test.ts`)
+- [ ] `CERT-TRANSITION-01` block removed from all 8 commands; `buildCertificationTransitionBlock` no longer imported in `leitstand-commands.ts` and `release-commands.ts` (evidence: `grep -r "buildCertificationTransitionBlock" packages/werkstatt/src/leitstand/ packages/werkstatt/src/release/` returns zero matches + test)
+- [ ] `PIPELINE_STATE_ORDER`, `detectChannelFromState`, `autoStepReleaseState`, `determineNextStep`, `releaseStateIndex` deleted from `leitstand-commands.ts` (evidence: `grep -r "PIPELINE_STATE_ORDER\|detectChannelFromState\|autoStepReleaseState\|determineNextStep" packages/werkstatt/src/leitstand/leitstand-commands.ts` returns zero matches)
+- [ ] `AGENTS.md` (root) updated to reflect unblocked deployment commands — remove "currently blocked with CERT-TRANSITION-01" from CERT-007 section
+- [ ] `packages/werkstatt/AGENTS.md` updated — remove "No R2 adapter" from CERT-003 section
+- [ ] `docs/architecture-dna.md` DNA-49 text updated — remove "currently blocked with CERT-TRANSITION-01 until CERT-007 reconnects them"
+- [ ] `docs/architecture-dna.md` DNA-73 text updated — remove "All site deployment commands are currently blocked with CERT-TRANSITION-01 until CERT-007"
+- [ ] `docs/verification-plan.xml` and `docs/development-plan.xml` synchronized with deployment command unblocking
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -312,6 +386,6 @@ When authorization fails:
 - Agents MUST NOT copy old Leitstand code from git history. The old code mutated release states and did not use `authorizeDeployment()`. Rewrite through the certification authority.
 - Agents MUST NOT remove `buildCertificationTransitionBlock` from `transition-block.ts` itself — only remove its imports from `leitstand-commands.ts` and `release-commands.ts`. The type `isCertificationTransitionBlock` may still be used by tests.
 - Agents MUST register the Astro certification profile before or in the same commit as Step 1. Without a profile, `authorizeDeployment()` fails at `CERT-DEPLOY-07`.
-- Agents MUST implement the R2 durable storage adapter before or in the same commit as Step 2. Without it, ` Leitstand.propagate` fails at `CERT-DEPLOY-09`.
+- Agents MUST implement the R2 durable storage adapter before or in the same commit as Step 2. Without it, `leitstand.propagate` fails at `CERT-DEPLOY-09`.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0865 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
