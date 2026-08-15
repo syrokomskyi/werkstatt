@@ -279,7 +279,7 @@ jobs:
           version: 10
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -324,7 +324,7 @@ A Warpgogol workshop powered by the Werkstatt engine and the ${vars.pluginPackag
 
 ## Prerequisites
 
-- Node.js 22+
+- Node.js 24+
 - pnpm 10+
 - Git LFS (if site stack)
 
