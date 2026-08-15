@@ -446,5 +446,13 @@
       <change-type>Axiom post-deploy mobile layout monitoring (RFC-0839)</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/methodologies-config.test.ts`; verify `methodologies.validate` passes with 9 instruments and 9 methodologies via `pnpm exec werkstatt run methodologies.validate`; verify `mobile-layout` is accepted as instrument type and `mobile-layout-stability` is accepted as methodology id; verify `dna.registry.validate` passes with DNA-70 registered.</expectation>
     </entry>
+    <entry id="vm-18">
+      <change-type>RFC-0855 charter, child decision, amendment, or draft packet changes</change-type>
+      <expectation>Run targeted `rfc.validate` for every changed RFC, `spec.validate --spec=werkstatt-release-certification`, `dna.registry.validate`, `compass.validate`, the checked-in program fixture validator from `docs/plans/agent-runtime-certification/README.md`, `git diff --check`, and `bash scripts/check-clean-trees.sh`. Verify exactly 25 packets, one ten-section body per packet, a linear dependency chain, null draft base/seal/completion fields, reachable governing sources, and matching SHA-256 digests.</expectation>
+    </entry>
+    <entry id="vm-19">
+      <change-type>RFC-0856 control-plane implementation or packet state transition</change-type>
+      <expectation>Run Forge unit/property/adversarial tests for strict schemas, qualified decision resolution, source/git/path boundaries, preparation/execution leases, token secrecy, genesis uniqueness, completion ancestry, and recovery; then run Forge build, command-manifest validation, ecosystem-manifest validation, scoped RFC evidence, and clean-tree verification. Zero unexpected or warning-only diagnostics are permitted.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

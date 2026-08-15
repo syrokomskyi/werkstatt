@@ -270,6 +270,25 @@
     </rules>
   </publication-pipeline>
 
+  <agent-runtime-architecture rfc="RFC-0855">
+    <control-plane>
+      <engine>`@warpgogol/werkstatt`</engine>
+      <law-kernel>Non-replaceable authority for graph admission, lifecycle, effects, isolation, certification, and promotion.</law-kernel>
+      <governance>`forge/program@1` packet control plane specified by RFC-0856; documentation-only until packet 000.</governance>
+    </control-plane>
+    <component-plane>
+      <profile>Exactly one stack profile identity per workshop.</profile>
+      <graph>Immutable resolved set of versioned capabilities with explicit grants, effects, scopes, isolation, and resource bounds.</graph>
+      <stacks>`@warpgogol/werkstatt-site`, `@warpgogol/werkstatt-game`, and `@warpgogol/werkstatt-video` remain stack-side providers and never become engine dependencies.</stacks>
+    </component-plane>
+    <security-plane>
+      <rule>Untrusted executable workloads use only an independently admitted real sandbox and deny-by-default broker; vm, workers, and ordinary subprocesses are not security tiers.</rule>
+      <rule>Release candidates and capability candidates remain distinct content-addressed artifacts.</rule>
+      <rule>Promotion requires deterministic, held-out, regression, independent evaluation, shadow, canary, and observation evidence under Law Kernel authority.</rule>
+    </security-plane>
+    <transition>Current `werkstatt/plugin@1` source remains until packet 230; no compatibility adapter is introduced.</transition>
+  </agent-runtime-architecture>
+
   <p2p-topology>
     <layer id="git-mesh" rfc="RFC-0563">
       <path>`packages/os/site-kernel/src/gitmesh/`</path>

@@ -81,6 +81,13 @@
     <rule>For `.astro` files, the two blocks and any `@ai-invariant` live inside the frontmatter (after the opening `---`), using `/* */` comment style.</rule>
   </astro-handling>
 
+  <agent-runtime-transition rfc="RFC-0855">
+    <rule>New high-risk component graph, lifecycle, effect, isolation, certification-authority, evolution, packet-transition, path-policy, git-boundary, and lease-token source files use standard coverage plus precise `@ai-invariant` statements.</rule>
+    <rule>`CHANGE_SUMMARY` must identify the active packet and governing decision without copying the packet body into source comments.</rule>
+    <rule>Generated manifests remain coverage mode `none`; edit their owners and regenerate rather than annotating generated output.</rule>
+    <rule>Source markup never grants authority to widen a sealed packet or bypass its allow-list.</rule>
+  </agent-runtime-transition>
+
   <rollout-policy>
     <rules>
       <rule>New non-trivial files in `apps/`, `packages/`, and `services/` must follow this contract immediately.</rule>

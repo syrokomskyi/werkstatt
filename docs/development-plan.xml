@@ -414,6 +414,22 @@
     </wave>
   </rollout-waves>
 
+  <agent-runtime-certification-program rfc="RFC-0855">
+    <status>documentation-ready</status>
+    <branch>program/agent-runtime-certification-cutover</branch>
+    <manifest>`docs/plans/agent-runtime-certification/program.yaml`</manifest>
+    <execution-law>Packets 000–240 are linear and non-parallel. Each packet requires preparation when applicable, a committed seal, one exclusive execution lease, canonical implementation commits, independent completion evidence, and a clean-tree handoff.</execution-law>
+    <milestones>
+      <milestone packets="000-040">Bootstrap governance, complete Node 24 and canonical primitives, accept specification reconciliation.</milestone>
+      <milestone packets="050-090">Build component contracts, lifecycle/effects, resolution, reflection, and neutral isolation.</milestone>
+      <milestone packets="100-130">Bind and integrate the CERT-001 foundation with resolved runtime identity.</milestone>
+      <milestone packets="140-180">Materialize and implement certification profile, authority, orchestration, producers, and independent evaluator data workloads.</milestone>
+      <milestone packets="190-200">Admit one real sandbox and add governed capability evolution.</milestone>
+      <milestone packets="210-240">Restore deployment authority, monitor/demote, perform one combined cutover, and remove only proven-obsolete artifacts.</milestone>
+    </milestones>
+    <transition-policy>An intermediate repository may be broken. Do not add compatibility paths, reorder packets, waive non-pass evidence, or begin a later packet early.</transition-policy>
+  </agent-runtime-certification-program>
+
   <rollback-strategy>
     <rule>If generated inventory or validation heuristics produce unstable churn, stop before source mutation work and correct the classification logic first.</rule>
     <rule>Do not bind new Compass validation commands into mandatory build pipelines until the corresponding coverage wave is complete.</rule>

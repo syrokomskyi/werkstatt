@@ -781,5 +781,96 @@
         <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
+    <node id="packages.forge" type="workspace">
+      <name>@warpgogol/forge</name>
+      <path>`packages/forge`</path>
+      <role>Portable governance modules and future RFC-0856 program control plane.</role>
+      <links>
+        <link rel="governed-by" target="docs.rfcs.rfc-0856" />
+      </links>
+    </node>
+
+    <node id="packages.werkstatt" type="workspace">
+      <name>@warpgogol/werkstatt</name>
+      <path>`packages/werkstatt`</path>
+      <role>Stack-agnostic engine and future Law Kernel/component-runtime authority.</role>
+      <links>
+        <link rel="governed-by" target="docs.rfcs.rfc-0855" />
+      </links>
+    </node>
+
+    <node id="packages.werkstatt-site" type="workspace">
+      <name>@warpgogol/werkstatt-site</name>
+      <path>`packages/werkstatt-site`</path>
+      <role>Astro stack profile and future profile-selected component capabilities.</role>
+      <links>
+        <link rel="depends-on" target="packages.werkstatt" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0855" />
+      </links>
+    </node>
+
+    <node id="spec.release-certification" type="vendored-specification">
+      <name>Werkstatt release certification specification</name>
+      <path>`docs/specs/werkstatt-release-certification`</path>
+      <role>Accepted release-certification model reconciled with the component runtime through AMD-007.</role>
+      <links>
+        <link rel="reconciled-by" target="docs.rfcs.rfc-0855" />
+      </links>
+    </node>
+
+    <node id="rfc-0769" type="superseded-decision">
+      <name>RFC-0769</name>
+      <path>`docs/rfcs/archive/superseded/rfc-0769-*.md`</path>
+      <role>Superseded engine/plugin boundary authority retained for history.</role>
+      <links>
+        <link rel="superseded-by" target="docs.rfcs.rfc-0855" />
+      </links>
+    </node>
+
+    <node id="rfc-0770" type="superseded-decision">
+      <name>RFC-0770</name>
+      <path>`docs/rfcs/archive/superseded/rfc-0770-*.md`</path>
+      <role>Superseded one-plugin contract authority retained for history.</role>
+      <links>
+        <link rel="superseded-by" target="docs.rfcs.rfc-0855" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0855" type="architecture-charter">
+      <name>Authority-first agent runtime and certification program</name>
+      <path>`docs/rfcs/rfc-0855-establish-the-authority-first-agent-native-runtime-and-certification-program.md`</path>
+      <role>Superseding authority for the component runtime, Law Kernel, certification integration, and strictly sequential cutover.</role>
+      <links>
+        <link rel="governs" target="docs.program.agent-runtime-certification" />
+        <link rel="supersedes" target="rfc-0769" />
+        <link rel="supersedes" target="rfc-0770" />
+        <link rel="constrains" target="packages.werkstatt" />
+        <link rel="constrains" target="packages.werkstatt-site" />
+        <link rel="delegates-governance" target="docs.rfcs.rfc-0856" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0856" type="governance-contract">
+      <name>Governed program packet control plane</name>
+      <path>`docs/rfcs/rfc-0856-establish-the-governed-program-packet-control-plane.md`</path>
+      <role>Owns strict program/packet schemas, decision resolution, sealing, exclusive leases, completion, recovery, and the sole bootstrap.</role>
+      <links>
+        <link rel="controls" target="docs.program.agent-runtime-certification" />
+        <link rel="implemented-by" target="packages.forge" />
+      </links>
+    </node>
+
+    <node id="docs.program.agent-runtime-certification" type="execution-program">
+      <name>Agent runtime certification packet program</name>
+      <path>`docs/plans/agent-runtime-certification/program.yaml`</path>
+      <role>Machine-authoritative linear order for packets 000–240 and their governing decisions, hashes, boundaries, and completion chain.</role>
+      <links>
+        <link rel="implements" target="docs.rfcs.rfc-0855" />
+        <link rel="controlled-by" target="docs.rfcs.rfc-0856" />
+        <link rel="reconciles" target="spec.release-certification" />
+        <link rel="transitions" target="packages.werkstatt" />
+        <link rel="transitions" target="packages.werkstatt-site" />
+      </links>
+    </node>
   </nodes>
 </knowledge-graph>

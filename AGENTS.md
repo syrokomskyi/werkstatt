@@ -30,9 +30,17 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 - Agents MUST NOT `git add -f` `.env` files in the cache clone — they are untracked artifacts, not git content.
 - External mirrors (`mirrors[2+]`) never receive `.env*` files — they are git remotes, and untracked files do not propagate via `git push`.
 
-## Werkstatt plugin contract (RFC-0770)
+## Legacy plugin contract and accepted component-runtime transition (RFC-0770, RFC-0855)
 
-The Werkstatt engine is stack-agnostic. Stack-specific logic (Astro, Phaser, video rendering) is contributed by a **plugin** — an npm package implementing the `werkstatt/plugin@1` contract. The engine and plugin together form a **workshop** (a consumer monorepo).
+The checked-in runtime still uses the `werkstatt/plugin@1` contract described below. RFC-0855 supersedes RFC-0769/RFC-0770 as architectural authority and replaces this runtime, strictly through `docs/plans/agent-runtime-certification/program.yaml`, with one stack profile resolving an immutable graph of independently lifecycle-managed components. Until packet 230 completes, treat the plugin facts below as current-code facts, not as the target architecture.
+
+- Agents MUST NOT implement RFC-0855 children from an accepted/draft document alone. Implementation requires the exact sealed packet, predecessor completion commit, governing decision status, source hashes, fixed branch, clean trees, and exclusive RFC-0856 lease.
+- Packets 000–240 execute sequentially with parallelism 1. Do not combine, reorder, pre-implement, or privately prepare later packets.
+- During the transition the repository may intentionally be unable to build or deploy. Do not restore a compatibility plugin path, downgrade a validation, or widen a packet to make an intermediate state green.
+- The Law Kernel, canonical identity/Diagnostic, effect authority, isolation admission, and program governance remain engine-owned. Stack packages contribute profile-selected capabilities and never become engine dependencies.
+- Agent-written or third-party executable artifacts remain disabled until packets 190 and 200 complete; evaluator outputs in packet 180 are untrusted data, not executable authority.
+
+Current pre-cutover code facts:
 
 - **Plugin contract:** `WerkstattPlugin` interface in `packages/werkstatt/src/plugin-contract.ts`. A plugin declares `schema: "werkstatt/plugin@1"`, an `id`, a `profileId` (matching a Forge stack profile), `moduleLoaders`, optional `pipelines`, `deployAdapters`, `hooks`, `paths`, and `invariants`.
 - **One plugin per workshop:** The engine refuses to start with zero or multiple plugins. `PluginRegistry.resolve()` throws if the count is not exactly one.

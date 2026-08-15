@@ -353,6 +353,16 @@
     </authority>
   </source-file-contract-requirements>
 
+  <agent-runtime-certification-program rfc="RFC-0855">
+    <requirement id="arc-01">The accepted target is one stack profile resolving an immutable graph of versioned, independently lifecycle-managed components; the one-plugin runtime is a pre-cutover implementation fact only.</requirement>
+    <requirement id="arc-02">The Law Kernel owns authority, canonical identity and diagnostics, grants and effects, lifecycle admission, isolation admission, certification, and promotion policy.</requirement>
+    <requirement id="arc-03">The transition executes packets 000 through 240 sequentially on one fixed branch with parallelism one, exact predecessor completion boundaries, and independently verified Steward/Executor roles.</requirement>
+    <requirement id="arc-04">A governing RFC/spec status alone never authorizes implementation; a sealed packet, exact hashes, clean trees, and the exclusive RFC-0856 lease are mandatory.</requirement>
+    <requirement id="arc-05">Intermediate build or deployment failure is permitted. Compatibility authority, validation downgrade, local fallback, scope widening, and parallel implementation are forbidden.</requirement>
+    <requirement id="arc-06">Agent-written and third-party executable artifacts remain disabled until a real admitted sandbox and the governed evolution controller are complete.</requirement>
+    <source>`docs/plans/agent-runtime-certification/program.yaml`</source>
+  </agent-runtime-certification-program>
+
   <change-entry-criteria>
     <criterion id="entry-01">Identify whether the task is local, workspace-scoped, or cross-workspace.</criterion>
     <criterion id="entry-02">Read the root Compass documents before touching architecture, shared packages, or high-risk files.</criterion>
