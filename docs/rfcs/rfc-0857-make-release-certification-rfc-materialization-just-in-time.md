@@ -1,12 +1,13 @@
 ---
 id: RFC-0857
 title: "Make release-certification RFC materialization just-in-time"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
