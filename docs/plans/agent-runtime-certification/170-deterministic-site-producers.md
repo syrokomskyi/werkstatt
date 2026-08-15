@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 170-deterministic-site-producers
-state: draft
+state: sealed
 governingDecision: werkstatt-release-certification/CERT-005
 decisionKind: spec-node
 resolvedRfc: null
