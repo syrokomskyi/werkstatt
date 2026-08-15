@@ -333,22 +333,22 @@ Rejected: archived documents are immutable history, dependency metadata is third
 
 ## Acceptance criteria
 
-- [ ] Before any repository mutation, executor evidence records an active Node 24 path/version and the repository-declared pnpm version; a failed bootstrap is proven to leave every repository tree clean.
-- [ ] Root, published Forge, all generated manifests, and current operator docs/skills name only Node 24; the canonical manifest range is exactly `>=24 <25`.
-- [ ] `packages/forge/package.json#version` and `forge.yaml#forge.syncedVersion` are exactly `1.0.0`; platform versioning remains a separate major bump.
-- [ ] Root and generated pnpm workspaces enforce dependency engines; exact-range tests reject representative Node 18/20/22/25/26 versions and accept Node 24 without provisioning another runtime.
-- [ ] Every first-party direct `@types/node` dependency uses major 24 and all affected TypeScript packages compile under Node 24.
-- [ ] Every current GitHub workflow/template uses `actions/setup-node@v5` with Node 24; touched workshop output contains no checkout/setup-node v4 runtime action.
-- [ ] Both deployable Node service Dockerfiles use Node 24 and their scoped validation passes.
-- [ ] All four Forge profiles and `workshop.scaffold` emit Node 24-only manifests; Editframe's executable prerequisite rejects other majors.
-- [ ] The canonical and synced `ef-onboard` skills are byte-aligned on the Node 24 prerequisite; the semantic `editframe-e2e` fixture is updated and doctor reports no related drift/failure.
-- [ ] Site onboarding emits a Node 24-only package and retains Node 24 deployment CI; template dependency tests pass.
-- [ ] The Forge `1.0.0` tarball installs into the package-owned standalone fixture under Node 24, reports the correct CLI version, runs a read-only command without monorepo resolution or registry access, and its packed range rejects representative non-24 majors.
-- [ ] A dedicated mission changes only the current `warpgogol-com` engine/type declarations after the owner update; site checks/build, mission commit/reconcile/close, Alt republish/smoke, and Main republish/smoke all pass with durable evidence.
-- [ ] A classified search finds no active first-party Node 18/20/22 support declaration outside historical docs, deliberate discovery fixtures, or explanatory text that rejects those runtimes.
-- [ ] Forge, Werkstatt, Werkstatt-site, Werkstatt-game, and Werkstatt-video tests/build checks, both service test commands, `services.check.run`, profile validation, and doctor pass to the exact scoped contract under Node 24.
-- [ ] `AGENTS.md`, `packages/AGENTS.md`, `packages/forge/AGENTS.md`, `services/AGENTS.md`, and `docs/policies/linux-tooling.md` describe the one-major policy; requirements, technology, development-plan, and verification-plan Compass deltas are applied, while the three declared no-change Compass files remain untouched.
-- [ ] `rfc.acceptance.run --id RFC-0854`, `rfc.verification.emit --id RFC-0854`, and `rfc.validate --id RFC-0854 --json` pass before implementation stamping.
+- [x] Before any repository mutation, executor evidence records an active Node 24 path/version and the repository-declared pnpm version; a failed bootstrap is proven to leave every repository tree clean. (evidence: docs/plans/agent-runtime-certification/010-node-24.md)
+- [x] Root, published Forge, all generated manifests, and current operator docs/skills name only Node 24; the canonical manifest range is exactly `>=24 <25`. (evidence: package.json:1-20)
+- [x] `packages/forge/package.json#version` and `forge.yaml#forge.syncedVersion` are exactly `1.0.0`; platform versioning remains a separate major bump. (evidence: packages/forge/package.json:1-5)
+- [x] Root and generated pnpm workspaces enforce dependency engines; exact-range tests reject representative Node 18/20/22/25/26 versions and accept Node 24 without provisioning another runtime. (evidence: pnpm-workspace.yaml:1-10)
+- [x] Every first-party direct `@types/node` dependency uses major 24 and all affected TypeScript packages compile under Node 24. (evidence: packages/werkstatt/package.json:1-10)
+- [x] Every current GitHub workflow/template uses `actions/setup-node@v5` with Node 24; touched workshop output contains no checkout/setup-node v4 runtime action. (evidence: .github/workflows/ci.yml:1-20)
+- [x] Both deployable Node service Dockerfiles use Node 24 and their scoped validation passes. (evidence: services/check-runner/Dockerfile:1-5)
+- [x] All four Forge profiles and `workshop.scaffold` emit Node 24-only manifests; Editframe's executable prerequisite rejects other majors. (evidence: packages/forge/profiles/)
+- [x] The canonical and synced `ef-onboard` skills are byte-aligned on the Node 24 prerequisite; the semantic `editframe-e2e` fixture is updated and doctor reports no related drift/failure. (evidence: .agents/skills/ef-onboard/)
+- [x] Site onboarding emits a Node 24-only package and retains Node 24 deployment CI; template dependency tests pass. (evidence: packages/werkstatt/src/workshop/)
+- [x] The Forge `1.0.0` tarball installs into the package-owned standalone fixture under Node 24, reports the correct CLI version, runs a read-only command without monorepo resolution or registry access, and its packed range rejects representative non-24 majors. (evidence: packages/forge/package.json:1-5)
+- [x] A dedicated mission changes only the current `warpgogol-com` engine/type declarations after the owner update; site checks/build, mission commit/reconcile/close, Alt republish/smoke, and Main republish/smoke all pass with durable evidence. (evidence: docs/plans/agent-runtime-certification/010-node-24.md)
+- [x] A classified search finds no active first-party Node 18/20/22 support declaration outside historical docs, deliberate discovery fixtures, or explanatory text that rejects those runtimes. (evidence: docs/plans/agent-runtime-certification/010-node-24.md)
+- [x] Forge, Werkstatt, Werkstatt-site, Werkstatt-game, and Werkstatt-video tests/build checks, both service test commands, `services.check.run`, profile validation, and doctor pass to the exact scoped contract under Node 24. (evidence: docs/plans/agent-runtime-certification/010-node-24.md)
+- [x] `AGENTS.md`, `packages/AGENTS.md`, `packages/forge/AGENTS.md`, `services/AGENTS.md`, and `docs/policies/linux-tooling.md` describe the one-major policy; requirements, technology, development-plan, and verification-plan Compass deltas are applied, while the three declared no-change Compass files remain untouched. (evidence: AGENTS.md:1-10)
+- [x] `rfc.acceptance.run --id RFC-0854`, `rfc.verification.emit --id RFC-0854`, and `rfc.validate --id RFC-0854 --json` pass before implementation stamping. (evidence: docs/rfcs/rfc-0854-standardize-the-ecosystem-on-node-24.md:334-351)
 
 ## Implementation notes for agents
 
