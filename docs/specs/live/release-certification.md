@@ -8,6 +8,9 @@ history:
   - rfc: RFC-0848
     mergedAt: 2026-08-15
     operation: created
+  - rfc: RFC-0848
+    mergedAt: 2026-08-15
+    operation: modified
 ---
 
 <!--
@@ -23,6 +26,7 @@ history:
 
 ### Dependency and execution boundaries
 
+
 | Order | RFC | One-session responsibility | Completion boundary |
 | --: | --- | --- | --- |
 | 1 | RFC-0849 | bounded canonical snapshot, bytes, hash, Unicode and resource limits | engine fingerprint tests/fixtures and DNA-53 correction pass |
@@ -33,8 +37,8 @@ history:
 | 6 | RFC-0848 | cross-module integration, source-boundary and surface-consistency verification | all integrated laws and repository governance checks pass |
 
 RFC-0850 must complete before RFC-0851; both follow RFC-0853 and the component-runtime prerequisites declared in their frontmatter. Each child receives its own audit, architecture acceptance, plan, implementation, review, and fix cycle. RFC-0848 receives no child code changes except corrections required by an actual integration defect; such a defect is fixed in its owning child module and verified here.
-
 ### CLI surface
+
 
 RFC-0848 adds and changes no registered command. Command lifecycle metadata belongs exclusively to RFC-0851. The integration session invokes exact existing validations:
 
@@ -59,8 +63,8 @@ pnpm exec werkstatt run rfc.verification.emit --id RFC-0848
 pnpm exec werkstatt run rfc.implement.stamp --id RFC-0848 --dry-run
 bash scripts/check-clean-trees.sh
 ```
-
 ### Cross-module integration laws
+
 
 The integration suite uses only public child APIs and synthetic fixtures. It proves:
 
@@ -74,14 +78,14 @@ The integration suite uses only public child APIs and synthetic fixtures. It pro
 8. legacy states/evidence/result shapes fail strict parsing and cannot be adapted;
 9. the transition block executes before every old site command side effect;
 10. site Diagnostic values parse through the RFC-0852 engine-owned schema and engine source has no plugin import.
-
 ### Scale and false-positive contract
+
 
 Integration imports RFC-0849's 8 MiB/depth-64 canonical bounds and RFC-0850's limits of 1,000 requirements, 10,000 admitted evidence records, and 1,000 action tasks. Selection/aggregation remains `O(E + R log R)` time and `O(E + R)` memory; integration must not wrap it in a per-requirement scan.
 
 All required schema, identity, aggregation, legacy, and transition diagnostics have zero intended false positives and no suppression/bypass. A confirmed defect is corrected in the owning spec/profile/producer/RFC and forces new identity/evidence as applicable. Until correction, the outcome remains invalid or `incomplete`, never pass. Advisory diagnostics may later have profile-governed suppressions; CERT-001 defines none.
-
 ### Integration file responsibilities
+
 
 | Path | RFC-0848 responsibility |
 | --- | --- |
@@ -94,8 +98,8 @@ All required schema, identity, aggregation, legacy, and transition diagnostics h
 | `docs/ecosystem.generated.yaml` | Verify regenerated ecosystem projection |
 
 The integration RFC does not edit mission workpieces, Sternsystem mirrors, releases, provider state, object storage, or the public site.
-
 ### Exact Compass and agent-document map
+
 
 The final CERT-001 integration evidence must review every file below. “No change” is acceptable only with an explicit rationale in the implementation evidence.
 
@@ -114,14 +118,14 @@ The final CERT-001 integration evidence must review every file below. “No chan
 | `packages/werkstatt-site/AGENTS.md` | Diagnostic consumer and non-authorizing producer/plugin boundary |
 
 Generated projections are updated from owners: `command.manifest.generate` then `docs.commands.generate`, and `ecosystem.manifest.generate`. They are never hand-edited.
-
 ### Output and failure contract
+
 
 The integration suite produces ordinary Vitest results; it defines no runtime JSON protocol. Runtime output contracts are owned by the children. An integration failure names the violated cross-module law and owning RFC/module so a weaker agent fixes the source rather than adding a bridge.
 
 Stable integration-only test labels use `CERT-INTEGRATION-*`; production code must not emit them. Any mismatch fails CI/tests. There is no warn mode, suppression file, migration allowance, or “expected legacy pass.”
-
 ### Failure modes
+
 
 | Failure | Required response |
 | --- | --- |
