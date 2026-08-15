@@ -237,16 +237,16 @@ Rejected: vague tasks encourage agents to guess. An authoritative non-pass witho
 
 ## Acceptance criteria
 
-- [ ] A single bounded evidence index is built in `O(E)` before requirement selection; source/tests prohibit per-requirement full evidence scans.
-- [ ] Hard limits of 1,000 requirements, 10,000 evidence records, and 1,000 action tasks return explicit non-pass failures without truncation.
-- [ ] Selection uses admission sequence and evaluation cuts; timestamp/order/retry/late-result properties prove historical decisions cannot change.
-- [ ] Aggregation exhaustively proves `fail > stale > incomplete > pass`, applicability, advisory neutrality, empty-profile non-pass, and mandatory dimension coverage.
-- [ ] Equivalent permutations yield byte-identical decision IDs, selected evidence lists, coverage summaries, and action-pack IDs.
-- [ ] Every non-pass produces one valid anchored task per actionable requirement or fails with `CERT-ACTION-01`; dependency cycles and vague tasks are rejected.
-- [ ] Dossier event/root hashing is order-sensitive and location/projection-time independent.
-- [ ] Deterministic maximum-size stress fixtures complete without limit bypass; advisory performance results are recorded without wall-clock CI assertions.
-- [ ] Evaluation modules have no filesystem/network/clock/env/plugin imports and mutate none of their inputs.
-- [ ] `pnpm --filter @warpgogol/werkstatt test`, `build:check`, `rfc.acceptance.run --id RFC-0850`, `rfc.verification.emit --id RFC-0850`, and `rfc.validate --id RFC-0850 --json` pass before stamping.
+- [x] A single bounded evidence index is built in `O(E)` before requirement selection; source/tests prohibit per-requirement full evidence scans. (evidence: packages/werkstatt/src/certification/evidence-selection.ts:38-82, packages/werkstatt/src/tests/certification-evaluation.test.ts:55-72)
+- [x] Hard limits of 1,000 requirements, 10,000 evidence records, and 1,000 action tasks return explicit non-pass failures without truncation. (evidence: packages/werkstatt/src/certification/aggregation.ts:76-90, packages/werkstatt/src/certification/evidence-selection.ts:32-37, packages/werkstatt/src/certification/action-pack.ts:61-66, packages/werkstatt/src/tests/certification-evaluation.pbt.test.ts:248-283)
+- [x] Selection uses admission sequence and evaluation cuts; timestamp/order/retry/late-result properties prove historical decisions cannot change. (evidence: packages/werkstatt/src/certification/evidence-selection.ts:84-140, packages/werkstatt/src/tests/certification-evaluation.pbt.test.ts:110-155)
+- [x] Aggregation exhaustively proves `fail > stale > incomplete > pass`, applicability, advisory neutrality, empty-profile non-pass, and mandatory dimension coverage. (evidence: packages/werkstatt/src/certification/aggregation.ts:56-71, packages/werkstatt/src/tests/certification-evaluation.pbt.test.ts:157-220)
+- [x] Equivalent permutations yield byte-identical decision IDs, selected evidence lists, coverage summaries, and action-pack IDs. (evidence: packages/werkstatt/src/tests/certification-evaluation.pbt.test.ts:55-108, packages/werkstatt/src/tests/certification-evaluation.test.ts:233-265)
+- [x] Every non-pass produces one valid anchored task per actionable requirement or fails with `CERT-ACTION-01`; dependency cycles and vague tasks are rejected. (evidence: packages/werkstatt/src/certification/action-pack.ts:68-120, packages/werkstatt/src/tests/certification-evaluation.test.ts:410-456)
+- [x] Dossier event/root hashing is order-sensitive and location/projection-time independent. (evidence: packages/werkstatt/src/certification/dossier-hash.ts:28-52, packages/werkstatt/src/tests/certification-evaluation.test.ts:500-540)
+- [x] Deterministic maximum-size stress fixtures complete without limit bypass; advisory performance results are recorded without wall-clock CI assertions. (evidence: packages/werkstatt/src/tests/certification-evaluation.pbt.test.ts:225-245)
+- [x] Evaluation modules have no filesystem/network/clock/env/plugin imports and mutate none of their inputs. (evidence: packages/werkstatt/src/certification/evidence-selection.ts:1-7, packages/werkstatt/src/certification/aggregation.ts:1-12, packages/werkstatt/src/certification/action-pack.ts:1-8, packages/werkstatt/src/certification/dossier-hash.ts:1-10)
+- [x] `pnpm --filter @warpgogol/werkstatt test`, `build:check`, `rfc.acceptance.run --id RFC-0850`, `rfc.verification.emit --id RFC-0850`, and `rfc.validate --id RFC-0850 --json` pass before stamping. (evidence: packages/werkstatt/src/tests/certification-evaluation.test.ts, packages/werkstatt/src/tests/certification-evaluation.pbt.test.ts)
 
 ## Implementation notes for agents
 

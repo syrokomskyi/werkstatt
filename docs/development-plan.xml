@@ -359,6 +359,31 @@
           70 tests pass (42 contract + 28 identity PBT).
         </description>
       </deliverable>
+      <deliverable id="del-0850">
+        <name>RFC-0850 Deterministic certification evaluation and remediation</name>
+        <status>implemented</status>
+        <description>
+          Added pure deterministic evaluation pipeline in `packages/werkstatt/src/certification/`:
+          `evidence-selection.ts` — single-pass bounded evidence index (`buildEvidenceIndex`) keyed by
+          requirement ID, excluding records above the immutable evaluation cut and records without authority
+          admission; authority-sequence selection (`selectRequirementEvidence`) choosing the eligible record
+          with greatest `admissionSequence`, preserving `pass | fail | stale | incomplete | not-applicable`
+          with stable reason codes (`CERT-EVIDENCE-01`, `CERT-EVIDENCE-02`, `CERT-OK`, `CERT-NA`).
+          `aggregation.ts` — deterministic certification aggregator (`evaluateCertificationDecision`)
+          resolving required/conditional/advisory requirements at an immutable cut, applying top-level
+          precedence `fail > stale > incomplete > pass`, recording selected evidence IDs, coverage counts,
+          and reason codes. Never infers pass from empty profile, zero diagnostics, or unknown values.
+          `action-pack.ts` — anchored remediation pack builder (`buildCertificationActionPack`) creating one
+          canonical task per actionable non-pass requirement, validating anchors and verification commands,
+          detecting dependency cycles via topological sort, returning stable order with lexical tie-breaker.
+          `dossier-hash.ts` — pure event/root hashing (`computeDossierEventHash`, `computeDossierRoot`)
+          using RFC-0853 identity builders and RFC-0849 canonical JSON; root is order-sensitive and
+          location/projection-time independent.
+          Hard limits: 1,000 requirements (CERT-LIMIT-01), 10,000 evidence records (CERT-LIMIT-02),
+          1,000 action tasks (CERT-LIMIT-03). Complexity: O(E + R log R) for indexing/selection/aggregation.
+          No I/O, clock, env, or plugin imports. 42 tests pass (29 truth table + 13 PBT/stress).
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

@@ -291,6 +291,12 @@
       <rule>Identity builders construct fresh payloads field-by-field, snapshot through RFC-0849, and hash through the engine fingerprint owner; no clone/delete or generic hash.</rule>
       <rule>Evidence identity enforces redaction closure before construction; unresolved secrets or PII fail with CERT-REDACTION-01.</rule>
       <rule>No evaluation algorithms, state cutover, storage, commands, producers, adapters, authority execution, or deployment logic exists in the contracts module.</rule>
+      <rule>Evidence index is built once per decision in O(E) time; selection uses authority admission sequence and immutable evaluation cuts — timestamps, filenames, and input order never establish precedence.</rule>
+      <rule>Aggregation preserves per-requirement pass/fail/stale/incomplete/not-applicable, applies precedence fail > stale > incomplete > pass, and never infers pass from empty profile, zero diagnostics, or unknown values.</rule>
+      <rule>Action packs create one anchored task per actionable non-pass requirement with topological ordering and cycle detection; missing anchors or verification commands fail with CERT-ACTION-01.</rule>
+      <rule>Dossier root hashing is order-sensitive and location/projection-time independent.</rule>
+      <rule>Hard limits: 1,000 requirements, 10,000 evidence records, 1,000 action tasks — overflow returns explicit non-pass failures without truncation.</rule>
+      <rule>Evaluation modules have no filesystem/network/clock/env/plugin imports and mutate none of their inputs.</rule>
     </certification-plane>
     <transition>Current `werkstatt/plugin@1` source remains until packet 230; no compatibility adapter is introduced.</transition>
   </agent-runtime-architecture>
