@@ -297,6 +297,7 @@
       <rule>Dossier root hashing is order-sensitive and location/projection-time independent.</rule>
       <rule>Hard limits: 1,000 requirements, 10,000 evidence records, 1,000 action tasks — overflow returns explicit non-pass failures without truncation.</rule>
       <rule>Evaluation modules have no filesystem/network/clock/env/plugin imports and mutate none of their inputs.</rule>
+      <rule>Release manifests accept only artifact readiness states `prepared` and `ready` (RFC-0851); legacy deployment-state labels are rejected without translation. All Leitstand commands and `release.rollback` are blocked with `CERT-TRANSITION-01` until CERT-007.</rule>
     </certification-plane>
     <transition>Current `werkstatt/plugin@1` source remains until packet 230; no compatibility adapter is introduced.</transition>
   </agent-runtime-architecture>

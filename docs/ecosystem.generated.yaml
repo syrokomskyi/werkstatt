@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: a2da119086c015d53a1a26cc84071fd013cbf03dcef1740ef817fe300723d385
+  contentHash: 457823cf57c8e404d47db9157f7fd8d4713acff8795541c2217fb361d79da9e8
   sources:
     - path: docs/architecture-dna.md
-      hash: 1f817ac52ca6c86112629a56ac717e39b564612c94e70f2b24461f4238e94953
+      hash: 9f0233f161248f4813c716b77ecd2fee87525c7857b40313a9ae48dbcf241253
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -23,19 +23,19 @@ meta:
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: 83c2f044ad2a5dea86ace5fe92679dea40f1add0956cb8fadc30d0898884b142
     - path: package.json
-      hash: e8de823d29ab444228de5ec5e2fdac84c9eaeb9c6c08a1ab2d94e5991db65be6
+      hash: 82f681fb2d5518144cc318af756f01073e1e625510685471211c9050d0409657
     - path: packages/forge/package.json
-      hash: 712d9e1ecbfb3e3f5319014458fbef46bb187518e5175378744bae5b8ecd3e7f
+      hash: 1c5da99ffd95ebe7facf0e13981d38de992b90b83b6fd04a423e75569048b648
     - path: packages/werkstatt-game/package.json
-      hash: 813b21c14e2a60167f6b809552a97189f4d6d3f8a6f3ee328f4ea6411e19284c
+      hash: f695f4e2c8d92f950b1c0e6c8b9a97b3b34232930a96b2f62219e678294b270b
     - path: packages/werkstatt-site/package.json
       hash: 1e083bee5ff81e88196a129cc55d0370c9a4bca338a165fc716f61aa9406929b
     - path: packages/werkstatt-video/package.json
-      hash: 5d90d06340c2ff7c7e7bfc24e096555bc2dc6f1daed7fe62736a0462d9fe1516
+      hash: ae73bcd009881b9a73754b4e5664bbbc5cabee06005ab32b4e69a0acf105c22d
     - path: packages/werkstatt/package.json
-      hash: 16713dca9ff30991f0551f686dee89bae1d73303a3dd3e1354fa1cd97225e88a
+      hash: 6ae8c16e7d6da2c2617cd40a5650225cfa44ec3163409eab69289aa5c0ff46b0
     - path: pnpm-workspace.yaml
-      hash: 42760fb474b7f830cfa72fdf8ec29f6403d744cbee724334001a9d498810ac9c
+      hash: 436869632a23135d7b2c1bf745c43dcdbd1f1b6a702609a59beb7ad30d0f0a93
     - path: services/cf-analytics-poller/package.json
       hash: 4615df2816849743fe6cbb4e9dcd7ca262e838ae94864b8ea86c4b165c9773cc
     - path: services/check-runner/package.json
@@ -58,7 +58,7 @@ meta:
       hash: 08b456e4efb8f242b3076a9bcf9247999df2d4e5d0103e15f7e456216f847208
 workspace:
   name: warpgogol-platform
-  version: 5.51.56
+  version: 6.0.3
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -5180,30 +5180,6 @@ commandProvenance:
     changedBy:
       - RFC-0851
     removedBy: []
-  - command: program.packet.complete
-    proposedBy:
-      - RFC-0856
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: program.packet.lease
-    proposedBy:
-      - RFC-0856
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: program.packet.seal
-    proposedBy:
-      - RFC-0856
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: program.packet.validate
-    proposedBy:
-      - RFC-0856
-    addedBy: []
-    changedBy: []
-    removedBy: []
   - command: release.list
     proposedBy: []
     addedBy: []
@@ -6726,26 +6702,81 @@ generatedOwnership:
     conditional: true
 rfcs:
   accepted: 3
-  implemented: 1
-  draft: 18
+  implemented: 10
+  draft: 7
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0855
+    - id: RFC-0849
+      implementedAt: 2026-08-15
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-53
+    - id: RFC-0850
+      implementedAt: 2026-08-15
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-51
+        - DNA-64
+    - id: RFC-0852
+      implementedAt: 2026-08-15
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-64
+    - id: RFC-0853
+      implementedAt: 2026-08-15
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-53
+        - DNA-64
+    - id: RFC-0854
+      implementedAt: 2026-08-15
+      kind: policy
+      scope: workspace
+      dnaRefs: []
+    - id: RFC-0858
+      implementedAt: 2026-08-15
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-53
+        - DNA-64
+    - id: RFC-0859
       implementedAt: 2026-08-15
       kind: architecture
       scope: workspace
       dnaRefs:
         - DNA-51
-        - DNA-52
-        - DNA-53
-        - DNA-59
         - DNA-64
-        - DNA-73
+    - id: RFC-0860
+      implementedAt: 2026-08-15
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-51
+        - DNA-53
+        - DNA-64
+    - id: RFC-0861
+      implementedAt: 2026-08-15
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-64
+    - id: RFC-0862
+      implementedAt: 2026-08-15
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-51
+        - DNA-64
   nonImplementedRfcs:
     accepted:
       - RFC-0179
-      - RFC-0856
+      - RFC-0851
       - RFC-0857
     draft:
       - RFC-0000
@@ -6753,17 +6784,6 @@ baseline:
       - RFC-0384
       - RFC-0387
       - RFC-0848
-      - RFC-0849
-      - RFC-0850
-      - RFC-0851
-      - RFC-0852
-      - RFC-0853
-      - RFC-0854
-      - RFC-0858
-      - RFC-0859
-      - RFC-0860
-      - RFC-0861
-      - RFC-0862
       - RFC-0863
       - RFC-0864
     reviewing: []
@@ -7134,4 +7154,44 @@ baseline:
       title: Sequential deployment pipeline enforcement
       provenance: rfc
       establishingRfc: RFC-0842
+      status: active
+    - id: DNA-74
+      title: Canonical Diagnostic schema ownership
+      provenance: rfc
+      establishingRfc: RFC-0852
+      status: active
+    - id: DNA-75
+      title: Component and capability contract ownership
+      provenance: rfc
+      establishingRfc: RFC-0858
+      status: active
+    - id: DNA-76
+      title: Lifecycle fiber and effect runtime ownership
+      provenance: rfc
+      establishingRfc: RFC-0859
+      status: active
+    - id: DNA-77
+      title: Deterministic component resolution and reconciliation
+      provenance: rfc
+      establishingRfc: RFC-0860
+      status: active
+    - id: DNA-78
+      title: Runtime reflection and conformance harness
+      provenance: rfc
+      establishingRfc: RFC-0861
+      status: active
+    - id: DNA-79
+      title: Provider-neutral isolation contract
+      provenance: rfc
+      establishingRfc: RFC-0862
+      status: active
+    - id: DNA-80
+      title: Certification contracts and identity builders
+      provenance: rfc
+      establishingRfc: RFC-0853
+      status: active
+    - id: DNA-81
+      title: Deterministic certification evaluation and remediation
+      provenance: rfc
+      establishingRfc: RFC-0850
       status: active

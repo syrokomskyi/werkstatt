@@ -384,6 +384,27 @@
           No I/O, clock, env, or plugin imports. 42 tests pass (29 truth table + 13 PBT/stress).
         </description>
       </deliverable>
+      <deliverable id="del-0851">
+        <name>RFC-0851 Forward-only state reset</name>
+        <status>implemented</status>
+        <description>
+          Replaced legacy release states (published, dev-deployed, alt-deployed, promoted,
+          main-deployed, rolled-back) with artifact-only states (prepared, ready) in
+          `packages/werkstatt/src/schemas/release.ts`. Deployment progress is now a separate
+          append-only DeploymentOperationState event chain, not a release manifest field.
+          Updated `readReleaseManifest` and `writeReleaseYaml` in
+          `packages/werkstatt/src/release/release-commands.ts` to use strict
+          `releaseManifestSchema` validation via the `yaml` package; manifests with legacy
+          states throw `LegacyReleaseError`. Updated `release.list` to report valid releases
+          separately from `legacyInvalid` entries. Blocked all Leitstand commands
+          (dev-deploy, propagate, promote, status, rollback, health, pipeline.check) and
+          `release.rollback` with `CERT-TRANSITION-01` via
+          `buildCertificationTransitionBlock` in
+          `packages/werkstatt/src/certification/transition-block.ts`. Updated all affected
+          tests to use YAML serialization and strict schema fields. Updated DNA-48, DNA-49,
+          and DNA-73 in `docs/architecture-dna.md`.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

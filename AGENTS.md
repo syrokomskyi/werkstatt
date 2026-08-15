@@ -50,6 +50,15 @@ Current pre-cutover code facts:
 - **Warn-only transition:** Until `forge.yaml` has a `profile` field, PLUGIN-01 is a warning, not an error. This allows workshops to operate without a plugin during the transition period (RFC-0776).
 - **Package:** `@warpgogol/werkstatt` (`packages/werkstatt/`) owns the contract types, plugin registry, and the `werkstatt.plugin.validate` command. The module is registered in `tools/kernel.config.ts` as `werkstatt-plugin`.
 
+## Release state and deployment transition (RFC-0851)
+
+RFC-0851 replaced legacy release states (`published`, `dev-deployed`, `alt-deployed`, `promoted`, `main-deployed`, `rolled-back`) with artifact-only states (`prepared`, `ready`). Deployment progress is now a separate append-only `DeploymentOperationState` event chain, not a release manifest field.
+
+- All Leitstand commands (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.status`, `leitstand.rollback`, `leitstand.health`, `leitstand.pipeline.check`) and `release.rollback` are blocked with `CERT-TRANSITION-01` until CERT-007 reconnects them to signed certification authority.
+- `release.list` reports valid releases separately from `legacyInvalid` entries (releases with legacy state labels). Legacy entries are preserved but never translated, migrated, or presented as deployable.
+- `readReleaseManifest` and `writeReleaseYaml` use strict `releaseManifestSchema` validation via the `yaml` package. Manifests with legacy states throw `LegacyReleaseError`.
+- Agents MUST NOT restore legacy deployment commands, bypass the transition block, or introduce compatibility/migration readers for old state labels.
+
 ## Publication policy (RFC-0773)
 
 - Agents MUST NOT trigger `npm publish` without an explicit operator command. Publication is operator-triggered, never automated.
