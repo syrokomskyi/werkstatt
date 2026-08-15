@@ -7,12 +7,12 @@ governingDecision: RFC-0853
 decisionKind: rfc
 resolvedRfc: RFC-0853
 dependsOnPacket: 090-isolation-contract
-baseCommit: null
+baseCommit: bf2a20d5e7fb2f230133527075818d2a9c86c9c7
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md"
-    sha256: 0ca5f8fc7727888b9a659e89cb9aa352754c7f5370dc799759b5d66c79724b5a
+    sha256: fac15be9a45718f86fc039a411ddd059be9db1999bf13ce7449e1789030a15f2
 allowedFiles:
   - "packages/werkstatt/src/certification/contracts/identifiers.ts"
   - "packages/werkstatt/src/certification/contracts/candidate.ts"

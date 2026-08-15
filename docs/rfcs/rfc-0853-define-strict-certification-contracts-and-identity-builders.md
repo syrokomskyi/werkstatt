@@ -1,12 +1,13 @@
 ---
 id: RFC-0853
 title: "Define strict certification contracts and identity builders"
-status: draft
+status: accepted
 kind: contract
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-14
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15

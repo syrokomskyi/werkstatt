@@ -126,7 +126,7 @@ packets:
     decisionKind: rfc
     resolvedRfc: RFC-0853
     dependsOnPacket: 090-isolation-contract
-    baseCommit: null
+    baseCommit: bf2a20d5e7fb2f230133527075818d2a9c86c9c7
     sealCommit: null
     completion: null
   - order: 110
