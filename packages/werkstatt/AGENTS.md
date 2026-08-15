@@ -80,6 +80,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - The suite verifies: canonical JSON snapshotting of diagnostic/certification values, identity digest determinism, immutable evaluation cut, permutation invariance, dossier root sensitivity, fail > stale > incomplete > pass precedence, deployment/artifact separation, legacy state rejection, transition block fail-closed, and engine/plugin Diagnostic ownership boundary.
 - `@warpgogol/werkstatt` imports no stack plugin; the site plugin defines no duplicate Diagnostic/certification authority.
 
+### Resolved certification profile (CERT-002, packet 140)
+
+- `packages/werkstatt/src/certification/profile/` owns `CertificationProfileV1` strict Zod schemas, producer declarations, requirements, applicability rules, reuse/freshness, execution, remediation, retention, and evaluator policy.
+- `hashCertificationProfileV1` computes canonical hash via RFC-0849 fingerprint authority (`snapshotCanonicalJsonObjectV1` + `canonicalJsonHashV1`). The hash is key-order invariant and sensitive to every semantic field change.
+- `validateCertificationProfileV1` validates: plugin/profile binding against active plugin and `forge.yaml`, duplicate requirement/producer IDs, producer registration and command existence, nine-dimension Main gate coverage, continuous-health freshness TTL/schedule, rollback drift-action eligibility, and evaluator policy consistency.
+- No producer execution, deployment decisions, I/O, clock, env, or plugin imports exist in this module.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
