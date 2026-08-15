@@ -41,7 +41,7 @@ All 25 packets (000–240) of the agent-runtime-certification program are **comp
 - **Build pipeline**: `build.prepare`, `build.check`, `astro build` — all work normally.
 - **Git**: `mission.git.commit` (workpiece), `ecosystem.commit` (platform) — both work.
 - **Validation**: `mission.validate`, `sternsystem.validate`, `werkstatt.plugin.validate` — all work.
-- **Deployment** (RFC-0865): `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.status`, `leitstand.health`, `leitstand.pipeline.check`, `leitstand.rollback`, and `release.rollback` — all work via certification authority (`authorizeDeployment()`, `verifyMainPromotion()`, `evaluateRollback()`). Each command requires a `--gate-decision` flag (path to `GateDecisionV1` JSON); `leitstand.promote` additionally requires `--main-verification-decision`.
+- **Deployment** (RFC-0865, RFC-0866): `leitstand.certify`, `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.status`, `leitstand.health`, `leitstand.pipeline.check`, `leitstand.rollback`, and `release.rollback` — all work via certification authority (`authorizeDeployment()`, `verifyMainPromotion()`, `evaluateRollback()`). `leitstand.certify` produces `GateDecisionV1` JSON at `systems-cache/{id}/gate-decisions/{release}-{gate}.json` from certification orchestration. Deploy commands resolve the gate decision at the conventional path by default; `--gate-decision` overrides the path. `leitstand.promote` additionally requires `--main-verification-decision`. The 13-phase deploy execution pipeline (build, wrangler deploy, build-identity, CDN purge, freshness, health, mission.check, Axiom gate, alt health check, evidence sync, bordbuch, system-state, effect record) runs after authorization.
 
 ### What agents CANNOT do
 
@@ -437,9 +437,10 @@ Agents MUST NOT skip step 1. Running reconcile without validation fails with "mi
 
 The deployment pipeline is strictly ordered. Agents MUST NOT skip steps, reorder, or deploy directly to Main.
 
-1. **Dev** — `leitstand.dev-deploy --site <id>` — deploys workpiece to dev channel with Axiom verification gate. For existing releases: `leitstand.dev-deploy --site <id> --release <releaseId>`.
-2. **Alt** — `leitstand.propagate --release <releaseId>` — deploys a verified release to alt channel. Requires Axiom evidence (commitSha + missionId match).
-3. **Main** — `leitstand.promote --release <releaseId>` — promotes an alt-deployed release to main channel. Requires release state `alt-deployed`.
+0. **Certify** — `leitstand.certify --site <id> --gate dev --release <releaseId> --artifact-hash sha256:...` — produces `GateDecisionV1` JSON at `systems-cache/{id}/gate-decisions/{release}-{gate}.json` from certification orchestration. Must be run before each deploy command. Repeat with `--gate alt` and `--gate main` for propagate and promote respectively.
+1. **Dev** — `leitstand.dev-deploy --site <id> --release <releaseId>` — deploys workpiece to dev channel. Runs 13-phase pipeline: build, wrangler deploy, build-identity, CDN purge (skipped for *.workers.dev), freshness, health, mission.check, evidence sync, bordbuch, system-state. Gate decision resolved at conventional path by default; `--gate-decision` overrides.
+2. **Alt** — `leitstand.propagate --site <id> --release <releaseId>` — deploys a verified release to alt channel. Requires R2 durable sync verification and Axiom evidence gate (commitSha + missionId match).
+3. **Main** — `leitstand.promote --site <id> --release <releaseId> --main-verification-decision <path>` — promotes an alt-deployed release to main channel. Verifies alt health before promoting. Requires `--main-verification-decision`.
 
 Rules:
 
