@@ -65,6 +65,6 @@ skillPacks:
   - prefix: wg
     dir: packages/werkstatt-site/src/domain/skills
 forge:
-  syncedVersion: 0.23.0
+  syncedVersion: 1.0.0
 independentVersionPackages:
   - packages/forge

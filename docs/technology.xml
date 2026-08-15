@@ -8,7 +8,7 @@
 
   <runtime>
     <node>
-      <version-range>&gt;=22</version-range>
+      <version-range>&gt;=24 &lt;25</version-range>
       <source>`package.json` engines.node</source>
     </node>
     <package-manager>
