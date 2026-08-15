@@ -95,6 +95,12 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Retention GC checks protected references (`current`, `rollback-target`, `open-incident`, `audit-hold`), age thresholds (certified vs unsuccessful), and creates tombstones before deletion. Durable replica verification rejects root hash mismatch (`CERT-STORAGE-03`).
 - No R2 adapter, producer orchestration, deployment commands, or I/O imports exist in this module.
 
+### Certification orchestration and command surface (CERT-004, packet 160)
+
+- `packages/werkstatt/src/certification/orchestration/` owns producer dependency planning via topological sort with cycle detection (`CERT-ORCHESTRATOR-01` duplicate IDs, `CERT-ORCHESTRATOR-02` unknown deps/cycles), gate lock manager with per-release+gate mutual exclusion and idempotent re-acquire (`CERT-ORCHESTRATOR-03` concurrent rejection), producer execution with bounded parallelism (semaphore), timeout, retry with backoff, progress events (`CERT-ORCHESTRATOR-04` execution failure), and resume point computation from partial evidence (`CERT-ORCHESTRATOR-07` all-complete rejection).
+- `packages/werkstatt/src/certification/commands/` owns read-only `getCertificationStatus` (candidate identity, latest decisions, coverage, durable replica status, next required action, action-pack locators) and `verifyCertification` (candidate ID recompute, dossier integrity, root hash match, decision references). `CERT-ORCHESTRATOR-08`/`CERT-ORCHESTRATOR-09`/`CERT-ORCHESTRATOR-10` cover identity and integrity failures.
+- No producer implementations, deployment commands, or I/O imports exist in this module.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
