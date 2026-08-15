@@ -1,0 +1,34 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "020-canonical-identity-bytes",
+  "baseCommit": "95298fefbe874cb76ab65c0bfe37148183208950",
+  "sealCommit": "afa9d28c322d4f8cbd102e19c27907f116cfb42f",
+  "implementationCommits": [
+    "afa9d28c322d4f8cbd102e19c27907f116cfb42f"
+  ],
+  "implementationHead": "afa9d28c322d4f8cbd102e19c27907f116cfb42f",
+  "changedFiles": [],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass",
+      "evidenceDigest": "sha256:e255d8258a4487a5d78f315824f483fd0d7027abda0fe237cd6dfe977cbb3435"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass",
+      "evidenceDigest": "sha256:eba2fd95b0a630791a84fd2d98af517f873f59066a3c3bf8da067ada5b1c51eb"
+    },
+    {
+      "command": "pnpm exec werkstatt run rfc.validate --id RFC-0849",
+      "status": "pass",
+      "evidenceDigest": "sha256:d047922c7356ed1fb11e31f3fe478ead23d7abf1aeda1594c748e1c169f7e1ca"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}
