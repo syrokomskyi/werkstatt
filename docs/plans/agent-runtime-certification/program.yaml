@@ -3,7 +3,7 @@ program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
 state: executing
-currentPacket: 010-node-24
+currentPacket: 020-canonical-identity-bytes
 steward: human:andrii-syrokomskyi
 sequential: true
 parallelism: 1
@@ -22,14 +22,14 @@ packets:
   - order: 10
     packetId: 010-node-24
     file: 010-node-24.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0854
     decisionKind: rfc
     resolvedRfc: RFC-0854
     dependsOnPacket: 000-program-control-plane
     baseCommit: 7841610506db94209178212582511207e2e1c9b7
     sealCommit: null
-    completion: null
+    completion: 799e7db56986309b0e9cbbe0675bbf2d5cea053e
   - order: 20
     packetId: 020-canonical-identity-bytes
     file: 020-canonical-identity-bytes.md
