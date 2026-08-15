@@ -137,6 +137,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `evaluateRollback` denies rollback during shared outage, when artifact is not ready, or when target is the same candidate. `evaluateCrashRecovery` resumes verification, restarts deployment, or quarantines with ambiguous state detection (`CERT-DEPLOY-13`).
 - `buildDeploymentEffectRecord` creates deterministic content-addressed effect records. No success inference from deploy exit alone, no false Main success from incomplete verification.
 
+### Continuous health and demotion (CERT-008, packet 220)
+
+- `packages/werkstatt/src/certification/health/monitor.ts` owns continuous certification health and drift response — monitoring windows, health state transitions, drift classification, and incident response.
+- `evaluateHealth` returns `current` (all pass), `degraded` (fail/stale/incomplete), with `CERT-HEALTH-01` for empty results. Fail triggers profile drift action, stale triggers retry, incomplete triggers retry. Shared outage overrides to `incident-only`.
+- `shouldRevoke` checks consecutive degraded windows against threshold. `classifyDriftCause` identifies shared outage, expired evidence, candidate regression, public output drift, and late evidence.
+- `evaluateScheduleWindow` enforces idempotency with duplicate detection and late delivery rejection. `buildHealthDecision` appends decisions without editing historical gate decisions. `buildHealthProjection` creates deterministic projections.
+- `evaluateMonitorRecovery` resumes from requirements/health-decision/incident/projection/complete with `CERT-HEALTH-02` ambiguous state. `isHealthTransitionValid` validates state transitions. No silent overwrite of newer health decisions, no monitor failure masquerading as current health.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
