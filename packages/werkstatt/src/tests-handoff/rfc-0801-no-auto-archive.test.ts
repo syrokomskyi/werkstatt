@@ -193,7 +193,7 @@ test("RFC-0801: mission.close does NOT call mission.archive after close", async 
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent" },
+    flags: { mission: "test-system-m000001", actor: "test-agent", "allow-no-op": true },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,

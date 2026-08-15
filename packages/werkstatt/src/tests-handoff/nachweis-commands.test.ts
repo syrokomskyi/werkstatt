@@ -70,6 +70,75 @@ vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
   };
 });
 
+// Mock bordbuch-commit-helper to write to the correct test path
+vi.mock("../bordbuch/bordbuch-commit-helper.ts", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../bordbuch/bordbuch-commit-helper.ts")>();
+  const { existsSync, readFileSync } = await import("node:fs");
+  const fsPromises = await import("node:fs/promises");
+  const nodePath = await import("node:path");
+  const { createHash } = await import("node:crypto");
+  return {
+    ...actual,
+    appendAndCommitBordbuch: vi.fn(
+      async (
+        workspaceRoot: string,
+        systemId: string,
+        kind: string,
+        summary: string,
+        actor: string,
+        options?: Record<string, unknown>,
+      ) => {
+        const filePath = nodePath.join(
+          workspaceRoot,
+          "systems-cache",
+          systemId,
+          "bordbuch",
+          "events.ndjson",
+        );
+        const dir = nodePath.dirname(filePath);
+        if (!existsSync(dir)) await fsPromises.mkdir(dir, { recursive: true });
+        const existingContent = existsSync(filePath) ? readFileSync(filePath, "utf8") : "";
+        const prevLines = existingContent
+          .trim()
+          .split("\n")
+          .filter((l) => l.trim());
+        const previousHash =
+          prevLines.length > 0 ? JSON.parse(prevLines[prevLines.length - 1]).hash : null;
+        const maxNum = prevLines.reduce((max, l) => {
+          const m = JSON.parse(l).id?.match(/^event-(\d{6})$/);
+          return m ? Math.max(max, parseInt(m[1], 10)) : max;
+        }, 0);
+        const id = `event-${String(maxNum + 1).padStart(6, "0")}`;
+        const entryWithoutHash = {
+          schemaVersion: "1.0.0",
+          id,
+          systemId,
+          occurredAt: new Date().toISOString(),
+          kind,
+          status: (options as { status?: string })?.status ?? "done",
+          missionId: (options as { missionId?: string })?.missionId ?? null,
+          releaseId: (options as { releaseId?: string })?.releaseId ?? null,
+          actor,
+          summary,
+          metadata: (options as { metadata?: unknown })?.metadata,
+          previousHash,
+          erratumOf: (options as { erratumOf?: string })?.erratumOf,
+        };
+        const stable = JSON.stringify(entryWithoutHash, Object.keys(entryWithoutHash).sort());
+        const hash = `sha256:${createHash("sha256").update(stable).digest("hex")}`;
+        const entry = { ...entryWithoutHash, hash };
+        const separator = existingContent.length > 0 && !existingContent.endsWith("\n") ? "\n" : "";
+        await fsPromises.writeFile(
+          filePath,
+          `${existingContent}${separator}${JSON.stringify(entry)}\n`,
+          "utf8",
+        );
+        return { entry, commitResult: { commitSha: null, pushed: false, error: null } };
+      },
+    ),
+  };
+});
+
 // Mock executeKernelCommand for bordbuch.validate delegation
 vi.mock("@warpgogol/werkstatt/kernel", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@warpgogol/werkstatt/kernel")>();
@@ -711,6 +780,7 @@ describe("RFC-0714: nachweis.approve", () => {
   it("appends bordbuch entry with approved summary and metadata", async () => {
     const cachePath = join(tmpDir, "systems-cache", "test-sys");
     await mkdir(cachePath, { recursive: true });
+    await mkdir(join(cachePath, "bordbuch"), { recursive: true });
     await writeEntitlements(cachePath, ["nachweis"]);
 
     await writePbpEntity(cachePath, "evidence-source", "test-record", {

@@ -390,7 +390,7 @@ describe("workshop.scaffold", () => {
         makeContext(tempDir),
       );
       const ci = fs.readFileSync(path.join(dest, ".github/workflows/ci.yml"), "utf8");
-      expect(ci).toContain("node-version: 24");
+      expect(ci).toContain('node-version: "24"');
       expect(ci).not.toContain("node-version: 22");
     });
 
