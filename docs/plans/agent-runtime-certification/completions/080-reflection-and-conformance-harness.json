@@ -1,0 +1,47 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "080-reflection-and-conformance-harness",
+  "baseCommit": "e85f033778abdd552379209be37fff24e4d1c415",
+  "sealCommit": "69debdf27e00b3ca6156c7e7d271f59359752cf5",
+  "implementationCommits": [
+    "99cfcfaade01f6dfd3cbd17b9c991c6843635237"
+  ],
+  "implementationHead": "99cfcfaade01f6dfd3cbd17b9c991c6843635237",
+  "changedFiles": [
+    "docs/architecture-dna.md",
+    "docs/development-plan.xml",
+    "docs/plans/agent-runtime-certification/080-reflection-and-conformance-harness.md",
+    "docs/requirements.xml",
+    "docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md",
+    "packages/werkstatt/AGENTS.md",
+    "packages/werkstatt/package.json",
+    "packages/werkstatt/src/component-runtime/conformance.ts",
+    "packages/werkstatt/src/component-runtime/reflection.ts",
+    "packages/werkstatt/src/component-runtime/testing/harness.ts",
+    "packages/werkstatt/src/component-runtime/tests/conformance.test.ts",
+    "packages/werkstatt/src/component-runtime/tests/reflection.test.ts"
+  ],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass",
+      "evidenceDigest": "sha256:e255d8258a4487a5d78f315824f483fd0d7027abda0fe237cd6dfe977cbb3435"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass",
+      "evidenceDigest": "sha256:eba2fd95b0a630791a84fd2d98af517f873f59066a3c3bf8da067ada5b1c51eb"
+    },
+    {
+      "command": "pnpm exec werkstatt run rfc.validate --id RFC-0861",
+      "status": "pass",
+      "evidenceDigest": "sha256:f40719b47feee98b180f52f088bb8699050b3f4f00907914bc16e44038ea70cd"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}

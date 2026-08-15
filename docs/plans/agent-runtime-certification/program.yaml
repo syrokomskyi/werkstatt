@@ -3,7 +3,7 @@ program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
 state: executing
-currentPacket: 080-reflection-and-conformance-harness
+currentPacket: 090-isolation-contract
 steward: human:andrii-syrokomskyi
 sequential: true
 parallelism: 1
@@ -99,14 +99,14 @@ packets:
   - order: 80
     packetId: 080-reflection-and-conformance-harness
     file: 080-reflection-and-conformance-harness.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0861
     decisionKind: rfc
     resolvedRfc: RFC-0861
     dependsOnPacket: 070-resolution-and-reconciliation
     baseCommit: e85f033778abdd552379209be37fff24e4d1c415
     sealCommit: null
-    completion: null
+    completion: 99cfcfaade01f6dfd3cbd17b9c991c6843635237
   - order: 90
     packetId: 090-isolation-contract
     file: 090-isolation-contract.md
