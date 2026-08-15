@@ -2,41 +2,43 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 040-specification-reconciliation
-state: draft
+state: sealed
 governingDecision: werkstatt-release-certification/AMD-007
 decisionKind: spec-amendment
 resolvedRfc: null
 dependsOnPacket: 030-canonical-diagnostic
-baseCommit: b82f2f75ad5361115a4cfa970a49eebe72abfe73
+baseCommit: 9c04fea2a03979a0445be88081aa41022ad8080b
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/specs/werkstatt-release-certification/amendments/amd-007-component-runtime-reconciliation.md"
+  - path: docs/specs/werkstatt-release-certification/amendments/amd-007-component-runtime-reconciliation.md
     sha256: ca12287a3dee5e07e2eb744c400015253f08f1767c399f94ebdd01895367ccb6
 allowedFiles:
-  - "docs/specs/werkstatt-release-certification/amendments/amd-007-component-runtime-reconciliation.md"
-  - "docs/specs/werkstatt-release-certification/forge-spec.yaml"
-  - "docs/plans/agent-runtime-certification/040-specification-reconciliation.md"
-  - "docs/plans/agent-runtime-certification/preparations/**"
-  - "docs/plans/agent-runtime-certification/program.yaml"
+  - docs/specs/werkstatt-release-certification/amendments/amd-007-component-runtime-reconciliation.md
+  - docs/specs/werkstatt-release-certification/forge-spec.yaml
+  - docs/plans/agent-runtime-certification/040-specification-reconciliation.md
+  - docs/plans/agent-runtime-certification/preparations/**
+  - docs/plans/agent-runtime-certification/program.yaml
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run spec.validate --spec=werkstatt-release-certification"
+  - command: pnpm exec werkstatt run spec.validate
+      --spec=werkstatt-release-certification
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 040: Specification reconciliation
 

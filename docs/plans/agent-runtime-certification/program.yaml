@@ -55,12 +55,12 @@ packets:
   - order: 40
     packetId: 040-specification-reconciliation
     file: 040-specification-reconciliation.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/AMD-007
     decisionKind: spec-amendment
     resolvedRfc: null
     dependsOnPacket: 030-canonical-diagnostic
-    baseCommit: b82f2f75ad5361115a4cfa970a49eebe72abfe73
+    baseCommit: 9c04fea2a03979a0445be88081aa41022ad8080b
     sealCommit: null
     completion: null
   - order: 50
