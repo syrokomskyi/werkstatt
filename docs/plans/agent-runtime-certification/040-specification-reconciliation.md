@@ -7,7 +7,7 @@ governingDecision: werkstatt-release-certification/AMD-007
 decisionKind: spec-amendment
 resolvedRfc: null
 dependsOnPacket: 030-canonical-diagnostic
-baseCommit: null
+baseCommit: b82f2f75ad5361115a4cfa970a49eebe72abfe73
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:

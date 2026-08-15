@@ -1,0 +1,44 @@
+{
+  "schema": "forge/program-packet-completion@1",
+  "program": "RFC-0855",
+  "packetId": "030-canonical-diagnostic",
+  "baseCommit": "7de9b5e9fddb5ef77739ba7e2227a2428c5f584d",
+  "sealCommit": "b82f2f75ad5361115a4cfa970a49eebe72abfe73",
+  "implementationCommits": [
+    "b82f2f75ad5361115a4cfa970a49eebe72abfe73"
+  ],
+  "implementationHead": "b82f2f75ad5361115a4cfa970a49eebe72abfe73",
+  "changedFiles": [],
+  "validations": [
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt test",
+      "status": "pass",
+      "evidenceDigest": "sha256:e255d8258a4487a5d78f315824f483fd0d7027abda0fe237cd6dfe977cbb3435"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt build",
+      "status": "pass",
+      "evidenceDigest": "sha256:eba2fd95b0a630791a84fd2d98af517f873f59066a3c3bf8da067ada5b1c51eb"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt-site test",
+      "status": "pass",
+      "evidenceDigest": "sha256:d46bb0a6519d007eeed882b40a00cf42044187716c84947ead131f2a425c214c"
+    },
+    {
+      "command": "pnpm --filter @warpgogol/werkstatt-site build",
+      "status": "pass",
+      "evidenceDigest": "sha256:35e763994465486546aa182b4b69388b99b14f7252d1a936573a55c288c1d2d8"
+    },
+    {
+      "command": "pnpm exec werkstatt run rfc.validate --id RFC-0852",
+      "status": "pass",
+      "evidenceDigest": "sha256:cac68ac809543040c1f30d160e0be43504c238ff5adfa976f4926278027371e7"
+    }
+  ],
+  "remainingTransitionDiagnostics": [],
+  "unexpectedDiagnostics": [],
+  "recoveryStatus": "not-applicable",
+  "cleanTrees": true,
+  "completedBy": "human:andrii-syrokomskyi"
+}
