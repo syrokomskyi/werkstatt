@@ -88,6 +88,15 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `computeSetHash` is input-order invariant and sensitive to every semantic field change. `verifySetHashStrict` detects set-hash mismatch (`COMPONENT-CONTRACT-07`).
 - No registry, loader, sandbox, plugin adapter, or activation behavior exists in this module. Later packets implement lifecycle and resolution against these types.
 
+### Lifecycle fiber and effect runtime (RFC-0859)
+
+- `packages/werkstatt/src/component-runtime/` owns the structured-concurrency runtime: lifecycle state machine, component fibers, effect handlers, and activation transaction.
+- `lifecycle.ts` exports a closed state machine (`declared → waiting → loading → active → draining → unloading → disposed` plus `failed`/`quarantined`). Invalid transitions are rejected with `LIFECYCLE-01`/`LIFECYCLE-02`.
+- `effects.ts` exports four effect handlers: `RevertibleEffectHandler` (disposer required), `TransactionalEffectHandler` (prepare/commit/abort with idempotency), `CompensatableEffectHandler` (compensation with equivalence evidence), `IrreversibleEmissionEffectHandler` (withheld until commit). Failed rollback quarantines.
+- `fiber.ts` exports `ComponentFiber` — structured ownership of child operations/resources, bounded drain with deadline, LIFO effect unwind, cancellation propagation at declared boundaries.
+- `activation.ts` exports `ActivationTransaction` — bounded set transition with prepare/commit/abort, prior-set drain in reverse dependency order, quarantine on incomplete rollback.
+- No resolver, sandbox, certification, or production activation occurs. Packet 070 supplies resolution; packet 230 performs production cutover.
+
 ## Mission git helpers
 
 - `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.
