@@ -121,6 +121,15 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Subpath exports: `@warpgogol/werkstatt/isolation/contracts`, `@warpgogol/werkstatt/isolation/schemas`, `@warpgogol/werkstatt/isolation/conformance`.
 - No concrete provider dependency, credential, artifact store, network endpoint, or production loader is added. Packet 190 selects and implements the first real provider.
 
+### Certification contracts and identity builders (RFC-0853)
+
+- `packages/werkstatt/src/certification/contracts/` owns strict Zod schemas and inferred types for all CERT-001 certification objects: identifiers, release candidates, policy bundles, evidence envelopes, dossier events, gate/main/health decisions, action packs, authority artifacts, and deployment operation state/events. All schemas use `.strict()` validation — unknown fields fail without coercion.
+- `packages/werkstatt/src/certification/identity.ts` owns explicit identity builders for each certification object. Each builder constructs a fresh payload object field-by-field, snapshots through RFC-0849 `snapshotCanonicalJsonObjectV1`, and hashes through `canonicalJsonHashV1`. No clone/delete, generic hash, object spread from source, or parallel interface exists.
+- Identity payloads include only semantic fields — excluded fields (candidate IDs, evidence IDs, event IDs, timestamps, locators, observed environments) do not affect identity digests. Included field changes (source hashes, content hashes, policy bundle roots, binding hashes, statuses, event kinds, task lists) always produce different digests.
+- Evidence identity enforces redaction closure: unresolved redaction reports fail with `CERT-REDACTION-01` before identity construction.
+- Subpath export: `@warpgogol/werkstatt/certification`.
+- No evaluation algorithms, state cutover, storage, commands, producers, adapters, authority execution, or deployment logic exists. Later packets implement those concerns.
+
 ## Mission git helpers
 
 - `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.

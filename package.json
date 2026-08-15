@@ -326,6 +326,10 @@
     "./isolation/conformance": {
       "types": "./src/isolation/conformance.ts",
       "default": "./src/isolation/conformance.ts"
+    },
+    "./certification": {
+      "types": "./src/certification/index.ts",
+      "default": "./src/certification/index.ts"
     }
   },
   "files": ["src", "bin", "os"],
