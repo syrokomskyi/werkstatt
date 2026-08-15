@@ -2,12 +2,12 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 120-forward-only-state-reset
-state: draft
+state: sealed
 governingDecision: RFC-0851
 decisionKind: rfc
 resolvedRfc: RFC-0851
 dependsOnPacket: 110-deterministic-evaluation
-baseCommit: null
+baseCommit: 823ff8ee8b67c80ee85666597df2d010ed432734
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:

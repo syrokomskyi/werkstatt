@@ -143,12 +143,12 @@ packets:
   - order: 120
     packetId: 120-forward-only-state-reset
     file: 120-forward-only-state-reset.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0851
     decisionKind: rfc
     resolvedRfc: RFC-0851
     dependsOnPacket: 110-deterministic-evaluation
-    baseCommit: null
+    baseCommit: 823ff8ee8b67c80ee85666597df2d010ed432734
     sealCommit: null
     completion: null
   - order: 130
