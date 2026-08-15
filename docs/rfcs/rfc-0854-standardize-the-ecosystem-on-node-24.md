@@ -1,7 +1,7 @@
 ---
 id: RFC-0854
 title: "Standardize the ecosystem on Node 24"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
@@ -216,7 +216,7 @@ The agent records the printed workpiece HEAD as `<site-commit-sha>` and uses it 
 ### Runtime contract
 
 | Surface | Required value/behavior |
-|---|---|
+| --- | --- |
 | First-party and generated `package.json#engines.node` | `>=24 <25` |
 | First-party direct `@types/node` | Node 24 major |
 | `@warpgogol/forge` independent version | `1.0.0`; `forge.syncedVersion` exactly matches |
@@ -232,7 +232,7 @@ The semver range is intentionally major-closed. Patch/minor selection within Nod
 ### File system responsibilities
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `package.json` | Root `>=24 <25` runtime and Node 24 type dependency |
 | `pnpm-workspace.yaml` | Enable dependency engine enforcement |
 | `packages/forge/package.json`, `forge.yaml` | Published Node 24-only engine/types, Forge `1.0.0`, matching sync watermark, and tarball smoke script |
@@ -258,7 +258,7 @@ The semver range is intentionally major-closed. Patch/minor selection within Nod
 ### Failure contract
 
 | Condition | Required result |
-|---|---|
+| --- | --- |
 | Executor still resolves a non-24 Node before file mutation | provision and re-verify Node 24; on any failure stop with all repository trees clean |
 | Running Node major is below 24 or above 24 | install/scaffold verification fails with expected `>=24 <25` and observed version |
 | A profile/template emits another range | owning package test fails |
