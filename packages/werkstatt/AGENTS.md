@@ -101,6 +101,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `packages/werkstatt/src/certification/commands/` owns read-only `getCertificationStatus` (candidate identity, latest decisions, coverage, durable replica status, next required action, action-pack locators) and `verifyCertification` (candidate ID recompute, dossier integrity, root hash match, decision references). `CERT-ORCHESTRATOR-08`/`CERT-ORCHESTRATOR-09`/`CERT-ORCHESTRATOR-10` cover identity and integrity failures.
 - No producer implementations, deployment commands, or I/O imports exist in this module.
 
+### Deterministic site producers and false-pass removal (CERT-005, packet 170)
+
+- `packages/werkstatt/src/certification/producers/` owns the deterministic producer framework — typed producer registry with duplicate rejection (`CERT-PRODUCER-01`), profile validation (`CERT-PRODUCER-03` missing, `CERT-PRODUCER-04` extra), applicability evaluation (always/entitlement/config/surface rules), false-pass guard rejecting empty-result success (`CERT-PRODUCER-05`), summary-only warning success for mandatory requirements (`CERT-PRODUCER-06`), and grace-period success (`CERT-PRODUCER-07`).
+- Diagnostic normalization deduplicates by `ruleId:file:line` and rejects missing `ruleId` or `message` (`CERT-PRODUCER-08`). Route/state/viewport matrix planning generates full combination sets for coverage.
+- Producer execution constructs evidence envelopes from handler results, rejecting unregistered producers (`CERT-PRODUCER-09`), handler crashes (`CERT-PRODUCER-10`), and false-pass results (`CERT-PRODUCER-11`).
+- No site-specific producer implementations, deployment commands, or I/O imports exist in this module.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
