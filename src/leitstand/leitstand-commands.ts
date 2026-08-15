@@ -1217,18 +1217,24 @@ export async function runLeitstandStatus(
         .filter((f) => f.endsWith(".json"))
         .map((f) => path.join(opsDir, f));
 
-      let latest: { releaseId: string; state: string; at: string } | null = null;
+      let latest: {
+        releaseId: string;
+        state: string;
+        at: string;
+        purgeResult?: PurgeResult;
+      } | null = null;
       for (const recordPath of channelRecords) {
         try {
           const content = await fs.readFile(recordPath, "utf8");
           const record = JSON.parse(content);
-          if (record.channel === ch && record.state === "authorized") {
+          if (record.channel === ch) {
             const at = record.timestamp ?? "";
             if (!latest || at > latest.at) {
               latest = {
-                releaseId: record.operationId ?? "",
+                releaseId: record.candidateId ?? record.operationId ?? "",
                 state: record.state ?? "",
                 at,
+                purgeResult: record.purgeResult,
               };
             }
           }
@@ -1241,8 +1247,9 @@ export async function runLeitstandStatus(
         channels[ch] = {
           releaseId: latest.releaseId,
           state: latest.state,
-          healthy: true,
+          healthy: latest.state === "deployed",
           at: latest.at,
+          purgeResult: latest.purgeResult,
         };
       } else {
         channels[ch] = null;
@@ -1339,17 +1346,95 @@ export async function runLeitstandRollback(
   );
   await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
 
+  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
+  if (!systemConfig.deployment) {
+    throw new Error(
+      `[leitstand.rollback] system '${systemId}' has no deployment config in system-config.yaml`,
+    );
+  }
+  const adapter = resolveAdapter(systemConfig.deployment.adapter);
+  const channelConfig =
+    channel === "dev"
+      ? systemConfig.deployment.channels.dev
+      : channel === "alt"
+        ? systemConfig.deployment.channels.alt
+        : systemConfig.deployment.channels.main;
+  const secretsFilePath = channelConfig?.secretsFile
+    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
+    : undefined;
+
+  const distPath = path.join(context.workspaceRoot, "releases", toReleaseId, "dist");
+
+  let rollbackUrl = channelConfig?.url ?? "";
+  let rollbackState: "succeeded" | "failed" = "succeeded";
+  let purgeResult: PurgeResult | undefined;
+
+  try {
+    const rollbackResult = await adapter.rollback({
+      systemId,
+      toReleaseId,
+      channel,
+      distPath,
+      workerName: channelConfig?.workerName ?? systemId,
+      url: rollbackUrl,
+      secretsFilePath,
+    });
+    rollbackUrl = rollbackResult.deploymentUrl || rollbackUrl;
+
+    const secretsEnv = secretsFilePath ? await sourceDotenv(secretsFilePath) : {};
+    const env = { ...filterEnv(process.env), ...secretsEnv };
+    const zoneId = env["CLOUDFLARE_ZONE_ID"];
+    const apiToken = env["CLOUDFLARE_API_TOKEN"];
+    if (zoneId && apiToken) {
+      const snapshot = await readBehaviorSnapshot(context.workspaceRoot, toReleaseId);
+      const routes = snapshot?.routes ?? [];
+      const urls = collectPurgeUrls(rollbackUrl, routes);
+      purgeResult = await purgeCacheByUrls(zoneId, apiToken, urls);
+    }
+  } catch (err) {
+    rollbackState = "failed";
+    return {
+      data: {
+        systemId,
+        channel,
+        rolledBackFrom: "",
+        rolledBackTo: toReleaseId,
+        state: "failed",
+        deploymentUrl: rollbackUrl,
+        releaseState: "rolled-back",
+        purgeResult,
+      },
+      summary: `[leitstand.rollback] failed: ${err instanceof Error ? err.message : String(err)}`,
+      exitCode: 1,
+    } as unknown as KernelCommandResult<LeitstandRollbackData>;
+  }
+
+  const finalEffectRecord = buildEffectRecord(
+    operationId,
+    systemId,
+    "dev-deploy",
+    channel,
+    "" as Sha256Digest,
+    operationId,
+    false,
+    null,
+    "rolled-back",
+    now,
+  );
+  await writeDeploymentEffectRecord(context.workspaceRoot, systemId, finalEffectRecord);
+
   return {
     data: {
       systemId,
       channel,
       rolledBackFrom: "",
       rolledBackTo: toReleaseId,
-      state: "succeeded",
-      deploymentUrl: "",
-      releaseState: "ready",
+      state: rollbackState,
+      deploymentUrl: rollbackUrl,
+      releaseState: "rolled-back",
+      purgeResult,
     },
-    summary: `[leitstand.rollback] authorized: candidate=${systemId} channel=${channel} to=${toReleaseId}`,
+    summary: `[leitstand.rollback] rolled back ${systemId} channel=${channel} to=${toReleaseId}`,
     exitCode: 0,
   } as unknown as KernelCommandResult<LeitstandRollbackData>;
 }
@@ -1364,22 +1449,62 @@ export interface LeitstandHealthData {
 
 export async function runLeitstandHealth(
   input: KernelCommandInput,
-  _context: KernelRuntimeContext,
+  context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandHealthData>> {
   const systemId = flagString(input, "site");
   if (!systemId) throw new Error("[leitstand.health] --site is required");
   const channel = parseChannel(flagString(input, "channel"), "alt");
 
-  return {
-    data: {
+  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
+  if (!systemConfig.deployment) {
+    return {
+      data: { systemId, channel, state: "unknown", checks: [] },
+      summary: `[leitstand.health] ${systemId}: no deployment config`,
+      exitCode: 0,
+    };
+  }
+  const adapter = resolveAdapter(systemConfig.deployment.adapter);
+  const channelConfig =
+    channel === "dev"
+      ? systemConfig.deployment.channels.dev
+      : channel === "alt"
+        ? systemConfig.deployment.channels.alt
+        : systemConfig.deployment.channels.main;
+
+  if (!channelConfig) {
+    return {
+      data: { systemId, channel, state: "unknown", checks: [] },
+      summary: `[leitstand.health] ${systemId}: channel ${channel} not configured`,
+      exitCode: 0,
+    };
+  }
+
+  try {
+    const result = await adapter.health({
       systemId,
+      deploymentUrl: channelConfig.url,
       channel,
-      state: "unknown",
-      checks: [],
-    },
-    summary: `[leitstand.health] ${systemId} channel=${channel}: state=unknown (no health probe configured)`,
-    exitCode: 0,
-  };
+      releaseId: "",
+      expectedBehaviorSnapshotHash: "",
+      workspaceRoot: context.workspaceRoot,
+    });
+    return {
+      data: {
+        systemId,
+        channel,
+        state: result.state ?? "unknown",
+        checks: result.checks ?? [],
+      },
+      summary: `[leitstand.health] ${systemId} channel=${channel}: state=${result.state ?? "unknown"}`,
+      exitCode: 0,
+    };
+  } catch (err) {
+    return {
+      data: { systemId, channel, state: "unhealthy", checks: [] },
+      summary: `[leitstand.health] ${systemId} channel=${channel}: error=${err instanceof Error ? err.message : String(err)}`,
+      exitCode: 0,
+    };
+  }
 }
 
 export interface PipelineCheckResult {
@@ -1401,6 +1526,14 @@ function determineNextStep(releaseState: string): string {
       return "release.ready";
     case "ready":
       return "leitstand.dev-deploy";
+    case "dev-deployed":
+      return "leitstand.propagate";
+    case "alt-deployed":
+      return "leitstand.promote";
+    case "main-deployed":
+      return "done";
+    case "failed":
+      return "leitstand.rollback";
     default:
       return "release.prepare";
   }
@@ -1408,7 +1541,7 @@ function determineNextStep(releaseState: string): string {
 
 export async function runLeitstandPipelineCheck(
   input: KernelCommandInput,
-  _context: KernelRuntimeContext,
+  context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<PipelineCheckResult>> {
   const releaseId = flagString(input, "release");
   if (!releaseId) {
@@ -1416,32 +1549,75 @@ export async function runLeitstandPipelineCheck(
   }
   const systemId = flagString(input, "site") ?? "";
 
+  const opsDir = path.join(
+    context.workspaceRoot,
+    "systems-cache",
+    systemId,
+    "deployment-operations",
+  );
+
+  const channelStates: Record<string, { state: string; at: string }> = {};
+  try {
+    const entries = await fs.readdir(opsDir);
+    for (const f of entries) {
+      if (!f.endsWith(".json")) continue;
+      try {
+        const record = JSON.parse(await fs.readFile(path.join(opsDir, f), "utf8"));
+        const ch = record.channel as string | undefined;
+        if (!ch) continue;
+        const at = record.timestamp ?? "";
+        if (!channelStates[ch] || at > channelStates[ch].at) {
+          channelStates[ch] = { state: record.state ?? "", at };
+        }
+      } catch {
+        // skip
+      }
+    }
+  } catch {
+    // ops dir doesn't exist yet
+  }
+
+  const devState = channelStates["dev"]?.state;
+  const altState = channelStates["alt"]?.state;
+  const mainState = channelStates["main"]?.state;
+
   const steps: PipelineCheckResult["steps"] = [
     { step: "release.prepare", status: "done", detail: "release prepared" },
     { step: "release.ready", status: "done", detail: "release ready" },
-    { step: "leitstand.dev-deploy", status: "pending", detail: "awaiting gate decision" },
+    {
+      step: "leitstand.dev-deploy",
+      status: devState === "deployed" ? "done" : devState === "failed" ? "blocked" : "pending",
+      detail: devState ? `state=${devState}` : "awaiting gate decision",
+    },
     {
       step: "leitstand.propagate",
-      status: "pending",
-      detail: "awaiting dev-deploy + R2 durable sync",
+      status: altState === "deployed" ? "done" : altState === "failed" ? "blocked" : "pending",
+      detail: altState ? `state=${altState}` : "awaiting dev-deploy + R2 durable sync",
     },
     {
       step: "leitstand.promote",
-      status: "pending",
-      detail: "awaiting propagate-alt + main verification",
+      status: mainState === "deployed" ? "done" : mainState === "failed" ? "blocked" : "pending",
+      detail: mainState ? `state=${mainState}` : "awaiting propagate-alt + main verification",
     },
   ];
+
+  let releaseState = "ready";
+  if (mainState === "deployed") releaseState = "main-deployed";
+  else if (altState === "deployed") releaseState = "alt-deployed";
+  else if (devState === "deployed") releaseState = "dev-deployed";
+  else if (devState === "failed" || altState === "failed" || mainState === "failed")
+    releaseState = "failed";
 
   return {
     data: {
       command: "leitstand.pipeline.check",
       releaseId,
       systemId,
-      releaseState: "ready",
+      releaseState,
       steps,
-      nextStep: determineNextStep("ready"),
+      nextStep: determineNextStep(releaseState),
     },
-    summary: `[leitstand.pipeline.check] release=${releaseId}: next=${determineNextStep("ready")}`,
+    summary: `[leitstand.pipeline.check] release=${releaseId}: state=${releaseState} next=${determineNextStep(releaseState)}`,
     exitCode: 0,
   };
 }
