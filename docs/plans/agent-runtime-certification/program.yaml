@@ -160,17 +160,17 @@ packets:
     resolvedRfc: RFC-0848
     dependsOnPacket: 120-forward-only-state-reset
     baseCommit: 51d2760c0e74c5b50e1e62fc907d91d9bc6b0365
-    sealCommit: null
-    completion: null
+    sealCommit: d5543b53
+    completion: fb76f54d
   - order: 140
     packetId: 140-resolved-certification-profile
     file: 140-resolved-certification-profile.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/CERT-002
     decisionKind: spec-node
     resolvedRfc: null
     dependsOnPacket: 130-foundation-integration
-    baseCommit: null
+    baseCommit: fb76f54d
     sealCommit: null
     completion: null
   - order: 150
