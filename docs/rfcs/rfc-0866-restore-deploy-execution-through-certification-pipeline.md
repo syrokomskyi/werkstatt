@@ -1,7 +1,7 @@
 ---
 id: RFC-0866
 title: "Restore deploy execution through certification pipeline"
-status: accepted
+status: draft
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
