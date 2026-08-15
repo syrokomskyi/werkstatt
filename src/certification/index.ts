@@ -129,3 +129,39 @@ export {
   buildActionPackIdentityV1,
   buildDeploymentOperationEventIdentityV1,
 } from "./identity.ts";
+
+export type {
+  CertificationLimitFailureV1,
+  RequirementStatus,
+  EvidenceIndexInputV1,
+  EvidenceIndexEntryV1,
+  EvidenceIndexV1,
+  RequirementEvidenceSelectionInputV1,
+  RequirementEvidenceSelectionV1,
+} from "./evidence-selection.ts";
+
+export {
+  buildEvidenceIndex,
+  selectRequirementEvidence,
+  EVIDENCE_SELECTION_LIMITS,
+} from "./evidence-selection.ts";
+
+export type {
+  CertificationEvaluationInputV1,
+  RequirementEvaluationV1,
+  CertificationEvaluationResultV1,
+} from "./aggregation.ts";
+
+export { evaluateCertificationDecision } from "./aggregation.ts";
+
+export type {
+  CertificationActionPackInputV1,
+  CertificationActionPackFailureV1,
+  RemediationMetadataV1,
+} from "./action-pack.ts";
+
+export { buildCertificationActionPack, ACTION_PACK_LIMITS } from "./action-pack.ts";
+
+export type { DossierHashFailureV1, DossierEventHashResultV1 } from "./dossier-hash.ts";
+
+export { computeDossierEventHash, computeDossierRoot } from "./dossier-hash.ts";

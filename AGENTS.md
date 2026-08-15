@@ -130,6 +130,16 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Subpath export: `@warpgogol/werkstatt/certification`.
 - No evaluation algorithms, state cutover, storage, commands, producers, adapters, authority execution, or deployment logic exists. Later packets implement those concerns.
 
+### Deterministic certification evaluation and remediation (RFC-0850)
+
+- `packages/werkstatt/src/certification/evidence-selection.ts` owns a single-pass bounded evidence index (`buildEvidenceIndex`) and authority-sequence selection (`selectRequirementEvidence`). The index is built once per decision in O(E) time, keyed by requirement ID. Selection chooses the eligible record with greatest authority `admissionSequence` at or below the immutable `evaluationCutSequence`. Producer timestamps, filenames, mtimes, lexical IDs, and input array order never establish precedence.
+- `packages/werkstatt/src/certification/aggregation.ts` owns deterministic certification aggregation (`evaluateCertificationDecision`). Resolves required/conditional/advisory requirements, selects at one immutable cut, preserves per-requirement `pass | fail | stale | incomplete | not-applicable`, applies top-level precedence `fail > stale > incomplete > pass`, records selected evidence IDs, coverage counts, and reason codes. Never infers pass from zero requirements, zero diagnostics, process exit 0, old evidence, producer crash, timeout, infrastructure unavailability, or unknown values.
+- `packages/werkstatt/src/certification/action-pack.ts` owns deterministic anchored action-pack construction (`buildCertificationActionPack`). Creates one canonical task per actionable non-pass requirement, classifies `product-fix | infrastructure-retry | policy-defect`, validates anchors and verification commands, detects dependency cycles, and returns stable topological order with lexical tie-breaker. Missing anchors, vague tasks, missing verification commands, cycles, or >1000 tasks fail with `CERT-ACTION-01` or `CERT-LIMIT-03`.
+- `packages/werkstatt/src/certification/dossier-hash.ts` owns pure event/root hashing (`computeDossierEventHash`, `computeDossierRoot`). Event hashing uses RFC-0853 `buildDossierEventIdentityV1`. Root hashing binds exact order — reordering, insertion, removal, or prior-hash changes alter the root; storage location and projection timestamps do not.
+- Hard limits: 1,000 requirements (`CERT-LIMIT-01`), 10,000 evidence records (`CERT-LIMIT-02`), 1,000 action tasks (`CERT-LIMIT-03`). All overflow returns explicit non-pass failures without truncation.
+- Complexity: indexing/selection/aggregation in O(E + R log R) time and O(E + R) memory. No per-requirement full evidence scan. Action-pack ordering in O(T + D + T log T).
+- No function reads/writes `releases/**`, `missions/**`, `systems-cache/**`, object storage, URLs, clocks, environment variables, or provider APIs. All modules are pure and independently testable.
+
 ## Mission git helpers
 
 - `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.
