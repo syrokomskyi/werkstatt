@@ -8,8 +8,8 @@ owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-14
-updatedAt: 2026-08-14
-enhancedAt: 2026-08-14
+updatedAt: 2026-08-15
+enhancedAt: 2026-08-15
 implementedAt:
 closedAt:
 supersedes: []
@@ -29,6 +29,13 @@ related:
   - RFC-0853
   - RFC-0850
   - RFC-0851
+  - RFC-0855
+  - RFC-0858
+  - RFC-0859
+  - RFC-0860
+  - RFC-0861
+  - RFC-0862
+  - werkstatt-release-certification/AMD-007
 dependsOn:
   - RFC-0849
   - RFC-0852
@@ -115,7 +122,7 @@ Locks, idempotency, atomic writes, artifact storage, fingerprinting, adapters, b
 ### Dependency and execution boundaries
 
 | Order | RFC | One-session responsibility | Completion boundary |
-|---:|---|---|---|
+| --: | --- | --- | --- |
 | 1 | RFC-0849 | bounded canonical snapshot, bytes, hash, Unicode and resource limits | engine fingerprint tests/fixtures and DNA-53 correction pass |
 | 2 | RFC-0852 | engine Diagnostic ownership, canonical/redacted data, legacy alias removal | engine/site packages compile; schema/boundary tests pass |
 | 3 | RFC-0853 | strict certification schemas, public subpath, explicit identity payload builders | traceability and identity sensitivity properties pass |
@@ -175,7 +182,7 @@ All required schema, identity, aggregation, legacy, and transition diagnostics h
 ### Integration file responsibilities
 
 | Path | RFC-0848 responsibility |
-|---|---|
+| --- | --- |
 | `packages/werkstatt/src/tests/certification-foundation.integration.test.ts` | Cross-child identity/evaluation/state and negative legacy laws |
 | `packages/werkstatt/src/certification/index.ts` | Verify deliberate public surface; fix ownership only in child RFC if incorrect |
 | `packages/werkstatt/package.json` | Verify certification export created by RFC-0853 |
@@ -191,7 +198,7 @@ The integration RFC does not edit mission workpieces, Sternsystem mirrors, relea
 The final CERT-001 integration evidence must review every file below. “No change” is acceptable only with an explicit rationale in the implementation evidence.
 
 | File | Required CERT-001 concern |
-|---|---|
+| --- | --- |
 | `docs/requirements.xml` | one fail-closed certification authority; reusable checks are non-authorizing |
 | `docs/technology.xml` | strict Zod/canonical identity and engine/plugin placement |
 | `docs/development-plan.xml` | six-RFC CERT-001 implementation order and blocked transition |
@@ -215,7 +222,7 @@ Stable integration-only test labels use `CERT-INTEGRATION-*`; production code mu
 ### Failure modes
 
 | Failure | Required response |
-|---|---|
+| --- | --- |
 | Child RFC not implemented | `rfc.implement.stamp` dependency block; do not start integration |
 | Canonical byte/domain drift | fix RFC-0849-owned source and rerun its tests |
 | Diagnostic ownership/schema drift | fix RFC-0852-owned source and rerun both package boundaries |

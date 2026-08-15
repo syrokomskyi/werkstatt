@@ -8,8 +8,8 @@ owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-14
-updatedAt: 2026-08-14
-enhancedAt: 2026-08-14
+updatedAt: 2026-08-15
+enhancedAt: 2026-08-15
 implementedAt:
 closedAt:
 supersedes:
@@ -34,8 +34,12 @@ related:
   - RFC-0849
   - RFC-0852
   - RFC-0853
+  - RFC-0855
+  - RFC-0860
+  - werkstatt-release-certification/AMD-007
 dependsOn:
   - RFC-0853
+  - RFC-0850
 batch: werkstatt-release-certification-cert-001
 satisfies:
   - DNA-48
@@ -68,6 +72,7 @@ successSignals:
   - "Deployment history is append-only operation data and certification/current health remain separate immutable contracts."
   - "Every legacy site deployment command fails before its first side effect until CERT-007 replaces the guard."
   - "Legacy release directories are reported invalid and are never translated, migrated, or presented as deployable."
+  - "Every rejected legacy state transition returns one canonical forward-only Diagnostic with the replacement operation and no compatibility fallback."
   - "Old release/deployment RFC authority is formally superseded while artifact-store, fingerprint, adapter, lock, and test mechanisms remain reusable but non-authorizing."
 nonGoals:
   - "This RFC does not implement authority-backed deployment, certification orchestration, Main verification, rollback execution, or health monitoring; CERT-007/CERT-008 own them."
@@ -119,7 +124,7 @@ The invariant becomes an operation/certification sequence rather than release en
 ### Superseded versus retained behavior
 
 | Concern | Result after this RFC |
-|---|---|
+| --- | --- |
 | Old release/deployment state labels and transition authority | Superseded and rejected |
 | Axiom/test evidence as direct deployment authorization | Non-authorizing; later producers may contribute only through certification |
 | Release id, immutable artifact/build identity, artifact-store references | Retained and restated |
@@ -199,7 +204,7 @@ Tests spy on the first boundary in each handler and prove zero calls. The shared
 ### File system responsibilities
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `packages/werkstatt/src/schemas/release.ts` | Strict artifact-only release manifest/state |
 | `packages/werkstatt/src/certification/contracts/state.ts` | Deployment operation state/event contracts from RFC-0853 |
 | `packages/werkstatt/src/certification/state-machine.ts` | Pure complete artifact/deployment transition tables |
@@ -237,7 +242,7 @@ Blocked commands return a canonical nonzero kernel result:
 ### Failure modes
 
 | Failure | Result |
-|---|---|
+| --- | --- |
 | Unknown/legacy manifest field or state | strict failure / `CERT-LEGACY-STATE-01`; never default/translate |
 | Invalid artifact transition | `CERT-STATE-01`, exit 1, no write |
 | Blocked deployment/rollback/health/status invocation | `CERT-TRANSITION-01`, incomplete, exit 1, no side effect |

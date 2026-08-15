@@ -29,6 +29,13 @@ related:
   - RFC-0853
   - RFC-0854
   - RFC-0856
+  - RFC-0858
+  - RFC-0859
+  - RFC-0860
+  - RFC-0861
+  - RFC-0862
+  - RFC-0863
+  - RFC-0864
   - werkstatt-release-certification/overview#target-architecture
   - werkstatt-release-certification/roadmap#implementation-roadmap
   - werkstatt-release-certification/ADR-003
@@ -154,7 +161,7 @@ Commands, pipelines, validators, evidence producers, evaluator implementations, 
 ### Effect classes
 
 | Class | Examples | Required contract |
-|---|---|---|
+| --- | --- | --- |
 | `revertible` | registration, listener, timer, lock, temporary file, child process | disposer, LIFO teardown, quiescence |
 | `transactional` | local state, registry update, database write | prepare/commit/abort and idempotency key |
 | `compensatable` | DNS change, remote mutation, deployment | explicit compensation and equivalence evidence |
@@ -268,7 +275,7 @@ The charter implementation creates valid draft planning artifacts only after chi
 The following order is normative. A row may be split further during audit if one packet cannot be completed safely in one fresh-agent session; rows may not be combined, reordered, or parallelized without amending this RFC and the program index.
 
 | Order | Packet | Governing document | One-session responsibility | Completion boundary |
-|---:|---|---|---|---|
+| --: | --- | --- | --- | --- |
 | 000 | Program packet control plane | RFC-0856 | implement schema, validation, Steward sealing, exclusive lease, completion, recovery, and genesis import | RFC-0856 suite passes; bootstrap completion committed; no second bootstrap possible |
 | 010 | Node 24 runtime | RFC-0854 | closed Node 24 ecosystem cutover and required site republish | all RFC-0854 checks and Alt/Main smoke pass |
 | 020 | Canonical identity bytes | RFC-0849 | bounded canonical JSON snapshot/bytes/hash | frozen vectors, limits, build, tests pass |
@@ -400,7 +407,7 @@ CERT-006 evaluator execution does not activate agent-written or third-party code
 ### File system responsibilities
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `docs/rfcs/rfc-0855-*.md` | program laws, sequence, packet contract, and completion definition |
 | `docs/rfcs/rfc-0856-*.md` | generic packet schema, validation, sealing, lease, completion, and recovery control plane |
 | `docs/specs/werkstatt-release-certification/amendments/amd-007-*.md` | accepted reconciliation of static certification seam; immutable snapshot remains untouched |
@@ -427,7 +434,7 @@ The charter has no runtime JSON output. Its machine-consumable outputs are `forg
 ### Failure modes
 
 | Failure | Required result |
-|---|---|
+| --- | --- |
 | Governing RFC is not implemented, amendment is not accepted, or commit is not reachable | stop before mutation |
 | Normative source hash differs | stop; re-audit and regenerate packet |
 | `NEEDS CLARIFICATION` remains | stop; return to architecture preparation |

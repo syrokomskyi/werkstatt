@@ -8,8 +8,8 @@ owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-14
-updatedAt: 2026-08-14
-enhancedAt: 2026-08-14
+updatedAt: 2026-08-15
+enhancedAt: 2026-08-15
 implementedAt:
 closedAt:
 supersedes: []
@@ -22,6 +22,11 @@ related:
   - RFC-0849
   - RFC-0852
   - RFC-0853
+  - RFC-0855
+  - RFC-0860
+  - RFC-0861
+  - RFC-0862
+  - werkstatt-release-certification/AMD-007
 dependsOn:
   - RFC-0853
 batch: werkstatt-release-certification-cert-001
@@ -59,7 +64,7 @@ acceptance:
 
 ## Context
 
-RFC-0849 supplies canonical bytes, RFC-0852 supplies canonical Diagnostic, and RFC-0853 supplies strict parsed certification contracts and immutable identities. CERT-001 also requires executable laws for selecting admitted evidence, freezing an evaluation cut, computing coverage/status, constructing remediation, and hashing ordered dossier history. Those laws remain separate so a single implementation session can stay pure and bounded.
+RFC-0849 supplies canonical bytes, RFC-0852 supplies canonical Diagnostic, and RFC-0853 supplies strict parsed certification contracts and immutable identities bound to the resolved component runtime. CERT-001 also requires executable laws for selecting admitted evidence, freezing an evaluation cut, computing coverage/status, constructing remediation, and hashing ordered dossier history. Evaluator inputs are immutable data snapshots obtained through admitted lifecycle capabilities; evaluator output is untrusted evidence until the independent aggregation law admits it. Those laws remain separate so a single implementation session can stay pure and bounded.
 
 Normative sources are `werkstatt-release-certification/contracts.md#aggregation-laws`, `verification.md`, ADR-003/004/011/012/018, and AMD-001/004/006. Storage and Certification Authority behavior remain CERT-003/CERT-004; these functions operate only on already parsed values supplied by a caller.
 
@@ -100,7 +105,7 @@ No implementation may register a temporary evaluation command. `release.certify`
 ### Limits and complexity contract
 
 | Input | Hard limit | Overflow result |
-|---|---:|---|
+| --- | --: | --- |
 | Resolved requirements per profile/decision | 1,000 | `CERT-LIMIT-01`, `incomplete`; no partial decision |
 | Admitted evidence records at one evaluation cut | 10,000 | `CERT-LIMIT-02`, `incomplete`; no truncation |
 | Action tasks in one pack | 1,000 | `CERT-LIMIT-03`; action-pack/decision construction fails |
@@ -167,7 +172,7 @@ A dependency cycle, missing anchor, generic/unbounded instruction, missing repro
 ### File system responsibilities
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `packages/werkstatt/src/certification/evidence-selection.ts` | One-pass bounded index plus authority-sequence selection |
 | `packages/werkstatt/src/certification/aggregation.ts` | Coverage, status precedence, decision construction |
 | `packages/werkstatt/src/certification/action-pack.ts` | Anchored tasks, dependencies, stable topological order |
@@ -181,14 +186,14 @@ No function reads or writes `releases/**`, `missions/**`, `systems-cache/**`, ob
 
 Pure functions return discriminated typed results and never log. Stable diagnostics/reasons are:
 
-| Rule | Meaning |
-|---|---|
-| `CERT-EVIDENCE-01` | no compatible admitted evidence at cut |
-| `CERT-EVIDENCE-02` | compatible evidence is stale/incompatible for current binding |
-| `CERT-GATE-01` | required requirement/dimension coverage incomplete |
-| `CERT-GATE-02` | contradictory or impossible evaluation input |
-| `CERT-ACTION-01` | remediation is missing, unsafe, cyclic, or unverifiable |
-| `CERT-LIMIT-01..03` | requirements, evidence, or task hard limit exceeded |
+| Rule                | Meaning                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `CERT-EVIDENCE-01`  | no compatible admitted evidence at cut                        |
+| `CERT-EVIDENCE-02`  | compatible evidence is stale/incompatible for current binding |
+| `CERT-GATE-01`      | required requirement/dimension coverage incomplete            |
+| `CERT-GATE-02`      | contradictory or impossible evaluation input                  |
+| `CERT-ACTION-01`    | remediation is missing, unsafe, cyclic, or unverifiable       |
+| `CERT-LIMIT-01..03` | requirements, evidence, or task hard limit exceeded           |
 
 Required evaluation has zero suppression and zero intended false positives. A confirmed producer/profile/evaluator defect is repaired normatively and creates new policy/candidate evidence; it is never suppressed, downgraded, or translated to pass. Infrastructure problems remain `incomplete`.
 

@@ -8,8 +8,8 @@ owners:
   - architecture
 reviewers: []
 createdAt: 2026-08-14
-updatedAt: 2026-08-14
-enhancedAt: 2026-08-14
+updatedAt: 2026-08-15
+enhancedAt: 2026-08-15
 implementedAt:
 closedAt:
 supersedes: []
@@ -25,9 +25,16 @@ related:
   - RFC-0850
   - RFC-0851
   - RFC-0852
+  - RFC-0855
+  - RFC-0858
+  - RFC-0859
+  - RFC-0860
+  - RFC-0861
+  - werkstatt-release-certification/AMD-007
 dependsOn:
   - RFC-0849
   - RFC-0852
+  - RFC-0862
 batch: werkstatt-release-certification-cert-001
 satisfies:
   - DNA-53
@@ -65,7 +72,7 @@ acceptance:
 
 ## Context
 
-The initial RFC-0849 attempted to implement canonical bytes, Diagnostic migration, the full CERT-001 schema inventory, and every identity builder in one session. Its audit required a second decomposition for agents that will implement each document independently. RFC-0849 now supplies the bounded opaque canonical snapshot and RFC-0852 supplies the strict engine-owned Diagnostic. This RFC is the final contract-only prerequisite: it translates the accepted certification model into stack-agnostic runtime schemas and explicit identities.
+The initial RFC-0849 attempted to implement canonical bytes, Diagnostic migration, the full CERT-001 schema inventory, and every identity builder in one session. Its audit required a second decomposition for agents that will implement each document independently. RFC-0849 now supplies the bounded opaque canonical snapshot and RFC-0852 supplies the strict engine-owned Diagnostic. RFC-0858 through RFC-0862 additionally establish the resolved component graph, lifecycle/effect laws, runtime reflection, and neutral isolation identities that certification must bind rather than duplicate. This RFC is the final contract-only prerequisite: it translates the accepted certification model into stack-agnostic runtime schemas and explicit identities.
 
 Normative sources are the complete `werkstatt-release-certification` snapshot, specifically `contracts.md`, `verification.md#core-invariants-and-required-properties`, ADR-001 through ADR-006, ADR-011, ADR-012, ADR-018, ADR-020, and accepted AMD-001/003/004/005/006. The implementation must build and check a traceability matrix against those sources; this RFC references rather than recopies every normative field table.
 
@@ -125,7 +132,7 @@ pnpm exec werkstatt run fingerprint.usage.lint --json
 ### Contract inventory and traceability
 
 | Module | Top-level contract families | Normative sources |
-|---|---|---|
+| --- | --- | --- |
 | `identifiers.ts` | digest, schema id, candidate/evidence/decision/action/event/operation/attempt IDs, sequence, gate/channel/environment/status primitives | contracts vocabulary; ADR-003/004; AMD-006 |
 | `candidate.ts` | `ReleaseCandidateV1`, build config, deployment plan, observed environment references | ADR-001/005; AMD-003/005 |
 | `policy-bundle.ts` | immutable policy bundle, resolved requirements, producer/schema/rubric/toolchain/issuer manifests | ADR-002; AMD-005 |
@@ -163,7 +170,7 @@ If a top-level input carries its own ID, parsing validates shape and the builder
 ### Required identity inclusion and exclusions
 
 | Identity | Required inclusions | Explicit exclusions |
-|---|---|---|
+| --- | --- | --- |
 | Candidate | system/release/source/content/artifact/build-config/deployment-plan/policy-bundle/toolchain identities | candidate self ID; observation timestamps; observed environment; secret values |
 | Policy bundle | complete canonical policy/profile/resolved requirements/schema/rubric/risk/producer/toolchain/deployment/retention/issuer manifests | root self ID; physical storage locators; materialization timestamp |
 | Evidence | complete canonical envelope including full Diagnostics, producer/binding/result/applicability/payload digests/redaction/attestation statement digest/authority admission facts | evidence self ID; physical payload locators; detached signature bytes |
@@ -189,7 +196,7 @@ The redaction object includes policy version, detected counts, and resolved flag
 ### File system responsibilities
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `packages/werkstatt/src/certification/contracts/identifiers.ts` | Non-substitutable primitives, enums, sequences, timestamps, safe semantic paths |
 | `packages/werkstatt/src/certification/contracts/candidate.ts` | Candidate, build config, deployment plan, observed-environment reference contracts |
 | `packages/werkstatt/src/certification/contracts/policy-bundle.ts` | Immutable policy bundle contracts |
@@ -210,15 +217,15 @@ The main package barrel does not expose internal helpers accidentally. Files rem
 
 ### Failure contract
 
-| Rule | Meaning |
-|---|---|
-| `CERT-SCHEMA-01` | strict contract parse failed, including unknown/legacy fields |
-| `CERT-IDENTITY-01` | supplied self identity differs from recomputed identity |
-| `CERT-PATH-01` | semantic path/locator is unsafe or non-canonical |
-| `CERT-REDACTION-01` | evidence reports or contains unresolved secret/PII exposure |
-| `CERT-CONTRACT-LIMIT-01` | a contract-specific collection/string bound exceeded |
-| RFC-0849 failure code | explicit identity payload cannot be snapshotted canonically |
-| RFC-0852 failure code | embedded Diagnostic is invalid, unsafe, or oversized |
+| Rule                     | Meaning                                                       |
+| ------------------------ | ------------------------------------------------------------- |
+| `CERT-SCHEMA-01`         | strict contract parse failed, including unknown/legacy fields |
+| `CERT-IDENTITY-01`       | supplied self identity differs from recomputed identity       |
+| `CERT-PATH-01`           | semantic path/locator is unsafe or non-canonical              |
+| `CERT-REDACTION-01`      | evidence reports or contains unresolved secret/PII exposure   |
+| `CERT-CONTRACT-LIMIT-01` | a contract-specific collection/string bound exceeded          |
+| RFC-0849 failure code    | explicit identity payload cannot be snapshotted canonically   |
+| RFC-0852 failure code    | embedded Diagnostic is invalid, unsafe, or oversized          |
 
 Explicit schema `.parse()` may throw Zod errors. Exported recovery/admission helpers use `safeParse` and discriminated typed failures. Identity builders never log or throw for domain data. Failure messages are bounded, omit rejected values, absolute paths, credentials, complete evidence payloads, and arbitrary producer output, and expose stable structured paths/reason codes.
 
