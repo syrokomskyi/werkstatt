@@ -40,10 +40,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 ## Package architecture
 
 - This package owns the Werkstatt site plugin: Astro path conventions, content validation, codegen, onboarding, audit, check-warpgogol, changelog renderers, and deploy adapter.
-- The plugin implements `werkstatt/plugin@1` (RFC-0770) with `profileId: "astro-typescript-turborepo"`.
+- The package currently implements `werkstatt/plugin@1` with `profileId: "astro-typescript-turborepo"`; that is a pre-cutover code fact, not the RFC-0855 target.
 - The plugin registers site-stack engine modules via `moduleLoaders` and provides deploy adapters.
 - RFC-0776 completed the migration: old packages (`packages/os/site-kernel-*`) are deleted. All imports now go through `@warpgogol/werkstatt-site` subpath exports.
 - Engine→stack imports are inverted through plugin hooks (RFC-0774/0775).
+
+### RFC-0855 transition
+
+The Astro profile identity survives, while static plugin hooks/modules are re-authored as versioned, lifecycle-managed producer/evaluator/adapter capabilities only in their sealed packets. Do not pre-convert modules, preserve a plugin compatibility adapter, or expose production activation. The engine may consume only neutral contracts; this package must remain the stack-side capability implementation. Packet 230 owns removal of the old plugin entry and the sole-site combined cutover.
 
 ## Module layout
 

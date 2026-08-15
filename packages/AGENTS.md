@@ -38,6 +38,10 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 
 ## Ownership boundaries
 
+### RFC-0855 transition boundary
+
+RFC-0855 supersedes the one-plugin architecture as the target but does not authorize immediate source edits. Follow `docs/plans/agent-runtime-certification/program.yaml` one sealed packet at a time. Current `werkstatt/plugin@1` files remain truthful pre-cutover code facts until packet 230 removes them; do not add new dependencies or compatibility layers around that contract. Engine-owned component graph, lifecycle, grants/effects, isolation, certification, and evolution contracts belong in `@warpgogol/werkstatt`; stack packages contribute profile-selected capabilities without engine back-imports. A package change outside the active packet allow-list is forbidden even when it appears necessary for compilation.
+
 | Package | Responsibility |
 | --- | --- |
 | `werkstatt` | RFC-0769/0772: Werkstatt engine — stack-agnostic lifecycle platform. Consolidates kernel runtime, missions, mirrors (Sternsystem), releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, fingerprint, integrity, observability, agent-gate, changelog, operations schemas, and workshop scaffolding (RFC-0779). Plugin contract (`werkstatt/plugin@1`) and registry in `src/plugin-contract.ts` and `src/plugin-registry.ts`. `werkstatt.autonomy.validate` enforces DNA-64 (no stack plugin imports). See `packages/werkstatt/AGENTS.md` for entry points. |

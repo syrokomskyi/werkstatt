@@ -6,6 +6,10 @@ RFC-0777: Werkstatt game plugin — Phaser turborepo stack. Implements the `werk
 
 This is a **package** workspace. Expose stable typed APIs. Do not import from apps or services.
 
+## RFC-0855 transition
+
+The Phaser profile identity and stack behavior survive, but the checked-in `werkstatt/plugin@1` entry is a pre-cutover fact. Convert hooks, validators, adapters, and invariants into versioned lifecycle-managed capabilities only when the corresponding RFC-0855 packet is sealed. Do not add a plugin compatibility adapter, import this package into the engine, or enable untrusted production artifacts. Packet 230 owns deletion of the old plugin entry.
+
 ## Plugin contract
 
 | Field | Value |
