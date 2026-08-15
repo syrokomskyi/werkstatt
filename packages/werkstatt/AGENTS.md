@@ -129,6 +129,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `packages/werkstatt/src/evolution/guards.ts` owns Law Kernel, evidence, boundary, and kill-switch checks — self-change boundary for forbidden scopes (`CERT-EVO-GUARD-01`), evidence immutability (`CERT-EVO-GUARD-02`/`03`), authority expiry (`CERT-EVO-GUARD-05`), shadow side effects (`CERT-EVO-GUARD-06`), canary boundaries (`CERT-EVO-GUARD-07`/`08`/`09`), and evidence poisoning (`CERT-EVO-GUARD-10`/`11`).
 - `packages/werkstatt/src/evolution/controller.ts` owns inspect/define/evaluate/observe orchestration. The controller cannot change Law Kernel, permissions, effect/isolation contracts, canonical identities/diagnostics, controller code, or evaluator policy.
 
+### Deployment effect authority (CERT-007, packet 210)
+
+- `packages/werkstatt/src/certification/deployment/authority.ts` owns signed external-effect authorization for Dev, Alt, and Main channel transitions. Gate requirements (`DEPLOYMENT_GATE_REQUIREMENTS`) enforce no force/skip/waiver/grace bypass paths for any gate.
+- `authorizeDeployment` rejects unknown gates (`CERT-DEPLOY-01`), force (`CERT-DEPLOY-02`), skip (`CERT-DEPLOY-03`), waiver (`CERT-DEPLOY-04`), grace (`CERT-DEPLOY-05`), candidate mismatch (`CERT-DEPLOY-06`), non-pass gate decision (`CERT-DEPLOY-07`), missing artifact readiness (`CERT-DEPLOY-08`), and missing durable sync for Alt/Main (`CERT-DEPLOY-09`).
+- `verifyMainPromotion` rejects candidate mismatch (`CERT-DEPLOY-10`), non-pass verification (`CERT-DEPLOY-11`), and missing durable sync (`CERT-DEPLOY-12`). Main does not become certified on traffic switch alone.
+- `evaluateRollback` denies rollback during shared outage, when artifact is not ready, or when target is the same candidate. `evaluateCrashRecovery` resumes verification, restarts deployment, or quarantines with ambiguous state detection (`CERT-DEPLOY-13`).
+- `buildDeploymentEffectRecord` creates deterministic content-addressed effect records. No success inference from deploy exit alone, no false Main success from incomplete verification.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
