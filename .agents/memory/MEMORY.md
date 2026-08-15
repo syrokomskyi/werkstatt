@@ -6,9 +6,9 @@ Curated project context (RFC-0664). This file is versioned — daily logs in `da
 
 <!-- What is being worked on right now. One to three bullets max. -->
 
-- RFC-0839 (Axiom post-deploy mobile layout monitoring) implemented, reviewed, stamped, and activated. Methodology `mobile-layout-stability` is `active: true` in `systems/methodologies.md`. Capture-side implemented by Axiom expert (RFC-0093 in pipelines repo).
-- RFC-0840 (preserve root-level operator config files during materialization) implemented by operator.
-- Mobile layout validation three-layer strategy complete: RFC-0837 (static CSS), RFC-0838 (Playwright pre-deploy), RFC-0839 (Axiom post-deploy).
+- RFC-0855 certification program: all 25 packets (000–240) completed. Leitstand deployment commands remain blocked with `CERT-TRANSITION-01` until CERT-007 is connected to Leitstand command surface. AGENTS.md files updated to reflect completed program status.
+- RFC-0865 (Connect CERT-007 deployment authority to Leitstand command surface) created in `draft` status. Restores 8 blocked deployment commands through `authorizeDeployment()` gate, registers minimal Astro certification profile, implements R2 durable storage adapter. Awaiting architecture review.
+- RFC-0839 (Axiom post-deploy mobile layout monitoring) implemented, reviewed, stamped, and activated. Methodology `mobile-layout-stability` is `active: true` in `systems/methodologies.md`.
 
 ## Decisions in flight
 
