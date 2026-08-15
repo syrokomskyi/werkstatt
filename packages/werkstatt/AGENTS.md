@@ -145,6 +145,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `evaluateScheduleWindow` enforces idempotency with duplicate detection and late delivery rejection. `buildHealthDecision` appends decisions without editing historical gate decisions. `buildHealthProjection` creates deterministic projections.
 - `evaluateMonitorRecovery` resumes from requirements/health-decision/incident/projection/complete with `CERT-HEALTH-02` ambiguous state. `isHealthTransitionValid` validates state transitions. No silent overwrite of newer health decisions, no monitor failure masquerading as current health.
 
+### Single-site clean cutover (CERT-009, packet 230)
+
+- `packages/werkstatt/src/certification/cutover/marker.ts` owns the clean cutover marker and legacy state prohibition for single-site republishing through the new complete pipeline.
+- `CleanCutoverMarkerV1` is the explicit marker containing new candidate, all decision IDs (dev, alt, main verification, evaluator), dossier root, Main identity (candidate, artifact hash, deployment URL, timestamp), health state, rollback target identity, bootstrap exception closure, continuous health window completion, and deterministic marker hash.
+- `verifyCutover` rejects legacy state reads for success (`CERT-CUTOVER-01`), missing dev decision (`CERT-CUTOVER-02`), missing alt decision (`CERT-CUTOVER-03`), missing main verification (`CERT-CUTOVER-04`), missing evaluator decisions (`CERT-CUTOVER-05`), incomplete health window (`CERT-CUTOVER-06`), revoked health (`CERT-CUTOVER-07`), same rollback candidate (`CERT-CUTOVER-08`), and invalid component set hash (`CERT-CUTOVER-09`).
+- `checkLegacyStateProhibition` enforces no runtime command reads legacy release certification, grace, or mission artifacts for success. `verifyMarkerIntegrity` detects tampering via hash recomputation.
+- `isBootstrapExceptionClosed` and `isRollbackTargetProtected` enforce bootstrap rollback target protection until the exception is closed, and permanent protection for prior-certified targets. No legacy state import, no cutover without complete certification path.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
