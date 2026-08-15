@@ -275,11 +275,11 @@ packets:
   - order: 240
     packetId: 240-cleanup
     file: 240-cleanup.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/CERT-010
     decisionKind: spec-node
     resolvedRfc: null
     dependsOnPacket: 230-combined-cutover
-    baseCommit: null
+    baseCommit: 32bc6ee
     sealCommit: null
     completion: null
