@@ -258,6 +258,20 @@
           The data field accepts only runtime-branded CanonicalJsonObjectV1 (RFC-0849).
         </description>
       </deliverable>
+      <deliverable id="del-0858">
+        <name>RFC-0858 Component and capability contracts</name>
+        <status>implemented</status>
+        <description>
+          Added strict versioned component manifests, capability provides/requires, attenuated grants,
+          closed effect declarations, isolation requirements, lifecycle-owned resources, and canonical
+          resolved-component-set identity in `packages/werkstatt/src/component/`. Strict Zod schemas
+          reject unknown fields, invalid identities, duplicate provides, Law Kernel reserved grant scopes,
+          and unknown effect/isolation/tier types. Canonical identity uses the existing fingerprint
+          authority (snapshotCanonicalJsonObjectV1 + canonicalJsonHashV1). computeSetHash is input-order
+          invariant and sensitive to every semantic field change. No registry, loader, sandbox, or
+          plugin adapter exists in this module.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

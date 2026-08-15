@@ -361,6 +361,7 @@
     <requirement id="arc-05">Intermediate build or deployment failure is permitted. Compatibility authority, validation downgrade, local fallback, scope widening, and parallel implementation are forbidden.</requirement>
     <requirement id="arc-06">Agent-written and third-party executable artifacts remain disabled until a real admitted sandbox and the governed evolution controller are complete.</requirement>
     <requirement id="arc-07">RFC-0852 (packet 030): `packages/werkstatt/src/schemas/diagnostic.ts` is the sole owner of Diagnostic strict Zod schemas and inferred types. Legacy aliases and deprecated fields are removed; `data` accepts only runtime-branded CanonicalJsonObjectV1.</requirement>
+    <requirement id="arc-08">RFC-0858 (packet 050): `packages/werkstatt/src/component/` owns strict versioned component manifests, capability provides/requires, grants, effects, isolation, resources, and canonical resolved-component-set identity. Unknown fields, invalid identities, duplicate provides, Law Kernel reserved grant scopes, and unknown effect/isolation/tier types fail. Canonical identity uses the existing fingerprint authority; no ad hoc hashing.</requirement>
     <source>`docs/plans/agent-runtime-certification/program.yaml`</source>
   </agent-runtime-certification-program>
 

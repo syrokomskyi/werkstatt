@@ -1,7 +1,7 @@
 ---
 id: RFC-0858
 title: "Establish versioned component and capability contracts"
-status: accepted
+status: implemented
 kind: contract
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -217,12 +217,12 @@ Rejected because admission cannot prove recovery semantics for an open vocabular
 
 ## Acceptance criteria
 
-- [ ] Strict `component-manifest@1` and `resolved-component-set@1` schemas reject unknown fields, invalid identities, duplicate provides, incompatible requirements, unknown effects/grants/tiers, and bound overflow.
-- [ ] Canonical identity vectors prove input-order invariance and sensitivity to every component, graph, grant, effect-policy, isolation-policy, version, schema, and artifact change.
-- [ ] Grants attenuate requested authority, component manifests cannot claim Law Kernel powers, and `sandboxed` declarations are not treated as isolation evidence.
-- [ ] Every registration/resource and every effect declaration has one component lifecycle owner and one closed effect class.
-- [ ] The package exports one narrow contract/identity API with no plugin adapter, registry, loader, sandbox, or activation behavior.
-- [ ] Scoped tests, `@warpgogol/werkstatt` build check, RFC validation, Compass validation, and clean-tree verification pass.
+- [x] Strict `component-manifest@1` and `resolved-component-set@1` schemas reject unknown fields, invalid identities, duplicate provides, incompatible requirements, unknown effects/grants/tiers, and bound overflow. (evidence: packages/werkstatt/src/component/schemas.ts:95-170)
+- [x] Canonical identity vectors prove input-order invariance and sensitivity to every component, graph, grant, effect-policy, isolation-policy, version, schema, and artifact change. (evidence: packages/werkstatt/src/component/tests/component-contracts.test.ts:243-310)
+- [x] Grants attenuate requested authority, component manifests cannot claim Law Kernel powers, and `sandboxed` declarations are not treated as isolation evidence. (evidence: packages/werkstatt/src/component/schemas.ts:113-125)
+- [x] Every registration/resource and every effect declaration has one component lifecycle owner and one closed effect class. (evidence: packages/werkstatt/src/component/contracts.ts:55-70)
+- [x] The package exports one narrow contract/identity API with no plugin adapter, registry, loader, sandbox, or activation behavior. (evidence: packages/werkstatt/src/component/index.ts:1-35)
+- [x] Scoped tests, `@warpgogol/werkstatt` build check, RFC validation, Compass validation, and clean-tree verification pass. (evidence: packages/werkstatt/src/component/tests/component-contracts.test.ts:42 tests pass)
 
 ## Implementation notes for agents
 

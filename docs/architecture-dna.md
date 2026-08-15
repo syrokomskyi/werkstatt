@@ -311,3 +311,7 @@ The workshop extends Axiom post-deploy monitoring with a `mobile-layout` instrum
 ## DNA-74 · Canonical Diagnostic schema ownership
 
 `packages/werkstatt/src/schemas/diagnostic.ts` is the sole owner of `DiagnosticSeverity`, `DiagnosticEvidence`, and `Diagnostic` strict Zod schemas and inferred types. `kernel/types.ts` re-exports these types (type-only). No package may redeclare, duplicate, or alias these types. Legacy aliases (`auditSeveritySchema`, `auditEvidenceSchema`, `auditFindingSchema`, `AuditFinding`) and deprecated fields (`id`, `blockId`, `suggestion`) are removed; no compatibility alias or parser may be reintroduced. The `data` field accepts only runtime-branded `CanonicalJsonObjectV1` (RFC-0849). Established by RFC-0852.
+
+## DNA-75 · Component and capability contract ownership
+
+`packages/werkstatt/src/component/` is the sole owner of `ComponentManifestV1`, `ResolvedComponentSetV1`, and all supporting contract types (capabilities, grants, effects, isolation, resources). Strict Zod schemas with `.strict()` validation reject unknown fields. Canonical identity uses the existing fingerprint authority (`snapshotCanonicalJsonObjectV1` + `canonicalJsonHashV1`) — no ad hoc hashing. `computeSetHash` is input-order invariant and sensitive to every semantic field change. Component manifests cannot claim Law Kernel reserved grant scopes (`certify`, `administer`). No registry, loader, sandbox, plugin adapter, or activation behavior exists in this module. Established by RFC-0858.
