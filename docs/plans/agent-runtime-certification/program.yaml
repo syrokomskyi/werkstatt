@@ -3,7 +3,7 @@ program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
 state: executing
-currentPacket: 030-canonical-diagnostic
+currentPacket: 040-specification-reconciliation
 steward: human:andrii-syrokomskyi
 sequential: true
 parallelism: 1
@@ -44,14 +44,14 @@ packets:
   - order: 30
     packetId: 030-canonical-diagnostic
     file: 030-canonical-diagnostic.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0852
     decisionKind: rfc
     resolvedRfc: RFC-0852
     dependsOnPacket: 020-canonical-identity-bytes
     baseCommit: 7de9b5e9fddb5ef77739ba7e2227a2428c5f584d
     sealCommit: null
-    completion: null
+    completion: b82f2f75ad5361115a4cfa970a49eebe72abfe73
   - order: 40
     packetId: 040-specification-reconciliation
     file: 040-specification-reconciliation.md
