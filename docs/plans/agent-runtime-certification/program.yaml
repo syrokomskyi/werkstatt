@@ -237,8 +237,8 @@ packets:
     resolvedRfc: RFC-0864
     dependsOnPacket: 190-capability-artifact-and-sandbox
     baseCommit: 2791a247
-    sealCommit: null
-    completion: null
+    sealCommit: 00180bae
+    completion: 480a64c0
   - order: 210
     packetId: 210-deployment-effect-authority
     file: 210-deployment-effect-authority.md
