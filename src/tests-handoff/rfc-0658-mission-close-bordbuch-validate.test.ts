@@ -249,22 +249,19 @@ test("mission.close fails when bordbuch has orphan-mission-close violation", asy
 test("mission.close succeeds when bordbuch is valid", async () => {
   setupWorkspace();
 
-  // Write a valid bordbuch with a mission-open event for this mission
+  // Write a valid (empty) bordbuch — no unmatched entries
   const bordbuchPath = join(testRoot, "systems-cache", "test-system", "bordbuch", "events.ndjson");
-  const openLine = makeBordbuchEntry({
-    id: "event-000001",
-    kind: "mission-open",
-    systemId: "test-system",
-    summary: "Mission test-system-m000001 opened",
-    actor: "test-agent",
-    missionId: "test-system-m000001",
-  });
-  writeFileSync(bordbuchPath, openLine + "\n");
+  writeFileSync(bordbuchPath, "");
 
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent", "skip-evidence-sync": true },
+    flags: {
+      mission: "test-system-m000001",
+      actor: "test-agent",
+      "skip-evidence-sync": true,
+      "allow-no-op": true,
+    },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,

@@ -187,7 +187,7 @@ test("mission.close writes .materialization-state.json with current cache clone 
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent" },
+    flags: { mission: "test-system-m000001", actor: "test-agent", "allow-no-op": true },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
@@ -237,7 +237,7 @@ test("mission.close copies .cache/video/ from workpiece to cache clone", async (
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent" },
+    flags: { mission: "test-system-m000001", actor: "test-agent", "allow-no-op": true },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
@@ -277,7 +277,7 @@ test("mission.close copies .cache/video-live/ from workpiece to cache clone", as
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent" },
+    flags: { mission: "test-system-m000001", actor: "test-agent", "allow-no-op": true },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
@@ -304,7 +304,7 @@ test("mission.close succeeds when workpiece has no .cache/ directory", async () 
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent" },
+    flags: { mission: "test-system-m000001", actor: "test-agent", "allow-no-op": true },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,

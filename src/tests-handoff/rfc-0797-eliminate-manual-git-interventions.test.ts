@@ -273,7 +273,12 @@ test("close calls sternsystem.sync before mirror check when external mirrors con
   vi.mocked(executeKernelCommand).mockClear();
 
   const input = {
-    flags: { mission: "test-system-m000001", actor: "test-agent", "skip-evidence-sync": true },
+    flags: {
+      mission: "test-system-m000001",
+      actor: "test-agent",
+      "skip-evidence-sync": true,
+      "allow-no-op": true,
+    },
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
