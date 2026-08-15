@@ -259,8 +259,8 @@ packets:
     resolvedRfc: null
     dependsOnPacket: 210-deployment-effect-authority
     baseCommit: 29b156ef
-    sealCommit: null
-    completion: null
+    sealCommit: ae670ae
+    completion: 9437bf6
   - order: 230
     packetId: 230-combined-cutover
     file: 230-combined-cutover.md
