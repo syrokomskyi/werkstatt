@@ -110,12 +110,12 @@ packets:
   - order: 90
     packetId: 090-isolation-contract
     file: 090-isolation-contract.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0862
     decisionKind: rfc
     resolvedRfc: RFC-0862
     dependsOnPacket: 080-reflection-and-conformance-harness
-    baseCommit: 99cfcfaade01f6dfd3cbd17b9c991c6843635237
+    baseCommit: 3c4a6fbc5c7d9cf42ba2a1a2a880d08c657be635
     sealCommit: null
     completion: null
   - order: 100

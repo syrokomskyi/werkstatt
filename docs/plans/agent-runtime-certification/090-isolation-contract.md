@@ -2,53 +2,54 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 090-isolation-contract
-state: draft
+state: sealed
 governingDecision: RFC-0862
 decisionKind: rfc
 resolvedRfc: RFC-0862
 dependsOnPacket: 080-reflection-and-conformance-harness
-baseCommit: 99cfcfaade01f6dfd3cbd17b9c991c6843635237
+baseCommit: 3c4a6fbc5c7d9cf42ba2a1a2a880d08c657be635
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md"
+  - path: docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md
     sha256: 988d80e92ae98976f7f55a0ff399039a78420f96f3911cec8e865a799a83a76a
 allowedFiles:
-  - "packages/werkstatt/src/isolation/contracts.ts"
-  - "packages/werkstatt/src/isolation/schemas.ts"
-  - "packages/werkstatt/src/isolation/conformance.ts"
-  - "packages/werkstatt/src/isolation/tests/**"
-  - "packages/werkstatt/package.json"
-  - "docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md"
-  - "docs/rfcs/verification/**"
-  - "docs/architecture-dna.md"
-  - "docs/requirements.xml"
-  - "docs/technology.xml"
-  - "docs/development-plan.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/verification-plan.xml"
-  - "docs/source-markup.xml"
-  - "AGENTS.md"
-  - "packages/AGENTS.md"
-  - "packages/werkstatt/AGENTS.md"
+  - packages/werkstatt/src/isolation/contracts.ts
+  - packages/werkstatt/src/isolation/schemas.ts
+  - packages/werkstatt/src/isolation/conformance.ts
+  - packages/werkstatt/src/isolation/tests/**
+  - packages/werkstatt/package.json
+  - docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md
+  - docs/rfcs/verification/**
+  - docs/architecture-dna.md
+  - docs/requirements.xml
+  - docs/technology.xml
+  - docs/development-plan.xml
+  - docs/knowledge-graph.xml
+  - docs/verification-plan.xml
+  - docs/source-markup.xml
+  - AGENTS.md
+  - packages/AGENTS.md
+  - packages/werkstatt/AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0862"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0862
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 090: Isolation contract
 
