@@ -2,24 +2,24 @@ schema: forge/program@1
 program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
-state: preparing
-currentPacket: 000-program-control-plane
+state: executing
+currentPacket: 010-node-24
 steward: human:andrii-syrokomskyi
 sequential: true
 parallelism: 1
 packets:
-  - order: 000
+  - order: 0
     packetId: 000-program-control-plane
     file: 000-program-control-plane.md
-    state: draft
+    state: completed
     governingDecision: RFC-0856
     decisionKind: rfc
     resolvedRfc: RFC-0856
     dependsOnPacket: null
     baseCommit: null
     sealCommit: null
-    completion: null
-  - order: 010
+    completion: 6c4f890d5910799529f0a62a4f4f763639d4c892
+  - order: 10
     packetId: 010-node-24
     file: 010-node-24.md
     state: draft
@@ -30,7 +30,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 020
+  - order: 20
     packetId: 020-canonical-identity-bytes
     file: 020-canonical-identity-bytes.md
     state: draft
@@ -41,7 +41,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 030
+  - order: 30
     packetId: 030-canonical-diagnostic
     file: 030-canonical-diagnostic.md
     state: draft
@@ -52,7 +52,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 040
+  - order: 40
     packetId: 040-specification-reconciliation
     file: 040-specification-reconciliation.md
     state: draft
@@ -63,7 +63,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 050
+  - order: 50
     packetId: 050-component-and-capability-contracts
     file: 050-component-and-capability-contracts.md
     state: draft
@@ -74,7 +74,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 060
+  - order: 60
     packetId: 060-fiber-and-effect-runtime
     file: 060-fiber-and-effect-runtime.md
     state: draft
@@ -85,7 +85,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 070
+  - order: 70
     packetId: 070-resolution-and-reconciliation
     file: 070-resolution-and-reconciliation.md
     state: draft
@@ -96,7 +96,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 080
+  - order: 80
     packetId: 080-reflection-and-conformance-harness
     file: 080-reflection-and-conformance-harness.md
     state: draft
@@ -107,7 +107,7 @@ packets:
     baseCommit: null
     sealCommit: null
     completion: null
-  - order: 090
+  - order: 90
     packetId: 090-isolation-contract
     file: 090-isolation-contract.md
     state: draft
