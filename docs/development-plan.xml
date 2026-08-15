@@ -421,6 +421,22 @@
           No child logic reimplemented; no adapters, aliases, or fallback passes.
         </description>
       </deliverable>
+      <deliverable id="del-140">
+        <name>CERT-002 Resolved certification profile</name>
+        <status>implemented</status>
+        <description>
+          Created `packages/werkstatt/src/certification/profile/` with strict Zod
+          schemas for `CertificationProfileV1`, producer declarations, requirements,
+          applicability rules, reuse/freshness, execution, remediation, retention,
+          and evaluator policy. `hashCertificationProfileV1` computes canonical
+          hash via RFC-0849 fingerprint authority. `validateCertificationProfileV1`
+          validates plugin/profile binding, duplicate IDs, producer registration,
+          dimension coverage for all nine dimensions and Main gate paths,
+          continuous-health freshness, rollback eligibility, and evaluator policy.
+          24 tests covering schema parsing, hash determinism, permutation
+          invariance, and all validation failure modes.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

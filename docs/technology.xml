@@ -299,6 +299,7 @@
       <rule>Evaluation modules have no filesystem/network/clock/env/plugin imports and mutate none of their inputs.</rule>
       <rule>Release manifests accept only artifact readiness states `prepared` and `ready` (RFC-0851); legacy deployment-state labels are rejected without translation. All Leitstand commands and `release.rollback` are blocked with `CERT-TRANSITION-01` until CERT-007.</rule>
       <rule>RFC-0848 integration suite at `packages/werkstatt/src/tests/certification-foundation.integration.test.ts` proves ten cross-module CERT-INTEGRATION laws using public child APIs only — no child logic is reimplemented, no adapters/aliases/fallback passes are introduced, and `@warpgogol/werkstatt` imports no stack plugin.</rule>
+      <rule>CERT-002 profile schemas at `packages/werkstatt/src/certification/profile/` own `CertificationProfileV1` with strict Zod validation, producer declarations, requirements, applicability, reuse/freshness, remediation, retention, and evaluator policy. Canonical hash uses RFC-0849 fingerprint authority. `validateCertificationProfileV1` enforces plugin/profile binding, duplicate IDs, producer registration, nine-dimension Main gate coverage, continuous-health freshness, and rollback eligibility. No producer execution or deployment decisions.</rule>
     </certification-plane>
     <transition>Current `werkstatt/plugin@1` source remains until packet 230; no compatibility adapter is introduced.</transition>
   </agent-runtime-architecture>

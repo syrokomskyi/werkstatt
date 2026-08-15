@@ -462,5 +462,9 @@
       <change-type>RFC-0848 cross-module integration suite changes</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt exec vitest run src/tests/certification-foundation.integration.test.ts`, `pnpm --filter @warpgogol/werkstatt build`, `pnpm exec werkstatt run rfc.validate --id RFC-0848`, and `pnpm exec werkstatt run werkstatt.autonomy.validate`. Verify all ten CERT-INTEGRATION laws pass, no child logic is reimplemented, `@warpgogol/werkstatt` imports no stack plugin, and the site plugin defines no duplicate Diagnostic/certification authority.</expectation>
     </entry>
+    <entry id="vm-22">
+      <change-type>CERT-002 certification profile schema/validation/hash changes</change-type>
+      <expectation>Run `vitest` on `certification-profile.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. All must pass with zero unexpected diagnostics.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>
