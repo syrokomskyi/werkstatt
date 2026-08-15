@@ -63,6 +63,15 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Failure paths use only array indices and object sorted ordinals — never raw keys. Path segments are capped at 64; overflow increments `omittedPathSegments`.
 - `Sha256Digest` is an opaque branded type (`sha256:` + 64 lowercase hex). `isSha256Digest` is the exact guard. `byteHash` and `byteHashFile` return `Sha256Digest`; existing string consumers remain compatible.
 
+### Canonical Diagnostic schema (RFC-0852)
+
+- `packages/werkstatt/src/schemas/diagnostic.ts` is the **sole owner** of `DiagnosticSeverity`, `DiagnosticEvidence`, and `Diagnostic` strict Zod schemas and inferred types. `kernel/types.ts` re-exports these types (type-only); no duplicate interface, severity union, or schema implementation may exist elsewhere.
+- The site plugin (`@warpgogol/werkstatt-site`) imports diagnostic schemas from `@warpgogol/werkstatt/schemas`. Legacy aliases (`auditSeveritySchema`, `auditEvidenceSchema`, `auditFindingSchema`, `AuditFinding`) and deprecated fields (`id`, `blockId`, `suggestion`) are removed; no compatibility alias or parser may be reintroduced.
+- `data` accepts only runtime-branded `CanonicalJsonObjectV1` (RFC-0849) validated via `z.custom` + `isCanonicalJsonObjectV1`; arbitrary objects and every RFC-0849-invalid value fail before persistence.
+- Field/collection limits: `ruleId` 128 chars `[A-Z0-9][A-Z0-9._-]*`, `message` 4 KiB, `fixHint` 8 KiB, `file`/`ruleFile` 1 KiB, `url` 4 KiB, `snippet` 16 KiB, 32 evidence items, 64 KiB canonical `data` bytes, 128 KiB per Diagnostic, 1000 diagnostics per persisted result.
+- Safe locator rules: `file`/`ruleFile` use workspace-relative POSIX paths (reject absolute, backslashes, `..`, empty, URI schemes, home expansion, credentials). URLs must be absolute `http:`/`https:` with no userinfo or credential-bearing query values.
+- Redaction: diagnostic strings and canonical `data` must be redacted before construction. Known secret patterns (API keys, JWTs, private keys, bearer tokens, connection strings, AWS creds), absolute paths, and PII (email, phone) are hard failures (`CERT-DIAGNOSTIC-REDACTION-01`).
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.

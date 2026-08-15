@@ -155,6 +155,18 @@ export type {
   NotausgangManifest,
 } from "./notausgang.ts";
 
+// RFC-0852: Engine-owned canonical Diagnostic schemas.
+export {
+  diagnosticSeveritySchema,
+  diagnosticEvidenceSchema,
+  diagnosticSchema,
+  diagnosticRuleIdSchema,
+  safeWorkspaceRelativePathSchema,
+  safeDiagnosticUrlSchema,
+  DIAGNOSTIC_LIMITS,
+} from "./diagnostic.ts";
+export type { DiagnosticSeverity, DiagnosticEvidence, Diagnostic } from "./diagnostic.ts";
+
 // RFC-0565: DHT site registry and content placement schemas.
 export {
   dhtSiteEntrySchema,

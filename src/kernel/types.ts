@@ -163,54 +163,28 @@ export interface KernelCommandResult<TData = unknown> {
 }
 
 // ---------------------------------------------------------------------------
-// RFC-0203: canonical Diagnostic model
+// RFC-0852: canonical Diagnostic model — re-exported from engine schema module
 // ---------------------------------------------------------------------------
-// The single shape every static check uses to report a finding. Promoted from
-// the RFC-0074 audit finding (`auditFindingSchema`) and graduated into the
-// kernel so the contract lives next to KernelCommandResult and the failure
-// renderer (formatFailureDiagnostics). `@warpgogol/werkstatt-site/checks` provides the
-// zod realization (`diagnosticSchema`).
+// The single shape every static check uses to report a finding. The Zod
+// schemas, types, limits, and validation helpers are owned by
+// `packages/werkstatt/src/schemas/diagnostic.ts` (RFC-0852). This file
+// re-exports the types so existing `@warpgogol/werkstatt/kernel` consumers
+// see no breakage. The site plugin imports the schemas directly from
+// `@warpgogol/werkstatt/schemas`.
 
-export type DiagnosticSeverity = "error" | "warning" | "info";
+import type {
+  DiagnosticSeverity as _DiagnosticSeverity,
+  DiagnosticEvidence as _DiagnosticEvidence,
+  Diagnostic as _Diagnostic,
+} from "../schemas/diagnostic.ts";
 
-/** Structured supporting evidence attached to a Diagnostic (RFC-0074 lineage). */
-export interface DiagnosticEvidence {
-  kind: "rule" | "rendered" | "source" | "config" | "cache" | "runtime";
-  ruleFile?: string;
-  ruleId?: string;
-  file?: string;
-  url?: string;
-  snippet?: string;
-}
-
-export interface Diagnostic {
-  /** Stable id from the rule registry, e.g. "KEL-01", "BIOME-TOKEN-02". */
-  ruleId: string;
-  severity: DiagnosticSeverity;
-  /** One human-readable sentence. No trailing newline. */
-  message: string;
-  /** Workspace-relative POSIX path. Optional: some violations are global. */
-  file?: string;
-  line?: number;
-  column?: number;
-  /** Imperative remediation a human or agent can execute. */
-  fixHint?: string;
-  /** Structured supporting evidence. */
-  evidence?: DiagnosticEvidence[];
-  /** Rule-specific structured extras for machine consumers. */
-  data?: Record<string, unknown>;
-  /** @deprecated Legacy audit fields retained during the RFC-0203 migration. */
-  id?: string;
-  blockId?: string;
-  /** @deprecated Use `fixHint`. Kept while audit findings migrate. */
-  suggestion?: string;
-}
+export type { DiagnosticSeverity, DiagnosticEvidence, Diagnostic } from "../schemas/diagnostic.ts";
 
 /** Canonical per-command result payload carried inside KernelCommandResult.data. */
 export interface CheckResult {
   command: string;
   status: "pass" | "warn" | "fail";
-  diagnostics: Diagnostic[];
+  diagnostics: _Diagnostic[];
   summary: { error: number; warning: number; info: number };
 }
 
