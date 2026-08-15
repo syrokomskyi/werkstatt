@@ -3,7 +3,7 @@ program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
 state: executing
-currentPacket: 040-specification-reconciliation
+currentPacket: 050-component-and-capability-contracts
 steward: human:andrii-syrokomskyi
 sequential: true
 parallelism: 1
@@ -55,14 +55,14 @@ packets:
   - order: 40
     packetId: 040-specification-reconciliation
     file: 040-specification-reconciliation.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/AMD-007
     decisionKind: spec-amendment
     resolvedRfc: null
     dependsOnPacket: 030-canonical-diagnostic
     baseCommit: 9c04fea2a03979a0445be88081aa41022ad8080b
     sealCommit: null
-    completion: null
+    completion: c531d216d0785c3061785ffdad008a1a10af7d2e
   - order: 50
     packetId: 050-component-and-capability-contracts
     file: 050-component-and-capability-contracts.md
