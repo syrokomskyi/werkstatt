@@ -7,12 +7,12 @@ governingDecision: RFC-0862
 decisionKind: rfc
 resolvedRfc: RFC-0862
 dependsOnPacket: 080-reflection-and-conformance-harness
-baseCommit: null
+baseCommit: 7fe49fab
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md"
-    sha256: 985b9e0818d590bf3e71b83fdf614a13346b13ae908dcb13289181067d71785a
+    sha256: 988d80e92ae98976f7f55a0ff399039a78420f96f3911cec8e865a799a83a76a
 allowedFiles:
   - "packages/werkstatt/src/isolation/contracts.ts"
   - "packages/werkstatt/src/isolation/schemas.ts"

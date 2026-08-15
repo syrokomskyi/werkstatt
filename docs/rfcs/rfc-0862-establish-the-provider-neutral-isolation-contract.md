@@ -1,11 +1,12 @@
 ---
 id: RFC-0862
 title: "Establish the provider-neutral isolation contract"
-status: draft
+status: accepted
 kind: contract
 scope: workspace
 owners: [architecture]
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15

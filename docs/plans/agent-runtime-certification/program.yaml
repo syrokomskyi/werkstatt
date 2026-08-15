@@ -115,7 +115,7 @@ packets:
     decisionKind: rfc
     resolvedRfc: RFC-0862
     dependsOnPacket: 080-reflection-and-conformance-harness
-    baseCommit: null
+    baseCommit: 7fe49fab
     sealCommit: null
     completion: null
   - order: 100
