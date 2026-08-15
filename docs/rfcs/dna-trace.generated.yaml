@@ -719,8 +719,8 @@ entries:
         - RFC-0726
         - RFC-0750
         - RFC-0771
-      accepted:
         - RFC-0855
+      accepted:
         - RFC-0856
       draft:
         - RFC-0850
@@ -742,8 +742,8 @@ entries:
         - RFC-0651
         - RFC-0771
         - RFC-0778
-      accepted:
         - RFC-0855
+      accepted: []
       draft:
         - RFC-0863
       other: []
@@ -783,8 +783,8 @@ entries:
         - RFC-0715
         - RFC-0738
         - RFC-0771
-      accepted:
         - RFC-0855
+      accepted:
         - RFC-0856
       draft:
         - RFC-0848
@@ -899,8 +899,8 @@ entries:
         - RFC-0707
         - RFC-0715
         - RFC-0724
-      accepted:
         - RFC-0855
+      accepted: []
       draft: []
       other: []
   - dnaId: DNA-6
@@ -947,8 +947,8 @@ entries:
         - RFC-0780
         - RFC-0808
         - RFC-0823
-      accepted:
         - RFC-0855
+      accepted: []
       draft:
         - RFC-0848
         - RFC-0850
@@ -1039,8 +1039,8 @@ entries:
     satisfiedBy:
       implemented:
         - RFC-0842
-      accepted:
         - RFC-0855
+      accepted: []
       draft:
         - RFC-0851
       other: []

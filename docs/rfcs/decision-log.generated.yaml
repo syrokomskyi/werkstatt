@@ -19579,7 +19579,7 @@ entries:
     rfcId: RFC-0855
     title: Establish the authority-first agent-native runtime and certification
       program
-    status: accepted
+    status: implemented
     alternativesText: >-
       ### Implement release certification unchanged, then replace the runtime
 

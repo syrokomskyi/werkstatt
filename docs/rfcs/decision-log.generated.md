@@ -9345,7 +9345,7 @@ Rejected: archived documents are immutable history, dependency metadata is third
 
 ### RFC-0855: Establish the authority-first agent-native runtime and certification program
 
-- **Status:** accepted
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Implement release certification unchanged, then replace the runtime
