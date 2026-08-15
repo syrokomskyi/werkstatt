@@ -50,7 +50,16 @@ import {
   runBehaviorSnapshotDiff,
 } from "../behavior-snapshot/behavior-snapshot-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
+import { buildCertificationTransitionBlock } from "../certification/transition-block.ts";
 import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import {
+  releaseManifestSchema,
+  legacyReleaseStateSchema,
+  type ReleaseManifest,
+  type LegacyReleaseDiagnostic,
+} from "../schemas/release.ts";
+import type { ReleaseArtifactRef } from "../schemas/artifact-store.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -82,44 +91,53 @@ async function listReleaseIds(workspaceRoot: string): Promise<string[]> {
   return entries.filter((e) => e.isDirectory() && !e.name.includes(".staging-")).map((e) => e.name);
 }
 
+export class LegacyReleaseError extends Error {
+  readonly releaseId: string;
+  readonly legacyState: string;
+  constructor(releaseId: string, legacyState: string) {
+    super(
+      `[release] release '${releaseId}' uses legacy state '${legacyState}' which is no longer valid per RFC-0851`,
+    );
+    this.releaseId = releaseId;
+    this.legacyState = legacyState;
+  }
+}
+
 export async function readReleaseManifest(
   workspaceRoot: string,
   releaseId: string,
-): Promise<Record<string, unknown>> {
+): Promise<ReleaseManifest> {
   const manifestPath = path.join(workspaceRoot, "releases", releaseId, "release.yaml");
   if (!existsSync(manifestPath)) {
     throw new Error(`[release] release '${releaseId}' not found`);
   }
   const content = await fs.readFile(manifestPath, "utf8");
-  const result: Record<string, unknown> = {};
-  for (const line of content.split("\n")) {
-    const match = line.match(/^(\w+):\s*(.*)$/);
-    if (match) {
-      result[match[1]] = match[2];
-    }
+  const parsed = parseYaml(content);
+  const result = releaseManifestSchema.safeParse(parsed);
+  if (result.success) {
+    return result.data;
   }
-  return result;
+  const stateValue =
+    typeof parsed === "object" && parsed !== null && "state" in parsed
+      ? String((parsed as Record<string, unknown>).state)
+      : "";
+  const legacyStateResult = legacyReleaseStateSchema.safeParse(stateValue);
+  if (legacyStateResult.success) {
+    throw new LegacyReleaseError(releaseId, legacyStateResult.data);
+  }
+  throw new Error(
+    `[release] release '${releaseId}' has invalid manifest: ${result.error.issues.map((i) => i.path.join(".") + ": " + i.message).join("; ")}`,
+  );
 }
 
 export async function writeReleaseYaml(
   workspaceRoot: string,
   releaseId: string,
-  manifest: Record<string, unknown>,
+  manifest: ReleaseManifest,
 ): Promise<void> {
   const releaseDir = path.join(workspaceRoot, "releases", releaseId);
-  const lines: string[] = [];
-  for (const [key, value] of Object.entries(manifest)) {
-    if (value === null) {
-      lines.push(`${key}: null`);
-    } else if (typeof value === "string") {
-      lines.push(`${key}: ${value}`);
-    } else if (typeof value === "boolean" || typeof value === "number") {
-      lines.push(`${key}: ${value}`);
-    } else {
-      lines.push(`${key}: ${JSON.stringify(value)}`);
-    }
-  }
-  await atomicWriteFile(path.join(releaseDir, "release.yaml"), lines.join("\n") + "\n");
+  const yaml = stringifyYaml(manifest, { sortMapEntries: false });
+  await atomicWriteFile(path.join(releaseDir, "release.yaml"), yaml);
 }
 
 // §6.1: release.prepare
@@ -476,8 +494,8 @@ export async function runReleasePrepare(
         JSON.stringify(buildIdentity, null, 2) + "\n",
       );
 
-      // Write release manifest
-      const releaseManifest: Record<string, unknown> = {
+      // Write release manifest (RFC-0851: strict artifact-only schema)
+      const releaseManifest: ReleaseManifest = {
         schemaVersion: "1.0.0",
         releaseId,
         systemId,
@@ -485,7 +503,7 @@ export async function runReleasePrepare(
         semver,
         platformVersion,
         createdAt: now,
-        publishedAt: null,
+        readyAt: null,
         state: "prepared",
         commitSha: commitSha === "unknown" ? "0000000" : commitSha,
         platformSemanticHash,
@@ -497,26 +515,14 @@ export async function runReleasePrepare(
         readableSnapshotHash,
         qualityReportHash: null,
         snapshotDiffVerdict,
-        cSurfaceVerdict: "pass" as const,
         migratorVerdict: "pass",
         versionCompareVerdict: "in-sync",
       };
 
       // Write release.yaml directly into stagingDir — atomicMoveDir will carry it
       // to the final location, avoiding a redundant re-write after the move.
-      const manifestLines: string[] = [];
-      for (const [key, value] of Object.entries(releaseManifest)) {
-        if (value === null) {
-          manifestLines.push(`${key}: null`);
-        } else if (typeof value === "string") {
-          manifestLines.push(`${key}: ${value}`);
-        } else if (typeof value === "boolean" || typeof value === "number") {
-          manifestLines.push(`${key}: ${value}`);
-        } else {
-          manifestLines.push(`${key}: ${JSON.stringify(value)}`);
-        }
-      }
-      await atomicWriteFile(path.join(stagingDir, "release.yaml"), manifestLines.join("\n") + "\n");
+      const manifestYaml = stringifyYaml(releaseManifest, { sortMapEntries: false });
+      await atomicWriteFile(path.join(stagingDir, "release.yaml"), manifestYaml);
 
       // RFC-0761: Copy .env from workpiece to release directory
       const srcEnv = path.join(workpieceDir, ".env");
@@ -673,13 +679,14 @@ export async function runReleaseReady(
   }
 
   const manifest = await readReleaseManifest(workspaceRoot, releaseId);
-  const state = manifest.state as string;
-  if (state !== "prepared") {
-    throw new Error(`[release.ready] release '${releaseId}' is not prepared (state: ${state})`);
+  if (manifest.state !== "prepared") {
+    throw new Error(
+      `[release.ready] release '${releaseId}' is not prepared (state: ${manifest.state})`,
+    );
   }
 
   // RFC-0585: Check distTreeHash is not pending
-  const distTreeHash = manifest.distTreeHash as string | undefined;
+  const distTreeHash = manifest.distTreeHash;
   if (!distTreeHash || distTreeHash === "sha256:pending") {
     throw new Error(
       `[release.ready] distTreeHash is pending or missing — run release.prepare to compute a real hash before marking ready`,
@@ -709,7 +716,7 @@ export async function runReleaseReady(
     );
   }
 
-  const systemId = manifest.systemId as string;
+  const systemId = manifest.systemId;
   const operationId = generateOperationId();
 
   await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "release.ready", "agent");
@@ -725,7 +732,16 @@ export async function runReleaseReady(
     const artifactResult = await storeArtifactCore(workspaceRoot, releaseId, distDir, systemId);
 
     // Update manifest with artifact reference and state transition in a single write
-    manifest.artifact = artifactResult.uri;
+    const artifactRef: ReleaseArtifactRef = {
+      uri: artifactResult.uri,
+      provider: "local",
+      distArtifactHash: artifactResult.distArtifactHash,
+      distTreeHash: artifactResult.distTreeHash,
+      siteContentHash: artifactResult.siteContentHash,
+      byteSize: artifactResult.byteSize,
+      fileCount: artifactResult.fileCount,
+    };
+    manifest.artifact = artifactRef;
     manifest.distArtifactHash = artifactResult.distArtifactHash;
     manifest.state = "ready";
     manifest.readyAt = now;
@@ -758,8 +774,8 @@ export async function runReleaseReady(
         systemId,
         state: "ready",
         readyAt: now,
-        artifactUri: (manifest.artifact as string) ?? null,
-        distArtifactHash: (manifest.distArtifactHash as string) ?? null,
+        artifactUri: manifest.artifact?.uri ?? null,
+        distArtifactHash: manifest.distArtifactHash ?? null,
         distVerified: true,
       },
       summary: `[release.ready] ${releaseId} marked ready`,
@@ -806,23 +822,18 @@ export async function runReleaseValidate(
 
   const manifest = await readReleaseManifest(workspaceRoot, releaseId);
   const distDir = path.join(releaseDir, "dist");
-  const releaseState = manifest.state as string;
+  const releaseState = manifest.state;
 
   let artifactPresent: boolean;
   if (releaseState === "ready") {
-    artifactPresent =
-      manifest.artifact !== null && manifest.artifact !== undefined && manifest.artifact !== "null";
+    artifactPresent = manifest.artifact !== null;
     if (!artifactPresent) {
       logger.warn(
         `[release.validate] ready release '${releaseId}' has no artifact — run release.ready to store it`,
       );
     }
   } else {
-    artifactPresent =
-      existsSync(distDir) ||
-      (manifest.artifact !== null &&
-        manifest.artifact !== undefined &&
-        manifest.artifact !== "null");
+    artifactPresent = existsSync(distDir) || manifest.artifact !== null;
   }
 
   logger.success(`[release.validate] ${releaseId} valid (state: ${releaseState})`);
@@ -831,8 +842,8 @@ export async function runReleaseValidate(
     data: {
       releaseId,
       manifestFound,
-      state: manifest.state as string,
-      snapshotDiffVerdict: manifest.snapshotDiffVerdict as string,
+      state: manifest.state,
+      snapshotDiffVerdict: manifest.snapshotDiffVerdict,
       artifactPresent,
     },
     summary: `[release.validate] ${releaseId} valid (state: ${manifest.state})`,
@@ -843,6 +854,7 @@ export async function runReleaseValidate(
 export interface ReleaseListData {
   releases: Array<{ releaseId: string; systemId: string; state: string }>;
   count: number;
+  legacyInvalid: LegacyReleaseDiagnostic[];
 }
 
 export async function runReleaseList(
@@ -855,31 +867,42 @@ export async function runReleaseList(
   const releasesDir = path.join(workspaceRoot, "releases");
   if (!existsSync(releasesDir)) {
     return {
-      data: { releases: [], count: 0 },
+      data: { releases: [], count: 0, legacyInvalid: [] },
       summary: `[release.list] 0 releases`,
     };
   }
 
   const entries = await fs.readdir(releasesDir, { withFileTypes: true });
   const releases: Array<{ releaseId: string; systemId: string; state: string }> = [];
+  const legacyInvalid: LegacyReleaseDiagnostic[] = [];
 
   for (const entry of entries) {
     if (!entry.isDirectory() || entry.name.includes(".staging-")) continue;
     const releaseId = entry.name;
     try {
       const manifest = await readReleaseManifest(workspaceRoot, releaseId);
-      const systemId = manifest.systemId as string;
+      const systemId = manifest.systemId;
       if (systemFilter && systemId !== systemFilter) continue;
-      releases.push({ releaseId, systemId, state: manifest.state as string });
-    } catch {
-      // skip unreadable
+      releases.push({ releaseId, systemId, state: manifest.state });
+    } catch (err) {
+      if (err instanceof LegacyReleaseError) {
+        legacyInvalid.push({
+          schema: "werkstatt/legacy-release-diagnostic@1",
+          releaseId: err.releaseId,
+          legacyState: err.legacyState as LegacyReleaseDiagnostic["legacyState"],
+          ruleId: "CERT-LEGACY-STATE-01",
+          message: `Release '${err.releaseId}' uses legacy state '${err.legacyState}' which is no longer valid per RFC-0851.`,
+          fixHint:
+            "This release directory is preserved but cannot be used. CERT-010 will handle audited cleanup.",
+        });
+      }
     }
   }
 
-  logger.info(`  Found ${releases.length} releases`);
+  logger.info(`  Found ${releases.length} valid releases, ${legacyInvalid.length} legacy invalid`);
   return {
-    data: { releases, count: releases.length },
-    summary: `[release.list] ${releases.length} releases`,
+    data: { releases, count: releases.length, legacyInvalid },
+    summary: `[release.list] ${releases.length} releases (${legacyInvalid.length} legacy invalid)`,
   };
 }
 
@@ -893,59 +916,18 @@ export interface ReleaseRollbackData {
 
 export async function runReleaseRollback(
   input: KernelCommandInput,
-  context: KernelRuntimeContext,
+  _context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<ReleaseRollbackData>> {
-  const { workspaceRoot, logger } = context;
   const releaseId = flagString(input, "release");
   if (!releaseId) throw new Error("[release.rollback] --release is required");
 
-  const manifest = await readReleaseManifest(workspaceRoot, releaseId);
-  if (manifest.state !== "ready") {
-    throw new Error(
-      `[release.rollback] release '${releaseId}' is not ready (state: ${manifest.state})`,
-    );
-  }
-
-  const systemId = manifest.systemId as string;
-  const operationId = generateOperationId();
-
-  await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "release.rollback", "agent");
-  await acquireLock(
-    workspaceRoot,
-    `release:${releaseId}`,
-    operationId,
-    "release.rollback",
-    "agent",
-  );
-
-  try {
-    const now = new Date().toISOString();
-    manifest.state = "rolled-back";
-    await writeReleaseYaml(workspaceRoot, releaseId, manifest);
-
-    await appendAndCommitBordbuch(
-      workspaceRoot,
-      systemId,
-      "release-rolled-back",
-      `Release ${releaseId} rolled back`,
-      "agent",
-      {
-        writerRole: "release",
-        metadata: { releaseId },
-      },
-      `Bordbuch: release-rolled-back ${releaseId}`,
-    );
-
-    logger.success(`[release.rollback] ${releaseId} rolled back`);
-
-    return {
-      data: { releaseId, systemId, state: "rolled-back", rolledBackAt: now },
-      summary: `[release.rollback] ${releaseId} rolled back`,
-    };
-  } finally {
-    await releaseLock(workspaceRoot, `release:${releaseId}`);
-    await releaseLock(workspaceRoot, `system:${systemId}`);
-  }
+  const block = buildCertificationTransitionBlock("release.rollback");
+  return {
+    data: { releaseId, systemId: "", state: "rolled-back", rolledBackAt: "" },
+    summary: `[release.rollback] blocked: CERT-TRANSITION-01 — site deployment is unavailable until CERT-007`,
+    exitCode: block.exitCode,
+    diagnostics: block.diagnostics,
+  } as unknown as KernelCommandResult<ReleaseRollbackData>;
 }
 
 // §6.8: release.state.validate (RFC-0655)
@@ -959,7 +941,7 @@ export interface ReleaseStateValidateData {
   missionId: string | null;
   releaseId: string | null;
   systemId: string | null;
-  releaseState: "prepared" | "ready" | "alt-deployed" | "promoted" | "rolled-back" | "missing";
+  releaseState: "prepared" | "ready" | "missing";
   checks: ReleaseStateCheck[];
   summary: string;
 }
@@ -993,8 +975,8 @@ export async function runReleaseStateValidate(
     targets.push({ missionId: missionIdFlag, releaseId: rid, systemId: sid });
   } else if (releaseIdFlag) {
     const manifest = await readReleaseManifest(workspaceRoot, releaseIdFlag);
-    const sid = (manifest.systemId as string | null) ?? null;
-    const mid = (manifest.missionId as string | null) ?? null;
+    const sid = manifest.systemId;
+    const mid = manifest.missionId;
     targets.push({ missionId: mid, releaseId: releaseIdFlag, systemId: sid });
   } else if (systemFlag) {
     // Validate all releases for the system
@@ -1002,9 +984,9 @@ export async function runReleaseStateValidate(
     for (const rid of releaseIds) {
       try {
         const manifest = await readReleaseManifest(workspaceRoot, rid);
-        const sid = manifest.systemId as string;
+        const sid = manifest.systemId;
         if (sid !== systemFlag) continue;
-        const mid = (manifest.missionId as string | null) ?? null;
+        const mid = manifest.missionId;
         targets.push({ missionId: mid, releaseId: rid, systemId: sid });
       } catch {
         // skip unreadable
@@ -1028,7 +1010,7 @@ export async function runReleaseStateValidate(
   if (targets.length > 0 && targets[0]!.releaseId) {
     try {
       const manifest = await readReleaseManifest(workspaceRoot, targets[0]!.releaseId);
-      overallReleaseState = manifest.state as ReleaseStateValidateData["releaseState"];
+      overallReleaseState = manifest.state;
     } catch {
       overallReleaseState = "missing";
     }
@@ -1148,7 +1130,7 @@ async function validateReleaseState(
   if (effectiveReleaseId) {
     try {
       const manifest = await readReleaseManifest(workspaceRoot, effectiveReleaseId);
-      const state = manifest.state as string;
+      const state = manifest.state;
       if (state === "prepared") {
         checks.push({
           rule: "release-state-progressed",
@@ -1164,7 +1146,7 @@ async function validateReleaseState(
       }
 
       // Check 5: state-last-release-consistent
-      if (state === "promoted" && systemId) {
+      if (state === "ready" && systemId) {
         try {
           const systemState = await readSystemState(workspaceRoot, systemId);
           const lastRelease = systemState.lastRelease as string | null | undefined;
@@ -1172,13 +1154,13 @@ async function validateReleaseState(
             checks.push({
               rule: "state-last-release-consistent",
               status: "warn",
-              message: `release '${effectiveReleaseId}' is promoted but system-state.yaml has no lastRelease for system '${systemId}'`,
+              message: `release '${effectiveReleaseId}' is ready but system-state.yaml has no lastRelease for system '${systemId}'`,
             });
           } else if (lastRelease !== effectiveReleaseId) {
             checks.push({
               rule: "state-last-release-consistent",
               status: "warn",
-              message: `system-state.yaml lastRelease '${lastRelease}' does not match promoted release '${effectiveReleaseId}'`,
+              message: `system-state.yaml lastRelease '${lastRelease}' does not match ready release '${effectiveReleaseId}'`,
             });
           } else {
             checks.push({

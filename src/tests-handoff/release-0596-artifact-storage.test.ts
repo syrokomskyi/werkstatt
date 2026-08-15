@@ -19,6 +19,7 @@ import {
   readFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { stringify as stringifyYaml, parse as parseYaml } from "yaml";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import { runReleaseReady, runReleaseValidate } from "../release/release-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
@@ -50,31 +51,39 @@ function writeReleaseManifest(
 ): void {
   const releaseDir = join(workspaceRoot, "releases", releaseId);
   mkdirSync(releaseDir, { recursive: true });
-  const lines: string[] = [];
-  for (const [key, value] of Object.entries(fields)) {
-    if (value === null) {
-      lines.push(`${key}: null`);
-    } else if (typeof value === "string") {
-      lines.push(`${key}: ${value}`);
-    } else if (typeof value === "boolean" || typeof value === "number") {
-      lines.push(`${key}: ${value}`);
-    } else {
-      lines.push(`${key}: ${JSON.stringify(value)}`);
-    }
-  }
-  writeFileSync(join(releaseDir, "release.yaml"), lines.join("\n") + "\n");
+  const defaults: Record<string, unknown> = {
+    schemaVersion: "1.0.0",
+    releaseId,
+    systemId: "test-sys",
+    missionId: "test-mission-m000001",
+    semver: "0.1.0",
+    platformVersion: "1.0.0",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    readyAt: null,
+    state: "prepared",
+    commitSha: "0000000",
+    platformSemanticHash: "sha256:semantic",
+    siteContentHash: "sha256:content",
+    distTreeHash: "sha256:abc123def456",
+    distArtifactHash: null,
+    artifact: null,
+    behaviorSnapshotHash: "sha256:behavior",
+    readableSnapshotHash: "sha256:readable",
+    qualityReportHash: null,
+    snapshotDiffVerdict: "pass",
+    migratorVerdict: "pass",
+    versionCompareVerdict: "in-sync",
+  };
+  const merged = { ...defaults, ...fields };
+  writeFileSync(join(releaseDir, "release.yaml"), stringifyYaml(merged));
 }
 
-function readReleaseManifestFile(workspaceRoot: string, releaseId: string): Record<string, string> {
+function readReleaseManifestFile(
+  workspaceRoot: string,
+  releaseId: string,
+): Record<string, unknown> {
   const content = readFileSync(join(workspaceRoot, "releases", releaseId, "release.yaml"), "utf8");
-  const result: Record<string, string> = {};
-  for (const line of content.split("\n")) {
-    const match = line.match(/^(\w+):\s*(.*)$/);
-    if (match) {
-      result[match[1]] = match[2];
-    }
-  }
-  return result;
+  return parseYaml(content) as Record<string, unknown>;
 }
 
 function createDistDir(workspaceRoot: string, releaseId: string): string {
@@ -198,17 +207,10 @@ test("release.ready stores artifact before state transition", async () => {
   createDistDir(tmpDir, releaseId);
 
   writeReleaseManifest(tmpDir, releaseId, {
-    schemaVersion: "1.0.0",
     releaseId,
     systemId,
-    semver: "0.1.0",
     state: "prepared",
     distTreeHash: "sha256:abc123def456",
-    snapshotDiffVerdict: "pass",
-    migratorVerdict: "pass",
-    versionCompareVerdict: "in-sync",
-    artifact: null,
-    distArtifactHash: null,
   });
 
   const result = await runReleaseReady(makeInput({ release: releaseId }), makeContext(tmpDir));
@@ -221,9 +223,10 @@ test("release.ready stores artifact before state transition", async () => {
   // Verify release.yaml has artifact and distArtifactHash set AND state: ready
   const manifest = readReleaseManifestFile(tmpDir, releaseId);
   expect(manifest.state).toBe("ready");
-  expect(manifest.artifact).not.toBe("null");
-  expect(manifest.distArtifactHash).not.toBe("null");
-  expect(manifest.artifact).toMatch(/^local:\/\//);
+  expect(manifest.artifact).not.toBeNull();
+  expect(manifest.distArtifactHash).not.toBeNull();
+  const artifact = manifest.artifact as Record<string, unknown>;
+  expect(artifact.uri).toMatch(/^local:\/\//);
 });
 
 test("release.ready output includes distArtifactHash field", async () => {
@@ -236,17 +239,10 @@ test("release.ready output includes distArtifactHash field", async () => {
   createDistDir(tmpDir, releaseId);
 
   writeReleaseManifest(tmpDir, releaseId, {
-    schemaVersion: "1.0.0",
     releaseId,
     systemId,
-    semver: "0.1.0",
     state: "prepared",
     distTreeHash: "sha256:abc123def456",
-    snapshotDiffVerdict: "pass",
-    migratorVerdict: "pass",
-    versionCompareVerdict: "in-sync",
-    artifact: null,
-    distArtifactHash: null,
   });
 
   const result = await runReleaseReady(makeInput({ release: releaseId }), makeContext(tmpDir));
@@ -261,15 +257,10 @@ test("release.ready fails on missing dist — state remains prepared", async () 
   const systemId = "test-sys";
 
   writeReleaseManifest(tmpDir, releaseId, {
-    schemaVersion: "1.0.0",
     releaseId,
     systemId,
-    semver: "0.1.0",
     state: "prepared",
     distTreeHash: "sha256:abc123def456",
-    snapshotDiffVerdict: "pass",
-    migratorVerdict: "pass",
-    versionCompareVerdict: "in-sync",
   });
 
   await expect(
@@ -287,13 +278,9 @@ test("release.validate flags ready release without artifact", async () => {
   const releaseId = "test-sys-r000020";
 
   writeReleaseManifest(tmpDir, releaseId, {
-    schemaVersion: "1.0.0",
     releaseId,
     systemId: "test-sys",
-    semver: "0.1.0",
     state: "ready",
-    distTreeHash: "sha256:abc123def456",
-    snapshotDiffVerdict: "pass",
     artifact: null,
   });
 
@@ -307,14 +294,18 @@ test("release.validate passes ready release with artifact", async () => {
   const releaseId = "test-sys-r000021";
 
   writeReleaseManifest(tmpDir, releaseId, {
-    schemaVersion: "1.0.0",
     releaseId,
     systemId: "test-sys",
-    semver: "0.1.0",
     state: "ready",
-    distTreeHash: "sha256:abc123def456",
-    snapshotDiffVerdict: "pass",
-    artifact: "local:///some/path/manifest.json",
+    artifact: {
+      uri: "local:///some/path/manifest.json",
+      provider: "local",
+      distArtifactHash: "sha256:abc",
+      distTreeHash: "sha256:def",
+      siteContentHash: "sha256:ghi",
+      byteSize: 100,
+      fileCount: 1,
+    },
   });
 
   const result = await runReleaseValidate(makeInput({ release: releaseId }), makeContext(tmpDir));

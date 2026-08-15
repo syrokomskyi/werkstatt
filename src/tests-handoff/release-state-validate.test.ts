@@ -15,6 +15,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { stringify as stringifyYaml } from "yaml";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 // Mock readMissionManifest to bypass Zod schema validation
@@ -93,17 +94,35 @@ function setMissionManifest(missionId: string, manifest: Record<string, unknown>
 async function writeReleaseManifest(
   workspaceRoot: string,
   releaseId: string,
-  manifest: Record<string, unknown>,
+  overrides: Record<string, unknown>,
 ): Promise<void> {
   const releaseDir = join(workspaceRoot, "releases", releaseId);
   await mkdir(releaseDir, { recursive: true });
-  // readReleaseManifest uses a simple regex parser, not YAML — write unquoted strings
-  const lines = Object.entries(manifest).map(([k, v]) => {
-    if (v === null) return `${k}: null`;
-    if (typeof v === "string") return `${k}: ${v}`;
-    return `${k}: ${JSON.stringify(v)}`;
-  });
-  await writeFile(join(releaseDir, "release.yaml"), lines.join("\n") + "\n");
+  const defaults: Record<string, unknown> = {
+    schemaVersion: "1.0.0",
+    releaseId,
+    systemId: "test-sys",
+    missionId: "test-sys-m000001",
+    semver: "0.1.0",
+    platformVersion: "1.0.0",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    readyAt: null,
+    state: "ready",
+    commitSha: "0000000",
+    platformSemanticHash: "sha256:semantic",
+    siteContentHash: "sha256:content",
+    distTreeHash: "sha256:abc123def456",
+    distArtifactHash: null,
+    artifact: null,
+    behaviorSnapshotHash: "sha256:behavior",
+    readableSnapshotHash: "sha256:readable",
+    qualityReportHash: null,
+    snapshotDiffVerdict: "pass",
+    migratorVerdict: "pass",
+    versionCompareVerdict: "in-sync",
+  };
+  const merged = { ...defaults, ...overrides };
+  await writeFile(join(releaseDir, "release.yaml"), stringifyYaml(merged));
 }
 
 async function writeCloseReport(
@@ -543,7 +562,7 @@ describe("release.state.validate", () => {
   });
 
   describe("check 5: state-last-release-consistent", () => {
-    it("passes when registry lastRelease matches promoted release", async () => {
+    it("passes when registry lastRelease matches ready release", async () => {
       setMissionManifest("test-sys-m000001", {
         systemId: "test-sys",
         releaseId: "test-sys-r000001",
@@ -552,7 +571,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "promoted",
+        state: "ready",
       });
 
       const result = await runReleaseStateValidate(
@@ -573,7 +592,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000002", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "promoted",
+        state: "ready",
       });
 
       const result = await runReleaseStateValidate(
