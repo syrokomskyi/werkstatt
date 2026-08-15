@@ -1,7 +1,7 @@
 ---
 id: RFC-0849
 title: "Establish bounded canonical JSON identity bytes"
-status: draft
+status: accepted
 kind: contract
 scope: workspace
 owners:
