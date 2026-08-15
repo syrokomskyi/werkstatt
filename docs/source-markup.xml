@@ -86,6 +86,7 @@
     <rule>`CHANGE_SUMMARY` must identify the active packet and governing decision without copying the packet body into source comments.</rule>
     <rule>Generated manifests remain coverage mode `none`; edit their owners and regenerate rather than annotating generated output.</rule>
     <rule>Source markup never grants authority to widen a sealed packet or bypass its allow-list.</rule>
+    <rule rfc="RFC-0857">Phase-aware lease, preparation report, and spec-node seal validation source files cite RFC-0857 in `CHANGE_SUMMARY` and use `@ai-invariant` for phase enum, preparation report schema, and reciprocal specRef/materializedAs mapping verification.</rule>
   </agent-runtime-transition>
 
   <rollout-policy>

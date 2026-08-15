@@ -690,6 +690,7 @@
     <branch>program/agent-runtime-certification-cutover</branch>
     <manifest>`docs/plans/agent-runtime-certification/program.yaml`</manifest>
     <execution-law>Packets 000–240 are linear and non-parallel. Each packet requires preparation when applicable, a committed seal, one exclusive execution lease, canonical implementation commits, independent completion evidence, and a clean-tree handoff.</execution-law>
+    <jit-preparation rfc="RFC-0857">CERT-002 through CERT-010 are materialized just-in-time under the Steward protocol: a phase-aware preparation lease, spec.status front verification, spec.materialize, audit, enhance, plan, explicit acceptance, hash refresh, preparation report, independent sealing, and lease release before Executor start. Non-spec child RFCs (packets 010–130) are created during charter implementation; spec-node RFCs (packets 140–240) are materialized JIT per RFC-0857.</jit-preparation>
     <milestones>
       <milestone packets="000-040">Bootstrap governance, complete Node 24 and canonical primitives, accept specification reconciliation.</milestone>
       <milestone packets="050-090">Build component contracts, lifecycle/effects, resolution, reflection, and neutral isolation.</milestone>

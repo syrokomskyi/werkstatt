@@ -9,7 +9,7 @@ This directory is the machine-governed, strictly sequential execution plan for R
 - The Executor changes only `allowedFiles`, leaves only enumerated transition diagnostics, and cannot seal, complete, or recover its own packet.
 - Missing or stale facts fail closed. There is no force, bypass, warning-only, compatibility, auto-takeover, or parallel path.
 - Packet 000 is the sole bootstrap. Packets 010–240 bind `baseCommit` to the predecessor completion commit.
-- CERT-002 through CERT-010 stay qualified spec decisions until just-in-time preparation materializes and obtains explicit human acceptance of their RFCs.
+- CERT-002 through CERT-010 stay qualified spec decisions until just-in-time preparation materializes and obtains explicit human acceptance of their RFCs. RFC-0857 is the controlling amendment for this JIT materialization protocol: it distinguishes non-spec child RFC creation (packets 010–130) from JIT CERT materialization (packets 140–240), requires phase-aware Steward preparation leases, reciprocal `specRef`/`materializedAs` mapping verification at seal boundary, and preparation reports.
 - AMD-007 stays qualified; packet 040 owns explicit acceptance and never edits immutable snapshot files.
 
 ## Three committed boundaries

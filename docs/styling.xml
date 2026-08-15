@@ -514,5 +514,6 @@
       commands, and exclusion rules.</item>
     <item>Documents RFC-0071 styling changes (expanded biome schema,
       derived token fields, @layer wrappers, coverage hint).</item>
+    <item rfc="RFC-0857">Reviewed for JIT CERT materialization protocol impact: no styling changes required. RFC-0857 is a governance/process amendment that adds phase-aware leases, preparation reports, and spec-node seal validation — none of which affect CSS cascade layers, biome rules, component styling APIs, or validation commands.</item>
   </change-summary>
 </styling>

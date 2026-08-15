@@ -1,7 +1,7 @@
 ---
 id: RFC-0857
 title: "Make release-certification RFC materialization just-in-time"
-status: accepted
+status: implemented
 kind: policy
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -254,7 +254,7 @@ RFC-0856's future `program.packet.validate` and `program.packet.seal` implementa
 ### File system responsibilities
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `docs/specs/werkstatt-release-certification/forge-spec.yaml` | Carries `materializedAs` written only by `spec.materialize` |
 | `docs/specs/werkstatt-release-certification/amendments/amd-007-*.md` | Remains proposed through charter implementation; accepted explicitly in packet 040 |
 | `docs/rfcs/rfc-0855-*.md` | Amended program charter; not edited in place by this RFC |
@@ -289,7 +289,7 @@ Before materialization, draft validation reports `resolvedRfc: null`. Sealed val
 ### Failure modes
 
 | Condition | Required result |
-|---|---|
+| --- | --- |
 | Spec node is blocked | Do not materialize or seal; wait for the governing predecessor implementation |
 | Proposed amendment would change the node | Draft may cite it as proposed; sealing waits for explicit acceptance or rejection |
 | `materializedAs` was hand-edited or lacks a reciprocal `specRef` | Fail validation; repair only through the canonical spec workflow |
@@ -354,18 +354,18 @@ Rejected because the spec node is the durable identity and the RFC number is a p
 
 ## Acceptance criteria
 
-- [ ] RFC-0855 planning distinguishes non-spec child RFC creation from JIT CERT materialization and cites RFC-0857 as the controlling amendment.
-- [ ] RFC-0855 and RFC-0856 frontmatter contain reciprocal `amendedBy: RFC-0857` metadata while their accepted bodies remain unchanged.
-- [ ] RFC-0856 planning defines repository-resolved generic qualified spec-node syntax and separate draft, preparation, sealed, active, and completion validation without adding a new command name.
-- [ ] Draft packets 140–240 use exact `werkstatt-release-certification/CERT-NNN` governing references and contain no invented repository RFC ids.
-- [ ] Every CERT packet requires a single phase-aware Steward preparation lease, `spec.status` front verification, `spec.materialize`, audit, enhance, plan, explicit acceptance, hash refresh, preparation report, independent sealing, and lease release before Executor start.
-- [ ] Sealing accepts only a complete descendant preparation range from predecessor `baseCommit`, records every governance commit and changed file, and rejects unrelated paths or rewritten ancestry.
-- [ ] Sealing requires one reciprocal `specRef`/`materializedAs` mapping to an accepted or implemented RFC whose `dependsOn` is the ordered de-duplicated union of effective spec dependencies and the preceding packet's resolved RFC, all implemented.
-- [ ] Interrupted preparation resumes from the last canonical Steward commit or becomes blocked through a tracked recovery record; it never deletes materialization artifacts or rewrites history.
-- [ ] AMD-007 remains proposed until packet 040 and no immutable specification snapshot is edited.
-- [ ] No blocked spec node is manually created, no `materializedAs` is hand-edited, and no planning/bypass mode is added to `spec.materialize`.
-- [ ] Requirements, technology, development-plan, knowledge-graph, verification-plan, and source-markup Compass projections describe JIT preparation; styling records a reviewed no-change rationale.
-- [ ] `rfc.validate RFC-0857 --json`, affected RFC validation, spec validation, dependency validation, and clean-tree checks pass.
+- [x] RFC-0855 planning distinguishes non-spec child RFC creation from JIT CERT materialization and cites RFC-0857 as the controlling amendment. (evidence: docs/plans/agent-runtime-certification/README.md:12)
+- [x] RFC-0855 and RFC-0856 frontmatter contain reciprocal `amendedBy: RFC-0857` metadata while their accepted bodies remain unchanged. (evidence: docs/rfcs/rfc-0855-_.md frontmatter, docs/rfcs/rfc-0856-_.md frontmatter)
+- [x] RFC-0856 planning defines repository-resolved generic qualified spec-node syntax and separate draft, preparation, sealed, active, and completion validation without adding a new command name. (evidence: packages/forge/os/program/state.ts:122-130, packages/forge/os/program/handlers/seal.ts:162-168)
+- [x] Draft packets 140–240 use exact `werkstatt-release-certification/CERT-NNN` governing references and contain no invented repository RFC ids. (evidence: docs/plans/agent-runtime-certification/program.yaml packets 140-240)
+- [x] Every CERT packet requires a single phase-aware Steward preparation lease, `spec.status` front verification, `spec.materialize`, audit, enhance, plan, explicit acceptance, hash refresh, preparation report, independent sealing, and lease release before Executor start. (evidence: packages/forge/os/program/schemas.ts:108-150, packages/forge/os/program/handlers/lease.ts:173-185)
+- [x] Sealing accepts only a complete descendant preparation range from predecessor `baseCommit`, records every governance commit and changed file, and rejects unrelated paths or rewritten ancestry. (evidence: packages/forge/os/program/handlers/complete.ts:152-157, packages/forge/os/program/state.ts:198-204)
+- [x] Sealing requires one reciprocal `specRef`/`materializedAs` mapping to an accepted or implemented RFC whose `dependsOn` is the ordered de-duplicated union of effective spec dependencies and the preceding packet's resolved RFC, all implemented. (evidence: packages/forge/os/program/handlers/seal.ts:252-329)
+- [x] Interrupted preparation resumes from the last canonical Steward commit or becomes blocked through a tracked recovery record; it never deletes materialization artifacts or rewrites history. (evidence: packages/forge/os/program/handlers/lease.ts:301-390)
+- [x] AMD-007 remains proposed until packet 040 and no immutable specification snapshot is edited. (evidence: docs/specs/werkstatt-release-certification/forge-spec.yaml AMD-007 status)
+- [x] No blocked spec node is manually created, no `materializedAs` is hand-edited, and no planning/bypass mode is added to `spec.materialize`. (evidence: packages/forge/os/spec/spec-materialize.ts — no bypass mode, docs/specs/werkstatt-release-certification/forge-spec.yaml — CERT-002 through CERT-010 unmaterialized)
+- [x] Requirements, technology, development-plan, knowledge-graph, verification-plan, and source-markup Compass projections describe JIT preparation; styling records a reviewed no-change rationale. (evidence: docs/requirements.xml:361, docs/technology.xml:278, docs/development-plan.xml:693, docs/knowledge-graph.xml:864-873, docs/verification-plan.xml:457-460, docs/source-markup.xml:89, docs/styling.xml:517)
+- [x] `rfc.validate RFC-0857 --json`, affected RFC validation, spec validation, dependency validation, and clean-tree checks pass. (evidence: rfc.validate --id RFC-0857 exit 0, spec.validate --spec=werkstatt-release-certification exit 0, all 95 program tests pass)
 
 ## Implementation notes for agents
 

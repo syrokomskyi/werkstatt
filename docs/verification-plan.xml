@@ -454,6 +454,10 @@
       <change-type>RFC-0856 control-plane implementation or packet state transition</change-type>
       <expectation>Run Forge unit/property/adversarial tests for strict schemas, qualified decision resolution, source/git/path boundaries, preparation/execution leases, token secrecy, genesis uniqueness, completion ancestry, and recovery; then run Forge build, command-manifest validation, ecosystem-manifest validation, scoped RFC evidence, and clean-tree verification. Zero unexpected or warning-only diagnostics are permitted.</expectation>
     </entry>
+    <entry id="vm-19a">
+      <change-type>RFC-0857 JIT materialization protocol or phase-aware lease/preparation schema changes</change-type>
+      <expectation>Run Forge program schema and lease tests (`packages/forge/src/tests/program-spec-node.test.ts`, `program-schemas.test.ts`, `program-lease.test.ts`), `rfc.validate --id RFC-0857`, `spec.validate --spec=werkstatt-release-certification`, and `spec.status --spec=werkstatt-release-certification`. Verify phase-aware lease schema accepts preparation and execution phases, preparation report schema validates, spec-node seal validation rejects null resolvedRfc (PROGRAM-PACKET-12), reciprocal specRef/materializedAs mapping verification works, and CERT-002 through CERT-010 remain unmaterialized until JIT.</expectation>
+    </entry>
     <entry id="vm-20">
       <change-type>RFC-0851 release state transition or manifest schema changes</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt test`, `pnpm --filter @warpgogol/werkstatt build`, `pnpm exec werkstatt run rfc.validate --id RFC-0851`, and all release/leitstand handoff tests. Verify that release manifests with legacy states throw `LegacyReleaseError`, `release.list` separates `legacyInvalid` entries, all Leitstand commands and `release.rollback` return `CERT-TRANSITION-01`, and no `--force`/`--legacy`/`--skip-certification` flag exists.</expectation>

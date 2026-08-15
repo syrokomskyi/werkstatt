@@ -857,6 +857,18 @@
       <links>
         <link rel="controls" target="docs.program.agent-runtime-certification" />
         <link rel="implemented-by" target="packages.forge" />
+        <link rel="amended-by" target="docs.rfcs.rfc-0857" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0857" type="governance-amendment">
+      <name>JIT CERT RFC materialization protocol</name>
+      <path>`docs/rfcs/rfc-0857-make-release-certification-rfc-materialization-just-in-time.md`</path>
+      <role>Normative amendment for just-in-time CERT RFC materialization: phase-aware preparation leases, reciprocal specRef/materializedAs mapping, preparation reports, and Steward protocol for spec-node packets 140–240.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0855" />
+        <link rel="amends" target="docs.rfcs.rfc-0856" />
+        <link rel="controls" target="docs.program.agent-runtime-certification" />
       </links>
     </node>
 

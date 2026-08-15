@@ -275,6 +275,7 @@
       <engine>`@warpgogol/werkstatt`</engine>
       <law-kernel>Non-replaceable authority for graph admission, lifecycle, effects, isolation, certification, and promotion.</law-kernel>
       <governance>`forge/program@1` packet control plane specified by RFC-0856; documentation-only until packet 000.</governance>
+      <jit-preparation rfc="RFC-0857">CERT-002 through CERT-010 use just-in-time materialization: phase-aware Steward preparation leases (preparation | execution), spec.status front verification, spec.materialize, reciprocal specRef/materializedAs mapping, preparation reports, and independent sealing before Executor start.</jit-preparation>
     </control-plane>
     <component-plane>
       <profile>Exactly one stack profile identity per workshop.</profile>
