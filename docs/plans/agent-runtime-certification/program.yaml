@@ -3,7 +3,7 @@ program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
 state: executing
-currentPacket: 070-resolution-and-reconciliation
+currentPacket: 080-reflection-and-conformance-harness
 steward: human:andrii-syrokomskyi
 sequential: true
 parallelism: 1
@@ -88,14 +88,14 @@ packets:
   - order: 70
     packetId: 070-resolution-and-reconciliation
     file: 070-resolution-and-reconciliation.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0860
     decisionKind: rfc
     resolvedRfc: RFC-0860
     dependsOnPacket: 060-fiber-and-effect-runtime
     baseCommit: 7d912aff316b4105c27e9b2115f35b1122cd580f
     sealCommit: null
-    completion: null
+    completion: c2364eeddf78df1fdab73923957a9bf073ef7675
   - order: 80
     packetId: 080-reflection-and-conformance-harness
     file: 080-reflection-and-conformance-harness.md
