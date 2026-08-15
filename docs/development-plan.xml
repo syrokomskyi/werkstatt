@@ -503,6 +503,13 @@
           Implement `packages/werkstatt/src/certification/health/monitor.ts` with health evaluation (current/degraded/revoked based on requirement results), revocation threshold, drift cause classification (shared outage, expired evidence, candidate regression, public output drift, late evidence), schedule window idempotency (duplicate detection, late delivery rejection), health decision builder, health projection (deterministic hash), monitor crash recovery (resume from requirements/health-decision/incident/projection/complete), and health transition validation. 44 tests covering health evaluation, revocation, drift classification, schedule windows, health decisions, projections, crash recovery, and transition validity.
         </description>
       </deliverable>
+      <deliverable id="del-230">
+        <name>CERT-009: Single-site clean cutover</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/certification/cutover/marker.ts` with clean cutover marker (new candidate, decision IDs, dossier root, Main identity, health state, rollback identity, bootstrap exception closure, continuous health window completion, deterministic marker hash), cutover verification (CERT-CUTOVER-01..09 for legacy state reads, missing decisions, incomplete health, revoked health, same rollback candidate, invalid component set), legacy state prohibition (no runtime command reads legacy release certification, grace, or mission artifacts for success), marker integrity verification (tamper detection), bootstrap exception closure, and rollback target protection. 26 tests covering cutover verification, marker building, legacy prohibition, bootstrap exception, rollback protection, and marker integrity.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

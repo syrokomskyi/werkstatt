@@ -498,5 +498,9 @@
       <change-type>CERT-008 continuous health and demotion changes</change-type>
       <expectation>Run `vitest` on `certification-health-monitor.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify `evaluateHealth` returns current when all pass, degraded on fail/stale/incomplete, rejects empty results; `shouldRevoke` checks consecutive degraded windows against threshold; `classifyDriftCause` identifies shared outage, expired evidence, candidate regression, public output drift, late evidence; `evaluateScheduleWindow` rejects duplicate and late delivery; `buildHealthDecision` appends without editing historical gate decisions; `buildHealthProjection` produces deterministic hash; `evaluateMonitorRecovery` resumes from requirements/health-decision/incident/projection/complete with ambiguous state detection; `isHealthTransitionValid` validates all state transitions including same-state.</expectation>
     </entry>
+    <entry id="vm-31">
+      <change-type>CERT-009 single-site clean cutover changes</change-type>
+      <expectation>Run `vitest` on `certification-cutover-marker.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify `verifyCutover` rejects legacy state reads for success, missing dev/alt/main/evaluator decisions, incomplete health window, revoked health, same rollback candidate, and invalid component set hash; `buildCutoverMarker` produces deterministic marker hash; `checkLegacyStateProhibition` rejects all legacy artifact types used for success; `verifyMarkerIntegrity` detects tampering; `isBootstrapExceptionClosed` and `isRollbackTargetProtected` enforce bootstrap and prior-certified protection rules.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>
