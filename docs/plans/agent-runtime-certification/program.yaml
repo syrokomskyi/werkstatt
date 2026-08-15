@@ -132,12 +132,12 @@ packets:
   - order: 110
     packetId: 110-deterministic-evaluation
     file: 110-deterministic-evaluation.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0850
     decisionKind: rfc
     resolvedRfc: RFC-0850
     dependsOnPacket: 100-certification-contracts-and-identities
-    baseCommit: null
+    baseCommit: 0d5acb1e84f05557f85e58d84ce7801f01a3be46
     sealCommit: null
     completion: null
   - order: 120

@@ -2,12 +2,12 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 110-deterministic-evaluation
-state: draft
+state: sealed
 governingDecision: RFC-0850
 decisionKind: rfc
 resolvedRfc: RFC-0850
 dependsOnPacket: 100-certification-contracts-and-identities
-baseCommit: null
+baseCommit: 0d5acb1e84f05557f85e58d84ce7801f01a3be46
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
