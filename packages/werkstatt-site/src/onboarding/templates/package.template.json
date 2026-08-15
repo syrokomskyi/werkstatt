@@ -6,7 +6,7 @@
   "packageManager": "pnpm@11.8.0",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=24 <25"
   },
   "scripts": {
     "start": "pnpm run stop; astro dev",
@@ -72,7 +72,7 @@
   },
   "devDependencies": {
     "@quantco/pnpm-licenses": "2.4.2",
-    "@types/node": "^26.1.0",
+    "@types/node": "^24.0.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "autoprefixer": "^10.5.2",

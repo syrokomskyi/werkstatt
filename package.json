@@ -2,10 +2,10 @@
   "name": "warpgogol-platform",
   "private": true,
   "type": "module",
-  "version": "5.51.57",
+  "version": "5.51.58",
   "packageManager": "pnpm@11.10.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=24 <25"
   },
   "scripts": {
     "clean": "node scripts/clean.mjs",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
-    "@types/node": "^26.1.2",
+    "@types/node": "^24.0.0",
     "@warpgogol/changelog-live": "^0.2.3",
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/repo-extract": "^1.2.2",

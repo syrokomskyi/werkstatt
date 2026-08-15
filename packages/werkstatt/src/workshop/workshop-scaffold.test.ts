@@ -381,4 +381,28 @@ describe("workshop.scaffold", () => {
       });
     });
   });
+
+  describe("RFC-0854: Node 24 conformance", () => {
+    it("CI workflow uses node-version: 24", async () => {
+      const dest = path.join(tempDir, "node24-workshop");
+      await runWorkshopScaffold(
+        makeInput({ name: "my-workshop", stack: "phaser-turborepo", dest }),
+        makeContext(tempDir),
+      );
+      const ci = fs.readFileSync(path.join(dest, ".github/workflows/ci.yml"), "utf8");
+      expect(ci).toContain("node-version: 24");
+      expect(ci).not.toContain("node-version: 22");
+    });
+
+    it("README mentions Node.js 24+", async () => {
+      const dest = path.join(tempDir, "node24-readme-workshop");
+      await runWorkshopScaffold(
+        makeInput({ name: "my-workshop", stack: "astro-typescript-turborepo", dest }),
+        makeContext(tempDir),
+      );
+      const readme = fs.readFileSync(path.join(dest, "README.md"), "utf8");
+      expect(readme).toContain("Node.js 24+");
+      expect(readme).not.toContain("Node.js 22+");
+    });
+  });
 });
