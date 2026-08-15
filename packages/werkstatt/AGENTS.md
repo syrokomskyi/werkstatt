@@ -54,6 +54,15 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - The `werkstatt.autonomy.validate` command (DNA-64 enforcement) scans `src/**` for forbidden `@warpgogol/*` imports.
 - RFC-0776 completed the migration: old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) are deleted. All imports now go through `@warpgogol/werkstatt` subpath exports.
 
+### Canonical JSON identity bytes (RFC-0849)
+
+- `snapshotCanonicalJsonObjectV1` is the only creator of runtime-branded `CanonicalJsonObjectV1`. The snapshot takes an object-root input only — root scalars, arrays, and all forbidden descriptors/values return bounded typed failures without logging or partial output.
+- The canonical encoder follows strict RFC 8785 JCS (JSON Canonicalization Scheme): no insignificant whitespace, lexicographic key ordering by UTF-16 code unit, mandatory escaping, shortest number representation. The Werkstatt profile additionally rejects negative zero, unsafe integers, lone surrogates, bigint, undefined, functions, symbols, host objects (Date, Map, Set, RegExp, Error, typed arrays), toJSON customization, non-enumerable properties, accessors, symbol keys, sparse array holes, array extra own keys, cycles, and aliases.
+- `canonicalJsonBytesV1` and `canonicalJsonHashV1` operate on the opaque branded snapshot only. Forged casts, structural lookalikes, and Proxy wrappers fail with `CERT-CANONICAL-BRAND-01`. The canonical source imports `byteHash` from `primitives.ts` but never `stableJsonHash` or `node:crypto`.
+- Hard limits: 8 MiB output bytes, 64 depth, 250k nodes, 10k object keys, 100k array items, 1 MiB string bytes, 1 KiB key bytes. All limits report `actual = maximum + 1` in `CERT-CANONICAL-LIMIT-01` failures.
+- Failure paths use only array indices and object sorted ordinals — never raw keys. Path segments are capped at 64; overflow increments `omittedPathSegments`.
+- `Sha256Digest` is an opaque branded type (`sha256:` + 64 lowercase hex). `isSha256Digest` is the exact guard. `byteHash` and `byteHashFile` return `Sha256Digest`; existing string consumers remain compatible.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.

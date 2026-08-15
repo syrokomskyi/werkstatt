@@ -12,6 +12,29 @@
 </CHANGE_SUMMARY>
 */
 
-export { byteHash, byteHashFile, stableStringify, stableJsonHash } from "./primitives.ts";
+export {
+  byteHash,
+  byteHashFile,
+  stableStringify,
+  stableJsonHash,
+  isSha256Digest,
+} from "./primitives.ts";
+export type { Sha256Digest } from "./primitives.ts";
+export {
+  CANONICAL_JSON_V1,
+  snapshotCanonicalJsonObjectV1,
+  isCanonicalJsonObjectV1,
+  canonicalJsonBytesV1,
+  canonicalJsonHashV1,
+  CanonicalJsonInvariantError,
+} from "./canonical-json.ts";
+export type {
+  CanonicalJsonObjectV1,
+  CanonicalJsonPathSegmentV1,
+  CanonicalJsonFailureCodeV1,
+  CanonicalJsonFailureV1,
+  CanonicalJsonSuccessV1,
+  CanonicalJsonObjectSnapshotResultV1,
+} from "./canonical-json.ts";
 export { hashHtml } from "./normalizers/html.ts";
 export type { FingerprintOptions, FingerprintFileResult, FingerprintResult } from "./types.ts";
