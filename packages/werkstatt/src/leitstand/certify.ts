@@ -9,6 +9,8 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
 <item>RFC-0866: initial certify module with CertifyInput, CertifyResult, and runLeitstandCertify().</item>
+<item>RFC-0866 fix A-2/C-3: use writeFileIfChanged instead of fs.writeFile for gate-decision JSON.</item>
+<item>RFC-0866 fix D-2: read dev deployment URL from effect records, accept --base-url flag fallback.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,6 +21,7 @@ import type {
   KernelRuntimeContext,
   KernelCommandResult,
 } from "@warpgogol/werkstatt/kernel";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
 import type { GateChannel } from "../certification/contracts/identifiers.ts";
@@ -82,7 +85,10 @@ export async function runLeitstandCertify(
     throw new Error("[leitstand.certify] --artifact-hash is required (sha256:... format)");
   }
 
+  const baseUrlFlag = flagString(input, "base-url");
   const gateChannel = gate as GateChannel;
+
+  const baseUrl = await resolveDevBaseUrl(context.workspaceRoot, systemId, baseUrlFlag);
 
   const producerNodes: ProducerDependencyNodeV1[] = [
     { producerId: "astro-mission-check", dependsOn: [] },
@@ -306,7 +312,7 @@ export async function runLeitstandCertify(
   const outputDir = path.join(context.workspaceRoot, "systems-cache", systemId, "gate-decisions");
   await fs.mkdir(outputDir, { recursive: true });
   const outputPath = path.join(outputDir, `${releaseId}-${gate}.json`);
-  await fs.writeFile(outputPath, JSON.stringify(gateDecision, null, 2), "utf8");
+  await writeFileIfChanged(outputPath, JSON.stringify(gateDecision, null, 2) + "\n");
 
   return {
     data: {
@@ -322,4 +328,43 @@ export async function runLeitstandCertify(
     summary: `[leitstand.certify] gate=${gate} status=${evaluationResult.status} decision=${decisionId} output=${outputPath}`,
     exitCode: 0,
   } as unknown as KernelCommandResult<CertifyResult>;
+}
+
+async function resolveDevBaseUrl(
+  workspaceRoot: string,
+  systemId: string,
+  baseUrlFlag: string | undefined,
+): Promise<string | undefined> {
+  const opsDir = path.join(workspaceRoot, "systems-cache", systemId, "deployment-operations");
+  let latestDevUrl: string | undefined;
+  try {
+    const entries = await fs.readdir(opsDir);
+    let latestAt = "";
+    for (const entry of entries) {
+      if (!entry.endsWith(".json")) continue;
+      try {
+        const content = await fs.readFile(path.join(opsDir, entry), "utf8");
+        const record = JSON.parse(content) as {
+          channel?: string;
+          timestamp?: string;
+          deploymentUrl?: string;
+        };
+        if (record.channel === "dev" && record.deploymentUrl) {
+          const at = record.timestamp ?? "";
+          if (!latestDevUrl || at > latestAt) {
+            latestAt = at;
+            latestDevUrl = record.deploymentUrl;
+          }
+        }
+      } catch {
+        // Skip malformed records
+      }
+    }
+  } catch {
+    // No deployment-operations directory yet
+  }
+
+  if (latestDevUrl) return latestDevUrl;
+  if (baseUrlFlag) return baseUrlFlag;
+  return undefined;
 }

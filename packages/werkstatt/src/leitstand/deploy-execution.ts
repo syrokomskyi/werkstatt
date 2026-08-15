@@ -10,6 +10,8 @@
 <CHANGE_SUMMARY>
 <item>RFC-0866: initial deploy-execution module with DeployExecutionContext, DeployExecutionResult, and executeDeployPhases().</item>
 <item>RFC-0866: implement full 13-phase executeDeployPhases function with channel-specific behavior.</item>
+<item>RFC-0866 fix: populate HealthInput.releaseId and workspaceRoot from ctx, PropagateInput.expectedBehaviorSnapshotHash from localDistTreeHash.</item>
+<item>RFC-0866 fix: capture error message in outer catch and add errorMessage to DeployExecutionResult.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -86,6 +88,7 @@ export interface DeployExecutionResult {
   evidenceSynced: boolean;
   evidenceSyncError: string | null;
   failingPhase?: string;
+  errorMessage?: string;
 }
 
 function getChannelConfig(
@@ -127,6 +130,8 @@ async function runHealthCheckWithRetry(
   systemId: string,
   deploymentUrl: string,
   channel: "dev" | "alt" | "main",
+  releaseId: string,
+  workspaceRoot: string,
 ): Promise<{ state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] }> {
   for (let attempt = 1; attempt <= HEALTH_CHECK_MAX_ATTEMPTS; attempt++) {
     if (attempt > 1) {
@@ -137,9 +142,9 @@ async function runHealthCheckWithRetry(
         systemId,
         deploymentUrl,
         channel,
-        releaseId: "",
+        releaseId,
         expectedBehaviorSnapshotHash: "",
-        workspaceRoot: "",
+        workspaceRoot,
       };
       const result = await adapter.health(healthInput);
       if (result.state === "healthy") {
@@ -246,7 +251,7 @@ export async function executeDeployPhases(
       distPath,
       workerName: channelConfig.workerName,
       secretsFilePath: ctx.secretsFilePath,
-      expectedBehaviorSnapshotHash: "",
+      expectedBehaviorSnapshotHash: localDistTreeHash || "",
     };
     let propagateResult: PropagationResult;
     try {
@@ -292,6 +297,8 @@ export async function executeDeployPhases(
       ctx.systemId,
       actualDeploymentUrl,
       channel,
+      ctx.releaseId ?? "",
+      ctx.workspaceRoot,
     );
     healthState = healthResult.state;
     healthChecks = healthResult.checks;
@@ -411,7 +418,12 @@ export async function executeDeployPhases(
       "deployed",
       now,
     );
-    await writeDeploymentEffectRecord(ctx.workspaceRoot, ctx.systemId, finalEffectRecord);
+    await writeDeploymentEffectRecord(
+      ctx.workspaceRoot,
+      ctx.systemId,
+      finalEffectRecord,
+      actualDeploymentUrl,
+    );
 
     return {
       deploymentUrl: actualDeploymentUrl,
@@ -431,7 +443,8 @@ export async function executeDeployPhases(
       evidenceSynced,
       evidenceSyncError,
     };
-  } catch {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
     const failedEffectRecord = buildEffectRecord(
       ctx.operationId,
       ctx.candidateId,
@@ -444,7 +457,12 @@ export async function executeDeployPhases(
       "failed",
       now,
     );
-    await writeDeploymentEffectRecord(ctx.workspaceRoot, ctx.systemId, failedEffectRecord);
+    await writeDeploymentEffectRecord(
+      ctx.workspaceRoot,
+      ctx.systemId,
+      failedEffectRecord,
+      deploymentUrl,
+    );
 
     return {
       deploymentUrl,
@@ -464,6 +482,7 @@ export async function executeDeployPhases(
       evidenceSynced,
       evidenceSyncError,
       failingPhase: failingPhase ?? "unknown",
+      errorMessage,
     };
   }
 }
