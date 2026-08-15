@@ -3,7 +3,7 @@ program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
 state: executing
-currentPacket: 020-canonical-identity-bytes
+currentPacket: 030-canonical-diagnostic
 steward: human:andrii-syrokomskyi
 sequential: true
 parallelism: 1
@@ -33,14 +33,14 @@ packets:
   - order: 20
     packetId: 020-canonical-identity-bytes
     file: 020-canonical-identity-bytes.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0849
     decisionKind: rfc
     resolvedRfc: RFC-0849
     dependsOnPacket: 010-node-24
     baseCommit: 95298fefbe874cb76ab65c0bfe37148183208950
     sealCommit: null
-    completion: null
+    completion: afa9d28c322d4f8cbd102e19c27907f116cfb42f
   - order: 30
     packetId: 030-canonical-diagnostic
     file: 030-canonical-diagnostic.md
@@ -49,7 +49,7 @@ packets:
     decisionKind: rfc
     resolvedRfc: RFC-0852
     dependsOnPacket: 020-canonical-identity-bytes
-    baseCommit: null
+    baseCommit: afa9d28c322d4f8cbd102e19c27907f116cfb42f
     sealCommit: null
     completion: null
   - order: 40

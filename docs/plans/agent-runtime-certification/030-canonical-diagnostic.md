@@ -7,7 +7,7 @@ governingDecision: RFC-0852
 decisionKind: rfc
 resolvedRfc: RFC-0852
 dependsOnPacket: 020-canonical-identity-bytes
-baseCommit: null
+baseCommit: afa9d28c322d4f8cbd102e19c27907f116cfb42f
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
