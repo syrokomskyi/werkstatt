@@ -15,10 +15,26 @@ normativeSources:
     sha256: ac69a904c57b4fd0f9c0baa8a417acb271e11109cb6c8c5b92d5fcc92049e7d8
 allowedFiles:
   - "packages/werkstatt/src/schemas/release.ts"
-  - "packages/werkstatt/src/certification/{state-machine.ts,contracts/state.ts}"
-  - "packages/werkstatt/src/modules/{release,leitstand}/**"
-  - "packages/werkstatt/src/tests/**"
-  - "docs/**"
+  - "packages/werkstatt/src/certification/contracts/state.ts"
+  - "packages/werkstatt/src/certification/state-machine.ts"
+  - "packages/werkstatt/src/certification/transition-block.ts"
+  - "packages/werkstatt/src/release/**"
+  - "packages/werkstatt/src/leitstand/**"
+  - "docs/architecture-dna.md"
+  - "docs/command-manifest.generated.yaml"
+  - "docs/COMMANDS.md"
+  - "docs/ecosystem.generated.yaml"
+  - "docs/rfcs/rfc-0851-replace-legacy-release-state-with-deployment-operations.md"
+  - "docs/rfcs/verification/**"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -70,10 +86,26 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 Only these paths may change:
 
 - `packages/werkstatt/src/schemas/release.ts`
-- `packages/werkstatt/src/certification/{state-machine.ts,contracts/state.ts}`
-- `packages/werkstatt/src/modules/{release,leitstand}/**`
-- `packages/werkstatt/src/tests/**`
-- `docs/**`
+- `packages/werkstatt/src/certification/contracts/state.ts`
+- `packages/werkstatt/src/certification/state-machine.ts`
+- `packages/werkstatt/src/certification/transition-block.ts`
+- `packages/werkstatt/src/release/**`
+- `packages/werkstatt/src/leitstand/**`
+- `docs/architecture-dna.md`
+- `docs/command-manifest.generated.yaml`
+- `docs/COMMANDS.md`
+- `docs/ecosystem.generated.yaml`
+- `docs/rfcs/rfc-0851-replace-legacy-release-state-with-deployment-operations.md`
+- `docs/rfcs/verification/**`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

@@ -14,12 +14,33 @@ normativeSources:
   - path: "docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md"
     sha256: 0ca5f8fc7727888b9a659e89cb9aa352754c7f5370dc799759b5d66c79724b5a
 allowedFiles:
-  - "packages/werkstatt/src/certification/contracts/**"
+  - "packages/werkstatt/src/certification/contracts/identifiers.ts"
+  - "packages/werkstatt/src/certification/contracts/candidate.ts"
+  - "packages/werkstatt/src/certification/contracts/policy-bundle.ts"
+  - "packages/werkstatt/src/certification/contracts/evidence.ts"
+  - "packages/werkstatt/src/certification/contracts/dossier.ts"
+  - "packages/werkstatt/src/certification/contracts/decisions.ts"
+  - "packages/werkstatt/src/certification/contracts/action-pack.ts"
+  - "packages/werkstatt/src/certification/contracts/authority.ts"
+  - "packages/werkstatt/src/certification/contracts/state.ts"
+  - "packages/werkstatt/src/certification/contracts/index.ts"
   - "packages/werkstatt/src/certification/identity.ts"
   - "packages/werkstatt/src/certification/index.ts"
-  - "packages/werkstatt/src/tests/certification-contracts*.test.ts"
+  - "packages/werkstatt/src/tests/certification-contracts.test.ts"
+  - "packages/werkstatt/src/tests/certification-identity.pbt.test.ts"
   - "packages/werkstatt/package.json"
-  - "docs/**"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
+  - "docs/technology.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/source-markup.xml"
+  - "docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/development-plan.xml"
+  - "docs/verification-plan.xml"
+  - "AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -70,12 +91,33 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `packages/werkstatt/src/certification/contracts/**`
+- `packages/werkstatt/src/certification/contracts/identifiers.ts`
+- `packages/werkstatt/src/certification/contracts/candidate.ts`
+- `packages/werkstatt/src/certification/contracts/policy-bundle.ts`
+- `packages/werkstatt/src/certification/contracts/evidence.ts`
+- `packages/werkstatt/src/certification/contracts/dossier.ts`
+- `packages/werkstatt/src/certification/contracts/decisions.ts`
+- `packages/werkstatt/src/certification/contracts/action-pack.ts`
+- `packages/werkstatt/src/certification/contracts/authority.ts`
+- `packages/werkstatt/src/certification/contracts/state.ts`
+- `packages/werkstatt/src/certification/contracts/index.ts`
 - `packages/werkstatt/src/certification/identity.ts`
 - `packages/werkstatt/src/certification/index.ts`
-- `packages/werkstatt/src/tests/certification-contracts*.test.ts`
+- `packages/werkstatt/src/tests/certification-contracts.test.ts`
+- `packages/werkstatt/src/tests/certification-identity.pbt.test.ts`
 - `packages/werkstatt/package.json`
-- `docs/**`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
+- `docs/technology.xml`
+- `docs/knowledge-graph.xml`
+- `docs/source-markup.xml`
+- `docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/development-plan.xml`
+- `docs/verification-plan.xml`
+- `AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

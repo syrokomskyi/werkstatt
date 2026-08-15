@@ -14,10 +14,23 @@ normativeSources:
   - path: "docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md"
     sha256: 985b9e0818d590bf3e71b83fdf614a13346b13ae908dcb13289181067d71785a
 allowedFiles:
-  - "packages/werkstatt/src/isolation/{contracts.ts,schemas.ts,conformance.ts}"
+  - "packages/werkstatt/src/isolation/contracts.ts"
+  - "packages/werkstatt/src/isolation/schemas.ts"
+  - "packages/werkstatt/src/isolation/conformance.ts"
   - "packages/werkstatt/src/isolation/tests/**"
   - "packages/werkstatt/package.json"
-  - "docs/**"
+  - "docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -68,10 +81,23 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `packages/werkstatt/src/isolation/{contracts.ts,schemas.ts,conformance.ts}`
+- `packages/werkstatt/src/isolation/contracts.ts`
+- `packages/werkstatt/src/isolation/schemas.ts`
+- `packages/werkstatt/src/isolation/conformance.ts`
 - `packages/werkstatt/src/isolation/tests/**`
 - `packages/werkstatt/package.json`
-- `docs/**`
+- `docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

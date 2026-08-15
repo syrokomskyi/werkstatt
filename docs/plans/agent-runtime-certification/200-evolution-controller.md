@@ -14,10 +14,23 @@ normativeSources:
   - path: "docs/rfcs/rfc-0864-establish-the-governed-capability-evolution-controller.md"
     sha256: db49feab6da2a73d0c2f289dfcd2c6570980110bbbd6c539490485fb04f9937d
 allowedFiles:
-  - "packages/werkstatt/src/evolution/**"
-  - "packages/werkstatt/src/tests/evolution*.test.ts"
-  - "packages/werkstatt/package.json"
-  - "docs/**"
+  - "packages/werkstatt/src/evolution/contracts.ts"
+  - "packages/werkstatt/src/evolution/reducer.ts"
+  - "packages/werkstatt/src/evolution/controller.ts"
+  - "packages/werkstatt/src/evolution/guards.ts"
+  - "packages/werkstatt/src/evolution/tests/**"
+  - "docs/rfcs/rfc-0864-establish-the-governed-capability-evolution-controller.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -68,10 +81,23 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `packages/werkstatt/src/evolution/**`
-- `packages/werkstatt/src/tests/evolution*.test.ts`
-- `packages/werkstatt/package.json`
-- `docs/**`
+- `packages/werkstatt/src/evolution/contracts.ts`
+- `packages/werkstatt/src/evolution/reducer.ts`
+- `packages/werkstatt/src/evolution/controller.ts`
+- `packages/werkstatt/src/evolution/guards.ts`
+- `packages/werkstatt/src/evolution/tests/**`
+- `docs/rfcs/rfc-0864-establish-the-governed-capability-evolution-controller.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

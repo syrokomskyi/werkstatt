@@ -12,15 +12,20 @@ branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md"
-    sha256: 47dd155d4417d69ad09a04437d7540ce0d40bdaa15fd0a3d15ff59375e675b99
+    sha256: efd3cee862670be6c8b39ae391a500439b363403d8b9327c61c36f8777299650
 allowedFiles:
-  - "packages/werkstatt/src/tests/certification-foundation.integration.test.ts"
-  - "packages/werkstatt/src/certification/index.ts"
-  - "packages/werkstatt/package.json"
-  - "packages/werkstatt-site/src/**"
-  - "docs/**"
+  - "docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
   - "AGENTS.md"
-  - "packages/**/AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -71,19 +76,24 @@ The governing anchor is `RFC-0848`. Sealing recomputes the normative digest and 
 
 ## 4. Verified current code facts
 
-At charter preparation the program and packet are draft, `baseCommit` is null, the branch is fixed, and `docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md` exists at SHA-256 `47dd155d4417d69ad09a04437d7540ce0d40bdaa15fd0a3d15ff59375e675b99`. The bounded responsibility is public-API integration across runtime identity, certification identity, evaluation, and state. Just-in-time preparation re-reads allowed owners and records actual paths/symbols; stale facts return to the Steward.
+At charter preparation the program and packet are draft, `baseCommit` is null, the branch is fixed, and `docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md` exists at SHA-256 `efd3cee862670be6c8b39ae391a500439b363403d8b9327c61c36f8777299650`. The bounded responsibility is public-API integration across runtime identity, certification identity, evaluation, and state. Just-in-time preparation re-reads allowed owners and records actual paths/symbols; stale facts return to the Steward.
 
 ## 5. Allowed and forbidden file boundaries
 
 Only these paths may change:
 
-- `packages/werkstatt/src/tests/certification-foundation.integration.test.ts`
-- `packages/werkstatt/src/certification/index.ts`
-- `packages/werkstatt/package.json`
-- `packages/werkstatt-site/src/**`
-- `docs/**`
+- `docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
 - `AGENTS.md`
-- `packages/**/AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

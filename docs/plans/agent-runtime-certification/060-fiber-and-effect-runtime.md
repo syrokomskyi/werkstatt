@@ -14,10 +14,23 @@ normativeSources:
   - path: "docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md"
     sha256: 3271a3453211789989ad26e74af9b40ed845e123aec48d1195422c2a0b0eb642
 allowedFiles:
-  - "packages/werkstatt/src/components/{lifecycle,effects}/**"
-  - "packages/werkstatt/src/tests/component-*.test.ts"
-  - "packages/werkstatt/package.json"
-  - "docs/**"
+  - "packages/werkstatt/src/component-runtime/fiber.ts"
+  - "packages/werkstatt/src/component-runtime/lifecycle.ts"
+  - "packages/werkstatt/src/component-runtime/effects.ts"
+  - "packages/werkstatt/src/component-runtime/activation.ts"
+  - "packages/werkstatt/src/component-runtime/tests/**"
+  - "docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -68,10 +81,23 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `packages/werkstatt/src/components/{lifecycle,effects}/**`
-- `packages/werkstatt/src/tests/component-*.test.ts`
-- `packages/werkstatt/package.json`
-- `docs/**`
+- `packages/werkstatt/src/component-runtime/fiber.ts`
+- `packages/werkstatt/src/component-runtime/lifecycle.ts`
+- `packages/werkstatt/src/component-runtime/effects.ts`
+- `packages/werkstatt/src/component-runtime/activation.ts`
+- `packages/werkstatt/src/component-runtime/tests/**`
+- `docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

@@ -15,10 +15,21 @@ normativeSources:
     sha256: 159657d70a2c73cce13f8c34b048e7eeffdc34dd7d3bba25c7c73925acbbc90f
 allowedFiles:
   - "packages/werkstatt/src/capability-artifacts/**"
-  - "packages/werkstatt/src/isolation/{providers,broker,tests}/**"
-  - "packages/werkstatt/package.json"
-  - ".env.example"
-  - "docs/**"
+  - "packages/werkstatt/src/isolation/providers/**"
+  - "packages/werkstatt/src/isolation/broker/**"
+  - "packages/werkstatt/src/isolation/tests/**"
+  - "docs/rfcs/rfc-0863-establish-capability-artifacts-and-the-first-real-sandbox.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -70,10 +81,21 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 Only these paths may change:
 
 - `packages/werkstatt/src/capability-artifacts/**`
-- `packages/werkstatt/src/isolation/{providers,broker,tests}/**`
-- `packages/werkstatt/package.json`
-- `.env.example`
-- `docs/**`
+- `packages/werkstatt/src/isolation/providers/**`
+- `packages/werkstatt/src/isolation/broker/**`
+- `packages/werkstatt/src/isolation/tests/**`
+- `docs/rfcs/rfc-0863-establish-capability-artifacts-and-the-first-real-sandbox.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

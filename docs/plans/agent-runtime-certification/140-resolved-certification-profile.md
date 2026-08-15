@@ -14,13 +14,21 @@ normativeSources:
   - path: "docs/specs/werkstatt-release-certification/forge-spec.yaml"
     sha256: 737eeb225e74c360f1085566771c5e4ff8be16f9a078175f8933b4f7aefeeb23
 allowedFiles:
-  - "docs/rfcs/**"
   - "packages/werkstatt/src/certification/profile/**"
-  - "packages/werkstatt/src/tests/certification-*.test.ts"
+  - "packages/werkstatt/src/tests/certification-profile*.test.ts"
   - "packages/werkstatt/package.json"
-  - "packages/werkstatt-site/src/certification/**"
-  - "services/**"
-  - "docs/**"
+  - "docs/specs/werkstatt-release-certification/forge-spec.yaml"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -73,13 +81,21 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `docs/rfcs/**`
 - `packages/werkstatt/src/certification/profile/**`
-- `packages/werkstatt/src/tests/certification-*.test.ts`
+- `packages/werkstatt/src/tests/certification-profile*.test.ts`
 - `packages/werkstatt/package.json`
-- `packages/werkstatt-site/src/certification/**`
-- `services/**`
-- `docs/**`
+- `docs/specs/werkstatt-release-certification/forge-spec.yaml`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

@@ -14,11 +14,24 @@ normativeSources:
   - path: "docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md"
     sha256: f838dae5004a1ecfae084cf223b03195a1fa69785b3ab74d28401ffb108fbe27
 allowedFiles:
-  - "packages/werkstatt/src/canonical-json/**"
-  - "packages/werkstatt/src/fingerprint/**"
-  - "packages/werkstatt/src/tests/**"
-  - "packages/werkstatt/package.json"
-  - "docs/**"
+  - "packages/werkstatt/src/fingerprint/primitives.ts"
+  - "packages/werkstatt/src/fingerprint/canonical-json.ts"
+  - "packages/werkstatt/src/fingerprint/index.ts"
+  - "packages/werkstatt/src/tests/canonical-json.test.ts"
+  - "packages/werkstatt/src/tests/canonical-json.pbt.test.ts"
+  - "packages/werkstatt/src/tests/fixtures/canonical-json-v1/**"
+  - "docs/architecture-dna.md"
+  - "packages/werkstatt/AGENTS.md"
+  - "docs/technology.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/source-markup.xml"
+  - "docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md"
+  - "docs/rfcs/verification/**"
+  - "docs/requirements.xml"
+  - "docs/development-plan.xml"
+  - "docs/verification-plan.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -69,11 +82,24 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `packages/werkstatt/src/canonical-json/**`
-- `packages/werkstatt/src/fingerprint/**`
-- `packages/werkstatt/src/tests/**`
-- `packages/werkstatt/package.json`
-- `docs/**`
+- `packages/werkstatt/src/fingerprint/primitives.ts`
+- `packages/werkstatt/src/fingerprint/canonical-json.ts`
+- `packages/werkstatt/src/fingerprint/index.ts`
+- `packages/werkstatt/src/tests/canonical-json.test.ts`
+- `packages/werkstatt/src/tests/canonical-json.pbt.test.ts`
+- `packages/werkstatt/src/tests/fixtures/canonical-json-v1/**`
+- `docs/architecture-dna.md`
+- `packages/werkstatt/AGENTS.md`
+- `docs/technology.xml`
+- `docs/knowledge-graph.xml`
+- `docs/source-markup.xml`
+- `docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md`
+- `docs/rfcs/verification/**`
+- `docs/requirements.xml`
+- `docs/development-plan.xml`
+- `docs/verification-plan.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

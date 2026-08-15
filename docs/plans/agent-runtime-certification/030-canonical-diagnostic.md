@@ -14,12 +14,26 @@ normativeSources:
   - path: "docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md"
     sha256: b4f71b7f31d016a8d417819a725c793bd60e6279d00fe9f3af12f0de4ef44433
 allowedFiles:
-  - "packages/werkstatt/src/diagnostic/**"
-  - "packages/werkstatt/src/**/diagnostic*.ts"
-  - "packages/werkstatt-site/src/**"
+  - "packages/werkstatt/src/schemas/diagnostic.ts"
+  - "packages/werkstatt/src/schemas/index.ts"
+  - "packages/werkstatt/src/kernel/types.ts"
   - "packages/werkstatt/package.json"
-  - "packages/werkstatt-site/package.json"
-  - "docs/**"
+  - "packages/werkstatt-site/src/checks/audit/types.ts"
+  - "packages/werkstatt-site/src/checks/**"
+  - "packages/werkstatt/src/tests/diagnostic-schema.test.ts"
+  - "packages/werkstatt-site/src/checks/tests/diagnostic-contract.test.ts"
+  - "docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -76,12 +90,26 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `packages/werkstatt/src/diagnostic/**`
-- `packages/werkstatt/src/**/diagnostic*.ts`
-- `packages/werkstatt-site/src/**`
+- `packages/werkstatt/src/schemas/diagnostic.ts`
+- `packages/werkstatt/src/schemas/index.ts`
+- `packages/werkstatt/src/kernel/types.ts`
 - `packages/werkstatt/package.json`
-- `packages/werkstatt-site/package.json`
-- `docs/**`
+- `packages/werkstatt-site/src/checks/audit/types.ts`
+- `packages/werkstatt-site/src/checks/**`
+- `packages/werkstatt/src/tests/diagnostic-schema.test.ts`
+- `packages/werkstatt-site/src/checks/tests/diagnostic-contract.test.ts`
+- `docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

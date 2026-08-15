@@ -126,11 +126,11 @@ Locks, idempotency, atomic writes, artifact storage, fingerprinting, adapters, b
 | 1 | RFC-0849 | bounded canonical snapshot, bytes, hash, Unicode and resource limits | engine fingerprint tests/fixtures and DNA-53 correction pass |
 | 2 | RFC-0852 | engine Diagnostic ownership, canonical/redacted data, legacy alias removal | engine/site packages compile; schema/boundary tests pass |
 | 3 | RFC-0853 | strict certification schemas, public subpath, explicit identity payload builders | traceability and identity sensitivity properties pass |
-| 4a | RFC-0850 | evidence index/selection, aggregation, action packs, dossier hashes | pure bounded tests/stress fixture pass |
-| 4b | RFC-0851 | artifact/deployment state split, strict release manifest, legacy command block, supersession | changed commands fail before side effects; DNA/docs regenerated |
-| 5 | RFC-0848 | cross-module integration, source-boundary and surface-consistency verification | all integrated laws and repository governance checks pass |
+| 4 | RFC-0850 | evidence index/selection, aggregation, action packs, dossier hashes | pure bounded tests/stress fixture pass |
+| 5 | RFC-0851 | artifact/deployment state split, strict release manifest, legacy command block, supersession | changed commands fail before side effects; DNA/docs regenerated |
+| 6 | RFC-0848 | cross-module integration, source-boundary and surface-consistency verification | all integrated laws and repository governance checks pass |
 
-RFC-0850 and RFC-0851 may be implemented in either order after RFC-0853. Each child receives its own audit, architecture acceptance, plan, implementation, review, and fix cycle. RFC-0848 receives no child code changes except corrections required by an actual integration defect; such a defect is fixed in its owning child module and verified here.
+RFC-0850 must complete before RFC-0851; both follow RFC-0853 and the component-runtime prerequisites declared in their frontmatter. Each child receives its own audit, architecture acceptance, plan, implementation, review, and fix cycle. RFC-0848 receives no child code changes except corrections required by an actual integration defect; such a defect is fixed in its owning child module and verified here.
 
 ### CLI surface
 

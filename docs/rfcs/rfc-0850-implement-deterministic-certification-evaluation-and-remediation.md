@@ -206,7 +206,7 @@ Required evaluation has zero suppression and zero intended false positives. A co
 5. Implement ordered dossier hashes and public exports.
 6. Run the maximum-size deterministic stress fixture and advisory benchmark.
 
-Every step is pure and independently testable. RFC-0851 may be implemented after RFC-0853 without waiting for this RFC, but RFC-0848 integration waits for both.
+Every step is pure and independently testable. RFC-0851 begins only after this RFC is implemented; RFC-0848 integration waits for both.
 
 ## Alternatives considered
 

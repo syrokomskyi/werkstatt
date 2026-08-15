@@ -12,11 +12,27 @@ branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md"
-    sha256: dcb213ca1f59a5ae2a0f7c72ccf0bb9dcf40f0e86c62c1f61f8f1fe686611a6d
+    sha256: c9b005a947e241061e0752544eaee7974cae8b2ba93da9dfa64280bc2a8b22d4
 allowedFiles:
-  - "packages/werkstatt/src/certification/{evidence-selection.ts,aggregation.ts,action-pack.ts,dossier.ts}"
+  - "packages/werkstatt/src/certification/evidence-selection.ts"
+  - "packages/werkstatt/src/certification/aggregation.ts"
+  - "packages/werkstatt/src/certification/action-pack.ts"
+  - "packages/werkstatt/src/certification/dossier-hash.ts"
+  - "packages/werkstatt/src/certification/index.ts"
   - "packages/werkstatt/src/tests/certification-evaluation*.test.ts"
-  - "docs/**"
+  - "missions/**"
+  - "docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -61,15 +77,31 @@ The governing anchor is `RFC-0850`. Sealing recomputes the normative digest and 
 
 ## 4. Verified current code facts
 
-At charter preparation the program and packet are draft, `baseCommit` is null, the branch is fixed, and `docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md` exists at SHA-256 `dcb213ca1f59a5ae2a0f7c72ccf0bb9dcf40f0e86c62c1f61f8f1fe686611a6d`. The bounded responsibility is shared bounded selection, evaluation, action packs, dossier hashing. Just-in-time preparation re-reads allowed owners and records actual paths/symbols; stale facts return to the Steward.
+At charter preparation the program and packet are draft, `baseCommit` is null, the branch is fixed, and `docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md` exists at SHA-256 `c9b005a947e241061e0752544eaee7974cae8b2ba93da9dfa64280bc2a8b22d4`. The bounded responsibility is shared bounded selection, evaluation, action packs, dossier hashing. Just-in-time preparation re-reads allowed owners and records actual paths/symbols; stale facts return to the Steward.
 
 ## 5. Allowed and forbidden file boundaries
 
 Only these paths may change:
 
-- `packages/werkstatt/src/certification/{evidence-selection.ts,aggregation.ts,action-pack.ts,dossier.ts}`
+- `packages/werkstatt/src/certification/evidence-selection.ts`
+- `packages/werkstatt/src/certification/aggregation.ts`
+- `packages/werkstatt/src/certification/action-pack.ts`
+- `packages/werkstatt/src/certification/dossier-hash.ts`
+- `packages/werkstatt/src/certification/index.ts`
 - `packages/werkstatt/src/tests/certification-evaluation*.test.ts`
-- `docs/**`
+- `missions/**`
+- `docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

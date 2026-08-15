@@ -14,10 +14,24 @@ normativeSources:
   - path: "docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md"
     sha256: 6d75771fcf1379f47555296de73a2f643b65625f640e3cb37c19b50e532eb647
 allowedFiles:
-  - "packages/werkstatt/src/components/contracts/**"
-  - "packages/werkstatt/src/tests/component-*.test.ts"
+  - "packages/werkstatt/src/component/contracts.ts"
+  - "packages/werkstatt/src/component/schemas.ts"
+  - "packages/werkstatt/src/component/identity.ts"
+  - "packages/werkstatt/src/component/index.ts"
+  - "packages/werkstatt/src/component/tests/**"
   - "packages/werkstatt/package.json"
-  - "docs/**"
+  - "docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
+  - "AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -68,10 +82,24 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `packages/werkstatt/src/components/contracts/**`
-- `packages/werkstatt/src/tests/component-*.test.ts`
+- `packages/werkstatt/src/component/contracts.ts`
+- `packages/werkstatt/src/component/schemas.ts`
+- `packages/werkstatt/src/component/identity.ts`
+- `packages/werkstatt/src/component/index.ts`
+- `packages/werkstatt/src/component/tests/**`
 - `packages/werkstatt/package.json`
-- `docs/**`
+- `docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+- `AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

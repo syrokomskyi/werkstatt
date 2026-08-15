@@ -14,13 +14,31 @@ normativeSources:
   - path: "docs/specs/werkstatt-release-certification/forge-spec.yaml"
     sha256: 737eeb225e74c360f1085566771c5e4ff8be16f9a078175f8933b4f7aefeeb23
 allowedFiles:
-  - "docs/rfcs/**"
-  - "packages/werkstatt/src/**"
-  - "packages/werkstatt-site/src/**"
-  - "tools/**"
-  - "docs/**"
+  - "packages/werkstatt/src/plugin-contract.ts"
+  - "packages/werkstatt/src/plugin-registry.ts"
+  - "packages/werkstatt/src/plugin/**"
+  - "packages/werkstatt/src/release/**"
+  - "packages/werkstatt/src/leitstand/**"
+  - "packages/werkstatt/src/tests/{plugin,release,leitstand}*.test.ts"
+  - "tools/kernel.config.ts"
+  - "docs/command-manifest.generated.yaml"
+  - "docs/COMMANDS.md"
+  - "docs/ecosystem.generated.yaml"
+  - "packages/werkstatt-site/AGENTS.md"
+  - "packages/werkstatt-game/AGENTS.md"
+  - "packages/werkstatt-video/AGENTS.md"
+  - "docs/specs/werkstatt-release-certification/forge-spec.yaml"
+  - "docs/rfcs/verification/**"
+  - "docs/architecture-dna.md"
+  - "docs/requirements.xml"
+  - "docs/technology.xml"
+  - "docs/development-plan.xml"
+  - "docs/knowledge-graph.xml"
+  - "docs/verification-plan.xml"
+  - "docs/source-markup.xml"
   - "AGENTS.md"
-  - "packages/**/AGENTS.md"
+  - "packages/AGENTS.md"
+  - "packages/werkstatt/AGENTS.md"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -79,13 +97,31 @@ At charter preparation the program and packet are draft, `baseCommit` is null, t
 
 Only these paths may change:
 
-- `docs/rfcs/**`
-- `packages/werkstatt/src/**`
-- `packages/werkstatt-site/src/**`
-- `tools/**`
-- `docs/**`
+- `packages/werkstatt/src/plugin-contract.ts`
+- `packages/werkstatt/src/plugin-registry.ts`
+- `packages/werkstatt/src/plugin/**`
+- `packages/werkstatt/src/release/**`
+- `packages/werkstatt/src/leitstand/**`
+- `packages/werkstatt/src/tests/{plugin,release,leitstand}*.test.ts`
+- `tools/kernel.config.ts`
+- `docs/command-manifest.generated.yaml`
+- `docs/COMMANDS.md`
+- `docs/ecosystem.generated.yaml`
+- `packages/werkstatt-site/AGENTS.md`
+- `packages/werkstatt-game/AGENTS.md`
+- `packages/werkstatt-video/AGENTS.md`
+- `docs/specs/werkstatt-release-certification/forge-spec.yaml`
+- `docs/rfcs/verification/**`
+- `docs/architecture-dna.md`
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
 - `AGENTS.md`
-- `packages/**/AGENTS.md`
+- `packages/AGENTS.md`
+- `packages/werkstatt/AGENTS.md`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 

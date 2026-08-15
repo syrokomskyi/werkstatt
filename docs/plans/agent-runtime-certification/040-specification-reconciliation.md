@@ -16,7 +16,9 @@ normativeSources:
 allowedFiles:
   - "docs/specs/werkstatt-release-certification/amendments/amd-007-component-runtime-reconciliation.md"
   - "docs/specs/werkstatt-release-certification/forge-spec.yaml"
-  - "docs/plans/agent-runtime-certification/**"
+  - "docs/plans/agent-runtime-certification/040-specification-reconciliation.md"
+  - "docs/plans/agent-runtime-certification/preparations/**"
+  - "docs/plans/agent-runtime-certification/program.yaml"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"
@@ -69,7 +71,9 @@ Only these paths may change:
 
 - `docs/specs/werkstatt-release-certification/amendments/amd-007-component-runtime-reconciliation.md`
 - `docs/specs/werkstatt-release-certification/forge-spec.yaml`
-- `docs/plans/agent-runtime-certification/**`
+- `docs/plans/agent-runtime-certification/040-specification-reconciliation.md`
+- `docs/plans/agent-runtime-certification/preparations/**`
+- `docs/plans/agent-runtime-certification/program.yaml`
 
 Mission workpieces, cache clones/mirrors, Git internals, tracked lease state, immutable snapshot files, credentials, provider state, and deployed-site state are forbidden unless an accepted decision and exact allow-list entry own them. A required extra path stops execution; the Executor cannot self-expand scope.
 
