@@ -14,6 +14,7 @@
   <item>RFC-0751: add leitstand.service.deploy for shared Cloudflare Worker services.</item>
   <item>RFC-0806: replace leitstand.service.deploy with dev-deploy, promote, and rollback commands.</item>
   <item>RFC-0842: add leitstand.pipeline.check command for release pipeline state inspection.</item>
+  <item>RFC-0866: add leitstand.certify command and shared deploy-execution pipeline.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -45,6 +46,12 @@ export {
   runLeitstandPipelineCheck,
   type PipelineCheckResult,
 } from "./leitstand-commands.ts";
+export { runLeitstandCertify, type CertifyInput, type CertifyResult } from "./certify.ts";
+export {
+  executeDeployPhases,
+  type DeployExecutionContext,
+  type DeployExecutionResult,
+} from "./deploy-execution.ts";
 export { runLeitstandServiceDevDeploy } from "./service-dev-deploy.ts";
 export { runLeitstandServicePromote } from "./service-promote.ts";
 export { runLeitstandServiceRollback } from "./service-rollback.ts";
