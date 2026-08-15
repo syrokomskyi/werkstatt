@@ -468,6 +468,13 @@
           Implement `packages/werkstatt/src/certification/producers/` with typed producer registry (duplicate rejection, profile validation), applicability evaluation (always/entitlement/config/surface), false-pass guard (empty-result, summary-only warning, grace-period rejection), diagnostic normalization with deduplication, route/state/viewport matrix planning, and producer execution with evidence envelope construction. 23 tests covering registration, validation, applicability, false-pass detection, matrix planning, normalization, and execution.
         </description>
       </deliverable>
+      <deliverable id="del-180">
+        <name>CERT-006: Independent evaluator agents and qualitative consensus</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/certification/evaluators/` with evaluator registry (duplicate rejection), risk routing (ordinary/critical/borderline with dimension-matched rules), evaluator isolation (self-review and duplicate identity rejection), consensus aggregation (pass/pass, fail/fail, disagreement → incomplete), payload validation (bundle hash, rubric, confidence, criterion/rationale), evaluator execution with isolation/validation/consensus, and coverage manifest building from deterministic evidence. 28 tests covering registration, risk routing, isolation, consensus, validation, execution, and coverage manifest.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

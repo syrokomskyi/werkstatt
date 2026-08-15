@@ -478,5 +478,9 @@
       <change-type>CERT-005 deterministic site producers and false-pass removal changes</change-type>
       <expectation>Run `vitest` on `certification-producers.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify producer registry rejects duplicates and validates against profile; applicability evaluation handles always/entitlement/config/surface rules; false-pass guard rejects empty-result success, summary-only warning success for mandatory requirements, and grace-period success; diagnostic normalization deduplicates and rejects missing ruleId; route/state/viewport matrix generates full combination set; producer execution constructs evidence envelopes and rejects unregistered/crashed/false-pass producers.</expectation>
     </entry>
+    <entry id="vm-26">
+      <change-type>CERT-006 independent evaluator agents and qualitative consensus changes</change-type>
+      <expectation>Run `vitest` on `certification-evaluators.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify evaluator registry rejects duplicates; risk routing classifies ordinary/critical/borderline with correct evaluator counts; isolation rejects self-review and duplicate identities; consensus aggregation returns pass/fail/incomplete correctly; payload validation rejects bundle hash mismatch, rubric mismatch, out-of-range confidence, unknown criteria, and empty rationale; evaluator execution rejects isolation violations, unregistered evaluators, crashes, and invalid payloads; coverage manifest builds from routes/states/viewports and evidence.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>
