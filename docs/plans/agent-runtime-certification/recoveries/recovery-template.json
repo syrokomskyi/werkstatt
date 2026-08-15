@@ -1,0 +1,20 @@
+{
+  "templateFor": "forge/program-packet-recovery@1",
+  "fieldOrder": [
+    "schema",
+    "program",
+    "packetId",
+    "priorLeaseDigest",
+    "observedHead",
+    "completedStages",
+    "resolvedDecision",
+    "continuationTarget",
+    "actor",
+    "reason"
+  ],
+  "rules": [
+    "Independent Steward authors after durable-state and git inspection.",
+    "Never include a raw lease token.",
+    "Never rewrite sealed history."
+  ]
+}

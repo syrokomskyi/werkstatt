@@ -1,0 +1,21 @@
+{
+  "templateFor": "forge/program-packet-preparation@1",
+  "fieldOrder": [
+    "schema",
+    "program",
+    "packetId",
+    "governingDecision",
+    "resolvedRfc",
+    "preparationBase",
+    "decisionCommits",
+    "materializationEvidence",
+    "acceptanceEvidence",
+    "sourceDigests",
+    "preparedBy"
+  ],
+  "rules": [
+    "Use under an exclusive preparation lease.",
+    "Preserve the qualified governingDecision after materialization.",
+    "Require explicit human acceptance before sealing."
+  ]
+}

@@ -1,0 +1,285 @@
+schema: forge/program@1
+program: RFC-0855
+title: Authority-first agent runtime and certification cutover
+branch: program/agent-runtime-certification-cutover
+state: draft
+currentPacket: 000-program-control-plane
+steward: human:andrii-syrokomskyi
+sequential: true
+parallelism: 1
+packets:
+  - order: 000
+    packetId: 000-program-control-plane
+    file: 000-program-control-plane.md
+    state: draft
+    governingDecision: RFC-0856
+    decisionKind: rfc
+    resolvedRfc: RFC-0856
+    dependsOnPacket: null
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 010
+    packetId: 010-node-24
+    file: 010-node-24.md
+    state: draft
+    governingDecision: RFC-0854
+    decisionKind: rfc
+    resolvedRfc: RFC-0854
+    dependsOnPacket: 000-program-control-plane
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 020
+    packetId: 020-canonical-identity-bytes
+    file: 020-canonical-identity-bytes.md
+    state: draft
+    governingDecision: RFC-0849
+    decisionKind: rfc
+    resolvedRfc: RFC-0849
+    dependsOnPacket: 010-node-24
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 030
+    packetId: 030-canonical-diagnostic
+    file: 030-canonical-diagnostic.md
+    state: draft
+    governingDecision: RFC-0852
+    decisionKind: rfc
+    resolvedRfc: RFC-0852
+    dependsOnPacket: 020-canonical-identity-bytes
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 040
+    packetId: 040-specification-reconciliation
+    file: 040-specification-reconciliation.md
+    state: draft
+    governingDecision: werkstatt-release-certification/AMD-007
+    decisionKind: spec-amendment
+    resolvedRfc: null
+    dependsOnPacket: 030-canonical-diagnostic
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 050
+    packetId: 050-component-and-capability-contracts
+    file: 050-component-and-capability-contracts.md
+    state: draft
+    governingDecision: RFC-0858
+    decisionKind: rfc
+    resolvedRfc: RFC-0858
+    dependsOnPacket: 040-specification-reconciliation
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 060
+    packetId: 060-fiber-and-effect-runtime
+    file: 060-fiber-and-effect-runtime.md
+    state: draft
+    governingDecision: RFC-0859
+    decisionKind: rfc
+    resolvedRfc: RFC-0859
+    dependsOnPacket: 050-component-and-capability-contracts
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 070
+    packetId: 070-resolution-and-reconciliation
+    file: 070-resolution-and-reconciliation.md
+    state: draft
+    governingDecision: RFC-0860
+    decisionKind: rfc
+    resolvedRfc: RFC-0860
+    dependsOnPacket: 060-fiber-and-effect-runtime
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 080
+    packetId: 080-reflection-and-conformance-harness
+    file: 080-reflection-and-conformance-harness.md
+    state: draft
+    governingDecision: RFC-0861
+    decisionKind: rfc
+    resolvedRfc: RFC-0861
+    dependsOnPacket: 070-resolution-and-reconciliation
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 090
+    packetId: 090-isolation-contract
+    file: 090-isolation-contract.md
+    state: draft
+    governingDecision: RFC-0862
+    decisionKind: rfc
+    resolvedRfc: RFC-0862
+    dependsOnPacket: 080-reflection-and-conformance-harness
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 100
+    packetId: 100-certification-contracts-and-identities
+    file: 100-certification-contracts-and-identities.md
+    state: draft
+    governingDecision: RFC-0853
+    decisionKind: rfc
+    resolvedRfc: RFC-0853
+    dependsOnPacket: 090-isolation-contract
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 110
+    packetId: 110-deterministic-evaluation
+    file: 110-deterministic-evaluation.md
+    state: draft
+    governingDecision: RFC-0850
+    decisionKind: rfc
+    resolvedRfc: RFC-0850
+    dependsOnPacket: 100-certification-contracts-and-identities
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 120
+    packetId: 120-forward-only-state-reset
+    file: 120-forward-only-state-reset.md
+    state: draft
+    governingDecision: RFC-0851
+    decisionKind: rfc
+    resolvedRfc: RFC-0851
+    dependsOnPacket: 110-deterministic-evaluation
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 130
+    packetId: 130-foundation-integration
+    file: 130-foundation-integration.md
+    state: draft
+    governingDecision: RFC-0848
+    decisionKind: rfc
+    resolvedRfc: RFC-0848
+    dependsOnPacket: 120-forward-only-state-reset
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 140
+    packetId: 140-resolved-certification-profile
+    file: 140-resolved-certification-profile.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-002
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 130-foundation-integration
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 150
+    packetId: 150-authority-and-durable-storage
+    file: 150-authority-and-durable-storage.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-003
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 140-resolved-certification-profile
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 160
+    packetId: 160-certification-orchestration
+    file: 160-certification-orchestration.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-004
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 150-authority-and-durable-storage
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 170
+    packetId: 170-deterministic-site-producers
+    file: 170-deterministic-site-producers.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-005
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 160-certification-orchestration
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 180
+    packetId: 180-independent-evaluators
+    file: 180-independent-evaluators.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-006
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 170-deterministic-site-producers
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 190
+    packetId: 190-capability-artifact-and-sandbox
+    file: 190-capability-artifact-and-sandbox.md
+    state: draft
+    governingDecision: RFC-0863
+    decisionKind: rfc
+    resolvedRfc: RFC-0863
+    dependsOnPacket: 180-independent-evaluators
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 200
+    packetId: 200-evolution-controller
+    file: 200-evolution-controller.md
+    state: draft
+    governingDecision: RFC-0864
+    decisionKind: rfc
+    resolvedRfc: RFC-0864
+    dependsOnPacket: 190-capability-artifact-and-sandbox
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 210
+    packetId: 210-deployment-effect-authority
+    file: 210-deployment-effect-authority.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-007
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 200-evolution-controller
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 220
+    packetId: 220-continuous-health-and-demotion
+    file: 220-continuous-health-and-demotion.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-008
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 210-deployment-effect-authority
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 230
+    packetId: 230-combined-cutover
+    file: 230-combined-cutover.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-009
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 220-continuous-health-and-demotion
+    baseCommit: null
+    sealCommit: null
+    completion: null
+  - order: 240
+    packetId: 240-cleanup
+    file: 240-cleanup.md
+    state: draft
+    governingDecision: werkstatt-release-certification/CERT-010
+    decisionKind: spec-node
+    resolvedRfc: null
+    dependsOnPacket: 230-combined-cutover
+    baseCommit: null
+    sealCommit: null
+    completion: null

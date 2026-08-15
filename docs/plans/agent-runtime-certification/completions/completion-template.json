@@ -1,0 +1,24 @@
+{
+  "templateFor": "forge/program-packet-completion@1",
+  "fieldOrder": [
+    "schema",
+    "program",
+    "packetId",
+    "baseCommit",
+    "sealCommit",
+    "implementationCommits",
+    "implementationHead",
+    "changedFiles",
+    "validations",
+    "remainingTransitionDiagnostics",
+    "unexpectedDiagnostics",
+    "recoveryStatus",
+    "cleanTrees",
+    "completedBy"
+  ],
+  "rules": [
+    "Populate from independently verified git and validation evidence.",
+    "Do not include the completion commit itself.",
+    "Reject unknown fields, dirty trees, and unexpected diagnostics."
+  ]
+}
