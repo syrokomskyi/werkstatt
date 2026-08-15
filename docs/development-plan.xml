@@ -510,6 +510,13 @@
           Implement `packages/werkstatt/src/certification/cutover/marker.ts` with clean cutover marker (new candidate, decision IDs, dossier root, Main identity, health state, rollback identity, bootstrap exception closure, continuous health window completion, deterministic marker hash), cutover verification (CERT-CUTOVER-01..09 for legacy state reads, missing decisions, incomplete health, revoked health, same rollback candidate, invalid component set), legacy state prohibition (no runtime command reads legacy release certification, grace, or mission artifacts for success), marker integrity verification (tamper detection), bootstrap exception closure, and rollback target protection. 26 tests covering cutover verification, marker building, legacy prohibition, bootstrap exception, rollback protection, and marker integrity.
         </description>
       </deliverable>
+      <deliverable id="del-240">
+        <name>CERT-010: Post-cutover legacy artifact cleanup</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/certification/cleanup/legacy-artifacts.ts` with idempotent inventory/plan/apply command for post-cutover legacy artifact cleanup. CleanupInventoryV1 (legacy + protected artifacts with byte counts and deterministic hash), CleanupPlanV1 (paths to delete/protect, total bytes to free, plan hash), CleanupTombstoneV1 (per-deletion record), CleanupReportV1 (freed bytes, remaining protected, mirror verification, recovery possibility). verifyCleanupPrerequisites enforces cutover marker, bootstrap exception closure, main-certified candidate match, durable dossier, mirrors, rollback references (CERT-CLEANUP-01..07). validatePlan rejects plan hash drift, inventory hash drift, unknown paths, and protected paths in deletion plan (CERT-CLEANUP-08..11). checkPathSafety rejects symlinks outside allowed roots. isSafeNoOp detects idempotent re-apply. verifyReportIntegrity validates freed bytes match tombstone sum. 31 tests covering prerequisites, inventory, plan, validation, tombstones, reports, no-op detection, integrity, and path safety.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
