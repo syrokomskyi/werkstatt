@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 190-capability-artifact-and-sandbox
-state: draft
+state: sealed
 governingDecision: RFC-0863
 decisionKind: rfc
 resolvedRfc: RFC-0863

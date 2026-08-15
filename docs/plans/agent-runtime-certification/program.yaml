@@ -220,12 +220,12 @@ packets:
   - order: 190
     packetId: 190-capability-artifact-and-sandbox
     file: 190-capability-artifact-and-sandbox.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0863
     decisionKind: rfc
     resolvedRfc: RFC-0863
     dependsOnPacket: 180-independent-evaluators
-    baseCommit: null
+    baseCommit: e8317f9e
     sealCommit: null
     completion: null
   - order: 200
