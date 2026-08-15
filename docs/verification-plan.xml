@@ -474,5 +474,9 @@
       <change-type>CERT-004 certification orchestration and command surface changes</change-type>
       <expectation>Run `vitest` on `certification-orchestration.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify producer dependency planning rejects cycles, duplicates, and unknown dependencies; gate lock manager rejects concurrent locks and allows idempotent re-acquire; producer execution respects bounded parallelism, timeout, retry, and emits progress events; resume point computation correctly identifies completed batches; `getCertificationStatus` returns candidate identity, decisions, coverage, and next required action; `verifyCertification` recomputes candidate ID, dossier root, and detects integrity violations.</expectation>
     </entry>
+    <entry id="vm-25">
+      <change-type>CERT-005 deterministic site producers and false-pass removal changes</change-type>
+      <expectation>Run `vitest` on `certification-producers.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify producer registry rejects duplicates and validates against profile; applicability evaluation handles always/entitlement/config/surface rules; false-pass guard rejects empty-result success, summary-only warning success for mandatory requirements, and grace-period success; diagnostic normalization deduplicates and rejects missing ruleId; route/state/viewport matrix generates full combination set; producer execution constructs evidence envelopes and rejects unregistered/crashed/false-pass producers.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

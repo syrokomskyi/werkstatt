@@ -461,6 +461,13 @@
           Implement `packages/werkstatt/src/certification/orchestration/` with producer dependency planning (topological sort, cycle detection), gate lock manager (mutual exclusion, idempotent re-acquire), producer execution with bounded parallelism, timeout, retry, cancellation, progress events, and resume point computation. Implement `packages/werkstatt/src/certification/commands/` with read-only `getCertificationStatus` and `verifyCertification`. 22 tests covering planning, locking, execution, retry, progress, resume, status, and verification.
         </description>
       </deliverable>
+      <deliverable id="del-170">
+        <name>CERT-005: Deterministic site producers and false-pass removal</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/certification/producers/` with typed producer registry (duplicate rejection, profile validation), applicability evaluation (always/entitlement/config/surface), false-pass guard (empty-result, summary-only warning, grace-period rejection), diagnostic normalization with deduplication, route/state/viewport matrix planning, and producer execution with evidence envelope construction. 23 tests covering registration, validation, applicability, false-pass detection, matrix planning, normalization, and execution.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
