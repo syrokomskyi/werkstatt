@@ -286,6 +286,20 @@
           best-effort teardown, or swallowed disposer errors. 51 tests pass.
         </description>
       </deliverable>
+      <deliverable id="del-0860">
+        <name>RFC-0860 Deterministic component resolution and reconciliation</name>
+        <status>implemented</status>
+        <description>
+          Added pure deterministic resolver in `packages/werkstatt/src/component-runtime/resolver.ts`:
+          validates manifests, checks artifact availability, verifies admitted grants, matches required
+          capabilities by namespace/compatibility/schema identity, rejects zero/multiple providers, detects
+          cycles, topologically sorts with canonical component-ID tie-breaking, computes graph/set identities
+          through RFC-0858. Added reconciliation in `reconciliation.ts`: pure desired-state diff plans
+          (stop/drain/unload/load/activate), no-op detection on unchanged setHash, RFC-0859 activation
+          transaction orchestration. Added `resolution-proof.ts` with bounded proof/diagnostics types.
+          Resolution is deterministic under input permutation. 71 tests pass.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">

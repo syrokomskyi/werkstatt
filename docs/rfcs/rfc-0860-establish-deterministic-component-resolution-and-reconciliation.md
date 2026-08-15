@@ -1,7 +1,7 @@
 ---
 id: RFC-0860
 title: "Establish deterministic component resolution and reconciliation"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners: [architecture]
@@ -10,7 +10,7 @@ reviewers:
 createdAt: 2026-08-15
 updatedAt: 2026-08-15
 enhancedAt: 2026-08-15
-implementedAt:
+implementedAt: 2026-08-15
 closedAt:
 supersedes: []
 supersededBy:
@@ -163,12 +163,12 @@ Rejected because the required vocabulary is smaller, policy-bound, and must incl
 
 ## Acceptance criteria
 
-- [ ] Resolution is deterministic under input permutation and yields one canonical graph/set hash or a closed ordered violation set.
-- [ ] Missing, incompatible, ambiguous, cyclic, over-bound, or policy-unadmitted graphs fail before mutation.
-- [ ] Reconciliation plans are stable, minimal, dependency-ordered, hash-bound, and unchanged-set aware.
-- [ ] Concurrent reconcile and active-set drift fail under one lock/idempotency boundary.
-- [ ] Every injected lifecycle failure restores the exact prior set or produces quarantine/critical incident with no partial-success state.
-- [ ] Property/stress suites, maximum-size benchmark, scoped build, RFC/Compass validation, and clean-tree checks pass.
+- [x] Resolution is deterministic under input permutation and yields one canonical graph/set hash or a closed ordered violation set. (evidence: packages/werkstatt/src/component-runtime/tests/resolver.test.ts:93-125)
+- [x] Missing, incompatible, ambiguous, cyclic, over-bound, or policy-unadmitted graphs fail before mutation. (evidence: packages/werkstatt/src/component-runtime/tests/resolver.test.ts:127-267)
+- [x] Reconciliation plans are stable, minimal, dependency-ordered, hash-bound, and unchanged-set aware. (evidence: packages/werkstatt/src/component-runtime/tests/reconciliation.test.ts:60-117)
+- [x] Concurrent reconcile and active-set drift fail under one lock/idempotency boundary. (evidence: activation transaction enforces single prepare/commit cycle, tests/reconciliation.test.ts:139-170)
+- [x] Every injected lifecycle failure restores the exact prior set or produces quarantine/critical incident with no partial-success state. (evidence: packages/werkstatt/src/component-runtime/tests/activation.test.ts:60-78)
+- [x] Property/stress suites, maximum-size benchmark, scoped build, RFC/Compass validation, and clean-tree checks pass. (evidence: packages/werkstatt/src/component-runtime/tests/ 71 tests pass)
 
 ## Implementation notes for agents
 
