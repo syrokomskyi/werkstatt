@@ -49,6 +49,12 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 
 The Astro profile identity survives, while static plugin hooks/modules are re-authored as versioned, lifecycle-managed producer/evaluator/adapter capabilities only in their sealed packets. Do not pre-convert modules, preserve a plugin compatibility adapter, or expose production activation. The engine may consume only neutral contracts; this package must remain the stack-side capability implementation. Packet 230 owns removal of the old plugin entry and the sole-site combined cutover.
 
+### Diagnostic consumer and certification boundary (RFC-0852, RFC-0848)
+
+- `packages/werkstatt-site/src/checks/audit/types.ts` re-exports `diagnosticSchema`, `diagnosticSeveritySchema`, `diagnosticEvidenceSchema` from `@warpgogol/werkstatt/schemas` — the engine is the sole owner.
+- This package defines no duplicate Diagnostic/certification authority. It is a non-authorizing producer and consumer of engine-owned schemas.
+- The RFC-0848 integration suite verifies that the engine/plugin Diagnostic ownership boundary holds: `@warpgogol/werkstatt` imports no stack plugin, and the site plugin defines no duplicate Diagnostic/certification authority.
+
 ## Module layout
 
 | Module | Source (RFC-0774) | Plugin contract slot |

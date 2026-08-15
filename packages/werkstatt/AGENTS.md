@@ -73,6 +73,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Safe locator rules: `file`/`ruleFile` use workspace-relative POSIX paths (reject absolute, backslashes, `..`, empty, URI schemes, home expansion, credentials). URLs must be absolute `http:`/`https:` with no userinfo or credential-bearing query values.
 - Redaction: diagnostic strings and canonical `data` must be redacted before construction. Known secret patterns (API keys, JWTs, private keys, bearer tokens, connection strings, AWS creds), absolute paths, and PII (email, phone) are hard failures (`CERT-DIAGNOSTIC-REDACTION-01`).
 
+### Certification foundation integration (RFC-0848)
+
+- The integration suite at `packages/werkstatt/src/tests/certification-foundation.integration.test.ts` proves ten `CERT-INTEGRATION-*` laws using public child APIs only (RFC-0849, 0850, 0851, 0852, 0853).
+- No child logic is reimplemented in the integration suite; failures route to the owning child RFC for correction.
+- The suite verifies: canonical JSON snapshotting of diagnostic/certification values, identity digest determinism, immutable evaluation cut, permutation invariance, dossier root sensitivity, fail > stale > incomplete > pass precedence, deployment/artifact separation, legacy state rejection, transition block fail-closed, and engine/plugin Diagnostic ownership boundary.
+- `@warpgogol/werkstatt` imports no stack plugin; the site plugin defines no duplicate Diagnostic/certification authority.
+
 ### RFC-0855 implementation discipline
 
 - Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
