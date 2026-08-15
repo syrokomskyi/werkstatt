@@ -215,8 +215,8 @@ packets:
     resolvedRfc: null
     dependsOnPacket: 170-deterministic-site-producers
     baseCommit: ad5e3f32
-    sealCommit: null
-    completion: null
+    sealCommit: c0c28ea4
+    completion: e8317f9e
   - order: 190
     packetId: 190-capability-artifact-and-sandbox
     file: 190-capability-artifact-and-sandbox.md
