@@ -47,9 +47,9 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 - `packages/werkstatt/src/schemas/diagnostic.ts` is the sole owner of `DiagnosticSeverity`, `DiagnosticEvidence`, and `Diagnostic` strict Zod schemas and inferred types. All packages MUST import diagnostic schemas from `@warpgogol/werkstatt/schemas` — no package may redeclare, duplicate, or alias these types.
 - Legacy aliases (`auditSeveritySchema`, `auditEvidenceSchema`, `auditFindingSchema`, `AuditFinding`) and deprecated fields (`id`, `blockId`, `suggestion`) are removed. No compatibility alias, parser, or dual schema may be reintroduced.
 
-### RFC-0855 transition boundary
+### RFC-0855 program completion and legacy plugin boundary
 
-RFC-0855 supersedes the one-plugin architecture as the target but does not authorize immediate source edits. Follow `docs/plans/agent-runtime-certification/program.yaml` one sealed packet at a time. Current `werkstatt/plugin@1` files remain truthful pre-cutover code facts until packet 230 removes them; do not add new dependencies or compatibility layers around that contract. Engine-owned component graph, lifecycle, grants/effects, isolation, certification, and evolution contracts belong in `@warpgogol/werkstatt`; stack packages contribute profile-selected capabilities without engine back-imports. A package change outside the active packet allow-list is forbidden even when it appears necessary for compilation.
+All 25 packets (000–240) of the agent-runtime-certification program are completed. The engine-owned component graph, lifecycle fibers, effects, resolved-set identity, isolation admission, certification authority, and evolution reducer are all implemented in `@warpgogol/werkstatt`. The `werkstatt/plugin@1` contract and registry (`src/plugin-contract.ts`, `src/plugin-registry.ts`) remain in code as **legacy facts** — they still load and function, but are architecturally superseded. Future removal of the plugin entry requires a superseding RFC. Do not add new dependencies, adapters, or compatibility layers around the plugin contract. Stack packages contribute profile-selected capabilities without engine back-imports.
 
 | Package | Responsibility |
 | --- | --- |

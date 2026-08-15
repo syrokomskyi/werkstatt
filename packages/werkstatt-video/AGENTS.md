@@ -6,9 +6,9 @@ RFC-0778: Werkstatt video plugin — Editframe stack. Implements the `werkstatt/
 
 This is a **package** workspace. Expose stable typed APIs. Do not import from apps or services.
 
-## RFC-0855 transition
+## RFC-0855 program completion
 
-The Editframe profile identity and stack behavior survive, but the checked-in `werkstatt/plugin@1` entry is a pre-cutover fact. Convert hooks, validators, adapters, and invariants into versioned lifecycle-managed capabilities only when the corresponding RFC-0855 packet is sealed. Do not add a plugin compatibility adapter, import this package into the engine, or enable untrusted production artifacts. Packet 230 owns deletion of the old plugin entry.
+All 25 packets (000–240) are completed. The Editframe profile identity and stack behavior survive. The checked-in `werkstatt/plugin@1` entry is a **legacy code fact** — it still loads and functions, but is architecturally superseded. Converting hooks, validators, adapters, and invariants into versioned lifecycle-managed capabilities requires a superseding RFC. Do not add a plugin compatibility adapter, import this package into the engine, or enable untrusted production artifacts.
 
 ## Plugin contract
 
@@ -59,6 +59,7 @@ The Editframe profile identity and stack behavior survive, but the checked-in `w
 ## Check gate composition
 
 `checkGate` runs all 4 validators in sequence:
+
 1. `video.composition.validate` — composition schema and time model
 2. `video.assets.validate` — asset manifest completeness
 3. `video.render.validate` — render determinism and format
@@ -71,6 +72,7 @@ All must pass for checkGate to succeed.
 The build hook writes `dist/.render-hash.json` after each successful render. The render validator compares the current `dist/` hash against this stored baseline. If they differ, WV-03 fails. This avoids expensive re-renders during validation.
 
 Deterministic encoding settings (declared in `editframe.config.ts`):
+
 - Fixed codec: H.264, Main profile
 - Constant bitrate (CBR)
 - No metadata (`-map_metadata -1`)

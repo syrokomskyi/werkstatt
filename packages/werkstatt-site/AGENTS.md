@@ -40,14 +40,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 ## Package architecture
 
 - This package owns the Werkstatt site plugin: Astro path conventions, content validation, codegen, onboarding, audit, check-warpgogol, changelog renderers, and deploy adapter.
-- The package currently implements `werkstatt/plugin@1` with `profileId: "astro-typescript-turborepo"`; that is a pre-cutover code fact, not the RFC-0855 target.
+- The package currently implements `werkstatt/plugin@1` with `profileId: "astro-typescript-turborepo"`; this is a **legacy code fact**. All 25 RFC-0855 packets are completed, but the plugin entry has not yet been removed from code. Future removal requires a superseding RFC.
 - The plugin registers site-stack engine modules via `moduleLoaders` and provides deploy adapters.
 - RFC-0776 completed the migration: old packages (`packages/os/site-kernel-*`) are deleted. All imports now go through `@warpgogol/werkstatt-site` subpath exports.
 - Engine→stack imports are inverted through plugin hooks (RFC-0774/0775).
 
-### RFC-0855 transition
+### RFC-0855 program completion
 
-The Astro profile identity survives, while static plugin hooks/modules are re-authored as versioned, lifecycle-managed producer/evaluator/adapter capabilities only in their sealed packets. Do not pre-convert modules, preserve a plugin compatibility adapter, or expose production activation. The engine may consume only neutral contracts; this package must remain the stack-side capability implementation. Packet 230 owns removal of the old plugin entry and the sole-site combined cutover.
+All 25 packets (000–240) are completed. The Astro profile identity survives. The static plugin hooks/modules remain in code as legacy facts — they still load and function. Converting them to versioned, lifecycle-managed producer/evaluator/adapter capabilities requires a superseding RFC. Do not pre-convert modules, preserve a plugin compatibility adapter, or expose production activation. The engine may consume only neutral contracts; this package must remain the stack-side capability implementation.
 
 ### Diagnostic consumer and certification boundary (RFC-0852, RFC-0848)
 

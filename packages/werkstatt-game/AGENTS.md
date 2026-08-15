@@ -6,9 +6,9 @@ RFC-0777: Werkstatt game plugin — Phaser turborepo stack. Implements the `werk
 
 This is a **package** workspace. Expose stable typed APIs. Do not import from apps or services.
 
-## RFC-0855 transition
+## RFC-0855 program completion
 
-The Phaser profile identity and stack behavior survive, but the checked-in `werkstatt/plugin@1` entry is a pre-cutover fact. Convert hooks, validators, adapters, and invariants into versioned lifecycle-managed capabilities only when the corresponding RFC-0855 packet is sealed. Do not add a plugin compatibility adapter, import this package into the engine, or enable untrusted production artifacts. Packet 230 owns deletion of the old plugin entry.
+All 25 packets (000–240) are completed. The Phaser profile identity and stack behavior survive. The checked-in `werkstatt/plugin@1` entry is a **legacy code fact** — it still loads and functions, but is architecturally superseded. Converting hooks, validators, adapters, and invariants into versioned lifecycle-managed capabilities requires a superseding RFC. Do not add a plugin compatibility adapter, import this package into the engine, or enable untrusted production artifacts.
 
 ## Plugin contract
 
@@ -55,6 +55,7 @@ The Phaser profile identity and stack behavior survive, but the checked-in `werk
 ## Check gate composition
 
 `checkGate` runs all 4 validators in sequence:
+
 1. `game.assets.validate` — asset manifest completeness
 2. `game.scenes.validate` — scene registry consistency
 3. `game.bundle.validate` — bundle size budget
@@ -72,6 +73,7 @@ Deploy adapters read credentials from `systems/registry.yaml` channel config, ne
 ## Bundle measurement
 
 `game.bundle.validate` measures gzipped bundle size by:
+
 1. Listing all files in `dist/`
 2. Gzipping each file individually using `node:zlib.gzipSync`
 3. Summing the gzipped sizes

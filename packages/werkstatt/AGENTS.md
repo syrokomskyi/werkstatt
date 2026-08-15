@@ -51,7 +51,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 
 - This package owns the Werkstatt engine: kernel runtime, missions, mirrors (Sternsystem), releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, werkstatt consistency primitives, fingerprint, integrity, observability, agent-gate, changelog, operations schemas, and workshop scaffolding (RFC-0779).
 - The package is stack-agnostic (DNA-64). It MUST NOT import stack plugins.
-- The plugin contract (`werkstatt/plugin@1`) and registry in `src/plugin-contract.ts` and `src/plugin-registry.ts` are current pre-cutover code facts. RFC-0855 supersedes their architectural authority; packet 230 removes them after component-runtime and certification evidence agree.
+- The plugin contract (`werkstatt/plugin@1`) and registry in `src/plugin-contract.ts` and `src/plugin-registry.ts` are **legacy code facts**. All 25 RFC-0855 packets are completed; the plugin entry has not yet been removed from code. Future removal requires a superseding RFC.
 - The `werkstatt.autonomy.validate` command (DNA-64 enforcement) scans `src/**` for forbidden `@warpgogol/*` imports.
 - RFC-0776 completed the migration: old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) are deleted. All imports now go through `@warpgogol/werkstatt` subpath exports.
 
@@ -161,12 +161,12 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `validatePlan` rejects plan hash drift (`CERT-CLEANUP-08`), inventory hash drift (`CERT-CLEANUP-09`), unknown paths (`CERT-CLEANUP-10`), and protected paths in deletion plan (`CERT-CLEANUP-11`). `checkPathSafety` rejects symlinks outside allowed roots.
 - Dry-run is default; apply requires exact plan hash. `isSafeNoOp` detects idempotent re-apply. `verifyReportIntegrity` validates freed bytes match tombstone sum. No deletion without cutover marker, no deletion of protected artifacts, no silent plan drift.
 
-### RFC-0855 implementation discipline
+### RFC-0855 post-completion discipline
 
-- Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
-- The engine owns the Law Kernel, component graph, lifecycle fibers, effects, resolved-set identity, isolation admission, certification authority, and evolution reducer. Stack-profile packages provide capabilities through contracts and must never be imported into the engine.
+- All 25 packets (000–240) are completed. The engine owns the Law Kernel, component graph, lifecycle fibers, effects, resolved-set identity, isolation admission, certification authority, and evolution reducer. Stack-profile packages provide capabilities through contracts and must never be imported into the engine.
 - Do not add adapters for `werkstatt/plugin@1`, force unload, ambient authority, local certification fallback, mutable capability artifacts, or ungoverned production activation.
-- An intentionally broken intermediate repository is permitted by RFC-0855. Never widen the packet or restore retired authority merely to recover a green build.
+- Future changes to certification/component runtime require a superseding RFC, not amendments to completed packets.
+- Leitstand deployment commands remain blocked with `CERT-TRANSITION-01` until CERT-007 is connected to the Leitstand command surface. This reconnection is a future task.
 
 ### Component and capability contracts (RFC-0858)
 
@@ -183,7 +183,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `effects.ts` exports four effect handlers: `RevertibleEffectHandler` (disposer required), `TransactionalEffectHandler` (prepare/commit/abort with idempotency), `CompensatableEffectHandler` (compensation with equivalence evidence), `IrreversibleEmissionEffectHandler` (withheld until commit). Failed rollback quarantines.
 - `fiber.ts` exports `ComponentFiber` — structured ownership of child operations/resources, bounded drain with deadline, LIFO effect unwind, cancellation propagation at declared boundaries.
 - `activation.ts` exports `ActivationTransaction` — bounded set transition with prepare/commit/abort, prior-set drain in reverse dependency order, quarantine on incomplete rollback.
-- No resolver, sandbox, certification, or production activation occurs. Packet 070 supplies resolution; packet 230 performs production cutover.
+- No resolver, sandbox, certification, or production activation occurs in this module. Packet 070 implemented resolution; packet 230 completed the single-site clean cutover marker.
 
 ### Deterministic component resolution and reconciliation (RFC-0860)
 
@@ -191,7 +191,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `packages/werkstatt/src/component-runtime/reconciliation.ts` owns pure desired-state diff and transaction orchestration: computes stop/drain/unload/load/activate plans, detects no-op (unchanged setHash), drives RFC-0859 activation transaction.
 - `packages/werkstatt/src/component-runtime/resolution-proof.ts` exports bounded proof/diagnostics types: `ResolutionProofV1`, `ResolutionViolationV1` with codes `RESOLUTION-01` through `RESOLUTION-08`.
 - Resolution is deterministic under input permutation. Missing, incompatible, ambiguous, cyclic, unadmitted, or artifact-mismatched graphs are blocked before lifecycle mutation.
-- No package/network discovery, fallback providers, cycle tolerance, or plugin adapters. Production activation remains absent until packet 230.
+- No package/network discovery, fallback providers, cycle tolerance, or plugin adapters. Production activation via the clean cutover marker is implemented (packet 230 completed).
 
 ### Runtime reflection and conformance harness (RFC-0861)
 
