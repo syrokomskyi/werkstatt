@@ -2,7 +2,7 @@ schema: forge/program@1
 program: RFC-0855
 title: Authority-first agent runtime and certification cutover
 branch: program/agent-runtime-certification-cutover
-state: draft
+state: preparing
 currentPacket: 000-program-control-plane
 steward: human:andrii-syrokomskyi
 sequential: true
