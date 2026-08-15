@@ -22,12 +22,12 @@ packets:
   - order: 10
     packetId: 010-node-24
     file: 010-node-24.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0854
     decisionKind: rfc
     resolvedRfc: RFC-0854
     dependsOnPacket: 000-program-control-plane
-    baseCommit: 6c4f890d5910799529f0a62a4f4f763639d4c892
+    baseCommit: 7841610506db94209178212582511207e2e1c9b7
     sealCommit: null
     completion: null
   - order: 20
