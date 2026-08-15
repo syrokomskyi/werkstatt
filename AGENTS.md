@@ -50,9 +50,16 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 
 - This package owns the Werkstatt engine: kernel runtime, missions, mirrors (Sternsystem), releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, werkstatt consistency primitives, fingerprint, integrity, observability, agent-gate, changelog, operations schemas, and workshop scaffolding (RFC-0779).
 - The package is stack-agnostic (DNA-64). It MUST NOT import stack plugins.
-- The plugin contract (`werkstatt/plugin@1`) and registry are in `src/plugin-contract.ts` and `src/plugin-registry.ts`.
+- The plugin contract (`werkstatt/plugin@1`) and registry in `src/plugin-contract.ts` and `src/plugin-registry.ts` are current pre-cutover code facts. RFC-0855 supersedes their architectural authority; packet 230 removes them after component-runtime and certification evidence agree.
 - The `werkstatt.autonomy.validate` command (DNA-64 enforcement) scans `src/**` for forbidden `@warpgogol/*` imports.
 - RFC-0776 completed the migration: old packages (`packages/os/site-kernel*`, `packages/fingerprint`, `packages/agent-gate`) are deleted. All imports now go through `@warpgogol/werkstatt` subpath exports.
+
+### RFC-0855 implementation discipline
+
+- Implement component/runtime/certification work only from the currently sealed packet in `docs/plans/agent-runtime-certification/`; an RFC status alone is insufficient.
+- The engine owns the Law Kernel, component graph, lifecycle fibers, effects, resolved-set identity, isolation admission, certification authority, and evolution reducer. Stack-profile packages provide capabilities through contracts and must never be imported into the engine.
+- Do not add adapters for `werkstatt/plugin@1`, force unload, ambient authority, local certification fallback, mutable capability artifacts, or ungoverned production activation.
+- An intentionally broken intermediate repository is permitted by RFC-0855. Never widen the packet or restore retired authority merely to recover a green build.
 
 ## Mission git helpers
 
