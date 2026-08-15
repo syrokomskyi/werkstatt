@@ -3,33 +3,34 @@
 # Owner command: rfc.verification.emit
 # Edit instead: the rfc.verification.emit generator source (not this file).
 # Regenerate:   forge rfc.verification.emit
-rfcId: RFC-0849
-title: Establish bounded canonical JSON identity bytes
+rfcId: RFC-0853
+title: Define strict certification contracts and identity builders
 rfcStatus: accepted
-emittedAt: 2026-08-15T11:51:10.440Z
+emittedAt: 2026-08-15T11:49:31.681Z
 commit: b72493b96546777473492820625b65a8269dc517
-workingTreeDirty: true
+workingTreeDirty: false
 kernelVersion: unknown
-rfcFileHash: 978fe6b1223b0d80a41eafd7aefd6c042754d0873d0428c658c0cb9517dfc406
-acceptanceHash: 74de7edcf6b1dcb5f8e79fbee7b7afba92b7159e24ef46bc6d3de7c4854ba330
+rfcFileHash: 2222d6221e0ff2d8c4cb29b3ee871a9dbc73094bf86feec8fa6005134142ba83
+acceptanceHash: 0b5959a7f60ab799b3700ed184cccc56f380a8f6a5f38516792c6aaf8b954429
 probes:
   - probe:
       probe: file-exists
-      path: packages/werkstatt/src/fingerprint/canonical-json.ts
+      path: packages/werkstatt/src/certification/contracts/index.ts
     ok: true
     detail: exists
     durationMs: 0
   - probe:
       probe: file-exists
-      path: packages/werkstatt/src/tests/canonical-json.pbt.test.ts
+      path: packages/werkstatt/src/certification/identity.ts
     ok: true
     detail: exists
     durationMs: 0
   - probe:
-      probe: file-exists
-      path: packages/werkstatt/src/tests/fixtures/canonical-json-v1/provenance.json
+      probe: file-contains
+      path: packages/werkstatt/package.json
+      pattern: ./certification
     ok: true
-    detail: exists
+    detail: pattern found
     durationMs: 0
 overall: pass
 

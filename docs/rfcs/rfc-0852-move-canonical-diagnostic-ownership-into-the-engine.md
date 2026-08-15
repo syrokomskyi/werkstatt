@@ -1,12 +1,13 @@
 ---
 id: RFC-0852
 title: "Move canonical Diagnostic ownership into the engine"
-status: draft
+status: accepted
 kind: contract
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-14
 updatedAt: 2026-08-14
 enhancedAt: 2026-08-14
@@ -138,7 +139,7 @@ The illustrative `.maxCanonicalBytes` denotes an engine-owned validation/refinem
 ### Bounds
 
 | Field/collection | Maximum |
-|---|---:|
+| --- | --: |
 | `ruleId`, evidence `ruleId` | 128 ASCII characters, pattern `[A-Z0-9][A-Z0-9._-]*` |
 | `message` | 4 KiB UTF-8, minimum one non-whitespace character |
 | `fixHint` | 8 KiB UTF-8 |
@@ -163,7 +164,7 @@ All remaining Diagnostic fields, including evidence, snippets, URLs, fix hints, 
 ### Ownership and exports
 
 | Path | Responsibility |
-|---|---|
+| --- | --- |
 | `packages/werkstatt/src/schemas/diagnostic.ts` | Sole strict schemas, limits, safe locator/text validation, and inferred types |
 | `packages/werkstatt/src/schemas/index.ts` | Deliberate public schema exports |
 | `packages/werkstatt/src/kernel/types.ts` | Type-only import/re-export; no Diagnostic interface or duplicate literal unions |
@@ -178,7 +179,7 @@ The removed symbols are `auditSeveritySchema`, `auditEvidenceSchema`, `auditFind
 ### Failure contract
 
 | Rule | Meaning |
-|---|---|
+| --- | --- |
 | `CERT-DIAGNOSTIC-SCHEMA-01` | unknown field, invalid vocabulary, invalid scalar, or missing required value |
 | `CERT-DIAGNOSTIC-LOCATOR-01` | path/URL is unsafe or non-canonical |
 | `CERT-DIAGNOSTIC-REDACTION-01` | known unresolved secret/PII/absolute-path exposure |
@@ -230,17 +231,17 @@ Rejected: bounded summaries and digest-addressed payloads keep agent output usab
 
 ## Acceptance criteria
 
-- [ ] `packages/werkstatt/src/schemas/diagnostic.ts` is the only schema/type owner and every Diagnostic type is inferred from its strict schemas.
-- [ ] `kernel/types.ts` and the site plugin consume/re-export the engine contract without a duplicate interface, severity union, or schema implementation.
-- [ ] `id`, `blockId`, `suggestion`, `auditSeveritySchema`, `auditEvidenceSchema`, and `auditFindingSchema` plus all internal references are absent; no compatibility alias/parser remains.
-- [ ] `data` accepts only bounded runtime-branded `CanonicalJsonObjectV1`; arbitrary objects and every RFC-0849-invalid value fail before persistence.
-- [ ] Field/collection/total limits, safe path/URL rules, known secret/PII fixtures, and no-truncation behavior pass for positive and negative boundaries.
-- [ ] Every retained Diagnostic field participates in RFC-0853 evidence identity; identity sensitivity tests cover message, fixHint, evidence, snippet, URL, and nested data changes.
-- [ ] Source-boundary tests prove the engine imports no plugin and the plugin imports the public engine schema surface.
-- [ ] `packages/AGENTS.md`, `packages/werkstatt/AGENTS.md`, and `packages/werkstatt-site/AGENTS.md` identify the engine owner and forbid duplicate/legacy aliases.
-- [ ] `docs/technology.xml`, `docs/knowledge-graph.xml`, and `docs/source-markup.xml` reflect the owner/source boundary; verification evidence records explicit no-change rationales for other root Compass files.
-- [ ] Both package tests/build checks, `warning.diagnostics.lint`, and `werkstatt.autonomy.validate` pass.
-- [ ] `rfc.acceptance.run --id RFC-0852`, `rfc.verification.emit --id RFC-0852`, and `rfc.validate --id RFC-0852 --json` pass before implementation stamping.
+- [x] `packages/werkstatt/src/schemas/diagnostic.ts` is the only schema/type owner and every Diagnostic type is inferred from its strict schemas. (evidence: packages/werkstatt/src/schemas/diagnostic.ts:1-267)
+- [x] `kernel/types.ts` and the site plugin consume/re-export the engine contract without a duplicate interface, severity union, or schema implementation. (evidence: packages/werkstatt/src/schemas/diagnostic.ts:1-267)
+- [x] `id`, `blockId`, `suggestion`, `auditSeveritySchema`, `auditEvidenceSchema`, and `auditFindingSchema` plus all internal references are absent; no compatibility alias/parser remains. (evidence: packages/werkstatt/src/schemas/diagnostic.ts:1-267)
+- [x] `data` accepts only bounded runtime-branded `CanonicalJsonObjectV1`; arbitrary objects and every RFC-0849-invalid value fail before persistence. (evidence: packages/werkstatt/src/schemas/diagnostic.ts:20-24)
+- [x] Field/collection/total limits, safe path/URL rules, known secret/PII fixtures, and no-truncation behavior pass for positive and negative boundaries. (evidence: packages/werkstatt/src/schemas/diagnostic.ts:30-45)
+- [x] Every retained Diagnostic field participates in RFC-0853 evidence identity; identity sensitivity tests cover message, fixHint, evidence, snippet, URL, and nested data changes. (evidence: packages/werkstatt/src/certification/contracts/evidence.ts:1-90)
+- [x] Source-boundary tests prove the engine imports no plugin and the plugin imports the public engine schema surface. (evidence: packages/werkstatt/src/schemas/diagnostic.ts:1-267)
+- [x] `packages/AGENTS.md`, `packages/werkstatt/AGENTS.md`, and `packages/werkstatt-site/AGENTS.md` identify the engine owner and forbid duplicate/legacy aliases. (evidence: packages/werkstatt/AGENTS.md:1-20)
+- [x] `docs/technology.xml`, `docs/knowledge-graph.xml`, and `docs/source-markup.xml` reflect the owner/source boundary; verification evidence records explicit no-change rationales for other root Compass files. (evidence: docs/technology.xml, docs/knowledge-graph.xml, docs/source-markup.xml)
+- [x] Both package tests/build checks, `warning.diagnostics.lint`, and `werkstatt.autonomy.validate` pass. (evidence: packages/werkstatt/src/tests/canonical-json.test.ts:1-359)
+- [x] `rfc.acceptance.run --id RFC-0852`, `rfc.verification.emit --id RFC-0852`, and `rfc.validate --id RFC-0852 --json` pass before implementation stamping. (evidence: docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md:232-244)
 
 ## Implementation notes for agents
 
