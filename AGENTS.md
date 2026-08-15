@@ -113,6 +113,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Subpath exports: `@warpgogol/werkstatt/component-runtime/reflection`, `@warpgogol/werkstatt/component-runtime/conformance`, `@warpgogol/werkstatt/component-runtime/testing`.
 - No production define/install/run/activate/promote command or authority decision is exported. Reflection and conformance results are projections/evidence, not authority.
 
+### Provider-neutral isolation contract (RFC-0862)
+
+- `packages/werkstatt/src/isolation/contracts.ts` owns neutral adapter/workload/bridge contracts: `IsolationAdapterV1`, `SandboxedWorkloadCreateV1`, `SandboxedWorkloadV1`, `CapabilityBridgeRequestV1`, `CapabilityBridgeResponseV1`, `TerminationReportV1`, `AttenuatedGrantSetV1`, `WorkloadLimitsV1`, `IsolationPropertyEvidenceV1`, `IsolationConformanceResultV1`. Workloads receive no ambient filesystem, network, process, environment, clock, randomness, credential, IPC, or host-object access.
+- `packages/werkstatt/src/isolation/schemas.ts` owns strict Zod schemas with `.strict()` validation for all isolation messages, grants, limits, and evidence. Unknown fields, invalid grants, replay, confused identity, and all bound violations are rejected. `validateIsolationAdapter` and `validateBridgeRequest` are the public validators.
+- `packages/werkstatt/src/isolation/conformance.ts` owns the provider-neutral adversarial conformance suite: `runIsolationConformance`, `createConformanceResult`. Covers filesystem/network/process/env/credential/descriptor escape, resource exhaustion, workload separation, teardown, crash, bridge confusion/replay. `node:vm`, `worker_threads`, and ordinary subprocesses fail the security-tier contract by definition. Missing property evidence returns `incomplete`, never `pass`.
+- Subpath exports: `@warpgogol/werkstatt/isolation/contracts`, `@warpgogol/werkstatt/isolation/schemas`, `@warpgogol/werkstatt/isolation/conformance`.
+- No concrete provider dependency, credential, artifact store, network endpoint, or production loader is added. Packet 190 selects and implements the first real provider.
+
 ## Mission git helpers
 
 - `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.
