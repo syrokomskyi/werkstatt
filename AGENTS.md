@@ -105,6 +105,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - Resolution is deterministic under input permutation. Missing, incompatible, ambiguous, cyclic, unadmitted, or artifact-mismatched graphs are blocked before lifecycle mutation.
 - No package/network discovery, fallback providers, cycle tolerance, or plugin adapters. Production activation remains absent until packet 230.
 
+### Runtime reflection and conformance harness (RFC-0861)
+
+- `packages/werkstatt/src/component-runtime/reflection.ts` owns the read-only, policy-filtered live capability catalog: `CapabilityCatalogV1`, `CapabilityCatalogEntryV1`, `createCapabilityCatalog`, `assertNoForbiddenFields`. Catalog entries are canonically ordered, exact-set-bound, caller-filtered, and omit secrets, raw grants, private state, credentials, prompts, executable bytes, and authority material.
+- `packages/werkstatt/src/component-runtime/conformance.ts` owns scenario/result contracts: `ConformanceScenarioV1`, `ConformanceEventV1`, `ConformanceExpectationV1`, `ConformanceResultV1`, `ConformanceTraceEntryV1`, `ConformanceMismatchV1`, `ConformanceCleanupReportV1`. Results are always marked `testOnly: true` and contain no admission/promotion decision.
+- `packages/werkstatt/src/component-runtime/testing/harness.ts` owns the test-only conformance harness: `runConformanceScenario`, `buildCatalog`, `TrustedFixture`. Guards reject non-test mode (`CONFORMANCE-01`), untrusted fixtures (`CONFORMANCE-02`), unpinned artifacts (`CONFORMANCE-03`), and hash mismatches (`CONFORMANCE-04`). Fixtures are embedded, hash-pinned, and trusted — no network/package discovery.
+- Subpath exports: `@warpgogol/werkstatt/component-runtime/reflection`, `@warpgogol/werkstatt/component-runtime/conformance`, `@warpgogol/werkstatt/component-runtime/testing`.
+- No production define/install/run/activate/promote command or authority decision is exported. Reflection and conformance results are projections/evidence, not authority.
+
 ## Mission git helpers
 
 - `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.
