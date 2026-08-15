@@ -7,7 +7,7 @@ governingDecision: RFC-0862
 decisionKind: rfc
 resolvedRfc: RFC-0862
 dependsOnPacket: 080-reflection-and-conformance-harness
-baseCommit: 7fe49fab
+baseCommit: 99cfcfaade01f6dfd3cbd17b9c991c6843635237
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
