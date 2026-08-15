@@ -458,5 +458,9 @@
       <change-type>RFC-0851 release state transition or manifest schema changes</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt test`, `pnpm --filter @warpgogol/werkstatt build`, `pnpm exec werkstatt run rfc.validate --id RFC-0851`, and all release/leitstand handoff tests. Verify that release manifests with legacy states throw `LegacyReleaseError`, `release.list` separates `legacyInvalid` entries, all Leitstand commands and `release.rollback` return `CERT-TRANSITION-01`, and no `--force`/`--legacy`/`--skip-certification` flag exists.</expectation>
     </entry>
+    <entry id="vm-21">
+      <change-type>RFC-0848 cross-module integration suite changes</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt exec vitest run src/tests/certification-foundation.integration.test.ts`, `pnpm --filter @warpgogol/werkstatt build`, `pnpm exec werkstatt run rfc.validate --id RFC-0848`, and `pnpm exec werkstatt run werkstatt.autonomy.validate`. Verify all ten CERT-INTEGRATION laws pass, no child logic is reimplemented, `@warpgogol/werkstatt` imports no stack plugin, and the site plugin defines no duplicate Diagnostic/certification authority.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

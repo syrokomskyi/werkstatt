@@ -26,6 +26,12 @@ allowedFiles:
   - "AGENTS.md"
   - "packages/AGENTS.md"
   - "packages/werkstatt/AGENTS.md"
+  - "packages/werkstatt/src/tests/certification-foundation.integration.test.ts"
+  - "packages/werkstatt-site/AGENTS.md"
+  - "packages/werkstatt-site/src/checks/audit/types.ts"
+  - "docs/command-manifest.generated.yaml"
+  - "docs/COMMANDS.md"
+  - "docs/ecosystem.generated.yaml"
 forbiddenFiles:
   - "missions/**"
   - "../systems-cache/**"

@@ -59,6 +59,15 @@ RFC-0851 replaced legacy release states (`published`, `dev-deployed`, `alt-deplo
 - `readReleaseManifest` and `writeReleaseYaml` use strict `releaseManifestSchema` validation via the `yaml` package. Manifests with legacy states throw `LegacyReleaseError`.
 - Agents MUST NOT restore legacy deployment commands, bypass the transition block, or introduce compatibility/migration readers for old state labels.
 
+## Certification foundation integration (RFC-0848)
+
+RFC-0848 is the parent integration RFC for the certification domain. It depends on five child RFCs (0849, 0850, 0851, 0852, 0853) and proves their cross-module composition through a single integration test suite.
+
+- The integration suite lives at `packages/werkstatt/src/tests/certification-foundation.integration.test.ts` and proves ten `CERT-INTEGRATION-*` laws using public child APIs only.
+- No child logic is reimplemented in the integration suite; failures route to the owning child RFC for correction, not to adapters or fallback passes.
+- `@warpgogol/werkstatt` imports no stack plugin; the site plugin defines no duplicate Diagnostic/certification authority.
+- Stable integration-only test labels use `CERT-INTEGRATION-*`; production code must not emit them.
+
 ## Publication policy (RFC-0773)
 
 - Agents MUST NOT trigger `npm publish` without an explicit operator command. Publication is operator-triggered, never automated.

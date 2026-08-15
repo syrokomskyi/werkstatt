@@ -405,6 +405,22 @@
           and DNA-73 in `docs/architecture-dna.md`.
         </description>
       </deliverable>
+      <deliverable id="del-0848">
+        <name>RFC-0848 Foundation integration</name>
+        <status>implemented</status>
+        <description>
+          Created `packages/werkstatt/src/tests/certification-foundation.integration.test.ts`
+          proving ten cross-module CERT-INTEGRATION laws using public child APIs only:
+          (1) diagnostic/certification values snapshotted by RFC-0849, (2) RFC-0853 identity
+          digests match canonical hash, (3) immutable evaluation cut excludes future authority,
+          (4) decision/action-pack identities invariant under input permutations, (5) dossier
+          root changes under event mutation and is location-independent, (6) fail > stale >
+          incomplete > pass precedence with no false green, (7) deployment operations bind same
+          candidate and cannot mutate artifact readiness, (8) legacy states fail strict parsing,
+          (9) transition block is fail-closed, (10) engine/plugin Diagnostic ownership boundary.
+          No child logic reimplemented; no adapters, aliases, or fallback passes.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
