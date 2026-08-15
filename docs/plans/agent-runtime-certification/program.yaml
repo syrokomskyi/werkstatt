@@ -143,7 +143,7 @@ packets:
   - order: 120
     packetId: 120-forward-only-state-reset
     file: 120-forward-only-state-reset.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0851
     decisionKind: rfc
     resolvedRfc: RFC-0851
@@ -154,7 +154,7 @@ packets:
   - order: 130
     packetId: 130-foundation-integration
     file: 130-foundation-integration.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0848
     decisionKind: rfc
     resolvedRfc: RFC-0848
@@ -165,7 +165,7 @@ packets:
   - order: 140
     packetId: 140-resolved-certification-profile
     file: 140-resolved-certification-profile.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-002
     decisionKind: spec-node
     resolvedRfc: null
@@ -176,7 +176,7 @@ packets:
   - order: 150
     packetId: 150-authority-and-durable-storage
     file: 150-authority-and-durable-storage.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-003
     decisionKind: spec-node
     resolvedRfc: null
@@ -187,7 +187,7 @@ packets:
   - order: 160
     packetId: 160-certification-orchestration
     file: 160-certification-orchestration.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-004
     decisionKind: spec-node
     resolvedRfc: null
@@ -198,7 +198,7 @@ packets:
   - order: 170
     packetId: 170-deterministic-site-producers
     file: 170-deterministic-site-producers.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-005
     decisionKind: spec-node
     resolvedRfc: null
@@ -209,7 +209,7 @@ packets:
   - order: 180
     packetId: 180-independent-evaluators
     file: 180-independent-evaluators.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-006
     decisionKind: spec-node
     resolvedRfc: null
@@ -220,7 +220,7 @@ packets:
   - order: 190
     packetId: 190-capability-artifact-and-sandbox
     file: 190-capability-artifact-and-sandbox.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0863
     decisionKind: rfc
     resolvedRfc: RFC-0863
@@ -231,7 +231,7 @@ packets:
   - order: 200
     packetId: 200-evolution-controller
     file: 200-evolution-controller.md
-    state: sealed
+    state: completed
     governingDecision: RFC-0864
     decisionKind: rfc
     resolvedRfc: RFC-0864
@@ -242,7 +242,7 @@ packets:
   - order: 210
     packetId: 210-deployment-effect-authority
     file: 210-deployment-effect-authority.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-007
     decisionKind: spec-node
     resolvedRfc: null
@@ -253,7 +253,7 @@ packets:
   - order: 220
     packetId: 220-continuous-health-and-demotion
     file: 220-continuous-health-and-demotion.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-008
     decisionKind: spec-node
     resolvedRfc: null
@@ -264,7 +264,7 @@ packets:
   - order: 230
     packetId: 230-combined-cutover
     file: 230-combined-cutover.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-009
     decisionKind: spec-node
     resolvedRfc: null
@@ -275,7 +275,7 @@ packets:
   - order: 240
     packetId: 240-cleanup
     file: 240-cleanup.md
-    state: sealed
+    state: completed
     governingDecision: werkstatt-release-certification/CERT-010
     decisionKind: spec-node
     resolvedRfc: null
