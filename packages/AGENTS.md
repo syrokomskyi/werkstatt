@@ -30,6 +30,10 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 
 - **Never write glob patterns containing `*/` inside `/* */` block comments** (e.g. `MODULE_CONTRACT`, `CHANGE_SUMMARY`). The `*/` sequence in `**/*.css` prematurely terminates the comment, causing TypeScript parse errors. Write "CSS files" or use `*.css` without the `**/` prefix instead.
 
+## Vitest mock limitations
+
+- **`vi.mock` for module A does not intercept internal calls within module B that imports from A.** When module B (e.g. `bordbuch-io.ts`) imports `resolveCacheClonePath` from module A (e.g. `registry-io.ts`) and calls it internally, mocking A's export only affects direct imports from A — B's internal call still uses the real function. This is a fundamental Vitest limitation: mocks replace exports, not internal references. When a test needs to redirect file paths written by a deeply nested call chain, create a self-contained mock for the outermost module (e.g. `bordbuch-commit-helper.ts`) that does not import the real implementation at all. Reimplement the necessary logic (entry creation, file write) directly in the mock factory.
+
 ## Generated file writes
 
 - Always use `writeFileIfChanged` from `@warpgogol/werkstatt` (re-exported from `@warpgogol/forge/utils`, RFC-0345) for generated file writes — both text and binary. It accepts `string | Uint8Array` and skips the disk write when content is byte-identical to the existing file.
