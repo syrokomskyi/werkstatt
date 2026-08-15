@@ -41,11 +41,11 @@ All 25 packets (000–240) of the agent-runtime-certification program are **comp
 - **Build pipeline**: `build.prepare`, `build.check`, `astro build` — all work normally.
 - **Git**: `mission.git.commit` (workpiece), `ecosystem.commit` (platform) — both work.
 - **Validation**: `mission.validate`, `sternsystem.validate`, `werkstatt.plugin.validate` — all work.
+- **Deployment** (RFC-0865): `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.status`, `leitstand.health`, `leitstand.pipeline.check`, `leitstand.rollback`, and `release.rollback` — all work via certification authority (`authorizeDeployment()`, `verifyMainPromotion()`, `evaluateRollback()`). Each command requires a `--gate-decision` flag (path to `GateDecisionV1` JSON); `leitstand.promote` additionally requires `--main-verification-decision`.
 
 ### What agents CANNOT do
 
-- **Deploy**: `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.rollback`, `leitstand.health`, `leitstand.pipeline.check`, and `release.rollback` are all **blocked** with `CERT-TRANSITION-01` (`status: "incomplete"`, `requiredNode: "CERT-007"`). Deployment will be unblocked when CERT-007 (deployment effect authority, packet 210 — implemented) is connected to the Leitstand command surface as signed certification authority. This reconnection is a future task, not yet scoped.
-- **Do NOT attempt to bypass** the transition block, restore legacy deployment commands, or introduce compatibility readers for old release state labels.
+- **Do NOT attempt to bypass** the certification authority, restore legacy deployment commands, or introduce compatibility readers for old release state labels.
 
 ### Legacy plugin contract (still in code, architecturally superseded)
 
@@ -69,10 +69,11 @@ Legacy plugin code facts:
 
 RFC-0851 replaced legacy release states (`published`, `dev-deployed`, `alt-deployed`, `promoted`, `main-deployed`, `rolled-back`) with artifact-only states (`prepared`, `ready`). Deployment progress is now a separate append-only `DeploymentOperationState` event chain, not a release manifest field.
 
-- All Leitstand commands (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.status`, `leitstand.rollback`, `leitstand.health`, `leitstand.pipeline.check`) and `release.rollback` are blocked with `CERT-TRANSITION-01` until CERT-007 reconnects them to signed certification authority.
+- All Leitstand commands (`leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.status`, `leitstand.rollback`, `leitstand.health`, `leitstand.pipeline.check`) and `release.rollback` are now **unblocked** (RFC-0865). They call `authorizeDeployment()`, `verifyMainPromotion()`, and `evaluateRollback()` from `packages/werkstatt/src/certification/deployment/authority.ts` via `packages/werkstatt/src/leitstand/deploy-helpers.ts`. Each command requires a `--gate-decision` flag pointing to a `GateDecisionV1` JSON file; `leitstand.promote` additionally requires `--main-verification-decision`. Deployment effect records are written to `systems-cache/{id}/deployment-operations/`.
+- `leitstand.propagate` and `leitstand.promote` verify R2 durable sync when `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, and `R2_BUCKET_NAME` env vars are set, using the R2 storage adapter from `packages/werkstatt/src/certification/storage/r2-adapter.ts`.
 - `release.list` reports valid releases separately from `legacyInvalid` entries (releases with legacy state labels). Legacy entries are preserved but never translated, migrated, or presented as deployable.
 - `readReleaseManifest` and `writeReleaseYaml` use strict `releaseManifestSchema` validation via the `yaml` package. Manifests with legacy states throw `LegacyReleaseError`.
-- Agents MUST NOT restore legacy deployment commands, bypass the transition block, or introduce compatibility/migration readers for old state labels.
+- Agents MUST NOT restore legacy deployment commands, bypass the certification authority, or introduce compatibility/migration readers for old state labels.
 
 ## Certification foundation integration (RFC-0848)
 
