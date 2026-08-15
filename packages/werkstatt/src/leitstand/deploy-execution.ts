@@ -356,9 +356,24 @@ export async function executeDeployPhases(
     }
 
     if (channel === "main") {
-      // Main verification is handled by the caller via authorizeMainPromotion
-      // This phase is a no-op in the shared pipeline — the verification
-      // happens before executeDeployPhases is called.
+      const altChannelConfig = getChannelConfig(ctx.systemConfig, "alt");
+      const altUrl = altChannelConfig.url ?? "";
+      if (altUrl) {
+        const altHealth = await runHealthCheckWithRetry(
+          ctx.adapter,
+          ctx.systemId,
+          altUrl,
+          "alt",
+          ctx.releaseId ?? "",
+          ctx.workspaceRoot,
+        );
+        if (altHealth.state !== "healthy") {
+          failingPhase = "alt-health-check";
+          throw new Error(
+            `Alt channel is not healthy (state=${altHealth.state}) — cannot promote to main`,
+          );
+        }
+      }
     }
 
     if (!ctx.skipEvidenceSync) {

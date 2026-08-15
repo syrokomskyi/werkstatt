@@ -32,6 +32,8 @@
   <item>RFC-0829: add test evidence gates (L4+L5) to propagate and promote via shared runTestEvidenceGate helper.</item>
   <item>RFC-0842: add target channel + URL logging to dev-deploy, propagate, and promote before lock acquisition.</item>
   <item>RFC-0866: wire executeDeployPhases into dev-deploy, propagate, promote; add failingPhase to result types.</item>
+  <item>RFC-0866 audit: resolve missionId + commitSha from system-state + workpiece git HEAD; pass to executeDeployPhases so mission.check and Axiom evidence gate actually run.</item>
+  <item>RFC-0866 audit: add alt health check before main deploy in executeDeployPhases for channel=main.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -724,6 +726,32 @@ function resolveSecretsFilePath(
     : undefined;
 }
 
+async function resolveMissionContext(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<{ missionId: string; commitSha: string }> {
+  try {
+    const state = await readSystemStateSmart(workspaceRoot, systemId);
+    const missionId = state.currentMission ?? "";
+    if (!missionId) return { missionId: "", commitSha: "" };
+    const workpieceDir = path.join(workspaceRoot, "missions", missionId, "workpiece");
+    if (!existsSync(workpieceDir)) return { missionId, commitSha: "" };
+    let commitSha = "";
+    try {
+      commitSha = execSync("git rev-parse HEAD", {
+        cwd: workpieceDir,
+        encoding: "utf-8",
+        stdio: "pipe",
+      }).trim();
+    } catch {
+      // workpiece may not be a git repo
+    }
+    return { missionId, commitSha };
+  } catch {
+    return { missionId: "", commitSha: "" };
+  }
+}
+
 export interface DevDeployResult {
   command: "leitstand.dev-deploy";
   systemId: string;
@@ -841,6 +869,8 @@ export async function runLeitstandDevDeploy(
   const channelConfig = depConfig.channels.dev;
   const secretsFilePath = resolveSecretsFilePath(context.workspaceRoot, channelConfig);
 
+  const { missionId, commitSha } = await resolveMissionContext(context.workspaceRoot, systemId);
+
   const { executeDeployPhases } = await import("./deploy-execution.ts");
   const deployResult = await executeDeployPhases(
     {
@@ -857,6 +887,8 @@ export async function runLeitstandDevDeploy(
       secretsFilePath,
       skipEvidenceSync: Boolean(flagString(input, "skip-evidence-sync")),
       forceBuild: Boolean(input.flags["force-build"]),
+      missionId,
+      commitSha,
     },
     "dev",
   );
@@ -865,8 +897,8 @@ export async function runLeitstandDevDeploy(
     data: {
       command: "leitstand.dev-deploy",
       systemId,
-      missionId: "",
-      commitSha: "",
+      missionId,
+      commitSha,
       buildState: deployResult.failingPhase === "build" ? "failed" : "succeeded",
       buildSkipped: deployResult.buildSkipped,
       deployState: deployResult.failingPhase ? "failed" : "succeeded",
@@ -1001,6 +1033,8 @@ export async function runLeitstandPropagate(
   const channelConfig = depConfig.channels.alt;
   const secretsFilePath = resolveSecretsFilePath(context.workspaceRoot, channelConfig);
 
+  const { missionId, commitSha } = await resolveMissionContext(context.workspaceRoot, systemId);
+
   const { executeDeployPhases } = await import("./deploy-execution.ts");
   const deployResult = await executeDeployPhases(
     {
@@ -1015,6 +1049,8 @@ export async function runLeitstandPropagate(
       operationId,
       gateDecisionPath,
       secretsFilePath,
+      missionId,
+      commitSha,
     },
     "alt",
   );

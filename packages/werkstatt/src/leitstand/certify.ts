@@ -11,6 +11,7 @@
 <item>RFC-0866: initial certify module with CertifyInput, CertifyResult, and runLeitstandCertify().</item>
 <item>RFC-0866 fix A-2/C-3: use writeFileIfChanged instead of fs.writeFile for gate-decision JSON.</item>
 <item>RFC-0866 fix D-2: read dev deployment URL from effect records, accept --base-url flag fallback.</item>
+<item>RFC-0866 audit: wire baseUrl into astro-mission-check producer handler — calls mission.check with --base-url when available, skips with warning when not.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -184,6 +185,61 @@ export async function runLeitstandCertify(
     execInput: ProducerExecutionInputV1,
   ): Promise<EvidenceEnvelopeV1> => {
     const evidenceId = `evidence-${execInput.producerId}-${now}`;
+    const diagnostics: Array<{
+      ruleId: string;
+      severity: "error" | "warning" | "info";
+      message: string;
+      evidence: Array<{ kind: "source" | "config" | "rule" | "rendered" | "cache" | "runtime" }>;
+    }> = [];
+
+    if (execInput.producerId === "astro-mission-check" && baseUrl) {
+      try {
+        const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
+        const result = await executeKernelCommand({
+          workspaceRoot: context.workspaceRoot,
+          commandName: "mission.check",
+          argv: [
+            `--site=${systemId}`,
+            "--external-preview",
+            `--base-url=${baseUrl}`,
+            "--no-report",
+          ],
+        });
+        const reports = Array.isArray(result) ? result : [result];
+        const failed = reports.find((r) => !r.ok || r.exitCode !== 0);
+        if (failed) {
+          diagnostics.push({
+            ruleId: "MISSION-CHECK-01",
+            severity: "error",
+            message: `mission.check exited with code ${failed.exitCode}`,
+            evidence: [],
+          });
+        } else {
+          diagnostics.push({
+            ruleId: "MISSION-CHECK-01",
+            severity: "info",
+            message: "mission.check passed",
+            evidence: [],
+          });
+        }
+      } catch (err) {
+        diagnostics.push({
+          ruleId: "MISSION-CHECK-01",
+          severity: "error",
+          message: `mission.check failed: ${err instanceof Error ? err.message : String(err)}`,
+          evidence: [],
+        });
+      }
+    } else if (execInput.producerId === "astro-mission-check" && !baseUrl) {
+      diagnostics.push({
+        ruleId: "MISSION-CHECK-01",
+        severity: "warning",
+        message:
+          "mission.check skipped — no dev deployment URL available (first deploy or no open mission)",
+        evidence: [],
+      });
+    }
+
     return {
       schema: "werkstatt/evidence-envelope@1",
       evidenceId,
@@ -195,7 +251,7 @@ export async function runLeitstandCertify(
         schema: "werkstatt/evidence-result@1",
         producerId: execInput.producerId,
         producerAttemptId: `${operationId}-0`,
-        diagnostics: [],
+        diagnostics,
         bindingHash: artifactHash,
         applicability: {
           appliesTo: execInput.profile.requirements
