@@ -2,53 +2,54 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 060-fiber-and-effect-runtime
-state: draft
+state: sealed
 governingDecision: RFC-0859
 decisionKind: rfc
 resolvedRfc: RFC-0859
 dependsOnPacket: 050-component-and-capability-contracts
-baseCommit: 85e403ecb201a9bd915b8cdf1c581d11852821c5
+baseCommit: cb8ebf18a8524cb0647c98877438f00875d45fcb
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md"
+  - path: docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md
     sha256: b9af6682df82d7bba4943a6ee144376c8e6010fb1a47e7eea495c09d669b761c
 allowedFiles:
-  - "packages/werkstatt/src/component-runtime/fiber.ts"
-  - "packages/werkstatt/src/component-runtime/lifecycle.ts"
-  - "packages/werkstatt/src/component-runtime/effects.ts"
-  - "packages/werkstatt/src/component-runtime/activation.ts"
-  - "packages/werkstatt/src/component-runtime/tests/**"
-  - "docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md"
-  - "docs/rfcs/verification/**"
-  - "docs/architecture-dna.md"
-  - "docs/requirements.xml"
-  - "docs/technology.xml"
-  - "docs/development-plan.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/verification-plan.xml"
-  - "docs/source-markup.xml"
-  - "AGENTS.md"
-  - "packages/AGENTS.md"
-  - "packages/werkstatt/AGENTS.md"
+  - packages/werkstatt/src/component-runtime/fiber.ts
+  - packages/werkstatt/src/component-runtime/lifecycle.ts
+  - packages/werkstatt/src/component-runtime/effects.ts
+  - packages/werkstatt/src/component-runtime/activation.ts
+  - packages/werkstatt/src/component-runtime/tests/**
+  - docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md
+  - docs/rfcs/verification/**
+  - docs/architecture-dna.md
+  - docs/requirements.xml
+  - docs/technology.xml
+  - docs/development-plan.xml
+  - docs/knowledge-graph.xml
+  - docs/verification-plan.xml
+  - docs/source-markup.xml
+  - AGENTS.md
+  - packages/AGENTS.md
+  - packages/werkstatt/AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0859"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0859
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 060: Fiber and effect runtime
 

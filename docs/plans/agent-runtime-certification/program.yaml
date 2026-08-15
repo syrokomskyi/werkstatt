@@ -77,12 +77,12 @@ packets:
   - order: 60
     packetId: 060-fiber-and-effect-runtime
     file: 060-fiber-and-effect-runtime.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0859
     decisionKind: rfc
     resolvedRfc: RFC-0859
     dependsOnPacket: 050-component-and-capability-contracts
-    baseCommit: 85e403ecb201a9bd915b8cdf1c581d11852821c5
+    baseCommit: cb8ebf18a8524cb0647c98877438f00875d45fcb
     sealCommit: null
     completion: null
   - order: 70
