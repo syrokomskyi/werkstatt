@@ -264,12 +264,12 @@ packets:
   - order: 230
     packetId: 230-combined-cutover
     file: 230-combined-cutover.md
-    state: draft
+    state: sealed
     governingDecision: werkstatt-release-certification/CERT-009
     decisionKind: spec-node
     resolvedRfc: null
     dependsOnPacket: 220-continuous-health-and-demotion
-    baseCommit: null
+    baseCommit: 9437bf6
     sealCommit: null
     completion: null
   - order: 240
