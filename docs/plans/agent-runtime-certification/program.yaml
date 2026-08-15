@@ -231,12 +231,12 @@ packets:
   - order: 200
     packetId: 200-evolution-controller
     file: 200-evolution-controller.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0864
     decisionKind: rfc
     resolvedRfc: RFC-0864
     dependsOnPacket: 190-capability-artifact-and-sandbox
-    baseCommit: null
+    baseCommit: 2791a247
     sealCommit: null
     completion: null
   - order: 210
