@@ -82,7 +82,7 @@ packets:
     decisionKind: rfc
     resolvedRfc: RFC-0859
     dependsOnPacket: 050-component-and-capability-contracts
-    baseCommit: null
+    baseCommit: 85e403ecb201a9bd915b8cdf1c581d11852821c5
     sealCommit: null
     completion: null
   - order: 70

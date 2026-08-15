@@ -7,12 +7,12 @@ governingDecision: RFC-0859
 decisionKind: rfc
 resolvedRfc: RFC-0859
 dependsOnPacket: 050-component-and-capability-contracts
-baseCommit: null
+baseCommit: 85e403ecb201a9bd915b8cdf1c581d11852821c5
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md"
-    sha256: 3271a3453211789989ad26e74af9b40ed845e123aec48d1195422c2a0b0eb642
+    sha256: b9af6682df82d7bba4943a6ee144376c8e6010fb1a47e7eea495c09d669b761c
 allowedFiles:
   - "packages/werkstatt/src/component-runtime/fiber.ts"
   - "packages/werkstatt/src/component-runtime/lifecycle.ts"
