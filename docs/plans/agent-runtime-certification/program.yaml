@@ -149,17 +149,17 @@ packets:
     resolvedRfc: RFC-0851
     dependsOnPacket: 110-deterministic-evaluation
     baseCommit: 823ff8ee8b67c80ee85666597df2d010ed432734
-    sealCommit: null
-    completion: null
+    sealCommit: 35763b2a008d21b2ddd555611f16b1e6aee3c4d8
+    completion: 51d2760c0e74c5b50e1e62fc907d91d9bc6b0365
   - order: 130
     packetId: 130-foundation-integration
     file: 130-foundation-integration.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0848
     decisionKind: rfc
     resolvedRfc: RFC-0848
     dependsOnPacket: 120-forward-only-state-reset
-    baseCommit: null
+    baseCommit: 51d2760c0e74c5b50e1e62fc907d91d9bc6b0365
     sealCommit: null
     completion: null
   - order: 140

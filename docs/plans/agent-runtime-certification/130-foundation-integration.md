@@ -2,7 +2,7 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 130-foundation-integration
-state: draft
+state: sealed
 governingDecision: RFC-0848
 decisionKind: rfc
 resolvedRfc: RFC-0848
