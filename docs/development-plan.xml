@@ -496,6 +496,13 @@
           Implement `packages/werkstatt/src/certification/deployment/authority.ts` with deployment gate requirements (no force/skip/waiver/grace), deployment authorization (gate decision pass, artifact readiness, durable sync for Alt/Main), main verification (post-switch certification with durable sync), rollback evaluation (shared outage detection, artifact readiness, same-candidate denial), crash recovery (resume-verification, restart-deployment, quarantine actions with ambiguous state detection), and deployment effect records (deterministic hash). 42 tests covering gate requirements, authorization with all bypass rejections, main verification, rollback evaluation, crash recovery scenarios, effect record hashing, and utility functions.
         </description>
       </deliverable>
+      <deliverable id="del-220">
+        <name>CERT-008: Continuous health and demotion</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/certification/health/monitor.ts` with health evaluation (current/degraded/revoked based on requirement results), revocation threshold, drift cause classification (shared outage, expired evidence, candidate regression, public output drift, late evidence), schedule window idempotency (duplicate detection, late delivery rejection), health decision builder, health projection (deterministic hash), monitor crash recovery (resume from requirements/health-decision/incident/projection/complete), and health transition validation. 44 tests covering health evaluation, revocation, drift classification, schedule windows, health decisions, projections, crash recovery, and transition validity.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
