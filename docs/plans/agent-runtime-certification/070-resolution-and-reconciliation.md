@@ -7,12 +7,12 @@ governingDecision: RFC-0860
 decisionKind: rfc
 resolvedRfc: RFC-0860
 dependsOnPacket: 060-fiber-and-effect-runtime
-baseCommit: null
+baseCommit: 9cac732d487fd7f7205061dec37e93ace474c9b6
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
   - path: "docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md"
-    sha256: f98c196687b90aa09d5d89a89b34f2bbb1011123c4c80b9cad325c11f9c91181
+    sha256: f27605f68f70e74efe7973b76d3b4341c3d82b128d439ade4206a9c06e4adb4d
 allowedFiles:
   - "packages/werkstatt/src/component-runtime/resolver.ts"
   - "packages/werkstatt/src/component-runtime/reconciliation.ts"
