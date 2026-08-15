@@ -121,12 +121,12 @@ packets:
   - order: 100
     packetId: 100-certification-contracts-and-identities
     file: 100-certification-contracts-and-identities.md
-    state: draft
+    state: sealed
     governingDecision: RFC-0853
     decisionKind: rfc
     resolvedRfc: RFC-0853
     dependsOnPacket: 090-isolation-contract
-    baseCommit: bf2a20d5e7fb2f230133527075818d2a9c86c9c7
+    baseCommit: 25ea6b44ffd8034866aa8a838547dcaa486e9545
     sealCommit: null
     completion: null
   - order: 110

@@ -2,63 +2,64 @@
 schema: forge/program-packet@1
 program: RFC-0855
 packetId: 100-certification-contracts-and-identities
-state: draft
+state: sealed
 governingDecision: RFC-0853
 decisionKind: rfc
 resolvedRfc: RFC-0853
 dependsOnPacket: 090-isolation-contract
-baseCommit: bf2a20d5e7fb2f230133527075818d2a9c86c9c7
+baseCommit: 25ea6b44ffd8034866aa8a838547dcaa486e9545
 branch: program/agent-runtime-certification-cutover
 steward: human:andrii-syrokomskyi
 normativeSources:
-  - path: "docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md"
+  - path: docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md
     sha256: fac15be9a45718f86fc039a411ddd059be9db1999bf13ce7449e1789030a15f2
 allowedFiles:
-  - "packages/werkstatt/src/certification/contracts/identifiers.ts"
-  - "packages/werkstatt/src/certification/contracts/candidate.ts"
-  - "packages/werkstatt/src/certification/contracts/policy-bundle.ts"
-  - "packages/werkstatt/src/certification/contracts/evidence.ts"
-  - "packages/werkstatt/src/certification/contracts/dossier.ts"
-  - "packages/werkstatt/src/certification/contracts/decisions.ts"
-  - "packages/werkstatt/src/certification/contracts/action-pack.ts"
-  - "packages/werkstatt/src/certification/contracts/authority.ts"
-  - "packages/werkstatt/src/certification/contracts/state.ts"
-  - "packages/werkstatt/src/certification/contracts/index.ts"
-  - "packages/werkstatt/src/certification/identity.ts"
-  - "packages/werkstatt/src/certification/index.ts"
-  - "packages/werkstatt/src/tests/certification-contracts.test.ts"
-  - "packages/werkstatt/src/tests/certification-identity.pbt.test.ts"
-  - "packages/werkstatt/package.json"
-  - "packages/AGENTS.md"
-  - "packages/werkstatt/AGENTS.md"
-  - "docs/technology.xml"
-  - "docs/knowledge-graph.xml"
-  - "docs/source-markup.xml"
-  - "docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md"
-  - "docs/rfcs/verification/**"
-  - "docs/architecture-dna.md"
-  - "docs/requirements.xml"
-  - "docs/development-plan.xml"
-  - "docs/verification-plan.xml"
-  - "AGENTS.md"
+  - packages/werkstatt/src/certification/contracts/identifiers.ts
+  - packages/werkstatt/src/certification/contracts/candidate.ts
+  - packages/werkstatt/src/certification/contracts/policy-bundle.ts
+  - packages/werkstatt/src/certification/contracts/evidence.ts
+  - packages/werkstatt/src/certification/contracts/dossier.ts
+  - packages/werkstatt/src/certification/contracts/decisions.ts
+  - packages/werkstatt/src/certification/contracts/action-pack.ts
+  - packages/werkstatt/src/certification/contracts/authority.ts
+  - packages/werkstatt/src/certification/contracts/state.ts
+  - packages/werkstatt/src/certification/contracts/index.ts
+  - packages/werkstatt/src/certification/identity.ts
+  - packages/werkstatt/src/certification/index.ts
+  - packages/werkstatt/src/tests/certification-contracts.test.ts
+  - packages/werkstatt/src/tests/certification-identity.pbt.test.ts
+  - packages/werkstatt/package.json
+  - packages/AGENTS.md
+  - packages/werkstatt/AGENTS.md
+  - docs/technology.xml
+  - docs/knowledge-graph.xml
+  - docs/source-markup.xml
+  - docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md
+  - docs/rfcs/verification/**
+  - docs/architecture-dna.md
+  - docs/requirements.xml
+  - docs/development-plan.xml
+  - docs/verification-plan.xml
+  - AGENTS.md
 forbiddenFiles:
-  - "missions/**"
-  - "../systems-cache/**"
-  - ".git/**"
-  - ".forge/program-leases/**"
-  - "docs/specs/werkstatt-release-certification/*.md"
+  - missions/**
+  - ../systems-cache/**
+  - .git/**
+  - .forge/program-leases/**
+  - docs/specs/werkstatt-release-certification/*.md
 permittedTransitionDiagnostics: []
 requiredValidations:
-  - command: "pnpm --filter @warpgogol/werkstatt test"
+  - command: pnpm --filter @warpgogol/werkstatt test
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm --filter @warpgogol/werkstatt build"
+  - command: pnpm --filter @warpgogol/werkstatt build
     expectedStatus: pass
     expectedDiagnostics: []
-  - command: "pnpm exec werkstatt run rfc.validate --id RFC-0853"
+  - command: pnpm exec werkstatt run rfc.validate --id RFC-0853
     expectedStatus: pass
     expectedDiagnostics: []
 ---
+
 
 # Packet 100: Certification contracts and identities
 
