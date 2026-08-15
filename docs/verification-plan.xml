@@ -482,5 +482,9 @@
       <change-type>CERT-006 independent evaluator agents and qualitative consensus changes</change-type>
       <expectation>Run `vitest` on `certification-evaluators.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify evaluator registry rejects duplicates; risk routing classifies ordinary/critical/borderline with correct evaluator counts; isolation rejects self-review and duplicate identities; consensus aggregation returns pass/fail/incomplete correctly; payload validation rejects bundle hash mismatch, rubric mismatch, out-of-range confidence, unknown criteria, and empty rationale; evaluator execution rejects isolation violations, unregistered evaluators, crashes, and invalid payloads; coverage manifest builds from routes/states/viewports and evidence.</expectation>
     </entry>
+    <entry id="vm-27">
+      <change-type>RFC-0863 capability artifact and sandbox implementation changes</change-type>
+      <expectation>Run `vitest` on `capability-artifact-and-sandbox.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `rfc.validate --id RFC-0863`. Verify artifact store rejects oversized artifacts, unallowed media types, and duplicate publication; hash verification detects missing artifacts and payload mismatches; provider admission store rejects non-pass decisions and stale conformance hashes; capability broker rejects ambient host capabilities and duplicate registrations; broker enforces policy, grants, size limits, and concurrency; audit entries are recorded for all invocations; fake sandbox adapter creates workloads, handles invoke/terminate lifecycle, and rejects invocations after termination.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

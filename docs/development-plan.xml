@@ -475,6 +475,13 @@
           Implement `packages/werkstatt/src/certification/evaluators/` with evaluator registry (duplicate rejection), risk routing (ordinary/critical/borderline with dimension-matched rules), evaluator isolation (self-review and duplicate identity rejection), consensus aggregation (pass/pass, fail/fail, disagreement → incomplete), payload validation (bundle hash, rubric, confidence, criterion/rationale), evaluator execution with isolation/validation/consensus, and coverage manifest building from deterministic evidence. 28 tests covering registration, risk routing, isolation, consensus, validation, execution, and coverage manifest.
         </description>
       </deliverable>
+      <deliverable id="del-190">
+        <name>RFC-0863: Capability artifact and sandbox implementation</name>
+        <status>done</status>
+        <description>
+          Implement `packages/werkstatt/src/capability-artifacts/` with immutable content-addressed artifact store (size/media-type policy, immutability, hash verification) and provider admission store (pass-only, stale conformance rejection). Implement `packages/werkstatt/src/isolation/broker/` with deny-by-default capability bridge (ambient host access rejection, policy/grant enforcement, size/concurrency limits, redacted audit). Implement `packages/werkstatt/src/isolation/providers/` with fake sandbox adapter implementing IsolationAdapterV1 with all 12 required property evidence. 30 tests covering artifact publish/verify, provider admission, broker registration/invocation/denial, and sandbox workload lifecycle.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
