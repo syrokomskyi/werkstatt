@@ -466,5 +466,9 @@
       <change-type>CERT-002 certification profile schema/validation/hash changes</change-type>
       <expectation>Run `vitest` on `certification-profile.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. All must pass with zero unexpected diagnostics.</expectation>
     </entry>
+    <entry id="vm-23">
+      <change-type>CERT-003 authority and durable storage changes</change-type>
+      <expectation>Run `vitest` on `certification-authority.test.ts` and `certification-storage.test.ts`, `tsc --noEmit` for `@warpgogol/werkstatt`, and `spec.validate --spec=werkstatt-release-certification`. Verify issuer registry rejects conflicting keys, attestation verification rejects unregistered issuers and key mismatches, dossier repository rejects chain breaks, root hash is location-independent, retention GC respects protected references and age thresholds, and durable replica verification rejects root hash mismatch.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>

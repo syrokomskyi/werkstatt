@@ -437,6 +437,23 @@
           invariance, and all validation failure modes.
         </description>
       </deliverable>
+      <deliverable id="del-150">
+        <name>CERT-003 Authority and durable storage</name>
+        <status>implemented</status>
+        <description>
+          Created `packages/werkstatt/src/certification/authority/` with issuer
+          registry, attestation verification, signed decision/root verification.
+          Created `packages/werkstatt/src/certification/storage/` with
+          content-addressed dossier repository (append-only event chain, chain
+          break detection, root hash recomputation), provider-neutral storage
+          adapter interface, in-memory adapter, stored-object verification,
+          retention GC with protected references, tombstones, and durable
+          replica verification. 36 tests covering issuer registration,
+          attestation/decision/root verification, storage put/get/head,
+          dossier append/chain/integrity, retention GC, tombstones, and
+          durable replica verification.
+        </description>
+      </deliverable>
     </phase>
 
     <phase id="phase-4">
