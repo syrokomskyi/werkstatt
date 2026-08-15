@@ -1,7 +1,20 @@
 command: rfc.index.generate
-generatedAt: 2026-08-14
-count: 817
+generatedAt: 2026-08-15
+count: 846
 entries:
+  - id: ""
+    title: ""
+    status: ""
+    kind: ""
+    createdAt: ""
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related: []
+    file: docs/rfcs/decision-log.generated.md
   - id: RFC-0001
     title: Introduce RFC governance process
     status: implemented
@@ -3842,6 +3855,7 @@ entries:
     amends: []
     amendedBy:
       - RFC-0233
+      - RFC-0852
     related:
       - RFC-0029
       - RFC-0030
@@ -6000,10 +6014,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0304-introduce-backs-workspaces-and-check-webgogol-runner-backend.md
   - id: RFC-0305
     title: Connect Matomo through a first-party analytics proxy and Messkanon
-    status: accepted
+    status: implemented
     kind: architecture
     createdAt: 2026-07-05
-    implementedAt: ""
+    implementedAt: 2026-08-14
     closedAt: ""
     supersedes:
       - RFC-0170
@@ -6025,7 +6039,7 @@ entries:
       - RFC-0282
       - RFC-0284
       - RFC-0304
-    file: docs/rfcs/rfc-0305-connect-matomo-through-first-party-analytics-proxy-and-messkanon.md
+    file: docs/rfcs/archive/implemented/rfc-0305-connect-matomo-through-first-party-analytics-proxy-and-messkanon.md
   - id: RFC-0306
     title: Switch per-page Markdown twins from /route/index.md to sibling /route.md
       URLs
@@ -7065,7 +7079,7 @@ entries:
     implementedAt: 2026-07-10
     closedAt: ""
     supersedes: []
-    supersededBy: ""
+    supersededBy: RFC-0851
     amends:
       - RFC-0221
     amendedBy:
@@ -7094,7 +7108,7 @@ entries:
     implementedAt: 2026-07-10
     closedAt: ""
     supersedes: []
-    supersededBy: ""
+    supersededBy: RFC-0851
     amends: []
     amendedBy:
       - RFC-0362
@@ -12014,7 +12028,7 @@ entries:
     implementedAt: 2026-07-30
     closedAt: ""
     supersedes: []
-    supersededBy: ""
+    supersededBy: RFC-0851
     amends:
       - RFC-0358
     amendedBy:
@@ -12335,7 +12349,7 @@ entries:
     implementedAt: 2026-07-31
     closedAt: ""
     supersedes: []
-    supersededBy: ""
+    supersededBy: RFC-0851
     amends:
       - RFC-0608
     amendedBy:
@@ -12358,7 +12372,7 @@ entries:
     implementedAt: 2026-07-31
     closedAt: ""
     supersedes: []
-    supersededBy: ""
+    supersededBy: RFC-0851
     amends:
       - RFC-0627
     amendedBy:
@@ -14477,7 +14491,8 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0846
     related:
       - RFC-0657
       - RFC-0649
@@ -14865,13 +14880,13 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0768-add-scroll-to-top-floating-button-component.md
   - id: RFC-0769
     title: Werkstatt engine program charter and terminology
-    status: implemented
+    status: superseded
     kind: architecture
     createdAt: 2026-08-09
     implementedAt: 2026-08-09
-    closedAt: ""
+    closedAt: 2026-08-15
     supersedes: []
-    supersededBy: ""
+    supersededBy: RFC-0855
     amends: []
     amendedBy: []
     related:
@@ -14879,23 +14894,23 @@ entries:
       - DNA-2
       - RFC-0398
       - RFC-0574
-    file: docs/rfcs/archive/implemented/rfc-0769-werkstatt-engine-program-charter-and-terminology.md
+    file: docs/rfcs/archive/superseded/rfc-0769-werkstatt-engine-program-charter-and-terminology.md
   - id: RFC-0770
     title: Werkstatt plugin contract and stack profile binding
-    status: implemented
+    status: superseded
     kind: contract
     createdAt: 2026-08-09
     implementedAt: 2026-08-09
-    closedAt: ""
+    closedAt: 2026-08-15
     supersedes: []
-    supersededBy: ""
+    supersededBy: RFC-0855
     amends: []
     amendedBy: []
     related:
       - RFC-0769
       - RFC-0392
       - DNA-54
-    file: docs/rfcs/archive/implemented/rfc-0770-werkstatt-plugin-contract-and-stack-profile-binding.md
+    file: docs/rfcs/archive/superseded/rfc-0770-werkstatt-plugin-contract-and-stack-profile-binding.md
   - id: RFC-0771
     title: Werkstatt engine core package composition
     status: implemented
@@ -16043,29 +16058,13 @@ entries:
       - RFC-0087
       - RFC-0830
     file: docs/rfcs/archive/implemented/rfc-0834-commit-generated-variant-manifests-for-drift-detection.md
-  - id: RFC-0834
-    title: Add component-level WCAG 2.5.3 Label in Name validator
-    status: draft
-    kind: architecture
-    createdAt: 2026-08-13
-    implementedAt: ""
-    closedAt: ""
-    supersedes: []
-    supersededBy: ""
-    amends: []
-    amendedBy: []
-    related:
-      - RFC-0832
-      - ADR-0047
-      - DNA-67
-    file: docs/rfcs/rfc-0834-add-component-level-wcag-2-5-3-label-in-name-validator.md
   - id: RFC-0835
     title: Add regression tests for LH-12 ignore patterns and IMG-DELIVERY-04
       404.html exemption
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-13
-    implementedAt: ""
+    implementedAt: 2026-08-14
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16076,4 +16075,560 @@ entries:
       - ADR-0046
       - RFC-0833
       - RFC-0830
-    file: docs/rfcs/rfc-0835-add-regression-tests-for-lh-12-ignore-and-img-delivery-04-404-exemption.md
+    file: docs/rfcs/archive/implemented/rfc-0835-add-regression-tests-for-lh-12-ignore-and-img-delivery-04-404-exemption.md
+  - id: RFC-0836
+    title: Add component-level WCAG 2.5.3 Label in Name validator
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-13
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0832
+      - ADR-0047
+      - DNA-67
+    file: docs/rfcs/archive/implemented/rfc-0836-add-component-level-wcag-2-5-3-label-in-name-validator.md
+  - id: RFC-0837
+    title: Add static CSS analysis for mobile layout anti-patterns
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-10
+      - DNA-67
+      - RFC-0838
+      - RFC-0839
+    file: docs/rfcs/archive/implemented/rfc-0837-add-static-css-analysis-for-mobile-layout-issues.md
+  - id: RFC-0838
+    title: Add Playwright mobile layout stability checks
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy:
+      - RFC-0843
+    related:
+      - DNA-66
+      - DNA-67
+      - DNA-68
+      - RFC-0837
+      - RFC-0839
+    file: docs/rfcs/archive/implemented/rfc-0838-add-playwright-mobile-layout-stability-checks.md
+  - id: RFC-0839
+    title: Add Axiom post-deploy mobile layout monitoring
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-66
+      - DNA-67
+      - DNA-68
+      - DNA-69
+      - RFC-0837
+      - RFC-0838
+    file: docs/rfcs/archive/implemented/rfc-0839-add-axiom-post-deploy-mobile-layout-monitoring.md
+  - id: RFC-0840
+    title: Preserve root-level operator config files during materialization
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy:
+      - RFC-0844
+    related:
+      - DNA-44
+      - DNA-62
+      - RFC-0822
+      - RFC-0830
+      - RFC-0833
+    file: docs/rfcs/archive/implemented/rfc-0840-preserve-root-level-config-files-during-materialization.md
+  - id: RFC-0841
+    title: Add image-delivery.config.yaml location diagnostic
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-62
+      - RFC-0830
+      - RFC-0840
+    file: docs/rfcs/archive/implemented/rfc-0841-add-image-delivery-config-location-diagnostic.md
+  - id: RFC-0842
+    title: Enforce sequential deployment pipeline (Dev → Alt → Main)
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: RFC-0851
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-62
+      - RFC-0628
+      - RFC-0608
+    file: docs/rfcs/archive/implemented/rfc-0842-enforce-sequential-deployment-pipeline.md
+  - id: RFC-0843
+    title: Amend mobile.layout.check — robust Playwright navigation and type-safe
+      evaluate
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0838
+    amendedBy: []
+    related:
+      - DNA-69
+      - RFC-0838
+      - RFC-0647
+    file: docs/rfcs/archive/implemented/rfc-0843-amend-mobile-layout-check-robust-playwright-navigation-and-type-safe-evaluate.md
+  - id: RFC-0844
+    title: Pre-build operator config presence check — fail fast before expensive
+      build cycle
+    status: implemented
+    kind: command
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0840
+    amendedBy: []
+    related:
+      - DNA-71
+      - RFC-0840
+      - RFC-0833
+      - RFC-0830
+    file: docs/rfcs/archive/implemented/rfc-0844-pre-build-operator-config-presence-check.md
+  - id: RFC-0845
+    title: Extend Playwright pre-flight to release.prepare and add download retry
+    status: implemented
+    kind: command
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0647
+      - RFC-0813
+    file: docs/rfcs/archive/implemented/rfc-0845-extend-playwright-preflight-to-release-prepare-and-add-download-retry.md
+  - id: RFC-0846
+    title: Health check retry with backoff for leitstand.dev-deploy
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0747
+    amendedBy: []
+    related:
+      - RFC-0724
+      - RFC-0747
+    file: docs/rfcs/archive/implemented/rfc-0846-health-check-retry-with-backoff-for-leitstand-dev-deploy.md
+  - id: RFC-0847
+    title: Cross-reference proxyBaseUrl hostname against service subdomain registry
+    status: implemented
+    kind: command
+    createdAt: 2026-08-14
+    implementedAt: 2026-08-14
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0305
+      - RFC-0752
+      - RFC-0753
+      - RFC-0831
+    file: docs/rfcs/archive/implemented/rfc-0847-cross-reference-proxyBaseUrl-hostname-against-service-subdomain-registry.md
+  - id: RFC-0848
+    title: Establish the core certification domain and deterministic decisions
+    status: draft
+    kind: contract
+    createdAt: 2026-08-14
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-48
+      - DNA-49
+      - DNA-51
+      - DNA-52
+      - DNA-73
+      - RFC-0362
+      - RFC-0363
+      - RFC-0849
+      - RFC-0852
+      - RFC-0853
+      - RFC-0850
+      - RFC-0851
+      - RFC-0855
+      - RFC-0858
+      - RFC-0859
+      - RFC-0860
+      - RFC-0861
+      - RFC-0862
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md
+  - id: RFC-0849
+    title: Establish bounded canonical JSON identity bytes
+    status: draft
+    kind: contract
+    createdAt: 2026-08-14
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0364
+      - RFC-0776
+      - RFC-0848
+      - RFC-0852
+      - RFC-0853
+      - RFC-0854
+    file: docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md
+  - id: RFC-0850
+    title: Implement deterministic certification evaluation and remediation
+    status: draft
+    kind: contract
+    createdAt: 2026-08-14
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0362
+      - RFC-0848
+      - RFC-0849
+      - RFC-0852
+      - RFC-0853
+      - RFC-0855
+      - RFC-0860
+      - RFC-0861
+      - RFC-0862
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md
+  - id: RFC-0851
+    title: Replace legacy release state with deployment operations
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-14
+    implementedAt: ""
+    closedAt: ""
+    supersedes:
+      - RFC-0357
+      - RFC-0358
+      - RFC-0608
+      - RFC-0627
+      - RFC-0628
+      - RFC-0842
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0379
+      - RFC-0649
+      - RFC-0650
+      - RFC-0698
+      - RFC-0700
+      - RFC-0724
+      - RFC-0829
+      - RFC-0848
+      - RFC-0849
+      - RFC-0852
+      - RFC-0853
+      - RFC-0855
+      - RFC-0860
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0851-replace-legacy-release-state-with-deployment-operations.md
+  - id: RFC-0852
+    title: Move canonical Diagnostic ownership into the engine
+    status: draft
+    kind: contract
+    createdAt: 2026-08-14
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0203
+    amendedBy: []
+    related:
+      - RFC-0247
+      - RFC-0776
+      - RFC-0848
+      - RFC-0849
+      - RFC-0853
+    file: docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md
+  - id: RFC-0853
+    title: Define strict certification contracts and identity builders
+    status: draft
+    kind: contract
+    createdAt: 2026-08-14
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0203
+      - RFC-0364
+      - RFC-0776
+      - RFC-0848
+      - RFC-0849
+      - RFC-0850
+      - RFC-0851
+      - RFC-0852
+      - RFC-0855
+      - RFC-0858
+      - RFC-0859
+      - RFC-0860
+      - RFC-0861
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md
+  - id: RFC-0854
+    title: Standardize the ecosystem on Node 24
+    status: draft
+    kind: policy
+    createdAt: 2026-08-14
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0543
+      - RFC-0704
+      - RFC-0779
+      - RFC-0849
+    file: docs/rfcs/rfc-0854-standardize-the-ecosystem-on-node-24.md
+  - id: RFC-0855
+    title: Establish the authority-first agent-native runtime and certification
+      program
+    status: accepted
+    kind: architecture
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes:
+      - RFC-0769
+      - RFC-0770
+    supersededBy: ""
+    amends: []
+    amendedBy:
+      - RFC-0857
+    related:
+      - RFC-0848
+      - RFC-0849
+      - RFC-0850
+      - RFC-0851
+      - RFC-0852
+      - RFC-0853
+      - RFC-0854
+      - RFC-0856
+      - RFC-0858
+      - RFC-0859
+      - RFC-0860
+      - RFC-0861
+      - RFC-0862
+      - RFC-0863
+      - RFC-0864
+      - werkstatt-release-certification/overview#target-architecture
+      - werkstatt-release-certification/roadmap#implementation-roadmap
+      - werkstatt-release-certification/ADR-003
+      - werkstatt-release-certification/ADR-005
+    file: docs/rfcs/rfc-0855-establish-the-authority-first-agent-native-runtime-and-certification-program.md
+  - id: RFC-0856
+    title: Establish the governed program packet control plane
+    status: accepted
+    kind: contract
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy:
+      - RFC-0857
+    related:
+      - RFC-0855
+      - RFC-0556
+    file: docs/rfcs/rfc-0856-establish-the-governed-program-packet-control-plane.md
+  - id: RFC-0857
+    title: Make release-certification RFC materialization just-in-time
+    status: accepted
+    kind: policy
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0855
+      - RFC-0856
+    amendedBy: []
+    related:
+      - RFC-0396
+      - RFC-0397
+      - werkstatt-release-certification/CERT-001
+      - werkstatt-release-certification/CERT-002
+      - werkstatt-release-certification/CERT-010
+    file: docs/rfcs/rfc-0857-make-release-certification-rfc-materialization-just-in-time.md
+  - id: RFC-0858
+    title: Establish versioned component and capability contracts
+    status: draft
+    kind: contract
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0855
+      - RFC-0856
+      - RFC-0857
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md
+  - id: RFC-0859
+    title: Establish the lifecycle fiber and effect runtime
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0855
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md
+  - id: RFC-0860
+    title: Establish deterministic component resolution and reconciliation
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0855
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md
+  - id: RFC-0861
+    title: Establish runtime reflection and the conformance harness
+    status: draft
+    kind: contract
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0855
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
+  - id: RFC-0862
+    title: Establish the provider-neutral isolation contract
+    status: draft
+    kind: contract
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0855
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md
+  - id: RFC-0863
+    title: Establish capability artifacts and the first real sandbox
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0855
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0863-establish-capability-artifacts-and-the-first-real-sandbox.md
+  - id: RFC-0864
+    title: Establish the governed capability evolution controller
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-15
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0855
+      - werkstatt-release-certification/AMD-007
+    file: docs/rfcs/rfc-0864-establish-the-governed-capability-evolution-controller.md
