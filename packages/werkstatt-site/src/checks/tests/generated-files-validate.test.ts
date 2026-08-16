@@ -270,4 +270,31 @@ describe("generated.files.validate conditional entries (RFC-0817)", () => {
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it("ADR-0048: behavior.snapshot.generated.yaml is conditional and does NOT produce GEN-FILES-01 when absent", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-files-adr0048-"));
+    try {
+      const result = await runGeneratedFilesValidate(input, ctx(root));
+      const diagnostics = (result.data?.diagnostics ?? []) as Array<{
+        message: string;
+        ruleId: string;
+        file?: string;
+      }>;
+
+      // behavior.snapshot.generated.yaml must be conditional:true (ADR-0048).
+      // Its generator (behavior.snapshot.generate) runs in build.post, not
+      // build.prepare — so the file does not exist during build.prepare.
+      // Without conditional:true, generated.files.validate reports a false
+      // GEN-FILES-01 on the first mission.validate after materialization.
+      const snapshotDiags = diagnostics.filter(
+        (d) =>
+          d.ruleId === "GEN-FILES-01" &&
+          (d.message.includes("behavior.snapshot.generated.yaml") ||
+            (d.file && d.file.includes("behavior.snapshot.generated.yaml"))),
+      );
+      expect(snapshotDiags).toHaveLength(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
 });

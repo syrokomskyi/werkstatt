@@ -725,10 +725,15 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   },
 
   // RFC-0269: Behavior snapshot — deterministic projection of public behavior surface.
+  // ADR-0048: conditional:true because behavior.snapshot.generate runs in build.post
+  // (after Astro build), not build.prepare. Without conditional, generated.files.validate
+  // (which runs in build.prepare) reports GEN-FILES-01 for this missing file on the first
+  // mission.validate after materialization.
   {
     path: "behavior.snapshot.generated.yaml",
     command: "behavior.snapshot.generate",
     module: "packages/werkstatt-site/src/checks/behavior-snapshot.ts",
+    conditional: true,
   },
 
   // RFC-0257 / RFC-0653: PDF generation via Playwright (cache output, conditional).
