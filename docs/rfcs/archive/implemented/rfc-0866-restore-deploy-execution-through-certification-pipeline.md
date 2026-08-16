@@ -22,7 +22,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0867
 related:
   - DNA-49
   - DNA-73
