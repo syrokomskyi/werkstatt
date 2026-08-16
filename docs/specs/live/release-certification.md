@@ -14,6 +14,9 @@ history:
   - rfc: RFC-0848
     mergedAt: 2026-08-16
     operation: modified
+  - rfc: RFC-0848
+    mergedAt: 2026-08-16
+    operation: modified
 ---
 
 <!--
@@ -31,6 +34,7 @@ history:
 
 
 
+
 | Order | RFC | One-session responsibility | Completion boundary |
 | --: | --- | --- | --- |
 | 1 | RFC-0849 | bounded canonical snapshot, bytes, hash, Unicode and resource limits | engine fingerprint tests/fixtures and DNA-53 correction pass |
@@ -42,6 +46,7 @@ history:
 
 RFC-0850 must complete before RFC-0851; both follow RFC-0853 and the component-runtime prerequisites declared in their frontmatter. Each child receives its own audit, architecture acceptance, plan, implementation, review, and fix cycle. RFC-0848 receives no child code changes except corrections required by an actual integration defect; such a defect is fixed in its owning child module and verified here.
 ### CLI surface
+
 
 
 
@@ -72,6 +77,7 @@ bash scripts/check-clean-trees.sh
 
 
 
+
 The integration suite uses only public child APIs and synthetic fixtures. It proves:
 
 1. all Diagnostic and certification values are parsed by RFC-0852/RFC-0853 and snapshotted by RFC-0849 before identity/evaluation/state use;
@@ -88,10 +94,12 @@ The integration suite uses only public child APIs and synthetic fixtures. It pro
 
 
 
+
 Integration imports RFC-0849's 8 MiB/depth-64 canonical bounds and RFC-0850's limits of 1,000 requirements, 10,000 admitted evidence records, and 1,000 action tasks. Selection/aggregation remains `O(E + R log R)` time and `O(E + R)` memory; integration must not wrap it in a per-requirement scan.
 
 All required schema, identity, aggregation, legacy, and transition diagnostics have zero intended false positives and no suppression/bypass. A confirmed defect is corrected in the owning spec/profile/producer/RFC and forces new identity/evidence as applicable. Until correction, the outcome remains invalid or `incomplete`, never pass. Advisory diagnostics may later have profile-governed suppressions; CERT-001 defines none.
 ### Integration file responsibilities
+
 
 
 
@@ -107,6 +115,7 @@ All required schema, identity, aggregation, legacy, and transition diagnostics h
 
 The integration RFC does not edit mission workpieces, Sternsystem mirrors, releases, provider state, object storage, or the public site.
 ### Exact Compass and agent-document map
+
 
 
 
@@ -131,10 +140,12 @@ Generated projections are updated from owners: `command.manifest.generate` then 
 
 
 
+
 The integration suite produces ordinary Vitest results; it defines no runtime JSON protocol. Runtime output contracts are owned by the children. An integration failure names the violated cross-module law and owning RFC/module so a weaker agent fixes the source rather than adding a bridge.
 
 Stable integration-only test labels use `CERT-INTEGRATION-*`; production code must not emit them. Any mismatch fails CI/tests. There is no warn mode, suppression file, migration allowance, or “expected legacy pass.”
 ### Failure modes
+
 
 
 

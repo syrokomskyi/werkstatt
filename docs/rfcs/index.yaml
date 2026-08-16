@@ -1,6 +1,6 @@
 command: rfc.index.generate
-generatedAt: 2026-08-15
-count: 846
+generatedAt: 2026-08-16
+count: 849
 entries:
   - id: ""
     title: ""
@@ -16285,10 +16285,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0847-cross-reference-proxyBaseUrl-hostname-against-service-subdomain-registry.md
   - id: RFC-0848
     title: Establish the core certification domain and deterministic decisions
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-14
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16314,13 +16314,13 @@ entries:
       - RFC-0861
       - RFC-0862
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md
+    file: docs/rfcs/archive/implemented/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md
   - id: RFC-0849
     title: Establish bounded canonical JSON identity bytes
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-14
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16333,13 +16333,13 @@ entries:
       - RFC-0852
       - RFC-0853
       - RFC-0854
-    file: docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md
+    file: docs/rfcs/archive/implemented/rfc-0849-establish-bounded-canonical-json-identity-bytes.md
   - id: RFC-0850
     title: Implement deterministic certification evaluation and remediation
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-14
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16356,13 +16356,13 @@ entries:
       - RFC-0861
       - RFC-0862
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md
+    file: docs/rfcs/archive/implemented/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md
   - id: RFC-0851
     title: Replace legacy release state with deployment operations
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-14
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes:
       - RFC-0357
@@ -16389,13 +16389,13 @@ entries:
       - RFC-0855
       - RFC-0860
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0851-replace-legacy-release-state-with-deployment-operations.md
+    file: docs/rfcs/archive/implemented/rfc-0851-replace-legacy-release-state-with-deployment-operations.md
   - id: RFC-0852
     title: Move canonical Diagnostic ownership into the engine
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-14
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16408,13 +16408,13 @@ entries:
       - RFC-0848
       - RFC-0849
       - RFC-0853
-    file: docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md
+    file: docs/rfcs/archive/implemented/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md
   - id: RFC-0853
     title: Define strict certification contracts and identity builders
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-14
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16435,13 +16435,13 @@ entries:
       - RFC-0860
       - RFC-0861
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md
+    file: docs/rfcs/archive/implemented/rfc-0853-define-strict-certification-contracts-and-identity-builders.md
   - id: RFC-0854
     title: Standardize the ecosystem on Node 24
-    status: draft
+    status: implemented
     kind: policy
     createdAt: 2026-08-14
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16452,7 +16452,7 @@ entries:
       - RFC-0704
       - RFC-0779
       - RFC-0849
-    file: docs/rfcs/rfc-0854-standardize-the-ecosystem-on-node-24.md
+    file: docs/rfcs/archive/implemented/rfc-0854-standardize-the-ecosystem-on-node-24.md
   - id: RFC-0855
     title: Establish the authority-first agent-native runtime and certification
       program
@@ -16488,13 +16488,13 @@ entries:
       - werkstatt-release-certification/roadmap#implementation-roadmap
       - werkstatt-release-certification/ADR-003
       - werkstatt-release-certification/ADR-005
-    file: docs/rfcs/rfc-0855-establish-the-authority-first-agent-native-runtime-and-certification-program.md
+    file: docs/rfcs/archive/implemented/rfc-0855-establish-the-authority-first-agent-native-runtime-and-certification-program.md
   - id: RFC-0856
     title: Establish the governed program packet control plane
-    status: accepted
+    status: implemented
     kind: contract
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16504,13 +16504,13 @@ entries:
     related:
       - RFC-0855
       - RFC-0556
-    file: docs/rfcs/rfc-0856-establish-the-governed-program-packet-control-plane.md
+    file: docs/rfcs/archive/implemented/rfc-0856-establish-the-governed-program-packet-control-plane.md
   - id: RFC-0857
     title: Make release-certification RFC materialization just-in-time
-    status: accepted
+    status: implemented
     kind: policy
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16524,13 +16524,13 @@ entries:
       - werkstatt-release-certification/CERT-001
       - werkstatt-release-certification/CERT-002
       - werkstatt-release-certification/CERT-010
-    file: docs/rfcs/rfc-0857-make-release-certification-rfc-materialization-just-in-time.md
+    file: docs/rfcs/archive/implemented/rfc-0857-make-release-certification-rfc-materialization-just-in-time.md
   - id: RFC-0858
     title: Establish versioned component and capability contracts
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16541,13 +16541,13 @@ entries:
       - RFC-0856
       - RFC-0857
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md
+    file: docs/rfcs/archive/implemented/rfc-0858-establish-versioned-component-and-capability-contracts.md
   - id: RFC-0859
     title: Establish the lifecycle fiber and effect runtime
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16556,13 +16556,13 @@ entries:
     related:
       - RFC-0855
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md
+    file: docs/rfcs/archive/implemented/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md
   - id: RFC-0860
     title: Establish deterministic component resolution and reconciliation
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16571,13 +16571,13 @@ entries:
     related:
       - RFC-0855
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md
+    file: docs/rfcs/archive/implemented/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md
   - id: RFC-0861
     title: Establish runtime reflection and the conformance harness
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16586,13 +16586,13 @@ entries:
     related:
       - RFC-0855
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
+    file: docs/rfcs/archive/implemented/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
   - id: RFC-0862
     title: Establish the provider-neutral isolation contract
-    status: draft
+    status: implemented
     kind: contract
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16601,13 +16601,13 @@ entries:
     related:
       - RFC-0855
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md
+    file: docs/rfcs/archive/implemented/rfc-0862-establish-the-provider-neutral-isolation-contract.md
   - id: RFC-0863
     title: Establish capability artifacts and the first real sandbox
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16616,13 +16616,13 @@ entries:
     related:
       - RFC-0855
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0863-establish-capability-artifacts-and-the-first-real-sandbox.md
+    file: docs/rfcs/archive/implemented/rfc-0863-establish-capability-artifacts-and-the-first-real-sandbox.md
   - id: RFC-0864
     title: Establish the governed capability evolution controller
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-15
-    implementedAt: ""
+    implementedAt: 2026-08-15
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16631,4 +16631,60 @@ entries:
     related:
       - RFC-0855
       - werkstatt-release-certification/AMD-007
-    file: docs/rfcs/rfc-0864-establish-the-governed-capability-evolution-controller.md
+    file: docs/rfcs/archive/implemented/rfc-0864-establish-the-governed-capability-evolution-controller.md
+  - id: RFC-0865
+    title: Connect CERT-007 deployment authority to Leitstand command surface
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-15
+    implementedAt: 2026-08-15
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0851
+      - RFC-0855
+      - RFC-0857
+      - RFC-0608
+      - RFC-0627
+      - RFC-0628
+      - RFC-0700
+      - RFC-0842
+    file: docs/rfcs/archive/implemented/rfc-0865-connect-cert-007-deployment-authority-to-leitstand-command-surface.md
+  - id: RFC-0866
+    title: Restore deploy execution through certification pipeline
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-15
+    implementedAt: 2026-08-15
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy:
+      - RFC-0867
+    related:
+      - DNA-49
+      - DNA-73
+      - DNA-59
+      - RFC-0865
+    file: docs/rfcs/archive/implemented/rfc-0866-restore-deploy-execution-through-certification-pipeline.md
+  - id: RFC-0867
+    title: Cache certification evidence by artifact hash to skip redundant
+      mission.check across gates
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-16
+    implementedAt: 2026-08-16
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0866
+    amendedBy: []
+    related:
+      - RFC-0866
+      - RFC-0865
+    file: docs/rfcs/archive/implemented/rfc-0867-cache-certification-evidence-by-artifact-hash.md
