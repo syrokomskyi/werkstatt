@@ -1,12 +1,12 @@
 ---
 id: ADR-0049
 title: "Investigate and optimize mobile.layout.check bottleneck (11+ minutes in release.prepare)"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-16
 updatedAt: 2026-08-16
-implementedAt:
+implementedAt: 2026-08-16
 closedAt:
 supersedes: []
 supersededBy:
