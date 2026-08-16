@@ -1,7 +1,7 @@
 ---
 id: RFC-0867
 title: "Cache certification evidence by artifact hash to skip redundant mission.check across gates"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-16
 updatedAt: 2026-08-16
 enhancedAt: 2026-08-16
-implementedAt:
+implementedAt: 2026-08-16
 closedAt:
 supersedes: []
 supersededBy:
