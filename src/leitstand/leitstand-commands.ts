@@ -109,6 +109,7 @@ import {
   makeR2ConfigFromEnv,
   resolveArtifactHash,
   resolveGateDecisionPath,
+  flagSite,
   type AuthorizeOutcome,
 } from "./deploy-helpers.ts";
 import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
@@ -786,7 +787,7 @@ export async function runLeitstandDevDeploy(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<DevDeployResult>> {
-  const systemId = flagString(input, "site");
+  const systemId = flagSite(input);
   if (!systemId) throw new Error("[leitstand.dev-deploy] --site is required");
   const releaseId = flagString(input, "release");
   const gateDecisionFlag = flagString(input, "gate-decision");
@@ -951,7 +952,7 @@ export async function runLeitstandPropagate(
 ): Promise<KernelCommandResult<LeitstandPropagateData>> {
   const releaseId = flagString(input, "release");
   if (!releaseId) throw new Error("[leitstand.propagate] --release is required");
-  const systemId = flagString(input, "site");
+  const systemId = flagSite(input);
   if (!systemId) throw new Error("[leitstand.propagate] --site is required");
   const gateDecisionFlag = flagString(input, "gate-decision");
   const candidateId = flagString(input, "candidate-id") ?? systemId;
@@ -1108,7 +1109,7 @@ export async function runLeitstandPromote(
 ): Promise<KernelCommandResult<LeitstandPromoteData>> {
   const releaseId = flagString(input, "release");
   if (!releaseId) throw new Error("[leitstand.promote] --release is required");
-  const systemId = flagString(input, "site");
+  const systemId = flagSite(input);
   if (!systemId) throw new Error("[leitstand.promote] --site is required");
   const gateDecisionFlag = flagString(input, "gate-decision");
   const candidateId = flagString(input, "candidate-id") ?? systemId;
@@ -1270,7 +1271,7 @@ export async function runLeitstandStatus(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandStatusData>> {
-  const systemId = flagString(input, "site");
+  const systemId = flagSite(input);
   if (!systemId) throw new Error("[leitstand.status] --site is required");
 
   const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
@@ -1349,7 +1350,7 @@ export async function runLeitstandRollback(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandRollbackData>> {
-  const systemId = flagString(input, "site");
+  const systemId = flagSite(input);
   const toReleaseId = flagString(input, "to-release");
   if (!systemId) throw new Error("[leitstand.rollback] --site is required");
   if (!toReleaseId) throw new Error("[leitstand.rollback] --to-release is required");
@@ -1519,7 +1520,7 @@ export async function runLeitstandHealth(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandHealthData>> {
-  const systemId = flagString(input, "site");
+  const systemId = flagSite(input);
   if (!systemId) throw new Error("[leitstand.health] --site is required");
   const channel = parseChannel(flagString(input, "channel"), "alt");
 
@@ -1615,7 +1616,7 @@ export async function runLeitstandPipelineCheck(
   if (!releaseId) {
     throw new Error("[leitstand.pipeline.check] --release is required");
   }
-  const systemId = flagString(input, "site") ?? "";
+  const systemId = flagSite(input) ?? "";
 
   const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
   const opsDir = path.join(cacheCloneDir, "deployment-operations");
