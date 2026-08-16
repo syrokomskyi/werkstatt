@@ -34,6 +34,23 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 
 - **`vi.mock` for module A does not intercept internal calls within module B that imports from A.** When module B (e.g. `bordbuch-io.ts`) imports `resolveCacheClonePath` from module A (e.g. `registry-io.ts`) and calls it internally, mocking A's export only affects direct imports from A — B's internal call still uses the real function. This is a fundamental Vitest limitation: mocks replace exports, not internal references. When a test needs to redirect file paths written by a deeply nested call chain, create a self-contained mock for the outermost module (e.g. `bordbuch-commit-helper.ts`) that does not import the real implementation at all. Reimplement the necessary logic (entry creation, file write) directly in the mock factory.
 
+## Promise.race timer cleanup
+
+- **Always clean up `setTimeout` timers after `Promise.race`**. When using `Promise.race` with a timeout promise, the `setTimeout` timer continues running even after the primary promise resolves. Store the timer handle and clear it in a `finally` block:
+  ```ts
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error("timed out")), MS);
+  });
+  try {
+    const result = await Promise.race([primaryPromise, timeoutPromise]);
+    // ...
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+  ```
+- Without `clearTimeout`, the process stays alive for the remaining timeout duration (up to 5 minutes in some cases), accumulating uncleared timers in long-running processes.
+
 ## Generated file writes
 
 - Always use `writeFileIfChanged` from `@warpgogol/werkstatt` (re-exported from `@warpgogol/forge/utils`, RFC-0345) for generated file writes — both text and binary. It accepts `string | Uint8Array` and skips the disk write when content is byte-identical to the existing file.
