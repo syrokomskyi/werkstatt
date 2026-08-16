@@ -172,6 +172,7 @@ function buildOauthAuthorizationServer(origin: string): string {
     agent_auth: {
       skill: `${origin}/auth.md`,
       register_uri: `${origin}/auth`,
+      claim_uri: `${origin}/.well-known/agent.json`,
       identity_types_supported: ["anonymous"],
       anonymous: {
         credential_types_supported: ["none"],
