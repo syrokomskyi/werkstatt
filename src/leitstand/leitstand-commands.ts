@@ -1111,16 +1111,14 @@ export async function runLeitstandPromote(
   const systemId = flagString(input, "site");
   if (!systemId) throw new Error("[leitstand.promote] --site is required");
   const gateDecisionFlag = flagString(input, "gate-decision");
-  const mainVerificationPath = flagString(input, "main-verification-decision");
   const candidateId = flagString(input, "candidate-id") ?? systemId;
   const artifactHashFlag = flagString(input, "artifact-hash");
 
-  if (!mainVerificationPath) {
-    throw new Error(
-      "[leitstand.promote] --main-verification-decision is required (path to MainVerificationDecisionV1 JSON)",
-    );
-  }
   const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
+  const mainVerificationPath =
+    flagString(input, "main-verification-decision") ??
+    path.join(cacheCloneDir, "gate-decisions", `${releaseId}-main-verification.json`);
+
   const gateDecisionPath = resolveGateDecisionPath(
     cacheCloneDir,
     releaseId,
@@ -1316,7 +1314,7 @@ export async function runLeitstandStatus(
         channels[ch] = {
           releaseId: latest.releaseId,
           state: latest.state,
-          healthy: latest.state === "deployed",
+          healthy: latest.state === "succeeded",
           at: latest.at,
           purgeResult: latest.purgeResult,
         };
@@ -1652,25 +1650,25 @@ export async function runLeitstandPipelineCheck(
     { step: "release.ready", status: "done", detail: "release ready" },
     {
       step: "leitstand.dev-deploy",
-      status: devState === "deployed" ? "done" : devState === "failed" ? "blocked" : "pending",
+      status: devState === "succeeded" ? "done" : devState === "failed" ? "blocked" : "pending",
       detail: devState ? `state=${devState}` : "awaiting gate decision",
     },
     {
       step: "leitstand.propagate",
-      status: altState === "deployed" ? "done" : altState === "failed" ? "blocked" : "pending",
+      status: altState === "succeeded" ? "done" : altState === "failed" ? "blocked" : "pending",
       detail: altState ? `state=${altState}` : "awaiting dev-deploy + R2 durable sync",
     },
     {
       step: "leitstand.promote",
-      status: mainState === "deployed" ? "done" : mainState === "failed" ? "blocked" : "pending",
+      status: mainState === "succeeded" ? "done" : mainState === "failed" ? "blocked" : "pending",
       detail: mainState ? `state=${mainState}` : "awaiting propagate-alt + main verification",
     },
   ];
 
   let releaseState = "ready";
-  if (mainState === "deployed") releaseState = "main-deployed";
-  else if (altState === "deployed") releaseState = "alt-deployed";
-  else if (devState === "deployed") releaseState = "dev-deployed";
+  if (mainState === "succeeded") releaseState = "main-deployed";
+  else if (altState === "succeeded") releaseState = "alt-deployed";
+  else if (devState === "succeeded") releaseState = "dev-deployed";
   else if (devState === "failed" || altState === "failed" || mainState === "failed")
     releaseState = "failed";
 
