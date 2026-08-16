@@ -17,11 +17,11 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | `schema` | `werkstatt/plugin@1` |
 | `id` | `werkstatt-godot` |
 | `profileId` | `godot-csharp` |
-| `moduleLoaders` | `checks` |
+| `moduleLoaders` | `checks`, `dev` |
 | `deployAdapters` | `itch-io`, `github-releases` |
 | `hooks` | `build`, `checkGate`, `releaseEvidence`, `scaffoldProject` |
 | `paths` | `Scenes` (contentDir), `bin` (distDir), `project.godot` + `Game.csproj` (entryPoints) |
-| `invariants` | GODOT-01..04 |
+| `invariants` | GODOT-01..07 |
 
 ## Module layout
 
@@ -29,15 +29,21 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | --- | --- | --- |
 | Plugin entry | `src/index.ts` | `werkstattGodotPlugin` export |
 | Path conventions | `src/paths/godot-paths.ts` | Godot path constants |
-| Invariants | `src/invariants/godot-invariants.ts` | GODOT-01..04 declarations |
+| Invariants | `src/invariants/godot-invariants.ts` | GODOT-01..07 declarations |
 | Scene validator | `src/checks/scene-validate.ts` | `godot.scene.validate` (GODOT-01) |
 | Gitignore validator | `src/checks/gitignore-validate.ts` | `godot.gitignore.validate` (GODOT-02) |
 | Secret scan | `src/checks/secret-scan.ts` | `godot.secret.scan` (GODOT-03) |
 | Project config validator | `src/checks/project-config-validate.ts` | `godot.project.config.validate` (GODOT-04) |
-| Check gate | `src/checks/index.ts` | Runs all 4 validators in checkGate |
+| Scene reference validator | `src/checks/scene-reference-validate.ts` | `godot.scene.reference.validate` (GODOT-05) |
+| Csproj validator | `src/checks/csproj-validate.ts` | `godot.csproj.validate` (GODOT-06) |
+| Resource validator | `src/checks/resource-validate.ts` | `godot.resource.validate` (GODOT-07) |
+| Check gate | `src/checks/index.ts` | Runs all 7 validators in checkGate |
 | Check module | `src/checks/module.ts` | Kernel module registering validators |
-| Build hook | `src/build/dotnet-build.ts` | `hooks.build` — runs `dotnet build` |
-| itch.io deploy | `src/deploy/itch-io.ts` | `deployAdapters["itch-io"]` |
+| Build hook | `src/build/dotnet-build.ts` | `hooks.build` — runs `dotnet build` then Godot export |
+| Dev server | `src/build/godot-dev-server.ts` | `godot.dev.server` — launches `godot --editor` |
+| Test runner | `src/build/dotnet-test.ts` | `godot.test` — runs `dotnet test` |
+| Dev module | `src/dev/module.ts` | Kernel module registering dev commands |
+| itch.io deploy | `src/deploy/itch-io.ts` | `deployAdapters["itch-io"]` — multi-platform channels |
 | GitHub Releases | `src/deploy/github-releases.ts` | `deployAdapters["github-releases"]` |
 | Scaffold | `src/onboarding/scaffold-project.ts` | `hooks.scaffoldProject` |
 | Release evidence | `src/release-evidence/godot-evidence.ts` | `hooks.releaseEvidence` |
@@ -50,17 +56,23 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | GODOT-02 | The .godot/ directory must not be committed to git | `godot.gitignore.validate` |
 | GODOT-03 | No hardcoded API keys or secrets in C# source files | `godot.secret.scan` |
 | GODOT-04 | project.godot autoloads and input map changes require explicit confirmation | `godot.project.config.validate` |
+| GODOT-05 | Scene files (.tscn) res:// references must point to existing files | `godot.scene.reference.validate` |
+| GODOT-06 | Game.csproj must use Godot.NET.Sdk, target net8.0, and enable dynamic loading | `godot.csproj.validate` |
+| GODOT-07 | Resource files (.tres) must reside in Resources/ and their res:// references must exist | `godot.resource.validate` |
 
 ## Check gate composition
 
-`checkGate` runs all 4 validators in sequence:
+`checkGate` runs all 7 validators in sequence:
 
 1. `godot.scene.validate` — scene/script directory structure (GODOT-01)
 2. `godot.gitignore.validate` — .godot/ is gitignored (GODOT-02)
 3. `godot.secret.scan` — hardcoded secret detection (GODOT-03)
-4. `godot.project.config.validate` — project.godot sensitive field watch (GODOT-04)
+4. `godot.project.config.validate` — project.godot sensitive field changes vs git HEAD (GODOT-04, non-blocking)
+5. `godot.scene.reference.validate` — scene res:// reference integrity (GODOT-05)
+6. `godot.csproj.validate` — Game.csproj Godot C# settings (GODOT-06)
+7. `godot.resource.validate` — .tres resource location and references (GODOT-07)
 
-All must pass for checkGate to succeed.
+All must pass for checkGate to succeed (GODOT-04 is non-blocking warnings).
 
 ## Credential injection
 
@@ -71,7 +83,7 @@ Deploy adapters read credentials from `systems/registry.yaml` channel config, ne
 
 ## Build hook
 
-`hooks.build` runs `dotnet build ./Game.csproj` in the workpiece directory via `execFileSync`. Reports success/failure via HookResult.
+`hooks.build` runs `dotnet build ./Game.csproj` in the workpiece directory via `execFileSync`. If `export_presets.cfg` exists, it then runs `godot --headless --export-release` for each preset. Reports success/failure via HookResult.
 
 ## Skills
 

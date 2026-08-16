@@ -7,6 +7,7 @@
   <item>Registers Godot-stack engine modules via moduleLoaders (checks).</item>
   <item>Provides deploy adapters (itch-io, github-releases) and lifecycle hooks.</item>
   <item>Declares Godot path conventions via StackPathConventions.</item>
+  <item>Registers dev module (godot.dev.server, godot.test) via moduleLoaders.</item>
 </responsibilities>
 <non-goals>
   <item>Do not implement engine logic — delegate to @warpgogol/werkstatt.</item>
@@ -17,6 +18,7 @@
 <CHANGE_SUMMARY>
   <item>Initial Godot plugin entry point — Godot path conventions, check/onboarding module loaders, deploy adapters, lifecycle hooks, GODOT-01..04 invariants.</item>
   <item>Fix: remove moduleLoaders.onboarding (no-op module deleted, scaffold handled via scaffoldProject hook).</item>
+  <item>Enhancement: add dev module (godot.dev.server, godot.test) via moduleLoaders. GODOT-01..07 invariants.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +35,8 @@ export const werkstattGodotPlugin: WerkstattPlugin = {
   moduleLoaders: {
     checks: async (): Promise<KernelModule> =>
       (await import("./checks/module.ts")).createGodotCheckModule(),
+    dev: async (): Promise<KernelModule> =>
+      (await import("./dev/module.ts")).createGodotDevModule(),
   },
   deployAdapters: {
     "itch-io": async () => {

@@ -35,6 +35,18 @@
       "types": "./src/build/dotnet-build.ts",
       "default": "./src/build/dotnet-build.ts"
     },
+    "./build/dev-server": {
+      "types": "./src/build/godot-dev-server.ts",
+      "default": "./src/build/godot-dev-server.ts"
+    },
+    "./build/test": {
+      "types": "./src/build/dotnet-test.ts",
+      "default": "./src/build/dotnet-test.ts"
+    },
+    "./dev/module": {
+      "types": "./src/dev/module.ts",
+      "default": "./src/dev/module.ts"
+    },
     "./release-evidence": {
       "types": "./src/release-evidence/godot-evidence.ts",
       "default": "./src/release-evidence/godot-evidence.ts"

@@ -8,6 +8,8 @@
   <item>Creates project.godot with .NET enabled.</item>
   <item>Creates Game.csproj for the .NET project.</item>
   <item>Creates .gitignore with .godot/, bin/, obj/ entries.</item>
+  <item>Creates icon.svg referenced by project.godot.</item>
+  <item>Creates .editorconfig for C# style enforcement.</item>
 </responsibilities>
 <non-goals>
   <item>Does not install dependencies — the consumer runs dotnet restore after scaffold.</item>
@@ -17,6 +19,7 @@
 <CHANGE_SUMMARY>
   <item>Initial Godot project scaffold — Main scene, Main script, project.godot, Game.csproj, .gitignore.</item>
   <item>Fix: use writeFileIfChanged instead of raw writeFile to avoid git churn on regeneration.</item>
+  <item>Enhancement: add icon.svg (referenced by project.godot) and .editorconfig for C# style enforcement.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -77,6 +80,32 @@ obj/
 *.csproj.user
 `;
 
+const ICON_SVG = `<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="16" fill="#478cbf"/>
+  <text x="64" y="80" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle">G</text>
+</svg>
+`;
+
+const EDITORCONFIG = `root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{cs,csproj}]
+indent_style = tab
+indent_size = 4
+
+[*.{tscn,tres,godot,cfg}]
+indent_style = tab
+indent_size = 4
+
+[*.{md,txt}]
+trim_trailing_whitespace = false
+`;
+
 export async function scaffoldGodotProject(ctx: PluginHookContext): Promise<HookResult> {
   const projectPath = ctx.workpiecePath ?? ctx.workspaceRoot;
   const projectId = (ctx as PluginHookContext & { projectId?: string }).projectId ?? "my-godot-game";
@@ -95,6 +124,8 @@ export async function scaffoldGodotProject(ctx: PluginHookContext): Promise<Hook
     await writeFileIfChanged(join(projectPath, "Scenes", "Main.tscn"), MAIN_TSCN);
     await writeFileIfChanged(join(projectPath, "Scripts", "Main.cs"), MAIN_CS.replace(/__PROJECT_NAME__/g, safeName));
     await writeFileIfChanged(join(projectPath, ".gitignore"), GITIGNORE);
+    await writeFileIfChanged(join(projectPath, "icon.svg"), ICON_SVG);
+    await writeFileIfChanged(join(projectPath, ".editorconfig"), EDITORCONFIG);
 
     ctx.logger.info("scaffold-project: project created successfully");
     return {
@@ -107,6 +138,8 @@ export async function scaffoldGodotProject(ctx: PluginHookContext): Promise<Hook
           "Scenes/Main.tscn",
           "Scripts/Main.cs",
           ".gitignore",
+          "icon.svg",
+          ".editorconfig",
         ],
       },
     };
