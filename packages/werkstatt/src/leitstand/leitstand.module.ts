@@ -46,6 +46,10 @@ export function createLeitstandModule(): KernelModule {
             required: true,
             description: "Sternsystem id with an active mission.",
           },
+          system: {
+            kind: "string",
+            description: "Alias for --site.",
+          },
           release: {
             kind: "string",
             description:
@@ -71,7 +75,7 @@ export function createLeitstandModule(): KernelModule {
           "artifact-hash": {
             kind: "string",
             description:
-              "RFC-0866: Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
+              "Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz or release.yaml distTreeHash if omitted.",
           },
         },
         writes: ["missions/{mission}/evidence/axiom/**"],
@@ -98,6 +102,15 @@ export function createLeitstandModule(): KernelModule {
             description:
               "Published release id with verified Axiom evidence (commitSha + missionId match).",
           },
+          site: {
+            kind: "string",
+            required: true,
+            description: "Sternsystem id.",
+          },
+          system: {
+            kind: "string",
+            description: "Alias for --site.",
+          },
           "gate-decision": {
             kind: "string",
             description:
@@ -110,7 +123,7 @@ export function createLeitstandModule(): KernelModule {
           "artifact-hash": {
             kind: "string",
             description:
-              "RFC-0866: Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
+              "Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz or release.yaml distTreeHash if omitted.",
           },
         },
         writes: [
@@ -139,6 +152,15 @@ export function createLeitstandModule(): KernelModule {
             required: true,
             description: "Alt-deployed release id to promote.",
           },
+          site: {
+            kind: "string",
+            required: true,
+            description: "Sternsystem id.",
+          },
+          system: {
+            kind: "string",
+            description: "Alias for --site.",
+          },
           "gate-decision": {
             kind: "string",
             description:
@@ -156,7 +178,7 @@ export function createLeitstandModule(): KernelModule {
           "artifact-hash": {
             kind: "string",
             description:
-              "RFC-0866: Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
+              "Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz or release.yaml distTreeHash if omitted.",
           },
         },
         writes: [
@@ -180,6 +202,7 @@ export function createLeitstandModule(): KernelModule {
         supportsAllSites: false,
         flags: {
           site: { kind: "string", required: true, description: "Sternsystem id." },
+          system: { kind: "string", description: "Alias for --site." },
           channel: {
             kind: "string",
             description: "Filter to a single channel: dev, alt, or main.",
@@ -202,6 +225,7 @@ export function createLeitstandModule(): KernelModule {
         mutatesState: true,
         flags: {
           site: { kind: "string", required: true, description: "Sternsystem id." },
+          system: { kind: "string", description: "Alias for --site." },
           "to-release": { kind: "string", description: "Explicit target release id." },
         },
         writes: [
@@ -225,6 +249,7 @@ export function createLeitstandModule(): KernelModule {
         supportsAllSites: false,
         flags: {
           site: { kind: "string", required: true, description: "Sternsystem id." },
+          system: { kind: "string", description: "Alias for --site." },
           channel: {
             kind: "string",
             description: "Deployment channel: dev, alt (default), or main.",
@@ -245,6 +270,8 @@ export function createLeitstandModule(): KernelModule {
             required: true,
             description: "Release id to inspect.",
           },
+          site: { kind: "string", description: "Sternsystem id." },
+          system: { kind: "string", description: "Alias for --site." },
         },
         reads: [
           "releases/{release}/**",
@@ -267,6 +294,10 @@ export function createLeitstandModule(): KernelModule {
             required: true,
             description: "Sternsystem id.",
           },
+          system: {
+            kind: "string",
+            description: "Alias for --site.",
+          },
           gate: {
             kind: "string",
             required: true,
@@ -284,18 +315,23 @@ export function createLeitstandModule(): KernelModule {
           "artifact-hash": {
             kind: "string",
             description:
-              "Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
+              "Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz or release.yaml distTreeHash if omitted.",
           },
           "base-url": {
             kind: "string",
             description:
               "RFC-0866: Dev deployment URL for mission-check producer. Defaults to latest dev effect record URL.",
           },
+          force: {
+            kind: "boolean",
+            description: "RFC-0867: Bypass evidence cache and re-execute producers.",
+          },
         },
         writes: ["systems-cache/{system}/gate-decisions/**"],
         reads: [
           "systems-cache/{system}/system-config.yaml",
           "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/gate-decisions/**",
         ],
         cacheable: false,
         execute: runLeitstandCertify,
