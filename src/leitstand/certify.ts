@@ -13,6 +13,7 @@
 <item>RFC-0866 fix D-2: read dev deployment URL from effect records, accept --base-url flag fallback.</item>
 <item>RFC-0866 audit: wire baseUrl into astro-mission-check producer handler — calls mission.check with --base-url when available, skips with warning when not.</item>
 <item>Fix hardcoded systems-cache paths: use resolveCacheClonePath for gate-decisions output and resolveDevBaseUrl. Commit gate-decision JSON to cache clone git.</item>
+<item>RFC-0867: add tryReuseEvidence — skip producer execution when prior gate evidence for same artifact hash is fresh. Write evidence sidecar {release}-evidence.json after producer execution.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,7 +32,7 @@ import type {
 } from "../certification/contracts/decisions.ts";
 import type { GateChannel } from "../certification/contracts/identifiers.ts";
 import { astroCertificationProfile } from "../certification/profile/astro-profile.ts";
-import { makeR2ConfigFromEnv, resolveArtifactHash } from "./deploy-helpers.ts";
+import { makeR2ConfigFromEnv, resolveArtifactHash, flagSite } from "./deploy-helpers.ts";
 import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import { cacheCloneCommit } from "../mission/mission-git-commit.ts";
 import { gitExec } from "../werkstatt/git-exec.ts";
@@ -48,10 +49,132 @@ import { evaluateCertificationDecision } from "../certification/aggregation.ts";
 import type { EvidenceEnvelopeV1 } from "../certification/contracts/evidence.ts";
 import type { ReleaseCandidateV1 } from "../certification/contracts/candidate.ts";
 import type { CertificationPolicyBundleV1 } from "../certification/contracts/policy-bundle.ts";
+import { gateDecisionV1Schema } from "../certification/contracts/decisions.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
   return typeof v === "string" ? v : undefined;
+}
+
+function flagBoolean(input: KernelCommandInput, key: string): boolean {
+  const v = input.flags[key];
+  return v === true || v === "true";
+}
+
+interface EvidenceCacheEntry {
+  artifactHash: Sha256Digest;
+  evidence: EvidenceEnvelopeV1[];
+  producedAt: string;
+  freshnessExpiresAt: string;
+  sourceGate: GateChannel;
+}
+
+interface EvidenceCacheSidecar {
+  schema: "werkstatt/evidence-cache@1";
+  releaseId: string;
+  artifactHash: Sha256Digest;
+  evidence: EvidenceEnvelopeV1[];
+  producedAt: string;
+  producedByGate: GateChannel;
+}
+
+async function tryReuseEvidence(
+  cacheCloneDir: string,
+  releaseId: string,
+  artifactHash: Sha256Digest,
+  forceRequested: boolean,
+): Promise<EvidenceCacheEntry | null> {
+  if (forceRequested) return null;
+
+  const gateDecisionsDir = path.join(cacheCloneDir, "gate-decisions");
+  let entries: string[];
+  try {
+    entries = await fs.readdir(gateDecisionsDir);
+  } catch {
+    return null;
+  }
+
+  const now = new Date();
+  const gateSuffixes = ["dev", "alt", "main"];
+
+  for (const gate of gateSuffixes) {
+    const decisionFile = entries.find((e) => e === `${releaseId}-${gate}.json`);
+    if (!decisionFile) continue;
+
+    let decision: GateDecisionV1;
+    try {
+      const content = await fs.readFile(path.join(gateDecisionsDir, decisionFile), "utf8");
+      const parsed = JSON.parse(content);
+      const result = gateDecisionV1Schema.safeParse(parsed);
+      if (!result.success) continue;
+      decision = result.data;
+    } catch {
+      continue;
+    }
+
+    if (decision.policyBundleRoot !== artifactHash) continue;
+
+    const sidecarFile = entries.find((e) => e === `${releaseId}-evidence.json`);
+    if (!sidecarFile) continue;
+
+    let sidecar: EvidenceCacheSidecar;
+    try {
+      const sidecarContent = await fs.readFile(path.join(gateDecisionsDir, sidecarFile), "utf8");
+      const sidecarParsed = JSON.parse(sidecarContent);
+      if (
+        sidecarParsed.schema !== "werkstatt/evidence-cache@1" ||
+        sidecarParsed.artifactHash !== artifactHash ||
+        !Array.isArray(sidecarParsed.evidence)
+      ) {
+        continue;
+      }
+      sidecar = sidecarParsed as EvidenceCacheSidecar;
+    } catch {
+      continue;
+    }
+
+    const freshEvidence = sidecar.evidence.filter((env) => {
+      if (!env.freshness?.expiresAt) return false;
+      return new Date(env.freshness.expiresAt) > now;
+    });
+
+    if (freshEvidence.length === 0) continue;
+
+    const earliestExpiry = freshEvidence.map((env) => env.freshness.expiresAt).sort()[0];
+
+    return {
+      artifactHash,
+      evidence: freshEvidence,
+      producedAt: sidecar.producedAt,
+      freshnessExpiresAt: earliestExpiry,
+      sourceGate: gate as GateChannel,
+    };
+  }
+
+  return null;
+}
+
+async function writeEvidenceSidecar(
+  cacheCloneDir: string,
+  releaseId: string,
+  artifactHash: Sha256Digest,
+  evidence: EvidenceEnvelopeV1[],
+  producedAt: string,
+  producedByGate: GateChannel,
+): Promise<string> {
+  const sidecar: EvidenceCacheSidecar = {
+    schema: "werkstatt/evidence-cache@1",
+    releaseId,
+    artifactHash,
+    evidence,
+    producedAt,
+    producedByGate,
+  };
+  const outputDir = path.join(cacheCloneDir, "gate-decisions");
+  await fs.mkdir(outputDir, { recursive: true });
+  const sidecarPath = path.join(outputDir, `${releaseId}-evidence.json`);
+  await writeFileIfChanged(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n");
+  return sidecarPath;
 }
 
 export interface CertifyInput {
@@ -78,7 +201,7 @@ export async function runLeitstandCertify(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CertifyResult>> {
-  const systemId = flagString(input, "site");
+  const systemId = flagSite(input);
   if (!systemId) throw new Error("[leitstand.certify] --site is required");
   const gate = flagString(input, "gate");
   if (!gate) throw new Error("[leitstand.certify] --gate is required (dev | alt | main)");
@@ -98,6 +221,10 @@ export async function runLeitstandCertify(
 
   const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
   const baseUrl = await resolveDevBaseUrl(cacheCloneDir, baseUrlFlag);
+
+  const forceRequested = flagBoolean(input, "force");
+
+  const reuseEntry = await tryReuseEvidence(cacheCloneDir, releaseId, artifactHash, forceRequested);
 
   const producerNodes: ProducerDependencyNodeV1[] = [
     { producerId: "astro-mission-check", dependsOn: [] },
@@ -327,43 +454,63 @@ export async function runLeitstandCertify(
     };
   };
 
-  const execResult = await executeProducers(plan, handler, {
-    candidate,
-    profile: astroCertificationProfile,
-    policyBundle,
-    config: {
-      ...DEFAULT_PRODUCER_CONFIG,
-      operationId,
-      timestamp: now,
-      timeoutMs: 300000,
-      maxRetries: 1,
-    },
-  });
+  let evidence: EvidenceEnvelopeV1[];
+  let producerCount = producerNodes.length;
 
-  if (!execResult.ok) {
-    return {
-      data: {
-        command: "leitstand.certify",
-        systemId,
-        gate,
-        decisionId: "",
-        status: "incomplete",
-        outputPath: "",
-        producerCount: producerNodes.length,
-        evidenceCount: 0,
+  if (reuseEntry) {
+    console.info(
+      `[leitstand.certify] reusing evidence from ${reuseEntry.sourceGate} gate (artifact hash match)`,
+    );
+    evidence = reuseEntry.evidence;
+    producerCount = 0;
+  } else {
+    const execResult = await executeProducers(plan, handler, {
+      candidate,
+      profile: astroCertificationProfile,
+      policyBundle,
+      config: {
+        ...DEFAULT_PRODUCER_CONFIG,
+        operationId,
+        timestamp: now,
+        timeoutMs: 300000,
+        maxRetries: 1,
       },
-      summary: `[leitstand.certify] producer execution failed: ${execResult.ruleId} — ${execResult.message}`,
-      exitCode: 1,
-      diagnostics: [
-        { ruleId: execResult.ruleId, severity: "error", message: execResult.message, evidence: [] },
-      ],
-    } as unknown as KernelCommandResult<CertifyResult>;
+    });
+
+    if (!execResult.ok) {
+      return {
+        data: {
+          command: "leitstand.certify",
+          systemId,
+          gate,
+          decisionId: "",
+          status: "incomplete",
+          outputPath: "",
+          producerCount: producerNodes.length,
+          evidenceCount: 0,
+        },
+        summary: `[leitstand.certify] producer execution failed: ${execResult.ruleId} — ${execResult.message}`,
+        exitCode: 1,
+        diagnostics: [
+          {
+            ruleId: execResult.ruleId,
+            severity: "error",
+            message: execResult.message,
+            evidence: [],
+          },
+        ],
+      } as unknown as KernelCommandResult<CertifyResult>;
+    }
+
+    evidence = execResult.evidence;
+
+    await writeEvidenceSidecar(cacheCloneDir, releaseId, artifactHash, evidence, now, gateChannel);
   }
 
   const evaluationResult = evaluateCertificationDecision({
     candidateId,
     policyBundle,
-    evidence: execResult.evidence,
+    evidence,
     evaluationCutSequence: 1,
     authorityTime: now,
     gate: gateChannel,
@@ -379,8 +526,8 @@ export async function runLeitstandCertify(
         decisionId: "",
         status: "incomplete",
         outputPath: "",
-        producerCount: producerNodes.length,
-        evidenceCount: execResult.evidence.length,
+        producerCount: producerCount,
+        evidenceCount: evidence.length,
       },
       summary: `[leitstand.certify] evaluation failed: ${evaluationResult.code} — ${evaluationResult.message}`,
       exitCode: 1,
@@ -448,8 +595,13 @@ export async function runLeitstandCertify(
   }
 
   const relPath = path.join("gate-decisions", `${releaseId}-${gate}.json`);
+  const sidecarRelPath = path.join("gate-decisions", `${releaseId}-evidence.json`);
+  const sidecarExists = !reuseEntry;
   try {
     gitExec(cacheCloneDir, `add ${relPath}`);
+    if (sidecarExists) {
+      gitExec(cacheCloneDir, `add ${sidecarRelPath}`);
+    }
     if (mainVerificationPath) {
       gitExec(
         cacheCloneDir,
@@ -492,8 +644,8 @@ export async function runLeitstandCertify(
       status: evaluationResult.status,
       outputPath,
       mainVerificationPath,
-      producerCount: producerNodes.length,
-      evidenceCount: execResult.evidence.length,
+      producerCount: producerCount,
+      evidenceCount: evidence.length,
     },
     summary: `[leitstand.certify] gate=${gate} status=${evaluationResult.status} decision=${decisionId} output=${outputPath}`,
     exitCode: 0,
