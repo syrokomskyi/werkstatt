@@ -334,6 +334,27 @@ entries:
     auditedAt: 2026-08-16T21:32:56.107Z
     verdict: baseline
     agent: system:baseline
+  - path: missions/warpgogol-com-m000062/workpiece/src/styles/local.css
+    entityId: ""
+    auditedRevision: 1
+    auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
+    auditedAt: 2026-08-16T22:11:02.956Z
+    verdict: baseline
+    agent: system:baseline
+  - path: missions/warpgogol-com-m000063/workpiece/src/styles/local.css
+    entityId: ""
+    auditedRevision: 1
+    auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
+    auditedAt: 2026-08-16T22:49:55.017Z
+    verdict: baseline
+    agent: system:baseline
+  - path: missions/warpgogol-com-m000064/workpiece/src/styles/local.css
+    entityId: ""
+    auditedRevision: 1
+    auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
+    auditedAt: 2026-08-16T23:20:39.138Z
+    verdict: baseline
+    agent: system:baseline
   - path: packages/agent-gate/src/action-pipeline.ts
     entityId: ""
     auditedRevision: 1

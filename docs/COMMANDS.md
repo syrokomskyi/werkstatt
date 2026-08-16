@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 765. Raw manifest entries: 765.
+Generated command rows: 770. Raw manifest entries: 770.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -33,7 +33,7 @@ Generated command rows: 765. Raw manifest entries: 765.
 | `agent.knowledge.generate` | workspace | app | yes | no | Project the business layer into static per-domain JSON files under public/api/agent/v1/ (RFC-0287). |
 | `agent.knowledge.validate` | workspace | app | no | no | Validate Agent Knowledge files: privacy boundary, envelope validity, generator↔artifact parity, freshness advisory (RFC-0287, AGK-01..05). |
 | `agent.manifest.generate` | workspace | app | yes | no | Assemble the Agent Surface Manifest and write src/agent-surface.generated.yaml + public/.well-known/agent.json (RFC-0286). |
-| `agent.markdown-negotiation.generate` | workspace | app | yes | no | Generate Astro middleware for Accept-header-based markdown content negotiation (RFC-0785). Writes a no-op pass-through when agent.enabled is false. |
+| `agent.markdown-negotiation.generate` | workspace | app | yes | no | Generate Astro middleware + Cloudflare Worker entry point for Accept-header-based markdown content negotiation (RFC-0785). Writes no-op pass-through files when agent.enabled is false. |
 | `agent.mcp-card.generate` | workspace | app | yes | no | Generate the SEP-1649 MCP Server Card projection to public/.well-known/mcp/server-card.json (RFC-0783). |
 | `agent.mcp-card.validate` | workspace | app | no | no | Validate the MCP Server Card: well-formedness and manifest↔card bijection (RFC-0783, AGM-01..03). |
 | `agent.openapi.generate` | workspace | app | yes | no | Generate the OpenAPI 3.1 projection of the Agent Surface Manifest to public/.well-known/agent.openapi.json (RFC-0289). |
@@ -392,6 +392,7 @@ Generated command rows: 765. Raw manifest entries: 765.
 | `legal.processors.validate` | workspace | app | no | no | Fail if a configured chat widget or external destination is not named (processor + recipients) in the Datenschutz/Privacy Policy, or no studio↔client DPA reference is present. No-op pass when nothing is configured (RFC-0177). |
 | `legal.scaffold` | workspace | app | yes | no | Generate Impressum and Datenschutz page+prose stubs for every DE/AT/CH locale in system.md i18n.supported. Merges nav targets and footer.legalIds/contactIds into the per-locale labels.md. Idempotent. Reads identity.legal.* from system.md; missing fields land as NEED_THIS_<FIELD> placeholders (RFC-0096). |
 | `legal.translation.validate` | workspace | app | no | no | Validate the RFC-0174 binding-language policy: every page `translation` block is internally consistent (status enum, binding never disabled, mandatory notice on while a locale is unofficial, binding-language file present, disabled locales have a fallback). |
+| `leitstand.certify` | workspace | workspace | no | no | Produce a GateDecisionV1 JSON file via certification orchestration (RFC-0866). Flags: --site, --gate, --release, --artifact-hash. |
 | `leitstand.dev-deploy` | workspace | workspace | no | no | Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --site. |
 | `leitstand.health` | workspace | workspace | no | no | Run health checks against a deployed channel (RFC-0379). Flags: --site, [--channel dev\|alt\|main]. |
 | `leitstand.pipeline.check` | workspace | workspace | no | no | Inspect deployment pipeline state for a release (RFC-0842). Flags: --release. |
@@ -541,6 +542,10 @@ Generated command rows: 765. Raw manifest entries: 765.
 | `print.pdf.copy` | workspace | app | no | no | Copy generated PDFs from .cache/pdf/ to dist/client/_print/. Runs in build.post after print.pdf.generate. Not cacheable — always executes to restore PDFs into freshly-built dist/. |
 | `print.pdf.generate` | workspace | app | yes | no | Generate PDFs from the built static site using Playwright Chromium. Writes to .cache/pdf/<hash>/ (RFC-0653). Use print.pdf.copy to copy PDFs into dist/client/_print/. Exits early when output.printPdf is not true (RFC-0257). |
 | `print.pdf.validate` | workspace | app | no | no | Verify that every expected PDF file exists and is non-empty in dist/client/_print/ (PRINT-PDF-01..02). Runs in build.post after generation. |
+| `program.packet.complete` | workspace | workspace | yes | no | Steward validates the implementation range, writes the completion report, and updates the program manifest. Supports --bootstrap for packet 000. Does not commit — use ecosystem.commit after. Usage: program.packet.complete --program=RFC-XXXX --packet=NNN-foo --steward=human:id --lease-token=<token> --implementation-head=<sha> --json |
+| `program.packet.lease` | workspace | workspace | no | no | Manage the exclusive local executor lease for a sealed packet. Actions: start, heartbeat, release, recover. Raw lease tokens are never persisted — only the SHA-256 hash. Usage: program.packet.lease --program=RFC-XXXX --packet=NNN-foo --action=start --executor=agent:id --json |
+| `program.packet.seal` | workspace | workspace | yes | no | Steward finalizes a packet against the predecessor's completion commit, updates packet state from draft to sealed, and records the seal in the program manifest. Does not commit — use ecosystem.commit after. Usage: program.packet.seal --program=RFC-XXXX --packet=NNN-foo --steward=human:id --idempotency-key=<key> --json |
+| `program.packet.validate` | workspace | workspace | no | no | Validate a program packet against schema, source hashes, branch/head, and state machine rules. Read-only. Usage: program.packet.validate --program=RFC-XXXX --packet=NNN-foo --phase=draft --json |
 | `props.contract.validate` | workspace | workspace | no | no | RFC-0262: validate every packages/ui manifest's generated types file is present, marker-carrying, and fresh (PROPS-01); validate any manifest `example` block against its own propsSchema (PROPS-02). |
 | `props.types.generate` | workspace | workspace | yes | no | RFC-0262: generate <id>.types.generated.ts next to every packages/ui manifest with a propsSchema/propsSchemaCompose (marker + sourceHash, idempotent). The manifest propsSchema is the only authored prop contract. |
 | `pseo.experiment.plan` | workspace | app | no | no | Read PSEO module context and declared experiments from system.md; emit a structured experiment plan with proof-gate thresholds (RFC-0277). Offline, read-only — the plan is a proposal, not auto-execution. |
