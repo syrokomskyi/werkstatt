@@ -28,7 +28,7 @@ import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
 import type { GateChannel } from "../certification/contracts/identifiers.ts";
 import { astroCertificationProfile } from "../certification/profile/astro-profile.ts";
-import { makeR2ConfigFromEnv } from "./deploy-helpers.ts";
+import { makeR2ConfigFromEnv, resolveArtifactHash } from "./deploy-helpers.ts";
 import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import { cacheCloneCommit } from "../mission/mission-git-commit.ts";
 import { gitExec } from "../werkstatt/git-exec.ts";
@@ -45,7 +45,6 @@ import { evaluateCertificationDecision } from "../certification/aggregation.ts";
 import type { EvidenceEnvelopeV1 } from "../certification/contracts/evidence.ts";
 import type { ReleaseCandidateV1 } from "../certification/contracts/candidate.ts";
 import type { CertificationPolicyBundleV1 } from "../certification/contracts/policy-bundle.ts";
-import { isSha256Digest } from "../fingerprint/primitives.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -87,10 +86,8 @@ export async function runLeitstandCertify(
   const releaseId = flagString(input, "release");
   if (!releaseId) throw new Error("[leitstand.certify] --release is required");
 
-  const artifactHash = artifactHashFlag as Sha256Digest;
-  if (!artifactHash || !isSha256Digest(artifactHash)) {
-    throw new Error("[leitstand.certify] --artifact-hash is required (sha256:... format)");
-  }
+  const releaseDir = path.join(context.workspaceRoot, "releases", releaseId);
+  const artifactHash = await resolveArtifactHash(artifactHashFlag, releaseDir);
 
   const baseUrlFlag = flagString(input, "base-url");
   const gateChannel = gate as GateChannel;

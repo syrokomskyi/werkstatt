@@ -70,8 +70,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "artifact-hash": {
             kind: "string",
-            required: true,
-            description: "RFC-0866: Artifact hash (sha256:... format).",
+            description:
+              "RFC-0866: Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
           },
         },
         writes: ["missions/{mission}/evidence/axiom/**"],
@@ -109,8 +109,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "artifact-hash": {
             kind: "string",
-            required: true,
-            description: "RFC-0866: Artifact hash (sha256:... format).",
+            description:
+              "RFC-0866: Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
           },
         },
         writes: [
@@ -155,8 +155,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "artifact-hash": {
             kind: "string",
-            required: true,
-            description: "RFC-0866: Artifact hash (sha256:... format).",
+            description:
+              "RFC-0866: Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
           },
         },
         writes: [
@@ -283,8 +283,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "artifact-hash": {
             kind: "string",
-            required: true,
-            description: "Artifact hash (sha256:... format).",
+            description:
+              "Artifact hash (sha256:... format). Auto-resolved from releases/{release}/artifact.tar.gz if omitted.",
           },
           "base-url": {
             kind: "string",
