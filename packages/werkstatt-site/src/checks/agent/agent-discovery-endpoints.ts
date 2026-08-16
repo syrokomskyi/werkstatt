@@ -170,7 +170,7 @@ function buildOauthAuthorizationServer(origin: string): string {
     code_challenge_methods_supported: ["S256"],
     scopes_supported: ["read"],
     agent_auth: {
-      skill: "auth.md",
+      skill: `${origin}/auth.md`,
       register_uri: `${origin}/auth`,
       identity_types_supported: ["anonymous"],
       anonymous: {

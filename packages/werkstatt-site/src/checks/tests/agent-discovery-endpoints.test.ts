@@ -180,7 +180,7 @@ test("generate: writes all four discovery endpoint files", async () => {
   expect(oas.authorization_endpoint).toBe("https://test.example/auth");
   expect(oas.response_types_supported).toContain("code");
   expect(oas.agent_auth).toBeDefined();
-  expect(oas.agent_auth.skill).toBe("auth.md");
+  expect(oas.agent_auth.skill).toBe("https://test.example/auth.md");
   expect(oas.agent_auth.register_uri).toBe("https://test.example/auth");
   expect(oas.agent_auth.identity_types_supported).toContain("anonymous");
 });
