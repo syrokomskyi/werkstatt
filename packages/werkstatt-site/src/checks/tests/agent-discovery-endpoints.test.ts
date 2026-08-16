@@ -167,7 +167,8 @@ test("generate: writes all four discovery endpoint files", async () => {
   const opr = JSON.parse(oprRaw);
   expect(opr.resource).toBe("https://test.example/");
   expect(opr.authorization_servers).toBeDefined();
-  expect(opr.bearer_methods).toContain("header");
+  expect(opr.bearer_methods_supported).toContain("header");
+  expect(opr.scopes_supported).toBeDefined();
 
   // oauth-authorization-server
   const oasRaw = await fs.readFile(
@@ -178,6 +179,10 @@ test("generate: writes all four discovery endpoint files", async () => {
   expect(oas.issuer).toBe("https://test.example/");
   expect(oas.authorization_endpoint).toBe("https://test.example/auth");
   expect(oas.response_types_supported).toContain("code");
+  expect(oas.agent_auth).toBeDefined();
+  expect(oas.agent_auth.skill).toBe("auth.md");
+  expect(oas.agent_auth.register_uri).toBe("https://test.example/auth");
+  expect(oas.agent_auth.identity_types_supported).toContain("anonymous");
 });
 
 test("generate: skip when agent.enabled is false and remove stale files", async () => {

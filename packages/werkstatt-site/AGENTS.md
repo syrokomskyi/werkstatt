@@ -153,6 +153,7 @@ RFC-0776 completed the import sweep. All packages and services now import from `
 ## Generated file loader rules
 
 - **Loaders of generated files MUST emit `console.warn` on ENOENT with actionable fix instructions.** Loaders like `loadContentRefIndex` and `loadDerivedPrices` return `null` when the generated file is missing. Without a warning, the failure is silent — prices disappear, formula references stop resolving, and the developer has no idea why. Always include the file path, what breaks without it, and the command to regenerate it (e.g. `pnpm exec werkstatt run content.ref-index.generate --site <siteId>`). This is the safety net for direct `astro dev` runs that bypass `mission.preview`'s pre-dev check.
+- **GENERATOR_OWNERSHIP_MAP entries for generators that only run in `build.post` MUST have `conditional: true`.** `generated.files.validate` runs in `build.prepare` and checks all non-conditional entries for file existence. If a generator only runs in `build.post` (e.g. `behavior.snapshot.generate`), its file does not exist during `build.prepare` on the first `mission.validate` after materialization — causing a false `GEN-FILES-01`. The `conditional` flag skips the absence check while `ownership.sync.validate` and `generated.stale.validate` still include the file in their expected-path sets (ADR-0048).
 
 ## Testing directory (RFC-0823, DNA-66)
 

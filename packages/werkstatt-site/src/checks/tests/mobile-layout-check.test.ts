@@ -14,6 +14,7 @@ import { makeTestSiteContext, testInput, unwrapData } from "./helpers.ts";
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial creation: tests for skip path, route discovery, mode behavior, and CLS computation.</item>
+  <item>ADR-0049: add context reuse test — verify newContext is called exactly 2 times regardless of route count.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -314,12 +315,45 @@ describe("mobile.layout.check", () => {
 
     await runMobileLayoutCheck(testInput(), makeTestSiteContext(workspaceRoot, appDir));
 
-    // 1 route × 2 orientations = 2 contexts, each must have route() called
+    // ADR-0049: 2 contexts (portrait + landscape), reused across all routes
     const newContextCalls = browser.newContext.mock.results;
     expect(newContextCalls.length).toBe(2);
     for (const callResult of newContextCalls) {
       const ctx = await callResult.value;
       expect(ctx.route).toHaveBeenCalled();
     }
+  });
+
+  it("ADR-0049: reuses contexts across multiple routes — newContext called exactly 2 times", async () => {
+    await writeFile(
+      join(distClient, "index.html"),
+      "<!DOCTYPE html><html><body>Home</body></html>",
+    );
+    await mkdir(join(distClient, "about"), { recursive: true });
+    await writeFile(
+      join(distClient, "about", "index.html"),
+      "<!DOCTYPE html><html><body>About</body></html>",
+    );
+    await mkdir(join(distClient, "contact"), { recursive: true });
+    await writeFile(
+      join(distClient, "contact", "index.html"),
+      "<!DOCTYPE html><html><body>Contact</body></html>",
+    );
+
+    // 3 routes × 2 orientations = 6 pages needed
+    const browser = setupMockBrowser([
+      makeMockPage({}),
+      makeMockPage({}),
+      makeMockPage({}),
+      makeMockPage({}),
+      makeMockPage({}),
+      makeMockPage({}),
+    ]);
+
+    await runMobileLayoutCheck(testInput(), makeTestSiteContext(workspaceRoot, appDir));
+
+    // ADR-0049: exactly 2 contexts (portrait + landscape), not 6 (3 routes × 2 orientations)
+    const newContextCalls = browser.newContext.mock.results;
+    expect(newContextCalls.length).toBe(2);
   });
 });

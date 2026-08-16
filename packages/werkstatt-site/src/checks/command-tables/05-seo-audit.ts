@@ -243,6 +243,14 @@ export const SEO_AUDIT_COMMANDS: CheckCommandEntry[] = [
         kind: "string",
         description: "Layout shift threshold in px (default 5)",
       },
+      concurrency: {
+        kind: "string",
+        description: "Number of routes to process in parallel (default 4, ADR-0049)",
+      },
+      "settle-wait": {
+        kind: "string",
+        description: "Settle wait per page in ms (default 500, ADR-0049)",
+      },
     },
     supportsAllSites: true,
     cacheable: false,

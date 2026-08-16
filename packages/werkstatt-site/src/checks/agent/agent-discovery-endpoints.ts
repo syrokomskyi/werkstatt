@@ -71,9 +71,18 @@ agent.json manifest.
 
 ## Registration
 
+This site supports anonymous agent access — no registration or credentials
+are required to read public discovery endpoints.
+
+- **Register URI**: \`https://${domain}/auth\`
+- **Identity Type**: anonymous
+- **Credential Type**: none
+- **Claim URI**: \`/.well-known/agent.json\`
+
 Agents can discover this site's capabilities by fetching the endpoints listed
-above. No explicit registration is required — all discovery metadata is
-publicly accessible.
+above. For authenticated operations, use the OAuth 2.0 authorization code flow
+with PKCE (S256) via the Authorization Server metadata at
+\`/.well-known/oauth-authorization-server\`.
 
 ## Contact
 
@@ -145,7 +154,7 @@ function buildOauthProtectedResource(origin: string): string {
   const doc = {
     resource: `${origin}/`,
     authorization_servers: [`${origin}/.well-known/oauth-authorization-server`],
-    bearer_methods: ["header"],
+    bearer_methods_supported: ["header"],
     scopes_supported: [],
   };
   return `${JSON.stringify(doc, null, 2)}\n`;
@@ -160,6 +169,15 @@ function buildOauthAuthorizationServer(origin: string): string {
     grant_types_supported: ["authorization_code"],
     code_challenge_methods_supported: ["S256"],
     scopes_supported: [],
+    agent_auth: {
+      skill: "auth.md",
+      register_uri: `${origin}/auth`,
+      identity_types_supported: ["anonymous"],
+      anonymous: {
+        credential_types_supported: ["none"],
+        claim_uri: `${origin}/.well-known/agent.json`,
+      },
+    },
   };
   return `${JSON.stringify(doc, null, 2)}\n`;
 }

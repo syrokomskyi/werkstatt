@@ -15,6 +15,7 @@ geometric invariants directly.
 <CHANGE_SUMMARY>
   <item>RFC-0838: initial implementation with four geometric rules (MOBILE-GEO-01..04).</item>
   <item>RFC-0843: refactor to shared playwright-utils (blockExternalRequests, evaluateInPage), fix result.timeout to only flag real timeouts.</item>
+  <item>ADR-0049: parallelize route processing (concurrency=4), reduce settle wait from 2s to 500ms, reuse browser contexts — reduces 124-page check from 11+ min to under 3 min.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,6 +32,7 @@ import type {
 import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
 import { ensureChromium } from "./playwright-chromium-ensure.ts";
 import { blockExternalRequests, evaluateInPage } from "./playwright-utils.ts";
+import type { BrowserContext } from "playwright";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -64,7 +66,8 @@ const LANDSCAPE_HEIGHT = 390;
 const DEFAULT_ROUTE_TIMEOUT_MS = 30_000;
 const DEFAULT_STABILITY_DELTA_PX = 5;
 const CLS_THRESHOLD = 0.1;
-const SETTLE_WAIT_MS = 2_000;
+const DEFAULT_SETTLE_WAIT_MS = 500;
+const DEFAULT_CONCURRENCY = 4;
 
 const MIME_TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -239,6 +242,126 @@ function computeMaxDelta(
   return { element: maxElement, deltaPx: maxDelta };
 }
 
+// ─── Per-route check (extracted for parallelization) ────────────────────────
+
+async function checkRoute(
+  route: string,
+  portraitCtx: BrowserContext,
+  landscapeCtx: BrowserContext,
+  baseUrl: string,
+  routeTimeoutMs: number,
+  settleWaitMs: number,
+  stabilityDeltaThreshold: number,
+  siteName: string,
+): Promise<{ results: RouteResult[]; diagnostics: Diagnostic[]; timedOut: boolean }> {
+  const results: RouteResult[] = [];
+  const diagnostics: Diagnostic[] = [];
+  let portraitGeometry: ElementGeometry[] = [];
+  let timedOut = false;
+
+  for (const orientation of ["portrait", "landscape"] as const) {
+    const ctx = orientation === "portrait" ? portraitCtx : landscapeCtx;
+    const page = await ctx.newPage();
+    await page.addInitScript(CLS_INIT_SCRIPT);
+
+    const result: RouteResult = {
+      route,
+      orientation,
+      passed: true,
+      overflow: null,
+      clsScore: null,
+      stabilityDelta: null,
+      timeout: false,
+    };
+
+    try {
+      await page.goto(`${baseUrl}${route}`, {
+        waitUntil: "load",
+        timeout: routeTimeoutMs,
+      });
+
+      await page.waitForTimeout(settleWaitMs);
+
+      // MOBILE-GEO-01: horizontal overflow
+      const dims = await evaluateInPage(page, () => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      result.overflow = { scrollWidth: dims.scrollWidth, clientWidth: dims.clientWidth };
+      if (dims.scrollWidth > dims.clientWidth) {
+        result.passed = false;
+        diagnostics.push({
+          ruleId: "MOBILE-GEO-01",
+          severity: "error",
+          file: `apps/${siteName}/dist/client${route}`,
+          message: `Route has horizontal overflow in ${orientation}: scrollWidth=${dims.scrollWidth}px > clientWidth=${dims.clientWidth}px.`,
+        });
+      }
+
+      // MOBILE-GEO-03: CLS
+      const clsEntries = await evaluateInPage(
+        page,
+        () =>
+          (
+            window as unknown as {
+              __clsEntries?: Array<{ startTime: number; value: number }>;
+            }
+          ).__clsEntries ?? [],
+      );
+      const clsScore = computeCls(clsEntries);
+      result.clsScore = clsScore;
+      if (clsScore >= CLS_THRESHOLD) {
+        result.passed = false;
+        diagnostics.push({
+          ruleId: "MOBILE-GEO-03",
+          severity: "error",
+          file: `apps/${siteName}/dist/client${route}`,
+          message: `CLS score ${clsScore.toFixed(4)} exceeds threshold ${CLS_THRESHOLD} in ${orientation}.`,
+        });
+      }
+
+      // Geometry measurement for MOBILE-GEO-02
+      const geometry = await evaluateInPage<ElementGeometry[]>(page, measureGeometry);
+      if (orientation === "portrait") {
+        portraitGeometry = geometry;
+      } else {
+        const delta = computeMaxDelta(portraitGeometry, geometry);
+        if (delta && delta.deltaPx > stabilityDeltaThreshold) {
+          result.passed = false;
+          result.stabilityDelta = delta;
+          diagnostics.push({
+            ruleId: "MOBILE-GEO-02",
+            severity: "error",
+            file: `apps/${siteName}/dist/client${route}`,
+            message: `Key element "${delta.element}" shifted ${delta.deltaPx}px after portrait→landscape rotation (threshold: ${stabilityDeltaThreshold}px).`,
+          });
+        } else if (delta) {
+          result.stabilityDelta = delta;
+        }
+      }
+    } catch (err) {
+      result.passed = false;
+      const errMsg = err instanceof Error ? err.message : String(err);
+      const isTimeout = errMsg.toLowerCase().includes("timeout");
+      result.timeout = isTimeout;
+      timedOut = isTimeout;
+      diagnostics.push({
+        ruleId: "MOBILE-GEO-04",
+        severity: "error",
+        file: `apps/${siteName}/dist/client${route}`,
+        message: isTimeout
+          ? `Route timed out in ${orientation} after ${routeTimeoutMs}ms: ${errMsg}`
+          : `Route failed in ${orientation}: ${errMsg}`,
+      });
+    }
+
+    results.push(result);
+    await page.close();
+  }
+
+  return { results, diagnostics, timedOut };
+}
+
 // ─── Command handler ─────────────────────────────────────────────────────────
 
 export async function runMobileLayoutCheck(
@@ -255,6 +378,14 @@ export async function runMobileLayoutCheck(
     typeof input.flags["stability-delta"] === "string"
       ? parseInt(input.flags["stability-delta"], 10) || DEFAULT_STABILITY_DELTA_PX
       : DEFAULT_STABILITY_DELTA_PX;
+  const concurrency =
+    typeof input.flags["concurrency"] === "string"
+      ? Math.max(1, parseInt(input.flags["concurrency"], 10) || DEFAULT_CONCURRENCY)
+      : DEFAULT_CONCURRENCY;
+  const settleWaitMs =
+    typeof input.flags["settle-wait"] === "string"
+      ? Math.max(0, parseInt(input.flags["settle-wait"], 10) || DEFAULT_SETTLE_WAIT_MS)
+      : DEFAULT_SETTLE_WAIT_MS;
 
   const siteName = site?.name;
   if (!siteName) {
@@ -355,130 +486,56 @@ export async function runMobileLayoutCheck(
     const diagnostics: Diagnostic[] = [];
 
     try {
-      for (const route of routes) {
-        let portraitGeometry: ElementGeometry[] = [];
-        let timedOut = false;
+      // ADR-0049: Create two reusable contexts — one per orientation.
+      // Context creation is expensive; reusing them across all routes avoids
+      // 248 context creations (124 routes × 2 orientations). External request
+      // blocking is set up once per context.
+      const portraitCtx = await browser.newContext({
+        viewport: { width: PORTRAIT_WIDTH, height: PORTRAIT_HEIGHT },
+        isMobile: true,
+        hasTouch: true,
+      });
+      await blockExternalRequests(portraitCtx, baseUrl);
 
-        for (const orientation of ["portrait", "landscape"] as const) {
-          const vw = orientation === "portrait" ? PORTRAIT_WIDTH : LANDSCAPE_WIDTH;
-          const vh = orientation === "portrait" ? PORTRAIT_HEIGHT : LANDSCAPE_HEIGHT;
+      const landscapeCtx = await browser.newContext({
+        viewport: { width: LANDSCAPE_WIDTH, height: LANDSCAPE_HEIGHT },
+        isMobile: true,
+        hasTouch: true,
+      });
+      await blockExternalRequests(landscapeCtx, baseUrl);
 
-          const ctx = await browser.newContext({
-            viewport: { width: vw, height: vh },
-            isMobile: true,
-            hasTouch: true,
-          });
-
-          // Block all external requests. mobile.layout.check tests geometric
-          // invariants of locally-built HTML/CSS — external resources (analytics
-          // beacons, CDN fonts, pulse endpoints) must not cause network timeouts
-          // or non-deterministic layout shifts. Only requests to the local static
-          // server are allowed; everything else is aborted immediately.
-          await blockExternalRequests(ctx, baseUrl);
-
-          const page = await ctx.newPage();
-
-          await page.addInitScript(CLS_INIT_SCRIPT);
-
-          const result: RouteResult = {
-            route,
-            orientation,
-            passed: true,
-            overflow: null,
-            clsScore: null,
-            stabilityDelta: null,
-            timeout: false,
-          };
-
-          try {
-            await page.goto(`${baseUrl}${route}`, {
-              waitUntil: "load",
-              timeout: routeTimeoutMs,
-            });
-
-            await page.waitForTimeout(SETTLE_WAIT_MS);
-
-            // MOBILE-GEO-01: horizontal overflow
-            const dims = await evaluateInPage(page, () => ({
-              scrollWidth: document.documentElement.scrollWidth,
-              clientWidth: document.documentElement.clientWidth,
-            }));
-            result.overflow = { scrollWidth: dims.scrollWidth, clientWidth: dims.clientWidth };
-            if (dims.scrollWidth > dims.clientWidth) {
-              result.passed = false;
-              diagnostics.push({
-                ruleId: "MOBILE-GEO-01",
-                severity: "error",
-                file: `apps/${siteName}/dist/client${route}`,
-                message: `Route has horizontal overflow in ${orientation}: scrollWidth=${dims.scrollWidth}px > clientWidth=${dims.clientWidth}px.`,
-              });
+      try {
+        // ADR-0049: Process routes in parallel batches. Within each route,
+        // portrait and landscape are sequential (MOBILE-GEO-02 requires portrait
+        // geometry before landscape). Across routes, batches run concurrently.
+        for (let i = 0; i < routes.length; i += concurrency) {
+          const batch = routes.slice(i, i + concurrency);
+          const batchOutputs = await Promise.all(
+            batch.map((route) =>
+              checkRoute(
+                route,
+                portraitCtx,
+                landscapeCtx,
+                baseUrl,
+                routeTimeoutMs,
+                settleWaitMs,
+                stabilityDeltaThreshold,
+                siteName,
+              ),
+            ),
+          );
+          for (const { results, diagnostics: diags, timedOut } of batchOutputs) {
+            routeResults.push(...results);
+            diagnostics.push(...diags);
+            if (outputFormat === "pretty") {
+              const tag = timedOut ? "[TIMEOUT]" : "[ok]";
+              logger.info(`${tag} ${results[0]?.route ?? ""}`);
             }
-
-            // MOBILE-GEO-03: CLS
-            const clsEntries = await evaluateInPage(
-              page,
-              () =>
-                (
-                  window as unknown as {
-                    __clsEntries?: Array<{ startTime: number; value: number }>;
-                  }
-                ).__clsEntries ?? [],
-            );
-            const clsScore = computeCls(clsEntries);
-            result.clsScore = clsScore;
-            if (clsScore >= CLS_THRESHOLD) {
-              result.passed = false;
-              diagnostics.push({
-                ruleId: "MOBILE-GEO-03",
-                severity: "error",
-                file: `apps/${siteName}/dist/client${route}`,
-                message: `CLS score ${clsScore.toFixed(4)} exceeds threshold ${CLS_THRESHOLD} in ${orientation}.`,
-              });
-            }
-
-            // Geometry measurement for MOBILE-GEO-02
-            const geometry = await evaluateInPage<ElementGeometry[]>(page, measureGeometry);
-            if (orientation === "portrait") {
-              portraitGeometry = geometry;
-            } else {
-              const delta = computeMaxDelta(portraitGeometry, geometry);
-              if (delta && delta.deltaPx > stabilityDeltaThreshold) {
-                result.passed = false;
-                result.stabilityDelta = delta;
-                diagnostics.push({
-                  ruleId: "MOBILE-GEO-02",
-                  severity: "error",
-                  file: `apps/${siteName}/dist/client${route}`,
-                  message: `Key element "${delta.element}" shifted ${delta.deltaPx}px after portrait→landscape rotation (threshold: ${stabilityDeltaThreshold}px).`,
-                });
-              } else if (delta) {
-                result.stabilityDelta = delta;
-              }
-            }
-          } catch (err) {
-            result.passed = false;
-            const errMsg = err instanceof Error ? err.message : String(err);
-            const isTimeout = errMsg.toLowerCase().includes("timeout");
-            result.timeout = isTimeout;
-            timedOut = isTimeout;
-            diagnostics.push({
-              ruleId: "MOBILE-GEO-04",
-              severity: "error",
-              file: `apps/${siteName}/dist/client${route}`,
-              message: isTimeout
-                ? `Route timed out in ${orientation} after ${routeTimeoutMs}ms: ${errMsg}`
-                : `Route failed in ${orientation}: ${errMsg}`,
-            });
           }
-
-          routeResults.push(result);
-          await ctx.close();
         }
-
-        if (outputFormat === "pretty") {
-          const tag = timedOut ? "[TIMEOUT]" : "[ok]";
-          logger.info(`${tag} ${route}`);
-        }
+      } finally {
+        await portraitCtx.close();
+        await landscapeCtx.close();
       }
     } finally {
       await browser.close();
