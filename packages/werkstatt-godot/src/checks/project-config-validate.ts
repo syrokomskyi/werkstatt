@@ -1,14 +1,15 @@
 /*
 <MODULE_CONTRACT>
-<purpose>godot.project.config.validate — warns on project.godot sensitive field changes (GODOT-04).</purpose>
+<purpose>godot.project.config.validate — warns on project.godot sensitive field presence (GODOT-04).</purpose>
 <keywords>validator, project, godot, config, autoload, input</keywords>
 <non-goals>
   <item>Does not modify files — read-only validator.</item>
-  <item>Does not block — severity is warning only.</item>
+  <item>Does not block — severity is warning only (exitCode 0 always).</item>
+  <item>Does not diff against baseline — checks presence of sensitive sections, not changes. Future enhancement: compare against git HEAD.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Initial project config validator — checks for autoload/input_map sections in project.godot.</item>
+  <item>Fix: make GODOT-04 warning-only (exitCode 0 always) to match described severity. Document presence-based limitation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,7 +28,7 @@ export interface ProjectConfigValidateViolation {
 
 export interface ProjectConfigValidateData {
   command: string;
-  status: "pass" | "fail";
+  status: "pass" | "warn";
   violations: ProjectConfigValidateViolation[];
 }
 
@@ -44,11 +45,10 @@ export async function validateProjectConfig(
   try {
     content = await readFile(join(projectRoot, PROJECT_GODOT), "utf-8");
   } catch {
-    const status = "pass";
     return {
-      data: { command: "godot.project.config.validate", status, violations },
+      data: { command: "godot.project.config.validate", status: "pass", violations },
       exitCode: 0,
-      summary: `godot.project.config.validate: ${status} (no project.godot found, skipping)`,
+      summary: `godot.project.config.validate: pass (no project.godot found, skipping)`,
     };
   }
 
@@ -62,10 +62,10 @@ export async function validateProjectConfig(
     }
   }
 
-  const status = violations.length === 0 ? "pass" : "fail";
+  const status: ProjectConfigValidateData["status"] = violations.length === 0 ? "pass" : "warn";
   return {
     data: { command: "godot.project.config.validate", status, violations },
-    exitCode: status === "pass" ? 0 : 1,
+    exitCode: 0,
     summary: `godot.project.config.validate: ${status} (${violations.length} warnings)`,
   };
 }

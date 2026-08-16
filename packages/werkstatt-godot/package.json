@@ -27,17 +27,9 @@
       "types": "./src/invariants/godot-invariants.ts",
       "default": "./src/invariants/godot-invariants.ts"
     },
-    "./onboarding": {
-      "types": "./src/onboarding/index.ts",
-      "default": "./src/onboarding/index.ts"
-    },
-    "./onboarding/module": {
-      "types": "./src/onboarding/module.ts",
-      "default": "./src/onboarding/module.ts"
-    },
-    "./deploy": {
-      "types": "./src/deploy/index.ts",
-      "default": "./src/deploy/index.ts"
+    "./deploy/types": {
+      "types": "./src/deploy/types.ts",
+      "default": "./src/deploy/types.ts"
     },
     "./build": {
       "types": "./src/build/dotnet-build.ts",
@@ -56,8 +48,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@warpgogol/werkstatt": "workspace:*",
-    "yaml": "^2.9.0"
+    "@warpgogol/werkstatt": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

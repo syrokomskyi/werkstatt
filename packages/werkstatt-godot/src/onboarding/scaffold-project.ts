@@ -19,8 +19,9 @@
 </CHANGE_SUMMARY>
 */
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import type { PluginHookContext, HookResult } from "@warpgogol/werkstatt/plugin";
 
 const PROJECT_GODOT = `; Engine configuration file.
@@ -88,11 +89,11 @@ export async function scaffoldGodotProject(ctx: PluginHookContext): Promise<Hook
     await mkdir(join(projectPath, "Resources"), { recursive: true });
     await mkdir(join(projectPath, "Assets"), { recursive: true });
 
-    await writeFile(join(projectPath, "project.godot"), PROJECT_GODOT.replace(/__PROJECT_NAME__/g, projectId));
-    await writeFile(join(projectPath, "Game.csproj"), GAME_CSPROJ);
-    await writeFile(join(projectPath, "Scenes", "Main.tscn"), MAIN_TSCN);
-    await writeFile(join(projectPath, "Scripts", "Main.cs"), MAIN_CS.replace(/__PROJECT_NAME__/g, safeName));
-    await writeFile(join(projectPath, ".gitignore"), GITIGNORE);
+    await writeFileIfChanged(join(projectPath, "project.godot"), PROJECT_GODOT.replace(/__PROJECT_NAME__/g, projectId));
+    await writeFileIfChanged(join(projectPath, "Game.csproj"), GAME_CSPROJ);
+    await writeFileIfChanged(join(projectPath, "Scenes", "Main.tscn"), MAIN_TSCN);
+    await writeFileIfChanged(join(projectPath, "Scripts", "Main.cs"), MAIN_CS.replace(/__PROJECT_NAME__/g, safeName));
+    await writeFileIfChanged(join(projectPath, ".gitignore"), GITIGNORE);
 
     ctx.logger.info("scaffold-project: project created successfully");
     return {

@@ -17,7 +17,7 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | `schema` | `werkstatt/plugin@1` |
 | `id` | `werkstatt-godot` |
 | `profileId` | `godot-csharp` |
-| `moduleLoaders` | `checks`, `onboarding` |
+| `moduleLoaders` | `checks` |
 | `deployAdapters` | `itch-io`, `github-releases` |
 | `hooks` | `build`, `checkGate`, `releaseEvidence`, `scaffoldProject` |
 | `paths` | `Scenes` (contentDir), `bin` (distDir), `project.godot` + `Game.csproj` (entryPoints) |
@@ -40,7 +40,6 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | itch.io deploy | `src/deploy/itch-io.ts` | `deployAdapters["itch-io"]` |
 | GitHub Releases | `src/deploy/github-releases.ts` | `deployAdapters["github-releases"]` |
 | Scaffold | `src/onboarding/scaffold-project.ts` | `hooks.scaffoldProject` |
-| Onboarding module | `src/onboarding/module.ts` | Kernel module registering scaffold command |
 | Release evidence | `src/release-evidence/godot-evidence.ts` | `hooks.releaseEvidence` |
 
 ## Stack invariants

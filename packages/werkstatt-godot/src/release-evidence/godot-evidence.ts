@@ -18,11 +18,11 @@
 </CHANGE_SUMMARY>
 */
 
-import { readFile, readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
-import type { Dirent } from "node:fs";
 import type { PluginHookContext, HookResult } from "@warpgogol/werkstatt/plugin";
+import { listFilesRecursive } from "../utils/list-files-recursive.ts";
 
 export interface GodotReleaseEvidence {
   projectHash: string;
@@ -79,23 +79,4 @@ async function hashFiles(filePaths: string[]): Promise<string> {
     hasher.update(content);
   }
   return hasher.digest("hex");
-}
-
-async function listFilesRecursive(dir: string, ext: string): Promise<string[]> {
-  const results: string[] = [];
-  let entries: Dirent[];
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return results;
-  }
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...(await listFilesRecursive(fullPath, ext)));
-    } else if (entry.isFile() && entry.name.endsWith(ext)) {
-      results.push(fullPath);
-    }
-  }
-  return results;
 }

@@ -12,13 +12,13 @@
 </CHANGE_SUMMARY>
 */
 
-import { readFile, readdir } from "node:fs/promises";
-import { join, relative } from "node:path";
-import type { Dirent } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { relative } from "node:path";
 import type {
   KernelCommandDefinition,
   KernelCommandResult,
 } from "@warpgogol/werkstatt/kernel/types";
+import { listFilesRecursive } from "../utils/list-files-recursive.ts";
 
 export interface SecretScanViolation {
   ruleId: string;
@@ -64,7 +64,14 @@ export async function scanSecrets(
   projectRoot: string,
 ): Promise<KernelCommandResult<SecretScanData>> {
   const violations: SecretScanViolation[] = [];
-  const csFiles = await listCsFiles(projectRoot);
+  const allCsFiles = await listFilesRecursive(projectRoot, ".cs", [
+    "bin",
+    "obj",
+    ".godot",
+    ".git",
+    "node_modules",
+  ]);
+  const csFiles = allCsFiles.filter((f) => !f.endsWith(".g.cs"));
 
   for (const filePath of csFiles) {
     const content = await readFile(filePath, "utf-8");
@@ -97,28 +104,6 @@ export async function scanSecrets(
     exitCode: status === "pass" ? 0 : 1,
     summary: `godot.secret.scan: ${status} (${violations.length} violations)`,
   };
-}
-
-async function listCsFiles(dir: string): Promise<string[]> {
-  const results: string[] = [];
-  let entries: Dirent[];
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return results;
-  }
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (entry.name === "bin" || entry.name === "obj" || entry.name === ".godot") {
-        continue;
-      }
-      results.push(...(await listCsFiles(fullPath)));
-    } else if (entry.isFile() && entry.name.endsWith(".cs") && !entry.name.endsWith(".g.cs")) {
-      results.push(fullPath);
-    }
-  }
-  return results;
 }
 
 export function createSecretScanCommand(): KernelCommandDefinition<SecretScanData> {

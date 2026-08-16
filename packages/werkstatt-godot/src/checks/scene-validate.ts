@@ -7,17 +7,17 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Initial scene validator — scans for .tscn in Scenes/ and .cs in Scripts/.</item>
+  <item>Fix: scan entire project root for misplaced .tscn/.cs files instead of only scanning Scenes/ and Scripts/ (circular logic).</item>
+  <item>Use shared listFilesRecursive from utils/list-files-recursive.ts.</item>
 </CHANGE_SUMMARY>
 */
 
-import { readdir, readFile } from "node:fs/promises";
-import { join, relative } from "node:path";
-import type { Dirent } from "node:fs";
+import { relative } from "node:path";
 import type {
   KernelCommandDefinition,
   KernelCommandResult,
 } from "@warpgogol/werkstatt/kernel/types";
+import { listFilesRecursive } from "../utils/list-files-recursive.ts";
 
 export interface SceneValidateViolation {
   ruleId: string;
@@ -33,14 +33,15 @@ export interface SceneValidateData {
 
 const SCENES_DIR = "Scenes";
 const SCRIPTS_DIR = "Scripts";
+const SKIP_DIRS = ["bin", "obj", ".godot", ".git", "node_modules"];
 
 export async function validateSceneStructure(
   projectRoot: string,
 ): Promise<KernelCommandResult<SceneValidateData>> {
   const violations: SceneValidateViolation[] = [];
 
-  const tscnFiles = await listFilesRecursive(join(projectRoot, SCENES_DIR), ".tscn");
-  const csFiles = await listFilesRecursive(join(projectRoot, SCRIPTS_DIR), ".cs");
+  const tscnFiles = await listFilesRecursive(projectRoot, ".tscn", SKIP_DIRS);
+  const csFiles = await listFilesRecursive(projectRoot, ".cs", SKIP_DIRS);
 
   for (const filePath of tscnFiles) {
     const relPath = relative(projectRoot, filePath);
@@ -70,25 +71,6 @@ export async function validateSceneStructure(
     exitCode: status === "pass" ? 0 : 1,
     summary: `godot.scene.validate: ${status} (${violations.length} violations)`,
   };
-}
-
-async function listFilesRecursive(dir: string, ext: string): Promise<string[]> {
-  const results: string[] = [];
-  let entries: Dirent[];
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return results;
-  }
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...(await listFilesRecursive(fullPath, ext)));
-    } else if (entry.isFile() && entry.name.endsWith(ext)) {
-      results.push(fullPath);
-    }
-  }
-  return results;
 }
 
 export function createSceneValidateCommand(): KernelCommandDefinition<SceneValidateData> {

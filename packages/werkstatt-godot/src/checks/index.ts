@@ -32,7 +32,9 @@ export async function runGodotCheckGate(ctx: PluginHookContext): Promise<HookRes
 
   const gitignoreResult = await validateGitignore(projectRoot);
   if (gitignoreResult.exitCode !== 0) {
-    errors.push(`godot.gitignore.validate: ${gitignoreResult.data?.violations.length ?? 0} violations`);
+    errors.push(
+      `godot.gitignore.validate: ${gitignoreResult.data?.violations.length ?? 0} violations`,
+    );
   }
 
   const secretResult = await scanSecrets(projectRoot);
@@ -41,8 +43,9 @@ export async function runGodotCheckGate(ctx: PluginHookContext): Promise<HookRes
   }
 
   const configResult = await validateProjectConfig(projectRoot);
-  if (configResult.exitCode !== 0) {
-    errors.push(`godot.project.config.validate: ${configResult.data?.violations.length ?? 0} warnings`);
+  const configWarnings = configResult.data?.violations.length ?? 0;
+  if (configWarnings > 0) {
+    ctx.logger.warn(`godot.project.config.validate: ${configWarnings} warnings (non-blocking)`);
   }
 
   ctx.logger.info(

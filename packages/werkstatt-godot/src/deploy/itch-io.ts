@@ -20,6 +20,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import type { DeployResult } from "./types.ts";
 
 export interface ItchIoDeployConfig {
   apiKey: string;
@@ -30,12 +31,6 @@ export interface ItchIoDeployConfig {
 
 export interface ItchIoAdapter {
   deploy(workpiecePath: string, config: ItchIoDeployConfig): DeployResult;
-}
-
-export interface DeployResult {
-  success: boolean;
-  url?: string;
-  errors?: string[];
 }
 
 export function createItchIoAdapter(): ItchIoAdapter {

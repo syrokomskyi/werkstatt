@@ -20,7 +20,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { DeployResult } from "./itch-io.ts";
+import type { DeployResult } from "./types.ts";
 
 export interface GitHubReleasesDeployConfig {
   token: string;
@@ -88,9 +88,7 @@ export function createGitHubReleasesAdapter(): GitHubReleasesAdapter {
 
         return {
           success: true,
-          url: config.repo
-            ? `https://github.com/${config.repo}/releases/tag/${tag}`
-            : undefined,
+          url: config.repo ? `https://github.com/${config.repo}/releases/tag/${tag}` : undefined,
         };
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);

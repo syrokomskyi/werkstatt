@@ -32,8 +32,6 @@ export const werkstattGodotPlugin: WerkstattPlugin = {
   moduleLoaders: {
     checks: async (): Promise<KernelModule> =>
       (await import("./checks/module.ts")).createGodotCheckModule(),
-    onboarding: async (): Promise<KernelModule> =>
-      (await import("./onboarding/module.ts")).createGodotOnboardingModule(),
   },
   deployAdapters: {
     "itch-io": async () => {
