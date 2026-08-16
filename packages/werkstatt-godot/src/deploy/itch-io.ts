@@ -14,6 +14,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial itch.io deploy adapter — butler push to itch.io.</item>
+  <item>Fix: import DeployResult from shared deploy/types.ts instead of defining locally.</item>
 </CHANGE_SUMMARY>
 */
 

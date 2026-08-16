@@ -4,7 +4,7 @@
 <keywords>plugin, godot, csharp, game, werkstatt</keywords>
 <responsibilities>
   <item>Exports werkstattGodotPlugin: WerkstattPlugin with profileId "godot-csharp".</item>
-  <item>Registers Godot-stack engine modules via moduleLoaders (checks, onboarding).</item>
+  <item>Registers Godot-stack engine modules via moduleLoaders (checks).</item>
   <item>Provides deploy adapters (itch-io, github-releases) and lifecycle hooks.</item>
   <item>Declares Godot path conventions via StackPathConventions.</item>
 </responsibilities>
@@ -16,6 +16,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial Godot plugin entry point — Godot path conventions, check/onboarding module loaders, deploy adapters, lifecycle hooks, GODOT-01..04 invariants.</item>
+  <item>Fix: remove moduleLoaders.onboarding (no-op module deleted, scaffold handled via scaffoldProject hook).</item>
 </CHANGE_SUMMARY>
 */
 

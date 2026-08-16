@@ -14,6 +14,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial GitHub Releases deploy adapter — gh release create with build artifacts.</item>
+  <item>Fix: import DeployResult from shared deploy/types.ts instead of itch-io.ts.</item>
 </CHANGE_SUMMARY>
 */
 

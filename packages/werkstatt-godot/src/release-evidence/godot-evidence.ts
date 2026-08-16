@@ -15,6 +15,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial release evidence hook — project hash, scene hash, script hash.</item>
+  <item>Fix: use shared listFilesRecursive from utils/list-files-recursive.ts, remove duplicated local function.</item>
 </CHANGE_SUMMARY>
 */
 

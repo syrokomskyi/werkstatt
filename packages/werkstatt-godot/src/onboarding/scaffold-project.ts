@@ -16,6 +16,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial Godot project scaffold — Main scene, Main script, project.godot, Game.csproj, .gitignore.</item>
+  <item>Fix: use writeFileIfChanged instead of raw writeFile to avoid git churn on regeneration.</item>
 </CHANGE_SUMMARY>
 */
 

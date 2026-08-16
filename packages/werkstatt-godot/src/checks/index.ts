@@ -12,6 +12,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial check gate composition running scene, gitignore, secret-scan, and project-config validators.</item>
+  <item>Fix: treat GODOT-04 config validator as non-blocking (warnings only, not errors).</item>
 </CHANGE_SUMMARY>
 */
 

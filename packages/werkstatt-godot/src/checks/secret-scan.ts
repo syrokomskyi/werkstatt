@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial secret scan — regex patterns for API keys, tokens, passwords in .cs files.</item>
+  <item>Fix: use shared listFilesRecursive from utils/list-files-recursive.ts, remove duplicated local listCsFiles function.</item>
 </CHANGE_SUMMARY>
 */
 
