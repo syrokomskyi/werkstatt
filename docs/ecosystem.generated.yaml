@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 457823cf57c8e404d47db9157f7fd8d4713acff8795541c2217fb361d79da9e8
+  contentHash: 9303d79878ef146a94f5304491af961ef31f60b02e271882b3baf5b35f1dfcde
   sources:
     - path: docs/architecture-dna.md
-      hash: 9f0233f161248f4813c716b77ecd2fee87525c7857b40313a9ae48dbcf241253
+      hash: 17406abca4f3fdd60f8b51e8eae7423e9be3cbddcf8c03b2ba546b442aaa5cdf
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -23,7 +23,7 @@ meta:
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: 83c2f044ad2a5dea86ace5fe92679dea40f1add0956cb8fadc30d0898884b142
     - path: package.json
-      hash: 82f681fb2d5518144cc318af756f01073e1e625510685471211c9050d0409657
+      hash: 064dda8da2a10212f6ccfe4bff47d930a718dbf388ca19dc8ddccb739fdcd36e
     - path: packages/forge/package.json
       hash: 1c5da99ffd95ebe7facf0e13981d38de992b90b83b6fd04a423e75569048b648
     - path: packages/werkstatt-game/package.json
@@ -58,7 +58,7 @@ meta:
       hash: 08b456e4efb8f242b3076a9bcf9247999df2d4e5d0103e15f7e456216f847208
 workspace:
   name: warpgogol-platform
-  version: 6.0.3
+  version: 6.5.19
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -2710,6 +2710,12 @@ commands:
     supportsAllSites: true
     providers:
       - workspace
+  - name: leitstand.certify
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: leitstand.dev-deploy
     scope: workspace
     mutatesState: false
@@ -5138,83 +5144,11 @@ commandProvenance:
     changedBy:
       - RFC-0179
     removedBy: []
-  - command: leitstand.dev-deploy
+  - command: leitstand.certify
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: leitstand.health
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: leitstand.pipeline.check
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: leitstand.promote
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: leitstand.propagate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: leitstand.rollback
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: leitstand.status
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: release.list
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: release.prepare
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: release.ready
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: release.rollback
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: release.state.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
-    removedBy: []
-  - command: release.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0851
+      - RFC-0867
     removedBy: []
   - command: surface.generate
     proposedBy: []
@@ -6701,91 +6635,27 @@ generatedOwnership:
     module: packages/werkstatt/src/bordbuch/bordbuch-generate.ts
     conditional: true
 rfcs:
-  accepted: 3
-  implemented: 10
-  draft: 7
+  accepted: 1
+  implemented: 1
+  draft: 4
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0849
-      implementedAt: 2026-08-15
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-53
-    - id: RFC-0850
-      implementedAt: 2026-08-15
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-51
-        - DNA-64
-    - id: RFC-0852
-      implementedAt: 2026-08-15
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-64
-    - id: RFC-0853
-      implementedAt: 2026-08-15
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-53
-        - DNA-64
-    - id: RFC-0854
-      implementedAt: 2026-08-15
-      kind: policy
-      scope: workspace
-      dnaRefs: []
-    - id: RFC-0858
-      implementedAt: 2026-08-15
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-53
-        - DNA-64
-    - id: RFC-0859
-      implementedAt: 2026-08-15
+    - id: RFC-0867
+      implementedAt: 2026-08-16
       kind: architecture
       scope: workspace
       dnaRefs:
-        - DNA-51
-        - DNA-64
-    - id: RFC-0860
-      implementedAt: 2026-08-15
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-51
-        - DNA-53
-        - DNA-64
-    - id: RFC-0861
-      implementedAt: 2026-08-15
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-64
-    - id: RFC-0862
-      implementedAt: 2026-08-15
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-51
-        - DNA-64
+        - DNA-49
+        - DNA-59
   nonImplementedRfcs:
     accepted:
       - RFC-0179
-      - RFC-0851
-      - RFC-0857
     draft:
       - RFC-0000
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0848
-      - RFC-0863
-      - RFC-0864
     reviewing: []
     superseded: []
     rejected: []
