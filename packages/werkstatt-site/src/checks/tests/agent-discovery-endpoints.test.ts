@@ -168,7 +168,7 @@ test("generate: writes all four discovery endpoint files", async () => {
   expect(opr.resource).toBe("https://test.example/");
   expect(opr.authorization_servers).toBeDefined();
   expect(opr.bearer_methods_supported).toContain("header");
-  expect(opr.scopes_supported).toBeDefined();
+  expect(opr.scopes_supported).toContain("read");
 
   // oauth-authorization-server
   const oasRaw = await fs.readFile(

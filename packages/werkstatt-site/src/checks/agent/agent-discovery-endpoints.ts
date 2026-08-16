@@ -155,7 +155,7 @@ function buildOauthProtectedResource(origin: string): string {
     resource: `${origin}/`,
     authorization_servers: [`${origin}/.well-known/oauth-authorization-server`],
     bearer_methods_supported: ["header"],
-    scopes_supported: [],
+    scopes_supported: ["read"],
   };
   return `${JSON.stringify(doc, null, 2)}\n`;
 }
@@ -168,7 +168,7 @@ function buildOauthAuthorizationServer(origin: string): string {
     response_types_supported: ["code"],
     grant_types_supported: ["authorization_code"],
     code_challenge_methods_supported: ["S256"],
-    scopes_supported: [],
+    scopes_supported: ["read"],
     agent_auth: {
       skill: "auth.md",
       register_uri: `${origin}/auth`,
