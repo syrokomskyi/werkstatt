@@ -262,7 +262,6 @@ async function checkRoute(
   for (const orientation of ["portrait", "landscape"] as const) {
     const ctx = orientation === "portrait" ? portraitCtx : landscapeCtx;
     const page = await ctx.newPage();
-    await page.addInitScript(CLS_INIT_SCRIPT);
 
     const result: RouteResult = {
       route,
@@ -275,6 +274,7 @@ async function checkRoute(
     };
 
     try {
+      await page.addInitScript(CLS_INIT_SCRIPT);
       await page.goto(`${baseUrl}${route}`, {
         waitUntil: "load",
         timeout: routeTimeoutMs,
@@ -353,10 +353,11 @@ async function checkRoute(
           ? `Route timed out in ${orientation} after ${routeTimeoutMs}ms: ${errMsg}`
           : `Route failed in ${orientation}: ${errMsg}`,
       });
+    } finally {
+      await page.close();
     }
 
     results.push(result);
-    await page.close();
   }
 
   return { results, diagnostics, timedOut };
