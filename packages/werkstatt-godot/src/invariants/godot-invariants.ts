@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Godot stack invariants GODOT-01..07 surfaced to agents.</purpose>
+<purpose>Godot stack invariants GODOT-01..11 surfaced to agents.</purpose>
 <keywords>invariants, godot, csharp</keywords>
 <non-goals>
   <item>Do not enforce invariants here — enforcement lives in validators.</item>
@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Initial Godot stack invariants GODOT-01..04.</item>
   <item>Enhancement: add GODOT-05 (scene reference integrity), GODOT-06 (csproj settings), GODOT-07 (resource location and references).</item>
+  <item>Enhancement: add GODOT-08 (script conventions), GODOT-09 (export presets), GODOT-10 (UID uniqueness), GODOT-11 (NuGet packages).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -50,5 +51,28 @@ export const GODOT_INVARIANTS: StackInvariant[] = [
     description:
       "Resource files (.tres) must reside in Resources/ and their res:// references must exist",
     check: "godot.resource.validate",
+  },
+  {
+    id: "GODOT-08",
+    description:
+      "C# scripts must have class name matching file name, partial keyword on Node subclasses, and using Godot; directive",
+    check: "godot.script.validate",
+  },
+  {
+    id: "GODOT-09",
+    description:
+      "export_presets.cfg must have valid presets with non-empty relative export paths and known platforms",
+    check: "godot.export.presets.validate",
+  },
+  {
+    id: "GODOT-10",
+    description: "Scene (.tscn) and resource (.tres) files must have unique uid:// declarations",
+    check: "godot.uid.validate",
+  },
+  {
+    id: "GODOT-11",
+    description:
+      "Game.csproj NuGet package references must be Godot-compatible and non-problematic",
+    check: "godot.nuget.validate",
   },
 ];

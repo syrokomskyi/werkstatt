@@ -19,6 +19,7 @@
   <item>Initial Godot plugin entry point — Godot path conventions, check/onboarding module loaders, deploy adapters, lifecycle hooks, GODOT-01..04 invariants.</item>
   <item>Fix: remove moduleLoaders.onboarding (no-op module deleted, scaffold handled via scaffoldProject hook).</item>
   <item>Enhancement: add dev module (godot.dev.server, godot.test) via moduleLoaders. GODOT-01..07 invariants.</item>
+  <item>Enhancement: add script (GODOT-08), export-presets (GODOT-09), uid (GODOT-10), nuget (GODOT-11) validators. Add godot.smoke.test and godot.context.generate dev commands. GODOT-01..11 invariants.</item>
 </CHANGE_SUMMARY>
 */
 

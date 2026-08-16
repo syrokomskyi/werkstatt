@@ -21,7 +21,7 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | `deployAdapters` | `itch-io`, `github-releases` |
 | `hooks` | `build`, `checkGate`, `releaseEvidence`, `scaffoldProject` |
 | `paths` | `Scenes` (contentDir), `bin` (distDir), `project.godot` + `Game.csproj` (entryPoints) |
-| `invariants` | GODOT-01..07 |
+| `invariants` | GODOT-01..11 |
 
 ## Module layout
 
@@ -29,7 +29,7 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | --- | --- | --- |
 | Plugin entry | `src/index.ts` | `werkstattGodotPlugin` export |
 | Path conventions | `src/paths/godot-paths.ts` | Godot path constants |
-| Invariants | `src/invariants/godot-invariants.ts` | GODOT-01..07 declarations |
+| Invariants | `src/invariants/godot-invariants.ts` | GODOT-01..11 declarations |
 | Scene validator | `src/checks/scene-validate.ts` | `godot.scene.validate` (GODOT-01) |
 | Gitignore validator | `src/checks/gitignore-validate.ts` | `godot.gitignore.validate` (GODOT-02) |
 | Secret scan | `src/checks/secret-scan.ts` | `godot.secret.scan` (GODOT-03) |
@@ -37,11 +37,17 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | Scene reference validator | `src/checks/scene-reference-validate.ts` | `godot.scene.reference.validate` (GODOT-05) |
 | Csproj validator | `src/checks/csproj-validate.ts` | `godot.csproj.validate` (GODOT-06) |
 | Resource validator | `src/checks/resource-validate.ts` | `godot.resource.validate` (GODOT-07) |
-| Check gate | `src/checks/index.ts` | Runs all 7 validators in checkGate |
+| Script validator | `src/checks/script-validate.ts` | `godot.script.validate` (GODOT-08) |
+| Export presets validator | `src/checks/export-presets-validate.ts` | `godot.export.presets.validate` (GODOT-09) |
+| UID validator | `src/checks/uid-validate.ts` | `godot.uid.validate` (GODOT-10) |
+| NuGet validator | `src/checks/nuget-validate.ts` | `godot.nuget.validate` (GODOT-11) |
+| Check gate | `src/checks/index.ts` | Runs all 11 validators in checkGate |
 | Check module | `src/checks/module.ts` | Kernel module registering validators |
 | Build hook | `src/build/dotnet-build.ts` | `hooks.build` — runs `dotnet build` then Godot export |
 | Dev server | `src/build/godot-dev-server.ts` | `godot.dev.server` — launches `godot --editor` |
 | Test runner | `src/build/dotnet-test.ts` | `godot.test` — runs `dotnet test` |
+| Smoke test | `src/build/godot-smoke-test.ts` | `godot.smoke.test` — headless runtime error detection |
+| Context generator | `src/build/godot-context-generate.ts` | `godot.context.generate` — structured project summary for AI agents |
 | Dev module | `src/dev/module.ts` | Kernel module registering dev commands |
 | itch.io deploy | `src/deploy/itch-io.ts` | `deployAdapters["itch-io"]` — multi-platform channels |
 | GitHub Releases | `src/deploy/github-releases.ts` | `deployAdapters["github-releases"]` |
@@ -59,10 +65,14 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | GODOT-05 | Scene files (.tscn) res:// references must point to existing files | `godot.scene.reference.validate` |
 | GODOT-06 | Game.csproj must use Godot.NET.Sdk, target net8.0, and enable dynamic loading | `godot.csproj.validate` |
 | GODOT-07 | Resource files (.tres) must reside in Resources/ and their res:// references must exist | `godot.resource.validate` |
+| GODOT-08 | C# scripts must have class name matching file name, partial keyword on Node subclasses, and using Godot; directive | `godot.script.validate` |
+| GODOT-09 | export_presets.cfg must have valid presets with non-empty relative export paths and known platforms | `godot.export.presets.validate` |
+| GODOT-10 | Scene (.tscn) and resource (.tres) files must have unique uid:// declarations | `godot.uid.validate` |
+| GODOT-11 | Game.csproj NuGet package references must be Godot-compatible and non-problematic | `godot.nuget.validate` |
 
 ## Check gate composition
 
-`checkGate` runs all 7 validators in sequence:
+`checkGate` runs all 11 validators in sequence:
 
 1. `godot.scene.validate` — scene/script directory structure (GODOT-01)
 2. `godot.gitignore.validate` — .godot/ is gitignored (GODOT-02)
@@ -71,6 +81,10 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 5. `godot.scene.reference.validate` — scene res:// reference integrity (GODOT-05)
 6. `godot.csproj.validate` — Game.csproj Godot C# settings (GODOT-06)
 7. `godot.resource.validate` — .tres resource location and references (GODOT-07)
+8. `godot.script.validate` — C# script conventions (GODOT-08)
+9. `godot.export.presets.validate` — export presets config (GODOT-09)
+10. `godot.uid.validate` — UID uniqueness in .tscn/.tres (GODOT-10)
+11. `godot.nuget.validate` — NuGet packages in Game.csproj (GODOT-11)
 
 All must pass for checkGate to succeed (GODOT-04 is non-blocking warnings).
 

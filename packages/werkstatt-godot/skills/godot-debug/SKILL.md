@@ -1,62 +1,74 @@
 ---
 name: godot-debug
-description: Diagnose bugs, crashes, and unexpected behavior in Godot 4.x + C# projects — reproduction, error classification, root cause tracing, minimal fixes.
+description: Use this skill when diagnosing a bug, crash, exception, or unexpected behavior in a Godot 4.x + C# project (editor errors, runtime exceptions, null reference on nodes, signal not firing, physics/rendering glitches).
 invocation: user
-concerns: code-mutation
+category: fo
+concerns: read-only
 dependsOn: []
+languagePolicy: ref(PREFERENCES.md)
+triggers:
+  - "debug godot crash"
+  - "fix godot exception"
+  - "diagnose godot bug"
+  - "godot game not working"
+  - "godot performance issue"
+  - "godot null reference"
+  - "scene loading error"
 ---
 
-# godot-debug
+# Godot + C# Debugging
 
-Diagnose bugs, crashes, exceptions, or unexpected behavior in Godot 4.x + C# projects.
+Before starting, read `PREFERENCES.md` at the repository root. If the file is missing or `aiLanguage` is unset, ask the operator once and create the file using the `my-preferences` skill semantics.
+
+## Forge diagnostics
+
+When working in a Forge-managed Godot project:
+
+- Run `godot.smoke.test` for headless smoke test (catches startup crashes).
+- Run Forge validators: `godot.scene.validate`, `godot.script.validate`, `godot.scene.reference.validate`, `godot.uid.validate`.
+- Run `godot.context.generate` for structured project summary (scene tree, autoloads, input map) as debugging context.
 
 ## When to use
 
-When a game crashes, throws an exception, behaves unexpectedly, or produces visual/audio glitches.
+Trigger this skill when asked to fix a bug, investigate an error/exception, or explain unexpected runtime/editor behavior in a Godot + C# project.
 
 ## Process
 
-1. **Reproduce.** Establish a reliable reproduction sequence. Run with real commands:
-   - `dotnet build ./Game.csproj` — check for compile errors
-   - `godot --path . --headless --quit` — check for engine boot errors
-   - `godot --path . --headless --script res://Scripts/TestRunner.cs --quit` — for headless test scenarios
+1. **Reproduce with real commands** — do not guess. Run:
 
-2. **Classify the error.**
-   - **Compile error**: CS#### — C# compiler error, usually in `Scripts/*.cs`.
-   - **Runtime exception**: `System.Exception` or derived — C# runtime error.
-   - **Engine error**: `ERROR:` or `WARNING:` in Godot output — scene loading, resource, signal issues.
-   - **Crash**: Segfault or hard crash — usually native code, memory, or engine bug.
-   - **Visual glitch**: Incorrect rendering — shader, material, or node hierarchy issue.
-   - **Logic bug**: Wrong behavior without error — algorithm or state management issue.
+   ```bash
+   dotnet build ./Game.csproj
+   godot --path . --headless --quit
+   ```
 
-3. **Trace to root cause.**
-   - Read the full error message and stack trace.
-   - Identify the file and line number.
-   - Check the scene hierarchy for missing or misconfigured nodes.
-   - Check signal connections — missing or duplicate connections.
-   - Check resource loading — null references from `Load<T>()` or `GD.Load<T>()`.
-   - Check lifecycle order — `_Ready()` vs `_Process()` vs `_Input()` timing.
+   Capture actual error output/stack trace before proposing a fix.
 
-4. **Fix minimally.**
-   - Change the smallest amount of code necessary.
-   - Do not refactor while fixing — that's a separate task.
-   - Add a comment explaining the fix if non-obvious.
-   - Test the fix with the reproduction sequence.
+2. **Classify the error**
+   - Build-time (C# compile error): check `.csproj` references, using directives, nullable annotations, LangVersion.
+   - Import-time (Godot editor/headless import errors): check `.import` metadata, resource paths, `uid://` references.
+   - Runtime null reference on a node: usually one of —
+     - Node accessed before `_Ready()`.
+     - `NodePath`/unique name (`%Name`) mismatch after a scene edit.
+     - Node freed (`QueueFree`) but reference still held elsewhere.
+   - Signal not firing: check the signal is connected (`Connect`) with matching signature, and that the emitting node is actually in the tree at the time of connection.
+   - Resource-related bug (unexpected shared state): check if a `Resource` instance is shared across multiple nodes without `Duplicate()`.
 
-5. **Verify.**
-   - `dotnet build ./Game.csproj` — compile check
-   - `dotnet test` — unit tests (if any)
-   - `godot --path . --headless --quit` — engine boot check
-   - Run the original reproduction sequence — confirm the bug is fixed.
-   - Run related gameplay — confirm no regression.
+3. **Trace to root cause, not the symptom**
+   - Prefer fixing lifecycle/ordering issues over adding defensive null checks that mask the real problem.
+   - If the bug stems from a renamed/removed `[Export]` field or node, check all `.tscn`/`.tres` files referencing it.
+
+4. **Fix minimally**
+   - Smallest diff that addresses the root cause.
+   - Do not refactor unrelated code in the same change.
+
+5. **Verify the fix**
+   - Re-run `dotnet build`, relevant `dotnet test`, and `godot --headless --quit`.
+   - If the bug only manifests in the editor/runtime visually, state clearly that manual verification in the Godot editor is still required.
 
 ## Common Godot + C# pitfalls
 
-- **NullReferenceException from GetNode.** Node path is wrong or node not yet ready. Use `GetNodeOrNull<T>()` or check `!= null`.
-- **Signal not firing.** Signal not connected, or connected to wrong method name. Check `Connect()` call and method signature.
-- **Script not attached.** `.tscn` references a script path that doesn't exist or class name doesn't match.
-- **Resource load returns null.** Path is wrong or resource type mismatch. Use `GD.Load<T>()` with correct type parameter.
-- **_Ready order.** Child nodes are ready before parent. Don't access sibling nodes in `_Ready()` — use `CallDeferred()` or signals.
-- **_Process vs _PhysicsProcess.** Physics in `_Process()` causes jitter. Use `_PhysicsProcess()` for `move_and_slide`, collision, rigidbody.
-- **Forgotten Disconnect.** Dynamically connected signals must be disconnected in `_ExitTree()` or they fire on freed nodes.
-- **UID mismatch.** Changed `uid://` in `.tscn` breaks resource references. Regenerate UIDs in the editor, not by hand.
+- Using a node in a constructor instead of `_Ready()`.
+- Holding a C# reference to a freed Godot node (use `IsInstanceValid()`).
+- Forgetting `CallDeferred` when modifying the scene tree from a signal callback during iteration.
+- Mismatched signal signatures between `[Signal]` declaration and handler.
+- Physics logic in `_Process` instead of `_PhysicsProcess` causing frame-rate-dependent behavior.

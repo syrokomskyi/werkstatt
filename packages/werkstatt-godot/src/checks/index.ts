@@ -1,9 +1,9 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Check gate composition for the Godot plugin — runs all 7 validators.</purpose>
+<purpose>Check gate composition for the Godot plugin — runs all 11 validators.</purpose>
 <keywords>checkgate, validators, godot</keywords>
 <responsibilities>
-  <item>Defines which validators run in checkGate: all 7 (scene, gitignore, secret-scan, project-config, scene-reference, csproj, resource).</item>
+  <item>Defines which validators run in checkGate: all 11 (scene, gitignore, secret-scan, project-config, scene-reference, csproj, resource, script, uid, export-presets, nuget).</item>
   <item>Aggregates results from each validator into a single HookResult.</item>
   <item>Treats project-config (GODOT-04) as non-blocking warnings.</item>
 </responsibilities>
@@ -15,6 +15,7 @@
   <item>Initial check gate composition running scene, gitignore, secret-scan, and project-config validators.</item>
   <item>Fix: treat GODOT-04 config validator as non-blocking (warnings only, not errors).</item>
   <item>Enhancement: add scene-reference (GODOT-05), csproj (GODOT-06), and resource (GODOT-07) validators to check gate.</item>
+  <item>Enhancement: add script (GODOT-08), export-presets (GODOT-09), uid (GODOT-10), and nuget (GODOT-11) validators to check gate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,6 +27,10 @@ import { validateProjectConfig } from "./project-config-validate.ts";
 import { validateSceneReferences } from "./scene-reference-validate.ts";
 import { validateCsproj } from "./csproj-validate.ts";
 import { validateResources } from "./resource-validate.ts";
+import { validateScripts } from "./script-validate.ts";
+import { validateUids } from "./uid-validate.ts";
+import { validateExportPresets } from "./export-presets-validate.ts";
+import { validateNuget } from "./nuget-validate.ts";
 
 export async function runGodotCheckGate(ctx: PluginHookContext): Promise<HookResult> {
   const projectRoot = ctx.workpiecePath ?? ctx.workspaceRoot;
@@ -73,8 +78,30 @@ export async function runGodotCheckGate(ctx: PluginHookContext): Promise<HookRes
     );
   }
 
+  const scriptResult = await validateScripts(projectRoot);
+  if (scriptResult.exitCode !== 0) {
+    errors.push(`godot.script.validate: ${scriptResult.data?.violations.length ?? 0} violations`);
+  }
+
+  const uidResult = await validateUids(projectRoot);
+  if (uidResult.exitCode !== 0) {
+    errors.push(`godot.uid.validate: ${uidResult.data?.violations.length ?? 0} violations`);
+  }
+
+  const exportPresetsResult = await validateExportPresets(projectRoot);
+  if (exportPresetsResult.exitCode !== 0) {
+    errors.push(
+      `godot.export.presets.validate: ${exportPresetsResult.data?.violations.length ?? 0} violations`,
+    );
+  }
+
+  const nugetResult = await validateNuget(projectRoot);
+  if (nugetResult.exitCode !== 0) {
+    errors.push(`godot.nuget.validate: ${nugetResult.data?.violations.length ?? 0} violations`);
+  }
+
   ctx.logger.info(
-    `checkGate: scene=${sceneResult.data?.status}, gitignore=${gitignoreResult.data?.status}, secrets=${secretResult.data?.status}, config=${configResult.data?.status}, scene-ref=${sceneRefResult.data?.status}, csproj=${csprojResult.data?.status}, resource=${resourceResult.data?.status}`,
+    `checkGate: scene=${sceneResult.data?.status}, gitignore=${gitignoreResult.data?.status}, secrets=${secretResult.data?.status}, config=${configResult.data?.status}, scene-ref=${sceneRefResult.data?.status}, csproj=${csprojResult.data?.status}, resource=${resourceResult.data?.status}, script=${scriptResult.data?.status}, uid=${uidResult.data?.status}, export-presets=${exportPresetsResult.data?.status}, nuget=${nugetResult.data?.status}`,
   );
 
   return {
@@ -90,3 +117,7 @@ export { validateProjectConfig } from "./project-config-validate.ts";
 export { validateSceneReferences } from "./scene-reference-validate.ts";
 export { validateCsproj } from "./csproj-validate.ts";
 export { validateResources } from "./resource-validate.ts";
+export { validateScripts } from "./script-validate.ts";
+export { validateUids } from "./uid-validate.ts";
+export { validateExportPresets } from "./export-presets-validate.ts";
+export { validateNuget } from "./nuget-validate.ts";

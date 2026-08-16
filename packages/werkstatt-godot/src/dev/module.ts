@@ -1,13 +1,14 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Godot dev module — registers dev server and test commands as kernel commands.</purpose>
+<purpose>Godot dev module — registers dev server, test, smoke test, and context generate commands as kernel commands.</purpose>
 <keywords>dev, server, test, godot, module</keywords>
 <non-goals>
-  <item>Do not implement logic here — delegate to build/godot-dev-server.ts and build/dotnet-test.ts.</item>
+  <item>Do not implement logic here — delegate to build/ files.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial Godot dev module — registers godot.dev.server and godot.test commands.</item>
+  <item>Enhancement: register godot.smoke.test and godot.context.generate commands.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -18,6 +19,8 @@ import type {
 } from "@warpgogol/werkstatt/kernel/types";
 import { runGodotDevServer } from "../build/godot-dev-server.ts";
 import { runDotnetTest } from "../build/dotnet-test.ts";
+import { runSmokeTest } from "../build/godot-smoke-test.ts";
+import { generateContext } from "../build/godot-context-generate.ts";
 
 interface DevServerData {
   command: string;
@@ -28,6 +31,29 @@ interface DevServerData {
 interface TestData {
   command: string;
   status: "pass" | "fail";
+}
+
+interface SmokeTestData {
+  command: string;
+  status: "pass" | "fail";
+  duration: number;
+  errors: string[];
+  warnings: string[];
+}
+
+interface ContextData {
+  command: string;
+  projectRoot: string;
+  mainScene: string | null;
+  autoloads: { name: string; path: string }[];
+  inputActions: string[];
+  renderer: string | null;
+  scenes: string[];
+  scripts: string[];
+  resources: string[];
+  csprojExists: boolean;
+  slnExists: boolean;
+  exportPresetsExist: boolean;
 }
 
 function createDevServerCommand(): KernelCommandDefinition<DevServerData> {
@@ -77,13 +103,49 @@ function createTestCommand(): KernelCommandDefinition<TestData> {
   };
 }
 
+function createSmokeTestCommand(): KernelCommandDefinition<SmokeTestData> {
+  return {
+    name: "godot.smoke.test",
+    description: "Run Godot headless smoke test to catch runtime errors",
+    scope: "workspace",
+    cacheable: false,
+    async execute(_input, context) {
+      const result = runSmokeTest(context.workspaceRoot);
+      return {
+        data: result.data!,
+        exitCode: result.exitCode,
+        summary: result.summary,
+      } satisfies KernelCommandResult<SmokeTestData>;
+    },
+  };
+}
+
+function createContextGenerateCommand(): KernelCommandDefinition<ContextData> {
+  return {
+    name: "godot.context.generate",
+    description: "Generate structured project context for AI agents",
+    scope: "workspace",
+    cacheable: false,
+    async execute(_input, context) {
+      const result = await generateContext(context.workspaceRoot);
+      return {
+        data: result.data!,
+        exitCode: result.exitCode,
+        summary: result.summary,
+      } satisfies KernelCommandResult<ContextData>;
+    },
+  };
+}
+
 export function createGodotDevModule(): KernelModule {
   return {
     name: "godot-dev",
-    version: "0.1.0",
+    version: "0.2.0",
     register(registry) {
       registry.registerCommand(createDevServerCommand());
       registry.registerCommand(createTestCommand());
+      registry.registerCommand(createSmokeTestCommand());
+      registry.registerCommand(createContextGenerateCommand());
     },
   };
 }

@@ -1,57 +1,78 @@
 ---
 name: godot-scene-review
-description: Review Godot scene and resource changes — .tscn, .tres, project.godot, .csproj serialization and compatibility risks.
+description: Use this skill when reviewing a pull request, diff, or set of changes in a Godot 4.x + C# project, especially changes touching .tscn, .tres, project.godot, or .csproj files. Ensures serialization and compatibility risks are caught.
 invocation: user
+category: fo
 concerns: read-only
 dependsOn: []
+languagePolicy: ref(PREFERENCES.md)
+triggers:
+  - "review godot scene changes"
+  - "review .tscn diff"
+  - "review .tres changes"
+  - "review project.godot changes"
+  - "review godot pr"
+  - "check scene integrity"
 ---
 
-# godot-scene-review
+# Godot Scene & Resource Change Review
 
-Review diffs and PRs touching `.tscn`, `.tres`, `project.godot`, or `.csproj` files in Godot 4.x + C# projects.
+Before starting, read `PREFERENCES.md` at the repository root. If the file is missing or `aiLanguage` is unset, ask the operator once and create the file using the `my-preferences` skill semantics.
+
+## Forge validators
+
+When working in a Forge-managed Godot project, run these validators before manual review:
+
+- `godot.scene.validate` — scene/script directory structure (GODOT-01)
+- `godot.scene.reference.validate` — res:// reference integrity (GODOT-05)
+- `godot.uid.validate` — UID uniqueness (GODOT-10)
+- `godot.script.validate` — C# script conventions (GODOT-08)
+- `godot.resource.validate` — .tres location and references (GODOT-07)
+- `godot.csproj.validate` — Game.csproj settings (GODOT-06)
+- `godot.export.presets.validate` — export presets config (GODOT-09)
+- `godot.nuget.validate` — NuGet packages (GODOT-11)
+- `godot.project.config.validate` — project.godot sensitive changes (GODOT-04, non-blocking)
 
 ## When to use
 
-When reviewing a PR that modifies scene files, resource files, project configuration, or C# project configuration.
+Trigger this skill when asked to review, audit, or check a diff/PR in a Godot + C# repository, or before merging changes that touch scene/resource files.
 
-## Checklist
+## Review checklist
 
-### Scene files (.tscn)
+### `.tscn` / `.tres` files
 
-- **Node hierarchy changes.** Check for added/removed nodes. Verify script attachments (`ExtResource`) still resolve.
-- **UID stability.** `uid://` references must not change for existing resources. New UIDs are fine; changed UIDs break references.
-- **Transform changes.** Position/rotation/scale changes should be intentional. Watch for accidental `Transform2D` or `Transform3D` resets.
-- **Sub-scene inheritance.** If a scene inherits from another, check that inherited changes don't break child overrides.
-- **Load steps.** `load_steps` count must match actual `ext_resource` + `sub_resource` entries. Mismatch causes load warnings.
+- Confirm the diff is minimal and localized — large unexplained rewrites of a scene file are a red flag (often caused by opening/resaving in a different editor version or config).
+- Check for renamed or removed nodes referenced by `NodePath` elsewhere in code or other scenes/signals — these break silently at runtime.
+- Check for changed `[Export]` field names/types on scripts used by this scene — renamed exported fields can silently drop serialized values.
+- Verify unique names (`%Name`) are preserved if code depends on them.
+- Confirm resource `uid://` / `path` references still resolve.
 
-### Resource files (.tres)
+### `project.godot`
 
-- **Resource type.** Verify `[ext_resource]` type matches the actual resource class.
-- **Property changes.** Check for removed properties — they may cause load failures in scenes referencing this resource.
-- **Script references.** If a `.tres` references a `.cs` script, verify the script path and class name match.
+- Flag any change to input map, autoloads, physics layers, or rendering settings — these are project-wide and need explicit confirmation from the user/maintainer, not silent acceptance.
 
-### project.godot
+### `.csproj` / `Directory.Build.props`
 
-- **Autoloads.** Added/removed autoloads affect global class availability. Confirm with operator — GODOT-04.
-- **Input map.** Added/removed/changed input actions affect gameplay. Confirm with operator — GODOT-04.
-- **Physics layers.** Layer name changes break collision masks. Confirm with operator — GODOT-04.
-- **Rendering settings.** Changes to renderer (Forward+/Mobile/Compatibility) affect platform compatibility.
+- Flag new NuGet package references — confirm they're intended and licensed appropriately.
+- Check target framework / LangVersion changes for compatibility.
 
-### .csproj
+### C# scripts
 
-- **TargetFramework.** Must match Godot .NET SDK requirements (`net8.0` for Godot 4.x).
-- **Nullable.** `<Nullable>enable</Nullable>` should be consistent across the project.
-- **Package references.** New `<PackageReference>` entries must be compatible with Godot's .NET runtime.
+- Confirm `[Export]`, `[GlobalClass]`, `[Tool]`, and signal declarations are unchanged unless intentionally modified.
+- Check for signal subscriptions without corresponding unsubscription (potential leak on node removal).
+- Check for main-thread blocking calls (synchronous I/O, heavy loops) inside `_Process`/`_PhysicsProcess`.
+- Verify shared `Resource` instances are duplicated (`Duplicate()`) before per-instance mutation, where relevant.
 
-## Verification
+### Save-game / persistent data
 
-After review, run:
+- Any change to a class or Resource used for save serialization must be flagged explicitly, with a note on backward compatibility (e.g., versioning, migration, or default values for new fields).
 
-- `dotnet build ./Game.csproj` — compile check
-- `godot --path . --headless --quit` — engine boot check
+## Output format
 
-## Findings format
+Summarize findings as:
 
-- **Blocking**: UID changes, broken references, missing scripts, load step mismatch.
-- **Needs confirmation**: Autoload changes, input map changes, physics layer changes, rendering setting changes.
-- **Minor notes**: Style, naming, optional improvements.
+- **Blocking issues** — must be fixed before merge (breaks build, breaks serialization, breaks save compatibility).
+- **Needs confirmation** — project-wide or ambiguous changes requiring maintainer sign-off.
+- **Minor notes** — style/convention deviations, non-blocking.
+
+Always run `dotnet build` and `godot --headless --quit` as part of the review when possible, and report actual results rather than assumptions.

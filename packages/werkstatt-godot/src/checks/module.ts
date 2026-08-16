@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Initial Godot check module — registers godot.scene.validate, godot.gitignore.validate, godot.secret.scan, godot.project.config.validate.</item>
   <item>Enhancement: register godot.scene.reference.validate, godot.csproj.validate, godot.resource.validate.</item>
+  <item>Enhancement: register godot.script.validate, godot.export.presets.validate, godot.uid.validate, godot.nuget.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,11 +21,15 @@ import { createProjectConfigValidateCommand } from "./project-config-validate.ts
 import { createSceneReferenceValidateCommand } from "./scene-reference-validate.ts";
 import { createCsprojValidateCommand } from "./csproj-validate.ts";
 import { createResourceValidateCommand } from "./resource-validate.ts";
+import { createScriptValidateCommand } from "./script-validate.ts";
+import { createUidValidateCommand } from "./uid-validate.ts";
+import { createExportPresetsValidateCommand } from "./export-presets-validate.ts";
+import { createNugetValidateCommand } from "./nuget-validate.ts";
 
 export function createGodotCheckModule(): KernelModule {
   return {
     name: "godot-checks",
-    version: "0.2.0",
+    version: "0.3.0",
     register(registry) {
       registry.registerCommand(createSceneValidateCommand());
       registry.registerCommand(createGitignoreValidateCommand());
@@ -33,6 +38,10 @@ export function createGodotCheckModule(): KernelModule {
       registry.registerCommand(createSceneReferenceValidateCommand());
       registry.registerCommand(createCsprojValidateCommand());
       registry.registerCommand(createResourceValidateCommand());
+      registry.registerCommand(createScriptValidateCommand());
+      registry.registerCommand(createUidValidateCommand());
+      registry.registerCommand(createExportPresetsValidateCommand());
+      registry.registerCommand(createNugetValidateCommand());
     },
   };
 }
