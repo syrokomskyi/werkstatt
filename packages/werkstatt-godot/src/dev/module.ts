@@ -11,7 +11,11 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule, KernelCommandDefinition, KernelCommandResult } from "@warpgogol/werkstatt/kernel/types";
+import type {
+  KernelModule,
+  KernelCommandDefinition,
+  KernelCommandResult,
+} from "@warpgogol/werkstatt/kernel/types";
 import { runGodotDevServer } from "../build/godot-dev-server.ts";
 import { runDotnetTest } from "../build/dotnet-test.ts";
 
@@ -34,10 +38,14 @@ function createDevServerCommand(): KernelCommandDefinition<DevServerData> {
     cacheable: false,
     async execute(_input, context) {
       const result = await runGodotDevServer(context);
+      const pid =
+        typeof result.data === "object" && result.data !== null && "pid" in result.data
+          ? (result.data as { pid?: number }).pid
+          : undefined;
       const data: DevServerData = {
         command: "godot.dev.server",
         status: result.success ? "pass" : "fail",
-        pid: result.data as { pid?: number } | undefined as number | undefined,
+        pid,
       };
       return {
         data,

@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial tests for csproj validator — passing, failing, and missing cases.</item>
+  <item>Fix: update test message expectation for net8.0+ flexible check, add net9.0 passing test.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -81,6 +82,22 @@ describe("validateCsproj", () => {
     expect(result.exitCode).toBe(1);
     expect(result.data?.violations).toHaveLength(1);
     expect(result.data?.violations[0]?.message).toContain("net8.0");
+  });
+
+  it("passes with net9.0 target", async () => {
+    writeFileSync(
+      join(tmpDir, "Game.csproj"),
+      `<Project Sdk="Godot.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+</Project>`,
+    );
+
+    const result = await validateCsproj(tmpDir);
+    expect(result.exitCode).toBe(0);
+    expect(result.data?.status).toBe("pass");
   });
 
   it("fails when EnableDynamicLoading is missing", async () => {

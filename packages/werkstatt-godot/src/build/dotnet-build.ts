@@ -16,19 +16,15 @@
 <CHANGE_SUMMARY>
   <item>Initial dotnet build hook — runs dotnet build via child_process.</item>
   <item>Enhancement: add Godot export step — reads export_presets.cfg and runs godot --headless --export-release for each preset.</item>
+  <item>Fix: use shared parseExportPresets from utils/parse-export-presets.ts instead of local duplicate.</item>
 </CHANGE_SUMMARY>
 */
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { PluginHookContext, HookResult } from "@warpgogol/werkstatt/plugin";
-
-interface ExportPreset {
-  name: string;
-  platform: string;
-  outputPath: string;
-}
+import { parseExportPresets } from "../utils/parse-export-presets.ts";
 
 export async function runDotnetBuild(ctx: PluginHookContext): Promise<HookResult> {
   const cwd = ctx.workpiecePath ?? ctx.workspaceRoot;
@@ -79,7 +75,7 @@ export async function runDotnetBuild(ctx: PluginHookContext): Promise<HookResult
     try {
       const exportOutput = execFileSync(
         "godot",
-        ["--headless", "--export-release", preset.name, preset.outputPath],
+        ["--headless", "--export-release", preset.name, preset.exportPath],
         {
           cwd,
           encoding: "utf-8",
@@ -102,29 +98,4 @@ export async function runDotnetBuild(ctx: PluginHookContext): Promise<HookResult
   }
 
   return { success: true };
-}
-
-function parseExportPresets(presetsPath: string): ExportPreset[] {
-  const content = readFileSync(presetsPath, "utf-8");
-  const presets: ExportPreset[] = [];
-  const sections = content.split(/\[preset_(\d+)\]/);
-
-  for (let i = 1; i < sections.length; i += 2) {
-    const body = sections[i + 1];
-    if (!body) continue;
-
-    const nameMatch = body.match(/^name="([^"]+)"/m);
-    const platformMatch = body.match(/^platform="([^"]+)"/m);
-    const pathMatch = body.match(/^export_path="([^"]+)"/m);
-
-    if (nameMatch && platformMatch && pathMatch) {
-      presets.push({
-        name: nameMatch[1]!,
-        platform: platformMatch[1]!,
-        outputPath: pathMatch[1]!,
-      });
-    }
-  }
-
-  return presets;
 }

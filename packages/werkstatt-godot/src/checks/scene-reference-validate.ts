@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial scene reference validator — parses .tscn files for res:// paths and checks existence.</item>
+  <item>Fix: use shared extractResReferences from utils/extract-res-references.ts instead of local duplicate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,6 +21,7 @@ import type {
   KernelCommandResult,
 } from "@warpgogol/werkstatt/kernel/types";
 import { listFilesRecursive } from "../utils/list-files-recursive.ts";
+import { extractResReferences } from "../utils/extract-res-references.ts";
 
 export interface SceneReferenceViolation {
   ruleId: string;
@@ -35,7 +37,6 @@ export interface SceneReferenceValidateData {
 }
 
 const SKIP_DIRS = ["bin", "obj", ".godot", ".git", "node_modules"];
-const RES_PATTERN = /"res:\/\/([^"]+)"/g;
 
 export async function validateSceneReferences(
   projectRoot: string,
@@ -46,11 +47,9 @@ export async function validateSceneReferences(
   for (const tscnFile of tscnFiles) {
     const content = await readFile(tscnFile, "utf-8");
     const relFile = relative(projectRoot, tscnFile);
-    let match: RegExpExecArray | null;
+    const references = extractResReferences(content);
 
-    RES_PATTERN.lastIndex = 0;
-    while ((match = RES_PATTERN.exec(content)) !== null) {
-      const resPath = match[1]!;
+    for (const resPath of references) {
       const absPath = join(projectRoot, resPath);
 
       if (!existsSync(absPath)) {

@@ -17,13 +17,16 @@
   <item>Initial itch.io deploy adapter — butler push to itch.io.</item>
   <item>Fix: import DeployResult from shared deploy/types.ts instead of defining locally.</item>
   <item>Enhancement: multi-platform channel support — reads export_presets.cfg and pushes each platform to its own itch.io channel.</item>
+  <item>Fix: use shared parseExportPresets from utils/parse-export-presets.ts instead of local duplicate.</item>
+  <item>Fix: return multi-channel URLs in DeployResult.urls instead of overloading errors field.</item>
 </CHANGE_SUMMARY>
 */
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import type { DeployResult } from "./types.ts";
+import { parseExportPresets } from "../utils/parse-export-presets.ts";
 
 export interface ItchIoChannelConfig {
   channel: string;
@@ -104,7 +107,7 @@ export function createItchIoAdapter(): ItchIoAdapter {
       return {
         success: true,
         url: urls.length === 1 ? urls[0] : undefined,
-        errors: urls.length > 1 ? urls : undefined,
+        urls: urls.length > 1 ? urls : undefined,
       };
     },
   };
@@ -144,26 +147,15 @@ function resolveChannelsFromPresets(
   workpiecePath: string,
   presetsPath: string,
 ): ItchIoChannelConfig[] {
-  const content = readFileSync(presetsPath, "utf-8");
+  const presets = parseExportPresets(presetsPath);
   const channels: ItchIoChannelConfig[] = [];
-  const sections = content.split(/\[preset_(\d+)\]/);
 
-  for (let i = 1; i < sections.length; i += 2) {
-    const body = sections[i + 1];
-    if (!body) continue;
-
-    const nameMatch = body.match(/^name="([^"]+)"/m);
-    const platformMatch = body.match(/^platform="([^"]+)"/m);
-    const pathMatch = body.match(/^export_path="([^"]+)"/m);
-
-    if (nameMatch && platformMatch && pathMatch) {
-      const exportPath = pathMatch[1]!;
-      const channel = platformToChannel(platformMatch[1]!);
-      channels.push({
-        channel,
-        buildPath: join(workpiecePath, dirname(exportPath)),
-      });
-    }
+  for (const preset of presets) {
+    const channel = platformToChannel(preset.platform);
+    channels.push({
+      channel,
+      buildPath: join(workpiecePath, dirname(preset.exportPath)),
+    });
   }
 
   return channels;

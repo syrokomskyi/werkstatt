@@ -49,7 +49,7 @@ export async function validateCsproj(
     };
   }
 
-  if (!content.includes('Sdk="Godot.NET.Sdk"') && !content.includes("Sdk=\"Godot.NET.Sdk\"")) {
+  if (!content.includes('Sdk="Godot.NET.Sdk"')) {
     violations.push({
       ruleId: "GODOT-06",
       file: GAME_CSPROJ,
@@ -57,12 +57,21 @@ export async function validateCsproj(
     });
   }
 
-  if (!content.includes("<TargetFramework>net8.0</TargetFramework>")) {
+  if (!/<TargetFramework>net(\d+)\.0/.test(content)) {
     violations.push({
       ruleId: "GODOT-06",
       file: GAME_CSPROJ,
-      message: "Game.csproj must target net8.0 (Godot 4.x requires .NET 8+)",
+      message: "Game.csproj must target net8.0 or higher (Godot 4.x requires .NET 8+)",
     });
+  } else {
+    const tfmMatch = content.match(/<TargetFramework>net(\d+)\.0/);
+    if (tfmMatch && parseInt(tfmMatch[1]!, 10) < 8) {
+      violations.push({
+        ruleId: "GODOT-06",
+        file: GAME_CSPROJ,
+        message: "Game.csproj must target net8.0 or higher (Godot 4.x requires .NET 8+)",
+      });
+    }
   }
 
   if (!content.includes("<EnableDynamicLoading>true</EnableDynamicLoading>")) {
