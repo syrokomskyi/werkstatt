@@ -12,6 +12,7 @@
 <item>RFC-0866 fix A-2/C-3: use writeFileIfChanged instead of fs.writeFile for gate-decision JSON.</item>
 <item>RFC-0866 fix D-2: read dev deployment URL from effect records, accept --base-url flag fallback.</item>
 <item>RFC-0866 audit: wire baseUrl into astro-mission-check producer handler — calls mission.check with --base-url when available, skips with warning when not.</item>
+<item>Fix hardcoded systems-cache paths: use resolveCacheClonePath for gate-decisions output and resolveDevBaseUrl. Commit gate-decision JSON to cache clone git.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,9 @@ import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
 import type { GateChannel } from "../certification/contracts/identifiers.ts";
 import { astroCertificationProfile } from "../certification/profile/astro-profile.ts";
 import { makeR2ConfigFromEnv } from "./deploy-helpers.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
+import { cacheCloneCommit } from "../mission/mission-git-commit.ts";
+import { gitExec } from "../werkstatt/git-exec.ts";
 import { createR2StorageAdapter } from "../certification/storage/r2-adapter.ts";
 import {
   planProducers,
@@ -91,7 +95,8 @@ export async function runLeitstandCertify(
   const baseUrlFlag = flagString(input, "base-url");
   const gateChannel = gate as GateChannel;
 
-  const baseUrl = await resolveDevBaseUrl(context.workspaceRoot, systemId, baseUrlFlag);
+  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
+  const baseUrl = await resolveDevBaseUrl(cacheCloneDir, baseUrlFlag);
 
   const producerNodes: ProducerDependencyNodeV1[] = [
     { producerId: "astro-mission-check", dependsOn: [] },
@@ -409,10 +414,23 @@ export async function runLeitstandCertify(
     decidedAt: now,
   };
 
-  const outputDir = path.join(context.workspaceRoot, "systems-cache", systemId, "gate-decisions");
+  const outputDir = path.join(cacheCloneDir, "gate-decisions");
   await fs.mkdir(outputDir, { recursive: true });
   const outputPath = path.join(outputDir, `${releaseId}-${gate}.json`);
   await writeFileIfChanged(outputPath, JSON.stringify(gateDecision, null, 2) + "\n");
+
+  const relPath = path.join("gate-decisions", `${releaseId}-${gate}.json`);
+  try {
+    gitExec(cacheCloneDir, `add ${relPath}`);
+    cacheCloneCommit(
+      cacheCloneDir,
+      `gate-decisions: ${releaseId}-${gate} (${gateDecision.status})`,
+    );
+    const branch = gitExec(cacheCloneDir, "rev-parse --abbrev-ref HEAD").trim();
+    gitExec(cacheCloneDir, `push origin ${branch}`);
+  } catch {
+    // Best-effort commit+push — file is written, sync will propagate later
+  }
 
   const r2Config = makeR2ConfigFromEnv(process.env as Record<string, string | undefined>);
   if (r2Config) {
@@ -448,11 +466,10 @@ export async function runLeitstandCertify(
 }
 
 async function resolveDevBaseUrl(
-  workspaceRoot: string,
-  systemId: string,
+  cacheCloneDir: string,
   baseUrlFlag: string | undefined,
 ): Promise<string | undefined> {
-  const opsDir = path.join(workspaceRoot, "systems-cache", systemId, "deployment-operations");
+  const opsDir = path.join(cacheCloneDir, "deployment-operations");
   let latestDevUrl: string | undefined;
   try {
     const entries = await fs.readdir(opsDir);

@@ -205,7 +205,7 @@ describe("deploy-helpers", () => {
         "2026-01-01T00:00:00Z",
       );
 
-      const filePath = await writeDeploymentEffectRecord(tmpDir, "test-system", record);
+      const filePath = await writeDeploymentEffectRecord(tmpDir, record);
       expect(filePath).toContain("deployment-operations");
       expect(filePath).toContain("op-001.json");
 

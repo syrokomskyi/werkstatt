@@ -111,6 +111,7 @@ function makeCtx(opId: string, workspaceRoot: string): DeployExecutionContext {
     artifactHash: "sha256:abc" as Sha256Digest,
     authResult,
     workspaceRoot,
+    cacheCloneDir: join(workspaceRoot, "..", "systems-cache", "test-sys"),
     systemConfig,
     adapter: nullAdapter,
     operationId: opId,

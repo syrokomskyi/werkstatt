@@ -58,6 +58,7 @@ import {
   readSystemConfigSmart,
   readSystemStateSmart,
   writeSystemStateSmart,
+  resolveCacheClonePath,
 } from "../sternsystem/registry-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { orchestrateSnap01Recovery } from "../mission/snapshot-auto-regen.ts";
@@ -795,9 +796,9 @@ export async function runLeitstandDevDeploy(
   if (!releaseId) {
     throw new Error("[leitstand.dev-deploy] --release is required");
   }
+  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
   const gateDecisionPath = resolveGateDecisionPath(
-    context.workspaceRoot,
-    systemId,
+    cacheCloneDir,
     releaseId,
     "dev",
     gateDecisionFlag,
@@ -859,7 +860,7 @@ export async function runLeitstandDevDeploy(
     "authorized",
     now,
   );
-  await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
+  await writeDeploymentEffectRecord(cacheCloneDir, effectRecord);
 
   const { adapter, systemConfig: depConfig } = await prepareDeployContext(
     context.workspaceRoot,
@@ -880,6 +881,7 @@ export async function runLeitstandDevDeploy(
       artifactHash,
       authResult,
       workspaceRoot: context.workspaceRoot,
+      cacheCloneDir,
       systemConfig: depConfig,
       adapter,
       operationId,
@@ -955,9 +957,9 @@ export async function runLeitstandPropagate(
   const candidateId = flagString(input, "candidate-id") ?? systemId;
   const artifactHashFlag = flagString(input, "artifact-hash");
 
+  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
   const gateDecisionPath = resolveGateDecisionPath(
-    context.workspaceRoot,
-    systemId,
+    cacheCloneDir,
     releaseId,
     "alt",
     gateDecisionFlag,
@@ -1023,7 +1025,7 @@ export async function runLeitstandPropagate(
     "authorized",
     now,
   );
-  await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
+  await writeDeploymentEffectRecord(cacheCloneDir, effectRecord);
 
   const { adapter, systemConfig: depConfig } = await prepareDeployContext(
     context.workspaceRoot,
@@ -1044,6 +1046,7 @@ export async function runLeitstandPropagate(
       artifactHash,
       authResult,
       workspaceRoot: context.workspaceRoot,
+      cacheCloneDir,
       systemConfig: depConfig,
       adapter,
       operationId,
@@ -1117,9 +1120,9 @@ export async function runLeitstandPromote(
       "[leitstand.promote] --main-verification-decision is required (path to MainVerificationDecisionV1 JSON)",
     );
   }
+  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
   const gateDecisionPath = resolveGateDecisionPath(
-    context.workspaceRoot,
-    systemId,
+    cacheCloneDir,
     releaseId,
     "main",
     gateDecisionFlag,
@@ -1187,7 +1190,7 @@ export async function runLeitstandPromote(
     "authorized",
     now,
   );
-  await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
+  await writeDeploymentEffectRecord(cacheCloneDir, effectRecord);
 
   const { adapter, systemConfig: depConfig } = await prepareDeployContext(
     context.workspaceRoot,
@@ -1206,6 +1209,7 @@ export async function runLeitstandPromote(
       artifactHash,
       authResult: authorization,
       workspaceRoot: context.workspaceRoot,
+      cacheCloneDir,
       systemConfig: depConfig,
       adapter,
       operationId,
@@ -1271,12 +1275,8 @@ export async function runLeitstandStatus(
   const systemId = flagString(input, "site");
   if (!systemId) throw new Error("[leitstand.status] --site is required");
 
-  const opsDir = path.join(
-    context.workspaceRoot,
-    "systems-cache",
-    systemId,
-    "deployment-operations",
-  );
+  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
+  const opsDir = path.join(cacheCloneDir, "deployment-operations");
   const channels: LeitstandStatusData["channels"] = {};
 
   for (const ch of ["dev", "alt", "main"] as const) {
@@ -1413,7 +1413,8 @@ export async function runLeitstandRollback(
     "rollback-authorized",
     now,
   );
-  await writeDeploymentEffectRecord(context.workspaceRoot, systemId, effectRecord);
+  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
+  await writeDeploymentEffectRecord(cacheCloneDir, effectRecord);
 
   const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
   if (!systemConfig.deployment) {
@@ -1490,7 +1491,7 @@ export async function runLeitstandRollback(
     "rolled-back",
     now,
   );
-  await writeDeploymentEffectRecord(context.workspaceRoot, systemId, finalEffectRecord);
+  await writeDeploymentEffectRecord(cacheCloneDir, finalEffectRecord);
 
   return {
     data: {
@@ -1618,12 +1619,8 @@ export async function runLeitstandPipelineCheck(
   }
   const systemId = flagString(input, "site") ?? "";
 
-  const opsDir = path.join(
-    context.workspaceRoot,
-    "systems-cache",
-    systemId,
-    "deployment-operations",
-  );
+  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
+  const opsDir = path.join(cacheCloneDir, "deployment-operations");
 
   const channelStates: Record<string, { state: string; at: string }> = {};
   try {
