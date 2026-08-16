@@ -21,7 +21,7 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | `deployAdapters` | `itch-io`, `github-releases` |
 | `hooks` | `build`, `checkGate`, `releaseEvidence`, `scaffoldProject` |
 | `paths` | `Scenes` (contentDir), `bin` (distDir), `project.godot` + `Game.csproj` (entryPoints) |
-| `invariants` | GODOT-01..11 |
+| `invariants` | GODOT-01..12 |
 
 ## Module layout
 
@@ -29,7 +29,7 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | --- | --- | --- |
 | Plugin entry | `src/index.ts` | `werkstattGodotPlugin` export |
 | Path conventions | `src/paths/godot-paths.ts` | Godot path constants |
-| Invariants | `src/invariants/godot-invariants.ts` | GODOT-01..11 declarations |
+| Invariants | `src/invariants/godot-invariants.ts` | GODOT-01..12 declarations |
 | Scene validator | `src/checks/scene-validate.ts` | `godot.scene.validate` (GODOT-01) |
 | Gitignore validator | `src/checks/gitignore-validate.ts` | `godot.gitignore.validate` (GODOT-02) |
 | Secret scan | `src/checks/secret-scan.ts` | `godot.secret.scan` (GODOT-03) |
@@ -41,13 +41,16 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | Export presets validator | `src/checks/export-presets-validate.ts` | `godot.export.presets.validate` (GODOT-09) |
 | UID validator | `src/checks/uid-validate.ts` | `godot.uid.validate` (GODOT-10) |
 | NuGet validator | `src/checks/nuget-validate.ts` | `godot.nuget.validate` (GODOT-11) |
-| Check gate | `src/checks/index.ts` | Runs all 11 validators in checkGate |
+| Addon validator | `src/checks/addon-validate.ts` | `godot.addon.validate` (GODOT-12) |
+| Check gate | `src/checks/index.ts` | Runs all 12 validators in checkGate |
 | Check module | `src/checks/module.ts` | Kernel module registering validators |
 | Build hook | `src/build/dotnet-build.ts` | `hooks.build` — runs `dotnet build` then Godot export |
 | Dev server | `src/build/godot-dev-server.ts` | `godot.dev.server` — launches `godot --editor` |
 | Test runner | `src/build/dotnet-test.ts` | `godot.test` — runs `dotnet test` |
 | Smoke test | `src/build/godot-smoke-test.ts` | `godot.smoke.test` — headless runtime error detection |
 | Context generator | `src/build/godot-context-generate.ts` | `godot.context.generate` — structured project summary for AI agents |
+| Playtest | `src/build/godot-playtest.ts` | `godot.playtest` — gameplay runtime error detection with deterministic input |
+| Screenshot | `src/build/godot-screenshot.ts` | `godot.screenshot` — viewport capture via Xvfb |
 | Dev module | `src/dev/module.ts` | Kernel module registering dev commands |
 | itch.io deploy | `src/deploy/itch-io.ts` | `deployAdapters["itch-io"]` — multi-platform channels |
 | GitHub Releases | `src/deploy/github-releases.ts` | `deployAdapters["github-releases"]` |
@@ -69,10 +72,11 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | GODOT-09 | export_presets.cfg must have valid presets with non-empty relative export paths and known platforms | `godot.export.presets.validate` |
 | GODOT-10 | Scene (.tscn) and resource (.tres) files must have unique uid:// declarations | `godot.uid.validate` |
 | GODOT-11 | Game.csproj NuGet package references must be Godot-compatible and non-problematic | `godot.nuget.validate` |
+| GODOT-12 | Addons in addons/ must have valid plugin.cfg, be enabled in project.godot, and declare NuGet deps in Game.csproj for C# addons | `godot.addon.validate` |
 
 ## Check gate composition
 
-`checkGate` runs all 11 validators in sequence:
+`checkGate` runs all 12 validators in sequence:
 
 1. `godot.scene.validate` — scene/script directory structure (GODOT-01)
 2. `godot.gitignore.validate` — .godot/ is gitignored (GODOT-02)
@@ -85,6 +89,7 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 9. `godot.export.presets.validate` — export presets config (GODOT-09)
 10. `godot.uid.validate` — UID uniqueness in .tscn/.tres (GODOT-10)
 11. `godot.nuget.validate` — NuGet packages in Game.csproj (GODOT-11)
+12. `godot.addon.validate` — addon structure and NuGet deps (GODOT-12)
 
 All must pass for checkGate to succeed (GODOT-04 is non-blocking warnings).
 
@@ -106,6 +111,7 @@ Three Godot-specific skills are bundled with this plugin:
 - **godot-feature**: Playbook for implementing new gameplay features, entities, or systems in Godot + C# projects.
 - **godot-scene-review**: Playbook for reviewing diffs/PRs touching .tscn, .tres, project.godot, or .csproj files.
 - **godot-debug**: Playbook for diagnosing bugs, crashes, exceptions, or unexpected behavior in Godot + C# projects.
+- **godot-mcp-bridge**: Playbook for working with Godot MCP plugins that give AI agents direct editor and runtime control.
 
 ## Scripts
 

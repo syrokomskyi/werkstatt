@@ -25,11 +25,12 @@ import { createScriptValidateCommand } from "./script-validate.ts";
 import { createUidValidateCommand } from "./uid-validate.ts";
 import { createExportPresetsValidateCommand } from "./export-presets-validate.ts";
 import { createNugetValidateCommand } from "./nuget-validate.ts";
+import { createAddonValidateCommand } from "./addon-validate.ts";
 
 export function createGodotCheckModule(): KernelModule {
   return {
     name: "godot-checks",
-    version: "0.3.0",
+    version: "0.4.0",
     register(registry) {
       registry.registerCommand(createSceneValidateCommand());
       registry.registerCommand(createGitignoreValidateCommand());
@@ -42,6 +43,7 @@ export function createGodotCheckModule(): KernelModule {
       registry.registerCommand(createUidValidateCommand());
       registry.registerCommand(createExportPresetsValidateCommand());
       registry.registerCommand(createNugetValidateCommand());
+      registry.registerCommand(createAddonValidateCommand());
     },
   };
 }

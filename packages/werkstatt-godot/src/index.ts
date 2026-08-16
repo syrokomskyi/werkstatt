@@ -20,6 +20,7 @@
   <item>Fix: remove moduleLoaders.onboarding (no-op module deleted, scaffold handled via scaffoldProject hook).</item>
   <item>Enhancement: add dev module (godot.dev.server, godot.test) via moduleLoaders. GODOT-01..07 invariants.</item>
   <item>Enhancement: add script (GODOT-08), export-presets (GODOT-09), uid (GODOT-10), nuget (GODOT-11) validators. Add godot.smoke.test and godot.context.generate dev commands. GODOT-01..11 invariants.</item>
+  <item>Enhancement: add addon (GODOT-12) validator, godot.playtest and godot.screenshot dev commands, godot-mcp-bridge skill. Enhanced context.generate with addons, display settings. GODOT-01..12 invariants.</item>
 </CHANGE_SUMMARY>
 */
 

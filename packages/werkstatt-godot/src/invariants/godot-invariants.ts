@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Godot stack invariants GODOT-01..11 surfaced to agents.</purpose>
+<purpose>Godot stack invariants GODOT-01..12 surfaced to agents.</purpose>
 <keywords>invariants, godot, csharp</keywords>
 <non-goals>
   <item>Do not enforce invariants here — enforcement lives in validators.</item>
@@ -10,6 +10,7 @@
   <item>Initial Godot stack invariants GODOT-01..04.</item>
   <item>Enhancement: add GODOT-05 (scene reference integrity), GODOT-06 (csproj settings), GODOT-07 (resource location and references).</item>
   <item>Enhancement: add GODOT-08 (script conventions), GODOT-09 (export presets), GODOT-10 (UID uniqueness), GODOT-11 (NuGet packages).</item>
+  <item>Enhancement: add GODOT-12 (addon validation).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -74,5 +75,11 @@ export const GODOT_INVARIANTS: StackInvariant[] = [
     description:
       "Game.csproj NuGet package references must be Godot-compatible and non-problematic",
     check: "godot.nuget.validate",
+  },
+  {
+    id: "GODOT-12",
+    description:
+      "Addons in addons/ must have valid plugin.cfg, be enabled in project.godot, and declare NuGet deps in Game.csproj for C# addons",
+    check: "godot.addon.validate",
   },
 ];
