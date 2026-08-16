@@ -129,6 +129,12 @@ export async function storeArtifactCore(
   const archivePath = path.join(storeDir, `${distArtifactHash}.tar.gz`);
   await fs.rename(archiveTmpPath, archivePath);
 
+  // Also copy artifact.tar.gz to releases/{release}/ for resolveArtifactHash
+  const releaseDir = path.join(workspaceRoot, "releases", releaseId);
+  await fs.mkdir(releaseDir, { recursive: true });
+  const releaseArtifactPath = path.join(releaseDir, "artifact.tar.gz");
+  await fs.copyFile(archivePath, releaseArtifactPath);
+
   // Clean up tmp dir if empty
   const tmpDir = path.dirname(archiveTmpPath);
   try {

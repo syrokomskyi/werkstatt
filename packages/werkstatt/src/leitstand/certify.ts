@@ -25,7 +25,10 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
-import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
+import type {
+  GateDecisionV1,
+  MainVerificationDecisionV1,
+} from "../certification/contracts/decisions.ts";
 import type { GateChannel } from "../certification/contracts/identifiers.ts";
 import { astroCertificationProfile } from "../certification/profile/astro-profile.ts";
 import { makeR2ConfigFromEnv, resolveArtifactHash } from "./deploy-helpers.ts";
@@ -66,6 +69,7 @@ export interface CertifyResult {
   decisionId: string;
   status: "pass" | "fail" | "stale" | "incomplete";
   outputPath: string;
+  mainVerificationPath?: string;
   producerCount: number;
   evidenceCount: number;
 }
@@ -416,9 +420,42 @@ export async function runLeitstandCertify(
   const outputPath = path.join(outputDir, `${releaseId}-${gate}.json`);
   await writeFileIfChanged(outputPath, JSON.stringify(gateDecision, null, 2) + "\n");
 
+  // When gate=main and status=pass, also write MainVerificationDecisionV1
+  let mainVerificationPath: string | undefined;
+  if (gate === "main" && evaluationResult.status === "pass") {
+    const mvDecisionId = `dec-mv-${now.toLowerCase().replace(/[:.]/g, "-")}-${Math.random().toString(36).slice(2, 8)}`;
+    const mainVerification: MainVerificationDecisionV1 = {
+      schema: "werkstatt/main-verification-decision@1",
+      decisionId: mvDecisionId,
+      candidateId,
+      policyBundleRoot: artifactHash,
+      gate: "main",
+      evaluationCut: 1,
+      selectedEvidence: gateDecision.selectedEvidence,
+      status: "pass",
+      coverage: evaluationResult.coverage,
+      reasons: [...evaluationResult.reasons],
+      actionPackRef: null,
+      rootDossierRef: artifactHash,
+      priorOperationRef: null,
+      decidedAt: now,
+    };
+    mainVerificationPath = path.join(outputDir, `${releaseId}-main-verification.json`);
+    await writeFileIfChanged(
+      mainVerificationPath,
+      JSON.stringify(mainVerification, null, 2) + "\n",
+    );
+  }
+
   const relPath = path.join("gate-decisions", `${releaseId}-${gate}.json`);
   try {
     gitExec(cacheCloneDir, `add ${relPath}`);
+    if (mainVerificationPath) {
+      gitExec(
+        cacheCloneDir,
+        `add ${path.join("gate-decisions", `${releaseId}-main-verification.json`)}`,
+      );
+    }
     cacheCloneCommit(
       cacheCloneDir,
       `gate-decisions: ${releaseId}-${gate} (${gateDecision.status})`,
@@ -454,6 +491,7 @@ export async function runLeitstandCertify(
       decisionId,
       status: evaluationResult.status,
       outputPath,
+      mainVerificationPath,
       producerCount: producerNodes.length,
       evidenceCount: execResult.evidence.length,
     },

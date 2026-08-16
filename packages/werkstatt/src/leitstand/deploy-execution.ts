@@ -383,16 +383,13 @@ export async function executeDeployPhases(
       }
     }
 
-    if (!ctx.skipEvidenceSync) {
+    if (!ctx.skipEvidenceSync && ctx.missionId) {
       try {
         const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
         await executeKernelCommand({
           workspaceRoot: ctx.workspaceRoot,
           commandName: "evidence.sync",
-          argv: [
-            `--site=${ctx.systemId}`,
-            ...(ctx.missionId ? [`--mission=${ctx.missionId}`] : []),
-          ],
+          argv: [`--site=${ctx.systemId}`, `--mission=${ctx.missionId}`],
         });
         evidenceSynced = true;
       } catch (err) {
@@ -442,7 +439,7 @@ export async function executeDeployPhases(
       ctx.authResult.ok ? ctx.authResult.outcome.decisionId : "",
       false,
       null,
-      "deployed",
+      "succeeded",
       now,
     );
     await writeDeploymentEffectRecord(ctx.cacheCloneDir, finalEffectRecord, actualDeploymentUrl);

@@ -146,8 +146,8 @@ export function createLeitstandModule(): KernelModule {
           },
           "main-verification-decision": {
             kind: "string",
-            required: true,
-            description: "RFC-0866: Path to MainVerificationDecisionV1 JSON file.",
+            description:
+              "RFC-0866: Path to MainVerificationDecisionV1 JSON file. Auto-resolved from systems-cache/{system}/gate-decisions/{release}-main-verification.json if omitted.",
           },
           "candidate-id": {
             kind: "string",
