@@ -153,7 +153,7 @@ function buildAgentSkillsIndex(
 function buildOauthProtectedResource(origin: string): string {
   const doc = {
     resource: `${origin}/`,
-    authorization_servers: [`${origin}/.well-known/oauth-authorization-server`],
+    authorization_servers: [`${origin}/`],
     bearer_methods_supported: ["header"],
     scopes_supported: ["read"],
   };
