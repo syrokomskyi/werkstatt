@@ -209,19 +209,19 @@ force: {
 
 ## Acceptance criteria
 
-- [ ] `tryReuseEvidence` function implemented in `certify.ts` — scans `gate-decisions/{release}-*.json` for matching `policyBundleRoot`, reads evidence sidecar `{release}-evidence.json`
-- [ ] `--force` flag added to `leitstand.certify` command registration in `leitstand.module.ts`
-- [ ] Evidence sidecar `gate-decisions/{release}-evidence.json` written after producer execution
-- [ ] Gate-decision JSON is still written per gate with unique `decisionId`
-- [ ] Stale evidence (past `freshness.expiresAt`) is not reused
-- [ ] Missing evidence sidecar falls through to producer execution (no error)
-- [ ] `reads` field in command registration includes `gate-decisions/**`
-- [ ] Concurrent certification for same release+gate is rejected by gate lock manager
-- [ ] Log message indicates evidence reuse source gate
-- [ ] Unit test: same artifact hash → evidence reused
-- [ ] Unit test: different artifact hash → producers execute
-- [ ] Unit test: `--force` → producers execute even with matching hash
-- [ ] Unit test: stale evidence → producers execute
+- [x] `tryReuseEvidence` function implemented in `certify.ts` — scans `gate-decisions/{release}-*.json` for matching `policyBundleRoot`, reads evidence sidecar `{release}-evidence.json` (evidence: packages/werkstatt/src/leitstand/certify.ts:82-168, test: leitstand-0867-evidence-reuse.test.ts "same artifact hash → evidence reused")
+- [x] `--force` flag added to `leitstand.certify` command registration in `leitstand.module.ts` (evidence: packages/werkstatt/src/leitstand/leitstand.module.ts:325-328, test: leitstand-0867-evidence-reuse.test.ts "--force → producers execute")
+- [x] Evidence sidecar `gate-decisions/{release}-evidence.json` written after producer execution (evidence: packages/werkstatt/src/leitstand/certify.ts:170-194, test: leitstand-0867-evidence-reuse.test.ts "same artifact hash → evidence reused" verifies sidecar is read)
+- [x] Gate-decision JSON is still written per gate with unique `decisionId` (evidence: packages/werkstatt/src/leitstand/certify.ts:568-580, gate-decision written in both reuse and execute paths)
+- [x] Stale evidence (past `freshness.expiresAt`) is not reused (evidence: packages/werkstatt/src/leitstand/certify.ts:147-152, test: leitstand-0867-evidence-reuse.test.ts "stale evidence → producers execute")
+- [x] Missing evidence sidecar falls through to producer execution (no error) (evidence: packages/werkstatt/src/leitstand/certify.ts:126, test: leitstand-0867-evidence-reuse.test.ts "missing evidence sidecar → producers execute")
+- [x] `reads` field in command registration includes `gate-decisions/**` (evidence: packages/werkstatt/src/leitstand/leitstand.module.ts:331-335)
+- [x] Concurrent certification for same release+gate is rejected by gate lock manager (evidence: CERT-ORCHESTRATOR-03 in packages/werkstatt/src/certification/orchestration/orchestrator.ts, per-release+gate mutual exclusion is pre-existing)
+- [x] Log message indicates evidence reuse source gate (evidence: packages/werkstatt/src/leitstand/certify.ts:467-469, test: leitstand-0867-evidence-reuse.test.ts "same artifact hash" verifies console.info)
+- [x] Unit test: same artifact hash → evidence reused (evidence: leitstand-0867-evidence-reuse.test.ts:177)
+- [x] Unit test: different artifact hash → producers execute (evidence: leitstand-0867-evidence-reuse.test.ts:205)
+- [x] Unit test: `--force` → producers execute even with matching hash (evidence: leitstand-0867-evidence-reuse.test.ts:226)
+- [x] Unit test: stale evidence → producers execute (evidence: leitstand-0867-evidence-reuse.test.ts:248)
 
 ## Implementation notes for agents
 
