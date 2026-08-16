@@ -47,6 +47,7 @@ import {
 } from "../certification/orchestration/orchestrator.ts";
 import { evaluateCertificationDecision } from "../certification/aggregation.ts";
 import type { EvidenceEnvelopeV1 } from "../certification/contracts/evidence.ts";
+import { evidenceEnvelopeV1Schema } from "../certification/contracts/evidence.ts";
 import type { ReleaseCandidateV1 } from "../certification/contracts/candidate.ts";
 import type { CertificationPolicyBundleV1 } from "../certification/contracts/policy-bundle.ts";
 import { gateDecisionV1Schema } from "../certification/contracts/decisions.ts";
@@ -84,6 +85,12 @@ async function tryReuseEvidence(
   artifactHash: Sha256Digest,
   forceRequested: boolean,
 ): Promise<EvidenceCacheEntry | null> {
+  // RFC-0867: The sequential deployment pipeline (dev → alt → main) uses the same
+  // certification profile and policy bundle for all gates of a given release.
+  // The artifact hash (policyBundleRoot) match is therefore sufficient to guarantee
+  // that reused evidence satisfies the current gate's requirements. If the profile
+  // or policy bundle changes between gates, a superseding RFC must add a profile-hash
+  // check here.
   if (forceRequested) return null;
 
   const gateDecisionsDir = path.join(cacheCloneDir, "gate-decisions");
@@ -128,7 +135,21 @@ async function tryReuseEvidence(
       ) {
         continue;
       }
-      sidecar = sidecarParsed as EvidenceCacheSidecar;
+      const validatedEvidence: EvidenceEnvelopeV1[] = [];
+      for (const env of sidecarParsed.evidence) {
+        const envResult = evidenceEnvelopeV1Schema.safeParse(env);
+        if (!envResult.success) continue;
+        validatedEvidence.push(envResult.data);
+      }
+      if (validatedEvidence.length === 0) continue;
+      sidecar = {
+        schema: sidecarParsed.schema,
+        releaseId: sidecarParsed.releaseId,
+        artifactHash: sidecarParsed.artifactHash,
+        evidence: validatedEvidence,
+        producedAt: sidecarParsed.producedAt,
+        producedByGate: sidecarParsed.producedByGate,
+      };
     } catch {
       continue;
     }
