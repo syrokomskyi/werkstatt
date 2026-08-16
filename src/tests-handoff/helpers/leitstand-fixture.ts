@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 export function writeSystemConfig(testRoot: string, systemId: string, deployment?: string): void {
-  const cacheDir = join(testRoot, "systems-cache", systemId);
+  const cacheDir = join(testRoot, "..", "systems-cache", systemId);
   mkdirSync(cacheDir, { recursive: true });
 
   const deploymentBlock = deployment ? `\ndeployment:\n${deployment}\n` : "\n";
@@ -27,7 +27,7 @@ export function writeSystemState(
   lastPropagated?: string,
   currentMission: string | null = null,
 ): void {
-  const cacheDir = join(testRoot, "systems-cache", systemId);
+  const cacheDir = join(testRoot, "..", "systems-cache", systemId);
   mkdirSync(cacheDir, { recursive: true });
 
   const missionField = currentMission ? currentMission : "null";

@@ -63,6 +63,7 @@ export interface DeployExecutionContext {
   artifactHash: Sha256Digest;
   authResult: AuthorizeOutcome;
   workspaceRoot: string;
+  cacheCloneDir: string;
   systemConfig: DeploymentStaticConfig;
   adapter: DeploymentAdapter;
   operationId: string;
@@ -442,12 +443,7 @@ export async function executeDeployPhases(
       "deployed",
       now,
     );
-    await writeDeploymentEffectRecord(
-      ctx.workspaceRoot,
-      ctx.systemId,
-      finalEffectRecord,
-      actualDeploymentUrl,
-    );
+    await writeDeploymentEffectRecord(ctx.cacheCloneDir, finalEffectRecord, actualDeploymentUrl);
 
     return {
       deploymentUrl: actualDeploymentUrl,
@@ -481,12 +477,7 @@ export async function executeDeployPhases(
       "failed",
       now,
     );
-    await writeDeploymentEffectRecord(
-      ctx.workspaceRoot,
-      ctx.systemId,
-      failedEffectRecord,
-      deploymentUrl,
-    );
+    await writeDeploymentEffectRecord(ctx.cacheCloneDir, failedEffectRecord, deploymentUrl);
 
     return {
       deploymentUrl,

@@ -41,7 +41,11 @@ import {
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
-import { readSystemState, writeSystemState } from "../sternsystem/registry-io.ts";
+import {
+  readSystemState,
+  writeSystemState,
+  resolveCacheClonePath,
+} from "../sternsystem/registry-io.ts";
 import { runPipelinePhase, computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
 import { checkBreaksCDeclaration } from "./breaks-c-helper.ts";
@@ -966,7 +970,10 @@ export async function runReleaseRollback(
     "rolled-back",
     now,
   );
-  await writeDeploymentEffectRecord(context.workspaceRoot, systemId || releaseId, effectRecord);
+  await writeDeploymentEffectRecord(
+    resolveCacheClonePath(context.workspaceRoot, systemId || releaseId),
+    effectRecord,
+  );
 
   return {
     data: { releaseId, systemId, state: "rolled-back", rolledBackAt: now },

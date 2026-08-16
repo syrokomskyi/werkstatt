@@ -10,12 +10,16 @@
 <item>RFC-0865: initial deploy authorization helper.</item>
 <item>RFC-0866 fix: add resolveGateDecisionPath helper for conventional gate-decision path resolution.</item>
 <item>RFC-0866 fix D-2: writeDeploymentEffectRecord accepts optional deploymentUrl for effect-record URL discovery.</item>
+<item>Fix hardcoded systems-cache paths: writeDeploymentEffectRecord and resolveGateDecisionPath now accept cacheCloneDir directly. writeDeploymentEffectRecord commits+pushes to cache clone git after write.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
+import { cacheCloneCommit } from "../mission/mission-git-commit.ts";
+import { gitExec } from "../werkstatt/git-exec.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import { isSha256Digest, byteHashFile } from "../fingerprint/primitives.ts";
 import type {
@@ -277,16 +281,29 @@ export function buildEffectRecord(
 }
 
 export async function writeDeploymentEffectRecord(
-  workspaceRoot: string,
-  systemId: string,
+  cacheCloneDir: string,
   record: DeploymentEffectRecordV1,
   deploymentUrl?: string,
 ): Promise<string> {
-  const dir = path.join(workspaceRoot, "systems-cache", systemId, "deployment-operations");
+  const dir = path.join(cacheCloneDir, "deployment-operations");
   await fs.mkdir(dir, { recursive: true });
   const filePath = path.join(dir, `${record.operationId}.json`);
   const payload = deploymentUrl ? { ...record, deploymentUrl } : record;
-  await fs.writeFile(filePath, JSON.stringify(payload, null, 2) + "\n", "utf8");
+  await writeFileIfChanged(filePath, JSON.stringify(payload, null, 2) + "\n");
+
+  const relPath = path.join("deployment-operations", `${record.operationId}.json`);
+  try {
+    gitExec(cacheCloneDir, `add ${relPath}`);
+    cacheCloneCommit(
+      cacheCloneDir,
+      `deployment-operations: ${record.operationId} (${record.state})`,
+    );
+    const branch = gitExec(cacheCloneDir, "rev-parse --abbrev-ref HEAD").trim();
+    gitExec(cacheCloneDir, `push origin ${branch}`);
+  } catch {
+    // Best-effort commit+push — file is written, sync will propagate later
+  }
+
   return filePath;
 }
 
@@ -307,18 +324,11 @@ export function makeR2ConfigFromEnv(
 }
 
 export function resolveGateDecisionPath(
-  workspaceRoot: string,
-  systemId: string,
+  cacheCloneDir: string,
   releaseId: string,
   gate: "dev" | "alt" | "main",
   override?: string,
 ): string {
   if (override) return override;
-  return path.join(
-    workspaceRoot,
-    "systems-cache",
-    systemId,
-    "gate-decisions",
-    `${releaseId}-${gate}.json`,
-  );
+  return path.join(cacheCloneDir, "gate-decisions", `${releaseId}-${gate}.json`);
 }
