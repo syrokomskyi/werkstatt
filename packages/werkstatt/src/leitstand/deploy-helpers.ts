@@ -50,6 +50,14 @@ import {
   type R2StorageConfig,
 } from "../certification/storage/index.ts";
 
+export function flagSite(input: { flags: Record<string, unknown> }): string | undefined {
+  const v = input.flags["site"];
+  if (typeof v === "string") return v;
+  const sys = input.flags["system"];
+  if (typeof sys === "string") return sys;
+  return undefined;
+}
+
 export interface GateDecisionInput {
   gateDecisionPath: string;
   artifactHash: Sha256Digest;
@@ -122,10 +130,23 @@ export async function resolveArtifactHash(
     if (existsSync(artifactPath)) {
       return await byteHashFile(artifactPath);
     }
+
+    const releaseYamlPath = path.join(releaseDir, "release.yaml");
+    if (existsSync(releaseYamlPath)) {
+      try {
+        const content = await fs.readFile(releaseYamlPath, "utf8");
+        const match = content.match(/^distTreeHash:\s*(sha256:[a-f0-9]{64})\s*$/m);
+        if (match && isSha256Digest(match[1])) {
+          return match[1];
+        }
+      } catch {
+        // release.yaml unreadable — fall through to error
+      }
+    }
   }
 
   throw new Error(
-    "[deploy] artifact hash not provided and no artifact.tar.gz found in release directory — use --artifact-hash or --release-dir",
+    "[deploy] artifact hash not provided and no artifact.tar.gz or release.yaml with distTreeHash found in release directory — use --artifact-hash or --release-dir",
   );
 }
 
