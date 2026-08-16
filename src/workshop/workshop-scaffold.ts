@@ -236,7 +236,7 @@ export async function runWorkshopScaffold(
         domain:
           stack === "astro-typescript-turborepo"
             ? "site"
-            : stack === "phaser-turborepo"
+            : stack === "phaser-turborepo" || stack === "godot-csharp"
               ? "game"
               : "video",
       },
