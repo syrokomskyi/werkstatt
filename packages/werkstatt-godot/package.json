@@ -1,0 +1,67 @@
+{
+  "name": "@warpgogol/werkstatt-godot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Werkstatt Godot plugin — Godot 4.x + C# stack.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./paths": {
+      "types": "./src/paths/godot-paths.ts",
+      "default": "./src/paths/godot-paths.ts"
+    },
+    "./checks": {
+      "types": "./src/checks/index.ts",
+      "default": "./src/checks/index.ts"
+    },
+    "./checks/module": {
+      "types": "./src/checks/module.ts",
+      "default": "./src/checks/module.ts"
+    },
+    "./invariants": {
+      "types": "./src/invariants/godot-invariants.ts",
+      "default": "./src/invariants/godot-invariants.ts"
+    },
+    "./onboarding": {
+      "types": "./src/onboarding/index.ts",
+      "default": "./src/onboarding/index.ts"
+    },
+    "./onboarding/module": {
+      "types": "./src/onboarding/module.ts",
+      "default": "./src/onboarding/module.ts"
+    },
+    "./deploy": {
+      "types": "./src/deploy/index.ts",
+      "default": "./src/deploy/index.ts"
+    },
+    "./build": {
+      "types": "./src/build/dotnet-build.ts",
+      "default": "./src/build/dotnet-build.ts"
+    },
+    "./release-evidence": {
+      "types": "./src/release-evidence/godot-evidence.ts",
+      "default": "./src/release-evidence/godot-evidence.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@warpgogol/werkstatt": "workspace:*",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  }
+}

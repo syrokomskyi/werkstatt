@@ -39,7 +39,7 @@ export function createWorkshopModule(): KernelModule {
             kind: "string",
             required: true,
             description:
-              "Stack profile id. Available: astro-typescript-turborepo, phaser-turborepo, editframe.",
+              "Stack profile id. Available: astro-typescript-turborepo, phaser-turborepo, editframe, godot-csharp.",
           },
           dest: {
             kind: "string",
