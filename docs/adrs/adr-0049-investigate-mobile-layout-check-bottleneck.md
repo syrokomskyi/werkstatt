@@ -46,3 +46,22 @@ Investigate the root cause of the `mobile.layout.check` performance bottleneck a
 
 - If unfixed, every `release.prepare` will take 11+ minutes just for this one check.
 - The optimization could reduce release preparation from ~15 minutes to ~5 minutes.
+
+## Justification
+
+The root cause was confirmed by reading the implementation: `mobile.layout.check` processed all 124 routes sequentially, each in two orientations (portrait + landscape), with a 2-second settle wait per page and a new browser context per orientation. This resulted in 248 context creations and 248 × 2s = ~8.3 minutes in settle waits alone.
+
+Three optimizations were applied:
+
+- **Parallel route processing** (concurrency=4): routes are processed in batches of 4 concurrent routes, reducing wall-clock time by ~4×. Within each route, portrait and landscape remain sequential because MOBILE-GEO-02 requires portrait geometry before landscape comparison.
+- **Reusable browser contexts**: two contexts (portrait + landscape) are created once and reused across all routes, eliminating 246 redundant context creations.
+- **Reduced settle wait** (2s → 500ms): external requests are blocked, pages are static HTML served from a local server — 500ms is sufficient for layout stabilization.
+
+Content-hash caching was evaluated but not implemented: the check runs on built HTML in `dist/client/`, and the build already invalidates on content changes. Adding a cache layer would add complexity without meaningful benefit for a check that now completes in under 3 minutes.
+
+## Evolution
+
+- The `--concurrency` flag allows tuning parallelism for environments with more or fewer CPU cores. Default is 4.
+- The `--settle-wait` flag allows tuning the settle wait per page. Default is 500ms.
+- If future sites exceed 500 pages, concurrency can be increased via the flag without code changes.
+- Content-hash caching remains a future option if the check becomes a bottleneck again at higher page counts.
