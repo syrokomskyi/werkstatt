@@ -95,7 +95,7 @@ export async function runSurfaceHubValidate(
       !level0.pillar.hero.primaryCta.target.startsWith("#")
     ) {
       diagnostics.push({
-        ruleId: "pillar-hero-cta-not-anchor",
+        ruleId: "PILLAR-HERO-CTA-NOT-ANCHOR",
         severity: "error",
         file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `depth-0 pillar hero primaryCta target "${level0.pillar.hero.primaryCta.target}" is not an anchor (expected "#industry-catalog")`,
@@ -107,7 +107,7 @@ export async function runSurfaceHubValidate(
     // pillar-missing-title-template
     if (!level0.titleTemplate) {
       diagnostics.push({
-        ruleId: "pillar-missing-title-template",
+        ruleId: "PILLAR-MISSING-TITLE-TEMPLATE",
         severity: "error",
         file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `depth-0 pillar level has no titleTemplate — the hub title must communicate the industry-hub function`,
@@ -120,7 +120,7 @@ export async function runSurfaceHubValidate(
     const depth1Entries = surfaceEntries.filter((e) => e.depth === 1 && e.indexable && !e.noindex);
     if (depth0Entry && depth1Entries.length === 0) {
       diagnostics.push({
-        ruleId: "pillar-no-published-industries",
+        ruleId: "PILLAR-NO-PUBLISHED-INDUSTRIES",
         severity: "error",
         file: ARTIFACT_FILE,
         message: `surface "${bp.id}" has a pillar hub but no published depth-1 industry entries`,
@@ -140,7 +140,7 @@ export async function runSurfaceHubValidate(
       const orphanEntries = surfaceEntries.filter((e) => e.depth === 1 && !e.indexable);
       for (const orphan of orphanEntries) {
         diagnostics.push({
-          ruleId: "pillar-orphan-industry",
+          ruleId: "PILLAR-ORPHAN-INDUSTRY",
           severity: "warning",
           file: ARTIFACT_FILE,
           message: `industry "${orphan.axes["industry"]}" has a depth-1 entry but was dropped by the eligibility engine (not indexable)`,
@@ -159,7 +159,7 @@ export async function runSurfaceHubValidate(
       for (const phrase of COMMERCIAL_PROMISE_PHRASES) {
         if (lower.includes(phrase.toLowerCase())) {
           diagnostics.push({
-            ruleId: "pillar-commercial-promise",
+            ruleId: "PILLAR-COMMERCIAL-PROMISE",
             severity: "error",
             file: ARTIFACT_FILE,
             message: `industry "${entry.axes["industry"]}" metaDescription contains unfulfillable promise phrase "${phrase}"`,
@@ -176,7 +176,7 @@ export async function runSurfaceHubValidate(
     const isBraced = priceRef.startsWith("{business-profile.") && priceRef.endsWith("}");
     if (!isBraceless && !isBraced) {
       diagnostics.push({
-        ruleId: "pillar-priceref-unresolvable",
+        ruleId: "PILLAR-PRICEREF-UNRESOLVABLE",
         severity: "error",
         file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `pillar.productPrice.priceRef "${priceRef}" is not a valid PBP reference (expected "business-profile.…")`,
@@ -185,7 +185,7 @@ export async function runSurfaceHubValidate(
     } else {
       // Syntax is valid — warn that resolution is not checked at validation time.
       diagnostics.push({
-        ruleId: "pillar-priceref-unresolvable",
+        ruleId: "PILLAR-PRICEREF-UNRESOLVABLE",
         severity: "warning",
         file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
         message: `pillar.productPrice.priceRef "${priceRef}" syntax is valid but PBP resolution is not checked at validation time`,

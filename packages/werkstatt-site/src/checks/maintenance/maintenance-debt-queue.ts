@@ -169,7 +169,7 @@ const DEFERRED_DEBT_CLASSES = [
   },
   {
     sourceCommand: "material.metadata.validate",
-    ruleId: "material.metadata.toolchain-missing",
+    ruleId: "MATERIAL.METADATA.TOOLCHAIN-MISSING",
     severity: "info" as const,
     rationale: "Toolchain availability info remains visible but is not an initial burn-down queue.",
   },

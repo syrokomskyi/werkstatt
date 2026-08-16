@@ -12,7 +12,7 @@
 */
 
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import { parse as yamlParse } from "yaml";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
@@ -64,6 +64,7 @@ export interface AuditAppContext {
   systemManifest: Record<string, unknown>;
   familyYamlPath: string;
   familyDirectory: string;
+  workspaceRoot: string;
 }
 
 export interface AuditLlmRuntimeContext {
@@ -94,6 +95,25 @@ export function summarizeAuditFindings(findings: Diagnostic[]): Record<Diagnosti
   };
 }
 
+export function toRelPath(workspaceRoot: string, absolutePath: string): string {
+  if (!absolutePath || absolutePath.startsWith("../") || absolutePath.startsWith("./")) {
+    return absolutePath;
+  }
+  const rel = relative(workspaceRoot, absolutePath);
+  return rel.replace(/\\/g, "/");
+}
+
+function normalizeFindingPaths(findings: Diagnostic[], workspaceRoot: string): Diagnostic[] {
+  return findings.map((f) => ({
+    ...f,
+    file: f.file ? toRelPath(workspaceRoot, f.file) : f.file,
+    evidence: f.evidence?.map((e) => ({
+      ...e,
+      file: e.file ? toRelPath(workspaceRoot, e.file) : e.file,
+    })),
+  }));
+}
+
 export function buildAuditResult(params: {
   command: string;
   app: string;
@@ -102,6 +122,7 @@ export function buildAuditResult(params: {
   kind?: string;
   cacheStats?: { hits: number; misses: number };
   pending?: boolean;
+  workspaceRoot?: string;
 }): AuditResult {
   const summary = summarizeAuditFindings(params.findings);
   const status = params.pending
@@ -111,12 +132,15 @@ export function buildAuditResult(params: {
       : summary.warning > 0
         ? "warn"
         : "ok";
+  const normalizedFindings = params.workspaceRoot
+    ? normalizeFindingPaths(params.findings, params.workspaceRoot)
+    : params.findings;
   return auditResultSchema.parse({
     command: params.command,
     kind: params.kind,
     app: params.app,
     status,
-    findings: params.findings,
+    findings: normalizedFindings,
     summary,
     cacheStats: params.cacheStats,
     runtimeMs: params.runtimeMs,
@@ -193,6 +217,7 @@ export async function loadAuditAppContext(context: KernelRuntimeContext): Promis
     systemManifest,
     familyYamlPath,
     familyDirectory,
+    workspaceRoot: context.workspaceRoot,
   };
 }
 

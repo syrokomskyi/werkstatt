@@ -71,7 +71,7 @@ export async function runSurfaceIntersectionReport(
     // Report publication decision distribution.
     const publicationDecision = record.data["publicationDecision"] ?? "pending";
     diagnostics.push({
-      ruleId: "intersection-record-status",
+      ruleId: "INTERSECTION-RECORD-STATUS",
       severity: "info",
       file: relFile,
       message: `intersection "${record.slug}" publicationDecision: ${publicationDecision}`,
@@ -98,7 +98,7 @@ export async function runSurfaceIntersectionReport(
       const count = Array.isArray(value) ? value.length : value ? 1 : 0;
       if (count === 0) {
         diagnostics.push({
-          ruleId: "intersection-field-empty",
+          ruleId: "INTERSECTION-FIELD-EMPTY",
           severity: "warning",
           file: relFile,
           message: `intersection "${record.slug}" field "${field}" is empty`,

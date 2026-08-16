@@ -23,7 +23,7 @@ function makeFinding(overrides: Partial<Finding> = {}): Finding {
     findingId: "finding_test_001",
     semanticFingerprint: mockDigestRef,
     methodologyId: "method_axe_core",
-    ruleId: "color-contrast",
+    ruleId: "COLOR-CONTRAST",
     affectedSubjectId: "https://example.com/",
     title: "Elements must meet minimum color contrast ratio",
     severity: "medium",
@@ -203,7 +203,7 @@ function makeObservationBundle(): ObservationBundle {
         instrumentRunId: "run_mock",
         subjectId: "https://example.com/",
         predicate: "has-accessibility-violation",
-        value: { ruleId: "color-contrast" },
+        value: { ruleId: "COLOR-CONTRAST" },
         evidence: [
           {
             evidenceRef: {

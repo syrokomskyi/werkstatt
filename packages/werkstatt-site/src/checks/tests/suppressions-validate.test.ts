@@ -114,7 +114,7 @@ describe("runSuppressionsValidate", () => {
       writeFileSync(
         join(tmpDir, "missions", "m000001", "evidence", "axiom", "study-run.json"),
         JSON.stringify({
-          findings: [{ ruleId: "known-rule-1" }, { ruleId: "known-rule-2" }],
+          findings: [{ ruleId: "KNOWN-RULE-1" }, { ruleId: "KNOWN-RULE-2" }],
         }),
       );
       const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));

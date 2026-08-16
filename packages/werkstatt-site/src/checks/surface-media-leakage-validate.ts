@@ -213,7 +213,7 @@ export async function runSurfaceMediaLeakageValidate(
   }
 
   const diagnostics: Diagnostic[] = violations.map((message) => ({
-    ruleId: "surface.media-leakage.validate",
+    ruleId: "SURFACE.MEDIA-LEAKAGE.VALIDATE",
     severity: "error" as const,
     file: DIST_CLIENT_DIR,
     message,

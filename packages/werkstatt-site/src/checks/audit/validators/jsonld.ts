@@ -49,6 +49,7 @@ export async function runJsonLdUrlValidate(
     const result = buildAuditResult({
       command: "jsonld.url.validate",
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
     });
@@ -75,7 +76,7 @@ export async function runJsonLdUrlValidate(
     ) {
       findings.push(
         finding({
-          ruleId: "jsonld-url.webpage-url-mismatch",
+          ruleId: "JSONLD-URL.WEBPAGE-URL-MISMATCH",
           severity: "error",
           file: page.file,
           message: `WebPage.url (${toComparablePathname(webpage.url)}) does not match canonical (${toComparablePathname(canonicalHref)}).`,
@@ -89,7 +90,7 @@ export async function runJsonLdUrlValidate(
       if (previous) {
         findings.push(
           finding({
-            ruleId: "jsonld-url.duplicate-webpage-id",
+            ruleId: "JSONLD-URL.DUPLICATE-WEBPAGE-ID",
             severity: "error",
             file: page.file,
             message: `WebPage @id "${id}" is not unique (also emitted by ${previous}).`,
@@ -105,6 +106,7 @@ export async function runJsonLdUrlValidate(
   const result = buildAuditResult({
     command: "jsonld.url.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });
@@ -162,7 +164,7 @@ export async function runJsonLdParityValidate(
     if (businessHasSameAs && !sawSameAs) {
       findings.push(
         finding({
-          ruleId: "jsonld-parity.org-missing-sameAs",
+          ruleId: "JSONLD-PARITY.ORG-MISSING-SAMEAS",
           severity: "error",
           file: "src/content/business",
           message: "Business web.socials are declared but the Organization node omits sameAs.",
@@ -173,7 +175,7 @@ export async function runJsonLdParityValidate(
     if (businessHasLogo && !sawLogo) {
       findings.push(
         finding({
-          ruleId: "jsonld-parity.org-missing-logo",
+          ruleId: "JSONLD-PARITY.ORG-MISSING-LOGO",
           severity: "error",
           file: "src/content/business",
           message: "Business web.logo is declared but the Organization node omits logo.",
@@ -194,7 +196,7 @@ export async function runJsonLdParityValidate(
       if (!atId) {
         findings.push(
           finding({
-            ruleId: "credit-node-orphaned",
+            ruleId: "CREDIT-NODE-ORPHANED",
             severity: "warning",
             file: page.file,
             message: `A material credit node (creditText: "${String(node.creditText).slice(0, 60)}") has no @id — it cannot be linked from the page entity (RFC-0227).`,
@@ -204,7 +206,7 @@ export async function runJsonLdParityValidate(
       } else if (seenAtIds.has(atId)) {
         findings.push(
           finding({
-            ruleId: "credit-node-duplicated",
+            ruleId: "CREDIT-NODE-DUPLICATED",
             severity: "error",
             file: page.file,
             message: `Two material credit nodes share @id "${atId}" on this page — exactly one node per credited asset is required (RFC-0227).`,
@@ -220,6 +222,7 @@ export async function runJsonLdParityValidate(
   const result = buildAuditResult({
     command: "jsonld.parity",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

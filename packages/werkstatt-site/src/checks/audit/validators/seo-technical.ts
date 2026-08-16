@@ -69,7 +69,7 @@ export async function runSeoTechnicalValidate(
       ) {
         findings.push(
           finding({
-            ruleId: "seo-technical.missing-sitemap-url",
+            ruleId: "SEO-TECHNICAL.MISSING-SITEMAP-URL",
             severity: "error",
             file: "public/sitemap.xml",
             message: `Route ${path} is missing from sitemap.xml.`,
@@ -83,7 +83,7 @@ export async function runSeoTechnicalValidate(
   if (llms && !/^##\s+Primary sources/m.test(llms)) {
     findings.push(
       finding({
-        ruleId: "seo-technical.llms-primary-sources-section",
+        ruleId: "SEO-TECHNICAL.LLMS-PRIMARY-SOURCES-SECTION",
         severity: "warning",
         file: "public/llms.txt",
         message: "llms.txt should include a 'Primary sources' section.",
@@ -94,7 +94,7 @@ export async function runSeoTechnicalValidate(
   if (llms && !/^##\s+Organization/m.test(llms)) {
     findings.push(
       finding({
-        ruleId: "seo-technical.llms-organization-section",
+        ruleId: "SEO-TECHNICAL.LLMS-ORGANIZATION-SECTION",
         severity: "warning",
         file: "public/llms.txt",
         message: "llms.txt should include an 'Organization' section.",
@@ -106,7 +106,7 @@ export async function runSeoTechnicalValidate(
   if (robots && !/Sitemap:\s*.+sitemap\.xml/i.test(robots)) {
     findings.push(
       finding({
-        ruleId: "seo-technical.robots-sitemap-ref",
+        ruleId: "SEO-TECHNICAL.ROBOTS-SITEMAP-REF",
         severity: "error",
         file: "public/robots.txt",
         message: "robots.txt must reference sitemap.xml.",
@@ -118,7 +118,7 @@ export async function runSeoTechnicalValidate(
   if (ai && !/policy:/i.test(ai)) {
     findings.push(
       finding({
-        ruleId: "seo-technical.ai-policy",
+        ruleId: "SEO-TECHNICAL.AI-POLICY",
         severity: "warning",
         file: "public/ai.txt",
         message: "ai.txt is missing a global policy directive.",
@@ -130,6 +130,7 @@ export async function runSeoTechnicalValidate(
   const result = buildAuditResult({
     command: "seo.technical.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

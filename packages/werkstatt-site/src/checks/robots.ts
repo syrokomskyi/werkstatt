@@ -214,7 +214,7 @@ export async function runRobotsValidate(
 
   diagnostics.push(
     ...violations.map((message) => ({
-      ruleId: "robots.validate",
+      ruleId: "ROBOTS.VALIDATE",
       severity: "error" as const,
       file: "public/robots.txt",
       message,
@@ -222,7 +222,7 @@ export async function runRobotsValidate(
         "Run robots.generate and ensure robots.txt contains User-agent, Sitemap, and crawl rules.",
     })),
     ...warnings.map((message) => ({
-      ruleId: "robots.validate",
+      ruleId: "ROBOTS.VALIDATE",
       severity: "warning" as const,
       file: "public/robots.txt",
       message,

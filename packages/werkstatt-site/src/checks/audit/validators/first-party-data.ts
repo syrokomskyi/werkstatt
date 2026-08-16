@@ -33,7 +33,7 @@ export async function runFirstPartyDataValidate(
   if (!(await pathExists(strategyPath))) {
     findings.push(
       finding({
-        ruleId: "first-party-data.missing-strategy",
+        ruleId: "FIRST-PARTY-DATA.MISSING-STRATEGY",
         severity: "info",
         file: strategyPath,
         message:
@@ -66,7 +66,7 @@ export async function runFirstPartyDataValidate(
       if (allowedFields.size > 0 && !allowedFields.has(name)) {
         findings.push(
           finding({
-            ruleId: "first-party-data.undeclared-field",
+            ruleId: "FIRST-PARTY-DATA.UNDECLARED-FIELD",
             severity: "error",
             file: html.file,
             message: `Rendered form field ${name} is not declared in first-party-data.yaml.`,
@@ -78,7 +78,7 @@ export async function runFirstPartyDataValidate(
     if (consentRequired && /<form[\s>]/i.test(html.html) && !/consent/i.test(html.html)) {
       findings.push(
         finding({
-          ruleId: "first-party-data.missing-consent-text",
+          ruleId: "FIRST-PARTY-DATA.MISSING-CONSENT-TEXT",
           severity: "warning",
           file: html.file,
           message: "Rendered form does not appear to include consent text.",
@@ -90,6 +90,7 @@ export async function runFirstPartyDataValidate(
   const result = buildAuditResult({
     command: "first-party-data.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

@@ -200,7 +200,7 @@ export function assetReferenceDiagnostics(findings: AssetReferenceFinding[]): Di
   for (const finding of findings) {
     for (const syntax of finding.contract.syntaxDiagnostics) {
       diagnostics.push({
-        ruleId: "asset.reference.validate",
+        ruleId: "ASSET.REFERENCE.VALIDATE",
         severity: "error",
         file: finding.file,
         line: finding.line,
@@ -211,7 +211,7 @@ export function assetReferenceDiagnostics(findings: AssetReferenceFinding[]): Di
     }
     if (!finding.contract.resolved) {
       diagnostics.push({
-        ruleId: "asset.reference.validate",
+        ruleId: "ASSET.REFERENCE.VALIDATE",
         severity: "warning",
         file: finding.file,
         line: finding.line,

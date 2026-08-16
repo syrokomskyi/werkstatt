@@ -249,14 +249,14 @@ export async function runSurfaceValidate(
 
   const diagnostics: Diagnostic[] = [
     ...violations.map((message) => ({
-      ruleId: "surface.validate",
+      ruleId: "SURFACE.VALIDATE",
       severity: "error" as const,
       file: ARTIFACT_FILE,
       message,
       fixHint: "Regenerate the surface artifact or correct the underlying surface records.",
     })),
     ...warnings.map((warning) => ({
-      ruleId: "surface.validate",
+      ruleId: "SURFACE.VALIDATE",
       severity: "warning" as const,
       file: ARTIFACT_FILE,
       message: `${warning.pageId}: ${warning.message}`,

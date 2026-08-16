@@ -66,7 +66,7 @@ export async function runDemandHierarchyValidate(
 
       if (!isCanonicalLevel(relPath)) {
         diagnostics.push({
-          ruleId: "demands.hierarchy.validate",
+          ruleId: "DEMANDS.HIERARCHY.VALIDATE",
           severity: "error",
           message: `invalid-level: "${relPath}" (lang=${lang}) — demand records must be at 1, 2, or 3 path segments below demands/{lang}/`,
         });
@@ -77,7 +77,7 @@ export async function runDemandHierarchyValidate(
       const existing = seenSlugs.get(derivedSlug);
       if (existing) {
         diagnostics.push({
-          ruleId: "demands.hierarchy.validate",
+          ruleId: "DEMANDS.HIERARCHY.VALIDATE",
           severity: "error",
           message: `slug-collision: "${derivedSlug}" produced by both "${existing}" and "${relPath}" (lang=${lang})`,
         });
@@ -91,7 +91,7 @@ export async function runDemandHierarchyValidate(
       const frontmatterSlug = typeof data.slug === "string" ? data.slug.trim() : undefined;
       if (frontmatterSlug && frontmatterSlug !== derivedSlug) {
         diagnostics.push({
-          ruleId: "demands.hierarchy.validate",
+          ruleId: "DEMANDS.HIERARCHY.VALIDATE",
           severity: "warning",
           message: `slug-override: "${relPath}" (lang=${lang}) frontmatter slug="${frontmatterSlug}" differs from derived slug="${derivedSlug}"`,
         });

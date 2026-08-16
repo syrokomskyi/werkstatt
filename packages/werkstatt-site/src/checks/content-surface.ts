@@ -388,7 +388,7 @@ export async function runContentSurfaceValidate(
   await checkPageBlocks(paths, violations, warnings);
 
   const diagnostics: Diagnostic[] = [...violations, ...warnings].map((item) => ({
-    ruleId: "content.surface.validate",
+    ruleId: "CONTENT.SURFACE.VALIDATE",
     severity: item.severity,
     file: item.file,
     message: item.message,

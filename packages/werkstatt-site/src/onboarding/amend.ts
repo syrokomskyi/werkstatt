@@ -233,7 +233,7 @@ export async function runAmendInputValidate(
 
   if (!batch || !/^amend-\d{3,}$/.test(batch)) {
     findings.push({
-      ruleId: "amend.input.invalid-batch",
+      ruleId: "AMEND.INPUT.INVALID-BATCH",
       severity: "error",
       message: "--batch must be provided and match amend-<NNN> (e.g. --batch amend-007).",
     });
@@ -244,7 +244,7 @@ export async function runAmendInputValidate(
   const briefPath = join(batchRoot, "00-amend-brief.md");
   if (!(await pathExists(briefPath))) {
     findings.push({
-      ruleId: "amend.input.missing-brief",
+      ruleId: "AMEND.INPUT.MISSING-BRIEF",
       severity: "error",
       file: `onboarding/.input/${batch}/00-amend-brief.md`,
       message: `Amend batch ${batch} has no 00-amend-brief.md. Amend never reuses the greenfield 00-brief.md bundle.`,
@@ -259,7 +259,7 @@ export async function runAmendInputValidate(
     if (!result.success) {
       for (const issue of result.error.issues) {
         findings.push({
-          ruleId: "amend.input.schema",
+          ruleId: "AMEND.INPUT.SCHEMA",
           severity: "error",
           file: `onboarding/.input/${batch}/00-amend-brief.md`,
           message: `${issue.path.join(".") || "frontmatter"}: ${issue.message}`,
@@ -270,7 +270,7 @@ export async function runAmendInputValidate(
     }
   } catch (error) {
     findings.push({
-      ruleId: "amend.input.parse",
+      ruleId: "AMEND.INPUT.PARSE",
       severity: "error",
       file: `onboarding/.input/${batch}/00-amend-brief.md`,
       message: error instanceof Error ? error.message : String(error),
@@ -281,7 +281,7 @@ export async function runAmendInputValidate(
 
   if (brief.amend.batch !== batch) {
     findings.push({
-      ruleId: "amend.input.batch-mismatch",
+      ruleId: "AMEND.INPUT.BATCH-MISMATCH",
       severity: "error",
       file: `onboarding/.input/${batch}/00-amend-brief.md`,
       message: `amend.batch (${brief.amend.batch}) must equal the batch folder name (${batch}).`,
@@ -289,7 +289,7 @@ export async function runAmendInputValidate(
   }
   if (appName && brief.amend.targetApp !== appName) {
     findings.push({
-      ruleId: "amend.input.app-mismatch",
+      ruleId: "AMEND.INPUT.APP-MISMATCH",
       severity: "error",
       message: `amend.targetApp (${brief.amend.targetApp}) must equal --site (${appName}).`,
     });
@@ -301,7 +301,7 @@ export async function runAmendInputValidate(
   const systemPath = join(appDir, "src", "content", "system.md");
   if (!(await pathExists(systemPath))) {
     findings.push({
-      ruleId: "amend.input.app-absent",
+      ruleId: "AMEND.INPUT.APP-ABSENT",
       severity: "error",
       message: `apps/${targetApp}/src/content/system.md not found. Amend requires an already-onboarded app (inverse of greenfield 00-prepare).`,
     });
@@ -316,7 +316,7 @@ export async function runAmendInputValidate(
     pages = new Set((manifest.pages ?? []).map((page) => page.pageId));
   } catch (error) {
     findings.push({
-      ruleId: "amend.input.system-invalid",
+      ruleId: "AMEND.INPUT.SYSTEM-INVALID",
       severity: "error",
       file: `apps/${targetApp}/src/content/system.md`,
       message: `Could not load system.md: ${error instanceof Error ? error.message : String(error)}`,
@@ -326,7 +326,7 @@ export async function runAmendInputValidate(
 
   if (!biome) {
     findings.push({
-      ruleId: "amend.input.biome-unresolved",
+      ruleId: "AMEND.INPUT.BIOME-UNRESOLVED",
       severity: "error",
       file: `apps/${targetApp}/src/content/system.md`,
       message: "system.md identity.biome is missing; amend requires a resolved biome.",
@@ -337,7 +337,7 @@ export async function runAmendInputValidate(
     const filePath = join(batchRoot, source.file);
     if (!(await pathExists(filePath))) {
       findings.push({
-        ruleId: "amend.input.source-missing",
+        ruleId: "AMEND.INPUT.SOURCE-MISSING",
         severity: "error",
         file: `onboarding/.input/${batch}/${source.file}`,
         message: `Declared source file '${source.file}' (sourceId ${source.sourceId}) is not present in the batch.`,
@@ -345,21 +345,21 @@ export async function runAmendInputValidate(
     }
     if (source.intent === "strengthen" && !pages.has(source.pageId)) {
       findings.push({
-        ruleId: "amend.input.strengthen-page-absent",
+        ruleId: "AMEND.INPUT.STRENGTHEN-PAGE-ABSENT",
         severity: "error",
         message: `intent: strengthen names pageId '${source.pageId}' but it is not present in system.md pages[].`,
       });
     }
     if (source.intent === "new-route" && pages.has(source.pageId)) {
       findings.push({
-        ruleId: "amend.input.new-route-page-present",
+        ruleId: "AMEND.INPUT.NEW-ROUTE-PAGE-PRESENT",
         severity: "error",
         message: `intent: new-route names pageId '${source.pageId}' but it already exists in system.md pages[]. Use strengthen (same locale) or expand-locale (new language) instead.`,
       });
     }
     if (source.intent === "expand-locale" && !pages.has(source.pageId)) {
       findings.push({
-        ruleId: "amend.input.expand-locale-page-absent",
+        ruleId: "AMEND.INPUT.EXPAND-LOCALE-PAGE-ABSENT",
         severity: "error",
         message: `intent: expand-locale names pageId '${source.pageId}' but it is not present in system.md pages[]. Use new-route to create it first.`,
       });

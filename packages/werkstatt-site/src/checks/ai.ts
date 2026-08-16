@@ -188,14 +188,14 @@ export async function runAiValidate(
 
   const diagnostics: Diagnostic[] = [
     ...violations.map((message) => ({
-      ruleId: "ai.validate",
+      ruleId: "AI.VALIDATE",
       severity: "error" as const,
       file: "public/ai.txt",
       message,
       fixHint: "Run ai.generate and ensure the ai.txt policy contains the required directives.",
     })),
     ...warnings.map((message) => ({
-      ruleId: "ai.validate",
+      ruleId: "AI.VALIDATE",
       severity: "warning" as const,
       file: "public/ai.txt",
       message,

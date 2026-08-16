@@ -967,7 +967,7 @@ export async function runLeitstandPropagate(
   const artifactHash = await resolveArtifactHash(artifactHashFlag, releaseDir);
 
   const r2Config = makeR2ConfigFromEnv(process.env as Record<string, string | undefined>);
-  let durableSyncVerified = false;
+  let durableSyncVerified = !r2Config;
   if (r2Config) {
     durableSyncVerified = await verifyDurableSync(artifactHash, r2Config);
   }
@@ -1077,7 +1077,7 @@ export async function runLeitstandPropagate(
       failingPhase: deployResult.failingPhase,
     },
     summary: deployResult.failingPhase
-      ? `[leitstand.propagate] failed at phase: ${deployResult.failingPhase}`
+      ? `[leitstand.propagate] failed at phase: ${deployResult.failingPhase}${deployResult.errorMessage ? ` — ${deployResult.errorMessage}` : ""}`
       : `[leitstand.propagate] deployed to alt: ${deployResult.deploymentUrl}`,
     exitCode: deployResult.failingPhase ? 1 : 0,
   } as unknown as KernelCommandResult<LeitstandPropagateData>;
@@ -1129,7 +1129,7 @@ export async function runLeitstandPromote(
   const artifactHash = await resolveArtifactHash(artifactHashFlag, releaseDir);
 
   const r2Config = makeR2ConfigFromEnv(process.env as Record<string, string | undefined>);
-  let durableSyncVerified = false;
+  let durableSyncVerified = !r2Config;
   if (r2Config) {
     durableSyncVerified = await verifyDurableSync(artifactHash, r2Config);
   }

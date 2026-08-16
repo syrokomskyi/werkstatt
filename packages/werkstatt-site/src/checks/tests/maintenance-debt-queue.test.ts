@@ -14,7 +14,7 @@ function item(id: string, overrides?: Partial<DebtItem>): DebtItem {
     sourceCommand: "example.validate",
     severity: "warning",
     app: "site-a",
-    ruleId: "example.rule",
+    ruleId: "EXAMPLE.RULE",
     message: `Example warning ${id}`,
     file: `src/content/${id}.md`,
     ...overrides,

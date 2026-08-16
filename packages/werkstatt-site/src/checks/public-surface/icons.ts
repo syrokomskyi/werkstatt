@@ -278,7 +278,7 @@ export async function runPublicIconsValidate(
     const filePath = join(app.publicDirectory, name);
     if (!(await context.io.exists(filePath))) {
       messages.push({
-        ruleId: "public.icons.validate",
+        ruleId: "PUBLIC.ICONS.VALIDATE",
         severity: "error",
         file: workspaceRel(context, filePath),
         message: `Missing generated icon artifact ${name}.`,
@@ -299,7 +299,7 @@ export async function runPublicIconsValidate(
       const meta = await sharp(Buffer.from(await context.io.readFileBytes(filePath))).metadata();
       if (meta.width !== size || meta.height !== size) {
         messages.push({
-          ruleId: "public.icons.validate",
+          ruleId: "PUBLIC.ICONS.VALIDATE",
           severity: "error",
           file: workspaceRel(context, filePath),
           message: `${name} must be ${size}x${size}px, got ${meta.width}x${meta.height}.`,
@@ -325,7 +325,7 @@ export async function runPublicIconsValidate(
       ]) {
         if (!iconMap.has(src)) {
           messages.push({
-            ruleId: "public.icons.validate",
+            ruleId: "PUBLIC.ICONS.VALIDATE",
             severity: "error",
             file: workspaceRel(context, manifestPath),
             message: `manifest.webmanifest is missing icon entry ${src}.`,
@@ -336,7 +336,7 @@ export async function runPublicIconsValidate(
       for (const src of ["/icon-maskable-192.png", "/icon-maskable-512.png"]) {
         if (iconMap.get(src)?.purpose !== "maskable") {
           messages.push({
-            ruleId: "public.icons.validate",
+            ruleId: "PUBLIC.ICONS.VALIDATE",
             severity: "error",
             file: workspaceRel(context, manifestPath),
             message: `${src} must have purpose: "maskable" in manifest.webmanifest.`,
@@ -346,7 +346,7 @@ export async function runPublicIconsValidate(
       }
     } catch (error) {
       messages.push({
-        ruleId: "public.icons.validate",
+        ruleId: "PUBLIC.ICONS.VALIDATE",
         severity: "error",
         file: workspaceRel(context, manifestPath),
         message: `manifest.webmanifest is invalid JSON: ${(error as Error).message}`,
@@ -376,7 +376,7 @@ export async function runPublicIconsValidate(
   ]) {
     if (!layout?.includes(needle)) {
       messages.push({
-        ruleId: "public.icons.validate",
+        ruleId: "PUBLIC.ICONS.VALIDATE",
         severity: "error",
         file: workspaceRel(context, layoutPath),
         message: `Shared head is missing icon declaration ${needle}.`,

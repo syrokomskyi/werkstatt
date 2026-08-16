@@ -34,7 +34,7 @@ export async function runInfraBriefValidate(
   if (!(await pathExists(infraPath))) {
     findings.push(
       finding({
-        ruleId: "infra-brief.missing-config",
+        ruleId: "INFRA-BRIEF.MISSING-CONFIG",
         severity: "info",
         file: infraPath,
         message:
@@ -46,7 +46,7 @@ export async function runInfraBriefValidate(
   if (!(await pathExists(wranglerPath))) {
     findings.push(
       finding({
-        ruleId: "infra-brief.missing-wrangler",
+        ruleId: "INFRA-BRIEF.MISSING-WRANGLER",
         severity: "warning",
         file: wranglerPath,
         message: "wrangler.jsonc is missing.",
@@ -57,7 +57,7 @@ export async function runInfraBriefValidate(
   if (!(await pathExists(workflowDir))) {
     findings.push(
       finding({
-        ruleId: "infra-brief.missing-workflows",
+        ruleId: "INFRA-BRIEF.MISSING-WORKFLOWS",
         severity: "warning",
         file: ".github/workflows",
         message: ".github/workflows directory is missing.",
@@ -68,6 +68,7 @@ export async function runInfraBriefValidate(
   const result = buildAuditResult({
     command: "infra.brief.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

@@ -137,7 +137,7 @@ export async function runSurfaceDuplicateContentReport(
   }
 
   const diagnostics: Diagnostic[] = pairs.map((pair) => ({
-    ruleId: "industry-duplicate-content",
+    ruleId: "INDUSTRY-DUPLICATE-CONTENT",
     severity: "error",
     file: ARTIFACT_FILE,
     message: `${pair.pageA} ↔ ${pair.pageB} similarity ${pair.similarity.toFixed(2)} exceeds threshold ${threshold}`,

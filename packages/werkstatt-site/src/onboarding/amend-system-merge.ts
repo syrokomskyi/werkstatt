@@ -122,7 +122,7 @@ export function applySitePlanDelta(
   for (const page of delta.addPages ?? []) {
     if (pageById.has(page.pageId)) {
       findings.push({
-        ruleId: "amend.system.page-exists",
+        ruleId: "AMEND.SYSTEM.PAGE-EXISTS",
         severity: "info",
         message: `Page '${page.pageId}' already present; new-route add skipped (idempotent).`,
       });
@@ -146,7 +146,7 @@ export function applySitePlanDelta(
     const page = pageById.get(exp.pageId);
     if (!page) {
       findings.push({
-        ruleId: "amend.system.expand-target-missing",
+        ruleId: "AMEND.SYSTEM.EXPAND-TARGET-MISSING",
         severity: "error",
         message: `expand-locale targets pageId '${exp.pageId}' which is not in system.md pages[].`,
       });
@@ -157,7 +157,7 @@ export function applySitePlanDelta(
     const already = routes[exp.locale] !== undefined && (!locales || locales.includes(exp.locale));
     if (already) {
       findings.push({
-        ruleId: "amend.system.locale-exists",
+        ruleId: "AMEND.SYSTEM.LOCALE-EXISTS",
         severity: "info",
         message: `Page '${exp.pageId}' already serves locale '${exp.locale}'; expand-locale skipped (idempotent).`,
       });
@@ -185,7 +185,7 @@ export async function runAmendSystemMerge(
 
   if (!batch || !/^amend-\d{3,}$/.test(batch)) {
     findings.push({
-      ruleId: "amend.system.invalid-batch",
+      ruleId: "AMEND.SYSTEM.INVALID-BATCH",
       severity: "error",
       message: "--batch must be provided and match amend-<NNN>.",
     });
@@ -193,7 +193,7 @@ export async function runAmendSystemMerge(
   }
   if (!context.site) {
     findings.push({
-      ruleId: "amend.system.no-app",
+      ruleId: "AMEND.SYSTEM.NO-APP",
       severity: "error",
       message: "amend.system.merge requires --site <client.id> (the already-onboarded app).",
     });
@@ -204,7 +204,7 @@ export async function runAmendSystemMerge(
   const manifest = await readAmendInputManifest(context.workspaceRoot, batch);
   if (!manifest) {
     findings.push({
-      ruleId: "amend.system.no-manifest",
+      ruleId: "AMEND.SYSTEM.NO-MANIFEST",
       severity: "error",
       file: `onboarding/.output/${batch}/a0-intake/input-manifest.json`,
       message: "Batch manifest missing; run amend.input.validate first.",
@@ -225,7 +225,7 @@ export async function runAmendSystemMerge(
     deltaRaw = await readFile(deltaPath, "utf8");
   } catch {
     findings.push({
-      ruleId: "amend.system.no-delta",
+      ruleId: "AMEND.SYSTEM.NO-DELTA",
       severity: "error",
       file: `onboarding/.output/${batch}/a2-compose/site-plan-delta.md`,
       message: "site-plan-delta.md not found; author it before merging.",
@@ -236,7 +236,7 @@ export async function runAmendSystemMerge(
   const deltaData = deltaParsed.data as Record<string, unknown>;
   if (deltaData.derivedFromInputHash !== manifest.inputHash) {
     findings.push({
-      ruleId: "amend.system.stale-delta",
+      ruleId: "AMEND.SYSTEM.STALE-DELTA",
       severity: "error",
       file: `onboarding/.output/${batch}/a2-compose/site-plan-delta.md`,
       message: `site-plan-delta.md derivedFromInputHash (${String(deltaData.derivedFromInputHash)}) != batch manifest hash (${manifest.inputHash}).`,
@@ -252,7 +252,7 @@ export async function runAmendSystemMerge(
     systemRaw = await readFile(systemPath, "utf8");
   } catch {
     findings.push({
-      ruleId: "amend.system.no-system-md",
+      ruleId: "AMEND.SYSTEM.NO-SYSTEM-MD",
       severity: "error",
       file: relative(context.workspaceRoot, systemPath).replace(/\\/g, "/"),
       message: "system.md not found; amend requires an already-onboarded app.",
@@ -282,7 +282,7 @@ export async function runAmendSystemMerge(
   if (!validation.success) {
     for (const issue of validation.error.issues) {
       findings.push({
-        ruleId: "amend.system.invalid-result",
+        ruleId: "AMEND.SYSTEM.INVALID-RESULT",
         severity: "error",
         file: relative(context.workspaceRoot, systemPath).replace(/\\/g, "/"),
         message: `${issue.path.join(".") || "system"}: ${issue.message}`,
@@ -299,7 +299,7 @@ export async function runAmendSystemMerge(
       await loadSystemManifest(contentDir);
     } catch (error) {
       findings.push({
-        ruleId: "amend.system.post-write-load-failed",
+        ruleId: "AMEND.SYSTEM.POST-WRITE-LOAD-FAILED",
         severity: "error",
         file: relative(context.workspaceRoot, systemPath).replace(/\\/g, "/"),
         message: `system.md failed to reload after merge: ${error instanceof Error ? error.message : String(error)}`,

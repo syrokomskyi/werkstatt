@@ -133,7 +133,7 @@ function validateBaselineShape(baseline: MaintenanceDebtBaseline | undefined): D
   if (!baseline) {
     return [
       {
-        ruleId: "maintenance.debt.baseline.validate",
+        ruleId: "MAINTENANCE.DEBT.BASELINE.VALIDATE",
         severity: "error",
         file: BASELINE_PATH,
         message: "Maintenance debt baseline is missing or unreadable.",
@@ -145,7 +145,7 @@ function validateBaselineShape(baseline: MaintenanceDebtBaseline | undefined): D
   const diagnostics: Diagnostic[] = [];
   if (baseline.meta?.schemaVersion !== 1) {
     diagnostics.push({
-      ruleId: "maintenance.debt.baseline.validate",
+      ruleId: "MAINTENANCE.DEBT.BASELINE.VALIDATE",
       severity: "error",
       file: BASELINE_PATH,
       message: "Maintenance debt baseline has an unsupported generated marker or schema version.",
@@ -187,7 +187,7 @@ export async function runMaintenanceDebtBaselineValidate(
     const key = maintenanceDebtKey(item);
     if (!baselineByKey.has(key)) {
       diagnostics.push({
-        ruleId: "maintenance.debt.baseline.validate",
+        ruleId: "MAINTENANCE.DEBT.BASELINE.VALIDATE",
         severity: item.severity === "warning" ? "error" : "warning",
         file: item.file ?? BASELINE_PATH,
         line: item.line,
@@ -201,7 +201,7 @@ export async function runMaintenanceDebtBaselineValidate(
   for (const item of baseline?.items ?? []) {
     if (isExpired(item.reviewAfter)) {
       diagnostics.push({
-        ruleId: "maintenance.debt.baseline.validate",
+        ruleId: "MAINTENANCE.DEBT.BASELINE.VALIDATE",
         severity: "warning",
         file: BASELINE_PATH,
         message: `Baseline item ${item.key} is past its reviewAfter date.`,

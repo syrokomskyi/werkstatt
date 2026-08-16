@@ -46,6 +46,7 @@ export async function runSeoMetaValidate(
     const result = buildAuditResult({
       command: "seo.meta.validate",
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
     });
@@ -86,7 +87,7 @@ export async function runSeoMetaValidate(
     if (!isNoindex && !extractMetaContent(page.html, "og:image", "property")) {
       findings.push(
         finding({
-          ruleId: "seo-meta.missing-og-image",
+          ruleId: "SEO-META.MISSING-OG-IMAGE",
           severity: "error",
           file: page.file,
           message: "Indexable page has no og:image.",
@@ -105,7 +106,7 @@ export async function runSeoMetaValidate(
     ) {
       findings.push(
         finding({
-          ruleId: "seo-meta.og-url-canonical-mismatch",
+          ruleId: "SEO-META.OG-URL-CANONICAL-MISMATCH",
           severity: "error",
           file: page.file,
           message: `og:url (${toComparablePathname(ogUrl)}) does not match canonical (${toComparablePathname(canonicalHref)}).`,
@@ -117,7 +118,7 @@ export async function runSeoMetaValidate(
     if (!extractMetaContent(page.html, "twitter:card", "name")) {
       findings.push(
         finding({
-          ruleId: "seo-meta.missing-twitter-card",
+          ruleId: "SEO-META.MISSING-TWITTER-CARD",
           severity: "warning",
           file: page.file,
           message: "Rendered page is missing twitter:card.",
@@ -130,6 +131,7 @@ export async function runSeoMetaValidate(
   const result = buildAuditResult({
     command: "seo.meta.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

@@ -44,6 +44,7 @@ export async function runRobotsPageValidate(
     const result = buildAuditResult({
       command: "robots.page.validate",
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
     });
@@ -79,7 +80,7 @@ export async function runRobotsPageValidate(
       if (sitemapLocs.has(path)) {
         findings.push(
           finding({
-            ruleId: "robots-page.noindex-in-sitemap",
+            ruleId: "ROBOTS-PAGE.NOINDEX-IN-SITEMAP",
             severity: "error",
             file: "public/sitemap.xml",
             message: `noindex page "${path}" is listed in the sitemap.`,
@@ -93,6 +94,7 @@ export async function runRobotsPageValidate(
   const result = buildAuditResult({
     command: "robots.page.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

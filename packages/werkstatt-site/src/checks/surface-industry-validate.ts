@@ -132,7 +132,7 @@ export async function runSurfaceIndustryValidate(
       const count = Array.isArray(value) ? value.length : 0;
       if (count < threshold) {
         diagnostics.push({
-          ruleId: "industry-gate-below-threshold",
+          ruleId: "INDUSTRY-GATE-BELOW-THRESHOLD",
           severity: "warning",
           file: relFile,
           message: `industry "${record.slug}" field "${recordField}" has ${count} entries (gate threshold: ${threshold})`,
@@ -148,7 +148,7 @@ export async function runSurfaceIndustryValidate(
     for (const phrase of claimRestrictions) {
       if (lowerText.includes(phrase.toLowerCase())) {
         diagnostics.push({
-          ruleId: "industry-claim-restriction",
+          ruleId: "INDUSTRY-CLAIM-RESTRICTION",
           severity: "error",
           file: relFile,
           message: `industry "${record.slug}" contains prohibited result-claim phrase "${phrase}"`,
@@ -163,7 +163,7 @@ export async function runSurfaceIndustryValidate(
     const missingNew = NEW_FIELDS.filter((f) => record.data[f] === undefined);
     if (usedDeprecated.length > 0 && missingNew.length > 0) {
       diagnostics.push({
-        ruleId: "industry-deprecated-field",
+        ruleId: "INDUSTRY-DEPRECATED-FIELD",
         severity: "warning",
         file: relFile,
         message: `industry "${record.slug}" uses deprecated fields [${usedDeprecated.join(", ")}] but is missing new dossier fields [${missingNew.join(", ")}]`,

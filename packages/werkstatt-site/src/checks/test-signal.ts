@@ -208,7 +208,7 @@ function diagnosticForSignal(signal: PackageTestSignal): Diagnostic | null {
   const severity: Diagnostic["severity"] =
     signal.signal === "skipped" && signal.requiredAction ? "error" : "warning";
   return {
-    ruleId: "test.signal.validate",
+    ruleId: "TEST.SIGNAL.VALIDATE",
     severity,
     file: `${signal.directory}/package.json`,
     message: `${signal.packageName} test signal is ${signal.signal}: ${asSentence(signal.evidence)}`,
@@ -227,7 +227,7 @@ function policyDiagnosticForSignal(signal: PackageTestSignal): Diagnostic[] {
 
   if (signal.signal === "noop") {
     diagnostics.push({
-      ruleId: "test.signal.policy.validate",
+      ruleId: "TEST.SIGNAL.POLICY.VALIDATE",
       severity: "error",
       file,
       message: `${signal.packageName} has a no-op test script.`,
@@ -240,7 +240,7 @@ function policyDiagnosticForSignal(signal: PackageTestSignal): Diagnostic[] {
 
   if (signal.signal !== "skipped") {
     diagnostics.push({
-      ruleId: "test.signal.policy.validate",
+      ruleId: "TEST.SIGNAL.POLICY.VALIDATE",
       severity: "error",
       file,
       message: `${signal.packageName} test signal is ${signal.signal} without package-level ownership metadata.`,
@@ -253,7 +253,7 @@ function policyDiagnosticForSignal(signal: PackageTestSignal): Diagnostic[] {
 
   if (tier === 0) {
     diagnostics.push({
-      ruleId: "test.signal.policy.validate",
+      ruleId: "TEST.SIGNAL.POLICY.VALIDATE",
       severity: "error",
       file,
       message: `${signal.packageName} is Tier 0 and must keep real tests.`,
@@ -264,7 +264,7 @@ function policyDiagnosticForSignal(signal: PackageTestSignal): Diagnostic[] {
 
   if (!metadata?.owner?.trim()) {
     diagnostics.push({
-      ruleId: "test.signal.policy.validate",
+      ruleId: "TEST.SIGNAL.POLICY.VALIDATE",
       severity: "error",
       file,
       message: `${signal.packageName} skipped-test metadata is missing owner.`,
@@ -274,7 +274,7 @@ function policyDiagnosticForSignal(signal: PackageTestSignal): Diagnostic[] {
   }
   if (!metadata?.rationale?.trim()) {
     diagnostics.push({
-      ruleId: "test.signal.policy.validate",
+      ruleId: "TEST.SIGNAL.POLICY.VALIDATE",
       severity: "error",
       file,
       message: `${signal.packageName} skipped-test metadata is missing rationale.`,
@@ -284,7 +284,7 @@ function policyDiagnosticForSignal(signal: PackageTestSignal): Diagnostic[] {
   }
   if (!isIsoDate(metadata?.reviewAfter)) {
     diagnostics.push({
-      ruleId: "test.signal.policy.validate",
+      ruleId: "TEST.SIGNAL.POLICY.VALIDATE",
       severity: "error",
       file,
       message: `${signal.packageName} skipped-test metadata has no valid reviewAfter ISO date.`,
@@ -293,7 +293,7 @@ function policyDiagnosticForSignal(signal: PackageTestSignal): Diagnostic[] {
     });
   } else if (isExpiredIsoDate(metadata?.reviewAfter)) {
     diagnostics.push({
-      ruleId: "test.signal.policy.validate",
+      ruleId: "TEST.SIGNAL.POLICY.VALIDATE",
       severity: tier === 0 ? "error" : "warning",
       file,
       message: `${signal.packageName} skipped-test review date has passed.`,

@@ -74,7 +74,7 @@ export async function runEcosystemManifestValidate(
   } catch {
     return diagnosticsResult("ecosystem.manifest.validate", [
       {
-        ruleId: "ecosystem.manifest.validate",
+        ruleId: "ECOSYSTEM.MANIFEST.VALIDATE",
         severity: "error",
         file: ECOSYSTEM_MANIFEST_PATH,
         message: `${ECOSYSTEM_MANIFEST_PATH} is missing.`,
@@ -98,7 +98,7 @@ export async function runEcosystemManifestValidate(
     }
     return diagnosticsResult("ecosystem.manifest.validate", [
       {
-        ruleId: "ecosystem.manifest.validate",
+        ruleId: "ECOSYSTEM.MANIFEST.VALIDATE",
         severity: "error",
         file: ECOSYSTEM_MANIFEST_PATH,
         message: ruleMessage,
@@ -122,7 +122,7 @@ export async function runWorkspaceSurfaceValidate(
     committed = yamlParse(await readFile(target, "utf8")) as EcosystemManifest;
   } catch {
     diagnostics.push({
-      ruleId: "workspace.surface.validate",
+      ruleId: "WORKSPACE.SURFACE.VALIDATE",
       severity: "error",
       file: ECOSYSTEM_MANIFEST_PATH,
       message: "Agent Control Plane manifest is missing or unreadable.",
@@ -132,7 +132,7 @@ export async function runWorkspaceSurfaceValidate(
 
   if (committed?.meta?.schemaVersion !== 2) {
     diagnostics.push({
-      ruleId: "workspace.surface.validate",
+      ruleId: "WORKSPACE.SURFACE.VALIDATE",
       severity: "error",
       file: ECOSYSTEM_MANIFEST_PATH,
       message: "Agent Control Plane manifest must use schemaVersion 2.",
@@ -146,7 +146,7 @@ export async function runWorkspaceSurfaceValidate(
   for (const pkg of live.packages) {
     if (!committedPackageDirectories.has(pkg.directory)) {
       diagnostics.push({
-        ruleId: "workspace.surface.validate",
+        ruleId: "WORKSPACE.SURFACE.VALIDATE",
         severity: "error",
         file: PNPM_WORKSPACE_PATH,
         message: `Workspace package ${pkg.directory} is not present in ${ECOSYSTEM_MANIFEST_PATH}.`,
@@ -164,7 +164,7 @@ export async function runWorkspaceSurfaceValidate(
     const committedPipeline = committedPipelineByName.get(pipeline.name);
     if (!committedPipeline) {
       diagnostics.push({
-        ruleId: "workspace.surface.validate",
+        ruleId: "WORKSPACE.SURFACE.VALIDATE",
         severity: "error",
         file: "tools/kernel.config.ts",
         message: `Pipeline ${pipeline.name} is not present in ${ECOSYSTEM_MANIFEST_PATH}.`,
@@ -174,7 +174,7 @@ export async function runWorkspaceSurfaceValidate(
     }
     if (committedPipeline.scope !== pipeline.scope) {
       diagnostics.push({
-        ruleId: "workspace.surface.validate",
+        ruleId: "WORKSPACE.SURFACE.VALIDATE",
         severity: "error",
         file: "tools/kernel.config.ts",
         message: `Pipeline ${pipeline.name} scope is ${committedPipeline.scope}, expected ${pipeline.scope}.`,
@@ -183,7 +183,7 @@ export async function runWorkspaceSurfaceValidate(
     }
     if (pipeline.scope === "workspace" && !committedPipeline.executableFromRoot) {
       diagnostics.push({
-        ruleId: "workspace.surface.validate",
+        ruleId: "WORKSPACE.SURFACE.VALIDATE",
         severity: "error",
         file: "tools/kernel.config.ts",
         message: `Workspace pipeline ${pipeline.name} is not marked executableFromRoot.`,
@@ -197,7 +197,7 @@ export async function runWorkspaceSurfaceValidate(
   const packagesCheckRun = committedPipelineByName.get("packages-check.run");
   if (!packagesCheck || !packagesCheckRun) {
     diagnostics.push({
-      ruleId: "workspace.surface.validate",
+      ruleId: "WORKSPACE.SURFACE.VALIDATE",
       severity: "error",
       file: "tools/kernel.config.ts",
       message:
@@ -206,7 +206,7 @@ export async function runWorkspaceSurfaceValidate(
     });
   } else if (packagesCheck.commands.join("\n") !== packagesCheckRun.commands.join("\n")) {
     diagnostics.push({
-      ruleId: "workspace.surface.validate",
+      ruleId: "WORKSPACE.SURFACE.VALIDATE",
       severity: "error",
       file: "tools/kernel.config.ts",
       message: "packages.check and packages-check.run command lists differ.",
@@ -219,7 +219,7 @@ export async function runWorkspaceSurfaceValidate(
   const fleetDrift = await validateFleetSitesDrift(context.workspaceRoot);
   if (fleetDrift.drifted) {
     diagnostics.push({
-      ruleId: "workspace.surface.validate",
+      ruleId: "WORKSPACE.SURFACE.VALIDATE",
       severity: "error",
       file: "fleet/fleet.sites.yaml",
       message: "fleet/fleet.sites.yaml has drifted from workspace site discovery.",

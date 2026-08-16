@@ -7,6 +7,7 @@ const mockConfig = {
   accessKeyId: "test-access-key-id",
   secretAccessKey: "test-secret-access-key",
   bucketName: "test-bucket",
+  apiToken: "test-api-token",
 };
 
 const testDigest = ("sha256:" + "a".repeat(64)) as Sha256Digest;
@@ -55,16 +56,16 @@ describe("createR2StorageAdapter", () => {
 
     expect(fetchSpy).toHaveBeenCalledOnce();
     const call = fetchSpy.mock.calls[0];
-    expect(call[0]).toBeInstanceOf(URL);
-    const url = call[0] as URL;
-    expect(url.hostname).toBe("test-account-id.r2.cloudflarestorage.com");
-    expect(url.pathname).toBe("/test-bucket/sha256:" + "a".repeat(64));
+    const url = call[0] as string;
+    expect(url).toContain("api.cloudflare.com/client/v4/accounts/test-account-id/r2");
+    expect(url).toContain("buckets/test-bucket/objects/");
+    expect(url).toContain(encodeURIComponent("sha256:" + "a".repeat(64)));
 
     const init = call[1] as RequestInit;
     expect(init.method).toBe("PUT");
-    expect(init.headers).toHaveProperty("Authorization");
-    expect(init.headers).toHaveProperty("x-amz-content-sha256");
-    expect(init.headers).toHaveProperty("x-amz-date");
+    const headers = init.headers as Record<string, string>;
+    expect(headers["Authorization"]).toBe("Bearer test-api-token");
+    expect(headers["Content-Type"]).toBe("application/json");
   });
 
   it("putObject throws on non-ok response", async () => {
@@ -89,10 +90,10 @@ describe("createR2StorageAdapter", () => {
     expect(result.exists).toBe(false);
   });
 
-  it("headObject returns exists:true with size on 200", async () => {
+  it("headObject returns exists:true with size from content-range on 206", async () => {
     fetchSpy.mockResolvedValueOnce(
-      createMockResponse(200, {
-        "content-length": "42",
+      createMockResponse(206, {
+        "content-range": "bytes 0-0/42",
         etag: '"def456"',
       }),
     );
@@ -107,7 +108,7 @@ describe("createR2StorageAdapter", () => {
   });
 
   it("headObject throws on non-404 error", async () => {
-    fetchSpy.mockResolvedValueOnce(createMockResponse(500, {}, "Internal Server Error"));
+    fetchSpy.mockResolvedValueOnce(createMockResponse(405, {}, "Method Not Allowed"));
 
     const adapter = createR2StorageAdapter(mockConfig);
     await expect(adapter.headObject(testDigest)).rejects.toThrow("CERT-R2-02");
@@ -148,8 +149,9 @@ describe("createR2StorageAdapter", () => {
     expect(result.locator).toContain("audit-etag");
 
     const call = fetchSpy.mock.calls[0];
-    const url = call[0] as URL;
-    expect(url.pathname).toContain("/test-bucket/audit/");
+    const url = call[0] as string;
+    expect(url).toContain("buckets/test-bucket/objects/");
+    expect(url).toContain("audit%2F");
   });
 
   it("appendAuditRecord throws on non-ok response", async () => {
@@ -159,7 +161,7 @@ describe("createR2StorageAdapter", () => {
     await expect(adapter.appendAuditRecord(new Uint8Array([1]))).rejects.toThrow("CERT-R2-04");
   });
 
-  it("Authorization header uses AWS4-HMAC-SHA256", async () => {
+  it("Authorization header uses Bearer token", async () => {
     fetchSpy.mockResolvedValueOnce(createMockResponse(200, { etag: '"abc"' }));
 
     const adapter = createR2StorageAdapter(mockConfig);
@@ -171,7 +173,6 @@ describe("createR2StorageAdapter", () => {
 
     const init = fetchSpy.mock.calls[0][1] as RequestInit;
     const headers = init.headers as Record<string, string>;
-    expect(headers["Authorization"]).toMatch(/^AWS4-HMAC-SHA256 Credential=test-access-key-id\//);
-    expect(headers["Authorization"]).toContain("Signature=");
+    expect(headers["Authorization"]).toBe("Bearer test-api-token");
   });
 });

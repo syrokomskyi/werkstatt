@@ -255,7 +255,7 @@ export async function runCiLocalValidate(
 
   if (!ciWorkflow) {
     diagnostics.push({
-      ruleId: "ci.local.validate",
+      ruleId: "CI.LOCAL.VALIDATE",
       severity: "error",
       file: GENERAL_CI_WORKFLOW,
       message: "General PR CI workflow is missing.",
@@ -301,7 +301,7 @@ export async function runCiLocalValidate(
 
   if (!rootPnpmMajor) {
     diagnostics.push({
-      ruleId: "ci.local.validate",
+      ruleId: "CI.LOCAL.VALIDATE",
       severity: "error",
       file: "package.json",
       message: "Root packageManager does not declare a pnpm major version.",

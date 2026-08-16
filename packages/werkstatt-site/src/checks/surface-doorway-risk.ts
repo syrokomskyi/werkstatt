@@ -170,7 +170,7 @@ export async function runSurfaceDoorwayRiskReport(
 
   const baseSeverity = exceedsThreshold && dossierMode !== "warn" ? "error" : "warning";
   const diagnostics: Diagnostic[] = flaggedPages.map((page) => ({
-    ruleId: "doorway-risk-missing-local-context",
+    ruleId: "DOORWAY-RISK-MISSING-LOCAL-CONTEXT",
     severity: baseSeverity,
     file: ARTIFACT_FILE,
     message: `${page.pageId} missing local context fields: ${page.missingFields.join(", ")}`,
@@ -181,7 +181,7 @@ export async function runSurfaceDoorwayRiskReport(
 
   if (exceedsThreshold && dossierMode !== "warn") {
     diagnostics.push({
-      ruleId: "doorway-risk-threshold-exceeded",
+      ruleId: "DOORWAY-RISK-THRESHOLD-EXCEEDED",
       severity: "error",
       file: ARTIFACT_FILE,
       message: `flagged share ${flaggedShare.toFixed(2)} exceeds threshold ${doorwayMaxFlaggedShare} (${flaggedPages.length}/${totalEntries} pages flagged)`,

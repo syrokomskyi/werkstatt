@@ -63,7 +63,7 @@ export async function runAnalyticsConfigValidate(
   if (!(await pathExists(analyticsConfigPath))) {
     findings.push(
       finding({
-        ruleId: "analytics-config.missing-config",
+        ruleId: "ANALYTICS-CONFIG.MISSING-CONFIG",
         severity: "info",
         file: analyticsConfigPath,
         message:
@@ -82,7 +82,7 @@ export async function runAnalyticsConfigValidate(
     if (expectedAdapter !== undefined && expectedAdapter !== actualAdapter) {
       findings.push(
         finding({
-          ruleId: "analytics-config.vendor-adapter",
+          ruleId: "ANALYTICS-CONFIG.VENDOR-ADAPTER",
           severity: "error",
           file: analyticsConfigPath,
           message: `growth.vendor.adapter=${String(actualAdapter)} does not match analytics-config adapter ${String(expectedAdapter)}.`,
@@ -98,7 +98,7 @@ export async function runAnalyticsConfigValidate(
       if (options[legacyKey] !== undefined) {
         findings.push(
           finding({
-            ruleId: "analytics-config.matomo-legacy-option",
+            ruleId: "ANALYTICS-CONFIG.MATOMO-LEGACY-OPTION",
             severity: "error",
             file: "src/content/system.md",
             message: `growth.vendor.options.${legacyKey} is RFC-0170 legacy and forbidden by RFC-0305.`,
@@ -121,7 +121,7 @@ export async function runAnalyticsConfigValidate(
       if (!options[required]) {
         findings.push(
           finding({
-            ruleId: "analytics-config.matomo-required-option",
+            ruleId: "ANALYTICS-CONFIG.MATOMO-REQUIRED-OPTION",
             severity: "error",
             file: "src/content/system.md",
             message: `Matomo production tracking requires growth.vendor.options.${required} (RFC-0305).`,
@@ -134,7 +134,7 @@ export async function runAnalyticsConfigValidate(
     if (options["proxyBaseUrl"] && !options["proxyBaseUrl"].includes("/_wg/analytics/")) {
       findings.push(
         finding({
-          ruleId: "analytics-config.matomo-proxy-route",
+          ruleId: "ANALYTICS-CONFIG.MATOMO-PROXY-ROUTE",
           severity: "error",
           file: "src/content/system.md",
           message: "Matomo proxyBaseUrl must route through /_wg/analytics/ (RFC-0305).",
@@ -156,7 +156,7 @@ export async function runAnalyticsConfigValidate(
           const hostname = extractProxyHostname(options["proxyBaseUrl"]);
           findings.push(
             finding({
-              ruleId: "analytics-config.proxy-subdomain-registered",
+              ruleId: "ANALYTICS-CONFIG.PROXY-SUBDOMAIN-REGISTERED",
               severity: "error",
               file: "services/registry.yaml",
               message: `proxyBaseUrl hostname '${hostname}' is not declared in any service subdomains in services/registry.yaml (RFC-0847). Add it to the corresponding service's subdomains array so subdomain.register can provision DNS and Workers Route.`,
@@ -174,7 +174,7 @@ export async function runAnalyticsConfigValidate(
     if (options["privacyProfile"] && options["privacyProfile"] !== "bannerfrei-v1") {
       findings.push(
         finding({
-          ruleId: "analytics-config.matomo-privacy-profile",
+          ruleId: "ANALYTICS-CONFIG.MATOMO-PRIVACY-PROFILE",
           severity: "error",
           file: "src/content/system.md",
           message: "Matomo production tracking requires privacyProfile=bannerfrei-v1 (RFC-0305).",
@@ -194,7 +194,7 @@ export async function runAnalyticsConfigValidate(
     if (!registryRecord) {
       findings.push(
         finding({
-          ruleId: "analytics-config.matomo-registry-record",
+          ruleId: "ANALYTICS-CONFIG.MATOMO-REGISTRY-RECORD",
           severity: "error",
           file: MATOMO_REGISTRY_PATH,
           message: `Production Matomo app ${audit.siteName} has no fleet registry record (RFC-0305).`,
@@ -206,6 +206,7 @@ export async function runAnalyticsConfigValidate(
   const result = buildAuditResult({
     command: "analytics.config.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

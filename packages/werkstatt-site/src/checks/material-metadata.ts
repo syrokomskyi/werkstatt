@@ -167,7 +167,7 @@ export async function runMaterialMetadataValidate(
   if (!hasExiftool) {
     return diagnosticsResult(command, [
       {
-        ruleId: "material.metadata.toolchain-missing",
+        ruleId: "MATERIAL.METADATA.TOOLCHAIN-MISSING",
         severity: "info",
         message: "Embedded metadata validation skipped because exiftool is not available.",
         fixHint: "Install exiftool when embedded material metadata validation is required.",

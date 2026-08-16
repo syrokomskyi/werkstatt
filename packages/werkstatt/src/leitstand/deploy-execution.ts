@@ -223,18 +223,24 @@ export async function executeDeployPhases(
         buildSkipped = true;
       }
 
-      buildIdentityPath = path.join(distDir, ".well-known", "build-identity.json");
+      buildIdentityPath = path.join(distDir, "client", ".well-known", "build-identity.json");
       try {
-        const distTreeHashResult = await fingerprintTree(path.join(distDir, "client"), {
-          mode: "stable",
-        });
-        localDistTreeHash = distTreeHashResult.value;
-        const identity = {
-          releaseId: ctx.releaseId,
-          distTreeHash: localDistTreeHash,
-          buildTimestamp: now,
-        };
-        await atomicWriteFile(buildIdentityPath, JSON.stringify(identity, null, 2));
+        if (existsSync(buildIdentityPath)) {
+          const existing = JSON.parse(await fs.readFile(buildIdentityPath, "utf8"));
+          localDistTreeHash = existing.distTreeHash ?? "";
+        }
+        if (!localDistTreeHash) {
+          const distTreeHashResult = await fingerprintTree(path.join(distDir, "client"), {
+            mode: "stable",
+          });
+          localDistTreeHash = distTreeHashResult.value;
+          const identity = {
+            releaseId: ctx.releaseId,
+            distTreeHash: localDistTreeHash,
+            buildTimestamp: now,
+          };
+          await atomicWriteFile(buildIdentityPath, JSON.stringify(identity, null, 2));
+        }
       } catch {
         // Non-fatal — build-identity is best-effort
       }
@@ -382,7 +388,10 @@ export async function executeDeployPhases(
         await executeKernelCommand({
           workspaceRoot: ctx.workspaceRoot,
           commandName: "evidence.sync",
-          argv: [`--site=${ctx.systemId}`],
+          argv: [
+            `--site=${ctx.systemId}`,
+            ...(ctx.missionId ? [`--mission=${ctx.missionId}`] : []),
+          ],
         });
         evidenceSynced = true;
       } catch (err) {

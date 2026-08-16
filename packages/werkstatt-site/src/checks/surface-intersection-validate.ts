@@ -124,7 +124,7 @@ export async function runSurfaceIntersectionValidate(
       const count = Array.isArray(value) ? value.length : value ? 1 : 0;
       if (count < threshold) {
         diagnostics.push({
-          ruleId: "intersection-gate-below-threshold",
+          ruleId: "INTERSECTION-GATE-BELOW-THRESHOLD",
           severity: mode === "fail" ? "error" : "warning",
           file: relFile,
           message: `intersection "${record.slug}" field "${recordField}" has ${count} entries (gate threshold: ${threshold})`,
@@ -138,7 +138,7 @@ export async function runSurfaceIntersectionValidate(
     const publicationDecision = record.data["publicationDecision"];
     if (publicationDecision !== undefined && publicationDecision !== "approved") {
       diagnostics.push({
-        ruleId: "intersection-publication-decision",
+        ruleId: "INTERSECTION-PUBLICATION-DECISION",
         severity: mode === "fail" ? "error" : "warning",
         file: relFile,
         message: `intersection "${record.slug}" has publicationDecision "${publicationDecision}" (expected "approved")`,
@@ -162,7 +162,7 @@ export async function runSurfaceIntersectionValidate(
         const independenceRatio = uniqueTokens / intersectionTokenCount;
         if (independenceRatio < substanceThreshold) {
           diagnostics.push({
-            ruleId: "intersection-substance-independence",
+            ruleId: "INTERSECTION-SUBSTANCE-INDEPENDENCE",
             severity: mode === "fail" ? "error" : "warning",
             file: relFile,
             message: `intersection "${record.slug}" substance independence ratio ${independenceRatio.toFixed(2)} below threshold ${substanceThreshold} — content too similar to parent pages`,
@@ -199,7 +199,7 @@ export async function runSurfaceIntersectionValidate(
         DEFAULT_SIMILARITY.similarityToOtherIntersections;
       if (sim > threshold) {
         diagnostics.push({
-          ruleId: "intersection-similarity-exceeded",
+          ruleId: "INTERSECTION-SIMILARITY-EXCEEDED",
           severity: mode === "fail" ? "error" : "warning",
           file: a.filePath.replace(app.directory + "/", ""),
           message: `intersection "${a.slug}" and "${b.slug}" similarity ${sim.toFixed(2)} exceeds threshold ${threshold}`,

@@ -271,7 +271,7 @@ async function attributionLangSkew(appRoot: string, contentRoot: string): Promis
   if (byLang.size > 1 && distinct.size > 1) {
     return [
       {
-        ruleId: "material.credits.attribution-policy-lang-skew",
+        ruleId: "MATERIAL.CREDITS.ATTRIBUTION-POLICY-LANG-SKEW",
         severity: "warning",
         file: "src/content/site",
         message: `Site attribution policy differs across languages (${[...byLang.keys()].join(", ")}).`,
@@ -514,7 +514,7 @@ export async function runMaterialCreditsValidate(
   for (const ref of state.proseRefs) {
     if (!state.records.some((record) => creditMatches(record, ref, state.defaultLanguage))) {
       proseWarnings.push({
-        ruleId: "material.credits.missing-prose-credit",
+        ruleId: "MATERIAL.CREDITS.MISSING-PROSE-CREDIT",
         severity: "warning",
         file: ref.file,
         message: `Prose "${ref.target.id}" has no authorship credit sidecar.`,
@@ -534,7 +534,7 @@ export async function runMaterialCreditsValidate(
   for (const record of state.records) {
     if (record.credit.status === "orphaned") {
       statusWarnings.push({
-        ruleId: "material.credits.orphaned-status",
+        ruleId: "MATERIAL.CREDITS.ORPHANED-STATUS",
         severity: "warning",
         file: record.file,
         message: `Credit record "${record.credit.id}" is orphaned.`,
@@ -544,7 +544,7 @@ export async function runMaterialCreditsValidate(
     }
     if (record.credit.status === "needs-review") {
       statusWarnings.push({
-        ruleId: "material.credits.needs-review-status",
+        ruleId: "MATERIAL.CREDITS.NEEDS-REVIEW-STATUS",
         severity: "warning",
         file: record.file,
         message: `Credit record "${record.credit.id}" needs review.`,

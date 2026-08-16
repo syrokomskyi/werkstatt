@@ -36,7 +36,7 @@ export async function runSeoInternalLinkingValidate(
   if (!linkingPlan) {
     findings.push(
       finding({
-        ruleId: "seo-internal-linking.missing-plan",
+        ruleId: "SEO-INTERNAL-LINKING.MISSING-PLAN",
         severity: "info",
         file: linkingPlanPath,
         message:
@@ -61,7 +61,7 @@ export async function runSeoInternalLinkingValidate(
     if (path && (inboundCounts.get(path) ?? 0) < minimumInbound) {
       findings.push(
         finding({
-          ruleId: "seo-internal-linking.inbound-threshold",
+          ruleId: "SEO-INTERNAL-LINKING.INBOUND-THRESHOLD",
           severity: "warning",
           file: linkingPlanPath,
           message: `Key page ${path} has ${inboundCounts.get(path) ?? 0} inbound links; expected at least ${minimumInbound}.`,
@@ -74,6 +74,7 @@ export async function runSeoInternalLinkingValidate(
   const result = buildAuditResult({
     command: "seo.internal-linking.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

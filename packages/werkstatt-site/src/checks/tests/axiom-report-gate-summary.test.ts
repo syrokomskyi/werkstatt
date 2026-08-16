@@ -16,7 +16,7 @@ function makeFinding(partial: Record<string, unknown>): unknown {
     severity: "high",
     predicate: "accessibility.axe.violation",
     title: "Test Finding",
-    ruleId: "test-rule",
+    ruleId: "TEST-RULE",
     affectedSubjectId: "test-page",
     ...partial,
   };

@@ -203,7 +203,7 @@ export async function runContentCoverageDelta(
   if (!app) {
     return result(command, [
       {
-        ruleId: "amend.coverage.no-app",
+        ruleId: "AMEND.COVERAGE.NO-APP",
         severity: "error",
         message: `${command} requires an --site target.`,
       },
@@ -212,7 +212,7 @@ export async function runContentCoverageDelta(
   if (!batch) {
     return result(command, [
       {
-        ruleId: "amend.coverage.no-batch",
+        ruleId: "AMEND.COVERAGE.NO-BATCH",
         severity: "error",
         message: `${command} requires --batch amend-<NNN>.`,
       },
@@ -231,7 +231,7 @@ export async function runContentCoverageDelta(
   if (!atomsRaw) {
     return result(command, [
       {
-        ruleId: "amend.coverage.missing-atoms",
+        ruleId: "AMEND.COVERAGE.MISSING-ATOMS",
         severity: "error",
         file: `onboarding/.output/${batch}/a3-author/atoms.yaml`,
         message: "Batch atoms.yaml not found; the a3-author phase must produce it.",
@@ -258,7 +258,7 @@ export async function runContentCoverageDelta(
   for (const atom of batchAtoms) {
     if (!atom.sourceId) {
       findings.push({
-        ruleId: "amend.coverage.atom-no-source",
+        ruleId: "AMEND.COVERAGE.ATOM-NO-SOURCE",
         severity: "error",
         file: `onboarding/.output/${batch}/a3-author/atoms.yaml`,
         message: `Atom '${atom.id}' has no sourceId; cannot record it in the cumulative ledger.`,
@@ -330,7 +330,7 @@ export async function runAmendAtomsMerge(
   if (!app) {
     return result(command, [
       {
-        ruleId: "amend.merge.no-app",
+        ruleId: "AMEND.MERGE.NO-APP",
         severity: "error",
         message: `${command} requires an --site target.`,
       },
@@ -339,7 +339,7 @@ export async function runAmendAtomsMerge(
   if (!batch || !pageId) {
     return result(command, [
       {
-        ruleId: "amend.merge.no-args",
+        ruleId: "AMEND.MERGE.NO-ARGS",
         severity: "error",
         message: `${command} requires --batch amend-<NNN> and --page <pageId>.`,
       },
@@ -350,7 +350,7 @@ export async function runAmendAtomsMerge(
   if (!manifest) {
     return result(command, [
       {
-        ruleId: "amend.merge.no-manifest",
+        ruleId: "AMEND.MERGE.NO-MANIFEST",
         severity: "error",
         file: `onboarding/.output/${batch}/a0-intake/input-manifest.json`,
         message: "Batch manifest not found; run amend.input.validate first.",
@@ -364,7 +364,7 @@ export async function runAmendAtomsMerge(
   if (sources.length === 0) {
     return result(command, [
       {
-        ruleId: "amend.merge.no-strengthen-source",
+        ruleId: "AMEND.MERGE.NO-STRENGTHEN-SOURCE",
         severity: "error",
         message: `No strengthen source in ${batch} targets pageId '${pageId}'. amend.atoms.merge only runs on strengthen sources.`,
       },
@@ -376,7 +376,7 @@ export async function runAmendAtomsMerge(
   if (!pages.has(pageId)) {
     return result(command, [
       {
-        ruleId: "amend.merge.requires-system-change",
+        ruleId: "AMEND.MERGE.REQUIRES-SYSTEM-CHANGE",
         severity: "error",
         message: `pageId '${pageId}' is not in system.md pages[]. A strengthen source must not require a system.md change — reclassify it as new-route.`,
       },
@@ -402,7 +402,7 @@ export async function runAmendAtomsMerge(
       if (sim >= HARD_SIMILARITY) {
         dropped.push(atomId);
         findings.push({
-          ruleId: "amend.merge.duplicate-dropped",
+          ruleId: "AMEND.MERGE.DUPLICATE-DROPPED",
           severity: "info",
           message: `Candidate '${atomId}' dropped: similarity ${sim.toFixed(2)} ≥ ${HARD_SIMILARITY} with existing page content.`,
         });
@@ -410,7 +410,7 @@ export async function runAmendAtomsMerge(
       }
       if (sim >= REVIEW_SIMILARITY) {
         findings.push({
-          ruleId: "amend.merge.review-band",
+          ruleId: "AMEND.MERGE.REVIEW-BAND",
           severity: "warn",
           message: `Candidate '${atomId}' at similarity ${sim.toFixed(2)} is in the review band [${REVIEW_SIMILARITY}, ${HARD_SIMILARITY}); pause for a human merge decision (RFC-0136 П-6).`,
         });
@@ -418,7 +418,7 @@ export async function runAmendAtomsMerge(
       const forbidden = forbiddenPhrases.find((phrase) => paragraph.toLowerCase().includes(phrase));
       if (forbidden) {
         findings.push({
-          ruleId: "amend.merge.voice-violation",
+          ruleId: "AMEND.MERGE.VOICE-VIOLATION",
           severity: "error",
           message: `Candidate '${atomId}' contains forbidden phrase '${forbidden}' (voice-profile).`,
         });
@@ -602,7 +602,7 @@ export async function runAmendProvenanceAppend(
   if (!app) {
     return result(command, [
       {
-        ruleId: "amend.provenance.no-app",
+        ruleId: "AMEND.PROVENANCE.NO-APP",
         severity: "error",
         message: `${command} requires an --site target.`,
       },
@@ -611,7 +611,7 @@ export async function runAmendProvenanceAppend(
   if (!batch) {
     return result(command, [
       {
-        ruleId: "amend.provenance.no-batch",
+        ruleId: "AMEND.PROVENANCE.NO-BATCH",
         severity: "error",
         message: `${command} requires --batch amend-<NNN>.`,
       },
@@ -622,7 +622,7 @@ export async function runAmendProvenanceAppend(
   if (!manifest) {
     return result(command, [
       {
-        ruleId: "amend.provenance.no-manifest",
+        ruleId: "AMEND.PROVENANCE.NO-MANIFEST",
         severity: "error",
         message: `Batch manifest for ${batch} not found; run amend.input.validate first.`,
       },
@@ -656,7 +656,7 @@ export async function runAmendProvenanceAppend(
     signature = await signBytes(key, new TextEncoder().encode(canonicalRecordBody(unsigned)));
   } else {
     findings.push({
-      ruleId: "amend.provenance.unsigned",
+      ruleId: "AMEND.PROVENANCE.UNSIGNED",
       severity: "warn",
       message:
         "PASSPORT_SIGNING_KEY not set; record written without a signature (structural-only audit until signed).",
@@ -679,7 +679,7 @@ export async function runAmendProvenanceAppend(
     }
     return result(command, [
       {
-        ruleId: "amend.provenance.immutable",
+        ruleId: "AMEND.PROVENANCE.IMMUTABLE",
         severity: "error",
         file: `apps/${app.name}/provenance/amend/${batch}.yaml`,
         message: `A provenance record for ${batch} already exists with different content. Provenance records are immutable; use a new batch id.`,
@@ -717,7 +717,7 @@ export async function runAmendProvenanceValidate(
   if (!app) {
     return result(command, [
       {
-        ruleId: "amend.provenance.no-app",
+        ruleId: "AMEND.PROVENANCE.NO-APP",
         severity: "error",
         message: `${command} requires an --site target.`,
       },
@@ -744,7 +744,7 @@ export async function runAmendProvenanceValidate(
       record = YAML.parse(raw) as AmendProvenanceRecord;
     } catch (error) {
       findings.push({
-        ruleId: "amend.provenance.parse",
+        ruleId: "AMEND.PROVENANCE.PARSE",
         severity: "error",
         file: `apps/${app.name}/provenance/amend/${file}`,
         message: error instanceof Error ? error.message : String(error),
@@ -754,7 +754,7 @@ export async function runAmendProvenanceValidate(
 
     if (!/^sha256:[0-9a-f]{64}$/.test(record.inputHash)) {
       findings.push({
-        ruleId: "amend.provenance.bad-hash",
+        ruleId: "AMEND.PROVENANCE.BAD-HASH",
         severity: "error",
         file: `apps/${app.name}/provenance/amend/${file}`,
         message: `inputHash '${record.inputHash}' is not a well-formed sha256 digest.`,
@@ -764,7 +764,7 @@ export async function runAmendProvenanceValidate(
     if (record.signature) {
       if (!pubKey) {
         findings.push({
-          ruleId: "amend.provenance.no-key",
+          ruleId: "AMEND.PROVENANCE.NO-KEY",
           severity: "warn",
           message: `No passport public key found; cannot verify signature for ${record.batch} (structural checks only).`,
         });
@@ -776,7 +776,7 @@ export async function runAmendProvenanceValidate(
         ))
       ) {
         findings.push({
-          ruleId: "amend.provenance.invalid-signature",
+          ruleId: "AMEND.PROVENANCE.INVALID-SIGNATURE",
           severity: "error",
           file: `apps/${app.name}/provenance/amend/${file}`,
           message: `Signature verification failed for ${record.batch}.`,
@@ -784,7 +784,7 @@ export async function runAmendProvenanceValidate(
       }
     } else {
       findings.push({
-        ruleId: "amend.provenance.unsigned",
+        ruleId: "AMEND.PROVENANCE.UNSIGNED",
         severity: "warn",
         message: `Provenance record ${record.batch} is unsigned.`,
       });
@@ -793,7 +793,7 @@ export async function runAmendProvenanceValidate(
     for (const change of record.changes) {
       if (pageIds.size > 0 && !pageIds.has(change.pageId)) {
         findings.push({
-          ruleId: "amend.provenance.page-missing",
+          ruleId: "AMEND.PROVENANCE.PAGE-MISSING",
           severity: "error",
           file: `apps/${app.name}/provenance/amend/${file}`,
           message: `Provenance record ${record.batch} references pageId '${change.pageId}' which is no longer in system.md.`,

@@ -54,7 +54,7 @@ export async function runAuditAgentReadinessValidate(
   if (htmlFiles.length === 0) {
     findings.push(
       finding({
-        ruleId: "agent-readiness.missing-dist",
+        ruleId: "AGENT-READINESS.MISSING-DIST",
         severity: "error",
         file: audit.distDirectory,
         message:
@@ -74,7 +74,7 @@ export async function runAuditAgentReadinessValidate(
     if (!hasVisibleMainHeading(page.html) && !pageInfo?.isLegal && !pageInfo?.isUtility) {
       findings.push(
         finding({
-          ruleId: "agent-readiness.h1-required",
+          ruleId: "AGENT-READINESS.H1-REQUIRED",
           severity: "error",
           file: page.file,
           message: "Rendered page is missing an H1 element.",
@@ -85,7 +85,7 @@ export async function runAuditAgentReadinessValidate(
     if (!/<title>.+<\/title>/i.test(page.html)) {
       findings.push(
         finding({
-          ruleId: "agent-readiness.title-required",
+          ruleId: "AGENT-READINESS.TITLE-REQUIRED",
           severity: "error",
           file: page.file,
           message: "Rendered page is missing a <title> element.",
@@ -102,7 +102,7 @@ export async function runAuditAgentReadinessValidate(
     ) {
       findings.push(
         finding({
-          ruleId: "agent-readiness.bytes-to-cta",
+          ruleId: "AGENT-READINESS.BYTES-TO-CTA",
           severity: "warning",
           file: page.file,
           message: `Primary CTA not detected within ${audit.agentReadinessBaseline.maxBytesToCta} bytes from body start.`,
@@ -113,7 +113,7 @@ export async function runAuditAgentReadinessValidate(
     if ((pageInfo?.requiresJsonLd ?? true) && !/application\/ld\+json/i.test(page.html)) {
       findings.push(
         finding({
-          ruleId: "agent-readiness.jsonld-required",
+          ruleId: "AGENT-READINESS.JSONLD-REQUIRED",
           severity: pageInfo?.isLegal ? "warning" : "error",
           file: page.file,
           message: "Rendered page is missing JSON-LD.",
@@ -128,7 +128,7 @@ export async function runAuditAgentReadinessValidate(
     ) {
       findings.push(
         finding({
-          ruleId: "agent-readiness.contact-form-required",
+          ruleId: "AGENT-READINESS.CONTACT-FORM-REQUIRED",
           severity: "warning",
           file: page.file,
           message: "Contact or donation page has no rendered form.",
@@ -140,7 +140,7 @@ export async function runAuditAgentReadinessValidate(
     if (!/document\.modelContext/.test(page.html) || !/registerTool/.test(page.html)) {
       findings.push(
         finding({
-          ruleId: "agent-readiness.webmcp-missing",
+          ruleId: "AGENT-READINESS.WEBMCP-MISSING",
           severity: "warning",
           file: page.file,
           message:
@@ -154,6 +154,7 @@ export async function runAuditAgentReadinessValidate(
   const result = buildAuditResult({
     command: "audit.agent.readiness.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

@@ -148,6 +148,7 @@ export async function runAppQaValidate(
       buildAuditResult({
         command: "onboarding.phase.validate",
         app: audit.siteName,
+        workspaceRoot: audit.workspaceRoot,
         findings: phaseFindings,
         runtimeMs: 0,
       }),

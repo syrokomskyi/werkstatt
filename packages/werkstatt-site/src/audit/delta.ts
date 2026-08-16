@@ -123,7 +123,7 @@ export async function runAuditDeltaRun(
   if (!app) {
     return result(command, [
       {
-        ruleId: "audit.delta.no-app",
+        ruleId: "AUDIT.DELTA.NO-APP",
         severity: "error",
         message: `${command} requires an --site target.`,
       },
@@ -132,7 +132,7 @@ export async function runAuditDeltaRun(
   if (!batch) {
     return result(command, [
       {
-        ruleId: "audit.delta.no-batch",
+        ruleId: "AUDIT.DELTA.NO-BATCH",
         severity: "error",
         message: `${command} requires --batch amend-<NNN>.`,
       },
@@ -143,7 +143,7 @@ export async function runAuditDeltaRun(
   if (delta.length === 0) {
     return result(command, [
       {
-        ruleId: "audit.delta.empty",
+        ruleId: "AUDIT.DELTA.EMPTY",
         severity: "error",
         message: `No delta found for ${batch}; run amend.input.validate (and a3-author) first.`,
       },
@@ -172,7 +172,7 @@ export async function runAuditDeltaRun(
       });
     } catch (error) {
       findings.push({
-        ruleId: "audit.delta.dispatch-error",
+        ruleId: "AUDIT.DELTA.DISPATCH-ERROR",
         severity: "error",
         message: `${audit}: ${error instanceof Error ? error.message : String(error)}`,
       });
@@ -183,7 +183,7 @@ export async function runAuditDeltaRun(
     steps.push({ command: audit, ok, summary: single?.summary });
     if (!ok) {
       findings.push({
-        ruleId: "audit.delta.regression",
+        ruleId: "AUDIT.DELTA.REGRESSION",
         severity: "error",
         message: `${audit} failed over the delta (touched: ${delta.map((d) => d.pageId).join(", ")}): ${single?.summary ?? "see logs"}`,
       });

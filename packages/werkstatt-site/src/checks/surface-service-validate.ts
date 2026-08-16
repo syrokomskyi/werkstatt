@@ -120,7 +120,7 @@ export async function runSurfaceServiceValidate(
       const count = Array.isArray(value) ? value.length : 0;
       if (count < threshold) {
         diagnostics.push({
-          ruleId: "service-gate-below-threshold",
+          ruleId: "SERVICE-GATE-BELOW-THRESHOLD",
           severity: mode === "fail" ? "error" : "warning",
           file: relFile,
           message: `service "${record.slug}" field "${recordField}" has ${count} entries (gate threshold: ${threshold})`,
@@ -134,7 +134,7 @@ export async function runSurfaceServiceValidate(
     const reviewStatus = record.data["reviewStatus"];
     if (reviewStatus !== undefined && reviewStatus !== "approved") {
       diagnostics.push({
-        ruleId: "service-review-status",
+        ruleId: "SERVICE-REVIEW-STATUS",
         severity: mode === "fail" ? "error" : "warning",
         file: relFile,
         message: `service "${record.slug}" has reviewStatus "${reviewStatus}" (expected "approved")`,
@@ -146,7 +146,7 @@ export async function runSurfaceServiceValidate(
     const publicationStatus = record.data["publicationStatus"];
     if (publicationStatus !== undefined && publicationStatus !== "published") {
       diagnostics.push({
-        ruleId: "service-publication-status",
+        ruleId: "SERVICE-PUBLICATION-STATUS",
         severity: mode === "fail" ? "error" : "warning",
         file: relFile,
         message: `service "${record.slug}" has publicationStatus "${publicationStatus}" (expected "published")`,
@@ -165,7 +165,7 @@ export async function runSurfaceServiceValidate(
     for (const phrase of allRestrictions) {
       if (lowerText.includes(phrase.toLowerCase())) {
         diagnostics.push({
-          ruleId: "service-claim-restriction",
+          ruleId: "SERVICE-CLAIM-RESTRICTION",
           severity: "error",
           file: relFile,
           message: `service "${record.slug}" contains prohibited result-claim phrase "${phrase}"`,

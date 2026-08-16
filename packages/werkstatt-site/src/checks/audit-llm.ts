@@ -139,9 +139,10 @@ export async function runAuditLlm(
       command: "audit.llm.run",
       kind,
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings: [
         {
-          ruleId: "audit-llm.missing-archetype",
+          ruleId: "AUDIT-LLM.MISSING-ARCHETYPE",
           severity: "error",
           message: "audit.llm.run --kind=archetype-lens requires --archetype.",
           evidence: [{ kind: "runtime", snippet: "--kind=archetype-lens --archetype=<id>" }],
@@ -160,9 +161,10 @@ export async function runAuditLlm(
       command: "audit.llm.run",
       kind,
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings: [
         {
-          ruleId: "audit-llm.missing-prompt-template",
+          ruleId: "AUDIT-LLM.MISSING-PROMPT-TEMPLATE",
           severity: "error",
           message: error instanceof Error ? error.message : String(error),
           evidence: [{ kind: "runtime", snippet: promptPathForKind(packageRoot, kind) }],
@@ -199,9 +201,10 @@ export async function runAuditLlm(
       command: "audit.llm.run",
       kind,
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings: [
         {
-          ruleId: "audit-llm.missing-rule-file",
+          ruleId: "AUDIT-LLM.MISSING-RULE-FILE",
           severity: "error",
           file: rulesPath,
           message: `Required rule file is missing for ${kind} audit.`,
@@ -246,9 +249,10 @@ export async function runAuditLlm(
       command: "audit.llm.run",
       kind,
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings: [
         {
-          ruleId: "audit-llm.provider-not-configured",
+          ruleId: "AUDIT-LLM.PROVIDER-NOT-CONFIGURED",
           severity: "error",
           message:
             "LLM API key is missing. Set LLM_API_KEY or OPENAI_API_KEY in process.env or .env.",
@@ -271,9 +275,10 @@ export async function runAuditLlm(
       command: "audit.llm.run",
       kind,
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings: [
         {
-          ruleId: "audit-llm.missing-voice-profile",
+          ruleId: "AUDIT-LLM.MISSING-VOICE-PROFILE",
           severity: "error",
           file: voiceProfilePath,
           message: "Linguistic audit requires onboarding/.output/04-author/voice-profile.yaml.",
@@ -334,9 +339,10 @@ export async function runAuditLlm(
       command: "audit.llm.run",
       kind,
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings: [
         {
-          ruleId: "audit-llm.provider-failure",
+          ruleId: "AUDIT-LLM.PROVIDER-FAILURE",
           severity: "error",
           message: (error as Error).message,
           evidence: [{ kind: "runtime", snippet: `${llmRuntime.provider}:${llmRuntime.model}` }],

@@ -19,7 +19,10 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { jsonldTypes, type JsonldSurfacePolicyEntry } from "@warpgogol/werkstatt-site/ontology/external-surfaces";
+import {
+  jsonldTypes,
+  type JsonldSurfacePolicyEntry,
+} from "@warpgogol/werkstatt-site/ontology/external-surfaces";
 import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
 import { parse as yamlParse } from "yaml";
 import { buildAuditResult, getAuditPageInfo, loadAuditAppContext } from "../helpers.ts";
@@ -118,7 +121,7 @@ export async function runSeoStructuredDataValidate(
       }
       findings.push(
         finding({
-          ruleId: "seo-structured-data.missing-jsonld",
+          ruleId: "SEO-STRUCTURED-DATA.MISSING-JSONLD",
           severity: "error",
           file: html.file,
           message: "Rendered HTML has no JSON-LD blocks.",
@@ -189,7 +192,7 @@ export async function runSeoStructuredDataValidate(
               if (providerName && providerName !== "Warpgogol") {
                 findings.push(
                   finding({
-                    ruleId: "seo-structured-data.service-provider-mismatch",
+                    ruleId: "SEO-STRUCTURED-DATA.SERVICE-PROVIDER-MISMATCH",
                     severity: "error",
                     file: html.file,
                     message: `Service node has provider.name "${providerName}" — must be "Warpgogol" on surface pages.`,
@@ -213,7 +216,7 @@ export async function runSeoStructuredDataValidate(
           if (hasOffer) {
             findings.push(
               finding({
-                ruleId: "seo-structured-data.fabricated-offer",
+                ruleId: "SEO-STRUCTURED-DATA.FABRICATED-OFFER",
                 severity: "error",
                 file: html.file,
                 message: `Fabricated offer type ${offerType} found on surface page — surface pages must not carry offer/pricing JSON-LD.`,
@@ -330,6 +333,7 @@ export async function runSeoStructuredDataValidate(
   const result = buildAuditResult({
     command: "seo.structured-data.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

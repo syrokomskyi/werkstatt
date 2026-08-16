@@ -154,7 +154,7 @@ export function validateUrlConstruction(
     if (!isValidHttpsUrl(url)) {
       results.push(
         finding({
-          ruleId: "wikidata.malformed-url",
+          ruleId: "WIKIDATA.MALFORMED-URL",
           severity: "error",
           file: contentFile,
           message: `externalIdentifier "${key}" schemeRef '${id.schemeRef}' + value '${id.value}' produces invalid HTTPS URL '${url}'. schemeRef must be a full HTTPS URL prefix (e.g. https://www.wikidata.org/wiki/).`,
@@ -172,7 +172,7 @@ export function validateLegalIdentityLegalName(
 ): Diagnostic | null {
   if (!legalName || legalName.trim() === "") {
     return finding({
-      ruleId: "wikidata.legalidentity-missing-legalname",
+      ruleId: "WIKIDATA.LEGALIDENTITY-MISSING-LEGALNAME",
       severity: "error",
       file: contentFile,
       message:
@@ -200,7 +200,7 @@ export function validateProjectionParity(
   if (missing.length === 0) return [];
   return [
     finding({
-      ruleId: "wikidata.projection-parity",
+      ruleId: "WIKIDATA.PROJECTION-PARITY",
       severity: "error",
       file: contentFile,
       message: `PBP externalIdentifiers produce sameAs URLs that are not reflected in rendered JSON-LD Organization sameAs: ${missing.join(", ")}. Projection is broken.`,
@@ -221,7 +221,7 @@ export function validateNotabilityEvidence(
   const hasExternal = evidenceSources.some((es) => NOTABILITY_EVIDENCE_KINDS.includes(es.kind));
   if (hasExternal) return null;
   return finding({
-    ruleId: "wikidata.no-notability-evidence",
+    ruleId: "WIKIDATA.NO-NOTABILITY-EVIDENCE",
     severity: "warning",
     file: contentFile,
     message:
@@ -242,7 +242,7 @@ export function validateClaimEvidenceCoverage(
       const claimFile = join(contentDir, `${claim.id}.md`);
       results.push(
         finding({
-          ruleId: "wikidata.claim-without-evidence",
+          ruleId: "WIKIDATA.CLAIM-WITHOUT-EVIDENCE",
           severity: "warning",
           file: claimFile,
           message: `Factual claim '${claim.statement}' has no evidenceRefs. Wikidata requires at least one reference per statement.`,
@@ -267,7 +267,7 @@ export function validateEvidenceReferences(
         const claimFile = join(contentDir, `${claim.id}.md`);
         results.push(
           finding({
-            ruleId: "wikidata.evidence-broken-ref",
+            ruleId: "WIKIDATA.EVIDENCE-BROKEN-REF",
             severity: "error",
             file: claimFile,
             message: `Claim evidenceRefs entry '${key}' (ref: '${ref.ref}') does not resolve to an existing EvidenceSource entity.`,
@@ -292,7 +292,7 @@ export function validateEvidenceSourceUrls(
       const esFile = join(contentDir, `${es.id}.md`);
       results.push(
         finding({
-          ruleId: "wikidata.evidence-missing-url",
+          ruleId: "WIKIDATA.EVIDENCE-MISSING-URL",
           severity: "error",
           file: esFile,
           message: `EvidenceSource '${es.name}' has no items with url. Wikidata references must be verifiable.`,
@@ -408,6 +408,7 @@ export async function runWikidataValidate(
     const result = buildAuditResult({
       command: "wikidata.validate",
       app: audit.siteName,
+      workspaceRoot: audit.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
     });
@@ -519,6 +520,7 @@ export async function runWikidataValidate(
   const result = buildAuditResult({
     command: "wikidata.validate",
     app: audit.siteName,
+    workspaceRoot: audit.workspaceRoot,
     findings: escalatedFindings,
     runtimeMs: Date.now() - started,
   });

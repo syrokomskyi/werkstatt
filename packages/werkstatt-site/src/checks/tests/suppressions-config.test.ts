@@ -23,7 +23,7 @@ function makeFinding(overrides: Partial<Finding> = {}): Finding {
     findingId: "f-001",
     semanticFingerprint: { algorithm: "sha256", digest: "abc" },
     methodologyId: "seo-runtime",
-    ruleId: "seo-runtime.canonical-mismatch",
+    ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
     affectedSubjectId: "https://dev.example.com/page",
     title: "Canonical mismatch",
     severity: "medium",
@@ -43,7 +43,7 @@ function makeFinding(overrides: Partial<Finding> = {}): Finding {
 describe("suppressionRuleSchema", () => {
   it("accepts a valid rule with all fields", () => {
     const rule = suppressionRuleSchema.parse({
-      ruleId: "seo-runtime.canonical-mismatch",
+      ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
       category: "channel-mismatch",
       channelNot: "main",
       reason: "Dev channel canonical mismatch",
@@ -56,7 +56,7 @@ describe("suppressionRuleSchema", () => {
   it("rejects missing reason", () => {
     expect(() =>
       suppressionRuleSchema.parse({
-        ruleId: "test-rule",
+        ruleId: "TEST-RULE",
         category: "test",
       }),
     ).toThrow();
@@ -74,7 +74,7 @@ describe("suppressionRuleSchema", () => {
   it("rejects missing category", () => {
     expect(() =>
       suppressionRuleSchema.parse({
-        ruleId: "test-rule",
+        ruleId: "TEST-RULE",
         reason: "test reason",
       }),
     ).toThrow();
@@ -86,7 +86,7 @@ describe("suppressionsConfigSchema", () => {
     const config = suppressionsConfigSchema.parse({
       suppressions: [
         {
-          ruleId: "test-rule",
+          ruleId: "TEST-RULE",
           category: "test",
           reason: "test reason",
         },
@@ -177,8 +177,8 @@ describe("loadWorkpieceSuppressions", () => {
 
 describe("mergeSuppressions", () => {
   it("concatenates workshop and workpiece rules", () => {
-    const workshop = { suppressions: [{ ruleId: "w-rule", category: "w-cat", reason: "w" }] };
-    const workpiece = { suppressions: [{ ruleId: "p-rule", category: "p-cat", reason: "p" }] };
+    const workshop = { suppressions: [{ ruleId: "W-RULE", category: "w-cat", reason: "w" }] };
+    const workpiece = { suppressions: [{ ruleId: "P-RULE", category: "p-cat", reason: "p" }] };
     const merged = mergeSuppressions(workshop, workpiece);
     expect(merged).toHaveLength(2);
     expect(merged[0].ruleId).toBe("w-rule");
@@ -186,7 +186,7 @@ describe("mergeSuppressions", () => {
   });
 
   it("returns workshop rules when workpiece is undefined", () => {
-    const workshop = { suppressions: [{ ruleId: "w-rule", category: "w-cat", reason: "w" }] };
+    const workshop = { suppressions: [{ ruleId: "W-RULE", category: "w-cat", reason: "w" }] };
     const merged = mergeSuppressions(workshop, undefined);
     expect(merged).toHaveLength(1);
   });
@@ -202,7 +202,7 @@ describe("applySuppressions", () => {
     const findings = [makeFinding()];
     const original = [...findings];
     const rules: SuppressionRule[] = [
-      { ruleId: "seo-runtime.canonical-mismatch", category: "test", reason: "test" },
+      { ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH", category: "test", reason: "test" },
     ];
     applySuppressions(findings, rules, { channel: "dev" });
     expect(findings).toEqual(original);
@@ -211,7 +211,7 @@ describe("applySuppressions", () => {
   it("marks matching finding as suppressed", () => {
     const findings = [makeFinding()];
     const rules: SuppressionRule[] = [
-      { ruleId: "seo-runtime.canonical-mismatch", category: "test", reason: "test" },
+      { ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH", category: "test", reason: "test" },
     ];
     const result = applySuppressions(findings, rules, { channel: "dev" });
     expect((result[0] as { suppressed?: boolean }).suppressed).toBe(true);
@@ -223,8 +223,8 @@ describe("applySuppressions", () => {
   it("first matching rule wins", () => {
     const findings = [makeFinding()];
     const rules: SuppressionRule[] = [
-      { ruleId: "seo-runtime.canonical-mismatch", category: "first", reason: "first rule" },
-      { ruleId: "seo-runtime.canonical-mismatch", category: "second", reason: "second rule" },
+      { ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH", category: "first", reason: "first rule" },
+      { ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH", category: "second", reason: "second rule" },
     ];
     const result = applySuppressions(findings, rules, { channel: "dev" });
     expect((result[0] as { suppressedBy?: { category: string } }).suppressedBy?.category).toBe(
@@ -233,9 +233,9 @@ describe("applySuppressions", () => {
   });
 
   it("does not match when ruleId differs", () => {
-    const findings = [makeFinding({ ruleId: "other-rule" })];
+    const findings = [makeFinding({ ruleId: "OTHER-RULE" })];
     const rules: SuppressionRule[] = [
-      { ruleId: "seo-runtime.canonical-mismatch", category: "test", reason: "test" },
+      { ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH", category: "test", reason: "test" },
     ];
     const result = applySuppressions(findings, rules, { channel: "dev" });
     expect((result[0] as { suppressed?: boolean }).suppressed).toBeUndefined();
@@ -245,7 +245,7 @@ describe("applySuppressions", () => {
     const findings = [makeFinding()];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "test",
         channel: "dev",
         reason: "dev only",
@@ -261,7 +261,7 @@ describe("applySuppressions", () => {
     const findings = [makeFinding()];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "test",
         channelNot: "main",
         reason: "non-main",
@@ -277,7 +277,7 @@ describe("applySuppressions", () => {
     const findings = [makeFinding({ affectedSubjectId: "https://example.com/sbom.cdx.json" })];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "non-html",
         contentType: [".json", ".txt"],
         reason: "non-HTML resource",
@@ -291,7 +291,7 @@ describe("applySuppressions", () => {
     const findings = [makeFinding({ affectedSubjectId: "https://example.com/page" })];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "non-html",
         contentType: [".json", ".txt"],
         reason: "non-HTML resource",
@@ -309,7 +309,7 @@ describe("applySuppressions", () => {
     ];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "deprecation",
         messagePattern: "Deprecated API for given entry type",
         reason: "browser deprecation",
@@ -327,7 +327,7 @@ describe("applySuppressions", () => {
     ];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "render-blocking",
         descriptionPattern: "preload",
         reason: "Astro CSS preload",
@@ -343,7 +343,7 @@ describe("applySuppressions", () => {
     ];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "deprecation",
         titlePattern: "Deprecated API",
         reason: "browser deprecation",
@@ -359,7 +359,7 @@ describe("applySuppressions", () => {
     ];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "deprecation",
         titlePattern: "Deprecated API",
         reason: "browser deprecation",
@@ -378,7 +378,7 @@ describe("applySuppressions", () => {
     ];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "deprecation",
         titlePattern: "Deprecated API",
         messagePattern: "nonexistent-in-title",
@@ -393,7 +393,7 @@ describe("applySuppressions", () => {
     const findings = [makeFinding({ affectedSubjectId: "https://example.com/page" })];
     const rules: SuppressionRule[] = [
       {
-        ruleId: "seo-runtime.canonical-mismatch",
+        ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH",
         category: "test",
         channelNot: "main",
         contentType: [".json"],
@@ -410,11 +410,11 @@ describe("applySuppressions", () => {
       {
         ...makeFinding(),
         suppressed: true,
-        suppressedBy: { ruleIndex: 0, ruleId: "prev", category: "prev", reason: "prev" },
+        suppressedBy: { ruleIndex: 0, ruleId: "PREV", category: "prev", reason: "prev" },
       },
     ] as unknown as Finding[];
     const rules: SuppressionRule[] = [
-      { ruleId: "seo-runtime.canonical-mismatch", category: "new", reason: "new" },
+      { ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH", category: "new", reason: "new" },
     ];
     const result = applySuppressions(findings, rules, { channel: "dev" });
     expect((result[0] as { suppressedBy?: { category: string } }).suppressedBy?.category).toBe(
@@ -423,9 +423,9 @@ describe("applySuppressions", () => {
   });
 
   it("returns findings unchanged when no rules match", () => {
-    const findings = [makeFinding({ ruleId: "unrelated-rule" })];
+    const findings = [makeFinding({ ruleId: "UNRELATED-RULE" })];
     const rules: SuppressionRule[] = [
-      { ruleId: "seo-runtime.canonical-mismatch", category: "test", reason: "test" },
+      { ruleId: "SEO-RUNTIME.CANONICAL-MISMATCH", category: "test", reason: "test" },
     ];
     const result = applySuppressions(findings, rules, { channel: "dev" });
     expect(result).toHaveLength(1);
@@ -439,17 +439,17 @@ describe("countSuppressedByCategory", () => {
       {
         ...makeFinding(),
         suppressed: true,
-        suppressedBy: { ruleIndex: 0, ruleId: "r1", category: "cat-a", reason: "r" },
+        suppressedBy: { ruleIndex: 0, ruleId: "R1", category: "cat-a", reason: "r" },
       },
       {
         ...makeFinding(),
         suppressed: true,
-        suppressedBy: { ruleIndex: 1, ruleId: "r2", category: "cat-a", reason: "r" },
+        suppressedBy: { ruleIndex: 1, ruleId: "R2", category: "cat-a", reason: "r" },
       },
       {
         ...makeFinding(),
         suppressed: true,
-        suppressedBy: { ruleIndex: 2, ruleId: "r3", category: "cat-b", reason: "r" },
+        suppressedBy: { ruleIndex: 2, ruleId: "R3", category: "cat-b", reason: "r" },
       },
       makeFinding(),
     ] as unknown as Finding[];

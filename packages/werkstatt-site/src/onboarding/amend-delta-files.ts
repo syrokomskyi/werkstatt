@@ -118,7 +118,7 @@ export async function runAmendDeltaFiles(
 
   if (!batch || !context.site) {
     findings.push({
-      ruleId: "amend.delta.files.bad-args",
+      ruleId: "AMEND.DELTA.FILES.BAD-ARGS",
       severity: "error",
       message: "amend.delta.files requires --site <client.id> and --batch amend-<NNN>.",
     });
@@ -176,7 +176,7 @@ export async function runAmendDeltaFiles(
   const sorted = [...files].sort((a, b) => a.localeCompare(b));
   if (sorted.length === 0) {
     findings.push({
-      ruleId: "amend.delta.files.empty",
+      ruleId: "AMEND.DELTA.FILES.EMPTY",
       severity: "warn",
       message: `No delta files resolved for ${batch}; run amend.input.validate (and a3-author) first.`,
     });

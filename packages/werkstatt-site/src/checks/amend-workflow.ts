@@ -142,7 +142,7 @@ export async function runAmendPhaseValidate(
   if (!batch) {
     return result(command, [
       {
-        ruleId: "amend.phase.no-batch",
+        ruleId: "AMEND.PHASE.NO-BATCH",
         severity: "error",
         message: `${command} requires --batch amend-<NNN>.`,
       },
@@ -151,7 +151,7 @@ export async function runAmendPhaseValidate(
   if (!phaseFlag || !(AMEND_PHASES as readonly string[]).includes(phaseFlag)) {
     return result(command, [
       {
-        ruleId: "amend.phase.invalid-phase",
+        ruleId: "AMEND.PHASE.INVALID-PHASE",
         severity: "error",
         message: `--phase must be one of ${AMEND_PHASES.join(", ")}.`,
       },
@@ -163,7 +163,7 @@ export async function runAmendPhaseValidate(
   if (!manifestHash) {
     return result(command, [
       {
-        ruleId: "amend.phase.no-manifest",
+        ruleId: "AMEND.PHASE.NO-MANIFEST",
         severity: "error",
         file: `onboarding/.output/${batch}/a0-intake/input-manifest.json`,
         message: "Batch manifest missing; run amend.input.validate first.",
@@ -182,7 +182,7 @@ export async function runAmendPhaseValidate(
       const relPath = `onboarding/.output/${batch}/${artifact.path}`;
       if (!(await pathExists(absolutePath))) {
         findings.push({
-          ruleId: "amend.phase.missing-output",
+          ruleId: "AMEND.PHASE.MISSING-OUTPUT",
           severity: "error",
           file: relPath,
           message: `Required ${checked} output is missing before ${phase}.`,
@@ -193,7 +193,7 @@ export async function runAmendPhaseValidate(
       const headerHash = await readHeaderHash(absolutePath);
       if (!headerHash) {
         findings.push({
-          ruleId: "amend.phase.missing-metadata",
+          ruleId: "AMEND.PHASE.MISSING-METADATA",
           severity: "error",
           file: relPath,
           message: `Required ${checked} output is missing its RFC-0076 derivedFromInputHash header.`,
@@ -202,7 +202,7 @@ export async function runAmendPhaseValidate(
       }
       if (headerHash !== manifestHash) {
         findings.push({
-          ruleId: "amend.phase.stale-output",
+          ruleId: "AMEND.PHASE.STALE-OUTPUT",
           severity: "error",
           file: relPath,
           message: `Artifact derived from ${headerHash}; current batch manifest hash is ${manifestHash}.`,
@@ -268,7 +268,7 @@ async function runAmendCheckSteps(
       scopeFiles = files;
       if (files.length === 0) {
         findings.push({
-          ruleId: "amend-check.empty-delta",
+          ruleId: "AMEND-CHECK.EMPTY-DELTA",
           severity: "error",
           message: `amend.delta.files resolved no files for ${batch}; the batch staged nothing — fix a3-author.`,
         });
@@ -276,7 +276,7 @@ async function runAmendCheckSteps(
       }
     } catch (error) {
       findings.push({
-        ruleId: "amend-check.delta-resolve-error",
+        ruleId: "AMEND-CHECK.DELTA-RESOLVE-ERROR",
         severity: "error",
         message: `amend.delta.files: ${error instanceof Error ? error.message : String(error)}`,
       });
@@ -302,7 +302,7 @@ async function runAmendCheckSteps(
       res = await dispatch(stepCommand, context, argv);
     } catch (error) {
       findings.push({
-        ruleId: "amend-check.dispatch-error",
+        ruleId: "AMEND-CHECK.DISPATCH-ERROR",
         severity: "error",
         message: `${stepCommand}: ${error instanceof Error ? error.message : String(error)}`,
       });
@@ -311,7 +311,7 @@ async function runAmendCheckSteps(
     stepResults.push({ command: stepCommand, ok: res.ok, summary: res.summary });
     if (!res.ok) {
       findings.push({
-        ruleId: "amend-check.step-failed",
+        ruleId: "AMEND-CHECK.STEP-FAILED",
         severity: "error",
         message: `${stepCommand} failed: ${res.summary ?? "see logs"}`,
       });

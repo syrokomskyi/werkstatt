@@ -32,7 +32,7 @@ export async function runContentAssetContractValidate(
   const diagnostics = assetReferenceDiagnostics(await collectAssetReferenceFindings(ctx)).map(
     (diagnostic) => ({
       ...diagnostic,
-      ruleId: "content.asset.contract.validate",
+      ruleId: "CONTENT.ASSET.CONTRACT.VALIDATE",
     }),
   );
   return diagnosticsResult(command, diagnostics);
