@@ -421,8 +421,10 @@ export async function executeDeployPhases(
         (state.lastPropagated as Record<string, unknown>)[channelKey] = {
           releaseId: ctx.releaseId ?? "",
           at: now,
-          url: actualDeploymentUrl,
-          state: "deployed",
+          healthy: true,
+          state: "succeeded",
+          operationId: ctx.operationId,
+          leaseExpiresAt: null,
         };
         await writeSystemStateSmart(ctx.workspaceRoot, ctx.systemId, state);
         systemStateUpdated = true;
