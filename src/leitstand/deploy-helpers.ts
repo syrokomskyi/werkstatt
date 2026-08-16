@@ -297,12 +297,13 @@ export function makeR2ConfigFromEnv(
   const accessKeyId = env.R2_ACCESS_KEY_ID;
   const secretAccessKey = env.R2_SECRET_ACCESS_KEY;
   const bucketName = env.R2_BUCKET_NAME;
+  const apiToken = env.R2_API_TOKEN ?? env.CLOUDFLARE_API_TOKEN;
 
   if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
     return null;
   }
 
-  return { accountId, accessKeyId, secretAccessKey, bucketName };
+  return { accountId, accessKeyId, secretAccessKey, bucketName, apiToken };
 }
 
 export function resolveGateDecisionPath(

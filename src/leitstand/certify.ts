@@ -27,6 +27,8 @@ import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
 import type { GateChannel } from "../certification/contracts/identifiers.ts";
 import { astroCertificationProfile } from "../certification/profile/astro-profile.ts";
+import { makeR2ConfigFromEnv } from "./deploy-helpers.ts";
+import { createR2StorageAdapter } from "../certification/storage/r2-adapter.ts";
 import {
   planProducers,
   executeProducers,
@@ -117,7 +119,7 @@ export async function runLeitstandCertify(
   }
 
   const now = new Date().toISOString();
-  const operationId = `certify-${now}-${Math.random().toString(36).slice(2, 8)}`;
+  const operationId = `certify-${now.toLowerCase().replace(/[:.]/g, "-")}-${Math.random().toString(36).slice(2, 8)}`;
 
   const candidate: ReleaseCandidateV1 = {
     schema: "werkstatt/release-candidate@1",
@@ -184,7 +186,7 @@ export async function runLeitstandCertify(
   const handler: ProducerExecutionHandlerV1 = async (
     execInput: ProducerExecutionInputV1,
   ): Promise<EvidenceEnvelopeV1> => {
-    const evidenceId = `evidence-${execInput.producerId}-${now}`;
+    const evidenceId = `evidence-${execInput.producerId}-${now.toLowerCase().replace(/[:.]/g, "-")}`;
     const diagnostics: Array<{
       ruleId: string;
       severity: "error" | "warning" | "info";
@@ -195,16 +197,44 @@ export async function runLeitstandCertify(
     if (execInput.producerId === "astro-mission-check" && baseUrl) {
       try {
         const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
-        const result = await executeKernelCommand({
-          workspaceRoot: context.workspaceRoot,
-          commandName: "mission.check",
-          argv: [
-            `--site=${systemId}`,
-            "--external-preview",
-            `--base-url=${baseUrl}`,
-            "--no-report",
-          ],
-        });
+        let missionId: string | undefined;
+        try {
+          const buildIdentityPath = path.join(
+            context.workspaceRoot,
+            "releases",
+            releaseId,
+            "dist",
+            "client",
+            ".well-known",
+            "build-identity.json",
+          );
+          const identity = JSON.parse(await fs.readFile(buildIdentityPath, "utf8"));
+          missionId = identity.missionId;
+        } catch {}
+        const argv = [
+          `--site=${systemId}`,
+          "--external-preview",
+          `--base-url=${baseUrl}`,
+          "--no-report",
+        ];
+        if (missionId) argv.push(`--mission=${missionId}`);
+        const MISSION_CHECK_TIMEOUT_MS = 5 * 60 * 1000;
+        const result = await Promise.race([
+          executeKernelCommand({
+            workspaceRoot: context.workspaceRoot,
+            commandName: "mission.check",
+            argv,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () =>
+                reject(
+                  new Error(`mission.check timed out after ${MISSION_CHECK_TIMEOUT_MS / 1000}s`),
+                ),
+              MISSION_CHECK_TIMEOUT_MS,
+            ),
+          ),
+        ]);
         const reports = Array.isArray(result) ? result : [result];
         const failed = reports.find((r) => !r.ok || r.exitCode !== 0);
         if (failed) {
@@ -269,6 +299,12 @@ export async function runLeitstandCertify(
         resolved: true,
         unresolvedSecrets: 0,
         unresolvedPii: 0,
+      },
+      authorityAdmission: {
+        schema: "werkstatt/authority-admission@1",
+        authoritySequence: 1,
+        admittedAt: now,
+        admittedBy: "leitstand.certify",
       },
       freshness: {
         expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
@@ -345,7 +381,7 @@ export async function runLeitstandCertify(
     } as unknown as KernelCommandResult<CertifyResult>;
   }
 
-  const decisionId = `dec-${now}-${Math.random().toString(36).slice(2, 8)}`;
+  const decisionId = `dec-${now.toLowerCase().replace(/[:.]/g, "-")}-${Math.random().toString(36).slice(2, 8)}`;
   const gateDecision: GateDecisionV1 = {
     schema: "werkstatt/gate-decision@1",
     decisionId,
@@ -369,6 +405,23 @@ export async function runLeitstandCertify(
   await fs.mkdir(outputDir, { recursive: true });
   const outputPath = path.join(outputDir, `${releaseId}-${gate}.json`);
   await writeFileIfChanged(outputPath, JSON.stringify(gateDecision, null, 2) + "\n");
+
+  const r2Config = makeR2ConfigFromEnv(process.env as Record<string, string | undefined>);
+  if (r2Config) {
+    try {
+      const adapter = createR2StorageAdapter(r2Config);
+      const gateDecisionBytes = Buffer.from(JSON.stringify(gateDecision, null, 2) + "\n", "utf8");
+      await adapter.putObject({
+        digest: artifactHash,
+        bytes: new Uint8Array(gateDecisionBytes),
+        mediaType: "application/json",
+      });
+    } catch (err) {
+      console.warn(
+        `[leitstand.certify] durable sync upload failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
 
   return {
     data: {

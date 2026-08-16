@@ -91,6 +91,7 @@ const CACHE_CLONE_ONLY_PATHS: readonly string[] = [
   "bordbuch/",
   "public/.well-known/bordbuch",
   "dns-records.yaml",
+  ".materialization-state.json",
 ];
 
 // RFC-0763: shared helper for bordbuch cleanup on failure paths.
@@ -1332,6 +1333,8 @@ export async function runMissionReconcile(
         });
       } catch (err) {
         // Check if all conflicts are bordbuch-only (delete/modify)
+        const isAutoResolvablePath = (p: string) =>
+          CACHE_CLONE_ONLY_PATHS.some((pattern) => p.startsWith(pattern));
         const conflictedPaths: string[] = [];
         const bordbuchDeletedPaths: string[] = [];
         try {
@@ -1353,20 +1356,13 @@ export async function runMissionReconcile(
             ) {
               conflictedPaths.push(filePath);
             } else if (status === "D ") {
-              const isBordbuchPath =
-                filePath.startsWith("bordbuch/") ||
-                filePath.startsWith("public/.well-known/bordbuch");
-              if (isBordbuchPath) bordbuchDeletedPaths.push(filePath);
+              if (isAutoResolvablePath(filePath)) bordbuchDeletedPaths.push(filePath);
             }
           }
         } catch {
           // git status failed — fall through to existing error
         }
 
-        const isAutoResolvablePath = (p: string) =>
-          CACHE_CLONE_ONLY_PATHS.some((pattern) =>
-            pattern.endsWith("/") ? p.startsWith(pattern) : p === pattern,
-          );
         const allAutoResolvable =
           conflictedPaths.length > 0 && conflictedPaths.every(isAutoResolvablePath);
 

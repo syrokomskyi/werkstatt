@@ -233,6 +233,11 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         env.PATH = `${input.nodeModulesBinPath}:${process.env.PATH ?? ""}`;
       }
 
+      const serverDir = path.join(input.distPath, "server");
+      const wranglerConfigDir = existsSync(path.join(serverDir, "wrangler.json"))
+        ? serverDir
+        : input.distPath;
+
       const wranglerArgs = [
         "--yes",
         "wrangler",
@@ -247,7 +252,7 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
       }
 
       const result = await runWranglerDeployWithRetry(runner, wranglerArgs, {
-        cwd: input.distPath,
+        cwd: wranglerConfigDir,
         env,
       });
 
@@ -263,7 +268,7 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         };
       }
 
-      const deployedUrl = extractDeploymentUrl(result.stdout) ?? input.url;
+      const deployedUrl = input.url || extractDeploymentUrl(result.stdout) || "";
 
       return {
         systemId: input.systemId,
@@ -286,6 +291,11 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         env.PATH = `${input.nodeModulesBinPath}:${process.env.PATH ?? ""}`;
       }
 
+      const serverDir = path.join(input.distPath, "server");
+      const wranglerConfigDir = existsSync(path.join(serverDir, "wrangler.json"))
+        ? serverDir
+        : input.distPath;
+
       const wranglerArgs = [
         "--yes",
         "wrangler",
@@ -300,11 +310,11 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
       }
 
       const result = await runWranglerDeployWithRetry(runner, wranglerArgs, {
-        cwd: input.distPath,
+        cwd: wranglerConfigDir,
         env,
       });
 
-      const deployedUrl = extractDeploymentUrl(result.stdout) ?? input.url;
+      const deployedUrl = input.url || extractDeploymentUrl(result.stdout) || "";
       const state = result.exitCode === 0 ? "succeeded" : "failed";
 
       return {
