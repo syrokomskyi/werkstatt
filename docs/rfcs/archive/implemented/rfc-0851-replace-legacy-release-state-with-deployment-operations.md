@@ -46,7 +46,7 @@ satisfies:
   - DNA-48
   - DNA-49
   - DNA-73
-versionBump: major
+versionBump: minor
 commands:
   proposed: []
   added: []

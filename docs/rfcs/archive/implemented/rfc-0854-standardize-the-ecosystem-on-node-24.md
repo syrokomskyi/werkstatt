@@ -23,7 +23,7 @@ related:
   - RFC-0849
 dependsOn: []
 satisfies: []
-versionBump: major
+versionBump: minor
 commands:
   proposed: []
   added: []

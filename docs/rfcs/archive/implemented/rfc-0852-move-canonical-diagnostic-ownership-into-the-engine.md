@@ -29,7 +29,7 @@ dependsOn:
 batch: werkstatt-release-certification-cert-001
 satisfies:
   - DNA-64
-versionBump: major
+versionBump: minor
 commands:
   proposed: []
   added: []

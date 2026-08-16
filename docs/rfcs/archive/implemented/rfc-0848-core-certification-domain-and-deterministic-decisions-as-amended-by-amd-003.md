@@ -48,7 +48,7 @@ satisfies:
   - DNA-53
   - DNA-64
 specRef: "werkstatt-release-certification/CERT-001"
-versionBump: major
+versionBump: minor
 liveSpec: release-certification
 commands:
   proposed: []
