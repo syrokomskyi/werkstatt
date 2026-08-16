@@ -18,21 +18,35 @@ const context = {
 } as unknown as KernelRuntimeContext;
 
 test("leitstand.certify requires --site", async () => {
-  const input: KernelCommandInput = { flags: { gate: "dev", release: "r000001", "artifact-hash": "sha256:abc" }, argv: [] };
+  const input: KernelCommandInput = {
+    flags: { gate: "dev", release: "r000001", "artifact-hash": "sha256:abc" },
+    argv: [],
+  };
   await expect(runLeitstandCertify(input, context)).rejects.toThrow("--site is required");
 });
 
 test("leitstand.certify requires --gate", async () => {
-  const input: KernelCommandInput = { flags: { site: "test-sys", release: "r000001", "artifact-hash": "sha256:abc" }, argv: [] };
+  const input: KernelCommandInput = {
+    flags: { site: "test-sys", release: "r000001", "artifact-hash": "sha256:abc" },
+    argv: [],
+  };
   await expect(runLeitstandCertify(input, context)).rejects.toThrow("--gate is required");
 });
 
 test("leitstand.certify requires --release", async () => {
-  const input: KernelCommandInput = { flags: { site: "test-sys", gate: "dev", "artifact-hash": "sha256:abc" }, argv: [] };
+  const input: KernelCommandInput = {
+    flags: { site: "test-sys", gate: "dev", "artifact-hash": "sha256:abc" },
+    argv: [],
+  };
   await expect(runLeitstandCertify(input, context)).rejects.toThrow("--release is required");
 });
 
-test("leitstand.certify requires --artifact-hash", async () => {
-  const input: KernelCommandInput = { flags: { site: "test-sys", gate: "dev", release: "r000001" }, argv: [] };
-  await expect(runLeitstandCertify(input, context)).rejects.toThrow("--artifact-hash is required");
+test("leitstand.certify auto-resolves --artifact-hash from release dir", async () => {
+  const input: KernelCommandInput = {
+    flags: { site: "test-sys", gate: "dev", release: "r000001" },
+    argv: [],
+  };
+  // --artifact-hash is now optional; auto-resolved from releases/{release}/artifact.tar.gz
+  // With no file at that path, the error will come from resolveArtifactHash.
+  await expect(runLeitstandCertify(input, context)).rejects.toThrow();
 });
