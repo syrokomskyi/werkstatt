@@ -1,10 +1,11 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0865: leitstand.dev-deploy requires --gate-decision for certification-gated deployment.</purpose>
-  <keywords>RFC-0865, leitstand, dev-deploy, certification, gate-decision, auto-commit, test</keywords>
+  <purpose>RFC-0866: leitstand.dev-deploy auto-resolves --gate-decision from conventional path.</purpose>
+  <keywords>RFC-0866, leitstand, dev-deploy, certification, gate-decision, auto-commit, test</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0865: update auto-commit dev-deploy test to assert --gate-decision requirement.</item>
+  <item>RFC-0866: update test — --gate-decision is now optional with conventional path fallback.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -17,9 +18,7 @@ const context = {
   logger: { info: () => {}, success: () => {}, warn: () => {}, error: () => {}, debug: () => {} },
 } as unknown as KernelRuntimeContext;
 
-test("leitstand.dev-deploy (auto-commit) requires --gate-decision", async () => {
+test("leitstand.dev-deploy (auto-commit) requires --release", async () => {
   const input: KernelCommandInput = { flags: { site: "test-sys" }, argv: [] };
-  await expect(runLeitstandDevDeploy(input, context)).rejects.toThrow(
-    "--gate-decision is required",
-  );
+  await expect(runLeitstandDevDeploy(input, context)).rejects.toThrow("--release is required");
 });
