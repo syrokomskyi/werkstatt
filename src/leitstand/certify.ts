@@ -210,7 +210,9 @@ export async function runLeitstandCertify(
           );
           const identity = JSON.parse(await fs.readFile(buildIdentityPath, "utf8"));
           missionId = identity.missionId;
-        } catch {}
+        } catch {
+          // build-identity.json not yet written or malformed — missionId unavailable
+        }
         const argv = [
           `--site=${systemId}`,
           "--external-preview",
@@ -219,38 +221,44 @@ export async function runLeitstandCertify(
         ];
         if (missionId) argv.push(`--mission=${missionId}`);
         const MISSION_CHECK_TIMEOUT_MS = 5 * 60 * 1000;
-        const result = await Promise.race([
-          executeKernelCommand({
-            workspaceRoot: context.workspaceRoot,
-            commandName: "mission.check",
-            argv,
-          }),
-          new Promise<never>((_, reject) =>
-            setTimeout(
-              () =>
-                reject(
-                  new Error(`mission.check timed out after ${MISSION_CHECK_TIMEOUT_MS / 1000}s`),
-                ),
-              MISSION_CHECK_TIMEOUT_MS,
-            ),
-          ),
-        ]);
-        const reports = Array.isArray(result) ? result : [result];
-        const failed = reports.find((r) => !r.ok || r.exitCode !== 0);
-        if (failed) {
-          diagnostics.push({
-            ruleId: "MISSION-CHECK-01",
-            severity: "error",
-            message: `mission.check exited with code ${failed.exitCode}`,
-            evidence: [],
-          });
-        } else {
-          diagnostics.push({
-            ruleId: "MISSION-CHECK-01",
-            severity: "info",
-            message: "mission.check passed",
-            evidence: [],
-          });
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () =>
+              reject(
+                new Error(`mission.check timed out after ${MISSION_CHECK_TIMEOUT_MS / 1000}s`),
+              ),
+            MISSION_CHECK_TIMEOUT_MS,
+          );
+        });
+        try {
+          const result = await Promise.race([
+            executeKernelCommand({
+              workspaceRoot: context.workspaceRoot,
+              commandName: "mission.check",
+              argv,
+            }),
+            timeoutPromise,
+          ]);
+          const reports = Array.isArray(result) ? result : [result];
+          const failed = reports.find((r) => !r.ok || r.exitCode !== 0);
+          if (failed) {
+            diagnostics.push({
+              ruleId: "MISSION-CHECK-01",
+              severity: "error",
+              message: `mission.check exited with code ${failed.exitCode}`,
+              evidence: [],
+            });
+          } else {
+            diagnostics.push({
+              ruleId: "MISSION-CHECK-01",
+              severity: "info",
+              message: "mission.check passed",
+              evidence: [],
+            });
+          }
+        } finally {
+          if (timer) clearTimeout(timer);
         }
       } catch (err) {
         diagnostics.push({
