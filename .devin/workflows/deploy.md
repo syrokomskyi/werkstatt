@@ -26,24 +26,23 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│  leitstand.certify --gate=dev                                     │
 │  leitstand.dev-deploy                                             │
 │  Channel: dev    Release state: ready ─────► dev-deployed        │
-│  Axiom evidence generated (commitSha + missionId match)          │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│  leitstand.certify --gate=alt                                     │
 │  leitstand.propagate                                              │
 │  Channel: alt    Release state: dev-deployed ─► alt-deployed     │
-│  Axiom evidence gate (commitSha + missionId match)               │
-│  Dev build-identity verification (fetch dev build-identity.json) │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│  leitstand.certify --gate=main                                    │
 │  leitstand.promote                                                │
 │  Channel: main   Release state: alt-deployed ─► main-deployed    │
-│  Live build-identity verification (alt vs main)                   │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
@@ -54,10 +53,12 @@ The deployment pipeline is strictly ordered. Never skip steps, reorder, or deplo
 
 **Key rules:**
 
+- `leitstand.certify` MUST be run before each deploy command (dev-deploy, propagate, promote). It produces the `GateDecisionV1` JSON file required for deployment authorization.
 - `leitstand.propagate` ALWAYS deploys to the **alt** channel only (hardcoded, RFC-0628). There is no `--channel` flag.
 - `leitstand.promote` ALWAYS deploys to the **main** channel only.
 - The `--all` CLI flag MUST NEVER be used on deployment commands (RFC-0842).
-- `leitstand.propagate` reads `systemId` from the release manifest — `--site` is not needed.
+- `--site` (or `--system` alias) is accepted by all leitstand commands. `leitstand.propagate` also accepts `--site` to override the release manifest's systemId.
+- `--artifact-hash` is optional on `leitstand.certify`, `leitstand.dev-deploy`, `leitstand.propagate`, and `leitstand.promote` — it auto-resolves from `releases/{release}/artifact.tar.gz` or `release.yaml` `distTreeHash`.
 - `mission.close` does NOT auto-archive (RFC-0801). The workpiece stays in `missions/<id>/workpiece/` with working `node_modules` until `mission.archive` is called explicitly after the deployment pipeline completes.
 
 ## Prerequisites
@@ -117,9 +118,19 @@ The release is now in `ready` state. Verify with:
 pnpm exec werkstatt run leitstand.pipeline.check --release <releaseId>
 ```
 
-### 4. Dev-deploy — deploy to dev channel with Axiom gate
+### 4. Certify (dev gate) — produce gate decision for dev
 
-`leitstand.dev-deploy` deploys the workpiece to the dev channel and runs Axiom verification automatically. It builds the workpiece, deploys to the dev worker, purges CDN, verifies freshness, and runs `mission.check`.
+`leitstand.certify` produces a `GateDecisionV1` JSON file via certification orchestration. It runs the `astro-mission-check` producer (which invokes `mission.check` with Playwright/Axiom) and writes the gate decision to `systems-cache/{system}/gate-decisions/{release}-dev.json`.
+
+```sh
+pnpm exec werkstatt run leitstand.certify --site <siteId> --gate=dev --release <releaseId>
+```
+
+The `--artifact-hash` flag is optional — it auto-resolves from `releases/{release}/artifact.tar.gz` or `release.yaml` `distTreeHash`.
+
+### 5. Dev-deploy — deploy to dev channel
+
+`leitstand.dev-deploy` deploys the release to the dev channel. It requires a gate decision from `leitstand.certify`.
 
 **After `mission.close`, the mission is no longer active.** The `--release` flag is REQUIRED to specify which release to deploy:
 
@@ -129,46 +140,58 @@ pnpm exec werkstatt run leitstand.dev-deploy --site <siteId> --release <releaseI
 
 Do NOT use `--all`. The `--all` flag is rejected on deployment commands (RFC-0842).
 
-Review the Axiom findings in the output. If there are blocking findings, fix them before proceeding.
-
 Release state transitions: `ready` → `dev-deployed`.
 
-### 5. Propagate — deploy to alt channel
+### 6. Certify (alt gate) + Propagate — deploy to alt channel
 
-`leitstand.propagate` deploys a verified release to the **alt** channel only (hardcoded, RFC-0628). It requires:
-
-- Release in `ready` state (confirmed by `release.ready`).
-- Axiom evidence from dev-deploy (commitSha + missionId match).
-- Dev build-identity verification (fetches dev `build-identity.json`).
+First, certify for the alt gate:
 
 ```sh
-pnpm exec werkstatt run leitstand.propagate --release <releaseId>
+pnpm exec werkstatt run leitstand.certify --site <siteId> --gate=alt --release <releaseId>
 ```
 
-**Do NOT pass `--site`** — `leitstand.propagate` reads `systemId` from the release manifest. **Do NOT pass `--all`** — the `--all` flag is rejected on deployment commands (RFC-0842). **Do NOT pass `--channel`** — the `--channel` flag was removed (RFC-0628). The channel is always `alt`.
+Then propagate to the alt channel:
+
+```sh
+pnpm exec werkstatt run leitstand.propagate --site <siteId> --release <releaseId>
+```
+
+`leitstand.propagate` deploys to the **alt** channel only (hardcoded, RFC-0628). It requires:
+
+- Release in `ready` state (confirmed by `release.ready`).
+- Gate decision from `leitstand.certify --gate=alt`.
+- Dev build-identity verification (fetches dev `build-identity.json`).
 
 Release state transitions: `ready` → `alt-deployed`.
 
 The site is now live on the alt domain. The operator verifies it before proceeding to Main.
 
-### 6. Promote — promote to main channel
+### 7. Certify (main gate) + Promote — promote to main channel
 
-`leitstand.promote` promotes an alt-deployed release to the **main** channel only. It requires:
+First, certify for the main gate (this also produces the `MainVerificationDecisionV1` JSON):
+
+```sh
+pnpm exec werkstatt run leitstand.certify --site <siteId> --gate=main --release <releaseId>
+```
+
+Then promote to the main channel:
+
+```sh
+pnpm exec werkstatt run leitstand.promote --site <siteId> --release <releaseId>
+```
+
+`leitstand.promote` requires:
 
 - Release in `alt-deployed` state.
+- Gate decision from `leitstand.certify --gate=main`.
+- Main verification decision (auto-resolved from `systems-cache/{system}/gate-decisions/{release}-main-verification.json`).
 - Live build-identity verification (alt vs main).
 
 **Only after Alt is verified by the operator.**
 
-```sh
-pnpm exec werkstatt run leitstand.promote --release <releaseId>
-```
-
-**Do NOT pass `--all`** — the `--all` flag is rejected on deployment commands (RFC-0842).
-
 Release state transitions: `alt-deployed` → `main-deployed`.
 
-### 7. Archive — clean up
+### 8. Archive — clean up
 
 After the main deployment is verified, archive the mission:
 
