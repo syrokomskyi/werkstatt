@@ -9,7 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
 <item>RFC-0865: initial R2 durable storage adapter for propagate-alt and promote-main gates.</item>
-<item>Switch from S3 SigV4 signing to Cloudflare R2 REST API with Bearer token — simpler, no SigV4 bugs.</item>
+<item>ADR-0032: Switch from S3 SigV4 signing to Cloudflare R2 REST API with Bearer token — simpler, no SigV4 bugs.</item>
 </CHANGE_SUMMARY>
 */
 
