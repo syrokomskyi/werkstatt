@@ -465,9 +465,6 @@ importers:
       '@warpgogol/werkstatt':
         specifier: workspace:*
         version: link:../werkstatt
-      yaml:
-        specifier: ^2.9.0
-        version: 2.9.0
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
