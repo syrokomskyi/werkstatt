@@ -110,7 +110,8 @@ export function createMissionModule(): KernelModule {
           },
           "skip-content-regression": {
             kind: "boolean",
-            description: "RFC-0734: Skip CREG-05 content regression review check.",
+            description:
+              "RFC-0734 + ADR-0050: Skip CREG-05 content regression review warning (non-blocking).",
           },
           "skip-template-sync": {
             kind: "boolean",

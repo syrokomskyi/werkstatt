@@ -21,7 +21,7 @@
   <item>RFC-0658: validate bordbuch before appending close event (defense-in-depth for distribution-reuse skip path).</item>
   <item>RFC-0703: auto-pin platform version via sternsystem.pin after registry update, before werkstatt commit.</item>
   <item>RFC-0705: move mirror status gathering before state transition; add blocking check when external mirrors are desynced.</item>
-  <item>RFC-0734: add CREG-05 enforcement — block close when content drift exists and no apply-result.json; add --skip-content-regression flag.</item>
+  <item>RFC-0734: add CREG-05 enforcement — warn when content drift exists and no apply-result.json; add --skip-content-regression flag. ADR-0050: changed from blocking throw to non-blocking warning.</item>
   <item>RFC-0762: extend CloseReportMirror with synced/syncError; add post-close sternsystem.sync call before state file write.</item>
   <item>Bug fix: push cache clone to origin before mirror sync check to prevent false "out of sync" when commits were created between reconcile and close.</item>
   <item>RFC-0801: remove auto-archive from mission.close; remove CloseReportArchive interface and --skip-auto-archive flag.</item>
@@ -788,7 +788,7 @@ export async function runMissionClose(
         }
       }
 
-      // RFC-0734: CREG-05 enforcement — check for unreviewed content drift before copying golden snapshot
+      // RFC-0734 + ADR-0050: CREG-05 check — warn about unreviewed content drift before copying golden snapshot (non-blocking)
       const skipContentRegression = flagBoolean(input, "skip-content-regression");
       if (!skipContentRegression) {
         const contentRegressionSrc = path.join(
@@ -847,8 +847,8 @@ export async function runMissionClose(
               }
             }
             if (!hasValidApplyResult) {
-              throw new Error(
-                `[mission.close] CREG-05: Content drift exists but no review.yaml has been processed. Run: pnpm exec werkstatt run content.regression.review.generate --site ${manifest.systemId}`,
+              logger.warn(
+                `  [mission.close] CREG-05: Content drift detected (expected after content changes). Review generation skipped — run content.regression.review.generate --site ${manifest.systemId} if regression review is needed. This is non-blocking — mission.close will complete successfully.`,
               );
             }
           }
