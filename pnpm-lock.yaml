@@ -763,9 +763,15 @@ importers:
 
   packages/werkstatt-shared:
     dependencies:
+      '@lordicon/element':
+        specifier: ^2.3.1
+        version: 2.3.1
       '@noble/ed25519':
         specifier: ^3.1.0
         version: 3.1.0
+      '@syrokomskyi/axiom-study':
+        specifier: link:../../../pipelines/packages/axiom/axiom-study
+        version: link:../../../pipelines/packages/axiom/axiom-study
       ajv:
         specifier: ^8.20.0
         version: 8.20.0
@@ -778,6 +784,12 @@ importers:
       hls.js:
         specifier: ^1.6.16
         version: 1.6.16
+      lenis:
+        specifier: ^1.3.25
+        version: 1.3.25(react@19.2.8)
+      plyr:
+        specifier: ^3.8.4
+        version: 3.8.4
       yaml:
         specifier: ^2.9.0
         version: 2.9.0
