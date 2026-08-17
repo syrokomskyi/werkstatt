@@ -88,6 +88,9 @@ vi.mock("@warpgogol/werkstatt-site/codegen", () => ({
   runGenerateScriptsOrchestrator: vi.fn(async () => []),
   runFontsImportsGenerate: vi.fn(async () => []),
   runBiomeCssGenerate: vi.fn(async () => []),
+  runAppBoilerplateValidate: vi.fn(async () => ({ data: { generated: [] }, summary: "ok", nextSteps: [] })),
+  runGenerateMaterialCreditsPage: vi.fn(async () => []),
+  runPropsTypesGenerate: vi.fn(async () => []),
 }));
 
 vi.mock("@warpgogol/werkstatt-site/onboarding", () => ({

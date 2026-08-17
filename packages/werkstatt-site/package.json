@@ -3462,6 +3462,10 @@
       "types": "./src/domain/passport/data.ts",
       "default": "./src/domain/passport/data.ts"
     },
+    "./passport/data": {
+      "types": "./src/domain/passport/data.ts",
+      "default": "./src/domain/passport/data.ts"
+    },
     "./domain/passport/dht-sign.test": {
       "types": "./src/domain/passport/dht-sign.test.ts",
       "default": "./src/domain/passport/dht-sign.test.ts"
@@ -10317,6 +10321,34 @@
     "./testing/unit/services/telegram-alert-bridge/health-endpoint.test": {
       "types": "./src/testing/unit/services/telegram-alert-bridge/health-endpoint.test.ts",
       "default": "./src/testing/unit/services/telegram-alert-bridge/health-endpoint.test.ts"
+    },
+    "./share/middleware": {
+      "types": "./src/domain/share/middleware/language-redirect.ts",
+      "default": "./src/domain/share/middleware/language-redirect.ts"
+    },
+    "./share/semantic": {
+      "types": "./src/domain/share/semantic/index.ts",
+      "default": "./src/domain/share/semantic/index.ts"
+    },
+    "./ui/components/currency-aware-price-display/currency-aware-price-display-component.astro": {
+      "types": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro",
+      "default": "./src/domain/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro"
+    },
+    "./ui/components/donation-card/donation-card-component.astro": {
+      "types": "./src/domain/ui/components/donation-card/donation-card-component.astro",
+      "default": "./src/domain/ui/components/donation-card/donation-card-component.astro"
+    },
+    "./ui/components/effects/effect-host.astro": {
+      "types": "./src/domain/ui/components/effects/effect-host.astro",
+      "default": "./src/domain/ui/components/effects/effect-host.astro"
+    },
+    "./ui/components/material-credit/credit-dedup.js": {
+      "types": "./src/domain/ui/components/material-credit/credit-dedup.js",
+      "default": "./src/domain/ui/components/material-credit/credit-dedup.js"
+    },
+    "./ui/components/section-body/list/section-list.astro": {
+      "types": "./src/domain/ui/components/section-body/list/section-list.astro",
+      "default": "./src/domain/ui/components/section-body/list/section-list.astro"
     }
   },
   "files": [
