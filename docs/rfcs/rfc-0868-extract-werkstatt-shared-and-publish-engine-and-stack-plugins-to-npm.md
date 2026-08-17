@@ -1,7 +1,7 @@
 ---
 id: RFC-0868
 title: "Extract @warpgogol/werkstatt-shared and publish engine + stack plugins to NPM"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-17
 updatedAt: 2026-08-17
 enhancedAt: 2026-08-17
-implementedAt:
+implementedAt: 2026-08-17
 closedAt:
 supersedes: []
 supersededBy:

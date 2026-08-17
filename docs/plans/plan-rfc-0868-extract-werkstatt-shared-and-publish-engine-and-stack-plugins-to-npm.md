@@ -1,7 +1,7 @@
 ---
 rfcId: RFC-0868
 planId: PLAN-RFC-0868-01
-status: draft
+status: implemented
 owner: architecture
 createdAt: 2026-08-17
 updatedAt:
@@ -30,13 +30,13 @@ scope:
 
 ## 1. Objectives
 
-- [ ] O1 — Create `@warpgogol/werkstatt-shared` package with shared domains extracted from `werkstatt-site` (maps to acceptance: package exists, domains moved, exports mirrored)
-- [ ] O2 — Remove engine→site coupling: update all `@warpgogol/werkstatt-site/*` imports in engine to `@warpgogol/werkstatt-shared/*`, remove autonomy exemptions (maps to acceptance: no site imports in engine, EXEMPT_PREFIXES clean, autonomy.validate passes)
-- [ ] O3 — Make axiom dependencies optional with dynamic import guard (maps to acceptance: axiom in optionalDependencies, leitstand guards value import)
-- [ ] O4 — Add build steps and publish config to all six packages (maps to acceptance: tsconfig.build.json, dual exports, private: false, publishConfig)
-- [ ] O5 — Register `werkstatt.shared.validate` command in engine (maps to acceptance: command registered and passing, output format matches)
-- [ ] O6 — Update `workshop.scaffold` templates for external NPM consumption (maps to acceptance: scaffold --verify passes)
-- [ ] O7 — Sync documentation: AGENTS.md, Compass XML, forge.yaml (maps to acceptance: AGENTS.md updated, technology.xml updated)
+- [x] O1 — Create `@warpgogol/werkstatt-shared` package with shared domains extracted from `werkstatt-site` (maps to acceptance: package exists, domains moved, exports mirrored)
+- [x] O2 — Remove engine→site coupling: update all `@warpgogol/werkstatt-site/*` imports in engine to `@warpgogol/werkstatt-shared/*`, remove autonomy exemptions (maps to acceptance: no site imports in engine, EXEMPT_PREFIXES clean, autonomy.validate passes)
+- [x] O3 — Make axiom dependencies optional with dynamic import guard (maps to acceptance: axiom in optionalDependencies, leitstand guards value import)
+- [x] O4 — Add build steps and publish config to all six packages (maps to acceptance: tsconfig.build.json, dual exports, private: false, publishConfig)
+- [x] O5 — Register `werkstatt.shared.validate` command in engine (maps to acceptance: command registered and passing, output format matches)
+- [x] O6 — Update `workshop.scaffold` templates for external NPM consumption (maps to acceptance: scaffold --verify passes)
+- [x] O7 — Sync documentation: AGENTS.md, Compass XML, forge.yaml (maps to acceptance: AGENTS.md updated, technology.xml updated)
 
 ## 2. Affected artifacts
 
@@ -395,7 +395,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Import breakage in 102+ engine files | Step 3 uses codemod, not manual edits; `build:check` after each batch |
 | `werkstatt-site` internal imports to moved domains | Step 3 updates relative imports to package-level imports |
 | Missing subpath exports in `werkstatt-shared` | Step 1 mirrors all existing exports; Step 3 adds missing ones discovered during codemod |
