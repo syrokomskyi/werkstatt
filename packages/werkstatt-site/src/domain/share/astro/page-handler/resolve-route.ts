@@ -51,10 +51,10 @@ import {
 import {
   resolveTranslationContext,
   type PageTranslationPolicy,
-} from "../../legal/translation-policy.ts";
-import type { ResolvedTranslationContext } from "../../legal/translation-policy.ts";
-import { pageIdToContentFileSlug } from "../../content/entity-id.ts";
-import { deepMergeEntryData } from "../../content/merge.ts";
+} from "@warpgogol/werkstatt-shared/share/legal/translation-policy";
+import type { ResolvedTranslationContext } from "@warpgogol/werkstatt-shared/share/legal/translation-policy";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
+import { deepMergeEntryData } from "@warpgogol/werkstatt-shared/share/content";
 import { getSiteLabelsData } from "../content.ts";
 import {
   deriveOrchestratorConfig,

@@ -16,8 +16,8 @@ import type {
   FeaturePolicyContentContext,
   FeaturePolicyTargetRef,
   FeaturePolicyResolverOptions,
-} from "../feature-policy.ts";
-import { createFeaturePolicyResolver } from "../feature-policy.ts";
+} from "@warpgogol/werkstatt-shared/share/feature-policy";
+import { createFeaturePolicyResolver } from "@warpgogol/werkstatt-shared/share/feature-policy";
 
 /**
  * Load Feature Policy content context from RFC-0047 content domains.

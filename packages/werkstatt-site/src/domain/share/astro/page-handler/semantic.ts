@@ -34,7 +34,7 @@ import {
   getContentRefIndex,
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
-} from "../../content-reference.ts";
+} from "@warpgogol/werkstatt-shared/share/content-reference";
 
 // re-exported so downstream modules can build alternate links from this same barrel if needed.
 export { buildBreadcrumbTrail, getAlternateLinks };

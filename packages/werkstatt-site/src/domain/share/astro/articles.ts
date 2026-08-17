@@ -18,7 +18,7 @@
 */
 
 import { getCollection } from "astro:content";
-import { pageIdToContentFileSlug } from "../content/entity-id.ts";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
 import { resolveLocalizedPagePath } from "./routes.ts";
 
 /** A single article card's resolved data. */

@@ -13,7 +13,7 @@ resolve-route.ts can both reference PageRouteData without a circular runtime imp
 
 import type { ResolvedPage } from "../../page.ts";
 import type { SemanticPageModel, SemanticBreadcrumb } from "../../semantic/models.ts";
-import type { ResolvedTranslationContext } from "../../legal/translation-policy.ts";
+import type { ResolvedTranslationContext } from "@warpgogol/werkstatt-shared/share/legal/translation-policy";
 import type { OrchestratorConfig } from "./semantic.ts";
 
 export interface SystemGrowthBlock {

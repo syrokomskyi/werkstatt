@@ -12,7 +12,7 @@
 */
 
 import { getEntry } from "astro:content";
-import { pageIdToContentFileSlug } from "../content/entity-id.ts";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
 
 type RawPagesEntry = {
   body?: string;

@@ -23,7 +23,7 @@
 */
 
 import { getCollection } from "astro:content";
-import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "../content/entity-id.ts";
+import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "@warpgogol/werkstatt-shared/share/content";
 import { DEFAULT_PROFILE_BASE_BY_LANG } from "./people-profile-defaults.ts";
 
 /** RFC-0511: localized suffix appended to the team page base segment for AI-agent routes. */

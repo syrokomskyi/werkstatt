@@ -23,7 +23,7 @@
 */
 
 import { getCollection } from "astro:content";
-import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "../content/entity-id.ts";
+import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "@warpgogol/werkstatt-shared/share/content";
 
 /** Nachweis evidence kinds from RFC-0706. */
 const NACHWEIS_EVIDENCE_KINDS = new Set([

@@ -22,7 +22,7 @@
 */
 
 import { getCollection } from "astro:content";
-import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "../content/entity-id.ts";
+import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "@warpgogol/werkstatt-shared/share/content";
 import { getRouteRegistry, resolveLocalizedPagePath } from "./routes.ts";
 import { participantPageId } from "./people-routes.ts";
 import type { LivePhoto } from "../schemas/live-photo.ts";

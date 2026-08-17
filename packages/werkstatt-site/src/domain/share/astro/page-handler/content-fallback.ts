@@ -19,9 +19,9 @@ resolution across pages, and the RFC-0192 Programmatic Surface redirect-stub res
 import { getEntry } from "@warpgogol/werkstatt-site/content-source/astro";
 import { EMPTY_RUNTIME_CONTEXT } from "../../runtime-context.ts";
 import type { PageEntry, ResolvedPage } from "../../page.ts";
-import { pageIdToContentFileSlug } from "../../content/entity-id.ts";
-import { deepMergeEntryData } from "../../content/merge.ts";
-import { resolveSharedContextProps } from "../../shared-context.ts";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
+import { deepMergeEntryData } from "@warpgogol/werkstatt-shared/share/content";
+import { resolveSharedContextProps } from "@warpgogol/werkstatt-shared/share/shared-context";
 import { deriveOrchestratorConfig } from "./semantic.ts";
 import type { PageRouteData } from "./types.ts";
 
