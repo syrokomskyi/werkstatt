@@ -10357,6 +10357,10 @@
     "./share": {
       "types": "./src/domain/share/index.ts",
       "default": "./src/domain/share/index.ts"
+    },
+    "./integration": {
+      "types": "./src/domain/integration/index.ts",
+      "default": "./src/domain/integration/index.ts"
     }
   },
   "files": [

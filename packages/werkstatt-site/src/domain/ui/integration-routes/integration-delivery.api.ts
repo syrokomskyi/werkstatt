@@ -42,7 +42,7 @@ import {
 import {
   createDeliveryHandler,
   type IntegrationSecrets,
-} from "@warpgogol/werkstatt-shared/integration";
+} from "@warpgogol/werkstatt-site/integration";
 import { supabaseBufferDestinationAdapter } from "@warpgogol/werkstatt-shared/integration-adapter-supabase-crm";
 
 /** RFC-0181: channel + CRM secrets bag from astro:env/server (client tokens). */
