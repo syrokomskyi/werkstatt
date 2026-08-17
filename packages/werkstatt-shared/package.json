@@ -318,6 +318,986 @@
     "./surface/io": {
       "types": "./src/surface/io/index.ts",
       "default": "./src/surface/io/index.ts"
+    },
+    "./checks/index": {
+      "types": "./src/checks/index.ts",
+      "default": "./src/checks/index.ts"
+    },
+    "./index": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./integration/adapters": {
+      "types": "./src/integration/adapters.ts",
+      "default": "./src/integration/adapters.ts"
+    },
+    "./integration/dispatch": {
+      "types": "./src/integration/dispatch.ts",
+      "default": "./src/integration/dispatch.ts"
+    },
+    "./integration/funnel": {
+      "types": "./src/integration/funnel.ts",
+      "default": "./src/integration/funnel.ts"
+    },
+    "./integration/index": {
+      "types": "./src/integration/index.ts",
+      "default": "./src/integration/index.ts"
+    },
+    "./integration/lifecycle": {
+      "types": "./src/integration/lifecycle.ts",
+      "default": "./src/integration/lifecycle.ts"
+    },
+    "./integration/orchestration": {
+      "types": "./src/integration/orchestration.ts",
+      "default": "./src/integration/orchestration.ts"
+    },
+    "./integration/port-barrel": {
+      "types": "./src/integration/port-barrel.ts",
+      "default": "./src/integration/port-barrel.ts"
+    },
+    "./integration/qstash": {
+      "types": "./src/integration/qstash.ts",
+      "default": "./src/integration/qstash.ts"
+    },
+    "./integration/sharding": {
+      "types": "./src/integration/sharding.ts",
+      "default": "./src/integration/sharding.ts"
+    },
+    "./integration/vitest.config": {
+      "types": "./src/integration/vitest.config.ts",
+      "default": "./src/integration/vitest.config.ts"
+    },
+    "./integration-adapter-supabase-crm/adapter": {
+      "types": "./src/integration-adapter-supabase-crm/adapter.ts",
+      "default": "./src/integration-adapter-supabase-crm/adapter.ts"
+    },
+    "./integration-adapter-supabase-crm/client": {
+      "types": "./src/integration-adapter-supabase-crm/client.ts",
+      "default": "./src/integration-adapter-supabase-crm/client.ts"
+    },
+    "./integration-adapter-supabase-crm/index": {
+      "types": "./src/integration-adapter-supabase-crm/index.ts",
+      "default": "./src/integration-adapter-supabase-crm/index.ts"
+    },
+    "./integration-adapter-supabase-crm/pipedrive-sync-target": {
+      "types": "./src/integration-adapter-supabase-crm/pipedrive-sync-target.ts",
+      "default": "./src/integration-adapter-supabase-crm/pipedrive-sync-target.ts"
+    },
+    "./integration-adapter-supabase-crm/supabase-rest": {
+      "types": "./src/integration-adapter-supabase-crm/supabase-rest.ts",
+      "default": "./src/integration-adapter-supabase-crm/supabase-rest.ts"
+    },
+    "./integration-adapter-supabase-crm/vitest.config": {
+      "types": "./src/integration-adapter-supabase-crm/vitest.config.ts",
+      "default": "./src/integration-adapter-supabase-crm/vitest.config.ts"
+    },
+    "./observability/conventions": {
+      "types": "./src/observability/conventions.ts",
+      "default": "./src/observability/conventions.ts"
+    },
+    "./observability/env-resolver": {
+      "types": "./src/observability/env-resolver.ts",
+      "default": "./src/observability/env-resolver.ts"
+    },
+    "./observability/index": {
+      "types": "./src/observability/index.ts",
+      "default": "./src/observability/index.ts"
+    },
+    "./observability/metric-registry": {
+      "types": "./src/observability/metric-registry.ts",
+      "default": "./src/observability/metric-registry.ts"
+    },
+    "./observability/otlp-converter": {
+      "types": "./src/observability/otlp-converter.ts",
+      "default": "./src/observability/otlp-converter.ts"
+    },
+    "./observability/otlp-json": {
+      "types": "./src/observability/otlp-json.ts",
+      "default": "./src/observability/otlp-json.ts"
+    },
+    "./observability/otlp-transport": {
+      "types": "./src/observability/otlp-transport.ts",
+      "default": "./src/observability/otlp-transport.ts"
+    },
+    "./observability/pusher": {
+      "types": "./src/observability/pusher.ts",
+      "default": "./src/observability/pusher.ts"
+    },
+    "./observability/redact": {
+      "types": "./src/observability/redact.ts",
+      "default": "./src/observability/redact.ts"
+    },
+    "./observability/typed-refs": {
+      "types": "./src/observability/typed-refs.ts",
+      "default": "./src/observability/typed-refs.ts"
+    },
+    "./observability/vitest.config": {
+      "types": "./src/observability/vitest.config.ts",
+      "default": "./src/observability/vitest.config.ts"
+    },
+    "./ontology/archetype-registry": {
+      "types": "./src/ontology/archetype-registry.ts",
+      "default": "./src/ontology/archetype-registry.ts"
+    },
+    "./ontology/biome-token-projection": {
+      "types": "./src/ontology/biome-token-projection.ts",
+      "default": "./src/ontology/biome-token-projection.ts"
+    },
+    "./ontology/cosmic/index": {
+      "types": "./src/ontology/cosmic/index.ts",
+      "default": "./src/ontology/cosmic/index.ts"
+    },
+    "./ontology/cosmic/moon-catalog": {
+      "types": "./src/ontology/cosmic/moon-catalog.ts",
+      "default": "./src/ontology/cosmic/moon-catalog.ts"
+    },
+    "./ontology/cosmic/planet-catalog": {
+      "types": "./src/ontology/cosmic/planet-catalog.ts",
+      "default": "./src/ontology/cosmic/planet-catalog.ts"
+    },
+    "./ontology/cosmic/star-catalog": {
+      "types": "./src/ontology/cosmic/star-catalog.ts",
+      "default": "./src/ontology/cosmic/star-catalog.ts"
+    },
+    "./ontology/enums": {
+      "types": "./src/ontology/enums.ts",
+      "default": "./src/ontology/enums.ts"
+    },
+    "./ontology/external-surfaces/index": {
+      "types": "./src/ontology/external-surfaces/index.ts",
+      "default": "./src/ontology/external-surfaces/index.ts"
+    },
+    "./ontology/index": {
+      "types": "./src/ontology/index.ts",
+      "default": "./src/ontology/index.ts"
+    },
+    "./ontology/operations/index": {
+      "types": "./src/ontology/operations/index.ts",
+      "default": "./src/ontology/operations/index.ts"
+    },
+    "./ontology/schemas/biome": {
+      "types": "./src/ontology/schemas/biome.ts",
+      "default": "./src/ontology/schemas/biome.ts"
+    },
+    "./ontology/schemas/capability": {
+      "types": "./src/ontology/schemas/capability.ts",
+      "default": "./src/ontology/schemas/capability.ts"
+    },
+    "./ontology/schemas/constellation": {
+      "types": "./src/ontology/schemas/constellation.ts",
+      "default": "./src/ontology/schemas/constellation.ts"
+    },
+    "./ontology/schemas/dns-records": {
+      "types": "./src/ontology/schemas/dns-records.ts",
+      "default": "./src/ontology/schemas/dns-records.ts"
+    },
+    "./ontology/schemas/index": {
+      "types": "./src/ontology/schemas/index.ts",
+      "default": "./src/ontology/schemas/index.ts"
+    },
+    "./ontology/schemas/page-entry": {
+      "types": "./src/ontology/schemas/page-entry.ts",
+      "default": "./src/ontology/schemas/page-entry.ts"
+    },
+    "./ontology/schemas/section-archetype": {
+      "types": "./src/ontology/schemas/section-archetype.ts",
+      "default": "./src/ontology/schemas/section-archetype.ts"
+    },
+    "./ontology/schemas/site-family": {
+      "types": "./src/ontology/schemas/site-family.ts",
+      "default": "./src/ontology/schemas/site-family.ts"
+    },
+    "./ontology/schemas/system/growth": {
+      "types": "./src/ontology/schemas/system/growth.ts",
+      "default": "./src/ontology/schemas/system/growth.ts"
+    },
+    "./ontology/schemas/system/integrations": {
+      "types": "./src/ontology/schemas/system/integrations.ts",
+      "default": "./src/ontology/schemas/system/integrations.ts"
+    },
+    "./ontology/schemas/system/manifest": {
+      "types": "./src/ontology/schemas/system/manifest.ts",
+      "default": "./src/ontology/schemas/system/manifest.ts"
+    },
+    "./ontology/schemas/system/page-output": {
+      "types": "./src/ontology/schemas/system/page-output.ts",
+      "default": "./src/ontology/schemas/system/page-output.ts"
+    },
+    "./ontology/schemas/system/release": {
+      "types": "./src/ontology/schemas/system/release.ts",
+      "default": "./src/ontology/schemas/system/release.ts"
+    },
+    "./ontology/schemas/system/text": {
+      "types": "./src/ontology/schemas/system/text.ts",
+      "default": "./src/ontology/schemas/system/text.ts"
+    },
+    "./ontology/schemas/system": {
+      "types": "./src/ontology/schemas/system.ts",
+      "default": "./src/ontology/schemas/system.ts"
+    },
+    "./ontology/shared-section-props/body-fragments": {
+      "types": "./src/ontology/shared-section-props/body-fragments.ts",
+      "default": "./src/ontology/shared-section-props/body-fragments.ts"
+    },
+    "./ontology/shared-section-props/catalog": {
+      "types": "./src/ontology/shared-section-props/catalog.ts",
+      "default": "./src/ontology/shared-section-props/catalog.ts"
+    },
+    "./ontology/shared-section-props/common": {
+      "types": "./src/ontology/shared-section-props/common.ts",
+      "default": "./src/ontology/shared-section-props/common.ts"
+    },
+    "./ontology/shared-section-props/index": {
+      "types": "./src/ontology/shared-section-props/index.ts",
+      "default": "./src/ontology/shared-section-props/index.ts"
+    },
+    "./ontology/shared-section-props/visual-header": {
+      "types": "./src/ontology/shared-section-props/visual-header.ts",
+      "default": "./src/ontology/shared-section-props/visual-header.ts"
+    },
+    "./ontology/vitest.config": {
+      "types": "./src/ontology/vitest.config.ts",
+      "default": "./src/ontology/vitest.config.ts"
+    },
+    "./passport/dht-sign.test": {
+      "types": "./src/passport/dht-sign.test.ts",
+      "default": "./src/passport/dht-sign.test.ts"
+    },
+    "./passport/identity-sign.test": {
+      "types": "./src/passport/identity-sign.test.ts",
+      "default": "./src/passport/identity-sign.test.ts"
+    },
+    "./passport/index": {
+      "types": "./src/passport/index.ts",
+      "default": "./src/passport/index.ts"
+    },
+    "./passport/vitest.config": {
+      "types": "./src/passport/vitest.config.ts",
+      "default": "./src/passport/vitest.config.ts"
+    },
+    "./share/agent/api-catalog": {
+      "types": "./src/share/agent/api-catalog.ts",
+      "default": "./src/share/agent/api-catalog.ts"
+    },
+    "./share/agent/capability": {
+      "types": "./src/share/agent/capability.ts",
+      "default": "./src/share/agent/capability.ts"
+    },
+    "./share/agent/dns-aid.test": {
+      "types": "./src/share/agent/dns-aid.test.ts",
+      "default": "./src/share/agent/dns-aid.test.ts"
+    },
+    "./share/agent/dns-aid": {
+      "types": "./src/share/agent/dns-aid.ts",
+      "default": "./src/share/agent/dns-aid.ts"
+    },
+    "./share/agent/fleet-catalog": {
+      "types": "./src/share/agent/fleet-catalog.ts",
+      "default": "./src/share/agent/fleet-catalog.ts"
+    },
+    "./share/agent/index": {
+      "types": "./src/share/agent/index.ts",
+      "default": "./src/share/agent/index.ts"
+    },
+    "./share/agent/knowledge": {
+      "types": "./src/share/agent/knowledge.ts",
+      "default": "./src/share/agent/knowledge.ts"
+    },
+    "./share/agent/manifest": {
+      "types": "./src/share/agent/manifest.ts",
+      "default": "./src/share/agent/manifest.ts"
+    },
+    "./share/agent/mcp-card": {
+      "types": "./src/share/agent/mcp-card.ts",
+      "default": "./src/share/agent/mcp-card.ts"
+    },
+    "./share/agent/omit-empty": {
+      "types": "./src/share/agent/omit-empty.ts",
+      "default": "./src/share/agent/omit-empty.ts"
+    },
+    "./share/agent/openapi": {
+      "types": "./src/share/agent/openapi.ts",
+      "default": "./src/share/agent/openapi.ts"
+    },
+    "./share/agent/proof": {
+      "types": "./src/share/agent/proof.ts",
+      "default": "./src/share/agent/proof.ts"
+    },
+    "./share/content/entity-id": {
+      "types": "./src/share/content/entity-id.ts",
+      "default": "./src/share/content/entity-id.ts"
+    },
+    "./share/content/index": {
+      "types": "./src/share/content/index.ts",
+      "default": "./src/share/content/index.ts"
+    },
+    "./share/content/merge": {
+      "types": "./src/share/content/merge.ts",
+      "default": "./src/share/content/merge.ts"
+    },
+    "./share/content/substitute-deep": {
+      "types": "./src/share/content/substitute-deep.ts",
+      "default": "./src/share/content/substitute-deep.ts"
+    },
+    "./share/content-discipline/index": {
+      "types": "./src/share/content-discipline/index.ts",
+      "default": "./src/share/content-discipline/index.ts"
+    },
+    "./share/content-discipline/parsers": {
+      "types": "./src/share/content-discipline/parsers.ts",
+      "default": "./src/share/content-discipline/parsers.ts"
+    },
+    "./share/content-discipline/types": {
+      "types": "./src/share/content-discipline/types.ts",
+      "default": "./src/share/content-discipline/types.ts"
+    },
+    "./share/env.d": {
+      "types": "./src/share/env.d.ts",
+      "default": "./src/share/env.d.ts"
+    },
+    "./share/fs/index": {
+      "types": "./src/share/fs/index.ts",
+      "default": "./src/share/fs/index.ts"
+    },
+    "./share/i18n/localization": {
+      "types": "./src/share/i18n/localization.ts",
+      "default": "./src/share/i18n/localization.ts"
+    },
+    "./share/index": {
+      "types": "./src/share/index.ts",
+      "default": "./src/share/index.ts"
+    },
+    "./share/knowledge/index": {
+      "types": "./src/share/knowledge/index.ts",
+      "default": "./src/share/knowledge/index.ts"
+    },
+    "./share/middleware/language-redirect": {
+      "types": "./src/share/middleware/language-redirect.ts",
+      "default": "./src/share/middleware/language-redirect.ts"
+    },
+    "./share/onboarding-yaml/index": {
+      "types": "./src/share/onboarding-yaml/index.ts",
+      "default": "./src/share/onboarding-yaml/index.ts"
+    },
+    "./share/redirects.test": {
+      "types": "./src/share/redirects.test.ts",
+      "default": "./src/share/redirects.test.ts"
+    },
+    "./share/schemas/claim-records": {
+      "types": "./src/share/schemas/claim-records.ts",
+      "default": "./src/share/schemas/claim-records.ts"
+    },
+    "./share/schemas/claims": {
+      "types": "./src/share/schemas/claims.ts",
+      "default": "./src/share/schemas/claims.ts"
+    },
+    "./share/schemas/horizontal-align": {
+      "types": "./src/share/schemas/horizontal-align.ts",
+      "default": "./src/share/schemas/horizontal-align.ts"
+    },
+    "./share/schemas/icon-color": {
+      "types": "./src/share/schemas/icon-color.ts",
+      "default": "./src/share/schemas/icon-color.ts"
+    },
+    "./share/schemas/index": {
+      "types": "./src/share/schemas/index.ts",
+      "default": "./src/share/schemas/index.ts"
+    },
+    "./share/schemas/live-photo": {
+      "types": "./src/share/schemas/live-photo.ts",
+      "default": "./src/share/schemas/live-photo.ts"
+    },
+    "./share/schemas/navigation": {
+      "types": "./src/share/schemas/navigation.ts",
+      "default": "./src/share/schemas/navigation.ts"
+    },
+    "./share/schemas/page-base": {
+      "types": "./src/share/schemas/page-base.ts",
+      "default": "./src/share/schemas/page-base.ts"
+    },
+    "./share/schemas/participant": {
+      "types": "./src/share/schemas/participant.ts",
+      "default": "./src/share/schemas/participant.ts"
+    },
+    "./share/schemas/person": {
+      "types": "./src/share/schemas/person.ts",
+      "default": "./src/share/schemas/person.ts"
+    },
+    "./share/schemas/section-background": {
+      "types": "./src/share/schemas/section-background.ts",
+      "default": "./src/share/schemas/section-background.ts"
+    },
+    "./share/schemas/section-body": {
+      "types": "./src/share/schemas/section-body.ts",
+      "default": "./src/share/schemas/section-body.ts"
+    },
+    "./share/schemas/section-cards": {
+      "types": "./src/share/schemas/section-cards.ts",
+      "default": "./src/share/schemas/section-cards.ts"
+    },
+    "./share/schemas/section-cta": {
+      "types": "./src/share/schemas/section-cta.ts",
+      "default": "./src/share/schemas/section-cta.ts"
+    },
+    "./share/schemas/section-header": {
+      "types": "./src/share/schemas/section-header.ts",
+      "default": "./src/share/schemas/section-header.ts"
+    },
+    "./share/schemas/section-image": {
+      "types": "./src/share/schemas/section-image.ts",
+      "default": "./src/share/schemas/section-image.ts"
+    },
+    "./share/schemas/section-motion": {
+      "types": "./src/share/schemas/section-motion.ts",
+      "default": "./src/share/schemas/section-motion.ts"
+    },
+    "./share/schemas/section-shell": {
+      "types": "./src/share/schemas/section-shell.ts",
+      "default": "./src/share/schemas/section-shell.ts"
+    },
+    "./share/schemas/section-stats": {
+      "types": "./src/share/schemas/section-stats.ts",
+      "default": "./src/share/schemas/section-stats.ts"
+    },
+    "./share/schemas/standard-list-item": {
+      "types": "./src/share/schemas/standard-list-item.ts",
+      "default": "./src/share/schemas/standard-list-item.ts"
+    },
+    "./share/scripts/external-links": {
+      "types": "./src/share/scripts/external-links.ts",
+      "default": "./src/share/scripts/external-links.ts"
+    },
+    "./share/scripts/gsap-counter": {
+      "types": "./src/share/scripts/gsap-counter.ts",
+      "default": "./src/share/scripts/gsap-counter.ts"
+    },
+    "./share/scripts/gsap-parallax": {
+      "types": "./src/share/scripts/gsap-parallax.ts",
+      "default": "./src/share/scripts/gsap-parallax.ts"
+    },
+    "./share/scripts/gsap-reveal": {
+      "types": "./src/share/scripts/gsap-reveal.ts",
+      "default": "./src/share/scripts/gsap-reveal.ts"
+    },
+    "./share/scripts/gsap-stagger": {
+      "types": "./src/share/scripts/gsap-stagger.ts",
+      "default": "./src/share/scripts/gsap-stagger.ts"
+    },
+    "./share/scripts/index": {
+      "types": "./src/share/scripts/index.ts",
+      "default": "./src/share/scripts/index.ts"
+    },
+    "./share/scripts/inline-number-animation": {
+      "types": "./src/share/scripts/inline-number-animation.ts",
+      "default": "./src/share/scripts/inline-number-animation.ts"
+    },
+    "./share/scripts/lenis": {
+      "types": "./src/share/scripts/lenis.ts",
+      "default": "./src/share/scripts/lenis.ts"
+    },
+    "./share/scripts/live-photos": {
+      "types": "./src/share/scripts/live-photos.ts",
+      "default": "./src/share/scripts/live-photos.ts"
+    },
+    "./share/scripts/lordicon": {
+      "types": "./src/share/scripts/lordicon.ts",
+      "default": "./src/share/scripts/lordicon.ts"
+    },
+    "./share/scripts/orchestrator": {
+      "types": "./src/share/scripts/orchestrator.ts",
+      "default": "./src/share/scripts/orchestrator.ts"
+    },
+    "./share/scripts/scheduler": {
+      "types": "./src/share/scripts/scheduler.ts",
+      "default": "./src/share/scripts/scheduler.ts"
+    },
+    "./share/scripts/video-player": {
+      "types": "./src/share/scripts/video-player.ts",
+      "default": "./src/share/scripts/video-player.ts"
+    },
+    "./share/semantic/ai": {
+      "types": "./src/share/semantic/ai.ts",
+      "default": "./src/share/semantic/ai.ts"
+    },
+    "./share/semantic/block-extraction": {
+      "types": "./src/share/semantic/block-extraction.ts",
+      "default": "./src/share/semantic/block-extraction.ts"
+    },
+    "./share/semantic/block-extractors/index": {
+      "types": "./src/share/semantic/block-extractors/index.ts",
+      "default": "./src/share/semantic/block-extractors/index.ts"
+    },
+    "./share/semantic/breadcrumbs": {
+      "types": "./src/share/semantic/breadcrumbs.ts",
+      "default": "./src/share/semantic/breadcrumbs.ts"
+    },
+    "./share/semantic/build-page": {
+      "types": "./src/share/semantic/build-page.ts",
+      "default": "./src/share/semantic/build-page.ts"
+    },
+    "./share/semantic/business-projection": {
+      "types": "./src/share/semantic/business-projection.ts",
+      "default": "./src/share/semantic/business-projection.ts"
+    },
+    "./share/semantic/extract": {
+      "types": "./src/share/semantic/extract.ts",
+      "default": "./src/share/semantic/extract.ts"
+    },
+    "./share/semantic/feed": {
+      "types": "./src/share/semantic/feed.ts",
+      "default": "./src/share/semantic/feed.ts"
+    },
+    "./share/semantic/ids": {
+      "types": "./src/share/semantic/ids.ts",
+      "default": "./src/share/semantic/ids.ts"
+    },
+    "./share/semantic/image-sitemap": {
+      "types": "./src/share/semantic/image-sitemap.ts",
+      "default": "./src/share/semantic/image-sitemap.ts"
+    },
+    "./share/semantic/index": {
+      "types": "./src/share/semantic/index.ts",
+      "default": "./src/share/semantic/index.ts"
+    },
+    "./share/semantic/jsonld/article": {
+      "types": "./src/share/semantic/jsonld/article.ts",
+      "default": "./src/share/semantic/jsonld/article.ts"
+    },
+    "./share/semantic/jsonld/breadcrumb": {
+      "types": "./src/share/semantic/jsonld/breadcrumb.ts",
+      "default": "./src/share/semantic/jsonld/breadcrumb.ts"
+    },
+    "./share/semantic/jsonld/collection-list": {
+      "types": "./src/share/semantic/jsonld/collection-list.ts",
+      "default": "./src/share/semantic/jsonld/collection-list.ts"
+    },
+    "./share/semantic/jsonld/context": {
+      "types": "./src/share/semantic/jsonld/context.ts",
+      "default": "./src/share/semantic/jsonld/context.ts"
+    },
+    "./share/semantic/jsonld/faq": {
+      "types": "./src/share/semantic/jsonld/faq.ts",
+      "default": "./src/share/semantic/jsonld/faq.ts"
+    },
+    "./share/semantic/jsonld/initiative": {
+      "types": "./src/share/semantic/jsonld/initiative.ts",
+      "default": "./src/share/semantic/jsonld/initiative.ts"
+    },
+    "./share/semantic/jsonld/organization": {
+      "types": "./src/share/semantic/jsonld/organization.ts",
+      "default": "./src/share/semantic/jsonld/organization.ts"
+    },
+    "./share/semantic/jsonld/person": {
+      "types": "./src/share/semantic/jsonld/person.ts",
+      "default": "./src/share/semantic/jsonld/person.ts"
+    },
+    "./share/semantic/jsonld/service": {
+      "types": "./src/share/semantic/jsonld/service.ts",
+      "default": "./src/share/semantic/jsonld/service.ts"
+    },
+    "./share/semantic/jsonld/shared": {
+      "types": "./src/share/semantic/jsonld/shared.ts",
+      "default": "./src/share/semantic/jsonld/shared.ts"
+    },
+    "./share/semantic/jsonld/types": {
+      "types": "./src/share/semantic/jsonld/types.ts",
+      "default": "./src/share/semantic/jsonld/types.ts"
+    },
+    "./share/semantic/jsonld/webpage": {
+      "types": "./src/share/semantic/jsonld/webpage.ts",
+      "default": "./src/share/semantic/jsonld/webpage.ts"
+    },
+    "./share/semantic/jsonld/website": {
+      "types": "./src/share/semantic/jsonld/website.ts",
+      "default": "./src/share/semantic/jsonld/website.ts"
+    },
+    "./share/semantic/jsonld": {
+      "types": "./src/share/semantic/jsonld.ts",
+      "default": "./src/share/semantic/jsonld.ts"
+    },
+    "./share/semantic/llms-policy": {
+      "types": "./src/share/semantic/llms-policy.ts",
+      "default": "./src/share/semantic/llms-policy.ts"
+    },
+    "./share/semantic/llms": {
+      "types": "./src/share/semantic/llms.ts",
+      "default": "./src/share/semantic/llms.ts"
+    },
+    "./share/semantic/markdown-hygiene": {
+      "types": "./src/share/semantic/markdown-hygiene.ts",
+      "default": "./src/share/semantic/markdown-hygiene.ts"
+    },
+    "./share/semantic/markdown-twin-provenance": {
+      "types": "./src/share/semantic/markdown-twin-provenance.ts",
+      "default": "./src/share/semantic/markdown-twin-provenance.ts"
+    },
+    "./share/semantic/models": {
+      "types": "./src/share/semantic/models.ts",
+      "default": "./src/share/semantic/models.ts"
+    },
+    "./share/semantic/organization-profile": {
+      "types": "./src/share/semantic/organization-profile.ts",
+      "default": "./src/share/semantic/organization-profile.ts"
+    },
+    "./share/semantic/output-projection": {
+      "types": "./src/share/semantic/output-projection.ts",
+      "default": "./src/share/semantic/output-projection.ts"
+    },
+    "./share/semantic/page-builders/markdown-page": {
+      "types": "./src/share/semantic/page-builders/markdown-page.ts",
+      "default": "./src/share/semantic/page-builders/markdown-page.ts"
+    },
+    "./share/semantic/page-markdown": {
+      "types": "./src/share/semantic/page-markdown.ts",
+      "default": "./src/share/semantic/page-markdown.ts"
+    },
+    "./share/semantic/page-utils": {
+      "types": "./src/share/semantic/page-utils.ts",
+      "default": "./src/share/semantic/page-utils.ts"
+    },
+    "./share/semantic/price-marker-resolver": {
+      "types": "./src/share/semantic/price-marker-resolver.ts",
+      "default": "./src/share/semantic/price-marker-resolver.ts"
+    },
+    "./share/semantic/robots": {
+      "types": "./src/share/semantic/robots.ts",
+      "default": "./src/share/semantic/robots.ts"
+    },
+    "./share/semantic/update-stamp": {
+      "types": "./src/share/semantic/update-stamp.ts",
+      "default": "./src/share/semantic/update-stamp.ts"
+    },
+    "./share/types/hls-js-light.d": {
+      "types": "./src/share/types/hls-js-light.d.ts",
+      "default": "./src/share/types/hls-js-light.d.ts"
+    },
+    "./share/vitest.config": {
+      "types": "./src/share/vitest.config.ts",
+      "default": "./src/share/vitest.config.ts"
+    },
+    "./surface/blueprint-schema": {
+      "types": "./src/surface/blueprint-schema.ts",
+      "default": "./src/surface/blueprint-schema.ts"
+    },
+    "./surface/blueprint-types": {
+      "types": "./src/surface/blueprint-types.ts",
+      "default": "./src/surface/blueprint-types.ts"
+    },
+    "./surface/blueprint": {
+      "types": "./src/surface/blueprint.ts",
+      "default": "./src/surface/blueprint.ts"
+    },
+    "./surface/breaker": {
+      "types": "./src/surface/breaker.ts",
+      "default": "./src/surface/breaker.ts"
+    },
+    "./surface/decision-composer": {
+      "types": "./src/surface/decision-composer.ts",
+      "default": "./src/surface/decision-composer.ts"
+    },
+    "./surface/eligibility": {
+      "types": "./src/surface/eligibility.ts",
+      "default": "./src/surface/eligibility.ts"
+    },
+    "./surface/evidence-records": {
+      "types": "./src/surface/evidence-records.ts",
+      "default": "./src/surface/evidence-records.ts"
+    },
+    "./surface/fleet": {
+      "types": "./src/surface/fleet.ts",
+      "default": "./src/surface/fleet.ts"
+    },
+    "./surface/geo": {
+      "types": "./src/surface/geo.ts",
+      "default": "./src/surface/geo.ts"
+    },
+    "./surface/governance": {
+      "types": "./src/surface/governance.ts",
+      "default": "./src/surface/governance.ts"
+    },
+    "./surface/index": {
+      "types": "./src/surface/index.ts",
+      "default": "./src/surface/index.ts"
+    },
+    "./surface/io/index": {
+      "types": "./src/surface/io/index.ts",
+      "default": "./src/surface/io/index.ts"
+    },
+    "./surface/io/surface-module-context-io": {
+      "types": "./src/surface/io/surface-module-context-io.ts",
+      "default": "./src/surface/io/surface-module-context-io.ts"
+    },
+    "./surface/io/visibility-outcomes-io": {
+      "types": "./src/surface/io/visibility-outcomes-io.ts",
+      "default": "./src/surface/io/visibility-outcomes-io.ts"
+    },
+    "./surface/module-context": {
+      "types": "./src/surface/module-context.ts",
+      "default": "./src/surface/module-context.ts"
+    },
+    "./surface/substance": {
+      "types": "./src/surface/substance.ts",
+      "default": "./src/surface/substance.ts"
+    },
+    "./surface/types": {
+      "types": "./src/surface/types.ts",
+      "default": "./src/surface/types.ts"
+    },
+    "./surface/visibility": {
+      "types": "./src/surface/visibility.ts",
+      "default": "./src/surface/visibility.ts"
+    },
+    "./surface/vitest.config": {
+      "types": "./src/surface/vitest.config.ts",
+      "default": "./src/surface/vitest.config.ts"
+    },
+    "./integration/tests/deliver-event.test": {
+      "types": "./src/integration/tests/deliver-event.test.ts",
+      "default": "./src/integration/tests/deliver-event.test.ts"
+    },
+    "./integration/tests/dispatch.test": {
+      "types": "./src/integration/tests/dispatch.test.ts",
+      "default": "./src/integration/tests/dispatch.test.ts"
+    },
+    "./integration/tests/funnel-bridge.test": {
+      "types": "./src/integration/tests/funnel-bridge.test.ts",
+      "default": "./src/integration/tests/funnel-bridge.test.ts"
+    },
+    "./integration/tests/hub-runtime.test": {
+      "types": "./src/integration/tests/hub-runtime.test.ts",
+      "default": "./src/integration/tests/hub-runtime.test.ts"
+    },
+    "./integration/tests/lifecycle.test": {
+      "types": "./src/integration/tests/lifecycle.test.ts",
+      "default": "./src/integration/tests/lifecycle.test.ts"
+    },
+    "./integration/tests/qstash.test": {
+      "types": "./src/integration/tests/qstash.test.ts",
+      "default": "./src/integration/tests/qstash.test.ts"
+    },
+    "./integration/tests/sharding.test": {
+      "types": "./src/integration/tests/sharding.test.ts",
+      "default": "./src/integration/tests/sharding.test.ts"
+    },
+    "./integration-adapter-supabase-crm/tests/change-balance.pbt.test": {
+      "types": "./src/integration-adapter-supabase-crm/tests/change-balance.pbt.test.ts",
+      "default": "./src/integration-adapter-supabase-crm/tests/change-balance.pbt.test.ts"
+    },
+    "./integration-adapter-supabase-crm/tests/funnel-persistence.test": {
+      "types": "./src/integration-adapter-supabase-crm/tests/funnel-persistence.test.ts",
+      "default": "./src/integration-adapter-supabase-crm/tests/funnel-persistence.test.ts"
+    },
+    "./integration-adapter-supabase-crm/tests/lifecycle-sync.test": {
+      "types": "./src/integration-adapter-supabase-crm/tests/lifecycle-sync.test.ts",
+      "default": "./src/integration-adapter-supabase-crm/tests/lifecycle-sync.test.ts"
+    },
+    "./integration-adapter-supabase-crm/tests/stage-map.test": {
+      "types": "./src/integration-adapter-supabase-crm/tests/stage-map.test.ts",
+      "default": "./src/integration-adapter-supabase-crm/tests/stage-map.test.ts"
+    },
+    "./observability/tests/conventions.test": {
+      "types": "./src/observability/tests/conventions.test.ts",
+      "default": "./src/observability/tests/conventions.test.ts"
+    },
+    "./observability/tests/metric-registry.test": {
+      "types": "./src/observability/tests/metric-registry.test.ts",
+      "default": "./src/observability/tests/metric-registry.test.ts"
+    },
+    "./observability/tests/otlp-converter.pbt.test": {
+      "types": "./src/observability/tests/otlp-converter.pbt.test.ts",
+      "default": "./src/observability/tests/otlp-converter.pbt.test.ts"
+    },
+    "./observability/tests/otlp-converter.test": {
+      "types": "./src/observability/tests/otlp-converter.test.ts",
+      "default": "./src/observability/tests/otlp-converter.test.ts"
+    },
+    "./observability/tests/otlp-json.test": {
+      "types": "./src/observability/tests/otlp-json.test.ts",
+      "default": "./src/observability/tests/otlp-json.test.ts"
+    },
+    "./observability/tests/pusher.test": {
+      "types": "./src/observability/tests/pusher.test.ts",
+      "default": "./src/observability/tests/pusher.test.ts"
+    },
+    "./observability/tests/redact.pbt.test": {
+      "types": "./src/observability/tests/redact.pbt.test.ts",
+      "default": "./src/observability/tests/redact.pbt.test.ts"
+    },
+    "./observability/tests/redact.test": {
+      "types": "./src/observability/tests/redact.test.ts",
+      "default": "./src/observability/tests/redact.test.ts"
+    },
+    "./ontology/tests/catalogs.pbt.test": {
+      "types": "./src/ontology/tests/catalogs.pbt.test.ts",
+      "default": "./src/ontology/tests/catalogs.pbt.test.ts"
+    },
+    "./ontology/tests/enums.test": {
+      "types": "./src/ontology/tests/enums.test.ts",
+      "default": "./src/ontology/tests/enums.test.ts"
+    },
+    "./ontology/tests/sternsystem-owner.test": {
+      "types": "./src/ontology/tests/sternsystem-owner.test.ts",
+      "default": "./src/ontology/tests/sternsystem-owner.test.ts"
+    },
+    "./passport/tests/schema.pbt.test": {
+      "types": "./src/passport/tests/schema.pbt.test.ts",
+      "default": "./src/passport/tests/schema.pbt.test.ts"
+    },
+    "./passport/tests/schema.test": {
+      "types": "./src/passport/tests/schema.test.ts",
+      "default": "./src/passport/tests/schema.test.ts"
+    },
+    "./share/tests/api-catalog.test": {
+      "types": "./src/share/tests/api-catalog.test.ts",
+      "default": "./src/share/tests/api-catalog.test.ts"
+    },
+    "./share/tests/breadcrumbs.test": {
+      "types": "./src/share/tests/breadcrumbs.test.ts",
+      "default": "./src/share/tests/breadcrumbs.test.ts"
+    },
+    "./share/tests/build-page-price-markers.test": {
+      "types": "./src/share/tests/build-page-price-markers.test.ts",
+      "default": "./src/share/tests/build-page-price-markers.test.ts"
+    },
+    "./share/tests/capability.test": {
+      "types": "./src/share/tests/capability.test.ts",
+      "default": "./src/share/tests/capability.test.ts"
+    },
+    "./share/tests/claim.test": {
+      "types": "./src/share/tests/claim.test.ts",
+      "default": "./src/share/tests/claim.test.ts"
+    },
+    "./share/tests/content-ref-index.test": {
+      "types": "./src/share/tests/content-ref-index.test.ts",
+      "default": "./src/share/tests/content-ref-index.test.ts"
+    },
+    "./share/tests/create-dev-props-validator.test": {
+      "types": "./src/share/tests/create-dev-props-validator.test.ts",
+      "default": "./src/share/tests/create-dev-props-validator.test.ts"
+    },
+    "./share/tests/derivation.test": {
+      "types": "./src/share/tests/derivation.test.ts",
+      "default": "./src/share/tests/derivation.test.ts"
+    },
+    "./share/tests/dev-props-validator.test": {
+      "types": "./src/share/tests/dev-props-validator.test.ts",
+      "default": "./src/share/tests/dev-props-validator.test.ts"
+    },
+    "./share/tests/fleet-catalog.test": {
+      "types": "./src/share/tests/fleet-catalog.test.ts",
+      "default": "./src/share/tests/fleet-catalog.test.ts"
+    },
+    "./share/tests/formula-eval.test": {
+      "types": "./src/share/tests/formula-eval.test.ts",
+      "default": "./src/share/tests/formula-eval.test.ts"
+    },
+    "./share/tests/freshness.test": {
+      "types": "./src/share/tests/freshness.test.ts",
+      "default": "./src/share/tests/freshness.test.ts"
+    },
+    "./share/tests/hero-section-numbering-parity.test": {
+      "types": "./src/share/tests/hero-section-numbering-parity.test.ts",
+      "default": "./src/share/tests/hero-section-numbering-parity.test.ts"
+    },
+    "./share/tests/image-sitemap.test": {
+      "types": "./src/share/tests/image-sitemap.test.ts",
+      "default": "./src/share/tests/image-sitemap.test.ts"
+    },
+    "./share/tests/jsonld-service.test": {
+      "types": "./src/share/tests/jsonld-service.test.ts",
+      "default": "./src/share/tests/jsonld-service.test.ts"
+    },
+    "./share/tests/knowledge.test": {
+      "types": "./src/share/tests/knowledge.test.ts",
+      "default": "./src/share/tests/knowledge.test.ts"
+    },
+    "./share/tests/ledger.test": {
+      "types": "./src/share/tests/ledger.test.ts",
+      "default": "./src/share/tests/ledger.test.ts"
+    },
+    "./share/tests/llms-0789.test": {
+      "types": "./src/share/tests/llms-0789.test.ts",
+      "default": "./src/share/tests/llms-0789.test.ts"
+    },
+    "./share/tests/manifest.test": {
+      "types": "./src/share/tests/manifest.test.ts",
+      "default": "./src/share/tests/manifest.test.ts"
+    },
+    "./share/tests/markdown-twin-provenance.test": {
+      "types": "./src/share/tests/markdown-twin-provenance.test.ts",
+      "default": "./src/share/tests/markdown-twin-provenance.test.ts"
+    },
+    "./share/tests/mcp-card.test": {
+      "types": "./src/share/tests/mcp-card.test.ts",
+      "default": "./src/share/tests/mcp-card.test.ts"
+    },
+    "./share/tests/onboarding-yaml.test": {
+      "types": "./src/share/tests/onboarding-yaml.test.ts",
+      "default": "./src/share/tests/onboarding-yaml.test.ts"
+    },
+    "./share/tests/ontology-role-by-cosmic-name.test": {
+      "types": "./src/share/tests/ontology-role-by-cosmic-name.test.ts",
+      "default": "./src/share/tests/ontology-role-by-cosmic-name.test.ts"
+    },
+    "./share/tests/openapi.test": {
+      "types": "./src/share/tests/openapi.test.ts",
+      "default": "./src/share/tests/openapi.test.ts"
+    },
+    "./share/tests/organization-jsonld.test": {
+      "types": "./src/share/tests/organization-jsonld.test.ts",
+      "default": "./src/share/tests/organization-jsonld.test.ts"
+    },
+    "./share/tests/output-projection.test": {
+      "types": "./src/share/tests/output-projection.test.ts",
+      "default": "./src/share/tests/output-projection.test.ts"
+    },
+    "./share/tests/plan.test": {
+      "types": "./src/share/tests/plan.test.ts",
+      "default": "./src/share/tests/plan.test.ts"
+    },
+    "./share/tests/price-marker-resolver.test": {
+      "types": "./src/share/tests/price-marker-resolver.test.ts",
+      "default": "./src/share/tests/price-marker-resolver.test.ts"
+    },
+    "./share/tests/proof.test": {
+      "types": "./src/share/tests/proof.test.ts",
+      "default": "./src/share/tests/proof.test.ts"
+    },
+    "./share/tests/resolve-field-path.test": {
+      "types": "./src/share/tests/resolve-field-path.test.ts",
+      "default": "./src/share/tests/resolve-field-path.test.ts"
+    },
+    "./share/tests/source.test": {
+      "types": "./src/share/tests/source.test.ts",
+      "default": "./src/share/tests/source.test.ts"
+    },
+    "./share/tests/substitute-deep.test": {
+      "types": "./src/share/tests/substitute-deep.test.ts",
+      "default": "./src/share/tests/substitute-deep.test.ts"
+    },
+    "./share/tests/text-normalize.pbt.test": {
+      "types": "./src/share/tests/text-normalize.pbt.test.ts",
+      "default": "./src/share/tests/text-normalize.pbt.test.ts"
+    },
+    "./share/tests/text-normalize.test": {
+      "types": "./src/share/tests/text-normalize.test.ts",
+      "default": "./src/share/tests/text-normalize.test.ts"
+    },
+    "./share/tests/twin-path.test": {
+      "types": "./src/share/tests/twin-path.test.ts",
+      "default": "./src/share/tests/twin-path.test.ts"
+    },
+    "./surface/tests/eligibility.pbt.test": {
+      "types": "./src/surface/tests/eligibility.pbt.test.ts",
+      "default": "./src/surface/tests/eligibility.pbt.test.ts"
+    },
+    "./surface/tests/eligibility.test": {
+      "types": "./src/surface/tests/eligibility.test.ts",
+      "default": "./src/surface/tests/eligibility.test.ts"
+    },
+    "./share/legal/index": {
+      "types": "./src/share/legal/index.ts",
+      "default": "./src/share/legal/index.ts"
     }
   },
   "scripts": {
@@ -330,7 +1310,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["src", "tsconfig.json"],
+  "files": [
+    "src",
+    "tsconfig.json"
+  ],
   "dependencies": {
     "@lordicon/element": "^2.3.1",
     "@noble/ed25519": "^3.1.0",
