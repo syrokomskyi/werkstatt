@@ -66,7 +66,11 @@ vi.mock("@warpgogol/werkstatt-site/codegen", () => ({
   runGenerateScriptsOrchestrator: vi.fn(async () => []),
   runFontsImportsGenerate: vi.fn(async () => []),
   runBiomeCssGenerate: vi.fn(async () => []),
-  runAppBoilerplateValidate: vi.fn(async () => ({ data: { generated: [] }, summary: "ok", nextSteps: [] })),
+  runAppBoilerplateValidate: vi.fn(async () => ({
+    data: { generated: [] },
+    summary: "ok",
+    nextSteps: [],
+  })),
   runGenerateMaterialCreditsPage: vi.fn(async () => []),
   runPropsTypesGenerate: vi.fn(async () => []),
   runGenerateIcons: vi.fn(async () => []),
@@ -83,7 +87,6 @@ vi.mock("@warpgogol/werkstatt-site/codegen", () => ({
   hasGeneratedMarker: vi.fn(() => false),
   stripGeneratedMarker: vi.fn((s: string) => s),
   GENERATED_MARKER: "GENERATED",
-
 }));
 
 vi.mock("@warpgogol/werkstatt-site/onboarding", () => ({
@@ -92,11 +95,12 @@ vi.mock("@warpgogol/werkstatt-site/onboarding", () => ({
   readRuntimeTemplate: vi.fn(() => ""),
 }));
 
-vi.mock("@warpgogol/werkstatt-shared/checks", () => ({
+vi.mock("@warpgogol/werkstatt-site/checks", () => ({
   runEnvExampleGenerate: vi.fn(async () => []),
   MISSION_PREFLIGHT_CRITICAL: [],
   MISSION_PREFLIGHT_WARNING: [],
   GENERATOR_OWNERSHIP_MAP: mockOwnershipMap,
+  ensureChromium: vi.fn(async () => ({ ok: true, path: "/usr/bin/chromium", version: "1.0" })),
 }));
 
 let testRoot: string;
