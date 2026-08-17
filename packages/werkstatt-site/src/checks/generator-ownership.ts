@@ -21,6 +21,7 @@
   <item>RFC-0810: make module field required in OwnershipEntry interface.</item>
   <item>RFC-0810: update all module paths from stale packages/os/ to post-RFC-0776 locations.</item>
   <item>RFC-0810: add ownership entries for agent.markdown-negotiation.generate, behavior.snapshot.generate, print.pdf.generate, surface.translation.generate, surface.translation.notes.generate, surface.translation.glossary.generate.</item>
+  <item>RFC-0870: register generated manifest paths (image-variants, video-manifest, live-video-manifest) as registry-only conditional entries.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -698,6 +699,16 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     conditional: true,
   },
 
+  // RFC-0870: Generated image variant manifest (committed to git for drift detection).
+  // conditional: true — only generated when source images exist.
+  {
+    path: "src/image-variants.generated.yaml",
+    command: "image.variants.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/image-variants.ts",
+    conditional: true,
+  },
+
   // RFC-0210: Video delivery formats (public outputs).
   // conditional: true — only generated when source videos exist.
   {
@@ -708,10 +719,30 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     conditional: true,
   },
 
+  // RFC-0870: Generated video manifest (committed to git for drift detection).
+  // conditional: true — only generated when source videos exist.
+  {
+    path: "src/video-manifest.generated.yaml",
+    command: "video.variants.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/video/video-variants.ts",
+    conditional: true,
+  },
+
   // RFC-0234: Living-photo clip delivery (public outputs).
   // conditional: true — only generated when living-photo sources exist.
   {
     path: "public/_video/live/**",
+    command: "live.variants.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/live-variants.ts",
+    conditional: true,
+  },
+
+  // RFC-0870: Generated live-video manifest (committed to git for drift detection).
+  // conditional: true — only generated when living-photo sources exist.
+  {
+    path: "src/live-video-manifest.generated.yaml",
     command: "live.variants.generate",
     markerPolicy: "registry-only",
     module: "packages/werkstatt-site/src/checks/live-variants.ts",
