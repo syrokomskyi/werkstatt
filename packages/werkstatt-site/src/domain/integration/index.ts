@@ -20,7 +20,7 @@
 */
 
 // Port-barrel re-exports all type/contract modules explicitly.
-export * from "./port-barrel.ts";
+export * from "@warpgogol/werkstatt-shared/integration/port-barrel";
 
 // Runtime modules — explicit re-exports to keep the public API surface clear.
 export type {
@@ -30,7 +30,7 @@ export type {
   DeliverEventResult,
   QueueBinding,
   KvDedupStore,
-} from "./orchestration.ts";
+} from "@warpgogol/werkstatt-shared/integration/orchestration";
 export {
   CHANNEL_ADAPTERS,
   CRM_ADAPTERS,
@@ -53,7 +53,7 @@ export {
   enqueueEvent,
   consumeIntegrationBatch,
   upsertLead,
-} from "./orchestration.ts";
+} from "@warpgogol/werkstatt-shared/integration/orchestration";
 
 export type { DeliveryHandlerConfig } from "./delivery-handler.ts";
 export { createDeliveryHandler } from "./delivery-handler.ts";
