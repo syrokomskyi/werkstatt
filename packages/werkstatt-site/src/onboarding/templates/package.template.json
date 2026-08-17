@@ -60,6 +60,7 @@
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/werkstatt": "workspace:*",
     "@warpgogol/werkstatt-site": "workspace:*",
+    "@warpgogol/werkstatt-shared": "workspace:*",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@upstash/qstash": "^2.11.1",
