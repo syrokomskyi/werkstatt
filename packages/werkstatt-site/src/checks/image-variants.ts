@@ -190,7 +190,7 @@ export async function runImageVariantsGenerate(
 
       for (const w of widths) {
         const destFile = join(variantDir, `${w}.webp`);
-        await sharp(srcFile).resize(w).webp({ quality: 80 }).toFile(destFile);
+        await sharp(srcFile).resize(w).webp({ quality: 72 }).toFile(destFile);
         generatedCount++;
         const publicUrl = `/${VARIANTS_PUBLIC_DIR}/${dirName}/${w}.webp`;
         variants.push({ width: w, url: publicUrl });

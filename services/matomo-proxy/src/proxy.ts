@@ -85,7 +85,7 @@ function withCachePolicy(response: Response, path: "matomo.js" | "matomo.php"): 
   const headers = new Headers(response.headers);
   headers.delete("set-cookie");
   if (path === "matomo.js") {
-    headers.set("Cache-Control", "public, max-age=300");
+    headers.set("Cache-Control", "public, max-age=31536000, immutable");
   } else {
     headers.set("Cache-Control", "no-store");
   }
