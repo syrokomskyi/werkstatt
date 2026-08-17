@@ -345,6 +345,8 @@ Agents **MUST NOT** use name-based `pnpm --filter <name>` for app-level commands
 
 When clearing the pipeline cache to force step re-execution (e.g. after deleting generated output files), agents MUST clear `.cache/pipeline-cache-hits.json` at the **werkstatt root**, not just `missions/*/workpiece/.cache/`. The pipeline cache-hits file lives at the workspace root and persists across builds — clearing only the workpiece `.cache/` directory does not reset the pipeline skip logic, causing steps like `sitemap.generate` to be skipped as `SKIP (cached)` even when their output files have been deleted.
 
+**Pipeline vs. command distinction (RFC-0870):** Pipelines (`build.prepare`, `build.check`, `build.post`, `check`, `compass`, `packages.check`, `sites.check`, `sites.check.author`, `sites.check.postbuild`, `standard.compass`, `integrity.release`, `mission-preflight.critical`, `mission-preflight.warning`) are composite step sequences executed via `werkstatt pipeline <name>` or `mission.validate`. Commands (e.g. `image.variants.generate`, `sternsystem.validate`) are individual registered handlers executed via `werkstatt run <name>`. Using a pipeline name as a command argument produces an "Unknown command" error with a hint (RFC-0870). Agents MUST use `werkstatt pipeline <name>` for pipeline names and `werkstatt run <name>` for command names.
+
 ## Commit discipline (RFC-0480)
 
 Agents MUST commit immediately after each completed and verified change — not at the end of the session. The workflow is: **edit → verify (typecheck/build) → commit → respond**. Never respond to the operator with uncommitted changes from the current session.
