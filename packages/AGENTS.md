@@ -246,3 +246,21 @@ rtk pnpm exec werkstatt run compass.invariant.add --file <path> --text "<invaria
   - `I18N-01` — string literals with spaces and letters that are not routed through `resolveLabel`, `props`, or `siteLabels`.
   - `I18N-02` — `resolveLabel` fallbacks that contain full sentences (>3 words or sentence punctuation).
   - Agents must move hardcoded text into `site/{lang}/labels.md` or section props; empty-string fallbacks are acceptable only when the key is guaranteed to be present.
+
+### Kernel CLI env var scoping (dotenv/CWD gotcha)
+
+The kernel CLI (`packages/werkstatt/src/kernel/cli/index.ts`) imports `dotenv/config` at startup, which loads `.env` from `process.cwd()` — the **werkstatt repo root**, not the workpiece directory. Workpiece `.env` files (e.g. `missions/<id>/workpiece/.env`) are NOT loaded into `process.env` during pipeline execution (`build.prepare`, `build.post`, etc.).
+
+**Impact:** Any kernel command that reads `process.env["PUBLIC_*"]` will get `undefined` unless the var is set in the werkstatt root `.env` (which typically doesn't exist) or set inline by another command in the same process (e.g. `mission.materialize` sets `process.env["PUBLIC_IMAGE_PROVIDER"]` at line 1185 of `mission-materialize.ts`, but this only helps if `build.prepare` runs in the same process — true during `mission.validate`, false during `release.prepare`).
+
+**Pattern for kernel commands needing workpiece env vars:** Read the workpiece `.env` file directly as a fallback:
+
+```typescript
+const value = process.env["KEY"] ?? (await readWorkpieceEnv(paths.appDirectory, "KEY"));
+```
+
+Where `readWorkpieceEnv` reads `<appDirectory>/.env` and extracts the key with a simple regex. See `image-variants.ts` for the reference implementation.
+
+**NOT affected:** Astro components and `image-provider-init.ts` use `import.meta.env.PUBLIC_*` (Vite env), which Vite resolves from the workpiece root at Astro build time. The gotcha only applies to kernel CLI commands that run outside the Astro build process.
+
+**Validators must fail, not skip:** When a generator is gated on an env var (e.g. `image.variants.validate` checks for `PUBLIC_IMAGE_PROVIDER=build-portable`), the validator MUST read the same env var and FAIL if the expected output is missing — not silently skip. Silent skips hide regressions until they reach production.
