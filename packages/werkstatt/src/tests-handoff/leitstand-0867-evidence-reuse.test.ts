@@ -5,6 +5,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0867: initial tests for evidence reuse — same hash, different hash, --force, stale, missing sidecar.</item>
+<item>Contract test: real evidence envelopes from runLeitstandCertify must pass evidenceEnvelopeV1Schema.safeParse — catches ID format mismatches that silently break reuse.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -13,6 +14,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { runLeitstandCertify } from "../leitstand/certify.ts";
+import { evidenceEnvelopeV1Schema } from "../certification/contracts/evidence.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { vi } from "vitest";
 
@@ -301,4 +303,49 @@ test("missing evidence sidecar → producers execute (no error)", async () => {
 
   expect(result.exitCode).toBe(0);
   expect(result.data!.producerCount).toBe(1);
+});
+
+test("contract: real evidence envelopes pass evidenceEnvelopeV1Schema validation", async () => {
+  const releaseId = "test-sys-r000006";
+  // No prior gate decision, no baseUrl, no deployment-operations dir.
+  // The handler will skip mission.check (warning branch) and produce
+  // a real evidence envelope with the actual evidenceId format.
+
+  const input: KernelCommandInput = {
+    flags: {
+      site: "test-sys",
+      gate: "dev",
+      release: releaseId,
+      "artifact-hash": ARTIFACT_HASH,
+    },
+    argv: [],
+  };
+
+  const result = await runLeitstandCertify(input, makeContext(join(tmpDir, "werkstatt")));
+
+  expect(result.exitCode).toBe(0);
+  expect(result.data!.producerCount).toBe(1);
+
+  // Read the evidence sidecar written by certify
+  const sidecarPath = join(cacheCloneDir, "gate-decisions", `${releaseId}-evidence.json`);
+  const sidecarRaw = JSON.parse(
+    await import("node:fs/promises").then((m) => m.readFile(sidecarPath, "utf8")),
+  );
+
+  expect(sidecarRaw.schema).toBe("werkstatt/evidence-cache@1");
+  expect(Array.isArray(sidecarRaw.evidence)).toBe(true);
+  expect(sidecarRaw.evidence.length).toBeGreaterThan(0);
+
+  // Validate each evidence envelope against the strict schema.
+  // This is the contract test: if the handler generates IDs or fields
+  // that don't match the schema, safeParse will fail here.
+  for (const env of sidecarRaw.evidence) {
+    const parsed = evidenceEnvelopeV1Schema.safeParse(env);
+    if (!parsed.success) {
+      throw new Error(
+        `evidence envelope failed schema validation: ${JSON.stringify(parsed.error.issues.slice(0, 3))}\n` +
+          `envelope: ${JSON.stringify({ evidenceId: env.evidenceId, schema: env.schema })}`,
+      );
+    }
+  }
 });
