@@ -1,6 +1,6 @@
 {
   "name": "@warpgogol/werkstatt-video",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "type": "module",
   "description": "Werkstatt video plugin — Editframe stack (RFC-0778).",
