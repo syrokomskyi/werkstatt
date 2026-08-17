@@ -188,9 +188,8 @@ export {
   type PlaywrightPreflightCheckResult,
 } from "./playwright-preflight.ts";
 
-// Axiom adapter: re-export report renderer and types for downstream consumers
+// Axiom adapter: re-export types for downstream consumers
 export {
-  renderAxiomReportHtml,
   type EvidenceMetadata,
   type MissionCheckResult,
   type AxiomReportData,

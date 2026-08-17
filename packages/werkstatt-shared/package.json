@@ -15,6 +15,26 @@
       "types": "./src/checks/index.ts",
       "default": "./src/checks/index.ts"
     },
+    "./content": {
+      "types": "./src/content/index.ts",
+      "default": "./src/content/index.ts"
+    },
+    "./content/markdown-frontmatter": {
+      "types": "./src/content/markdown-frontmatter.ts",
+      "default": "./src/content/markdown-frontmatter.ts"
+    },
+    "./content/system-manifest": {
+      "types": "./src/content/system-manifest.ts",
+      "default": "./src/content/system-manifest.ts"
+    },
+    "./onboarding": {
+      "types": "./src/onboarding/index.ts",
+      "default": "./src/onboarding/index.ts"
+    },
+    "./onboarding/brief": {
+      "types": "./src/onboarding/brief.ts",
+      "default": "./src/onboarding/brief.ts"
+    },
     "./checks/lib/astro-site-url": {
       "types": "./src/checks/lib/astro-site-url.ts",
       "default": "./src/checks/lib/astro-site-url.ts"
@@ -1314,10 +1334,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "src",
-    "tsconfig.json"
-  ],
+  "files": ["src", "tsconfig.json"],
   "dependencies": {
     "@lordicon/element": "^2.3.1",
     "@noble/ed25519": "^3.1.0",
@@ -1327,6 +1344,7 @@
     "hls.js": "^1.6.16",
     "lenis": "^1.3.25",
     "plyr": "^3.8.4",
+    "gray-matter": "^4.0.3",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
   },

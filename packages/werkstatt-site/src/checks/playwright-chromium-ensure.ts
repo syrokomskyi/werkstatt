@@ -15,7 +15,6 @@
 </CHANGE_SUMMARY>
 */
 
-import { preflightChromium } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -89,6 +88,7 @@ export async function ensureChromium(
 
   for (let attempt = 1; attempt <= ENSURE_CHROMIUM_MAX_ATTEMPTS; attempt++) {
     try {
+      const { preflightChromium } = await import("@syrokomskyi/axiom-factory-app/run/axiom-cli");
       await preflightChromium(false);
 
       const { chromium } = await import("playwright");

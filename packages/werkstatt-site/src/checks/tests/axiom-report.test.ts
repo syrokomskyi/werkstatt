@@ -3,7 +3,8 @@ import { join } from "node:path";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 
-import { runAxiomReport, renderAxiomReportHtml } from "../axiom-adapter.ts";
+import { runAxiomReport } from "../axiom-adapter.ts";
+import { renderAxiomReportHtml } from "@syrokomskyi/axiom-factory-app/run/report";
 import type { EvidenceMetadata } from "../axiom-adapter.ts";
 import { makeTestContext } from "./helpers.ts";
 import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";

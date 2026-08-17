@@ -35,11 +35,7 @@ import {
 } from "@warpgogol/werkstatt-shared/share/semantic";
 import { passResult, failResult, resultFromViolations } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
-import {
-  runSeoTechnicalRuntimeInstrument,
-  type SeoRuntimeState,
-  toDeterministicContext,
-} from "@syrokomskyi/axiom-study";
+import type { SeoRuntimeState } from "@syrokomskyi/axiom-study";
 
 const IMAGE_SITEMAP_FILENAME = "sitemap-images.xml";
 
@@ -203,6 +199,8 @@ export async function runSitemapImagesValidate(
   let instrumentRunId: string | undefined;
   if (entries.length > 0) {
     try {
+      const { toDeterministicContext, runSeoTechnicalRuntimeInstrument } =
+        await import("@syrokomskyi/axiom-study");
       const instrumentCtx = toDeterministicContext({
         origin: "build-time",
         recordedAt: new Date().toISOString(),

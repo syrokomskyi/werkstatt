@@ -23,11 +23,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { getLineColumn } from "@warpgogol/werkstatt-shared/share/text-position";
-import {
-  runPerformanceVitalsInstrument,
-  type PerformanceVitalsState,
-  toDeterministicContext,
-} from "@syrokomskyi/axiom-study";
+import type { PerformanceVitalsState } from "@syrokomskyi/axiom-study";
 interface Finding {
   filePath: string;
   line: number;
@@ -607,6 +603,8 @@ export async function runLighthouseBudgetCheck(
   // RFC-0016: call axiom-study performance-vitals instrument
   let instrumentRunId: string | undefined;
   try {
+    const { toDeterministicContext, runPerformanceVitalsInstrument } =
+      await import("@syrokomskyi/axiom-study");
     const instrumentCtx = toDeterministicContext({
       origin: "build-time",
       recordedAt: new Date().toISOString(),

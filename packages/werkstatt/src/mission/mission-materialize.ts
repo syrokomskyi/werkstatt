@@ -50,30 +50,6 @@ import {
   resolveMirrorPath,
 } from "../sternsystem/registry-io.ts";
 import { installBordbuchPreCommitHook } from "../bordbuch/bordbuch-hook.ts";
-import {
-  runGenerateAgentsDocs,
-  runGenerateApiRoutes,
-  runGenerateGlobalStyles,
-  runGenerateI18nMiddleware,
-  runGenerateOverlayPages,
-  runGeneratePublicInfrastructure,
-  runGenerateRoutes,
-  runGenerateScriptsOrchestrator,
-  runFontsImportsGenerate,
-  runBiomeCssGenerate,
-} from "@warpgogol/werkstatt-site/codegen";
-import {
-  applyTokens,
-  readTemplate,
-  readRuntimeTemplate,
-} from "@warpgogol/werkstatt-site/onboarding";
-import {
-  runEnvExampleGenerate,
-  MISSION_PREFLIGHT_CRITICAL,
-  MISSION_PREFLIGHT_WARNING,
-  GENERATOR_OWNERSHIP_MAP,
-  ensureChromium,
-} from "@warpgogol/werkstatt-site/checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { restoreEnvFilesFromCacheClone } from "./env-persist.ts";
 import { restoreOperatorConfigFiles } from "./operator-config-files.ts";
@@ -228,7 +204,8 @@ const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
  * The ownership map uses `{system}` as a template placeholder. This function
  * returns paths relative to the cache clone root (e.g. `public/.well-known/bordbuch.json`).
  */
-function getWorkspaceAbsoluteGeneratedPaths(): Set<string> {
+async function getWorkspaceAbsoluteGeneratedPaths(): Promise<Set<string>> {
+  const { GENERATOR_OWNERSHIP_MAP } = await import("@warpgogol/werkstatt-site/checks");
   const prefix = "systems/{system}/";
   const paths = new Set<string>();
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
@@ -280,6 +257,26 @@ async function generateFullBoilerplate(
   context: KernelRuntimeContext,
   logger: { info: (msg: string) => void },
 ): Promise<string[]> {
+  const [codegenMod, onboardingMod, checksMod] = await Promise.all([
+    import("@warpgogol/werkstatt-site/codegen"),
+    import("@warpgogol/werkstatt-site/onboarding"),
+    import("@warpgogol/werkstatt-site/checks"),
+  ]);
+  const {
+    runGenerateAgentsDocs,
+    runGenerateApiRoutes,
+    runGenerateGlobalStyles,
+    runGenerateI18nMiddleware,
+    runGenerateOverlayPages,
+    runGeneratePublicInfrastructure,
+    runGenerateRoutes,
+    runGenerateScriptsOrchestrator,
+    runFontsImportsGenerate,
+    runBiomeCssGenerate,
+  } = codegenMod;
+  const { applyTokens, readTemplate, readRuntimeTemplate } = onboardingMod;
+  const { runEnvExampleGenerate } = checksMod;
+
   const regeneratedFiles: string[] = [];
 
   // Resolve domain from system.md in the staging directory
@@ -632,6 +629,8 @@ async function runPreflightGate(
     return results;
   }
 
+  const { MISSION_PREFLIGHT_CRITICAL, MISSION_PREFLIGHT_WARNING } =
+    await import("@warpgogol/werkstatt-site/checks");
   const criticalResults = await runSteps(MISSION_PREFLIGHT_CRITICAL, systemId);
   const warningResults = await runSteps(MISSION_PREFLIGHT_WARNING, systemId);
   const criticalPassed = criticalResults.every((r) => r.ok);
@@ -1055,7 +1054,7 @@ export async function runMissionMaterialize(
       // These are generated artifacts (e.g. bordbuch projections) that belong in
       // the cache clone, not the workpiece. Filtering them at copy time avoids
       // ownership.sync.validate OWN-01 failures.
-      const skipPathsGlobal = getWorkspaceAbsoluteGeneratedPaths();
+      const skipPathsGlobal = await getWorkspaceAbsoluteGeneratedPaths();
 
       // Copy data set from Sternsystem
       for (const dataPath of STERNSYSTEM_DATA_PATHS) {
@@ -1244,6 +1243,7 @@ export async function runMissionMaterialize(
     // and independent-qa). Idempotent — skips if Chromium is already launchable.
     // Non-fatal: log and continue if install fails.
     try {
+      const { ensureChromium } = await import("@warpgogol/werkstatt-site/checks");
       await ensureChromium(workspaceRoot, logger);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

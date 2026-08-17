@@ -31,11 +31,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { RFC_DIR } from "@warpgogol/werkstatt/kernel";
-import {
-  runRuntimeFunctionalHealthInstrument,
-  type RuntimeHealthState,
-  toDeterministicContext,
-} from "@syrokomskyi/axiom-study";
+import type { RuntimeHealthState } from "@syrokomskyi/axiom-study";
 import { blockExternalRequests, evaluateInPage } from "./playwright-utils.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -406,6 +402,8 @@ export async function runIndependentQa(
     let instrumentRunId: string | undefined;
     if (executions.length > 0) {
       try {
+        const { toDeterministicContext, runRuntimeFunctionalHealthInstrument } =
+          await import("@syrokomskyi/axiom-study");
         const instrumentCtx = toDeterministicContext({
           origin: baseUrl,
           recordedAt: new Date().toISOString(),

@@ -26,17 +26,11 @@ import {
   type KernelNextStep,
 } from "@warpgogol/werkstatt/kernel";
 
-import {
-  runAxiomCheck,
-  readEvidenceFiles,
-  countFindingsBySeverity,
-  type AxiomCheckResult,
-  type MethodologiesConfig as AxiomMethodologiesConfig,
+import type {
+  AxiomCheckResult,
+  MethodologiesConfig as AxiomMethodologiesConfig,
 } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
-import {
-  renderAxiomReportHtml,
-  type EvidenceMetadata,
-} from "@syrokomskyi/axiom-factory-app/run/report";
+import type { EvidenceMetadata } from "@syrokomskyi/axiom-factory-app/run/report";
 import type { Finding } from "@syrokomskyi/axiom-study";
 
 import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
@@ -53,7 +47,7 @@ import { parse as parseYaml } from "yaml";
 
 // ─── Re-exports for downstream consumers ───────────────────────────────────
 
-export { renderAxiomReportHtml, type EvidenceMetadata };
+export type { EvidenceMetadata };
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -260,6 +254,7 @@ export async function runMissionCheck(
     // fails, the catch block below returns exitCode 2 (infrastructure error).
     await ensureChromium(workspaceRoot, logger);
 
+    const { runAxiomCheck } = await import("@syrokomskyi/axiom-factory-app/run/axiom-cli");
     result = await runAxiomCheck({
       baseUrl,
       auditId: missionId,
@@ -329,6 +324,8 @@ export async function runMissionCheck(
 
           // Recalculate counts excluding suppressed findings
           const activeFindings = suppressedFindings.filter((f) => !f.suppressed);
+          const { countFindingsBySeverity } =
+            await import("@syrokomskyi/axiom-factory-app/run/axiom-cli");
           activeFindingsCount = countFindingsBySeverity(activeFindings as unknown as Finding[]);
           const activeErrors = activeFindingsCount.critical + activeFindingsCount.high;
           const activeWarnings = activeFindingsCount.medium + activeFindingsCount.low;
@@ -519,6 +516,7 @@ export async function runAxiomReport(
     );
   }
 
+  const { readEvidenceFiles } = await import("@syrokomskyi/axiom-factory-app/run/axiom-cli");
   let evidence: Awaited<ReturnType<typeof readEvidenceFiles>>;
   try {
     evidence = await readEvidenceFiles(evidenceDir);
@@ -548,6 +546,7 @@ export async function runAxiomReport(
     auditId,
   };
 
+  const { renderAxiomReportHtml } = await import("@syrokomskyi/axiom-factory-app/run/report");
   const html = renderAxiomReportHtml(studyRun, capsule, bundle, metadata);
 
   // RFC-0684: Post-process HTML to inject suppressed findings section.
@@ -577,7 +576,9 @@ export async function runAxiomReport(
   const total = activeFindings.length;
   const closureSatisfied = capsule.closureDecision.satisfied;
 
-  const findingsCount = countFindingsBySeverity(activeFindings);
+  const { countFindingsBySeverity: countBySeverity } =
+    await import("@syrokomskyi/axiom-factory-app/run/axiom-cli");
+  const findingsCount = countBySeverity(activeFindings);
   const errors = findingsCount.critical + findingsCount.high;
 
   const nextSteps: KernelNextStep[] =

@@ -27,11 +27,7 @@ import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import { createRequire } from "node:module";
 import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
-import {
-  runSeoTechnicalRuntimeInstrument,
-  type SeoRuntimeState,
-  toDeterministicContext,
-} from "@syrokomskyi/axiom-study";
+import type { SeoRuntimeState } from "@syrokomskyi/axiom-study";
 
 const EXTERNAL_FONT_ORIGIN =
   /(fonts\.googleapis\.com|fonts\.gstatic\.com|use\.typekit\.net|fonts\.bunny\.net)/i;
@@ -223,6 +219,8 @@ export async function runFontsOriginValidate(
   let instrumentRunId: string | undefined;
   if (seoStates.length > 0) {
     try {
+      const { toDeterministicContext, runSeoTechnicalRuntimeInstrument } =
+        await import("@syrokomskyi/axiom-study");
       const instrumentCtx = toDeterministicContext({
         origin: "build-time",
         recordedAt: new Date().toISOString(),

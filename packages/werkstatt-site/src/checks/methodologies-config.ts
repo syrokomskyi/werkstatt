@@ -114,7 +114,3 @@ export function tryLoadMethodologiesConfig(
     };
   }
 }
-
-// isBlockingFinding is now imported from @syrokomskyi/axiom-factory-app/run/report
-// and re-exported for downstream consumers (leitstand-commands.ts, etc.)
-export { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";

@@ -28,11 +28,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { fileExists } from "./lib/file-exists.ts";
 import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
-import {
-  runRuntimeFunctionalHealthInstrument,
-  type RuntimeHealthState,
-  toDeterministicContext,
-} from "@syrokomskyi/axiom-study";
+import type { RuntimeHealthState } from "@syrokomskyi/axiom-study";
 
 /** Matches an `_astro/<file>.<imgext>` origin path anywhere (after any /cdn-cgi/image/ prefix). */
 const ASTRO_ASSET_RE = /_astro\/[A-Za-z0-9._-]+\.(?:webp|avif|jpg|jpeg|png|gif|svg)/gi;
@@ -87,6 +83,8 @@ export async function runCloudflareAssetsValidate(
   // RFC-0016: call axiom-study runtime-health instrument
   let instrumentRunId: string | undefined;
   try {
+    const { toDeterministicContext, runRuntimeFunctionalHealthInstrument } =
+      await import("@syrokomskyi/axiom-study");
     const instrumentCtx = toDeterministicContext({
       origin: "build-time",
       recordedAt: new Date().toISOString(),

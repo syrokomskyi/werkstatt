@@ -28,11 +28,7 @@ import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { chatAdapterVendorOrigins } from "@warpgogol/werkstatt-site/chat";
-import {
-  runPrivacyConsentComplianceInstrument,
-  type PrivacyConsentState,
-  toDeterministicContext,
-} from "@syrokomskyi/axiom-study";
+import type { PrivacyConsentState } from "@syrokomskyi/axiom-study";
 
 interface IntegrationsConfig {
   chat?: { adapter?: string; options?: Record<string, string> };
@@ -129,6 +125,8 @@ export async function runConsentActivationValidate(
   let instrumentRunId: string | undefined;
   if (htmlFiles.length > 0) {
     try {
+      const { toDeterministicContext, runPrivacyConsentComplianceInstrument } =
+        await import("@syrokomskyi/axiom-study");
       const instrumentCtx = toDeterministicContext({
         origin: "build-time",
         recordedAt: new Date().toISOString(),

@@ -31,7 +31,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
-import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
+import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-shared/content";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import {
   isNachweisEntitled,

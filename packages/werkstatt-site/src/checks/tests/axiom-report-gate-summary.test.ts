@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { renderAxiomReportHtml, type EvidenceMetadata } from "../axiom-adapter.ts";
+import { renderAxiomReportHtml } from "@syrokomskyi/axiom-factory-app/run/report";
+import type { EvidenceMetadata } from "../axiom-adapter.ts";
 import type { MethodologyEvidenceEntry } from "@syrokomskyi/axiom-factory-app/run/report";
 
 function makeFinding(partial: Record<string, unknown>): unknown {
