@@ -1,89 +1,128 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Boundary guard for @warpgogol/werkstatt-shared (RFC-0868). Scans
-packages/werkstatt-shared/src/** for @warpgogol/werkstatt-site imports that
-indicate stack-plugin coupling. The shared package MUST NOT depend on the
-site plugin — only on @warpgogol/werkstatt (engine) and external packages.</purpose>
-<keywords>shared, validate, RFC-0868, boundary guard</keywords>
+<purpose>Boundary guard for RFC-0868. Implements three checks:
+SHARED-01: @warpgogol/werkstatt-shared is declared as a dependency in packages/werkstatt/package.json
+SHARED-02: No @warpgogol/werkstatt-site/* exemptions remain in EXEMPT_PREFIXES in autonomy-validate.ts
+SHARED-03: No @warpgogol/werkstatt-site/* imports remain in packages/werkstatt/src/** non-test files</purpose>
+<keywords>shared, validate, RFC-0868, boundary guard, SHARED-01, SHARED-02, SHARED-03</keywords>
 <non-goals>
-  <item>Do not scan test files — tests may import from any package.</item>
-  <item>Do not scan node_modules — only shared source is checked.</item>
+  <item>Does not scan werkstatt-shared source — that is the shared package's own boundary, not the engine's.</item>
+  <item>Does not replace werkstatt.autonomy.validate — SHARED-03 is a cross-check, not a replacement.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0868: initial shared-package boundary guard.</item>
+  <item>RFC-0868: initial shared-validate implementing SHARED-01/02/03 per RFC spec.</item>
+  <item>RFC-0868: use shared import-scan-util to avoid duplication with autonomy-validate.</item>
 </CHANGE_SUMMARY>
 */
 
-import { readdir, readFile } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { scanDirectoryForImports, type ImportViolation } from "./import-scan-util.ts";
 
-const FORBIDDEN_PREFIX = "@warpgogol/werkstatt-site";
+const SHARED_PKG = "@warpgogol/werkstatt-shared";
+const SITE_PREFIX = "@warpgogol/werkstatt-site";
 
-const IMPORT_PATTERN =
-  /(?:^|\n)\s*(?:import\s+(?:type\s+)?[^;]+?\s+from\s+|require\s*\(\s*)["'`](@warpgogol\/werkstatt-site[^"'`]*)["'`]/g;
-
-const EXCLUDE_DIRS = new Set(["node_modules", "tests", "dist"]);
-const EXCLUDE_SUFFIXES = [".test.ts", ".spec.ts"];
-
-export interface SharedViolation {
-  file: string;
-  specifier: string;
+export interface SharedCheckResult {
+  id: string;
+  status: "pass" | "fail";
+  detail: string;
 }
 
 export interface SharedValidateResult {
   command: string;
   status: "pass" | "fail";
-  violations: SharedViolation[];
-  scannedFiles: number;
+  checks: SharedCheckResult[];
 }
 
-function shouldExcludeFile(fileName: string): boolean {
-  return EXCLUDE_SUFFIXES.some((suffix) => fileName.endsWith(suffix));
-}
-
-async function scanDirectory(
-  dir: string,
-  workspaceRoot: string,
-  violations: SharedViolation[],
-): Promise<number> {
-  let scannedFiles = 0;
-  const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
-
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      if (EXCLUDE_DIRS.has(entry.name)) continue;
-      scannedFiles += await scanDirectory(fullPath, workspaceRoot, violations);
-    } else if (entry.name.endsWith(".ts") && !shouldExcludeFile(entry.name)) {
-      scannedFiles++;
-      const content = await readFile(fullPath, "utf8").catch(() => "");
-      let match: RegExpExecArray | null;
-      const pattern = new RegExp(IMPORT_PATTERN.source, "g");
-      while ((match = pattern.exec(content)) !== null) {
-        violations.push({
-          file: relative(workspaceRoot, fullPath),
-          specifier: match[1]!,
-        });
-      }
-    }
+async function checkSharedDependency(workspaceRoot: string): Promise<SharedCheckResult> {
+  const pkgJsonPath = join(workspaceRoot, "packages", "werkstatt", "package.json");
+  try {
+    const content = await readFile(pkgJsonPath, "utf8");
+    const pkg = JSON.parse(content);
+    const deps = pkg.dependencies ?? {};
+    const hasShared = SHARED_PKG in deps;
+    return {
+      id: "SHARED-01",
+      status: hasShared ? "pass" : "fail",
+      detail: hasShared
+        ? `${SHARED_PKG} declared in packages/werkstatt/package.json dependencies`
+        : `${SHARED_PKG} missing from packages/werkstatt/package.json dependencies`,
+    };
+  } catch {
+    return {
+      id: "SHARED-01",
+      status: "fail",
+      detail: `Cannot read packages/werkstatt/package.json`,
+    };
   }
-
-  return scannedFiles;
 }
 
-export async function runSharedValidate(
-  workspaceRoot: string,
-): Promise<SharedValidateResult> {
-  const sharedSrcDir = join(workspaceRoot, "packages", "werkstatt-shared", "src");
-  const violations: SharedViolation[] = [];
-  const scannedFiles = await scanDirectory(sharedSrcDir, workspaceRoot, violations);
+async function checkExemptionHygiene(workspaceRoot: string): Promise<SharedCheckResult> {
+  const autonomyPath = join(
+    workspaceRoot,
+    "packages",
+    "werkstatt",
+    "src",
+    "plugin",
+    "autonomy-validate.ts",
+  );
+  try {
+    const content = await readFile(autonomyPath, "utf8");
+    const hasSiteExemption = content.includes(`"@warpgogol/werkstatt-site"`);
+    return {
+      id: "SHARED-02",
+      status: hasSiteExemption ? "fail" : "pass",
+      detail: hasSiteExemption
+        ? `${SITE_PREFIX} found in EXEMPT_PREFIXES in autonomy-validate.ts — must be removed`
+        : `No ${SITE_PREFIX} exemptions in EXEMPT_PREFIXES in autonomy-validate.ts`,
+    };
+  } catch {
+    return {
+      id: "SHARED-02",
+      status: "fail",
+      detail: `Cannot read packages/werkstatt/src/plugin/autonomy-validate.ts`,
+    };
+  }
+}
+
+async function checkNoSiteImports(workspaceRoot: string): Promise<{
+  result: SharedCheckResult;
+  violations: ImportViolation[];
+}> {
+  const engineSrcDir = join(workspaceRoot, "packages", "werkstatt", "src");
+  const { violations, scannedFiles } = await scanDirectoryForImports(
+    engineSrcDir,
+    workspaceRoot,
+    (specifier) => specifier === SITE_PREFIX || specifier.startsWith(SITE_PREFIX + "/"),
+  );
+
+  return {
+    result: {
+      id: "SHARED-03",
+      status: violations.length === 0 ? "pass" : "fail",
+      detail:
+        violations.length === 0
+          ? `No ${SITE_PREFIX}/* imports in packages/werkstatt/src/** (${scannedFiles} files scanned)`
+          : `${violations.length} ${SITE_PREFIX}/* import(s) found in packages/werkstatt/src/** (${scannedFiles} files scanned)`,
+    },
+    violations,
+  };
+}
+
+export async function runSharedValidate(workspaceRoot: string): Promise<SharedValidateResult> {
+  const [shared01, shared02, shared03Result] = await Promise.all([
+    checkSharedDependency(workspaceRoot),
+    checkExemptionHygiene(workspaceRoot),
+    checkNoSiteImports(workspaceRoot),
+  ]);
+
+  const checks = [shared01, shared02, shared03Result.result];
+  const anyFail = checks.some((c) => c.status === "fail");
 
   return {
     command: "werkstatt.shared.validate",
-    status: violations.length === 0 ? "pass" : "fail",
-    violations,
-    scannedFiles,
+    status: anyFail ? "fail" : "pass",
+    checks,
   };
 }

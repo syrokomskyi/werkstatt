@@ -17,36 +17,38 @@ import type {
   KernelModule,
   KernelRuntimeContext,
 } from "../src/kernel/types.ts";
-import {
-  runSharedValidate,
-  type SharedValidateResult,
-} from "../src/plugin/shared-validate.ts";
+import { runSharedValidate, type SharedValidateResult } from "../src/plugin/shared-validate.ts";
 
-export const werkstattSharedModule: KernelModule = {
-  name: "werkstatt-shared",
+export const werkstattSharedValidateModule: KernelModule = {
+  name: "werkstatt-shared-validate",
   version: "0.1.0",
   register(registry) {
     registry.registerCommand({
       name: "werkstatt.shared.validate",
       description:
-        "Scan packages/werkstatt-shared/src/** for forbidden @warpgogol/werkstatt-site imports. Enforces RFC-0868 shared/site boundary.",
+        "Check SHARED-01 (werkstatt-shared dep declared), SHARED-02 (no site exemptions in autonomy-validate), SHARED-03 (no site imports in engine src). Enforces RFC-0868.",
       scope: "workspace",
       supportsAllSites: false,
       flags: {},
-      reads: ["packages/werkstatt-shared/src/**"],
+      reads: [
+        "packages/werkstatt/package.json",
+        "packages/werkstatt/src/plugin/autonomy-validate.ts",
+        "packages/werkstatt/src/**",
+      ],
       cacheable: false,
       async execute(
         _input: KernelCommandInput,
         context: KernelRuntimeContext,
       ): Promise<KernelCommandResult<SharedValidateResult>> {
         const result = await runSharedValidate(context.workspaceRoot);
+        const failedChecks = result.checks.filter((c) => c.status === "fail");
         return {
           exitCode: result.status === "pass" ? 0 : 1,
           data: result,
           summary:
             result.status === "pass"
-              ? `Shared boundary guard passed — ${result.scannedFiles} files scanned, zero violations`
-              : `Shared boundary guard failed — ${result.violations.length} violation(s) in ${result.scannedFiles} files`,
+              ? `Shared boundary guard passed — SHARED-01/02/03 all pass`
+              : `Shared boundary guard failed — ${failedChecks.map((c) => c.id).join(", ")}`,
         };
       },
     });

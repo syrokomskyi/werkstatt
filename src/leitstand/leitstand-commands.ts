@@ -88,8 +88,6 @@ import { execSync } from "node:child_process";
 import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
 import type { SiteE2eRunResult } from "@warpgogol/werkstatt/testing/e2e";
-import { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";
-import type { Finding } from "@syrokomskyi/axiom-study";
 import {
   loadWorkshopSuppressions,
   loadWorkpieceSuppressions,

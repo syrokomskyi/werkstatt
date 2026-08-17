@@ -30,9 +30,9 @@
       "types": "./os/werkstatt-autonomy.module.ts",
       "default": "./os/werkstatt-autonomy.module.ts"
     },
-    "./os/werkstatt-shared-module": {
-      "types": "./os/werkstatt-shared-module.ts",
-      "default": "./os/werkstatt-shared-module.ts"
+    "./os/werkstatt-shared-validate-module": {
+      "types": "./os/werkstatt-shared-validate.module.ts",
+      "default": "./os/werkstatt-shared-validate.module.ts"
     },
     "./package.json": "./package.json",
     "./kernel": {
