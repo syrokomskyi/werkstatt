@@ -529,6 +529,12 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     markerPolicy: "registry-only",
     module: "packages/werkstatt-site/src/checks/agent/agent-discovery-endpoints.ts",
   },
+  {
+    path: "public/.well-known/agent-card.json",
+    command: "agent.discovery-endpoints.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-discovery-endpoints.ts",
+  },
 
   // RFC-0290: Agent route JSON bridges (Vite cannot import .yaml directly).
   {
