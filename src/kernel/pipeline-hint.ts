@@ -19,6 +19,10 @@
  * RFC-0870: Known pipeline names registered in kernel.config.ts and site modules.
  * Used to provide a helpful hint when a user accidentally uses a pipeline name
  * as a command argument.
+ *
+ * Source of truth: `pipelines` object in `tools/kernel.config.ts` (workspace-level)
+ * and pipeline registrations in site module's `createStandardCheckModule` (app-level).
+ * When a pipeline is added or renamed in either location, update this set.
  */
 export const KNOWN_PIPELINE_NAMES = new Set([
   "build.prepare",
