@@ -15,14 +15,6 @@
       "types": "./src/checks/index.ts",
       "default": "./src/checks/index.ts"
     },
-    "./checks/result-helpers": {
-      "types": "./src/checks/result-helpers.ts",
-      "default": "./src/checks/result-helpers.ts"
-    },
-    "./checks/suppressions-config": {
-      "types": "./src/checks/suppressions-config.ts",
-      "default": "./src/checks/suppressions-config.ts"
-    },
     "./checks/lib/astro-site-url": {
       "types": "./src/checks/lib/astro-site-url.ts",
       "default": "./src/checks/lib/astro-site-url.ts"
@@ -31,61 +23,297 @@
       "types": "./src/checks/lib/i18n.ts",
       "default": "./src/checks/lib/i18n.ts"
     },
-    "./ontology": {
-      "types": "./src/ontology/index.ts",
-      "default": "./src/ontology/index.ts"
+    "./checks/result-helpers": {
+      "types": "./src/checks/result-helpers.ts",
+      "default": "./src/checks/result-helpers.ts"
     },
-    "./ontology/*": {
-      "types": "./src/ontology/*",
-      "default": "./src/ontology/*"
-    },
-    "./share": {
-      "types": "./src/share/index.ts",
-      "default": "./src/share/index.ts"
-    },
-    "./share/*": {
-      "types": "./src/share/*",
-      "default": "./src/share/*"
-    },
-    "./passport": {
-      "types": "./src/passport/index.ts",
-      "default": "./src/passport/index.ts"
-    },
-    "./passport/*": {
-      "types": "./src/passport/*",
-      "default": "./src/passport/*"
+    "./checks/suppressions-config": {
+      "types": "./src/checks/suppressions-config.ts",
+      "default": "./src/checks/suppressions-config.ts"
     },
     "./integration": {
       "types": "./src/integration/index.ts",
       "default": "./src/integration/index.ts"
     },
-    "./integration/*": {
-      "types": "./src/integration/*",
-      "default": "./src/integration/*"
-    },
     "./integration-adapter-supabase-crm": {
       "types": "./src/integration-adapter-supabase-crm/index.ts",
       "default": "./src/integration-adapter-supabase-crm/index.ts"
     },
-    "./integration-adapter-supabase-crm/*": {
-      "types": "./src/integration-adapter-supabase-crm/*",
-      "default": "./src/integration-adapter-supabase-crm/*"
+    "./integration-adapter-supabase-crm/tenant-registry": {
+      "types": "./src/integration-adapter-supabase-crm/tenant-registry.ts",
+      "default": "./src/integration-adapter-supabase-crm/tenant-registry.ts"
+    },
+    "./integration-adapter-supabase-crm/worker": {
+      "types": "./src/integration-adapter-supabase-crm/worker.ts",
+      "default": "./src/integration-adapter-supabase-crm/worker.ts"
+    },
+    "./integration/crm-buffer": {
+      "types": "./src/integration/crm-buffer.ts",
+      "default": "./src/integration/crm-buffer.ts"
+    },
+    "./integration/port": {
+      "types": "./src/integration/port.ts",
+      "default": "./src/integration/port.ts"
     },
     "./observability": {
       "types": "./src/observability/index.ts",
       "default": "./src/observability/index.ts"
     },
-    "./observability/*": {
-      "types": "./src/observability/*",
-      "default": "./src/observability/*"
+    "./ontology": {
+      "types": "./src/ontology/index.ts",
+      "default": "./src/ontology/index.ts"
+    },
+    "./ontology/cosmic": {
+      "types": "./src/ontology/cosmic/index.ts",
+      "default": "./src/ontology/cosmic/index.ts"
+    },
+    "./ontology/external-surfaces": {
+      "types": "./src/ontology/external-surfaces/index.ts",
+      "default": "./src/ontology/external-surfaces/index.ts"
+    },
+    "./ontology/manifest": {
+      "types": "./src/ontology/manifest.ts",
+      "default": "./src/ontology/manifest.ts"
+    },
+    "./ontology/operations": {
+      "types": "./src/ontology/operations/index.ts",
+      "default": "./src/ontology/operations/index.ts"
+    },
+    "./ontology/archetypes": {
+      "types": "./src/ontology/archetype-registry.ts",
+      "default": "./src/ontology/archetype-registry.ts"
+    },
+    "./ontology/schemas": {
+      "types": "./src/ontology/schemas/index.ts",
+      "default": "./src/ontology/schemas/index.ts"
+    },
+    "./ontology/schemas/manifest-resolver": {
+      "types": "./src/ontology/schemas/manifest-resolver.ts",
+      "default": "./src/ontology/schemas/manifest-resolver.ts"
+    },
+    "./ontology/shared-section-props": {
+      "types": "./src/ontology/shared-section-props/index.ts",
+      "default": "./src/ontology/shared-section-props/index.ts"
+    },
+    "./passport": {
+      "types": "./src/passport/index.ts",
+      "default": "./src/passport/index.ts"
+    },
+    "./passport/dht-sign": {
+      "types": "./src/passport/dht-sign.ts",
+      "default": "./src/passport/dht-sign.ts"
+    },
+    "./passport/identity-sign": {
+      "types": "./src/passport/identity-sign.ts",
+      "default": "./src/passport/identity-sign.ts"
+    },
+    "./passport/key-rotate": {
+      "types": "./src/passport/key-rotate.ts",
+      "default": "./src/passport/key-rotate.ts"
+    },
+    "./passport/schema": {
+      "types": "./src/passport/schema.ts",
+      "default": "./src/passport/schema.ts"
+    },
+    "./passport/sign": {
+      "types": "./src/passport/sign.ts",
+      "default": "./src/passport/sign.ts"
+    },
+    "./share": {
+      "types": "./src/share/index.ts",
+      "default": "./src/share/index.ts"
+    },
+    "./share/agent": {
+      "types": "./src/share/agent/index.ts",
+      "default": "./src/share/agent/index.ts"
+    },
+    "./share/attribution-display": {
+      "types": "./src/share/attribution-display.ts",
+      "default": "./src/share/attribution-display.ts"
+    },
+    "./share/check-hints": {
+      "types": "./src/share/check-hints.ts",
+      "default": "./src/share/check-hints.ts"
+    },
+    "./share/content": {
+      "types": "./src/share/content/index.ts",
+      "default": "./src/share/content/index.ts"
+    },
+    "./share/content-discipline": {
+      "types": "./src/share/content-discipline/index.ts",
+      "default": "./src/share/content-discipline/index.ts"
+    },
+    "./share/content-reference": {
+      "types": "./src/share/content-reference.ts",
+      "default": "./src/share/content-reference.ts"
+    },
+    "./share/content/resolve-field-path": {
+      "types": "./src/share/content/resolve-field-path.ts",
+      "default": "./src/share/content/resolve-field-path.ts"
+    },
+    "./share/counter-utils": {
+      "types": "./src/share/counter-utils.ts",
+      "default": "./src/share/counter-utils.ts"
+    },
+    "./share/css-value-normalize": {
+      "types": "./src/share/css-value-normalize.ts",
+      "default": "./src/share/css-value-normalize.ts"
+    },
+    "./share/dev-props-validator": {
+      "types": "./src/share/dev-props-validator.ts",
+      "default": "./src/share/dev-props-validator.ts"
+    },
+    "./share/entitlement": {
+      "types": "./src/share/entitlement.ts",
+      "default": "./src/share/entitlement.ts"
+    },
+    "./share/feature-policy": {
+      "types": "./src/share/feature-policy.ts",
+      "default": "./src/share/feature-policy.ts"
+    },
+    "./share/formula-eval": {
+      "types": "./src/share/formula-eval.ts",
+      "default": "./src/share/formula-eval.ts"
+    },
+    "./share/fs": {
+      "types": "./src/share/fs/index.ts",
+      "default": "./src/share/fs/index.ts"
+    },
+    "./share/image-provider": {
+      "types": "./src/share/image-provider.ts",
+      "default": "./src/share/image-provider.ts"
+    },
+    "./share/knowledge": {
+      "types": "./src/share/knowledge/index.ts",
+      "default": "./src/share/knowledge/index.ts"
+    },
+    "./share/knowledge/claim": {
+      "types": "./src/share/knowledge/claim.ts",
+      "default": "./src/share/knowledge/claim.ts"
+    },
+    "./share/knowledge/derivation": {
+      "types": "./src/share/knowledge/derivation.ts",
+      "default": "./src/share/knowledge/derivation.ts"
+    },
+    "./share/knowledge/freshness": {
+      "types": "./src/share/knowledge/freshness.ts",
+      "default": "./src/share/knowledge/freshness.ts"
+    },
+    "./share/knowledge/ledger": {
+      "types": "./src/share/knowledge/ledger.ts",
+      "default": "./src/share/knowledge/ledger.ts"
+    },
+    "./share/knowledge/plan": {
+      "types": "./src/share/knowledge/plan.ts",
+      "default": "./src/share/knowledge/plan.ts"
+    },
+    "./share/knowledge/source": {
+      "types": "./src/share/knowledge/source.ts",
+      "default": "./src/share/knowledge/source.ts"
+    },
+    "./share/material-credits": {
+      "types": "./src/share/material-credits.ts",
+      "default": "./src/share/material-credits.ts"
+    },
+    "./share/middleware": {
+      "types": "./src/share/middleware/language-redirect.ts",
+      "default": "./src/share/middleware/language-redirect.ts"
+    },
+    "./share/offer-capacity": {
+      "types": "./src/share/offer-capacity.ts",
+      "default": "./src/share/offer-capacity.ts"
+    },
+    "./share/onboarding-yaml": {
+      "types": "./src/share/onboarding-yaml/index.ts",
+      "default": "./src/share/onboarding-yaml/index.ts"
+    },
+    "./share/page": {
+      "types": "./src/share/page.ts",
+      "default": "./src/share/page.ts"
+    },
+    "./share/redirects": {
+      "types": "./src/share/redirects.ts",
+      "default": "./src/share/redirects.ts"
+    },
+    "./share/rfc0042-utils": {
+      "types": "./src/share/rfc0042-utils.ts",
+      "default": "./src/share/rfc0042-utils.ts"
+    },
+    "./share/runtime-context": {
+      "types": "./src/share/runtime-context.ts",
+      "default": "./src/share/runtime-context.ts"
+    },
+    "./share/schemas": {
+      "types": "./src/share/schemas/index.ts",
+      "default": "./src/share/schemas/index.ts"
+    },
+    "./share/schemas/effects": {
+      "types": "./src/share/schemas/effects.ts",
+      "default": "./src/share/schemas/effects.ts"
+    },
+    "./share/schemas/features": {
+      "types": "./src/share/schemas/features.ts",
+      "default": "./src/share/schemas/features.ts"
+    },
+    "./share/schemas/material-credit": {
+      "types": "./src/share/schemas/material-credit.ts",
+      "default": "./src/share/schemas/material-credit.ts"
+    },
+    "./share/schemas/media": {
+      "types": "./src/share/schemas/media.ts",
+      "default": "./src/share/schemas/media.ts"
+    },
+    "./share/schemas/print": {
+      "types": "./src/share/schemas/print.ts",
+      "default": "./src/share/schemas/print.ts"
+    },
+    "./share/schemas/site-background": {
+      "types": "./src/share/schemas/site-background.ts",
+      "default": "./src/share/schemas/site-background.ts"
+    },
+    "./share/scripts/gsap-mountain-journey": {
+      "types": "./src/share/scripts/gsap-mountain-journey.ts",
+      "default": "./src/share/scripts/gsap-mountain-journey.ts"
+    },
+    "./share/semantic": {
+      "types": "./src/share/semantic/index.ts",
+      "default": "./src/share/semantic/index.ts"
+    },
+    "./share/semantic/derived-prices-loader": {
+      "types": "./src/share/semantic/derived-prices-loader.ts",
+      "default": "./src/share/semantic/derived-prices-loader.ts"
+    },
+    "./share/shared-context": {
+      "types": "./src/share/shared-context.ts",
+      "default": "./src/share/shared-context.ts"
+    },
+    "./share/string-utils": {
+      "types": "./src/share/string-utils.ts",
+      "default": "./src/share/string-utils.ts"
+    },
+    "./share/text-normalize": {
+      "types": "./src/share/text-normalize.ts",
+      "default": "./src/share/text-normalize.ts"
+    },
+    "./share/text-position": {
+      "types": "./src/share/text-position.ts",
+      "default": "./src/share/text-position.ts"
+    },
+    "./share/visibility": {
+      "types": "./src/share/visibility.ts",
+      "default": "./src/share/visibility.ts"
+    },
+    "./share/wrap-inline-numbers": {
+      "types": "./src/share/wrap-inline-numbers.ts",
+      "default": "./src/share/wrap-inline-numbers.ts"
     },
     "./surface": {
       "types": "./src/surface/index.ts",
       "default": "./src/surface/index.ts"
     },
-    "./surface/*": {
-      "types": "./src/surface/*",
-      "default": "./src/surface/*"
+    "./surface/io": {
+      "types": "./src/surface/io/index.ts",
+      "default": "./src/surface/io/index.ts"
     }
   },
   "scripts": {
@@ -95,11 +323,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@lordicon/element": "^2.3.1",
     "@noble/ed25519": "^3.1.0",
+    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study",
     "ajv": "^8.20.0",
     "bs58": "^6.0.0",
     "expr-eval": "^2.0.2",
     "hls.js": "^1.6.16",
+    "lenis": "^1.3.25",
+    "plyr": "^3.8.4",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
   },

@@ -1,27 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Maintains packages/observability/src/redact.ts as an authored observability authored module so agents can evolve it without rediscovering local boundaries.</purpose>
-<non-goals>
-  <item>Do not import node: modules — must be Workers-compatible.</item>
-  <item>Do not redact at the collector level — this is a convenience for emitters.</item>
-</non-goals>
+<purpose>Re-export shim for observability/redact.ts moved to @warpgogol/werkstatt-shared (RFC-0868).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0337: initial implementation.</item>
-  <item>Fix 2026-07-11: only trim the URL root slash so redaction is idempotent for multi-slash paths.</item>
+  <item>RFC-0868: moved to werkstatt-shared, this file re-exports for backward compatibility.</item>
 </CHANGE_SUMMARY>
 */
 
-export function redactUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-    parsed.hash = "";
-    parsed.search = "";
-    parsed.hostname = parsed.hostname.toLowerCase();
-    const redacted = parsed.toString();
-    if (parsed.pathname === "/") return redacted.replace(/\/$/, "");
-    return redacted;
-  } catch {
-    return url;
-  }
-}
+export * from "@warpgogol/werkstatt-shared/observability/redact";

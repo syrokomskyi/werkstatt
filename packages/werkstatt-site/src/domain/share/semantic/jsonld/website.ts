@@ -1,27 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Maintains packages/share/src/semantic/jsonld/website.ts as an authored share authored module so agents can evolve it without rediscovering local boundaries.</purpose>
-<non-goals>
-  <item>Do not parse raw content.</item>
-</non-goals>
+<purpose>Re-export shim for share/semantic/jsonld/website.ts moved to @warpgogol/werkstatt-shared (RFC-0868).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Added WebSite JSON-LD generation.</item>
+  <item>RFC-0868: moved to werkstatt-shared, this file re-exports for backward compatibility.</item>
 </CHANGE_SUMMARY>
 */
 
-import type { JsonLdContext } from "./context.ts";
-import type { JsonLdNode } from "./types.ts";
-
-export function buildWebSiteNode(context: JsonLdContext): JsonLdNode {
-  const { page, ids } = context;
-
-  return {
-    "@type": "WebSite",
-    "@id": ids.website,
-    url: page.organization.url,
-    name: page.organization.name,
-    inLanguage: page.lang,
-    publisher: { "@id": ids.organization },
-  };
-}
+export * from "@warpgogol/werkstatt-shared/share/semantic/jsonld/website";

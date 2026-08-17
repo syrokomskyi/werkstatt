@@ -1,18 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Maintains packages/share/src/semantic/jsonld/types.ts as an authored share authored module so agents can evolve it without rediscovering local boundaries.</purpose>
-<non-goals>
-  <item>Do not implement JSON-LD processing logic.</item>
-</non-goals>
+<purpose>Re-export shim for share/semantic/jsonld/types.ts moved to @warpgogol/werkstatt-shared (RFC-0868).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Moved from app semantic/jsonld/types to packages/share.</item>
+  <item>RFC-0868: moved to werkstatt-shared, this file re-exports for backward compatibility.</item>
 </CHANGE_SUMMARY>
 */
 
-export type JsonLdNode = Record<string, unknown>;
-
-export type JsonLdDocument = {
-  "@context": "https://schema.org";
-  "@graph": JsonLdNode[];
-};
+export * from "@warpgogol/werkstatt-shared/share/semantic/jsonld/types";

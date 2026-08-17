@@ -1,8 +1,10 @@
-import { defineConfig } from "vitest/config";
+/*
+<MODULE_CONTRACT>
+<purpose>Re-export shim for surface/vitest.config.ts moved to @warpgogol/werkstatt-shared (RFC-0868).</purpose>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0868: moved to werkstatt-shared, this file re-exports for backward compatibility.</item>
+</CHANGE_SUMMARY>
+*/
 
-export default defineConfig({
-  test: {
-    environment: "node",
-    include: ["src/**/*.test.ts"],
-  },
-});
+export * from "@warpgogol/werkstatt-shared/surface/vitest.config";

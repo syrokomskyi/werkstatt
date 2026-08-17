@@ -1,36 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Node-only loader for derived-prices.generated.json (RFC-0767). Reads the file from process.cwd()/src/derived-prices.generated.json and returns null on ENOENT. NOT exported from the semantic barrel — uses node:fs and would pollute client bundles.</purpose>
-<non-goals>
-  <item>Does not parse or validate the JSON shape — just reads and JSON.parse.</item>
-  <item>Does not cache — callers are responsible for calling once and passing the result.</item>
-</non-goals>
+<purpose>Re-export shim for share/semantic/derived-prices-loader.ts moved to @warpgogol/werkstatt-shared (RFC-0868).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0767: relocated loadDerivedPrices from packages/ui to packages/share to break circular dependency. Node-only subpath export.</item>
+  <item>RFC-0868: moved to werkstatt-shared, this file re-exports for backward compatibility.</item>
 </CHANGE_SUMMARY>
 */
 
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import type { DerivedPriceEntry } from "./price-marker-resolver.ts";
-
-export function loadDerivedPrices(
-  cwd: string = process.cwd(),
-): Record<string, DerivedPriceEntry[]> | null {
-  const filePath = join(cwd, "src", "derived-prices.generated.json");
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, "utf-8");
-  } catch (err: unknown) {
-    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {
-      console.warn(
-        `[derived-prices] ${filePath} not found — currency-aware price variants will not render. ` +
-          `Run: pnpm exec werkstatt run derived-prices.materialize --site <siteId>`,
-      );
-      return null;
-    }
-    throw err;
-  }
-  return JSON.parse(raw) as Record<string, DerivedPriceEntry[]>;
-}
+export * from "@warpgogol/werkstatt-shared/share/semantic/derived-prices-loader";

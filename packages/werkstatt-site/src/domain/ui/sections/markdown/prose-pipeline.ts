@@ -20,11 +20,8 @@
 
 import { render } from "astro:content";
 import type { MaterialCreditLabels } from "@warpgogol/werkstatt-shared/share";
-import {
-  getProseContentEntry,
-  wrapInlineNumbers,
-  type AttributionSiteDefault,
-} from "@warpgogol/werkstatt-shared/share";
+import { getProseContentEntry } from "@warpgogol/werkstatt-site/share/astro/content";
+import { wrapInlineNumbers, type AttributionSiteDefault } from "@warpgogol/werkstatt-shared/share";
 import {
   getContentRefIndex,
   resolveReferencesInString,
