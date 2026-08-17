@@ -1,6 +1,6 @@
 {
   "name": "@warpgogol/werkstatt-video",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Werkstatt video plugin — Editframe stack (RFC-0778).",
@@ -57,11 +57,10 @@
     "test:watch": "vitest"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "dependencies": {
-    "@warpgogol/werkstatt": "workspace:*",
+    "@warpgogol/werkstatt": "*",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

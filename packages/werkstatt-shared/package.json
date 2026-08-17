@@ -1,6 +1,6 @@
 {
   "name": "@warpgogol/werkstatt-shared",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Stack-agnostic shared infrastructure extracted from werkstatt-site (RFC-0868).",
@@ -324,8 +324,7 @@
     "test:watch": "vitest"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "files": ["src", "tsconfig.json"],
   "dependencies": {
@@ -341,7 +340,7 @@
     "zod": "^4.4.3"
   },
   "optionalDependencies": {
-    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
+    "@syrokomskyi/axiom-study": "*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260801.1",

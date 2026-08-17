@@ -1,6 +1,6 @@
 {
   "name": "@warpgogol/werkstatt",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Werkstatt engine \u2014 stack-agnostic lifecycle platform (RFC-0769/0772).",
@@ -351,7 +351,6 @@
     "@libp2p/ping": "^3.1.11",
     "@libp2p/tcp": "^11.0.26",
     "@multiformats/multiaddr": "^13.0.3",
-    "@warpgogol/forge": "workspace:*",
     "@warpgogol/werkstatt-shared": "workspace:*",
     "@aws-sdk/client-s3": "^3.1101.0",
     "@noble/ed25519": "^3.1.0",
@@ -382,17 +381,17 @@
     "p-limit": "^7.3.1",
     "semver": "^7.8.5",
     "simple-git": "^3.36.0",
-    "zod": "^4.4.3",
-    "@warpgogol/werkstatt-site": "workspace:*"
+    "zod": "^4.4.3"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "optionalDependencies": {
     "better-sqlite3": "^13.0.2",
-    "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
-    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
+    "@warpgogol/forge": "workspace:*",
+    "@warpgogol/werkstatt-site": "workspace:*",
+    "@syrokomskyi/axiom-factory-app": "*",
+    "@syrokomskyi/axiom-study": "*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
