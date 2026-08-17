@@ -28,7 +28,7 @@ before matchStaticAsset short-circuits prerendered pages (Astro issue #16252).</
 // @ai-invariant: Wraps Astro Cloudflare handler. Runs before matchStaticAsset for prerendered pages.
 // RFC-0785: markdown content negotiation for agent requests.
 import { default as astroHandler } from "@astrojs/cloudflare/entrypoints/server";
-import { markdownTwinUrlPath } from "@warpgogol/werkstatt-site/share/semantic";
+import { markdownTwinUrlPath } from "@warpgogol/werkstatt-shared/share/semantic";
 
 const SUPPORTED_LANGS = {{SUPPORTED_LANGS}};
 

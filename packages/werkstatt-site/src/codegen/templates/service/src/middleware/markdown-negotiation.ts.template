@@ -24,7 +24,7 @@
 // @ai-invariant: Runs on every GET request. Fast Accept header check before any fetch.
 // RFC-0785: markdown content negotiation for agent requests.
 import { defineMiddleware } from "astro:middleware";
-import { markdownTwinUrlPath } from "@warpgogol/werkstatt-site/share/semantic";
+import { markdownTwinUrlPath } from "@warpgogol/werkstatt-shared/share/semantic";
 
 const SUPPORTED_LANGS = {{SUPPORTED_LANGS}};
 
