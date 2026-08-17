@@ -23,6 +23,7 @@
   <item>Preserve operator-filled .env from old workpiece before atomicMoveDir and restore after — prevents secret loss (CLOUDFLARE_API_TOKEN, R2 keys) on re-materialization.</item>
   <item>RFC-0796: add checkWorkspaceGlobsForStalePackages pre-flight guard before pnpm install — detects stale package.json workspace references to missing packages.</item>
   <item>RFC-0822: replace old-workpiece .env preservation with restoreEnvFilesFromCacheClone — cache clone is the canonical inter-mission store for secrets.</item>
+  <item>RFC-0870: restore registry-only generated files from git after atomicMoveDir — prevents silent loss of committed manifests when staging dir lacks them.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -1183,6 +1184,39 @@ export async function runMissionMaterialize(
     }
     process.env["PUBLIC_IMAGE_PROVIDER"] = "build-portable";
     logger.info(`  PUBLIC_IMAGE_PROVIDER set to build-portable in .env files`);
+
+    // RFC-0870: Restore registry-only generated files from git after atomicMoveDir.
+    // The staging dir may lack committed generated manifests (e.g. image-variants.generated.yaml)
+    // because they are not in STERNSYSTEM_DATA_PATHS and were not regenerated during boilerplate.
+    // Use `git checkout` to restore them from the workpiece's git HEAD (cloned from cache clone).
+    // Non-fatal: failure logs a warning, materialize proceeds — build.prepare will regenerate.
+    try {
+      const { GENERATOR_OWNERSHIP_MAP } =
+        await import("@warpgogol/werkstatt-site/checks/generator-ownership");
+      const registryOnlyNonConditional = GENERATOR_OWNERSHIP_MAP.filter(
+        (e) => e.markerPolicy === "registry-only" && !e.conditional,
+      );
+      let restoredCount = 0;
+      for (const entry of registryOnlyNonConditional) {
+        try {
+          execSync(`git checkout HEAD -- ${entry.path}`, {
+            cwd: workpieceDir,
+            stdio: ["pipe", "pipe", "pipe"],
+            encoding: "utf-8",
+          });
+          restoredCount++;
+        } catch {
+          // File not tracked in git or does not exist in HEAD — skip
+        }
+      }
+      if (restoredCount > 0) {
+        logger.info(`  Restored ${restoredCount} registry-only generated file(s) from git`);
+      }
+    } catch (restoreErr) {
+      logger.warn(
+        `  Warning: failed to restore registry-only generated files: ${restoreErr instanceof Error ? restoreErr.message : String(restoreErr)}`,
+      );
+    }
 
     // RFC-0840: Restore operator config files from cache clone after atomicMoveDir.
     // Done after .env* restoration — same pattern, different file set.
