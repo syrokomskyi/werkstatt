@@ -13,6 +13,7 @@
   <item>RFC-0648: add branch-convention rule enforcing main as default branch for cache clone and bare repo.</item>
   <item>RFC-0792: add yaml-syntax-error rule for top-level YAML file syntax checking in systems-cache.</item>
   <item>RFC-0822: add ENV-PERSIST-01 warning when cache clone lacks .env* but active workpiece has them.</item>
+  <item>RFC-0870: add STERN-MANIFEST-01 check for missing committed generated manifests in cache clone HEAD.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -74,6 +75,53 @@ const FORBIDDEN_PATTERNS = [
   "wrangler.toml",
   "wrangler.jsonc",
 ];
+
+// RFC-0870: Committed generated manifest paths checked in cache clone HEAD.
+// These are registry-only generated files committed to git for drift detection.
+// Only checked when tracked in git — new systems without manifests are not flagged.
+const COMMITTED_MANIFEST_PATHS = [
+  "src/image-variants.generated.yaml",
+  "src/video-manifest.generated.yaml",
+  "src/live-video-manifest.generated.yaml",
+];
+
+/**
+ * RFC-0870: Check that committed generated manifests are present in the cache
+ * clone git HEAD. Uses `git ls-tree HEAD -- <path>` to determine if a file is
+ * tracked. Only files that ARE tracked but missing from HEAD trigger
+ * STERN-MANIFEST-01 — untracked files (new systems) are not flagged.
+ */
+function checkManifestPresence(cacheDir: string, systemId: string): SternsystemViolation[] {
+  const violations: SternsystemViolation[] = [];
+  for (const manifestPath of COMMITTED_MANIFEST_PATHS) {
+    try {
+      // Check if the file is tracked in git history (any commit)
+      const tracked = execSync(`git log --oneline -1 -- ${manifestPath}`, {
+        cwd: cacheDir,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "pipe"],
+      }).trim();
+      if (!tracked) continue; // Not tracked — new system, skip
+
+      // Check if the file exists in HEAD
+      const headContent = execSync(`git ls-tree HEAD -- ${manifestPath}`, {
+        cwd: cacheDir,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "pipe"],
+      }).trim();
+      if (!headContent) {
+        violations.push({
+          systemId,
+          rule: "STERN-MANIFEST-01",
+          message: `Committed generated manifest ${manifestPath} is missing from cache clone HEAD — run the generating command in a mission workpiece and commit via mission.git.commit`,
+        });
+      }
+    } catch {
+      // Git command failed — skip this manifest
+    }
+  }
+  return violations;
+}
 
 async function checkBundleContract(
   cacheDir: string,
@@ -437,6 +485,10 @@ export async function runSternsystemValidate(
     // RFC-0792: YAML syntax checking for all top-level YAML files in cache clone
     const yamlViolations = await validateYamlFiles(cacheDir, entry.id);
     violations.push(...yamlViolations);
+
+    // RFC-0870: Manifest presence check — committed generated manifests must exist in cache clone HEAD
+    const manifestViolations = checkManifestPresence(cacheDir, entry.id);
+    violations.push(...manifestViolations);
 
     // RFC-0822: ENV-PERSIST-01 warning — cache clone lacks .env* but workpiece has them
     try {
