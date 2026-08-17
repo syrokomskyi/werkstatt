@@ -225,7 +225,7 @@ Change 1 — `sternsystem.validate --json`:
 
 - **False positive on new Sternsystemen:** A freshly onboarded system may not have manifests yet. Mitigation: `sternsystem.validate` only checks manifests that are tracked in git (via `git ls-tree HEAD`). If the file is not tracked, no error — the system has not yet committed a manifest.
 - **`git checkout` in materialize may conflict with uncommitted changes:** Mitigation: `git checkout -- <file>` only restores files that are tracked and missing from disk. If the file exists with different content, `git checkout` would overwrite it — but materialize just created the workpiece from a fresh staging directory, so there should be no uncommitted changes.
-- **Pipeline hint may become stale:** If pipeline names change, the hint dictionary needs updating. Mitigation: the hint reads from the same pipeline registry that defines them.
+- **Pipeline hint may become stale:** If pipeline names change, the hint dictionary needs updating. Mitigation: the static `KNOWN_PIPELINE_NAMES` set in `pipeline-hint.ts` is curated from `kernel.config.ts` and site module registrations. When a pipeline is added or renamed, update the set. A cross-reference comment links the two.
 
 ## Acceptance criteria
 
