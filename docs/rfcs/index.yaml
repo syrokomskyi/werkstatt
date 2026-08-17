@@ -1,6 +1,6 @@
 command: rfc.index.generate
-generatedAt: 2026-08-16
-count: 849
+generatedAt: 2026-08-17
+count: 850
 entries:
   - id: ""
     title: ""
@@ -16688,3 +16688,25 @@ entries:
       - RFC-0866
       - RFC-0865
     file: docs/rfcs/archive/implemented/rfc-0867-cache-certification-evidence-by-artifact-hash.md
+  - id: RFC-0868
+    title: Extract @warpgogol/werkstatt-shared and publish engine + stack plugins to
+      NPM
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-17
+    implementedAt: 2026-08-17
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-64
+      - RFC-0769
+      - RFC-0772
+      - RFC-0774
+      - RFC-0776
+      - RFC-0777
+      - RFC-0778
+      - RFC-0779
+    file: docs/rfcs/archive/implemented/rfc-0868-extract-werkstatt-shared-and-publish-engine-and-stack-plugins-to-npm.md
