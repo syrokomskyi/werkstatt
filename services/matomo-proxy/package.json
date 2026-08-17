@@ -20,6 +20,7 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
+    "@warpgogol/werkstatt-shared": "workspace:*",
     "@warpgogol/werkstatt-site": "workspace:*"
   },
   "gogol": {
