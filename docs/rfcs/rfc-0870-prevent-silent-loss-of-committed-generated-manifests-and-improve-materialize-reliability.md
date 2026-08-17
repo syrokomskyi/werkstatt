@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335)
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-17
 updatedAt: 2026-08-17
+enhancedAt: 2026-08-17
 implementedAt:
 closedAt:
 supersedes: []
@@ -52,11 +54,10 @@ packagesImpacted:
   - "@warpgogol/werkstatt-site"
 successSignals:
   - "A freshly materialized workpiece has all git-tracked generated files present on disk without manual copying."
-  - "sternsystem.validate emits STERN-MANIFEST-01 when a committed generated manifest (image-variants, live-video-manifest) is missing from the cache clone HEAD."
+  - "sternsystem.validate emits STERN-MANIFEST-01 when a committed generated manifest (image-variants, video-manifest, live-video-manifest) is missing from the cache clone HEAD."
   - "Agents encountering a pipeline-not-command error see a actionable hint pointing to the correct command."
 nonGoals:
   - "Do not change the materialize atomic-move strategy or STERNSYSTEM_DATA_PATHS."
-  - "Do not add new generated-file types to the registry — only enforce existing ones."
   - "Do not change the build.prepare pipeline ordering."
   - "Do not auto-generate missing manifests during sternsystem.validate — only report."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
@@ -81,7 +82,7 @@ nonGoals:
 
 ## Context
 
-RFC-0834 established that generated variant manifests (`src/image-variants.generated.yaml`, `src/video-manifest.generated.yaml`) are committed to git for drift detection and cold-materialize availability. RFC-0869 further reinforced this by making the manifest a critical input for the `build-portable` image provider.
+RFC-0834 established that generated variant manifests (`src/image-variants.generated.yaml`, `src/video-manifest.generated.yaml`, `src/live-video-manifest.generated.yaml`) are committed to git for drift detection and cold-materialize availability. RFC-0869 further reinforced this by making the manifest a critical input for the `build-portable` image provider.
 
 Despite these policies, during mission `warpgogol-com-m000068` (2026-08-17) three operational gaps were discovered:
 
@@ -93,7 +94,7 @@ Despite these policies, during mission `warpgogol-com-m000068` (2026-08-17) thre
 
 ## Problem
 
-1. **No validator detects missing committed manifests in cache clone.** `sternsystem.validate` checks mirror topology, path existence, and bundle storage types — but does not verify that committed generated manifests (`src/image-variants.generated.yaml`, `src/live-video-manifest.generated.yaml`) exist in the cache clone HEAD. An agent or operator can `git rm` these files and no check fires until production Lighthouse. This violates DNA-58 (Generated-file content determinism) — the manifest is a committed generated artifact that should be drift-detectable.
+1. **No validator detects missing committed manifests in cache clone.** `sternsystem.validate` checks mirror topology, path existence, and bundle storage types — but does not verify that committed generated manifests (`src/image-variants.generated.yaml`, `src/video-manifest.generated.yaml`, `src/live-video-manifest.generated.yaml`) exist in the cache clone HEAD. An agent or operator can `git rm` these files and no check fires until production Lighthouse. This violates DNA-58 (Generated-file content determinism) — the manifest is a committed generated artifact that should be drift-detectable.
 
 2. **`mission.materialize` does not restore all git-tracked files to disk.** The `atomicMoveDir` operation moves the staged workpiece into place, but files with `markerPolicy: "registry-only"` that are git-tracked may not be present on disk if they were not in the staging directory. This forces agents to manually `cp` files from the cache clone, wasting time and risking inconsistency. This violates DNA-47 (Materialization) — a materialized workpiece should be immediately buildable.
 
@@ -103,11 +104,11 @@ Despite these policies, during mission `warpgogol-com-m000068` (2026-08-17) thre
 
 Three changes:
 
-1. **`sternsystem.validate` gains a committed-manifest presence check.** After existing mirror topology checks, the validator reads the cache clone git HEAD and verifies that registered generated manifests with `markerPolicy: "registry-only"` and `committed: true` are present. Emits `STERN-MANIFEST-01` (error) for each missing manifest.
+1. **`sternsystem.validate` gains a committed-manifest presence check.** After existing mirror topology checks, the validator reads the cache clone git HEAD and verifies that the three committed generated manifests (`src/image-variants.generated.yaml`, `src/video-manifest.generated.yaml`, `src/live-video-manifest.generated.yaml`) are present. These manifest paths are also added to `GENERATOR_OWNERSHIP_MAP` with `markerPolicy: "registry-only"` so they are tracked as generated files. Emits `STERN-MANIFEST-01` (error) for each missing manifest.
 
-2. **`mission.materialize` runs `git checkout -- <file>` for registry-only generated files after `atomicMoveDir`.** After the workpiece is moved into place, materialize runs `git checkout` on all git-tracked files that are in the generator ownership registry with `markerPolicy: "registry-only"`. This ensures they exist on disk without manual copying.
+2. **`mission.materialize` runs `git checkout -- <file>` for registry-only generated files after `atomicMoveDir`.** After the workpiece is moved into place, materialize runs `git checkout` on all git-tracked files that are in the generator ownership registry with `markerPolicy: "registry-only"`. The registry is read via dynamic `import()` from `@warpgogol/werkstatt-site/checks/generator-ownership` to respect DNA-64 (engine MUST NOT statically import from site plugin). This ensures they exist on disk without manual copying.
 
-3. **Kernel command runner includes a pipeline hint.** When `werkstatt run <name>` fails with "Unknown command" or "No target site resolved" and `<name>` matches a known pipeline name (from `build.prepare`, `build.check`, `build.post`), the error message includes: `Hint: '<name>' is a pipeline, not a command. Run individual steps directly (e.g., 'image.variants.generate') or use 'mission.validate' which executes the full pipeline.`
+3. **Kernel CLI includes a pipeline hint.** When `werkstatt run <name>` fails with "Unknown command" (in `packages/werkstatt/src/kernel/cli/index.ts`) or "No target site with a kernel config could be resolved" (in `packages/werkstatt/src/kernel/runtime/execute-command.ts`) and `<name>` matches a known pipeline name (from `build.prepare`, `build.check`, `build.post`), the error message includes: `Hint: '<name>' is a pipeline, not a command. Run individual steps directly (e.g., 'image.variants.generate') or use 'mission.validate' which executes the full pipeline.`
 
 ## Architectural fit
 
@@ -149,7 +150,9 @@ interface ManifestPresenceFinding {
   fixHint: string;
 }
 
-// Change 2: materialize restoration
+// Change 2: materialize restoration — reads OwnershipEntry from GENERATOR_OWNERSHIP_MAP
+// via dynamic import() from @warpgogol/werkstatt-site/checks/generator-ownership
+// Only entries with markerPolicy: "registry-only" and no conditional: true are restored.
 interface RegistryOnlyFile {
   path: string;           // e.g., "public/auth.md"
   command: string;        // e.g., "agent.discovery-endpoints.generate"
@@ -168,11 +171,15 @@ interface PipelineHint {
 | Path | Role |
 | --- | --- |
 | `systems-cache/{id}/src/image-variants.generated.yaml` | Checked by sternsystem.validate (Change 1) |
+| `systems-cache/{id}/src/video-manifest.generated.yaml` | Checked by sternsystem.validate (Change 1) |
 | `systems-cache/{id}/src/live-video-manifest.generated.yaml` | Checked by sternsystem.validate (Change 1) |
 | `missions/{mission}/workpiece/public/auth.md` | Restored by mission.materialize (Change 2) |
 | `missions/{mission}/workpiece/src/*.generated.yaml` | Restored by mission.materialize (Change 2) |
-| `packages/werkstatt-site/src/checks/generator-ownership.ts` | Read for registry-only file list (Change 2) |
-| `packages/forge/os/kernel/kernel-runner.ts` | Pipeline hint added to error message (Change 3) |
+| `packages/werkstatt-site/src/checks/generator-ownership.ts` | Add manifest entries + read for registry-only file list (Changes 1, 2) |
+| `packages/werkstatt/src/sternsystem/sternsystem-validate.ts` | Manifest presence check (Change 1) |
+| `packages/werkstatt/src/mission/mission-materialize.ts` | git checkout for registry-only files (Change 2) |
+| `packages/werkstatt/src/kernel/cli/index.ts` | Pipeline hint on "Unknown command" (Change 3) |
+| `packages/werkstatt/src/kernel/runtime/execute-command.ts` | Pipeline hint on "No target site" (Change 3) |
 
 ### Output format
 
@@ -216,7 +223,7 @@ Change 1 — `sternsystem.validate --json`:
 
 ## Risks
 
-- **False positive on new Sternsystemen:** A freshly onboarded system may not have manifests yet. Mitigation: `sternsystem.validate` only checks manifests that are registered in the generator ownership registry AND tracked in git. If the file is not tracked, no error.
+- **False positive on new Sternsystemen:** A freshly onboarded system may not have manifests yet. Mitigation: `sternsystem.validate` only checks manifests that are tracked in git (via `git ls-tree HEAD`). If the file is not tracked, no error — the system has not yet committed a manifest.
 - **`git checkout` in materialize may conflict with uncommitted changes:** Mitigation: `git checkout -- <file>` only restores files that are tracked and missing from disk. If the file exists with different content, `git checkout` would overwrite it — but materialize just created the workpiece from a fresh staging directory, so there should be no uncommitted changes.
 - **Pipeline hint may become stale:** If pipeline names change, the hint dictionary needs updating. Mitigation: the hint reads from the same pipeline registry that defines them.
 
@@ -224,7 +231,7 @@ Change 1 — `sternsystem.validate --json`:
 
 - [ ] `sternsystem.validate` emits `STERN-MANIFEST-01` when a committed generated manifest is missing from cache clone HEAD (evidence: test in `sternsystem-validate.test.ts`)
 - [ ] `mission.materialize` restores registry-only generated files to disk after `atomicMoveDir` (evidence: test in `mission-materialize.test.ts`)
-- [ ] Kernel command runner includes pipeline hint when a pipeline name is used as a command (evidence: test in `kernel-runner.test.ts`)
+- [ ] Kernel CLI includes pipeline hint when a pipeline name is used as a command (evidence: test in `cli-index.test.ts`)
 - [ ] `sternsystem.validate` integrated into existing `mission.close` validation chain
 - [ ] Existing Sternsystemen pass without changes (manifests are already committed per RFC-0834)
 - [ ] `AGENTS.md` updated with note about pipeline vs command distinction
