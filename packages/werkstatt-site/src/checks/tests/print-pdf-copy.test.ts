@@ -16,6 +16,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync
 import { join } from "node:path";
 import { runPrintPdfCopy } from "../print-pdf.ts";
 import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 function makeContext(appDir: string): KernelRuntimeContext {
   return {
@@ -36,7 +37,7 @@ function makeContext(appDir: string): KernelRuntimeContext {
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-print-pdf-copy-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-print-pdf-copy-"));
 });
 
 afterEach(() => {

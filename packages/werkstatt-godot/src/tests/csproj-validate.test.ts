@@ -16,12 +16,13 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { validateCsproj } from "../checks/csproj-validate.ts";
+import { tmpdir } from "node:os";
 
 describe("validateCsproj", () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(process.cwd(), "tmp-csproj-test-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "tmp-csproj-test-"));
   });
 
   afterEach(() => {

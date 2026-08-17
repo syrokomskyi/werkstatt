@@ -15,12 +15,13 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { validateResources } from "../checks/resource-validate.ts";
+import { tmpdir } from "node:os";
 
 describe("validateResources", () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(process.cwd(), "tmp-resource-test-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "tmp-resource-test-"));
   });
 
   afterEach(() => {

@@ -15,12 +15,13 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { validateSceneReferences } from "../checks/scene-reference-validate.ts";
+import { tmpdir } from "node:os";
 
 describe("validateSceneReferences", () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(process.cwd(), "tmp-scene-ref-test-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "tmp-scene-ref-test-"));
   });
 
   afterEach(() => {

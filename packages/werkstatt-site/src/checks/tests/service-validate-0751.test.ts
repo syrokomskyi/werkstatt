@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { runServiceNamingValidate } from "../services/service-naming-validate.ts";
 import { runServiceRegistryValidate } from "../services/service-registry-validate.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 function makeInput(): KernelCommandInput {
   return { flags: {}, argv: [] };
@@ -67,7 +68,7 @@ describe("service.naming.validate (RFC-0751)", () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(process.cwd(), "tmp-svc-naming-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "tmp-svc-naming-"));
     mkdirSync(join(tmpDir, "systems"), { recursive: true });
   });
 
@@ -207,7 +208,7 @@ describe("service.registry.validate (RFC-0751)", () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(process.cwd(), "tmp-svc-reg-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "tmp-svc-reg-"));
     mkdirSync(join(tmpDir, "systems"), { recursive: true });
   });
 
