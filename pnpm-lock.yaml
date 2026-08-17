@@ -321,6 +321,9 @@ importers:
       expr-eval:
         specifier: ^2.0.2
         version: 2.0.2
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
       hls.js:
         specifier: ^1.6.16
         version: 1.6.16
