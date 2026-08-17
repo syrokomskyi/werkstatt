@@ -13,6 +13,7 @@ which are not stack plugins.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0772: initial autonomy guard implementation modeled on forge.doctor precedent.</item>
+  <item>RFC-0868: refactor to use shared import-scan-util.ts, removing duplicated scanning logic.</item>
 </CHANGE_SUMMARY>
 */
 
