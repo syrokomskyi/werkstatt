@@ -18,7 +18,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-shared/checks";
 
 interface WranglerConfig {
   main?: string;

@@ -28,7 +28,7 @@ import {
   updateTenantSecretRef,
   countOutboxByStatus,
   type SecretKind,
-} from "@warpgogol/werkstatt-site/integration-adapter-supabase-crm/tenant-registry";
+} from "@warpgogol/werkstatt-shared/integration-adapter-supabase-crm/tenant-registry";
 import { resolveRegistryClient, extractProjectRef } from "./env.ts";
 
 /** lagebild.tenant.add — create tenant row in sync_tenants and emit secret setup commands. */

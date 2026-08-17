@@ -96,7 +96,7 @@ import {
   mergeSuppressions,
   applySuppressions,
   type SuppressedFinding,
-} from "@warpgogol/werkstatt-site/checks/suppressions-config";
+} from "@warpgogol/werkstatt-shared/checks/suppressions-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 import {
@@ -650,7 +650,7 @@ async function checkDistSize(
   let totalSize = 0;
   let largestFile = 0;
   let largestFilePath = "";
-  const { collectFiles } = await import("@warpgogol/werkstatt-site/share/fs");
+  const { collectFiles } = await import("@warpgogol/werkstatt-shared/share/fs");
   for (const file of await collectFiles(distPath)) {
     const stat = await fs.stat(file);
     totalSize += stat.size;

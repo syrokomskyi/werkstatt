@@ -16,8 +16,8 @@ handed to the delivery substrate on success.
 </CHANGE_SUMMARY>
 */
 
-import type { CapabilityInputOutputSchema, CapabilityRecord } from "@warpgogol/werkstatt-site/ontology";
-import type { IntegrationEvent } from "@warpgogol/werkstatt-site/integration/port";
+import type { CapabilityInputOutputSchema, CapabilityRecord } from "@warpgogol/werkstatt-shared/ontology";
+import type { IntegrationEvent } from "@warpgogol/werkstatt-shared/integration/port";
 
 export interface ValidationFieldError {
   path: string;

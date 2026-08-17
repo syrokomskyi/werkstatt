@@ -12,8 +12,8 @@
 */
 
 import type { KernelExecutionReport } from "../types.ts";
-import type { MetricsPusher } from "@warpgogol/werkstatt-site/observability";
-import { createMetricsPusher, METRIC_REFS } from "@warpgogol/werkstatt-site/observability";
+import type { MetricsPusher } from "@warpgogol/werkstatt-shared/observability";
+import { createMetricsPusher, METRIC_REFS } from "@warpgogol/werkstatt-shared/observability";
 
 let pusher: MetricsPusher | null | undefined;
 

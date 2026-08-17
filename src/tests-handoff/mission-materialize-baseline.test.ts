@@ -96,7 +96,7 @@ vi.mock("@warpgogol/werkstatt-site/onboarding", () => ({
   readRuntimeTemplate: vi.fn(() => ""),
 }));
 
-vi.mock("@warpgogol/werkstatt-site/checks", () => ({
+vi.mock("@warpgogol/werkstatt-shared/checks", () => ({
   runEnvExampleGenerate: vi.fn(async () => []),
   MISSION_PREFLIGHT_CRITICAL: [],
   MISSION_PREFLIGHT_WARNING: [],

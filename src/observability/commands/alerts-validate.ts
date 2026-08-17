@@ -18,8 +18,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
-import { WARPGOGOL_METRIC_REGISTRY } from "@warpgogol/werkstatt-site/observability";
+import { diagnosticsResult } from "@warpgogol/werkstatt-shared/checks";
+import { WARPGOGOL_METRIC_REGISTRY } from "@warpgogol/werkstatt-shared/observability";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { ALERT_RULES, NOTIFICATION_CHANNELS } from "../alert-rules.ts";
 

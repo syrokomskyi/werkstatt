@@ -28,7 +28,7 @@ RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for 
 */
 
 import { z } from "zod";
-import { starNameSchema } from "@warpgogol/werkstatt-site/ontology/cosmic";
+import { starNameSchema } from "@warpgogol/werkstatt-shared/ontology/cosmic";
 import { deploymentStaticConfigSchema, lastPropagatedChannelSchema } from "./leitstand.ts";
 
 const semverRe = /^\d+\.\d+\.\d+$/;

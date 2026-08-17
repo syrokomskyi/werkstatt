@@ -22,7 +22,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { dnsRecordFileSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
+import { dnsRecordFileSchema } from "@warpgogol/werkstatt-shared/ontology/schemas";
 import { flagString } from "./dns-helpers.ts";
 import { discoverSystems, resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 

@@ -27,8 +27,8 @@ import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import {
   loadSurfaceModuleContexts,
   readVisibilityOutcomes,
-} from "@warpgogol/werkstatt-site/surface/io";
-import type { SurfaceModuleContext } from "@warpgogol/werkstatt-site/surface";
+} from "@warpgogol/werkstatt-shared/surface/io";
+import type { SurfaceModuleContext } from "@warpgogol/werkstatt-shared/surface";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 
 const FREEZE_FILE = "src/surface/freeze.generated.yaml";
