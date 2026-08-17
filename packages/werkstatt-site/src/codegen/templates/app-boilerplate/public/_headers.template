@@ -62,6 +62,12 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
+/_img/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_video/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /*.css
   Cache-Control: public, max-age=31536000, immutable
 

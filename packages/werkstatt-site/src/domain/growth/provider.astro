@@ -64,6 +64,20 @@ const config: GrowthConfig = GrowthConfigSchema.parse({
 });
 
 const configJson = JSON.stringify(config);
+
+const growthProxyOrigin = (() => {
+  if (config.vendor.adapter === "matomo") {
+    const proxyBaseUrl = config.vendor.options["proxyBaseUrl"];
+    if (proxyBaseUrl) {
+      try {
+        return new URL(proxyBaseUrl).origin;
+      } catch {
+        return undefined;
+      }
+    }
+  }
+  return undefined;
+})();
 ---
 
 <!--
@@ -80,6 +94,7 @@ const configJson = JSON.stringify(config);
   and add a loader entry here.
 -->
 <script id={GROWTH_CONFIG_SCRIPT_ID} type="application/json" set:html={configJson} />
+{growthProxyOrigin && <link rel="preconnect" href={growthProxyOrigin} crossorigin />}
 
 <script>
   import { bootGrowthLayer } from "@warpgogol/werkstatt-site/growth/client";
@@ -90,7 +105,14 @@ const configJson = JSON.stringify(config);
     matomo: () => import("@warpgogol/werkstatt-site/growth-adapter-matomo"),
   };
 
-  bootGrowthLayer(growthLoaders).catch((err) => {
-    console.warn("[growth] bootGrowthLayer failed:", err);
-  });
+  const boot = () =>
+    bootGrowthLayer(growthLoaders).catch((err) => {
+      console.warn("[growth] bootGrowthLayer failed:", err);
+    });
+
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(boot, { timeout: 3000 });
+  } else {
+    setTimeout(boot, 200);
+  }
 </script>

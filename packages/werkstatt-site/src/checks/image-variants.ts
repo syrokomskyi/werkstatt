@@ -32,12 +32,15 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import type { ImageVariantEntry, ImageVariantManifest } from "@warpgogol/werkstatt-shared/share/image-provider";
+import type {
+  ImageVariantEntry,
+  ImageVariantManifest,
+} from "@warpgogol/werkstatt-shared/share/image-provider";
 
 const MANIFEST_RELATIVE = "src/image-variants.generated.yaml";
 const VARIANTS_PUBLIC_DIR = "_img";
 /** Target widths for the responsive ladder (never upscale). */
-const TARGET_WIDTHS = [320, 480, 640, 768, 1024, 1280] as const;
+const TARGET_WIDTHS = [320, 480, 640, 768, 1024, 1280, 1536, 1920] as const;
 
 // ---------------------------------------------------------------------------
 // Helpers
