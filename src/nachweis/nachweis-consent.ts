@@ -28,7 +28,7 @@ import type {
 import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
-} from "@warpgogol/werkstatt-site/content";
+} from "@warpgogol/werkstatt-shared/content";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {

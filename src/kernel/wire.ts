@@ -16,7 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "./types.ts";
 import { discoverSiteWorkspaces } from "./discovery.ts";
-import { loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";
+import { loadSystemManifestSync } from "@warpgogol/werkstatt-shared/content";
 import { buildGeneratedHeader, hasGeneratedMarker } from "./generated-marker.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -141,7 +141,7 @@ function buildModuleDecisions(
     },
     {
       key: "onboarding",
-      include: hasPackage(packageJson, "@warpgogol/werkstatt-site/onboarding"),
+      include: hasPackage(packageJson, "@warpgogol/werkstatt-shared/onboarding"),
       reason: "onboarding package not installed",
     },
     {

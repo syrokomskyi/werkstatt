@@ -24,7 +24,6 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
-import { runContentRefIndexGenerate } from "@warpgogol/werkstatt-site/codegen";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 
 interface DevCriticalFile {
@@ -260,6 +259,7 @@ export async function runMissionPreview(
     toolsDirectory: path.join(workpiecePath, "tools"),
   };
   try {
+    const { runContentRefIndexGenerate } = await import("@warpgogol/werkstatt-site/codegen");
     await runContentRefIndexGenerate({ argv: [], flags: {} }, { ...context, site: workpieceSite });
   } catch (err) {
     logger.warn(

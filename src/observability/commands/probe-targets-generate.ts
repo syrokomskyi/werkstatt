@@ -22,7 +22,7 @@ import { diagnosticsResult } from "@warpgogol/werkstatt-shared/checks";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { readAstroSiteUrl } from "@warpgogol/werkstatt-shared/checks/lib/astro-site-url";
 import { readDefaultLanguageCode } from "@warpgogol/werkstatt-shared/checks/lib/i18n";
-import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
+import { loadSystemManifest } from "@warpgogol/werkstatt-shared/content";
 
 interface ProbeTarget {
   siteId: string;

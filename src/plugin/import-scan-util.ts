@@ -22,7 +22,7 @@ export interface ImportViolation {
   specifier: string;
 }
 
-const EXCLUDE_DIRS = new Set(["node_modules", "tests", "tests-handoff", "dist"]);
+const EXCLUDE_DIRS = new Set(["node_modules", "tests", "tests-handoff", "dist", "templates"]);
 const EXCLUDE_SUFFIXES = [".test.ts", ".spec.ts"];
 
 const IMPORT_PATTERN =
