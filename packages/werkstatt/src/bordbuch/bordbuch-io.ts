@@ -395,6 +395,7 @@ export async function commitAndPushBordbuch(
   }
 
   try {
+    gitExec(systemDir, `pull --rebase origin ${branch}`);
     gitExec(systemDir, `push origin ${branch}`);
     return { commitSha, pushed: true, error: null };
   } catch (err) {
