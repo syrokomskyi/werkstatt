@@ -327,7 +327,7 @@
     "access": "public",
     "provenance": true
   },
-  "files": ["src", "tsconfig.json", "README.md"],
+  "files": ["src", "tsconfig.json"],
   "dependencies": {
     "@lordicon/element": "^2.3.1",
     "@noble/ed25519": "^3.1.0",

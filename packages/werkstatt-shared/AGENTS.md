@@ -25,4 +25,4 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from `w
 
 - Package is published as `@warpgogol/werkstatt-shared` with `access: public` and NPM provenance.
 - `prepublishOnly` runs typecheck before publish.
-- CI workflow: `.github/workflows/npm-publish.yml` publishes on `v*` tags.
+- CI workflow: `.github/workflows/publish.yml` publishes on `v*` tags.

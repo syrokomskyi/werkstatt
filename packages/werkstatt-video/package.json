@@ -1,7 +1,7 @@
 {
   "name": "@warpgogol/werkstatt-video",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "Werkstatt video plugin — Editframe stack (RFC-0778).",
   "main": "./src/index.ts",
@@ -52,8 +52,13 @@
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "pnpm exec tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "dependencies": {
     "@warpgogol/werkstatt": "workspace:*",
