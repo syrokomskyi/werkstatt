@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, readFileSync, existsSync } from "node:f
 import { join } from "node:path";
 import { writeMissionManifest, readMissionManifest } from "../mission/mission-io.ts";
 import type { MissionManifest } from "@warpgogol/werkstatt/schemas";
+import { tmpdir } from "node:os";
 
 function makeManifest(missionId: string, systemId: string): MissionManifest {
   return {
@@ -38,7 +39,7 @@ function makeManifest(missionId: string, systemId: string): MissionManifest {
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-release-id-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-release-id-"));
 });
 
 afterEach(() => {

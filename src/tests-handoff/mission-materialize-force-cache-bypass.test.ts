@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createMaterializeWorkspace } from "./helpers/materialize-fixture.ts";
+import { tmpdir } from "node:os";
 
 const mockPipeline = vi.hoisted(() => ({
   forceUsed: undefined as boolean | undefined,
@@ -130,7 +131,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-mat-force-bypass-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-mat-force-bypass-"));
   tmpWorkspace = join(testRoot, "workspace");
   mockPipeline.forceUsed = undefined;
   mockPipeline.pipelineNameUsed = "";

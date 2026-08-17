@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createLeitstandSystem } from "./helpers/leitstand-fixture.ts";
+import { tmpdir } from "node:os";
 
 const mockState = vi.hoisted(() => ({
   validateResult: {
@@ -84,7 +85,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-close-evidence-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-close-evidence-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
   mockState.syncCalled = false;

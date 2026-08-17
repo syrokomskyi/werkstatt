@@ -16,6 +16,7 @@ import { runMissionOpen } from "../mission/mission-open.ts";
 import { computeEntryHash } from "../bordbuch/bordbuch-io.ts";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 function gitInit(dir: string): void {
   execSync("git init", { cwd: dir, stdio: "pipe" });
@@ -78,7 +79,7 @@ let tmpWorkspace: string;
 let cacheDir: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-bordbuch-gate-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-bordbuch-gate-"));
   tmpWorkspace = join(testRoot, "workspace");
   cacheDir = join(testRoot, "systems-cache", "test-system");
   mkdirSync(tmpWorkspace, { recursive: true });

@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 const mockExecuteKernelCommand = vi.hoisted(() => ({
   calls: [] as Array<{ commandName: string; argv?: string[] }>,
@@ -136,7 +137,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-mat-baseline-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-mat-baseline-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
   mockExecuteKernelCommand.calls = [];

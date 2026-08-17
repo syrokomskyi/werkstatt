@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "nod
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import { runWorkpieceWrite } from "../workpiece/workpiece-write.ts";
+import { tmpdir } from "node:os";
 import type {
   KernelCommandInput,
   KernelRuntimeContext,
@@ -23,7 +24,7 @@ let tmpDir: string;
 let workpieceDir: string;
 
 function setupMission(clientEditable: string[]): string {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-wp-write-test-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-wp-write-test-"));
   const missionDir = join(tmpDir, "missions", "test-mission");
   workpieceDir = join(missionDir, "workpiece");
   const contentDir = join(workpieceDir, "src", "content");

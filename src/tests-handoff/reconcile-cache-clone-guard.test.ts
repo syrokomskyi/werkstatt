@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { isWorkpieceDirty } from "../mission/mission-git-commit.ts";
+import { tmpdir } from "node:os";
 
 function gitInit(dir: string): void {
   execSync("git init", { cwd: dir, stdio: "pipe" });
@@ -28,7 +29,7 @@ function gitCommit(dir: string, msg: string): void {
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-cache-guard-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-cache-guard-"));
 });
 
 afterEach(() => {

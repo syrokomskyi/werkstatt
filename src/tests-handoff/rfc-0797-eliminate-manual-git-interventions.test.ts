@@ -18,6 +18,7 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { tmpdir } from "node:os";
 
 // --- Mocks ---
 
@@ -81,7 +82,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-rfc-0797-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-rfc-0797-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
   mockSync.executeKernelCommandResult = {
@@ -379,7 +380,7 @@ test("commitCacheCloneIfDirty commits all dirty files and returns commit SHA", a
   const { commitCacheCloneIfDirty } = await import("../mission/mission-git-commit.ts");
 
   // Create a temp git repo with some committed files
-  const repoDir = mkdtempSync(join(process.cwd(), "tmp-rfc-0797-cache-"));
+  const repoDir = mkdtempSync(join(tmpdir(), "tmp-rfc-0797-cache-"));
   gitInit(repoDir);
   writeFileSync(join(repoDir, "file1.txt"), "content1\n");
   gitCommit(repoDir, "initial");
@@ -418,7 +419,7 @@ test("commitCacheCloneIfDirty commits all dirty files and returns commit SHA", a
 test("commitCacheCloneIfDirty returns committed=false when nothing dirty", async () => {
   const { commitCacheCloneIfDirty } = await import("../mission/mission-git-commit.ts");
 
-  const repoDir = mkdtempSync(join(process.cwd(), "tmp-rfc-0797-clean-"));
+  const repoDir = mkdtempSync(join(tmpdir(), "tmp-rfc-0797-clean-"));
   gitInit(repoDir);
   writeFileSync(join(repoDir, "file1.txt"), "content1\n");
   gitCommit(repoDir, "initial");
@@ -435,7 +436,7 @@ test("commitCacheCloneIfDirty returns committed=false when nothing dirty", async
 test("commitCacheCloneIfDirty returns committed=false when no .git directory", async () => {
   const { commitCacheCloneIfDirty } = await import("../mission/mission-git-commit.ts");
 
-  const repoDir = mkdtempSync(join(process.cwd(), "tmp-rfc-0797-nogit-"));
+  const repoDir = mkdtempSync(join(tmpdir(), "tmp-rfc-0797-nogit-"));
   // No git init
   writeFileSync(join(repoDir, "file1.txt"), "content1\n");
 

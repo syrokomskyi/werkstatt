@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { commitWerkstattSideEffects } from "../werkstatt/werkstatt-commit.ts";
+import { tmpdir } from "node:os";
 
 function gitInit(dir: string): void {
   execSync("git init -b main", { cwd: dir, stdio: "pipe" });
@@ -32,7 +33,7 @@ function gitStatusPorcelain(dir: string): string {
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-werkstatt-commit-test-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-werkstatt-commit-test-"));
 });
 
 afterEach(() => {

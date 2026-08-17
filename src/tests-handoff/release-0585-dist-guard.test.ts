@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 import { runReleaseReady } from "../release/release-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 function makeContext(workspaceRoot: string): KernelRuntimeContext {
   return {
@@ -71,7 +72,7 @@ function writeReleaseManifest(
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-release-guard-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-release-guard-"));
 });
 
 afterEach(() => {

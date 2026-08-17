@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 const mock = vi.hoisted(() => ({
   pipelineCalls: [] as string[],
@@ -111,7 +112,7 @@ function gitCommit(dir: string, msg: string): void {
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-build-check-"));
+  tmpWorkspace = mkdtempSync(join(tmpdir(), "tmp-build-check-"));
   mock.pipelineCalls = [];
   mock.prepareOk = true;
   mock.checkOk = true;

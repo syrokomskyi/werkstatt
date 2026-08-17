@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createMaterializeWorkspace } from "./helpers/materialize-fixture.ts";
+import { tmpdir } from "node:os";
 
 const mockPipeline = vi.hoisted(() => ({
   pipelineResult: {
@@ -107,7 +108,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-rfc-0620-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-rfc-0620-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
 });
