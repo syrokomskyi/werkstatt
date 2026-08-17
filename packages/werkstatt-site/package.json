@@ -1,7 +1,7 @@
 {
   "name": "@warpgogol/werkstatt-site",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "Werkstatt site plugin — Astro stack engine modules and domain layer (RFC-0774/0775).",
   "main": "./src/index.ts",
@@ -951,6 +951,7 @@
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "pnpm exec tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -959,9 +960,6 @@
     "@ai-sdk/openai": "^4.0.27",
     "@astrojs/compiler": "^4.0.0",
     "@cyclonedx/cyclonedx-library": "^1.14.0",
-    "@syrokomskyi/axiom-capture": "link:../../../pipelines/packages/axiom/axiom-capture",
-    "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
-    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study",
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/werkstatt": "workspace:*",
     "ai": "^7.0.47",
@@ -996,6 +994,15 @@
     "micromark-extension-gfm": "^3.0.0",
     "qrcode": "^1.5.4",
     "@warpgogol/werkstatt-shared": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "optionalDependencies": {
+    "@syrokomskyi/axiom-capture": "link:../../../pipelines/packages/axiom/axiom-capture",
+    "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
+    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
   },
   "devDependencies": {
     "@quantco/pnpm-licenses": "2.4.2",

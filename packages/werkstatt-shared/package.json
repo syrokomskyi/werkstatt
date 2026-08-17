@@ -1,7 +1,7 @@
 {
   "name": "@warpgogol/werkstatt-shared",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "Stack-agnostic shared infrastructure extracted from werkstatt-site (RFC-0868).",
   "main": "./src/index.ts",
@@ -319,13 +319,18 @@
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "pnpm exec tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "files": ["src", "tsconfig.json", "README.md"],
   "dependencies": {
     "@lordicon/element": "^2.3.1",
     "@noble/ed25519": "^3.1.0",
-    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study",
     "ajv": "^8.20.0",
     "bs58": "^6.0.0",
     "expr-eval": "^2.0.2",
@@ -334,6 +339,9 @@
     "plyr": "^3.8.4",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
+  },
+  "optionalDependencies": {
+    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260801.1",
