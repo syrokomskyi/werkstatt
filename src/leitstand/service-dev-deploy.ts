@@ -15,6 +15,7 @@ health check, and dev state recording.</purpose>
 
 import path from "node:path";
 import { existsSync } from "node:fs";
+import { copyFileSync } from "node:fs";
 import type { KernelCommandInput, KernelCommandResult } from "@warpgogol/werkstatt/kernel";
 import { readServicesRegistry, findServiceEntry } from "../sternsystem/registry-io.ts";
 import {
@@ -73,6 +74,19 @@ export async function runLeitstandServiceDevDeploy(
   }
 
   await acquireServiceLock(workspaceRoot, serviceId, operationId, "leitstand.service.dev-deploy");
+
+  // Auto-create .env.dev from .env if .env.dev is missing but .env and .env.dev.example exist
+  const envDevPath = path.join(serviceDir, ".env.dev");
+  const envPath = path.join(serviceDir, ".env");
+  const envDevExamplePath = path.join(serviceDir, ".env.dev.example");
+  if (!existsSync(envDevPath) && existsSync(envPath) && existsSync(envDevExamplePath)) {
+    try {
+      copyFileSync(envPath, envDevPath);
+      logger.info(`[leitstand.service.dev-deploy] auto-created .env.dev from .env`);
+    } catch {
+      // best-effort — deploy.preflight will report the error
+    }
+  }
 
   try {
     // 1. Pre-deploy gates: service.naming.validate, service.registry.validate, services.check.run, build:check, deploy.preflight --dev

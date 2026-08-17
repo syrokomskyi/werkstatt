@@ -48,6 +48,7 @@ import {
 } from "../werkstatt/index.ts";
 import { resolveActor } from "./actor-identity.ts";
 import { trashPath } from "@warpgogol/forge/utils";
+import { gitExec } from "../werkstatt/git-exec.ts";
 
 export interface StaleEntryCheck {
   removedPaths: string[];
@@ -301,8 +302,14 @@ export async function runMissionOpen(
       );
     }
     if (!pushResult.pushed) {
+      const cacheDir = resolveCacheClonePath(workspaceRoot, systemId);
+      try {
+        gitExec(cacheDir, "reset --hard HEAD~1");
+      } catch {
+        // best-effort rollback — if reset fails, manual intervention needed
+      }
       throw new Error(
-        `[mission.open] bordbuch push failed for system '${systemId}' — mission-open event was committed but not persisted to the bare repo. ` +
+        `[mission.open] bordbuch push failed for system '${systemId}' — mission-open event was rolled back. ` +
           `Error: ${pushResult.error ?? "unknown"}. ` +
           `Check git remote connectivity and re-run mission.open.`,
       );
