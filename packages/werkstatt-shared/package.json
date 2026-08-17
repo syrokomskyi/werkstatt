@@ -211,6 +211,10 @@
       "types": "./src/share/knowledge/source.ts",
       "default": "./src/share/knowledge/source.ts"
     },
+    "./share/legal/translation-policy": {
+      "types": "./src/share/legal/translation-policy.ts",
+      "default": "./src/share/legal/translation-policy.ts"
+    },
     "./share/material-credits": {
       "types": "./src/share/material-credits.ts",
       "default": "./src/share/material-credits.ts"

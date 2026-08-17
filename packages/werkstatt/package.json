@@ -351,7 +351,7 @@
     "@libp2p/ping": "^3.1.11",
     "@libp2p/tcp": "^11.0.26",
     "@multiformats/multiaddr": "^13.0.3",
-    "@warpgogol/werkstatt-shared": "workspace:*",
+    "@warpgogol/werkstatt-shared": "*",
     "@aws-sdk/client-s3": "^3.1101.0",
     "@noble/ed25519": "^3.1.0",
     "asn1js": "^3.0.10",
@@ -388,8 +388,7 @@
   },
   "optionalDependencies": {
     "better-sqlite3": "^13.0.2",
-    "@warpgogol/forge": "workspace:*",
-    "@warpgogol/werkstatt-site": "workspace:*",
+    "@warpgogol/forge": "*",
     "@syrokomskyi/axiom-factory-app": "*",
     "@syrokomskyi/axiom-study": "*"
   },
