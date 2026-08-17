@@ -731,9 +731,6 @@ importers:
       '@warpgogol/forge':
         specifier: workspace:*
         version: link:../forge
-      '@warpgogol/werkstatt-site':
-        specifier: workspace:*
-        version: link:../werkstatt-site
       better-sqlite3:
         specifier: ^13.0.2
         version: 13.0.2

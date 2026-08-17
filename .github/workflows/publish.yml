@@ -1,9 +1,10 @@
 name: NPM publish
 
 # RFC-0868: Publish @warpgogol/werkstatt, @warpgogol/werkstatt-shared,
-# @warpgogol/werkstatt-site, @warpgogol/werkstatt-game, @warpgogol/werkstatt-godot,
+# @warpgogol/werkstatt-game, @warpgogol/werkstatt-godot,
 # and @warpgogol/werkstatt-video to NPM on release tag.
 # Uses npm provenance for supply-chain attestation.
+# Note: @warpgogol/werkstatt-site is NOT published to NPM (excluded by design).
 
 on:
   push:
@@ -12,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "Package to publish (all|werkstatt|werkstatt-shared|werkstatt-site|werkstatt-game|werkstatt-godot|werkstatt-video)"
+        description: "Package to publish (all|werkstatt|werkstatt-shared|werkstatt-game|werkstatt-godot|werkstatt-video)"
         required: false
         default: "all"
 
@@ -56,7 +57,6 @@ jobs:
         run: |
           pnpm --filter @warpgogol/werkstatt-shared build:check
           pnpm --filter @warpgogol/werkstatt build:check
-          pnpm --filter @warpgogol/werkstatt-site build:check
           pnpm --filter @warpgogol/werkstatt-game build:check
           pnpm --filter @warpgogol/werkstatt-godot build:check
           pnpm --filter @warpgogol/werkstatt-video build:check
@@ -70,12 +70,6 @@ jobs:
       - name: Publish @warpgogol/werkstatt
         if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt' || github.event.inputs.package == ''
         run: pnpm --filter @warpgogol/werkstatt publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @warpgogol/werkstatt-site
-        if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt-site' || github.event.inputs.package == ''
-        run: pnpm --filter @warpgogol/werkstatt-site publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
