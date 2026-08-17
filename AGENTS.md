@@ -792,6 +792,7 @@ The Werkstatt engine is a family of private npm packages developed in this monor
 ### Terminology (normative for all downstream RFCs)
 
 - **Engine** — `@warpgogol/werkstatt`: stack-agnostic lifecycle platform (kernel runtime, missions, mirrors, releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, consistency primitives, fingerprint, integrity, observability).
+- **Shared** — `@warpgogol/werkstatt-shared`: stack-agnostic shared infrastructure (checks, integration, ontology, passport, share, surface) extracted from the site plugin (RFC-0868). Consumed by both engine and plugins. MUST NOT import from any plugin.
 - **Plugin** — `@warpgogol/werkstatt-<stack>`: stack-specific package implementing the plugin contract (path conventions, validators, codegen, content handling, onboarding templates, deploy adapters, stack invariants). Plugins: `werkstatt-site` (Astro), `werkstatt-game` (Phaser), `werkstatt-video` (Editframe).
 - **Workshop** — consumer monorepo (pnpm + Turborepo) that installs the engine + exactly one plugin from npm. Contains `forge.yaml`, `tools/kernel.config.ts`, `systems-cache/`, `missions/`, `docs/`, `.agents/`, hooks, CI.
 - **Project** — a Sternsystem discovered via `systems-cache/{id}/system-config.yaml` in the workshop, living outside the workshop in mirrors per RFC-0574.
@@ -802,6 +803,7 @@ The Werkstatt engine is a family of private npm packages developed in this monor
 | npm package | Contents | Source |
 | --- | --- | --- |
 | `@warpgogol/werkstatt` | Engine (one consolidated package) | `packages/werkstatt` |
+| `@warpgogol/werkstatt-shared` | Shared infrastructure (checks, integration, ontology, passport, share, surface) | `packages/werkstatt-shared` |
 | `@warpgogol/werkstatt-site` | Site plugin: Astro engine modules + full site domain layer | `packages/werkstatt-site` |
 | `@warpgogol/werkstatt-game` | Game plugin (phaser-turborepo profile) | `packages/werkstatt-game` |
 | `@warpgogol/werkstatt-video` | Video plugin (editframe profile) | `packages/werkstatt-video` |

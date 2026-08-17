@@ -42,6 +42,7 @@
   <entry key="nachweis.*">Registers workspace nachweis commands: nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw (RFC-0707).</entry>
   <entry key="exploration.*">Registers workspace exploration note commands: exploration.list, exploration.show, exploration.archive (RFC-0710).</entry>
   <entry key="werkstatt.plugin.validate">Registers workspace plugin contract validation command (RFC-0770).</entry>
+  <entry key="werkstatt.shared.validate">Registers workspace shared/site boundary guard command (RFC-0868).</entry>
   <entry key="service.smoke.run">RFC-0825: post-deploy smoke tests for services.</entry>
   <entry key="site.smoke.run">RFC-0825: post-deploy smoke tests for sites.</entry>
 </MODULE_MAP>
@@ -162,6 +163,8 @@ export default defineKernelConfig({
       (await import("@warpgogol/werkstatt/os/werkstatt-plugin-module")).forgeWerkstattPluginModule,
     "werkstatt-autonomy": async () =>
       (await import("@warpgogol/werkstatt/os/werkstatt-autonomy-module")).werkstattAutonomyModule,
+    "werkstatt-shared": async () =>
+      (await import("@warpgogol/werkstatt/os/werkstatt-shared-module")).werkstattSharedModule,
     workshop: async () =>
       (await import("@warpgogol/werkstatt/workshop-module")).createWorkshopModule(),
   },
