@@ -17,7 +17,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { ImageDescriptor, MaterialCreditLabels } from "@warpgogol/werkstatt-shared/share";
+import type { ImageDescriptor, MaterialCreditLabels } from "@warpgogol/werkstatt-site/share";
 import {
   buildImageSources,
   creditByTarget,
@@ -25,7 +25,7 @@ import {
   labelForMaterialCreditRole,
   resolveAttributionDisplay,
   type AttributionSiteDefault,
-} from "@warpgogol/werkstatt-shared/share";
+} from "@warpgogol/werkstatt-site/share";
 import { contentAssetCredits, contentAssetImages } from "../../content-assets.ts";
 
 function escapeHtml(value: string): string {

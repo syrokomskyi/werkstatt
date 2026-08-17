@@ -19,9 +19,9 @@
 */
 
 import { render } from "astro:content";
-import type { MaterialCreditLabels } from "@warpgogol/werkstatt-shared/share";
+import type { MaterialCreditLabels } from "@warpgogol/werkstatt-site/share";
 import { getProseContentEntry } from "@warpgogol/werkstatt-site/share/astro/content";
-import { wrapInlineNumbers, type AttributionSiteDefault } from "@warpgogol/werkstatt-shared/share";
+import { wrapInlineNumbers, type AttributionSiteDefault } from "@warpgogol/werkstatt-site/share";
 import {
   getContentRefIndex,
   resolveReferencesInString,

@@ -10349,6 +10349,14 @@
     "./ui/components/section-body/list/section-list.astro": {
       "types": "./src/domain/ui/components/section-body/list/section-list.astro",
       "default": "./src/domain/ui/components/section-body/list/section-list.astro"
+    },
+    "./share/astro/routes": {
+      "types": "./src/domain/share/astro/routes.ts",
+      "default": "./src/domain/share/astro/routes.ts"
+    },
+    "./share": {
+      "types": "./src/domain/share/index.ts",
+      "default": "./src/domain/share/index.ts"
     }
   },
   "files": [
