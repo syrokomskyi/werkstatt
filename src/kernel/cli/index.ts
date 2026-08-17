@@ -11,6 +11,7 @@
   <item>Return a JSON error envelope for top-level CLI exceptions when --json is requested.</item>
   <item>RFC-0686: add --concurrency flag for pipeline execution.</item>
   <item>ADR-0022: add --no-registry-cache flag to disable process-lifetime registry cache.</item>
+  <item>RFC-0870: add pipeline hint to Unknown command and not-registered error messages.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,6 +26,7 @@ import {
 } from "../index.ts";
 import { setRegistryCacheEnabled } from "../runtime/registry-cache.ts";
 import { flushFactoryTelemetry } from "../runtime/telemetry.ts";
+import { pipelineHint } from "../pipeline-hint.ts";
 // @ai-invariant: CLI execution must route through registered kernel commands and preserve typed flag parsing.
 
 function argvRequestsHelp(argv: string[]): boolean {
@@ -36,7 +38,7 @@ async function printCommandHelp(workspaceRoot: string, commandName: string): Pro
   const manifest = await buildCommandManifest(workspaceRoot);
   const entry = manifest.commands.find((command) => command.name === commandName);
   if (!entry) {
-    console.log(`Unknown command "${commandName}".`);
+    console.log(`Unknown command "${commandName}".${pipelineHint(commandName)}`);
     return;
   }
   console.log(`${entry.name} — ${entry.description}`);

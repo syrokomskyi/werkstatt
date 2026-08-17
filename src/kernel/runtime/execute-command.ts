@@ -17,6 +17,7 @@ resolves a workspace-scoped or app-scoped command from CLI options and runs it.
   <item>RFC-0635: inject force from context into input.flags.force so command handlers can read --force without declaring it in their flag schema.</item>
   <item>ADR-0022: workspace registry now uses process-lifetime cache via getOrBuildWorkspaceRegistry.</item>
   <item>RFC-0842: add assertAllSitesAllowed guard — rejects --all for commands where supportsAllSites is not true (covers false and undefined).</item>
+  <item>RFC-0870: add pipeline hint to not-registered and no-target-site error messages.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,6 +25,7 @@ import { performance } from "node:perf_hooks";
 import { readFile } from "node:fs/promises";
 import { relative } from "node:path";
 import { createKernelLogger } from "../logger.ts";
+import { pipelineHint } from "../pipeline-hint.ts";
 import { loadWorkspaceConfig, loadKernelAppConfig } from "../discovery.ts";
 import {
   createDefaultIO,
@@ -444,7 +446,9 @@ export async function executeKernelCommand(
   );
 
   if (targetSites.length === 0) {
-    throw new Error("No target site with a kernel config could be resolved.");
+    throw new Error(
+      `No target site with a kernel config could be resolved.${pipelineHint(options.commandName)}`,
+    );
   }
 
   const reports: KernelExecutionReport[] = [];
@@ -511,7 +515,7 @@ export async function executeKernelCommand(
 
     if (!command) {
       throw new Error(
-        `Kernel command \`${options.commandName}\` is not registered for site \`${site.name}\`.`,
+        `Kernel command \`${options.commandName}\` is not registered for site \`${site.name}\`.${pipelineHint(options.commandName)}`,
       );
     }
 
