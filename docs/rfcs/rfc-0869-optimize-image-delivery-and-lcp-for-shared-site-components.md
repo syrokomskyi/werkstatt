@@ -292,8 +292,8 @@ The default quality change from `"max"` to `90` affects every `ResponsiveImage` 
 - [x] `women-section.astro` adds `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/sections/women/women-section.astro:71)
 - [x] `credits-gallery-section.astro` changes `quality="high"` to `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/sections/credits-gallery/credits-gallery-section.astro:291)
 - [x] `brand-label-component.astro` adds `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/components/brand-label/brand-label-component.astro:72)
-- [ ] `image-variants.generated.yaml` is generated and committed in the warpgogol-com cache clone (deferred to next warpgogol-com mission — code changes complete, operational step requires mission workpiece)
-- [ ] `image.delivery.validate` passes for hero-bg, home-bg, and poster images in warpgogol-com (deferred to next warpgogol-com mission — code changes complete, validation requires mission workpiece build)
+- [x] `image-variants.generated.yaml` is generated and committed in the warpgogol-com cache clone (evidence: missions/warpgogol-com-m000067/evidence/validation-report.json:973, image.variants.validate passed — manifest generated during build.prepare pipeline)
+- [x] `image.delivery.validate` passes for hero-bg, home-bg, and poster images in warpgogol-com (evidence: missions/warpgogol-com-m000067/evidence/validation-report.json, build.post pipeline 46/46 steps passed including image.delivery.validate)
 - [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0869 --json, status: pass)
 
 ## Implementation notes for agents
