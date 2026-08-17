@@ -134,7 +134,7 @@ vi.mock("../sternsystem/registry-io.ts", async (importOriginal) => {
   };
 });
 
-vi.mock("@warpgogol/werkstatt-shared/checks", () => ({
+vi.mock("@warpgogol/werkstatt-site/checks", () => ({
   runEnvExampleGenerate: vi.fn(async () => []),
   MISSION_PREFLIGHT_CRITICAL: [],
   MISSION_PREFLIGHT_WARNING: [],
