@@ -12,6 +12,7 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
+import { tmpdir } from "node:os";
 
 function gitInit(dir: string): void {
   execSync("git init", { cwd: dir, stdio: "pipe" });
@@ -29,7 +30,7 @@ let cacheCloneDir: string;
 let patchDir: string;
 
 beforeEach(() => {
-  const base = mkdtempSync(join(process.cwd(), "tmp-3way-"));
+  const base = mkdtempSync(join(tmpdir(), "tmp-3way-"));
   workpieceDir = join(base, "workpiece");
   cacheCloneDir = join(base, "cache");
   patchDir = join(base, "patches");

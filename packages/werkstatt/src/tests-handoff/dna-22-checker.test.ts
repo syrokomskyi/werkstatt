@@ -12,11 +12,12 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isClientEditable } from "../workpiece/dna-22-checker.ts";
+import { tmpdir } from "node:os";
 
 let tmpDir: string;
 
 function setupWorkpiece(clientEditable: string[]): string {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-dna22-test-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-dna22-test-"));
   const contentDir = join(tmpDir, "src", "content");
   mkdirSync(contentDir, { recursive: true });
   mkdirSync(join(contentDir, "pages"), { recursive: true });

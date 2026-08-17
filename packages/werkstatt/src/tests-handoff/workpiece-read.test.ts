@@ -12,6 +12,7 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runWorkpieceRead } from "../workpiece/workpiece-read.ts";
+import { tmpdir } from "node:os";
 import type {
   KernelCommandInput,
   KernelRuntimeContext,
@@ -22,7 +23,7 @@ let tmpDir: string;
 let workpieceDir: string;
 
 function setupMission(clientEditable: string[]): string {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-wp-read-test-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-wp-read-test-"));
   const missionDir = join(tmpDir, "missions", "test-mission");
   workpieceDir = join(missionDir, "workpiece");
   const contentDir = join(workpieceDir, "src", "content");

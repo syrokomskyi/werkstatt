@@ -13,11 +13,12 @@ import { mkdtempSync, rmSync, existsSync, readFileSync, statSync } from "node:fs
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { installBordbuchPreCommitHook } from "../bordbuch/bordbuch-hook.ts";
+import { tmpdir } from "node:os";
 
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-bordbuch-hook-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-bordbuch-hook-"));
 });
 
 afterEach(() => {

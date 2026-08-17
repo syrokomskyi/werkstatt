@@ -12,6 +12,7 @@ import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { runDnsRecordsSchemaValidate } from "./dns-records-schema-validate.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "../kernel/types.ts";
+import { tmpdir } from "node:os";
 
 let testRoot: string;
 let tmpDir: string;
@@ -25,7 +26,7 @@ function resolveDnsPath(systemId: string): string {
 }
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-dns-schema-validate-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-dns-schema-validate-"));
   tmpDir = join(testRoot, "workspace");
   mkdirSync(tmpDir, { recursive: true });
 });

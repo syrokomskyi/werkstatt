@@ -15,11 +15,12 @@ import { deriveNextMissionNumberSafe } from "../bordbuch/bordbuch-io.ts";
 import { runMissionCleanup } from "../mission/mission-cleanup.ts";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-stale-symlink-0796-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-stale-symlink-0796-"));
 });
 
 afterEach(() => {

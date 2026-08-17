@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "nod
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 // ---------------------------------------------------------------------------
 // Mocks — same pattern as rfc-0658-mission-close-bordbuch-validate.test.ts
@@ -107,7 +108,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-no-op-guard-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-no-op-guard-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
   mockState.validateResult = { data: null, exitCode: 0, summary: "" };

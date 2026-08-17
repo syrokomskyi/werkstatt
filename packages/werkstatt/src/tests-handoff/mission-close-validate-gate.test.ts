@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 const mockState = vi.hoisted(() => ({
   validateResult: {
@@ -47,7 +48,7 @@ function gitCommit(dir: string, msg: string): void {
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-close-validate-gate-"));
+  tmpWorkspace = mkdtempSync(join(tmpdir(), "tmp-close-validate-gate-"));
   mockState.validateResult = { data: null, exitCode: 0, summary: "" };
   mockState.onValidate = null;
 });

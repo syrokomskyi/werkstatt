@@ -11,11 +11,12 @@
 import { test, describe, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-stale-validate-0796-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-stale-validate-0796-"));
 });
 
 afterEach(() => {

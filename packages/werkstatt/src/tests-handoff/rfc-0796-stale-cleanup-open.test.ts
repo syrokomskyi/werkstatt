@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, symlinkSync, existsSync 
 import { join, basename } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 // Mock bordbuch validation to bypass pre-flight gate (we're testing stale entry cleanup, not bordbuch)
 vi.mock("../bordbuch/bordbuch-io.ts", () => ({
@@ -89,7 +90,7 @@ function gitCommit(dir: string, msg: string): void {
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-stale-cleanup-open-"));
+  tmpWorkspace = mkdtempSync(join(tmpdir(), "tmp-stale-cleanup-open-"));
 });
 
 afterEach(() => {

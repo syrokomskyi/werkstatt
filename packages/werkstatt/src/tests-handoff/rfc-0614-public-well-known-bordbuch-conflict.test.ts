@@ -13,6 +13,7 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
+import { tmpdir } from "node:os";
 
 function gitInit(dir: string): void {
   execSync("git init -b main", { cwd: dir, stdio: "pipe" });
@@ -47,7 +48,7 @@ let workpieceDir: string;
 let baseDir: string;
 
 beforeEach(() => {
-  baseDir = mkdtempSync(join(process.cwd(), "tmp-rfc0614-"));
+  baseDir = mkdtempSync(join(tmpdir(), "tmp-rfc0614-"));
   cacheCloneDir = join(baseDir, "cache");
   workpieceDir = join(baseDir, "workpiece");
   mkdirSync(cacheCloneDir, { recursive: true });

@@ -24,6 +24,7 @@ import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts"
 import { runReleaseReady, runReleaseValidate } from "../release/release-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { tmpdir } from "node:os";
 
 function makeContext(workspaceRoot: string): KernelRuntimeContext {
   return {
@@ -116,7 +117,7 @@ systems:
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-release-0596-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-release-0596-"));
 });
 
 afterEach(() => {

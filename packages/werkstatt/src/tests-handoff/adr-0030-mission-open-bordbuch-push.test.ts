@@ -14,6 +14,7 @@ import { join, basename } from "node:path";
 import { execSync } from "node:child_process";
 import { runMissionOpen } from "../mission/mission-open.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 function gitInit(dir: string): void {
   execSync("git init -b main", { cwd: dir, stdio: "pipe" });
@@ -30,7 +31,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-adr-0030-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-adr-0030-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
 });

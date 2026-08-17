@@ -17,12 +17,13 @@ import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/werkst
 import { setupCloudflareApiMock, cfSuccessResponse } from "./helpers/cloudflare-api-mock.ts";
 import { buildSystemConfig, buildServicesRegistry } from "./helpers/registry-builder.ts";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { tmpdir } from "node:os";
 
 let tmpDir: string;
 let mockFetch: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(process.cwd(), "tmp-subdomain-register-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "tmp-subdomain-register-"));
   writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
   mockFetch = vi.fn();
   vi.stubGlobal("fetch", mockFetch);

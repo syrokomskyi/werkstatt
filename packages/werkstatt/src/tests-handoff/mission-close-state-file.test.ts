@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { tmpdir } from "node:os";
 
 const mockState = vi.hoisted(() => ({
   validateResult: {
@@ -114,7 +115,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-close-state-file-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-close-state-file-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
 });

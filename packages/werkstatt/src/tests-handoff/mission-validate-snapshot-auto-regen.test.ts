@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
+import { tmpdir } from "node:os";
 
 const mockState = vi.hoisted(() => ({
   prepareResult: { ok: true, steps: [{ ok: true, commandName: "config.regenerate", exitCode: 0 }] },
@@ -142,7 +143,7 @@ function gitCommit(dir: string, msg: string): void {
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-validate-snap-"));
+  tmpWorkspace = mkdtempSync(join(tmpdir(), "tmp-validate-snap-"));
   mockState.commandCalls = [];
   mockState.pipelineCalls = [];
   mockState.revalidateResult = null;

@@ -13,6 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync
 import { join } from "node:path";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createMaterializeWorkspace, gitInit, gitCommit } from "./helpers/materialize-fixture.ts";
+import { tmpdir } from "node:os";
 
 const mockPipeline = vi.hoisted(() => ({
   forceUsed: undefined as boolean | undefined,
@@ -146,7 +147,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-mat-artifact-cache-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-mat-artifact-cache-"));
   tmpWorkspace = join(testRoot, "workspace");
   mockPipeline.forceUsed = undefined;
   mockPipeline.pipelineNameUsed = "";

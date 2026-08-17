@@ -17,6 +17,7 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { tmpdir } from "node:os";
 
 // --- Mocks for mission.reconcile tests ---
 
@@ -60,7 +61,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-rfc-0705-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-rfc-0705-"));
   tmpWorkspace = join(testRoot, "workspace");
   mkdirSync(tmpWorkspace, { recursive: true });
   mockSync.executeKernelCommandResult = {

@@ -14,6 +14,7 @@ import { join } from "node:path";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import { createMaterializeWorkspace, gitHead } from "./helpers/materialize-fixture.ts";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
+import { tmpdir } from "node:os";
 
 const mockPipeline = vi.hoisted(() => ({
   pipelineResult: {
@@ -128,7 +129,7 @@ let testRoot: string;
 let tmpWorkspace: string;
 
 beforeEach(() => {
-  testRoot = mkdtempSync(join(process.cwd(), "tmp-mat-preflight-skip-"));
+  testRoot = mkdtempSync(join(tmpdir(), "tmp-mat-preflight-skip-"));
   tmpWorkspace = join(testRoot, "workspace");
   mockPipeline.pipelineResult = {
     ok: true,
