@@ -340,7 +340,7 @@ export async function runLeitstandCertify(
   const handler: ProducerExecutionHandlerV1 = async (
     execInput: ProducerExecutionInputV1,
   ): Promise<EvidenceEnvelopeV1> => {
-    const evidenceId = `evidence-${execInput.producerId}-${now.toLowerCase().replace(/[:.]/g, "-")}`;
+    const evidenceId = `ev-${execInput.producerId}-${now.toLowerCase().replace(/[:.]/g, "-")}`;
     const diagnostics: Array<{
       ruleId: string;
       severity: "error" | "warning" | "info";
