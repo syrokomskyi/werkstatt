@@ -43,7 +43,7 @@ interface Props {
   sizes?: string;
   /** Override the responsive width ladder. */
   widths?: number[];
-  /** Quality preset or numeric (1..100). Defaults to "max" to preserve source fidelity. */
+  /** Quality preset or numeric (1..100). Defaults to 90 for balanced compression; pass "max" for content images requiring full fidelity. */
   quality?: number | ImageQualityPreset;
   /** RFC-0220: optional visible credit disclosure for non-decorative content images. */
   credit?: MaterialCredit | null;
@@ -71,7 +71,7 @@ const {
   fetchpriority,
   sizes,
   widths,
-  quality = "max",
+  quality = 90,
   credit,
   creditDisplay,
   lang,
