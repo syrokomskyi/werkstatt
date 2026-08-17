@@ -1,7 +1,7 @@
 {
   "name": "@warpgogol/werkstatt",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "Werkstatt engine \u2014 stack-agnostic lifecycle platform (RFC-0769/0772).",
   "main": "./src/index.ts",
@@ -29,6 +29,10 @@
     "./os/werkstatt-autonomy-module": {
       "types": "./os/werkstatt-autonomy.module.ts",
       "default": "./os/werkstatt-autonomy.module.ts"
+    },
+    "./os/werkstatt-shared-module": {
+      "types": "./os/werkstatt-shared-module.ts",
+      "default": "./os/werkstatt-shared-module.ts"
     },
     "./package.json": "./package.json",
     "./kernel": {
@@ -336,6 +340,7 @@
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "pnpm exec tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -349,8 +354,6 @@
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/werkstatt-shared": "workspace:*",
     "@aws-sdk/client-s3": "^3.1101.0",
-    "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
-    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study",
     "@noble/ed25519": "^3.1.0",
     "asn1js": "^3.0.10",
     "pkijs": "^3.3.3",
@@ -382,8 +385,14 @@
     "zod": "^4.4.3",
     "@warpgogol/werkstatt-site": "workspace:*"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "optionalDependencies": {
-    "better-sqlite3": "^13.0.2"
+    "better-sqlite3": "^13.0.2",
+    "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
+    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
