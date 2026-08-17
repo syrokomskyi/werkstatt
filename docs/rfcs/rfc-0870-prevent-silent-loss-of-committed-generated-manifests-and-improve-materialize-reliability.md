@@ -1,7 +1,7 @@
 ---
 id: RFC-0870
 title: "Prevent silent loss of committed generated manifests and improve materialize reliability"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
