@@ -1298,6 +1298,10 @@
     "./share/legal/index": {
       "types": "./src/share/legal/index.ts",
       "default": "./src/share/legal/index.ts"
+    },
+    "./share/scripts": {
+      "types": "./src/share/scripts/index.ts",
+      "default": "./src/share/scripts/index.ts"
     }
   },
   "scripts": {
