@@ -10322,10 +10322,6 @@
       "types": "./src/testing/unit/services/telegram-alert-bridge/health-endpoint.test.ts",
       "default": "./src/testing/unit/services/telegram-alert-bridge/health-endpoint.test.ts"
     },
-    "./share/middleware": {
-      "types": "./src/domain/share/middleware/language-redirect.ts",
-      "default": "./src/domain/share/middleware/language-redirect.ts"
-    },
     "./share/semantic": {
       "types": "./src/domain/share/semantic/index.ts",
       "default": "./src/domain/share/semantic/index.ts"
@@ -10363,9 +10359,7 @@
       "default": "./src/domain/integration/index.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
