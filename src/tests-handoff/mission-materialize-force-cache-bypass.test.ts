@@ -52,6 +52,21 @@ vi.mock("@warpgogol/werkstatt-site/codegen", () => ({
   runAppBoilerplateValidate: vi.fn(async () => ({ data: { generated: [] }, summary: "ok", nextSteps: [] })),
   runGenerateMaterialCreditsPage: vi.fn(async () => []),
   runPropsTypesGenerate: vi.fn(async () => []),
+  runGenerateIcons: vi.fn(async () => []),
+  runCleanIcons: vi.fn(async () => []),
+  runGenerateOpenSourcePage: vi.fn(async () => []),
+  runSectionScaffold: vi.fn(async () => []),
+  runSystemMdCompile: vi.fn(async () => []),
+  runLegalScaffold: vi.fn(async () => []),
+  runMaterialMetadataWrite: vi.fn(async () => []),
+  runContentRefIndexGenerate: vi.fn(async () => []),
+  runContentRefMigrate: vi.fn(async () => []),
+  runContentFormulaMigrate: vi.fn(async () => []),
+  buildGeneratedHeader: vi.fn(() => ""),
+  hasGeneratedMarker: vi.fn(() => false),
+  stripGeneratedMarker: vi.fn((s: string) => s),
+  GENERATED_MARKER: "GENERATED",
+
 }));
 
 vi.mock("@warpgogol/werkstatt-site/onboarding", () => ({
