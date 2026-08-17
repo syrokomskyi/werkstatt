@@ -280,21 +280,21 @@ The default quality change from `"max"` to `90` affects every `ResponsiveImage` 
 
 ## Acceptance criteria
 
-- [ ] `ResponsiveImage` default quality changed from `"max"` to `90` in `responsive-image.astro`
-- [ ] `hero-section.astro` passes `widths` and `sizes="100vw"` to `ResponsiveImage` for `heroBgImage`
-- [ ] `hero-decision-card-section.astro` bg image changed to `quality={90}` with `widths` + `sizes`
-- [ ] `site-background-component.astro` passes `widths` and `sizes="100vw"` to `ResponsiveImage` for background images
-- [ ] `section-shell.astro` passes `widths` and `sizes` to `ResponsiveImage` for bg image
-- [ ] `media.astro` passes `widths`, `sizes`, and `quality: 90` to `buildImageSources` for video poster
-- [ ] `footer-component.astro` adds `quality="max"` to photo call sites
-- [ ] `footer-promo-component.astro` adds `quality="max"`
-- [ ] `section-card-grid.astro` adds `quality="max"`
-- [ ] `women-section.astro` adds `quality="max"`
-- [ ] `credits-gallery-section.astro` changes `quality="high"` to `quality="max"`
-- [ ] `brand-label-component.astro` adds `quality="max"`
-- [ ] `image-variants.generated.yaml` is generated and committed in the warpgogol-com cache clone
-- [ ] `image.delivery.validate` passes for hero-bg, home-bg, and poster images in warpgogol-com
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `ResponsiveImage` default quality changed from `"max"` to `90` in `responsive-image.astro` (evidence: packages/werkstatt-site/src/domain/ui/components/responsive-image/responsive-image.astro:74, quality = 90)
+- [x] `hero-section.astro` passes `widths` and `sizes="100vw"` to `ResponsiveImage` for `heroBgImage` (evidence: packages/werkstatt-site/src/domain/ui/sections/hero/hero-section.astro:144-145)
+- [x] `hero-decision-card-section.astro` bg image changed to `quality={90}` with `widths` + `sizes` (evidence: packages/werkstatt-site/src/domain/ui/sections/hero-decision-card/hero-decision-card-section.astro:145-149)
+- [x] `site-background-component.astro` passes `widths` and `sizes="100vw"` to `ResponsiveImage` for background images (evidence: packages/werkstatt-site/src/domain/ui/components/site-background/site-background-component.astro:89-90)
+- [x] `section-shell.astro` passes `widths` and `sizes` to `ResponsiveImage` for bg image (evidence: packages/werkstatt-site/src/domain/ui/components/section-shell/section-shell.astro:151-152)
+- [x] `media.astro` passes `widths`, `sizes`, and `quality: 90` to `buildImageSources` for video poster (evidence: packages/werkstatt-site/src/domain/ui/components/media/media.astro:104)
+- [x] `footer-component.astro` adds `quality="max"` to photo call sites (evidence: packages/werkstatt-site/src/domain/ui/components/footer/footer-component.astro:183,220)
+- [x] `footer-promo-component.astro` adds `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/components/footer-promo/footer-promo-component.astro:72)
+- [x] `section-card-grid.astro` adds `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/components/section-body/cards/section-card-grid.astro:146)
+- [x] `women-section.astro` adds `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/sections/women/women-section.astro:71)
+- [x] `credits-gallery-section.astro` changes `quality="high"` to `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/sections/credits-gallery/credits-gallery-section.astro:291)
+- [x] `brand-label-component.astro` adds `quality="max"` (evidence: packages/werkstatt-site/src/domain/ui/components/brand-label/brand-label-component.astro:72)
+- [ ] `image-variants.generated.yaml` is generated and committed in the warpgogol-com cache clone (deferred to next warpgogol-com mission — code changes complete, operational step requires mission workpiece)
+- [ ] `image.delivery.validate` passes for hero-bg, home-bg, and poster images in warpgogol-com (deferred to next warpgogol-com mission — code changes complete, validation requires mission workpiece build)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0869 --json, status: pass)
 
 ## Implementation notes for agents
 
