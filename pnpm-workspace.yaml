@@ -18,3 +18,12 @@ minimumReleaseAgeExclude:
   - '@warpgogol/repo-extract'
   - '@warpgogol/forge'
   - '@warpgogol/changelog-live'
+
+overrides:
+  '@syrokomskyi/axiom-capture': 'link:../pipelines/packages/axiom/axiom-capture'
+  '@syrokomskyi/axiom-factory-app': 'link:../pipelines/apps/axiom/factory'
+  '@syrokomskyi/axiom-study': 'link:../pipelines/packages/axiom/axiom-study'
+  '@warpgogol/forge': 'workspace:*'
+  '@warpgogol/werkstatt': 'workspace:*'
+  '@warpgogol/werkstatt-shared': 'workspace:*'
+  '@warpgogol/werkstatt-site': 'workspace:*'
