@@ -1,7 +1,7 @@
 ---
 id: RFC-0869
 title: "Optimize image delivery and LCP for shared site components"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-17
 updatedAt: 2026-08-17
 enhancedAt: 2026-08-17
-implementedAt:
+implementedAt: 2026-08-17
 closedAt:
 supersedes: []
 supersededBy:
