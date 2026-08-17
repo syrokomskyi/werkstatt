@@ -230,10 +230,13 @@ function computeMaxDelta(
   for (const p of portrait) {
     const l = landscape.find((g) => g.tag === p.tag);
     if (!l) continue;
-    // x and y are compared in absolute pixels (header/main/footer should
-    // not jump horizontally or shift vertically relative to the top).
+    // x is compared in absolute pixels (elements should not jump horizontally).
     const dx = Math.abs(p.x - l.x);
-    const dy = Math.abs(p.y - l.y);
+    // y is excluded: the y-position of any element naturally varies drastically
+    // between portrait and landscape because content above it reflows to a
+    // different height. This is especially true for footer/main elements near
+    // the bottom of the page. y-position is not a stability signal during
+    // orientation change.
     // width is normalized as a fraction of the viewport width,
     // then converted back to pixel-equivalent against the portrait viewport.
     // This prevents false positives when the viewport width changes from
@@ -243,7 +246,7 @@ function computeMaxDelta(
     // portrait and landscape due to reflow, and is not a stability signal.
     const dw =
       Math.abs(p.width / portraitVp.width - l.width / landscapeVp.width) * portraitVp.width;
-    const delta = Math.max(dx, dy, dw);
+    const delta = Math.max(dx, dw);
     if (delta > maxDelta) {
       maxDelta = delta;
       maxElement = p.tag;
