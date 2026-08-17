@@ -34,7 +34,7 @@ describe("runAuditDeltaRun", () => {
     expect(res.exitCode).toBe(1);
     expect((res.data as { status: string }).status).toBe("fail");
     expect((res.data as { findings: { ruleId: string }[] }).findings[0].ruleId).toBe(
-      "audit.delta.empty",
+      "AUDIT.DELTA.EMPTY",
     );
   });
 
@@ -42,7 +42,7 @@ describe("runAuditDeltaRun", () => {
     const res = await runAuditDeltaRun(makeInput({ batch: "amend-001" }), makeContext("test-app"));
     expect(res.exitCode).toBe(1);
     expect((res.data as { findings: { ruleId: string }[] }).findings[0].ruleId).toBe(
-      "audit.delta.empty",
+      "AUDIT.DELTA.EMPTY",
     );
   });
 

@@ -79,7 +79,9 @@ function extractDnsAidSection(text: string): string | null {
   if (beginIdx === -1) return null;
   const endIdx = text.indexOf(END_MARKER, beginIdx);
   if (endIdx === -1) return null;
-  return text.slice(beginIdx, endIdx + END_MARKER.length);
+  const lineStart = text.lastIndexOf("\n", beginIdx);
+  const start = lineStart === -1 ? 0 : lineStart + 1;
+  return text.slice(start, endIdx + END_MARKER.length);
 }
 
 // ---------------------------------------------------------------------------

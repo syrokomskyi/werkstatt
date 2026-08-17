@@ -111,7 +111,7 @@ describe("surface.service.validate", () => {
       expect(result.exitCode).toBe(0);
       const data = unwrapData(result);
       const gateDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "service-gate-below-threshold",
+        (d: { ruleId: string }) => d.ruleId === "SERVICE-GATE-BELOW-THRESHOLD",
       );
       expect(gateDiags.length).toBeGreaterThan(0);
     });
@@ -139,7 +139,7 @@ describe("surface.service.validate", () => {
       const result = await runSurfaceServiceValidate(testInput(), context);
       const data = unwrapData(result);
       const claimDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "service-claim-restriction",
+        (d: { ruleId: string }) => d.ruleId === "SERVICE-CLAIM-RESTRICTION",
       );
       expect(claimDiags.length).toBeGreaterThan(0);
     });
@@ -192,7 +192,7 @@ describe("surface.service.validate", () => {
       const result = await runSurfaceServiceValidate(testInput(), context);
       const data = unwrapData(result);
       const reviewDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "service-review-status",
+        (d: { ruleId: string }) => d.ruleId === "SERVICE-REVIEW-STATUS",
       );
       expect(reviewDiags.length).toBeGreaterThan(0);
     });

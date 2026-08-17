@@ -153,7 +153,7 @@ describe("surface.intersection.validate", () => {
       const result = await runSurfaceIntersectionValidate(testInput(), context);
       const data = unwrapData(result);
       const gateDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "intersection-gate-below-threshold",
+        (d: { ruleId: string }) => d.ruleId === "INTERSECTION-GATE-BELOW-THRESHOLD",
       );
       expect(gateDiags).toHaveLength(0);
     });
@@ -173,7 +173,7 @@ describe("surface.intersection.validate", () => {
       const result = await runSurfaceIntersectionValidate(testInput(), context);
       const data = unwrapData(result);
       const gateDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "intersection-gate-below-threshold",
+        (d: { ruleId: string }) => d.ruleId === "INTERSECTION-GATE-BELOW-THRESHOLD",
       );
       expect(gateDiags.length).toBeGreaterThanOrEqual(2);
     });
@@ -192,7 +192,7 @@ describe("surface.intersection.validate", () => {
       const result = await runSurfaceIntersectionValidate(testInput(), context);
       const data = unwrapData(result);
       const pubDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "intersection-publication-decision",
+        (d: { ruleId: string }) => d.ruleId === "INTERSECTION-PUBLICATION-DECISION",
       );
       expect(pubDiags.length).toBeGreaterThan(0);
     });
@@ -220,7 +220,7 @@ describe("surface.intersection.validate", () => {
       const result = await runSurfaceIntersectionValidate(testInput(), context);
       const data = unwrapData(result);
       const substanceDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "intersection-substance-independence",
+        (d: { ruleId: string }) => d.ruleId === "INTERSECTION-SUBSTANCE-INDEPENDENCE",
       );
       expect(substanceDiags.length).toBeGreaterThan(0);
     });
@@ -254,7 +254,7 @@ describe("surface.intersection.validate", () => {
       const result = await runSurfaceIntersectionValidate(testInput(), context);
       const data = unwrapData(result);
       const simDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "intersection-similarity-exceeded",
+        (d: { ruleId: string }) => d.ruleId === "INTERSECTION-SIMILARITY-EXCEEDED",
       );
       expect(simDiags.length).toBeGreaterThan(0);
     });
@@ -294,7 +294,7 @@ describe("surface.intersection.validate", () => {
       const result = await runSurfaceIntersectionValidate(testInput(), context);
       const data = unwrapData(result);
       const simDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "intersection-similarity-exceeded",
+        (d: { ruleId: string }) => d.ruleId === "INTERSECTION-SIMILARITY-EXCEEDED",
       );
       expect(simDiags).toHaveLength(0);
     });

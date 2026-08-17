@@ -28,7 +28,7 @@ describe("agent-webmcp-script.astro (RFC-0799)", () => {
   });
 
   test("script contains document.modelContext feature detection guard", () => {
-    expect(astroSource).toContain("var mc = document.modelContext");
+    expect(astroSource).toContain("var mc = navigator.modelContext");
     expect(astroSource).toContain('if (!mc || typeof mc.registerTool !== "function") return');
   });
 

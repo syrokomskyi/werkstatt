@@ -109,7 +109,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const leakDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" && d.message.includes("AIPlatform"),
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" && d.message.includes("AIPlatform"),
       );
       expect(leakDiags.length).toBeGreaterThan(0);
     });
@@ -128,7 +128,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const leakDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" && d.message.includes("Copyright"),
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" && d.message.includes("Copyright"),
       );
       expect(leakDiags.length).toBeGreaterThan(0);
     });
@@ -148,7 +148,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const copyrightDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" && d.message.includes("Copyright"),
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" && d.message.includes("Copyright"),
       );
       expect(copyrightDiags).toHaveLength(0);
     });
@@ -168,7 +168,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const geminiDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" && d.message.includes("Gemini"),
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" && d.message.includes("Gemini"),
       );
       expect(geminiDiags).toHaveLength(0);
     });
@@ -188,7 +188,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const geminiDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" && d.message.includes("Gemini"),
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" && d.message.includes("Gemini"),
       );
       expect(geminiDiags.length).toBeGreaterThan(0);
     });
@@ -207,7 +207,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const labelDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" &&
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" &&
           d.message.includes("MEDIA-LEAK-AI-LABEL"),
       );
       expect(labelDiags.length).toBeGreaterThan(0);
@@ -227,7 +227,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const linkDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" && d.message.includes("MEDIA-LEAK-AI-LINK"),
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" && d.message.includes("MEDIA-LEAK-AI-LINK"),
       );
       expect(linkDiags.length).toBeGreaterThan(0);
     });
@@ -246,7 +246,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const aiDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" &&
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" &&
           (d.message.includes("MEDIA-LEAK-AI-LABEL") || d.message.includes("MEDIA-LEAK-AI-LINK")),
       );
       expect(aiDiags).toHaveLength(0);
@@ -266,7 +266,7 @@ describe("surface.media-leakage.validate", () => {
       const data = unwrapData(result);
       const leakDiags = data.diagnostics.filter(
         (d: { ruleId: string; message: string }) =>
-          d.ruleId === "surface.media-leakage.validate" && d.message.includes("AIPlatform"),
+          d.ruleId === "SURFACE.MEDIA-LEAKAGE.VALIDATE" && d.message.includes("AIPlatform"),
       );
       expect(leakDiags).toHaveLength(0);
     });

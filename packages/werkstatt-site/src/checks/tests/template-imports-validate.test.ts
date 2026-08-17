@@ -90,7 +90,7 @@ describe("extractWorkspaceImports", () => {
     expect(imports).toHaveLength(3);
     expect(imports.map((i) => i.package)).toEqual([
       "@warpgogol/werkstatt",
-      "@warpgogol/werkstatt-site",
+      "@warpgogol/werkstatt-shared",
       "@warpgogol/forge",
     ]);
   });
@@ -192,7 +192,7 @@ describe("runTemplateImportsValidate", () => {
         name: "test-workspace",
         devDependencies: {
           "@warpgogol/werkstatt": "workspace:*",
-          "@warpgogol/werkstatt-site": "workspace:*",
+          "@warpgogol/werkstatt-shared": "workspace:*",
         },
       }),
     );

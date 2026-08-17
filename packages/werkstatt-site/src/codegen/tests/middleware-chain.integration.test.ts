@@ -60,6 +60,14 @@ declare module "@warpgogol/werkstatt-shared/share/middleware" {
   export function createLanguageRedirectMiddleware(opts: { supportedLangs: string[]; defaultLang: string }): any;
 }
 
+declare module "@warpgogol/werkstatt-site/share/semantic" {
+  export function markdownTwinUrlPath(pathname: string, opts: { supportedLangs: string[] }): string;
+}
+
+declare module "@warpgogol/werkstatt-site/share/middleware" {
+  export function createLanguageRedirectMiddleware(opts: { supportedLangs: string[]; defaultLang: string }): any;
+}
+
 declare module "@warpgogol/werkstatt-shared/share/text-normalize" {
   export function createDevNormalizeMiddleware(config: any): any;
   export function resolveNormalizeConfig(manifest: any): any;

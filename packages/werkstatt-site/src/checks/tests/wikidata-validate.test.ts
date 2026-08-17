@@ -128,7 +128,7 @@ describe("validateUrlConstruction (RFC-0531)", () => {
     };
     const results = validateUrlConstruction(ids, BUSINESS_FILE);
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.malformed-url");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.MALFORMED-URL");
     expect(results[0]!.severity).toBe("error");
   });
 
@@ -138,7 +138,7 @@ describe("validateUrlConstruction (RFC-0531)", () => {
     };
     const results = validateUrlConstruction(ids, BUSINESS_FILE);
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.malformed-url");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.MALFORMED-URL");
   });
 
   it("returns no findings for undefined externalIdentifiers", () => {
@@ -151,14 +151,14 @@ describe("validateLegalIdentityLegalName (RFC-0531)", () => {
   it("returns an error when legalName is missing", () => {
     const result = validateLegalIdentityLegalName(undefined, LEGAL_IDENTITY_FILE);
     expect(result).not.toBeNull();
-    expect(result!.ruleId).toBe("wikidata.legalidentity-missing-legalname");
+    expect(result!.ruleId).toBe("WIKIDATA.LEGALIDENTITY-MISSING-LEGALNAME");
     expect(result!.severity).toBe("error");
   });
 
   it("returns an error when legalName is empty", () => {
     const result = validateLegalIdentityLegalName("", LEGAL_IDENTITY_FILE);
     expect(result).not.toBeNull();
-    expect(result!.ruleId).toBe("wikidata.legalidentity-missing-legalname");
+    expect(result!.ruleId).toBe("WIKIDATA.LEGALIDENTITY-MISSING-LEGALNAME");
   });
 
   it("returns an error when legalName is whitespace", () => {
@@ -213,7 +213,7 @@ describe("validateProjectionParity (RFC-0531)", () => {
       "dist/page.html",
     );
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.projection-parity");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.PROJECTION-PARITY");
     expect(results[0]!.severity).toBe("error");
   });
 
@@ -274,14 +274,14 @@ describe("validateNotabilityEvidence (RFC-0535)", () => {
     ];
     const result = validateNotabilityEvidence(true, sources, BUSINESS_FILE);
     expect(result).not.toBeNull();
-    expect(result!.ruleId).toBe("wikidata.no-notability-evidence");
+    expect(result!.ruleId).toBe("WIKIDATA.NO-NOTABILITY-EVIDENCE");
     expect(result!.severity).toBe("warning");
   });
 
   it("returns a warning when Business has QID but no EvidenceSources at all", () => {
     const result = validateNotabilityEvidence(true, [], BUSINESS_FILE);
     expect(result).not.toBeNull();
-    expect(result!.ruleId).toBe("wikidata.no-notability-evidence");
+    expect(result!.ruleId).toBe("WIKIDATA.NO-NOTABILITY-EVIDENCE");
   });
 });
 
@@ -292,7 +292,7 @@ describe("validateClaimEvidenceCoverage (RFC-0535)", () => {
     const claims = [{ id: "claim1", claimClass: "factual", statement: "Founded in 2010" }];
     const results = validateClaimEvidenceCoverage(claims, CLAIMS_DIR);
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.claim-without-evidence");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.CLAIM-WITHOUT-EVIDENCE");
     expect(results[0]!.severity).toBe("warning");
   });
 
@@ -352,7 +352,7 @@ describe("validateEvidenceReferences (RFC-0535)", () => {
     const sourceIds = new Set(["es1"]);
     const results = validateEvidenceReferences(claims, sourceIds, CLAIMS_DIR);
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.evidence-broken-ref");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.EVIDENCE-BROKEN-REF");
     expect(results[0]!.severity).toBe("error");
   });
 
@@ -384,7 +384,7 @@ describe("validateEvidenceSourceUrls (RFC-0535)", () => {
     const sources = [{ id: "es1", name: "Empty", kind: "external-web-sources" }];
     const results = validateEvidenceSourceUrls(sources, EVIDENCE_SOURCES_DIR);
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.evidence-missing-url");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.EVIDENCE-MISSING-URL");
     expect(results[0]!.severity).toBe("error");
   });
 
@@ -399,7 +399,7 @@ describe("validateEvidenceSourceUrls (RFC-0535)", () => {
     ];
     const results = validateEvidenceSourceUrls(sources, EVIDENCE_SOURCES_DIR);
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.evidence-missing-url");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.EVIDENCE-MISSING-URL");
   });
 
   it("returns an error when EvidenceSource items have whitespace-only url", () => {
@@ -413,7 +413,7 @@ describe("validateEvidenceSourceUrls (RFC-0535)", () => {
     ];
     const results = validateEvidenceSourceUrls(sources, EVIDENCE_SOURCES_DIR);
     expect(results).toHaveLength(1);
-    expect(results[0]!.ruleId).toBe("wikidata.evidence-missing-url");
+    expect(results[0]!.ruleId).toBe("WIKIDATA.EVIDENCE-MISSING-URL");
   });
 
   it("returns no findings for empty EvidenceSources array", () => {

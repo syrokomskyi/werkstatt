@@ -139,7 +139,7 @@ describe("surface.industry.validate", () => {
       expect(result.exitCode).toBe(0);
       const data = unwrapData(result);
       const gateDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "industry-gate-below-threshold",
+        (d: { ruleId: string }) => d.ruleId === "INDUSTRY-GATE-BELOW-THRESHOLD",
       );
       expect(gateDiags.length).toBeGreaterThan(0);
     });
@@ -167,7 +167,7 @@ describe("surface.industry.validate", () => {
       const result = await runSurfaceIndustryValidate(testInput(), context);
       const data = unwrapData(result);
       const claimDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "industry-claim-restriction",
+        (d: { ruleId: string }) => d.ruleId === "INDUSTRY-CLAIM-RESTRICTION",
       );
       expect(claimDiags.length).toBeGreaterThan(0);
     });
@@ -197,7 +197,7 @@ describe("surface.industry.validate", () => {
       const result = await runSurfaceIndustryValidate(testInput(), context);
       const data = unwrapData(result);
       const depDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "industry-deprecated-field",
+        (d: { ruleId: string }) => d.ruleId === "INDUSTRY-DEPRECATED-FIELD",
       );
       expect(depDiags.length).toBeGreaterThan(0);
     });

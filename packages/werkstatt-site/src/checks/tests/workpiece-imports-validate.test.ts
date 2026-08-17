@@ -145,10 +145,10 @@ describe("runWorkpieceImportsValidate", () => {
     await mkdir(wgDir, { recursive: true });
     await mkdir(join(wgDir, "werkstatt"));
     await writeFile(join(wgDir, "werkstatt", "package.json"), '{"name":"@warpgogol/werkstatt"}');
-    await mkdir(join(wgDir, "werkstatt-site"));
+    await mkdir(join(wgDir, "werkstatt-shared"));
     await writeFile(
-      join(wgDir, "werkstatt-site", "package.json"),
-      '{"name":"@warpgogol/werkstatt-site"}',
+      join(wgDir, "werkstatt-shared", "package.json"),
+      '{"name":"@warpgogol/werkstatt-shared"}',
     );
 
     const result = await runWorkpieceImportsValidate(

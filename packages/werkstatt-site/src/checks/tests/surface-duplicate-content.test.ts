@@ -116,7 +116,7 @@ describe("surface.duplicate-content.report", () => {
       expect(result.exitCode).toBe(1);
       const data = unwrapData(result);
       const dupDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "industry-duplicate-content",
+        (d: { ruleId: string }) => d.ruleId === "INDUSTRY-DUPLICATE-CONTENT",
       );
       expect(dupDiags.length).toBeGreaterThan(0);
     });

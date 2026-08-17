@@ -48,7 +48,7 @@ describe("suppressionRuleSchema", () => {
       channelNot: "main",
       reason: "Dev channel canonical mismatch",
     });
-    expect(rule.ruleId).toBe("seo-runtime.canonical-mismatch");
+    expect(rule.ruleId).toBe("SEO-RUNTIME.CANONICAL-MISMATCH");
     expect(rule.category).toBe("channel-mismatch");
     expect(rule.channelNot).toBe("main");
   });
@@ -181,8 +181,8 @@ describe("mergeSuppressions", () => {
     const workpiece = { suppressions: [{ ruleId: "P-RULE", category: "p-cat", reason: "p" }] };
     const merged = mergeSuppressions(workshop, workpiece);
     expect(merged).toHaveLength(2);
-    expect(merged[0].ruleId).toBe("w-rule");
-    expect(merged[1].ruleId).toBe("p-rule");
+    expect(merged[0].ruleId).toBe("W-RULE");
+    expect(merged[1].ruleId).toBe("P-RULE");
   });
 
   it("returns workshop rules when workpiece is undefined", () => {
@@ -216,7 +216,7 @@ describe("applySuppressions", () => {
     const result = applySuppressions(findings, rules, { channel: "dev" });
     expect((result[0] as { suppressed?: boolean }).suppressed).toBe(true);
     expect((result[0] as { suppressedBy?: { ruleId: string } }).suppressedBy?.ruleId).toBe(
-      "seo-runtime.canonical-mismatch",
+      "SEO-RUNTIME.CANONICAL-MISMATCH",
     );
   });
 

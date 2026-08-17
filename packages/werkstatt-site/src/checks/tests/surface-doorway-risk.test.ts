@@ -128,7 +128,7 @@ describe("surface.doorway-risk.report", () => {
       const result = await runSurfaceDoorwayRiskReport(testInput(), context);
       const data = unwrapData(result);
       const doorwayDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "doorway-risk-missing-local-context",
+        (d: { ruleId: string }) => d.ruleId === "DOORWAY-RISK-MISSING-LOCAL-CONTEXT",
       );
       expect(doorwayDiags.length).toBeGreaterThan(0);
     });
@@ -201,7 +201,15 @@ describe("surface.doorway-risk.report", () => {
   it("emits warnings (not errors) when dossier mode is warn (RFC-0516)", async () => {
     await withTempApp(async (root, appDir, context) => {
       // Write a valid blueprint with mode: warn
-      const bpDir = join(root, "packages", "werkstatt-site", "src", "domain", "ontology", "blueprints");
+      const bpDir = join(
+        root,
+        "packages",
+        "werkstatt-site",
+        "src",
+        "domain",
+        "ontology",
+        "blueprints",
+      );
       await mkdir(bpDir, { recursive: true });
       await writeFile(
         join(bpDir, "website-local.yaml"),
@@ -245,7 +253,7 @@ describe("surface.doorway-risk.report", () => {
       const result = await runSurfaceDoorwayRiskReport(testInput(), context);
       const data = unwrapData(result);
       const doorwayDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "doorway-risk-missing-local-context",
+        (d: { ruleId: string }) => d.ruleId === "DOORWAY-RISK-MISSING-LOCAL-CONTEXT",
       );
       expect(doorwayDiags.length).toBeGreaterThan(0);
       for (const d of doorwayDiags) {
@@ -253,7 +261,7 @@ describe("surface.doorway-risk.report", () => {
       }
       // No threshold-exceeded error diagnostic
       const thresholdDiags = data.diagnostics.filter(
-        (d: { ruleId: string }) => d.ruleId === "doorway-risk-threshold-exceeded",
+        (d: { ruleId: string }) => d.ruleId === "DOORWAY-RISK-THRESHOLD-EXCEEDED",
       );
       expect(thresholdDiags.length).toBe(0);
     });

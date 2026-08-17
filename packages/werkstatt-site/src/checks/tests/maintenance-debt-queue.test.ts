@@ -34,7 +34,7 @@ function queue(overrides?: Partial<DebtQueue>): DebtQueue {
     sourceCommands: ["example.validate"],
     selectors: {
       apps: ["site-a"],
-      ruleIds: ["example.rule"],
+      ruleIds: ["EXAMPLE.RULE"],
       severity: ["warning"],
     },
     batchPolicy: {
@@ -66,7 +66,7 @@ function validate(
     currentItems,
     acceptedKeys: new Set(acceptedKeys ?? []),
     registeredCommands: new Set(["example.validate"]),
-    registeredRuleIds: new Set(["example.rule", "other.rule"]),
+    registeredRuleIds: new Set(["EXAMPLE.RULE", "other.rule"]),
     registeredApps: new Set(["site-a"]),
   });
 }

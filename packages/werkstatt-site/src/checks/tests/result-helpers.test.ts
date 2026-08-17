@@ -102,12 +102,12 @@ describe("failResult", () => {
     const data = unwrapData(failResult("test.cmd", ["bad thing", "worse thing"]));
     expect(data.diagnostics).toHaveLength(2);
     expect(data.diagnostics[0]).toEqual({
-      ruleId: "TEST.CMD",
+      ruleId: "test.cmd",
       severity: "error",
       message: "bad thing",
     });
     expect(data.diagnostics[1]).toEqual({
-      ruleId: "TEST.CMD",
+      ruleId: "test.cmd",
       severity: "error",
       message: "worse thing",
     });
