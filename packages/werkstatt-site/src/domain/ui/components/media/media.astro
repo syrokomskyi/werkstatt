@@ -25,7 +25,12 @@
 </CHANGE_SUMMARY>
 */
 
-import { resolveImage, resolveVideo, buildImageSources, creditByTarget } from "@warpgogol/werkstatt-site/share";
+import {
+  resolveImage,
+  resolveVideo,
+  buildImageSources,
+  creditByTarget,
+} from "@warpgogol/werkstatt-site/share";
 import type { Media } from "@warpgogol/werkstatt-site/share";
 import ResponsiveImage from "../responsive-image/responsive-image.astro";
 import LivePhoto from "../live-photo/live-photo.astro";
@@ -101,7 +106,13 @@ const captions = manifestCaptions.map((m) => {
 });
 
 const preload = media.preload ?? "metadata";
-const posterSources = authoredPoster ? buildImageSources(authoredPoster, { quality: "max" }) : null;
+const posterSources = authoredPoster
+  ? buildImageSources(authoredPoster, {
+      quality: 90,
+      widths: [320, 480, 640, 768, 1024],
+      sizes: "(max-width: 768px) 100vw, 400px",
+    })
+  : null;
 const materialCredit =
   profile === "feature" && media.source.name
     ? creditByTarget(
