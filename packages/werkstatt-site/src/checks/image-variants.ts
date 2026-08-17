@@ -50,6 +50,23 @@ async function collectContentImages(contentDir: string): Promise<string[]> {
   return collectFiles(contentDir, { extensions: [".webp"] });
 }
 
+/**
+ * Read a key from the workpiece .env file. The kernel CLI loads dotenv from
+ * the werkstatt root CWD, not the workpiece directory, so workpiece-scoped
+ * env vars like PUBLIC_IMAGE_PROVIDER are missing from process.env during
+ * build.prepare pipeline execution. This helper reads the workpiece .env
+ * directly as a fallback.
+ */
+async function readWorkpieceEnv(appDirectory: string, key: string): Promise<string | undefined> {
+  try {
+    const raw = await readFile(join(appDirectory, ".env"), "utf-8");
+    const match = raw.match(new RegExp(`^${key}=(.+)$`, "m"));
+    return match?.[1]?.trim().replace(/^["']|["']$/g, "");
+  } catch {
+    return undefined;
+  }
+}
+
 /** Derive a short stable dir name from the content-relative source path. */
 function pathToHash(contentRelPath: string): string {
   // e.g. "business/de/assets/katrin-hennings.webp" → first 8 chars of base name
@@ -89,9 +106,13 @@ export async function runImageVariantsGenerate(
   const command = "image.variants.generate";
   const paths = requireAstroSitePaths(ctx);
 
-  // Read PUBLIC_IMAGE_PROVIDER from the app's .env / environment.
-  // The generator is a no-op when the app is not on the build-portable provider.
-  const imageProvider = process.env["PUBLIC_IMAGE_PROVIDER"];
+  // Read PUBLIC_IMAGE_PROVIDER from process.env (werkstatt root .env via dotenv)
+  // or fall back to the workpiece .env file. The kernel CLI loads dotenv from
+  // the werkstatt root CWD, not the workpiece directory, so the workpiece .env
+  // must be read explicitly when process.env doesn't have the key.
+  const imageProvider =
+    process.env["PUBLIC_IMAGE_PROVIDER"] ??
+    (await readWorkpieceEnv(paths.appDirectory, "PUBLIC_IMAGE_PROVIDER"));
   if (imageProvider !== "build-portable") {
     return {
       data: { command, status: "pass", note: "PUBLIC_IMAGE_PROVIDER != build-portable — skipped" },
@@ -248,10 +269,28 @@ export async function runImageVariantsValidate(
   const paths = requireAstroSitePaths(ctx);
   const manifestPath = join(paths.appDirectory, MANIFEST_RELATIVE);
 
+  // Check if build-portable provider is active via process.env or workpiece .env.
+  const imageProvider =
+    process.env["PUBLIC_IMAGE_PROVIDER"] ??
+    (await readWorkpieceEnv(paths.appDirectory, "PUBLIC_IMAGE_PROVIDER"));
+
   let raw: string;
   try {
     raw = await readFile(manifestPath, "utf-8");
   } catch {
+    if (imageProvider === "build-portable") {
+      return {
+        data: {
+          command,
+          status: "fail",
+          violations: [
+            `${MANIFEST_RELATIVE} not found but PUBLIC_IMAGE_PROVIDER=build-portable — run image.variants.generate`,
+          ],
+        },
+        exitCode: 1,
+        summary: `${command}: missing manifest (build-portable active)`,
+      };
+    }
     // No manifest = app is not using build-portable provider. Skip silently.
     return {
       data: {
