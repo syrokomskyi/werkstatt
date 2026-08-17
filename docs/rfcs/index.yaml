@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-17
-count: 850
+count: 852
 entries:
   - id: ""
     title: ""
@@ -16710,3 +16710,38 @@ entries:
       - RFC-0778
       - RFC-0779
     file: docs/rfcs/archive/implemented/rfc-0868-extract-werkstatt-shared-and-publish-engine-and-stack-plugins-to-npm.md
+  - id: RFC-0869
+    title: Optimize image delivery and LCP for shared site components
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-17
+    implementedAt: 2026-08-17
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-67
+      - RFC-0204
+      - RFC-0830
+      - RFC-0833
+    file: docs/rfcs/archive/implemented/rfc-0869-optimize-image-delivery-and-lcp-for-shared-site-components.md
+  - id: RFC-0870
+    title: Prevent silent loss of committed generated manifests and improve
+      materialize reliability
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-17
+    implementedAt: 2026-08-17
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0834
+      - RFC-0869
+      - RFC-0204
+      - RFC-0081
+    file: docs/rfcs/archive/implemented/rfc-0870-prevent-silent-loss-of-committed-generated-manifests-and-improve-materialize-reliability.md
