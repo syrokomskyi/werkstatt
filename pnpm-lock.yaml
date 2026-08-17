@@ -487,6 +487,9 @@ importers:
       '@warpgogol/werkstatt':
         specifier: workspace:*
         version: link:../../../packages/werkstatt
+      '@warpgogol/werkstatt-shared':
+        specifier: workspace:*
+        version: link:../../../packages/werkstatt-shared
       '@warpgogol/werkstatt-site':
         specifier: workspace:*
         version: link:../../../packages/werkstatt-site

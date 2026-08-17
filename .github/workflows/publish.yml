@@ -1,0 +1,98 @@
+name: NPM publish
+
+# RFC-0868: Publish @warpgogol/werkstatt, @warpgogol/werkstatt-shared,
+# @warpgogol/werkstatt-site, @warpgogol/werkstatt-game, @warpgogol/werkstatt-godot,
+# and @warpgogol/werkstatt-video to NPM on release tag.
+# Uses npm provenance for supply-chain attestation.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to publish (all|werkstatt|werkstatt-shared|werkstatt-site|werkstatt-game|werkstatt-godot|werkstatt-video)"
+        required: false
+        default: "all"
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    name: Publish to NPM
+    env:
+      TZ: UTC
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck all packages
+        run: |
+          pnpm --filter @warpgogol/werkstatt-shared build:check
+          pnpm --filter @warpgogol/werkstatt build:check
+          pnpm --filter @warpgogol/werkstatt-site build:check
+          pnpm --filter @warpgogol/werkstatt-game build:check
+          pnpm --filter @warpgogol/werkstatt-godot build:check
+          pnpm --filter @warpgogol/werkstatt-video build:check
+
+      - name: Publish @warpgogol/werkstatt-shared
+        if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt-shared' || github.event.inputs.package == ''
+        run: pnpm --filter @warpgogol/werkstatt-shared publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @warpgogol/werkstatt
+        if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt' || github.event.inputs.package == ''
+        run: pnpm --filter @warpgogol/werkstatt publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @warpgogol/werkstatt-site
+        if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt-site' || github.event.inputs.package == ''
+        run: pnpm --filter @warpgogol/werkstatt-site publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @warpgogol/werkstatt-game
+        if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt-game' || github.event.inputs.package == ''
+        run: pnpm --filter @warpgogol/werkstatt-game publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @warpgogol/werkstatt-godot
+        if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt-godot' || github.event.inputs.package == ''
+        run: pnpm --filter @warpgogol/werkstatt-godot publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @warpgogol/werkstatt-video
+        if: github.event.inputs.package == 'all' || github.event.inputs.package == 'werkstatt-video' || github.event.inputs.package == ''
+        run: pnpm --filter @warpgogol/werkstatt-video publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

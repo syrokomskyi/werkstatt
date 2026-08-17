@@ -163,8 +163,9 @@ export default defineKernelConfig({
       (await import("@warpgogol/werkstatt/os/werkstatt-plugin-module")).forgeWerkstattPluginModule,
     "werkstatt-autonomy": async () =>
       (await import("@warpgogol/werkstatt/os/werkstatt-autonomy-module")).werkstattAutonomyModule,
-    "werkstatt-shared": async () =>
-      (await import("@warpgogol/werkstatt/os/werkstatt-shared-module")).werkstattSharedModule,
+    "werkstatt-shared-validate": async () =>
+      (await import("@warpgogol/werkstatt/os/werkstatt-shared-validate-module"))
+        .werkstattSharedValidateModule,
     workshop: async () =>
       (await import("@warpgogol/werkstatt/workshop-module")).createWorkshopModule(),
   },

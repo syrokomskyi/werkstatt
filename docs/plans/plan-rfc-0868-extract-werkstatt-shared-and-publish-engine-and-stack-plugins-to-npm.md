@@ -1,7 +1,7 @@
 ---
 rfcId: RFC-0868
 planId: PLAN-RFC-0868-01
-status: implemented
+status: in-progress
 owner: architecture
 createdAt: 2026-08-17
 updatedAt:

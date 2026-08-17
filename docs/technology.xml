@@ -280,7 +280,7 @@
     <component-plane>
       <profile>Exactly one stack profile identity per workshop.</profile>
       <graph>Immutable resolved set of versioned capabilities with explicit grants, effects, scopes, isolation, and resource bounds.</graph>
-      <stacks>`@warpgogol/werkstatt-site`, `@warpgogol/werkstatt-game`, `@warpgogol/werkstatt-godot`, and `@warpgogol/werkstatt-video` remain stack-side providers and never become engine dependencies.</stacks>
+      <stacks>`@warpgogol/werkstatt-shared` (RFC-0868: stack-agnostic shared infrastructure consumed by engine and site plugin), `@warpgogol/werkstatt-site`, `@warpgogol/werkstatt-game`, `@warpgogol/werkstatt-godot`, and `@warpgogol/werkstatt-video` remain stack-side providers and never become engine dependencies. `werkstatt-shared` is an exception: it is consumed by the engine via `@warpgogol/werkstatt-shared/*` imports and enforced by `werkstatt.shared.validate` (SHARED-01/02/03).</stacks>
     </component-plane>
     <security-plane>
       <rule>Untrusted executable workloads use only an independently admitted real sandbox and deny-by-default broker; vm, workers, and ordinary subprocesses are not security tiers.</rule>
