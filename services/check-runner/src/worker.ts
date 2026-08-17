@@ -12,7 +12,7 @@
 
 import { loadRunnerConfig } from "./config.ts";
 import { runOnce } from "./run-once.ts";
-import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+import { createMetricsPusher } from "@warpgogol/werkstatt-shared/observability";
 
 const config = loadRunnerConfig();
 

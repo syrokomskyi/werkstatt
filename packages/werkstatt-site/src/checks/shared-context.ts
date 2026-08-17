@@ -17,7 +17,7 @@ resolvable and non-ambiguous at author time.
 
 import { join, relative } from "node:path";
 import { readFile } from "node:fs/promises";
-import { PageEntrySchema, systemManifestSchema } from "@warpgogol/werkstatt-site/ontology";
+import { PageEntrySchema, systemManifestSchema } from "@warpgogol/werkstatt-shared/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -29,7 +29,7 @@ import {
   loadSystemManifest,
   parseMarkdownFrontmatter,
 } from "@warpgogol/werkstatt-site/content";
-import { collectSharedContextCandidatesByLevel } from "@warpgogol/werkstatt-site/share/shared-context";
+import { collectSharedContextCandidatesByLevel } from "@warpgogol/werkstatt-shared/share/shared-context";
 import { resultFromViolations } from "./result-helpers.ts";
 
 interface ParsedPage {

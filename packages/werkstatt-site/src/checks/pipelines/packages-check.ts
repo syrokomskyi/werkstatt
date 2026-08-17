@@ -127,7 +127,7 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "onboarding.yaml.import.lint" },
   // RFC-0189: hardcoded strings in shared UI components
   { command: "ui.i18n.lint" },
-  // RFC-0230: hardcoded strings in UI-facing @warpgogol/werkstatt-site/share helpers
+  // RFC-0230: hardcoded strings in UI-facing @warpgogol/werkstatt-shared/share helpers
   { command: "share.i18n.lint" },
   // RFC-0205: silent empty-string fallbacks on UI-visible props
   { command: "ui.silent-defaults.lint" },

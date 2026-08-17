@@ -1,0 +1,113 @@
+{
+  "name": "@warpgogol/werkstatt-shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Stack-agnostic shared infrastructure extracted from werkstatt-site (RFC-0868).",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./checks": {
+      "types": "./src/checks/index.ts",
+      "default": "./src/checks/index.ts"
+    },
+    "./checks/result-helpers": {
+      "types": "./src/checks/result-helpers.ts",
+      "default": "./src/checks/result-helpers.ts"
+    },
+    "./checks/suppressions-config": {
+      "types": "./src/checks/suppressions-config.ts",
+      "default": "./src/checks/suppressions-config.ts"
+    },
+    "./checks/lib/astro-site-url": {
+      "types": "./src/checks/lib/astro-site-url.ts",
+      "default": "./src/checks/lib/astro-site-url.ts"
+    },
+    "./checks/lib/i18n": {
+      "types": "./src/checks/lib/i18n.ts",
+      "default": "./src/checks/lib/i18n.ts"
+    },
+    "./ontology": {
+      "types": "./src/ontology/index.ts",
+      "default": "./src/ontology/index.ts"
+    },
+    "./ontology/*": {
+      "types": "./src/ontology/*",
+      "default": "./src/ontology/*"
+    },
+    "./share": {
+      "types": "./src/share/index.ts",
+      "default": "./src/share/index.ts"
+    },
+    "./share/*": {
+      "types": "./src/share/*",
+      "default": "./src/share/*"
+    },
+    "./passport": {
+      "types": "./src/passport/index.ts",
+      "default": "./src/passport/index.ts"
+    },
+    "./passport/*": {
+      "types": "./src/passport/*",
+      "default": "./src/passport/*"
+    },
+    "./integration": {
+      "types": "./src/integration/index.ts",
+      "default": "./src/integration/index.ts"
+    },
+    "./integration/*": {
+      "types": "./src/integration/*",
+      "default": "./src/integration/*"
+    },
+    "./integration-adapter-supabase-crm": {
+      "types": "./src/integration-adapter-supabase-crm/index.ts",
+      "default": "./src/integration-adapter-supabase-crm/index.ts"
+    },
+    "./integration-adapter-supabase-crm/*": {
+      "types": "./src/integration-adapter-supabase-crm/*",
+      "default": "./src/integration-adapter-supabase-crm/*"
+    },
+    "./observability": {
+      "types": "./src/observability/index.ts",
+      "default": "./src/observability/index.ts"
+    },
+    "./observability/*": {
+      "types": "./src/observability/*",
+      "default": "./src/observability/*"
+    },
+    "./surface": {
+      "types": "./src/surface/index.ts",
+      "default": "./src/surface/index.ts"
+    },
+    "./surface/*": {
+      "types": "./src/surface/*",
+      "default": "./src/surface/*"
+    }
+  },
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^3.1.0",
+    "ajv": "^8.20.0",
+    "bs58": "^6.0.0",
+    "expr-eval": "^2.0.2",
+    "hls.js": "^1.6.16",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260801.1",
+    "@types/node": "^24.0.0",
+    "astro": "^7.2.0",
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  }
+}

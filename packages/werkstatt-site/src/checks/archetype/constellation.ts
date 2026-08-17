@@ -12,7 +12,7 @@ ontology schema plus catalog linkage (every slot cosmicName must be declared by 
 */
 
 import { join, relative } from "node:path";
-import { constellationSchema } from "@warpgogol/werkstatt-site/ontology";
+import { constellationSchema } from "@warpgogol/werkstatt-shared/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,

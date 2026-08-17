@@ -40,7 +40,7 @@ import {
   type Escalation,
   type FieldClass,
   type ReviewVerdict,
-} from "@warpgogol/werkstatt-site/surface";
+} from "@warpgogol/werkstatt-shared/surface";
 import {
   collectMarkdownFiles,
   loadSystemManifest,

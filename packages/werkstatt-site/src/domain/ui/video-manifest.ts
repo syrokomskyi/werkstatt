@@ -18,7 +18,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { VideoManifest, VideoManifestEntry } from "@warpgogol/werkstatt-site/share/schemas/media";
+import type { VideoManifest, VideoManifestEntry } from "@warpgogol/werkstatt-shared/share/schemas/media";
 import { loadGeneratedManifest } from "./generated-manifest-loader.ts";
 
 const manifest = loadGeneratedManifest<VideoManifest>("/src/video-manifest.generated.yaml");

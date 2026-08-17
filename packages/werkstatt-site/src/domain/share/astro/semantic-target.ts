@@ -7,7 +7,7 @@ navigation/CTA links from content-declared targets.
 </purpose>
 <non-goals>
   <item>Do not import from apps/*.</item>
-  <item>Do not handle page rendering or visibility policy (see @warpgogol/werkstatt-site/share/feature-policy).</item>
+  <item>Do not handle page rendering or visibility policy (see @warpgogol/werkstatt-shared/share/feature-policy).</item>
   <item>Do not persist state or manage user preferences.</item>
 </non-goals>
 </MODULE_CONTRACT>

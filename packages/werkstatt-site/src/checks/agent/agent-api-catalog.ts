@@ -26,7 +26,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { buildApiCatalog, type ApiCatalog } from "@warpgogol/werkstatt-site/share/agent";
+import { buildApiCatalog, type ApiCatalog } from "@warpgogol/werkstatt-shared/share/agent";
 import { loadInternalManifest, readAgentBlock } from "./agent-shared.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 

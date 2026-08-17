@@ -29,7 +29,7 @@ import { markdownCollectionLoader } from "@warpgogol/werkstatt-site/share/astro/
 import { fsDataCollectionLoader } from "@warpgogol/werkstatt-site/content-source";
 import { pbpCollections } from "@warpgogol/werkstatt-site/pbp/astro";
 import { createFaqCollection } from "@warpgogol/werkstatt-site/faq/astro";
-import { toDataEntryId } from "@warpgogol/werkstatt-site/share/content";
+import { toDataEntryId } from "@warpgogol/werkstatt-shared/share/content";
 
 const system = defineCollection({
   loader: glob({
@@ -92,4 +92,4 @@ export const collections = {
 };
 
 // Page-data and component-content types are exported from @warpgogol/werkstatt-site/ui and
-// @warpgogol/werkstatt-site/share. Apps must not re-declare them here.
+// @warpgogol/werkstatt-shared/share. Apps must not re-declare them here.

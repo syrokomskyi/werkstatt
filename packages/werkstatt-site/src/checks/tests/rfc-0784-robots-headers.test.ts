@@ -17,7 +17,7 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { buildRobotsTxt, type RobotsPolicy } from "@warpgogol/werkstatt-site/share/semantic";
+import { buildRobotsTxt, type RobotsPolicy } from "@warpgogol/werkstatt-shared/share/semantic";
 import { runRobotsGenerate, runRobotsValidate } from "../robots.ts";
 import { runGeneratePublicInfrastructure } from "../../codegen/app-boilerplate.ts";
 import { runHeadersSecurityValidate } from "../public-surface/security.ts";

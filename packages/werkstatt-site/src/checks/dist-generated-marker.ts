@@ -30,7 +30,7 @@ import {
   isGeneratedMarkerTextCandidate,
 } from "@warpgogol/werkstatt/kernel";
 import { passResult, failResult } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { stripHtmlGeneratedMarker } from "./strip-html-generated-marker.ts";
 
 function isHtmlFile(filePath: string): boolean {

@@ -28,7 +28,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const SCAN_ROOT = join("packages");

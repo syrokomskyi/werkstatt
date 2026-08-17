@@ -29,7 +29,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { ensureChromium } from "./playwright-chromium-ensure.ts";
 import { blockExternalRequests, evaluateInPage } from "./playwright-utils.ts";
 import type { BrowserContext } from "playwright";

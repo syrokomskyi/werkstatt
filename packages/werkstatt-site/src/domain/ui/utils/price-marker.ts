@@ -2,14 +2,14 @@
 // from PBP offering entities via derivedPrices, enabling dynamic currency-aware
 // pricing for both own and competitor prices (range model supported).
 // RFC-0766: renderPriceDisplayHtml generates HTML strings for prose content.
-// RFC-0767: OFFERING_URI_PREFIX and PRICE_MARKER_RE relocated to @warpgogol/werkstatt-site/share/semantic.
+// RFC-0767: OFFERING_URI_PREFIX and PRICE_MARKER_RE relocated to @warpgogol/werkstatt-shared/share/semantic.
 import {
   buildPriceVariants,
   formatPrice,
   loadDerivedPrices,
   type SourcePriceProp,
 } from "../sections/price-card/price-variants.ts";
-import { OFFERING_URI_PREFIX, PRICE_MARKER_RE } from "@warpgogol/werkstatt-site/share/semantic";
+import { OFFERING_URI_PREFIX, PRICE_MARKER_RE } from "@warpgogol/werkstatt-shared/share/semantic";
 import { decimalMultiply, decimalRound, type PbpRoundingMode } from "@warpgogol/werkstatt-site/pbp";
 
 export type TextPart = { kind: "text"; value: string };

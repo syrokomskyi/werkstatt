@@ -3,8 +3,8 @@
   <purpose>RFC-0558: shared I/O helpers for identity config (werkstatt.identity.json)
   read/write and credential ID generation.</purpose>
   <non-goals>
-    <item>Do not handle signing — that lives in @warpgogol/werkstatt-site/passport/identity-sign.</item>
-    <item>Do not handle key generation — that lives in @warpgogol/werkstatt-site/passport/sign.</item>
+    <item>Do not handle signing — that lives in @warpgogol/werkstatt-shared/passport/identity-sign.</item>
+    <item>Do not handle key generation — that lives in @warpgogol/werkstatt-shared/passport/sign.</item>
   </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -19,7 +19,7 @@ import {
   WerkstattIdentityConfigSchema,
   type WerkstattIdentityConfig,
   type WerkstattCredential,
-} from "@warpgogol/werkstatt-site/passport";
+} from "@warpgogol/werkstatt-shared/passport";
 
 export const IDENTITY_CONFIG_FILENAME = "werkstatt.identity.json";
 

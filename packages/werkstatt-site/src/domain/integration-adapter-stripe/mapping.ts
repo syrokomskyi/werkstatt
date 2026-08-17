@@ -26,8 +26,8 @@ import type {
   InvoiceKind,
   LifecycleEventKind,
   SubscriptionPlan,
-} from "@warpgogol/werkstatt-site/integration";
-import { INVOICE_KINDS, SUBSCRIPTION_PLANS } from "@warpgogol/werkstatt-site/integration";
+} from "@warpgogol/werkstatt-shared/integration";
+import { INVOICE_KINDS, SUBSCRIPTION_PLANS } from "@warpgogol/werkstatt-shared/integration";
 import { z } from "zod";
 import { verifyStripeSignature } from "./signature.ts";
 

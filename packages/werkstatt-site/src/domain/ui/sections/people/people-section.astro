@@ -14,8 +14,8 @@ founder-trust-card). Links a card to the person's profile page when one is live.
 </CHANGE_SUMMARY>
 */
 
-import type { CtaConfig } from "@warpgogol/werkstatt-site/share";
-import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import type { CtaConfig } from "@warpgogol/werkstatt-shared/share";
+import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
 import {
   cast,
   resolveSectionAnchor,
@@ -23,7 +23,7 @@ import {
   selectPeople,
   resolveEffectsForTarget,
   creditByTarget,
-} from "@warpgogol/werkstatt-site/share";
+} from "@warpgogol/werkstatt-shared/share";
 import type { PeopleSectionContent } from "./people-section.types.generated.ts";
 import PersonProfile from "../../components/person-profile/person-profile-component.astro";
 import SectionImage from "@warpgogol/werkstatt-site/ui/components/section-image.astro";

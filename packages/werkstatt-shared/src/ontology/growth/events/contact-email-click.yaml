@@ -1,0 +1,21 @@
+# Event: contact.email_click
+# RFC-0305 / Messkanon
+
+id: contact.email_click
+label: Contact Email Click
+description: >
+  A visitor clicked an email contact affordance. Payload must identify only the
+  placement, not the email address or visitor.
+
+category: contact
+autoEmit: false
+
+payload:
+  locale:
+    type: string
+    description: Active locale
+    required: true
+  placement:
+    type: string
+    description: Stable machine-readable UI placement
+    required: true

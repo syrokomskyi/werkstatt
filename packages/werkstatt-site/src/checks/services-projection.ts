@@ -19,7 +19,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { projectServices } from "@warpgogol/werkstatt-site/share/semantic";
+import { projectServices } from "@warpgogol/werkstatt-shared/share/semantic";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import type { Diagnostic } from "@warpgogol/werkstatt/kernel";

@@ -1,11 +1,11 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0181: the QStash delivery callback /api/integration-route. Delegates to
-createDeliveryHandler from @warpgogol/werkstatt-site/share/integration — the deep module that owns QStash
+createDeliveryHandler from @warpgogol/werkstatt-shared/share/integration — the deep module that owns QStash
 verification, Redis idempotency, channel fan-out, CRM routing, and email notification.
 This file is a thin adapter that injects secrets + the Cloudflare email binding.</purpose>
 <non-goals>
-  <item>Do not implement delivery logic here — it lives in @warpgogol/werkstatt-site/share/integration.</item>
+  <item>Do not implement delivery logic here — it lives in @warpgogol/werkstatt-shared/share/integration.</item>
   <item>Do not expose or log secrets.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -42,8 +42,8 @@ import {
 import {
   createDeliveryHandler,
   type IntegrationSecrets,
-} from "@warpgogol/werkstatt-site/integration";
-import { supabaseBufferDestinationAdapter } from "@warpgogol/werkstatt-site/integration-adapter-supabase-crm";
+} from "@warpgogol/werkstatt-shared/integration";
+import { supabaseBufferDestinationAdapter } from "@warpgogol/werkstatt-shared/integration-adapter-supabase-crm";
 
 /** RFC-0181: channel + CRM secrets bag from astro:env/server (client tokens). */
 function buildSecrets(): IntegrationSecrets {

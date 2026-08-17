@@ -21,7 +21,7 @@ import {
   runAgentApiCatalogGenerate,
   runAgentApiCatalogValidate,
 } from "../agent/agent-api-catalog.ts";
-import { buildAgentSurfaceManifest } from "@warpgogol/werkstatt-site/share/agent";
+import { buildAgentSurfaceManifest } from "@warpgogol/werkstatt-shared/share/agent";
 import type {
   KernelCommandInput,
   KernelRuntimeContext,

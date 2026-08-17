@@ -66,7 +66,7 @@ describe("section.image-props.validate", () => {
       await writeFile(
         join(sectionsDir, "test-section", "test-section.astro"),
         `---
-import { cast } from "@warpgogol/werkstatt-site/share";
+import { cast } from "@warpgogol/werkstatt-shared/share";
 const props = cast(pageOverride);
 ---
 
@@ -92,7 +92,7 @@ const props = cast(pageOverride);
       await writeFile(
         join(sectionsDir, "hero", "hero-section.astro"),
         `---
-import { resolveImage } from "@warpgogol/werkstatt-site/share";
+import { resolveImage } from "@warpgogol/werkstatt-shared/share";
 import { contentAssetImages } from "../../content-assets.ts";
 const bgImage = resolveImage(contentAssetImages, props.backgroundImage, { lang });
 ---

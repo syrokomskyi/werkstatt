@@ -13,7 +13,7 @@
 */
 
 import { proxyMatomoRequest } from "./proxy.ts";
-import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+import { createMetricsPusher } from "@warpgogol/werkstatt-shared/observability";
 
 interface Env {
   WARPGOGOL_OTLP_ENDPOINT: string;

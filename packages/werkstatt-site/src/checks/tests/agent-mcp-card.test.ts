@@ -18,7 +18,7 @@ import path from "node:path";
 import os from "node:os";
 import { stringify as yamlStringify } from "yaml";
 import { runAgentMcpCardGenerate, runAgentMcpCardValidate } from "../agent/agent-mcp-card.ts";
-import { buildAgentSurfaceManifest } from "@warpgogol/werkstatt-site/share/agent";
+import { buildAgentSurfaceManifest } from "@warpgogol/werkstatt-shared/share/agent";
 import type {
   KernelCommandInput,
   KernelRuntimeContext,

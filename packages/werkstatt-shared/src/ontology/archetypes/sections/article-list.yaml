@@ -1,0 +1,30 @@
+id: article-list
+displayName: Article list
+version: 1.0.0
+semanticRole: article-index
+description: |
+  Starter RFC-0072 archetype seeded from existing manifest metadata (RFC-0178).
+  Lists dated article pages (RFC-0167 blog module) as an index section.
+expectedIntents:
+  - explain-approach
+  - build-trust
+  - answer-questions
+expectedIndustryFit:
+  - non-profit
+  - consulting-and-coaching
+layoutHint: single-column
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+  shape: |
+    z.object({
+      tag: z.string().optional(),
+      limit: z.number().int().positive().optional(),
+      emptyLabel: z.string().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Io
+constraints: {}

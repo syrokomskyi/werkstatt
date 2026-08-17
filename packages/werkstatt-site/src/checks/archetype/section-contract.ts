@@ -12,8 +12,8 @@
 */
 
 import { join, relative, basename, dirname } from "node:path";
-import { fileExists as pathExists } from "@warpgogol/werkstatt-site/share/fs";
-import { manifestSchema } from "@warpgogol/werkstatt-site/ontology";
+import { fileExists as pathExists } from "@warpgogol/werkstatt-shared/share/fs";
+import { manifestSchema } from "@warpgogol/werkstatt-shared/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,

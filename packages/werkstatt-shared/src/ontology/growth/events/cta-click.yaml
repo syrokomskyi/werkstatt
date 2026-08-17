@@ -1,0 +1,30 @@
+# Event: cta-click
+# DNA-27 / RFC-0027
+#
+# Fired when a visitor clicks a call-to-action element.
+# The label field must be a stable machine-readable id (not display text).
+
+id: cta-click
+label: CTA Click
+description: >
+  A visitor clicked a call-to-action button or link. Use stable label values
+  (e.g. "hero-donate", "nav-spenden", "footer-contact") to enable funnel analysis.
+
+category: engagement
+autoEmit: false
+
+payload:
+  locale:
+    type: string
+    description: Active locale
+    required: true
+  label:
+    type: string
+    description: >
+      Stable machine-readable id for the CTA (e.g. 'hero-donate', 'nav-spenden').
+      Must not change without a migration — used in funnel definitions.
+    required: true
+  href:
+    type: string
+    description: Absolute or relative href the CTA navigates to
+    required: false

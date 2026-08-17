@@ -13,8 +13,8 @@ an archetype, and safely rename a cosmic name across the catalog-managed surface
 
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
-import { PlanetCatalog, MoonCatalog } from "@warpgogol/werkstatt-site/ontology";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-shared/share/fs";
+import { PlanetCatalog, MoonCatalog } from "@warpgogol/werkstatt-shared/ontology";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt/kernel";
 import type {
   KernelCommandInput,

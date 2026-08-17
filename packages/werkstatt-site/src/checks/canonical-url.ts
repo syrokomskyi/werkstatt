@@ -24,8 +24,8 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/canonical-url";
-import { resolvePageUpdateStamp, isValidStampDate } from "@warpgogol/werkstatt-site/share/semantic";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/astro/canonical-url";
+import { resolvePageUpdateStamp, isValidStampDate } from "@warpgogol/werkstatt-shared/share/semantic";
 import { diagnosticsResult } from "./result-helpers.ts";
 import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";

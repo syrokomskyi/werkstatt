@@ -34,7 +34,7 @@ import {
   authenticateInbound,
   buildQstashPublish,
   QSTASH_EU_BASE,
-} from "@warpgogol/werkstatt-site/integration";
+} from "@warpgogol/werkstatt-shared/integration";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../section-api-utils.ts";
 
 export const POST: APIRoute = async ({ request }) => {

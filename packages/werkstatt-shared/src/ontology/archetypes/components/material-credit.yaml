@@ -1,0 +1,20 @@
+id: material-credit
+displayName: Material credit
+version: 1.0.0
+semanticRole: component-material-credit
+description: |
+  RFC-0220 disclosure primitive for visible material credits and structured
+  CreativeWork provenance data.
+expectedIntents:
+  - disclose-material-provenance
+  - render-credits
+  - emit-structured-credit-data
+expectedIndustryFit: []
+layoutHint: single-column
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({}).passthrough()
+acceptedCosmicNames:
+  - Cordelia
+constraints: {}

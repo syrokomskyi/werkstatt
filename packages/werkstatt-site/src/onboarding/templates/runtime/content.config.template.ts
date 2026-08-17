@@ -22,7 +22,7 @@ import { markdownCollectionLoader } from "@warpgogol/werkstatt-site/share/astro/
 import { fsDataCollectionLoader } from "@warpgogol/werkstatt-site/content-source";
 import { pbpCollections } from "@warpgogol/werkstatt-site/pbp/astro";
 import { createFaqCollection } from "@warpgogol/werkstatt-site/faq/astro";
-import { toDataEntryId } from "@warpgogol/werkstatt-site/share/content";
+import { toDataEntryId } from "@warpgogol/werkstatt-shared/share/content";
 
 const system = defineCollection({
   loader: glob({

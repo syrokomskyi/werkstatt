@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>PBP semantic profile adapter — maps PBP compiler output to SemanticSiteProfile (RFC-0469).</purpose>
 <non-goals>
-  <item>Does not define SemanticSiteProfile — that lives in @warpgogol/werkstatt-site/share/semantic.</item>
+  <item>Does not define SemanticSiteProfile — that lives in @warpgogol/werkstatt-shared/share/semantic.</item>
   <item>Does not implement the compiler — delegates to @warpgogol/werkstatt-site/pbp/compiler.</item>
   <item>Does not handle page-level semantic models — use buildPbpPageSemanticModel instead.</item>
 </non-goals>
@@ -15,7 +15,7 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { buildOrganizationProfile, type SemanticSiteProfile } from "@warpgogol/werkstatt-site/share/semantic";
+import { buildOrganizationProfile, type SemanticSiteProfile } from "@warpgogol/werkstatt-shared/share/semantic";
 import { compilePbpProfile } from "./compiler/index.js";
 import type { PbpCompilerResult } from "./compiler/types.js";
 

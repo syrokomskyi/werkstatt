@@ -8,8 +8,8 @@ import {
   SUBSCRIPTION_TRANSITIONS,
   VISITOR_FUNNEL_STAGES,
   isValidFunnelStage,
-} from "@warpgogol/werkstatt-site/integration";
-import { SUBSCRIPTION_STATUSES } from "@warpgogol/werkstatt-site/integration";
+} from "@warpgogol/werkstatt-shared/integration";
+import { SUBSCRIPTION_STATUSES } from "@warpgogol/werkstatt-shared/integration";
 import {
   checkFunnelTriggerBijection,
   checkSubscriptionTriggerBijection,

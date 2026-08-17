@@ -18,7 +18,7 @@ by focusing on the RFC-0785 use case: middleware content negotiation.
 */
 
 import { describe, it, expect } from "vitest";
-import { markdownTwinUrlPath } from "@warpgogol/werkstatt-site/share/semantic";
+import { markdownTwinUrlPath } from "@warpgogol/werkstatt-shared/share/semantic";
 
 const supportedLangs = ["de", "en", "uk"];
 

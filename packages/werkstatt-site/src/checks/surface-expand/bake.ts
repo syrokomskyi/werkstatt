@@ -24,8 +24,8 @@ import type {
   BlueprintPillar,
   SurfaceNarrative,
   VirtualRouteEntry,
-} from "@warpgogol/werkstatt-site/surface";
-import type { PageEntry } from "@warpgogol/werkstatt-site/surface";
+} from "@warpgogol/werkstatt-shared/surface";
+import type { PageEntry } from "@warpgogol/werkstatt-shared/surface";
 import {
   type Block,
   md,

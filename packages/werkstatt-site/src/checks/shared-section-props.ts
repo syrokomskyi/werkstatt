@@ -19,7 +19,7 @@ fragment catalog. Two commands:
 </CHANGE_SUMMARY>
 */
 
-import { SHARED_SECTION_PROPS, sharedSectionPropsChangelog } from "@warpgogol/werkstatt-site/ontology";
+import { SHARED_SECTION_PROPS, sharedSectionPropsChangelog } from "@warpgogol/werkstatt-shared/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,

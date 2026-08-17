@@ -13,7 +13,7 @@
 */
 
 /**
- * @warpgogol/werkstatt-site/passport — Passport emission pipeline
+ * @warpgogol/werkstatt-shared/passport — Passport emission pipeline
  *
  * DNA-31 / RFC-0028
  *
@@ -32,7 +32,7 @@
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import type { SystemManifest } from "@warpgogol/werkstatt-site/ontology/schemas";
+import type { SystemManifest } from "@warpgogol/werkstatt-shared/ontology/schemas";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { collectNebulaInputs } from "@warpgogol/werkstatt-site/nebula/collect";
 import type { NebulaInputs } from "@warpgogol/werkstatt-site/nebula";

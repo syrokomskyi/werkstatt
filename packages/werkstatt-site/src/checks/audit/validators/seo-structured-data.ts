@@ -22,8 +22,8 @@ import type {
 import {
   jsonldTypes,
   type JsonldSurfacePolicyEntry,
-} from "@warpgogol/werkstatt-site/ontology/external-surfaces";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
+} from "@warpgogol/werkstatt-shared/ontology/external-surfaces";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-shared/surface";
 import { parse as yamlParse } from "yaml";
 import { buildAuditResult, getAuditPageInfo, loadAuditAppContext } from "../helpers.ts";
 import type { Diagnostic } from "../types.ts";

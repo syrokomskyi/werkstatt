@@ -18,7 +18,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { toApiRecord, runDnsRecordUpsert } from "./dns-record-upsert.ts";
-import type { DnsRecordDeclaration } from "@warpgogol/werkstatt-site/ontology/schemas";
+import type { DnsRecordDeclaration } from "@warpgogol/werkstatt-shared/ontology/schemas";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 vi.mock("./dns-helpers.ts", async (importOriginal) => {

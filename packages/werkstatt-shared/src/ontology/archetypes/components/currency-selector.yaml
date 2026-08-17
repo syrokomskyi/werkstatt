@@ -1,0 +1,19 @@
+id: currency-selector
+displayName: Currency Selector
+version: 1.0.0
+semanticRole: component-currency-selector
+description: |
+  Currency selector dropdown for multi-currency sites (RFC-0743).
+  Renders available target currencies and persists selection in localStorage.
+expectedIntents:
+  - orient-visitor
+  - guide-navigation
+expectedIndustryFit: []
+layoutHint: split
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({}).passthrough()
+acceptedCosmicNames:
+  - Portia
+constraints: {}

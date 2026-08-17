@@ -30,7 +30,7 @@ import {
   UPSTASH_QSTASH_URL,
   UPSTASH_QSTASH_TOKEN,
 } from "astro:env/server";
-import { buildQstashPublish, QSTASH_EU_BASE } from "@warpgogol/werkstatt-site/integration";
+import { buildQstashPublish, QSTASH_EU_BASE } from "@warpgogol/werkstatt-shared/integration";
 import { verifyAndMapStripeEvent } from "@warpgogol/werkstatt-site/integration-adapter-stripe";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../section-api-utils.ts";
 

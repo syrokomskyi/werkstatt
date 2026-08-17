@@ -1,0 +1,23 @@
+id: approach
+displayName: Approach
+version: 1.2.0
+semanticRole: approach
+description: |
+  Approach cards with images. RFC-0103 bodyKind: cards.
+expectedIntents:
+  - explain-approach
+  - build-trust
+  - demonstrate-expertise
+expectedIndustryFit:
+  - non-profit
+layoutHint: card-grid
+bodyKind: cards
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+    - body-cards
+acceptedCosmicNames:
+  - Titan
+constraints: {}

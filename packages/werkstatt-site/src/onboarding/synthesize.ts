@@ -16,7 +16,7 @@ and hashing for per-system onboarding directories (onboarding/<system-id>/.input
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
-import { collectFiles as collectFilesShared, fileExists as pathExists } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles as collectFilesShared, fileExists as pathExists } from "@warpgogol/werkstatt-shared/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,

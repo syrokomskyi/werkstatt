@@ -1,0 +1,21 @@
+# Event: contact.route_click
+# RFC-0305 / Messkanon
+
+id: contact.route_click
+label: Contact Route Click
+description: >
+  A visitor clicked a route or directions affordance. Payload must identify only
+  the placement, not the visitor location or route details.
+
+category: contact
+autoEmit: false
+
+payload:
+  locale:
+    type: string
+    description: Active locale
+    required: true
+  placement:
+    type: string
+    description: Stable machine-readable UI placement
+    required: true

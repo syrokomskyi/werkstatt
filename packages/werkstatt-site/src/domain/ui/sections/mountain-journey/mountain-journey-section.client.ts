@@ -14,7 +14,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { initMountainJourneyAnimation } from "@warpgogol/werkstatt-site/share/scripts/gsap-mountain-journey";
+import { initMountainJourneyAnimation } from "@warpgogol/werkstatt-shared/share/scripts/gsap-mountain-journey";
 
 function init(): void {
   const scene = document.querySelector<HTMLElement>("[data-mountain-journey-scene]");

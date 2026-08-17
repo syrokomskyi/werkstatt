@@ -28,8 +28,8 @@ import {
   type ClusterOutcome,
   type VisibilitySnapshot,
   type VirtualRouteEntry,
-} from "@warpgogol/werkstatt-site/surface";
-import type { OutcomesPayload } from "@warpgogol/werkstatt-site/surface/io";
+} from "@warpgogol/werkstatt-shared/surface";
+import type { OutcomesPayload } from "@warpgogol/werkstatt-shared/surface/io";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const SURFACE_ARTIFACT_FILE = "src/surface.generated.yaml";
@@ -512,4 +512,4 @@ export async function runVisibilityActionPlan(
   };
 }
 
-export { readVisibilityOutcomes, type OutcomesPayload } from "@warpgogol/werkstatt-site/surface/io";
+export { readVisibilityOutcomes, type OutcomesPayload } from "@warpgogol/werkstatt-shared/surface/io";

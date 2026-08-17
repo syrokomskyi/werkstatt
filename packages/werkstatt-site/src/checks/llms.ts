@@ -29,13 +29,13 @@ import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
 import { loadSemanticSiteModel } from "@warpgogol/werkstatt-site/content";
-import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/werkstatt-site/share/semantic";
+import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/werkstatt-shared/share/semantic";
 import {
   canonicalPageUrl,
   type CanonicalUrlOptions,
-} from "@warpgogol/werkstatt-site/share/canonical-url";
+} from "@warpgogol/werkstatt-site/share/astro/canonical-url";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
-import { includeInLlms, type SurfaceArtifact } from "@warpgogol/werkstatt-site/surface";
+import { includeInLlms, type SurfaceArtifact } from "@warpgogol/werkstatt-shared/surface";
 import { loadLazySurfacePages } from "@warpgogol/werkstatt-site/share/astro/surface-routes";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 

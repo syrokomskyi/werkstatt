@@ -20,7 +20,7 @@ import {
   type Blueprint,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@warpgogol/werkstatt-site/surface";
+} from "@warpgogol/werkstatt-shared/surface";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 
 export interface DatasetEntry {

@@ -30,8 +30,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
-import { jsonldTypes, type MediaLeakagePolicy } from "@warpgogol/werkstatt-site/ontology/external-surfaces";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-shared/surface";
+import { jsonldTypes, type MediaLeakagePolicy } from "@warpgogol/werkstatt-shared/ontology/external-surfaces";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { ARTIFACT_FILE } from "./surface/shared.ts";
 

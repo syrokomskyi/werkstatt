@@ -50,7 +50,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { executeKernelCommand, executeKernelPipeline } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import {
   runPipelinePhase,
   computeBuildInputHash,

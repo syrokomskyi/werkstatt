@@ -12,7 +12,7 @@
 
 import { join } from "node:path";
 import { containsSecretLikeText } from "@warpgogol/werkstatt-site/check-core";
-import { parseWarpgogolCheckHints } from "@warpgogol/werkstatt-site/share/check-hints";
+import { parseWarpgogolCheckHints } from "@warpgogol/werkstatt-shared/share/check-hints";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {

@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Validates that apps use @warpgogol/werkstatt-site/share utilities instead of re-implementing them locally.</purpose>
+<purpose>Validates that apps use @warpgogol/werkstatt-shared/share utilities instead of re-implementing them locally.</purpose>
 <non-goals>
   <item>Do not check for app-specific business logic duplication.</item>
   <item>Do not enforce file size limits on app utilities (removed per RFC-0037).</item>
@@ -8,7 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial implementation for RFC-0037 Wave 2.</item>
-  <item>Allows astro:content imports in @warpgogol/werkstatt-site/share per RFC-0037.</item>
+  <item>Allows astro:content imports in @warpgogol/werkstatt-shared/share per RFC-0037.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -36,7 +36,7 @@ export interface ShareUtilityViolation {
   message: string;
 }
 
-// Canonical exports from @warpgogol/werkstatt-site/share (derived from packages/share/src/index.ts)
+// Canonical exports from @warpgogol/werkstatt-shared/share (derived from packages/share/src/index.ts)
 // These function names should not be re-implemented in apps
 const CANONICAL_EXPORTS = new Set([
   // Content utilities
@@ -67,8 +67,8 @@ const CANONICAL_EXPORTS = new Set([
 
 /**
  * Runs share.utility.lint validation.
- * Checks that apps don't re-implement utilities from @warpgogol/werkstatt-site/share.
- * Per RFC-0037: allows astro:content imports in @warpgogol/werkstatt-site/share.
+ * Checks that apps don't re-implement utilities from @warpgogol/werkstatt-shared/share.
+ * Per RFC-0037: allows astro:content imports in @warpgogol/werkstatt-shared/share.
  */
 export async function runShareUtilityLint(
   input: KernelCommandInput,
@@ -87,7 +87,7 @@ export async function runShareUtilityLint(
     violations.push(...appViolations);
   }
 
-  // Also verify @warpgogol/werkstatt-site/share itself doesn't have issues
+  // Also verify @warpgogol/werkstatt-shared/share itself doesn't have issues
   const shareViolations = await lintSharePackage(workspaceRoot);
   violations.push(...shareViolations);
 
@@ -99,7 +99,7 @@ export async function runShareUtilityLint(
     },
     summary:
       violations.length === 0
-        ? "All apps use @warpgogol/werkstatt-site/share utilities correctly"
+        ? "All apps use @warpgogol/werkstatt-shared/share utilities correctly"
         : `${violations.length} violation(s) found`,
   };
 }
@@ -141,14 +141,14 @@ async function lintApp(appPath: string, siteName: string): Promise<ShareUtilityV
             file: `src/utils/${file}`,
             rule: "duplicate-export",
             exportName,
-            canonicalImport: `@warpgogol/werkstatt-site/share`,
-            message: `${exportName} is already exported by @warpgogol/werkstatt-site/share. Remove local re-implementation and import from the canonical package.`,
+            canonicalImport: `@warpgogol/werkstatt-shared/share`,
+            message: `${exportName} is already exported by @warpgogol/werkstatt-shared/share. Remove local re-implementation and import from the canonical package.`,
           });
         }
       }
 
       // Check for direct astro:content imports in app
-      // RFC-0037: astro:content is allowed in @warpgogol/werkstatt-site/share
+      // RFC-0037: astro:content is allowed in @warpgogol/werkstatt-shared/share
       // Apps MAY use astro:content for content-collections utilities (legitimate app-specific logic)
       // but should prefer @warpgogol/werkstatt-site/share/astro where equivalent functionality exists
       if (
@@ -183,7 +183,7 @@ async function lintSharePackage(workspaceRoot: string): Promise<ShareUtilityViol
       const content = await fs.readFile(astroContentPath, "utf-8");
       if (!content.includes("astro:content")) {
         violations.push({
-          package: "@warpgogol/werkstatt-site/share",
+          package: "@warpgogol/werkstatt-shared/share",
           file: "src/astro/content.ts",
           rule: "wrong-import-source",
           message:

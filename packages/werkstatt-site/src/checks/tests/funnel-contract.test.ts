@@ -9,7 +9,7 @@ import {
   isValidFunnelStage,
   reachableStages,
   scanForMakeComReferences,
-} from "@warpgogol/werkstatt-site/integration";
+} from "@warpgogol/werkstatt-shared/integration";
 
 /**
  * RFC-0188: the platform — not UChat — owns the funnel state machine. These

@@ -12,8 +12,8 @@ length-preserving strippers used by the token/color lints.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import { getLineColumn } from "@warpgogol/werkstatt-site/share/text-position";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
+import { getLineColumn } from "@warpgogol/werkstatt-shared/share/text-position";
 import type { KernelCommandInput } from "@warpgogol/werkstatt/kernel";
 export { getLineColumn };
 

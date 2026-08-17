@@ -28,7 +28,7 @@ import {
   verifyIdentityCredential,
   type WerkstattIdentityConfig,
   type WerkstattCredential,
-} from "@warpgogol/werkstatt-site/passport";
+} from "@warpgogol/werkstatt-shared/passport";
 import { readSystemConfig } from "@warpgogol/werkstatt/sternsystem";
 
 export interface StudioGateAuthResult {

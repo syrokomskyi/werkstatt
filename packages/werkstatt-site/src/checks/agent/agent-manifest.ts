@@ -39,11 +39,11 @@ import {
   capabilityToActionRef,
   buildAgentSigningPayload,
   type AgentSurfaceManifest,
-} from "@warpgogol/werkstatt-site/share/agent";
-import { BUSINESS_DOMAIN_VISIBILITY } from "@warpgogol/werkstatt-site/share/semantic";
+} from "@warpgogol/werkstatt-shared/share/agent";
+import { BUSINESS_DOMAIN_VISIBILITY } from "@warpgogol/werkstatt-shared/share/semantic";
 import { PINNED_MCP_PROTOCOL_VERSION } from "@warpgogol/werkstatt/agent-gate";
-import { verifyBytes } from "@warpgogol/werkstatt-site/passport/sign";
-import { PassportPublicKeyFileSchema } from "@warpgogol/werkstatt-site/passport/schema";
+import { verifyBytes } from "@warpgogol/werkstatt-shared/passport/sign";
+import { PassportPublicKeyFileSchema } from "@warpgogol/werkstatt-shared/passport/schema";
 import { readAstroSiteUrl } from "../lib/astro-site-url.ts";
 import { readEntitledFeatures } from "../lib/entitlements.ts";
 import { loadCapabilityCatalog, collectRenderedSectionTypes } from "./agent-capability.ts";

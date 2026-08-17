@@ -21,8 +21,8 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import { getLineColumn } from "@warpgogol/werkstatt-site/share/text-position";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
+import { getLineColumn } from "@warpgogol/werkstatt-shared/share/text-position";
 import {
   runPerformanceVitalsInstrument,
   type PerformanceVitalsState,

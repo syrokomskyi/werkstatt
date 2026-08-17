@@ -8,7 +8,7 @@ imported from its canonical home. Structurally prevents the next agent from
 re-introducing the duplication class this RFC cleaned up.
 </purpose>
 <non-goals>
-  <item>Do not flag mere re-exports (`export { fileExists } from "@warpgogol/werkstatt-site/share/fs"`) — only fresh declarations.</item>
+  <item>Do not flag mere re-exports (`export { fileExists } from "@warpgogol/werkstatt-shared/share/fs"`) — only fresh declarations.</item>
   <item>Do not flag a differently-named local wrapper that internally delegates to the canonical helper.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -26,14 +26,14 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const SCAN_ROOT = join("packages");
 
 /**
  * Files that deliberately inline reserved helpers for dependency-free
- * portability (e.g. @warpgogol/forge cannot depend on @warpgogol/werkstatt-site/share).
+ * portability (e.g. @warpgogol/forge cannot depend on @warpgogol/werkstatt-shared/share).
  * Each entry is a repo-relative file path.
  */
 const INLINE_ALLOWLIST = new Set<string>(["packages/forge/src/utils/fs.ts"]);
@@ -41,23 +41,23 @@ const INLINE_ALLOWLIST = new Set<string>(["packages/forge/src/utils/fs.ts"]);
 /** Reserved shared-helper identifiers and the single file allowed to declare each. */
 export const RESERVED_HELPERS: Record<string, { importPath: string; canonicalFile: string }> = {
   fileExists: {
-    importPath: "@warpgogol/werkstatt-site/share/fs",
+    importPath: "@warpgogol/werkstatt-shared/share/fs",
     canonicalFile: "packages/share/src/fs/index.ts",
   },
   collectFiles: {
-    importPath: "@warpgogol/werkstatt-site/share/fs",
+    importPath: "@warpgogol/werkstatt-shared/share/fs",
     canonicalFile: "packages/share/src/fs/index.ts",
   },
   readJsonFile: {
-    importPath: "@warpgogol/werkstatt-site/share/fs",
+    importPath: "@warpgogol/werkstatt-shared/share/fs",
     canonicalFile: "packages/share/src/fs/index.ts",
   },
   readYamlFile: {
-    importPath: "@warpgogol/werkstatt-site/share/fs",
+    importPath: "@warpgogol/werkstatt-shared/share/fs",
     canonicalFile: "packages/share/src/fs/index.ts",
   },
   getLineColumn: {
-    importPath: "@warpgogol/werkstatt-site/share/text-position",
+    importPath: "@warpgogol/werkstatt-shared/share/text-position",
     canonicalFile: "packages/share/src/text-position.ts",
   },
   collectMarkdownFiles: {

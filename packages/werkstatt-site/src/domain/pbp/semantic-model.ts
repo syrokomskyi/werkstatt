@@ -15,12 +15,12 @@ has no dependency on PBP entity schemas or loaders.
   <item>Established by RFC-0470 as part of the PBP layer.</item>
   <item>Replaced getBusinessFaqEntries with direct getCollection("faq") call — FAQ now has its own collection (RFC-0475).</item>
   <item>Replaced DEFAULT_LANGUAGE_CODE import with local constant.</item>
-  <item>Replaced buildSiteSemanticProfile import with SemanticSiteProfile type from @warpgogol/werkstatt-site/share/semantic.</item>
+  <item>Replaced buildSiteSemanticProfile import with SemanticSiteProfile type from @warpgogol/werkstatt-shared/share/semantic.</item>
 </CHANGE_SUMMARY>
 */
 
 import { getEntry, getCollection } from "astro:content";
-import { loadDerivedPrices } from "@warpgogol/werkstatt-site/share/semantic/derived-prices-loader";
+import { loadDerivedPrices } from "@warpgogol/werkstatt-shared/share/semantic/derived-prices-loader";
 import {
   buildSemanticPageModelWith,
   type SemanticBreadcrumb,
@@ -29,14 +29,14 @@ import {
   type SemanticPageModel,
   type SemanticPageType,
   type SemanticSiteProfile,
-} from "@warpgogol/werkstatt-site/share/semantic";
-import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
+} from "@warpgogol/werkstatt-shared/share/semantic";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
 import {
   getContentRefIndex,
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
-} from "@warpgogol/werkstatt-site/share/content-reference";
-import { parseMaterialCreditMap, materialCreditAtId } from "@warpgogol/werkstatt-site/share/material-credits";
+} from "@warpgogol/werkstatt-shared/share/content-reference";
+import { parseMaterialCreditMap, materialCreditAtId } from "@warpgogol/werkstatt-shared/share/material-credits";
 import { emitPipelineLogEvent } from "@warpgogol/werkstatt-site/content";
 
 const DEFAULT_LANGUAGE_CODE = "de";
@@ -146,7 +146,7 @@ async function getFaqEntries(lang: string): Promise<SemanticFaqEntry[]> {
  * Reproduces the previous Astro-path read behavior exactly — notably the home
  * label resolves from `header.brandLabel` only. Content references ({collection.file.field})
  * are substituted in getPageFrontmatter so JSON-LD/OG output gets resolved values.
- * Construction logic now lives once in @warpgogol/werkstatt-site/share's buildSemanticPageModelWith.
+ * Construction logic now lives once in @warpgogol/werkstatt-shared/share's buildSemanticPageModelWith.
  */
 const astroSemanticReader: SemanticContentReader = {
   async getPageFrontmatter(pageId, lang) {

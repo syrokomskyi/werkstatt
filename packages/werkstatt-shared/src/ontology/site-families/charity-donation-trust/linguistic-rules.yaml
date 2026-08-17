@@ -1,0 +1,6 @@
+family: charity-donation-trust
+version: 1.0.0
+rules:
+  - Use plain-language fundraising copy.
+  - Prefer short declarative sentences near CTAs.
+  - Ban unverifiable absolutes such as "guaranteed impact".

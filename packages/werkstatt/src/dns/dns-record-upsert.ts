@@ -37,7 +37,7 @@ import {
   recordsMatch,
 } from "./dns-helpers.ts";
 import { ensureTxtQuoted } from "./txt-normalize.ts";
-import type { DnsRecordDeclaration } from "@warpgogol/werkstatt-site/ontology/schemas";
+import type { DnsRecordDeclaration } from "@warpgogol/werkstatt-shared/ontology/schemas";
 
 export interface DnsRecordUpsertResult {
   command: "dns.record.upsert";

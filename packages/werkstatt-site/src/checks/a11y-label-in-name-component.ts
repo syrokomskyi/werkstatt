@@ -23,7 +23,7 @@ a11y.label-in-name.validate (RFC-0832).
 
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import type {
   CheckResult,
   Diagnostic,

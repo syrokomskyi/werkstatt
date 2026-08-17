@@ -1,0 +1,44 @@
+id: charity-donation-trust
+displayName: Charity · Donation trust
+version: 1.0.0
+description: |
+  Donation-first trust system for mission-driven nonprofits. Emphasizes mission clarity,
+  impact proof, transparent fund allocation, and a single primary ask.
+
+detection:
+  signals:
+    archetypePrimary: donation-funnel
+    audienceAny: [donors, supporters, volunteers]
+    conversionPrimary: donation-intent
+    materialMentionsAny: [donation, transparency, recurring-support]
+  threshold: 0.7
+
+recipe:
+  candidateBiomes:
+    - nonprofit-trust
+  candidateConstellations:
+    - nonprofit-donation-funnel
+  requiredSectionArchetypes:
+    # Remapped 2026-05-29 from placeholder names to the existing archetype YAMLs
+    # under packages/ontology/archetypes/sections/ (see RFC-0131).
+    - hero
+    - impact
+    - donation-use
+    - final-cta
+  conversionGoals:
+    primary:
+      id: donation-confirmation
+      eventName: donation-confirmed
+    secondary:
+      - id: donation-intent
+        eventName: donation-intent
+      - id: contact-submitted
+        eventName: contact-submit
+  auditThresholds:
+    transparencyVisible: required
+    impactProofVisible: required
+    singlePrimaryAsk: required
+    testimonialPresent: warn
+  agentReadinessBaseline:
+    maxBytesToCta: 4096
+    requireStructuredData: [Organization, FAQPage]

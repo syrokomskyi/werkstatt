@@ -54,7 +54,7 @@ export interface GeoServiceConfig {
   overrides?: GeoOverrides;
 }
 
-/** Structurally identical to LocalizedSlug in @warpgogol/werkstatt-site/surface. Duplicated to avoid a @warpgogol/werkstatt-site/geo -> @warpgogol/werkstatt-site/surface dependency (which would form a workspace cycle). */
+/** Structurally identical to LocalizedSlug in @warpgogol/werkstatt-shared/surface. Duplicated to avoid a @warpgogol/werkstatt-site/geo -> @warpgogol/werkstatt-shared/surface dependency (which would form a workspace cycle). */
 export interface GeoLocalizedSlug {
   neutral: string;
   byLang?: Record<string, string>;

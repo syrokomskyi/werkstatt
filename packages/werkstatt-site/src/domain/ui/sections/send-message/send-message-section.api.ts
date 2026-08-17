@@ -29,7 +29,7 @@ import {
   buildQstashPublish,
   QSTASH_EU_BASE,
   type IntegrationEvent,
-} from "@warpgogol/werkstatt-site/integration";
+} from "@warpgogol/werkstatt-shared/integration";
 import { SendMessageRequestSchema } from "@warpgogol/werkstatt-site/testing/contract";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../../section-api-utils.ts";
 

@@ -1,0 +1,123 @@
+id: nonprofit-trust
+version: 1.0.0
+displayName: Nonprofit Trust
+family: charity-donation-trust
+axes:
+  warmth: warm
+  contrast: medium
+  density: comfortable
+  typographySharpness: soft
+  diagramPresence: supportive
+  photoStance: documentary
+  motionStance: restrained
+  textContrast: aa
+  cornerRadius: 6px
+  borderWeight: 1px
+palette:
+  brand: "#2D5016"
+  brandHover: "#244112"
+  brandContrast: "#FFFFFF"
+  accent: "#3D7A1A"
+  surface: "#F5F0E8"
+  surfaceMuted: "#ECE4D8"
+  ink: "#2C2C2C"
+  inkSoft: "#4A463F"
+  inkMuted: "#5A5A52"
+  divider: "#D9CFBF"
+  success: "#38A169"
+  warning: "#D97706"
+  danger: "#E53E3E"
+  info: "#2B6CB0"
+components:
+  heroOverlay: rgba(45, 80, 22, 0.6)
+  heroText: "#f7fafc"
+  surfaceGlass: rgba(245, 240, 232, 0.72)
+  sectionAltBase: "#2d5016"
+  sectionAltText: "#f5f0e8"
+  sectionAltTextSoft: "#d4e4c8"
+  sectionAltLink: "#fbb6ce"
+  sectionAltLinkVisited: "#ed64a6"
+  sectionAltLinkHover: "#ffffff"
+  sectionAltAccent: "#4a8c2a"
+  statsBg: "#3a6b1e"
+  footerBg: "#3a3a2a"
+  footerText: "#e8e4dc"
+  footerTextMuted: "#a8a498"
+  cardBg: "#ffffff"
+  cardBorder: rgba(45, 80, 22, 0.1)
+  cta: var(--ds-color-primary)
+  ctaHover: color-mix(in srgb, var(--ds-color-primary), black 30%)
+  ctaText: "#ffffff"
+  surfaceAlt: "#f0ebe3"
+  textSoftOnDark: "rgba(247, 250, 252, 0.84)"
+  textInverse84: "rgba(247, 250, 252, 0.84)"
+typography:
+  headingFamily: "'Lora', Georgia, serif"
+  bodyFamily: "'Inter', system-ui, sans-serif"
+  monoFamily: "'JetBrains Mono', 'Courier New', monospace"
+  scaleRatio: 1.2
+  baseSize: 17px
+  lineHeightBody: 1.6
+  lineHeightHeading: 1.15
+  measureBody: 68ch
+  measureHeading: 24ch
+  numericFeatures: tnum, lnum
+spacing:
+  base: 8px
+  sectionPaddingY: clamp(32px, 7vw, 64px)
+  containerMaxWidth: 1180px
+  containerNarrow: 720px
+  gutter: clamp(16px, 2vw, 32px)
+motion:
+  durationFast: 150ms
+  durationMedium: 240ms
+  durationSlow: 360ms
+  easing: cubic-bezier(0.16, 1, 0.3, 1)
+  reduceMotionRespect: true
+geometry:
+  diagramLineWeight: 1px
+  diagramAccentColor: "#3D7A1A"
+  decorativeAllowed: false
+shadows:
+  sm: 0 2px 8px rgb(26 32 44 / 0.08)
+  md: 0 4px 20px rgb(26 32 44 / 0.12)
+  lg: 0 8px 40px rgb(26 32 44 / 0.16)
+  xl: 0 24px 60px rgb(0 0 0 / 0.35)
+  glass: 0 4px 12px rgb(0 0 0 / 0.06)
+  glow: 0 0 28px rgb(28 69 50 / 0.12)
+  header: 0 6px 24px rgb(0 0 0 / 0.25)
+  appeal: 0 18px 40px rgb(15 23 42 / 0.08)
+gradients:
+  accent: linear-gradient(135deg, rgb(181 76 31) 0%, rgb(212 101 46) 100%)
+  primary: linear-gradient(135deg, rgb(26 67 50) 0%, rgb(45 90 69) 100%)
+  vignetteDark: radial-gradient(circle at center, transparent 0%, rgb(0 0 0 / 0.45) 100%)
+siteBackground:
+  layers:
+    - kind: color
+      color: var(--ds-color-bg)
+    - kind: gradient
+      direction: vertical
+      stops:
+        - at: 0
+          color: var(--ds-color-surface)
+          opacity: 1
+        - at: 1
+          color: var(--ds-color-bg)
+          opacity: 1
+fonts:
+  - family: Inter
+    package: "@fontsource/inter"
+    weights: [400, 500, 600]
+  - family: Lora
+    package: "@fontsource/lora"
+    weights: [400, 500, 600, 700]
+constraints:
+  forbidStockPhotoTags:
+    - crying-child-cliche
+    - generic-volunteer-circle
+  forbidPhrases:
+    - 100% guaranteed impact
+    - donate now or it is too late
+  enforceTabularNumeralsIn:
+    - stats
+    - donation

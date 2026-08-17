@@ -25,9 +25,9 @@ import { readFile, copyFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { createServer } from "node:http";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
 import { stableJsonHash, byteHash } from "@warpgogol/werkstatt/fingerprint";
-import type { PrintPdfGenerateResult } from "@warpgogol/werkstatt-site/share/schemas/print";
+import type { PrintPdfGenerateResult } from "@warpgogol/werkstatt-shared/share/schemas/print";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { blockExternalRequests, evaluateInPage } from "./playwright-utils.ts";
 

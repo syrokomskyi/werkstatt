@@ -16,12 +16,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { fileExists as exists, collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { fileExists as exists, collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import {
   sectionArchetypeSchema,
   systemManifestSchema,
   type SectionArchetypeContract,
-} from "@warpgogol/werkstatt-site/ontology";
+} from "@warpgogol/werkstatt-shared/ontology";
 import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
@@ -309,8 +309,8 @@ function renderSectionAstro(slug: string, sectionPascal: string, bodyKind: BodyK
     return `---
 ${sectionCompassMarkers(`${slug} composite section — bespoke layout in SectionShell + SectionHeader.`)}
 
-import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
-import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
+import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-shared/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import type { ${sectionPascal}SectionContent } from "./${slug}-section.types.generated.ts";
@@ -342,7 +342,7 @@ const props = cast<${sectionPascal}SectionContent>(pageOverride);
   {/* TODO: bespoke composite layout for ${slug} — implement section-specific content here. */}
   {/* If this section uses image props (backgroundImage, imageName, portraitImage, etc.),
        resolve them through resolveImage + contentAssetImages — never use the raw prop as a URL:
-     import { resolveImage } from "@warpgogol/werkstatt-site/share";
+     import { resolveImage } from "@warpgogol/werkstatt-shared/share";
      import { contentAssetImages } from "../../content-assets.ts";
      const bgImage = resolveImage(contentAssetImages, props.backgroundImage, { lang }); */}
 </SectionShell>
@@ -352,8 +352,8 @@ const props = cast<${sectionPascal}SectionContent>(pageOverride);
   return `---
 ${sectionCompassMarkers(`${slug} thin dispatcher section — ${bodyKind} body.`)}
 
-import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
-import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
+import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-shared/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import ${component} from "@warpgogol/werkstatt-site/ui/components/${importPath}";

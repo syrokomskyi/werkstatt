@@ -24,7 +24,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { parseBlueprint, type Blueprint } from "@warpgogol/werkstatt-site/surface";
+import { parseBlueprint, type Blueprint } from "@warpgogol/werkstatt-shared/surface";
 import { failResult, passResult } from "./result-helpers.ts";
 import { readDeclaredBlueprints } from "./surface-expand.ts";
 

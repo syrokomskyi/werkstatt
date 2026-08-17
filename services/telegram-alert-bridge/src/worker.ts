@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+import { createMetricsPusher } from "@warpgogol/werkstatt-shared/observability";
 
 interface SignozWebhookPayload {
   alert_name?: string;

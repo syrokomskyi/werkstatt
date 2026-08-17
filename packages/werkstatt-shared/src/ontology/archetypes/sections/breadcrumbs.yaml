@@ -1,0 +1,21 @@
+id: breadcrumbs
+displayName: Breadcrumbs
+version: 1.0.0
+semanticRole: breadcrumbs
+description: |
+  Starter RFC-0072 archetype seeded from existing manifest metadata.
+expectedIntents:
+  - orient-visitor
+  - surface-content
+  - fulfill-legal-requirement
+expectedIndustryFit:
+  - non-profit
+layoutHint: single-column
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({}).passthrough()
+acceptedCosmicNames:
+  - Thebe
+constraints: {}

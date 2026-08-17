@@ -37,7 +37,7 @@ import {
   buildMarkdownTwin,
   type MarkdownTwinProvenance,
   type MarkdownTwinSemanticMeta,
-} from "@warpgogol/werkstatt-site/share/semantic";
+} from "@warpgogol/werkstatt-shared/share/semantic";
 
 const logger = {
   section() {},

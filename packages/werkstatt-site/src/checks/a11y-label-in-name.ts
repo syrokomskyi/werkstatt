@@ -24,7 +24,7 @@ where the label names the region, not the content.
 import { join, relative } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { parse, type DefaultTreeAdapterMap } from "parse5";
 import type {
   CheckResult,

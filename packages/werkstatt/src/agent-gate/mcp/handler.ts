@@ -17,8 +17,8 @@ one level up, at the transport boundary in index.ts).
 </CHANGE_SUMMARY>
 */
 
-import type { AgentSurfaceManifest } from "@warpgogol/werkstatt-site/share/agent";
-import type { CapabilityRecord } from "@warpgogol/werkstatt-site/ontology";
+import type { AgentSurfaceManifest } from "@warpgogol/werkstatt-shared/share/agent";
+import type { CapabilityRecord } from "@warpgogol/werkstatt-shared/ontology";
 import type { AgentGatePorts } from "../ports.ts";
 import type { RateLimiter } from "../limits.ts";
 import { validateAgainstCapabilitySchema, buildIntegrationEventFromAction } from "../actions.ts";

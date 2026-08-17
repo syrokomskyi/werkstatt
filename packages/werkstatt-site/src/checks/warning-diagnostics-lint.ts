@@ -24,7 +24,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 
 const SUPPRESSION = "warning-diagnostics-ok:";
 const WARNING_MARKER = /\[warn:[^\]]+]/;

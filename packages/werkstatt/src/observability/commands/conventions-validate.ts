@@ -18,12 +18,12 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-shared/checks";
 import {
   FORBIDDEN_LABEL_KEYS,
   METRIC_NAME_PATTERN,
   WARPGOGOL_METRIC_REGISTRY,
-} from "@warpgogol/werkstatt-site/observability";
+} from "@warpgogol/werkstatt-shared/observability";
 
 const METRIC_NAME_LITERAL_PATTERN =
   /["']((?:warpgogol_(?:factory|probe|delivery|workers)_[a-z0-9_]+))["']/g;
@@ -124,7 +124,7 @@ export async function runObservabilityConventionsValidate(
     }
   }
 
-  // OBS-CONV-04: direct OTLP env reads outside @warpgogol/werkstatt-site/observability
+  // OBS-CONV-04: direct OTLP env reads outside @warpgogol/werkstatt-shared/observability
   const envSourceGlobs = ["packages/**/*.ts", "services/**/*.ts"];
   for (const glob of envSourceGlobs) {
     const files = await context.io.glob(glob, { cwd: context.workspaceRoot });
@@ -142,9 +142,9 @@ export async function runObservabilityConventionsValidate(
           severity: "warning",
           file: normalized,
           message:
-            "Direct reference to WARPGOGOL_OTLP_ENDPOINT/WARPGOGOL_OTLP_TOKEN outside @warpgogol/werkstatt-site/observability. Emitters must go through the port.",
+            "Direct reference to WARPGOGOL_OTLP_ENDPOINT/WARPGOGOL_OTLP_TOKEN outside @warpgogol/werkstatt-shared/observability. Emitters must go through the port.",
           fixHint:
-            "Use createMetricsPusher from @warpgogol/werkstatt-site/observability which reads env vars internally.",
+            "Use createMetricsPusher from @warpgogol/werkstatt-shared/observability which reads env vars internally.",
         });
       }
     }

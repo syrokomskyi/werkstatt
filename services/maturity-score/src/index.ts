@@ -16,7 +16,7 @@ URL hash. The real HDRI scoring logic is deferred.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+import { createMetricsPusher } from "@warpgogol/werkstatt-shared/observability";
 
 export interface MaturityScoreWorkerEnv {
   WARPGOGOL_OTLP_ENDPOINT: string;

@@ -23,7 +23,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { signBytes, verifyBytes } from "@warpgogol/werkstatt-site/passport/sign";
+import { signBytes, verifyBytes } from "@warpgogol/werkstatt-shared/passport/sign";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type { DiscoveredSiteWorkspace } from "@warpgogol/werkstatt/kernel";
 import {

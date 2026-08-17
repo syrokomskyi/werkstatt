@@ -14,15 +14,15 @@
 
 /* RFC-0103: women — composite (image + paragraphs body) via SectionShell + SectionHeader + SectionParagraphs. */
 
-import type { SectionParagraphsBody } from "@warpgogol/werkstatt-site/share";
-import type { SectionProps } from "@warpgogol/werkstatt-site/share/page";
+import type { SectionParagraphsBody } from "@warpgogol/werkstatt-shared/share";
+import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
 import {
   cast,
   need,
   resolveImageRequired,
   resolveSectionAnchor,
   creditByTarget,
-} from "@warpgogol/werkstatt-site/share";
+} from "@warpgogol/werkstatt-shared/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import ResponsiveImage from "@warpgogol/werkstatt-site/ui/components/responsive-image.astro";

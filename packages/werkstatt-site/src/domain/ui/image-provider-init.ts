@@ -21,8 +21,8 @@
 import {
   createBuildPortableProvider,
   setDefaultImageProvider,
-} from "@warpgogol/werkstatt-site/share/image-provider";
-import type { ImageVariantManifest } from "@warpgogol/werkstatt-site/share/image-provider";
+} from "@warpgogol/werkstatt-shared/share/image-provider";
+import type { ImageVariantManifest } from "@warpgogol/werkstatt-shared/share/image-provider";
 import { loadGeneratedManifest } from "./generated-manifest-loader.ts";
 
 (function initImageProvider() {

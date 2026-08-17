@@ -31,7 +31,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 
 const SCAN_ROOT = join("packages", "werkstatt-site", "src", "checks", "src");
 const BASELINE_PATH = join(

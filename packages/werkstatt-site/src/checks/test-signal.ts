@@ -76,9 +76,9 @@ const NOOP_PATTERNS = [
 const TIER_0_PACKAGES = new Set([
   "@warpgogol/werkstatt/kernel",
   "@warpgogol/werkstatt-site/checks",
-  "@warpgogol/werkstatt-site/share",
+  "@warpgogol/werkstatt-shared/share",
   "@warpgogol/werkstatt-site/integration-adapter-stripe",
-  "@warpgogol/werkstatt-site/integration-adapter-supabase-crm",
+  "@warpgogol/werkstatt-shared/integration-adapter-supabase-crm",
 ]);
 
 const TIER_1_PATTERNS = [
@@ -107,7 +107,7 @@ function classifyTier(signal: PackageTestSignal): TestSignalTier {
   if (signal.directory.startsWith("services/")) return 1;
   if (
     signal.directory === "packages/ui" ||
-    signal.packageName === "@warpgogol/werkstatt-site/ontology"
+    signal.packageName === "@warpgogol/werkstatt-shared/ontology"
   )
     return 2;
   if (TIER_1_PATTERNS.some((pattern) => pattern.test(signal.packageName))) return 1;

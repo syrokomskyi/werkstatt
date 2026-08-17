@@ -45,7 +45,7 @@ import type {
   SemanticBlock,
   SemanticFaqEntry,
   SemanticPageModel,
-} from "@warpgogol/werkstatt-site/share/semantic";
+} from "@warpgogol/werkstatt-shared/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";

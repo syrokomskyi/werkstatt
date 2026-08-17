@@ -29,9 +29,9 @@ import {
   type AgentKnowledgeDomain,
   type AgentKnowledgeEnvelope,
   type AgentKnowledgeFreshness,
-} from "@warpgogol/werkstatt-site/share/agent";
-import { projectWeb } from "@warpgogol/werkstatt-site/share/semantic";
-import type { AuthoredFreshnessLedger } from "@warpgogol/werkstatt-site/share/knowledge";
+} from "@warpgogol/werkstatt-shared/share/agent";
+import { projectWeb } from "@warpgogol/werkstatt-shared/share/semantic";
+import type { AuthoredFreshnessLedger } from "@warpgogol/werkstatt-shared/share/knowledge";
 import { defaultLanguageFromManifest } from "../lib/i18n.ts";
 
 const FRESHNESS_LEDGER_FILE = "src/freshness.generated.yaml";

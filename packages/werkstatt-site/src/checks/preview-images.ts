@@ -20,12 +20,12 @@ import { mkdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
 import {
   resolveNormalizeConfig,
   normalizeText,
-} from "@warpgogol/werkstatt-site/share/text-normalize";
-import type { NormalizeConfig } from "@warpgogol/werkstatt-site/share/text-normalize";
+} from "@warpgogol/werkstatt-shared/share/text-normalize";
+import type { NormalizeConfig } from "@warpgogol/werkstatt-shared/share/text-normalize";
 import { generateBrandCardPng } from "./preview-templates.ts";
 import YAML from "yaml";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";

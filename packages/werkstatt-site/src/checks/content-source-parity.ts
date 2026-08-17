@@ -24,7 +24,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-shared/share/fs";
 
 interface ParityDiff {
   domain: string;

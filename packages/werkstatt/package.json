@@ -347,6 +347,7 @@
     "@libp2p/tcp": "^11.0.26",
     "@multiformats/multiaddr": "^13.0.3",
     "@warpgogol/forge": "workspace:*",
+    "@warpgogol/werkstatt-shared": "workspace:*",
     "@aws-sdk/client-s3": "^3.1101.0",
     "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
     "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study",

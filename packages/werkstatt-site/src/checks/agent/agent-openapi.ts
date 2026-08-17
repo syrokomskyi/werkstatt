@@ -30,7 +30,7 @@ import {
   formatAgentOpenApi,
   type OpenApiDocument,
   type CapabilitySchemaInput,
-} from "@warpgogol/werkstatt-site/share/agent";
+} from "@warpgogol/werkstatt-shared/share/agent";
 import { loadCapabilityCatalog } from "./agent-capability.ts";
 import { loadInternalManifest, readAgentBlock } from "./agent-shared.ts";
 import { diagnosticsResult } from "../result-helpers.ts";

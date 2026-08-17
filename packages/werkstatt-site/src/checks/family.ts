@@ -23,7 +23,7 @@ import {
   SiteFamilyContract,
   biomeSchema,
   constellationSchema,
-} from "@warpgogol/werkstatt-site/ontology";
+} from "@warpgogol/werkstatt-shared/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,

@@ -320,7 +320,7 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "analytics.messkanon.validate" },
   { command: "analytics.binding.validate" },
   { command: "infra.brief.validate" },
-  // RFC-0032: Shared utility usage in apps must come from @warpgogol/werkstatt-site/share
+  // RFC-0032: Shared utility usage in apps must come from @warpgogol/werkstatt-shared/share
   { command: "share.utility.lint" },
   // Styling
   { command: "tokens.ds.lint" },

@@ -30,7 +30,7 @@ import {
   type SurfaceCounts,
   type SurfaceManifest,
   type VirtualRouteEntry,
-} from "@warpgogol/werkstatt-site/surface";
+} from "@warpgogol/werkstatt-shared/surface";
 import { diagnosticsResult, failResult } from "../result-helpers.ts";
 import {
   loadSurfaceBlueprints,

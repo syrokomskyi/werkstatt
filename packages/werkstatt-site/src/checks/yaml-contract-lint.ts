@@ -25,7 +25,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const WHITELIST_PATH = "yaml-contract.whitelist.yaml";

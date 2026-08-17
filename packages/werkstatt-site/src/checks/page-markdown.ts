@@ -19,9 +19,9 @@ rendered HTML resolves to an emitted twin.</purpose>
 import { dirname, join, relative } from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/werkstatt-site/share/people-profile-defaults";
+import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/werkstatt-site/share/astro/people-profile-defaults";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -49,12 +49,12 @@ import {
   PRIORITY_BY_PAGE_TYPE,
   DOMAIN_BY_PAGE_TYPE,
   SEMANTIC_PAGE_TYPES,
-} from "@warpgogol/werkstatt-site/share/semantic";
+} from "@warpgogol/werkstatt-shared/share/semantic";
 import {
   canonicalPageUrl,
   type CanonicalUrlOptions,
-} from "@warpgogol/werkstatt-site/share/canonical-url";
-import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
+} from "@warpgogol/werkstatt-site/share/astro/canonical-url";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/astro/url-policy";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { failResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
@@ -537,7 +537,7 @@ export async function runPageMarkdownValidate(
   // entry has command === "page.markdown.generate". Non-twin .md files (e.g.
   // auth.md owned by agent.discovery-endpoints.generate) are excluded.
   const { parseMarkdownTwinFrontmatter, computeContentHash } =
-    await import("@warpgogol/werkstatt-site/share/semantic");
+    await import("@warpgogol/werkstatt-shared/share/semantic");
   const allMdFiles = await collectFiles(publicDir, { extensions: [".md"], ignore: () => false });
   const markdownFiles = allMdFiles.filter((abs) => {
     const relPath = toPosix(relative(context.workspaceRoot, abs));

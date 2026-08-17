@@ -1,0 +1,53 @@
+id: donation-card
+displayName: Donation Card
+version: 1.1.0
+semanticRole: donation-card
+description: |
+  Donation card composite. RFC-0101 composed; business data resolved from
+  src/content/business-profile/{lang}/organization/legal-identity.md when not overridden.
+expectedIntents:
+  - display-donation-card
+  - facilitate-donation
+  - build-trust
+expectedIndustryFit:
+  - non-profit
+layoutHint: single-column
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+  shape: |
+    z.object({
+      labels: z.object({
+        title: z.string().min(1),
+        ibanLabel: z.string().min(1),
+        bicLabel: z.string().min(1),
+        bankLabel: z.string().min(1),
+        copyButtonLabel: z.string().min(1),
+        qrCodeButtonLabel: z.string().min(1),
+        donationInfoLinkLabel: z.string().min(1),
+        oldDetailsLabel: z.string().optional(),
+        oldDetailsButtonLabel: z.string().min(1),
+        oldDetailsButtonExpandedLabel: z.string().optional(),
+        kontoLabel: z.string().optional(),
+        blzLabel: z.string().optional(),
+        qrCodeModalTitle: z.string().min(1),
+        qrCodeModalCloseLabel: z.string().min(1),
+        qrCodeAltText: z.string().min(1),
+        qrInstruction: z.string().min(1),
+        donationInfoLinkHref: z.string().optional(),
+        modalCloseIcon: z.string().optional(),
+      }),
+      title: z.string().optional(),
+      companyName: z.string().optional(),
+      bankName: z.string().optional(),
+      iban: z.string().optional(),
+      bic: z.string().optional(),
+      konto: z.string().optional(),
+      blz: z.string().optional(),
+      trustIndicators: z.array(z.string()).optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Pandora
+constraints: {}

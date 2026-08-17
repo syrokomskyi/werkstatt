@@ -1,0 +1,29 @@
+id: credits
+displayName: Credits gallery
+version: 1.0.0
+semanticRole: credits-gallery
+description: |
+  Material credits page rendered as an optimized media gallery (RFC-0232).
+  Reads *.credits.yaml sidecars (RFC-0220) and renders each credited material
+  as a responsive image (or living-photo / feature video) preview beside its
+  localized provenance details. The preview media is computed from
+  credit.target.id + credit.target.domain with RFC-0053 language fallback — no
+  media filename is authored in content, and no raw HTML lives in any .md.
+expectedIntents:
+  - surface-content
+  - fulfill-legal-requirement
+expectedIndustryFit: []
+layoutHint: card-grid
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+  shape: |
+    z.object({
+      heading: z.string().optional(),
+      lead: z.string().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Makemake
+constraints: {}

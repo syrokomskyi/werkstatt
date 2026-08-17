@@ -17,7 +17,7 @@
 */
 
 import { z } from "zod";
-import { IntegrationEventSchema } from "@warpgogol/werkstatt-site/integration";
+import { IntegrationEventSchema } from "@warpgogol/werkstatt-shared/integration";
 
 export const IntegrationRouteRequestSchema = IntegrationEventSchema;
 

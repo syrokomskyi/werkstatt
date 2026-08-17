@@ -136,7 +136,7 @@ describe("runWorkpieceImportsValidate", () => {
       join(srcDir, "index.ts"),
       [
         `import { foo } from "@warpgogol/werkstatt/kernel";`,
-        `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
+        `const bar = await import("@warpgogol/werkstatt-shared/share/fs");`,
       ].join("\n"),
     );
 

@@ -1,0 +1,28 @@
+# Event: passport-view
+# DNA-27 / RFC-0028
+#
+# Fired when a visitor loads the /cosmic/passport page.
+# Emitted by the PassportHeader (Methone) moon via emit() after render.
+
+id: passport-view
+label: Passport View
+description: >
+  A visitor opened the Cosmic Passport page. Emitted once per page load by
+  the passport-header moon component.
+
+category: navigation
+autoEmit: false
+
+payload:
+  locale:
+    type: string
+    description: "Active locale at view time (e.g. 'de', 'en')"
+    required: true
+  appId:
+    type: string
+    description: "The app identifier from the passport (e.g. 'my-app')"
+    required: true
+  nebulaScore:
+    type: number
+    description: "Composite Nebula Score (0-100) from the passport, if available"
+    required: false

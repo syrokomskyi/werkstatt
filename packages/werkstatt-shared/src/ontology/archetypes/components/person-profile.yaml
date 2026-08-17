@@ -1,0 +1,20 @@
+id: person-profile
+displayName: Person Profile
+version: 1.0.0
+semanticRole: component-person-profile
+description: |
+  Starter RFC-0072 archetype seeded from existing manifest metadata.
+expectedIntents:
+  - introduce-team
+  - humanise-brand
+  - demonstrate-expertise
+expectedIndustryFit:
+  - non-profit
+layoutHint: split
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({}).passthrough()
+acceptedCosmicNames:
+  - Miranda
+constraints: {}

@@ -27,7 +27,7 @@ import type {
 import { resolveCacheClonePath, readSystemConfig } from "@warpgogol/werkstatt/sternsystem";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { buildDnsAidRecord, type DnsAidRecord } from "@warpgogol/werkstatt-site/share/agent";
+import { buildDnsAidRecord, type DnsAidRecord } from "@warpgogol/werkstatt-shared/share/agent";
 import { loadInternalManifest, readAgentBlock } from "./agent-shared.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 

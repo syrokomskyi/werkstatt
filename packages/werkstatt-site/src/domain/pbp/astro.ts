@@ -16,7 +16,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "zod";
-import { toDataEntryId } from "@warpgogol/werkstatt-site/share/content";
+import { toDataEntryId } from "@warpgogol/werkstatt-shared/share/content";
 import { fsDataCollectionLoader } from "@warpgogol/werkstatt-site/content-source";
 import { rateSnapshotSchema } from "./schemas/rate-snapshot.js";
 

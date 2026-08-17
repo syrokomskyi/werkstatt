@@ -21,7 +21,7 @@ SITES_BUILD_CHECK_PIPELINE as a safety net for the auto-sync in mission.close.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
+import { fileExists } from "@warpgogol/werkstatt-shared/share/fs";
 import { TEMPLATES_DIR } from "../onboarding/templates.ts";
 import type {
   CheckResult,

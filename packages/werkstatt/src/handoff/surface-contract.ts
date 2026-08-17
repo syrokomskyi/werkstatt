@@ -3,7 +3,7 @@
 <purpose>RFC-0480: surface.contract.validate — validate generated C-surfaces against declarative contract.</purpose>
 <non-goals>
   <item>Does not generate C-surfaces — only validates them against the contract.</item>
-  <item>Does not modify the contract — contracts are declarative in @warpgogol/werkstatt-site/ontology/external-surfaces.</item>
+  <item>Does not modify the contract — contracts are declarative in @warpgogol/werkstatt-shared/ontology/external-surfaces.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -25,7 +25,7 @@ import {
   urlSchema,
   jsonldTypes,
   sitemapShape,
-} from "@warpgogol/werkstatt-site/ontology/external-surfaces";
+} from "@warpgogol/werkstatt-shared/ontology/external-surfaces";
 import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 
 export interface SurfaceContractValidateData {

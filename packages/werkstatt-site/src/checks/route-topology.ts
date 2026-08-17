@@ -26,7 +26,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/astro/url-policy";
 import { resultFromViolations } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 

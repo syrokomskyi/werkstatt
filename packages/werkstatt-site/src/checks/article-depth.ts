@@ -38,9 +38,9 @@ import {
   type SemanticBuildProfile,
   type SemanticPageModel,
   type SemanticPageType,
-} from "@warpgogol/werkstatt-site/share/semantic";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/canonical-url";
-import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
+} from "@warpgogol/werkstatt-shared/share/semantic";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/astro/canonical-url";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/astro/url-policy";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import {

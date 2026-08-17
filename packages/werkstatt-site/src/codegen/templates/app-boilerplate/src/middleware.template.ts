@@ -23,7 +23,7 @@ import { sequence } from "astro:middleware";
 import languageRedirectMiddleware from "./middleware/language-redirect";
 import tombstoneMiddleware from "./middleware/retired-tombstones";
 import markdownNegotiationMiddleware from "./middleware/markdown-negotiation";
-import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/werkstatt-site/share/text-normalize";
+import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/werkstatt-shared/share/text-normalize";
 import { loadSystemManifestSync } from "@warpgogol/werkstatt-site/content";
 
 const devNormalize = import.meta.env.DEV

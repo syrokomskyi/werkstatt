@@ -83,7 +83,7 @@ describe("extractWorkspaceImports", () => {
   it("extracts both static and dynamic imports from the same file", () => {
     const source = [
       `import { foo } from "@warpgogol/werkstatt/kernel";`,
-      `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
+      `const bar = await import("@warpgogol/werkstatt-shared/share/fs");`,
       `import { baz } from "@warpgogol/forge";`,
     ].join("\n");
     const imports = extractWorkspaceImports(source, "test.ts");
@@ -117,7 +117,7 @@ describe("extractWorkspaceImports", () => {
       `// line 1: comment`,
       `import { foo } from "@warpgogol/werkstatt/kernel";`,
       `// line 3: comment`,
-      `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
+      `const bar = await import("@warpgogol/werkstatt-shared/share/fs");`,
     ].join("\n");
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(2);
@@ -203,7 +203,7 @@ describe("runTemplateImportsValidate", () => {
       join(pkgDir, "kernel.config.template.ts"),
       [
         `import { foo } from "@warpgogol/werkstatt/kernel";`,
-        `const bar = await import("@warpgogol/werkstatt-site/share/fs");`,
+        `const bar = await import("@warpgogol/werkstatt-shared/share/fs");`,
       ].join("\n"),
     );
     await writeFile(

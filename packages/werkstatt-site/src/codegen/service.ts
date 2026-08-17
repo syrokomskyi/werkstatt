@@ -25,7 +25,7 @@ import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import {
   parseMaterialCreditMap,
   type MaterialCreditRecord,
-} from "@warpgogol/werkstatt-site/share/material-credits";
+} from "@warpgogol/werkstatt-shared/share/material-credits";
 import {
   formatMaterialCreditLine,
   labelForMaterialCreditRole,
@@ -35,9 +35,9 @@ import {
   materialCreditLabelsSchema,
   materialTargetKey,
   type MaterialCreditLabels,
-} from "@warpgogol/werkstatt-site/share/schemas/material-credit";
+} from "@warpgogol/werkstatt-shared/share/schemas/material-credit";
 import { hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
-import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-shared/share/fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.join(__dirname, "templates", "service");

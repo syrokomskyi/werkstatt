@@ -21,7 +21,7 @@ import {
   registerRateSourceAdapter,
   type RateSourceAdapter,
 } from "@warpgogol/werkstatt-site/pbp-rate-adapters";
-import { createMetricsPusher } from "@warpgogol/werkstatt-site/observability";
+import { createMetricsPusher } from "@warpgogol/werkstatt-shared/observability";
 
 export interface RateFetcherWorkerEnv {
   RATE_FETCHER_SUPABASE_URL: string;

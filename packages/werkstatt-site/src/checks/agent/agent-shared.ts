@@ -17,7 +17,7 @@ agent-openapi.ts, agent-api-catalog.ts, and agent-mcp-card.ts.
 import { join } from "node:path";
 import { parse as yamlParse } from "yaml";
 import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
-import type { AgentSurfaceManifest } from "@warpgogol/werkstatt-site/share/agent";
+import type { AgentSurfaceManifest } from "@warpgogol/werkstatt-shared/share/agent";
 
 const INTERNAL_MANIFEST_FILE = "src/agent-surface.generated.yaml";
 

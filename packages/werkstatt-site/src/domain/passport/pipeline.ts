@@ -15,7 +15,7 @@
 */
 
 import { createHash } from "node:crypto";
-import type { SystemManifest } from "@warpgogol/werkstatt-site/ontology/schemas";
+import type { SystemManifest } from "@warpgogol/werkstatt-shared/ontology/schemas";
 import { computeNebulaScore, toPassportScores } from "@warpgogol/werkstatt-site/nebula/compute";
 import type { NebulaInputs, NebulaScore } from "@warpgogol/werkstatt-site/nebula";
 import type { UniRegistry } from "@warpgogol/werkstatt-site/star-map";

@@ -1,0 +1,6 @@
+family: check-quality-operator
+version: 1.0.0
+rules:
+  - "URL-first framing: the visitor brings a URL, not a business problem."
+  - Show what the check covers before asking for action.
+  - "Reports must be concrete and actionable, not vanity scores."

@@ -27,9 +27,9 @@ import {
   type SurfaceNarrative,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@warpgogol/werkstatt-site/surface";
-import type { PageEntry } from "@warpgogol/werkstatt-site/surface";
-import { toKebabCase } from "@warpgogol/werkstatt-site/share/string-utils";
+} from "@warpgogol/werkstatt-shared/surface";
+import type { PageEntry } from "@warpgogol/werkstatt-shared/surface";
+import { toKebabCase } from "@warpgogol/werkstatt-shared/share/string-utils";
 import { createGeoService, type GeoProviderResult } from "@warpgogol/werkstatt-site/geo";
 import { loadApprovedEnrichedBulk, loadApprovedNarrativesBulk } from "../surface-enrich.ts";
 import {

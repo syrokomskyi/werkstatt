@@ -18,7 +18,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 
 // @ai-invariant COMPONENTS_ALLOWED_EXTENSIONS lists extensions expected inside src/components/.
 // Any other extension found triggers a naming.components.lint violation. CSS belongs in

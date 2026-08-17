@@ -27,7 +27,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { listRegisteredKernelCommands, loadAppRuntime } from "@warpgogol/werkstatt/kernel";
-import { fileExists } from "@warpgogol/werkstatt-site/share/fs";
+import { fileExists } from "@warpgogol/werkstatt-shared/share/fs";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 

@@ -39,11 +39,11 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import type { VideoManifest, LiveVideoManifest } from "@warpgogol/werkstatt-site/share/schemas/media";
+import type { VideoManifest, LiveVideoManifest } from "@warpgogol/werkstatt-shared/share/schemas/media";
 import { fileExists } from "../lib/file-exists.ts";
 import { passResult, resultFromViolations } from "../result-helpers.ts";
 import { readDefaultLanguageCode } from "../lib/i18n.ts";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 
 /** Recursively collect every living-photo clip (`.webm`/`.mp4`), skipping RFC-0210 `media/` sources. */
 async function collectClips(dir: string): Promise<string[]> {

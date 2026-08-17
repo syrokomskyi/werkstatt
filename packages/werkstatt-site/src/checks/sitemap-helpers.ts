@@ -16,17 +16,17 @@ import { parse as yamlParse } from "yaml";
 import { join, dirname } from "node:path";
 import type { WorkspaceIO, DirEntry } from "@warpgogol/werkstatt/kernel";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { resolvePageOutput, type RawPageOutput } from "@warpgogol/werkstatt-site/share/semantic";
-import { localizeUrl } from "@warpgogol/werkstatt-site/share/url-policy";
+import { resolvePageOutput, type RawPageOutput } from "@warpgogol/werkstatt-shared/share/semantic";
+import { localizeUrl } from "@warpgogol/werkstatt-site/share/astro/url-policy";
 import {
   canonicalPageUrl,
   type CanonicalUrlOptions,
-} from "@warpgogol/werkstatt-site/share/canonical-url";
+} from "@warpgogol/werkstatt-site/share/astro/canonical-url";
 import {
   resolvePageUpdateStamp,
   type PageUpdateStampResult,
-} from "@warpgogol/werkstatt-site/share/semantic";
-import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/werkstatt-site/share/people-profile-defaults";
+} from "@warpgogol/werkstatt-shared/share/semantic";
+import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/werkstatt-site/share/astro/people-profile-defaults";
 import { hasGeneratedMarker } from "@warpgogol/werkstatt-site/codegen";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";

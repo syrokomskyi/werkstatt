@@ -24,7 +24,7 @@ import {
   normalizeComparableText,
   parseContentAtomsFile,
   parseCoverageLedgerMarkdown,
-} from "@warpgogol/werkstatt-site/share/content-discipline";
+} from "@warpgogol/werkstatt-shared/share/content-discipline";
 import type {
   KernelCommandInput,
   KernelCommandResult,

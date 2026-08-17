@@ -15,11 +15,11 @@ zone ID resolution, environment variable resolution, and record identity.
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { dnsRecordFileSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
+import { dnsRecordFileSchema } from "@warpgogol/werkstatt-shared/ontology/schemas";
 import type {
   DnsRecordDeclaration,
   DnsRecordFile,
-} from "@warpgogol/werkstatt-site/ontology/schemas";
+} from "@warpgogol/werkstatt-shared/ontology/schemas";
 import { filterEnv, sourceDotenv } from "../leitstand/adapters/cloudflare-workers.ts";
 import { resolveZoneId } from "../subdomain/subdomain-helpers.ts";
 import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";

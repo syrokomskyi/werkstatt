@@ -30,7 +30,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { resolveMissionDir } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { discoverSystems, readSystemState } from "../sternsystem/registry-io.ts";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "./r2-client.ts";
 

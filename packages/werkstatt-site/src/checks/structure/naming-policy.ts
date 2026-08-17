@@ -24,7 +24,7 @@ import {
   RELEASE_ID_REGEX,
   BORDBUCH_EVENT_ID_REGEX,
   isLatinOnly,
-} from "@warpgogol/werkstatt-site/ontology/operations";
+} from "@warpgogol/werkstatt-shared/ontology/operations";
 
 interface NamingViolation {
   artifact: string;

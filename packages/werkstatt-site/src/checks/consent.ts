@@ -26,7 +26,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { chatAdapterVendorOrigins } from "@warpgogol/werkstatt-site/chat";
 import {
   runPrivacyConsentComplianceInstrument,

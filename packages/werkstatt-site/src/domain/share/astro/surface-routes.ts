@@ -17,9 +17,9 @@
 </CHANGE_SUMMARY>
 */
 
-// Inlined from @warpgogol/werkstatt-site/surface/src/types.ts to break the workspace cycle
+// Inlined from @warpgogol/werkstatt-shared/surface/src/types.ts to break the workspace cycle
 // (surface → site-kernel-content → share → surface). These are type-only;
-// the canonical definitions live in @warpgogol/werkstatt-site/surface and must stay structurally compatible.
+// the canonical definitions live in @warpgogol/werkstatt-shared/surface and must stay structurally compatible.
 import type { PageEntry } from "../page.ts";
 
 interface VirtualRouteEntry {

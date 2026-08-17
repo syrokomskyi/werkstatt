@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Price variant utilities for currency-aware price display (RFC-0743) — formatPrice, loadDerivedPrices, and buildPriceVariants extracted from price-card-section.astro for testability. RFC-0767: DerivedPriceEntry type and loadDerivedPrices relocated to @warpgogol/werkstatt-site/share.</purpose>
+<purpose>Price variant utilities for currency-aware price display (RFC-0743) — formatPrice, loadDerivedPrices, and buildPriceVariants extracted from price-card-section.astro for testability. RFC-0767: DerivedPriceEntry type and loadDerivedPrices relocated to @warpgogol/werkstatt-shared/share.</purpose>
 <non-goals>
   <item>Does not format recurrence — delegates to formatRecurrence from share.</item>
   <item>Does not render HTML — returns structured data for the .astro template.</item>
@@ -9,13 +9,13 @@
 <CHANGE_SUMMARY>
   <item>Extracted from price-card-section.astro for testability (review fix G-3).</item>
   <item>Review fix A-1: exported formatPrice to eliminate duplication. Review fix G-3: added loadDerivedPrices with ENOENT handling.</item>
-  <item>RFC-0767: DerivedPriceEntry type and loadDerivedPrices moved to @warpgogol/werkstatt-site/share. Now re-imported from @warpgogol/werkstatt-site/share/semantic and @warpgogol/werkstatt-site/share/semantic/derived-prices-loader.</item>
+  <item>RFC-0767: DerivedPriceEntry type and loadDerivedPrices moved to @warpgogol/werkstatt-shared/share. Now re-imported from @warpgogol/werkstatt-shared/share/semantic and @warpgogol/werkstatt-shared/share/semantic/derived-prices-loader.</item>
 </CHANGE_SUMMARY>
 */
 
-import { formatRecurrence } from "@warpgogol/werkstatt-site/share/formula-eval";
-import type { DerivedPriceEntry } from "@warpgogol/werkstatt-site/share/semantic";
-import { loadDerivedPrices } from "@warpgogol/werkstatt-site/share/semantic/derived-prices-loader";
+import { formatRecurrence } from "@warpgogol/werkstatt-shared/share/formula-eval";
+import type { DerivedPriceEntry } from "@warpgogol/werkstatt-shared/share/semantic";
+import { loadDerivedPrices } from "@warpgogol/werkstatt-shared/share/semantic/derived-prices-loader";
 
 export type { DerivedPriceEntry };
 export { loadDerivedPrices };

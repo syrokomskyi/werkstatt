@@ -19,17 +19,17 @@
 */
 
 import { render } from "astro:content";
-import type { MaterialCreditLabels } from "@warpgogol/werkstatt-site/share";
+import type { MaterialCreditLabels } from "@warpgogol/werkstatt-shared/share";
 import {
   getProseContentEntry,
   wrapInlineNumbers,
   type AttributionSiteDefault,
-} from "@warpgogol/werkstatt-site/share";
+} from "@warpgogol/werkstatt-shared/share";
 import {
   getContentRefIndex,
   resolveReferencesInString,
   EMPTY_CONTENT_REF_INDEX,
-} from "@warpgogol/werkstatt-site/share/content-reference";
+} from "@warpgogol/werkstatt-shared/share/content-reference";
 import GithubSlugger from "github-slugger";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
@@ -39,7 +39,7 @@ import { loadDerivedPrices } from "../price-card/price-variants.ts";
 import {
   PRICE_MARKER_RE as PRICE_MARKER_GLOBAL_RE,
   AMOUNT_MARKER_RE as AMOUNT_MARKER_GLOBAL_RE,
-} from "@warpgogol/werkstatt-site/share/semantic";
+} from "@warpgogol/werkstatt-shared/share/semantic";
 
 /**
  * Render markdown to HTML with GFM support (tables, strikethrough, task lists,

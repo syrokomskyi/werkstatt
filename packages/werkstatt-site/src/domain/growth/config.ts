@@ -27,14 +27,14 @@
  */
 
 import { z } from "zod";
-import { growthVendorSchema } from "@warpgogol/werkstatt-site/ontology/schemas";
+import { growthVendorSchema } from "@warpgogol/werkstatt-shared/ontology/schemas";
 
 // ---------------------------------------------------------------------------
 // Zod schema — used both for authoring-time validation and runtime parsing
 // ---------------------------------------------------------------------------
 
 /**
- * Vendor config schema — re-exported from @warpgogol/werkstatt-site/ontology as the single source
+ * Vendor config schema — re-exported from @warpgogol/werkstatt-shared/ontology as the single source
  * of truth. The ontology schema is shared with systemGrowthSchema so the
  * `growth.vendor` shape in system.md and the runtime config stay in sync.
  */

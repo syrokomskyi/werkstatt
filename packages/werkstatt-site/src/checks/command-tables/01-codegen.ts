@@ -263,7 +263,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "manifest.contract.validate",
     description:
-      "Validate every *.manifest.yaml in packages/werkstatt-site/src/domain/ui/{sections,components,pages}/ against @warpgogol/werkstatt-site/ontology manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).",
+      "Validate every *.manifest.yaml in packages/werkstatt-site/src/domain/ui/{sections,components,pages}/ against @warpgogol/werkstatt-shared/ontology manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
@@ -315,7 +315,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "onboarding.yaml.import.lint",
     description:
-      "Block direct YAML.parse of RFC-0076 onboarding artifacts in kernel onboarding/audit/content-discipline sources; require @warpgogol/werkstatt-site/share/onboarding-yaml (RFC-0082).",
+      "Block direct YAML.parse of RFC-0076 onboarding artifacts in kernel onboarding/audit/content-discipline sources; require @warpgogol/werkstatt-shared/share/onboarding-yaml (RFC-0082).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,

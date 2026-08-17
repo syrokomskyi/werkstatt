@@ -28,7 +28,7 @@ import {
   listRegisteredKernelPipelines,
 } from "@warpgogol/werkstatt/kernel";
 import { diagnosticsResult, failResult } from "./result-helpers.ts";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 
 const DNA_REGISTRY = "docs/architecture-dna.md";
 const RFC_DIR = "docs/rfcs";

@@ -18,9 +18,9 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-shared/checks";
 import { parse as yamlParse } from "yaml";
-import { readAstroSiteUrl } from "@warpgogol/werkstatt-site/checks/lib/astro-site-url";
+import { readAstroSiteUrl } from "@warpgogol/werkstatt-shared/checks/lib/astro-site-url";
 
 interface ProbeTarget {
   siteId: string;

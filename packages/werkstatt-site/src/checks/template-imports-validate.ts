@@ -23,7 +23,7 @@ import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { promisify } from "node:util";
-import { collectFiles, fileExists } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles, fileExists } from "@warpgogol/werkstatt-shared/share/fs";
 import { discoverWorkspacePackages } from "@warpgogol/werkstatt/kernel";
 import type {
   CheckResult,
@@ -65,7 +65,7 @@ interface TemplateImport {
   line: number;
 }
 
-/** Normalize an import specifier to its package name (e.g. @warpgogol/werkstatt-site/share/fs → @warpgogol/werkstatt-site/share). */
+/** Normalize an import specifier to its package name (e.g. @warpgogol/werkstatt-shared/share/fs → @warpgogol/werkstatt-shared/share). */
 function normalizePackageName(specifier: string): string {
   if (specifier.startsWith("@")) {
     const parts = specifier.split("/");

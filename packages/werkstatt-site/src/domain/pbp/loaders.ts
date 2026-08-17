@@ -17,7 +17,7 @@ import {
   getEntryLanguage,
   stripEntryLanguage,
   toDataEntryId,
-} from "@warpgogol/werkstatt-site/share/content";
+} from "@warpgogol/werkstatt-shared/share/content";
 import { pbpSchemaById } from "./schemas/index.js";
 import { validateSchemaId } from "./schema-id.js";
 import { deepMerge } from "./utils/deep-merge.js";

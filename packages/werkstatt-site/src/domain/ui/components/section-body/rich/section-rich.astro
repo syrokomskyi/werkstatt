@@ -17,13 +17,13 @@
 */
 
 import { render } from "astro:content";
-import type { HorizontalAlign } from "@warpgogol/werkstatt-site/share";
-import { getProseContentEntry, wrapInlineNumbers } from "@warpgogol/werkstatt-site/share";
+import type { HorizontalAlign } from "@warpgogol/werkstatt-shared/share";
+import { getProseContentEntry, wrapInlineNumbers } from "@warpgogol/werkstatt-shared/share";
 import {
   getContentRefIndex,
   resolveReferencesInString,
   EMPTY_CONTENT_REF_INDEX,
-} from "@warpgogol/werkstatt-site/share/content-reference";
+} from "@warpgogol/werkstatt-shared/share/content-reference";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import "./section-rich.css";

@@ -19,13 +19,13 @@ import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/werks
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
-import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
 import {
   PRINT_ORIENTATIONS,
   PRINT_PAGE_SIZES,
   PRINT_BACKGROUND_MODES,
   PRINT_REGIONS,
-} from "@warpgogol/werkstatt-site/share/schemas/print";
+} from "@warpgogol/werkstatt-shared/share/schemas/print";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
 interface PrintViolation {

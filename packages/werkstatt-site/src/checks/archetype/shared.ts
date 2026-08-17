@@ -14,13 +14,13 @@ archetype catalog command set.</purpose>
 import { readFile } from "node:fs/promises";
 import { join, relative, basename, dirname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/werkstatt-shared/share/fs";
 import {
   sectionArchetypeSchema,
   manifestSchema,
   type SectionArchetypeContract,
   type Manifest,
-} from "@warpgogol/werkstatt-site/ontology";
+} from "@warpgogol/werkstatt-shared/ontology";
 
 export const ARCHETYPE_REGISTRY_FILENAME = "packages/werkstatt-site/src/domain/ontology/archetypes/index.yaml";
 
@@ -69,7 +69,7 @@ export interface ArchetypeRegistry {
   totalCount: number;
   entries: ArchetypeRegistryEntry[];
   // RFC-0084: derived sets of semanticRole values per layer. Replace the
-  // closed SemanticRoleValues enum in @warpgogol/werkstatt-site/ontology — manifests'
+  // closed SemanticRoleValues enum in @warpgogol/werkstatt-shared/ontology — manifests'
   // `role` field is now cross-checked against the set matching the manifest's
   // layer. Adding a new archetype with a novel semanticRole no longer
   // requires editing enums.ts.
@@ -164,7 +164,7 @@ export async function loadUiManifestFiles(workspaceRoot: string) {
 // moonImportPaths from all UI manifests. Sections + non-shell components feed
 // planetImportPaths; shell components (archetype ID starting with "shell.")
 // feed moonImportPaths so the shell-block table is also content-derived rather
-// than hand-maintained in @warpgogol/werkstatt-site/share/page.ts.
+// than hand-maintained in @warpgogol/werkstatt-shared/share/page.ts.
 export function isShellArchetype(archetypeId: string): boolean {
   return archetypeId.startsWith("shell.");
 }

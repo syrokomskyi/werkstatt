@@ -20,14 +20,14 @@ derivative is updated. Part of the Content Knowledge Lifecycle (RFC-0211).
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, parseDocument } from "yaml";
-import { recordClaimsSchema } from "@warpgogol/werkstatt-site/share/schemas";
-import { resolveFieldPath } from "@warpgogol/werkstatt-site/share/content/resolve-field-path";
+import { recordClaimsSchema } from "@warpgogol/werkstatt-shared/share/schemas";
+import { resolveFieldPath } from "@warpgogol/werkstatt-shared/share/content/resolve-field-path";
 import {
   parseClaimSubject,
   formatClaimSubject,
   type ClaimSubject,
-} from "@warpgogol/werkstatt-site/share/knowledge/claim";
-import { hashSourceValue, derivedState } from "@warpgogol/werkstatt-site/share/knowledge/derivation";
+} from "@warpgogol/werkstatt-shared/share/knowledge/claim";
+import { hashSourceValue, derivedState } from "@warpgogol/werkstatt-shared/share/knowledge/derivation";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import type {
   CheckResult,

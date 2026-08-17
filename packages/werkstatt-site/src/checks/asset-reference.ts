@@ -22,7 +22,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import {
   describeContentAssetResolution,
   type ContentAssetDomain,

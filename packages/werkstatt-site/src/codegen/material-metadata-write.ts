@@ -27,23 +27,23 @@ import { promisify } from "node:util";
 import { join, extname } from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { materialCreditSchema } from "@warpgogol/werkstatt-site/share/schemas/material-credit";
-import type { MaterialCredit } from "@warpgogol/werkstatt-site/share/schemas/material-credit";
-import type { VideoManifest, LiveVideoManifest } from "@warpgogol/werkstatt-site/share/schemas/media";
-import type { ImageVariantManifest } from "@warpgogol/werkstatt-site/share/image-provider";
-import type { SemanticSiteModel } from "@warpgogol/werkstatt-site/share/semantic";
+import { materialCreditSchema } from "@warpgogol/werkstatt-shared/share/schemas/material-credit";
+import type { MaterialCredit } from "@warpgogol/werkstatt-shared/share/schemas/material-credit";
+import type { VideoManifest, LiveVideoManifest } from "@warpgogol/werkstatt-shared/share/schemas/media";
+import type { ImageVariantManifest } from "@warpgogol/werkstatt-shared/share/image-provider";
+import type { SemanticSiteModel } from "@warpgogol/werkstatt-shared/share/semantic";
 import {
   loadContentRefIndex,
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
-} from "@warpgogol/werkstatt-site/share/content-reference";
+} from "@warpgogol/werkstatt-shared/share/content-reference";
 import { loadSystemManifest, loadSemanticSiteModel } from "@warpgogol/werkstatt-site/content";
 
 const exec = promisify(execCallback);

@@ -21,7 +21,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-site/share/content";
+import { pageIdToContentFileSlug } from "@warpgogol/werkstatt-shared/share/content";
 import { passResult, failResult } from "./result-helpers.ts";
 
 interface ContentFilenameViolation {

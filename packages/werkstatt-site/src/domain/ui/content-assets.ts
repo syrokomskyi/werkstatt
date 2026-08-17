@@ -13,7 +13,7 @@
   the previous per-file globs.
 </purpose>
 <non-goals>
-  <item>Do not implement resolution logic — sections call resolveImage(contentAssetImages, ...) from @warpgogol/werkstatt-site/share.</item>
+  <item>Do not implement resolution logic — sections call resolveImage(contentAssetImages, ...) from @warpgogol/werkstatt-shared/share.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -47,7 +47,7 @@ export const contentAssetVideos = import.meta.glob<string>(
   { eager: true, query: "?url", import: "default" },
 );
 
-/** RFC-0220: raw YAML sidecars for material credits, resolved by @warpgogol/werkstatt-site/share helpers. */
+/** RFC-0220: raw YAML sidecars for material credits, resolved by @warpgogol/werkstatt-shared/share helpers. */
 export const contentAssetCredits = import.meta.glob<string>("/src/content/**/*.credits.yaml", {
   eager: true,
   query: "?raw",

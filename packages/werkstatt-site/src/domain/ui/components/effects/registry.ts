@@ -22,7 +22,7 @@ import {
   type EffectColor,
   type EffectKind,
   type EffectRenderStrategy,
-} from "@warpgogol/werkstatt-site/share/schemas/effects";
+} from "@warpgogol/werkstatt-shared/share/schemas/effects";
 
 /** RFC-0151 — resolve a color alias to a biome token var(); pass raw values through. */
 export function resolveEffectColor(color: EffectColor | undefined, fallback: string): string {

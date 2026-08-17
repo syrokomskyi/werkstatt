@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Maintains packages/werkstatt-site/src/domain/ui/components/scroll-to-top/scroll-to-top-component.client.ts as an authored ui component client module so agents can evolve it without rediscovering local boundaries.</purpose>
 <non-goals>
-  <item>Do not manage Lenis initialization — that lives in @warpgogol/werkstatt-site/share/scripts/lenis.ts.</item>
+  <item>Do not manage Lenis initialization — that lives in @warpgogol/werkstatt-shared/share/scripts/lenis.ts.</item>
   <item>Do not handle per-site configuration or content-layer labels.</item>
 </non-goals>
 </MODULE_CONTRACT>

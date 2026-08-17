@@ -2,13 +2,13 @@
 <MODULE_CONTRACT>
 <purpose>Autonomy guard for the Werkstatt engine (RFC-0772). Scans packages/werkstatt/src/**
 for @warpgogol/* import specifiers that indicate stack-plugin coupling. Excludes
-self-imports (@warpgogol/werkstatt) and shared schema packages (@warpgogol/werkstatt-site/ontology,
-@warpgogol/werkstatt-site/share) which are not stack plugins.</purpose>
+self-imports (@warpgogol/werkstatt) and shared infrastructure packages (@warpgogol/werkstatt-shared/*)
+which are not stack plugins.</purpose>
 <keywords>autonomy, guard, RFC-0772, DNA-64, plugin boundary</keywords>
 <non-goals>
   <item>Do not scan test files — tests may import from any package.</item>
   <item>Do not scan node_modules — only engine source is checked.</item>
-  <item>Do not block on @warpgogol/werkstatt-site/ontology or @warpgogol/werkstatt-site/share — these are shared schema packages.</item>
+  <item>Do not block on @warpgogol/werkstatt-shared/* — these are shared infrastructure packages.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -22,33 +22,17 @@ import { join, relative } from "node:path";
 /**
  * Packages that are exempt from the autonomy guard.
  * - @warpgogol/werkstatt: self-imports (engine importing its own subpaths)
- * - @warpgogol/werkstatt-site/ontology: shared schema package (not a stack plugin)
- * - @warpgogol/werkstatt-site/share: shared utility package (not a stack plugin)
+ * - @warpgogol/werkstatt-shared: shared infrastructure package (not a stack plugin)
  * - @warpgogol/forge: governance package (not a stack plugin)
- * - @warpgogol/werkstatt-site/passport: identity/signing infrastructure (not a stack plugin)
- * - @warpgogol/werkstatt-site/observability: observability infrastructure (not a stack plugin)
- * - @warpgogol/werkstatt-site/integration: integration contracts (not a stack plugin)
- * - @warpgogol/werkstatt-site/integration-adapter-supabase-crm: integration adapter (not a stack plugin)
- * - @warpgogol/werkstatt-site/surface: surface contracts (not a stack plugin)
  *
  * Stack-specific packages that SHOULD be flagged (not exempt):
- * - @warpgogol/werkstatt-site (except shared schema subpaths above)
+ * - @warpgogol/werkstatt-site (stack plugin — engine MUST NOT import)
  *
- * RFC-0776 completed the migration: old @warpgogol/site-kernel-* packages
- * are deleted. The engine now imports from @warpgogol/werkstatt-site/*
- * subpaths for shared schemas only, and through plugin hooks for stack logic.
+ * RFC-0868 extracted shared infrastructure into @warpgogol/werkstatt-shared.
+ * The engine now imports from @warpgogol/werkstatt-shared/* for shared schemas
+ * and through plugin hooks for stack logic.
  */
-const EXEMPT_PREFIXES = [
-  "@warpgogol/werkstatt",
-  "@warpgogol/werkstatt-site/ontology",
-  "@warpgogol/werkstatt-site/share",
-  "@warpgogol/forge",
-  "@warpgogol/werkstatt-site/passport",
-  "@warpgogol/werkstatt-site/observability",
-  "@warpgogol/werkstatt-site/integration",
-  "@warpgogol/werkstatt-site/integration-adapter-supabase-crm",
-  "@warpgogol/werkstatt-site/surface",
-];
+const EXEMPT_PREFIXES = ["@warpgogol/werkstatt", "@warpgogol/werkstatt-shared", "@warpgogol/forge"];
 
 /**
  * Pattern matching @warpgogol/* import specifiers (both runtime and type-only).

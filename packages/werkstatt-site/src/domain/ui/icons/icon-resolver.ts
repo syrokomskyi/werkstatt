@@ -8,7 +8,7 @@
 </purpose>
 <non-goals>
   <item>Do not implement rendering logic — returns the component, caller renders it.</item>
-  <item>Do not manage deferred hydration — that stays in @warpgogol/werkstatt-site/share/scripts/lordicon.ts.</item>
+  <item>Do not manage deferred hydration — that stays in @warpgogol/werkstatt-shared/share/scripts/lordicon.ts.</item>
   <item>Do not hard-code vendor names or collection folders.</item>
 </non-goals>
 </MODULE_CONTRACT>

@@ -27,8 +27,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import type { SurfaceArtifact } from "@warpgogol/werkstatt-site/surface";
-import { pageText, tokenize } from "@warpgogol/werkstatt-site/surface";
+import type { SurfaceArtifact } from "@warpgogol/werkstatt-shared/surface";
+import { pageText, tokenize } from "@warpgogol/werkstatt-shared/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceBlueprints } from "./surface-expand.ts";
 import { defaultPageForEntry, jaccard, shingles } from "./surface-quality.ts";

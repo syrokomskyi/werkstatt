@@ -31,8 +31,8 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
-import { markdownTwinRelPath, markdownTwinUrlPath } from "@warpgogol/werkstatt-site/share/semantic";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
+import { markdownTwinRelPath, markdownTwinUrlPath } from "@warpgogol/werkstatt-shared/share/semantic";
 import { passResult, failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import {

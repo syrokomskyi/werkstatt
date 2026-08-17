@@ -13,7 +13,7 @@ packages/werkstatt-site/src/domain/ontology/blueprints, and reads a site's decla
 
 import { join } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
-import { parseBlueprint, type Blueprint } from "@warpgogol/werkstatt-site/surface";
+import { parseBlueprint, type Blueprint } from "@warpgogol/werkstatt-shared/surface";
 
 const BLUEPRINTS_DIR = join(
   "packages",

@@ -21,7 +21,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import { collectGatedPageIds } from "@warpgogol/werkstatt-site/share/astro/deployment-gate";
-import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/werkstatt-site/share/semantic";
+import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/werkstatt-shared/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { passResult, failResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";

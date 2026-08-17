@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import { uniqueFaqList, localEvidenceList } from "../surface-expand/bake-helpers.ts";
 import { bakePage } from "../surface-expand/bake.ts";
 import type { BakeCtx } from "../surface-expand/bake.ts";
-import type { VirtualRouteEntry, BlueprintLevel } from "@warpgogol/werkstatt-site/surface";
+import type { VirtualRouteEntry, BlueprintLevel } from "@warpgogol/werkstatt-shared/surface";
 
 function makeEntry(
   surfaceId: string,

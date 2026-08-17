@@ -125,7 +125,7 @@ export default defineConfig({
     optimizeDeps: {
       include: ["gsap", "gsap/ScrollTrigger"],
       exclude: [
-        "@warpgogol/werkstatt-site/share",
+        "@warpgogol/werkstatt-shared/share",
         "@warpgogol/werkstatt-site/ui",
         "@warpgogol/werkstatt-site/pbp",
         "@warpgogol/werkstatt/fingerprint",
@@ -133,7 +133,7 @@ export default defineConfig({
         "@warpgogol/werkstatt-site/faq",
         "@warpgogol/werkstatt/agent-gate",
         "@warpgogol/werkstatt-site/growth",
-        "@warpgogol/werkstatt-site/ontology",
+        "@warpgogol/werkstatt-shared/ontology",
         "@warpgogol/werkstatt-site/tokens",
         "@warpgogol/werkstatt",
         "@warpgogol/werkstatt-site/paths",

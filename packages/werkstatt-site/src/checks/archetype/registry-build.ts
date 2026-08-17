@@ -13,8 +13,8 @@ builds and validates packages/werkstatt-site/src/domain/ontology/archetypes/inde
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fileExists as pathExists } from "@warpgogol/werkstatt-site/share/fs";
-import { PlanetCatalog, MoonCatalog } from "@warpgogol/werkstatt-site/ontology";
+import { fileExists as pathExists } from "@warpgogol/werkstatt-shared/share/fs";
+import { PlanetCatalog, MoonCatalog } from "@warpgogol/werkstatt-shared/ontology";
 import { writeFileAtomic } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {

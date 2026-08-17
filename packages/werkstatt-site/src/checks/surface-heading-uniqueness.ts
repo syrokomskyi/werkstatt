@@ -24,7 +24,7 @@ import { join, relative } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { parse as yamlParse } from "yaml";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { parse, type DefaultTreeAdapterMap } from "parse5";
 import type {
   CheckResult,
@@ -33,7 +33,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-site/surface";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/werkstatt-shared/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { ARTIFACT_FILE } from "./surface/shared.ts";
 

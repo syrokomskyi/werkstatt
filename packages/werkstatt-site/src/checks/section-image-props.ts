@@ -20,7 +20,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { collectFiles } from "@warpgogol/werkstatt-site/share/fs";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import type {
   CheckResult,
   Diagnostic,
@@ -45,7 +45,7 @@ const RULE_ID = "section.image-props.validate";
 const MESSAGE =
   'Image prop used as raw URL — resolve through resolveImage(contentAssetImages, props.xxx, { lang }) instead.';
 const FIX_HINT =
-  'import { resolveImage } from "@warpgogol/werkstatt-site/share"; import { contentAssetImages } from "../../content-assets.ts"; then use the resolved image src.';
+  'import { resolveImage } from "@warpgogol/werkstatt-shared/share"; import { contentAssetImages } from "../../content-assets.ts"; then use the resolved image src.';
 
 export async function runSectionImagePropsValidate(
   _input: KernelCommandInput,

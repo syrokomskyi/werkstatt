@@ -18,10 +18,10 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { buildGeneratedHeader } from "@warpgogol/werkstatt/kernel";
-import { diagnosticsResult } from "@warpgogol/werkstatt-site/checks";
+import { diagnosticsResult } from "@warpgogol/werkstatt-shared/checks";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
-import { readAstroSiteUrl } from "@warpgogol/werkstatt-site/checks/lib/astro-site-url";
-import { readDefaultLanguageCode } from "@warpgogol/werkstatt-site/checks/lib/i18n";
+import { readAstroSiteUrl } from "@warpgogol/werkstatt-shared/checks/lib/astro-site-url";
+import { readDefaultLanguageCode } from "@warpgogol/werkstatt-shared/checks/lib/i18n";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 
 interface ProbeTarget {

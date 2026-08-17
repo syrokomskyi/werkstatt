@@ -35,8 +35,8 @@ import {
   type SurfaceNarrative,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@warpgogol/werkstatt-site/surface";
-import { toKebabCase } from "@warpgogol/werkstatt-site/share/string-utils";
+} from "@warpgogol/werkstatt-shared/surface";
+import { toKebabCase } from "@warpgogol/werkstatt-shared/share/string-utils";
 import { heroSignature } from "./bake.ts";
 import { matchingRecordsForEntry, hasEvidenceValue, ageDays } from "./expand-helpers.ts";
 
