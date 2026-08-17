@@ -331,6 +331,14 @@ export type SemanticPageModel = {
    * Image Provider Port run in the render layer), so it ships the raw token.
    */
   leadImageToken?: { src: string; alt: string };
+  /**
+   * Unresolved token for the page's actual LCP element, carried from the
+   * framework-free page handler to the asset-aware render layer. Set to the
+   * hero block's `backgroundImage` when present (full-viewport, fetchpriority
+   * high), falling back to `leadImage` when visible. Used for `<link
+   * rel="preload" as="image">` in `<head>`.
+   */
+  lcpImageToken?: { src: string; alt: string };
   /** RFC-0162: Open Graph type. Defaults to "website" when unset. */
   ogType?: OgType;
   /** RFC-0162: Open Graph locale in `xx_XX` form (from system.md i18n hreflang). */

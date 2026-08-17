@@ -119,10 +119,11 @@ if (semanticPage?.leadImageToken && !semanticPage.output?.image) {
 }
 
 // ADR-0052: Build LCP image sources for <link rel="preload"> in <head>.
-// Uses the same leadImageToken + contentAssetImages resolution as primaryImage above.
+// Uses lcpImageToken (the page's actual LCP element — hero backgroundImage
+// when present, visible leadImage otherwise) resolved through contentAssetImages.
 const lcpImage = (() => {
-  if (!semanticPage?.leadImageToken) return undefined;
-  const meta = resolveImage(contentAssetImages, semanticPage.leadImageToken.src, {
+  if (!semanticPage?.lcpImageToken) return undefined;
+  const meta = resolveImage(contentAssetImages, semanticPage.lcpImageToken.src, {
     lang: semanticPage.lang,
   });
   if (!meta) return undefined;

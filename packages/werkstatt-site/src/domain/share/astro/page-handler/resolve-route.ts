@@ -990,6 +990,14 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
       if (lead) {
         semanticPage.leadImageToken = { src: lead.src, alt: lead.alt ?? "" };
       }
+      const bgImage = (leadBlock?.props as Record<string, unknown> | undefined)?.backgroundImage;
+      const leadVisible = (leadBlock?.props as Record<string, unknown> | undefined)
+        ?.leadImageVisible;
+      if (typeof bgImage === "string" && bgImage) {
+        semanticPage.lcpImageToken = { src: bgImage, alt: "" };
+      } else if (lead && leadVisible !== false) {
+        semanticPage.lcpImageToken = { src: lead.src, alt: lead.alt ?? "" };
+      }
     }
     if (!semanticPage.ogType) {
       semanticPage.ogType = "website";
