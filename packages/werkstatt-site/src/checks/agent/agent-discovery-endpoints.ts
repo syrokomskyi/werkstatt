@@ -12,6 +12,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial: auth.md, agent-skills/index.json, oauth-protected-resource, oauth-authorization-server generators.</item>
+  <item>Added agent-card.json (A2A Agent Card) generator.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -150,6 +151,38 @@ function buildAgentSkillsIndex(
   return `${JSON.stringify(doc, null, 2)}\n`;
 }
 
+function buildAgentCard(
+  origin: string,
+  manifest: { baseUrl: string; knowledge: Array<{ domain: string; url: string; schema: string }> },
+  siteName: string,
+): string {
+  const skills = manifest.knowledge.map((ref) => ({
+    id: ref.domain,
+    name: ref.domain.charAt(0).toUpperCase() + ref.domain.slice(1),
+    description: `Agent knowledge for ${ref.domain} domain`,
+  }));
+
+  const doc = {
+    name: siteName,
+    version: "1.0.0",
+    description: `Agent discovery surface for ${siteName}. Provides structured knowledge endpoints, MCP tools, and OAuth-protected API access for AI agents.`,
+    supportedInterfaces: [
+      {
+        url: `${origin}/.well-known/agent.json`,
+        protocolBinding: "HTTP+JSON",
+        protocolVersion: "1.0",
+      },
+    ],
+    capabilities: {
+      streaming: false,
+      pushNotifications: false,
+      extendedAgentCard: false,
+    },
+    skills,
+  };
+  return `${JSON.stringify(doc, null, 2)}\n`;
+}
+
 function buildOauthProtectedResource(origin: string): string {
   const doc = {
     resource: `${origin}/`,
@@ -201,6 +234,7 @@ export async function runAgentDiscoveryEndpointsGenerate(
       join(agentSkillsDir, "index.json"),
       join(wellKnownDir, "oauth-protected-resource"),
       join(wellKnownDir, "oauth-authorization-server"),
+      join(wellKnownDir, "agent-card.json"),
     ];
     for (const f of filesToRemove) {
       if (await context.io.exists(f)) await context.io.rm(f);
@@ -252,6 +286,17 @@ export async function runAgentDiscoveryEndpointsGenerate(
   const oasContent = buildOauthAuthorizationServer(origin);
   if (await writeFileIfChanged(context, oasPath, oasContent)) {
     filesWritten.push(".well-known/oauth-authorization-server");
+  }
+
+  // agent-card.json (A2A Agent Card)
+  const agentCardPath = join(wellKnownDir, "agent-card.json");
+  const agentCardContent = buildAgentCard(
+    origin,
+    internalManifest ?? { baseUrl: origin, knowledge: [] },
+    context.site?.name ?? "site",
+  );
+  if (await writeFileIfChanged(context, agentCardPath, agentCardContent)) {
+    filesWritten.push(".well-known/agent-card.json");
   }
 
   return {

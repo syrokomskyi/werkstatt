@@ -184,6 +184,25 @@ test("generate: writes all four discovery endpoint files", async () => {
   expect(oas.agent_auth.register_uri).toBe("https://test.example/auth");
   expect(oas.agent_auth.claim_uri).toBe("https://test.example/.well-known/agent.json");
   expect(oas.agent_auth.identity_types_supported).toContain("anonymous");
+
+  // agent-card.json (A2A Agent Card)
+  const acRaw = await fs.readFile(
+    path.join(appDir, "public", ".well-known", "agent-card.json"),
+    "utf-8",
+  );
+  const ac = JSON.parse(acRaw);
+  expect(ac.name).toBeDefined();
+  expect(ac.version).toBe("1.0.0");
+  expect(ac.description).toBeDefined();
+  expect(ac.supportedInterfaces).toBeDefined();
+  expect(ac.supportedInterfaces[0].url).toBe("https://test.example/.well-known/agent.json");
+  expect(ac.supportedInterfaces[0].protocolBinding).toBeDefined();
+  expect(ac.capabilities).toBeDefined();
+  expect(ac.skills).toBeDefined();
+  expect(ac.skills.length).toBeGreaterThan(0);
+  expect(ac.skills[0].id).toBeDefined();
+  expect(ac.skills[0].name).toBeDefined();
+  expect(ac.skills[0].description).toBeDefined();
 });
 
 test("generate: skip when agent.enabled is false and remove stale files", async () => {
@@ -208,6 +227,11 @@ test("generate: skip when agent.enabled is false and remove stale files", async 
     "stale",
     "utf-8",
   );
+  await fs.writeFile(
+    path.join(appDir, "public", ".well-known", "agent-card.json"),
+    "stale",
+    "utf-8",
+  );
 
   const result = await runAgentDiscoveryEndpointsGenerate(input, makeContext(tmpDir, appDir));
   expect(result.exitCode).toBe(0);
@@ -221,6 +245,7 @@ test("generate: skip when agent.enabled is false and remove stale files", async 
   expect(existsSync(path.join(appDir, "public", ".well-known", "oauth-authorization-server"))).toBe(
     false,
   );
+  expect(existsSync(path.join(appDir, "public", ".well-known", "agent-card.json"))).toBe(false);
 });
 
 test("generate: is idempotent — second run produces identical output", async () => {
