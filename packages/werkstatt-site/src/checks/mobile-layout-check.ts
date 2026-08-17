@@ -222,17 +222,28 @@ function measureGeometry(): ElementGeometry[] {
 function computeMaxDelta(
   portrait: ElementGeometry[],
   landscape: ElementGeometry[],
+  portraitVp: { width: number; height: number },
+  landscapeVp: { width: number; height: number },
 ): { element: string; deltaPx: number } | null {
   let maxDelta = 0;
   let maxElement = "";
   for (const p of portrait) {
     const l = landscape.find((g) => g.tag === p.tag);
     if (!l) continue;
+    // x and y are compared in absolute pixels (header/main/footer should
+    // not jump horizontally or shift vertically relative to the top).
     const dx = Math.abs(p.x - l.x);
     const dy = Math.abs(p.y - l.y);
-    const dw = Math.abs(p.width - l.width);
-    const dh = Math.abs(p.height - l.height);
-    const delta = Math.max(dx, dy, dw, dh);
+    // width is normalized as a fraction of the viewport width,
+    // then converted back to pixel-equivalent against the portrait viewport.
+    // This prevents false positives when the viewport width changes from
+    // 390px (portrait) to 844px (landscape) — a full-width element in both
+    // orientations has 0 normalized delta.
+    // height is excluded: content height naturally varies drastically between
+    // portrait and landscape due to reflow, and is not a stability signal.
+    const dw =
+      Math.abs(p.width / portraitVp.width - l.width / landscapeVp.width) * portraitVp.width;
+    const delta = Math.max(dx, dy, dw);
     if (delta > maxDelta) {
       maxDelta = delta;
       maxElement = p.tag;
@@ -325,7 +336,12 @@ async function checkRoute(
       if (orientation === "portrait") {
         portraitGeometry = geometry;
       } else {
-        const delta = computeMaxDelta(portraitGeometry, geometry);
+        const delta = computeMaxDelta(
+          portraitGeometry,
+          geometry,
+          { width: PORTRAIT_WIDTH, height: PORTRAIT_HEIGHT },
+          { width: LANDSCAPE_WIDTH, height: LANDSCAPE_HEIGHT },
+        );
         if (delta && delta.deltaPx > stabilityDeltaThreshold) {
           result.passed = false;
           result.stabilityDelta = delta;

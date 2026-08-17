@@ -56,7 +56,7 @@ const MANIFEST_RELATIVE = "src/video-manifest.generated.yaml";
 const VIDEO_PUBLIC_DIR = "_video";
 const CACHE_RELATIVE = join(".cache", "video");
 /** Bump to force a clean re-encode of every source when the ffmpeg recipe changes. */
-const ENCODER_SETTINGS_VERSION = "6";
+const ENCODER_SETTINGS_VERSION = "7";
 const AUDIO_BITRATE_BPS = 128_000;
 const DEFAULT_MAX_SIZE_MB = 24;
 const MIN_VIDEO_BITRATE_BPS = 200_000;
@@ -355,7 +355,7 @@ async function encodePoster(source: string, outDir: string, atSeconds: number): 
     "-frames:v",
     "1",
     "-vf",
-    "scale=768:-2",
+    "scale=480:-2",
     "-q:v",
     "4",
     join(outDir, "poster.webp"),

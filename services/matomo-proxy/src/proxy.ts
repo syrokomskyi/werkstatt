@@ -84,6 +84,7 @@ function buildForwardHeaders(request: Request): Headers {
 function withCachePolicy(response: Response, path: "matomo.js" | "matomo.php"): Response {
   const headers = new Headers(response.headers);
   headers.delete("set-cookie");
+  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
   if (path === "matomo.js") {
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
   } else {
@@ -108,6 +109,7 @@ export async function proxyMatomoRequest(request: Request): Promise<Response> {
       headers: {
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "content-type",
+        "Cross-Origin-Resource-Policy": "cross-origin",
         "Cache-Control": "no-store",
       },
     });

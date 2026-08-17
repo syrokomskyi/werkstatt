@@ -15,13 +15,13 @@ services:
       - domain: matomo-proxy.warpgogol.com
         zone: warpgogol.com
     lastDeployed:
-      at: 2026-08-17T15:06:15.135Z
+      at: 2026-08-17T17:01:13.657Z
       state: succeeded
-      operationId: op-msxd92hy-a7zsjquw
+      operationId: op-msxhcxwk-atoardcz
     lastDevDeployed:
-      at: 2026-08-17T15:05:51.367Z
+      at: 2026-08-17T17:00:28.144Z
       state: succeeded
-      operationId: op-msxd8j9i-hssx176o
+      operationId: op-msxhbqrw-4gqbbu1n
     healthCheckPath: /_wg/analytics/health
   - id: rate-fetcher
     kind: scheduled-worker

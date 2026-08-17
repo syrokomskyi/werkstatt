@@ -57,9 +57,13 @@ export async function runStandardLayoutOrchestration(
     }
   }
 
-  // 2. LordIcon hydration (mandatory on demand)
+  // 2. LordIcon hydration (deferred to load event to avoid blocking LCP)
   if (has("lord-icon")) {
-    initLordIconOnDemand();
+    if (document.readyState === "complete") {
+      initLordIconOnDemand();
+    } else {
+      window.addEventListener("load", () => initLordIconOnDemand(), { once: true });
+    }
   }
 
   // 3. Lenis smooth scroll (opt-in via smoothScroll: true)

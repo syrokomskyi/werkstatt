@@ -23,7 +23,7 @@
 import StructuredData from "@warpgogol/werkstatt-site/ui/components/seo/structured-data";
 import SocialMeta from "@warpgogol/werkstatt-site/ui/components/seo/social-meta";
 import { buildJsonLd, markdownTwinUrlPath } from "@warpgogol/werkstatt-shared/share/semantic";
-import { resolveImage } from "@warpgogol/werkstatt-site/share";
+import { resolveImage, buildImageSources } from "@warpgogol/werkstatt-site/share";
 import type { SemanticPageModel } from "@warpgogol/werkstatt-shared/share/semantic";
 import type { OrchestratorConfig } from "@warpgogol/werkstatt-site/share/astro/page-handler";
 import { contentAssetImages } from "../../content-assets.ts";
@@ -118,6 +118,21 @@ if (semanticPage?.leadImageToken && !semanticPage.output?.image) {
   }
 }
 
+// ADR-0052: Build LCP image sources for <link rel="preload"> in <head>.
+// Uses the same leadImageToken + contentAssetImages resolution as primaryImage above.
+const lcpImage = (() => {
+  if (!semanticPage?.leadImageToken) return undefined;
+  const meta = resolveImage(contentAssetImages, semanticPage.leadImageToken.src, {
+    lang: semanticPage.lang,
+  });
+  if (!meta) return undefined;
+  return buildImageSources(meta, {
+    widths: [320, 480, 768, 1024, 1280, 1536, 1920],
+    sizes: "100vw",
+    quality: "max",
+  });
+})();
+
 const schema = semanticPage ? buildJsonLd(semanticPage) : null;
 
 // RFC-0165: per-page robots directive. An explicit `robots` prop wins; otherwise
@@ -136,6 +151,18 @@ const robotsContent = robots ?? robotsFromOutput;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    {
+      lcpImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={lcpImage.src}
+          imagesrcset={lcpImage.srcset}
+          imagesizes={lcpImage.sizes}
+          fetchpriority="high"
+        />
+      )
+    }
     <link
       rel="preload"
       as="style"
