@@ -40,6 +40,7 @@ function rootPackageJson(vars: WorkshopTemplateVars): string {
         },
         dependencies: {
           "@warpgogol/werkstatt": "latest",
+          "@warpgogol/werkstatt-shared": "latest",
           [vars.pluginPackage]: "latest",
           "@warpgogol/forge": "latest",
         },
