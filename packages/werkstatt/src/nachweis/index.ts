@@ -9,6 +9,7 @@
   <item>RFC-0707: initial nachweis barrel exports.</item>
   <item>RFC-0714: add nachweis.approve and nachweis.public-derivative exports.</item>
   <item>RFC-0873: add assessment bundle types, Zod schema, and nachweis.assessment.ingest handler export.</item>
+  <item>RFC-0874: add nachweis.measure.lighthouse handler and type exports.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -60,4 +61,11 @@ export { runNachweisWithdraw } from "./nachweis-withdraw.ts";
 export { runNachweisApprove } from "./nachweis-approve.ts";
 export { runNachweisPublicDerivative } from "./nachweis-public-derivative.ts";
 export { runNachweisAssessmentIngest } from "./nachweis-assessment-ingest.ts";
+export { runNachweisLighthouseMeasure } from "./nachweis-lighthouse-measure.ts";
+export type {
+  LighthouseCategoryProjection,
+  LighthouseRunResult,
+  LighthouseMeasureOptions,
+  LighthouseMeasureResult,
+} from "./nachweis-lighthouse-measure.ts";
 export { createNachweisModule } from "./nachweis.module.ts";
