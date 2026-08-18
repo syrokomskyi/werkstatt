@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 4d44ad95ad8cba28b38b99d259d9bd88407abd50a976c095c88e0b9565c08c69
+  contentHash: 2accb4516df22195986d62ef150d3d9ed000497f3ad215244ed76fb0f4ba0d62
   sources:
     - path: docs/architecture-dna.md
       hash: 17406abca4f3fdd60f8b51e8eae7423e9be3cbddcf8c03b2ba546b442aaa5cdf
@@ -25,19 +25,19 @@ meta:
     - path: missions/warpgogol-com-m000076/workpiece/package.json
       hash: 3ab613bae4020f0c5aab3026a057676d7f0674997f278236a5be32b06c8e5be7
     - path: package.json
-      hash: cd7faaa4123d25e9418fa7e2bf2347bbd400b1c83f0a507e89bf0c58f01a92ad
+      hash: b6bcc7e7a65dad7c81a56d8af79b2bb4e54a983fd937066b3ac99ccee75f8104
     - path: packages/forge/package.json
-      hash: 954dcfff05f0cc3be5f60154485b712f3b678a4fa1f3a8cde1ad855f245dcf9a
+      hash: 5c182cfec72dad751a2bc182989355e6cbc84c1b169cc7cb3d796582d6590a8c
     - path: packages/werkstatt-game/package.json
-      hash: 578754dd98492b32e112594656c52edffd18fcebd139f7204a870565deacdc0c
+      hash: 51f61d2909f20b2bb7e1665f81dd568dcc902412f62daf6b2f11333dc006f62d
     - path: packages/werkstatt-godot/package.json
-      hash: 56a3327167c103019450502cd04a80e0c6cd579bcadd3c194459e9a3f26bcdbb
+      hash: 26df77d467420d54bb0e8c88a88a5c42871674bf09c97ce2f807ed8c10d48291
     - path: packages/werkstatt-shared/package.json
-      hash: 691aca40e6a75525a93b1c59a16f59e098fc62812271b84ded458b9000ee8c4b
+      hash: a0c0ef4e6e5571e60ee37b0538462ccdba1943ff87f52a59bea9f0eae8e7265d
     - path: packages/werkstatt-site/package.json
       hash: eac504dd6d380e58ebe7eccea8dcb4d3fdd9db98612db568554b06a7f536ade4
     - path: packages/werkstatt/package.json
-      hash: b314d157e093ec2db506ffa977f523bd921a614467a09251a1ffbc3557aa7958
+      hash: d92dac70924f5cb4dbb09669653cd300e918418ba45918e8a8d180640b6ca529
     - path: pnpm-workspace.yaml
       hash: e7ed6c8e86e7f2e7c0c404c792a287ef6dde757f1ee03fed81ec410ea841f96d
     - path: services/cf-analytics-poller/package.json
@@ -59,10 +59,10 @@ meta:
     - path: services/telegram-alert-bridge/package.json
       hash: 71816ff8d2f8fdb4fcfdfad734a635ef006f18414e26484a88eb6cebc29e0af8
     - path: tools/kernel.config.ts
-      hash: 3243bbbef1979221d5833a75f334bed8d1fcf0e9f528ea27ea6081c5ff6f861d
+      hash: b2ea826727ffb23d58db6df4b008adf5a105f54de18c8d3eec26f74a1fa13efc
 workspace:
   name: warpgogol-platform
-  version: 6.14.28
+  version: 8.0.0
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -74,10 +74,6 @@ apps:
     packageName: warpgogol-com
 sternsystems: []
 missions:
-  - id: warpgogol-com-m000070
-    sternsystem: ""
-    status: open
-    workpiecePath: null
   - id: warpgogol-com-m000076
     sternsystem: ""
     status: open
@@ -3596,6 +3592,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: nachweis.assessment.ingest
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
   - name: nachweis.consent.update
     scope: workspace
     mutatesState: true
@@ -5899,12 +5902,6 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
-  - name: workshop.scaffold
-    scope: workspace
-    mutatesState: true
-    supportsAllSites: false
-    providers:
-      - workspace
   - name: workspace.discovery.validate
     scope: workspace
     mutatesState: false
@@ -5941,11 +5938,23 @@ commands:
       - site
       - workspace
 commandProvenance:
+  - command: forge.create
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0877
+    removedBy: []
   - command: integration.config.validate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0179
+    removedBy: []
+  - command: nachweis.assessment.ingest
+    proposedBy:
+      - RFC-0873
+    addedBy: []
+    changedBy: []
     removedBy: []
   - command: nachweis.manifest.generate
     proposedBy: []
@@ -5959,17 +5968,10 @@ commandProvenance:
     changedBy:
       - RFC-0872
     removedBy: []
-  - command: nachweis.timestamp
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0871
-    removedBy: []
   - command: nachweis.validate
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0871
       - RFC-0872
     removedBy: []
   - command: nachweis.withdraw
@@ -5990,6 +5992,12 @@ commandProvenance:
     changedBy:
       - RFC-0384
     removedBy: []
+  - command: workshop.scaffold
+    proposedBy: []
+    addedBy: []
+    changedBy: []
+    removedBy:
+      - RFC-0877
 pipelines:
   - name: build.check
     scope: app
@@ -7489,23 +7497,30 @@ generatedOwnership:
     module: packages/werkstatt/src/bordbuch/bordbuch-generate.ts
     conditional: true
 rfcs:
-  accepted: 2
-  implemented: 0
-  draft: 9
+  accepted: 3
+  implemented: 1
+  draft: 7
   reviewing: 0
 baseline:
-  implementedRfcs: []
+  implementedRfcs:
+    - id: RFC-0872
+      implementedAt: 2026-08-18
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-46
+        - DNA-53
+        - DNA-59
   nonImplementedRfcs:
     accepted:
       - RFC-0179
-      - RFC-0871
+      - RFC-0873
+      - RFC-0877
     draft:
       - RFC-0000
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0872
-      - RFC-0873
       - RFC-0874
       - RFC-0875
       - RFC-0876

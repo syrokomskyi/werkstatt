@@ -5,7 +5,7 @@
 # Regenerate:   forge rfc.decision-log.generate
 command: rfc.decision-log.generate
 status: ok
-count: 866
+count: 876
 entries:
   - kind: rejected-alternative
     rfcId: RFC-0001
@@ -19257,7 +19257,7 @@ entries:
   - kind: rejected-alternative
     rfcId: RFC-0848
     title: Establish the core certification domain and deterministic decisions
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Keep the original monolithic RFC
 
@@ -19294,11 +19294,11 @@ entries:
 
       Rejected. They remain useful producers/mechanisms only after later
       profiles and authority admission bind them to the candidate/policy/cut.
-    file: docs/rfcs/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md
+    file: docs/rfcs/archive/implemented/rfc-0848-core-certification-domain-and-deterministic-decisions-as-amended-by-amd-003.md
   - kind: rejected-alternative
     rfcId: RFC-0849
     title: Establish bounded canonical JSON identity bytes
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Support scalar/array roots through an opaque wrapper
 
@@ -19355,11 +19355,11 @@ entries:
       Rejected: the command is plugin-owned and certification source does not
       exist until RFC-0853. RFC-0853 owns enforcement against its actual source
       boundary; RFC-0849 remains an engine-only implementation session.
-    file: docs/rfcs/rfc-0849-establish-bounded-canonical-json-identity-bytes.md
+    file: docs/rfcs/archive/implemented/rfc-0849-establish-bounded-canonical-json-identity-bytes.md
   - kind: rejected-alternative
     rfcId: RFC-0850
     title: Implement deterministic certification evaluation and remediation
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Scan all evidence for every requirement
 
@@ -19390,11 +19390,11 @@ entries:
       Rejected: vague tasks encourage agents to guess. An authoritative non-pass
       without safe anchored remediation is itself incomplete and must fail
       construction.
-    file: docs/rfcs/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md
+    file: docs/rfcs/archive/implemented/rfc-0850-implement-deterministic-certification-evaluation-and-remediation.md
   - kind: rejected-alternative
     rfcId: RFC-0851
     title: Replace legacy release state with deployment operations
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Add certification states to the release enum
 
@@ -19423,11 +19423,11 @@ entries:
       Rejected: the certification specification and single-site cutover target
       site deployment. Backend service workflows are a separate runtime
       composition.
-    file: docs/rfcs/rfc-0851-replace-legacy-release-state-with-deployment-operations.md
+    file: docs/rfcs/archive/implemented/rfc-0851-replace-legacy-release-state-with-deployment-operations.md
   - kind: rejected-alternative
     rfcId: RFC-0852
     title: Move canonical Diagnostic ownership into the engine
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Keep the runtime schema in the site plugin
 
@@ -19464,11 +19464,11 @@ entries:
 
       Rejected: bounded summaries and digest-addressed payloads keep agent
       output usable and prevent canonical identity abuse.
-    file: docs/rfcs/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md
+    file: docs/rfcs/archive/implemented/rfc-0852-move-canonical-diagnostic-ownership-into-the-engine.md
   - kind: rejected-alternative
     rfcId: RFC-0853
     title: Define strict certification contracts and identity builders
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Combine this work back into RFC-0849
 
@@ -19506,11 +19506,11 @@ entries:
       Rejected: material evidence meaning/safety could change without changing
       evidence ID. Only physical locators and detached signature bytes are
       excluded.
-    file: docs/rfcs/rfc-0853-define-strict-certification-contracts-and-identity-builders.md
+    file: docs/rfcs/archive/implemented/rfc-0853-define-strict-certification-contracts-and-identity-builders.md
   - kind: rejected-alternative
     rfcId: RFC-0854
     title: Standardize the ecosystem on Node 24
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Keep `>=22` and test Node 22/24
 
@@ -19574,7 +19574,7 @@ entries:
       Rejected: archived documents are immutable history, dependency metadata is
       third-party evidence, and discovery tests intentionally parse arbitrary
       versions. Only current first-party support declarations change.
-    file: docs/rfcs/rfc-0854-standardize-the-ecosystem-on-node-24.md
+    file: docs/rfcs/archive/implemented/rfc-0854-standardize-the-ecosystem-on-node-24.md
   - kind: rejected-alternative
     rfcId: RFC-0855
     title: Establish the authority-first agent-native runtime and certification
@@ -19645,11 +19645,11 @@ entries:
       Rejected. Only known, enumerated operational diagnostics may remain.
       Arbitrary type, test, schema, state, or validator failures destroy the
       packet handoff contract.
-    file: docs/rfcs/rfc-0855-establish-the-authority-first-agent-native-runtime-and-certification-program.md
+    file: docs/rfcs/archive/implemented/rfc-0855-establish-the-authority-first-agent-native-runtime-and-certification-program.md
   - kind: rejected-alternative
     rfcId: RFC-0856
     title: Establish the governed program packet control plane
-    status: accepted
+    status: implemented
     alternativesText: >-
       ### Prose-only packets
 
@@ -19695,11 +19695,11 @@ entries:
       Rejected as unnecessary infrastructure. RFC-0855 prohibits cross-workspace
       parallel execution; the local lease prevents accidental concurrency in the
       shared workspace and reports its non-security limitation honestly.
-    file: docs/rfcs/rfc-0856-establish-the-governed-program-packet-control-plane.md
+    file: docs/rfcs/archive/implemented/rfc-0856-establish-the-governed-program-packet-control-plane.md
   - kind: rejected-alternative
     rfcId: RFC-0857
     title: Make release-certification RFC materialization just-in-time
-    status: accepted
+    status: implemented
     alternativesText: >-
       ### Create every CERT RFC manually during charter implementation
 
@@ -19739,11 +19739,11 @@ entries:
       is a projection. Rewriting the governing identity adds avoidable packet
       churn and weakens traceability; sealing can resolve and bind both
       identities without replacing either.
-    file: docs/rfcs/rfc-0857-make-release-certification-rfc-materialization-just-in-time.md
+    file: docs/rfcs/archive/implemented/rfc-0857-make-release-certification-rfc-materialization-just-in-time.md
   - kind: rejected-alternative
     rfcId: RFC-0858
     title: Establish versioned component and capability contracts
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Extend `WerkstattPlugin`
 
@@ -19764,11 +19764,11 @@ entries:
 
       Rejected because admission cannot prove recovery semantics for an open
       vocabulary.
-    file: docs/rfcs/rfc-0858-establish-versioned-component-and-capability-contracts.md
+    file: docs/rfcs/archive/implemented/rfc-0858-establish-versioned-component-and-capability-contracts.md
   - kind: rejected-alternative
     rfcId: RFC-0859
     title: Establish the lifecycle fiber and effect runtime
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Independent AbortControllers and disposers
 
@@ -19789,11 +19789,11 @@ entries:
 
       Rejected because five coarse hooks do not own individual
       registrations/resources or dependent drains.
-    file: docs/rfcs/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md
+    file: docs/rfcs/archive/implemented/rfc-0859-establish-the-lifecycle-fiber-and-effect-runtime.md
   - kind: rejected-alternative
     rfcId: RFC-0860
     title: Establish deterministic component resolution and reconciliation
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Let module registration order resolve dependencies
 
@@ -19814,11 +19814,11 @@ entries:
 
       Rejected because the required vocabulary is smaller, policy-bound, and
       must include grants/effects/isolation rather than package versions alone.
-    file: docs/rfcs/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md
+    file: docs/rfcs/archive/implemented/rfc-0860-establish-deterministic-component-resolution-and-reconciliation.md
   - kind: rejected-alternative
     rfcId: RFC-0861
     title: Establish runtime reflection and the conformance harness
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Expose the kernel registry
 
@@ -19839,11 +19839,11 @@ entries:
 
       Rejected; scenarios may inform expectations, but Werkstatt owns contracts
       and has no production dependency.
-    file: docs/rfcs/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
+    file: docs/rfcs/archive/implemented/rfc-0861-establish-runtime-reflection-and-the-conformance-harness.md
   - kind: rejected-alternative
     rfcId: RFC-0862
     title: Establish the provider-neutral isolation contract
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Standardize on `node:vm` or worker threads
 
@@ -19863,11 +19863,11 @@ entries:
 
       Rejected because deny lists leak ambient authority; all access must be
       explicit brokered capability RPC.
-    file: docs/rfcs/rfc-0862-establish-the-provider-neutral-isolation-contract.md
+    file: docs/rfcs/archive/implemented/rfc-0862-establish-the-provider-neutral-isolation-contract.md
   - kind: rejected-alternative
     rfcId: RFC-0863
     title: Establish capability artifacts and the first real sandbox
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Load npm packages or source folders directly
 
@@ -19888,11 +19888,11 @@ entries:
 
       Rejected because secure artifact execution must be proven independently
       before autonomous candidate transitions exist.
-    file: docs/rfcs/rfc-0863-establish-capability-artifacts-and-the-first-real-sandbox.md
+    file: docs/rfcs/archive/implemented/rfc-0863-establish-capability-artifacts-and-the-first-real-sandbox.md
   - kind: rejected-alternative
     rfcId: RFC-0864
     title: Establish the governed capability evolution controller
-    status: draft
+    status: implemented
     alternativesText: >-
       ### Let an agent edit a live capability in place
 
@@ -19913,5 +19913,295 @@ entries:
 
       Rejected because a replaceable capability must not expand its own
       authority or redefine its evaluator.
-    file: docs/rfcs/rfc-0864-establish-the-governed-capability-evolution-controller.md
+    file: docs/rfcs/archive/implemented/rfc-0864-establish-the-governed-capability-evolution-controller.md
+  - kind: rejected-alternative
+    rfcId: RFC-0865
+    title: Connect CERT-007 deployment authority to Leitstand command surface
+    status: implemented
+    alternativesText: >-
+      **Alternative A: Restore old Leitstand code as-is, without certification
+      authority.** Rejected: RFC-0851 explicitly forbids restoring legacy
+      deployment commands. The old code mutated release states (now prohibited
+      by `LegacyReleaseError`), did not call `authorizeDeployment()`, and did
+      not use `DeploymentOperationState` event chain. Restoring it would violate
+      the forward-only cutover and bypass the certification authority.
+
+
+      **Alternative B: Leave `CERT-TRANSITION-01` block and deploy manually
+      through wrangler.** Rejected: Manual deploy bypasses certification
+      authority, gate decisions, artifact readiness, durable sync, Bordbuch
+      events, health checks, and smoke tests. It creates untracked deployments
+      without pipeline enforcement (DNA-49, DNA-73). The goal of the Werkstatt
+      platform is to eliminate manual operator work, not enshrine it.
+    file: docs/rfcs/archive/implemented/rfc-0865-connect-cert-007-deployment-authority-to-leitstand-command-surface.md
+  - kind: rejected-alternative
+    rfcId: RFC-0866
+    title: Restore deploy execution through certification pipeline
+    status: implemented
+    alternativesText: >-
+      - **Fold into RFC-0865:** Rejected. RFC-0865 is already marked
+      `implemented` and its scope is authorization connection. Deploy execution
+      is a distinct concern with its own rollout steps.
+
+      - **Copy old 2123-line code:** Rejected. RFC-0865 explicitly states old
+      code must be rewritten from scratch. The old code bypassed certification;
+      the new code must gate on `authorizeDeployment()`.
+
+      - **Auto-produce gate decisions inside deploy commands:** Rejected.
+      Separating `leitstand.certify` from deploy commands allows operators to
+      inspect the gate decision before authorizing a deploy, and allows reusing
+      the same gate decision for multiple deploys.
+
+      - **Add new deployment adapters:** Out of scope. Only `cloudflare-workers`
+      is needed for current sites.
+    file: docs/rfcs/archive/implemented/rfc-0866-restore-deploy-execution-through-certification-pipeline.md
+  - kind: rejected-alternative
+    rfcId: RFC-0867
+    title: Cache certification evidence by artifact hash to skip redundant
+      mission.check across gates
+    status: implemented
+    alternativesText: >-
+      1. **Cache at the producer level (inside `mission.check`)**: Rejected —
+      `mission.check` is a general-purpose command that should not be aware of
+      certification gate semantics. The cache belongs in the certification
+      layer.
+
+
+      2. **Cache at the dossier level**: Rejected — the dossier is an immutable
+      append-only event chain. Reusing evidence is a pre-execution optimization,
+      not a storage concern.
+
+
+      3. **Single certification for all gates**: Rejected — each gate needs its
+      own `GateDecisionV1` with its own `decisionId` and `gate` field for the
+      deployment authority to consume. The optimization is about skipping
+      producer execution, not collapsing gate decisions.
+    file: docs/rfcs/archive/implemented/rfc-0867-cache-certification-evidence-by-artifact-hash.md
+  - kind: rejected-alternative
+    rfcId: RFC-0868
+    title: Extract @warpgogol/werkstatt-shared and publish engine + stack plugins to
+      NPM
+    status: implemented
+    alternativesText: >-
+      ### A: Move shared modules into werkstatt (rejected)
+
+
+      Move ontology, passport, share, etc. into
+      `packages/werkstatt/src/shared/`. Engine becomes self-contained.
+
+
+      **Rejected because**: The engine package becomes a dumping ground for both
+      lifecycle logic and shared infrastructure. Stack plugins would import from
+      `@warpgogol/werkstatt/shared/*` — coupling stack plugins to engine
+      internals. The shared layer is a dependency of both engine and stack
+      plugins, not an internal of the engine.
+
+
+      ### B: Publish werkstatt-site too (rejected)
+
+
+      Add `werkstatt-site` to the publication list. 5 packages on NPM. Engine
+      keeps its `werkstatt-site` dependency.
+
+
+      **Rejected because**: Non-site workshops (game, godot, video) would pull
+      in `werkstatt-site` (with Astro, codegen templates, 27 domain packages) as
+      a transitive dependency. This is wasteful (hundreds of MB), semantically
+      wrong (game projects don't need Astro), and masks the architectural
+      problem instead of fixing it.
+
+
+      ### C: Keep link: dependencies, document as monorepo-only (rejected)
+
+
+      Don't publish. Keep `workshop.scaffold` as an internal tool. All projects
+      are Sternsystemen inside the monorepo.
+
+
+      **Rejected because**: The operator explicitly wants external workshops
+      with full lifecycle support. The platform's value proposition includes
+      `workshop.scaffold` for external use.
+
+
+      ### D: Peer dependencies for axiom (rejected)
+
+
+      Make `@syrokomskyi/axiom-*` peer dependencies instead of optional.
+
+
+      **Rejected because**: Peer dependencies require the consumer to install
+      them, which breaks `pnpm install` in external workshops where axiom
+      packages are not available. Optional dependencies are truly optional — the
+      engine degrades gracefully without them.
+    file: docs/rfcs/archive/implemented/rfc-0868-extract-werkstatt-shared-and-publish-engine-and-stack-plugins-to-npm.md
+  - kind: rejected-alternative
+    rfcId: RFC-0869
+    title: Optimize image delivery and LCP for shared site components
+    status: implemented
+    alternativesText: >-
+      1. **Per-site image quality config in `system.md`** — rejected. Adds
+      configuration burden for every site. A sensible global default (90) with
+      explicit overrides at call sites is simpler and sufficient.
+
+
+      2. **Global default change to `quality="high"` (80)** — rejected. 80 is
+      too aggressive for content images. 90 provides a good balance between file
+      size reduction and visual fidelity as a default, with `"max"` available
+      for images where fidelity matters.
+
+
+      3. **RFC scope limited to components only, excluding manifest** —
+      rejected. Without the `image-variants.generated.yaml` manifest, the
+      `build-portable` provider cannot generate `srcset` regardless of what
+      `widths` and `sizes` the components pass. The manifest is a prerequisite
+      for responsive images to work.
+
+
+      4. **Include CSP fix in this RFC** — rejected. The CSP issue is a
+      site-specific `system.md` `proxyBaseUrl` configuration problem, not a
+      shared component issue. `resolveCspScriptSrcExtra` already handles
+      same-origin correctly. Fixing it here would mix site-specific config with
+      shared component changes.
+
+
+      5. **Include forced reflow fix in this RFC** — rejected. The reflow is
+      36.6ms (minor) and may be third-party. The `lighthouse.validate` LH-13
+      rule already detects read-after-write patterns. A separate investigation
+      is needed to identify the source.
+    file: docs/rfcs/archive/implemented/rfc-0869-optimize-image-delivery-and-lcp-for-shared-site-components.md
+  - kind: rejected-alternative
+    rfcId: RFC-0870
+    title: Prevent silent loss of committed generated manifests and improve
+      materialize reliability
+    status: implemented
+    alternativesText: >-
+      - **Auto-generate missing manifests in sternsystem.validate:** Rejected.
+      Validators must be read-only (K-0004: Evaluation must not mutate its
+      subject). sternsystem.validate should report, not fix.
+
+      - **Add a separate `manifest.presence.validate` command:** Rejected. The
+      check belongs in `sternsystem.validate` — it is a Sternsystem-level
+      invariant, not a site-level check.
+
+      - **Run `build.prepare` before `generated.files.validate` in
+      `mission.validate`:** Rejected. `build.prepare` already runs before
+      `generated.files.validate` in the pipeline. The issue was that the file
+      was git-tracked but not on disk after materialize — a materialize bug, not
+      a pipeline ordering issue.
+
+      - **Make `build.prepare` a real command alias:** Rejected. Pipelines are
+      compositions of commands; making them callable as commands blurs the
+      distinction. The hint (Change 3) is sufficient.
+    file: docs/rfcs/archive/implemented/rfc-0870-prevent-silent-loss-of-committed-generated-manifests-and-improve-materialize-reliability.md
+  - kind: rejected-alternative
+    rfcId: RFC-0871
+    title: Separate RFC 3161 timestamp evidence from eIDAS qualified timestamp claims
+    status: implemented
+    alternativesText: >-
+      - **Rename `qualifiedTimestamp` to `timestamp` without adding assurance
+      metadata.** Rejected because it removes the distinction between RFC 3161
+      and eIDAS-qualified without providing a mechanism to record the
+      difference. The whole point of the RFC is to make the assurance class
+      machine-readable.
+
+
+      - **Add a separate `nachweis.qualify` command that upgrades a timestamped
+      record to `eidas-qualified`.** Rejected because it creates a second
+      Bordbuch event type and a two-step workflow. The assurance metadata
+      belongs in the `nachweis-timestamped` event itself — it is a property of
+      the timestamp, not a separate lifecycle stage.
+
+
+      - **Store assurance metadata in the EvidenceSource PBP entity instead of
+      Bordbuch.** Rejected because timestamp assurance is a
+      cryptographic-evidence property, not a business-profile property. Bordbuch
+      is the append-only audit trail for N3 artifacts; PBP entities are content
+      records. Mixing them violates the separation established by RFC-0707.
+    file: docs/rfcs/archive/implemented/rfc-0871-separate-rfc-3161-timestamp-evidence-from-eidas-qualified-timestamp-claims.md
+  - kind: rejected-alternative
+    rfcId: RFC-0872
+    title: Add technical-assessment PBP contract and policy-driven Nachweis
+      publication gates
+    status: implemented
+    alternativesText: >-
+      1. **Extend the existing 6-condition gate with optional flags.** Rejected
+      — adding `consentRequired: false` flags to the existing gate would require
+      every caller to understand which flags apply to which kind. Policy-driven
+      resolution is deterministic and kind-selected, not flag-configured.
+
+
+      2. **Create a separate `NachweisRecord` PBP entity for technical
+      assessments.** Rejected — this would duplicate the entire
+      Bordbuch/R2/manifest infrastructure. The RFC's `nonGoals` explicitly
+      exclude this. `PbpEvidenceSource` with `kind: technical-assessment` and an
+      `assessment` field is sufficient.
+
+
+      3. **Keep legacy booleans alongside V2 indefinitely.** Rejected —
+      forward-only discipline forbids dual-paths. The V2 gate is a strict
+      superset; legacy booleans are a projection of V2 conditions. Removing them
+      eliminates dead code and prevents callers from deriving publishability
+      from a non-normative source.
+    file: docs/rfcs/rfc-0872-add-technical-assessment-pbp-contract-and-policy-driven-nachweis-publication-gates.md
+  - kind: rejected-alternative
+    rfcId: RFC-0873
+    title: Add generic Nachweis technical-assessment ingest and immutable
+      observation history
+    status: accepted
+    alternativesText: >-
+      - **Extend `nachweis.ingest` with a `--bundle` flag:** Rejected.
+      `nachweis.ingest` accepts a single PDF file and produces a
+      `recordId`-keyed record. Assessment bundles are JSON with multiple
+      artifacts and `(seriesId, observationId)` identity. Combining them would
+      require a bifurcated code path inside one command, violating the
+      single-responsibility principle.
+
+      - **Provider-specific commands (`nachweis.lighthouse.ingest`,
+      `nachweis.cloudflare.ingest`):** Rejected. Each provider would duplicate
+      R2 path construction, hashing, PBP writes, and Bordbuch appends. The
+      generic `AssessmentBundleV1` envelope eliminates provider-specific code in
+      the core.
+
+      - **Store assessments as `operational-evidence` kind:** Rejected. RFC-0872
+      established `technical-assessment` as a distinct PBP evidence kind with
+      its own publication policy (`technical-assessment-v1`) that does not
+      require consent or public derivative. Using `operational-evidence` would
+      apply the wrong publication gate.
+    file: docs/rfcs/rfc-0873-add-generic-nachweis-technical-assessment-ingest-and-immutable-observation-history.md
+  - kind: rejected-alternative
+    rfcId: RFC-0877
+    title: In-place agent-driven installation flow
+    status: accepted
+    alternativesText: >-
+      - **Keep global install as primary path** — rejected. Global install
+      requires sudo on some systems, pollutes the global namespace, and breaks
+      the "one folder, one project" mental model. The operator wants
+      agent-driven installation from within the project folder.
+
+
+      - **Use `pnpm dlx` for one-off execution** — rejected. `pnpm dlx`
+      downloads forge every time, is slow, and does not leave forge installed in
+      the project. The agent needs forge available as a devDependency for
+      `forge.yaml` bindings to work.
+
+
+      - **Keep `workshop.scaffold` as internal command** — rejected. Two
+      scaffolding paths (forge create and workshop.scaffold) create maintenance
+      burden and divergence risk. Consolidating into `forge create --in-place`
+      simplifies the codebase and ensures a single source of truth for project
+      scaffolding.
+
+
+      - **Auto-install engine and plugins from `forge create --in-place`** —
+      rejected. The agent should control package installation to handle edge
+      cases (network issues, specific versions, operator preferences). `forge
+      create` is a scaffolding command, not a dependency manager.
+
+
+      - **Make `--profile` default to `forge-shell`** — rejected. In the
+      agent-driven flow, the operator always describes the project type. If the
+      agent cannot determine the type, it should ask the operator, not silently
+      create a governance-only project. A required `--profile` forces explicit
+      choice.
+    file: docs/rfcs/rfc-0877-in-place-agent-driven-installation-flow.md
 

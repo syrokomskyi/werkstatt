@@ -165,7 +165,7 @@
 - **Closed:** 2026-08-15
 - **Decision:** The engine gains a **plugin contract** (`werkstatt/plugin@1`): a typed interface that a stack plugin implements and registers, plus a **profile binding** rule: `forge.yaml` `profile` field (RFC-0643) resolves to a forge stack profile id, and the workshop's `tools/kernel.config.ts` composes the engine with the plugin whose `profileId` matches.
 
-## rejected-alternative (842)
+## rejected-alternative (852)
 
 ### RFC-0001: Introduce RFC governance process
 
@@ -9158,7 +9158,7 @@ Instead of setting `ECOSYSTEM_COMMIT=1`, route the commit through `ecosystem.com
 
 ### RFC-0848: Establish the core certification domain and deterministic decisions
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Keep the original monolithic RFC
@@ -9183,7 +9183,7 @@ Rejected. They remain useful producers/mechanisms only after later profiles and 
 
 ### RFC-0849: Establish bounded canonical JSON identity bytes
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Support scalar/array roots through an opaque wrapper
@@ -9216,7 +9216,7 @@ Rejected: the command is plugin-owned and certification source does not exist un
 
 ### RFC-0850: Implement deterministic certification evaluation and remediation
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Scan all evidence for every requirement
@@ -9237,7 +9237,7 @@ Rejected: vague tasks encourage agents to guess. An authoritative non-pass witho
 
 ### RFC-0851: Replace legacy release state with deployment operations
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Add certification states to the release enum
@@ -9258,7 +9258,7 @@ Rejected: the certification specification and single-site cutover target site de
 
 ### RFC-0852: Move canonical Diagnostic ownership into the engine
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Keep the runtime schema in the site plugin
@@ -9283,7 +9283,7 @@ Rejected: bounded summaries and digest-addressed payloads keep agent output usab
 
 ### RFC-0853: Define strict certification contracts and identity builders
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Combine this work back into RFC-0849
@@ -9308,7 +9308,7 @@ Rejected: material evidence meaning/safety could change without changing evidenc
 
 ### RFC-0854: Standardize the ecosystem on Node 24
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Keep `>=22` and test Node 22/24
@@ -9382,7 +9382,7 @@ Rejected. Only known, enumerated operational diagnostics may remain. Arbitrary t
 
 ### RFC-0856: Establish the governed program packet control plane
 
-- **Status:** accepted
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Prose-only packets
@@ -9411,7 +9411,7 @@ Rejected as unnecessary infrastructure. RFC-0855 prohibits cross-workspace paral
 
 ### RFC-0857: Make release-certification RFC materialization just-in-time
 
-- **Status:** accepted
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Create every CERT RFC manually during charter implementation
@@ -9436,7 +9436,7 @@ Rejected because the spec node is the durable identity and the RFC number is a p
 
 ### RFC-0858: Establish versioned component and capability contracts
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Extend `WerkstattPlugin`
@@ -9453,7 +9453,7 @@ Rejected because admission cannot prove recovery semantics for an open vocabular
 
 ### RFC-0859: Establish the lifecycle fiber and effect runtime
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Independent AbortControllers and disposers
@@ -9470,7 +9470,7 @@ Rejected because five coarse hooks do not own individual registrations/resources
 
 ### RFC-0860: Establish deterministic component resolution and reconciliation
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Let module registration order resolve dependencies
@@ -9487,7 +9487,7 @@ Rejected because the required vocabulary is smaller, policy-bound, and must incl
 
 ### RFC-0861: Establish runtime reflection and the conformance harness
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Expose the kernel registry
@@ -9504,7 +9504,7 @@ Rejected; scenarios may inform expectations, but Werkstatt owns contracts and ha
 
 ### RFC-0862: Establish the provider-neutral isolation contract
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Standardize on `node:vm` or worker threads
@@ -9521,7 +9521,7 @@ Rejected because deny lists leak ambient authority; all access must be explicit 
 
 ### RFC-0863: Establish capability artifacts and the first real sandbox
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Load npm packages or source folders directly
@@ -9538,7 +9538,7 @@ Rejected because secure artifact execution must be proven independently before a
 
 ### RFC-0864: Establish the governed capability evolution controller
 
-- **Status:** draft
+- **Status:** implemented
 - **Alternatives considered:**
 
 ### Let an agent edit a live capability in place
@@ -9552,4 +9552,134 @@ Rejected because runtime novelty, distribution shifts, latency, costs, privacy, 
 ### Let the controller evolve governance and isolation
 
 Rejected because a replaceable capability must not expand its own authority or redefine its evaluator.
+
+### RFC-0865: Connect CERT-007 deployment authority to Leitstand command surface
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+**Alternative A: Restore old Leitstand code as-is, without certification authority.** Rejected: RFC-0851 explicitly forbids restoring legacy deployment commands. The old code mutated release states (now prohibited by `LegacyReleaseError`), did not call `authorizeDeployment()`, and did not use `DeploymentOperationState` event chain. Restoring it would violate the forward-only cutover and bypass the certification authority.
+
+**Alternative B: Leave `CERT-TRANSITION-01` block and deploy manually through wrangler.** Rejected: Manual deploy bypasses certification authority, gate decisions, artifact readiness, durable sync, Bordbuch events, health checks, and smoke tests. It creates untracked deployments without pipeline enforcement (DNA-49, DNA-73). The goal of the Werkstatt platform is to eliminate manual operator work, not enshrine it.
+
+### RFC-0866: Restore deploy execution through certification pipeline
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Fold into RFC-0865:** Rejected. RFC-0865 is already marked `implemented` and its scope is authorization connection. Deploy execution is a distinct concern with its own rollout steps.
+- **Copy old 2123-line code:** Rejected. RFC-0865 explicitly states old code must be rewritten from scratch. The old code bypassed certification; the new code must gate on `authorizeDeployment()`.
+- **Auto-produce gate decisions inside deploy commands:** Rejected. Separating `leitstand.certify` from deploy commands allows operators to inspect the gate decision before authorizing a deploy, and allows reusing the same gate decision for multiple deploys.
+- **Add new deployment adapters:** Out of scope. Only `cloudflare-workers` is needed for current sites.
+
+### RFC-0867: Cache certification evidence by artifact hash to skip redundant mission.check across gates
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Cache at the producer level (inside `mission.check`)**: Rejected — `mission.check` is a general-purpose command that should not be aware of certification gate semantics. The cache belongs in the certification layer.
+
+2. **Cache at the dossier level**: Rejected — the dossier is an immutable append-only event chain. Reusing evidence is a pre-execution optimization, not a storage concern.
+
+3. **Single certification for all gates**: Rejected — each gate needs its own `GateDecisionV1` with its own `decisionId` and `gate` field for the deployment authority to consume. The optimization is about skipping producer execution, not collapsing gate decisions.
+
+### RFC-0868: Extract @warpgogol/werkstatt-shared and publish engine + stack plugins to NPM
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+### A: Move shared modules into werkstatt (rejected)
+
+Move ontology, passport, share, etc. into `packages/werkstatt/src/shared/`. Engine becomes self-contained.
+
+**Rejected because**: The engine package becomes a dumping ground for both lifecycle logic and shared infrastructure. Stack plugins would import from `@warpgogol/werkstatt/shared/*` — coupling stack plugins to engine internals. The shared layer is a dependency of both engine and stack plugins, not an internal of the engine.
+
+### B: Publish werkstatt-site too (rejected)
+
+Add `werkstatt-site` to the publication list. 5 packages on NPM. Engine keeps its `werkstatt-site` dependency.
+
+**Rejected because**: Non-site workshops (game, godot, video) would pull in `werkstatt-site` (with Astro, codegen templates, 27 domain packages) as a transitive dependency. This is wasteful (hundreds of MB), semantically wrong (game projects don't need Astro), and masks the architectural problem instead of fixing it.
+
+### C: Keep link: dependencies, document as monorepo-only (rejected)
+
+Don't publish. Keep `workshop.scaffold` as an internal tool. All projects are Sternsystemen inside the monorepo.
+
+**Rejected because**: The operator explicitly wants external workshops with full lifecycle support. The platform's value proposition includes `workshop.scaffold` for external use.
+
+### D: Peer dependencies for axiom (rejected)
+
+Make `@syrokomskyi/axiom-*` peer dependencies instead of optional.
+
+**Rejected because**: Peer dependencies require the consumer to install them, which breaks `pnpm install` in external workshops where axiom packages are not available. Optional dependencies are truly optional — the engine degrades gracefully without them.
+
+### RFC-0869: Optimize image delivery and LCP for shared site components
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Per-site image quality config in `system.md`** — rejected. Adds configuration burden for every site. A sensible global default (90) with explicit overrides at call sites is simpler and sufficient.
+
+2. **Global default change to `quality="high"` (80)** — rejected. 80 is too aggressive for content images. 90 provides a good balance between file size reduction and visual fidelity as a default, with `"max"` available for images where fidelity matters.
+
+3. **RFC scope limited to components only, excluding manifest** — rejected. Without the `image-variants.generated.yaml` manifest, the `build-portable` provider cannot generate `srcset` regardless of what `widths` and `sizes` the components pass. The manifest is a prerequisite for responsive images to work.
+
+4. **Include CSP fix in this RFC** — rejected. The CSP issue is a site-specific `system.md` `proxyBaseUrl` configuration problem, not a shared component issue. `resolveCspScriptSrcExtra` already handles same-origin correctly. Fixing it here would mix site-specific config with shared component changes.
+
+5. **Include forced reflow fix in this RFC** — rejected. The reflow is 36.6ms (minor) and may be third-party. The `lighthouse.validate` LH-13 rule already detects read-after-write patterns. A separate investigation is needed to identify the source.
+
+### RFC-0870: Prevent silent loss of committed generated manifests and improve materialize reliability
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Auto-generate missing manifests in sternsystem.validate:** Rejected. Validators must be read-only (K-0004: Evaluation must not mutate its subject). sternsystem.validate should report, not fix.
+- **Add a separate `manifest.presence.validate` command:** Rejected. The check belongs in `sternsystem.validate` — it is a Sternsystem-level invariant, not a site-level check.
+- **Run `build.prepare` before `generated.files.validate` in `mission.validate`:** Rejected. `build.prepare` already runs before `generated.files.validate` in the pipeline. The issue was that the file was git-tracked but not on disk after materialize — a materialize bug, not a pipeline ordering issue.
+- **Make `build.prepare` a real command alias:** Rejected. Pipelines are compositions of commands; making them callable as commands blurs the distinction. The hint (Change 3) is sufficient.
+
+### RFC-0871: Separate RFC 3161 timestamp evidence from eIDAS qualified timestamp claims
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Rename `qualifiedTimestamp` to `timestamp` without adding assurance metadata.** Rejected because it removes the distinction between RFC 3161 and eIDAS-qualified without providing a mechanism to record the difference. The whole point of the RFC is to make the assurance class machine-readable.
+
+- **Add a separate `nachweis.qualify` command that upgrades a timestamped record to `eidas-qualified`.** Rejected because it creates a second Bordbuch event type and a two-step workflow. The assurance metadata belongs in the `nachweis-timestamped` event itself — it is a property of the timestamp, not a separate lifecycle stage.
+
+- **Store assurance metadata in the EvidenceSource PBP entity instead of Bordbuch.** Rejected because timestamp assurance is a cryptographic-evidence property, not a business-profile property. Bordbuch is the append-only audit trail for N3 artifacts; PBP entities are content records. Mixing them violates the separation established by RFC-0707.
+
+### RFC-0872: Add technical-assessment PBP contract and policy-driven Nachweis publication gates
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Extend the existing 6-condition gate with optional flags.** Rejected — adding `consentRequired: false` flags to the existing gate would require every caller to understand which flags apply to which kind. Policy-driven resolution is deterministic and kind-selected, not flag-configured.
+
+2. **Create a separate `NachweisRecord` PBP entity for technical assessments.** Rejected — this would duplicate the entire Bordbuch/R2/manifest infrastructure. The RFC's `nonGoals` explicitly exclude this. `PbpEvidenceSource` with `kind: technical-assessment` and an `assessment` field is sufficient.
+
+3. **Keep legacy booleans alongside V2 indefinitely.** Rejected — forward-only discipline forbids dual-paths. The V2 gate is a strict superset; legacy booleans are a projection of V2 conditions. Removing them eliminates dead code and prevents callers from deriving publishability from a non-normative source.
+
+### RFC-0873: Add generic Nachweis technical-assessment ingest and immutable observation history
+
+- **Status:** accepted
+- **Alternatives considered:**
+
+- **Extend `nachweis.ingest` with a `--bundle` flag:** Rejected. `nachweis.ingest` accepts a single PDF file and produces a `recordId`-keyed record. Assessment bundles are JSON with multiple artifacts and `(seriesId, observationId)` identity. Combining them would require a bifurcated code path inside one command, violating the single-responsibility principle.
+- **Provider-specific commands (`nachweis.lighthouse.ingest`, `nachweis.cloudflare.ingest`):** Rejected. Each provider would duplicate R2 path construction, hashing, PBP writes, and Bordbuch appends. The generic `AssessmentBundleV1` envelope eliminates provider-specific code in the core.
+- **Store assessments as `operational-evidence` kind:** Rejected. RFC-0872 established `technical-assessment` as a distinct PBP evidence kind with its own publication policy (`technical-assessment-v1`) that does not require consent or public derivative. Using `operational-evidence` would apply the wrong publication gate.
+
+### RFC-0877: In-place agent-driven installation flow
+
+- **Status:** accepted
+- **Alternatives considered:**
+
+- **Keep global install as primary path** — rejected. Global install requires sudo on some systems, pollutes the global namespace, and breaks the "one folder, one project" mental model. The operator wants agent-driven installation from within the project folder.
+
+- **Use `pnpm dlx` for one-off execution** — rejected. `pnpm dlx` downloads forge every time, is slow, and does not leave forge installed in the project. The agent needs forge available as a devDependency for `forge.yaml` bindings to work.
+
+- **Keep `workshop.scaffold` as internal command** — rejected. Two scaffolding paths (forge create and workshop.scaffold) create maintenance burden and divergence risk. Consolidating into `forge create --in-place` simplifies the codebase and ensures a single source of truth for project scaffolding.
+
+- **Auto-install engine and plugins from `forge create --in-place`** — rejected. The agent should control package installation to handle edge cases (network issues, specific versions, operator preferences). `forge create` is a scaffolding command, not a dependency manager.
+
+- **Make `--profile` default to `forge-shell`** — rejected. In the agent-driven flow, the operator always describes the project type. If the agent cannot determine the type, it should ask the operator, not silently create a governance-only project. A required `--profile` forces explicit choice.
 
