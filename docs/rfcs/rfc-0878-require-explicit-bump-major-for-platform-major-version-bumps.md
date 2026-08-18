@@ -11,8 +11,7 @@ reviewers:
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
-satisfies:
-  - DNA-51
+satisfies: []
 versionBump: patch
 commands:
   proposed: []
@@ -45,6 +44,25 @@ RFC-0877 declared `versionBump: major`. During implementation, 5 `ecosystem.comm
 
 `ecosystem.commit` will treat `versionBump: major` in RFC frontmatter as advisory only. When `--bump` is not explicitly set to `major`, the command downgrades to `patch` instead of applying a major bump. This prevents accidental major version inflation during multi-step RFC implementations.
 
+### Behavior change
+
+| RFC `versionBump` | `--bump` flag | Current behavior | New behavior |
+| --- | --- | --- | --- |
+| `major` | absent | **major bump** | patch bump (major requires `--bump major`) |
+| `major` | `--bump major` | major bump | major bump (unchanged) |
+| `major` | `--bump patch` | patch bump | patch bump (unchanged) |
+| `major` | `--bump minor` | minor bump | minor bump (unchanged — override takes precedence) |
+| `minor` | absent | minor bump | minor bump (unchanged) |
+| `patch` | absent | patch bump | patch bump (unchanged) |
+| `none` | absent | EC-06 block | EC-06 block (unchanged) |
+
+### Rationale
+
+- `minor` and `patch` bumps are safe — they do not signal breaking changes to consumers.
+- `major` bumps are consequential — they require consumer migration and must be deliberate.
+- The RFC `versionBump` field declares the _eventual_ bump for the RFC's release, not the per-commit bump during implementation.
+- The `--bump` flag already exists and takes precedence — this change only affects the default when `--bump` is absent and RFC declares `major`.
+
 ## Architectural fit
 
 This change fits within the existing `ecosystem.commit` architecture (RFC-0703, RFC-0754). The `--bump` override mechanism already exists — this change only affects the default fallback when `--bump` is absent. No new commands, no new flags, no structural changes.
@@ -70,28 +88,6 @@ if (rfcId) {
 ```
 
 The change: when `versionBump === "major"` and `!hasValidBumpOverride`, set `bumpType = "patch"` instead of `bumpType = "major"`. The operator must pass `--bump major` explicitly to get a major bump.
-
-## Proposal
-
-Change `ecosystem.commit` to treat `versionBump: major` in RFC frontmatter as advisory only — the command must NOT automatically apply a major bump. Major bumps require the explicit `--bump major` flag.
-
-### Behavior change
-
-| RFC `versionBump` | `--bump` flag | Current behavior | New behavior |
-| --- | --- | --- | --- |
-| `major` | absent | **major bump** | patch bump (major requires `--bump major`) |
-| `major` | `--bump major` | major bump | major bump (unchanged) |
-| `major` | `--bump patch` | patch bump | patch bump (unchanged) |
-| `minor` | absent | minor bump | minor bump (unchanged) |
-| `patch` | absent | patch bump | patch bump (unchanged) |
-| `none` | absent | EC-06 block | EC-06 block (unchanged) |
-
-### Rationale
-
-- `minor` and `patch` bumps are safe — they do not signal breaking changes to consumers.
-- `major` bumps are consequential — they require consumer migration and must be deliberate.
-- The RFC `versionBump` field declares the _eventual_ bump for the RFC's release, not the per-commit bump during implementation.
-- The `--bump` flag already exists and takes precedence — this change only affects the default when `--bump` is absent and RFC declares `major`.
 
 ## Rollout
 
