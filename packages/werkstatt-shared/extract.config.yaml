@@ -1,0 +1,33 @@
+# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-shared
+# Extracts packages/werkstatt-shared from the werkstatt monorepo into a standalone public repo.
+# RFC-0868: Shared infrastructure publication config.
+
+projectDir: packages/werkstatt-shared
+destName: werkstatt-shared
+standalone: true
+
+workspacePrefixes:
+  - "@warpgogol/"
+stripScopes:
+  - "@warpgogol/"
+preservePackages:
+  - "@warpgogol/werkstatt-shared"
+  - "@warpgogol/werkstatt"
+packageManager: "pnpm"
+
+ignoreDirs:
+  - .turbo
+  - .agents
+  - node_modules
+  - tmp-*
+
+excludePathSegments:
+  - .npmrc
+
+postProcess:
+  - action: delete
+    path: AGENTS.md
+
+git:
+  remote: git@github.com:syrokomskyi/werkstatt-shared.git
+  autoPush: true

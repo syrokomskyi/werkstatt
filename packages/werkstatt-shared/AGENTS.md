@@ -25,4 +25,4 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from `w
 
 - Package is published as `@warpgogol/werkstatt-shared` with `access: public`.
 - `prepublishOnly` runs typecheck before publish.
-- CI workflow: `.github/workflows/publish.yml` publishes on `v*` tags.
+- Publication is operator-triggered via repo-extract (RFC-0773). See `extract.config.yaml` and `docs/authoring/publication-runbook.md`.
