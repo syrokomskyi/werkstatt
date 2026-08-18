@@ -1,12 +1,13 @@
 ---
 id: RFC-0873
 title: "Add generic Nachweis technical-assessment ingest and immutable observation history"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
