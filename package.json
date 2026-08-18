@@ -3,7 +3,11 @@
   "version": "0.4.1",
   "private": false,
   "type": "module",
-  "description": "Werkstatt engine \u2014 stack-agnostic lifecycle platform (RFC-0769/0772).",
+  "description": "Werkstatt engine — stack-agnostic lifecycle platform (RFC-0769/0772).",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syrokomskyi/werkstatt.git"
+  },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "bin": {
