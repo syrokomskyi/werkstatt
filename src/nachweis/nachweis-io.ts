@@ -67,6 +67,7 @@ export interface NachweisManifestEntry {
   qualityStatus: string;
   sourceSha256: string;
   publishedAt: string | null;
+  timestampAssurance: "rfc3161" | "eidas-qualified";
 }
 
 export interface NachweisManifest {

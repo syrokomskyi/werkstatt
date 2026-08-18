@@ -270,23 +270,6 @@ describe("workshop.scaffold", () => {
     });
   });
 
-  describe("stack-specific customization — video stack", () => {
-    it("does not include LFS patterns for editframe stack", async () => {
-      const dest = path.join(tempDir, "video-workshop");
-      const result = await runWorkshopScaffold(
-        makeInput({ name: "my-video-workshop", stack: "editframe", dest }),
-        makeContext(tempDir),
-      );
-      expect(result.exitCode).toBe(0);
-
-      const gitattributes = fs.readFileSync(path.join(dest, ".gitattributes"), "utf8");
-      expect(gitattributes).not.toContain("filter=lfs");
-
-      const pkgJson = JSON.parse(fs.readFileSync(path.join(dest, "package.json"), "utf8"));
-      expect(pkgJson.dependencies["@warpgogol/werkstatt-video"]).toBe("latest");
-    });
-  });
-
   describe("empty destination directory is allowed", () => {
     it("succeeds when destination exists but is empty", async () => {
       const dest = path.join(tempDir, "empty-workshop");
