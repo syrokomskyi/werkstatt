@@ -278,3 +278,17 @@ Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guar
 - **Extract error-return helpers for command handlers.** When a kernel command handler returns the same `KernelCommandResult<T>` error shape (same `data` fields with `exitCode: 1`) from multiple code paths, extract a `makeErrorResult(...)` helper. This eliminates Fowler's Duplicated Code smell and makes future field additions a single-point change. Example: `nachweis-assessment-ingest.ts` reduced from ~613 to ~480 lines by extracting `makeErrorResult(systemId, bundle, dryRun, summary)`.
 
 - **Use narrow credential regex patterns in assessment bundles.** When scanning assessment bundles for credential leakage, use specific key names (`aws_secret_access_key`, `private_key`, `client_secret`) rather than generic `secret`/`password` substrings. Generic patterns produce false positives on legitimate assessment data containing field names like `"secret": "some-value"`. The narrowed patterns are in `CREDENTIAL_PATTERNS` in `nachweis-assessment-ingest.ts`.
+
+## nachweis.measure.lighthouse (RFC-0874)
+
+`nachweis.measure.lighthouse` is a provider adapter that runs five sequential canonical Google Lighthouse runs against a target HTTPS URL, parses the LHR JSON output, aggregates category scores, builds an `AssessmentBundleV1`, and delegates to `nachweis.assessment.ingest` (RFC-0873) for R2 upload, PBP write, and Bordbuch append.
+
+- **Chrome/Chromium dependency:** Lighthouse requires Chrome/Chromium installed. The command checks for Chrome at common paths (`/usr/bin/google-chrome`, `/usr/bin/chromium`, etc.) or via `CHROME_PATH` env variable. If not found, fails with `LIGHTHOUSE_CHROME_NOT_FOUND` before any runs begin.
+- **Lighthouse dependency:** Pinned to exact version `13.4.1` in `optionalDependencies`. The command uses `npx lighthouse` CLI subprocess, not a static import — this keeps the engine stack-agnostic (DNA-64).
+- **Canonical run validity:** A run is valid if Lighthouse exits 0, LHR JSON parses, no `runtimeError` (or `NO_ERROR`), and `requestedUrl`/`finalUrl`/`lighthouseVersion`/`fetchTime` are present. Any invalid run fails the batch with `LIGHTHOUSE_CANONICAL_BATCH_INCOMPLETE`.
+- **Numeric category aggregation:** Categories with `score` in [0, 1] are scaled to 0-100. Five samples are sorted, median (index 2) is the aggregated score. `min`, `max`, and `samples[]` are preserved.
+- **Non-numeric category aggregation:** Categories with `score: null` and `experimental: true` (e.g. Agentic Browsing) are projected as `numerator`/`denominator`/`status` — never coerced to 0-100. `experimental: true` is preserved in the bundle.
+- **Deterministic observedAt:** `observedAt` is set from the first canonical run's `fetchTime`, not `new Date()`.
+- **Entitlement gating:** Skips silently when `nachweis` entitlement is not resolved (same as all nachweis commands).
+- **Dry-run:** `--dry-run` returns immediately without running Lighthouse or ingesting.
+- **No duplication:** The adapter does not duplicate R2 path construction, SHA-256 hashing, PBP persistence, or Bordbuch append logic — it produces an `AssessmentBundleV1` and calls `runNachweisAssessmentIngest` directly.
