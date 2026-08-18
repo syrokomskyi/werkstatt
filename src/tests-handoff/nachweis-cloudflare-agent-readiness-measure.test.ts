@@ -195,16 +195,24 @@ function makeMockResponse(status: number, body: string) {
 function makeCompletedResult(overrides?: Record<string, unknown>): unknown {
   return {
     result: {
-      agentReadiness: {
-        level: 3,
-        levelName: "Good",
-        overall: 72,
-        checks: {
-          robots: { status: "pass", details: { score: 100 }, durationMs: 120 },
-          structuredData: { status: "pass", details: { score: 85 }, durationMs: 230 },
-          metaTags: { status: "fail", details: { score: 40 }, durationMs: 95 },
-          commerce: { status: "not-checked", details: {}, durationMs: 0 },
-          customAiAccess: { status: "pass", details: { passed: 8, total: 10 }, durationMs: 310 },
+      meta: {
+        processors: {
+          agentReadiness: {
+            level: 3,
+            levelName: "Good",
+            overall: 72,
+            checks: {
+              robots: { status: "pass", details: { score: 100 }, durationMs: 120 },
+              structuredData: { status: "pass", details: { score: 85 }, durationMs: 230 },
+              metaTags: { status: "fail", details: { score: 40 }, durationMs: 95 },
+              commerce: { status: "not-checked", details: {}, durationMs: 0 },
+              customAiAccess: {
+                status: "pass",
+                details: { passed: 8, total: 10 },
+                durationMs: 310,
+              },
+            },
+          },
         },
       },
       scan: {
@@ -485,7 +493,7 @@ describe("RFC-0875: nachweis.measure.cloudflare-agent-readiness", () => {
           body: JSON.stringify(
             makeCompletedResult({
               result: {
-                agentReadiness: null,
+                meta: { processors: { agentReadiness: null } },
                 scan: { url: "https://example.com" },
                 task: { status: "Finished", success: false },
               },
@@ -552,13 +560,15 @@ describe("RFC-0875: nachweis.measure.cloudflare-agent-readiness", () => {
       mockState.pollResponses = [
         {
           status: 200,
-          body: JSON.stringify({
-            result: {
-              scan: { url: "https://example.com" },
-              task: { status: "Finished", success: true },
-            },
-            success: true,
-          }),
+          body: JSON.stringify(
+            makeCompletedResult({
+              result: {
+                meta: { processors: {} },
+                scan: { url: "https://example.com" },
+                task: { status: "Finished", success: true },
+              },
+            }),
+          ),
         },
       ];
 
@@ -612,16 +622,20 @@ describe("RFC-0875: nachweis.measure.cloudflare-agent-readiness", () => {
 
       const resultWithExtra = makeCompletedResult({
         result: {
-          agentReadiness: {
-            level: 2,
-            levelName: "Fair",
-            overall: 55,
-            checks: {
-              robots: { status: "pass", details: { score: 90 }, durationMs: 100 },
-              newFutureDimension: {
-                status: "pass",
-                details: { score: 77 },
-                durationMs: 200,
+          meta: {
+            processors: {
+              agentReadiness: {
+                level: 2,
+                levelName: "Fair",
+                overall: 55,
+                checks: {
+                  robots: { status: "pass", details: { score: 90 }, durationMs: 100 },
+                  newFutureDimension: {
+                    status: "pass",
+                    details: { score: 77 },
+                    durationMs: 200,
+                  },
+                },
               },
             },
           },
@@ -640,7 +654,11 @@ describe("RFC-0875: nachweis.measure.cloudflare-agent-readiness", () => {
         await import("../nachweis/nachweis-cloudflare-agent-readiness-measure.ts");
 
       // Verify parser preserves unknown dimension
-      const parsed = parseAgentReadiness(JSON.parse(JSON.stringify(resultWithExtra)) as never);
+      // parseAgentReadiness expects the unwrapped response (meta at top level)
+      const unwrapped = (
+        JSON.parse(JSON.stringify(resultWithExtra)) as { result: Record<string, unknown> }
+      ).result;
+      const parsed = parseAgentReadiness(unwrapped as never);
       const dimIds = parsed.dimensions.map((d) => d.id);
       expect(dimIds).toContain("newFutureDimension");
       expect(dimIds).toContain("robots");
@@ -672,10 +690,12 @@ describe("RFC-0875: nachweis.measure.cloudflare-agent-readiness", () => {
         await import("../nachweis/nachweis-cloudflare-agent-readiness-measure.ts");
 
       const parsed = parseAgentReadiness({
-        result: {
-          agentReadiness: {
-            checks: {
-              commerce: { status: "not-checked", details: {} },
+        meta: {
+          processors: {
+            agentReadiness: {
+              checks: {
+                commerce: { status: "not-checked", details: {} },
+              },
             },
           },
         },
