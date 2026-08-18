@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "nachweis-assessment-bundle@1",
+  "systemId": "warpgogol-com",
+  "slug": "warpgogol-cloudflare-agent-readiness-20260818t071500z",
+  "title": {
+    "de": "warpgogol.com – Cloudflare Agent Readiness",
+    "uk": "warpgogol.com — Cloudflare Agent Readiness"
+  },
+  "seriesId": "warpgogol-cloudflare-agent-readiness",
+  "observationId": "20260818T071500Z-example",
+  "subject": {
+    "url": "https://warpgogol.com/",
+    "canonicalUrl": "https://warpgogol.com/"
+  },
+  "provider": {
+    "id": "cloudflare",
+    "name": "Cloudflare",
+    "homepage": "https://www.cloudflare.com/"
+  },
+  "tool": {
+    "id": "cloudflare-url-scanner-agent-readiness",
+    "name": "Cloudflare URL Scanner — Agent Readiness"
+  },
+  "execution": {
+    "mode": "provider-run",
+    "authorizationBasis": "site-owner"
+  },
+  "observedAt": "REPLACE_FROM_ACTUAL_PROVIDER_RESULT",
+  "methodology": {
+    "id": "CF-AR-01",
+    "version": "1.0",
+    "runCount": 1,
+    "aggregation": "provider"
+  },
+  "result": {
+    "overall": {
+      "score": 100,
+      "level": "REPLACE_FROM_ACTUAL_PROVIDER_RESULT"
+    },
+    "dimensions": [
+      {
+        "id": "EXAMPLE_ONLY",
+        "providerLabel": "REPLACE_FROM_ACTUAL_PROVIDER_SCHEMA",
+        "score": 100
+      }
+    ]
+  },
+  "freshness": {
+    "maxAgeDays": 30
+  },
+  "artifacts": [
+    {
+      "key": "cloudflare-submission",
+      "role": "raw-result",
+      "file": "./cloudflare-submission.json",
+      "mediaType": "application/json",
+      "canonical": false
+    },
+    {
+      "key": "cloudflare-result",
+      "role": "raw-result",
+      "file": "./cloudflare-result.json",
+      "mediaType": "application/json",
+      "canonical": true
+    },
+    {
+      "key": "provider-parser-metadata",
+      "role": "methodology",
+      "file": "./provider-parser-metadata.json",
+      "mediaType": "application/json",
+      "canonical": false
+    }
+  ]
+}

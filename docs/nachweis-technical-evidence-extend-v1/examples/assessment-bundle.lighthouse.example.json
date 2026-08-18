@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "nachweis-assessment-bundle@1",
+  "systemId": "warpgogol-com",
+  "slug": "warpgogol-lighthouse-home-20260818t070000z",
+  "title": {
+    "de": "warpgogol.com – Google Lighthouse",
+    "uk": "warpgogol.com — Google Lighthouse"
+  },
+  "seriesId": "warpgogol-lighthouse-home",
+  "observationId": "20260818T070000Z-example",
+  "subject": {
+    "url": "https://warpgogol.com/",
+    "canonicalUrl": "https://warpgogol.com/"
+  },
+  "provider": {
+    "id": "google-chrome-lighthouse",
+    "name": "Google Lighthouse",
+    "homepage": "https://developer.chrome.com/docs/lighthouse/"
+  },
+  "tool": {
+    "id": "lighthouse",
+    "name": "Lighthouse",
+    "version": "REPLACE_FROM_ACTUAL_LHR"
+  },
+  "execution": {
+    "mode": "operator-run",
+    "authorizationBasis": "site-owner"
+  },
+  "observedAt": "REPLACE_FROM_FIRST_CANONICAL_LHR_FETCH_TIME",
+  "methodology": {
+    "id": "WG-LH-01",
+    "version": "1.0",
+    "runCount": 5,
+    "aggregation": "median"
+  },
+  "result": {
+    "dimensions": [
+      {
+        "id": "performance",
+        "providerLabel": "Performance",
+        "score": 91,
+        "samples": [
+          89,
+          90,
+          91,
+          92,
+          93
+        ],
+        "min": 89,
+        "max": 93
+      },
+      {
+        "id": "agentic-browsing",
+        "providerLabel": "Agentic Browsing",
+        "numerator": 3,
+        "denominator": 3,
+        "status": "pass",
+        "experimental": true
+      }
+    ]
+  },
+  "freshness": {
+    "maxAgeDays": 30
+  },
+  "artifacts": [
+    {
+      "key": "lhr-run-01",
+      "role": "raw-result",
+      "file": "./lhr-run-01.json",
+      "mediaType": "application/json",
+      "canonical": true
+    },
+    {
+      "key": "lhr-run-02",
+      "role": "raw-result",
+      "file": "./lhr-run-02.json",
+      "mediaType": "application/json",
+      "canonical": true
+    },
+    {
+      "key": "lhr-run-03",
+      "role": "raw-result",
+      "file": "./lhr-run-03.json",
+      "mediaType": "application/json",
+      "canonical": true
+    },
+    {
+      "key": "lhr-run-04",
+      "role": "raw-result",
+      "file": "./lhr-run-04.json",
+      "mediaType": "application/json",
+      "canonical": true
+    },
+    {
+      "key": "lhr-run-05",
+      "role": "raw-result",
+      "file": "./lhr-run-05.json",
+      "mediaType": "application/json",
+      "canonical": true
+    },
+    {
+      "key": "methodology",
+      "role": "methodology",
+      "file": "./methodology.json",
+      "mediaType": "application/json",
+      "canonical": false
+    }
+  ]
+}

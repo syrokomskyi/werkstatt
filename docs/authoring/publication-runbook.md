@@ -1,6 +1,6 @@
 # Publication Runbook — Private npm via repo-extract
 
-This runbook describes the operator-triggered publication pipeline for `@warpgogol/werkstatt` and plugin packages (`werkstatt-site`, `werkstatt-game`, `werkstatt-video`) to private npm. Established by RFC-0773.
+This runbook describes the operator-triggered publication pipeline for `@warpgogol/werkstatt` and plugin packages (`werkstatt-site`, `werkstatt-game`, `werkstatt-godot`) to private npm. Established by RFC-0773.
 
 ## Prerequisites
 
@@ -112,4 +112,4 @@ If `npm publish` succeeds but the published package is broken:
 
 ## Plugin packages
 
-Plugin packages (`werkstatt-site`, `werkstatt-game`, `werkstatt-video`) reuse the identical `extract.config.yaml` shape when they land. Each plugin's config adds the engine to `preservePackages` and pins the engine peer range in its `package.json`. See RFC-0773 for the versioning policy.
+Plugin packages (`werkstatt-site`, `werkstatt-game`, `werkstatt-godot`) reuse the identical `extract.config.yaml` shape when they land. Each plugin's config adds the engine to `preservePackages` and pins the engine peer range in its `package.json`. See RFC-0773 for the versioning policy.
