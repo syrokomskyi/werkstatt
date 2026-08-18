@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 792. Raw manifest entries: 1400.
+Generated command rows: 796. Raw manifest entries: 1406.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -306,10 +306,12 @@ Generated command rows: 792. Raw manifest entries: 1400.
 | `forge.assets.check` | workspace | workspace | no | no | Check for missing, orphaned, and unreferenced assets. Use --strict to fail on orphaned assets, --dry-run to skip hashing. |
 | `forge.assets.list` | workspace | workspace | no | no | List all assets declared in the active stack profile, grouped by type. Use --dry-run to skip hashing, --type to filter by asset type. |
 | `forge.build` | workspace | workspace | no | no | Execute produce commands for all artifacts declared in the active stack profile. Use --dry-run to print resolved commands. |
-| `forge.create` | workspace | workspace | no | no | Create a forge project in-place: scaffold + init + binding defaults. Usage: forge create --in-place --profile <profile-id> [--name <name>] [--package-manager pnpm] |
+| `forge.create` | workspace | workspace | no | no | Create a forge project in-place: scaffold + init + binding defaults. The target directory must be empty (only .git/ tolerated). Usage: forge create --in-place --profile <profile-id> [--name <name>] [--package-manager pnpm] |
 | `forge.determinism.check` | workspace | workspace | no | no | Verify artifact determinism by building twice and comparing output hashes. Reads determinism.inputs glob patterns from the active stack profile. Use --dry-run to print resolved inputs, --artifact to check a single artifact. |
 | `forge.dev` | workspace | workspace | no | no | Start the dev/preview server declared in the active stack profile. Use --dry-run to print the resolved command without executing. |
 | `forge.doctor` | workspace | workspace | no | no | Diagnose forge state in an existing project. |
+| `forge.init` | workspace | workspace | no | no | Deploy forge into a project: create forge.yaml, PREFERENCES.md, copy skills, create docs dirs. Hidden recovery command — normally called by forge.create. |
+| `forge.package.health` | workspace | workspace | no | no | Validate all published packages (private: false) for standalone extraction readiness. Checks engines.node, embedded .github/workflows/ci.yml, extract.config.yaml, and devDependencies completeness (no hoisted tool deps). Exits non-zero on errors. Use --json for machine-readable output. |
 | `forge.port.scaffold` | workspace | workspace | no | no | Generate a skeleton for a new forge skill or command. |
 | `forge.port.validate` | workspace | workspace | no | no | Validate a single ported skill or command for compliance with forge contracts. |
 | `forge.profile.validate` | workspace | workspace | no | no | Validate profile YAML files under packages/forge/profiles/ against the stack-profile schema (RFC-0640). |
@@ -476,6 +478,8 @@ Generated command rows: 792. Raw manifest entries: 1400.
 | `nachweis.ingest` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0707: Ingest a PDF evidence document — compute SHA-256, upload to R2, append Bordbuch entry. |
 | `nachweis.key.ensure` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0715: Generate an Ed25519 keypair for Nachweis operator signatures. Writes private key to file, publishes public key JSON. |
 | `nachweis.manifest.generate` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0707: Generate public/nachweise/manifest.json from published records (generatedAt: null per RFC-0602). |
+| `nachweis.measure.cloudflare-agent-readiness` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0875: Submit an Unlisted Cloudflare URL Scanner scan with Agent Readiness enabled, poll for completion, parse dimensions, build AssessmentBundleV1, and delegate to nachweis.assessment.ingest. |
+| `nachweis.measure.lighthouse` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0874: Run five sequential canonical Google Lighthouse runs, parse LHR JSON, aggregate categories, build AssessmentBundleV1, and delegate to nachweis.assessment.ingest. |
 | `nachweis.public-derivative` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0714: Upload a public-derivative PDF to R2 and update evidence-source items.public.storage to public. Idempotent by SHA-256. |
 | `nachweis.publish` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0707/RFC-0872: Enforce policy-driven publication gate V2 and transition record to published. Gate policy resolved by evidence kind; technical-assessment does not require consent or public derivative. |
 | `nachweis.sign` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0715: Sign a Nachweis record with an Ed25519 operator key. Appends nachweis-signed Bordbuch entry. Idempotent. |
