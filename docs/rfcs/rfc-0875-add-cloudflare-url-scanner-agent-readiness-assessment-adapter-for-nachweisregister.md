@@ -1,7 +1,7 @@
 ---
 id: RFC-0875
 title: "Add Cloudflare URL Scanner Agent Readiness assessment adapter for Nachweisregister"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
