@@ -1,12 +1,13 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0715: nachweis.verify-signature command handler — verifies the Ed25519 operator signature and RFC 3161 timestamp for a Nachweis record.</purpose>
+<purpose>RFC-0715/RFC-0871: nachweis.verify-signature command handler — verifies the Ed25519 operator signature and RFC 3161 timestamp for a Nachweis record, reporting timestamp assurance metadata.</purpose>
 <keywords>nachweis, verify, signature, ed25519, timestamp, rfc3161</keywords>
 <responsibilities>
   <item>Reads the nachweis-signed and nachweis-timestamped Bordbuch entries for the slug.</item>
   <item>Reconstructs the canonical record payload from the EvidenceSource entity.</item>
   <item>Verifies the Ed25519 signature against the published public key.</item>
   <item>Reports timestamp token presence (does not cryptographically verify the TSA token — deferred).</item>
+  <item>RFC-0871: reports timestampAssurance from Bordbuch metadata, defaults to rfc3161 for legacy entries.</item>
   <item>Read-only command — does not modify state.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
 </responsibilities>
@@ -17,6 +18,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial nachweis.verify-signature command handler.</item>
   <item>RFC-0715 review fix: import flagString from nachweis-n3-types.ts.</item>
+  <item>RFC-0871: report timestampAssurance and qualificationEvidenceRef from Bordbuch metadata, default rfc3161 for legacy entries.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -39,6 +41,7 @@ import {
   resolvePbpEntityDir,
   flagString,
   type NachweisVerifySignatureResult,
+  type TimestampAssurance,
 } from "./nachweis-n3-types.ts";
 import { canonicalRecordPayload, type NachweisRecordPayload } from "./nachweis-sign.ts";
 
@@ -100,6 +103,7 @@ export async function runNachweisVerifySignature(
         systemId,
         signatureValid: false,
         timestampVerified: false,
+        timestampAssurance: "rfc3161",
         publicKeyHex: null,
         details: "No nachweis-signed Bordbuch entry found for this slug.",
       },
@@ -118,6 +122,7 @@ export async function runNachweisVerifySignature(
         systemId,
         signatureValid: false,
         timestampVerified: false,
+        timestampAssurance: "rfc3161",
         publicKeyHex: publicKeyHex ?? null,
         details: "Signature or public key metadata missing from Bordbuch entry.",
       },
@@ -137,10 +142,17 @@ export async function runNachweisVerifySignature(
   }
 
   const timestampVerified = timestampedEntry != null;
+  const timestampAssurance: TimestampAssurance =
+    (timestampedEntry?.metadata?.timestampAssurance as TimestampAssurance | undefined) ?? "rfc3161";
+  const qualificationEvidenceRef = timestampedEntry?.metadata?.qualificationEvidenceRef as
+    string | undefined;
+
+  const assuranceLabel =
+    timestampAssurance === "eidas-qualified" ? "eIDAS qualified timestamp" : "RFC 3161 timestamp";
 
   const details = signatureValid
     ? timestampVerified
-      ? "Signature valid, RFC 3161 timestamp token present."
+      ? `Signature valid, ${assuranceLabel} token present.`
       : "Signature valid, but no RFC 3161 timestamp token found."
     : "Signature verification failed — canonical payload does not match.";
 
@@ -150,10 +162,12 @@ export async function runNachweisVerifySignature(
       systemId,
       signatureValid,
       timestampVerified,
+      timestampAssurance,
+      ...(qualificationEvidenceRef ? { qualificationEvidenceRef } : {}),
       publicKeyHex,
       details,
     },
     exitCode: signatureValid ? 0 : 1,
-    summary: `[nachweis.verify-signature] ${systemId}: ${signatureValid ? "PASS" : "FAIL"} — '${slug}' (signature: ${signatureValid}, timestamp: ${timestampVerified})`,
+    summary: `[nachweis.verify-signature] ${systemId}: ${signatureValid ? "PASS" : "FAIL"} — '${slug}' (signature: ${signatureValid}, timestamp: ${timestampVerified}, assurance: ${timestampAssurance})`,
   };
 }

@@ -16,6 +16,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.manifest.generate command handler.</item>
+  <item>RFC-0871: read Bordbuch to resolve timestampAssurance per record, default rfc3161 for legacy entries.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,6 +30,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-shared/content";
+import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import {
   isNachweisEntitled,
   makeSkipResult,
@@ -77,6 +79,19 @@ export async function runNachweisManifestGenerate(
   const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const records: NachweisManifestEntry[] = [];
 
+  // RFC-0871: read Bordbuch to resolve timestampAssurance per slug
+  const bordbuchEntries = await readBordbuch(workspaceRoot, systemId);
+  const timestampedEntries = new Map<string, { timestampAssurance?: string }>();
+  for (const e of bordbuchEntries) {
+    if (e.kind === "nachweis-timestamped" && e.metadata?.slug) {
+      if (!timestampedEntries.has(e.metadata.slug as string)) {
+        timestampedEntries.set(e.metadata.slug as string, {
+          timestampAssurance: e.metadata?.timestampAssurance as string | undefined,
+        });
+      }
+    }
+  }
+
   if (existsSync(evidenceDir)) {
     const entries = await fs.readdir(evidenceDir, { withFileTypes: true });
     for (const entry of entries) {
@@ -116,6 +131,9 @@ export async function runNachweisManifestGenerate(
         qualityStatus: (data.qualityStatus as string | undefined) ?? "unverified",
         sourceSha256: firstSha ?? "",
         publishedAt: (publication.publishedAt as string | null) ?? null,
+        timestampAssurance:
+          (timestampedEntries.get(slug)?.timestampAssurance as
+            "rfc3161" | "eidas-qualified" | undefined) ?? "rfc3161",
       });
     }
   }

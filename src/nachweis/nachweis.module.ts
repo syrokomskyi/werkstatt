@@ -16,6 +16,7 @@
   <item>RFC-0707: initial nachweis kernel module with 6 command registrations.</item>
   <item>RFC-0714: add nachweis.approve and nachweis.public-derivative command registrations.</item>
   <item>RFC-0715: add nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature. Remove --pilot-n2-exception from nachweis.publish.</item>
+  <item>RFC-0871: add --timestamp-assurance and --qualification-evidence-ref flags to nachweis.timestamp.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -277,7 +278,7 @@ export function createNachweisModule(): KernelModule {
       registry.registerCommand({
         name: "nachweis.timestamp",
         description:
-          "RFC-0715: Obtain an RFC 3161 timestamp token for a signed Nachweis record. Requires nachweis.sign to have run first. Idempotent.",
+          "RFC-0715/RFC-0871: Obtain an RFC 3161 timestamp token for a signed Nachweis record. Requires nachweis.sign to have run first. Idempotent. RFC-0871: --timestamp-assurance distinguishes rfc3161 (default) from eidas-qualified (requires --qualification-evidence-ref).",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -286,6 +287,15 @@ export function createNachweisModule(): KernelModule {
           system: { kind: "string", description: "Target system ID" },
           slug: { kind: "string", required: true, description: "Record slug to timestamp" },
           "tsa-url": { kind: "string", description: "Custom TSA URL (default: freetsa.org/tsr)" },
+          "timestamp-assurance": {
+            kind: "string",
+            description: "Timestamp assurance level (rfc3161 | eidas-qualified, default: rfc3161)",
+          },
+          "qualification-evidence-ref": {
+            kind: "string",
+            description:
+              "Evidence reference URL (required when --timestamp-assurance=eidas-qualified)",
+          },
           "dry-run": { kind: "boolean", description: "Skip TSA query and Bordbuch write" },
           json: { kind: "boolean", description: "Output JSON result." },
         },
