@@ -1,7 +1,7 @@
 ---
 id: RFC-0871
 title: "Separate RFC 3161 timestamp evidence from eIDAS qualified timestamp claims"
-status: accepted
+status: implemented
 kind: policy
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
-implementedAt:
+implementedAt: 2026-08-18
 closedAt:
 supersedes: []
 supersededBy:
