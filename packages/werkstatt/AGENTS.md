@@ -272,3 +272,9 @@ Dev-critical files: `src/content-ref-index.generated.yaml`, `src/derived-prices.
 This is the only **hard guard** preventing agents from directly committing to Sternsystem cache clones. AGENTS.md rules are soft guards — they rely on agent compliance. The pre-commit hook is enforced by git itself and cannot be bypassed without `--no-verify` (which AGENTS.md already restricts to last-resort use on closed missions).
 
 Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guard. If a file needs to be committed to a cache clone, use `mission.git.commit` or open a mission and work through the workpiece.
+
+## Command handler patterns
+
+- **Extract error-return helpers for command handlers.** When a kernel command handler returns the same `KernelCommandResult<T>` error shape (same `data` fields with `exitCode: 1`) from multiple code paths, extract a `makeErrorResult(...)` helper. This eliminates Fowler's Duplicated Code smell and makes future field additions a single-point change. Example: `nachweis-assessment-ingest.ts` reduced from ~613 to ~480 lines by extracting `makeErrorResult(systemId, bundle, dryRun, summary)`.
+
+- **Use narrow credential regex patterns in assessment bundles.** When scanning assessment bundles for credential leakage, use specific key names (`aws_secret_access_key`, `private_key`, `client_secret`) rather than generic `secret`/`password` substrings. Generic patterns produce false positives on legitimate assessment data containing field names like `"secret": "some-value"`. The narrowed patterns are in `CREDENTIAL_PATTERNS` in `nachweis-assessment-ingest.ts`.
