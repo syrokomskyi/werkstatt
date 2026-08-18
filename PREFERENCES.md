@@ -44,12 +44,12 @@ If ANY item is unchecked, STOP and invoke `fo-session-retro` now.
 When the operator invokes a fo-skill (e.g. `fo-idea-i-just-want-to-see-the-result`, `fo-idea-implement`, `fo-fix`, `fo-review`) in the first message of a session, the agent MUST follow that skill's full pipeline to completion. Do NOT fall back to a manual step-by-step plan. The skill's pipeline (audit → enhance → plan → implement → review → fix) exists for a reason — skipping phases produces lower-quality results.
 
 - If `fo-idea-i-just-want-to-see-the-result` is invoked, run the FULL pipeline: idea → audit → enhance → plan → implement → review → fix.
-- If `fo-idea-implement` is invoked, follow its steps 3.1–3.8 literally, including `fo-doc-audit` delegation.
+- If `fo-idea-implement` is invoked, follow its steps 4.1–4.8 literally, including `fo-doc-audit` delegation.
 - The operator's invocation IS the instruction to run the entire pipeline autonomously. No pauses between steps asking "shall I proceed?".
 
 ## RFC implementation completion rules
 
-When finishing an RFC implementation, the agent MUST follow `fo-idea-implement` steps 3.6–3.8 literally:
+When finishing an RFC implementation, the agent MUST follow `fo-idea-implement` steps 4.6–4.8 literally:
 
 1. **Check every acceptance criterion semantically** — not just existence, but observable behavior. Add inline `(evidence: <file:line>, <test-or-command>)` to each `[x]` (V-27). Run the relevant validators to prove it.
 2. **No unchecked criteria at `implemented`** — if a criterion cannot be met, do NOT stamp `implemented`; split the deferred work into a follow-up RFC via `rfc.supersede.propose` (V-26).
