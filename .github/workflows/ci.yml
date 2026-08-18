@@ -54,6 +54,9 @@ jobs:
       - name: Package checks
         run: pnpm exec werkstatt run packages-check.run --json
 
+      - name: Package health (extraction readiness)
+        run: pnpm exec forge run forge.package.health --json
+
       - name: RFC validation
         run: pnpm exec werkstatt run rfc.validate
 

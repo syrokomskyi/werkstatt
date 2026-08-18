@@ -112,6 +112,23 @@ Each extraction repo has a `.github/workflows/ci.yml` that runs on push to `main
 - **`--provenance` only for public repos** — `npm publish --provenance` fails with E422 for private GitHub repos ("Unsupported GitHub Actions source repository visibility: private"). Remove `--provenance` for private extraction repos.
 - **`NPM_TOKEN` secret** — must be set in each extraction repo via `gh secret set NPM_TOKEN --repo syrokomskyi/<name>`. The token from `~/.npmrc` can be reused for all repos.
 
+## Pre-extraction health check
+
+Before running repo-extract, verify all published packages are extraction-ready:
+
+```sh
+pnpm exec forge run forge.package.health
+```
+
+This checks every `packages/*/package.json` with `private: false` for:
+
+- **PKG-HEALTH-01**: `engines.node` present and matching root.
+- **PKG-HEALTH-02**: `.github/workflows/ci.yml` embedded in the package directory.
+- **PKG-HEALTH-03**: `extract.config.yaml` present.
+- **PKG-HEALTH-04**: All tools used in `scripts` (eslint, prettier, vitest, tsc, tsx, turbo, biome) are declared in `devDependencies` or `dependencies` — no monorepo hoisting.
+
+The command exits non-zero on errors. This is also run as a CI gate in the root `.github/workflows/ci.yml` ("Package health (extraction readiness)" step), so any violation blocks the PR before merge.
+
 ## Failure modes
 
 | Failure | Action |
