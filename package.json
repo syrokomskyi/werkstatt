@@ -1,6 +1,6 @@
 {
   "name": "@warpgogol/werkstatt",
-  "version": "0.4.1",
+  "version": "1.0.0",
   "private": false,
   "type": "module",
   "description": "Werkstatt engine — stack-agnostic lifecycle platform (RFC-0769/0772).",
