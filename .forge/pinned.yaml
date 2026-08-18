@@ -86,6 +86,12 @@ pinned:
   - path: packages/werkstatt-site/extract.config.yaml
     mode: protect
     reason: Site plugin extraction config — required for npm publication (RFC-0773)
+  - path: packages/werkstatt-shared/extract.config.yaml
+    mode: protect
+    reason: Shared infrastructure extraction config — required for npm publication (RFC-0868)
   - path: packages/werkstatt-game/extract.config.yaml
     mode: protect
     reason: Game plugin extraction config — required for npm publication (RFC-0773)
+  - path: packages/werkstatt-godot/extract.config.yaml
+    mode: protect
+    reason: Godot plugin extraction config — required for npm publication

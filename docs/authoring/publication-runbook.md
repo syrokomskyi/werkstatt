@@ -1,6 +1,6 @@
-# Publication Runbook — Private npm via repo-extract
+# Publication Runbook — npm via repo-extract
 
-This runbook describes the operator-triggered publication pipeline for `@warpgogol/werkstatt` and plugin packages (`werkstatt-site`, `werkstatt-game`, `werkstatt-godot`) to private npm. Established by RFC-0773.
+This runbook describes the operator-triggered publication pipeline for `@warpgogol/forge`, `@warpgogol/werkstatt`, `@warpgogol/werkstatt-shared`, and plugin packages (`werkstatt-game`, `werkstatt-godot`) to npm. Established by RFC-0773, updated for repo-extract workflow.
 
 ## Prerequisites
 
@@ -67,7 +67,7 @@ Abort if smoke commands fail. The monorepo dogfooding gap that allowed the failu
 
 ```sh
 cd <extraction-folder>
-npm publish --access restricted
+npm publish --access public
 ```
 
 Verify publication:
@@ -110,6 +110,14 @@ If `npm publish` succeeds but the published package is broken:
 | `npm publish` network failure | Retry. Check `npm view <pkg>@<version>` before retrying — npm registry is eventually consistent, a failed publish may leave the package in a pending state. |
 | LFS pointer in extraction | Abort. repo-extract must materialize real content, not LFS pointers. If repo-extract lacks LFS support, create an upstream issue/PR before wave 3. |
 
-## Plugin packages
+## Published packages
 
-Plugin packages (`werkstatt-site`, `werkstatt-game`, `werkstatt-godot`) reuse the identical `extract.config.yaml` shape when they land. Each plugin's config adds the engine to `preservePackages` and pins the engine peer range in its `package.json`. See RFC-0773 for the versioning policy.
+| Package | Extraction config | Git remote | npm access |
+| --- | --- | --- | --- |
+| `@warpgogol/forge` | `packages/forge/extract.config.yaml` | `git@github.com:syrokomskyi/forge.git` | public |
+| `@warpgogol/werkstatt` | `packages/werkstatt/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt.git` | public |
+| `@warpgogol/werkstatt-shared` | `packages/werkstatt-shared/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-shared.git` | public |
+| `@warpgogol/werkstatt-game` | `packages/werkstatt-game/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-game.git` | public |
+| `@warpgogol/werkstatt-godot` | `packages/werkstatt-godot/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-godot.git` | public |
+
+Note: `@warpgogol/werkstatt-site` is NOT published to npm (excluded by design — it is a site-composition plugin consumed only within the monorepo).
