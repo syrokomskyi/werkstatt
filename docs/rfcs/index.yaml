@@ -1,6 +1,6 @@
 command: rfc.index.generate
-generatedAt: 2026-08-17
-count: 852
+generatedAt: 2026-08-18
+count: 858
 entries:
   - id: ""
     title: ""
@@ -13908,7 +13908,8 @@ entries:
     supersededBy: ""
     amends:
       - RFC-0707
-    amendedBy: []
+    amendedBy:
+      - RFC-0871
     related:
       - DNA-34
       - DNA-53
@@ -13929,7 +13930,8 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0871
     related:
       - RFC-0708
       - ADR-0028
@@ -16745,3 +16747,116 @@ entries:
       - RFC-0204
       - RFC-0081
     file: docs/rfcs/archive/implemented/rfc-0870-prevent-silent-loss-of-committed-generated-manifests-and-improve-materialize-reliability.md
+  - id: RFC-0871
+    title: Separate RFC 3161 timestamp evidence from eIDAS qualified timestamp claims
+    status: implemented
+    kind: policy
+    createdAt: 2026-08-18
+    implementedAt: 2026-08-18
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0715
+      - RFC-0716
+    amendedBy: []
+    related:
+      - ADR-0028
+      - ADR-0054
+    file: docs/rfcs/archive/implemented/rfc-0871-separate-rfc-3161-timestamp-evidence-from-eidas-qualified-timestamp-claims.md
+  - id: RFC-0872
+    title: Add technical-assessment PBP contract and policy-driven Nachweis
+      publication gates
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-18
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0706
+      - RFC-0707
+      - RFC-0714
+    amendedBy: []
+    related:
+      - ADR-0028
+      - ADR-0054
+      - RFC-0715
+    file: docs/rfcs/rfc-0872-add-technical-assessment-pbp-contract-and-policy-driven-nachweis-publication-gates.md
+  - id: RFC-0873
+    title: Add generic Nachweis technical-assessment ingest and immutable
+      observation history
+    status: draft
+    kind: command
+    createdAt: 2026-08-18
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0707
+    amendedBy: []
+    related:
+      - ADR-0054
+      - RFC-0872
+      - RFC-0713
+      - RFC-0715
+    file: docs/rfcs/rfc-0873-add-generic-nachweis-technical-assessment-ingest-and-immutable-observation-history.md
+  - id: RFC-0874
+    title: Add reproducible Google Lighthouse assessment adapter for Nachweisregister
+    status: draft
+    kind: command
+    createdAt: 2026-08-18
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - ADR-0054
+      - RFC-0872
+      - RFC-0873
+    file: docs/rfcs/rfc-0874-add-reproducible-google-lighthouse-assessment-adapter-for-nachweisregister.md
+  - id: RFC-0875
+    title: Add Cloudflare URL Scanner Agent Readiness assessment adapter for
+      Nachweisregister
+    status: draft
+    kind: command
+    createdAt: 2026-08-18
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - ADR-0054
+      - RFC-0872
+      - RFC-0873
+      - RFC-0713
+    file: docs/rfcs/rfc-0875-add-cloudflare-url-scanner-agent-readiness-assessment-adapter-for-nachweisregister.md
+  - id: RFC-0876
+    title: Add technical Nachweis UI, observation history and Warpgogol
+      Lighthouse/Cloudflare pilot
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-18
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0708
+      - RFC-0716
+    amendedBy: []
+    related:
+      - ADR-0028
+      - ADR-0054
+      - RFC-0871
+      - RFC-0872
+      - RFC-0873
+      - RFC-0874
+      - RFC-0875
+    file: docs/rfcs/rfc-0876-add-technical-nachweis-ui-observation-history-and-warpgogol-lighthouse-cloudflare-pilot.md
