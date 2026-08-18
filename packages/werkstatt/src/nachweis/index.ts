@@ -10,6 +10,7 @@
   <item>RFC-0714: add nachweis.approve and nachweis.public-derivative exports.</item>
   <item>RFC-0873: add assessment bundle types, Zod schema, and nachweis.assessment.ingest handler export.</item>
   <item>RFC-0874: add nachweis.measure.lighthouse handler and type exports.</item>
+  <item>RFC-0875: add nachweis.measure.cloudflare-agent-readiness handler and type exports.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -62,10 +63,12 @@ export { runNachweisApprove } from "./nachweis-approve.ts";
 export { runNachweisPublicDerivative } from "./nachweis-public-derivative.ts";
 export { runNachweisAssessmentIngest } from "./nachweis-assessment-ingest.ts";
 export { runNachweisLighthouseMeasure } from "./nachweis-lighthouse-measure.ts";
+export { runNachweisCloudflareAgentReadinessMeasure } from "./nachweis-cloudflare-agent-readiness-measure.ts";
 export type {
   LighthouseCategoryProjection,
   LighthouseRunResult,
   LighthouseMeasureOptions,
   LighthouseMeasureResult,
 } from "./nachweis-lighthouse-measure.ts";
+export type { CloudflareAgentReadinessMeasureResult } from "./nachweis-cloudflare-agent-readiness-measure.ts";
 export { createNachweisModule } from "./nachweis.module.ts";
