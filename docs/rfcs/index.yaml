@@ -16894,14 +16894,14 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0877-in-place-agent-driven-installation-flow.md
   - id: RFC-0878
     title: Require explicit --bump major for platform major version bumps
-    status: accepted
+    status: implemented
     kind: command
     createdAt: 2026-08-18
-    implementedAt: ""
+    implementedAt: 2026-08-18
     closedAt: ""
     supersedes: []
     supersededBy: ""
     amends: []
     amendedBy: []
     related: []
-    file: docs/rfcs/rfc-0878-require-explicit-bump-major-for-platform-major-version-bumps.md
+    file: docs/rfcs/archive/implemented/rfc-0878-require-explicit-bump-major-for-platform-major-version-bumps.md
