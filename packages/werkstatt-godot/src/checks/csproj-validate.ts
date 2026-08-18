@@ -13,6 +13,7 @@
 */
 
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type {
   KernelCommandDefinition,
@@ -49,6 +50,18 @@ export async function validateCsproj(
     };
   }
 
+  // Also read Directory.Build.props if it exists — MSBuild merges these properties
+  const dbpPath = join(projectRoot, "Directory.Build.props");
+  let dbpContent = "";
+  if (existsSync(dbpPath)) {
+    try {
+      dbpContent = await readFile(dbpPath, "utf-8");
+    } catch {
+      // ignore read errors
+    }
+  }
+  const combined = content + "\n" + dbpContent;
+
   if (!content.includes('Sdk="Godot.NET.Sdk"')) {
     violations.push({
       ruleId: "GODOT-06",
@@ -57,14 +70,14 @@ export async function validateCsproj(
     });
   }
 
-  if (!/<TargetFramework>net(\d+)\.0/.test(content)) {
+  if (!/<TargetFramework>net(\d+)\.0/.test(combined)) {
     violations.push({
       ruleId: "GODOT-06",
       file: GAME_CSPROJ,
       message: "Game.csproj must target net8.0 or higher (Godot 4.x requires .NET 8+)",
     });
   } else {
-    const tfmMatch = content.match(/<TargetFramework>net(\d+)\.0/);
+    const tfmMatch = combined.match(/<TargetFramework>net(\d+)\.0/);
     if (tfmMatch && parseInt(tfmMatch[1]!, 10) < 8) {
       violations.push({
         ruleId: "GODOT-06",
@@ -74,7 +87,7 @@ export async function validateCsproj(
     }
   }
 
-  if (!content.includes("<EnableDynamicLoading>true</EnableDynamicLoading>")) {
+  if (!combined.includes("<EnableDynamicLoading>true</EnableDynamicLoading>")) {
     violations.push({
       ruleId: "GODOT-06",
       file: GAME_CSPROJ,

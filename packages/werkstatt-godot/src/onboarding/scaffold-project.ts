@@ -43,7 +43,10 @@ config/icon="res://icon.svg"
 project/assembly_name="__PROJECT_NAME__"
 `;
 
-const GAME_CSPROJ = `<Project Sdk="Godot.NET.Sdk">
+const GAME_CSPROJ = `<Project Sdk="Godot.NET.Sdk" />
+`;
+
+const DIRECTORY_BUILD_PROPS = `<Project>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <TargetFramework Condition="'$(OS)' == 'Windows_NT'">net8.0-windows</TargetFramework>
@@ -52,6 +55,86 @@ const GAME_CSPROJ = `<Project Sdk="Godot.NET.Sdk">
     <Nullable>enable</Nullable>
   </PropertyGroup>
 </Project>
+`;
+
+const GLOBAL_JSON = `{
+  "sdk": {
+    "version": "8.0.100",
+    "rollForward": "latestFeature"
+  }
+}
+`;
+
+const GAME_SLN = `Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "__PROJECT_NAME__", "Game.csproj", "{AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
+`;
+
+const EXPORT_PRESETS = `[preset.0]
+
+name="Web"
+platform="Web"
+runnable=true
+dedicated_server=false
+custom_features=""
+export_filter="all_resources"
+include_filter=""
+exclude_filter=""
+export_path="bin/web/index.html"
+encryption_include_filters=""
+encryption_exclude_filters=""
+encrypt_export=false
+
+[preset.0.options]
+
+html/export_icon=true
+html/custom_html_shell=""
+html/head_include=""
+`;
+
+const OMNISHARP_JSON = `{
+  "FormattingOptions": {
+    "UseTabs": true,
+    "TabSize": 4,
+    "IndentationSize": 4,
+    "NewLine": "\\n"
+  },
+  "RoslynExtensionsOptions": {
+    "EnableAnalyzersSupport": true
+  }
+}
+`;
+
+const VSCODE_SETTINGS = `{
+  "files.associations": {
+    "*.tscn": "gdscript",
+    "*.tres": "gdscript",
+    "*.gd": "gdscript"
+  },
+  "search.exclude": {
+    "**/.godot": true,
+    "**/bin": true,
+    "**/obj": true
+  },
+  "files.watcherExclude": {
+    "**/.godot/**": true,
+    "**/bin/**": true,
+    "**/obj/**": true
+  }
+}
 `;
 
 const MAIN_TSCN = `[gd_scene load_steps=2 format=3 uid="uid://main_scene"]
@@ -128,6 +211,13 @@ export async function scaffoldGodotProject(ctx: PluginHookContext): Promise<Hook
 
     await writeFileIfChanged(join(projectPath, "project.godot"), PROJECT_GODOT.replace(/__PROJECT_NAME__/g, projectId));
     await writeFileIfChanged(join(projectPath, "Game.csproj"), GAME_CSPROJ);
+    await writeFileIfChanged(join(projectPath, "Directory.Build.props"), DIRECTORY_BUILD_PROPS);
+    await writeFileIfChanged(join(projectPath, "global.json"), GLOBAL_JSON);
+    await writeFileIfChanged(join(projectPath, "Game.sln"), GAME_SLN.replace(/__PROJECT_NAME__/g, projectId));
+    await writeFileIfChanged(join(projectPath, "export_presets.cfg"), EXPORT_PRESETS);
+    await writeFileIfChanged(join(projectPath, "omnisharp.json"), OMNISHARP_JSON);
+    await mkdir(join(projectPath, ".vscode"), { recursive: true });
+    await writeFileIfChanged(join(projectPath, ".vscode", "settings.json"), VSCODE_SETTINGS);
     await writeFileIfChanged(join(projectPath, "Scenes", "Main.tscn"), MAIN_TSCN.replace(/__PROJECT_NAME__/g, projectId));
     await writeFileIfChanged(join(projectPath, "Scripts", "Main.cs"), MAIN_CS.replace(/__PROJECT_NAME__/g, safeName));
     await writeFileIfChanged(join(projectPath, ".gitignore"), GITIGNORE);
@@ -142,6 +232,12 @@ export async function scaffoldGodotProject(ctx: PluginHookContext): Promise<Hook
         filesCreated: [
           "project.godot",
           "Game.csproj",
+          "Directory.Build.props",
+          "global.json",
+          "Game.sln",
+          "export_presets.cfg",
+          "omnisharp.json",
+          ".vscode/settings.json",
           "Scenes/Main.tscn",
           "Scripts/Main.cs",
           ".gitignore",
