@@ -534,10 +534,17 @@ export async function runEcosystemCommit(
         message: `${rfcId} declares versionBump: none — no version bump needed.`,
         fixHint: "Use `git commit` for prose-only RFC changes that do not touch platform scope.",
       });
-    } else if (versionBump === "minor" || versionBump === "major") {
+    } else if (versionBump === "minor") {
       // --bump override takes precedence over RFC versionBump
       if (!hasValidBumpOverride) {
         bumpType = versionBump;
+      }
+    } else if (versionBump === "major") {
+      // RFC-0878: versionBump: major is advisory only — downgrade to patch
+      // unless --bump major is explicitly passed. Prevents accidental major
+      // version inflation during multi-step RFC implementations.
+      if (!hasValidBumpOverride) {
+        bumpType = "patch";
       }
     }
   }
