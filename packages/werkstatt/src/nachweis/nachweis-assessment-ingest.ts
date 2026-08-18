@@ -71,9 +71,9 @@ function flagBool(input: KernelCommandInput, key: string): boolean {
 
 const CREDENTIAL_PATTERNS: RegExp[] = [
   /(?:api[_-]?key|apikey)\s*[:=]\s*["']?[A-Za-z0-9]{20,}["']?/i,
-  /(?:secret|password|passwd)\s*[:=]\s*["']?[^\s"']{8,}["']?/i,
+  /(?:aws_secret_access_key|private_key|client_secret)\s*[:=]\s*["']?[^\s"']{8,}["']?/i,
   /-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----/,
-  /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/,
+  /eyJ[A-Za-z0-9_-]{10,}\.\.[A-Za-z0-9_-]{10,}/,
   /AKIA[0-9A-Z]{16}/,
   /Bearer\s+[A-Za-z0-9._-]{20,}/i,
 ];
@@ -94,6 +94,29 @@ function isPathInsideDir(filePath: string, dirPath: string): boolean {
   const dir = path.resolve(dirPath);
   const relative = path.relative(dir, resolved);
   return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative);
+}
+
+function makeErrorResult(
+  systemId: string,
+  bundle: { slug: string; seriesId: string; observationId: string } | null,
+  dryRun: boolean,
+  summary: string,
+): KernelCommandResult<AssessmentIngestResult> {
+  return {
+    data: {
+      systemId,
+      slug: bundle?.slug ?? "",
+      seriesId: bundle?.seriesId ?? "",
+      observationId: bundle?.observationId ?? "",
+      verificationLevel: "N1",
+      artifactHashes: {},
+      alreadyIngested: false,
+      bordbuchEventId: null,
+      dryRun,
+    },
+    exitCode: 1,
+    summary,
+  };
 }
 
 export async function runNachweisAssessmentIngest(
@@ -125,99 +148,54 @@ export async function runNachweisAssessmentIngest(
   const rawBundleJson = await fs.readFile(bundlePath, "utf8");
 
   if (scanForCredentials(rawBundleJson)) {
-    return {
-      data: {
-        systemId,
-        slug: "",
-        seriesId: "",
-        observationId: "",
-        verificationLevel: "N1",
-        artifactHashes: {},
-        alreadyIngested: false,
-        bordbuchEventId: null,
-        dryRun,
-      },
-      exitCode: 1,
-      summary: `[nachweis.assessment.ingest] CREDENTIAL_DETECTED: bundle '${bundlePath}' contains credential-like patterns`,
-    };
+    return makeErrorResult(
+      systemId,
+      null,
+      dryRun,
+      `[nachweis.assessment.ingest] CREDENTIAL_DETECTED: bundle '${bundlePath}' contains credential-like patterns`,
+    );
   }
 
   const parsed = assessmentBundleV1Schema.safeParse(JSON.parse(rawBundleJson));
   if (!parsed.success) {
-    return {
-      data: {
-        systemId,
-        slug: "",
-        seriesId: "",
-        observationId: "",
-        verificationLevel: "N1",
-        artifactHashes: {},
-        alreadyIngested: false,
-        bordbuchEventId: null,
-        dryRun,
-      },
-      exitCode: 1,
-      summary: `[nachweis.assessment.ingest] ASSESSMENT_BUNDLE_INVALID: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`,
-    };
+    return makeErrorResult(
+      systemId,
+      null,
+      dryRun,
+      `[nachweis.assessment.ingest] ASSESSMENT_BUNDLE_INVALID: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`,
+    );
   }
 
   const bundle: AssessmentBundleV1 = parsed.data;
 
   if (bundle.systemId !== systemId) {
-    return {
-      data: {
-        systemId,
-        slug: bundle.slug,
-        seriesId: bundle.seriesId,
-        observationId: bundle.observationId,
-        verificationLevel: "N1",
-        artifactHashes: {},
-        alreadyIngested: false,
-        bordbuchEventId: null,
-        dryRun,
-      },
-      exitCode: 1,
-      summary: `[nachweis.assessment.ingest] ASSESSMENT_SYSTEM_MISMATCH: bundle systemId '${bundle.systemId}' != --system '${systemId}'`,
-    };
+    return makeErrorResult(
+      systemId,
+      bundle,
+      dryRun,
+      `[nachweis.assessment.ingest] ASSESSMENT_SYSTEM_MISMATCH: bundle systemId '${bundle.systemId}' != --system '${systemId}'`,
+    );
   }
 
   for (const seg of [bundle.slug, bundle.seriesId, bundle.observationId]) {
     if (!isPathSafe(seg)) {
-      return {
-        data: {
-          systemId,
-          slug: bundle.slug,
-          seriesId: bundle.seriesId,
-          observationId: bundle.observationId,
-          verificationLevel: "N1",
-          artifactHashes: {},
-          alreadyIngested: false,
-          bordbuchEventId: null,
-          dryRun,
-        },
-        exitCode: 1,
-        summary: `[nachweis.assessment.ingest] ASSESSMENT_PATH_UNSAFE: segment '${seg}' contains path traversal characters`,
-      };
+      return makeErrorResult(
+        systemId,
+        bundle,
+        dryRun,
+        `[nachweis.assessment.ingest] ASSESSMENT_PATH_UNSAFE: segment '${seg}' contains path traversal characters`,
+      );
     }
   }
 
   for (const artifact of bundle.artifacts) {
     if (!isPathSafe(artifact.key)) {
-      return {
-        data: {
-          systemId,
-          slug: bundle.slug,
-          seriesId: bundle.seriesId,
-          observationId: bundle.observationId,
-          verificationLevel: "N1",
-          artifactHashes: {},
-          alreadyIngested: false,
-          bordbuchEventId: null,
-          dryRun,
-        },
-        exitCode: 1,
-        summary: `[nachweis.assessment.ingest] ASSESSMENT_PATH_UNSAFE: artifact key '${artifact.key}' contains path traversal characters`,
-      };
+      return makeErrorResult(
+        systemId,
+        bundle,
+        dryRun,
+        `[nachweis.assessment.ingest] ASSESSMENT_PATH_UNSAFE: artifact key '${artifact.key}' contains path traversal characters`,
+      );
     }
   }
 
@@ -226,97 +204,49 @@ export async function runNachweisAssessmentIngest(
   for (const artifact of bundle.artifacts) {
     const artifactPath = path.resolve(bundleDir, artifact.file);
     if (!isPathInsideDir(artifactPath, bundleDir)) {
-      return {
-        data: {
-          systemId,
-          slug: bundle.slug,
-          seriesId: bundle.seriesId,
-          observationId: bundle.observationId,
-          verificationLevel: "N1",
-          artifactHashes: {},
-          alreadyIngested: false,
-          bordbuchEventId: null,
-          dryRun,
-        },
-        exitCode: 1,
-        summary: `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_PATH_ESCAPE: artifact '${artifact.key}' path '${artifact.file}' escapes bundle directory`,
-      };
+      return makeErrorResult(
+        systemId,
+        bundle,
+        dryRun,
+        `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_PATH_ESCAPE: artifact '${artifact.key}' path '${artifact.file}' escapes bundle directory`,
+      );
     }
     if (!existsSync(artifactPath)) {
-      return {
-        data: {
-          systemId,
-          slug: bundle.slug,
-          seriesId: bundle.seriesId,
-          observationId: bundle.observationId,
-          verificationLevel: "N1",
-          artifactHashes: {},
-          alreadyIngested: false,
-          bordbuchEventId: null,
-          dryRun,
-        },
-        exitCode: 1,
-        summary: `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_MISSING: artifact '${artifact.key}' file '${artifact.file}' not found`,
-      };
+      return makeErrorResult(
+        systemId,
+        bundle,
+        dryRun,
+        `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_MISSING: artifact '${artifact.key}' file '${artifact.file}' not found`,
+      );
     }
     try {
       const stat = lstatSync(artifactPath);
       if (stat.isSymbolicLink()) {
-        return {
-          data: {
-            systemId,
-            slug: bundle.slug,
-            seriesId: bundle.seriesId,
-            observationId: bundle.observationId,
-            verificationLevel: "N1",
-            artifactHashes: {},
-            alreadyIngested: false,
-            bordbuchEventId: null,
-            dryRun,
-          },
-          exitCode: 1,
-          summary: `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_PATH_ESCAPE: artifact '${artifact.key}' is a symlink — symlinks are not allowed`,
-        };
+        return makeErrorResult(
+          systemId,
+          bundle,
+          dryRun,
+          `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_PATH_ESCAPE: artifact '${artifact.key}' is a symlink — symlinks are not allowed`,
+        );
       }
     } catch {
-      // lstat failed — treat as missing
-      return {
-        data: {
-          systemId,
-          slug: bundle.slug,
-          seriesId: bundle.seriesId,
-          observationId: bundle.observationId,
-          verificationLevel: "N1",
-          artifactHashes: {},
-          alreadyIngested: false,
-          bordbuchEventId: null,
-          dryRun,
-        },
-        exitCode: 1,
-        summary: `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_MISSING: artifact '${artifact.key}' file could not be stat'd`,
-      };
+      return makeErrorResult(
+        systemId,
+        bundle,
+        dryRun,
+        `[nachweis.assessment.ingest] ASSESSMENT_ARTIFACT_MISSING: artifact '${artifact.key}' file could not be stat'd`,
+      );
     }
   }
 
-  const hasCanonicalRaw = bundle.artifacts.some(
-    (a) => a.role === "raw-result" && a.canonical,
-  );
+  const hasCanonicalRaw = bundle.artifacts.some((a) => a.role === "raw-result" && a.canonical);
   if (!hasCanonicalRaw) {
-    return {
-      data: {
-        systemId,
-        slug: bundle.slug,
-        seriesId: bundle.seriesId,
-        observationId: bundle.observationId,
-        verificationLevel: "N1",
-        artifactHashes: {},
-        alreadyIngested: false,
-        bordbuchEventId: null,
-        dryRun,
-      },
-      exitCode: 1,
-      summary: `[nachweis.assessment.ingest] ASSESSMENT_CANONICAL_RAW_REQUIRED: at least one canonical raw-result artifact is required`,
-    };
+    return makeErrorResult(
+      systemId,
+      bundle,
+      dryRun,
+      `[nachweis.assessment.ingest] ASSESSMENT_CANONICAL_RAW_REQUIRED: at least one canonical raw-result artifact is required`,
+    );
   }
 
   const artifactHashes: Record<string, string> = {};
@@ -343,8 +273,7 @@ export async function runNachweisAssessmentIngest(
   const existingItems =
     (existingData?.items as Record<string, Record<string, unknown>> | undefined) ?? {};
   const existingAssessment = existingData?.assessment as
-    | { seriesId?: string; observationId?: string }
-    | undefined;
+    { seriesId?: string; observationId?: string } | undefined;
 
   if (
     existingAssessment &&
@@ -358,9 +287,7 @@ export async function runNachweisAssessmentIngest(
         existingHashes[artifact.key] = item.sha256;
       }
     }
-    const allMatch = bundle.artifacts.every(
-      (a) => existingHashes[a.key] === artifactHashes[a.key],
-    );
+    const allMatch = bundle.artifacts.every((a) => existingHashes[a.key] === artifactHashes[a.key]);
     if (allMatch) {
       logger.info(
         `[nachweis.assessment.ingest] already ingested for '${bundle.slug}' (${bundle.seriesId}/${bundle.observationId}) — skipping`,
@@ -512,8 +439,20 @@ export async function runNachweisAssessmentIngest(
   await fs.writeFile(evidenceFile, updatedContent, "utf8");
 
   const operationId = generateOperationId();
-  await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "nachweis.assessment.ingest", "agent");
-  await acquireLock(workspaceRoot, `bordbuch:${systemId}`, operationId, "nachweis.assessment.ingest", "agent");
+  await acquireLock(
+    workspaceRoot,
+    `system:${systemId}`,
+    operationId,
+    "nachweis.assessment.ingest",
+    "agent",
+  );
+  await acquireLock(
+    workspaceRoot,
+    `bordbuch:${systemId}`,
+    operationId,
+    "nachweis.assessment.ingest",
+    "agent",
+  );
 
   let bordbuchEventId: string | null = null;
   try {
