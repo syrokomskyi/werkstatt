@@ -1,7 +1,7 @@
 ---
 id: RFC-0872
 title: "Add technical-assessment PBP contract and policy-driven Nachweis publication gates"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
-implementedAt:
+implementedAt: 2026-08-18
 closedAt:
 supersedes: []
 supersededBy:
@@ -447,16 +447,16 @@ Do not move Nachweis pages into surface blueprints.
 
 ## Acceptance criteria
 
-- [ ] Existing attestation fixtures produce the same publish/pass/fail outcomes as before.
-- [ ] Existing published attestation still requires Consent and public derivative.
-- [ ] Technical assessment validates without a Consent entity.
-- [ ] Technical assessment validates without a public PDF derivative.
-- [ ] Technical assessment cannot publish without canonical raw-result hash.
-- [ ] Technical assessment cannot publish without N3.
-- [ ] Technical assessment cannot publish without approval/legal check.
-- [ ] Technical assessment cannot publish without authorization basis.
-- [ ] Locale assessment drift fails.
-- [ ] `not_applicable` never satisfies a condition marked `required: true`.
-- [ ] Technical withdrawal does not alter Consent.
-- [ ] Manifest includes technical observation identity.
-- [ ] Build output remains deterministic.
+- [x] Existing attestation fixtures produce the same publish/pass/fail outcomes as before.
+- [x] Existing published attestation still requires Consent and public derivative.
+- [x] Technical assessment validates without a Consent entity.
+- [x] Technical assessment validates without a public PDF derivative.
+- [x] Technical assessment cannot publish without canonical raw-result hash.
+- [x] Technical assessment cannot publish without N3.
+- [x] Technical assessment cannot publish without approval/legal check.
+- [x] Technical assessment cannot publish without authorization basis.
+- [x] Locale assessment drift fails.
+- [x] `not_applicable` never satisfies a condition marked `required: true`.
+- [x] Technical withdrawal does not alter Consent.
+- [x] Manifest includes technical observation identity.
+- [x] Build output remains deterministic.
