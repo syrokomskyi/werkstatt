@@ -9,6 +9,7 @@
   <item>Resolves R2 storage paths for private and public document storage.</item>
   <item>Reads resolved entitlements to check for the nachweis feature.</item>
   <item>RFC-0872: provides policy-driven publication gate V2 types and policy resolution.</item>
+  <item>RFC-0873: provides AssessmentBundleV1 types, Zod schema, and assessment R2 path resolution.</item>
 </responsibilities>
 <non-goals>
   <item>Does not implement command handlers — those live in nachweis-*.ts files.</item>
@@ -21,6 +22,7 @@
   <item>RFC-0713: uploadToR2 passes R2_NACHWEIS envPrefix for per-bucket credential isolation.</item>
   <item>RFC-0714: add NachweisApproveResult, NachweisPublicDerivativeResult interfaces and resolveNachweisPublicR2Path helper.</item>
   <item>RFC-0872: add NachweisPublicationGateV2, policy resolution, extend NachweisManifestEntry, replace legacy NachweisPublicationGate.</item>
+  <item>RFC-0873: add AssessmentBundleV1, assessmentBundleV1Schema, AssessmentIngestResult, resolveAssessmentR2Path, mediaTypeToExt, extend uploadToR2 with optional contentType.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +30,7 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { parse as yamlParse } from "yaml";
+import { z } from "zod";
 import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { loadSystemManifest } from "@warpgogol/werkstatt-shared/content";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
@@ -396,13 +399,17 @@ export function resolveNachweisPublicR2Path(
   return `${systemId}/public/${recordId}/v${version}/public.pdf`;
 }
 
-export async function uploadToR2(fileBuffer: Uint8Array, r2Path: string): Promise<void> {
+export async function uploadToR2(
+  fileBuffer: Uint8Array,
+  r2Path: string,
+  contentType?: string,
+): Promise<void> {
   const config = resolveR2ConfigFromEnv(NACHWEIS_BUCKET, "R2_NACHWEIS");
   const client = createR2Client(config);
   await client.putObject({
     key: r2Path,
     body: fileBuffer,
-    contentType: "application/pdf",
+    contentType: contentType ?? "application/pdf",
   });
 }
 
@@ -476,4 +483,212 @@ export function makeSkipResult(
     exitCode: 0,
     summary: `[${commandName}] skipped — nachweis entitlement not resolved for ${systemId}`,
   };
+}
+
+// RFC-0873: Assessment bundle types and helpers
+
+export interface AssessmentBundleArtifact {
+  key: string;
+  role: "raw-result" | "report" | "screenshot" | "summary" | "methodology";
+  file: string;
+  mediaType: string;
+  canonical: boolean;
+}
+
+export interface AssessmentBundleV1 {
+  schemaVersion: "nachweis-assessment-bundle@1";
+  systemId: string;
+  slug: string;
+  title: Record<string, string>;
+  seriesId: string;
+  observationId: string;
+  subject: { url: string; canonicalUrl?: string };
+  provider: { id: string; name: string; homepage?: string };
+  tool: { id: string; name: string; version?: string };
+  execution: {
+    mode: "operator-run" | "provider-run";
+    authorizationBasis: "site-owner" | "service-contract" | "explicit-operator";
+  };
+  observedAt: string;
+  methodology: {
+    id: string;
+    version: string;
+    runCount: number;
+    aggregation: "provider" | "median" | "none";
+  };
+  result: {
+    overall?: { score?: number; level?: string };
+    dimensions: Array<{
+      id: string;
+      providerLabel: string;
+      score?: number;
+      numerator?: number;
+      denominator?: number;
+      status?: "pass" | "fail" | "not-checked";
+      level?: string;
+      experimental?: boolean;
+      min?: number;
+      max?: number;
+      samples?: number[];
+    }>;
+  };
+  freshness: { maxAgeDays: number };
+  providerReportUrl?: string;
+  artifacts: AssessmentBundleArtifact[];
+}
+
+export interface AssessmentIngestResult {
+  systemId: string;
+  slug: string;
+  seriesId: string;
+  observationId: string;
+  verificationLevel: "N1";
+  artifactHashes: Record<string, string>;
+  alreadyIngested: boolean;
+  bordbuchEventId: string | null;
+  dryRun: boolean;
+}
+
+const ISO_8601_WITH_TZ_BUNDLE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
+
+const assessmentDimensionSchema = z
+  .object({
+    id: z.string().min(1),
+    providerLabel: z.string().min(1),
+    score: z.number().finite().min(0).max(100).optional(),
+    numerator: z.number().finite().min(0).optional(),
+    denominator: z.number().finite().min(1).optional(),
+    status: z.enum(["pass", "fail", "not-checked"]).optional(),
+    level: z.string().optional(),
+    experimental: z.boolean().optional(),
+    min: z.number().finite().optional(),
+    max: z.number().finite().optional(),
+    samples: z.array(z.number().finite().min(0).max(100)).optional(),
+  })
+  .refine(
+    (d) => {
+      if (d.numerator != null || d.denominator != null) {
+        return d.numerator != null && d.denominator != null && d.numerator <= d.denominator;
+      }
+      return true;
+    },
+    { message: "numerator/denominator must appear as a valid pair" },
+  )
+  .refine(
+    (d) => {
+      if (d.samples != null && d.samples.length > 0) {
+        const sMin = Math.min(...d.samples);
+        const sMax = Math.max(...d.samples);
+        if (d.min != null && d.min !== sMin) return false;
+        if (d.max != null && d.max !== sMax) return false;
+      }
+      return true;
+    },
+    { message: "min/max must match sample extrema when samples are present" },
+  );
+
+export const assessmentBundleV1Schema = z
+  .object({
+    schemaVersion: z.literal("nachweis-assessment-bundle@1"),
+    systemId: z.string().min(1),
+    slug: z
+      .string()
+      .min(1)
+      .regex(/^[a-zA-Z0-9_-]+$/, "slug must be path-safe"),
+    title: z.record(z.string(), z.string()),
+    seriesId: z
+      .string()
+      .min(1)
+      .regex(/^[a-zA-Z0-9_-]+$/, "seriesId must be path-safe"),
+    observationId: z
+      .string()
+      .min(1)
+      .regex(/^[a-zA-Z0-9_-]+$/, "observationId must be path-safe"),
+    subject: z.object({
+      url: z.string().url(),
+      canonicalUrl: z.string().url().optional(),
+    }),
+    provider: z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      homepage: z.string().url().optional(),
+    }),
+    tool: z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      version: z.string().optional(),
+    }),
+    execution: z.object({
+      mode: z.enum(["operator-run", "provider-run"]),
+      authorizationBasis: z.enum(["site-owner", "service-contract", "explicit-operator"]),
+    }),
+    observedAt: z
+      .string()
+      .regex(ISO_8601_WITH_TZ_BUNDLE, "observedAt must be ISO 8601 with timezone"),
+    methodology: z.object({
+      id: z.string().min(1),
+      version: z.string().min(1),
+      runCount: z.number().int().min(1),
+      aggregation: z.enum(["provider", "median", "none"]),
+    }),
+    result: z.object({
+      overall: z
+        .object({
+          score: z.number().finite().min(0).max(100).optional(),
+          level: z.string().optional(),
+        })
+        .optional(),
+      dimensions: z.array(assessmentDimensionSchema).min(1),
+    }),
+    freshness: z.object({
+      maxAgeDays: z.number().int().min(1),
+    }),
+    providerReportUrl: z
+      .string()
+      .url()
+      .refine((u) => u.startsWith("https:"), { message: "providerReportUrl must be HTTPS" })
+      .optional(),
+    artifacts: z
+      .array(
+        z.object({
+          key: z
+            .string()
+            .min(1)
+            .regex(/^[a-zA-Z0-9_.-]+$/, "artifact key must be path-safe"),
+          role: z.enum(["raw-result", "report", "screenshot", "summary", "methodology"]),
+          file: z.string().min(1),
+          mediaType: z.string().min(1),
+          canonical: z.boolean(),
+        }),
+      )
+      .min(1),
+  })
+  .refine((b) => b.artifacts.some((a) => a.role === "raw-result" && a.canonical), {
+    message: "at least one canonical raw-result artifact is required",
+  });
+
+const MEDIA_TYPE_TO_EXT: Record<string, string> = {
+  "application/json": ".json",
+  "image/png": ".png",
+  "image/jpeg": ".jpg",
+  "image/webp": ".webp",
+  "image/svg+xml": ".svg",
+  "application/pdf": ".pdf",
+  "text/html": ".html",
+  "text/plain": ".txt",
+  "text/csv": ".csv",
+};
+
+export function mediaTypeToExt(mediaType: string): string {
+  return MEDIA_TYPE_TO_EXT[mediaType] ?? ".bin";
+}
+
+export function resolveAssessmentR2Path(
+  systemId: string,
+  seriesId: string,
+  observationId: string,
+  artifactKey: string,
+  ext: string,
+): string {
+  return `${systemId}/private/assessments/${seriesId}/${observationId}/${artifactKey}${ext}`;
 }
