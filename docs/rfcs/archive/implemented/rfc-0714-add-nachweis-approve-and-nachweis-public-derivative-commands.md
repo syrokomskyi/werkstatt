@@ -23,7 +23,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0707
-amendedBy: []
+amendedBy:
+  - RFC-0872
 related:
   - RFC-0707
   - RFC-0706
