@@ -3,6 +3,9 @@
   "version": "1.2.0",
   "private": false,
   "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "description": "Werkstatt engine — stack-agnostic lifecycle platform (RFC-0769/0772).",
   "repository": {
     "type": "git",
