@@ -1,9 +1,10 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0715: unit tests for nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature, and N3 gate in nachweis.approve.</purpose>
+  <purpose>RFC-0715/RFC-0871: unit tests for nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature, and N3 gate in nachweis.approve.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial N3 crypto verification unit tests.</item>
+  <item>RFC-0871: add tests for timestamp assurance, legacy projection, and qualification evidence validation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -503,4 +504,238 @@ test("nachweis.approve --verification-level N2 is unchanged (no N3 gate)", async
 
   expect(result.exitCode).toBe(0);
   expect(result.data!.verificationLevel).toBe("N2");
+});
+
+// ---------------------------------------------------------------------------
+// RFC-0871: Timestamp assurance
+// ---------------------------------------------------------------------------
+
+test("RFC-0871: nachweis.timestamp dry-run defaults to rfc3161 assurance", async () => {
+  const slug = "test-evidence";
+  await writeEvidenceSource(slug);
+
+  const keyFile = path.join(tmpDir, "test-signing.key");
+  await ensureNachweisKey(keyFile, false);
+
+  await runNachweisSign(
+    makeInput({ system: systemId, slug, "key-file": keyFile }),
+    mockContext(tmpDir),
+  );
+
+  const result = await runNachweisTimestamp(
+    makeInput({ system: systemId, slug, "dry-run": true }),
+    mockContext(tmpDir),
+  );
+
+  expect(result.exitCode).toBe(0);
+  expect(result.data!.timestampAssurance).toBe("rfc3161");
+  expect(result.data!.qualificationEvidenceRef).toBeUndefined();
+});
+
+test("RFC-0871: nachweis.timestamp dry-run accepts eidas-qualified with qualification-evidence-ref", async () => {
+  const slug = "test-evidence";
+  await writeEvidenceSource(slug);
+
+  const keyFile = path.join(tmpDir, "test-signing.key");
+  await ensureNachweisKey(keyFile, false);
+
+  await runNachweisSign(
+    makeInput({ system: systemId, slug, "key-file": keyFile }),
+    mockContext(tmpDir),
+  );
+
+  const evidenceRef = "https://example.eu/tl/qtsp-entry.json";
+  const result = await runNachweisTimestamp(
+    makeInput({
+      system: systemId,
+      slug,
+      "dry-run": true,
+      "timestamp-assurance": "eidas-qualified",
+      "qualification-evidence-ref": evidenceRef,
+    }),
+    mockContext(tmpDir),
+  );
+
+  expect(result.exitCode).toBe(0);
+  expect(result.data!.timestampAssurance).toBe("eidas-qualified");
+  expect(result.data!.qualificationEvidenceRef).toBe(evidenceRef);
+});
+
+test("RFC-0871: nachweis.timestamp fails when eidas-qualified without qualification-evidence-ref", async () => {
+  const slug = "test-evidence";
+  await writeEvidenceSource(slug);
+
+  const keyFile = path.join(tmpDir, "test-signing.key");
+  await ensureNachweisKey(keyFile, false);
+
+  await runNachweisSign(
+    makeInput({ system: systemId, slug, "key-file": keyFile }),
+    mockContext(tmpDir),
+  );
+
+  await expect(
+    runNachweisTimestamp(
+      makeInput({
+        system: systemId,
+        slug,
+        "dry-run": true,
+        "timestamp-assurance": "eidas-qualified",
+      }),
+      mockContext(tmpDir),
+    ),
+  ).rejects.toThrow("TIMESTAMP_QUALIFICATION_EVIDENCE_REQUIRED");
+});
+
+test("RFC-0871: nachweis.timestamp fails with invalid assurance value", async () => {
+  const slug = "test-evidence";
+  await writeEvidenceSource(slug);
+
+  const keyFile = path.join(tmpDir, "test-signing.key");
+  await ensureNachweisKey(keyFile, false);
+
+  await runNachweisSign(
+    makeInput({ system: systemId, slug, "key-file": keyFile }),
+    mockContext(tmpDir),
+  );
+
+  await expect(
+    runNachweisTimestamp(
+      makeInput({
+        system: systemId,
+        slug,
+        "dry-run": true,
+        "timestamp-assurance": "invalid",
+      }),
+      mockContext(tmpDir),
+    ),
+  ).rejects.toThrow("INVALID_ASSURANCE");
+});
+
+test("RFC-0871: nachweis.verify-signature reports rfc3161 for legacy entries without timestampAssurance metadata", async () => {
+  const slug = "test-evidence";
+  await writeEvidenceSource(slug);
+
+  const keyFile = path.join(tmpDir, "test-signing.key");
+  await ensureNachweisKey(keyFile, false);
+
+  await runNachweisSign(
+    makeInput({ system: systemId, slug, "key-file": keyFile }),
+    mockContext(tmpDir),
+  );
+
+  // Manually write a legacy nachweis-timestamped entry WITHOUT timestampAssurance
+  const entries = await readBordbuchFile();
+  const lastHash = entries.length > 0 ? entries[entries.length - 1].hash : null;
+  const tsEntry = makeEntry(
+    {
+      id: `event-${String(entries.length + 1).padStart(6, "0")}`,
+      kind: "nachweis-timestamped" as BordbuchEntry["kind"],
+      missionId: null,
+      occurredAt: new Date().toISOString(),
+      summary: `Record '${slug}' timestamped via FreeTSA`,
+      metadata: { slug, timestampTokenBase64: "dGVzdA==", tsaUrl: "https://freetsa.org/tsr" },
+    },
+    lastHash,
+  );
+  await writeBordbuch([...entries, tsEntry]);
+
+  const result = await runNachweisVerifySignature(
+    makeInput({ system: systemId, slug }),
+    mockContext(tmpDir),
+  );
+
+  expect(result.exitCode).toBe(0);
+  expect(result.data!.timestampVerified).toBe(true);
+  expect(result.data!.timestampAssurance).toBe("rfc3161");
+  expect(result.data!.qualificationEvidenceRef).toBeUndefined();
+});
+
+test("RFC-0871: nachweis.verify-signature reports eidas-qualified when metadata present", async () => {
+  const slug = "test-evidence";
+  await writeEvidenceSource(slug);
+
+  const keyFile = path.join(tmpDir, "test-signing.key");
+  await ensureNachweisKey(keyFile, false);
+
+  await runNachweisSign(
+    makeInput({ system: systemId, slug, "key-file": keyFile }),
+    mockContext(tmpDir),
+  );
+
+  // Write a nachweis-timestamped entry with eidas-qualified assurance
+  const entries = await readBordbuchFile();
+  const lastHash = entries.length > 0 ? entries[entries.length - 1].hash : null;
+  const evidenceRef = "https://example.eu/tl/qtsp-entry.json";
+  const tsEntry = makeEntry(
+    {
+      id: `event-${String(entries.length + 1).padStart(6, "0")}`,
+      kind: "nachweis-timestamped" as BordbuchEntry["kind"],
+      missionId: null,
+      occurredAt: new Date().toISOString(),
+      summary: `Record '${slug}' timestamped via QTSP`,
+      metadata: {
+        slug,
+        timestampTokenBase64: "dGVzdA==",
+        tsaUrl: "https://qtsp.example.eu/tsr",
+        timestampAssurance: "eidas-qualified",
+        qualificationEvidenceRef: evidenceRef,
+      },
+    },
+    lastHash,
+  );
+  await writeBordbuch([...entries, tsEntry]);
+
+  const result = await runNachweisVerifySignature(
+    makeInput({ system: systemId, slug }),
+    mockContext(tmpDir),
+  );
+
+  expect(result.exitCode).toBe(0);
+  expect(result.data!.timestampVerified).toBe(true);
+  expect(result.data!.timestampAssurance).toBe("eidas-qualified");
+  expect(result.data!.qualificationEvidenceRef).toBe(evidenceRef);
+  expect(result.data!.details).toContain("eIDAS qualified timestamp");
+});
+
+test("RFC-0871: nachweis.verify-signature details mention RFC 3161 for rfc3161 assurance", async () => {
+  const slug = "test-evidence";
+  await writeEvidenceSource(slug);
+
+  const keyFile = path.join(tmpDir, "test-signing.key");
+  await ensureNachweisKey(keyFile, false);
+
+  await runNachweisSign(
+    makeInput({ system: systemId, slug, "key-file": keyFile }),
+    mockContext(tmpDir),
+  );
+
+  // Write a nachweis-timestamped entry with rfc3161 assurance
+  const entries = await readBordbuchFile();
+  const lastHash = entries.length > 0 ? entries[entries.length - 1].hash : null;
+  const tsEntry = makeEntry(
+    {
+      id: `event-${String(entries.length + 1).padStart(6, "0")}`,
+      kind: "nachweis-timestamped" as BordbuchEntry["kind"],
+      missionId: null,
+      occurredAt: new Date().toISOString(),
+      summary: `Record '${slug}' timestamped via FreeTSA`,
+      metadata: {
+        slug,
+        timestampTokenBase64: "dGVzdA==",
+        tsaUrl: "https://freetsa.org/tsr",
+        timestampAssurance: "rfc3161",
+      },
+    },
+    lastHash,
+  );
+  await writeBordbuch([...entries, tsEntry]);
+
+  const result = await runNachweisVerifySignature(
+    makeInput({ system: systemId, slug }),
+    mockContext(tmpDir),
+  );
+
+  expect(result.exitCode).toBe(0);
+  expect(result.data!.timestampAssurance).toBe("rfc3161");
+  expect(result.data!.details).toContain("RFC 3161 timestamp");
 });

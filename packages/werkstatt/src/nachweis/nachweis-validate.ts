@@ -19,6 +19,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.validate command handler.</item>
   <item>RFC-0715: add N3 artifact check — verify nachweis-signed and nachweis-timestamped entries exist for N3 records.</item>
+  <item>RFC-0871: add n3-timestamp-qualification-evidence-missing violation for eidas-qualified records without qualificationEvidenceRef.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -293,6 +294,23 @@ export async function runNachweisValidate(
           message: `Record '${slug}' is published at N3 but has no nachweis-timestamped Bordbuch entry. Run nachweis.timestamp first.`,
           recordId: slug,
         });
+      }
+
+      // RFC-0871: eidas-qualified assurance requires qualificationEvidenceRef
+      if (hasTimestamped) {
+        const timestampedEntry = nachweisEntries.find(
+          (e) => e.kind === "nachweis-timestamped" && e.metadata?.slug === slug,
+        );
+        const assurance = timestampedEntry?.metadata?.timestampAssurance as string | undefined;
+        const evidenceRef = timestampedEntry?.metadata?.qualificationEvidenceRef as
+          string | undefined;
+        if (assurance === "eidas-qualified" && !evidenceRef) {
+          violations.push({
+            rule: "n3-timestamp-qualification-evidence-missing",
+            message: `Record '${slug}' has timestampAssurance 'eidas-qualified' but no qualificationEvidenceRef in Bordbuch metadata. Provide --qualification-evidence-ref when running nachweis.timestamp.`,
+            recordId: slug,
+          });
+        }
       }
     }
   }
