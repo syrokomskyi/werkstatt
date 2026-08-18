@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
+enhancedAt: 2026-08-18
 satisfies:
   - DNA-51
 versionBump: patch
