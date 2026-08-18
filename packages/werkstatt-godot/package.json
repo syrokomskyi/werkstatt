@@ -3,6 +3,9 @@
   "version": "0.6.0",
   "private": false,
   "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "description": "Werkstatt Godot plugin — Godot 4.x + C# stack.",
   "repository": {
     "type": "git",

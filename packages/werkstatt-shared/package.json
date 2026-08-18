@@ -3,6 +3,9 @@
   "version": "0.6.0",
   "private": false,
   "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "description": "Stack-agnostic shared infrastructure extracted from werkstatt-site (RFC-0868).",
   "repository": {
     "type": "git",
