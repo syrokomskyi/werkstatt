@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
+enhancedAt: 2026-08-18
 implementedAt:
 closedAt:
 supersedes:
@@ -41,7 +42,6 @@ related:
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
-  - DNA-54
   - DNA-64
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
@@ -67,8 +67,8 @@ successSignals:
   - "forge create --in-place scaffolds a working project in the current directory without creating a subdirectory"
   - "Project name is auto-derived from the folder name and converted to kebab-case"
   - "--profile is required with --in-place; missing --profile produces an error listing all supported profiles"
-  - "--in-place tolerates non-empty directories (package.json, node_modules/, pnpm-lock.yaml from prior pnpm add -D) but refuses if forge.yaml or conflicting scaffold files already exist"
-  - "workshop.scaffold command and its module are removed from the engine"
+  - "--in-place tolerates non-empty directories (package.json, node_modules/, pnpm-lock.yaml, .git/, .vscode/ from prior setup) but refuses if forge.yaml or conflicting scaffold files already exist"
+  - "workshop.scaffold command, its module files, and package exports are removed from the engine"
   - "README describes only the in-place agent-driven flow; global install and pnpm dlx paths are removed"
   - "AGENTS.md includes explicit agent instructions for determining supported project types and reporting unsupported types to the operator"
 nonGoals:
@@ -77,6 +77,7 @@ nonGoals:
   - "Removing forge-shell profile — governance-only projects remain supported"
   - "Changing forge-bootstrap skill internals (register selection, auto-doctor, auto-ADR) — only the entry flow changes"
   - "Changing the internal forge.scaffold or forge.init commands — only forge.create orchestration changes"
+  - "Keeping forge create --name X as an undocumented backward-compat path — forward-only ecosystem, old path is removed from code entirely"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec werkstatt run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -116,11 +117,10 @@ The operator's vision is a single, agent-driven installation flow: the operator 
 
 ## Decision
 
-`forge create` gains an `--in-place` flag that scaffolds the project directly in the current working directory instead of creating a subdirectory. When `--in-place` is passed, `--profile` becomes required (no default), `--name` becomes optional (auto-derived from the folder name, converted to kebab-case), and the empty-directory check is replaced by a conflict check that tolerates `package.json`, `node_modules/`, and `pnpm-lock.yaml` but refuses if `forge.yaml` or other scaffold files already exist. The `--in-place` flag is the only documented installation path; global install (`pnpm add -g`), `pnpm dlx`, and `forge create --name X` (subdirectory creation) are removed from the README. The `workshop.scaffold` command (RFC-0779) is removed from the engine. README and AGENTS.md are rewritten to describe the agent-driven flow and include explicit agent instructions for determining supported project types.
+`forge create` gains an `--in-place` flag that scaffolds the project directly in the current working directory instead of creating a subdirectory. `--in-place` is the only mode — the old `--name X` subdirectory-creation path is removed from code entirely (forward-only ecosystem). `--profile` is required (no default), `--name` becomes optional (auto-derived from the folder name, converted to kebab-case), and the empty-directory check is replaced by an allowlist-based conflict check that refuses only forge-specific files (`forge.yaml`, `.agents/`, `docs/`, `skills/`, `AGENTS.md`, `.forge/`) and tolerates everything else (`package.json`, `node_modules/`, `.git/`, `.vscode/`, etc.). Global install (`pnpm add -g`), `pnpm dlx`, and `forge create --name X` (subdirectory creation) are removed from the README and from code. The `workshop.scaffold` command (RFC-0779) is removed from the engine. README and AGENTS.md are rewritten to describe the agent-driven flow and include explicit agent instructions for determining supported project types.
 
 ## Architectural fit
 
-- **DNA-54 (Forge bindings contract)** — the RFC changes how forge is installed and how `forge.yaml` is bootstrapped, but does not change the bindings contract itself. The `forge.yaml` structure remains the same; only the entry path to creating it changes.
 - **DNA-64 (Engine/profile/component-graph boundary)** — the RFC removes `workshop.scaffold` from the engine, consolidating scaffolding into `forge create`. This strengthens the boundary: forge owns project scaffolding, the engine owns lifecycle management. The engine no longer exposes a scaffolding command to consumers.
 - **RFC-0374 (forge extraction)** — forge is a portable, dependency-free package. Adding `--in-place` does not introduce new dependencies. The flag is pure orchestration logic within `create.ts`.
 - **RFC-0547 (barrier-free onboarding)** — superseded. The forge-as-devDependency pattern remains, but the onboarding flow changes from terminal-first to agent-first.
@@ -149,13 +149,13 @@ Flags for `forge create --in-place`:
 
 | Flag | Required | Description |
 | --- | --- | --- |
-| `--in-place` | yes (new) | Scaffold in the current working directory instead of creating a subdirectory |
-| `--profile` | yes (when `--in-place`) | Stack profile id. No default — error if missing, listing all supported profiles |
-| `--name` | no | Project name override. If omitted, derived from `path.basename(cwd)` and converted to kebab-case |
+| `--in-place` | yes | Scaffold in the current working directory. This is the only mode — the flag is mandatory. |
+| `--profile` | yes | Stack profile id. No default — error if missing, listing all supported profiles |
+| `--name` | no | Project name override. If omitted, derived from `path.basename(cwd)` and converted to kebab-case. Note: `--name` is an override for the project name in `forge.yaml`, not a directory name. |
 | `--template` | no | Template id for multi-template profiles (unchanged) |
 | `--package-manager` | no | Package manager (default: pnpm, unchanged) |
 
-Without `--in-place`, `forge create` behavior is unchanged (creates subdirectory, `--name` required, `--profile` defaults to `forge-shell`). This path is not documented in the README but remains functional for backward compatibility.
+Without `--in-place`, `forge create` does not exist — `--in-place` is the only mode. The old `--name X` subdirectory-creation path is removed from code entirely (forward-only ecosystem).
 
 ### TypeScript contracts
 
@@ -174,9 +174,10 @@ interface CreateFlags {
 // 1. targetDir = context.workspaceRoot (not workspaceRoot/name)
 // 2. projectName = flags.name ?? toKebabCase(path.basename(context.workspaceRoot))
 // 3. --profile is required (error if missing)
-// 4. Conflict check replaces empty-dir check:
-//    - Tolerated: package.json, node_modules/, pnpm-lock.yaml, .npmrc
-//    - Refused: forge.yaml, .agents/, docs/, skills/, AGENTS.md, .forge/
+// 4. Conflict check uses allowlist approach:
+//    - Refused files: forge.yaml, .agents/, docs/, skills/, AGENTS.md, .forge/
+//    - Everything else is tolerated (package.json, node_modules/, pnpm-lock.yaml,
+//      .git/, .vscode/, .idea/, .windsurf/, .DS_Store, Thumbs.db, .npmrc, etc.)
 ```
 
 ```ts
@@ -192,16 +193,24 @@ function toKebabCase(input: string): string {
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/src/onboarding/create.ts` | Add `--in-place` flag handling, conflict check, name-from-folder logic |
-| `packages/forge/os/core/core.module.ts` | Register `--in-place` flag on `forge.create` command |
+| `packages/forge/src/onboarding/create.ts` | Add `--in-place` flag handling, conflict check, name-from-folder logic; remove `--name` as positional arg |
+| `packages/forge/os/core/core.module.ts` | Register `--in-place` flag on `forge.create` command; remove `--name` flag |
 | `packages/forge/README.md` | Rewrite installation guide for agent-driven flow |
 | `packages/forge/skills/meta/forge-bootstrap/SKILL.md` | Update entry flow description (agent-driven, not terminal-driven) |
 | `packages/werkstatt/src/workshop/workshop-scaffold.ts` | Delete |
 | `packages/werkstatt/src/workshop/workshop.module.ts` | Delete (removes `workshop.scaffold` command registration) |
 | `packages/werkstatt/src/workshop/templates.ts` | Delete |
 | `packages/werkstatt/src/workshop/workshop-scaffold.test.ts` | Delete |
-| `AGENTS.md` (root) | Add agent instructions for installation flow and unsupported-type handling |
-| `packages/forge/src/tests/create.test.ts` | Add tests for `--in-place` flag |
+| `packages/werkstatt/src/workshop/index.ts` | Delete (barrel re-export for workshop module) |
+| `packages/werkstatt/package.json` | Remove `./workshop` and `./workshop-module` from `exports` field |
+| `packages/werkstatt/AGENTS.md` | Remove `@warpgogol/werkstatt/workshop` and `@warpgogol/werkstatt/workshop-module` from entry points table |
+| `tools/kernel.config.ts` | Remove `workshop` module loader entry |
+| `AGENTS.md` (root) | Replace `workshop.scaffold` reference (line 12) with `forge create --in-place` instructions; add agent installation flow section |
+| `docs/authoring/site-composition.md` | Remove `workshop.scaffold` reference |
+| `docs/COMMANDS.md` | Regenerate (remove `workshop.scaffold` entry) |
+| `docs/command-manifest.generated.yaml` | Regenerate (remove `workshop.scaffold` entry) |
+| `docs/ecosystem.generated.yaml` | Regenerate (remove `workshop.scaffold` entry) |
+| `packages/forge/src/tests/create.test.ts` | Add tests for `--in-place` flag; remove tests for `--name` positional mode |
 
 ### Output format
 
@@ -248,10 +257,14 @@ Error when conflicting files exist:
 | --- | --- |
 | `--in-place` without `--profile` | Fail with error listing all supported profiles |
 | `forge.yaml` already exists in cwd | Fail — refuse to overwrite existing Forge project |
-| Conflicting files exist (`.agents/`, `docs/`, `skills/`, `AGENTS.md`) | Fail with list of conflicting files |
+| Conflicting files exist (`.agents/`, `docs/`, `skills/`, `AGENTS.md`, `.forge/`) | Fail with list of conflicting files |
 | `package.json` exists (from `pnpm add -D`) | Tolerated — forge create merges/overwrites with forge project package.json |
 | `node_modules/` exists | Tolerated — ignored |
 | `pnpm-lock.yaml` exists | Tolerated — ignored |
+| `.git/` exists (operator ran `git init`) | Tolerated — ignored |
+| `.vscode/`, `.idea/`, `.windsurf/` exists (IDE-created) | Tolerated — ignored |
+| `.DS_Store`, `Thumbs.db`, `desktop.ini` exists (OS-created) | Tolerated — ignored |
+| `--name` flag passed | Accepted as project name override (used in `forge.yaml` only, not as directory name) |
 | Folder name is not kebab-case | Auto-converted to kebab-case for project name |
 | Folder name is empty or only non-alphanumeric | Fail — cannot derive project name |
 
@@ -311,13 +324,14 @@ The `forge-bootstrap` skill (`packages/forge/skills/meta/forge-bootstrap/SKILL.m
 
 ## Rollout
 
-- **Major version bump** — `@warpgogol/forge` 2.0.0 and `@warpgogol/werkstatt` next major. The `--in-place` flag, `--profile` requirement, and `workshop.scaffold` removal are breaking changes.
+- **Major version bump** — `@warpgogol/forge` 2.0.0 and `@warpgogol/werkstatt` next major. The `--in-place` flag, `--profile` requirement, `workshop.scaffold` removal, and `--name` path removal are breaking changes.
 - **New projects** — all new projects use `forge create --in-place` from day one. The README describes only this path.
 - **Existing projects** — unaffected. They already have `forge.yaml`, skills, and AGENTS.md. `forge upgrade` continues to work. The removal of `workshop.scaffold` does not affect existing workshops.
-- **Backward compatibility** — `forge create --name X` (without `--in-place`) remains functional but undocumented. It is not removed from code, only from the README. This provides a safety net for automated scripts that may still use the old path.
+- **No backward compatibility** — `forge create --name X` (without `--in-place`) is removed from code entirely. The ecosystem is forward-only; no undocumented paths or dual-mode behavior is maintained.
 - **Migration** — no migration needed. Existing projects do not need to change anything. The `forge upgrade` command continues to sync skills and binding defaults.
 - **README** — rewritten in the same commit as the code changes. The npm README is the primary discovery surface for agents.
 - **AGENTS.md** — updated in the same commit. Agents read AGENTS.md at session start and follow the new installation instructions.
+- **Generated files** — `docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, `docs/ecosystem.generated.yaml` are regenerated to remove `workshop.scaffold` entries.
 
 ## Alternatives considered
 
@@ -333,7 +347,7 @@ The `forge-bootstrap` skill (`packages/forge/skills/meta/forge-bootstrap/SKILL.m
 
 ## Risks
 
-- **Breaking change for existing users** — `forge create --name X` is removed from documentation and `workshop.scaffold` is deleted from the engine. Users with automated scripts that call these commands will break. Mitigation: `forge create --name X` remains functional (undocumented), and `workshop.scaffold` is an internal command not used by consumers.
+- **Breaking change for existing users** — `forge create --name X` is removed from code and `workshop.scaffold` is deleted from the engine. Users with automated scripts that call these commands will break. Mitigation: major version bump signals the breaking change; migration is straightforward (use `forge create --in-place --profile <id>` instead of `forge create --name X --profile <id>`).
 
 - **Agent misinterprets unsupported project types** — if the operator describes a project type that maps partially to a supported profile (e.g. "Unity game" → agent might try `godot-csharp`), the agent might scaffold the wrong profile. Mitigation: AGENTS.md instructions explicitly tell the agent to check the supported profiles table and report unsupported types to the operator.
 
@@ -348,13 +362,16 @@ The `forge-bootstrap` skill (`packages/forge/skills/meta/forge-bootstrap/SKILL.m
 - [ ] `forge create --in-place --profile <id>` scaffolds a project in the current directory without creating a subdirectory (evidence: `packages/forge/src/tests/create.test.ts`, `--in-place` test cases)
 - [ ] `--profile` is required with `--in-place`; missing `--profile` produces an error listing all supported profiles (evidence: `packages/forge/src/tests/create.test.ts`, missing-profile test)
 - [ ] Project name is auto-derived from `path.basename(cwd)` and converted to kebab-case when `--name` is not provided (evidence: `packages/forge/src/tests/create.test.ts`, name-derivation test)
-- [ ] `--in-place` tolerates `package.json`, `node_modules/`, `pnpm-lock.yaml` but refuses if `forge.yaml` or conflicting scaffold files exist (evidence: `packages/forge/src/tests/create.test.ts`, conflict-check tests)
-- [ ] `workshop.scaffold` command and its module files are deleted from `packages/werkstatt/` (evidence: `git log --diff-filter=D -- packages/werkstatt/src/workshop/`)
+- [ ] `--in-place` tolerates `package.json`, `node_modules/`, `pnpm-lock.yaml`, `.git/`, `.vscode/` but refuses if `forge.yaml` or conflicting scaffold files exist (evidence: `packages/forge/src/tests/create.test.ts`, conflict-check tests)
+- [ ] `--name` flag is accepted as project name override (used in `forge.yaml` only, not as directory name) (evidence: `packages/forge/src/tests/create.test.ts`, `--name` override test)
+- [ ] `workshop.scaffold` command, its module files, barrel `index.ts`, and package `exports` entries are deleted from `packages/werkstatt/` (evidence: `git log --diff-filter=D -- packages/werkstatt/src/workshop/`)
 - [ ] `workshop` module removed from `tools/kernel.config.ts` (evidence: `tools/kernel.config.ts` no longer imports workshop module)
+- [ ] `packages/werkstatt/AGENTS.md` entry points table no longer lists `@warpgogol/werkstatt/workshop` or `@warpgogol/werkstatt/workshop-module` (evidence: `packages/werkstatt/AGENTS.md`)
 - [ ] README rewritten to describe only the agent-driven in-place flow (evidence: `packages/forge/README.md`, no global install or `pnpm dlx` instructions)
 - [ ] AGENTS.md includes explicit agent instructions for installation flow and unsupported-type handling (evidence: `AGENTS.md`, new "Installation flow" section)
+- [ ] Root `AGENTS.md` line 12 no longer references `workshop.scaffold` (evidence: `AGENTS.md`)
 - [ ] `forge-bootstrap` skill updated for agent-driven entry (evidence: `packages/forge/skills/meta/forge-bootstrap/SKILL.md`)
-- [ ] `forge create --name X` (without `--in-place`) remains functional for backward compatibility (evidence: `packages/forge/src/tests/create.test.ts`, existing `--name` tests still pass)
+- [ ] Generated files regenerated without `workshop.scaffold` entries (evidence: `docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, `docs/ecosystem.generated.yaml`)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -363,9 +380,10 @@ The `forge-bootstrap` skill (`packages/forge/skills/meta/forge-bootstrap/SKILL.m
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0877 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- Agents MUST delete all `workshop.scaffold` files in a single commit — leaving partial files causes import errors in the engine.
-- Agents MUST update `tools/kernel.config.ts` in the same commit as the file deletions — the kernel config references the workshop module.
+- Agents MUST delete all `workshop.scaffold` files (including `index.ts`) in a single commit — leaving partial files causes import errors in the engine.
+- Agents MUST update `tools/kernel.config.ts` and `packages/werkstatt/package.json` `exports` in the same commit as the file deletions — both reference the workshop module.
 - Agents MUST run `pnpm run build:check` on both `packages/forge` and `packages/werkstatt` after changes to verify no broken imports.
 - Agents MUST update the synced `.agents/skills/forge-bootstrap/SKILL.md` copy when editing `packages/forge/skills/meta/forge-bootstrap/SKILL.md` — `forge create` is not run automatically after manual edits.
-- Agents MUST NOT remove `forge create --name X` (without `--in-place`) from code — only from documentation. The undocumented path remains as backward compatibility.
+- Agents MUST remove the `forge create --name X` subdirectory-creation mode from code entirely — `--in-place` is the only mode. `--name` remains as a project name override only. The ecosystem is forward-only, no undocumented dual-mode behavior is maintained.
+- Agents MUST regenerate `docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, and `docs/ecosystem.generated.yaml` after removing `workshop.scaffold` — generated files must not retain stale command entries.
 - Agents MUST install engine and stack plugin packages manually after `forge create --in-place` — the command does not auto-install dependencies.
