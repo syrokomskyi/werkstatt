@@ -54,12 +54,19 @@ const GAME_CSPROJ = `<Project Sdk="Godot.NET.Sdk">
 </Project>
 `;
 
-const MAIN_TSCN = `[gd_scene load_steps=1 format=3 uid="uid://main_scene"]
+const MAIN_TSCN = `[gd_scene load_steps=2 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_script"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_script")
+
+[node name="HelloLabel" type="Label" parent="."]
+offset_left = 200.0
+offset_top = 200.0
+offset_right = 600.0
+offset_bottom = 300.0
+text = "__PROJECT_NAME__"
 `;
 
 const MAIN_CS = `using Godot;
@@ -121,7 +128,7 @@ export async function scaffoldGodotProject(ctx: PluginHookContext): Promise<Hook
 
     await writeFileIfChanged(join(projectPath, "project.godot"), PROJECT_GODOT.replace(/__PROJECT_NAME__/g, projectId));
     await writeFileIfChanged(join(projectPath, "Game.csproj"), GAME_CSPROJ);
-    await writeFileIfChanged(join(projectPath, "Scenes", "Main.tscn"), MAIN_TSCN);
+    await writeFileIfChanged(join(projectPath, "Scenes", "Main.tscn"), MAIN_TSCN.replace(/__PROJECT_NAME__/g, projectId));
     await writeFileIfChanged(join(projectPath, "Scripts", "Main.cs"), MAIN_CS.replace(/__PROJECT_NAME__/g, safeName));
     await writeFileIfChanged(join(projectPath, ".gitignore"), GITIGNORE);
     await writeFileIfChanged(join(projectPath, "icon.svg"), ICON_SVG);
