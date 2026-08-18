@@ -1,7 +1,7 @@
 ---
 id: RFC-0873
 title: "Add generic Nachweis technical-assessment ingest and immutable observation history"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
-implementedAt:
+implementedAt: 2026-08-18
 closedAt:
 supersedes: []
 supersededBy:
@@ -26,9 +26,9 @@ related:
 satisfies: []
 versionBump: minor
 commands:
-  proposed:
+  proposed: []
+  added:
     - nachweis.assessment.ingest
-  added: []
   changed: []
   removed: []
 appsImpacted:
@@ -421,14 +421,14 @@ export interface AssessmentIngestResult {
 
 ## Acceptance criteria
 
-- [ ] Valid bundle dry-run performs no remote/file state mutation.
-- [ ] Valid bundle ingest produces verified hashes, R2 objects, PBP source and Bordbuch event.
-- [ ] Same ingest is idempotent.
-- [ ] Same observation ID with changed content fails.
-- [ ] New observation in same series preserves old artifacts and records.
-- [ ] Path traversal and symlink escape fail.
-- [ ] Missing canonical raw artifact fails.
-- [ ] No credentials appear in JSON result, PBP or Bordbuch.
-- [ ] Command supports `--json`.
-- [ ] Command is entitlement-gated exactly like existing Nachweis commands.
-- [ ] `nachweis.validate` passes the captured draft record but `nachweis.publish` still fails until N3/approval gates are completed.
+- [x] Valid bundle dry-run performs no remote/file state mutation. (evidence: nachweis-assessment-ingest.test.ts "dry-run performs no remote/file state mutation")
+- [x] Valid bundle ingest produces verified hashes, R2 objects, PBP source and Bordbuch event. (evidence: nachweis-assessment-ingest.test.ts "valid bundle ingest produces hashes, R2 objects, PBP source, Bordbuch event")
+- [x] Same ingest is idempotent. (evidence: nachweis-assessment-ingest.test.ts "same ingest is idempotent")
+- [x] Same observation ID with changed content fails. (evidence: nachweis-assessment-ingest.test.ts "same observation ID with changed content fails")
+- [x] New observation in same series preserves old artifacts and records. (evidence: nachweis-assessment-ingest.test.ts "new observation in same series preserves old artifacts")
+- [x] Path traversal and symlink escape fail. (evidence: nachweis-assessment-ingest.test.ts "path traversal in slug fails" + "artifact path escape fails")
+- [x] Missing canonical raw artifact fails. (evidence: nachweis-assessment-ingest.test.ts "missing canonical raw artifact fails")
+- [x] No credentials appear in JSON result, PBP or Bordbuch. (evidence: nachweis-assessment-ingest.test.ts "no credentials appear in JSON result, PBP, or Bordbuch")
+- [x] Command supports `--json`. (evidence: nachweis.module.ts flag "json: { kind: boolean }")
+- [x] Command is entitlement-gated exactly like existing Nachweis commands. (evidence: nachweis-assessment-ingest.test.ts "skips when nachweis entitlement is not resolved")
+- [x] `nachweis.validate` passes the captured draft record but `nachweis.publish` still fails until N3/approval gates are completed. (evidence: nachweis-assessment-ingest.ts writes valid PBP evidence-source with kind=technical-assessment, nachweis-validate.ts enforces gate V2 via evaluateGateV2 from RFC-0872)
