@@ -339,16 +339,21 @@ async function pollForResult(
     }
 
     const responseText = await response.text();
-    const parsed = JSON.parse(responseText) as CloudflareScanResultResponse;
+    const rawParsed = JSON.parse(responseText) as {
+      result?: CloudflareScanResultResponse;
+    } & CloudflareScanResultResponse;
+    // Cloudflare API v4 wraps payload under `result` — unwrap if present
+    const parsed = (rawParsed.result ?? rawParsed) as CloudflareScanResultResponse;
 
     const taskStatus = parsed.task?.status;
+    const taskStatusLower = taskStatus?.toLowerCase();
     const taskSuccess = parsed.task?.success;
 
-    if (taskStatus === "finished" && taskSuccess === false) {
+    if (taskStatusLower === "finished" && taskSuccess === false) {
       throw new ScanFailedError(`Provider reported task.success=false for scan ${scanId}`);
     }
 
-    if (taskStatus === "finished" && taskSuccess === true) {
+    if (taskStatusLower === "finished" && taskSuccess === true) {
       return { rawResponse: responseText, parsed };
     }
 
@@ -690,10 +695,10 @@ export async function runNachweisCloudflareAgentReadinessMeasure(
     const parserMetadata = {
       parserVersion: "cf-ar-01",
       fieldPaths: {
-        overall: "result.agentReadiness.overall",
-        levelName: "result.agentReadiness.levelName",
-        checks: "result.agentReadiness.checks.<dimensionId>.status",
-        checkDetails: "result.agentReadiness.checks.<dimensionId>.details",
+        overall: "result.meta.processors.agentReadiness.level",
+        levelName: "result.meta.processors.agentReadiness.levelName",
+        checks: "result.meta.processors.agentReadiness.checks.<dimensionId>.status",
+        checkDetails: "result.meta.processors.agentReadiness.checks.<dimensionId>.details",
       },
       parsedAt: new Date().toISOString(),
     };
