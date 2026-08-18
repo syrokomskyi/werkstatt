@@ -28,6 +28,7 @@
   <item>RFC-0797: replace dirty workpiece guard with commitWorkpieceIfDirty auto-commit; add pre-mirror-check sternsystem.sync inside lock with --skip-auto-sync flag.</item>
   <item>RFC-0820: add zero operator commit guard — block close when no commits since materialization; add --allow-no-op override flag.</item>
   <item>RFC-0822: persist .env* files to cache clone as final close step.</item>
+  <item>RFC-0878: write .closed sentinel file to workpiece as final step before returning.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -884,6 +885,17 @@ export async function runMissionClose(
     } catch (err) {
       logger.info(
         `  Warning: failed to write materialization state or copy .cache/: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    // RFC-0878: Write .closed sentinel file to workpiece as final step.
+    // The workpiece pre-commit hook checks this file and refuses all commits
+    // (including MISSION_GIT_COMMIT=1 bypass) when it exists.
+    try {
+      await fs.writeFile(path.join(workpieceDir, ".closed"), `${now}\n`);
+    } catch (sentinelErr) {
+      logger.warn(
+        `  Warning: failed to write .closed sentinel to workpiece: ${sentinelErr instanceof Error ? sentinelErr.message : String(sentinelErr)}`,
       );
     }
 

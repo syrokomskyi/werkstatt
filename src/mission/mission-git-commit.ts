@@ -16,6 +16,7 @@
   <item>RFC-0644: add commitWorkpieceIfDirty helper for auto-committing dirty workpiece before mission.reconcile.</item>
   <item>RFC-0797: add commitCacheCloneIfDirty helper for auto-committing all dirty files in cache clone before reconcile dirty guard.</item>
   <item>RFC-0820: add noChanges field to MissionGitCommitData and prominent stderr warning when no changes to commit.</item>
+  <item>RFC-0878: add .closed sentinel check to commitWorkpieceIfDirty — refuse to commit closed workpieces (defence-in-depth, since --no-verify bypasses the hook).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -317,6 +318,13 @@ export function commitWorkpieceIfDirty(
   workpieceDir: string,
   missionId: string,
 ): WorkpieceCommitResult {
+  // RFC-0878: Defence-in-depth — refuse to commit if .closed sentinel exists.
+  // commitDirIfDirty uses --no-verify which bypasses the pre-commit hook.
+  if (existsSync(path.join(workpieceDir, ".closed"))) {
+    throw new Error(
+      `[commitWorkpieceIfDirty] workpiece is closed (RFC-0878) — mission '${missionId}' has a .closed sentinel file. No commits are allowed in a closed workpiece.`,
+    );
+  }
   return commitDirIfDirty(workpieceDir, `workpiece: auto-commit before reconcile ${missionId}`);
 }
 
