@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Initial tests for csproj validator — passing, failing, and missing cases.</item>
   <item>Fix: update test message expectation for net8.0+ flexible check, add net9.0 passing test.</item>
+  <item>Add Directory.Build.props property merging tests — verifies properties in Directory.Build.props are recognized by the validator.</item>
 </CHANGE_SUMMARY>
 */
 

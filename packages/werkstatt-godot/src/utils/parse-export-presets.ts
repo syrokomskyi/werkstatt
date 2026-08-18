@@ -13,6 +13,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial export presets parser — extracted from dotnet-build.ts and itch-io.ts to remove duplication.</item>
+  <item>Fix: change [preset_N] to [preset.N] (Godot 4.x dot notation) — pre-existing regex bug exposed by scaffolded export_presets.cfg.</item>
 </CHANGE_SUMMARY>
 */
 

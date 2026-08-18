@@ -1,3 +1,16 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Unit tests for export-presets-validate.ts (GODOT-09).</purpose>
+<keywords>tests, export, presets, validator, godot</keywords>
+<non-goals>
+  <item>Does not test the build hook or deploy adapter — only the validator.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Initial tests for export presets validator — covers Godot 4.x [preset.N] format, missing file, empty/absolute paths, unknown platform, multiple presets.</item>
+</CHANGE_SUMMARY>
+*/
+
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
