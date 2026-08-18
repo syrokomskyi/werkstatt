@@ -1,7 +1,7 @@
 ---
 id: RFC-0872
 title: "Add technical-assessment PBP contract and policy-driven Nachweis publication gates"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
