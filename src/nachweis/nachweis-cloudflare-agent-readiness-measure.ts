@@ -306,9 +306,14 @@ async function pollForResult(
 ): Promise<PollResult> {
   const endpoint = makeResultEndpoint(accountId, scanId);
   const startTime = Date.now();
+  const pollIntervalRaw = Number(process.env.CLOUDFLARE_AR_POLL_INTERVAL_MS);
   const pollIntervalMs =
-    Number(process.env.CLOUDFLARE_AR_POLL_INTERVAL_MS) || DEFAULT_POLL_INTERVAL_MS;
-  const maxElapsedMs = Number(process.env.CLOUDFLARE_AR_MAX_ELAPSED_MS) || DEFAULT_MAX_ELAPSED_MS;
+    Number.isFinite(pollIntervalRaw) && pollIntervalRaw > 0
+      ? pollIntervalRaw
+      : DEFAULT_POLL_INTERVAL_MS;
+  const maxElapsedRaw = Number(process.env.CLOUDFLARE_AR_MAX_ELAPSED_MS);
+  const maxElapsedMs =
+    Number.isFinite(maxElapsedRaw) && maxElapsedRaw > 0 ? maxElapsedRaw : DEFAULT_MAX_ELAPSED_MS;
 
   for (;;) {
     const elapsed = Date.now() - startTime;
