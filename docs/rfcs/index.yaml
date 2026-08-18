@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-18
-count: 858
+count: 860
 entries:
   - id: ""
     title: ""
@@ -13749,7 +13749,8 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0872
     related:
       - ADR-0028
       - RFC-0398
@@ -13773,6 +13774,8 @@ entries:
     amendedBy:
       - RFC-0713
       - RFC-0714
+      - RFC-0872
+      - RFC-0873
     related:
       - ADR-0028
       - RFC-0706
@@ -13891,7 +13894,8 @@ entries:
     supersededBy: ""
     amends:
       - RFC-0707
-    amendedBy: []
+    amendedBy:
+      - RFC-0872
     related:
       - RFC-0707
       - RFC-0706
@@ -16767,10 +16771,10 @@ entries:
   - id: RFC-0872
     title: Add technical-assessment PBP contract and policy-driven Nachweis
       publication gates
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-18
-    implementedAt: ""
+    implementedAt: 2026-08-18
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16783,14 +16787,14 @@ entries:
       - ADR-0028
       - ADR-0054
       - RFC-0715
-    file: docs/rfcs/rfc-0872-add-technical-assessment-pbp-contract-and-policy-driven-nachweis-publication-gates.md
+    file: docs/rfcs/archive/implemented/rfc-0872-add-technical-assessment-pbp-contract-and-policy-driven-nachweis-publication-gates.md
   - id: RFC-0873
     title: Add generic Nachweis technical-assessment ingest and immutable
       observation history
-    status: draft
+    status: implemented
     kind: command
     createdAt: 2026-08-18
-    implementedAt: ""
+    implementedAt: 2026-08-18
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16802,7 +16806,7 @@ entries:
       - RFC-0872
       - RFC-0713
       - RFC-0715
-    file: docs/rfcs/rfc-0873-add-generic-nachweis-technical-assessment-ingest-and-immutable-observation-history.md
+    file: docs/rfcs/archive/implemented/rfc-0873-add-generic-nachweis-technical-assessment-ingest-and-immutable-observation-history.md
   - id: RFC-0874
     title: Add reproducible Google Lighthouse assessment adapter for Nachweisregister
     status: draft
@@ -16860,3 +16864,44 @@ entries:
       - RFC-0874
       - RFC-0875
     file: docs/rfcs/rfc-0876-add-technical-nachweis-ui-observation-history-and-warpgogol-lighthouse-cloudflare-pilot.md
+  - id: RFC-0877
+    title: In-place agent-driven installation flow
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-18
+    implementedAt: 2026-08-18
+    closedAt: ""
+    supersedes:
+      - RFC-0544
+      - RFC-0779
+      - RFC-0547
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0374
+      - RFC-0392
+      - RFC-0542
+      - RFC-0543
+      - RFC-0545
+      - RFC-0546
+      - RFC-0548
+      - RFC-0640
+      - RFC-0643
+      - RFC-0769
+      - RFC-0770
+      - RFC-0868
+    file: docs/rfcs/archive/implemented/rfc-0877-in-place-agent-driven-installation-flow.md
+  - id: RFC-0878
+    title: Require explicit --bump major for platform major version bumps
+    status: accepted
+    kind: command
+    createdAt: 2026-08-18
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related: []
+    file: docs/rfcs/rfc-0878-require-explicit-bump-major-for-platform-major-version-bumps.md
