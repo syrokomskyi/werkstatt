@@ -1,8 +1,8 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  Styles for NachweisCard (Praxidike). Uses --ds-* tokens only.
-  RFC-0708 / DNA-10 / WCAG 2.2 AA.
+  Styles for NachweisCard (Nix). Uses --ds-* tokens only.
+  RFC-0708 / RFC-0876 / DNA-10 / WCAG 2.2 AA.
 </purpose>
 <non-goals>
   <item>Does not define layout for the list wrapper — that belongs to nachweis-list.</item>
@@ -10,6 +10,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
+  <item>RFC-0876: add technical-assessment variant styles.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -125,4 +126,150 @@
 .nachweis-card:focus-visible {
   outline: 2px solid var(--ds-color-accent-focus);
   outline-offset: 2px;
+}
+
+/* Technical-assessment variant — RFC-0876 */
+
+.nachweis-card--technical {
+  background: var(--ds-color-surface-elevated);
+  border-color: var(--ds-color-border);
+}
+
+.nachweis-card--technical .nachweis-card__title {
+  font-size: var(--ds-font-size-lg);
+}
+
+.nachweis-card__meta {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-4);
+}
+
+.nachweis-card__meta .nachweis-card__entry dt {
+  font-weight: 600;
+  font-size: var(--ds-text-xs);
+  color: var(--ds-color-text-quiet);
+  margin-bottom: 0;
+}
+
+.nachweis-card__meta .nachweis-card__entry dd {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-color-text-primary);
+  margin: 0;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.nachweis-card__overall {
+  font-size: var(--ds-text-2);
+  color: var(--ds-color-text-primary);
+  margin: 0 0 var(--ds-space-4);
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+}
+
+.nachweis-card__score {
+  font-size: var(--ds-font-size-xl);
+  font-weight: 700;
+  color: var(--ds-color-text-primary);
+}
+
+.nachweis-card__level {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-color-text-secondary);
+}
+
+.nachweis-card__dimensions {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-4);
+}
+
+.nachweis-card__dimension {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--ds-space-2) 0;
+  border-bottom: 1px solid var(--ds-color-border);
+}
+
+.nachweis-card__dimension:last-child {
+  border-bottom: none;
+}
+
+.nachweis-card__dimension dt {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-color-text-secondary);
+  font-weight: 500;
+}
+
+.nachweis-card__dimension dd {
+  margin: 0;
+  font-size: var(--ds-text-sm);
+  color: var(--ds-color-text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+}
+
+.nachweis-card__dimension-score {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.nachweis-card__dimension-status {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-color-text-quiet);
+}
+
+.nachweis-card__dimension[data-status="pass"] .nachweis-card__dimension-status {
+  color: var(--ds-color-success);
+}
+
+.nachweis-card__dimension[data-status="fail"] .nachweis-card__dimension-status {
+  color: var(--ds-color-danger);
+}
+
+.nachweis-card__dimension[data-status="not-checked"] .nachweis-card__dimension-status {
+  color: var(--ds-color-text-quiet);
+}
+
+.nachweis-card__limitation {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-color-text-secondary);
+  margin: 0 0 var(--ds-space-3);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.nachweis-card__hashes {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-color-text-quiet);
+  margin: 0 0 var(--ds-space-3);
+}
+
+.nachweis-card__hash-summary {
+  font-family: ui-monospace, monospace;
+  background: var(--ds-color-surface-elevated);
+  padding: 0.125em 0.375em;
+  border-radius: var(--ds-radius-sm);
+}
+
+/* Compact variant — RFC-0876 */
+.nachweis-card--compact {
+  padding: var(--ds-space-4);
+}
+
+.nachweis-card--compact .nachweis-card__title {
+  font-size: var(--ds-font-size-md);
+  margin-bottom: var(--ds-space-2);
+}
+
+.nachweis-card--compact .nachweis-card__meta {
+  margin-bottom: var(--ds-space-2);
+}
+
+.nachweis-card--compact .nachweis-card__dimensions {
+  margin-bottom: var(--ds-space-2);
 }

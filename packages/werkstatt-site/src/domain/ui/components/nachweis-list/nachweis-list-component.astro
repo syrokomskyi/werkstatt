@@ -4,7 +4,8 @@
 <purpose>
   NachweisList (Hydra) — List of nachweis-card components for the Nachweis
   index page. Renders published records only. Shows an empty state message
-  when no published records exist. RFC-0708.
+  when no published records exist. Supports registry and compact variants,
+  kind filtering, and limit. RFC-0708 / RFC-0876.
 </purpose>
 <non-goals>
   <item>Does not fetch data — receives records via props from the page block.</item>
@@ -13,20 +14,24 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
+  <item>RFC-0876: add variant, kindFilter, limit props; compact rendering path.</item>
 </CHANGE_SUMMARY>
 */
 
 /**
  * NachweisList (Hydra) — trust list component
- * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
+ * RFC-0708 / RFC-0876 / DNA-17 / DNA-23 / WCAG 2.2 AA
  */
 
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
 import { cast } from "@warpgogol/werkstatt-site/share";
-import NachweisCard from "../nachweis-card/nachweis-card-component.astro";
+import NachweisCard, {
+  type NachweisAssessmentDimension,
+} from "../nachweis-card/nachweis-card-component.astro";
 import "./nachweis-list-component.css";
 
-interface NachweisRecord {
+interface NachweisAttestationRecord {
+  variant: "attestation";
   slug: string;
   title: string;
   result: string;
@@ -43,18 +48,60 @@ interface NachweisRecord {
   verifiedDate?: string;
 }
 
+interface NachweisTechnicalAssessmentRecord {
+  variant: "technical-assessment";
+  slug: string;
+  title: string;
+  provider: { id: string; name: string };
+  tool: { name: string; version?: string };
+  executionMode: "operator-run" | "provider-run";
+  subjectUrl: string;
+  observedAt: string;
+  methodology: {
+    id: string;
+    version: string;
+    runCount: number;
+    aggregation: "provider" | "median" | "none";
+  };
+  overall?: { score?: number; level?: string };
+  dimensions: NachweisAssessmentDimension[];
+  verificationLevel: "N0" | "N1" | "N2" | "N3";
+  sourceHashes: string[];
+  limitation: string;
+  status?: "draft" | "preview" | "published" | "withdrawn";
+}
+
+type NachweisRecord = NachweisAttestationRecord | NachweisTechnicalAssessmentRecord;
+
 interface NachweisListContent {
   records?: NachweisRecord[];
   emptyMessage?: string;
+  variant?: "registry" | "compact";
+  kindFilter?: Array<"attestation" | "technical-assessment">;
+  limit?: number;
 }
 
 const { pageOverride } = Astro.props as SectionProps;
 const props = cast<NachweisListContent>(pageOverride);
-const records = props.records ?? [];
+const allRecords = props.records ?? [];
 const emptyMessage = props.emptyMessage ?? "Weitere Nachweise werden derzeit vorbereitet.";
+const listVariant = props.variant ?? "registry";
+const kindFilter = props.kindFilter;
+const limit = props.limit;
+
+let records = allRecords;
+if (kindFilter && kindFilter.length > 0) {
+  records = records.filter((r) => kindFilter.includes(r.variant));
+}
+if (limit !== undefined && limit > 0) {
+  records = records.slice(0, limit);
+}
 ---
 
-<section class="nachweis-list" data-component="nachweis-list">
+<section
+  class:list={["nachweis-list", `nachweis-list--${listVariant}`]}
+  data-component="nachweis-list"
+>
   {
     records.length === 0 ? (
       <p class="nachweis-list__empty">{emptyMessage}</p>
@@ -62,7 +109,7 @@ const emptyMessage = props.emptyMessage ?? "Weitere Nachweise werden derzeit vor
       <ul class="nachweis-list__items" role="list">
         {records.map((record) => (
           <li class="nachweis-list__item">
-            <NachweisCard {...record} />
+            <NachweisCard {...record} compact={listVariant === "compact"} />
           </li>
         ))}
       </ul>

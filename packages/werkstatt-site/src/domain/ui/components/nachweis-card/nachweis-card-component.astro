@@ -2,29 +2,42 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  NachweisCard (Nix) — Semantic article displaying a Nachweis record:
-  result/scope, context/limitations, quote, source, what was verified, what
-  was not verified, and status. RFC-0708.
+  NachweisCard (Nix) — Semantic article displaying a Nachweis record.
+  Discriminated union: attestation variant (RFC-0708) and technical-assessment
+  variant (RFC-0876). The variant field is the discriminant.
 </purpose>
 <non-goals>
   <item>Does not fetch data — receives all data via props from the page block.</item>
   <item>Does not handle routing or navigation.</item>
   <item>Does not render the Sichtpass section — use nachweis-detail for that.</item>
+  <item>Does not render observation history — use nachweis-detail for that.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
+  <item>RFC-0876: add discriminated union with technical-assessment variant.</item>
 </CHANGE_SUMMARY>
 */
 
 /**
  * NachweisCard (Nix) — trust card component
- * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
+ * RFC-0708 / RFC-0876 / DNA-17 / DNA-23 / WCAG 2.2 AA
  */
 
 import "./nachweis-card-component.css";
 
-interface Props {
+export interface NachweisAssessmentDimension {
+  id: string;
+  providerLabel: string;
+  score?: number;
+  numerator?: number;
+  denominator?: number;
+  status?: "pass" | "fail" | "not-checked";
+  level?: string;
+}
+
+interface NachweisAttestationCardProps {
+  variant: "attestation";
   slug: string;
   title: string;
   result: string;
@@ -41,102 +54,255 @@ interface Props {
   verifiedDate?: string;
 }
 
-const {
-  slug,
-  title,
-  result,
-  scope,
-  context,
-  limitations,
-  quote,
-  quoteLang,
-  source,
-  verifiedScope,
-  notVerifiedScope,
-  status,
-  verifiedByLabel,
-  verifiedDate,
-} = Astro.props;
+interface NachweisTechnicalAssessmentCardProps {
+  variant: "technical-assessment";
+  slug: string;
+  title: string;
+  provider: { id: string; name: string };
+  tool: { name: string; version?: string };
+  executionMode: "operator-run" | "provider-run";
+  subjectUrl: string;
+  observedAt: string;
+  methodology: {
+    id: string;
+    version: string;
+    runCount: number;
+    aggregation: "provider" | "median" | "none";
+  };
+  overall?: { score?: number; level?: string };
+  dimensions: NachweisAssessmentDimension[];
+  verificationLevel: "N0" | "N1" | "N2" | "N3";
+  sourceHashes: string[];
+  limitation: string;
+  status?: "draft" | "preview" | "published" | "withdrawn";
+  compact?: boolean;
+}
 
-const headingId = `nachweis-card-${slug}-title`;
+type NachweisCardProps = NachweisAttestationCardProps | NachweisTechnicalAssessmentCardProps;
+
+const props = Astro.props as NachweisCardProps;
+
+const headingId = `nachweis-card-${props.slug}-title`;
+
+function formatDate(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString("de-DE", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return iso;
+  }
+}
 ---
 
-<article class="nachweis-card" data-component="nachweis-card" aria-labelledby={headingId}>
-  <h2 id={headingId} class="nachweis-card__title">{title}</h2>
+{
+  props.variant === "attestation" && (
+    <article
+      class="nachweis-card"
+      data-component="nachweis-card"
+      data-variant="attestation"
+      aria-labelledby={headingId}
+    >
+      <h2 id={headingId} class="nachweis-card__title">
+        {props.title}
+      </h2>
 
-  <p class="nachweis-card__result">{result}</p>
+      <p class="nachweis-card__result">{props.result}</p>
 
-  {
-    scope && (
-      <p class="nachweis-card__scope">
-        <span class="nachweis-card__label">Geltungsbereich:</span>
-        {scope}
+      {props.scope && (
+        <p class="nachweis-card__scope">
+          <span class="nachweis-card__label">Geltungsbereich:</span>
+          {props.scope}
+        </p>
+      )}
+
+      {props.context && <p class="nachweis-card__context">{props.context}</p>}
+
+      {props.limitations && (
+        <p class="nachweis-card__limitations">
+          <span class="nachweis-card__label">Einschränkungen:</span>
+          {props.limitations}
+        </p>
+      )}
+
+      {props.quote && (
+        <blockquote class="nachweis-card__quote" cite={props.source} lang={props.quoteLang}>
+          {props.quote}
+        </blockquote>
+      )}
+
+      {props.source && (
+        <p class="nachweis-card__source">
+          <span class="nachweis-card__label">Quelle:</span>
+          <cite>{props.source}</cite>
+        </p>
+      )}
+
+      <dl class="nachweis-card__verification">
+        {props.verifiedScope && (
+          <div class="nachweis-card__entry">
+            <dt>Was dokumentiert wird</dt>
+            <dd>{props.verifiedScope}</dd>
+          </div>
+        )}
+        {props.notVerifiedScope && (
+          <div class="nachweis-card__entry">
+            <dt>Was nicht geprüft wurde</dt>
+            <dd>{props.notVerifiedScope}</dd>
+          </div>
+        )}
+      </dl>
+
+      {props.verifiedDate && (
+        <p class="nachweis-card__date">
+          <time datetime={props.verifiedDate}>{props.verifiedDate}</time>
+        </p>
+      )}
+
+      <p class="nachweis-card__status" data-status={props.status}>
+        <span class="nachweis-card__status-text">
+          {props.status === "published" && "Veröffentlicht"}
+          {props.status === "preview" && "Vorschau"}
+          {props.status === "draft" && "Entwurf"}
+          {props.status === "withdrawn" && "Zurückgezogen"}
+        </span>
+        {props.verifiedByLabel && (
+          <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
+        )}
       </p>
-    )
-  }
+    </article>
+  )
+}
 
-  {context && <p class="nachweis-card__context">{context}</p>}
+{
+  props.variant === "technical-assessment" && (
+    <article
+      class:list={[
+        "nachweis-card",
+        "nachweis-card--technical",
+        props.compact && "nachweis-card--compact",
+      ]}
+      data-component="nachweis-card"
+      data-variant="technical-assessment"
+      aria-labelledby={headingId}
+    >
+      <h2 id={headingId} class="nachweis-card__title">
+        {props.title}
+      </h2>
 
-  {
-    limitations && (
-      <p class="nachweis-card__limitations">
-        <span class="nachweis-card__label">Einschränkungen:</span>
-        {limitations}
-      </p>
-    )
-  }
-
-  {
-    quote && (
-      <blockquote class="nachweis-card__quote" cite={source} lang={quoteLang}>
-        {quote}
-      </blockquote>
-    )
-  }
-
-  {
-    source && (
-      <p class="nachweis-card__source">
-        <span class="nachweis-card__label">Quelle:</span>
-        <cite>{source}</cite>
-      </p>
-    )
-  }
-
-  <dl class="nachweis-card__verification">
-    {
-      verifiedScope && (
+      <dl class="nachweis-card__meta">
         <div class="nachweis-card__entry">
-          <dt>Was dokumentiert wurde</dt>
-          <dd>{verifiedScope}</dd>
+          <dt>Anbieter</dt>
+          <dd>{props.provider.name}</dd>
         </div>
-      )
-    }
-    {
-      notVerifiedScope && (
         <div class="nachweis-card__entry">
-          <dt>Was nicht geprüft wurde</dt>
-          <dd>{notVerifiedScope}</dd>
+          <dt>Werkzeug</dt>
+          <dd>
+            {props.tool.name}
+            {props.tool.version && ` (v${props.tool.version})`}
+          </dd>
         </div>
-      )
-    }
-  </dl>
+        {!props.compact && (
+          <div class="nachweis-card__entry">
+            <dt>Prüfling</dt>
+            <dd>
+              <a href={props.subjectUrl} rel="noopener noreferrer">
+                {props.subjectUrl}
+              </a>
+            </dd>
+          </div>
+        )}
+        <div class="nachweis-card__entry">
+          <dt>Beobachtet am</dt>
+          <dd>
+            <time datetime={props.observedAt}>{formatDate(props.observedAt)}</time>
+          </dd>
+        </div>
+        {!props.compact && (
+          <div class="nachweis-card__entry">
+            <dt>Methode</dt>
+            <dd>
+              {props.methodology.id}@{props.methodology.version}
+              {" — "}
+              {props.methodology.runCount} Lauf{props.methodology.runCount !== 1 ? "e" : ""}
+              {", Aggregation: "}
+              {props.methodology.aggregation}
+            </dd>
+          </div>
+        )}
+        {!props.compact && (
+          <div class="nachweis-card__entry">
+            <dt>Ausführung</dt>
+            <dd>
+              {props.executionMode === "operator-run"
+                ? "Operator-ausgeführt"
+                : "Anbieter-ausgeführt"}
+            </dd>
+          </div>
+        )}
+      </dl>
 
-  {
-    verifiedDate && (
-      <p class="nachweis-card__date">
-        <time datetime={verifiedDate}>{verifiedDate}</time>
+      {(props.overall?.score !== undefined || props.overall?.level) && (
+        <p class="nachweis-card__overall">
+          <span class="nachweis-card__label">Gesamtergebnis:</span>
+          {props.overall.score !== undefined && (
+            <span class="nachweis-card__score">{props.overall.score}</span>
+          )}
+          {props.overall.level && <span class="nachweis-card__level">{props.overall.level}</span>}
+        </p>
+      )}
+
+      {props.dimensions.length > 0 && (
+        <dl class="nachweis-card__dimensions">
+          {props.dimensions.map((dim) => (
+            <div class="nachweis-card__dimension" data-status={dim.status ?? "not-checked"}>
+              <dt>{dim.providerLabel}</dt>
+              <dd>
+                {dim.score !== undefined && (
+                  <span class="nachweis-card__dimension-score">
+                    {dim.score}
+                    {dim.numerator !== undefined && dim.denominator !== undefined
+                      ? ` (${dim.numerator}/${dim.denominator})`
+                      : ""}
+                  </span>
+                )}
+                {dim.level && <span class="nachweis-card__dimension-level">{dim.level}</span>}
+                {dim.status && (
+                  <span class="nachweis-card__dimension-status">
+                    {dim.status === "pass" && "Bestanden"}
+                    {dim.status === "fail" && "Nicht bestanden"}
+                    {dim.status === "not-checked" && "Nicht geprüft"}
+                  </span>
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      <p class="nachweis-card__limitation">{props.limitation}</p>
+
+      {!props.compact && props.sourceHashes.length > 0 && (
+        <p class="nachweis-card__hashes">
+          <span class="nachweis-card__label">Quell-Hashes:</span>
+          <code class="nachweis-card__hash-summary">
+            {props.sourceHashes.length} Hash{props.sourceHashes.length !== 1 ? "es" : ""}
+          </code>
+        </p>
+      )}
+
+      <p class="nachweis-card__status" data-status={props.status ?? "published"}>
+        <span class="nachweis-card__status-text">
+          {(props.status ?? "published") === "published" && "Veröffentlicht"}
+          {props.status === "preview" && "Vorschau"}
+          {props.status === "draft" && "Entwurf"}
+          {props.status === "withdrawn" && "Zurückgezogen"}
+        </span>
+        <span class="nachweis-card__verified-by">N{props.verificationLevel.replace("N", "")}</span>
       </p>
-    )
-  }
-
-  <p class="nachweis-card__status" data-status={status}>
-    <span class="nachweis-card__status-text">
-      {status === "published" && "Veröffentlicht"}
-      {status === "preview" && "Vorschau"}
-      {status === "draft" && "Entwurf"}
-      {status === "withdrawn" && "Zurückgezogen"}
-    </span>
-    {verifiedByLabel && <span class="nachweis-card__verified-by">{verifiedByLabel}</span>}
-  </p>
-</article>
+    </article>
+  )
+}
