@@ -23,6 +23,7 @@ ignoreDirs:
 
 excludePathSegments:
   - .npmrc
+  - src/tests
 
 postProcess:
   - action: delete
