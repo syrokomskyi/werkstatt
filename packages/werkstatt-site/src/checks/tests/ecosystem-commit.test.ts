@@ -424,6 +424,57 @@ status: accepted
     }
   });
 
+  it("RFC-0878: versionBump: major downgrades to patch without --bump major", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9005", "major");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9005", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.bumpType).toBe("patch");
+      expect(result.data?.newVersion).toBe("1.0.1");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0878: --bump major with versionBump: major produces major bump", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9006", "major");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9006", bump: "major", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.bumpType).toBe("major");
+      expect(result.data?.newVersion).toBe("2.0.0");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0878: --bump minor with versionBump: major produces minor bump (override precedence)", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9007", "major");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9007", bump: "minor", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.bumpType).toBe("minor");
+      expect(result.data?.newVersion).toBe("1.1.0");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it("--bump flag works without --rfc", async () => {
     const root = await setupWorkspace();
     try {
