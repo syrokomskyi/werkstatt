@@ -60,6 +60,28 @@ nonGoals:
 
 # RFC-0876: Add technical Nachweis UI, observation history and Warpgogol Lighthouse/Cloudflare pilot
 
+## Problem
+
+The existing Nachweis UI (RFC-0708) only supports attestation records — project confirmations and client testimonials. Technical measurements (Lighthouse performance scores, Cloudflare Agent Readiness checks) have no dedicated presentation variant. Without one, technical results either cannot be shown or are forced into the attestation card shape, misrepresenting their nature (point-in-time measurements vs. ongoing attestations).
+
+The homepage (RFC-0716) shows a static trust-strip with hardcoded Nachweis references. It does not dynamically project published evidence from PBP records. Visitors see stale references, not current observations.
+
+The `/nachweise/` registry page presents only project attestations. Technical assessments need their own section with distinct copy, methodology disclosure, and observation history.
+
+The Warpgogol pilot needs real canonical Lighthouse and Cloudflare observations published through the N3 verification gate — not screenshot-seeded values — to demonstrate the product as a future client site would use it.
+
+## Architectural fit
+
+This RFC extends existing components (DNA-17: cosmic overlay, DNA-23: manifests) without creating new ones. The `nachweis-card`, `nachweis-list`, `nachweis-detail`, and `nachweis-verify` components gain a `variant` discriminant — a forward-only change with no compatibility shim.
+
+The `/nachweise/` page remains block-declarative (DNA-24). The homepage evidence block remains block-declarative. No markdown bodies in page entries.
+
+All data is resolved at Astro build time (SSG) via `getCollection("business-profile")` — no client-side fetching. PBP evidence-source entities are the source of truth. The manifest (`/public/nachweise/manifest.json`) carries summary fields for technical assessments.
+
+Observation history is resolved by grouping PBP entities by `assessment.seriesId` and sorting by `assessment.observedAt` descending. No separate collection is created.
+
+The RFC amends RFC-0708 (component extensions) and RFC-0716 (homepage placement). Both are updated with `amendedBy: [RFC-0876]`.
+
 ## Context
 
 RFC-0708 provides four reusable Nachweis UI components. RFC-0716 adds static contextual references.
