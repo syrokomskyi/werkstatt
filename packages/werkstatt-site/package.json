@@ -1,7 +1,7 @@
 {
   "name": "@warpgogol/werkstatt-site",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "type": "module",
   "description": "Werkstatt site plugin — Astro stack engine modules and domain layer (RFC-0774/0775).",
   "main": "./src/index.ts",
@@ -10406,10 +10406,6 @@
     "micromark-extension-gfm": "^3.0.0",
     "qrcode": "^1.5.4",
     "@warpgogol/werkstatt-shared": "workspace:*"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
   },
   "optionalDependencies": {
     "@syrokomskyi/axiom-capture": "link:../../../pipelines/packages/axiom/axiom-capture",
