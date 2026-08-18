@@ -17,6 +17,7 @@ supersededBy:
 amends: []
 amendedBy:
   - RFC-0717
+  - RFC-0876
 related:
   - ADR-0028
   - RFC-0706

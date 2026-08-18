@@ -24,6 +24,7 @@ supersededBy:
 amends: []
 amendedBy:
   - RFC-0871
+  - RFC-0876
 related:
   - RFC-0708
   - ADR-0028
