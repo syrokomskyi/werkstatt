@@ -1,12 +1,13 @@
 ---
 id: RFC-0876
 title: "Add technical Nachweis UI, observation history and Warpgogol Lighthouse/Cloudflare pilot"
-status: draft
+status: accepted
 kind: architecture
 scope: app
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
