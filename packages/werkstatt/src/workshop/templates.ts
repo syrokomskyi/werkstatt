@@ -410,11 +410,6 @@ export const STACK_PLUGIN_MAP: Record<
     importName: "@warpgogol/werkstatt-game",
     exportName: "werkstattGamePlugin",
   },
-  editframe: {
-    package: "@warpgogol/werkstatt-video",
-    importName: "@warpgogol/werkstatt-video",
-    exportName: "werkstattVideoPlugin",
-  },
   "godot-csharp": {
     package: "@warpgogol/werkstatt-godot",
     importName: "@warpgogol/werkstatt-godot",

@@ -13,6 +13,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial N3 shared types module.</item>
   <item>RFC-0715 review fix: add shared flagString/flagBool helpers to eliminate duplication across command files.</item>
+  <item>RFC-0871: add TimestampAssurance type, extend NachweisTimestampResult and NachweisVerifySignatureResult with assurance metadata.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -45,6 +46,8 @@ export interface NachweisSignResult {
   idempotent: boolean;
 }
 
+export type TimestampAssurance = "rfc3161" | "eidas-qualified";
+
 export interface NachweisTimestampResult {
   slug: string;
   systemId: string;
@@ -52,6 +55,8 @@ export interface NachweisTimestampResult {
   tsaUrl: string;
   bordbuchEventId: string | null;
   idempotent: boolean;
+  timestampAssurance: TimestampAssurance;
+  qualificationEvidenceRef?: string;
 }
 
 export interface NachweisVerifySignatureResult {
@@ -59,6 +64,8 @@ export interface NachweisVerifySignatureResult {
   systemId: string;
   signatureValid: boolean;
   timestampVerified: boolean;
+  timestampAssurance: TimestampAssurance;
+  qualificationEvidenceRef?: string;
   publicKeyHex: string | null;
   details: string;
 }
