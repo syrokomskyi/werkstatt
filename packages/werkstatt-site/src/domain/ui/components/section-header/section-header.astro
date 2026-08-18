@@ -28,6 +28,10 @@ import {
 import "../effects/effect-text.css";
 import "./section-header.css";
 
+const rawProps = Astro.props as SectionHeaderProps & {
+  lang?: string;
+  pageOverride?: SectionHeaderProps;
+};
 const {
   sectionNumber,
   hideSectionNumber = false,
@@ -40,7 +44,7 @@ const {
   headingEffects,
   subheadingEffects,
   lang,
-} = Astro.props as SectionHeaderProps & { lang?: string };
+} = rawProps.pageOverride ?? rawProps;
 
 const derivedPrices = loadDerivedPrices();
 const offeringUriPrefix = "https://warpgogol.com/id/offerings/";

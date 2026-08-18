@@ -136,6 +136,7 @@ export async function runPageMarkdownGenerate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const paths = requireAstroSitePaths(context);
+  const app = context.site?.name;
   const siteUrl = (await readAstroSiteUrl(paths.appDirectory)) ?? "https://example.com";
   const contentDir = join(paths.appDirectory, "src", "content");
   const { manifest } = await loadSystemManifest(contentDir);
@@ -489,6 +490,8 @@ export async function runPageMarkdownGenerate(
     for (const file of markdownFiles) {
       const rel = normalizeRelPath(relative(paths.publicDirectory, file));
       if (seen.has(rel)) continue;
+      const wsRel = toPosix(relative(context.workspaceRoot, file));
+      if (!isFileOwnedByCommand(wsRel, "page.markdown.generate", app)) continue;
       await rm(file);
       removed += 1;
     }
