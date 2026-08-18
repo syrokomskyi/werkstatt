@@ -1,10 +1,11 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0707: nachweis.withdraw command handler — revokes consent, sets withdrawn status, regenerates manifest.</purpose>
+<purpose>RFC-0707: nachweis.withdraw command handler — revokes consent (conditional on policy), sets withdrawn status, regenerates manifest.</purpose>
 <keywords>nachweis, withdraw, revoke, consent, bordbuch, manifest</keywords>
 <responsibilities>
-  <item>Sets consent.status: revoked, record_status: withdrawn, publication.visibility: private.</item>
-  <item>Appends nachweis-consent and nachweis-record Bordbuch entries.</item>
+  <item>Sets record_status: withdrawn, publication.visibility: private.</item>
+  <item>RFC-0872: conditionally revokes consent only for attestation-v1 policy records.</item>
+  <item>Appends nachweis-consent (if applicable) and nachweis-record Bordbuch entries.</item>
   <item>Regenerates manifest to remove withdrawn record from public output.</item>
   <item>Idempotent: if already withdrawn, returns no-op result.</item>
   <item>Does NOT delete R2 object — personal data persists as audit trail.</item>
@@ -16,6 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.withdraw command handler.</item>
+  <item>RFC-0872: conditionally revoke consent based on publication policy (only attestation-v1).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -40,6 +42,7 @@ import {
   resolveNachweisCachePath,
   resolvePbpEntityDir,
   resolveDefaultLang,
+  resolveNachweisPublicationPolicy,
   type NachweisWithdrawResult,
 } from "./nachweis-io.ts";
 
@@ -112,15 +115,22 @@ export async function runNachweisWithdraw(
   const updatedContent = stringifyMarkdownFrontmatter(evidenceContent, evidenceData);
   await fs.writeFile(evidenceFile, updatedContent, "utf8");
 
-  // Update Consent entity if it exists
+  // RFC-0872: conditionally revoke consent based on publication policy
+  const kind = (evidenceData as Record<string, unknown>).kind as string | undefined;
+  const policyId = kind ? resolveNachweisPublicationPolicy(kind) : "attestation-v1";
+  const shouldRevokeConsent = policyId === "attestation-v1";
+
+  // Update Consent entity if it exists and policy requires consent
   const consentDir = resolvePbpEntityDir(cachePath, lang, "consent");
   const consentFile = path.join(consentDir, `${slug}.md`);
-  if (existsSync(consentFile)) {
+  let consentRevoked = false;
+  if (shouldRevokeConsent && existsSync(consentFile)) {
     const rawConsent = await fs.readFile(consentFile, "utf8");
     const { data: consentData, content: consentContent } = parseMarkdownFrontmatter(rawConsent);
     consentData.consentStatus = "revoked";
     const updatedConsent = stringifyMarkdownFrontmatter(consentContent, consentData);
     await fs.writeFile(consentFile, updatedConsent, "utf8");
+    consentRevoked = true;
   }
 
   // Append Bordbuch entries
@@ -139,26 +149,38 @@ export async function runNachweisWithdraw(
     const { entries } = await appendBatchAndCommitBordbuch(
       workspaceRoot,
       systemId,
-      [
-        {
-          kind: "nachweis-consent",
-          summary: `Consent revoked for '${slug}': ${reason}`,
-          actor: "agent",
-          options: {
-            writerRole: "nachweis",
-            metadata: { slug, reason, action: "withdraw" },
-          },
-        },
-        {
-          kind: "nachweis-record",
-          summary: `Withdrawn '${slug}': ${reason}`,
-          actor: "agent",
-          options: {
-            writerRole: "nachweis",
-            metadata: { slug, reason, action: "withdraw" },
-          },
-        },
-      ],
+      shouldRevokeConsent
+        ? [
+            {
+              kind: "nachweis-consent",
+              summary: `Consent revoked for '${slug}': ${reason}`,
+              actor: "agent",
+              options: {
+                writerRole: "nachweis",
+                metadata: { slug, reason, action: "withdraw" },
+              },
+            },
+            {
+              kind: "nachweis-record",
+              summary: `Withdrawn '${slug}': ${reason}`,
+              actor: "agent",
+              options: {
+                writerRole: "nachweis",
+                metadata: { slug, reason, action: "withdraw", policyId },
+              },
+            },
+          ]
+        : [
+            {
+              kind: "nachweis-record",
+              summary: `Withdrawn '${slug}': ${reason}`,
+              actor: "agent",
+              options: {
+                writerRole: "nachweis",
+                metadata: { slug, reason, action: "withdraw", policyId },
+              },
+            },
+          ],
       `Bordbuch: nachweis-withdraw ${systemId} ${slug}`,
     );
     for (const e of entries) {
@@ -177,7 +199,9 @@ export async function runNachweisWithdraw(
     argv: [`--system=${systemId}`],
   });
 
-  logger.info(`[nachweis.withdraw] withdrawn '${slug}' — manifest regenerated`);
+  logger.info(
+    `[nachweis.withdraw] withdrawn '${slug}' — manifest regenerated${consentRevoked ? " (consent revoked)" : " (no consent revocation — policy: " + policyId + ")"}`,
+  );
 
   return {
     data: {

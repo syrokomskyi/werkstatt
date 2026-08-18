@@ -17,6 +17,7 @@
   <item>RFC-0714: add nachweis.approve and nachweis.public-derivative command registrations.</item>
   <item>RFC-0715: add nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature. Remove --pilot-n2-exception from nachweis.publish.</item>
   <item>RFC-0871: add --timestamp-assurance and --qualification-evidence-ref flags to nachweis.timestamp.</item>
+  <item>RFC-0872: update nachweis.validate, nachweis.publish, nachweis.withdraw descriptions to reflect policy-driven V2 gates.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -72,7 +73,7 @@ export function createNachweisModule(): KernelModule {
       registry.registerCommand({
         name: "nachweis.validate",
         description:
-          "RFC-0707: Validate PBP trust entities and enforce publication gate conditions.",
+          "RFC-0707/RFC-0872: Validate PBP trust entities and enforce policy-driven publication gate V2 conditions (attestation-v1, operational-measurement-v1, technical-assessment-v1).",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: false,
@@ -133,7 +134,7 @@ export function createNachweisModule(): KernelModule {
       registry.registerCommand({
         name: "nachweis.publish",
         description:
-          "RFC-0707: Enforce publication gate and transition record to published. Requires N3 verification level.",
+          "RFC-0707/RFC-0872: Enforce policy-driven publication gate V2 and transition record to published. Gate policy resolved by evidence kind; technical-assessment does not require consent or public derivative.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -151,7 +152,7 @@ export function createNachweisModule(): KernelModule {
       registry.registerCommand({
         name: "nachweis.withdraw",
         description:
-          "RFC-0707: Withdraw a published record — revoke consent, set withdrawn status, regenerate manifest. Idempotent.",
+          "RFC-0707/RFC-0872: Withdraw a published record — consent revocation is policy-driven (attestation only), set withdrawn status, regenerate manifest. Idempotent.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
