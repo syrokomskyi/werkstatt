@@ -57,6 +57,8 @@
   },
   "files": ["src"],
   "scripts": {
+    "lint": "pnpm exec eslint \"src/**/*.ts\"",
+    "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -72,7 +74,9 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "eslint": "^10.8.0",
     "typescript": "^6.0.3",
+    "typescript-eslint": "8.65.0",
     "vitest": "^4.1.10"
   }
 }

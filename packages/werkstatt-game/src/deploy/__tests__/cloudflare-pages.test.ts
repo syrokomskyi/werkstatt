@@ -90,7 +90,7 @@ describe("cloudflare-pages deploy adapter", () => {
       projectName: "my-game",
     });
 
-    const lastCall = vi.mocked(execFileSync).mock.calls.at(-1) as unknown as any[];
+    const lastCall = vi.mocked(execFileSync).mock.calls.at(-1) as unknown as unknown[];
     const options = lastCall[2] as { env: Record<string, string> } | undefined;
     expect(options?.env.CLOUDFLARE_API_TOKEN).toBe("cf_secret_token");
     expect(options?.env.CLOUDFLARE_ACCOUNT_ID).toBe("cf_account_123");

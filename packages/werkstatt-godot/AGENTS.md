@@ -117,6 +117,8 @@ Three Godot-specific skills are bundled with this plugin:
 
 | Script        | Command                                   |
 | ------------- | ----------------------------------------- |
+| `lint`        | `pnpm exec eslint "src/**/*.ts"`          |
+| `typecheck`   | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `build`       | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `build:check` | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `test`        | `vitest run`                              |

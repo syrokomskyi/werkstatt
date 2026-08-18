@@ -16,6 +16,8 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from `w
 
 | Script        | Command                                   |
 | ------------- | ----------------------------------------- |
+| `lint`        | `pnpm exec eslint "src/**/*.ts"`          |
+| `typecheck`   | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `build`       | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `build:check` | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `test`        | `vitest run`                              |

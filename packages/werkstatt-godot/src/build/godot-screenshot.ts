@@ -19,7 +19,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { execFileSync, execSync } from "node:child_process";
+import { execFileSync, execSync, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type {
@@ -128,7 +128,6 @@ export function captureScreenshot(
     }
 
     display = ":99";
-    const { spawn } = require("node:child_process") as typeof import("node:child_process");
     xvfbChild = spawn(xvfbBin, [
       display,
       "-screen",

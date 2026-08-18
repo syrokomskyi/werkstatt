@@ -15,6 +15,11 @@ preservePackages:
   - "@warpgogol/werkstatt"
 packageManager: "pnpm"
 
+ci:
+  provider: github-actions
+  publish: true
+  nodeVersion: 24
+
 ignoreDirs:
   - .turbo
   - .agents

@@ -32,6 +32,7 @@ export function createLanguageRedirectMiddleware(options: {
   supportedLangs: readonly string[];
   defaultLang: string;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return defineMiddleware((ctx: any, next: any) => {
     const url = new URL(ctx.request.url);
     const segments = url.pathname.split("/").filter(Boolean);

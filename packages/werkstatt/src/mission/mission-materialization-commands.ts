@@ -1429,7 +1429,7 @@ export async function runMissionReconcile(
       // The merge can silently remove system-config.yaml / system-state.yaml if the
       // workpiece branch doesn't track them. Restore from preReconcileSha if missing.
       const criticalFiles = ["system-config.yaml", "system-state.yaml"];
-      let restoredFiles: string[] = [];
+      const restoredFiles: string[] = [];
       for (const cf of criticalFiles) {
         if (!existsSync(path.join(systemDir, cf)) && preReconcileSha) {
           try {

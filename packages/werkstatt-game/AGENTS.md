@@ -83,6 +83,8 @@ Deploy adapters read credentials from `systems/registry.yaml` channel config, ne
 
 | Script        | Command                                   |
 | ------------- | ----------------------------------------- |
+| `lint`        | `pnpm exec eslint "src/**/*.ts"`          |
+| `typecheck`   | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `build`       | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `build:check` | `pnpm exec tsc -p tsconfig.json --noEmit` |
 | `test`        | `vitest run`                              |

@@ -38,12 +38,14 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 
 ## Scripts
 
-| Script        | Command                                   |
-| ------------- | ----------------------------------------- |
-| `build`       | `pnpm exec tsc -p tsconfig.json --noEmit` |
-| `build:check` | `pnpm exec tsc -p tsconfig.json --noEmit` |
-| `test`        | `vitest run`                              |
-| `test:watch`  | `vitest`                                  |
+| Script        | Command                                       |
+| ------------- | --------------------------------------------- |
+| `lint`        | `pnpm exec eslint "src/**/*.ts" "os/**/*.ts"` |
+| `typecheck`   | `pnpm exec tsc -p tsconfig.json --noEmit`     |
+| `build`       | `pnpm exec tsc -p tsconfig.json --noEmit`     |
+| `build:check` | `pnpm exec tsc -p tsconfig.json --noEmit`     |
+| `test`        | `vitest run`                                  |
+| `test:watch`  | `vitest`                                      |
 
 ## Package architecture
 
