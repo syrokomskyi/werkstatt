@@ -1,13 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { createActivationTransaction, type ActivationTransaction } from "../activation.ts";
+import { createActivationTransaction } from "../activation.ts";
 import { ComponentFiber } from "../fiber.ts";
-import type { ResolvedComponentIdentityV1, ResolvedComponentSetV1 } from "../../component/contracts.ts";
+import type {
+  ResolvedComponentIdentityV1,
+  ResolvedComponentSetV1,
+} from "../../component/contracts.ts";
 import { computeSetHash } from "../../component/identity.ts";
 
 const VALID_SHA = "sha256:" + "a".repeat(64);
 const VALID_SHA_2 = "sha256:" + "b".repeat(64);
 
-function makeIdentity(overrides: Partial<ResolvedComponentIdentityV1> = {}): ResolvedComponentIdentityV1 {
+function makeIdentity(
+  overrides: Partial<ResolvedComponentIdentityV1> = {},
+): ResolvedComponentIdentityV1 {
   return {
     componentId: "werkstatt/engine",
     version: "1.0.0",
@@ -54,7 +59,9 @@ describe("ActivationTransaction", () => {
   it("prepares, commits, and drains prior set on commit", async () => {
     const priorSet = makeSet([makeIdentity({ componentId: "werkstatt/old" })]);
     const newSet = makeSet([makeIdentity({ componentId: "werkstatt/new" })]);
-    const tx = createActivationTransaction("tx-2", priorSet, newSet, makeFiber, { timeoutMs: 1000 });
+    const tx = createActivationTransaction("tx-2", priorSet, newSet, makeFiber, {
+      timeoutMs: 1000,
+    });
 
     await tx.prepare();
     await tx.commit();
@@ -96,10 +103,12 @@ describe("ActivationTransaction", () => {
         fiber.transitionTo("waiting");
         fiber.transitionTo("loading");
         fiber.transitionTo("active");
-        fiber.run({
-          id: "slow-op",
-          execute: async () => new Promise(() => {}),
-        }).catch(() => {});
+        fiber
+          .run({
+            id: "slow-op",
+            execute: async () => new Promise(() => {}),
+          })
+          .catch(() => {});
       }
       return fiber;
     };
@@ -122,7 +131,11 @@ describe("ActivationTransaction", () => {
 
   it("multiple components activate in dependency order", async () => {
     const c1 = makeIdentity({ componentId: "werkstatt/alpha", version: "1.0.0" });
-    const c2 = makeIdentity({ componentId: "werkstatt/beta", version: "1.0.0", artifactHash: VALID_SHA_2 });
+    const c2 = makeIdentity({
+      componentId: "werkstatt/beta",
+      version: "1.0.0",
+      artifactHash: VALID_SHA_2,
+    });
     const set = makeSet([c2, c1]);
     const tx = createActivationTransaction("tx-8", null, set, makeFiber, { timeoutMs: 1000 });
 
