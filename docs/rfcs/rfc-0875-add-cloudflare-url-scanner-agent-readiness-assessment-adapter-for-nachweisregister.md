@@ -27,7 +27,8 @@ versionBump: minor
 commands:
   proposed:
     - nachweis.measure.cloudflare-agent-readiness
-  added: []
+  added:
+    - nachweis.measure.cloudflare-agent-readiness
   changed: []
   removed: []
 appsImpacted:
@@ -436,20 +437,20 @@ No existing apps or pipelines are affected — the command is manually invoked, 
 
 ## Acceptance criteria
 
-- [ ] Uses official URL Scanner API, not UI scraping.
-- [ ] Dedicated least-privilege env vars.
-- [ ] Unlisted default.
-- [ ] `agentReadiness` requested.
-- [ ] 15s bounded polling, 5min max by default.
-- [ ] Raw submission/result retained.
-- [ ] Parser has real/official fixture coverage.
-- [ ] Schema drift fails safely.
-- [ ] Dimensions are not hard-coded to a fixed count.
-- [ ] Not-checked is not zero.
-- [ ] Adapter emits valid `AssessmentBundleV1`.
-- [ ] Generic ingest performs R2/PBP/Bordbuch.
-- [ ] Adapter never signs/approves/publishes.
-- [ ] User screenshot values are not hard-coded.
+- [x] Uses official URL Scanner API, not UI scraping. (evidence: nachweis-cloudflare-agent-readiness-measure.ts:submitScan uses POST /client/v4/accounts/{accountId}/urlscanner/v2/scan)
+- [x] Dedicated least-privilege env vars. (evidence: .env.example:95-100 declares CLOUDFLARE_URL_SCANNER_ACCOUNT_ID and CLOUDFLARE_URL_SCANNER_API_TOKEN with How to obtain instructions)
+- [x] Unlisted default. (evidence: nachweis-cloudflare-agent-readiness-measure.ts:submitScan sends visibility: "Unlisted" in request body; test case verifies)
+- [x] `agentReadiness` requested. (evidence: nachweis-cloudflare-agent-readiness-measure.ts:submitScan sends agentReadiness: true in request body; test case verifies)
+- [x] 15s bounded polling, 5min max by default. (evidence: nachweis-cloudflare-agent-readiness-measure.ts:DEFAULT_POLL_INTERVAL_MS=15000, DEFAULT_MAX_ELAPSED_MS=300000; timeout test verifies)
+- [x] Raw submission/result retained. (evidence: nachweis-cloudflare-agent-readiness-measure.ts writes cloudflare-submission.json and cloudflare-result.json as bundle artifacts)
+- [x] Parser has real/official fixture coverage. (evidence: packages/werkstatt/src/tests-handoff/fixtures/cloudflare-agent-readiness/sample-result.json)
+- [x] Schema drift fails safely. (evidence: parseAgentReadiness throws SchemaUnsupportedError when agentReadiness absent; handler returns ASSESSMENT_SCHEMA_UNSUPPORTED; test case verifies)
+- [x] Dimensions are not hard-coded to a fixed count. (evidence: parseAgentReadiness iterates result.agentReadiness.checks keys dynamically; unknown dimension test verifies)
+- [x] Not-checked is not zero. (evidence: parseAgentReadiness maps not-checked status to status: "not-checked", no score: 0; parser unit test verifies)
+- [x] Adapter emits valid `AssessmentBundleV1`. (evidence: handler validates bundle with assessmentBundleV1Schema before delegating to ingest)
+- [x] Generic ingest performs R2/PBP/Bordbuch. (evidence: handler delegates to runNachweisAssessmentIngest, same as Lighthouse adapter; test logs show "uploaded 3 artifacts to R2")
+- [x] Adapter never signs/approves/publishes. (evidence: handler ends after ingest delegation — no publish/approve/sign calls in nachweis-cloudflare-agent-readiness-measure.ts)
+- [x] User screenshot values are not hard-coded. (evidence: parser reads from API response fields, no literal scores in handler; parseAgentReadiness iterates response checks)
 
 ## Implementation notes for agents
 
