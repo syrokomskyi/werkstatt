@@ -33,7 +33,7 @@ describe("game.secret.scan", () => {
     await mkdir(join(projectRoot, "src"), { recursive: true });
     await writeFile(
       join(projectRoot, "src", "config.ts"),
-      `const apiKey = "sk_test_1234567890abcdefghijklmnopqrstuvwx";\n`,
+      `const apiKey = "FAKE_TEST_KEY_1234567890abcdefghijklmnopqrstuvwx";\n`,
     );
 
     const result = await scanSecrets(projectRoot);
@@ -62,7 +62,7 @@ describe("game.secret.scan", () => {
     await mkdir(join(projectRoot, "src"), { recursive: true });
     await writeFile(
       join(projectRoot, "src", "main.ts"),
-      `// const apiKey = "sk_test_1234567890abcdefghijklmnopqrstuvwx";\nexport default {};\n`,
+      `// const apiKey = "FAKE_TEST_KEY_1234567890abcdefghijklmnopqrstuvwx";\nexport default {};\n`,
     );
 
     const result = await scanSecrets(projectRoot);
