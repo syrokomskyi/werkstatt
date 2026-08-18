@@ -51,7 +51,7 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: major
+versionBump: patch
 commands:
   proposed: []
   added: []
