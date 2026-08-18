@@ -59,11 +59,12 @@ export async function validateExportPresets(
 
   const content = await readFile(presetsPath, "utf-8");
 
-  // Check: at least one [preset_N] section exists
-  if (!/\[preset_\d+\]/.test(content)) {
+  // Check: at least one [preset.N] section exists (Godot 4.x dot notation)
+  if (!/\[preset\.\d+\]/.test(content)) {
     violations.push({
       ruleId: "GODOT-09",
-      message: "export_presets.cfg contains no preset sections — at least one export preset is required for deployment",
+      message:
+        "export_presets.cfg contains no preset sections — at least one export preset is required for deployment",
     });
     return {
       data: {
@@ -82,7 +83,8 @@ export async function validateExportPresets(
   if (presets.length === 0) {
     violations.push({
       ruleId: "GODOT-09",
-      message: "export_presets.cfg has preset sections but none are complete (missing name, platform, or export_path)",
+      message:
+        "export_presets.cfg has preset sections but none are complete (missing name, platform, or export_path)",
     });
   }
 

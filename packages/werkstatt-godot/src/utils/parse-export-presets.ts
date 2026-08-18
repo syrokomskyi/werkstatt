@@ -27,7 +27,7 @@ export interface ExportPreset {
 export function parseExportPresets(presetsPath: string): ExportPreset[] {
   const content = readFileSync(presetsPath, "utf-8");
   const presets: ExportPreset[] = [];
-  const sections = content.split(/\[preset_(\d+)\]/);
+  const sections = content.split(/\[preset\.(\d+)\]/);
 
   for (let i = 1; i < sections.length; i += 2) {
     const body = sections[i + 1];

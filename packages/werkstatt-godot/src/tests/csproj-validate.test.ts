@@ -117,6 +117,58 @@ describe("validateCsproj", () => {
     expect(result.data?.violations[0]?.message).toContain("EnableDynamicLoading");
   });
 
+  it("passes when properties are in Directory.Build.props instead of Game.csproj", async () => {
+    writeFileSync(join(tmpDir, "Game.csproj"), `<Project Sdk="Godot.NET.Sdk" />`);
+    writeFileSync(
+      join(tmpDir, "Directory.Build.props"),
+      `<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+</Project>`,
+    );
+
+    const result = await validateCsproj(tmpDir);
+    expect(result.exitCode).toBe(0);
+    expect(result.data?.status).toBe("pass");
+  });
+
+  it("fails when TargetFramework is only in Directory.Build.props but below net8.0", async () => {
+    writeFileSync(join(tmpDir, "Game.csproj"), `<Project Sdk="Godot.NET.Sdk" />`);
+    writeFileSync(
+      join(tmpDir, "Directory.Build.props"),
+      `<Project>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+</Project>`,
+    );
+
+    const result = await validateCsproj(tmpDir);
+    expect(result.exitCode).toBe(1);
+    expect(result.data?.violations).toHaveLength(1);
+    expect(result.data?.violations[0]?.message).toContain("net8.0");
+  });
+
+  it("fails when EnableDynamicLoading is missing from both Game.csproj and Directory.Build.props", async () => {
+    writeFileSync(join(tmpDir, "Game.csproj"), `<Project Sdk="Godot.NET.Sdk" />`);
+    writeFileSync(
+      join(tmpDir, "Directory.Build.props"),
+      `<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+</Project>`,
+    );
+
+    const result = await validateCsproj(tmpDir);
+    expect(result.exitCode).toBe(1);
+    expect(result.data?.violations).toHaveLength(1);
+    expect(result.data?.violations[0]?.message).toContain("EnableDynamicLoading");
+  });
+
   it("fails with all three violations", async () => {
     writeFileSync(
       join(tmpDir, "Game.csproj"),
