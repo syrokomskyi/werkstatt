@@ -2,15 +2,15 @@ import type { Sha256Digest } from "../../fingerprint/primitives.ts";
 import { byteHash } from "../../fingerprint/primitives.ts";
 import type {
   GateChannel,
-  CertificationStatus,
+  _CertificationStatus,
 } from "../contracts/identifiers.ts";
 import type {
   GateDecisionV1,
   MainVerificationDecisionV1,
 } from "../contracts/decisions.ts";
 import type {
-  DeploymentOperationStateV1,
-  DeploymentOperationEventV1,
+  _DeploymentOperationStateV1,
+  _DeploymentOperationEventV1,
 } from "../contracts/state.ts";
 import type {
   DeploymentOperationState,

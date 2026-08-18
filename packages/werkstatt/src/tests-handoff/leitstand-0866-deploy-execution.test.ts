@@ -21,7 +21,7 @@ import type {
   RollbackInput,
   HealthInput,
 } from "../leitstand/adapter.ts";
-import type { PropagationResult, HealthCheck, PurgeResult } from "@warpgogol/werkstatt/schemas";
+import type { PropagationResult, HealthCheck, } from "@warpgogol/werkstatt/schemas";
 import type { AuthorizeResult } from "../leitstand/deploy-helpers.ts";
 import type { DeploymentStaticConfig } from "@warpgogol/werkstatt/schemas";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";

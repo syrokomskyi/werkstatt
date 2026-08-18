@@ -107,7 +107,7 @@ export async function validatePlugin(
     deployAdapters?: Record<string, unknown>;
   }> = [];
 
-  for (const [loaderName, loader] of Object.entries(moduleLoaders)) {
+  for (const [_loaderName, loader] of Object.entries(moduleLoaders)) {
     try {
       const mod = await loader();
       const candidate = mod as unknown as Record<string, unknown>;

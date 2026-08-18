@@ -21,7 +21,7 @@
 
 import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join, } from "node:path";
 import type {
   KernelCommandDefinition,
   KernelCommandResult,

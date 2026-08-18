@@ -13,11 +13,11 @@ import {
   type HealthRequirementResultV1,
   type ScheduleWindowV1,
   type MonitorRecoveryStateV1,
-  type CertificationHealth,
+  type _CertificationHealth,
 } from "../certification/health/monitor.ts";
 
-const D = "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
-const D1 = "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
+const _D = "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
+const _D1 = "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
 const TS = "2026-08-15T12:00:00Z";
 const TS2 = "2026-08-15T13:00:00Z";
 

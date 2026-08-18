@@ -15,14 +15,14 @@ import type {
   QualitativeRubricV1,
   ChangeProfileV1,
   RiskRuleV1,
-  CoverageManifestV1,
+  _CoverageManifestV1,
 } from "../certification/evaluators/index.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import type { EvidenceEnvelopeV1 } from "../certification/index.ts";
 
 const D = "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
 const D1 = "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
-const D2 = "sha256:2222222222222222222222222222222222222222222222222222222222222222" as string as Sha256Digest;
+const _D2 = "sha256:2222222222222222222222222222222222222222222222222222222222222222" as string as Sha256Digest;
 const TS = "2026-08-15T12:00:00Z";
 
 function mkRubric(): QualitativeRubricV1 {

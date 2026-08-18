@@ -17,7 +17,7 @@ import { computeSetHash } from "../../component/identity.ts";
 import type { Sha256Digest } from "../../fingerprint/primitives.ts";
 
 const VALID_SHA = ("sha256:" + "a".repeat(64)) as Sha256Digest;
-const VALID_SHA_2 = ("sha256:" + "b".repeat(64)) as Sha256Digest;
+const _VALID_SHA_2 = ("sha256:" + "b".repeat(64)) as Sha256Digest;
 
 function cid(id: string): ComponentId {
   return id as ComponentId;
@@ -123,8 +123,8 @@ describe("createCapabilityCatalog", () => {
 
   it("maps lifecycle states to reflected states correctly", () => {
     const identity = makeResolvedIdentity();
-    const set = makeResolvedSet({ components: [identity] });
-    const manifests = new Map<ComponentId, ComponentManifestV1>([
+    const _set = makeResolvedSet({ components: [identity] });
+    const _manifests = new Map<ComponentId, ComponentManifestV1>([
       ["werkstatt/engine", makeManifest()],
     ]);
 

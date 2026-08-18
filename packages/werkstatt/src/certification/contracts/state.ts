@@ -3,7 +3,7 @@ import {
   digestSchema,
   operationIdSchema,
   eventIdSchema,
-  schemaIdSchema,
+  _schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
   authoritySequenceSchema,

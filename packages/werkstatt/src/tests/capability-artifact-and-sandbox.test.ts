@@ -8,21 +8,20 @@ import type {
   ArtifactProvenanceV1,
   SandboxProviderAdmissionV1,
 } from "../capability-artifacts/index.ts";
-import { byteHash } from "../fingerprint/primitives.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import { createCapabilityBroker } from "../isolation/broker/index.ts";
 import type { BrokerPolicyV1, BrokerInvocationContextV1 } from "../isolation/broker/index.ts";
 import {
   createFakeSandboxAdapter,
   getFakeAdapterId,
-  getFakeAdapterVersion,
+  _getFakeAdapterVersion,
   getFakePropertyEvidence,
 } from "../isolation/providers/fake-sandbox.ts";
 import type {
   AttenuatedGrantSetV1,
   AttenuatedGrantV1,
   CapabilityBridgeRequestV1,
-  SandboxedWorkloadCreateV1,
+  _SandboxedWorkloadCreateV1,
 } from "../isolation/contracts.ts";
 
 const D =

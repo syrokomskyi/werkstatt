@@ -19,7 +19,7 @@ import {
   dnsListResponse,
   routeListResponse,
 } from "./helpers/cloudflare-api-mock.ts";
-import { buildSystemConfig, buildServicesRegistry } from "./helpers/registry-builder.ts";
+import { buildSystemConfig, } from "./helpers/registry-builder.ts";
 import { expectData } from "./helpers/kernel-result-helpers.ts";
 import { tmpdir } from "node:os";
 

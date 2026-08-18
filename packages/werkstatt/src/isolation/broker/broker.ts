@@ -1,7 +1,7 @@
 import type { CapabilityId } from "../../component/contracts.ts";
 import type { Sha256Digest } from "../../fingerprint/primitives.ts";
 import type {
-  AttenuatedGrantV1,
+  _AttenuatedGrantV1,
   AttenuatedGrantSetV1,
   CapabilityBridgeRequestV1,
   CapabilityBridgeResponseV1,

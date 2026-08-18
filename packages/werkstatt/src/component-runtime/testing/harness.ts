@@ -4,7 +4,6 @@ import type {
   ResolvedComponentIdentityV1,
   ResolvedComponentSetV1,
 } from "../../component/contracts.ts";
-import type { ComponentLifecycleState } from "../lifecycle.ts";
 import { ComponentFiber } from "../fiber.ts";
 import type { Deadline } from "../fiber.ts";
 import { resolve, type ResolutionInputV1 } from "../resolver.ts";
@@ -15,7 +14,7 @@ import {
   type LiveComponentObservation,
 } from "../reflection.ts";
 import type {
-  ConformanceEventV1,
+  _ConformanceEventV1,
   ConformanceExpectationV1,
   ConformanceScenarioV1,
   ConformanceTraceEntryV1,

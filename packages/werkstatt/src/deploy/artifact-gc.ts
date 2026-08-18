@@ -28,7 +28,7 @@ import {
   artifactDir,
   currentSymlinkPath,
   listArtifactHashes,
-  platformArtifactsBase,
+  _platformArtifactsBase,
   previousSymlinkPath,
   readSymlinkBasename,
 } from "./deploy-utils.ts";

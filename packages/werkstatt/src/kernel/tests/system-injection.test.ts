@@ -228,7 +228,7 @@ describe("RFC-0817: --system=value and --site=value format detection", () => {
   });
 
   it("(k) CLI: --site=value in argv is not double-injected", () => {
-    const cmd = makeCommand("test.cli.site-eq", {
+    const _cmd = makeCommand("test.cli.site-eq", {
       system: makeFlagSpec("string"),
     });
     const siteName = "warpgogol-com";

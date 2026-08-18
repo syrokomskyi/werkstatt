@@ -154,7 +154,7 @@ export async function runSternsystemRegister(
   const diagnostics: string[] = [];
 
   if (isAmend) {
-    const config = await readSystemConfig(workspaceRoot, id);
+    const _config = await readSystemConfig(workspaceRoot, id);
 
     if (owner) {
       // owner field not in systemConfigSchema — would need schema extension

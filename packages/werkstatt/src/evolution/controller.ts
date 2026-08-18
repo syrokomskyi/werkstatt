@@ -1,8 +1,7 @@
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
-import { byteHash } from "../fingerprint/primitives.ts";
 import type {
   CapabilityCandidateV1,
-  EvolutionEvidenceBundleV1,
+  _EvolutionEvidenceBundleV1,
   TransitionRequestV1,
   TransitionRecordV1,
   InspectionSnapshotV1,

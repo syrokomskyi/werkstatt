@@ -7,8 +7,8 @@ import {
 } from "../testing/harness.ts";
 import type {
   ConformanceScenarioV1,
-  ConformanceEventV1,
-  ConformanceExpectationV1,
+  _ConformanceEventV1,
+  _ConformanceExpectationV1,
 } from "../conformance.ts";
 import type {
   ComponentManifestV1,
@@ -18,7 +18,7 @@ import type {
   ResolvedComponentIdentityV1,
 } from "../../component/contracts.ts";
 import { computeSetHash } from "../../component/identity.ts";
-import { resolve, type ResolutionInputV1 } from "../resolver.ts";
+import { type _ResolutionInputV1 } from "../resolver.ts";
 import type { Sha256Digest } from "../../fingerprint/primitives.ts";
 
 const VALID_SHA = ("sha256:" + "a".repeat(64)) as Sha256Digest;

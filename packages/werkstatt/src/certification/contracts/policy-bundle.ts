@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
   digestSchema,
-  schemaIdSchema,
+  _schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
 } from "./identifiers.ts";

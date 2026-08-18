@@ -8,7 +8,6 @@ import {
   DEPLOYMENT_STATES,
   type DeploymentOperationState,
 } from "../certification/state-machine.ts";
-import type { ReleaseArtifactState } from "../schemas/release.ts";
 
 describe("artifact state machine", () => {
   it("allows prepared → ready", () => {

@@ -3,7 +3,7 @@ import type {
   ComponentId,
   CapabilityId,
   CapabilityProvideV1,
-  CapabilityRequireV1,
+  _CapabilityRequireV1,
   ResolvedComponentIdentityV1,
   ResolvedComponentSetV1,
 } from "../component/contracts.ts";
