@@ -109,12 +109,12 @@ The change: when `versionBump === "major"` and `!hasValidBumpOverride`, set `bum
 
 ## Acceptance criteria
 
-- [ ] `ecosystem.commit --rfc RFC-XXXX` where RFC has `versionBump: major` and no `--bump` flag produces a patch bump, not a major bump (evidence: `packages/werkstatt-site/src/checks/tests/ecosystem-commit.test.ts`, new test case)
-- [ ] `ecosystem.commit --rfc RFC-XXXX --bump major` where RFC has `versionBump: major` produces a major bump (evidence: existing test or new test case)
-- [ ] `ecosystem.commit --rfc RFC-XXXX` where RFC has `versionBump: minor` and no `--bump` flag still produces a minor bump (evidence: existing tests pass)
-- [ ] `ecosystem.commit --rfc RFC-XXXX` where RFC has `versionBump: patch` and no `--bump` flag still produces a patch bump (evidence: existing tests pass)
-- [ ] AGENTS.md documents the new behavior (evidence: `AGENTS.md`, Platform-scope commit discipline section)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `ecosystem.commit --rfc RFC-XXXX` where RFC has `versionBump: major` and no `--bump` flag produces a patch bump, not a major bump (evidence: `packages/werkstatt-site/src/checks/tests/ecosystem-commit.test.ts:427`, test "RFC-0878: versionBump: major downgrades to patch without --bump major")
+- [x] `ecosystem.commit --rfc RFC-XXXX --bump major` where RFC has `versionBump: major` produces a major bump (evidence: `packages/werkstatt-site/src/checks/tests/ecosystem-commit.test.ts:444`, test "RFC-0878: --bump major with versionBump: major produces major bump")
+- [x] `ecosystem.commit --rfc RFC-XXXX` where RFC has `versionBump: minor` and no `--bump` flag still produces a minor bump (evidence: `packages/werkstatt-site/src/checks/tests/ecosystem-commit.test.ts:392`, existing test "--rfc reads versionBump from frontmatter" — 36 tests pass)
+- [x] `ecosystem.commit --rfc RFC-XXXX` where RFC has `versionBump: patch` and no `--bump` flag still produces a patch bump (evidence: `packages/werkstatt-site/src/checks/tests/ecosystem-commit.test.ts:410`, existing test "--bump flag overrides RFC versionBump" with default patch — 36 tests pass)
+- [x] AGENTS.md documents the new behavior (evidence: `AGENTS.md:216`, Platform-scope commit discipline section)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec forge rfc.validate --id RFC-0878 --json` returns 0 violations)
 
 ## Implementation notes for agents
 
