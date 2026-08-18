@@ -16809,10 +16809,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0873-add-generic-nachweis-technical-assessment-ingest-and-immutable-observation-history.md
   - id: RFC-0874
     title: Add reproducible Google Lighthouse assessment adapter for Nachweisregister
-    status: draft
+    status: implemented
     kind: command
     createdAt: 2026-08-18
-    implementedAt: ""
+    implementedAt: 2026-08-18
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16822,7 +16822,8 @@ entries:
       - ADR-0054
       - RFC-0872
       - RFC-0873
-    file: docs/rfcs/rfc-0874-add-reproducible-google-lighthouse-assessment-adapter-for-nachweisregister.md
+      - RFC-0833
+    file: docs/rfcs/archive/implemented/rfc-0874-add-reproducible-google-lighthouse-assessment-adapter-for-nachweisregister.md
   - id: RFC-0875
     title: Add Cloudflare URL Scanner Agent Readiness assessment adapter for
       Nachweisregister
