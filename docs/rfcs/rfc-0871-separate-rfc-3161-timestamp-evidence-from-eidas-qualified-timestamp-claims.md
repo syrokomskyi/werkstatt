@@ -316,14 +316,14 @@ Existing N3 records continue to verify without changes — their Bordbuch entrie
 
 ## Acceptance criteria
 
-- [ ] Legacy N3 records still verify. (evidence: packages/werkstatt/src/nachweis/nachweis-n3.test.ts:447-488)
-- [ ] Legacy missing assurance projects as `rfc3161`. (evidence: packages/werkstatt/src/nachweis/nachweis-verify-signature.ts:139)
-- [ ] Default `nachweis.timestamp` records `rfc3161`. (evidence: packages/werkstatt/src/nachweis/nachweis-timestamp.ts:48-50)
-- [ ] `eidas-qualified` without qualification evidence fails deterministically. (evidence: packages/werkstatt/src/nachweis/nachweis-timestamp.ts:52-53)
-- [ ] Homepage Nachweis copy no longer says `RFC 3161 qualified timestamp` generically. (evidence: systems-cache/warpgogol-com/src/content/pages/de/home.md)
-- [ ] Verify/detail pages expose the actual assurance class. (evidence: packages/werkstatt-site/src/domain/ui/components/nachweis-verify/nachweis-verify-component.astro:107)
-- [ ] Unit tests cover both assurance classes and legacy projection. (evidence: packages/werkstatt/src/nachweis/nachweis-n3.test.ts)
-- [ ] No existing hash-chain entry is mutated. (evidence: packages/werkstatt/src/nachweis/nachweis-timestamp.ts:84-101)
+- [x] Legacy N3 records still verify. (evidence: packages/werkstatt/src/nachweis/nachweis-n3.test.ts:447-488)
+- [x] Legacy missing assurance projects as `rfc3161`. (evidence: packages/werkstatt/src/nachweis/nachweis-verify-signature.ts:139)
+- [x] Default `nachweis.timestamp` records `rfc3161`. (evidence: packages/werkstatt/src/nachweis/nachweis-timestamp.ts:48-50)
+- [x] `eidas-qualified` without qualification evidence fails deterministically. (evidence: packages/werkstatt/src/nachweis/nachweis-timestamp.ts:52-53)
+- [x] Homepage Nachweis copy no longer says `RFC 3161 qualified timestamp` generically. (evidence: systems-cache/warpgogol-com/src/content/pages/de/home.md)
+- [x] Verify/detail pages expose the actual assurance class. (evidence: packages/werkstatt-site/src/domain/ui/components/nachweis-verify/nachweis-verify-component.astro:107)
+- [x] Unit tests cover both assurance classes and legacy projection. (evidence: packages/werkstatt/src/nachweis/nachweis-n3.test.ts)
+- [x] No existing hash-chain entry is mutated. (evidence: packages/werkstatt/src/nachweis/nachweis-timestamp.ts:84-101)
 
 ## Agent constraints
 
