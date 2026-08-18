@@ -117,7 +117,7 @@ function flagBool(input: KernelCommandInput, key: string): boolean {
 function flagInt(input: KernelCommandInput, key: string, defaultValue: number): number {
   const v = input.flags[key];
   if (v == null) return defaultValue;
-  const n = typeof v === "number" ? v : parseInt(String(v), 10);
+  const n = parseInt(String(v), 10);
   return Number.isFinite(n) ? n : defaultValue;
 }
 
@@ -684,90 +684,94 @@ export async function runNachweisLighthouseMeasure(
   const workDir = await mkdtemp(path.join(tmpdir(), "lighthouse-measure-"));
   const timeoutPerRunMs = 120_000;
 
-  let runResults: LighthouseRunResult[];
   try {
+    let runResults: LighthouseRunResult[];
+    try {
+      logger.info(
+        `[nachweis.measure.lighthouse] starting ${runs} sequential Lighthouse runs against ${url}`,
+      );
+      runResults = await runLighthouseBatch(url, runs, workDir, timeoutPerRunMs);
+    } catch (err) {
+      const code =
+        err instanceof LighthouseBatchError ? err.code : "LIGHTHOUSE_CANONICAL_BATCH_INCOMPLETE";
+      return makeErrorMeasureResult(
+        systemId,
+        seriesId,
+        code,
+        `[nachweis.measure.lighthouse] ${code}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    const aggregatedCategories = aggregateCategories(runResults);
+
+    const firstRun = runResults[0]!;
+    await writeMethodologyArtifact(workDir, options, {
+      lighthouseVersion: firstRun.lighthouseVersion,
+      userAgent: firstRun.userAgent,
+      requestedUrl: firstRun.requestedUrl,
+      finalUrl: firstRun.finalUrl,
+    });
+
+    const bundle = buildAssessmentBundle(options, runResults, aggregatedCategories);
+
+    const parsed = assessmentBundleV1Schema.safeParse(bundle);
+    if (!parsed.success) {
+      return makeErrorMeasureResult(
+        systemId,
+        seriesId,
+        "ASSESSMENT_BUNDLE_INVALID",
+        `[nachweis.measure.lighthouse] ASSESSMENT_BUNDLE_INVALID: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`,
+      );
+    }
+
+    const bundlePath = path.join(workDir, "assessment-bundle.json");
+    await fs.writeFile(bundlePath, JSON.stringify(bundle, null, 2), "utf8");
+
     logger.info(
-      `[nachweis.measure.lighthouse] starting ${runs} sequential Lighthouse runs against ${url}`,
+      `[nachweis.measure.lighthouse] ${runs} runs complete, lighthouseVersion=${firstRun.lighthouseVersion}, delegating to nachweis.assessment.ingest`,
     );
-    runResults = await runLighthouseBatch(url, runs, workDir, timeoutPerRunMs);
-  } catch (err) {
-    const code =
-      err instanceof LighthouseBatchError ? err.code : "LIGHTHOUSE_CANONICAL_BATCH_INCOMPLETE";
-    return makeErrorMeasureResult(
+
+    const ingestInput: KernelCommandInput = {
+      argv: [],
+      flags: {
+        system: systemId,
+        bundle: bundlePath,
+        "dry-run": false,
+      },
+    };
+    const ingestResult = await runNachweisAssessmentIngest(ingestInput, context);
+
+    if (ingestResult.exitCode !== 0) {
+      return makeErrorMeasureResult(
+        systemId,
+        seriesId,
+        "ASSESSMENT_INGEST_FAILED",
+        `[nachweis.measure.lighthouse] ASSESSMENT_INGEST_FAILED: ${ingestResult.summary}`,
+      );
+    }
+
+    const measureResult: LighthouseMeasureResult = {
+      command: "nachweis.measure.lighthouse",
+      status: "ok",
       systemId,
       seriesId,
-      code,
-      `[nachweis.measure.lighthouse] ${code}: ${err instanceof Error ? err.message : String(err)}`,
-    );
+      observationId: bundle.observationId,
+      lighthouseVersion: firstRun.lighthouseVersion,
+      runCount: runs,
+      aggregation: "median",
+      ingest: ingestResult.data,
+    };
+
+    const summary = jsonOutput
+      ? JSON.stringify(measureResult, null, 2)
+      : `[nachweis.measure.lighthouse] ${systemId}: ${runs} runs complete, observationId=${bundle.observationId}, lighthouseVersion=${firstRun.lighthouseVersion}`;
+
+    return {
+      data: measureResult,
+      exitCode: 0,
+      summary,
+    };
+  } finally {
+    await fs.rm(workDir, { recursive: true, force: true });
   }
-
-  const aggregatedCategories = aggregateCategories(runResults);
-
-  const firstRun = runResults[0]!;
-  await writeMethodologyArtifact(workDir, options, {
-    lighthouseVersion: firstRun.lighthouseVersion,
-    userAgent: firstRun.userAgent,
-    requestedUrl: firstRun.requestedUrl,
-    finalUrl: firstRun.finalUrl,
-  });
-
-  const bundle = buildAssessmentBundle(options, runResults, aggregatedCategories);
-
-  const parsed = assessmentBundleV1Schema.safeParse(bundle);
-  if (!parsed.success) {
-    return makeErrorMeasureResult(
-      systemId,
-      seriesId,
-      "ASSESSMENT_BUNDLE_INVALID",
-      `[nachweis.measure.lighthouse] ASSESSMENT_BUNDLE_INVALID: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`,
-    );
-  }
-
-  const bundlePath = path.join(workDir, "assessment-bundle.json");
-  await fs.writeFile(bundlePath, JSON.stringify(bundle, null, 2), "utf8");
-
-  logger.info(
-    `[nachweis.measure.lighthouse] ${runs} runs complete, lighthouseVersion=${firstRun.lighthouseVersion}, delegating to nachweis.assessment.ingest`,
-  );
-
-  const ingestInput: KernelCommandInput = {
-    argv: [],
-    flags: {
-      system: systemId,
-      bundle: bundlePath,
-      "dry-run": false,
-    },
-  };
-  const ingestResult = await runNachweisAssessmentIngest(ingestInput, context);
-
-  if (ingestResult.exitCode !== 0) {
-    return makeErrorMeasureResult(
-      systemId,
-      seriesId,
-      "ASSESSMENT_INGEST_FAILED",
-      `[nachweis.measure.lighthouse] ASSESSMENT_INGEST_FAILED: ${ingestResult.summary}`,
-    );
-  }
-
-  const measureResult: LighthouseMeasureResult = {
-    command: "nachweis.measure.lighthouse",
-    status: "ok",
-    systemId,
-    seriesId,
-    observationId: bundle.observationId,
-    lighthouseVersion: firstRun.lighthouseVersion,
-    runCount: runs,
-    aggregation: "median",
-    ingest: ingestResult.data,
-  };
-
-  const summary = jsonOutput
-    ? JSON.stringify(measureResult, null, 2)
-    : `[nachweis.measure.lighthouse] ${systemId}: ${runs} runs complete, observationId=${bundle.observationId}, lighthouseVersion=${firstRun.lighthouseVersion}`;
-
-  return {
-    data: measureResult,
-    exitCode: 0,
-    summary,
-  };
 }
