@@ -360,20 +360,20 @@ The `forge-bootstrap` skill (`packages/forge/skills/meta/forge-bootstrap/SKILL.m
 
 ## Acceptance criteria
 
-- [ ] `forge create --in-place --profile <id>` scaffolds a project in the current directory without creating a subdirectory (evidence: `packages/forge/src/tests/create.test.ts`, `--in-place` test cases)
-- [ ] `--profile` is required with `--in-place`; missing `--profile` produces an error listing all supported profiles (evidence: `packages/forge/src/tests/create.test.ts`, missing-profile test)
-- [ ] Project name is auto-derived from `path.basename(cwd)` and converted to kebab-case when `--name` is not provided (evidence: `packages/forge/src/tests/create.test.ts`, name-derivation test)
-- [ ] `--in-place` tolerates `package.json`, `node_modules/`, `pnpm-lock.yaml`, `.git/`, `.vscode/` but refuses if `forge.yaml` or conflicting scaffold files exist (evidence: `packages/forge/src/tests/create.test.ts`, conflict-check tests)
-- [ ] `--name` flag is accepted as project name override (used in `forge.yaml` only, not as directory name) (evidence: `packages/forge/src/tests/create.test.ts`, `--name` override test)
-- [ ] `workshop.scaffold` command, its module files, barrel `index.ts`, and package `exports` entries are deleted from `packages/werkstatt/` (evidence: `git log --diff-filter=D -- packages/werkstatt/src/workshop/`)
-- [ ] `workshop` module removed from `tools/kernel.config.ts` (evidence: `tools/kernel.config.ts` no longer imports workshop module)
-- [ ] `packages/werkstatt/AGENTS.md` entry points table no longer lists `@warpgogol/werkstatt/workshop` or `@warpgogol/werkstatt/workshop-module` (evidence: `packages/werkstatt/AGENTS.md`)
-- [ ] README rewritten to describe only the agent-driven in-place flow (evidence: `packages/forge/README.md`, no global install or `pnpm dlx` instructions)
-- [ ] AGENTS.md includes explicit agent instructions for installation flow and unsupported-type handling (evidence: `AGENTS.md`, new "Installation flow" section)
-- [ ] Root `AGENTS.md` line 12 no longer references `workshop.scaffold` (evidence: `AGENTS.md`)
-- [ ] `forge-bootstrap` skill updated for agent-driven entry (evidence: `packages/forge/skills/meta/forge-bootstrap/SKILL.md`)
-- [ ] Generated files regenerated without `workshop.scaffold` entries (evidence: `docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, `docs/ecosystem.generated.yaml`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `forge create --in-place --profile <id>` scaffolds a project in the current directory without creating a subdirectory (evidence: `packages/forge/src/tests/create.test.ts`, `--in-place` test cases)
+- [x] `--profile` is required with `--in-place`; missing `--profile` produces an error listing all supported profiles (evidence: `packages/forge/src/tests/create.test.ts`, missing-profile test)
+- [x] Project name is auto-derived from `path.basename(cwd)` and converted to kebab-case when `--name` is not provided (evidence: `packages/forge/src/tests/create.test.ts`, name-derivation test)
+- [x] `--in-place` tolerates `package.json`, `node_modules/`, `pnpm-lock.yaml`, `.git/`, `.vscode/` but refuses if `forge.yaml` or conflicting scaffold files exist (evidence: `packages/forge/src/tests/create.test.ts`, conflict-check tests)
+- [x] `--name` flag is accepted as project name override (used in `forge.yaml` only, not as directory name) (evidence: `packages/forge/src/tests/create.test.ts`, `--name` override test)
+- [x] `workshop.scaffold` command, its module files, barrel `index.ts`, and package `exports` entries are deleted from `packages/werkstatt/` (evidence: `git log --diff-filter=D -- packages/werkstatt/src/workshop/`)
+- [x] `workshop` module removed from `tools/kernel.config.ts` (evidence: `tools/kernel.config.ts` no longer imports workshop module)
+- [x] `packages/werkstatt/AGENTS.md` entry points table no longer lists `@warpgogol/werkstatt/workshop` or `@warpgogol/werkstatt/workshop-module` (evidence: `packages/werkstatt/AGENTS.md`)
+- [x] README rewritten to describe only the agent-driven in-place flow (evidence: `packages/forge/README.md`, no global install or `pnpm dlx` instructions)
+- [x] AGENTS.md includes explicit agent instructions for installation flow and unsupported-type handling (evidence: `AGENTS.md`, new "Installation flow" section)
+- [x] Root `AGENTS.md` line 12 no longer references `workshop.scaffold` (evidence: `AGENTS.md`)
+- [x] `forge-bootstrap` skill updated for agent-driven entry (evidence: `packages/forge/skills/meta/forge-bootstrap/SKILL.md`)
+- [x] Generated files regenerated without `workshop.scaffold` entries (evidence: `docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, `docs/ecosystem.generated.yaml`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec forge rfc.validate --id RFC-0877` passes with 0 errors)
 
 ## Implementation notes for agents
 
