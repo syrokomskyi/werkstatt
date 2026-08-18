@@ -292,3 +292,18 @@ Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guar
 - **Entitlement gating:** Skips silently when `nachweis` entitlement is not resolved (same as all nachweis commands).
 - **Dry-run:** `--dry-run` returns immediately without running Lighthouse or ingesting.
 - **No duplication:** The adapter does not duplicate R2 path construction, SHA-256 hashing, PBP persistence, or Bordbuch append logic — it produces an `AssessmentBundleV1` and calls `runNachweisAssessmentIngest` directly.
+
+## nachweis.measure.cloudflare-agent-readiness (RFC-0875)
+
+`nachweis.measure.cloudflare-agent-readiness` is a provider adapter that submits an Unlisted Cloudflare URL Scanner scan with `agentReadiness: true`, polls the result endpoint until completion, parses Agent Readiness dimensions, builds an `AssessmentBundleV1`, and delegates to `nachweis.assessment.ingest` (RFC-0873) for R2 upload, PBP write, and Bordbuch append.
+
+- **Credentials:** Requires `CLOUDFLARE_URL_SCANNER_ACCOUNT_ID` and `CLOUDFLARE_URL_SCANNER_API_TOKEN` env vars. Fails with `CLOUDFLARE_CREDENTIALS_MISSING` if absent.
+- **API endpoints:** `POST /client/v4/accounts/{accountId}/urlscanner/v2/scan` for submission, `GET /client/v4/accounts/{accountId}/urlscanner/v2/result/{scanId}` for polling. Uses `fetch()` (Node 18+ built-in) — no external HTTP library.
+- **Unlisted visibility:** Scans are submitted with `visibility: "Unlisted"` by default — results are not publicly indexed.
+- **Polling:** 15-second intervals, 5-minute max elapsed. HTTP 404 = in progress, HTTP 200 + `task.success: true` = complete, HTTP 200 + `task.success: false` = `CLOUDFLARE_SCAN_FAILED`, timeout = `CLOUDFLARE_SCAN_TIMEOUT`.
+- **Parser:** Uses explicit field paths (`result.agentReadiness.checks.<id>.status`, `.details`) — no heuristic field-name matching. Fails with `ASSESSMENT_SCHEMA_UNSUPPORTED` if `agentReadiness` is absent.
+- **Not-checked dimensions:** Mapped to `status: "not-checked"` — never coerced to `score: 0`.
+- **Unknown dimensions:** Preserved from the provider response — dimensions are not hard-coded.
+- **Deterministic observedAt:** Set from `result.scan.finishedAt` or `result.scan.createdAt`, not `new Date()`.
+- **Raw artifacts:** `cloudflare-submission.json` and `cloudflare-result.json` are preserved as bundle artifacts.
+- **No duplication:** Same as Lighthouse — the adapter produces an `AssessmentBundleV1` and calls `runNachweisAssessmentIngest` directly.
