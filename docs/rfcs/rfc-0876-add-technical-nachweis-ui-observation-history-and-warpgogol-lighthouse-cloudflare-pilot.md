@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
+enhancedAt: 2026-08-18
 implementedAt:
 closedAt:
 supersedes: []
@@ -26,6 +27,8 @@ related:
   - RFC-0874
   - RFC-0875
 satisfies:
+  - DNA-17
+  - DNA-23
   - DNA-24
 versionBump: patch
 commands:
@@ -48,6 +51,10 @@ nonGoals:
   - "Does not create a carousel"
   - "Does not hard-code provider scores"
   - "Does not publish raw private provider artifacts by default"
+  - "Does not add technical score strips to every page — context-specific future projections require evidence relevance"
+  - "Does not draw a chart in v1 — no existing generic accessible chart component exists in the codebase"
+  - "Does not make wall-clock freshness a deterministic build gate — a future scheduler may automate reruns"
+  - "Does not create a separate badge component for compact projection — reuses nachweis-card with variant: compact"
 ---
 
 # RFC-0876: Add technical Nachweis UI, observation history and Warpgogol Lighthouse/Cloudflare pilot
@@ -80,7 +87,7 @@ Do not create Nachweis surface blueprints.
 
 #### `nachweis-card`
 
-Change to a discriminated union:
+Change to a discriminated union with an explicit discriminant field `variant` on both variants:
 
 ```ts
 type NachweisCardProps =
@@ -88,7 +95,16 @@ type NachweisCardProps =
   | NachweisTechnicalAssessmentCardProps;
 ```
 
-Existing attestation props remain compatible.
+Attestation variant (extends existing props with a discriminant):
+
+```ts
+interface NachweisAttestationCardProps {
+  variant: "attestation";
+  // ...all existing props from RFC-0708 (slug, title, result, scope, etc.)
+}
+```
+
+The `variant: "attestation"` field is added to all existing call sites. This is a forward-only change — no compatibility shim, no dual-path. Existing attestation card snapshot/semantic tests are updated to include the discriminant.
 
 Technical variant:
 
@@ -96,7 +112,7 @@ Technical variant:
 interface NachweisTechnicalAssessmentCardProps {
   variant: "technical-assessment";
   slug: string;
-  title: Record<string, string>;
+  title: string; // localized by the page per-locale, same as attestation
   provider: { id: string; name: string };
   tool: { name: string; version?: string };
   executionMode: "operator-run" | "provider-run";
@@ -111,10 +127,28 @@ interface NachweisTechnicalAssessmentCardProps {
   overall?: { score?: number; level?: string };
   dimensions: NachweisAssessmentDimension[];
   verificationLevel: "N0" | "N1" | "N2" | "N3";
-  sourceHashes: string[];
+  sourceHashes: string[]; // SHA-256 hashes from the Sichtpass, shown as a summary on the card
   limitation: string;
 }
 ```
+
+`NachweisAssessmentDimension` is the UI projection of the dimension shape from `AssessmentBundleV1["result"]["dimensions"]` in `@warpgogol/werkstatt/nachweis`:
+
+```ts
+interface NachweisAssessmentDimension {
+  id: string;
+  providerLabel: string;
+  score?: number;
+  numerator?: number;
+  denominator?: number;
+  status?: "pass" | "fail" | "not-checked";
+  level?: string;
+}
+```
+
+The UI dimension type omits `experimental`, `min`, `max`, `samples` — these are not rendered in v1. The source of truth remains the `AssessmentBundleV1` schema; the UI type is a minimal projection.
+
+`sourceHashes` are the same SHA-256 values shown in the Sichtpass section of `nachweis-detail`. The card shows them as a compact summary; the detail page shows them with full labels. No duplicate data — both read from the same PBP entity.
 
 Do not require quote, organization/person or Consent props for this variant.
 
@@ -132,7 +166,9 @@ interface NachweisListProps {
 }
 ```
 
-`compact` uses the same semantic data but reduces explanatory detail for contextual projection. No separate badge component unless implementation proves the existing component cannot meet composition/accessibility requirements.
+`compact` uses the same semantic data but reduces explanatory detail for contextual projection. In compact mode, the card omits: `context`, `limitations` (full text), `verifiedScope`, `notVerifiedScope`, and `sourceHashes`. It keeps: `title`, `result`, `observedAt` (as `<time datetime>`), `provider` name, `limitation` (short), and a link to detail. No separate badge component — `nachweis-card` with `variant: "compact"` renders the reduced form.
+
+`kindFilter` is used when a single `NachweisList` receives mixed record types and needs to render only one kind. The registry page uses two separate `NachweisList` instances (one per section), each with `kindFilter` set to its section's kind. This avoids pre-filtering in the page block and keeps the component self-contained.
 
 #### `nachweis-detail`
 
@@ -228,7 +264,9 @@ Required:
 
 For a technical series, show: `Pruefverlauf`
 
-Data comes from published immutable observations sharing `seriesId`.
+Data comes from published immutable observations sharing `seriesId`. Each observation is a separate PBP evidence-source entity with `assessment.seriesId` and `assessment.observationId` fields. The evidence-source slug MUST be unique per observation (e.g. `{seriesId}-{observationId}`) so that new observations in the same series do not overwrite previous ones.
+
+The history list is resolved at build time by reading PBP evidence-source entities via `getCollection("business-profile")`, filtering by `kind: "technical-assessment"` and `status: "published"`, grouping by `assessment.seriesId`, and sorting by `assessment.observedAt` descending. The manifest (`/public/nachweise/manifest.json`) also carries `seriesId`, `observationId`, and `observedAt` fields for technical assessments — the detail page may read from either source, but the PBP entity is the source of truth.
 
 Initial UI may show up to the latest five rows:
 
@@ -278,7 +316,7 @@ Display at most:
 
 CTA: `Alle Nachweise ansehen`
 
-The component reads published records; no scores are copied manually into `home.md`.
+The component reads published records at build time via `getCollection("business-profile")`, filtering by `type: "evidence-source"`, `kind` in the Nachweis evidence kinds set, and `status: "published"`. No scores are copied manually into `home.md`. The block resolves the latest published observation per `seriesId` by sorting on `assessment.observedAt` descending and taking the first row per series.
 
 If no records are published, fall back to a neutral process explanation rather than fake examples.
 
@@ -404,3 +442,104 @@ Agentic Browsing `3/3` is rendered as text/status, not a 100 circle.
 - [ ] Cloudflare pilot is rerun via API; screenshot values are not seeded.
 - [ ] Both pilot observations complete N3 and publish through the policy gate.
 - [ ] `/nachweise/`, both detail pages, verify pages, status JSON and manifest work after deploy.
+
+## Design
+
+### Data flow
+
+All Nachweis UI data is resolved at Astro build time (SSG). No client-side fetching.
+
+1. **PBP evidence-source entities** in the `business-profile` content collection are the source of truth. Each entity has `type: "evidence-source"`, `kind` (attestation or technical-assessment), `status` (draft/published), and optional `assessment` metadata (for technical assessments with `seriesId`, `observationId`, `observedAt`, `dimensions`).
+2. **`nachweis-routes.ts`** enumerates published entities and generates virtual routes for detail and verify pages.
+3. **`/nachweise/` registry page** reads all published entities, splits by kind, renders two `NachweisList` sections (technical + attestation).
+4. **Homepage block** reads all published entities, resolves the latest per `seriesId`, renders a compact `NachweisList`.
+5. **`/public/nachweise/manifest.json`** is generated by `nachweis.manifest.generate` and carries summary fields including `seriesId`, `observationId`, `observedAt` for technical assessments. The status JSON endpoint reads from the same manifest.
+6. **Observation history** on the detail page reads all published entities with the same `assessment.seriesId`, sorted by `observedAt` descending.
+
+### File system responsibilities
+
+| Path | Change |
+| --- | --- |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-card/nachweis-card-component.astro` | Add discriminated union, technical-assessment variant |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-card/nachweis-card-component.css` | Technical-assessment styles |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-list/nachweis-list-component.astro` | Add `variant`, `kindFilter`, `limit` props |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-detail/nachweis-detail-component.astro` | Add technical detail layout, observation history |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-verify/nachweis-verify-component.astro` | No change (already uses RFC-0871 timestamp assurance) |
+| `packages/werkstatt-site/src/domain/share/astro/nachweis-routes.ts` | No change (already includes `technical-assessment` kind) |
+| `packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-*.yaml` | Update archetype schemas if needed |
+| warpgogol-com `src/content/pages/*/home.md` | Replace static nachweis block with dynamic projection |
+| warpgogol-com `src/content/pages/*/nachweise/index.md` | Update to umbrella registry with two sections |
+| warpgogol-com footer layout | Remove volatile scores, keep stable Nachweise links |
+
+### DNA alignment
+
+- **DNA-17** (Cosmic overlay): Component manifests retain their `cosmicName` entries (Nix, Hydra, Kerberos, Styx). No new components are created — existing ones are extended.
+- **DNA-23** (Cosmic overlay — manifests): The `manifest.yaml` files for the four components remain valid. No cosmic name changes.
+- **DNA-24** (Block-declarative pages): The `/nachweise/` page remains a frontmatter-only document with `blocks[]`. The homepage block remains block-declarative. No markdown bodies in page entries.
+
+### `amendedBy` reciprocation
+
+Upon implementation, RFC-0708 and RFC-0716 frontmatter must be updated to include `amendedBy: [RFC-0876]`. This is a mechanical step done during implementation, not a separate RFC.
+
+### Compass sync
+
+`docs/verification-plan.xml` may need updates if new verification rules are introduced for technical-assessment UI rendering. `docs/source-markup.xml` may need updates if the component contracts change. Check during `fo-doc-audit` after implementation.
+
+### AGENTS.md updates
+
+`packages/werkstatt-site/AGENTS.md` should document the technical-assessment variant in the component rules section after implementation.
+
+## Rollout
+
+### Default behavior
+
+All Nachweis UI components gain the `variant` discriminant. Existing attestation call sites are updated to pass `variant: "attestation"`. The `/nachweise/` page gains two sections. The homepage block becomes dynamic.
+
+### Adoption path for warpgogol-com
+
+1. Extend the four components in `packages/werkstatt-site`.
+2. Update existing attestation content to include `variant: "attestation"`.
+3. Update `/nachweise/` page content to umbrella registry.
+4. Replace homepage static nachweis block with dynamic projection.
+5. Update footer to remove volatile scores.
+6. Run Lighthouse and Cloudflare pilot observations through the publication flow.
+7. Build, validate, deploy.
+
+### New-app compliance
+
+New sites with the `nachweis` entitlement automatically get the extended components. No migration needed — the components handle empty states gracefully.
+
+## Alternatives considered
+
+1. **Separate components for technical assessments** (e.g. `nachweis-technical-card.astro`): Rejected because it duplicates the semantic structure (article, dl, headings) and creates a maintenance burden. The discriminated union keeps one component with two rendering paths.
+2. **Client-side fetching for homepage projection**: Rejected because the site is SSG (Astro). Build-time resolution via `getCollection` is simpler, faster, and consistent with the existing `nachweis-routes.ts` pattern.
+3. **Storing observation history in a separate collection**: Rejected because PBP evidence-source entities already carry `assessment.seriesId` and `assessment.observationId`. A separate collection would duplicate data and create a sync problem.
+4. **Carousel for registry**: Rejected by explicit nonGoal. A linear list with semantic `<ul>` is more accessible and honest.
+
+## Risks
+
+- **Agent misinterpretation risk**: An agent might treat the `variant` field as optional and omit it, causing a runtime error in the discriminated union. Mitigation: the `cast` helper in `nachweis-list` validates the discriminant and throws a descriptive error if missing.
+- **False-positive rate for validators**: The existing `nachweis-card` snapshot tests will need updating to include `variant: "attestation"`. This is expected and not a false positive — the tests are updated, not weakened.
+- **Slug collision for observation history**: If the slug is not unique per observation, new observations overwrite old ones. Mitigation: the slug MUST include the observationId (e.g. `{seriesId}-{observationId}`). The `nachweis-assessment-ingest` code currently uses a series-level slug — this RFC requires updating it to include the observationId.
+- **Homepage empty state**: If no technical records are published, the homepage block must render a neutral process explanation, not fake examples. This is a content authoring step, not auto-generated.
+- **Pilot execution failure**: Lighthouse or Cloudflare API calls may fail. The publication flow is operator-driven — a failed measurement does not block the build. The homepage falls back to the empty state.
+
+## Implementation notes for agents
+
+- **Do not seed screenshot values** into PBP content or test fixtures (RFC-0874, RFC-0875). Run the actual Lighthouse and Cloudflare measurements.
+- **Do not call `nachweis.public-derivative`** merely to satisfy the technical policy. It is optional.
+- **Do not call `nachweis.consent.update`** for Warpgogol technical records unless a real consent-bearing artifact is introduced.
+- **Do not use the word `aktuell`** solely because a record exists. If a record is older than its declared freshness policy (`maxAgeDays = 30`), avoid a "current" label.
+- **Do not map `not-checked` Cloudflare dimensions to score 0** (RFC-0875). Render them as `not-checked` status.
+- **Do not infer eIDAS qualification** from the word `TSA`, from RFC 3161 compliance, or from a provider marketing page (RFC-0871).
+- **Do not silently upgrade legacy records** (RFC-0871).
+- **Do not weaken N3** merely to avoid the terminology correction (RFC-0871).
+- **Do not put live Lighthouse/Cloudflare numbers in the footer.**
+- **Do not spray scores across the site.** Only the homepage and `/nachweise/` render technical scores.
+- **Do not create a carousel.** Use semantic `<ul>` lists.
+- **Do not draw a chart in v1.** No existing generic accessible chart component exists.
+- **Never delete an older public observation** merely because a new score is lower/higher. Withdrawal is a governance action with reason.
+- **Distinguish code changes from content authoring**: Component extensions, page block updates, and footer changes are code changes an agent can make. Pilot observations require operator execution of the measurement adapters. Homepage empty-state prose requires human authoring.
+- **RFC-0871 compliance**: Timestamp wording in `nachweis-verify` and `nachweis-detail` must use the structured `timestamp` prop with `assurance: "rfc3161" | "eidas-qualified"`. Do not make stronger legal claims than supported.
+- **RFC-0874 compliance**: Lighthouse pilot must run 5 sequential runs with median aggregation. Screenshot values are not seeded.
+- **RFC-0875 compliance**: Cloudflare pilot must submit via API, poll for results, and parse using the documented field paths. Screenshot values are not seeded.
