@@ -6,6 +6,7 @@
   <item>Registers nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw, nachweis.approve, nachweis.public-derivative.</item>
   <item>RFC-0873: Registers nachweis.assessment.ingest for technical-assessment bundle ingestion.</item>
   <item>RFC-0874: Registers nachweis.measure.lighthouse for reproducible Lighthouse assessment measurement.</item>
+  <item>RFC-0875: Registers nachweis.measure.cloudflare-agent-readiness for Cloudflare URL Scanner Agent Readiness assessment.</item>
   <item>RFC-0715: Registers nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature.</item>
   <item>Uses dynamic imports for lazy loading (same pattern as evidence-module.ts and bordbuch.module.ts).</item>
   <item>Declares correct scopes, flags, reads/writes for each command.</item>
@@ -22,6 +23,7 @@
   <item>RFC-0872: update nachweis.validate, nachweis.publish, nachweis.withdraw descriptions to reflect policy-driven V2 gates.</item>
   <item>RFC-0873: add nachweis.assessment.ingest command registration.</item>
   <item>RFC-0874: add nachweis.measure.lighthouse command registration.</item>
+  <item>RFC-0875: add nachweis.measure.cloudflare-agent-readiness command registration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -46,6 +48,8 @@ export function createNachweisModule(): KernelModule {
       const { runNachweisVerifySignature } = await import("./nachweis-verify-signature.ts");
       const { runNachweisAssessmentIngest } = await import("./nachweis-assessment-ingest.ts");
       const { runNachweisLighthouseMeasure } = await import("./nachweis-lighthouse-measure.ts");
+      const { runNachweisCloudflareAgentReadinessMeasure } =
+        await import("./nachweis-cloudflare-agent-readiness-measure.ts");
 
       registry.registerCommand({
         name: "nachweis.ingest",
@@ -383,6 +387,50 @@ export function createNachweisModule(): KernelModule {
         reads: [],
         writes: [],
         execute: runNachweisLighthouseMeasure,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.measure.cloudflare-agent-readiness",
+        description:
+          "RFC-0875: Submit an Unlisted Cloudflare URL Scanner scan with Agent Readiness enabled, poll for completion, parse dimensions, build AssessmentBundleV1, and delegate to nachweis.assessment.ingest.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          url: {
+            kind: "string",
+            required: true,
+            description: "Target HTTPS URL to scan with Cloudflare URL Scanner",
+          },
+          "series-id": {
+            kind: "string",
+            description: "Assessment series ID (default: cloudflare-agent-readiness-pilot)",
+          },
+          "authorization-basis": {
+            kind: "string",
+            description:
+              "Authorization basis: site-owner (default), service-contract, explicit-operator",
+          },
+          methodology: {
+            kind: "string",
+            description:
+              "Methodology ID and version in format <id>@<version> (default: CF-AR-01@1.0)",
+          },
+          "freshness-days": {
+            kind: "string",
+            description: "Freshness max age in days (default: 30)",
+          },
+          "dry-run": {
+            kind: "boolean",
+            description: "Skip API call and ingest — return dry-run result",
+          },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisCloudflareAgentReadinessMeasure,
       });
 
       registry.registerCommand({
