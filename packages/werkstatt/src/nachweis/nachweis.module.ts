@@ -1,9 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0707/RFC-0714/RFC-0715: Nachweis kernel module — registers 12 nachweis.* commands with lazy-loaded handlers.</purpose>
+<purpose>RFC-0707/RFC-0714/RFC-0715/RFC-0873: Nachweis kernel module — registers 13 nachweis.* commands with lazy-loaded handlers.</purpose>
 <keywords>nachweis, module, kernel, commands, registration</keywords>
 <responsibilities>
   <item>Registers nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw, nachweis.approve, nachweis.public-derivative.</item>
+  <item>RFC-0873: Registers nachweis.assessment.ingest for technical-assessment bundle ingestion.</item>
   <item>RFC-0715: Registers nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature.</item>
   <item>Uses dynamic imports for lazy loading (same pattern as evidence-module.ts and bordbuch.module.ts).</item>
   <item>Declares correct scopes, flags, reads/writes for each command.</item>
@@ -18,6 +19,7 @@
   <item>RFC-0715: add nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature. Remove --pilot-n2-exception from nachweis.publish.</item>
   <item>RFC-0871: add --timestamp-assurance and --qualification-evidence-ref flags to nachweis.timestamp.</item>
   <item>RFC-0872: update nachweis.validate, nachweis.publish, nachweis.withdraw descriptions to reflect policy-driven V2 gates.</item>
+  <item>RFC-0873: add nachweis.assessment.ingest command registration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -40,6 +42,7 @@ export function createNachweisModule(): KernelModule {
       const { runNachweisSign } = await import("./nachweis-sign.ts");
       const { runNachweisTimestamp } = await import("./nachweis-timestamp.ts");
       const { runNachweisVerifySignature } = await import("./nachweis-verify-signature.ts");
+      const { runNachweisAssessmentIngest } = await import("./nachweis-assessment-ingest.ts");
 
       registry.registerCommand({
         name: "nachweis.ingest",
@@ -303,6 +306,32 @@ export function createNachweisModule(): KernelModule {
         reads: [],
         writes: [],
         execute: runNachweisTimestamp,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.assessment.ingest",
+        description:
+          "RFC-0873: Ingest a technical-assessment bundle (AssessmentBundleV1) — validate, hash artifacts, upload to R2, write PBP evidence-source, append Bordbuch entry.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          bundle: {
+            kind: "string",
+            required: true,
+            description: "Path to AssessmentBundleV1 JSON file",
+          },
+          "dry-run": {
+            kind: "boolean",
+            description: "Skip R2 upload, PBP write, and Bordbuch append",
+          },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisAssessmentIngest,
       });
 
       registry.registerCommand({

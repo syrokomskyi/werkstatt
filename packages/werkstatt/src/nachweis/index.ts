@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis barrel exports.</item>
   <item>RFC-0714: add nachweis.approve and nachweis.public-derivative exports.</item>
+  <item>RFC-0873: add assessment bundle types, Zod schema, and nachweis.assessment.ingest handler export.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -42,6 +43,12 @@ export {
   type NachweisWithdrawResult,
   type NachweisApproveResult,
   type NachweisPublicDerivativeResult,
+  type AssessmentBundleArtifact,
+  type AssessmentBundleV1,
+  type AssessmentIngestResult,
+  assessmentBundleV1Schema,
+  mediaTypeToExt,
+  resolveAssessmentR2Path,
 } from "./nachweis-io.ts";
 
 export { runNachweisIngest } from "./nachweis-ingest.ts";
@@ -52,4 +59,5 @@ export { runNachweisPublish } from "./nachweis-publish.ts";
 export { runNachweisWithdraw } from "./nachweis-withdraw.ts";
 export { runNachweisApprove } from "./nachweis-approve.ts";
 export { runNachweisPublicDerivative } from "./nachweis-public-derivative.ts";
+export { runNachweisAssessmentIngest } from "./nachweis-assessment-ingest.ts";
 export { createNachweisModule } from "./nachweis.module.ts";
