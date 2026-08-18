@@ -460,7 +460,7 @@ export async function runNachweisAssessmentIngest(
       workspaceRoot,
       systemId,
       "nachweis-record",
-      `Assessment ingested for '${bundle.slug}' (${bundle.seriesId}/${bundle.observationId})`,
+      `Assessment ingested for '${bundle.slug}' (${bundle.seriesId})`,
       "agent",
       {
         writerRole: "nachweis",
