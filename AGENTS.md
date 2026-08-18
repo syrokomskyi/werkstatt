@@ -34,8 +34,6 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `@warpgogol/werkstatt/schemas` | `./src/schemas/index.ts` |
 | `@warpgogol/werkstatt/component` | `./src/component/index.ts` |
 | `@warpgogol/werkstatt/handoff` | `./src/handoff/index.ts` |
-| `@warpgogol/werkstatt/workshop` | `./src/workshop/index.ts` |
-| `@warpgogol/werkstatt/workshop-module` | `./src/workshop/workshop.module.ts` |
 | `@warpgogol/werkstatt/*-module` | `./src/*/*.module.ts` (all module entry points) |
 
 ## Scripts
@@ -49,7 +47,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 
 ## Package architecture
 
-- This package owns the Werkstatt engine: kernel runtime, missions, mirrors (Sternsystem), releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, werkstatt consistency primitives, fingerprint, integrity, observability, agent-gate, changelog, operations schemas, and workshop scaffolding (RFC-0779).
+- This package owns the Werkstatt engine: kernel runtime, missions, mirrors (Sternsystem), releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, werkstatt consistency primitives, fingerprint, integrity, observability, agent-gate, changelog, and operations schemas.
 - The package is stack-agnostic (DNA-64). It MUST NOT import stack plugins.
 - The plugin contract (`werkstatt/plugin@1`) and registry in `src/plugin-contract.ts` and `src/plugin-registry.ts` are **legacy code facts**. All 25 RFC-0855 packets are completed; the plugin entry has not yet been removed from code. Future removal requires a superseding RFC.
 - The `werkstatt.autonomy.validate` command (DNA-64 enforcement) scans `src/**` for forbidden `@warpgogol/*` static imports. The `werkstatt.shared.validate` command (RFC-0868) enforces that no `@warpgogol/werkstatt-site/*` static imports remain in `src/**`.
