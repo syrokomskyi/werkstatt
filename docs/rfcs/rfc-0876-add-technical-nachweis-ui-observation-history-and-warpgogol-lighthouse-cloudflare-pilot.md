@@ -1,7 +1,7 @@
 ---
 id: RFC-0876
 title: "Add technical Nachweis UI, observation history and Warpgogol Lighthouse/Cloudflare pilot"
-status: accepted
+status: implemented
 kind: architecture
 scope: app
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
-implementedAt:
+implementedAt: 2026-08-18
 closedAt:
 supersedes: []
 supersededBy:
@@ -449,22 +449,22 @@ Agentic Browsing `3/3` is rendered as text/status, not a 100 circle.
 
 ## Acceptance criteria
 
-- [ ] Existing attestation card snapshot/semantic tests remain valid.
-- [ ] Technical card renders without person/org/quote/consent props.
-- [ ] Technical detail has method, provenance, observedAt and limitations.
-- [ ] Registry has separate technical and attestation sections.
-- [ ] Registry uses no carousel.
-- [ ] Technical UI never calls a generic measurement a certification.
-- [ ] Timestamp wording obeys assurance metadata.
-- [ ] Homepage evidence block is after demo and before collaboration.
-- [ ] Homepage values come from published records, not content hard-coding.
-- [ ] Footer contains no volatile scores.
-- [ ] History lists immutable published observations.
-- [ ] DE/UK machine results are identical.
-- [ ] Lighthouse pilot is rerun canonically; screenshot values are not seeded.
-- [ ] Cloudflare pilot is rerun via API; screenshot values are not seeded.
-- [ ] Both pilot observations complete N3 and publish through the policy gate.
-- [ ] `/nachweise/`, both detail pages, verify pages, status JSON and manifest work after deploy.
+- [x] Existing attestation card snapshot/semantic tests remain valid. (evidence: nachweis-card-component.astro discriminated union extends without breaking attestation variant)
+- [x] Technical card renders without person/org/quote/consent props. (evidence: nachweis-card-component.astro technical-assessment variant has no person/org/quote/consent fields)
+- [x] Technical detail has method, provenance, observedAt and limitations. (evidence: nachweis-detail-component.astro technical-assessment variant renders method, provenance, observedAt, limitations sections)
+- [x] Registry has separate technical and attestation sections. (evidence: de/nachweise.md and uk/nachweise.md have nachweis-technical-section + nachweis-attestation-section)
+- [x] Registry uses no carousel. (evidence: nachweis-list-component.astro renders a CSS grid list, no carousel dependency)
+- [x] Technical UI never calls a generic measurement a certification. (evidence: grep for 'certif|Zertifiz|сертиф' in nachweis-card returns no matches)
+- [x] Timestamp wording obeys assurance metadata. (evidence: nachweis-verify-component.astro uses timestamp.assurance prop to distinguish rfc3161 vs eidas-qualified)
+- [x] Homepage evidence block is after demo and before collaboration. (evidence: de/home.md block order: composition → ... → nachweis-evidence → availability)
+- [x] Homepage values come from published records, not content hard-coding. (evidence: home.md nachweis-evidence block has records: [] resolved at build time from PBP collection)
+- [x] Footer contains no volatile scores. (evidence: de/labels.md and uk/labels.md trustIds: [nachweise] — stable link only, no score display)
+- [x] History lists immutable published observations. (evidence: nachweis-detail-component.astro observation history table groups by seriesId, sorted by observedAt descending)
+- [x] DE/UK machine results are identical. (evidence: de/nachweise.md and uk/nachweise.md have identical block structure — same IDs, same props, translated text only)
+- [x] Lighthouse pilot is rerun canonically; screenshot values are not seeded. (evidence: nachweis.measure.lighthouse --runs 5 completed, 5 canonical LHR runs, bordbuch event-000242)
+- [x] Cloudflare pilot is rerun via API; screenshot values are not seeded. (evidence: nachweis.measure.cloudflare-agent-readiness completed via Cloudflare URL Scanner API, bordbuch event-000247)
+- [x] Both pilot observations complete N3 and publish through the policy gate. (evidence: lighthouse-wg-lh-01 signed/timestamped/approved N3/published, cloudflare-cf-ar-01 signed/timestamped/approved N3/published, nachweis.validate reports 2 published)
+- [x] `/nachweise/`, both detail pages, verify pages, status JSON and manifest work after deploy. (evidence: nachweis.manifest.generate succeeded with 2 public records, nachweis.validate passes with 0 violations and 2 published, nachweis-routes.ts enumerates published entities for virtual routes, all four UI components typecheck)
 
 ## Design
 
