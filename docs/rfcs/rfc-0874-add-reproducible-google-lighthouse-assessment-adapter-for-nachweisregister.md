@@ -1,7 +1,7 @@
 ---
 id: RFC-0874
 title: "Add reproducible Google Lighthouse assessment adapter for Nachweisregister"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
 enhancedAt: 2026-08-18
-implementedAt:
+implementedAt: 2026-08-18
 closedAt:
 supersedes: []
 supersededBy:
