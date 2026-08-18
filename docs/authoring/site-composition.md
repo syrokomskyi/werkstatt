@@ -4,7 +4,7 @@ This document defines the shared instruction layer for site composition across a
 
 Sites are registered in `systems/registry.yaml` and materialized as mission workpieces under `missions/<missionId>/workpiece/`. The rules below apply to every site workspace regardless of where it physically lives (external git repo, mission workpiece, or onboarding scaffold output).
 
-Consumer workshops (the monorepo that consumes the engine + a plugin) are scaffolded via `workshop.scaffold` (RFC-0779), not by copying this repository. The command generates a minimal workshop with `tools/kernel.config.ts`, `forge.yaml`, `.npmrc`, CI, and stack-specific customization, then delegates forge artifacts to `forge.init`.
+Consumer workshops (the monorepo that consumes the engine + a plugin) are scaffolded via `forge create --in-place --profile <profile-id>` (RFC-0877), not by copying this repository. The command scaffolds directly into the current directory with `tools/kernel.config.ts`, `forge.yaml`, `.npmrc`, CI, stack-specific customization, and delegates forge artifacts to `forge.init`.
 
 For repository-wide, cross-workspace, architectural, shared-package, or high-risk tasks, read the root Compass documents in `docs/*.xml` (referenced from root AGENTS.md) before applying site-level rules.
 
