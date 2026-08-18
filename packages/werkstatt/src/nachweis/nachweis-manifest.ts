@@ -8,6 +8,7 @@
   <item>Writes to {cachePath}/public/nachweise/manifest.json using writeFileIfChanged.</item>
   <item>Writes empty manifest (records: []) when no published records exist.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
+  <item>RFC-0872: include observation identity fields for technical-assessment records.</item>
 </responsibilities>
 <non-goals>
   <item>Does not publish records — that is nachweis.publish.</item>
@@ -17,6 +18,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.manifest.generate command handler.</item>
   <item>RFC-0871: read Bordbuch to resolve timestampAssurance per record, default rfc3161 for legacy entries.</item>
+  <item>RFC-0872: add technical-assessment kind, include observation identity fields in manifest entries.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -46,6 +48,8 @@ const NACHWEIS_EVIDENCE_KINDS = new Set([
   "project-confirmation",
   "certificate",
   "operational-evidence",
+  // RFC-0872: technical assessment evidence type
+  "technical-assessment",
 ]);
 
 const MANIFEST_SCHEMA_VERSION = "1.0.0";
@@ -134,6 +138,21 @@ export async function runNachweisManifestGenerate(
         timestampAssurance:
           (timestampedEntries.get(slug)?.timestampAssurance as
             "rfc3161" | "eidas-qualified" | undefined) ?? "rfc3161",
+        // RFC-0872: observation identity fields for technical assessments
+        ...(kind === "technical-assessment"
+          ? {
+              kind,
+              seriesId: (data.assessment as Record<string, unknown>)?.seriesId as
+                string | undefined,
+              observationId: (data.assessment as Record<string, unknown>)?.observationId as
+                string | undefined,
+              observedAt: (data.assessment as Record<string, unknown>)?.observedAt as
+                string | undefined,
+              assessmentProviderId: (
+                (data.assessment as Record<string, unknown>)?.provider as Record<string, unknown>
+              )?.id as string | undefined,
+            }
+          : {}),
       });
     }
   }

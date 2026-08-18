@@ -8,6 +8,7 @@
   <item>Generates deterministic record IDs in nr_{slug}_{YYYYMMDD} format.</item>
   <item>Resolves R2 storage paths for private and public document storage.</item>
   <item>Reads resolved entitlements to check for the nachweis feature.</item>
+  <item>RFC-0872: provides policy-driven publication gate V2 types and policy resolution.</item>
 </responsibilities>
 <non-goals>
   <item>Does not implement command handlers — those live in nachweis-*.ts files.</item>
@@ -19,6 +20,7 @@
   <item>RFC-0707: initial nachweis I/O layer with R2 upload, hash computation, record ID generation.</item>
   <item>RFC-0713: uploadToR2 passes R2_NACHWEIS envPrefix for per-bucket credential isolation.</item>
   <item>RFC-0714: add NachweisApproveResult, NachweisPublicDerivativeResult interfaces and resolveNachweisPublicR2Path helper.</item>
+  <item>RFC-0872: add NachweisPublicationGateV2, policy resolution, extend NachweisManifestEntry, replace legacy NachweisPublicationGate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -68,6 +70,12 @@ export interface NachweisManifestEntry {
   sourceSha256: string;
   publishedAt: string | null;
   timestampAssurance: "rfc3161" | "eidas-qualified";
+  // RFC-0872: observation identity fields for technical assessments
+  kind?: string;
+  seriesId?: string;
+  observationId?: string;
+  observedAt?: string;
+  assessmentProviderId?: string;
 }
 
 export interface NachweisManifest {
@@ -77,22 +85,246 @@ export interface NachweisManifest {
   records: NachweisManifestEntry[];
 }
 
-export interface NachweisPublicationGate {
+// RFC-0872: Policy-driven publication gate V2
+
+export type NachweisPublicationPolicyId =
+  "attestation-v1" | "operational-measurement-v1" | "technical-assessment-v1";
+
+export type GateStatus = "pass" | "fail" | "not_applicable";
+
+// RFC-0872: Gate condition IDs
+export const GATE_CONDITION_IDS = [
+  "source-integrity-verified",
+  "record-approved",
+  "n3-met",
+  "legal-content-check-passed",
+  "consent-granted",
+  "public-derivative-ready",
+  "canonical-raw-artifact-verified",
+  "assessment-metadata-valid",
+  "execution-authorization-basis-present",
+] as const;
+
+export type GateConditionId = (typeof GATE_CONDITION_IDS)[number];
+
+export interface NachweisGateConditionResult {
+  id: GateConditionId;
+  required: boolean;
+  status: GateStatus;
+}
+
+export interface NachweisPublicationGateV2 {
   slug: string;
+  policyId: NachweisPublicationPolicyId;
+  conditions: NachweisGateConditionResult[];
   allPassed: boolean;
-  consentGranted: boolean;
-  sourceIntegrityVerified: boolean;
-  recordApproved: boolean;
-  verificationLevelMet: boolean;
-  publicDerivativeReady: boolean;
-  legalContentCheckPassed: boolean;
+}
+
+export class UnsupportedNachweisKindError extends Error {
+  readonly kind: string;
+  constructor(kind: string) {
+    super(`[nachweis] unsupported evidence kind for publication policy: '${kind}'`);
+    this.name = "UnsupportedNachweisKindError";
+    this.kind = kind;
+  }
+}
+
+const NACHWEIS_KIND_TO_POLICY: Record<string, NachweisPublicationPolicyId> = {
+  "client-statement": "attestation-v1",
+  "project-confirmation": "attestation-v1",
+  certificate: "attestation-v1",
+  "operational-evidence": "operational-measurement-v1",
+  "technical-assessment": "technical-assessment-v1",
+};
+
+export function resolveNachweisPublicationPolicy(kind: string): NachweisPublicationPolicyId {
+  const policy = NACHWEIS_KIND_TO_POLICY[kind];
+  if (!policy) {
+    throw new UnsupportedNachweisKindError(kind);
+  }
+  return policy;
+}
+
+// RFC-0872: Required conditions per policy
+const REQUIRED_CONDITIONS: Record<NachweisPublicationPolicyId, Set<GateConditionId>> = {
+  "attestation-v1": new Set<GateConditionId>([
+    "source-integrity-verified",
+    "record-approved",
+    "n3-met",
+    "legal-content-check-passed",
+    "consent-granted",
+    "public-derivative-ready",
+  ]),
+  "operational-measurement-v1": new Set<GateConditionId>([
+    "source-integrity-verified",
+    "record-approved",
+    "n3-met",
+    "legal-content-check-passed",
+    "canonical-raw-artifact-verified",
+    "execution-authorization-basis-present",
+  ]),
+  "technical-assessment-v1": new Set<GateConditionId>([
+    "source-integrity-verified",
+    "record-approved",
+    "n3-met",
+    "legal-content-check-passed",
+    "canonical-raw-artifact-verified",
+    "assessment-metadata-valid",
+    "execution-authorization-basis-present",
+  ]),
+};
+
+export function isConditionRequired(
+  policyId: NachweisPublicationPolicyId,
+  conditionId: GateConditionId,
+): boolean {
+  return REQUIRED_CONDITIONS[policyId].has(conditionId);
+}
+
+// RFC-0872: Shared gate evaluation — used by both nachweis.validate and nachweis.publish
+
+const ISO_8601_WITH_TZ = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
+
+export function validateAssessmentMetadata(assessment: Record<string, unknown>): boolean {
+  if (assessment.profile !== "technical-assessment") return false;
+  if (typeof assessment.seriesId !== "string" || assessment.seriesId === "") return false;
+  if (typeof assessment.observationId !== "string" || assessment.observationId === "") return false;
+  if (typeof assessment.observedAt !== "string" || !ISO_8601_WITH_TZ.test(assessment.observedAt))
+    return false;
+  const methodology = assessment.methodology as Record<string, unknown> | undefined;
+  if (!methodology) return false;
+  if (typeof methodology.runCount !== "number" || methodology.runCount < 1) return false;
+  const freshness = assessment.freshness as Record<string, unknown> | undefined;
+  if (!freshness) return false;
+  if (typeof freshness.maxAgeDays !== "number" || freshness.maxAgeDays < 1) return false;
+  const dimensions = assessment.dimensions;
+  if (!Array.isArray(dimensions) || dimensions.length < 1) return false;
+
+  for (const dim of dimensions as Record<string, unknown>[]) {
+    // score, when present, is finite and in [0,100]
+    if (dim.score != null) {
+      if (
+        typeof dim.score !== "number" ||
+        !Number.isFinite(dim.score) ||
+        dim.score < 0 ||
+        dim.score > 100
+      )
+        return false;
+    }
+    // numerator/denominator must occur as a valid pair
+    if (dim.numerator != null || dim.denominator != null) {
+      if (typeof dim.numerator !== "number" || typeof dim.denominator !== "number") return false;
+      if (dim.denominator <= 0) return false;
+      if (dim.numerator < 0 || dim.numerator > dim.denominator) return false;
+    }
+    // samples, when present, contain finite values in [0,100]
+    if (dim.samples != null) {
+      if (!Array.isArray(dim.samples)) return false;
+      for (const s of dim.samples) {
+        if (typeof s !== "number" || !Number.isFinite(s) || s < 0 || s > 100) return false;
+      }
+      // min/max must match sample extrema when samples are present
+      const sampleMin = Math.min(...(dim.samples as number[]));
+      const sampleMax = Math.max(...(dim.samples as number[]));
+      if (dim.min != null && dim.min !== sampleMin) return false;
+      if (dim.max != null && dim.max !== sampleMax) return false;
+    }
+  }
+
+  // providerReportUrl, when present, must be HTTPS
+  if (assessment.providerReportUrl != null) {
+    if (
+      typeof assessment.providerReportUrl !== "string" ||
+      !assessment.providerReportUrl.startsWith("https:")
+    )
+      return false;
+  }
+
+  return true;
+}
+
+export interface NachweisGateInput {
+  evidenceData: Record<string, unknown>;
+  consentData: Record<string, unknown> | undefined;
+  bordbuchEntries: {
+    kind: string;
+    metadata?: Record<string, unknown> | null;
+    summary: string;
+  }[];
+}
+
+export function evaluateGateV2(
+  slug: string,
+  kind: string,
+  input: NachweisGateInput,
+): NachweisPublicationGateV2 {
+  const policyId = resolveNachweisPublicationPolicy(kind);
+  const items = input.evidenceData.items as
+    | Record<string, { sha256?: string; storage?: string; role?: string; canonical?: boolean }>
+    | undefined;
+  const assessment = input.evidenceData.assessment as Record<string, unknown> | undefined;
+
+  const consentGranted = input.consentData?.consentStatus === "granted";
+  const sourceIntegrityVerified =
+    items != null && Object.values(items).some((item) => item.sha256 != null);
+  const recordApproved = input.bordbuchEntries.some(
+    (e) => e.kind === "nachweis-record" && e.summary.includes("approved"),
+  );
+  const verificationLevelMet = input.bordbuchEntries.some(
+    (e) => e.kind === "nachweis-record" && e.metadata?.verificationLevel === "N3",
+  );
+  const publicDerivativeReady =
+    items != null && Object.values(items).some((item) => item.storage === "public");
+  const legalContentCheckPassed = input.bordbuchEntries.some(
+    (e) => e.kind === "nachweis-record" && e.metadata?.legalContentCheckPassed === true,
+  );
+  const canonicalRawArtifactVerified =
+    items != null &&
+    Object.values(items).some(
+      (item) => item.role === "raw-result" && item.canonical === true && item.sha256 != null,
+    );
+  const assessmentMetadataValid = assessment != null && validateAssessmentMetadata(assessment);
+  const executionAuthorizationBasisPresent =
+    assessment != null &&
+    assessment.authorizationBasis != null &&
+    assessment.authorizationBasis !== "";
+
+  const conditionResults: Record<GateConditionId, boolean> = {
+    "source-integrity-verified": sourceIntegrityVerified,
+    "record-approved": recordApproved,
+    "n3-met": verificationLevelMet,
+    "legal-content-check-passed": legalContentCheckPassed,
+    "consent-granted": consentGranted,
+    "public-derivative-ready": publicDerivativeReady,
+    "canonical-raw-artifact-verified": canonicalRawArtifactVerified,
+    "assessment-metadata-valid": assessmentMetadataValid,
+    "execution-authorization-basis-present": executionAuthorizationBasisPresent,
+  };
+
+  const conditions: NachweisGateConditionResult[] = (
+    Object.keys(conditionResults) as GateConditionId[]
+  ).map((id) => {
+    const required = isConditionRequired(policyId, id);
+    const passed = conditionResults[id];
+    const status = required ? (passed ? "pass" : "fail") : "not_applicable";
+    return { id, required, status };
+  });
+
+  const allPassed = conditions.every((c) => !c.required || c.status === "pass");
+
+  return {
+    slug,
+    policyId,
+    conditions,
+    allPassed,
+  };
 }
 
 export interface NachweisValidateResult {
   systemId: string;
   records: number;
   violations: NachweisViolation[];
-  gateResults: NachweisPublicationGate[];
+  gateResults: NachweisPublicationGateV2[];
 }
 
 export interface NachweisViolation {
@@ -113,7 +345,7 @@ export interface NachweisPublishResult {
   recordId: string;
   systemId: string;
   published: boolean;
-  gateResult: NachweisPublicationGate;
+  gateResult: NachweisPublicationGateV2;
   bordbuchEventId: string | null;
 }
 

@@ -10,6 +10,7 @@
   <item>Enforces publication gate: no published record without all conditions met.</item>
   <item>Delegates bordbuch hash-chain validation to bordbuch.validate.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
+  <item>RFC-0872: policy-driven gate V2, technical-assessment validation, locale drift check.</item>
 </responsibilities>
 <non-goals>
   <item>Does not modify any state — read-only validation.</item>
@@ -20,6 +21,7 @@
   <item>RFC-0707: initial nachweis.validate command handler.</item>
   <item>RFC-0715: add N3 artifact check — verify nachweis-signed and nachweis-timestamped entries exist for N3 records.</item>
   <item>RFC-0871: add n3-timestamp-qualification-evidence-missing violation for eidas-qualified records without qualificationEvidenceRef.</item>
+  <item>RFC-0872: replace evaluateGate with policy-driven evaluateGateV2, add technical-assessment validation, locale drift check.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -32,7 +34,11 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
-import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-shared/content";
+import {
+  snapshotCanonicalJsonObjectV1,
+  canonicalJsonHashV1,
+} from "@warpgogol/werkstatt/fingerprint";
+import { parseMarkdownFrontmatter, loadSystemManifest } from "@warpgogol/werkstatt-shared/content";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import {
   isNachweisEntitled,
@@ -40,7 +46,10 @@ import {
   resolveNachweisCachePath,
   resolvePbpEntityDir,
   resolveDefaultLang,
-  type NachweisPublicationGate,
+  resolveNachweisPublicationPolicy,
+  evaluateGateV2,
+  validateAssessmentMetadata,
+  type NachweisPublicationGateV2,
   type NachweisValidateResult,
   type NachweisViolation,
 } from "./nachweis-io.ts";
@@ -50,6 +59,8 @@ const NACHWEIS_EVIDENCE_KINDS = new Set([
   "project-confirmation",
   "certificate",
   "operational-evidence",
+  // RFC-0872: technical assessment evidence type
+  "technical-assessment",
 ]);
 
 const BCP47_PATTERN = /^[a-z]{2,3}(-[A-Z][a-zA-Z]{3})?(-[A-Z]{2})?$/;
@@ -94,51 +105,28 @@ async function readPbpEntitiesByType(
   return records;
 }
 
-function evaluateGate(
+function evaluateGateV2Local(
   slug: string,
+  kind: string,
   evidenceRecord: PbpEntityRecord | undefined,
   consentRecord: PbpEntityRecord | undefined,
   bordbuchEntries: { kind: string; metadata?: Record<string, unknown> | null; summary: string }[],
-): NachweisPublicationGate {
-  const consentGranted = consentRecord?.data?.consentStatus === "granted";
-  const sourceIntegrityVerified =
-    evidenceRecord?.data?.items != null &&
-    Object.values(evidenceRecord.data.items as Record<string, { sha256?: string }>).some(
-      (item) => item.sha256 != null,
-    );
-  const recordApproved = bordbuchEntries.some(
-    (e) => e.kind === "nachweis-record" && e.summary.includes("approved"),
-  );
-  const verificationLevelMet = bordbuchEntries.some(
-    (e) => e.kind === "nachweis-record" && e.metadata?.verificationLevel === "N3",
-  );
-  const publicDerivativeReady =
-    evidenceRecord?.data?.items != null &&
-    Object.values(evidenceRecord.data.items as Record<string, { storage?: string }>).some(
-      (item) => item.storage === "public",
-    );
-  const legalContentCheckPassed = bordbuchEntries.some(
-    (e) => e.kind === "nachweis-record" && e.metadata?.legalContentCheckPassed === true,
-  );
+): NachweisPublicationGateV2 {
+  return evaluateGateV2(slug, kind, {
+    evidenceData: (evidenceRecord?.data ?? {}) as Record<string, unknown>,
+    consentData: consentRecord?.data as Record<string, unknown> | undefined,
+    bordbuchEntries,
+  });
+}
 
-  const allPassed =
-    consentGranted &&
-    sourceIntegrityVerified &&
-    recordApproved &&
-    verificationLevelMet &&
-    publicDerivativeReady &&
-    legalContentCheckPassed;
-
-  return {
-    slug,
-    allPassed,
-    consentGranted,
-    sourceIntegrityVerified,
-    recordApproved,
-    verificationLevelMet,
-    publicDerivativeReady,
-    legalContentCheckPassed,
-  };
+async function resolveSupportedLangs(cachePath: string): Promise<string[]> {
+  const contentDir = path.join(cachePath, "src", "content");
+  const { manifest } = await loadSystemManifest(contentDir);
+  const i18n = manifest.i18n as
+    { default?: string; supported?: Record<string, unknown> } | undefined;
+  if (!i18n?.default) return [];
+  const langs = Object.keys(i18n.supported ?? { [i18n.default]: true });
+  return langs.length > 0 ? langs : [i18n.default];
 }
 
 export async function runNachweisValidate(
@@ -242,7 +230,7 @@ export async function runNachweisValidate(
       e.kind === "nachweis-timestamped",
   );
 
-  const gateResults: NachweisPublicationGate[] = [];
+  const gateResults: NachweisPublicationGateV2[] = [];
   const slugs = new Set<string>();
   for (const es of evidenceSources) {
     const kind = es.data.kind as string | undefined;
@@ -259,22 +247,114 @@ export async function runNachweisValidate(
     const consentRecord = consents.find(
       (c) => (c.data as Record<string, unknown>).slug === slug || c.id === slug,
     );
-    const gate = evaluateGate(slug, evidenceRecord, consentRecord, nachweisEntries);
+    const kind = (evidenceRecord?.data as Record<string, unknown>)?.kind as string | undefined;
+    if (!kind) continue;
+    const gate = evaluateGateV2Local(slug, kind, evidenceRecord, consentRecord, nachweisEntries);
     gateResults.push(gate);
 
     // Check if record is published but gate not passed
     const isPublished =
       (evidenceRecord?.data as Record<string, unknown>)?.recordStatus === "published";
     if (isPublished && !gate.allPassed) {
+      const failedConditions = gate.conditions
+        .filter((c) => c.required && c.status !== "pass")
+        .map((c) => c.id);
       violations.push({
         rule: "publication-gate-violation",
-        message: `Record '${slug}' is published but gate conditions not met (consent: ${gate.consentGranted}, integrity: ${gate.sourceIntegrityVerified}, approved: ${gate.recordApproved}, verification: ${gate.verificationLevelMet}, derivative: ${gate.publicDerivativeReady}, legal: ${gate.legalContentCheckPassed})`,
+        message: `Record '${slug}' is published but gate conditions not met (policy: ${gate.policyId}, failed: ${failedConditions.join(", ")})`,
         recordId: slug,
       });
     }
 
+    // RFC-0872: technical-assessment-specific validation
+    if (kind === "technical-assessment") {
+      const assessment = (evidenceRecord?.data as Record<string, unknown>)?.assessment as
+        Record<string, unknown> | undefined;
+      if (!assessment) {
+        violations.push({
+          rule: "TECHNICAL_ASSESSMENT_METADATA_REQUIRED",
+          message: `EvidenceSource '${slug}' has kind 'technical-assessment' but no assessment field`,
+          recordId: slug,
+        });
+      }
+      const items = (evidenceRecord?.data as Record<string, unknown>)?.items as
+        Record<string, { role?: string; canonical?: boolean; sha256?: string }> | undefined;
+      const hasCanonicalRaw =
+        items != null &&
+        Object.values(items).some((item) => item.role === "raw-result" && item.canonical === true);
+      if (!hasCanonicalRaw) {
+        violations.push({
+          rule: "TECHNICAL_ASSESSMENT_CANONICAL_RAW_REQUIRED",
+          message: `EvidenceSource '${slug}' has no canonical raw-result artifact`,
+          recordId: slug,
+        });
+      }
+      if (items != null && hasCanonicalRaw) {
+        for (const [itemKey, item] of Object.entries(items)) {
+          if (item.role === "raw-result" && item.canonical === true && item.sha256 == null) {
+            violations.push({
+              rule: "TECHNICAL_ASSESSMENT_HASH_REQUIRED",
+              message: `EvidenceSource '${slug}' canonical raw-result item '${itemKey}' is missing sha256`,
+              recordId: slug,
+            });
+          }
+        }
+        // RFC-0872 section 2: screenshot canonical invariant — if any item has
+        // role: screenshot and canonical: true, there MUST also be a canonical raw-result
+        const hasCanonicalScreenshot = Object.values(items).some(
+          (item) => item.role === "screenshot" && item.canonical === true,
+        );
+        if (hasCanonicalScreenshot && !hasCanonicalRaw) {
+          violations.push({
+            rule: "TECHNICAL_ASSESSMENT_CANONICAL_SCREENSHOT_WITHOUT_RAW",
+            message: `EvidenceSource '${slug}' has canonical screenshot but no canonical raw-result artifact (screenshots cannot be the sole canonical artifact)`,
+            recordId: slug,
+          });
+        }
+        // RFC-0872 section 2: no two canonical artifacts may reuse the same
+        // logical item key for different hashes
+        const canonicalHashes = new Map<string, string>();
+        for (const [itemKey, item] of Object.entries(items)) {
+          if (item.canonical === true && item.sha256 != null) {
+            const existing = canonicalHashes.get(item.sha256);
+            if (existing !== undefined && existing !== itemKey) {
+              violations.push({
+                rule: "TECHNICAL_ASSESSMENT_DUPLICATE_CANONICAL_HASH",
+                message: `EvidenceSource '${slug}' canonical items '${existing}' and '${itemKey}' share the same sha256 '${item.sha256}'`,
+                recordId: slug,
+              });
+            }
+            canonicalHashes.set(item.sha256, itemKey);
+          }
+        }
+      }
+      // Check authorization basis
+      if (
+        assessment &&
+        (assessment.authorizationBasis == null || assessment.authorizationBasis === "")
+      ) {
+        violations.push({
+          rule: "ASSESSMENT_AUTHORIZATION_REQUIRED",
+          message: `EvidenceSource '${slug}' technical assessment lacks authorizationBasis`,
+          recordId: slug,
+        });
+      }
+    }
+
+    // RFC-0872: assessment field must be absent for non-technical kinds
+    if (kind !== "technical-assessment") {
+      const assessment = (evidenceRecord?.data as Record<string, unknown>)?.assessment;
+      if (assessment != null) {
+        violations.push({
+          rule: "assessment-on-non-technical-kind",
+          message: `EvidenceSource '${slug}' has kind '${kind}' but has an assessment field (only technical-assessment allows assessment)`,
+          recordId: slug,
+        });
+      }
+    }
+
     // RFC-0715: N3 artifact check — published N3 records must have nachweis-signed and nachweis-timestamped entries
-    if (isPublished && gate.verificationLevelMet) {
+    if (isPublished && gate.conditions.find((c) => c.id === "n3-met")?.status === "pass") {
       const hasSigned = nachweisEntries.some(
         (e) => e.kind === "nachweis-signed" && e.metadata?.slug === slug,
       );
@@ -311,6 +391,43 @@ export async function runNachweisValidate(
             recordId: slug,
           });
         }
+      }
+    }
+  }
+
+  // RFC-0872: locale drift check for technical-assessment assessment field
+  const supportedLangs = await resolveSupportedLangs(cachePath);
+  if (supportedLangs.length > 1) {
+    const assessmentByObsId = new Map<string, Map<string, string>>();
+    for (const lang of supportedLangs) {
+      const langEntities = await readPbpEntitiesByType(cachePath, "evidence-source", lang);
+      for (const es of langEntities) {
+        const kind = es.data.kind as string | undefined;
+        if (kind !== "technical-assessment") continue;
+        const assessment = es.data.assessment as Record<string, unknown> | undefined;
+        if (!assessment) continue;
+        const observationId = assessment.observationId as string | undefined;
+        if (!observationId) continue;
+        const snapshot = snapshotCanonicalJsonObjectV1(assessment);
+        if (!snapshot.ok) continue;
+        const hash = canonicalJsonHashV1(snapshot.value);
+        let langMap = assessmentByObsId.get(observationId);
+        if (!langMap) {
+          langMap = new Map();
+          assessmentByObsId.set(observationId, langMap);
+        }
+        langMap.set(lang, hash);
+      }
+    }
+    for (const [observationId, langMap] of assessmentByObsId) {
+      if (langMap.size < 2) continue;
+      const hashes = [...langMap.values()];
+      const allMatch = hashes.every((h) => h === hashes[0]);
+      if (!allMatch) {
+        violations.push({
+          rule: "TECHNICAL_ASSESSMENT_LOCALE_DRIFT",
+          message: `Technical assessment observationId '${observationId}' has locale drift — assessment values differ across locales: ${[...langMap.entries()].map(([l, h]) => `${l}=${h.slice(0, 16)}`).join(", ")}`,
+        });
       }
     }
   }

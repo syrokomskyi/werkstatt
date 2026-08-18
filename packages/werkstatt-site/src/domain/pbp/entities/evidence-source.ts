@@ -4,6 +4,7 @@
  * @see pbp-specification-package/entity-model §25 (EvidenceSource)
  * @see RFC-0416
  * @see RFC-0706 (Nachweisregister evidence kind + items extensions)
+ * @see RFC-0872 (technical-assessment kind, artifact roles, assessment field)
  * @see ADR-0028 (Nachweisregister as PBP trust-layer extension)
  */
 
@@ -20,7 +21,9 @@ export type PbpEvidenceKind =
   | "client-statement"
   | "project-confirmation"
   | "certificate"
-  | "operational-evidence";
+  | "operational-evidence"
+  // RFC-0872: technical assessment evidence type
+  | "technical-assessment";
 
 export const PBP_EVIDENCE_KINDS: readonly PbpEvidenceKind[] = [
   "external-web-sources",
@@ -31,10 +34,74 @@ export const PBP_EVIDENCE_KINDS: readonly PbpEvidenceKind[] = [
   "project-confirmation",
   "certificate",
   "operational-evidence",
+  // RFC-0872: technical assessment evidence type
+  "technical-assessment",
 ] as const;
 
 export function isPbpEvidenceKind(value: string): value is PbpEvidenceKind {
   return PBP_EVIDENCE_KINDS.includes(value as PbpEvidenceKind);
+}
+
+// RFC-0872: artifact role for technical-assessment evidence items
+export type PbpEvidenceArtifactRole =
+  "raw-result" | "report" | "screenshot" | "summary" | "methodology";
+
+// RFC-0872: technical assessment sub-types
+export type NachweisAssessmentExecutionMode = "operator-run" | "provider-run";
+
+export type NachweisAssessmentAuthorizationBasis =
+  "site-owner" | "service-contract" | "explicit-operator";
+
+export type NachweisAssessmentDimensionStatus = "pass" | "fail" | "not-checked";
+
+export interface NachweisAssessmentProvider {
+  id: string;
+  name: string;
+  homepage?: string;
+}
+
+export interface NachweisAssessmentTool {
+  id: string;
+  name: string;
+  version?: string;
+}
+
+export interface NachweisAssessmentMethodology {
+  id: string;
+  version: string;
+  runCount: number;
+  aggregation: "provider" | "median" | "none";
+}
+
+export interface NachweisAssessmentDimension {
+  id: string;
+  providerLabel: string;
+  score?: number;
+  numerator?: number;
+  denominator?: number;
+  status?: NachweisAssessmentDimensionStatus;
+  level?: string;
+  experimental?: boolean;
+  min?: number;
+  max?: number;
+  samples?: number[];
+}
+
+export interface NachweisTechnicalAssessmentV1 {
+  profile: "technical-assessment";
+  seriesId: string;
+  observationId: string;
+  subject: { url: string; canonicalUrl?: string };
+  provider: NachweisAssessmentProvider;
+  tool: NachweisAssessmentTool;
+  executionMode: NachweisAssessmentExecutionMode;
+  authorizationBasis: NachweisAssessmentAuthorizationBasis;
+  observedAt: string;
+  methodology: NachweisAssessmentMethodology;
+  overall?: { score?: number; level?: string };
+  dimensions: NachweisAssessmentDimension[];
+  freshness: { maxAgeDays: number };
+  providerReportUrl?: string;
 }
 
 export interface PbpEvidenceSource extends PbpEntity {
@@ -53,6 +120,11 @@ export interface PbpEvidenceSource extends PbpEntity {
       mediaType?: string;
       qualityStatus?:
         "unverified" | "verified" | "verified_with_quality_issue" | "changed" | "rejected";
+      // RFC-0872: artifact semantics for technical-assessment evidence
+      role?: PbpEvidenceArtifactRole;
+      canonical?: boolean;
     }
   >;
+  // RFC-0872: normalized technical assessment metadata
+  assessment?: NachweisTechnicalAssessmentV1;
 }

@@ -659,7 +659,11 @@ describe("RFC-0707: nachweis.publish", () => {
     expect(result.exitCode).toBe(1);
     expect(expectData(result).published).toBe(false);
     expect(expectData(result).gateResult.allPassed).toBe(false);
-    expect(expectData(result).gateResult.consentGranted).toBe(false);
+    const consentCondition = expectData(result).gateResult.conditions.find(
+      (c) => c.id === "consent-granted",
+    );
+    expect(consentCondition).toBeTruthy();
+    expect(consentCondition!.status).toBe("fail");
   });
 });
 
@@ -1204,6 +1208,8 @@ describe("RFC-0715: nachweis.validate consent matching by c.id fallback", () => 
     // Gate should pass — consent matched by c.id fallback
     const gate = expectData(result).gateResults.find((g) => g.slug === "test-record");
     expect(gate).toBeTruthy();
-    expect(gate!.consentGranted).toBe(true);
+    const consentCondition = gate!.conditions.find((c) => c.id === "consent-granted");
+    expect(consentCondition).toBeTruthy();
+    expect(consentCondition!.status).toBe("pass");
   });
 });

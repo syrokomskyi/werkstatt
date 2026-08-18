@@ -3,7 +3,7 @@
 <purpose>RFC-0707: nachweis.publish command handler — enforces publication gate and transitions record to published.</purpose>
 <keywords>nachweis, publish, gate, public, bordbuch</keywords>
 <responsibilities>
-  <item>Checks publication gate preconditions (consent, integrity, approval, verification level, derivative, legal).</item>
+  <item>Checks publication gate preconditions using policy-driven V2 gate (RFC-0872).</item>
   <item>Requires N3 verification level (RFC-0715: --pilot-n2-exception removed, N2 grandfathering for existing records).</item>
   <item>Sets publication.visibility: public on EvidenceSource entity.</item>
   <item>Appends nachweis-record Bordbuch entry.</item>
@@ -18,6 +18,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.publish command handler.</item>
   <item>RFC-0715: remove --pilot-n2-exception flag, require N3 only. N2 grandfathering: existing N2-published records remain valid.</item>
+  <item>RFC-0872: replace legacy boolean gate with policy-driven V2 gate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -42,7 +43,8 @@ import {
   resolveNachweisCachePath,
   resolvePbpEntityDir,
   resolveDefaultLang,
-  type NachweisPublicationGate,
+  evaluateGateV2,
+  type NachweisPublicationGateV2,
   type NachweisPublishResult,
 } from "./nachweis-io.ts";
 
@@ -107,36 +109,22 @@ export async function runNachweisPublish(
     (e) => e.kind === "nachweis-record" || e.kind === "nachweis-consent",
   );
 
-  // Evaluate gate
-  const items = evidenceData.items as
-    Record<string, { sha256?: string; storage?: string }> | undefined;
-  const gate: NachweisPublicationGate = {
-    slug,
-    allPassed: false,
-    consentGranted: consentData?.consentStatus === "granted",
-    sourceIntegrityVerified:
-      items != null && Object.values(items).some((item) => item.sha256 != null),
-    recordApproved: nachweisEntries.some(
-      (e) => e.kind === "nachweis-record" && e.summary.includes("approved"),
-    ),
-    verificationLevelMet: nachweisEntries.some(
-      (e) => e.kind === "nachweis-record" && e.metadata?.verificationLevel === "N3",
-    ),
-    publicDerivativeReady:
-      items != null && Object.values(items).some((item) => item.storage === "public"),
-    legalContentCheckPassed: nachweisEntries.some(
-      (e) => e.kind === "nachweis-record" && e.metadata?.legalContentCheckPassed === true,
-    ),
-  };
-  gate.allPassed =
-    gate.consentGranted &&
-    gate.sourceIntegrityVerified &&
-    gate.recordApproved &&
-    gate.verificationLevelMet &&
-    gate.publicDerivativeReady &&
-    gate.legalContentCheckPassed;
+  // Evaluate gate V2 (RFC-0872: policy-driven, shared with nachweis.validate)
+  const kind = evidenceData.kind as string | undefined;
+  if (!kind) {
+    throw new Error(`[nachweis.publish] evidence-source '${slug}' has no kind field`);
+  }
+
+  const gate = evaluateGateV2(slug, kind, {
+    evidenceData: evidenceData as Record<string, unknown>,
+    consentData: consentData as Record<string, unknown> | undefined,
+    bordbuchEntries: nachweisEntries,
+  });
 
   if (!gate.allPassed) {
+    const failedConditions = gate.conditions
+      .filter((c) => c.required && c.status !== "pass")
+      .map((c) => c.id);
     return {
       data: {
         recordId: (evidenceData.recordId as string | undefined) ?? `nr_${slug}`,
@@ -146,7 +134,7 @@ export async function runNachweisPublish(
         bordbuchEventId: null,
       },
       exitCode: 1,
-      summary: `[nachweis.publish] ${systemId}: gate failed for '${slug}' — consent: ${gate.consentGranted}, integrity: ${gate.sourceIntegrityVerified}, approved: ${gate.recordApproved}, verification: ${gate.verificationLevelMet}, derivative: ${gate.publicDerivativeReady}, legal: ${gate.legalContentCheckPassed}`,
+      summary: `[nachweis.publish] ${systemId}: gate failed for '${slug}' — policy: ${gate.policyId}, failed: ${failedConditions.join(", ")}`,
     };
   }
 

@@ -23,14 +23,20 @@
 */
 
 import { getCollection } from "astro:content";
-import { getEntryLanguage, stripEntryLanguage, toDataEntryId } from "@warpgogol/werkstatt-shared/share/content";
+import {
+  getEntryLanguage,
+  stripEntryLanguage,
+  toDataEntryId,
+} from "@warpgogol/werkstatt-shared/share/content";
 
-/** Nachweis evidence kinds from RFC-0706. */
+/** Nachweis evidence kinds from RFC-0706 and RFC-0872. */
 const NACHWEIS_EVIDENCE_KINDS = new Set([
   "client-statement",
   "project-confirmation",
   "certificate",
   "operational-evidence",
+  // RFC-0872: technical assessment evidence type
+  "technical-assessment",
 ]);
 
 /** Synthetic pageId for a Nachweis detail page. */
