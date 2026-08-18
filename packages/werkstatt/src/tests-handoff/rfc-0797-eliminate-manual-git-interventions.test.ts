@@ -256,12 +256,13 @@ test("close auto-commits dirty workpiece instead of throwing", async () => {
 
   expect(data.closeReport).toBeDefined();
   // Verify workpiece is now clean (auto-committed)
+  // RFC-0878: .closed sentinel is written as untracked file — expect only that.
   const status = execSync("git status --porcelain", {
     cwd: workpieceDir,
     encoding: "utf-8",
     stdio: "pipe",
   }).trim();
-  expect(status).toBe("");
+  expect(status).toBe("?? .closed");
 });
 
 // 2a: Pre-mirror-check sync called when external mirrors configured
