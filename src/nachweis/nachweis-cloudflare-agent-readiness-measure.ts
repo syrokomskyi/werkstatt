@@ -92,8 +92,10 @@ function flagInt(input: KernelCommandInput, key: string, defaultValue: number): 
 // ── Cloudflare API types ────────────────────────────────────────────────────
 
 interface CloudflareScanSubmissionResponse {
+  uuid?: string;
   result?: {
     uuid?: string;
+    tasks?: Array<{ uuid?: string; status?: string }>;
   };
   success?: boolean;
   errors?: Array<{ code?: number; message?: string }>;
@@ -113,16 +115,17 @@ interface CloudflareAgentReadinessResult {
 }
 
 interface CloudflareScanResultResponse {
-  result?: {
-    agentReadiness?: CloudflareAgentReadinessResult;
-    scan?: {
-      url?: string;
-      createdAt?: string;
-      finishedAt?: string;
-    };
-    task?: {
-      status?: string;
-      success?: boolean;
+  task?: {
+    status?: string;
+    success?: boolean;
+    time?: string;
+    timeEnd?: string;
+    url?: string;
+    uuid?: string;
+  };
+  meta?: {
+    processors?: {
+      agentReadiness?: CloudflareAgentReadinessResult;
     };
   };
   success?: boolean;
@@ -158,58 +161,53 @@ export function parseAgentReadiness(raw: CloudflareScanResultResponse): {
   overall?: { score?: number; level?: string };
   dimensions: ParsedDimension[];
 } {
-  const ar = raw.result?.agentReadiness;
+  const ar = raw.meta?.processors?.agentReadiness;
   if (!ar || typeof ar !== "object") {
-    throw new SchemaUnsupportedError("result.agentReadiness not found in response");
+    throw new SchemaUnsupportedError("meta.processors.agentReadiness not found in response");
   }
 
   const dimensions: ParsedDimension[] = [];
   const checks = ar.checks ?? {};
 
-  for (const [dimId, check] of Object.entries(checks)) {
-    if (!check || typeof check !== "object") continue;
+  // Checks are nested two levels: checks.<category>.<checkName>
+  // Each category becomes a dimension with numerator/denominator counting.
+  for (const [catId, catChecks] of Object.entries(checks)) {
+    if (!catChecks || typeof catChecks !== "object") continue;
+
+    let passed = 0;
+    let total = 0;
+    let allPass = true;
+
+    for (const [, check] of Object.entries(
+      catChecks as Record<string, CloudflareAgentReadinessCheck>,
+    )) {
+      if (!check || typeof check !== "object") continue;
+      const status = check.status;
+      if (status === "neutral" || status === "Neutral") continue;
+      total++;
+      if (status === "pass" || status === "Pass") {
+        passed++;
+      } else if (status === "fail" || status === "Fail") {
+        allPass = false;
+      }
+    }
+
+    if (total === 0) continue;
 
     const dim: ParsedDimension = {
-      id: dimId,
-      providerLabel: humanizeDimensionLabel(dimId),
+      id: catId,
+      providerLabel: humanizeDimensionLabel(catId),
+      numerator: passed,
+      denominator: total,
+      status: allPass && passed === total ? "pass" : passed > 0 ? "fail" : "not-checked",
     };
-
-    const status = check.status;
-    if (status === "not-checked" || status === "not_checked" || status === "notchecked") {
-      dim.status = "not-checked";
-    } else if (status === "pass" || status === "Pass") {
-      dim.status = "pass";
-    } else if (status === "fail" || status === "Fail") {
-      dim.status = "fail";
-    } else if (typeof status === "string" && status.length > 0) {
-      // Unknown status — treat as not-checked rather than guessing
-      dim.status = "not-checked";
-    }
-
-    // Extract score or pass-count from details if available
-    const details = check.details;
-    if (details && typeof details === "object") {
-      const d = details as Record<string, unknown>;
-      if (typeof d.score === "number") {
-        dim.score = d.score;
-      } else if (typeof d.overall === "number") {
-        dim.score = d.overall;
-      }
-      if (typeof d.numerator === "number" && typeof d.denominator === "number") {
-        dim.numerator = d.numerator;
-        dim.denominator = d.denominator;
-      } else if (typeof d.passed === "number" && typeof d.total === "number") {
-        dim.numerator = d.passed;
-        dim.denominator = d.total;
-      }
-    }
 
     dimensions.push(dim);
   }
 
   const overall: { score?: number; level?: string } = {};
-  if (typeof ar.overall === "number") {
-    overall.score = ar.overall;
+  if (typeof ar.level === "number") {
+    overall.score = ar.level;
   }
   if (typeof ar.levelName === "string" && ar.levelName.length > 0) {
     overall.level = ar.levelName;
@@ -271,16 +269,15 @@ async function submitScan(
 
   const responseText = await response.text();
 
-  if (!response.ok) {
-    throw new SubmissionError(
-      `POST ${endpoint} returned HTTP ${response.status}: ${responseText.slice(0, 500)}`,
-    );
-  }
-
   const parsed = JSON.parse(responseText) as CloudflareScanSubmissionResponse;
-  const scanId = parsed.result?.uuid;
+  const scanId = parsed.uuid ?? parsed.result?.uuid ?? parsed.result?.tasks?.[0]?.uuid;
   if (!scanId) {
-    throw new SubmissionError("Submission response missing result.uuid");
+    if (!response.ok) {
+      throw new SubmissionError(
+        `POST ${endpoint} returned HTTP ${response.status}: ${responseText.slice(0, 500)}`,
+      );
+    }
+    throw new SubmissionError("Submission response missing result.uuid or result.tasks[0].uuid");
   }
 
   return { scanId, rawResponse: responseText };
@@ -344,14 +341,14 @@ async function pollForResult(
     const responseText = await response.text();
     const parsed = JSON.parse(responseText) as CloudflareScanResultResponse;
 
-    const taskStatus = parsed.result?.task?.status;
-    const taskSuccess = parsed.result?.task?.success;
+    const taskStatus = parsed.task?.status;
+    const taskSuccess = parsed.task?.success;
 
-    if (taskStatus === "Finished" && taskSuccess === false) {
+    if (taskStatus === "finished" && taskSuccess === false) {
       throw new ScanFailedError(`Provider reported task.success=false for scan ${scanId}`);
     }
 
-    if (taskStatus === "Finished" && taskSuccess === true) {
+    if (taskStatus === "finished" && taskSuccess === true) {
       return { rawResponse: responseText, parsed };
     }
 
@@ -407,8 +404,7 @@ function buildAssessmentBundle(
   parsed: CloudflareScanResultResponse,
   parsedResult: ReturnType<typeof parseAgentReadiness>,
 ): AssessmentBundleV1 {
-  const observedAt =
-    parsed.result?.scan?.finishedAt ?? parsed.result?.scan?.createdAt ?? new Date().toISOString();
+  const observedAt = parsed.task?.timeEnd ?? parsed.task?.time ?? new Date().toISOString();
 
   const observationId = `cf-ar-${scanId.slice(0, 12)}`;
   const slug = `cloudflare-cf-ar-01`;
