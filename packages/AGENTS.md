@@ -262,4 +262,9 @@ Where `readWorkpieceEnv` reads `<appDirectory>/.env` and extracts the key with a
 
 **NOT affected:** Astro components and `image-provider-init.ts` use `import.meta.env.PUBLIC_*` (Vite env), which Vite resolves from the workpiece root at Astro build time. The gotcha only applies to kernel CLI commands that run outside the Astro build process.
 
+## repo-extract publication rules
+
+- **Exclude test directories from extraction.** `extract.config.yaml` MUST include `src/tests` (and `src/checks/__tests__` for plugin packages) in `excludePathSegments`. Test files contain fixture secrets (PEM keys, Stripe tokens, GitHub tokens) that trigger repo-extract's secret scan and GitHub Push Protection, blocking extraction and push.
+- **Use `npm publish --ignore-scripts` for extraction folders.** The extracted `tsconfig.json` does not inherit `skipLibCheck` from the monorepo's `tsconfig/node-lib.json`, so `prepublishOnly` typecheck fails on transitive dependency type errors. Typecheck is already verified in the monorepo before extraction — use `--ignore-scripts` to skip the redundant check.
+
 **Validators must fail, not skip:** When a generator is gated on an env var (e.g. `image.variants.validate` checks for `PUBLIC_IMAGE_PROVIDER=build-portable`), the validator MUST read the same env var and FAIL if the expected output is missing — not silently skip. Silent skips hide regressions until they reach production.
