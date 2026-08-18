@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 0e60b19f483326275f4617af70b484c0c330ce85933d8593bb50896b022edc87
+  contentHash: 51c8fc79dfb551da0a21ebca26cfcc8dd61bf305aa905488fc7e717e4a901bfc
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -10114,8 +10114,9 @@ commands:
     pipelines: []
   - name: forge.create
     description: "Create a forge project in-place: scaffold + init + binding
-      defaults. Usage: forge create --in-place --profile <profile-id> [--name
-      <name>] [--package-manager pnpm]"
+      defaults. The target directory must be empty (only .git/ tolerated).
+      Usage: forge create --in-place --profile <profile-id> [--name <name>]
+      [--package-manager pnpm]"
     scope: workspace
     provider: workspace
     module: forge-core
@@ -10131,7 +10132,7 @@ commands:
         kind: string
         required: true
         description: "Stack profile id. Required. Available: forge-shell,
-          astro-typescript-turborepo, phaser-turborepo, godot-csharp."
+          phaser-turborepo, godot-csharp."
       name:
         kind: string
         required: false
@@ -10331,7 +10332,7 @@ commands:
       profile:
         kind: string
         required: true
-        description: Stack profile id (e.g. astro-typescript-turborepo).
+        description: Stack profile id (e.g. phaser-turborepo).
       name:
         kind: string
         required: true
@@ -15578,6 +15579,96 @@ commands:
     validatesOutputs: []
     pipelines:
       - build.prepare
+  - name: nachweis.measure.lighthouse
+    description: "RFC-0874: Run five sequential canonical Google Lighthouse runs,
+      parse LHR JSON, aggregate categories, build AssessmentBundleV1, and
+      delegate to nachweis.assessment.ingest."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      url:
+        kind: string
+        required: true
+        description: Target HTTPS URL to measure with Lighthouse
+      series-id:
+        kind: string
+        description: "Assessment series ID (default: lighthouse-pilot)"
+      authorization-basis:
+        kind: string
+        description: "Authorization basis: site-owner (default), service-contract,
+          explicit-operator"
+      runs:
+        kind: string
+        description: "Number of sequential Lighthouse runs (default: 5)"
+      methodology:
+        kind: string
+        description: "Methodology ID and version in format <id>@<version> (default:
+          WG-LH-01@1.0)"
+      freshness-days:
+        kind: string
+        description: "Freshness max age in days (default: 30)"
+      dry-run:
+        kind: boolean
+        description: Skip Lighthouse execution and ingest — return dry-run result
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.measure.lighthouse
+    description: "RFC-0874: Run five sequential canonical Google Lighthouse runs,
+      parse LHR JSON, aggregate categories, build AssessmentBundleV1, and
+      delegate to nachweis.assessment.ingest."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      url:
+        kind: string
+        required: true
+        description: Target HTTPS URL to measure with Lighthouse
+      series-id:
+        kind: string
+        description: "Assessment series ID (default: lighthouse-pilot)"
+      authorization-basis:
+        kind: string
+        description: "Authorization basis: site-owner (default), service-contract,
+          explicit-operator"
+      runs:
+        kind: string
+        description: "Number of sequential Lighthouse runs (default: 5)"
+      methodology:
+        kind: string
+        description: "Methodology ID and version in format <id>@<version> (default:
+          WG-LH-01@1.0)"
+      freshness-days:
+        kind: string
+        description: "Freshness max age in days (default: 30)"
+      dry-run:
+        kind: boolean
+        description: Skip Lighthouse execution and ingest — return dry-run result
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: nachweis.public-derivative
     description: "RFC-0714: Upload a public-derivative PDF to R2 and update
       evidence-source items.public.storage to public. Idempotent by SHA-256."

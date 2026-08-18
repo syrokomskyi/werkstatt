@@ -28,9 +28,9 @@ dependsOn:
 satisfies: []
 versionBump: minor
 commands:
-  proposed:
+  proposed: []
+  added:
     - nachweis.measure.lighthouse
-  added: []
   changed: []
   removed: []
 appsImpacted:
@@ -490,18 +490,18 @@ Five sequential Lighthouse runs against a production URL take approximately 2.5�
 
 ## Acceptance criteria
 
-- [ ] Exact Lighthouse dependency is pinned in `packages/werkstatt/package.json`.
-- [ ] Command runs five sequential canonical runs by default.
-- [ ] Raw LHR JSON for every successful canonical run is preserved as canonical artifact.
-- [ ] Any canonical run failure prevents ingest (`LIGHTHOUSE_CANONICAL_BATCH_INCOMPLETE`).
-- [ ] Median/min/max/samples are correct against a deterministic test fixture with known expected values.
-- [ ] Agentic Browsing is preserved as numerator/denominator/status, not converted into a fake 0-100 score.
-- [ ] Tool and browser/run metadata (`lighthouseVersion`, `fetchTime`, `userAgent`, `requestedUrl`, `finalUrl`, `configSettings`) are captured per the "Captured LHR metadata" section.
-- [ ] Adapter emits valid `AssessmentBundleV1` accepted by `nachweis.assessment.ingest`.
-- [ ] Generic ingest handles hashes/R2/PBP/Bordbuch (adapter does not duplicate these).
-- [ ] Adapter never signs/approves/publishes (ends at N1 capture).
-- [ ] User screenshot values are not hard-coded in PBP content or test fixtures.
-- [ ] `--methodology` flag parsing splits `<id>@<version>` correctly.
-- [ ] `--json` output shape matches the documented structure.
-- [ ] Chrome/Chromium not installed fails with `LIGHTHOUSE_CHROME_NOT_FOUND`.
-- [ ] Command is entitlement-gated (skips when `nachweis` entitlement is not resolved).
+- [x] Exact Lighthouse dependency is pinned in `packages/werkstatt/package.json`. (evidence: packages/werkstatt/package.json:387, `"lighthouse": "13.4.1"`)
+- [x] Command runs five sequential canonical runs by default. (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts, `flagInt(input, "runs", 5)` + `runLighthouseBatch` sequential loop)
+- [x] Raw LHR JSON for every successful canonical run is preserved as canonical artifact. (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts, `buildAssessmentBundle` maps each run to `role: "raw-result", canonical: true`)
+- [x] Any canonical run failure prevents ingest (`LIGHTHOUSE_CANONICAL_BATCH_INCOMPLETE`). (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts, `LighthouseBatchError` thrown on non-zero exit / missing LHR / invalid LHR)
+- [x] Median/min/max/samples are correct against a deterministic test fixture with known expected values. (evidence: packages/werkstatt/src/tests-handoff/nachweis-lighthouse-measure.test.ts, "aggregates numeric categories via median with min/max/samples" test with scores [0.85, 0.91, 0.88, 0.92, 0.87] → median 88)
+- [x] Agentic Browsing is preserved as numerator/denominator/status, not converted into a fake 0-100 score. (evidence: packages/werkstatt/src/tests-handoff/nachweis-lighthouse-measure.test.ts, "aggregates non-numeric categories preserving numerator/denominator" test)
+- [x] Tool and browser/run metadata (`lighthouseVersion`, `fetchTime`, `userAgent`, `requestedUrl`, `finalUrl`, `configSettings`) are captured per the "Captured LHR metadata" section. (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts, `LighthouseRunResult` interface + `writeMethodologyArtifact`)
+- [x] Adapter emits valid `AssessmentBundleV1` accepted by `nachweis.assessment.ingest`. (evidence: packages/werkstatt/src/tests-handoff/nachweis-lighthouse-measure.test.ts, "builds a valid AssessmentBundleV1 from run results" test — `assessmentBundleV1Schema.safeParse` passes)
+- [x] Generic ingest handles hashes/R2/PBP/Bordbuch (adapter does not duplicate these). (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts, `runNachweisAssessmentIngest(ingestInput, context)` call — no R2/SHA-256/PBP/Bordbuch logic in handler)
+- [x] Adapter never signs/approves/publishes (ends at N1 capture). (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts — no sign/approve/publish calls; delegates to ingest which ends at N1)
+- [x] User screenshot values are not hard-coded in PBP content or test fixtures. (evidence: packages/werkstatt/src/tests-handoff/nachweis-lighthouse-measure.test.ts — all tests use synthetic LHR fixtures with `makeSyntheticLhr` helper)
+- [x] `--methodology` flag parsing splits `<id>@<version>` correctly. (evidence: packages/werkstatt/src/tests-handoff/nachweis-lighthouse-measure.test.ts, "fails with LIGHTHOUSE_METHODOLOGY_INVALID when @ is missing" + "when version is empty" tests)
+- [x] `--json` output shape matches the documented structure. (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts, `LighthouseMeasureResult` interface matches RFC `--json` output shape)
+- [x] Chrome/Chromium not installed fails with `LIGHTHOUSE_CHROME_NOT_FOUND`. (evidence: packages/werkstatt/src/nachweis/nachweis-lighthouse-measure.ts, `checkChromeAvailable()` + `LIGHTHOUSE_CHROME_NOT_FOUND` error result)
+- [x] Command is entitlement-gated (skips when `nachweis` entitlement is not resolved). (evidence: packages/werkstatt/src/tests-handoff/nachweis-lighthouse-measure.test.ts, "skips when nachweis entitlement is not resolved" test)
