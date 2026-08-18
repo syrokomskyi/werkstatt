@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 51c8fc79dfb551da0a21ebca26cfcc8dd61bf305aa905488fc7e717e4a901bfc
+  contentHash: 0c98a7214d92adae61bc905066ed03e4f8b6404fead8eaa5523b4654a884809f
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -10215,6 +10215,53 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: forge.init
+    description: "Deploy forge into a project: create forge.yaml, PREFERENCES.md,
+      copy skills, create docs dirs. Hidden recovery command — normally called
+      by forge.create."
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      ai-language:
+        kind: string
+        description: "AI communication language (default: en)."
+      documentation-language:
+        kind: string
+        description: "Documentation language (default: en)."
+      from:
+        kind: string
+        description: Detect stack from existing project path.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: forge.package.health
+    description: "Validate all published packages (private: false) for standalone
+      extraction readiness. Checks engines.node, embedded
+      .github/workflows/ci.yml, extract.config.yaml, and devDependencies
+      completeness (no hoisted tool deps). Exits non-zero on errors. Use --json
+      for machine-readable output."
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      json:
+        kind: boolean
+        description: Output structured JSON result.
+    reads:
+      - packages/*/package.json
+      - packages/*/.github/workflows/ci.yml
+      - packages/*/extract.config.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: forge.port.scaffold
     description: Generate a skeleton for a new forge skill or command.
     scope: workspace
@@ -15579,6 +15626,90 @@ commands:
     validatesOutputs: []
     pipelines:
       - build.prepare
+  - name: nachweis.measure.cloudflare-agent-readiness
+    description: "RFC-0875: Submit an Unlisted Cloudflare URL Scanner scan with
+      Agent Readiness enabled, poll for completion, parse dimensions, build
+      AssessmentBundleV1, and delegate to nachweis.assessment.ingest."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      url:
+        kind: string
+        required: true
+        description: Target HTTPS URL to scan with Cloudflare URL Scanner
+      series-id:
+        kind: string
+        description: "Assessment series ID (default: cloudflare-agent-readiness-pilot)"
+      authorization-basis:
+        kind: string
+        description: "Authorization basis: site-owner (default), service-contract,
+          explicit-operator"
+      methodology:
+        kind: string
+        description: "Methodology ID and version in format <id>@<version> (default:
+          CF-AR-01@1.0)"
+      freshness-days:
+        kind: string
+        description: "Freshness max age in days (default: 30)"
+      dry-run:
+        kind: boolean
+        description: Skip API call and ingest — return dry-run result
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.measure.cloudflare-agent-readiness
+    description: "RFC-0875: Submit an Unlisted Cloudflare URL Scanner scan with
+      Agent Readiness enabled, poll for completion, parse dimensions, build
+      AssessmentBundleV1, and delegate to nachweis.assessment.ingest."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      url:
+        kind: string
+        required: true
+        description: Target HTTPS URL to scan with Cloudflare URL Scanner
+      series-id:
+        kind: string
+        description: "Assessment series ID (default: cloudflare-agent-readiness-pilot)"
+      authorization-basis:
+        kind: string
+        description: "Authorization basis: site-owner (default), service-contract,
+          explicit-operator"
+      methodology:
+        kind: string
+        description: "Methodology ID and version in format <id>@<version> (default:
+          CF-AR-01@1.0)"
+      freshness-days:
+        kind: string
+        description: "Freshness max age in days (default: 30)"
+      dry-run:
+        kind: boolean
+        description: Skip API call and ingest — return dry-run result
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: nachweis.measure.lighthouse
     description: "RFC-0874: Run five sequential canonical Google Lighthouse runs,
       parse LHR JSON, aggregate categories, build AssessmentBundleV1, and
