@@ -23,7 +23,12 @@ propsSchema:
       recordPayloadSha256: z.string().optional(),
       envelopeSha256: z.string().optional(),
       operatorSignature: z.string().optional(),
-      qualifiedTimestamp: z.string().optional(),
+      timestamp: z.object({
+        tokenPresent: z.boolean(),
+        assurance: z.enum(["rfc3161", "eidas-qualified"]),
+        providerName: z.string().optional(),
+        qualificationEvidenceRef: z.string().optional(),
+      }).optional(),
       verificationLevel: z.string().optional(),
     }).passthrough()
 acceptedCosmicNames:
