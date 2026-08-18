@@ -1,7 +1,7 @@
 ---
 id: RFC-0878
 title: "Require explicit --bump major for platform major version bumps"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-18
 updatedAt: 2026-08-18
+implementedAt: 2026-08-18
 enhancedAt: 2026-08-18
 satisfies: []
 versionBump: patch
