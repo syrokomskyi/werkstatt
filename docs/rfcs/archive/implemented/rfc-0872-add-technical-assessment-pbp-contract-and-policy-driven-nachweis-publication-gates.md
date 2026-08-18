@@ -447,16 +447,16 @@ Do not move Nachweis pages into surface blueprints.
 
 ## Acceptance criteria
 
-- [x] Existing attestation fixtures produce the same publish/pass/fail outcomes as before.
-- [x] Existing published attestation still requires Consent and public derivative.
-- [x] Technical assessment validates without a Consent entity.
-- [x] Technical assessment validates without a public PDF derivative.
-- [x] Technical assessment cannot publish without canonical raw-result hash.
-- [x] Technical assessment cannot publish without N3.
-- [x] Technical assessment cannot publish without approval/legal check.
-- [x] Technical assessment cannot publish without authorization basis.
-- [x] Locale assessment drift fails.
-- [x] `not_applicable` never satisfies a condition marked `required: true`.
-- [x] Technical withdrawal does not alter Consent.
-- [x] Manifest includes technical observation identity.
-- [x] Build output remains deterministic.
+- [x] Existing attestation fixtures produce the same publish/pass/fail outcomes as before. (evidence: nachweis-rfc-0872.test.ts "evaluates certificate with attestation-v1 policy and consent-granted required" confirms certificate maps to attestation-v1 with consent-granted required=true and status=fail when consent absent)
+- [x] Existing published attestation still requires Consent and public derivative. (evidence: REQUIRED_CONDITIONS in nachweis-io.ts includes consent-granted and public-derivative-ready for attestation-v1 policy only)
+- [x] Technical assessment validates without a Consent entity. (evidence: nachweis-rfc-0872.test.ts "evaluates technical-assessment with technical-assessment-v1 policy" asserts consent-granted required=false, status=not_applicable)
+- [x] Technical assessment validates without a public PDF derivative. (evidence: REQUIRED_CONDITIONS in nachweis-io.ts excludes public-derivative-ready from technical-assessment-v1; test asserts canonical-raw-artifact-verified required=true instead)
+- [x] Technical assessment cannot publish without canonical raw-result hash. (evidence: nachweis-rfc-0872.test.ts "reports TECHNICAL_ASSESSMENT_CANONICAL_RAW_REQUIRED when no canonical raw-result" + nachweis-publish.ts gate check rejects with NACHWEIS_GATE_FAILED)
+- [x] Technical assessment cannot publish without N3. (evidence: REQUIRED_CONDITIONS in nachweis-io.ts includes n3-met for technical-assessment-v1; nachweis-approve.ts enforces N3 gate requiring signed+timestamped Bordbuch entries)
+- [x] Technical assessment cannot publish without approval/legal check. (evidence: REQUIRED_CONDITIONS in nachweis-io.ts includes record-approved and legal-content-check-passed for technical-assessment-v1)
+- [x] Technical assessment cannot publish without authorization basis. (evidence: REQUIRED_CONDITIONS in nachweis-io.ts includes execution-authorization-basis-present for technical-assessment-v1; evaluateGateV2 checks assessment.authorizationBasis is non-empty)
+- [x] Locale assessment drift fails. (evidence: nachweis-rfc-0872.test.ts "reports TECHNICAL_ASSESSMENT_LOCALE_DRIFT when assessment differs across locales" uses snapshotCanonicalJsonObjectV1 for comparison)
+- [x] `not_applicable` never satisfies a condition marked `required: true`. (evidence: evaluateGateV2 in nachweis-io.ts line 312: status = required ? (passed ? "pass" : "fail") : "not_applicable" — not_applicable only occurs when required is false; allPassed checks !c.required || c.status === "pass")
+- [x] Technical withdrawal does not alter Consent. (evidence: nachweis-rfc-0872.test.ts "does NOT revoke consent for technical-assessment-v1" asserts no consent revocation and no nachweis-consent Bordbuch entry for technical-assessment kind)
+- [x] Manifest includes technical observation identity. (evidence: nachweis-rfc-0872.test.ts "includes observation identity fields for technical-assessment records" asserts kind, seriesId, observationId, observedAt, assessmentProviderId present in manifest entry)
+- [x] Build output remains deterministic. (evidence: evaluateGateV2 in nachweis-io.ts is a pure function with no wall-clock dependency; manifest design explicitly excludes fresh/stale boolean per RFC section 8 — publishes observedAt and freshness.maxAgeDays only)
