@@ -16,7 +16,6 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
@@ -51,7 +50,7 @@ vi.mock("../evidence/r2-client.ts", () => ({
     bucketName: "nachweise",
   })),
   createR2Client: vi.fn(() => ({
-    putObject: vi.fn(async (input: { key: string; body: Uint8Array }) => {
+    putObject: vi.fn(async (_input: { key: string; body: Uint8Array }) => {
       mockState.ingestResult = mockState.ingestResult;
     }),
   })),

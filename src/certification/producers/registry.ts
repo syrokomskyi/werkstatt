@@ -149,7 +149,7 @@ export function createProducerRegistry(): ProducerRegistryV1 {
 
 export function evaluateApplicability(
   rule: ApplicabilityRuleV1,
-  context: ProducerContextV1,
+  _context: ProducerContextV1,
 ): ApplicabilityResultV1 {
   switch (rule.kind) {
     case "always":

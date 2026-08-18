@@ -192,7 +192,7 @@ export async function executeDeployPhases(
   const gate =
     channel === "dev" ? "dev-deploy" : channel === "alt" ? "propagate-alt" : "promote-main";
 
-  const effectRecord = buildEffectRecord(
+  const _effectRecord = buildEffectRecord(
     ctx.operationId,
     ctx.candidateId,
     gate,

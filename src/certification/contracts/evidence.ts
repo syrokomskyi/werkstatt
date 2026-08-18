@@ -3,7 +3,7 @@ import { diagnosticSchema } from "../../schemas/diagnostic.ts";
 import {
   digestSchema,
   evidenceIdSchema,
-  schemaIdSchema,
+  _schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
   authoritySequenceSchema,

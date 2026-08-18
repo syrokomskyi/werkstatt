@@ -9,7 +9,7 @@ import {
 } from "../effects.ts";
 import type { EffectDeclarationV1 } from "../../component/contracts.ts";
 
-const VALID_SHA = "sha256:" + "a".repeat(64);
+const _VALID_SHA = "sha256:" + "a".repeat(64);
 
 describe("RevertibleEffectHandler", () => {
   it("dispose calls disposer and succeeds", async () => {

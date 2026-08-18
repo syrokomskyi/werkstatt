@@ -3,7 +3,7 @@ import {
   humanReadableIdSchema,
   digestSchema,
   utcTimestampSchema,
-  gateChannelSchema,
+  _gateChannelSchema,
   environmentSchema,
 } from "../contracts/identifiers.ts";
 

@@ -15,7 +15,6 @@ across the three new command handlers.</purpose>
 
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
-import path from "node:path";
 import { spawn } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import type { ServiceEntry } from "@warpgogol/werkstatt/schemas";

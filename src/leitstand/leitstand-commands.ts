@@ -53,16 +53,13 @@ import type {
   LastPropagatedChannel,
   PurgeResult,
 } from "@warpgogol/werkstatt/schemas";
-import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
+import { generateOperationId } from "../werkstatt/index.ts";
 import {
   readSystemConfigSmart,
   readSystemStateSmart,
-  writeSystemStateSmart,
+  _writeSystemStateSmart,
   resolveCacheClonePath,
 } from "../sternsystem/registry-io.ts";
-import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
-import { orchestrateSnap01Recovery } from "../mission/snapshot-auto-regen.ts";
-import { buildIdentitySchema } from "@warpgogol/werkstatt/schemas";
 import type {
   DeploymentAdapter,
   DeploymentLimits,
@@ -83,20 +80,17 @@ import {
   verifyCloudflareToken,
   BUILD_IDENTITY_PATH,
 } from "./cache-purge.ts";
-import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
+import { artifactStorePreflight, } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
-import { fingerprintTree } from "@warpgogol/werkstatt/fingerprint/semantic";
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
 import type { SiteE2eRunResult } from "@warpgogol/werkstatt/testing/e2e";
 import {
-  loadWorkshopSuppressions,
-  loadWorkpieceSuppressions,
-  mergeSuppressions,
-  applySuppressions,
-  type SuppressedFinding,
+  _loadWorkshopSuppressions,
+  _loadWorkpieceSuppressions,
+  _mergeSuppressions,
+  _applySuppressions,
+  type _SuppressedFinding,
 } from "@warpgogol/werkstatt-shared/checks/suppressions-config";
-import { atomicWriteFile } from "../werkstatt/atomic.ts";
-import { computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 import {
   authorizeAndDeploy,
   verifyDurableSync,
@@ -108,13 +102,11 @@ import {
   resolveArtifactHash,
   resolveGateDecisionPath,
   flagSite,
-  type AuthorizeOutcome,
+  type _AuthorizeOutcome,
 } from "./deploy-helpers.ts";
-import type { GateDecisionV1 } from "../certification/contracts/decisions.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
-import { isSha256Digest } from "../fingerprint/primitives.ts";
 
-async function runSiteSmokeCheck(
+async function _runSiteSmokeCheck(
   workspaceRoot: string,
   systemId: string,
   deployedUrl: string,
@@ -143,7 +135,7 @@ async function runSiteSmokeCheck(
   }
 }
 
-async function runSiteE2eCheck(
+async function _runSiteE2eCheck(
   workspaceRoot: string,
   systemId: string,
   deployedUrl: string,
@@ -168,7 +160,7 @@ async function runSiteE2eCheck(
   }
 }
 
-function logCacheDirSize(cacheDir: string, logger: { info: (msg: string) => void }): void {
+function _logCacheDirSize(cacheDir: string, logger: { info: (msg: string) => void }): void {
   try {
     const entries = readdirSync(cacheDir, { withFileTypes: true });
     let totalSize = 0;
@@ -240,7 +232,7 @@ function resolveAdapter(name: string | undefined): DeploymentAdapter {
   throw new Error(`[leitstand] adapter-not-implemented: '${name}' has no concrete implementation`);
 }
 
-function getChannelConfig(dep: DeploymentStaticConfig, channel: Channel): DeploymentChannel {
+function _getChannelConfig(dep: DeploymentStaticConfig, channel: Channel): DeploymentChannel {
   const channelConfig =
     channel === "dev" ? dep.channels.dev : channel === "alt" ? dep.channels.alt : dep.channels.main;
   if (!channelConfig) {
@@ -361,8 +353,8 @@ const FRESHNESS_BACKOFF_DELAYS_MS = [3_000, 6_000, 12_000, 24_000];
 
 // Shared health check retry constants (RFC-0747, RFC-0846).
 // Used by leitstand.dev-deploy (dev health) and leitstand.promote (alt health).
-const HEALTH_CHECK_MAX_ATTEMPTS = 3;
-const HEALTH_CHECK_BACKOFF_DELAYS_MS = [3_000, 6_000];
+const _HEALTH_CHECK_MAX_ATTEMPTS = 3;
+const _HEALTH_CHECK_BACKOFF_DELAYS_MS = [3_000, 6_000];
 
 // RFC-0649 / RFC-0657: Verify CDN freshness by fetching build-identity.json from the CDN URL
 // and comparing distTreeHash against the local build-identity. Retries up to 5 times with
@@ -423,7 +415,7 @@ export async function verifyFreshness(
 }
 
 // RFC-0624: Post-deploy CDN cache purge step. Non-blocking on failure.
-async function runPurgeStep(
+async function _runPurgeStep(
   workspaceRoot: string,
   releaseId: string,
   deploymentUrl: string,
@@ -460,7 +452,7 @@ async function runPurgeStep(
   return result;
 }
 
-async function earlyCloudflareTokenCheck(
+async function _earlyCloudflareTokenCheck(
   secretsFilePath: string | undefined,
   logger: { info: (m: string) => void; warn: (m: string) => void },
 ): Promise<void> {
@@ -490,7 +482,7 @@ interface PreflightCheck {
   detail: string;
 }
 
-async function runPreflight(
+async function _runPreflight(
   workspaceRoot: string,
   releaseId: string,
   dep: DeploymentStaticConfig,
@@ -672,7 +664,7 @@ async function checkDistSize(
   };
 }
 
-function buildLastPropagatedEntry(
+function _buildLastPropagatedEntry(
   releaseId: string,
   state: LastPropagatedChannel["state"],
   healthy: boolean,

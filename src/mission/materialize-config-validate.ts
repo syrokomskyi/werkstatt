@@ -31,7 +31,7 @@ import { OPERATOR_CONFIG_FILES } from "./operator-config-files.ts";
 import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import { discoverSystems } from "../sternsystem/registry-io.ts";
 
-const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
+const _STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
 
 const BOILERPLATE_FILES = new Set([
   ".gitignore",

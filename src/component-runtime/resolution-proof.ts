@@ -1,6 +1,5 @@
 import type { ComponentId, CapabilityId } from "../component/contracts.ts";
 import type { ResolvedComponentSetV1 } from "../component/contracts.ts";
-import type { Sha256Digest } from "../fingerprint/primitives.ts";
 
 export type ResolutionViolationCode =
   | "RESOLUTION-01"

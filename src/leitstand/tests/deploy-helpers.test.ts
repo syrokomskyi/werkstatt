@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
@@ -31,7 +31,7 @@ const validGateDecision = {
   decidedAt: "2026-01-01T00:00:00Z",
 };
 
-const validMainVerificationDecision = {
+const _validMainVerificationDecision = {
   schema: "werkstatt/main-verification-decision@1",
   decisionId: "dec-main-001",
   candidateId: "test-candidate",

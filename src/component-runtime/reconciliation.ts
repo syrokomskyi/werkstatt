@@ -4,8 +4,7 @@ import type {
   ResolvedComponentIdentityV1,
 } from "../component/contracts.ts";
 import { computeSetHash } from "../component/identity.ts";
-import type { Sha256Digest } from "../fingerprint/primitives.ts";
-import { resolve, type ResolutionInputV1, type ResolutionResultV1 } from "./resolver.ts";
+import { resolve, type ResolutionInputV1, type _ResolutionResultV1 } from "./resolver.ts";
 import { createActivationTransaction, type ActivationTransaction } from "./activation.ts";
 import type { ComponentFiber } from "./fiber.ts";
 import type { Deadline } from "./fiber.ts";
@@ -155,7 +154,7 @@ export function reconcile(options: ReconcileOptions): ReconcileOutcome | Promise
     }] };
   }
 
-  const plan = planResult as ReconciliationPlanV1;
+  const _plan = planResult as ReconciliationPlanV1;
 
   const tx = createActivationTransaction(
     options.transactionId,

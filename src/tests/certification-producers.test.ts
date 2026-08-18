@@ -16,7 +16,7 @@ import type {
 import type {
   ReleaseCandidateV1,
   CertificationPolicyBundleV1,
-  EvidenceEnvelopeV1,
+  _EvidenceEnvelopeV1,
   ResolvedRequirementV1,
 } from "../certification/index.ts";
 import type { CertificationProfileV1 } from "../certification/profile/schemas.ts";

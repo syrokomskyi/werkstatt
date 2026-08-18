@@ -19,16 +19,13 @@
 */
 
 import {
-  runLeitstandDevDeploy,
-  runLeitstandPropagate,
-  runLeitstandPromote,
-  runLeitstandStatus,
-  runLeitstandRollback,
-  runLeitstandHealth,
+  _runLeitstandDevDeploy,
+  _runLeitstandPropagate,
+  _runLeitstandPromote,
+  _runLeitstandStatus,
+  _runLeitstandRollback,
+  _runLeitstandHealth,
 } from "./leitstand-commands.ts";
-import { runLeitstandServiceDevDeploy } from "./service-dev-deploy.ts";
-import { runLeitstandServicePromote } from "./service-promote.ts";
-import { runLeitstandServiceRollback } from "./service-rollback.ts";
 
 export {
   runLeitstandDevDeploy,

@@ -1,9 +1,6 @@
 import type { Sha256Digest } from "../../fingerprint/primitives.ts";
 import type { Diagnostic } from "../../schemas/diagnostic.ts";
-import type { ReleaseCandidateV1 } from "../contracts/candidate.ts";
-import type { CertificationPolicyBundleV1 } from "../contracts/policy-bundle.ts";
 import type { EvidenceEnvelopeV1 } from "../contracts/evidence.ts";
-import type { CertificationProfileV1 } from "../profile/schemas.ts";
 
 export type RiskClass = "ordinary" | "critical" | "borderline";
 export type EvaluatorVerdict = "pass" | "fail" | "borderline" | "incomplete";

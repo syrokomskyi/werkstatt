@@ -4,7 +4,7 @@ import type {
   CapabilityCandidateV1,
   EvolutionEvidenceBundleV1,
   TransitionRequestV1,
-  InspectionSnapshotV1,
+  _InspectionSnapshotV1,
   BoundedIntentV1,
   KillSwitchStateV1,
 } from "./contracts.ts";

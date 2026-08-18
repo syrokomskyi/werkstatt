@@ -9,7 +9,7 @@ import type {
   TransitionRecordV1,
   CompensatingActionV1,
 } from "./contracts.ts";
-import { isForwardTransition, isTerminalStage, FORWARD_ONLY_SEQUENCE } from "./contracts.ts";
+import { isForwardTransition, isTerminalStage, } from "./contracts.ts";
 
 export interface ReducerStateV1 {
   candidates: Map<string, CapabilityCandidateV1>;

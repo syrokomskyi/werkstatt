@@ -35,7 +35,7 @@ import {
   hasAppsCollision,
   resolveMirrors,
   resolveMirrorPath,
-  resolveCacheClonePath,
+  _resolveCacheClonePath,
   resolveWorkpiecePath,
   readSystemState,
   isGitAccessible,
