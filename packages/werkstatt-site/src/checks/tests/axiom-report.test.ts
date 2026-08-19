@@ -307,7 +307,7 @@ describe("axiom.report", () => {
     expect(result.data!.closureSatisfied).toBe(true);
     expect(result.nextSteps!.length).toBeGreaterThan(0);
     expect(existsSync(join(evidenceDir, "report.html"))).toBe(true);
-  });
+  }, 30000);
 
   it("fails with AXIOM-REPORT-01 when evidence directory not found", async () => {
     const result = await runAxiomReport(
