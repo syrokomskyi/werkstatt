@@ -178,8 +178,10 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
 
     const slug = data.slug;
     if (typeof slug !== "string" || slug.trim() === "") {
-      // Skip records without slug — nachweis.validate will report NACHWEIS-SLUG-01
-      continue;
+      throw new Error(
+        `[nachweis-list] Evidence record ${entry.id} is missing required frontmatter "slug". ` +
+          `Run nachweis.validate to identify affected files.`,
+      );
     }
 
     if (data.kind === "technical-assessment" && data.assessment) {
