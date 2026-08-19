@@ -248,16 +248,16 @@ No change from RFC-0836. The command returns `KernelCommandResult<CheckResult>` 
 
 ## Acceptance criteria
 
-- [ ] `parseRecordLookup` function extracts Record name and key expression from `recordName[keyExpr]` patterns
-- [ ] `splitFallback` function extracts the primary expression before `??`
-- [ ] `isRecordLookupMismatch` function returns `true` when aria-label and visible text use different Record identifiers
-- [ ] `extractVisibleTextExprs` is extended to recognize Record-lookup expressions (`recordName[keyExpr]` and `recordName[keyExpr] ?? fallback`)
-- [ ] `a11y.label-in-name.component.validate` emits `A11Y-LIN-COMP-01` for Record-lookup mismatches
-- [ ] Safe patterns (resolveLabelInName, naming convention, same Record identifier) are not flagged
-- [ ] Unit tests cover: different Record identifiers → violation, same Record identifier → safe, naming convention → safe, resolveLabelInName → safe, non-Record-lookup expressions → existing behavior unchanged, fallback expressions → primary expression checked
-- [ ] MODULE_CONTRACT purpose and CHANGE_SUMMARY in `a11y-label-in-name-component.ts` are updated to mention Record-lookup detection
-- [ ] Command description in `command-tables/08-section-framework.ts` is updated to mention Record-lookup detection
-- [ ] `rfc.validate` passes on this file
+- [x] `parseRecordLookup` function extracts Record name and key expression from `recordName[keyExpr]` patterns (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:158-162)
+- [x] `splitFallback` function extracts the primary expression before `??` (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:153-156)
+- [x] `isRecordLookupMismatch` function returns `true` when aria-label and visible text use different Record identifiers (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:164-173)
+- [x] `extractVisibleTextExprs` is extended to recognize Record-lookup expressions (`recordName[keyExpr]` and `recordName[keyExpr] ?? fallback`) (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:135-138)
+- [x] `a11y.label-in-name.component.validate` emits `A11Y-LIN-COMP-01` for Record-lookup mismatches (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:212-240, tests/a11y-label-in-name-component.test.ts:191-200)
+- [x] Safe patterns (resolveLabelInName, naming convention, same Record identifier) are not flagged (evidence: tests/a11y-label-in-name-component.test.ts:202-210,212-220,222-230,254-262)
+- [x] Unit tests cover: different Record identifiers → violation, same Record identifier → safe, naming convention → safe, resolveLabelInName → safe, non-Record-lookup expressions → existing behavior unchanged, fallback expressions → primary expression checked (evidence: tests/a11y-label-in-name-component.test.ts:189-262 — 7 new test cases, all 23 tests pass)
+- [x] MODULE_CONTRACT purpose and CHANGE_SUMMARY in `a11y-label-in-name-component.ts` are updated to mention Record-lookup detection (evidence: packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts:10-11,23)
+- [x] Command description in `command-tables/08-section-framework.ts` is updated to mention Record-lookup detection (evidence: packages/werkstatt-site/src/checks/command-tables/08-section-framework.ts:122)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0882 --json` — zero errors)
 
 ## Implementation notes for agents
 
