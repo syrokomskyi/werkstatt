@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
+enhancedAt: 2026-08-19
 implementedAt:
 closedAt:
 supersedes: []
@@ -33,7 +34,6 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - packages/werkstatt
-  - packages/werkstatt-site
 successSignals:
   - "Post-build validators can be re-run on existing dist/ in seconds, without a full Astro rebuild"
   - "Iterative debugging of IMG-DELIVERY-04, A11Y-LIN-01, and other post-build rules takes seconds instead of ~4 minutes"
@@ -46,6 +46,8 @@ nonGoals:
 # RFC-0883: Add post-build-only validation mode for fast iterative debugging
 
 ## Context
+
+The kernel already provides `sites-check.postbuild` (app-scoped, `--site`), which runs `SITES_CHECK_POSTBUILD_PIPELINE` on an existing dist/ with a dist/ existence guard (RFC-0085). However, during mission work the operator has a `--mission` id, not a `--site` id, and `sites-check.postbuild` does not accept `--mission`. Additionally, there is no way to skip slow Playwright-based steps (`mobile.layout.check` at 53s) when debugging fast validators.
 
 During mission `warpgogol-com-m000077`, iterative debugging of post-build validation failures (`IMG-DELIVERY-04`, `A11Y-LIN-01`) required running the full `mission.validate` pipeline each time. Each cycle took ~4 minutes:
 
@@ -83,7 +85,7 @@ pnpm exec werkstatt run validate.postbuild --mission warpgogol-com-m000077
 pnpm exec werkstatt run validate.postbuild --site warpgogol-com
 ```
 
-Scope: site. Requires either `--mission` or `--site` to resolve the workpiece. If `dist/client/` does not exist, the command fails with a clear error message: "No dist/ found — run mission.validate first to build the site."
+Scope: workspace. Requires either `--mission` or `--site` to resolve the workpiece. If `dist/client/` does not exist, the command fails with exit code 1 and a clear error message: "No dist/ found — run mission.validate first to build the site."
 
 ### TypeScript contracts
 
@@ -109,34 +111,12 @@ interface ValidatePostbuildResult {
 ### Execution model
 
 1. Resolve workpiece path from `--mission` or `--site`.
-2. Check that `dist/client/` exists. If not, fail with error.
-3. Load the site's kernel config to resolve the `SITES_CHECK_POSTBUILD_PIPELINE`.
-4. Run each step in the pipeline, in order, with the same concurrency as `build.post`.
-5. Steps that require a fresh build (e.g. `dist.generated-marker.strip`, `text.normalize.apply`) are **skipped** — they modify dist during build.post and are not re-runnable.
-6. Steps that validate existing dist (e.g. `image.delivery.validate`, `a11y.label-in-name.validate`, `csp.origins.validate`, `lighthouse.budget.check`) run normally.
-7. Steps that generate artifacts (e.g. `behavior.snapshot.generate`, `print.pdf.generate`) are **skipped** — they are not validators and require a fresh build.
+2. Check that `dist/client/` exists. If not, fail with exit code 1.
+3. Resolve the site's kernel registry and retrieve the `SITES_CHECK_POSTBUILD_PIPELINE` steps (same pipeline used by `sites-check.postbuild` and embedded in `build.post`).
+4. If `--skip-slow` is set, filter out the slow steps (see below).
+5. Run the remaining steps in order via `executeKernelPipeline`, passing `siteWorkspace` to bypass discovery when `--mission` is used.
 
-### Skippable vs runnable steps
-
-| Step | Runnable in validate.postbuild? | Reason |
-| --- | --- | --- |
-| `dist.generated-marker.strip` | skip | Modifies dist — already done during build |
-| `text.normalize.apply` | skip | Modifies dist — already done during build |
-| `dist.html-structure.validate` | run | Validates existing dist |
-| `seo.technical.validate` | run | Validates existing dist |
-| `seo.structured-data.validate` | run | Validates existing dist |
-| `canonical.url.validate` | run | Validates existing dist |
-| `lighthouse.budget.check` | run | Validates existing dist |
-| `mobile.layout.check` | run | Validates existing dist (but takes 53s — see below) |
-| `cloudflare.assets.validate` | run | Validates existing dist |
-| `image.delivery.validate` | run | Validates existing dist |
-| `csp.origins.validate` | run | Validates existing dist |
-| `behavior.snapshot.validate` | run | Validates existing dist |
-| `a11y.label-in-name.validate` | run | Validates existing dist |
-| `behavior.snapshot.generate` | skip | Generates artifacts — not a validator |
-| `print.pdf.generate` | skip | Generates artifacts — not a validator |
-| `print.pdf.copy` | skip | Copies artifacts — not a validator |
-| `print.pdf.validate` | skip | Validates generated PDFs — skipped because generate is skipped |
+`SITES_CHECK_POSTBUILD_PIPELINE` already contains only validators — generation and mutation steps (`dist.generated-marker.strip`, `text.normalize.apply`, `behavior.snapshot.generate`, `print.pdf.generate`, etc.) are in `SITES_BUILD_POST_PIPELINE`, not in this pipeline. No skip list is needed.
 
 ### `--skip-slow` flag
 
@@ -144,14 +124,22 @@ interface ValidatePostbuildResult {
 pnpm exec werkstatt run validate.postbuild --mission warpgogol-com-m000077 --skip-slow
 ```
 
-Skips `mobile.layout.check` (53s) and `lighthouse.budget.check` (if slow). Useful when debugging specific validators like `image.delivery.validate` or `a11y.label-in-name.validate` that run in <2 seconds.
+Skips the following slow steps, defined as a static list in the command implementation:
+
+| Step                      | Typical duration | Reason                                |
+| ------------------------- | ---------------- | ------------------------------------- |
+| `mobile.layout.check`     | ~53s             | Playwright-based geometric assertions |
+| `lighthouse.budget.check` | ~10-30s          | Lighthouse audit runner               |
+| `qa.independent.run`      | ~5-15s           | Playwright-based page probes          |
+
+Useful when debugging specific validators like `image.delivery.validate` or `a11y.label-in-name.validate` that run in <2 seconds.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/werkstatt/src/mission/validate-postbuild.ts` | New command implementation |
-| `packages/werkstatt/src/mission/module.ts` | Command registration |
+| `packages/werkstatt/src/mission/mission.module.ts` | Command registration |
 | `{workpiece}/dist/client/` | Read by validators — must exist from a prior build |
 
 ### Output format
@@ -172,9 +160,10 @@ Skips `mobile.layout.check` (53s) and `lighthouse.budget.check` (if slow). Usefu
 
 ### Failure modes
 
-- **No dist/ found**: Command fails with error message. Does not attempt to build.
-- **Stale dist/**: If dist/ is from a previous build and the source has changed, validators may produce false results. The command prints a warning: "dist/ may be stale — run mission.validate for a full check."
-- **Step failure**: Same behavior as `build.post` — the command stops at the first failing step and reports the error.
+- **No dist/ found**: Exit code 1. Error message: "No dist/ found — run mission.validate first to build the site." Does not attempt to build.
+- **Stale dist/**: The command always prints a warning: "dist/ may be stale — run mission.validate for a full check." Staleness is not detected programmatically (no timestamp comparison); the warning is unconditional because the command cannot know whether source files changed since the last build.
+- **Step failure**: Exit code 1. The command stops at the first failing step and reports the error, same as `build.post`.
+- **Concurrent execution**: Running `validate.postbuild` twice on the same dist/ simultaneously is safe — all validators are read-only. No file locking needed.
 
 ## Rollout
 
@@ -185,6 +174,7 @@ Skips `mobile.layout.check` (53s) and `lighthouse.budget.check` (if slow). Usefu
 
 ## Alternatives considered
 
+- **Extend `sites-check.postbuild` with `--mission` and `--skip-slow` flags**: `sites-check.postbuild` already runs `SITES_CHECK_POSTBUILD_PIPELINE` on existing dist/ (RFC-0085). Rejected because `sites-check.postbuild` is `scope: "app"` (requires `--site`, uses site discovery), while `--mission` is a workspace-level concept that follows the `mission.validate` pattern. Adding `--mission` to an app-scoped command would violate the scope contract. A separate workspace-scoped command keeps the resolution path clean.
 - **`--skip-build` flag on `mission.validate`**: Rejected — `mission.validate` is the authoritative validation command and should always run the full pipeline. Mixing modes creates confusion about what was actually validated.
 - **Cache dist/ and diff**: Rejected — too complex for the problem. Re-running validators on existing dist is simpler and sufficient.
 - **Run individual validators by name**: Rejected — developers would need to know which validators to run. The post-build pipeline is a curated set; running all of them (minus slow ones) is more robust.
@@ -193,15 +183,14 @@ Skips `mobile.layout.check` (53s) and `lighthouse.budget.check` (if slow). Usefu
 
 - **False confidence**: Developers might skip `mission.validate` and rely only on `validate.postbuild`. Mitigated by the warning message and by the fact that `validate.postbuild` does not run build.check or build.prepare.
 - **Stale dist/**: If source files change but dist/ is not rebuilt, validators may pass or fail incorrectly. The warning message addresses this.
-- **Maintenance burden**: Low — the command reuses the existing pipeline runner and step definitions. The only new logic is the skip list and dist/ existence check.
+- **Maintenance burden**: Low — the command reuses the existing pipeline runner and step definitions. The only new logic is the `--skip-slow` static list and dist/ existence check.
 
 ## Acceptance criteria
 
 - [ ] `validate.postbuild` command registered with `--mission` and `--site` flags
 - [ ] Command fails with clear error if `dist/client/` does not exist
-- [ ] Command runs all runnable post-build validators from `SITES_CHECK_POSTBUILD_PIPELINE`
-- [ ] Skips steps that modify dist or generate artifacts (strip, normalize, generate, pdf)
-- [ ] `--skip-slow` flag skips `mobile.layout.check` and other slow steps
+- [ ] Command runs all validators from `SITES_CHECK_POSTBUILD_PIPELINE` (which already contains only validators — no skip list needed)
+- [ ] `--skip-slow` flag skips `mobile.layout.check`, `lighthouse.budget.check`, and `qa.independent.run`
 - [ ] `--json` output format documented and stable
 - [ ] Warning printed when dist/ may be stale
 - [ ] Unit tests cover: dist/ exists → run validators, dist/ missing → error, --skip-slow → slow steps skipped
