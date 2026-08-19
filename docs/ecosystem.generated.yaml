@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 2accb4516df22195986d62ef150d3d9ed000497f3ad215244ed76fb0f4ba0d62
+  contentHash: 4e90984b08d5b846e8b4748ed06150d5ae08bf1f3acf96c6928d259e317a885c
   sources:
     - path: docs/architecture-dna.md
       hash: 17406abca4f3fdd60f8b51e8eae7423e9be3cbddcf8c03b2ba546b442aaa5cdf
@@ -24,20 +24,22 @@ meta:
       hash: 83c2f044ad2a5dea86ace5fe92679dea40f1add0956cb8fadc30d0898884b142
     - path: missions/warpgogol-com-m000076/workpiece/package.json
       hash: 3ab613bae4020f0c5aab3026a057676d7f0674997f278236a5be32b06c8e5be7
+    - path: missions/warpgogol-com-m000077/workpiece/package.json
+      hash: 3ab613bae4020f0c5aab3026a057676d7f0674997f278236a5be32b06c8e5be7
     - path: package.json
-      hash: b6bcc7e7a65dad7c81a56d8af79b2bb4e54a983fd937066b3ac99ccee75f8104
+      hash: 030eb250c2177fc11a65ec028cd1438cfba681e85789d90b14bc23591d92b05d
     - path: packages/forge/package.json
-      hash: 5c182cfec72dad751a2bc182989355e6cbc84c1b169cc7cb3d796582d6590a8c
+      hash: 2d3486be94751ceaeb769abe882db6ca71def7fd6d0b4ca19dea3cfbd8ca789b
     - path: packages/werkstatt-game/package.json
-      hash: 51f61d2909f20b2bb7e1665f81dd568dcc902412f62daf6b2f11333dc006f62d
+      hash: 8b02c10d6c60bdf3cf36a56d540ebcd49cba0420be44b5cac04a057b3ccb2888
     - path: packages/werkstatt-godot/package.json
-      hash: 26df77d467420d54bb0e8c88a88a5c42871674bf09c97ce2f807ed8c10d48291
+      hash: 5fc056602da55fb97ddd8eb613ab4715865dbe08b533952552cd04c762e0abdc
     - path: packages/werkstatt-shared/package.json
-      hash: a0c0ef4e6e5571e60ee37b0538462ccdba1943ff87f52a59bea9f0eae8e7265d
+      hash: 273460d719c8939b733d5f07d07f29d20f42231987a9818f3595df7bac3fd563
     - path: packages/werkstatt-site/package.json
-      hash: eac504dd6d380e58ebe7eccea8dcb4d3fdd9db98612db568554b06a7f536ade4
+      hash: 9c52fe9a93dc2a859d3a1423f6a61e692734b7ebcbb98c0ff592816f778fb4ed
     - path: packages/werkstatt/package.json
-      hash: d92dac70924f5cb4dbb09669653cd300e918418ba45918e8a8d180640b6ca529
+      hash: d1dea1cd1f7ad72c8235e7c618815d82a089425d97a976eec83aa60147051e0a
     - path: pnpm-workspace.yaml
       hash: e7ed6c8e86e7f2e7c0c404c792a287ef6dde757f1ee03fed81ec410ea841f96d
     - path: services/cf-analytics-poller/package.json
@@ -62,7 +64,7 @@ meta:
       hash: b2ea826727ffb23d58db6df4b008adf5a105f54de18c8d3eec26f74a1fa13efc
 workspace:
   name: warpgogol-platform
-  version: 8.0.0
+  version: 6.19.18
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -70,7 +72,7 @@ workspace:
     - services/*
 apps:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000076/workpiece
+    directory: missions/warpgogol-com-m000077/workpiece
     packageName: warpgogol-com
 sternsystems: []
 missions:
@@ -78,6 +80,10 @@ missions:
     sternsystem: ""
     status: open
     workpiecePath: missions/warpgogol-com-m000076/workpiece
+  - id: warpgogol-com-m000077
+    sternsystem: ""
+    status: open
+    workpiecePath: missions/warpgogol-com-m000077/workpiece
 packages:
   - name: warpgogol-com
     directory: missions/warpgogol-com-m000076/workpiece
@@ -106,6 +112,43 @@ packages:
     testSignal:
       packageName: warpgogol-com
       directory: missions/warpgogol-com-m000076/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000077/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/forge"
+      - "@warpgogol/werkstatt"
+      - "@warpgogol/werkstatt-shared"
+      - "@warpgogol/werkstatt-site"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000077/workpiece
       signal: skipped
       evidence: App author/build checks currently cover the deployable site; direct
         app unit tests are deferred until an app-level smoke-test harness lands.
@@ -470,16 +513,16 @@ quality:
     real: 6
     noop: 0
     absent: 0
-    skipped: 10
+    skipped: 11
   testSignalPolicy:
     hasErrors: false
     errorCount: 0
     warningCount: 0
   maintenanceDebtBaseline:
     exists: true
-    currentItems: 291
+    currentItems: 295
     baselineItems: 230
-    newItems: 291
+    newItems: 295
     expiredItems: 0
 commands:
   - name: a11y.label-in-name.component.validate
@@ -2522,6 +2565,18 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
+  - name: forge.init
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.package.health
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: forge.port.scaffold
     scope: workspace
     mutatesState: false
@@ -3621,6 +3676,20 @@ commands:
       - site
       - workspace
   - name: nachweis.manifest.generate
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
+  - name: nachweis.measure.cloudflare-agent-readiness
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
+  - name: nachweis.measure.lighthouse
     scope: workspace
     mutatesState: true
     supportsAllSites: false
@@ -5938,53 +6007,24 @@ commands:
       - site
       - workspace
 commandProvenance:
-  - command: forge.create
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0877
-    removedBy: []
   - command: integration.config.validate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0179
     removedBy: []
-  - command: nachweis.assessment.ingest
+  - command: nachweis.measure.cloudflare-agent-readiness
     proposedBy:
-      - RFC-0873
-    addedBy: []
+      - RFC-0875
+    addedBy:
+      - RFC-0875
     changedBy: []
     removedBy: []
-  - command: nachweis.manifest.generate
+  - command: section.shell.contract.validate
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0872
-    removedBy: []
-  - command: nachweis.publish
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0872
-    removedBy: []
-  - command: nachweis.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0872
-    removedBy: []
-  - command: nachweis.withdraw
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0872
-    removedBy: []
-  - command: pbp.content.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0872
+      - RFC-0879
     removedBy: []
   - command: surface.generate
     proposedBy: []
@@ -5992,12 +6032,6 @@ commandProvenance:
     changedBy:
       - RFC-0384
     removedBy: []
-  - command: workshop.scaffold
-    proposedBy: []
-    addedBy: []
-    changedBy: []
-    removedBy:
-      - RFC-0877
 pipelines:
   - name: build.check
     scope: app
@@ -7497,33 +7531,42 @@ generatedOwnership:
     module: packages/werkstatt/src/bordbuch/bordbuch-generate.ts
     conditional: true
 rfcs:
-  accepted: 3
-  implemented: 1
-  draft: 7
+  accepted: 1
+  implemented: 3
+  draft: 4
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0872
+    - id: RFC-0875
       implementedAt: 2026-08-18
-      kind: architecture
+      kind: command
       scope: workspace
       dnaRefs:
-        - DNA-46
-        - DNA-53
+        - DNA-40
         - DNA-59
+    - id: RFC-0876
+      implementedAt: 2026-08-18
+      kind: architecture
+      scope: app
+      dnaRefs:
+        - DNA-17
+        - DNA-23
+        - DNA-24
+    - id: RFC-0879
+      implementedAt: 2026-08-19
+      kind: command
+      scope: workspace
+      dnaRefs:
+        - DNA-8
+        - DNA-37
   nonImplementedRfcs:
     accepted:
       - RFC-0179
-      - RFC-0873
-      - RFC-0877
     draft:
       - RFC-0000
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0874
-      - RFC-0875
-      - RFC-0876
     reviewing: []
     superseded: []
     rejected: []
