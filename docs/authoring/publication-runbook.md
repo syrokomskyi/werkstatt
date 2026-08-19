@@ -1,6 +1,6 @@
 # Publication Runbook — npm via repo-extract
 
-This runbook describes the operator-triggered publication pipeline for `@warpgogol/forge`, `@warpgogol/werkstatt`, `@warpgogol/werkstatt-shared`, and plugin packages (`werkstatt-game`, `werkstatt-godot`) to npm. Established by RFC-0773, updated for repo-extract workflow.
+This runbook describes the operator-triggered publication pipeline for `@warpgogol/forge`, `@warpgogol/werkstatt`, `@warpgogol/werkstatt-shared`, and plugin packages (`werkstatt-phaser`, `werkstatt-godot`) to npm. Established by RFC-0773, updated for repo-extract workflow.
 
 ## Prerequisites
 
@@ -148,7 +148,7 @@ The command exits non-zero on errors. This is also run as a CI gate in the root 
 | `@warpgogol/forge` | `packages/forge/extract.config.yaml` | `git@github.com:syrokomskyi/forge.git` | public |
 | `@warpgogol/werkstatt` | `packages/werkstatt/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt.git` | public |
 | `@warpgogol/werkstatt-shared` | `packages/werkstatt-shared/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-shared.git` | public |
-| `@warpgogol/werkstatt-game` | `packages/werkstatt-game/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-game.git` | public |
+| `@warpgogol/werkstatt-phaser` | `packages/werkstatt-phaser/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-phaser.git` | public |
 | `@warpgogol/werkstatt-godot` | `packages/werkstatt-godot/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-godot.git` | public |
 
 Note: `@warpgogol/werkstatt-site` is NOT published to npm (excluded by design — it is a site-composition plugin consumed only within the monorepo).
