@@ -1,0 +1,74 @@
+{
+  "name": "@warpgogol/werkstatt-phaser",
+  "version": "0.7.2",
+  "private": false,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "description": "Werkstatt Phaser plugin — Phaser + Vite + Turborepo stack.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syrokomskyi/werkstatt-phaser.git"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./paths": {
+      "types": "./src/paths/phaser-paths.ts",
+      "default": "./src/paths/phaser-paths.ts"
+    },
+    "./checks": {
+      "types": "./src/checks/index.ts",
+      "default": "./src/checks/index.ts"
+    },
+    "./checks/module": {
+      "types": "./src/checks/module.ts",
+      "default": "./src/checks/module.ts"
+    },
+    "./invariants": {
+      "types": "./src/invariants/phaser-invariants.ts",
+      "default": "./src/invariants/phaser-invariants.ts"
+    },
+    "./deploy/types": {
+      "types": "./src/deploy/types.ts",
+      "default": "./src/deploy/types.ts"
+    },
+    "./build": {
+      "types": "./src/build/vite-build.ts",
+      "default": "./src/build/vite-build.ts"
+    },
+    "./release-evidence": {
+      "types": "./src/release-evidence/phaser-evidence.ts",
+      "default": "./src/release-evidence/phaser-evidence.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "lint": "pnpm exec eslint \"src/**/*.ts\"",
+    "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@warpgogol/werkstatt": "*",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "eslint": "^10.8.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "8.65.0",
+    "vitest": "^4.1.10"
+  }
+}
