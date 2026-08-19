@@ -126,7 +126,7 @@ export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
   return published.map(({ slug, supportedLangs }) => {
     const routes: Record<string, string> = {};
     for (const lang of supportedLangs) {
-      routes[lang] = `/nachweise/${slug}/`;
+      routes[lang] = `nachweise/${slug}`;
     }
     return {
       pageId: nachweisPageId(slug),
