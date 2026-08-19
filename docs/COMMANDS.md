@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 775. Raw manifest entries: 775.
+Generated command rows: 776. Raw manifest entries: 776.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -755,6 +755,7 @@ Generated command rows: 775. Raw manifest entries: 775.
 | `ui.silent-defaults.lint` | workspace | workspace | no | no | Scan packages/werkstatt-site/src/domain/ui/{sections,components}/ for silent empty-string fallbacks (?? "", = "", defaultContent) on UI-visible text props (RFC-0205). |
 | `uni.registry.build` | workspace | workspace | yes | no | Scan all *.manifest.yaml files across workspace apps and packages/ui/, validate each against manifestSchema, and emit uni.registry.yaml at the workspace root (DNA-18, RFC-0023). |
 | `uni.registry.validate` | workspace | workspace | no | no | Validate that uni.registry.yaml is fresh — detect NEW, STALE, and CHANGED manifest entries (DNA-18, RFC-0023). |
+| `validate.postbuild` | workspace | workspace | no | no | Run post-build validators on existing dist/ without a full rebuild (RFC-0883). |
 | `video.dist.prune` | workspace | app | yes | no | RFC-0210 build.post: delete bundled feature/background SOURCE videos from dist/client/_astro (served from public/_video instead) so large masters don't break the Cloudflare 25 MiB asset limit. Ambient clips are untouched. |
 | `video.ios-fallback.validate` | workspace | app | no | no | Refuse to publish without an iOS-playable video format: every `media:` source must expose an existing MP4 rendition, and every living-photo clip must ship a sibling iOS MP4 or be transparent-by-design (poster-only on iOS) (RFC-0234). |
 | `video.media.validate` | workspace | app | no | no | Validate explicit media configs: every `media:` source token resolves to a source video, feature media has alt text, and feature media warns when it ships no captions (WCAG 1.2.2) (RFC-0210). |

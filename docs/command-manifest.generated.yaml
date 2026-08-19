@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 6f53fb5fba119d377c5c5e53668d1013eaf5c7f5fba1d2fe2feac0ba0dfc7141
+  contentHash: d4c16dea2d23d57e1ef5c4941068636801e991957b679a564fc43641057a2c2b
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -15001,6 +15001,31 @@ commands:
     validatesOutputs: []
     pipelines:
       - packages.check
+  - name: validate.postbuild
+    description: Run post-build validators on existing dist/ without a full rebuild
+      (RFC-0883).
+    scope: workspace
+    provider: workspace
+    module: mission
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      mission:
+        kind: string
+        description: Mission id.
+      site:
+        kind: string
+        description: Site id.
+      skip-slow:
+        kind: boolean
+        description: Skip slow Playwright/Lighthouse steps.
+    reads:
+      - missions/{mission}/**
+      - apps/{site}/**
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: video.dist.prune
     description: "RFC-0210 build.post: delete bundled feature/background SOURCE
       videos from dist/client/_astro (served from public/_video instead) so

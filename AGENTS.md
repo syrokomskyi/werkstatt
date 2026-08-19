@@ -40,7 +40,7 @@ All 25 packets (000–240) of the agent-runtime-certification program are **comp
 - **Content and code**: editing workpiece files, `packages/*`, `services/*` — all work normally.
 - **Build pipeline**: `build.prepare`, `build.check`, `astro build` — all work normally.
 - **Git**: `mission.git.commit` (workpiece), `ecosystem.commit` (platform) — both work.
-- **Validation**: `mission.validate`, `sternsystem.validate`, `werkstatt.plugin.validate` — all work.
+- **Validation**: `mission.validate`, `validate.postbuild` (RFC-0883, post-build-only fast iterative debugging), `sternsystem.validate`, `werkstatt.plugin.validate` — all work.
 - **Deployment** (RFC-0865, RFC-0866): `leitstand.certify`, `leitstand.dev-deploy`, `leitstand.propagate`, `leitstand.promote`, `leitstand.status`, `leitstand.health`, `leitstand.pipeline.check`, `leitstand.rollback`, and `release.rollback` — all work via certification authority (`authorizeDeployment()`, `verifyMainPromotion()`, `evaluateRollback()`). `leitstand.certify` produces `GateDecisionV1` JSON at `systems-cache/{id}/gate-decisions/{release}-{gate}.json` from certification orchestration. Deploy commands resolve the gate decision at the conventional path by default; `--gate-decision` overrides the path. `leitstand.promote` additionally requires `--main-verification-decision`. The 13-phase deploy execution pipeline (build, wrangler deploy, build-identity, CDN purge, freshness, health, mission.check, Axiom gate, alt health check, evidence sync, bordbuch, system-state, effect record) runs after authorization.
 
 ### What agents CANNOT do
