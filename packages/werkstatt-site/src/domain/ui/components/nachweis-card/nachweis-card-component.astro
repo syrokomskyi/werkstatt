@@ -255,14 +255,6 @@ function getLiveCheckUrl(
             {props.title}
           </h2>
           <p class="nachweis-card__subtitle">
-            {props.provider.homepage ? (
-              <a href={props.provider.homepage} rel="noopener noreferrer" target="_blank">
-                {providerLabels[props.provider.id] ?? props.provider.name}
-              </a>
-            ) : (
-              <span>{providerLabels[props.provider.id] ?? props.provider.name}</span>
-            )}
-            {" · "}
             {props.tool.name}
             {props.tool.version && ` v${props.tool.version}`}
           </p>
