@@ -180,13 +180,13 @@ if (!hasFetchpriorityHigh && imgs.length > 0 && !pageExempt) {
 
 ## Acceptance criteria
 
-- [ ] `ConfigOverride` interface includes optional `pagePattern?: string` field
-- [ ] `loadDeliveryConfig` parses `pagePattern` from YAML and silently ignores non-string values (treats as `undefined`)
-- [ ] `isPageSkipped` function uses `picomatch` to match page paths against `pagePattern` for a given rule
-- [ ] `IMG-DELIVERY-04` check calls `isPageSkipped` alongside the existing `404.html` exemption
-- [ ] `pagePattern` only affects page-level rules (IMG-DELIVERY-04), not per-image rules (IMG-DELIVERY-01, IMG-DELIVERY-02)
-- [ ] Unit tests cover: pagePattern match → exempt, pagePattern no match → not exempt, invalid glob → not exempt (no crash), missing pagePattern → not exempt
-- [ ] `rfc.validate` passes on this file
+- [x] `ConfigOverride` interface includes optional `pagePattern?: string` field (evidence: `packages/werkstatt-site/src/checks/image-delivery.ts` ConfigOverride interface, line 97)
+- [x] `loadDeliveryConfig` parses `pagePattern` from YAML and silently ignores non-string values (treats as `undefined`) (evidence: `image-delivery.ts` line 153, `typeof override.pagePattern === "string"`)
+- [x] `isPageSkipped` function uses `picomatch` to match page paths against `pagePattern` for a given rule (evidence: `image-delivery.ts` lines 197-208)
+- [x] `IMG-DELIVERY-04` check calls `isPageSkipped` alongside the existing `404.html` exemption (evidence: `image-delivery.ts` line 413)
+- [x] `pagePattern` only affects page-level rules (IMG-DELIVERY-04), not per-image rules (IMG-DELIVERY-01, IMG-DELIVERY-02) (evidence: `isPageSkipped` only called at line 413 for page-level check; `isRuleSkipped` at line 394 uses `srcPattern` only)
+- [x] Unit tests cover: pagePattern match → exempt, pagePattern no match → not exempt, invalid glob → not exempt (no crash), missing pagePattern → not exempt (evidence: `image-delivery.test.ts` lines 276-409, 6 test cases, all passing)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0881` → "All 1 RFC(s) passed validation")
 
 ## Implementation notes for agents
 
