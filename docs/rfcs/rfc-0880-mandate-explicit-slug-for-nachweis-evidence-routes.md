@@ -1,7 +1,7 @@
 ---
 id: RFC-0880
 title: "Mandate explicit slug for Nachweis evidence routes and formalize route generation contract"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -10,7 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
-implementedAt:
+implementedAt: 2026-08-19
 closedAt:
 supersedes: []
 supersededBy:
