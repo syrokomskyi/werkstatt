@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0830: initial test suite — IMG-DELIVERY-01, IMG-DELIVERY-02, IMG-DELIVERY-04, config, skip-on-missing-dist.</item>
   <item>RFC-0841: add IMG-DELIVERY-CONFIG-02 location diagnostic tests (root only, src only, both, neither).</item>
+  <item>RFC-0881: add pagePattern tests — match, no-match, invalid glob, missing, per-image isolation, non-string ignore.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -271,6 +272,141 @@ describe("image.delivery.validate (RFC-0830)", () => {
         f.rule === "IMG-DELIVERY-04" && f.severity === "error" && f.message.includes("decoding"),
     );
     expect(perImageFindings.length).toBeGreaterThanOrEqual(1);
+  });
+
+  // --- pagePattern (RFC-0881) ---
+
+  it("pagePattern: match exempts page from IMG-DELIVERY-04 page-level check", async () => {
+    await writeImage("hero.webp", 800, 600);
+    await mkdir(join(distDir, "nachweise", "test"), { recursive: true });
+    await writeHtml(
+      "nachweise/test/index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="lazy" decoding="async" /></body></html>`,
+    );
+    await writeConfig(`
+overrides:
+  - srcPattern: "**"
+    rules:
+      - IMG-DELIVERY-04
+    reason: "text-only Nachweis page with no meaningful LCP image"
+    pagePattern: "**/nachweise/**"
+`);
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const pageLevelFindings = getFindings(data).filter(
+      (f) => f.rule === "IMG-DELIVERY-04" && f.message.includes("No <img> with fetchpriority"),
+    );
+    expect(pageLevelFindings).toHaveLength(0);
+  });
+
+  it("pagePattern: no match does not exempt page from IMG-DELIVERY-04", async () => {
+    await writeImage("hero.webp", 800, 600);
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="lazy" decoding="async" /></body></html>`,
+    );
+    await writeConfig(`
+overrides:
+  - srcPattern: "**"
+    rules:
+      - IMG-DELIVERY-04
+    reason: "text-only Nachweis page with no meaningful LCP image"
+    pagePattern: "**/nachweise/**"
+`);
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const pageLevelFindings = getFindings(data).filter(
+      (f) => f.rule === "IMG-DELIVERY-04" && f.message.includes("No <img> with fetchpriority"),
+    );
+    expect(pageLevelFindings).toHaveLength(1);
+    expect(pageLevelFindings[0]!.severity).toBe("error");
+  });
+
+  it("pagePattern: invalid glob does not crash and does not exempt", async () => {
+    await writeImage("hero.webp", 800, 600);
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="lazy" decoding="async" /></body></html>`,
+    );
+    await writeConfig(`
+overrides:
+  - srcPattern: "**"
+    rules:
+      - IMG-DELIVERY-04
+    reason: "invalid glob test"
+    pagePattern: "["
+`);
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const pageLevelFindings = getFindings(data).filter(
+      (f) => f.rule === "IMG-DELIVERY-04" && f.message.includes("No <img> with fetchpriority"),
+    );
+    expect(pageLevelFindings).toHaveLength(1);
+  });
+
+  it("pagePattern: missing pagePattern does not exempt page", async () => {
+    await writeImage("hero.webp", 800, 600);
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="lazy" decoding="async" /></body></html>`,
+    );
+    await writeConfig(`
+overrides:
+  - srcPattern: "**"
+    rules:
+      - IMG-DELIVERY-04
+    reason: "no pagePattern — should not exempt"
+`);
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const pageLevelFindings = getFindings(data).filter(
+      (f) => f.rule === "IMG-DELIVERY-04" && f.message.includes("No <img> with fetchpriority"),
+    );
+    expect(pageLevelFindings).toHaveLength(1);
+  });
+
+  it("pagePattern: does not exempt per-image rules (IMG-DELIVERY-01)", async () => {
+    await writeImage("hero.webp", 800, 600);
+    await mkdir(join(distDir, "nachweise", "test"), { recursive: true });
+    await writeHtml(
+      "nachweise/test/index.html",
+      `<html><body><img src="/hero.webp" width="800" height="600" loading="eager" fetchpriority="high" decoding="async" /></body></html>`,
+    );
+    await writeConfig(`
+overrides:
+  - srcPattern: "/nonexistent.webp"
+    rules:
+      - IMG-DELIVERY-01
+    reason: "pagePattern should not affect per-image rules"
+    pagePattern: "**/nachweise/**"
+`);
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const srcsetFindings = getFindings(data).filter((f) => f.rule === "IMG-DELIVERY-01");
+    expect(srcsetFindings).toHaveLength(1);
+    expect(srcsetFindings[0]!.severity).toBe("error");
+  });
+
+  it("pagePattern: non-string value is silently ignored (treated as undefined)", async () => {
+    await writeImage("hero.webp", 800, 600);
+    await writeHtml(
+      "index.html",
+      `<html><body><img src="/hero.webp" srcset="/hero.webp 320w, /hero.webp 800w" sizes="100vw" width="800" height="600" loading="lazy" decoding="async" /></body></html>`,
+    );
+    await writeConfig(`
+overrides:
+  - srcPattern: "**"
+    rules:
+      - IMG-DELIVERY-04
+    reason: "non-string pagePattern should be ignored"
+    pagePattern: 123
+`);
+    const result = await runImageDeliveryValidate(input, ctx());
+    const data = getData(result);
+    const pageLevelFindings = getFindings(data).filter(
+      (f) => f.rule === "IMG-DELIVERY-04" && f.message.includes("No <img> with fetchpriority"),
+    );
+    expect(pageLevelFindings).toHaveLength(1);
   });
 
   // --- Config ---
