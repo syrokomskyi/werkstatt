@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
+enhancedAt: 2026-08-19
 implementedAt:
 closedAt:
 supersedes: []
@@ -25,7 +26,6 @@ commands:
   proposed: []
   added: []
   changed:
-    - session.save
     - session.validate
   removed: []
 appsImpacted: []
@@ -59,7 +59,7 @@ The existing infrastructure is well-suited for this enhancement:
 - `SessionFrontmatter` (`packages/forge/os/session/types.ts:65-77`) already holds structured session metadata.
 - Mermaid diagrams are textual and Git-versionable, fitting naturally into markdown closing blocks and session files.
 
-The gap is that no protocol defines *what* the closing block must contain for substantial sessions, *when* a diagram is warranted, or *how* the session file captures the engineering checkpoint metadata.
+The gap is that no protocol defines _what_ the closing block must contain for substantial sessions, _when_ a diagram is warranted, or _how_ the session file captures the engineering checkpoint metadata.
 
 ## Problem
 
@@ -67,7 +67,7 @@ Three concrete gaps in the current session-end protocol:
 
 1. **No state-transition proof.** The closing block says "RFC-XXXX implemented, 3 commits" but does not show what the system looked like before, what changed, and what it looks like now. An engineer cannot verify the project transitioned from state N to N+1 without reading the full session transcript.
 
-2. **No visual system delta.** When a session changes architecture, runtime flow, state machines, or persistence models, a text-only summary forces the reader to reconstruct the mental model from prose. A Mermaid diagram of the *resulting state* would reduce cognitive load — but no protocol defines when to include one or which diagram type to use.
+2. **No visual system delta.** When a session changes architecture, runtime flow, state machines, or persistence models, a text-only summary forces the reader to reconstruct the mental model from prose. A Mermaid diagram of the _resulting state_ would reduce cognitive load — but no protocol defines when to include one or which diagram type to use.
 
 3. **No remaining-uncertainty section.** The closing block ends with "next steps" (slash commands to run), but never states what is unverified, what assumptions remain open, or what known limitations were introduced. This leaves the operator without a clear picture of technical debt created during the session.
 
@@ -143,7 +143,7 @@ The agent MUST analyze the session's changes to determine if a diagram is warran
 | Entities / persistence model | `erDiagram` | Data models, entity relationships, schema changes, storage contracts |
 | Pipeline / dependency chain | `flowchart` | Build pipeline, validation pipeline, deployment pipeline changed |
 | Quantitative results (performance, coverage, benchmarks) | markdown table | Measurable data exists that is clearer as a table than prose |
-| No structural change | *(none)* | Session did not change system structure, runtime flow, state, or persistence |
+| No structural change | _(none)_ | Session did not change system structure, runtime flow, state, or persistence |
 
 **Rules:**
 
@@ -211,7 +211,7 @@ If the answer is no, the agent improves the checkpoint before presenting it. Thi
 - **RFC-0537 (Session documentation domain):** This RFC extends `SessionFrontmatter` with optional checkpoint fields. The existing `session.save` deterministic extraction is not modified — checkpoint fields are agent-populated.
 - **DNA-54 (Forge bindings contract):** Skill body changes in `fo-session-summary.md`, `fo-session-retro/SKILL.md`, `fo-handoff/SKILL.md`, and `fo-session-save/SKILL.md` must comply with the bindings contract — no hardcoded project-specific literals in instruction lines.
 - **`fo-session-summary.md`:** The closing block template is restructured. The existing 2-section format (Summary + Next steps) becomes the lightweight mode. The full mode adds System Delta, Resulting Architecture, Verification, and Remaining Issues sections.
-- **`fo-handoff`:** The handoff document gains the same BEFORE/CHANGE/AFTER structure and diagram selection rules. The handoff is the primary artifact for the next agent picking up the work — it benefits most from the visual system delta.
+- **`fo-handoff`:** The handoff document gains a **System State Transition** section with three prose subsections — **Before** (state N, from `checkpoint.before`), **Change** (what was done, from `checkpoint.change`), **After** (state N+1, from `checkpoint.after`) — plus the diagram selection rules. The handoff is the primary artifact for the next agent picking up the work — it benefits most from the visual system delta. The three subsections are a prose rendering of the `SessionCheckpoint` interface fields, not separate frontmatter entries.
 - **`fo-session-save`:** The skill's frontmatter generation step is extended to populate checkpoint fields when the agent provides them.
 - **Site OS operator model:** No new commands are introduced. `session.validate` gains a non-blocking SES-06 warning for missing checkpoint fields in implementation/mission sessions.
 
@@ -275,6 +275,8 @@ See the `SessionCheckpoint`, `SessionDiagram`, `SessionEvidenceEntry`, and `Sess
 - **Lightweight vs full mode:** The agent decides based on the diagram selection rules. No flag or configuration is needed.
 - **Existing sessions:** Unaffected. Sessions saved before this RFC do not have checkpoint frontmatter and are not retroactively modified.
 - **`session.validate` SES-06:** Non-blocking warning. Existing sessions without checkpoint fields trigger SES-06 but pass validation. The warning is a signal to the agent to populate checkpoint fields in future sessions.
+- **SES-06 noise for existing sessions:** Sessions saved before this RFC was implemented will not have checkpoint fields and will trigger SES-06 warnings. This is acceptable and temporary — the warnings are non-blocking, and old sessions are archived over time by `session.archive` (default 30-day threshold). No date-based exemption is added to avoid over-engineering. The noise decreases naturally as pre-RFC sessions age into the archive.
+- **SES-06 multi-type sessions:** SES-06 triggers when the `types` array contains `"implementation"` or `"mission"` (using `Array.includes`). A session with `types: ["implementation", "freeform"]` triggers the warning; a session with `types: ["freeform"]` does not. This matches the existing `session.validate` pattern of iterating the `types` array.
 - **Skill sync:** After modifying skill files in `packages/forge/skills/`, the synced copies in `.agents/skills/` must be updated in the same commit.
 - **No migration path needed.** The closing block format is agent-authored, not machine-generated. There is no generated file to regenerate.
 
