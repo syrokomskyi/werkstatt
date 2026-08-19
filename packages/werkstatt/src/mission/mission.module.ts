@@ -32,6 +32,7 @@ export function createMissionModule(): KernelModule {
       const { runMissionCleanup } = await import("./mission-cleanup.ts");
       const { runMissionValidate, runMissionBuild, runMissionDiff, runMissionReconcile } =
         await import("./mission-materialization-commands.ts");
+      const { runValidatePostbuild } = await import("./validate-postbuild.ts");
       const { runWorkpieceRead } = await import("../workpiece/workpiece-read.ts");
       const { runWorkpieceWrite } = await import("../workpiece/workpiece-write.ts");
       const { runMaterializeConfigValidate } = await import("./materialize-config-validate.ts");
@@ -428,6 +429,24 @@ export function createMissionModule(): KernelModule {
         reads: ["missions/{mission}/workpiece/*", "missions/{mission}/workpiece/src/*"],
         cacheable: false,
         execute: runWorkpieceConfigPresenceCheck,
+      });
+      registry.registerCommand({
+        name: "validate.postbuild",
+        description:
+          "Run post-build validators on existing dist/ without a full rebuild (RFC-0883).",
+        scope: "workspace",
+        supportsAllSites: false,
+        flags: {
+          mission: { kind: "string", description: "Mission id." },
+          site: { kind: "string", description: "Site id." },
+          "skip-slow": {
+            kind: "boolean",
+            description: "Skip slow Playwright/Lighthouse steps.",
+          },
+        },
+        reads: ["missions/{mission}/**", "apps/{site}/**"],
+        cacheable: false,
+        execute: runValidatePostbuild,
       });
     },
   };
