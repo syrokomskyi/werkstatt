@@ -161,9 +161,10 @@ function parseRecordLookup(expr: string): RecordLookup | null {
   return { recordName: match[1], keyExpr: match[2] };
 }
 
-function isRecordLookupMismatch(ariaLabelExpr: string, visibleTextExpr: string): boolean {
-  const ariaLookup = parseRecordLookup(splitFallback(ariaLabelExpr));
-  const textLookup = parseRecordLookup(splitFallback(visibleTextExpr));
+function isRecordLookupMismatch(
+  ariaLookup: RecordLookup | null,
+  textLookup: RecordLookup | null,
+): boolean {
   if (!ariaLookup || !textLookup) return false;
   if (ariaLookup.recordName === textLookup.recordName) return false;
   return true;
@@ -209,20 +210,18 @@ export function extractComponentLabelInNameViolations(
     for (const visibleTextExpr of visibleTextExprs) {
       const varName = getVariableName(visibleTextExpr);
       const varNameReferenced = ariaLabelExpr.toLowerCase().includes(varName.toLowerCase());
-      const recordLookupMismatch = isRecordLookupMismatch(ariaLabelExpr, visibleTextExpr);
 
-      // RFC-0882: Record-lookup exemption — if both expressions are Record-lookups
-      // with the same Record identifier, skip the variable-name check.
-      // getVariableName produces nonsensical values for Record-lookup expressions
-      // and may flag same-Record patterns with different fallbacks (false positive).
+      // RFC-0882: Parse both expressions once for Record-lookup detection.
       const ariaLookup = parseRecordLookup(splitFallback(ariaLabelExpr));
       const textLookup = parseRecordLookup(splitFallback(visibleTextExpr));
-      const sameRecordLookup =
-        ariaLookup !== null &&
-        textLookup !== null &&
-        ariaLookup.recordName === textLookup.recordName;
 
-      if (sameRecordLookup) continue;
+      // Record-lookup exemption: if both expressions are Record-lookups with the
+      // same Record identifier, skip the variable-name check — getVariableName
+      // produces nonsensical values for Record-lookup expressions and may flag
+      // same-Record patterns with different fallbacks (false positive).
+      if (ariaLookup && textLookup && ariaLookup.recordName === textLookup.recordName) continue;
+
+      const recordLookupMismatch = isRecordLookupMismatch(ariaLookup, textLookup);
 
       if (!varNameReferenced || recordLookupMismatch) {
         findings.push({
