@@ -77,6 +77,7 @@ interface ConfigOverride {
   srcPattern: string;
   rules: string[];
   reason: string;
+  pagePattern?: string;
 }
 
 interface DeliveryConfig {
@@ -144,7 +145,13 @@ async function loadDeliveryConfig(
         Array.isArray((entry as Record<string, unknown>).rules) &&
         typeof (entry as Record<string, unknown>).reason === "string"
       ) {
-        validOverrides.push(entry as ConfigOverride);
+        const override = entry as Record<string, unknown>;
+        validOverrides.push({
+          srcPattern: override.srcPattern as string,
+          rules: override.rules as string[],
+          reason: override.reason as string,
+          pagePattern: typeof override.pagePattern === "string" ? override.pagePattern : undefined,
+        });
       } else {
         warnings.push({
           rule: "IMG-DELIVERY-CONFIG-01",
@@ -181,6 +188,19 @@ function isRuleSkipped(config: DeliveryConfig | null, src: string, rule: string)
     if (!override.rules.includes(rule)) return false;
     try {
       return picomatch(override.srcPattern, { dot: true })(src);
+    } catch {
+      return false;
+    }
+  });
+}
+
+function isPageSkipped(config: DeliveryConfig | null, pagePath: string, rule: string): boolean {
+  if (!config) return false;
+  return config.overrides.some((override) => {
+    if (!override.rules.includes(rule)) return false;
+    if (!override.pagePattern) return false;
+    try {
+      return picomatch(override.pagePattern, { dot: true })(pagePath);
     } catch {
       return false;
     }
@@ -388,8 +408,10 @@ export async function runImageDeliveryValidate(
 
     // IMG-DELIVERY-04: At least one fetchpriority="high" image per page.
     // Skip 404.html — it is a non-content error page with no meaningful LCP image.
+    // Also skip pages matching a pagePattern override in image-delivery.config.yaml.
     const basename = file.split("/").pop() ?? "";
-    if (!hasFetchpriorityHigh && imgs.length > 0 && basename !== "404.html") {
+    const pageExempt = basename === "404.html" || isPageSkipped(config, file, "IMG-DELIVERY-04");
+    if (!hasFetchpriorityHigh && imgs.length > 0 && !pageExempt) {
       findings.push({
         rule: "IMG-DELIVERY-04",
         file,
