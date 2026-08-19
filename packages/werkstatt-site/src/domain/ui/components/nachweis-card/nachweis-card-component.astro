@@ -236,6 +236,7 @@ function getLiveCheckUrl(
       data-component="nachweis-card"
       data-variant="technical-assessment"
       data-provider={props.provider.id}
+      data-nachweis-animate
       aria-labelledby={headingId}
     >
       <header class="nachweis-card__header">
@@ -279,10 +280,18 @@ function getLiveCheckUrl(
                   cy="60"
                   r="52"
                   class="nachweis-card__gauge-fill"
-                  style={`stroke-dashoffset: ${326.7 * (1 - (props.overall.score ?? 0) / 100)}`}
+                  data-animate-gauge
+                  data-target-offset={326.7 * (1 - (props.overall.score ?? 0) / 100)}
+                  style="stroke-dashoffset: 326.7"
                 />
               </svg>
-              <span class="nachweis-card__gauge-score">{props.overall.score}</span>
+              <span
+                class="nachweis-card__gauge-score"
+                data-count-up
+                data-target-value={props.overall.score}
+              >
+                0
+              </span>
             </div>
           )}
           {props.overall.level && (
@@ -313,7 +322,9 @@ function getLiveCheckUrl(
                 <div class="nachweis-card__score-bar-track">
                   <div
                     class="nachweis-card__score-bar-fill"
-                    style={`width: ${Math.min(100, Math.max(0, dim.score))}%`}
+                    data-animate-width
+                    data-target-width={Math.min(100, Math.max(0, dim.score ?? 0))}
+                    style="width: 0%"
                   />
                 </div>
               )}
@@ -400,8 +411,9 @@ function getLiveCheckUrl(
         </p>
       )}
 
-      <footer class="nachweis-card__footer">
-        <span class="nachweis-card__status-badge" data-status={props.status ?? "published"}>
+      <footer class="nachweis-card__footer" data-status={props.status ?? "published"}>
+        <span class="nachweis-card__status-indicator" data-status={props.status ?? "published"}>
+          <span class="nachweis-card__status-dot" aria-hidden="true" />
           <span class="nachweis-card__status-text">
             {(props.status ?? "published") === "published" && "Veröffentlicht"}
             {props.status === "preview" && "Vorschau"}
@@ -409,15 +421,117 @@ function getLiveCheckUrl(
             {props.status === "withdrawn" && "Zurückgezogen"}
           </span>
         </span>
-        <span class="nachweis-card__verification-level">
-          N{props.verificationLevel.replace("N", "")}
+        <span
+          class="nachweis-card__n-level"
+          data-level={props.verificationLevel}
+          aria-label={`Verification Level ${props.verificationLevel}`}
+        >
+          {Array.from({ length: 3 }, (_, i) => (
+            <span
+              class="nachweis-card__n-level-seg"
+              data-filled={i < Number(props.verificationLevel.replace("N", "")) ? "true" : "false"}
+            />
+          ))}
+          <span class="nachweis-card__n-level-label">{props.verificationLevel}</span>
         </span>
         {!props.compact && props.sourceHashes.length > 0 && (
-          <span class="nachweis-card__hash-count">
-            {props.sourceHashes.length} Hash{props.sourceHashes.length !== 1 ? "es" : ""}
+          <span class="nachweis-card__hash-chip">
+            <span class="nachweis-card__hash-icon" aria-hidden="true">
+              #
+            </span>
+            <span
+              class="nachweis-card__hash-count"
+              data-count-up
+              data-target-value={props.sourceHashes.length}
+            >
+              0
+            </span>
+            <span class="nachweis-card__hash-suffix">
+              {" "}
+              Hash{props.sourceHashes.length !== 1 ? "es" : ""}
+            </span>
           </span>
         )}
       </footer>
     </EffectHost>
   )
 }
+
+<script>
+  function initNachweisCardAnimations() {
+    const cards = document.querySelectorAll<HTMLElement>("[data-nachweis-animate]");
+    if (cards.length === 0) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function animateCountUp(el: HTMLElement, target: number, duration: number) {
+      const start = performance.now();
+      function frame(now: number) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (progress < 1) requestAnimationFrame(frame);
+        else el.textContent = String(target);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function animateCard(card: HTMLElement) {
+      card.dataset.animateIn = "true";
+
+      if (prefersReducedMotion) {
+        card.querySelectorAll<HTMLElement>("[data-count-up]").forEach((el) => {
+          el.textContent = String(el.dataset.targetValue ?? 0);
+        });
+        card.querySelectorAll<HTMLElement>("[data-animate-width]").forEach((el) => {
+          el.style.width = `${el.dataset.targetWidth ?? 0}%`;
+        });
+        card.querySelectorAll<HTMLElement>("[data-animate-gauge]").forEach((el) => {
+          el.style.strokeDashoffset = String(el.dataset.targetOffset ?? 326.7);
+        });
+        return;
+      }
+
+      card.querySelectorAll<HTMLElement>("[data-count-up]").forEach((el) => {
+        const target = Number(el.dataset.targetValue ?? 0);
+        animateCountUp(el, target, 1200);
+      });
+
+      card.querySelectorAll<HTMLElement>("[data-animate-width]").forEach((el) => {
+        const target = Number(el.dataset.targetWidth ?? 0);
+        requestAnimationFrame(() => {
+          el.style.transition = "width 1.2s cubic-bezier(0.22, 1, 0.36, 1)";
+          el.style.width = `${target}%`;
+        });
+      });
+
+      card.querySelectorAll<HTMLElement>("[data-animate-gauge]").forEach((el) => {
+        const target = Number(el.dataset.targetOffset ?? 326.7);
+        requestAnimationFrame(() => {
+          el.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.22, 1, 0.36, 1)";
+          el.style.strokeDashoffset = String(target);
+        });
+      });
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            animateCard(entry.target as HTMLElement);
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+    );
+
+    cards.forEach((card) => observer.observe(card));
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initNachweisCardAnimations);
+  } else {
+    initNachweisCardAnimations();
+  }
+</script>
