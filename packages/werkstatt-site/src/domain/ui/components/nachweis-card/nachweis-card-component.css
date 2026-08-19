@@ -189,6 +189,26 @@
   line-height: var(--ds-line-height-sm);
 }
 
+.nachweis-card__subtitle a {
+  color: var(--ds-color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.nachweis-card__subtitle a:hover {
+  color: var(--ds-color-primary);
+}
+
+.nachweis-card__source a {
+  color: var(--ds-color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.nachweis-card__source a:hover {
+  color: var(--ds-color-primary);
+}
+
 /* Overall score gauge */
 .nachweis-card__overall-gauge {
   display: flex;
@@ -414,20 +434,14 @@
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-font-weight-bold);
   color: var(--ds-color-accent);
-  text-decoration: none;
-  padding: 0.375em 0.875em;
-  border-radius: var(--ds-radius-xs);
-  border: 1px solid var(--ds-color-border);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
   white-space: nowrap;
-  transition:
-    background-color var(--ds-duration-fast) var(--ds-ease-standard),
-    border-color var(--ds-duration-fast) var(--ds-ease-standard);
+  transition: color var(--ds-duration-fast) var(--ds-ease-standard);
 }
 
 .nachweis-card__live-check-link:hover {
-  background: var(--ds-color-surface-hover);
-  border-color: var(--ds-color-accent);
-  text-decoration: underline;
+  color: var(--ds-color-primary);
 }
 
 .nachweis-card__check-score {
@@ -465,11 +479,12 @@
 
 .nachweis-card__meta-item a {
   color: var(--ds-color-accent);
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
 }
 
 .nachweis-card__meta-item a:hover {
-  text-decoration: underline;
+  color: var(--ds-color-primary);
 }
 
 .nachweis-card__meta-compact {
