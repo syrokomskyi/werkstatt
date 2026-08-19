@@ -82,7 +82,7 @@ export const UTILITY_SECTION_SLUGS: ReadonlySet<string> = new Set(["breadcrumbs"
 
 // Extract `<slug>` from a path under packages/werkstatt-site/src/domain/ui/sections/<slug>/...
 export function sectionSlugOf(relPath: string): string | null {
-  const m = relPath.match(/packages\/ui\/src\/sections\/([^/]+)\//);
+  const m = relPath.match(/packages\/werkstatt-site\/src\/domain\/ui\/sections\/([^/]+)\//);
   return m ? m[1] : null;
 }
 
@@ -92,17 +92,26 @@ export function isUtilitySection(relPath: string): boolean {
 }
 
 export async function walkAstroSections(workspaceRoot: string): Promise<string[]> {
-  const root = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
+  const root = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "sections");
   return collectFiles(root, { extensions: [".astro"], ignore: () => false });
 }
 
 export async function walkSectionManifests(workspaceRoot: string): Promise<string[]> {
-  const root = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "src", "sections");
+  const root = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ui", "sections");
   return collectFiles(root, { extensions: [".manifest.yaml"], ignore: () => false });
 }
 
 export async function walkArchetypeYamls(workspaceRoot: string): Promise<string[]> {
-  const root = join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "archetypes", "sections");
+  const root = join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "archetypes",
+    "sections",
+  );
   const entries = await collectFiles(root, { extensions: [".yaml"], ignore: () => false });
   return entries;
 }
