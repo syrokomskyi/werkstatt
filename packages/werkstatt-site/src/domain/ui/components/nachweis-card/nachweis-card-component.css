@@ -35,6 +35,18 @@
   transform: translateY(-2px);
 }
 
+/* EffectHost integration: remove conflicting background/border/shadow when glass is active */
+.effect-host--glass.nachweis-card,
+.effect-host--glass.nachweis-card--technical {
+  background: transparent;
+  border: none;
+  box-shadow: var(--ds-shadow-glass);
+}
+
+.effect-host--glass.nachweis-card:hover {
+  box-shadow: var(--ds-shadow-glass);
+}
+
 .nachweis-card__title {
   font-family: var(--ds-font-heading);
   font-size: var(--ds-text-3);

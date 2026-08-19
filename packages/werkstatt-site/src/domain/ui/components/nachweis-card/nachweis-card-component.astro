@@ -24,6 +24,8 @@
  * RFC-0708 / RFC-0876 / DNA-17 / DNA-23 / WCAG 2.2 AA
  */
 
+import EffectHost from "../effects/effect-host.astro";
+import type { Effect } from "@warpgogol/werkstatt-site/share";
 import "./nachweis-card-component.css";
 
 export interface NachweisAssessmentDimension {
@@ -124,6 +126,10 @@ const liveCheckUrls: Record<string, (subjectUrl: string) => string> = {
   cloudflare: (url) => `https://isitagentready.com/${url.replace(/\/$/, "")}`,
 };
 
+const defaultGlassEffects: Effect[] = [
+  { kind: "glass", enabled: true, blur: 16, saturate: 180, tintOpacity: 0.6 },
+];
+
 function getLiveCheckUrl(
   providerId: string,
   subjectUrl: string,
@@ -138,7 +144,9 @@ function getLiveCheckUrl(
 
 {
   props.variant === "attestation" && (
-    <article
+    <EffectHost
+      as="article"
+      effects={defaultGlassEffects}
       class="nachweis-card"
       data-component="nachweis-card"
       data-variant="attestation"
@@ -211,13 +219,15 @@ function getLiveCheckUrl(
           <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
         )}
       </p>
-    </article>
+    </EffectHost>
   )
 }
 
 {
   props.variant === "technical-assessment" && (
-    <article
+    <EffectHost
+      as="article"
+      effects={defaultGlassEffects}
       class:list={[
         "nachweis-card",
         "nachweis-card--technical",
@@ -408,6 +418,6 @@ function getLiveCheckUrl(
           </span>
         )}
       </footer>
-    </article>
+    </EffectHost>
   )
 }
