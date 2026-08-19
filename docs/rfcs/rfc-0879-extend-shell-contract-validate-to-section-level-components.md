@@ -1,7 +1,7 @@
 ---
 id: RFC-0879
 title: "Extend section.shell.contract.validate to section-level components"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
 enhancedAt: 2026-08-19
-implementedAt:
+implementedAt: 2026-08-19
 closedAt:
 supersedes: []
 supersededBy:
