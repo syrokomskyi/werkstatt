@@ -19,15 +19,12 @@
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0708 review fix: extract loadPublishedNachweisEntries() to eliminate duplicated logic.</item>
+  <item>RFC-0880: remove file-path fallback, require explicit slug in frontmatter.</item>
 </CHANGE_SUMMARY>
 */
 
 import { getCollection } from "astro:content";
-import {
-  getEntryLanguage,
-  stripEntryLanguage,
-  toDataEntryId,
-} from "@warpgogol/werkstatt-shared/share/content";
+import { getEntryLanguage } from "@warpgogol/werkstatt-shared/share/content";
 
 /** Nachweis evidence kinds from RFC-0706 and RFC-0872. */
 const NACHWEIS_EVIDENCE_KINDS = new Set([
@@ -110,7 +107,13 @@ async function loadPublishedNachweisEntries(): Promise<PublishedNachweisEntry[]>
     // Only published records get routes — draft records are excluded
     if (data.status !== "published") continue;
 
-    const slug = data.slug ?? stripEntryLanguage(toDataEntryId(entry.id));
+    const slug = data.slug;
+    if (typeof slug !== "string" || slug.trim() === "") {
+      throw new Error(
+        `[nachweis-routes] Evidence record ${entry.id} is missing required frontmatter "slug". ` +
+          `Run nachweis.validate to identify affected files.`,
+      );
+    }
     result.push({ slug, supportedLangs });
   }
   return result;

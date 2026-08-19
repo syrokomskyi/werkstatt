@@ -22,6 +22,7 @@
   <item>RFC-0715: add N3 artifact check — verify nachweis-signed and nachweis-timestamped entries exist for N3 records.</item>
   <item>RFC-0871: add n3-timestamp-qualification-evidence-missing violation for eidas-qualified records without qualificationEvidenceRef.</item>
   <item>RFC-0872: replace evaluateGate with policy-driven evaluateGateV2, add technical-assessment validation, locale drift check.</item>
+  <item>RFC-0880: add NACHWEIS-SLUG-01 check for mandatory slug in Nachweis evidence records.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -158,6 +159,17 @@ export async function runNachweisValidate(
   for (const es of evidenceSources) {
     const kind = es.data.kind as string | undefined;
     if (!kind || !NACHWEIS_EVIDENCE_KINDS.has(kind)) continue;
+
+    // RFC-0880: NACHWEIS-SLUG-01 — mandatory slug in frontmatter
+    const slug = (es.data as Record<string, unknown>).slug as string | undefined;
+    if (typeof slug !== "string" || slug.trim() === "") {
+      violations.push({
+        rule: "NACHWEIS-SLUG-01",
+        message: `EvidenceSource '${es.id}' has kind '${kind}' but no frontmatter slug. Add a slug field to the frontmatter.`,
+        recordId: es.id,
+      });
+    }
+
     const items = es.data.items as Record<string, { sha256?: string }> | undefined;
     if (!items) {
       violations.push({

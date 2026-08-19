@@ -16,6 +16,7 @@
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0876: add variant, kindFilter, limit props; compact rendering path.</item>
   <item>RFC-0876: load published records from getCollection at build time.</item>
+  <item>RFC-0880: remove file-path fallback, require explicit slug in frontmatter.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,11 +28,7 @@
 import { getCollection } from "astro:content";
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
 import { cast } from "@warpgogol/werkstatt-site/share";
-import {
-  getEntryLanguage,
-  stripEntryLanguage,
-  toDataEntryId,
-} from "@warpgogol/werkstatt-shared/share/content";
+import { getEntryLanguage } from "@warpgogol/werkstatt-shared/share/content";
 import NachweisCard, {
   type NachweisAssessmentDimension,
 } from "../nachweis-card/nachweis-card-component.astro";
@@ -179,7 +176,11 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
     if (!data.kind || !NACHWEIS_EVIDENCE_KINDS.has(data.kind)) continue;
     if (data.status !== "published") continue;
 
-    const slug = data.slug ?? stripEntryLanguage(toDataEntryId(entry.id));
+    const slug = data.slug;
+    if (typeof slug !== "string" || slug.trim() === "") {
+      // Skip records without slug — nachweis.validate will report NACHWEIS-SLUG-01
+      continue;
+    }
 
     if (data.kind === "technical-assessment" && data.assessment) {
       const a = data.assessment;
