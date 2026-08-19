@@ -1,7 +1,7 @@
 ---
 id: RFC-0879
 title: "Extend section.shell.contract.validate to section-level components"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
