@@ -1,7 +1,7 @@
 ---
 id: RFC-0883
 title: "Add post-build-only validation mode for fast iterative debugging"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
