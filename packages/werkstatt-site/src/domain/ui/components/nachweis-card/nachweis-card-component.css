@@ -644,21 +644,13 @@
 /* Scroll-triggered animation states                                           */
 /* ========================================================================== */
 
-/* Pre-animation: elements start hidden until data-animate-in is set */
+/* Pre-animation: count-up elements start hidden until data-animate-in is set */
 [data-nachweis-animate] [data-count-up] {
   opacity: 0.01;
 }
 
 [data-nachweis-animate][data-animate-in="true"] [data-count-up] {
   opacity: 1;
-}
-
-[data-nachweis-animate] [data-animate-width] {
-  width: 0% !important;
-}
-
-[data-nachweis-animate] [data-animate-gauge] {
-  stroke-dashoffset: 326.7 !important;
 }
 
 /* ========================================================================== */
@@ -759,16 +751,6 @@
   [data-nachweis-animate] [data-count-up] {
     opacity: 1;
   }
-
-  [data-nachweis-animate] [data-animate-width] {
-    width: var(--target-width, 0%) !important;
-    transition: none !important;
-  }
-
-  [data-nachweis-animate] [data-animate-gauge] {
-    stroke-dashoffset: var(--target-offset, 326.7) !important;
-    transition: none !important;
-  }
 }
 
 @media print {
@@ -778,15 +760,5 @@
 
   [data-nachweis-animate] [data-count-up] {
     opacity: 1;
-  }
-
-  [data-nachweis-animate] [data-animate-width] {
-    width: var(--target-width, 0%) !important;
-    transition: none !important;
-  }
-
-  [data-nachweis-animate] [data-animate-gauge] {
-    stroke-dashoffset: var(--target-offset, 326.7) !important;
-    transition: none !important;
   }
 }

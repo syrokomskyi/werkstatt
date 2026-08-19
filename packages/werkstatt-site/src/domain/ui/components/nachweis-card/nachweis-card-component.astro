@@ -308,7 +308,13 @@ function getLiveCheckUrl(
                 <span class="nachweis-card__score-bar-label">{dim.providerLabel}</span>
                 <span class="nachweis-card__score-bar-value">
                   {dim.score !== undefined && (
-                    <span class="nachweis-card__score-bar-score">{dim.score}</span>
+                    <span
+                      class="nachweis-card__score-bar-score"
+                      data-count-up
+                      data-target-value={dim.score}
+                    >
+                      0
+                    </span>
                   )}
                   {dim.numerator !== undefined && dim.denominator !== undefined && (
                     <span class="nachweis-card__score-bar-frac">
