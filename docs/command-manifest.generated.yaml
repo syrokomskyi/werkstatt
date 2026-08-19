@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: ca3e28d3857c7062f19b44d96e4a815150416daf1764c17660456f87c7735f20
+  contentHash: 6f53fb5fba119d377c5c5e53668d1013eaf5c7f5fba1d2fe2feac0ba0dfc7141
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -15,7 +15,10 @@ commands:
       aria-label={...} and visible text {...} are both present but the
       aria-label expression does not reference the visible text variable (WCAG
       2.5.3 Label in Name). Emits A11Y-LIN-COMP-01 (error) for mismatches.
-      Recognizes resolveLabelInName helper and merged-label patterns as safe."
+      Recognizes resolveLabelInName helper and merged-label patterns as safe.
+      RFC-0882: extended to detect Record-lookup aria-label mismatches where
+      aria-label and visible text use different Record identifiers (e.g.
+      recordA[key] vs recordB[key])."
     scope: workspace
     provider: workspace
     module: check
