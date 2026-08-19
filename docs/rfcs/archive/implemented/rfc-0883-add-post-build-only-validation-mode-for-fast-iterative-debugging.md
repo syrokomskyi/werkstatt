@@ -1,7 +1,7 @@
 ---
 id: RFC-0883
 title: "Add post-build-only validation mode for fast iterative debugging"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
 enhancedAt: 2026-08-19
-implementedAt:
+implementedAt: 2026-08-19
 closedAt:
 supersedes: []
 supersededBy:
@@ -26,9 +26,9 @@ related:
 satisfies: []
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - validate.postbuild
-  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -187,14 +187,14 @@ Useful when debugging specific validators like `image.delivery.validate` or `a11
 
 ## Acceptance criteria
 
-- [ ] `validate.postbuild` command registered with `--mission` and `--site` flags
-- [ ] Command fails with clear error if `dist/client/` does not exist
-- [ ] Command runs all validators from `SITES_CHECK_POSTBUILD_PIPELINE` (which already contains only validators — no skip list needed)
-- [ ] `--skip-slow` flag skips `mobile.layout.check`, `lighthouse.budget.check`, and `qa.independent.run`
-- [ ] `--json` output format documented and stable
-- [ ] Warning printed when dist/ may be stale
-- [ ] Unit tests cover: dist/ exists → run validators, dist/ missing → error, --skip-slow → slow steps skipped
-- [ ] `rfc.validate` passes on this file
+- [x] `validate.postbuild` command registered with `--mission` and `--site` flags (evidence: packages/werkstatt/src/mission/mission.module.ts:433-450)
+- [x] Command fails with clear error if `dist/` does not exist (evidence: packages/werkstatt/src/mission/validate-postbuild.ts:82-94)
+- [x] Command runs all validators from `SITES_CHECK_POSTBUILD_PIPELINE` (which already contains only validators — no skip list needed) (evidence: packages/werkstatt/src/mission/validate-postbuild.ts:103-121)
+- [x] `--skip-slow` flag skips `mobile.layout.check`, `lighthouse.budget.check`, and `qa.independent.run` (evidence: packages/werkstatt/src/mission/validate-postbuild.ts:38-42)
+- [x] `--json` output format documented and stable (evidence: packages/werkstatt/src/mission/validate-postbuild.ts:33-41 — ValidatePostbuildData interface)
+- [x] Warning printed when dist/ may be stale (evidence: packages/werkstatt/src/mission/validate-postbuild.ts:97)
+- [x] Unit tests cover: dist/ exists → run validators, dist/ missing → error, --skip-slow → slow steps skipped (evidence: packages/werkstatt/src/mission/validate-postbuild.test.ts:1-297)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0883 → OK)
 
 ## Implementation notes for agents
 

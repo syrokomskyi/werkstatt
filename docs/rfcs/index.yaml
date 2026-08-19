@@ -16966,10 +16966,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0881-add-page-level-exemption-pattern-for-image-delivery-validation.md
   - id: RFC-0882
     title: Enhance A11Y-LIN-COMP-01 to detect Record-lookup aria-label mismatches
-    status: accepted
+    status: implemented
     kind: command
     createdAt: 2026-08-19
-    implementedAt: ""
+    implementedAt: 2026-08-19
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16979,13 +16979,13 @@ entries:
       - RFC-0832
       - RFC-0836
       - ADR-0047
-    file: docs/rfcs/rfc-0882-enhance-a11y-lin-comp-01-to-detect-record-lookup-aria-label-mismatches.md
+    file: docs/rfcs/archive/implemented/rfc-0882-enhance-a11y-lin-comp-01-to-detect-record-lookup-aria-label-mismatches.md
   - id: RFC-0883
     title: Add post-build-only validation mode for fast iterative debugging
-    status: accepted
+    status: implemented
     kind: command
     createdAt: 2026-08-19
-    implementedAt: ""
+    implementedAt: 2026-08-19
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16997,4 +16997,4 @@ entries:
       - RFC-0836
       - RFC-0880
       - RFC-0881
-    file: docs/rfcs/rfc-0883-add-post-build-only-validation-mode-for-fast-iterative-debugging.md
+    file: docs/rfcs/archive/implemented/rfc-0883-add-post-build-only-validation-mode-for-fast-iterative-debugging.md
