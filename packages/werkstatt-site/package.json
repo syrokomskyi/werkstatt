@@ -1,6 +1,6 @@
 {
   "name": "@warpgogol/werkstatt-site",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Werkstatt site plugin — Astro stack engine modules and domain layer (RFC-0774/0775).",
