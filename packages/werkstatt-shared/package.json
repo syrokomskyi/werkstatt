@@ -1358,7 +1358,7 @@
     "zod": "^4.4.3"
   },
   "optionalDependencies": {
-    "@syrokomskyi/axiom-study": "*"
+    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260801.1",

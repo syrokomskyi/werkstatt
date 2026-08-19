@@ -391,8 +391,8 @@
     "better-sqlite3": "^13.0.2",
     "lighthouse": "13.4.1",
     "@warpgogol/forge": "*",
-    "@syrokomskyi/axiom-factory-app": "*",
-    "@syrokomskyi/axiom-study": "*"
+    "@syrokomskyi/axiom-factory-app": "link:../../../pipelines/apps/axiom/factory",
+    "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
