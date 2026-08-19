@@ -6,6 +6,7 @@
  * @see RFC-0706 (Nachweisregister evidence kind + items extensions)
  * @see RFC-0872 (technical-assessment kind, artifact roles, assessment field)
  * @see ADR-0028 (Nachweisregister as PBP trust-layer extension)
+ * @see ADR-0054 (technical assessments as first-class Nachweisregister evidence profile)
  */
 
 import type { PbpEntity } from "../envelope.js";

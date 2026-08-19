@@ -11,6 +11,7 @@
   <item>Delegates bordbuch hash-chain validation to bordbuch.validate.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
   <item>RFC-0872: policy-driven gate V2, technical-assessment validation, locale drift check.</item>
+  <item>ADR-0054: enforces the technical-assessment evidence profile decision — canonical raw artifact, assessment metadata, authorization basis, no dummy consent.</item>
 </responsibilities>
 <non-goals>
   <item>Does not modify any state — read-only validation.</item>
