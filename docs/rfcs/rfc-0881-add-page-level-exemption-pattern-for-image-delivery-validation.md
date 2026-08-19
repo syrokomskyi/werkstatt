@@ -1,7 +1,7 @@
 ---
 id: RFC-0881
 title: "Add page-level exemption pattern for image delivery validation"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
