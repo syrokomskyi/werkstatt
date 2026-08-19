@@ -1,12 +1,12 @@
 ---
 id: ADR-0054
 title: "Technical assessments as a first-class Nachweisregister evidence profile"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-18
-updatedAt: 2026-08-18
-implementedAt:
+updatedAt: 2026-08-19
+implementedAt: 2026-08-19
 closedAt:
 supersedes: []
 supersededBy:
