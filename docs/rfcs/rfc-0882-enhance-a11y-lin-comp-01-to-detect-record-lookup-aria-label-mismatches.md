@@ -1,7 +1,7 @@
 ---
 id: RFC-0882
 title: "Enhance A11Y-LIN-COMP-01 to detect Record-lookup aria-label mismatches"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
