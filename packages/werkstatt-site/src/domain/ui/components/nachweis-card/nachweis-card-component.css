@@ -406,40 +406,6 @@
   color: var(--ds-color-text);
 }
 
-.nachweis-card__disclaimer {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-color-text-quiet);
-  font-style: italic;
-  margin: 0;
-}
-
-.nachweis-card__live-check {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  flex-wrap: wrap;
-  margin: 0 0 var(--ds-space-3);
-  padding: var(--ds-space-3);
-  background: var(--ds-color-surface);
-  border-radius: var(--ds-radius-xs);
-  border-inline-start: 3px solid var(--ds-color-card-border);
-}
-
-.nachweis-card__live-check-link {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-font-weight-bold);
-  color: var(--ds-color-accent);
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-  white-space: nowrap;
-  transition: color var(--ds-duration-fast) var(--ds-ease-standard);
-}
-
-.nachweis-card__live-check-link:hover {
-  color: var(--ds-color-primary);
-}
-
 .nachweis-card__check-score {
   font-size: var(--ds-text-xs);
   font-variant-numeric: tabular-nums;
