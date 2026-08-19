@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-19
-count: 865
+count: 866
 entries:
   - id: ""
     title: ""
@@ -16998,3 +16998,19 @@ entries:
       - RFC-0880
       - RFC-0881
     file: docs/rfcs/archive/implemented/rfc-0883-add-post-build-only-validation-mode-for-fast-iterative-debugging.md
+  - id: RFC-0884
+    title: Add Engineering Checkpoint protocol for session-end visual handoff
+    status: implemented
+    kind: policy
+    createdAt: 2026-08-19
+    implementedAt: 2026-08-19
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0581
+      - RFC-0537
+      - DNA-54
+    file: docs/rfcs/archive/implemented/rfc-0884-add-engineering-checkpoint-protocol-for-session-end-visual-handoff.md
