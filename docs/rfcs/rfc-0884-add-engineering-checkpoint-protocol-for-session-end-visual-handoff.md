@@ -303,17 +303,17 @@ See the `SessionCheckpoint`, `SessionDiagram`, `SessionEvidenceEntry`, and `Sess
 
 ## Acceptance criteria
 
-- [ ] `fo-session-summary.md` restructured with lightweight and full checkpoint modes, diagram selection rules table, and quality test self-check instructions
-- [ ] `fo-session-retro/SKILL.md` step 7 (Report) updated to produce Engineering Checkpoint closing block with mode selection
-- [ ] `fo-handoff/SKILL.md` updated with BEFORE/CHANGE/AFTER structure and diagram selection rules
-- [ ] `fo-session-save/SKILL.md` updated with checkpoint frontmatter field generation guidance
-- [ ] `SessionFrontmatter` in `packages/forge/os/session/types.ts` extended with `systemDelta`, `diagrams`, `evidence`, `remainingIssues`, `checkpoint` optional fields
-- [ ] `SESSION_KNOWN_KEYS` in `packages/forge/os/session/types.ts` extended with new field names
-- [ ] `session.validate` handler updated with SES-06 warning for missing checkpoint fields in implementation/mission sessions
-- [ ] `AGENTS.md` session-end discipline section references Engineering Checkpoint protocol
-- [ ] `.agents/skills/` synced copies updated for all modified skills
-- [ ] `rfc.validate` passes on this RFC file
-- [ ] `forge.skill.validate` passes after skill modifications
+- [x] `fo-session-summary.md` restructured with lightweight and full checkpoint modes, diagram selection rules table, and quality test self-check instructions (evidence: `packages/forge/skills/_shared/fo-session-summary.md:25-70`)
+- [x] `fo-session-retro/SKILL.md` step 7 (Report) updated to produce Engineering Checkpoint closing block with mode selection (evidence: `packages/forge/skills/fo/fo-session-retro/SKILL.md:438-464`)
+- [x] `fo-handoff/SKILL.md` updated with BEFORE/CHANGE/AFTER structure and diagram selection rules (evidence: `packages/forge/skills/fo/fo-handoff/SKILL.md:36-40`)
+- [x] `fo-session-save/SKILL.md` updated with checkpoint frontmatter field generation guidance (evidence: `packages/forge/skills/fo/fo-session-save/SKILL.md:49-56`)
+- [x] `SessionFrontmatter` in `packages/forge/os/session/types.ts` extended with `systemDelta`, `diagrams`, `evidence`, `remainingIssues`, `checkpoint` optional fields (evidence: `packages/forge/os/session/types.ts:100-117`)
+- [x] `SESSION_KNOWN_KEYS` in `packages/forge/os/session/types.ts` extended with new field names (evidence: `packages/forge/os/session/types.ts:34-52`)
+- [x] `session.validate` handler updated with SES-06 warning for missing checkpoint fields in implementation/mission sessions (evidence: `packages/forge/os/session/handlers/validate.ts:166-186`)
+- [x] `AGENTS.md` session-end discipline section references Engineering Checkpoint protocol (evidence: `AGENTS.md:486`)
+- [x] `.agents/skills/` synced copies updated for all modified skills (evidence: `.agents/skills/_shared/fo-session-summary.md`, `.agents/skills/fo-session-retro/SKILL.md`, `.agents/skills/fo-handoff/SKILL.md`, `.agents/skills/fo-session-save/SKILL.md`)
+- [x] `rfc.validate` passes on this RFC file (evidence: `rtk pnpm exec werkstatt run rfc.validate --id RFC-0884 --json` — 0 violations)
+- [x] `forge.skill.validate` passes after skill modifications (evidence: `rtk pnpm exec werkstatt run forge.skill.validate --json` — 0 violations)
 
 ## Implementation notes for agents
 
