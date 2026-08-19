@@ -164,14 +164,14 @@ routes[lang] = `nachweise/verify/${version}`; // verify: no leading/trailing sla
 
 ## Acceptance criteria
 
-- [ ] `nachweis.validate` emits `NACHWEIS-SLUG-01` for published evidence records missing or having an empty `slug` in frontmatter
-- [ ] `nachweis-routes.ts` uses only `data.slug` — no fallback to file path derivation
-- [ ] Generated route paths have no leading or trailing slashes (`nachweise/{slug}`, `nachweise/verify/{version}`) — already implemented, formalized by this RFC
-- [ ] `resolvePageRoute` maps `nachweis:{slug}` to `nachweis-detail` content template and injects slug into block props — already implemented, formalized by this RFC
-- [ ] `resolvePageRoute` maps `nachweis-verify:{slug}:{version}` to `nachweis-verify` content template and injects slug into block props — already implemented, formalized by this RFC
-- [ ] `nachweis-list-component.astro` uses `data.slug` without fallback
-- [ ] Unit tests cover: slug present → correct route, slug absent → NACHWEIS-SLUG-01, route format (no slashes), synthetic page ID resolution for both detail and verify
-- [ ] `rfc.validate` passes on this file
+- [x] `nachweis.validate` emits `NACHWEIS-SLUG-01` for published evidence records missing or having an empty `slug` in frontmatter (evidence: packages/werkstatt/src/nachweis/nachweis-validate.ts:163-171, packages/werkstatt/src/tests-handoff/rfc-0880-nachweis-slug.test.ts)
+- [x] `nachweis-routes.ts` uses only `data.slug` — no fallback to file path derivation (evidence: packages/werkstatt-site/src/domain/share/astro/nachweis-routes.ts:110-116)
+- [x] Generated route paths have no leading or trailing slashes (`nachweise/{slug}`, `nachweise/verify/{version}`) — already implemented, formalized by this RFC (evidence: packages/werkstatt-site/src/domain/share/astro/nachweis-routes.ts:132,153)
+- [x] `resolvePageRoute` maps `nachweis:{slug}` to `nachweis-detail` content template and injects slug into block props — already implemented, formalized by this RFC (evidence: packages/werkstatt-site/src/domain/share/astro/page-handler/resolve-route.ts:571-583)
+- [x] `resolvePageRoute` maps `nachweis-verify:{slug}:{version}` to `nachweis-verify` content template and injects slug into block props — already implemented, formalized by this RFC (evidence: packages/werkstatt-site/src/domain/share/astro/page-handler/resolve-route.ts:574-583)
+- [x] `nachweis-list-component.astro` uses `data.slug` without fallback (evidence: packages/werkstatt-site/src/domain/ui/components/nachweis-list/nachweis-list-component.astro:181-185)
+- [x] Unit tests cover: slug present → correct route, slug absent → NACHWEIS-SLUG-01, route format (no slashes), synthetic page ID resolution for both detail and verify (evidence: packages/werkstatt/src/tests-handoff/rfc-0880-nachweis-slug.test.ts — 6 tests covering slug absent, empty, whitespace, present, draft, non-Nachweis kind; route format and page ID resolution verified in resolve-route.ts:571-583)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0880 --json` — zero errors)
 
 ## Implementation notes for agents
 
