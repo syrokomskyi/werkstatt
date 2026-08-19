@@ -52,14 +52,27 @@ export async function validateAssets(
   const manifestPath = join(projectRoot, MANIFEST_PATH);
 
   let manifest: AssetManifest = { assets: [] };
+  let manifestParseError: string | undefined;
   try {
     const raw = await readFile(manifestPath, "utf-8");
-    const parsed = parseYaml(raw) as AssetManifest | undefined;
-    if (parsed && Array.isArray(parsed.assets)) {
-      manifest = parsed;
+    try {
+      const parsed = parseYaml(raw) as AssetManifest | undefined;
+      if (parsed && Array.isArray(parsed.assets)) {
+        manifest = parsed;
+      }
+    } catch (parseErr) {
+      manifestParseError = parseErr instanceof Error ? parseErr.message : String(parseErr);
     }
   } catch {
-    // No manifest = empty manifest (valid for freshly scaffolded projects)
+    // File not found = empty manifest (valid for freshly scaffolded projects)
+  }
+
+  if (manifestParseError) {
+    violations.push({
+      ruleId: "PHASER-02",
+      file: MANIFEST_PATH,
+      message: `Failed to parse asset manifest: ${manifestParseError}`,
+    });
   }
 
   for (const entry of manifest.assets) {
@@ -107,7 +120,7 @@ async function listAssetFiles(dir: string): Promise<string[]> {
     if (entry.isDirectory()) {
       const sub = await listAssetFiles(join(dir, entry.name));
       for (const s of sub) {
-        results.push(`${entry.name}/${s}`);
+        results.push(join(entry.name, s));
       }
     } else {
       results.push(entry.name);

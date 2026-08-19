@@ -75,9 +75,23 @@ export async function scanSecrets(
     const lines = content.split("\n");
     const relFile = relative(projectRoot, filePath);
 
+    let inBlockComment = false;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
-      if (line.trim().startsWith("//") || line.trim().startsWith("*")) {
+      const trimmed = line.trim();
+      if (inBlockComment) {
+        if (trimmed.includes("*/")) {
+          inBlockComment = false;
+        }
+        continue;
+      }
+      if (trimmed.startsWith("/*")) {
+        if (!trimmed.includes("*/")) {
+          inBlockComment = true;
+        }
+        continue;
+      }
+      if (trimmed.startsWith("//") || trimmed.startsWith("*")) {
         continue;
       }
       for (const { pattern, label } of SECRET_PATTERNS) {

@@ -114,8 +114,8 @@ function extractRegisteredScenes(configContent: string): Set<string> {
   while ((match = sceneRegex.exec(configContent)) !== null) {
     scenes.add(match[1]!);
   }
-  const keyRegex = /key\s*:\s*["']([A-Za-z0-9_-]+)["']/g;
-  while ((match = keyRegex.exec(configContent)) !== null) {
+  const sceneKeyRegex = /scenes?\s*:\s*\[[\s\S]*?\{\s*key\s*:\s*["']([A-Za-z0-9_-]+)["']/g;
+  while ((match = sceneKeyRegex.exec(configContent)) !== null) {
     scenes.add(match[1]!);
   }
   return scenes;

@@ -17,10 +17,7 @@ describe("phaser.assets.validate", () => {
 
   it("passes with empty manifest (freshly scaffolded project)", async () => {
     await mkdir(join(projectRoot, "src", "assets"), { recursive: true });
-    await writeFile(
-      join(projectRoot, "src", "assets", "manifest.yaml"),
-      "assets: []\n",
-    );
+    await writeFile(join(projectRoot, "src", "assets", "manifest.yaml"), "assets: []\n");
 
     const result = await validateAssets(projectRoot);
 
@@ -70,10 +67,7 @@ describe("phaser.assets.validate", () => {
   it("fails when asset file exists but is not in manifest (PHASER-02)", async () => {
     await mkdir(join(projectRoot, "src", "assets"), { recursive: true });
     await writeFile(join(projectRoot, "src", "assets", "orphan.png"), "fake-png");
-    await writeFile(
-      join(projectRoot, "src", "assets", "manifest.yaml"),
-      "assets: []\n",
-    );
+    await writeFile(join(projectRoot, "src", "assets", "manifest.yaml"), "assets: []\n");
 
     const result = await validateAssets(projectRoot);
 
@@ -82,5 +76,21 @@ describe("phaser.assets.validate", () => {
     expect(result.data?.violations).toHaveLength(1);
     expect(result.data?.violations[0]!.ruleId).toBe("PHASER-02");
     expect(result.data?.violations[0]!.message).toContain("not listed in manifest");
+  });
+
+  it("fails when manifest has invalid YAML syntax (PHASER-02)", async () => {
+    await mkdir(join(projectRoot, "src", "assets"), { recursive: true });
+    await writeFile(
+      join(projectRoot, "src", "assets", "manifest.yaml"),
+      "assets: [invalid: yaml: syntax\n",
+    );
+
+    const result = await validateAssets(projectRoot);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.data?.status).toBe("fail");
+    expect(result.data?.violations).toHaveLength(1);
+    expect(result.data?.violations[0]!.ruleId).toBe("PHASER-02");
+    expect(result.data?.violations[0]!.message).toContain("Failed to parse");
   });
 });

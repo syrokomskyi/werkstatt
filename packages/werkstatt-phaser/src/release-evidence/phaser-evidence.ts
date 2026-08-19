@@ -21,7 +21,7 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { createHash } from "node:crypto";
+import { byteHash, byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import type { Dirent } from "node:fs";
 import type { PluginHookContext, HookResult } from "@warpgogol/werkstatt/plugin";
 
@@ -59,8 +59,8 @@ export async function generatePhaserEvidence(ctx: PluginHookContext): Promise<Ho
 
 async function hashFile(filePath: string): Promise<string> {
   try {
-    const content = await readFile(filePath);
-    return createHash("sha256").update(content).digest("hex");
+    const digest = await byteHashFile(filePath);
+    return digest.slice("sha256:".length);
   } catch {
     return "0000000000000000000000000000000000000000000000000000000000000000";
   }
@@ -71,12 +71,12 @@ async function hashDirectory(dirPath: string): Promise<string> {
   if (files.length === 0) {
     return "0000000000000000000000000000000000000000000000000000000000000000";
   }
-  const hasher = createHash("sha256");
+  const chunks: Buffer[] = [];
   for (const filePath of files.sort()) {
     const content = await readFile(filePath);
-    hasher.update(content);
+    chunks.push(content);
   }
-  return hasher.digest("hex");
+  return byteHash(Buffer.concat(chunks)).slice("sha256:".length);
 }
 
 async function measureDirSize(dirPath: string): Promise<number> {

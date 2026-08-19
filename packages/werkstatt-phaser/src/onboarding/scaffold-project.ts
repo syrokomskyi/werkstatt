@@ -19,8 +19,9 @@
 </CHANGE_SUMMARY>
 */
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import type { PluginHookContext, HookResult } from "@warpgogol/werkstatt/plugin";
 
 const BOOT_SCENE_TS = `export class BootScene extends Phaser.Scene {
@@ -33,12 +34,14 @@ const BOOT_SCENE_TS = `export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start("BootScene");
+    // Boot scene — initialise global game systems here.
+    // Transition to the next scene via this.scene.start("NextScene").
   }
 }
 `;
 
-const PHASER_CONFIG_TS = `import { BootScene } from "./src/scenes/boot.ts";
+const PHASER_CONFIG_TS = `import Phaser from "phaser";
+import { BootScene } from "./src/scenes/boot.ts";
 
 export interface PhaserGameConfig {
   type: number;
@@ -134,16 +137,16 @@ export async function scaffoldPhaserProject(ctx: PluginHookContext): Promise<Hoo
     await mkdir(join(projectPath, "src", "assets"), { recursive: true });
     await mkdir(join(projectPath, "public"), { recursive: true });
 
-    await writeFile(join(projectPath, "src", "scenes", "boot.ts"), BOOT_SCENE_TS);
-    await writeFile(join(projectPath, "src", "assets", "manifest.yaml"), MANIFEST_YAML);
-    await writeFile(join(projectPath, "src", "main.ts"), MAIN_TS);
-    await writeFile(join(projectPath, "phaser.config.ts"), PHASER_CONFIG_TS);
-    await writeFile(join(projectPath, "vite.config.ts"), VITE_CONFIG_TS);
+    await writeFileIfChanged(join(projectPath, "src", "scenes", "boot.ts"), BOOT_SCENE_TS);
+    await writeFileIfChanged(join(projectPath, "src", "assets", "manifest.yaml"), MANIFEST_YAML);
+    await writeFileIfChanged(join(projectPath, "src", "main.ts"), MAIN_TS);
+    await writeFileIfChanged(join(projectPath, "phaser.config.ts"), PHASER_CONFIG_TS);
+    await writeFileIfChanged(join(projectPath, "vite.config.ts"), VITE_CONFIG_TS);
 
     const pkgJson = PACKAGE_JSON.replace('"my-phaser-game"', `"${projectId}"`);
-    await writeFile(join(projectPath, "package.json"), pkgJson);
+    await writeFileIfChanged(join(projectPath, "package.json"), pkgJson);
 
-    await writeFile(join(projectPath, "tsconfig.json"), TSCONFIG_JSON);
+    await writeFileIfChanged(join(projectPath, "tsconfig.json"), TSCONFIG_JSON);
 
     ctx.logger.info("scaffold-project: project created successfully");
     return {
