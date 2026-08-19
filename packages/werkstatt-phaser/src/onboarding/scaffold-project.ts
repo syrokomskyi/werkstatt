@@ -16,6 +16,7 @@
 <CHANGE_SUMMARY>
   <item>Initial Phaser project scaffold — boot scene, asset manifest, phaser.config.ts, package.json, tsconfig.json, vite.config.ts.</item>
   <item>Migration from werkstatt-game: renamed from game to phaser.</item>
+  <item>Fix boot scene infinite loop, add missing Phaser import in phaser.config.ts, use writeFileIfChanged for idempotent writes (RFC-0345).</item>
 </CHANGE_SUMMARY>
 */
 

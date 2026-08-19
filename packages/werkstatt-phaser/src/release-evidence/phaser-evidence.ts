@@ -16,6 +16,7 @@
 <CHANGE_SUMMARY>
   <item>Initial release evidence hook — bundle hash, asset manifest hash, scene registry hash.</item>
   <item>Migration from werkstatt-game: renamed from game to phaser.</item>
+  <item>DNA-53: replace node:crypto createHash with byteHashFile/byteHash from @warpgogol/werkstatt/fingerprint.</item>
 </CHANGE_SUMMARY>
 */
 

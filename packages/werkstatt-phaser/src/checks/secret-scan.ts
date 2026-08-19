@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>Initial secret scan — regex patterns for API keys, tokens, passwords in TypeScript files under src/.</item>
   <item>Migration from werkstatt-game: renamed command and rule IDs from game.* to phaser.*.</item>
+  <item>Skip block comments in addition to line comments to prevent false positives from secrets in comments.</item>
 </CHANGE_SUMMARY>
 */
 

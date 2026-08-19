@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Initial assets validator — reads manifest, checks referenced assets exist.</item>
   <item>Migration from werkstatt-game: renamed command and rule IDs from game.* to phaser.*.</item>
+  <item>Surface YAML parse errors as PHASER-02 violations instead of silent swallowing; use path.join for cross-platform path separator safety.</item>
 </CHANGE_SUMMARY>
 */
 

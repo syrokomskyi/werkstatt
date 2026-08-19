@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Initial scenes validator — scans src/scenes/, checks phaser.config.ts registration.</item>
   <item>Migration from werkstatt-game: renamed command and rule IDs from game.* to phaser.*.</item>
+  <item>Restrict keyRegex to only match keys inside scene arrays to prevent false positives from other config objects.</item>
 </CHANGE_SUMMARY>
 */
 
