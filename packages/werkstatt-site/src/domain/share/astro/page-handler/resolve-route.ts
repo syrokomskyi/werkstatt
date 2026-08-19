@@ -564,6 +564,15 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
 
   const fileSlug = pageIdToContentFileSlug(pageId);
 
+  // RFC-0708: Nachweis detail routes are synthetic — they share the
+  // `nachweis-detail` content template. The evidence slug is extracted from
+  // the pageId and injected into the block props.
+  const nachweisSlug =
+    pageId.startsWith("nachweis:") && pageId !== "nachweis-detail"
+      ? pageId.slice("nachweis:".length)
+      : undefined;
+  const effectiveFileSlug = nachweisSlug ? "nachweis-detail" : fileSlug;
+
   // RFC-0192: Programmatic Surface routes resolve their blocks from the surface artifact
   // (baked at build time), not a content/pages/*.md file.
   const routeEntry = registry.byPageId.get(pageId);
@@ -621,10 +630,10 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
   } else if (surfacePage) {
     entryData = surfacePage as unknown as Record<string, unknown>;
   } else {
-    let entry = await getEntry("pages", `${lang}/${fileSlug}`);
+    let entry = await getEntry("pages", `${lang}/${effectiveFileSlug}`);
 
     if (!entry && lang !== defaultLang) {
-      entry = await getEntry("pages", `${defaultLang}/${fileSlug}`);
+      entry = await getEntry("pages", `${defaultLang}/${effectiveFileSlug}`);
       if (entry) {
         console.warn(
           `[content-fallback] "pages/${lang}/${slug}" not found — using "${defaultLang}" fallback`,
@@ -641,12 +650,30 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
     // Deep merge default language entry data onto localized entry data for prop fallback
     // This ensures boolean, numeric, and other parameter types fall back to default language
     if (lang !== defaultLang) {
-      const defaultEntry = await getEntry("pages", `${defaultLang}/${fileSlug}`);
+      const defaultEntry = await getEntry("pages", `${defaultLang}/${effectiveFileSlug}`);
       if (defaultEntry) {
         entryData = deepMergeEntryData(
           defaultEntry.data as Record<string, unknown>,
           entryData,
         ) as Record<string, unknown>;
+      }
+    }
+
+    // RFC-0708: inject the evidence slug into the nachweis-detail block props
+    if (nachweisSlug) {
+      const blocks = entryData.blocks as Array<Record<string, unknown>> | undefined;
+      if (Array.isArray(blocks)) {
+        entryData = {
+          ...entryData,
+          blocks: blocks.map((block) =>
+            block.type === "nachweis-detail"
+              ? {
+                  ...block,
+                  props: { ...(block.props as Record<string, unknown>), slug: nachweisSlug },
+                }
+              : block,
+          ),
+        };
       }
     }
   }
