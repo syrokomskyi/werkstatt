@@ -40,6 +40,18 @@
   line-height: 1.6;
 }
 
+/* Registry variant — 2-column grid on desktop */
+.nachweis-list--registry .nachweis-list__items {
+  gap: var(--ds-space-5);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .nachweis-list--registry .nachweis-list__items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* Compact variant — RFC-0876 */
 .nachweis-list--compact .nachweis-list__items {
   gap: var(--ds-space-4);

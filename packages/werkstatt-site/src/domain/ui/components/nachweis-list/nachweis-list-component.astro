@@ -3,18 +3,19 @@
 <MODULE_CONTRACT>
 <purpose>
   NachweisList (Hydra) — List of nachweis-card components for the Nachweis
-  index page. Renders published records only. Shows an empty state message
-  when no published records exist. Supports registry and compact variants,
-  kind filtering, and limit. RFC-0708 / RFC-0876.
+  index page. Reads published evidence-source records from the
+  business-profile content collection at build time (RFC-0876). Shows an
+  empty state message when no published records exist. Supports registry
+  and compact variants, kind filtering, and limit. RFC-0708 / RFC-0876.
 </purpose>
 <non-goals>
-  <item>Does not fetch data — receives records via props from the page block.</item>
   <item>Does not handle routing to detail pages.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0876: add variant, kindFilter, limit props; compact rendering path.</item>
+  <item>RFC-0876: load published records from getCollection at build time.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,11 +24,18 @@
  * RFC-0708 / RFC-0876 / DNA-17 / DNA-23 / WCAG 2.2 AA
  */
 
+import { getCollection } from "astro:content";
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
 import { cast } from "@warpgogol/werkstatt-site/share";
+import {
+  getEntryLanguage,
+  stripEntryLanguage,
+  toDataEntryId,
+} from "@warpgogol/werkstatt-shared/share/content";
 import NachweisCard, {
   type NachweisAssessmentDimension,
 } from "../nachweis-card/nachweis-card-component.astro";
+import SectionHeader from "../section-header/section-header.astro";
 import "./nachweis-list-component.css";
 
 interface NachweisAttestationRecord {
@@ -52,7 +60,7 @@ interface NachweisTechnicalAssessmentRecord {
   variant: "technical-assessment";
   slug: string;
   title: string;
-  provider: { id: string; name: string };
+  provider: { id: string; name: string; homepage?: string };
   tool: { name: string; version?: string };
   executionMode: "operator-run" | "provider-run";
   subjectUrl: string;
@@ -69,6 +77,7 @@ interface NachweisTechnicalAssessmentRecord {
   sourceHashes: string[];
   limitation: string;
   status?: "draft" | "preview" | "published" | "withdrawn";
+  providerReportUrl?: string;
 }
 
 type NachweisRecord = NachweisAttestationRecord | NachweisTechnicalAssessmentRecord;
@@ -79,17 +88,153 @@ interface NachweisListContent {
   variant?: "registry" | "compact";
   kindFilter?: Array<"attestation" | "technical-assessment">;
   limit?: number;
+  header?: {
+    heading: string;
+    subheading?: string;
+    align?: "left" | "center" | "right";
+    level?: number;
+    hideSectionNumber?: boolean;
+  };
 }
 
-const { pageOverride } = Astro.props as SectionProps;
+const { lang, pageOverride } = Astro.props as SectionProps;
 const props = cast<NachweisListContent>(pageOverride);
-const allRecords = props.records ?? [];
 const emptyMessage = props.emptyMessage ?? "Weitere Nachweise werden derzeit vorbereitet.";
 const listVariant = props.variant ?? "registry";
 const kindFilter = props.kindFilter;
 const limit = props.limit;
 
-let records = allRecords;
+const NACHWEIS_EVIDENCE_KINDS = new Set([
+  "client-statement",
+  "project-confirmation",
+  "certificate",
+  "operational-evidence",
+  "technical-assessment",
+]);
+
+interface EvidenceSourceData {
+  type?: string;
+  kind?: string;
+  status?: string;
+  name?: string;
+  slug?: string;
+  items?: Record<string, { sha256?: string }>;
+  assessment?: {
+    profile?: string;
+    seriesId?: string;
+    observationId?: string;
+    observedAt?: string;
+    subject?: { url?: string };
+    provider?: { id?: string; name?: string; homepage?: string };
+    tool?: { id?: string; name?: string; version?: string };
+    executionMode?: string;
+    providerReportUrl?: string;
+    methodology?: {
+      id: string;
+      version: string;
+      runCount: number;
+      aggregation: "provider" | "median" | "none";
+    };
+    overall?: { score?: number; level?: string };
+    dimensions?: Array<{
+      id: string;
+      providerLabel: string;
+      score?: number;
+      numerator?: number;
+      denominator?: number;
+      status?: string;
+      level?: string;
+    }>;
+  };
+}
+
+async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
+  const systemEntries = await getCollection("system");
+  const system = (systemEntries.find((e: { id: string }) => e.id === "system")?.data ?? {}) as {
+    i18n?: { default?: string };
+  };
+  const defaultLang = system.i18n?.default ?? "de";
+
+  const entries = await getCollection("business-profile");
+  let langEntries = entries.filter((e: { id: string }) => {
+    const entryLang = getEntryLanguage(e.id);
+    return entryLang === lang;
+  });
+  if (langEntries.length === 0) {
+    langEntries = entries.filter((e: { id: string }) => {
+      const entryLang = getEntryLanguage(e.id);
+      return entryLang === defaultLang;
+    });
+  }
+
+  const records: NachweisRecord[] = [];
+  for (const entry of langEntries) {
+    const data = entry.data as EvidenceSourceData;
+    if (data.type !== "evidence-source") continue;
+    if (!data.kind || !NACHWEIS_EVIDENCE_KINDS.has(data.kind)) continue;
+    if (data.status !== "published") continue;
+
+    const slug = data.slug ?? stripEntryLanguage(toDataEntryId(entry.id));
+
+    if (data.kind === "technical-assessment" && data.assessment) {
+      const a = data.assessment;
+      const sourceHashes = data.items
+        ? Object.values(data.items)
+            .map((item) => item.sha256)
+            .filter((h): h is string => !!h)
+        : [];
+
+      records.push({
+        variant: "technical-assessment",
+        slug,
+        title: data.name ?? slug,
+        provider: {
+          id: a.provider?.id ?? "unknown",
+          name: a.provider?.name ?? "Unknown",
+          ...(a.provider?.homepage ? { homepage: a.provider.homepage } : {}),
+        },
+        tool: {
+          name: a.tool?.name ?? "Unknown",
+          ...(a.tool?.version ? { version: a.tool.version } : {}),
+        },
+        executionMode: (a.executionMode as "operator-run" | "provider-run") ?? "operator-run",
+        subjectUrl: a.subject?.url ?? "",
+        observedAt: a.observedAt ?? "",
+        methodology: a.methodology ?? { id: "", version: "", runCount: 1, aggregation: "none" },
+        ...(a.overall ? { overall: a.overall } : {}),
+        ...(a.providerReportUrl ? { providerReportUrl: a.providerReportUrl } : {}),
+        dimensions: (a.dimensions ?? []).map((d) => ({
+          id: d.id,
+          providerLabel: d.providerLabel,
+          ...(d.score !== undefined ? { score: d.score } : {}),
+          ...(d.numerator !== undefined ? { numerator: d.numerator } : {}),
+          ...(d.denominator !== undefined ? { denominator: d.denominator } : {}),
+          ...(d.status ? { status: d.status as "pass" | "fail" | "not-checked" } : {}),
+          ...(d.level ? { level: d.level } : {}),
+        })),
+        verificationLevel: "N1",
+        sourceHashes,
+        limitation: "Point-in-time measurement. Results may vary between runs.",
+        status: "published",
+      });
+    } else {
+      records.push({
+        variant: "attestation",
+        slug,
+        title: data.name ?? slug,
+        result: "",
+        status: "published",
+      });
+    }
+  }
+  return records;
+}
+
+const overrideRecords = props.records ?? [];
+const loadedRecords =
+  overrideRecords.length > 0 ? overrideRecords : await loadPublishedNachweisRecords();
+
+let records = loadedRecords;
 if (kindFilter && kindFilter.length > 0) {
   records = records.filter((r) => kindFilter.includes(r.variant));
 }
@@ -102,17 +247,31 @@ if (limit !== undefined && limit > 0) {
   class:list={["nachweis-list", `nachweis-list--${listVariant}`]}
   data-component="nachweis-list"
 >
-  {
-    records.length === 0 ? (
-      <p class="nachweis-list__empty">{emptyMessage}</p>
-    ) : (
-      <ul class="nachweis-list__items" role="list">
-        {records.map((record) => (
-          <li class="nachweis-list__item">
-            <NachweisCard {...record} compact={listVariant === "compact"} />
-          </li>
-        ))}
-      </ul>
-    )
-  }
+  <div class="container">
+    {
+      props.header && (
+        <SectionHeader
+          heading={props.header.heading}
+          subheading={props.header.subheading}
+          align={props.header.align ?? "left"}
+          level={props.header.level ?? 2}
+          hideSectionNumber={props.header.hideSectionNumber}
+          lang={lang}
+        />
+      )
+    }
+    {
+      records.length === 0 ? (
+        <p class="nachweis-list__empty">{emptyMessage}</p>
+      ) : (
+        <ul class="nachweis-list__items" role="list">
+          {records.map((record) => (
+            <li class="nachweis-list__item">
+              <NachweisCard {...record} compact={listVariant === "compact"} />
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
 </section>

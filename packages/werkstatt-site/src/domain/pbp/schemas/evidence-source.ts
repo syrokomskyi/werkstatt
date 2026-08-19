@@ -142,6 +142,16 @@ export const evidenceSourceSchema = pbpEntitySchema
     name: nonEmptyString,
     kind: pbpEvidenceKindSchema,
     authority: z.object({ kind: nonEmptyString }),
+    // RFC-0876: Nachweis operational fields used by manifest generator and routes
+    slug: nonEmptyString.optional(),
+    recordId: nonEmptyString.optional(),
+    version: z.number().int().positive().optional(),
+    publication: z
+      .object({
+        visibility: z.enum(["public", "private"]),
+        publishedAt: nonEmptyString.optional(),
+      })
+      .optional(),
     items: z
       .record(
         z.string(),
