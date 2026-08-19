@@ -165,7 +165,7 @@ describe("werkstatt.plugin.validate", () => {
   it("PLUGIN-01 (multiple): two plugins → error, exit 1", async () => {
     setKernelConfig(workspaceRoot, {
       "plugin-a": async () => makePlugin("werkstatt-site", "astro-typescript-turborepo"),
-      "plugin-b": async () => makePlugin("werkstatt-game", "phaser-turborepo"),
+      "plugin-b": async () => makePlugin("werkstatt-phaser", "phaser-turborepo"),
     });
     writeForgeYaml(workspaceRoot, "astro-typescript-turborepo");
     writeRegistryYaml(workspaceRoot, []);
