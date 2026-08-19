@@ -1,7 +1,7 @@
 ---
 id: RFC-0884
 title: "Add Engineering Checkpoint protocol for session-end visual handoff"
-status: accepted
+status: implemented
 kind: policy
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
 enhancedAt: 2026-08-19
-implementedAt:
+implementedAt: 2026-08-19
 closedAt:
 supersedes: []
 supersededBy:
