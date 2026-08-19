@@ -15,12 +15,12 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
+enhancedAt: 2026-08-19
 amendedBy: []
 related:
   - RFC-0832
   - RFC-0836
   - ADR-0047
-  - RFC-0880
 satisfies:
   - DNA-67
 versionBump: patch
@@ -73,9 +73,9 @@ The `a11y.label-in-name.component.validate` detection logic is enhanced to recog
 
 ## Architectural fit
 
-- **RFC-0836 (amended)**: Extends the detection logic of the existing validator. The command name, pipeline placement, and output format remain unchanged.
+- **RFC-0836 (extended)**: Extends the detection logic of the existing validator. The command name, pipeline placement, and output format remain unchanged. This RFC does not amend RFC-0836 — it is a standalone RFC that changes the existing command's detection logic.
 - **RFC-0832 (related)**: The post-build validator remains the final gate. This RFC adds a pre-build check for a pattern that the post-build validator already catches.
-- **ADR-0047 (related)**: ADR-0047 established the `resolveLabelInName` helper pattern. Components that use `resolveLabelInName` or precompute a merged label (e.g. `const ariaLabel = \`${initials} — ${name}\``) are recognized as safe — the precomputed variable is derived from both the initials and the name, so the accessible name includes the visible text.
+- **ADR-0047 (related)**: ADR-0047 established the `resolveLabelInName` helper pattern. Components that use `resolveLabelInName` are recognized as safe via the existing variable-name-reference heuristic. Components that precompute a merged label must name the aria-label variable to contain the visible text variable name (e.g. `providerBadgeTextAriaLabel` for visible text `{providerBadgeText}`) — the validator does not parse frontmatter and cannot detect template literal definitions.
 - **DNA-67 (satisfied)**: Extends the pre-deploy Lighthouse parity gate by catching the `label-content-name-mismatch` audit at authoring time for an additional pattern.
 
 ## Design
@@ -101,8 +101,8 @@ function isRecordLookupMismatch(
   ariaLabelExpr: string,
   visibleTextExpr: string,
 ): boolean {
-  const ariaLookup = parseRecordLookup(ariaLabelExpr.trim());
-  const textLookup = parseRecordLookup(visibleTextExpr.trim());
+  const ariaLookup = parseRecordLookup(splitFallback(ariaLabelExpr));
+  const textLookup = parseRecordLookup(splitFallback(visibleTextExpr));
   if (!ariaLookup || !textLookup) return false;
   // Same Record identifier → safe (same lookup, just different rendering)
   if (ariaLookup.recordName === textLookup.recordName) return false;
@@ -111,13 +111,54 @@ function isRecordLookupMismatch(
 }
 ```
 
+### Fallback expression splitting
+
+Record-lookup expressions often have fallbacks (e.g. `providerLabels[id] ?? props.provider.name`). The `parseRecordLookup` regex does not match expressions with `??` suffixes. A `splitFallback` helper extracts the primary expression before `??`:
+
+```ts
+function splitFallback(expr: string): string {
+  const idx = expr.indexOf("??");
+  return idx !== -1 ? expr.substring(0, idx).trim() : expr.trim();
+}
+```
+
+`isRecordLookupMismatch` calls `splitFallback` on both expressions before `parseRecordLookup`. If the primary expression is not a Record-lookup, the check is skipped (no false positive).
+
+### Visible text expression extraction
+
+The current `extractVisibleTextExprs` function uses regex `/^(props\.\w+|content\.\w+|[a-zA-Z_]\w*)$/` which only matches simple variable references. Record-lookup expressions like `providerInitials[props.provider.id] ?? props.provider.name.slice(0, 2).toUpperCase()` are NOT matched — meaning `visibleTextExprs` would be empty and the element would be skipped entirely (line 174: `if (visibleTextExprs.length === 0) continue;`). Without extending this regex, `isRecordLookupMismatch` is never called.
+
+The regex is extended to also match Record-lookup expressions:
+
+```ts
+function extractVisibleTextExprs(content: string): string[] {
+  const textOnly = content.replace(/<[^>]*>/g, "");
+  const exprs: string[] = [];
+  const regex = /\{([^}]+)\}/g;
+  let match;
+  while ((match = regex.exec(textOnly)) !== null) {
+    const expr = match[1].trim();
+    // Simple variable reference: props.xxx, content.xxx, variableName
+    if (/^(props\.\w+|content\.\w+|[a-zA-Z_]\w*)$/.test(expr)) {
+      exprs.push(expr);
+      continue;
+    }
+    // Record-lookup: recordName[keyExpr] or recordName[keyExpr] ?? fallback
+    if (/^(\w+)\s*(?:\?\.\s*)?\[.+\]\s*(?:\?\?.*)?$/.test(expr)) {
+      exprs.push(expr);
+    }
+  }
+  return exprs;
+}
+```
+
 ### Safe pattern recognition
 
 The existing safe patterns from RFC-0836 remain:
 
 1. **`resolveLabelInName` helper**: `aria-label={resolveLabelInName(ariaLabel, label)}` → safe.
-2. **Variable name reference**: `aria-label={mergedLabel}` where `mergedLabel` is derived from `label` → safe (existing heuristic).
-3. **Precomputed merged label** (NEW recognition): `const ariaLabel = \`${initials} — ${name}\``followed by`aria-label={ariaLabel}`with`{initials}` → safe. The validator checks if the aria-label variable is a template literal that references the visible text variable.
+2. **Variable name reference**: `aria-label={mergedLabel}` where `mergedLabel` contains `label` as a substring → safe (existing heuristic, case-insensitive).
+3. **Naming convention for precomputed labels**: `aria-label={providerBadgeTextAriaLabel}` with visible text `{providerBadgeText}` → safe, because `providerBadgeTextAriaLabel` contains `providerBadgeText` as a substring (case-insensitive). The validator does not parse frontmatter — it relies on the aria-label variable name containing the visible text variable name. Component authors must follow this naming convention when precomputing merged labels.
 
 ### Violation pattern (detected after this RFC)
 
@@ -134,25 +175,52 @@ The aria-label uses `providerLabels` and the visible text uses `providerInitials
 ```astro
 const providerLabel = providerLabels[props.provider.id] ?? props.provider.name;
 const providerBadgeText = providerInitials[props.provider.id] ?? props.provider.name.slice(0, 2).toUpperCase();
-const providerBadgeAriaLabel = `${providerBadgeText} — ${providerLabel}`;
+const providerBadgeTextAriaLabel = `${providerBadgeText} — ${providerLabel}`;
 ---
-<a aria-label={providerBadgeAriaLabel}>
+<a aria-label={providerBadgeTextAriaLabel}>
   {providerBadgeText}
 </a>
 ```
 
-The aria-label variable (`providerBadgeAriaLabel`) is a template literal that references the visible text variable (`providerBadgeText`) → safe.
+The aria-label variable (`providerBadgeTextAriaLabel`) contains the visible text variable name (`providerBadgeText`) as a substring → safe via the existing variable-name-reference heuristic.
 
-### Fallback expressions
+### CLI surface
 
-Record-lookup expressions often have fallbacks (e.g. `providerLabels[id] ?? props.provider.name`). The parser extracts the **primary** expression (before `??`) for the Record-lookup check. If the primary expression is a Record-lookup and the fallback is a different variable, the check applies to the primary expression.
+```sh
+pnpm exec werkstatt run a11y.label-in-name.component.validate
+```
+
+Scope: workspace. Scans `packages/werkstatt-site/src/domain/ui/**/*.astro`. No `--site` flag — the command scans shared package components, not per-site content. No flags changed from RFC-0836.
+
+### TypeScript contracts
+
+The existing `ComponentLabelInNameFinding` interface is unchanged. New internal functions:
+
+```ts
+interface RecordLookup {
+  recordName: string;
+  keyExpr: string;
+}
+
+function splitFallback(expr: string): string;
+function parseRecordLookup(expr: string): RecordLookup | null;
+function isRecordLookupMismatch(ariaLabelExpr: string, visibleTextExpr: string): boolean;
+```
+
+The `extractVisibleTextExprs` function is extended to recognize Record-lookup expressions (see Visible text expression extraction above). The `extractComponentLabelInNameViolations` function calls `isRecordLookupMismatch` as an additional check after the existing variable-name-reference check.
+
+### Output format
+
+No change from RFC-0836. The command returns `KernelCommandResult<CheckResult>` via `diagnosticsResult`. Diagnostics use `ruleId: "A11Y-LIN-COMP-01"`, `severity: "error"`, and the same `message`/`fixHint` constants. The `data` field includes `element`, `ariaLabelExpr`, and `visibleTextExpr`.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts` | Validator source — enhanced detection logic |
+| `packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts` | Validator source — enhanced detection logic, extended `extractVisibleTextExprs`, `splitFallback`, `parseRecordLookup`, `isRecordLookupMismatch` |
 | `packages/werkstatt-site/src/checks/tests/a11y-label-in-name-component.test.ts` | Unit tests — new test cases for Record-lookup patterns |
+| `packages/werkstatt-site/src/checks/command-tables/08-section-framework.ts` | Command description — updated to mention Record-lookup detection |
+| `packages/werkstatt-site/src/checks/a11y-label-in-name-component.ts` MODULE_CONTRACT | Purpose and CHANGE_SUMMARY — updated to mention Record-lookup detection |
 
 ### Failure modes
 
@@ -162,7 +230,7 @@ Record-lookup expressions often have fallbacks (e.g. `providerLabels[id] ?? prop
 ## Rollout
 
 - **Default behavior**: The enhanced detection is active from implementation. No opt-in flag.
-- **Existing components**: Components that use `resolveLabelInName` or precomputed merged labels are already safe. Components with Record-lookup mismatches will be flagged — they must be fixed (the fix pattern is straightforward: precompute a merged label).
+- **Existing components**: Components that use `resolveLabelInName` or follow the naming convention (aria-label variable name contains visible text variable name) are already safe. Components with Record-lookup mismatches will be flagged — they must be fixed (the fix pattern is straightforward: precompute a merged label with a name that contains the visible text variable name).
 - **Pipeline integration**: No pipeline changes — `a11y.label-in-name.component.validate` already runs in `PACKAGES_CHECK_PIPELINE`.
 
 ## Alternatives considered
@@ -176,18 +244,23 @@ Record-lookup expressions often have fallbacks (e.g. `providerLabels[id] ?? prop
 - **False positive rate**: Low — the check only fires when both expressions are Record-lookups with different Record identifiers. Components that use the same Record for both (rare but valid) are not flagged.
 - **Fallback expression complexity**: Expressions with complex fallbacks (e.g. `a ?? b ?? c`) may not parse cleanly. The parser extracts the primary expression and skips the check if parsing fails — no false positive.
 - **Maintenance burden**: Moderate — the Record-lookup parser is a single regex and a comparison function. The existing test suite is extended with new cases.
+- **Performance**: The validator scans ~47 `.astro` files in `packages/werkstatt-site/src/domain/ui/`. The Record-lookup regex adds negligible overhead — one additional regex test per visible text expression. No measurable impact on `PACKAGES_CHECK_PIPELINE` runtime.
 
 ## Acceptance criteria
 
 - [ ] `parseRecordLookup` function extracts Record name and key expression from `recordName[keyExpr]` patterns
+- [ ] `splitFallback` function extracts the primary expression before `??`
 - [ ] `isRecordLookupMismatch` function returns `true` when aria-label and visible text use different Record identifiers
+- [ ] `extractVisibleTextExprs` is extended to recognize Record-lookup expressions (`recordName[keyExpr]` and `recordName[keyExpr] ?? fallback`)
 - [ ] `a11y.label-in-name.component.validate` emits `A11Y-LIN-COMP-01` for Record-lookup mismatches
-- [ ] Safe patterns (resolveLabelInName, precomputed merged label, same Record identifier) are not flagged
-- [ ] Unit tests cover: different Record identifiers → violation, same Record identifier → safe, precomputed merged label → safe, resolveLabelInName → safe, non-Record-lookup expressions → existing behavior unchanged
+- [ ] Safe patterns (resolveLabelInName, naming convention, same Record identifier) are not flagged
+- [ ] Unit tests cover: different Record identifiers → violation, same Record identifier → safe, naming convention → safe, resolveLabelInName → safe, non-Record-lookup expressions → existing behavior unchanged, fallback expressions → primary expression checked
+- [ ] MODULE_CONTRACT purpose and CHANGE_SUMMARY in `a11y-label-in-name-component.ts` are updated to mention Record-lookup detection
+- [ ] Command description in `command-tables/08-section-framework.ts` is updated to mention Record-lookup detection
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- The fix pattern for flagged components is to precompute a merged label: `const ariaLabel = \`${visibleText} — ${recordLabel}\``.
+- The fix pattern for flagged components is to precompute a merged label with a variable name that contains the visible text variable name: `const visibleTextAriaLabel = \`${visibleText} — ${recordLabel}\``where`visibleTextAriaLabel`contains`visibleText` as a substring.
 - Agents MUST NOT weaken the existing variable-name-reference check — the Record-lookup check is additive.
