@@ -72,6 +72,7 @@ interface EvidenceSourceData {
   type?: string;
   kind?: string;
   status?: string;
+  slug?: string;
 }
 
 interface PublishedNachweisEntry {
@@ -109,7 +110,7 @@ async function loadPublishedNachweisEntries(): Promise<PublishedNachweisEntry[]>
     // Only published records get routes — draft records are excluded
     if (data.status !== "published") continue;
 
-    const slug = stripEntryLanguage(toDataEntryId(entry.id));
+    const slug = data.slug ?? stripEntryLanguage(toDataEntryId(entry.id));
     result.push({ slug, supportedLangs });
   }
   return result;
