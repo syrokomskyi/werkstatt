@@ -8,10 +8,12 @@ section-framework validator suite (RFC-0111).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: split out of section-framework.ts (Phase 3 file-size split).</item>
+  <item>RFC-0879: fix path bugs (walkAstroSections, walkSectionManifests, sectionSlugOf), add UTILITY_COMPONENT_SLUGS and walkSectionLevelComponents.</item>
 </CHANGE_SUMMARY>
 */
 
 import { join } from "node:path";
+import { readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
 import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
@@ -80,6 +82,23 @@ export function fail(command: string, violations: Violation[]): KernelCommandRes
 // SHELL and BG validators stop reporting structural violations against them.
 export const UTILITY_SECTION_SLUGS: ReadonlySet<string> = new Set(["breadcrumbs", "navigation"]);
 
+// RFC-0879: components registered in the archetype index with layer: component
+// but never used as top-level page blocks. Excluded from shell contract scanning
+// analogous to UTILITY_SECTION_SLUGS (RFC-0126).
+export const UTILITY_COMPONENT_SLUGS: ReadonlySet<string> = new Set([
+  "brand-label",
+  "copyright",
+  "currency-selector",
+  "lang-switcher",
+  "layout",
+  "not-found",
+  "live-photo",
+  "material-credit",
+  "responsive-image",
+  "scroll-to-top",
+  "social-meta",
+]);
+
 // Extract `<slug>` from a path under packages/werkstatt-site/src/domain/ui/sections/<slug>/...
 export function sectionSlugOf(relPath: string): string | null {
   const m = relPath.match(/packages\/werkstatt-site\/src\/domain\/ui\/sections\/([^/]+)\//);
@@ -114,6 +133,63 @@ export async function walkArchetypeYamls(workspaceRoot: string): Promise<string[
   );
   const entries = await collectFiles(root, { extensions: [".yaml"], ignore: () => false });
   return entries;
+}
+
+// RFC-0879: scan section-level components (layer: component in the archetype
+// registry) for shell contract compliance. Filters by archetype sourceFile
+// directory names and excludes UTILITY_COMPONENT_SLUGS entries.
+export async function walkSectionLevelComponents(workspaceRoot: string): Promise<string[]> {
+  const componentsRoot = join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ui",
+    "components",
+  );
+  const allComponentFiles = await collectFiles(componentsRoot, {
+    extensions: [".astro"],
+    ignore: () => false,
+  });
+
+  const archetypeIndexPath = join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "archetypes",
+    "index.yaml",
+  );
+  let archetypeIndex: string;
+  try {
+    archetypeIndex = await readFile(archetypeIndexPath, "utf-8");
+  } catch {
+    return [];
+  }
+  const parsed = parseYaml(archetypeIndex) as {
+    entries?: Array<{ id: string; layer: string; sourceFile?: string }>;
+  };
+
+  const sectionLevelDirs = new Set(
+    (parsed.entries ?? [])
+      .filter((e) => e.layer === "component" && e.sourceFile?.includes("/components/"))
+      .map((e) => {
+        const m = e.sourceFile?.match(/\/components\/([^/]+)\.yaml$/);
+        return m ? m[1] : null;
+      })
+      .filter((d): d is string => d !== null),
+  );
+
+  return allComponentFiles.filter((file) => {
+    const match = file.match(/components\/([^/]+)\//);
+    if (!match) return false;
+    const dir = match[1];
+    if (UTILITY_COMPONENT_SLUGS.has(dir)) return false;
+    return sectionLevelDirs.has(dir);
+  });
 }
 
 // ---------------------------------------------------------------------------

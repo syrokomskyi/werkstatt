@@ -8,6 +8,7 @@ through &lt;SectionShell&gt;.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: split out of section-framework.ts (Phase 3 file-size split).</item>
+  <item>RFC-0879: extend scan to section-level components (layer: component in archetype registry).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,6 +25,7 @@ import {
   ok,
   fail,
   walkAstroSections,
+  walkSectionLevelComponents,
   type CheckResult,
   type Violation,
 } from "./shared.ts";
@@ -34,7 +36,9 @@ export async function runSectionShellContractValidate(
 ): Promise<KernelCommandResult<CheckResult>> {
   const cmd = "section.shell.contract.validate";
   const violations: Violation[] = [];
-  const files = await walkAstroSections(context.workspaceRoot);
+  const sectionFiles = await walkAstroSections(context.workspaceRoot);
+  const componentFiles = await walkSectionLevelComponents(context.workspaceRoot);
+  const files = [...sectionFiles, ...componentFiles];
   for (const file of files) {
     const rel = relative(context.workspaceRoot, file).replace(/\\/g, "/");
     // RFC-0126: skip utility sections (breadcrumbs, navigation) — they are
