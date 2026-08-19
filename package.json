@@ -29,7 +29,7 @@
     "lint:all": "eslint \"packages/**/*.ts\" \"packages/**/*.astro\"",
     "lint:yaml": "eslint --config eslint.config.js \"**/*.yaml\"",
     "git-add-force": "git rm -r --cached . && git add .",
-    "postinstall": "playwright install chromium"
+    "postinstall": "node scripts/ensure-playwright.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
