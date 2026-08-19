@@ -1,6 +1,6 @@
 command: rfc.index.generate
-generatedAt: 2026-08-18
-count: 860
+generatedAt: 2026-08-19
+count: 861
 entries:
   - id: ""
     title: ""
@@ -13795,6 +13795,7 @@ entries:
     amends: []
     amendedBy:
       - RFC-0717
+      - RFC-0876
     related:
       - ADR-0028
       - RFC-0706
@@ -13936,6 +13937,7 @@ entries:
     amends: []
     amendedBy:
       - RFC-0871
+      - RFC-0876
     related:
       - RFC-0708
       - ADR-0028
@@ -16827,10 +16829,10 @@ entries:
   - id: RFC-0875
     title: Add Cloudflare URL Scanner Agent Readiness assessment adapter for
       Nachweisregister
-    status: draft
+    status: implemented
     kind: command
     createdAt: 2026-08-18
-    implementedAt: ""
+    implementedAt: 2026-08-18
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16841,14 +16843,14 @@ entries:
       - RFC-0872
       - RFC-0873
       - RFC-0713
-    file: docs/rfcs/rfc-0875-add-cloudflare-url-scanner-agent-readiness-assessment-adapter-for-nachweisregister.md
+    file: docs/rfcs/archive/implemented/rfc-0875-add-cloudflare-url-scanner-agent-readiness-assessment-adapter-for-nachweisregister.md
   - id: RFC-0876
     title: Add technical Nachweis UI, observation history and Warpgogol
       Lighthouse/Cloudflare pilot
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-18
-    implementedAt: ""
+    implementedAt: 2026-08-18
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -16864,7 +16866,7 @@ entries:
       - RFC-0873
       - RFC-0874
       - RFC-0875
-    file: docs/rfcs/rfc-0876-add-technical-nachweis-ui-observation-history-and-warpgogol-lighthouse-cloudflare-pilot.md
+    file: docs/rfcs/archive/implemented/rfc-0876-add-technical-nachweis-ui-observation-history-and-warpgogol-lighthouse-cloudflare-pilot.md
   - id: RFC-0877
     title: In-place agent-driven installation flow
     status: implemented
@@ -16906,3 +16908,21 @@ entries:
     amendedBy: []
     related: []
     file: docs/rfcs/archive/implemented/rfc-0878-require-explicit-bump-major-for-platform-major-version-bumps.md
+  - id: RFC-0879
+    title: Extend section.shell.contract.validate to section-level components
+    status: implemented
+    kind: command
+    createdAt: 2026-08-19
+    implementedAt: 2026-08-19
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-8
+      - DNA-37
+      - RFC-0101
+      - RFC-0108
+      - RFC-0126
+    file: docs/rfcs/archive/implemented/rfc-0879-extend-shell-contract-validate-to-section-level-components.md
