@@ -147,7 +147,7 @@ export async function getNachweisVerifyRoutes(): Promise<NachweisVerifyRouteEntr
     const version = "v1";
     const routes: Record<string, string> = {};
     for (const lang of supportedLangs) {
-      routes[lang] = `/nachweise/verify/${version}/`;
+      routes[lang] = `nachweise/verify/${version}`;
     }
     return {
       pageId: nachweisVerifyPageId(slug, version),

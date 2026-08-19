@@ -564,14 +564,23 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
 
   const fileSlug = pageIdToContentFileSlug(pageId);
 
-  // RFC-0708: Nachweis detail routes are synthetic — they share the
-  // `nachweis-detail` content template. The evidence slug is extracted from
-  // the pageId and injected into the block props.
-  const nachweisSlug =
+  // RFC-0708: Nachweis detail and verify routes are synthetic — they share
+  // content templates (`nachweis-detail` / `nachweis-verify`). The evidence
+  // slug is extracted from the pageId and injected into the block props.
+  const nachweisDetailSlug =
     pageId.startsWith("nachweis:") && pageId !== "nachweis-detail"
       ? pageId.slice("nachweis:".length)
       : undefined;
-  const effectiveFileSlug = nachweisSlug ? "nachweis-detail" : fileSlug;
+  const nachweisVerifySlug =
+    pageId.startsWith("nachweis-verify:") && pageId !== "nachweis-verify"
+      ? pageId.slice("nachweis-verify:".length).split(":")[0]
+      : undefined;
+  const nachweisSlug = nachweisDetailSlug ?? nachweisVerifySlug;
+  const effectiveFileSlug = nachweisDetailSlug
+    ? "nachweis-detail"
+    : nachweisVerifySlug
+      ? "nachweis-verify"
+      : fileSlug;
 
   // RFC-0192: Programmatic Surface routes resolve their blocks from the surface artifact
   // (baked at build time), not a content/pages/*.md file.
@@ -659,14 +668,14 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
       }
     }
 
-    // RFC-0708: inject the evidence slug into the nachweis-detail block props
+    // RFC-0708: inject the evidence slug into the nachweis-detail/nachweis-verify block props
     if (nachweisSlug) {
       const blocks = entryData.blocks as Array<Record<string, unknown>> | undefined;
       if (Array.isArray(blocks)) {
         entryData = {
           ...entryData,
           blocks: blocks.map((block) =>
-            block.type === "nachweis-detail"
+            block.type === "nachweis-detail" || block.type === "nachweis-verify"
               ? {
                   ...block,
                   props: { ...(block.props as Record<string, unknown>), slug: nachweisSlug },
