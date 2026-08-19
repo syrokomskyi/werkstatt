@@ -1,12 +1,12 @@
 ---
 id: ADR-0055
 title: "Testing conventions for route generators and resolvePageRoute"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
-implementedAt:
+implementedAt: 2026-08-19
 closedAt:
 supersedes: []
 supersededBy:
