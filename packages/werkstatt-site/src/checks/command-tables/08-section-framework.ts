@@ -119,7 +119,7 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
   {
     name: "a11y.label-in-name.component.validate",
     description:
-      "RFC-0836: scan .astro component source files in packages/werkstatt-site/src/domain/ui/ for interactive elements where aria-label={...} and visible text {...} are both present but the aria-label expression does not reference the visible text variable (WCAG 2.5.3 Label in Name). Emits A11Y-LIN-COMP-01 (error) for mismatches. Recognizes resolveLabelInName helper and merged-label patterns as safe.",
+      "RFC-0836: scan .astro component source files in packages/werkstatt-site/src/domain/ui/ for interactive elements where aria-label={...} and visible text {...} are both present but the aria-label expression does not reference the visible text variable (WCAG 2.5.3 Label in Name). Emits A11Y-LIN-COMP-01 (error) for mismatches. Recognizes resolveLabelInName helper and merged-label patterns as safe. RFC-0882: extended to detect Record-lookup aria-label mismatches where aria-label and visible text use different Record identifiers (e.g. recordA[key] vs recordB[key]).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,

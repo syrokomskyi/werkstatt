@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0836: initial — unit tests for component-level WCAG 2.5.3 Label in Name validator.</item>
+  <item>RFC-0882: added test cases for Record-lookup mismatch detection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -183,6 +184,81 @@ const label = "test";
     const findings = extractComponentLabelInNameViolations(source);
     expect(findings.length).toBe(1);
     expect(findings[0].visibleTextExpr).toBe("{content.brandLabel}");
+  });
+
+  // RFC-0882: Record-lookup mismatch detection
+
+  it("red: Record-lookup mismatch with different Record identifiers", () => {
+    const source = `---
+---
+<a aria-label={providerLabels[props.provider.id] ?? props.provider.name}>
+  {providerInitials[props.provider.id] ?? props.provider.name.slice(0, 2).toUpperCase()}
+</a>`;
+    const findings = extractComponentLabelInNameViolations(source);
+    expect(findings.length).toBe(1);
+    expect(findings[0].rule).toBe("A11Y-LIN-COMP-01");
+  });
+
+  it("green: same Record identifier is safe", () => {
+    const source = `---
+---
+<a aria-label={labels[id]}>
+  {labels[id]}
+</a>`;
+    const findings = extractComponentLabelInNameViolations(source);
+    expect(findings.length).toBe(0);
+  });
+
+  it("green: naming convention for precomputed labels", () => {
+    const source = `---
+---
+<a aria-label={providerBadgeTextAriaLabel}>
+  {providerBadgeText}
+</a>`;
+    const findings = extractComponentLabelInNameViolations(source);
+    expect(findings.length).toBe(0);
+  });
+
+  it("green: Record-lookup with fallback where primary is same Record (exemption)", () => {
+    const source = `---
+---
+<a aria-label={labels[id] ?? fallback}>
+  {labels[id] ?? other}
+</a>`;
+    const findings = extractComponentLabelInNameViolations(source);
+    expect(findings.length).toBe(0);
+  });
+
+  it("red: Record-lookup mismatch with fallback", () => {
+    const source = `---
+---
+<a aria-label={providerLabels[id] ?? fallback}>
+  {providerInitials[id] ?? other}
+</a>`;
+    const findings = extractComponentLabelInNameViolations(source);
+    expect(findings.length).toBe(1);
+    expect(findings[0].rule).toBe("A11Y-LIN-COMP-01");
+  });
+
+  it("green: non-Record-lookup expression with fallback does not trigger Record-lookup check", () => {
+    const source = `---
+---
+<a aria-label={someLabel ?? fallback}>
+  {otherLabel}
+</a>`;
+    const findings = extractComponentLabelInNameViolations(source);
+    expect(findings.length).toBe(1);
+    expect(findings[0].rule).toBe("A11Y-LIN-COMP-01");
+  });
+
+  it("green: resolveLabelInName with Record-lookup visible text", () => {
+    const source = `---
+---
+<a aria-label={resolveLabelInName(ariaLabel, providerInitials[id])}>
+  {providerInitials[id]}
+</a>`;
+    const findings = extractComponentLabelInNameViolations(source);
+    expect(findings.length).toBe(0);
   });
 });
 

@@ -7,6 +7,8 @@ aria-label={...} and visible text {...} are both present but the aria-label
 expression does not reference the visible text variable (WCAG 2.5.3 Label in
 Name). This is a pre-build static analysis complement to the post-build
 a11y.label-in-name.validate (RFC-0832).
+RFC-0882: extended to detect Record-lookup aria-label mismatches where
+aria-label and visible text use different Record identifiers.
 </purpose>
 <non-goals>
   <item>Do not replace the post-build a11y.label-in-name.validate (RFC-0832) — both validators run.</item>
@@ -18,6 +20,7 @@ a11y.label-in-name.validate (RFC-0832).
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0836: initial — component-level WCAG 2.5.3 Label in Name validator using regex-based .astro scanning.</item>
+  <item>RFC-0882: extended extractVisibleTextExprs to recognize Record-lookup expressions; added splitFallback, parseRecordLookup, isRecordLookupMismatch for Record-lookup mismatch detection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -124,7 +127,13 @@ function extractVisibleTextExprs(content: string): string[] {
   let match;
   while ((match = regex.exec(textOnly)) !== null) {
     const expr = match[1].trim();
+    // Simple variable reference: props.xxx, content.xxx, variableName
     if (/^(props\.\w+|content\.\w+|[a-zA-Z_]\w*)$/.test(expr)) {
+      exprs.push(expr);
+      continue;
+    }
+    // RFC-0882: Record-lookup: recordName[keyExpr] or recordName[keyExpr] ?? fallback
+    if (/^(\w+)\s*(?:\?\.\s*)?\[.+\]\s*(?:\?\?.*)?$/.test(expr)) {
       exprs.push(expr);
     }
   }
@@ -134,6 +143,30 @@ function extractVisibleTextExprs(content: string): string[] {
 function getVariableName(expr: string): string {
   const parts = expr.split(".");
   return parts[parts.length - 1];
+}
+
+interface RecordLookup {
+  recordName: string;
+  keyExpr: string;
+}
+
+function splitFallback(expr: string): string {
+  const idx = expr.indexOf("??");
+  return idx !== -1 ? expr.substring(0, idx).trim() : expr.trim();
+}
+
+function parseRecordLookup(expr: string): RecordLookup | null {
+  const match = expr.match(/^(\w+)\s*(?:\?\.\s*)?\[(.+)\]$/);
+  if (!match) return null;
+  return { recordName: match[1], keyExpr: match[2] };
+}
+
+function isRecordLookupMismatch(ariaLabelExpr: string, visibleTextExpr: string): boolean {
+  const ariaLookup = parseRecordLookup(splitFallback(ariaLabelExpr));
+  const textLookup = parseRecordLookup(splitFallback(visibleTextExpr));
+  if (!ariaLookup || !textLookup) return false;
+  if (ariaLookup.recordName === textLookup.recordName) return false;
+  return true;
 }
 
 export function extractComponentLabelInNameViolations(
@@ -175,7 +208,23 @@ export function extractComponentLabelInNameViolations(
 
     for (const visibleTextExpr of visibleTextExprs) {
       const varName = getVariableName(visibleTextExpr);
-      if (!ariaLabelExpr.toLowerCase().includes(varName.toLowerCase())) {
+      const varNameReferenced = ariaLabelExpr.toLowerCase().includes(varName.toLowerCase());
+      const recordLookupMismatch = isRecordLookupMismatch(ariaLabelExpr, visibleTextExpr);
+
+      // RFC-0882: Record-lookup exemption — if both expressions are Record-lookups
+      // with the same Record identifier, skip the variable-name check.
+      // getVariableName produces nonsensical values for Record-lookup expressions
+      // and may flag same-Record patterns with different fallbacks (false positive).
+      const ariaLookup = parseRecordLookup(splitFallback(ariaLabelExpr));
+      const textLookup = parseRecordLookup(splitFallback(visibleTextExpr));
+      const sameRecordLookup =
+        ariaLookup !== null &&
+        textLookup !== null &&
+        ariaLookup.recordName === textLookup.recordName;
+
+      if (sameRecordLookup) continue;
+
+      if (!varNameReferenced || recordLookupMismatch) {
         findings.push({
           rule: RULE_ID,
           line: i + 1,
