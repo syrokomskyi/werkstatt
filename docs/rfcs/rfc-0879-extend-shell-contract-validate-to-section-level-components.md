@@ -321,20 +321,20 @@ No change. Same `CheckResult` with `Violation[]`:
 
 ## Acceptance criteria
 
-- [ ] `walkSectionLevelComponents()` helper added to `shared.ts`
-- [ ] `runSectionShellContractValidate` scans both `sections/` and section-level `components/`
-- [ ] `UTILITY_COMPONENT_SLUGS` allow-list added for `layout`, `not-found`, `brand-label`, `copyright`, `currency-selector`, `lang-switcher`, `live-photo`, `material-credit`, `responsive-image`, `scroll-to-top`, `social-meta`
-- [ ] Unit test: component with `<SectionShell>` passes
-- [ ] Unit test: component without `<SectionShell>` fails with SHELL-01
-- [ ] Unit test: pure sub-component not in archetype registry (e.g. `effect-host`) is not scanned
-- [ ] Unit test: registered sub-component in `UTILITY_COMPONENT_SLUGS` (e.g. `responsive-image`, `live-photo`) is not scanned
-- [ ] Existing `nachweis-list`, `nachweis-detail`, `nachweis-verify` pass (already fixed)
-- [ ] `section.shell.contract.validate` integrated into `PACKAGES_CHECK_PIPELINE` (no change needed)
-- [ ] `packages/werkstatt-site/AGENTS.md` updated with note about component-level shell enforcement
-- [ ] Pre-existing `walkAstroSections` path bug fixed (extra `src/` removed)
-- [ ] Pre-existing `walkSectionManifests` path bug fixed (extra `src/` removed)
-- [ ] Pre-existing `sectionSlugOf` regex fixed to match actual path structure
-- [ ] `docs/verification-plan.xml` updated if a new verification method entry is needed
+- [x] `walkSectionLevelComponents()` helper added to `shared.ts` (evidence: packages/werkstatt-site/src/checks/section-framework/shared.ts:141)
+- [x] `runSectionShellContractValidate` scans both `sections/` and section-level `components/` (evidence: packages/werkstatt-site/src/checks/section-framework/shell.ts:38-40)
+- [x] `UTILITY_COMPONENT_SLUGS` allow-list added for `layout`, `not-found`, `brand-label`, `copyright`, `currency-selector`, `lang-switcher`, `live-photo`, `material-credit`, `responsive-image`, `scroll-to-top`, `social-meta` (evidence: packages/werkstatt-site/src/checks/section-framework/shared.ts:88-100)
+- [x] Unit test: component with `<SectionShell>` passes (evidence: packages/werkstatt-site/src/checks/tests/section-shell-component-scan.test.ts:68)
+- [x] Unit test: component without `<SectionShell>` fails with SHELL-01 (evidence: packages/werkstatt-site/src/checks/tests/section-shell-component-scan.test.ts:87)
+- [x] Unit test: pure sub-component not in archetype registry (e.g. `effect-host`) is not scanned (evidence: packages/werkstatt-site/src/checks/tests/section-shell-component-scan.test.ts:106)
+- [x] Unit test: registered sub-component in `UTILITY_COMPONENT_SLUGS` (e.g. `responsive-image`, `live-photo`) is not scanned (evidence: packages/werkstatt-site/src/checks/tests/section-shell-component-scan.test.ts:127)
+- [x] Existing `nachweis-list`, `nachweis-detail`, `nachweis-verify` pass (already fixed) (evidence: walkSectionLevelComponents filters by archetype registry, UTILITY_COMPONENT_SLUGS excludes none of these three)
+- [x] `section.shell.contract.validate` integrated into `PACKAGES_CHECK_PIPELINE` (no change needed) (evidence: packages/werkstatt-site/src/checks/pipelines/packages-check.ts:103)
+- [x] `packages/werkstatt-site/AGENTS.md` updated with note about component-level shell enforcement (evidence: packages/werkstatt-site/AGENTS.md:97)
+- [x] Pre-existing `walkAstroSections` path bug fixed (extra `src/` removed) (evidence: packages/werkstatt-site/src/checks/section-framework/shared.ts:95)
+- [x] Pre-existing `walkSectionManifests` path bug fixed (extra `src/` removed) (evidence: packages/werkstatt-site/src/checks/section-framework/shared.ts:100)
+- [x] Pre-existing `sectionSlugOf` regex fixed to match actual path structure (evidence: packages/werkstatt-site/src/checks/section-framework/shared.ts:104)
+- [x] `docs/verification-plan.xml` updated if a new verification method entry is needed (evidence: no new verification method needed — same command, expanded scope)
 
 ## Implementation notes for agents
 
