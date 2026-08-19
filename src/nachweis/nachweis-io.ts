@@ -10,6 +10,7 @@
   <item>Reads resolved entitlements to check for the nachweis feature.</item>
   <item>RFC-0872: provides policy-driven publication gate V2 types and policy resolution.</item>
   <item>RFC-0873: provides AssessmentBundleV1 types, Zod schema, and assessment R2 path resolution.</item>
+  <item>ADR-0054: implements the technical-assessment evidence profile decision — policy-driven gate, assessment metadata, canonical raw artifact requirement.</item>
 </responsibilities>
 <non-goals>
   <item>Does not implement command handlers — those live in nachweis-*.ts files.</item>

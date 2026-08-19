@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0873: nachweis.assessment.ingest command handler — validates an AssessmentBundleV1, hashes artifacts, uploads to R2, writes PBP evidence-source, appends Bordbuch entry.</purpose>
+<purpose>RFC-0873: nachweis.assessment.ingest command handler — validates an AssessmentBundleV1, hashes artifacts, uploads to R2, writes PBP evidence-source, appends Bordbuch entry. Implements ADR-0054: generic normalized assessment contract between provider adapters and PBP/Bordbuch.</purpose>
 <keywords>nachweis, assessment, ingest, r2, bordbuch, evidence-source, technical-assessment</keywords>
 <responsibilities>
   <item>Validates bundle via assessmentBundleV1Schema (Zod runtime validation).</item>
