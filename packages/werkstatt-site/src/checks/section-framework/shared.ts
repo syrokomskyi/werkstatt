@@ -166,7 +166,10 @@ export async function walkSectionLevelComponents(workspaceRoot: string): Promise
   let archetypeIndex: string;
   try {
     archetypeIndex = await readFile(archetypeIndexPath, "utf-8");
-  } catch {
+  } catch (err) {
+    console.warn(
+      `[section.shell.contract.validate] IO-01: archetype index not found at ${archetypeIndexPath}, skipping component scanning (${(err as Error).message})`,
+    );
     return [];
   }
   const parsed = parseYaml(archetypeIndex) as {
