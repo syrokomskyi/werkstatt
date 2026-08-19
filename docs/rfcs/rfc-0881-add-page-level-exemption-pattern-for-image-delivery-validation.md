@@ -10,14 +10,15 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-19
 updatedAt: 2026-08-19
+enhancedAt: 2026-08-19
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0830
 amendedBy: []
 related:
-  - RFC-0830
   - RFC-0835
   - RFC-0841
   - RFC-0880
@@ -64,12 +65,20 @@ The `image-delivery.config.yaml` override schema gains an optional `pagePattern`
 
 ## Architectural fit
 
-- **RFC-0830 (amended)**: Extends the config override schema with a new optional field. The `srcPattern` and `rules` fields remain unchanged. The `reason` field remains mandatory.
+- **RFC-0830 (amended)**: Extends the config override schema with a new optional `pagePattern` field. The `srcPattern` and `rules` fields remain unchanged. The `reason` field remains mandatory.
 - **RFC-0835 (related)**: RFC-0835 added the `404.html` hardcoded exemption for `IMG-DELIVERY-04`. This RFC generalizes that concept — `404.html` could be expressed as `pagePattern: "**/404.html"` in config, but the hardcoded exemption remains as a default safety net.
 - **RFC-0841 (related)**: RFC-0841 added config location diagnostics. The `pagePattern` field follows the same config loading path and emits the same `IMG-DELIVERY-CONFIG-01` warning for malformed entries.
 - **DNA-72 (related)**: DNA-72 covers validator config location diagnostics. The `pagePattern` field does not change the config location — it is an additional field in the existing config file.
 
 ## Design
+
+### CLI surface
+
+```sh
+pnpm exec werkstatt run image.delivery.validate --site <siteId> --json
+```
+
+No new flags. The `--json` output shape is unchanged from RFC-0830: `{ command, status, findings[], checkedImages }`. The only change is that `findings[]` may now include fewer `IMG-DELIVERY-04` entries when `pagePattern` overrides are configured.
 
 ### Config schema
 
@@ -86,6 +95,8 @@ overrides:
       - IMG-DELIVERY-04
     reason: "Nachweis detail and verify pages are text-only with no LCP image."
 ```
+
+The `srcPattern` field remains mandatory for all overrides. When an override targets only a page-level rule via `pagePattern`, use `srcPattern: "**"` as a dummy wildcard — it satisfies the schema requirement without affecting per-image rule checks (which are not listed in `rules[]` for this override).
 
 ### TypeScript contracts
 
@@ -143,9 +154,10 @@ if (!hasFetchpriorityHigh && imgs.length > 0 && !pageExempt) {
 
 ### Failure modes
 
-- **IMG-DELIVERY-CONFIG-01**: Malformed `pagePattern` (not a string) → warning, override is skipped.
+- **Non-string `pagePattern`**: Silently ignored (treated as `undefined`). The override is still loaded, but `isPageSkipped` returns `false` for it. This matches the existing code behavior — `IMG-DELIVERY-CONFIG-01` is only emitted for missing `srcPattern`, `rules`, or `reason`.
 - **picomatch error**: Invalid glob pattern → `isPageSkipped` returns `false` for that override (defensive — no crash).
 - **No match**: If `pagePattern` doesn't match any pages, the override is a no-op (no error, no warning).
+- **Override with both `srcPattern` and `pagePattern`**: The two fields operate independently — `srcPattern` is checked by `isRuleSkipped` for per-image rules, `pagePattern` is checked by `isPageSkipped` for page-level rules. An override can have both without conflict.
 
 ## Rollout
 
@@ -163,13 +175,13 @@ if (!hasFetchpriorityHigh && imgs.length > 0 && !pageExempt) {
 ## Risks
 
 - **Over-exemption**: Operators could use a broad `pagePattern` (e.g. `**`) to exempt all pages from `IMG-DELIVERY-04`, masking real LCP regressions. Mitigated by the mandatory `reason` field (audit trail) and the fact that per-image checks still run.
-- **Glob pattern errors**: Invalid picomatch patterns silently fail (return `false`). This is intentional — a config error should not crash the build. The `IMG-DELIVERY-CONFIG-01` warning catches non-string `pagePattern` values.
+- **Glob pattern errors**: Invalid picomatch patterns silently fail (return `false`). This is intentional — a config error should not crash the build. Non-string `pagePattern` values are silently ignored (treated as `undefined`).
 - **Performance**: `isPageSkipped` runs per-page, but the number of overrides is typically small (<10) and picomatch compilation is cached by the `picomatch` library.
 
 ## Acceptance criteria
 
 - [ ] `ConfigOverride` interface includes optional `pagePattern?: string` field
-- [ ] `loadDeliveryConfig` parses `pagePattern` from YAML and emits `IMG-DELIVERY-CONFIG-01` for non-string values
+- [ ] `loadDeliveryConfig` parses `pagePattern` from YAML and silently ignores non-string values (treats as `undefined`)
 - [ ] `isPageSkipped` function uses `picomatch` to match page paths against `pagePattern` for a given rule
 - [ ] `IMG-DELIVERY-04` check calls `isPageSkipped` alongside the existing `404.html` exemption
 - [ ] `pagePattern` only affects page-level rules (IMG-DELIVERY-04), not per-image rules (IMG-DELIVERY-01, IMG-DELIVERY-02)
@@ -178,6 +190,8 @@ if (!hasFetchpriorityHigh && imgs.length > 0 && !pageExempt) {
 
 ## Implementation notes for agents
 
-- Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
+- Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented), per RFC-0224 (accepted→implemented transition).
 - The ad-hoc implementation from mission `warpgogol-com-m000077` already satisfies the technical requirements. This RFC formalizes the contract and adds tests.
 - Agents MUST NOT extend `pagePattern` to per-image rules without a superseding RFC.
+- Agents MUST update `packages/werkstatt-site/AGENTS.md` to document the `pagePattern` field in the `image.delivery.validate` command description.
+- No Compass XML sync needed — this RFC adds an optional field to an existing config schema, not a repository-wide requirement or shared package contract change.
