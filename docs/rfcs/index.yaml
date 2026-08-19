@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-19
-count: 861
+count: 865
 entries:
   - id: ""
     title: ""
@@ -15990,7 +15990,8 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0881
     related:
       - RFC-0204
       - RFC-0043
@@ -16926,3 +16927,74 @@ entries:
       - RFC-0108
       - RFC-0126
     file: docs/rfcs/archive/implemented/rfc-0879-extend-shell-contract-validate-to-section-level-components.md
+  - id: RFC-0880
+    title: Mandate explicit slug for Nachweis evidence routes and formalize route
+      generation contract
+    status: implemented
+    kind: command
+    createdAt: 2026-08-19
+    implementedAt: 2026-08-19
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-048
+      - RFC-0708
+      - RFC-0872
+      - RFC-0873
+      - RFC-0881
+      - RFC-0883
+    file: docs/rfcs/archive/implemented/rfc-0880-mandate-explicit-slug-for-nachweis-evidence-routes.md
+  - id: RFC-0881
+    title: Add page-level exemption pattern for image delivery validation
+    status: implemented
+    kind: command
+    createdAt: 2026-08-19
+    implementedAt: 2026-08-19
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0830
+    amendedBy: []
+    related:
+      - RFC-0835
+      - RFC-0841
+      - RFC-0880
+    file: docs/rfcs/archive/implemented/rfc-0881-add-page-level-exemption-pattern-for-image-delivery-validation.md
+  - id: RFC-0882
+    title: Enhance A11Y-LIN-COMP-01 to detect Record-lookup aria-label mismatches
+    status: accepted
+    kind: command
+    createdAt: 2026-08-19
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0832
+      - RFC-0836
+      - ADR-0047
+    file: docs/rfcs/rfc-0882-enhance-a11y-lin-comp-01-to-detect-record-lookup-aria-label-mismatches.md
+  - id: RFC-0883
+    title: Add post-build-only validation mode for fast iterative debugging
+    status: accepted
+    kind: command
+    createdAt: 2026-08-19
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0830
+      - RFC-0832
+      - RFC-0836
+      - RFC-0880
+      - RFC-0881
+    file: docs/rfcs/rfc-0883-add-post-build-only-validation-mode-for-fast-iterative-debugging.md
