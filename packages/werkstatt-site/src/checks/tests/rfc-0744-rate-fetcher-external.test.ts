@@ -15,6 +15,7 @@ import { join } from "node:path";
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { makeTestSiteContext } from "./helpers.ts";
+import { runRateSnapshotResolve } from "../rate-snapshot-resolve.ts";
 
 const originalEnv = { ...process.env };
 
@@ -147,8 +148,6 @@ test("external mode creates RateSnapshot from Supabase observation", async () =>
     ]);
     vi.stubGlobal("fetch", mockFetch);
 
-    const { runRateSnapshotResolve } = await import("../rate-snapshot-resolve.ts");
-
     const result = await runRateSnapshotResolve(
       { flags: { system: "test" }, args: [] } as never,
       makeTestSiteContext(workspace, workspace, "test"),
@@ -193,8 +192,6 @@ test("external mode with no observations returns warning for source-price-only",
     const mockFetch = createMockFetch([]);
     vi.stubGlobal("fetch", mockFetch);
 
-    const { runRateSnapshotResolve } = await import("../rate-snapshot-resolve.ts");
-
     const result = await runRateSnapshotResolve(
       { flags: { system: "test" }, args: [] } as never,
       makeTestSiteContext(workspace, workspace, "test"),
@@ -224,8 +221,6 @@ test("external mode without Supabase env vars returns warning", async () => {
     delete process.env.RATE_FETCHER_SUPABASE_URL;
     delete process.env.RATE_FETCHER_SUPABASE_KEY;
 
-    const { runRateSnapshotResolve } = await import("../rate-snapshot-resolve.ts");
-
     const result = await runRateSnapshotResolve(
       { flags: { system: "test" }, args: [] } as never,
       makeTestSiteContext(workspace, workspace, "test"),
@@ -253,8 +248,6 @@ test("external mode dev skip produces warning", async () => {
       join(workspace, "src", "content", "business-profile", "rate-policy-eur-uah.md"),
       makeRatePolicyContent(),
     );
-
-    const { runRateSnapshotResolve } = await import("../rate-snapshot-resolve.ts");
 
     const result = await runRateSnapshotResolve(
       { flags: { system: "test", dev: true }, args: [] } as never,

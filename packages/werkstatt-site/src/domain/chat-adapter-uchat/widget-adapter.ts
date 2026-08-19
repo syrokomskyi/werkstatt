@@ -139,3 +139,8 @@ const UChatWidgetAdapter: ChatWidgetAdapter = {
 };
 
 export default UChatWidgetAdapter;
+
+/** @internal Reset module state for testing. */
+export function __resetForTesting(): void {
+  _injected = false;
+}

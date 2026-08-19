@@ -23,6 +23,10 @@ vi.mock("@syrokomskyi/axiom-factory-app/run/axiom-cli", () => ({
   preflightChromium: vi.fn(),
 }));
 
+vi.mock("../playwright-chromium-ensure.ts", () => ({
+  ensureChromium: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { runAxiomCheck } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
 import type { AxiomCheckResult } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
 
