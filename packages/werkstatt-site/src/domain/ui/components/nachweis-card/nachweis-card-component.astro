@@ -117,6 +117,11 @@ const providerInitials: Record<string, string> = {
   cloudflare: "CF",
 };
 
+const providerLabel = providerLabels[props.provider.id] ?? props.provider.name;
+const providerBadgeText =
+  providerInitials[props.provider.id] ?? props.provider.name.slice(0, 2).toUpperCase();
+const providerBadgeAriaLabel = `${providerBadgeText} — ${providerLabel}`;
+
 function hasScoreDimensions(dims: NachweisAssessmentDimension[]): boolean {
   return dims.some((d) => d.score !== undefined);
 }
@@ -246,9 +251,9 @@ function getLiveCheckUrl(
           href={props.provider.homepage ?? "#"}
           rel="noopener noreferrer"
           target="_blank"
-          aria-label={providerLabels[props.provider.id] ?? props.provider.name}
+          aria-label={providerBadgeAriaLabel}
         >
-          {providerInitials[props.provider.id] ?? props.provider.name.slice(0, 2).toUpperCase()}
+          {providerBadgeText}
         </a>
         <div class="nachweis-card__header-text">
           <h2 id={headingId} class="nachweis-card__title">
