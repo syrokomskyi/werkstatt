@@ -35,6 +35,7 @@ import {
 import NachweisCard, {
   type NachweisAssessmentDimension,
 } from "../nachweis-card/nachweis-card-component.astro";
+import SectionShell from "../section-shell/section-shell.astro";
 import SectionHeader from "../section-header/section-header.astro";
 import "./nachweis-list-component.css";
 
@@ -95,9 +96,13 @@ interface NachweisListContent {
     level?: number;
     hideSectionNumber?: boolean;
   };
+  background?: unknown;
+  effects?: unknown;
+  density?: "compact" | "normal" | "spacious";
+  tone?: "default" | "warning" | "success" | "muted";
 }
 
-const { lang, pageOverride } = Astro.props as SectionProps;
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const props = cast<NachweisListContent>(pageOverride);
 const emptyMessage = props.emptyMessage ?? "Weitere Nachweise werden derzeit vorbereitet.";
 const listVariant = props.variant ?? "registry";
@@ -243,14 +248,23 @@ if (limit !== undefined && limit > 0) {
 }
 ---
 
-<section
-  class:list={["nachweis-list", `nachweis-list--${listVariant}`]}
-  data-component="nachweis-list"
+<SectionShell
+  slug="nachweis-list"
+  sectionNumber={sectionNumber}
+  background={props.background ?? { kind: "transparent" }}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
 >
-  <div class="container">
+  <div
+    class:list={["nachweis-list", `nachweis-list--${listVariant}`]}
+    data-component="nachweis-list"
+  >
     {
       props.header && (
         <SectionHeader
+          sectionNumber={sectionNumber}
           heading={props.header.heading}
           subheading={props.header.subheading}
           align={props.header.align ?? "left"}
@@ -274,4 +288,4 @@ if (limit !== undefined && limit > 0) {
       )
     }
   </div>
-</section>
+</SectionShell>

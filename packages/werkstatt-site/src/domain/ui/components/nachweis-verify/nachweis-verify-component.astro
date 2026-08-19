@@ -26,6 +26,7 @@
 
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
 import { cast } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "../section-shell/section-shell.astro";
 import "./nachweis-verify-component.css";
 
 interface NachweisVerifyContent {
@@ -43,9 +44,14 @@ interface NachweisVerifyContent {
     qualificationEvidenceRef?: string;
   };
   verificationLevel?: string;
+  background?: unknown;
+  effects?: unknown;
+  density?: "compact" | "normal" | "spacious";
+  tone?: "default" | "warning" | "success" | "muted";
 }
 
-const { pageOverride } = Astro.props as SectionProps;
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const props = cast<NachweisVerifyContent>(pageOverride);
 const {
   slug,
   version,
@@ -56,87 +62,97 @@ const {
   operatorSignature,
   timestamp,
   verificationLevel,
-} = cast<NachweisVerifyContent>(pageOverride);
+} = props;
 
 const headingId = `nachweis-verify-${slug}-${version}-title`;
 ---
 
-<section class="nachweis-verify" data-component="nachweis-verify" aria-labelledby={headingId}>
-  <h2 id={headingId} class="nachweis-verify__title">
-    Kryptographische Verifikation — Version {version}
-  </h2>
+<SectionShell
+  slug="nachweis-verify"
+  sectionNumber={sectionNumber}
+  background={props.background ?? { kind: "transparent" }}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <div class="nachweis-verify" data-component="nachweis-verify" aria-labelledby={headingId}>
+    <h2 id={headingId} class="nachweis-verify__title">
+      Kryptographische Verifikation — Version {version}
+    </h2>
 
-  <dl class="nachweis-verify__data">
-    <div class="nachweis-verify__entry">
-      <dt>Quell-Hash (SHA-256)</dt>
-      <dd><code class="nachweis-verify__hash">{sourceSha256}</code></dd>
-    </div>
-    {
-      publicDerivativeSha256 && (
-        <div class="nachweis-verify__entry">
-          <dt>Öffentliche Ableitung (SHA-256)</dt>
-          <dd>
-            <code class="nachweis-verify__hash">{publicDerivativeSha256}</code>
-          </dd>
-        </div>
-      )
-    }
-    {
-      recordPayloadSha256 && (
-        <div class="nachweis-verify__entry">
-          <dt>Datensatz-Hash (SHA-256)</dt>
-          <dd>
-            <code class="nachweis-verify__hash">{recordPayloadSha256}</code>
-          </dd>
-        </div>
-      )
-    }
-    {
-      envelopeSha256 && (
-        <div class="nachweis-verify__entry">
-          <dt>Umschlag-Hash (SHA-256)</dt>
-          <dd>
-            <code class="nachweis-verify__hash">{envelopeSha256}</code>
-          </dd>
-        </div>
-      )
-    }
-    {
-      verificationLevel && (
-        <div class="nachweis-verify__entry">
-          <dt>Prüfungsniveau</dt>
-          <dd>{verificationLevel}</dd>
-        </div>
-      )
-    }
-    {
-      timestamp?.tokenPresent && (
-        <div class="nachweis-verify__entry">
-          <dt>
-            {timestamp.assurance === "eidas-qualified"
-              ? "Qualifizierter elektronischer Zeitstempel (eIDAS)"
-              : "RFC 3161-Zeitstempel"}
-          </dt>
-          <dd>
-            {timestamp.providerName && <span>{timestamp.providerName}</span>}
-            {timestamp.qualificationEvidenceRef && (
-              <a href={timestamp.qualificationEvidenceRef} rel="noopener noreferrer">
-                Qualifikationsnachweis
-              </a>
-            )}
-          </dd>
-        </div>
-      )
-    }
-    {
-      operatorSignature && (
-        <div class="nachweis-verify__entry">
-          <dt>Operator-Signatur</dt>
-          <dd>
-            <code class="nachweis-verify__hash">{operatorSignature}</code>
-          </dd>
-        </div>
-      )
-    }
-  </dl>
-</section>
+    <dl class="nachweis-verify__data">
+      <div class="nachweis-verify__entry">
+        <dt>Quell-Hash (SHA-256)</dt>
+        <dd><code class="nachweis-verify__hash">{sourceSha256}</code></dd>
+      </div>
+      {
+        publicDerivativeSha256 && (
+          <div class="nachweis-verify__entry">
+            <dt>Öffentliche Ableitung (SHA-256)</dt>
+            <dd>
+              <code class="nachweis-verify__hash">{publicDerivativeSha256}</code>
+            </dd>
+          </div>
+        )
+      }
+      {
+        recordPayloadSha256 && (
+          <div class="nachweis-verify__entry">
+            <dt>Datensatz-Hash (SHA-256)</dt>
+            <dd>
+              <code class="nachweis-verify__hash">{recordPayloadSha256}</code>
+            </dd>
+          </div>
+        )
+      }
+      {
+        envelopeSha256 && (
+          <div class="nachweis-verify__entry">
+            <dt>Umschlag-Hash (SHA-256)</dt>
+            <dd>
+              <code class="nachweis-verify__hash">{envelopeSha256}</code>
+            </dd>
+          </div>
+        )
+      }
+      {
+        verificationLevel && (
+          <div class="nachweis-verify__entry">
+            <dt>Prüfungsniveau</dt>
+            <dd>{verificationLevel}</dd>
+          </div>
+        )
+      }
+      {
+        timestamp?.tokenPresent && (
+          <div class="nachweis-verify__entry">
+            <dt>
+              {timestamp.assurance === "eidas-qualified"
+                ? "Qualifizierter elektronischer Zeitstempel (eIDAS)"
+                : "RFC 3161-Zeitstempel"}
+            </dt>
+            <dd>
+              {timestamp.providerName && <span>{timestamp.providerName}</span>}
+              {timestamp.qualificationEvidenceRef && (
+                <a href={timestamp.qualificationEvidenceRef} rel="noopener noreferrer">
+                  Qualifikationsnachweis
+                </a>
+              )}
+            </dd>
+          </div>
+        )
+      }
+      {
+        operatorSignature && (
+          <div class="nachweis-verify__entry">
+            <dt>Operator-Signatur</dt>
+            <dd>
+              <code class="nachweis-verify__hash">{operatorSignature}</code>
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+  </div>
+</SectionShell>
