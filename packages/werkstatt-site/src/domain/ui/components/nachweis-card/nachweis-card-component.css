@@ -25,14 +25,10 @@
   border-radius: var(--ds-radius-2);
   background: var(--ds-color-card-bg);
   box-shadow: var(--ds-shadow-sm);
-  transition:
-    box-shadow var(--ds-duration-fast) var(--ds-ease-standard),
-    transform var(--ds-duration-fast) var(--ds-ease-standard);
 }
 
 .nachweis-card:hover {
   box-shadow: var(--ds-shadow-md);
-  transform: translateY(-2px);
 }
 
 /* EffectHost integration: remove conflicting background/border/shadow when glass is active */
