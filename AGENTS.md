@@ -483,6 +483,8 @@ The agent auto-commits after each standalone operator request via `fo-step-commi
 
 This rule is complementary to RFC-0480's per-response `git status` verification, not a replacement. RFC-0480 checks before each response; RFC-0581 is a final safety net at session end. Together with RFC-0575 (session-start pre-flight), they form a bracket: check at start → commit during → verify at end.
 
+**Engineering Checkpoint protocol (RFC-0884):** Session-end closing blocks follow the Engineering Checkpoint protocol. Substantial sessions (architecture, runtime flow, state machines, persistence, public contracts) use a 6-section full checkpoint (Completed, System Delta, Resulting Architecture, Verification, Remaining Issues, Next Step) with an optional Mermaid diagram. Lightweight sessions use a 3-section format (Completed, Verification, Next Step). The agent selects the mode based on what changed, not on session chronology. Diagram selection rules and a quality test self-check are defined in `_shared/fo-session-summary.md`.
+
 **Session-retro language discipline (NON-NEGOTIABLE):** All `fo-session-retro` output — the insight triage table, the `ask_user_question` confirmation prompt, the final summary report, and any inline commentary — MUST be written in `PREFERENCES.md` `aiLanguage`. English templates in the skill are structural placeholders only; the agent MUST translate all headings, column names, labels, and prose to `aiLanguage` before presenting output. Only identifiers (file paths, skill names, RFC/ADR ids, commit hashes) stay untranslated. If `aiLanguage` is `ru`, the triage table heading is «Сортировка инсайтов сессии», not «Session Insight Triage».
 
 ## RFC stamping completion discipline (RFC-0646)
