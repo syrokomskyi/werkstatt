@@ -124,6 +124,22 @@ function hasScoreDimensions(dims: NachweisAssessmentDimension[]): boolean {
 const defaultGlassEffects: Effect[] = [
   { kind: "glass", enabled: true, blur: 16, saturate: 180, tintOpacity: 0.6 },
 ];
+
+const liveCheckUrls: Record<string, (subjectUrl: string) => string> = {
+  "google-lighthouse": (url) => `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}`,
+  cloudflare: (url) => `https://isitagentready.com/${url.replace(/\/$/, "")}`,
+};
+
+function getLiveCheckUrl(
+  providerId: string,
+  subjectUrl: string,
+  override?: string,
+): string | undefined {
+  if (override) return override;
+  const builder = liveCheckUrls[providerId];
+  if (!builder || !subjectUrl) return undefined;
+  return builder(subjectUrl);
+}
 ---
 
 {
@@ -376,6 +392,21 @@ const defaultGlassEffects: Effect[] = [
           </div>
         </dl>
       )}
+
+      {!props.compact &&
+        getLiveCheckUrl(props.provider.id, props.subjectUrl, props.providerReportUrl) && (
+          <a
+            class="nachweis-card__live-check-btn"
+            href={getLiveCheckUrl(props.provider.id, props.subjectUrl, props.providerReportUrl)}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Live-Prüfung
+            <span class="nachweis-card__live-check-arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+        )}
 
       {props.compact && (
         <p class="nachweis-card__meta-compact">

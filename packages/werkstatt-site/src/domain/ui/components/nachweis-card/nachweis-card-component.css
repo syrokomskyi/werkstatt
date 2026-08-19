@@ -412,6 +412,41 @@
   color: var(--ds-color-text-quiet);
 }
 
+/* Live-check button — compact */
+.nachweis-card__live-check-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-accent);
+  text-decoration: none;
+  padding: 0.4em 0.9em;
+  border-radius: var(--ds-radius-1);
+  border: 1px solid var(--ds-color-card-border);
+  background: var(--ds-color-surface);
+  transition:
+    color var(--ds-duration-fast) var(--ds-ease-standard),
+    border-color var(--ds-duration-fast) var(--ds-ease-standard),
+    background var(--ds-duration-fast) var(--ds-ease-standard);
+  margin-bottom: var(--ds-space-3);
+}
+
+.nachweis-card__live-check-btn:hover {
+  color: var(--ds-color-primary);
+  border-color: var(--ds-color-accent);
+  background: var(--ds-color-surface-hover, var(--ds-color-surface));
+}
+
+.nachweis-card__live-check-arrow {
+  font-size: var(--ds-text-sm);
+  transition: transform var(--ds-duration-fast) var(--ds-ease-standard);
+}
+
+.nachweis-card__live-check-btn:hover .nachweis-card__live-check-arrow {
+  transform: translateX(2px);
+}
+
 /* Meta grid */
 .nachweis-card__meta-grid {
   display: grid;
