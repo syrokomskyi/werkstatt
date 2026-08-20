@@ -19,7 +19,8 @@ amends:
   - RFC-0706
   - RFC-0707
   - RFC-0714
-amendedBy: []
+amendedBy:
+  - RFC-0885
 related:
   - ADR-0028
   - ADR-0054
