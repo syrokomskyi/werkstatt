@@ -13,6 +13,7 @@
   <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; update reads to include releases/{release}/**.</item>
   <item>RFC-0842: add leitstand.pipeline.check command for release pipeline state inspection.</item>
   <item>RFC-0866: add leitstand.certify command; add --gate-decision, --candidate-id, --artifact-hash flags to dev-deploy, propagate, promote.</item>
+  <item>Fix description flags for dev-deploy, propagate, promote to include --site (KERNEL-FLAG-06).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -36,7 +37,7 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.dev-deploy",
         description:
-          "Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --site.",
+          "Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --site, [--release].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: false,
@@ -91,7 +92,7 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.propagate",
         description:
-          "Deploy a published release with verified Axiom evidence to the alt channel (RFC-0628). Flags: --release.",
+          "Deploy a published release with verified Axiom evidence to the alt channel (RFC-0628). Flags: --site, --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -142,7 +143,7 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.promote",
         description:
-          "Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --release.",
+          "Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --site, --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
