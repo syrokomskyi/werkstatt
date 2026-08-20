@@ -16,6 +16,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0876: add discriminated union with technical-assessment variant.</item>
+  <item>RFC-0887: add website link indicator to attestation variant.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -54,6 +55,9 @@ interface NachweisAttestationCardProps {
   status: "draft" | "preview" | "published" | "withdrawn";
   verifiedByLabel?: string;
   verifiedDate?: string;
+  // RFC-0887: display control and website link
+  display?: { websiteLink: "visible" | "hidden" };
+  websiteUrl?: string;
 }
 
 interface NachweisTechnicalAssessmentCardProps {
@@ -86,6 +90,20 @@ type NachweisCardProps = NachweisAttestationCardProps | NachweisTechnicalAssessm
 const props = Astro.props as NachweisCardProps;
 
 const headingId = `nachweis-card-${props.slug}-title`;
+
+// RFC-0887: website link indicator (attestation variant only)
+const showWebsiteLink =
+  props.variant === "attestation" && props.display?.websiteLink === "visible" && props.websiteUrl;
+const websiteDomain =
+  props.variant === "attestation" && props.websiteUrl ? safeHostname(props.websiteUrl) : undefined;
+
+function safeHostname(url: string): string | undefined {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return undefined;
+  }
+}
 
 function formatDate(iso: string): string {
   try {
@@ -224,6 +242,21 @@ function getLiveCheckUrl(
           <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
         )}
       </p>
+
+      {showWebsiteLink && websiteDomain && (
+        <a
+          class="nachweis-card__website-link"
+          href={props.websiteUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          aria-label={`Website besuchen: ${websiteDomain}`}
+        >
+          <span class="nachweis-card__website-link-icon" aria-hidden="true">
+            ↗
+          </span>
+          {websiteDomain}
+        </a>
+      )}
     </EffectHost>
   )
 }
