@@ -823,11 +823,12 @@
 .nachweis-card__website-link {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.3em;
+  gap: 0.15em;
   margin: 0;
   font-size: var(--ds-text-sm);
   color: var(--ds-color-text-primary);
   text-decoration: underline;
+  white-space: nowrap;
 }
 
 .nachweis-card__website-link-arrow {
