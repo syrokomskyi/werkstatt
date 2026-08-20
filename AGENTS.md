@@ -310,3 +310,23 @@ Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guar
 - **Deterministic observedAt:** Set from `result.scan.finishedAt` or `result.scan.createdAt`, not `new Date()`.
 - **Raw artifacts:** `cloudflare-submission.json` and `cloudflare-result.json` are preserved as bundle artifacts.
 - **No duplication:** Same as Lighthouse — the adapter produces an `AssessmentBundleV1` and calls `runNachweisAssessmentIngest` directly.
+
+## nachweis.consent.update and display↔consent coupling (RFC-0886)
+
+`nachweis.consent.update` requires a `--scope` flag (`document|screenshot|websiteLink`) and updates `consentScope[scope]` instead of the removed `consentStatus`. The publication gate enforces display↔consent consistency via the `display-consent-consistent` condition (required for `attestation-v1` only).
+
+- **`--scope` is required:** The command fails if `--scope` is missing or not one of `document`, `screenshot`, `websiteLink`.
+- **Per-aspect consent:** Each aspect (`document`, `screenshot`, `websiteLink`) is updated independently. Updating one scope preserves the others.
+- **Gate logic:** `consent-granted` and `display-consent-consistent` pass when every display aspect that is `"visible"` has `consentScope[aspect].status === "granted"`. When no aspects are visible (or `display` is absent), both conditions pass (vacuous truth — grandfathered for pre-RFC-0885 records).
+- **Policy scope:** `display-consent-consistent` is required only for `attestation-v1`. It is NOT required for `operational-measurement-v1` or `technical-assessment-v1`.
+- **Validation:** `nachweis.validate` reports `NACHWEIS-DISPLAY-CONSENT-01` violations when a visible display aspect lacks granted consent.
+
+## nachweis.screenshot.upload (RFC-0886)
+
+`nachweis.screenshot.upload` uploads a website screenshot to R2 and updates `EvidenceSource.websiteScreenshot`.
+
+- **Supported extensions:** `.webp`, `.png`, `.jpg`, `.jpeg`. Other extensions fail with an error.
+- **R2 path:** `{systemId}/screenshots/{slug}/website-screenshot{ext}` — separate from evidence PDF paths (`{systemId}/public/...`).
+- **SHA-256:** Computed from the file, stored in `websiteScreenshot.sha256`.
+- **Dry-run:** `--dry-run` skips R2 upload and entity update, returns the computed hash and R2 key.
+- **Bordbuch:** Appends a `nachweis-record` entry with `screenshotSha256` and `mediaType` metadata.

@@ -585,7 +585,7 @@ describe("RFC-0707: nachweis.consent.update", () => {
   it("skips silently when nachweis entitlement is not resolved", async () => {
     const { runNachweisConsentUpdate } = await import("../nachweis/nachweis-consent.ts");
     const result = await runNachweisConsentUpdate(
-      makeInput({ system: "test-sys", "consent-id": "test", status: "granted" }),
+      makeInput({ system: "test-sys", "consent-id": "test", scope: "document", status: "granted" }),
       makeContext("test-sys"),
     );
     expect(result.exitCode).toBe(0);
@@ -617,6 +617,7 @@ describe("RFC-0707: nachweis.consent.update", () => {
       makeInput({
         system: "test-sys",
         "consent-id": "test-consent",
+        scope: "document",
         status: "granted",
         method: "verified_business_email",
       }),
@@ -676,6 +677,8 @@ describe("RFC-0707: nachweis.publish", () => {
       titleDe: "Test",
       titleUk: "Тест",
       items: { main: { sha256: "a".repeat(64) } },
+      // RFC-0886: display field required for consent-granted to be evaluated
+      display: { document: "visible", screenshot: "hidden", websiteLink: "hidden" },
     });
 
     const { runNachweisPublish } = await import("../nachweis/nachweis-publish.ts");

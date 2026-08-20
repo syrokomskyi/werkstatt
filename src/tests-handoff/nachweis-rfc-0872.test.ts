@@ -538,6 +538,8 @@ describe("RFC-0872: nachweis.validate gate V2", () => {
       titleDe: "Cert",
       titleUk: "Cert",
       items: { main: { sha256: SHA256_A } },
+      // RFC-0886: display field required for consent-granted to be evaluated
+      display: { document: "visible", screenshot: "hidden", websiteLink: "hidden" },
     });
 
     const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
