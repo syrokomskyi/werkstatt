@@ -1,9 +1,9 @@
-# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt
-# Extracts packages/werkstatt from the werkstatt monorepo into a standalone private repo.
+# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-knowledge
+# Extracts packages/werkstatt-knowledge from the werkstatt monorepo into a standalone private repo.
 # RFC-0773: Engine publication pipeline via repo-extract to private npm.
 
-projectDir: packages/werkstatt
-destName: werkstatt
+projectDir: packages/werkstatt-knowledge
+destName: werkstatt-knowledge
 standalone: true
 
 workspacePrefixes:
@@ -11,9 +11,8 @@ workspacePrefixes:
 stripScopes:
   - "@warpgogol/"
 preservePackages:
+  - "@warpgogol/werkstatt-knowledge"
   - "@warpgogol/werkstatt"
-  - "@warpgogol/werkstatt-shared"
-  - "@warpgogol/forge"
 packageManager: "pnpm"
 
 ci:
@@ -36,5 +35,5 @@ postProcess:
     path: AGENTS.md
 
 git:
-  remote: git@github.com:syrokomskyi/werkstatt.git
+  remote: git@github.com:syrokomskyi/werkstatt-knowledge.git
   autoPush: true
