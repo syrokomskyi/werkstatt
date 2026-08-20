@@ -1127,6 +1127,36 @@ export async function runLeitstandPromote(
   const channelConfig = depConfig.channels.main;
   const secretsFilePath = resolveSecretsFilePath(context.workspaceRoot, channelConfig);
 
+  // RFC-0896: Register custom domain DNS + Workers route and www → apex redirect
+  // before deploying to the main channel. Both commands are idempotent.
+  try {
+    const { runCustomdomainRegister } = await import("../customdomain/customdomain-register.ts");
+    const { runRedirectRegister } = await import("../customdomain/redirect-register.ts");
+    const customdomainInput: KernelCommandInput = {
+      flags: { site: systemId },
+      argv: [],
+    };
+    await runCustomdomainRegister(customdomainInput, context);
+    await runRedirectRegister(customdomainInput, context);
+  } catch (err) {
+    return {
+      data: {
+        releaseId,
+        systemId,
+        channel: "main",
+        deploymentUrl: "",
+        state: "failed",
+        buildIdentityVerified: false,
+        testEvidenceVerified: false,
+        healthState: "unknown",
+        releaseState: "promoted",
+        failingPhase: "custom-domain-setup",
+      },
+      summary: `[leitstand.promote] custom domain setup failed: ${err instanceof Error ? err.message : String(err)}`,
+      exitCode: 1,
+    } as unknown as KernelCommandResult<LeitstandPromoteData>;
+  }
+
   const { executeDeployPhases } = await import("./deploy-execution.ts");
   const deployResult = await executeDeployPhases(
     {
