@@ -381,19 +381,10 @@
   font-size: var(--ds-text-4);
   font-weight: var(--ds-font-weight-bold);
   font-variant-numeric: tabular-nums;
+  color: var(--ds-color-text);
 }
 
-.nachweis-card__score-bar[data-range="good"] .nachweis-card__score-bar-score {
-  color: var(--ds-color-success-solid);
-}
-
-.nachweis-card__score-bar[data-range="fair"] .nachweis-card__score-bar-score {
-  color: var(--ds-color-status-fair);
-}
-
-.nachweis-card__score-bar[data-range="poor"] .nachweis-card__score-bar-score {
-  color: var(--ds-color-danger-bright);
-}
+/* Score color kept neutral (text color) for both modes */
 
 .nachweis-card__score-bar-frac {
   font-size: var(--ds-text-xs);
@@ -483,14 +474,7 @@
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-font-weight-bold);
   font-variant-numeric: tabular-nums;
-}
-
-.nachweis-card__check-item[data-status="pass"] .nachweis-card__check-score {
-  color: var(--ds-color-success-solid);
-}
-
-.nachweis-card__check-item[data-status="fail"] .nachweis-card__check-score {
-  color: var(--ds-color-danger-bright);
+  color: var(--ds-color-text);
 }
 
 .nachweis-card__check-item[data-status="not-checked"] .nachweis-card__check-score {
