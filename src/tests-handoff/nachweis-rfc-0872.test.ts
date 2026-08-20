@@ -910,11 +910,13 @@ describe("RFC-0872: PBP evidence-source schema", () => {
       status: "draft",
       name: "Test Entity",
       kind: "technical-assessment",
+      slug: "tech-assessment-001",
       authority: { kind: "test" },
       items: {
         raw: { role: "raw-result", canonical: true, sha256: SHA256_A },
       },
       assessment: makeAssessment(),
+      display: { document: "visible", screenshot: "hidden", websiteLink: "hidden" },
       ...overrides,
     };
   }
