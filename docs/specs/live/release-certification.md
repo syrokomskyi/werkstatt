@@ -86,6 +86,9 @@ history:
   - rfc: RFC-0848
     mergedAt: 2026-08-20
     operation: modified
+  - rfc: RFC-0848
+    mergedAt: 2026-08-20
+    operation: modified
 ---
 
 <!--
@@ -127,6 +130,7 @@ history:
 
 
 
+
 | Order | RFC | One-session responsibility | Completion boundary |
 | --: | --- | --- | --- |
 | 1 | RFC-0849 | bounded canonical snapshot, bytes, hash, Unicode and resource limits | engine fingerprint tests/fixtures and DNA-53 correction pass |
@@ -138,6 +142,7 @@ history:
 
 RFC-0850 must complete before RFC-0851; both follow RFC-0853 and the component-runtime prerequisites declared in their frontmatter. Each child receives its own audit, architecture acceptance, plan, implementation, review, and fix cycle. RFC-0848 receives no child code changes except corrections required by an actual integration defect; such a defect is fixed in its owning child module and verified here.
 ### CLI surface
+
 
 
 
@@ -216,6 +221,7 @@ bash scripts/check-clean-trees.sh
 
 
 
+
 The integration suite uses only public child APIs and synthetic fixtures. It proves:
 
 1. all Diagnostic and certification values are parsed by RFC-0852/RFC-0853 and snapshotted by RFC-0849 before identity/evaluation/state use;
@@ -229,6 +235,7 @@ The integration suite uses only public child APIs and synthetic fixtures. It pro
 9. the transition block executes before every old site command side effect;
 10. site Diagnostic values parse through the RFC-0852 engine-owned schema and engine source has no plugin import.
 ### Scale and false-positive contract
+
 
 
 
@@ -287,6 +294,7 @@ All required schema, identity, aggregation, legacy, and transition diagnostics h
 
 
 
+
 | Path | RFC-0848 responsibility |
 | --- | --- |
 | `packages/werkstatt/src/tests/certification-foundation.integration.test.ts` | Cross-child identity/evaluation/state and negative legacy laws |
@@ -299,6 +307,7 @@ All required schema, identity, aggregation, legacy, and transition diagnostics h
 
 The integration RFC does not edit mission workpieces, Sternsystem mirrors, releases, provider state, object storage, or the public site.
 ### Exact Compass and agent-document map
+
 
 
 
@@ -371,10 +380,12 @@ Generated projections are updated from owners: `command.manifest.generate` then 
 
 
 
+
 The integration suite produces ordinary Vitest results; it defines no runtime JSON protocol. Runtime output contracts are owned by the children. An integration failure names the violated cross-module law and owning RFC/module so a weaker agent fixes the source rather than adding a bridge.
 
 Stable integration-only test labels use `CERT-INTEGRATION-*`; production code must not emit them. Any mismatch fails CI/tests. There is no warn mode, suppression file, migration allowance, or “expected legacy pass.”
 ### Failure modes
+
 
 
 

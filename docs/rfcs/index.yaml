@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-20
-count: 872
+count: 877
 entries:
   - id: ""
     title: ""
@@ -17108,10 +17108,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0888-add-sichtpass-bordbuch-event-kind.md
   - id: RFC-0890
     title: Raw website screenshot ingestion and archival for Nachweis evidence
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-20
-    implementedAt: ""
+    implementedAt: 2026-08-20
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17123,19 +17123,18 @@ entries:
       - RFC-0887
       - DNA-46
       - DNA-59
-    file: docs/rfcs/rfc-0890-raw-website-screenshot-ingestion-and-archival.md
+    file: docs/rfcs/archive/implemented/rfc-0890-raw-website-screenshot-ingestion-and-archival.md
   - id: RFC-0891
     title: Website screenshot processing and 16:9 display variant generation for
       Nachweis
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-20
-    implementedAt: ""
+    implementedAt: 2026-08-20
     closedAt: ""
     supersedes: []
     supersededBy: ""
-    amends:
-      - RFC-0886
+    amends: []
     amendedBy: []
     related:
       - RFC-0885
@@ -17144,4 +17143,90 @@ entries:
       - RFC-0890
       - DNA-46
       - DNA-59
-    file: docs/rfcs/rfc-0891-website-screenshot-processing-and-display-variant-generation.md
+    file: docs/rfcs/archive/implemented/rfc-0891-website-screenshot-processing-and-display-variant-generation.md
+  - id: RFC-0892
+    title: Website meta fields for Nachweis attestation cards
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: 2026-08-20
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0885
+      - RFC-0887
+      - RFC-0891
+    file: docs/rfcs/archive/implemented/rfc-0892-website-meta-fields-for-nachweis-cards.md
+  - id: RFC-0893
+    title: Add icon.references.validate command for build-time vendor icon existence
+      checks
+    status: implemented
+    kind: command
+    createdAt: 2026-08-20
+    implementedAt: 2026-08-20
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0100
+      - RFC-0103
+      - RFC-0104
+    file: docs/rfcs/archive/implemented/rfc-0893-add-icon-references-validate-command.md
+  - id: RFC-0894
+    title: Add werkstatt-knowledge plugin for evidence-backed knowledge systems
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: 2026-08-20
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0770
+      - RFC-0776
+      - RFC-0777
+    file: docs/rfcs/archive/implemented/rfc-0894-add-werkstatt-knowledge-plugin.md
+  - id: RFC-0895
+    title: Switch site rollback to native Cloudflare wrangler rollback and unify
+      with service rollback
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: 2026-08-20
+    closedAt: ""
+    supersedes:
+      - RFC-0865
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-49
+      - DNA-52
+      - DNA-73
+      - RFC-0806
+      - RFC-0865
+      - RFC-0851
+    file: docs/rfcs/archive/implemented/rfc-0895-switch-site-rollback-to-native-cloudflare-wrangler-rollback-and-unify-with-service-rollback.md
+  - id: RFC-0896
+    title: Add custom domain DNS and www redirect management for site deployments
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: 2026-08-20
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0752
+      - RFC-0753
+      - DNA-73
+    file: docs/rfcs/archive/implemented/rfc-0896-add-custom-domain-dns-and-www-redirect-management-for-site-deployments.md
