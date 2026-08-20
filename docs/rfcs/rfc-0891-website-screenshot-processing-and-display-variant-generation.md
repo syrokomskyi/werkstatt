@@ -1,7 +1,7 @@
 ---
 id: RFC-0891
 title: "Website screenshot processing and 16:9 display variant generation for Nachweis"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
