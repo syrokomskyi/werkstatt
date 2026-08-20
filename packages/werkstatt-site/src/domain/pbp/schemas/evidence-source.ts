@@ -154,6 +154,8 @@ const pbpWebsiteScreenshotSchema = z.object({
   mediaType: nonEmptyString,
   storage: z.enum(["private", "public"]),
   url: nonEmptyString.optional(),
+  // RFC-0887: capture date for UI display
+  capturedAt: nonEmptyString.optional(),
 });
 
 // ADR-0056: Nachweis evidence kinds that require a mandatory slug at schema level.

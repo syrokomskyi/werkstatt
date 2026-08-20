@@ -122,6 +122,8 @@ export interface PbpWebsiteScreenshot {
   mediaType: string;
   storage: "private" | "public";
   url?: string;
+  // RFC-0887: capture date for UI display
+  capturedAt?: string;
 }
 
 export interface PbpEvidenceSource extends PbpEntity {
