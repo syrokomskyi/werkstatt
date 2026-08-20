@@ -49,9 +49,7 @@ import {
   resolveNachweisCachePath,
   resolvePbpEntityDir,
   resolveDefaultLang,
-  resolveNachweisPublicationPolicy,
   evaluateGateV2,
-  validateAssessmentMetadata,
   isValidSha256Hex,
   type NachweisPublicationGateV2,
   type NachweisValidateResult,
@@ -137,7 +135,7 @@ export async function runNachweisValidate(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<NachweisValidateResult>> {
-  const { workspaceRoot, logger } = context;
+  const { workspaceRoot } = context;
   const systemId = flagString(input, "system") ?? context.site?.name;
   if (!systemId) throw new Error("[nachweis.validate] --system is required");
 

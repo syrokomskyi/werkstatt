@@ -3,7 +3,6 @@ import {
   digestSchema,
   operationIdSchema,
   eventIdSchema,
-  schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
   authoritySequenceSchema,
@@ -47,9 +46,7 @@ export const deploymentOperationStateV1Schema = z
   })
   .strict();
 
-export type DeploymentOperationStateV1 = z.infer<
-  typeof deploymentOperationStateV1Schema
->;
+export type DeploymentOperationStateV1 = z.infer<typeof deploymentOperationStateV1Schema>;
 
 export const deploymentOperationEventV1Schema = z
   .object({
@@ -81,6 +78,4 @@ export const deploymentOperationEventV1Schema = z
   })
   .strict();
 
-export type DeploymentOperationEventV1 = z.infer<
-  typeof deploymentOperationEventV1Schema
->;
+export type DeploymentOperationEventV1 = z.infer<typeof deploymentOperationEventV1Schema>;

@@ -5,11 +5,7 @@ import {
   TEST_MODE_SENTINEL,
   type TrustedFixture,
 } from "../testing/harness.ts";
-import type {
-  ConformanceScenarioV1,
-  ConformanceEventV1,
-  ConformanceExpectationV1,
-} from "../conformance.ts";
+import type { ConformanceScenarioV1 } from "../conformance.ts";
 import type {
   ComponentManifestV1,
   ComponentId,
@@ -18,7 +14,6 @@ import type {
   ResolvedComponentIdentityV1,
 } from "../../component/contracts.ts";
 import { computeSetHash } from "../../component/identity.ts";
-import { type ResolutionInputV1 } from "../resolver.ts";
 import type { Sha256Digest } from "../../fingerprint/primitives.ts";
 
 const VALID_SHA = ("sha256:" + "a".repeat(64)) as Sha256Digest;

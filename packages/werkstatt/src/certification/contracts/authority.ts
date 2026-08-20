@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
   digestSchema,
-  schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
   authoritySequenceSchema,
@@ -31,9 +30,7 @@ export const attestationVerificationV1Schema = z
   })
   .strict();
 
-export type AttestationVerificationV1 = z.infer<
-  typeof attestationVerificationV1Schema
->;
+export type AttestationVerificationV1 = z.infer<typeof attestationVerificationV1Schema>;
 
 export const signedDecisionV1Schema = z
   .object({
@@ -71,9 +68,7 @@ export const operationAuthorizationV1Schema = z
   })
   .strict();
 
-export type OperationAuthorizationV1 = z.infer<
-  typeof operationAuthorizationV1Schema
->;
+export type OperationAuthorizationV1 = z.infer<typeof operationAuthorizationV1Schema>;
 
 export const nonAuthoritativePreviewV1Schema = z
   .object({
@@ -86,6 +81,4 @@ export const nonAuthoritativePreviewV1Schema = z
   })
   .strict();
 
-export type NonAuthoritativePreviewV1 = z.infer<
-  typeof nonAuthoritativePreviewV1Schema
->;
+export type NonAuthoritativePreviewV1 = z.infer<typeof nonAuthoritativePreviewV1Schema>;

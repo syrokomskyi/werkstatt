@@ -221,6 +221,7 @@ test("pin writes system.pin.json and activates the system", async () => {
     "rfc-0548",
     "rfc-0572",
     "rfc-0757",
+    "rfc-0885",
   ]);
 });
 

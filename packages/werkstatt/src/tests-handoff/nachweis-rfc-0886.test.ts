@@ -220,7 +220,7 @@ async function readPbpEntity(
   return data as Record<string, unknown>;
 }
 
-async function writeBordbuchEntry(
+async function _writeBordbuchEntry(
   cachePath: string,
   entry: Record<string, unknown>,
 ): Promise<void> {

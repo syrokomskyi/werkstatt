@@ -3,7 +3,6 @@ import type {
   ComponentId,
   CapabilityId,
   CapabilityProvideV1,
-  CapabilityRequireV1,
   ResolvedComponentIdentityV1,
   ResolvedComponentSetV1,
 } from "../component/contracts.ts";
@@ -16,10 +15,7 @@ import {
   computeIsolationPolicyHash,
 } from "../component/identity.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
-import type {
-  ResolutionViolationV1,
-  ResolutionProofV1,
-} from "./resolution-proof.ts";
+import type { ResolutionViolationV1, ResolutionProofV1 } from "./resolution-proof.ts";
 import { createResolutionProof } from "./resolution-proof.ts";
 
 export interface ComponentArtifactIndexV1 {
@@ -108,7 +104,9 @@ function detectCycle(
     adj.get(e.from)?.push(e.to);
   }
 
-  const WHITE = 0, GRAY = 1, BLACK = 2;
+  const WHITE = 0,
+    GRAY = 1,
+    BLACK = 2;
   const color = new Map<ComponentId, number>();
   for (const id of componentIds) {
     color.set(id, WHITE);
@@ -162,9 +160,7 @@ function topologicalSort(
     adj.get(e.from)?.push(e.to);
   }
 
-  const queue: ComponentId[] = componentIds
-    .filter((id) => (inDegree.get(id) ?? 0) === 0)
-    .sort();
+  const queue: ComponentId[] = componentIds.filter((id) => (inDegree.get(id) ?? 0) === 0).sort();
 
   const order: ComponentId[] = [];
   const depth = new Map<ComponentId, number>();
@@ -241,9 +237,7 @@ export function resolve(input: ResolutionInputV1): ResolutionResultV1 {
   }
 
   // 3. Check admitted grants
-  const admittedSet = new Set(
-    input.admittedGrants.admitted.map((g) => `${g.scope}:${g.resource}`),
-  );
+  const admittedSet = new Set(input.admittedGrants.admitted.map((g) => `${g.scope}:${g.resource}`));
   for (const manifest of input.desired) {
     for (const grant of manifest.requestedGrants) {
       const key = `${grant.scope}:${grant.resource}`;
@@ -279,9 +273,10 @@ export function resolve(input: ResolutionInputV1): ResolutionResultV1 {
         continue;
       }
 
-      const compatible = providers.filter((p) =>
-        semverSatisfies(p.provide.version, req.compatibility) &&
-        p.provide.schemaHash === req.schemaHash,
+      const compatible = providers.filter(
+        (p) =>
+          semverSatisfies(p.provide.version, req.compatibility) &&
+          p.provide.schemaHash === req.schemaHash,
       );
 
       if (compatible.length === 0) {
@@ -343,10 +338,12 @@ export function resolve(input: ResolutionInputV1): ResolutionResultV1 {
   }
 
   // 7. Build resolved set
-  const manifestMap = new Map(componentIds.map((id) => {
-    const m = input.desired.find((d) => d.componentId === id)!;
-    return [id, m] as const;
-  }));
+  const manifestMap = new Map(
+    componentIds.map((id) => {
+      const m = input.desired.find((d) => d.componentId === id)!;
+      return [id, m] as const;
+    }),
+  );
 
   const resolvedComponents: ResolvedComponentIdentityV1[] = order.map((id) => {
     const m = manifestMap.get(id)!;

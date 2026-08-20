@@ -15,14 +15,16 @@ import type {
   QualitativeRubricV1,
   ChangeProfileV1,
   RiskRuleV1,
-  CoverageManifestV1,
 } from "../certification/evaluators/index.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import type { EvidenceEnvelopeV1 } from "../certification/index.ts";
 
-const D = "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
-const D1 = "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
-const _D2 = "sha256:2222222222222222222222222222222222222222222222222222222222222222" as string as Sha256Digest;
+const D =
+  "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
+const D1 =
+  "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
+const _D2 =
+  "sha256:2222222222222222222222222222222222222222222222222222222222222222" as string as Sha256Digest;
 const TS = "2026-08-15T12:00:00Z";
 
 function mkRubric(): QualitativeRubricV1 {
@@ -31,8 +33,20 @@ function mkRubric(): QualitativeRubricV1 {
     rubricId: "rubric-001",
     version: "1.0.0",
     criteria: [
-      { criterionId: "crit-001", title: "Clarity", description: "Content is clear", dimension: "ux-conversion", weight: 1.0 },
-      { criterionId: "crit-002", title: "Accuracy", description: "Content is accurate", dimension: "business-truth-compliance", weight: 1.5 },
+      {
+        criterionId: "crit-001",
+        title: "Clarity",
+        description: "Content is clear",
+        dimension: "ux-conversion",
+        weight: 1.0,
+      },
+      {
+        criterionId: "crit-002",
+        title: "Accuracy",
+        description: "Content is accurate",
+        dimension: "business-truth-compliance",
+        weight: 1.5,
+      },
     ],
   };
 }
@@ -123,7 +137,11 @@ describe("createEvaluatorRegistry", () => {
 
 describe("routeRisk", () => {
   const criticalRules: RiskRuleV1[] = [
-    { ruleId: "r1", dimension: "security-operational-readiness", description: "security changes are critical" },
+    {
+      ruleId: "r1",
+      dimension: "security-operational-readiness",
+      description: "security changes are critical",
+    },
   ];
   const borderlineRules: RiskRuleV1[] = [
     { ruleId: "r2", dimension: "ux-conversion", description: "UX changes are borderline" },
@@ -271,7 +289,13 @@ describe("validateEvaluatorPayload", () => {
   it("fails on unknown criterion", () => {
     const payload = mkPayload("e1", {
       criteria: [
-        { criterionId: "unknown-crit", verdict: "pass", rationale: "test", diagnosticIds: [], evidenceAnchors: [] },
+        {
+          criterionId: "unknown-crit",
+          verdict: "pass",
+          rationale: "test",
+          diagnosticIds: [],
+          evidenceAnchors: [],
+        },
       ],
     });
     const result = validateEvaluatorPayload(payload, D, mkRubric());
@@ -284,7 +308,13 @@ describe("validateEvaluatorPayload", () => {
   it("fails on empty rationale (ungrounded prose)", () => {
     const payload = mkPayload("e1", {
       criteria: [
-        { criterionId: "crit-001", verdict: "pass", rationale: "  ", diagnosticIds: [], evidenceAnchors: [] },
+        {
+          criterionId: "crit-001",
+          verdict: "pass",
+          rationale: "  ",
+          diagnosticIds: [],
+          evidenceAnchors: [],
+        },
       ],
     });
     const result = validateEvaluatorPayload(payload, D, mkRubric());
@@ -367,7 +397,9 @@ describe("executeEvaluators", () => {
 
   it("fails when evaluator throws", async () => {
     const reg = createEvaluatorRegistry();
-    reg.register(mkIdentity("e1"), async () => { throw new Error("evaluator crashed"); });
+    reg.register(mkIdentity("e1"), async () => {
+      throw new Error("evaluator crashed");
+    });
 
     const result = await executeEvaluators(reg, {
       evaluatorIds: ["e1"],
@@ -420,12 +452,7 @@ describe("executeEvaluators", () => {
 
 describe("buildCoverageManifest", () => {
   it("builds coverage manifest from routes/states/viewports", () => {
-    const manifest = buildCoverageManifest(
-      ["/", "/about"],
-      ["default"],
-      ["desktop", "mobile"],
-      [],
-    );
+    const manifest = buildCoverageManifest(["/", "/about"], ["default"], ["desktop", "mobile"], []);
     expect(manifest.combinations).toHaveLength(4);
     expect(manifest.combinations[0].covered).toBe(false);
     expect(manifest.combinations[0].evidenceId).toBeNull();

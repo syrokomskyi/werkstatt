@@ -13,11 +13,12 @@ import {
   type HealthRequirementResultV1,
   type ScheduleWindowV1,
   type MonitorRecoveryStateV1,
-  type CertificationHealth,
 } from "../certification/health/monitor.ts";
 
-const _D = "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
-const _D1 = "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
+const _D =
+  "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
+const _D1 =
+  "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
 const TS = "2026-08-15T12:00:00Z";
 const TS2 = "2026-08-15T13:00:00Z";
 
@@ -35,9 +36,7 @@ function mkReqResult(
   };
 }
 
-function mkHealthInput(
-  overrides: Partial<HealthEvaluationInputV1> = {},
-): HealthEvaluationInputV1 {
+function mkHealthInput(overrides: Partial<HealthEvaluationInputV1> = {}): HealthEvaluationInputV1 {
   return {
     candidateId: "cand-001",
     assessedAt: TS,
@@ -84,9 +83,7 @@ describe("evaluateHealth", () => {
     const result = evaluateHealth(
       mkHealthInput({
         sharedOutageDetected: true,
-        requirementResults: [
-          mkReqResult({ requirementId: "req-001", status: "fail" }),
-        ],
+        requirementResults: [mkReqResult({ requirementId: "req-001", status: "fail" })],
       }),
     );
     expect(result.ok).toBe(true);
@@ -100,9 +97,7 @@ describe("evaluateHealth", () => {
   it("returns degraded with retry for stale requirements", () => {
     const result = evaluateHealth(
       mkHealthInput({
-        requirementResults: [
-          mkReqResult({ requirementId: "req-001", status: "stale" }),
-        ],
+        requirementResults: [mkReqResult({ requirementId: "req-001", status: "stale" })],
       }),
     );
     expect(result.ok).toBe(true);
@@ -145,9 +140,7 @@ describe("evaluateHealth", () => {
   it("returns degraded with retry for incomplete requirements", () => {
     const result = evaluateHealth(
       mkHealthInput({
-        requirementResults: [
-          mkReqResult({ requirementId: "req-001", status: "incomplete" }),
-        ],
+        requirementResults: [mkReqResult({ requirementId: "req-001", status: "incomplete" })],
       }),
     );
     expect(result.ok).toBe(true);
@@ -159,9 +152,7 @@ describe("evaluateHealth", () => {
   });
 
   it("rejects empty requirement results", () => {
-    const result = evaluateHealth(
-      mkHealthInput({ requirementResults: [] }),
-    );
+    const result = evaluateHealth(mkHealthInput({ requirementResults: [] }));
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.ruleId).toBe("CERT-HEALTH-01");
@@ -172,9 +163,7 @@ describe("evaluateHealth", () => {
     const result = evaluateHealth(
       mkHealthInput({
         sharedOutageDetected: true,
-        requirementResults: [
-          mkReqResult({ requirementId: "req-001", status: "stale" }),
-        ],
+        requirementResults: [mkReqResult({ requirementId: "req-001", status: "stale" })],
       }),
     );
     expect(result.ok).toBe(true);
@@ -213,40 +202,32 @@ describe("classifyDriftCause", () => {
   });
 
   it("classifies expired evidence", () => {
-    expect(
-      classifyDriftCause(mkReqResult({ evidenceExpired: true }), false),
-    ).toBe("expired-evidence");
+    expect(classifyDriftCause(mkReqResult({ evidenceExpired: true }), false)).toBe(
+      "expired-evidence",
+    );
   });
 
   it("classifies TTL exceeded", () => {
-    expect(
-      classifyDriftCause(mkReqResult({ ttlExceeded: true }), false),
-    ).toBe("expired-evidence");
+    expect(classifyDriftCause(mkReqResult({ ttlExceeded: true }), false)).toBe("expired-evidence");
   });
 
   it("classifies candidate regression", () => {
-    expect(
-      classifyDriftCause(mkReqResult({ status: "fail" }), false),
-    ).toBe("candidate-specific-regression");
+    expect(classifyDriftCause(mkReqResult({ status: "fail" }), false)).toBe(
+      "candidate-specific-regression",
+    );
   });
 
   it("classifies public output drift", () => {
-    expect(
-      classifyDriftCause(mkReqResult({ status: "stale" }), false),
-    ).toBe("public-output-drift");
+    expect(classifyDriftCause(mkReqResult({ status: "stale" }), false)).toBe("public-output-drift");
   });
 
   it("classifies late evidence", () => {
-    expect(
-      classifyDriftCause(mkReqResult({ status: "incomplete" }), false),
-    ).toBe("late-evidence");
+    expect(classifyDriftCause(mkReqResult({ status: "incomplete" }), false)).toBe("late-evidence");
   });
 });
 
 describe("evaluateScheduleWindow", () => {
-  function mkWindow(
-    overrides: Partial<ScheduleWindowV1> = {},
-  ): ScheduleWindowV1 {
+  function mkWindow(overrides: Partial<ScheduleWindowV1> = {}): ScheduleWindowV1 {
     return {
       windowId: "win-001",
       startedAt: TS,
@@ -282,10 +263,7 @@ describe("evaluateScheduleWindow", () => {
       startedAt: TS,
       completedAt: TS2,
     });
-    const result = evaluateScheduleWindow(
-      mkWindow({ startedAt: TS }),
-      [prior],
-    );
+    const result = evaluateScheduleWindow(mkWindow({ startedAt: TS }), [prior]);
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.effective).toBe(false);
@@ -299,10 +277,9 @@ describe("evaluateScheduleWindow", () => {
       startedAt: TS,
       completedAt: TS,
     });
-    const result = evaluateScheduleWindow(
-      mkWindow({ windowId: "win-001", startedAt: TS2 }),
-      [prior],
-    );
+    const result = evaluateScheduleWindow(mkWindow({ windowId: "win-001", startedAt: TS2 }), [
+      prior,
+    ]);
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.effective).toBe(true);
@@ -345,23 +322,15 @@ describe("buildHealthDecision", () => {
 
 describe("buildHealthProjection", () => {
   it("builds a projection with deterministic hash", () => {
-    const p1 = buildHealthProjection(
-      "cand-001", "current", "dec-001", TS, [], 0, TS,
-    );
-    const p2 = buildHealthProjection(
-      "cand-001", "current", "dec-001", TS, [], 0, TS,
-    );
+    const p1 = buildHealthProjection("cand-001", "current", "dec-001", TS, [], 0, TS);
+    const p2 = buildHealthProjection("cand-001", "current", "dec-001", TS, [], 0, TS);
     expect(p1.schema).toBe("werkstatt/health-projection@1");
     expect(p1.projectionHash).toBe(p2.projectionHash);
   });
 
   it("produces different hash for different health", () => {
-    const p1 = buildHealthProjection(
-      "cand-001", "current", "dec-001", TS, [], 0, TS,
-    );
-    const p2 = buildHealthProjection(
-      "cand-001", "degraded", "dec-001", TS, [], 1, TS,
-    );
+    const p1 = buildHealthProjection("cand-001", "current", "dec-001", TS, [], 0, TS);
+    const p2 = buildHealthProjection("cand-001", "degraded", "dec-001", TS, [], 1, TS);
     expect(p1.projectionHash).not.toBe(p2.projectionHash);
   });
 });

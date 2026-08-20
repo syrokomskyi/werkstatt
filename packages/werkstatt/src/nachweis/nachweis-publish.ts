@@ -45,7 +45,6 @@ import {
   resolvePbpEntityDir,
   resolveDefaultLang,
   evaluateGateV2,
-  type NachweisPublicationGateV2,
   type NachweisPublishResult,
 } from "./nachweis-io.ts";
 

@@ -188,8 +188,8 @@ export async function runNachweisScreenshotProcess(
   }
 
   // Compute 16:9 crop region
-  let cropHeight = Math.min(Math.round((rawWidth * 9) / 16), rawHeight);
-  let cropWidth = cropHeight === rawHeight ? Math.round((rawHeight * 16) / 9) : rawWidth;
+  const cropHeight = Math.min(Math.round((rawWidth * 9) / 16), rawHeight);
+  const cropWidth = cropHeight === rawHeight ? Math.round((rawHeight * 16) / 9) : rawWidth;
   const cropLeft = cropWidth < rawWidth ? Math.round((rawWidth - cropWidth) / 2) : 0;
   const cropTop = cropOffset;
 

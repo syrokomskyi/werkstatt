@@ -1,11 +1,5 @@
 import { z } from "zod";
-import {
-  digestSchema,
-  actionIdSchema,
-  schemaIdSchema,
-  humanReadableIdSchema,
-  utcTimestampSchema,
-} from "./identifiers.ts";
+import { actionIdSchema, humanReadableIdSchema, utcTimestampSchema } from "./identifiers.ts";
 
 export const actionAnchorV1Schema = z
   .object({
@@ -50,6 +44,4 @@ export const certificationActionPackV1Schema = z
   })
   .strict();
 
-export type CertificationActionPackV1 = z.infer<
-  typeof certificationActionPackV1Schema
->;
+export type CertificationActionPackV1 = z.infer<typeof certificationActionPackV1Schema>;

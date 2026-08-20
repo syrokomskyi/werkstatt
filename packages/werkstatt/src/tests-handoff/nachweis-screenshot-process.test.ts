@@ -407,7 +407,7 @@ describe("RFC-0891: nachweis.screenshot.process", () => {
     );
     const raw = await readFile(evidenceFile, "utf8");
     expect(raw).toContain("image/webp");
-    expect(raw).toContain(data.r2Key);
+    expect(raw).toContain("/nachweis-screenshots/test-slug.webp");
     expect(raw).toContain("rawArtifact");
   });
 

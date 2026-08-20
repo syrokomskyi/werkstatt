@@ -19,6 +19,16 @@ import {
 } from "../leitstand/adapters/cloudflare-workers.ts";
 import type { CommandRunner } from "../leitstand/adapter.ts";
 
+// RFC-0895: rollback uses runWranglerRollback (native spawn) instead of the
+// injected runner. Mock it so tests don't spawn real wrangler processes.
+vi.mock("../leitstand/service-deploy-helpers.ts", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../leitstand/service-deploy-helpers.ts")>();
+  return {
+    ...original,
+    runWranglerRollback: vi.fn(async () => ({ exitCode: 0, stdout: "", stderr: "" })),
+  };
+});
+
 function stubRunner(exitCode: number, stdout: string, stderr: string = ""): CommandRunner {
   return vi.fn(async () => ({ exitCode, stdout, stderr })) as unknown as CommandRunner;
 }
@@ -65,8 +75,13 @@ test("adapter: propagate fails when wrangler exits non-zero", async () => {
 });
 
 test("adapter: rollback succeeds when wrangler exits 0", async () => {
-  const runner = stubRunner(0, "Deployed to https://alt.test.example.com");
-  const adapter = createCloudflareWorkersAdapter(runner);
+  const { runWranglerRollback } = await import("../leitstand/service-deploy-helpers.ts");
+  vi.mocked(runWranglerRollback).mockResolvedValueOnce({
+    exitCode: 0,
+    stdout: "Rollback complete",
+    stderr: "",
+  });
+  const adapter = createCloudflareWorkersAdapter(stubRunner(0, ""));
   const result = await adapter.rollback({
     systemId: "test-system",
     channel: "main",
@@ -252,25 +267,9 @@ test("RFC-0623: propagate does NOT retry on syntax error", async () => {
   expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(1);
 });
 
-test("RFC-0623: rollback retries on transient 502 error then succeeds", async () => {
-  vi.useFakeTimers();
-  const runner = statefulRunner([
-    { exitCode: 1, stdout: "", stderr: "Error: 502 Bad Gateway" },
-    { exitCode: 0, stdout: "Deployed to https://test.example.com", stderr: "" },
-  ]);
-  const adapter = createCloudflareWorkersAdapter(runner);
-  const promise = adapter.rollback({
-    systemId: "test-system",
-    channel: "main",
-    wranglerConfigDir: "/tmp",
-    workerName: "test-system",
-  });
-  await vi.advanceTimersByTimeAsync(30_000);
-  const result = await promise;
-  expect(result.state).toBe("succeeded");
-  expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(2);
-  vi.useRealTimers();
-});
+// RFC-0895: rollback no longer retries — it uses native wrangler rollback
+// which is a single atomic operation. The retry-on-transient-error test was
+// removed because the old deploy-based rollback path is gone.
 
 test("ADR-0027: sourceDotenv skips entries with empty values", async () => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "wg-test-adr27-"));
