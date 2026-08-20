@@ -24,6 +24,7 @@
   <item>RFC-0796: add checkWorkspaceGlobsForStalePackages pre-flight guard before pnpm install — detects stale package.json workspace references to missing packages.</item>
   <item>RFC-0822: replace old-workpiece .env preservation with restoreEnvFilesFromCacheClone — cache clone is the canonical inter-mission store for secrets.</item>
   <item>RFC-0870: restore registry-only generated files from git after atomicMoveDir — prevents silent loss of committed manifests when staging dir lacks them.</item>
+  <item>Hardcode production domain in SITE_LINE — remove PUBLIC_SITE_URL override that allowed .env to bake dev domain into build artifacts.</item>
 </CHANGE_SUMMARY>
 */
 
