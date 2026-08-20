@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
+enhancedAt: 2026-08-20
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,14 +25,12 @@ amendedBy: []
 related:
   - RFC-0752
   - RFC-0753
-  - DNA-49
   - DNA-73
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-49
-  - DNA-73
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -52,7 +51,6 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - werkstatt
-  - werkstatt-site
 successSignals:
   - Apex domain resolves to the deployed Worker within one deployment cycle
   - www subdomain redirects to apex with HTTP 301
@@ -100,12 +98,12 @@ Specific gaps:
 
 ## Decision
 
-The kernel gains two new commands — `customdomain.register` and `redirect.register` — that idempotently create DNS records, Workers routes, and Cloudflare Redirect Rules for site apex domains and www→apex redirects. Both commands are called automatically from the deployment pipeline (`leitstand.propagate` for alt, `leitstand.promote` for main) before `wrangler deploy`.
+The kernel gains two new commands — `customdomain.register` and `redirect.register` — that idempotently create DNS records, Workers routes, and Cloudflare Redirect Rules for site apex domains and www→apex redirects. Both commands are called automatically from `leitstand.promote` (main channel) before `wrangler deploy`. The alt channel (`leitstand.propagate`) is out of scope — it uses `alt.{domain}`, not the apex domain.
 
 ## Architectural fit
 
 - **DNA-49 (Fleet propagation)**: Extends Leitstand to ensure custom domain infrastructure is in place before deployment. The pipeline already handles per-site targeting and channel ordering; this adds DNS/route readiness as a pipeline step.
-- **DNA-73 (Sequential deployment pipeline)**: Both commands run inside the existing Dev → Alt → Main pipeline. `customdomain.register` and `redirect.register` execute before `wrangler deploy` in `leitstand.propagate` (alt) and `leitstand.promote` (main), preserving sequential ordering.
+- **DNA-73 (Sequential deployment pipeline)**: Both commands run inside the existing Dev → Alt → Main pipeline. They execute during `leitstand.promote` (main) only, before `wrangler deploy`, preserving sequential ordering. The alt channel is skipped because it uses `alt.{domain}`, not the apex domain.
 - **RFC-0752 (Subdomain management)**: Follows the same idempotent pattern — check existing records, create if missing, error on mismatch. Reuses `cloudflare-api.ts` functions.
 - **RFC-0753 (DNS record management)**: `dns.record.upsert` remains for arbitrary DNS records (SVCB, TXT). `customdomain.register` is specialized for apex domain + Workers route, `redirect.register` for www + Redirect Rule.
 - **Site OS operator model**: Both commands are workspace-scope, registered in a new `customdomain.module.ts` in `packages/werkstatt/src/customdomain/`.
@@ -120,23 +118,21 @@ pnpm exec werkstatt run customdomain.register --site warpgogol-com
 
 # Register www DNS + Redirect Rule (www → apex, 301)
 pnpm exec werkstatt run redirect.register --site warpgogol-com
-
-# Dry-run (preview changes without API calls)
-pnpm exec werkstatt run customdomain.register --site warpgogol-com --dry-run
-pnpm exec werkstatt run redirect.register --site warpgogol-com --dry-run
 ```
 
 Flags:
 
 - `--site` (required) — System ID from `system-config.yaml`
-- `--dry-run` (optional) — Preview changes without making API calls
 
 Scope: `workspace` (reads `systems-cache/{system}/system-config.yaml`).
+
+Both commands use the standard `KernelCommandInput` — no custom input type is needed. The `--site` flag is parsed via the standard `flagSite(input)` helper, consistent with `subdomain.register` and other leitstand commands.
 
 ### TypeScript contracts
 
 ```ts
 // customdomain.register result
+// Input: standard KernelCommandInput with --site flag
 interface CustomDomainRegisterResult {
   command: "customdomain.register";
   systemId: string;
@@ -159,6 +155,7 @@ interface CustomDomainRegisterResult {
 }
 
 // redirect.register result
+// Input: standard KernelCommandInput with --site flag
 interface RedirectRegisterResult {
   command: "redirect.register";
   systemId: string;
@@ -187,12 +184,13 @@ interface RedirectRegisterResult {
 | Path | Role |
 | --- | --- |
 | `systems-cache/{system}/system-config.yaml` | Read for `cloudflareZoneId`, `deployment.channels.main.url`, `deployment.channels.main.workerName` |
+| `tools/kernel.config.ts` | Register `customdomain` module loader (analogous to `subdomain` and `dns` loaders) |
 | `packages/werkstatt/src/customdomain/customdomain.module.ts` | New kernel module registering both commands |
 | `packages/werkstatt/src/customdomain/customdomain-register.ts` | `customdomain.register` handler |
 | `packages/werkstatt/src/customdomain/redirect-register.ts` | `redirect.register` handler |
 | `packages/werkstatt/src/customdomain/customdomain-helpers.ts` | Shared helpers: resolve system config, build DNS/route/redirect payloads |
-| `packages/werkstatt/src/leitstand/adapters/cloudflare-api.ts` | Extended with `listRedirectRules`, `createRedirectRule` for Rulesets API |
-| `packages/werkstatt/src/leitstand/leitstand-commands.ts` | `runLeitstandPropagate` and `runLeitstandPromote` call both commands before `executeDeployPhases` |
+| `packages/werkstatt/src/leitstand/adapters/cloudflare-api.ts` | Extended with `getRedirectRuleset`, `createRedirectRule` for Rulesets API |
+| `packages/werkstatt/src/leitstand/leitstand-commands.ts` | `runLeitstandPromote` calls both commands before `executeDeployPhases` |
 
 ### Output format
 
@@ -208,6 +206,8 @@ interface RedirectRegisterResult {
     "content": "192.0.2.1",
     "proxied": true,
     "created": true
+    // Note: 192.0.2.1 is a TEST-NET-1 (RFC 5737) documentation placeholder.
+// For proxied records, Cloudflare replaces the content with their anycast IPs.
   },
   "workersRoute": {
     "id": "def456",
@@ -249,16 +249,18 @@ interface RedirectRegisterResult {
 - **Workers route mismatch**: If an existing Workers route points to a different script, the command throws.
 - **Redirect Rule mismatch**: If an existing Redirect Rule for www exists but has a different target or status code, the command throws.
 - **Missing `cloudflareZoneId`**: If `system-config.yaml` lacks `cloudflareZoneId`, the command throws.
-- **Missing `CLOUDFLARE_API_TOKEN`**: The token must have `Zone:DNS:Edit`, `Workers Routes:Edit`, and `Zone:Page Rules:Edit` (or `Zone:Transform:Edit` for Redirect Rules) permissions.
-- **`--dry-run`**: Reports what would be created without making API calls. Always exits 0 if the config is valid.
-- Pipeline integration: if `customdomain.register` or `redirect.register` fails, the deployment pipeline (`leitstand.propagate`/`leitstand.promote`) fails with a clear error message. The pipeline does not silently skip DNS setup.
+- **Missing or inaccessible zone**: If the Cloudflare API returns 404 for the zone or the token lacks permissions, the command throws with a descriptive error.
+- **Missing `CLOUDFLARE_API_TOKEN`**: The token must have `Zone:DNS:Edit`, `Workers Routes:Edit`, and `Zone:Transform:Edit` (for Redirect Rules via Rulesets API) permissions.
+- **No `--dry-run`**: Consistent with `subdomain.register` and `dns.record.upsert`, which do not have a dry-run flag. The commands are idempotent — re-running them is safe.
+- **No validate commands**: The commands are idempotent and self-validating — they check existing records before creating. A separate `customdomain.validate`/`redirect.validate` is redundant, unlike `subdomain.validate` which exists because `leitstand.service.promote` calls validate-then-register as an optimization (avoid register if already valid). For sites, `leitstand.promote` calls register directly since the idempotent check is built in.
+- Pipeline integration: if `customdomain.register` or `redirect.register` fails, `leitstand.promote` fails with a clear error message. The pipeline does not silently skip DNS setup.
 
 ## Rollout
 
-- **Default behavior**: `customdomain.register` and `redirect.register` run automatically inside `leitstand.propagate` (alt channel) and `leitstand.promote` (main channel) before `wrangler deploy`. No operator intervention needed for new sites.
+- **Default behavior**: `customdomain.register` and `redirect.register` run automatically inside `leitstand.promote` (main channel) before `wrangler deploy`. No operator intervention needed for new sites. The alt channel (`leitstand.propagate`) is not involved — it uses `alt.{domain}`, not the apex domain.
 - **Existing sites**: Sites with manually configured DNS and routes are unaffected — both commands are idempotent. If existing records match, they are skipped. If they mismatch, the command errors with a fix hint.
 - **New sites**: Automatically comply from day one. Onboarding (`onboarding.scaffold`) already generates `system-config.yaml` with `cloudflareZoneId` and `deployment.channels.main.url`.
-- **Pipeline integration**: Both commands are called in `runLeitstandPropagate` and `runLeitstandPromote` after authorization but before `executeDeployPhases`. If either fails, the deployment aborts.
+- **Pipeline integration**: Both commands are called in `runLeitstandPromote` after authorization but before `executeDeployPhases`. If either fails, the deployment aborts.
 - **No deprecation**: This RFC does not supersede `subdomain.register` (RFC-0752) or `dns.record.upsert` (RFC-0753) — they remain for service subdomains and arbitrary DNS records respectively.
 
 ## Alternatives considered
@@ -279,16 +281,15 @@ interface RedirectRegisterResult {
 
 ## Acceptance criteria
 
-- [ ] `customdomain.register` command registered in `customdomain.module.ts` with `--site` and `--dry-run` flags
-- [ ] `redirect.register` command registered in `customdomain.module.ts` with `--site` and `--dry-run` flags
+- [ ] `customdomain.register` command registered in `customdomain.module.ts` with `--site` flag
+- [ ] `redirect.register` command registered in `customdomain.module.ts` with `--site` flag
 - [ ] `customdomain.register` creates a proxied A record for the apex domain and a Workers route pointing to the site's Worker, idempotently
 - [ ] `redirect.register` creates a proxied CNAME record for `www.{apex}` and a Cloudflare Redirect Rule (301 to apex), idempotently
 - [ ] Both commands error on mismatched existing records with a descriptive fix hint
-- [ ] `runLeitstandPropagate` calls `customdomain.register` and `redirect.register` before `executeDeployPhases`
 - [ ] `runLeitstandPromote` calls `customdomain.register` and `redirect.register` before `executeDeployPhases`
-- [ ] `cloudflare-api.ts` extended with `listRedirectRules` and `createRedirectRule` functions for the Rulesets API
+- [ ] `cloudflare-api.ts` extended with `getRedirectRuleset` and `createRedirectRule` functions for the Rulesets API
 - [ ] `--json` output format matches the documented shape
-- [ ] Unit tests for both commands covering: create, idempotent skip, mismatch error, dry-run
+- [ ] Unit tests for both commands covering: create, idempotent skip, mismatch error
 - [ ] `AGENTS.md` updated with custom domain and redirect registration pipeline step
 - [ ] `rfc.validate` passes on this file with zero RFC-specific errors
 
@@ -300,6 +301,9 @@ interface RedirectRegisterResult {
 - Agents MUST NOT use `dns.record.upsert` as a substitute for `customdomain.register` — the latter also creates the Workers route, which `dns.record.upsert` does not.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0896 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The Cloudflare Rulesets API endpoint for Redirect Rules is `POST /zones/{zone_id}/rulesets/phases/http_request_dynamic_redirect/rules`. The rule action is `redirect` with `status_code: 301` and `from_url` matching `www.{apex}/*`.
+- The Cloudflare Rulesets API for Redirect Rules uses a two-step read-then-append pattern:
+  1. `GET /zones/{zone_id}/rulesets/phases/http_request_dynamic_redirect/entrypoint` — fetch the existing phase ruleset and its rules. Check if a rule for `www.{apex}` already exists (by description or expression match).
+  2. If not found, `POST /zones/{zone_id}/rulesets/{ruleset_id}/rules` — append a single rule to the existing ruleset. The rule action is `redirect` with `status_code: 301` and `expression` matching `(http.host eq "www.{apex}")`. This approach preserves existing Redirect Rules in the zone (unlike `PUT /entrypoint` which replaces all rules) and is safe for concurrent deployments of different sites in the same zone — each POST appends a distinct rule for a distinct www subdomain.
+- The A record content `192.0.2.1` is a TEST-NET-1 (RFC 5737) documentation placeholder. For proxied records, Cloudflare replaces the content with their anycast IPs — the actual IP value is irrelevant.
 - Both commands MUST be idempotent: if the correct DNS record, Workers route, or Redirect Rule already exists, skip creation and report `state: "already-registered"`.
-- Pipeline integration point: in `runLeitstandPropagate` and `runLeitstandPromote`, call both commands after `authorizeAndDeploy` succeeds but before `executeDeployPhases`. If either fails, return a failed result with `failingPhase: "custom-domain-setup"`.
+- Pipeline integration point: in `runLeitstandPromote`, call both commands after `authorizeAndDeploy` succeeds but before `executeDeployPhases`. If either fails, return a failed result with `failingPhase: "custom-domain-setup"`.
