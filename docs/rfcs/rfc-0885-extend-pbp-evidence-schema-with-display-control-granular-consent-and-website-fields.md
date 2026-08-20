@@ -337,22 +337,22 @@ The command code (`content-pbp.ts`) does not change — it already calls `pbpSch
 
 ## Acceptance criteria
 
-- [x] `PbpEvidenceDisplay`, `PbpWebsiteScreenshot` types defined in `evidence-source.ts` entity <!-- evidence: packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts:109-125 -->
-- [x] `PbpConsentScope`, `PbpConsentScopeEntry`, `PbpConsentScopeStatus` types defined in `consent.ts` entity <!-- evidence: packages/werkstatt-site/src/domain/pbp/entities/consent.ts:33-58 -->
-- [x] `PbpEvidenceSource` interface includes `display?`, `websiteUrl?`, `websiteScreenshot?` fields <!-- evidence: packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts:150-155 -->
-- [x] `PbpConsent` interface includes `consentScope` field; old `consentStatus`, `grantedAt`, `method` fields removed <!-- evidence: packages/werkstatt-site/src/domain/pbp/entities/consent.ts:60-71 -->
-- [x] Zod schema `evidenceSourceSchema` validates new fields with `.strict()`; `superRefine` requires `display` for Nachweis kinds and rejects it for non-Nachweis kinds <!-- evidence: packages/werkstatt-site/src/domain/pbp/schemas/evidence-source.ts:213-249 -->
-- [x] Zod schema `consentSchema` validates `consentScope` with per-aspect entries; rejects old fields <!-- evidence: packages/werkstatt-site/src/domain/pbp/schemas/consent.ts:34-54 -->
-- [x] `pbp.content.validate` rejects Nachweis EvidenceSource entities missing `display` <!-- evidence: schema superRefine in evidence-source.ts:236-241 -->
-- [x] `pbp.content.validate` rejects non-Nachweis EvidenceSource entities with `display` <!-- evidence: schema superRefine in evidence-source.ts:243-249 -->
-- [x] `pbp.content.validate` rejects PbpConsent entities with old `consentStatus` field <!-- evidence: .strict() on consentSchema rejects unknown keys -->
-- [x] `evaluateGateV2` in `nachweis-io.ts` checks `consentScope.document.status` instead of `consentStatus` <!-- evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:271-275 -->
-- [x] `nachweis.consent.update` writes `consentScope.document` instead of `consentStatus`/`method`/`grantedAt` <!-- evidence: packages/werkstatt/src/nachweis/nachweis-consent.ts:88-113 -->
-- [x] `nachweis.withdraw` sets `consentScope.document.status` to `denied` instead of `consentStatus` to `revoked` <!-- evidence: packages/werkstatt/src/nachweis/nachweis-withdraw.ts:130-145 -->
-- [x] `nachweis.validate` checks `consentScope.document.status` and `grantedAt` instead of `consentStatus`/`grantedAt` <!-- evidence: packages/werkstatt/src/nachweis/nachweis-validate.ts:194-210 -->
-- [x] Migrator registered for existing Nachweis entities (complete consentStatus→consentScope mapping, add default display) <!-- evidence: packages/werkstatt/src/migrators/rfc-0885.ts, registered in registry.ts:86 -->
-- [x] Test fixtures updated in `nachweis-commands.test.ts` and `nachweis-rfc-0872.test.ts` <!-- evidence: 5 consent fixtures updated, assertion revoked→denied -->
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpEvidenceDisplay`, `PbpWebsiteScreenshot` types defined in `evidence-source.ts` entity (evidence: packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts:109-125 defines PbpEvidenceDisplayAspect, PbpEvidenceDisplay, PbpWebsiteScreenshot)
+- [x] `PbpConsentScope`, `PbpConsentScopeEntry`, `PbpConsentScopeStatus` types defined in `consent.ts` entity (evidence: packages/werkstatt-site/src/domain/pbp/entities/consent.ts:33-58 defines PbpConsentScopeStatus, PbpConsentScopeEntry, PbpConsentScope)
+- [x] `PbpEvidenceSource` interface includes `display?`, `websiteUrl?`, `websiteScreenshot?` fields (evidence: packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts:150-155 adds display, websiteUrl, websiteScreenshot to PbpEvidenceSource)
+- [x] `PbpConsent` interface includes `consentScope` field; old `consentStatus`, `grantedAt`, `method` fields removed (evidence: packages/werkstatt-site/src/domain/pbp/entities/consent.ts:60-71 shows consentScope field, old fields absent)
+- [x] Zod schema `evidenceSourceSchema` validates new fields with `.strict()`; `superRefine` requires `display` for Nachweis kinds and rejects it for non-Nachweis kinds (evidence: packages/werkstatt-site/src/domain/pbp/schemas/evidence-source.ts:213-249 adds display/websiteUrl/websiteScreenshot fields and superRefine checks)
+- [x] Zod schema `consentSchema` validates `consentScope` with per-aspect entries; rejects old fields (evidence: packages/werkstatt-site/src/domain/pbp/schemas/consent.ts:34-54 replaces consentStatus/grantedAt/method with consentScope, .strict() rejects unknown keys)
+- [x] `pbp.content.validate` rejects Nachweis EvidenceSource entities missing `display` (evidence: schema superRefine in evidence-source.ts:236-241 adds issue when isNachweisKind && !hasDisplay)
+- [x] `pbp.content.validate` rejects non-Nachweis EvidenceSource entities with `display` (evidence: schema superRefine in evidence-source.ts:243-249 adds issue when !isNachweisKind && hasDisplay)
+- [x] `pbp.content.validate` rejects PbpConsent entities with old `consentStatus` field (evidence: .strict() on consentSchema in consent.ts:54 rejects unknown keys including consentStatus)
+- [x] `evaluateGateV2` in `nachweis-io.ts` checks `consentScope.document.status` instead of `consentStatus` (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:271-275 reads consentScope.document.status === 'granted')
+- [x] `nachweis.consent.update` writes `consentScope.document` instead of `consentStatus`/`method`/`grantedAt` (evidence: packages/werkstatt/src/nachweis/nachweis-consent.ts:88-113 writes consentScope and deletes old fields)
+- [x] `nachweis.withdraw` sets `consentScope.document.status` to `denied` instead of `consentStatus` to `revoked` (evidence: packages/werkstatt/src/nachweis/nachweis-withdraw.ts:130-145 sets consentScope.document.status to 'denied' and deletes old fields)
+- [x] `nachweis.validate` checks `consentScope.document.status` and `grantedAt` instead of `consentStatus`/`grantedAt` (evidence: packages/werkstatt/src/nachweis/nachweis-validate.ts:194-210 reads consentScope.document.status and consentScope.document.grantedAt)
+- [x] Migrator registered for existing Nachweis entities (evidence: packages/werkstatt/src/migrators/rfc-0885.ts implements consentStatus to consentScope mapping and default display; registered in registry.ts:86)
+- [x] Test fixtures updated in `nachweis-commands.test.ts` and `nachweis-rfc-0872.test.ts` (evidence: 5 consent fixtures updated to consentScope, assertion revoked changed to denied, makeValidEntity helper updated with display and slug)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0885 --json returned exitCode 0 with no errors)
 
 ## Implementation notes for agents
 
