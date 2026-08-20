@@ -16,6 +16,7 @@ deploy.scripts.validate — validates deploy scripts in systems and services pac
   <item>RFC-0388: extend parseEnvExample with hasHowToObtain, add ENV-CONTRACT-05 rule, add root scope.</item>
   <item>RFC-0388: add ENV-CONTRACT-06 rule — no commented-out variables, blank line between variable blocks.</item>
   <item>RFC-0761: remove env.main.check and env.alt.check commands; update deploy.scripts.validate to check --secrets-file .env.</item>
+  <item>Remove build:main and build:alt from REQUIRED_DEPLOY_SCRIPTS; fix stale fixHint path from deleted packages/os/site-kernel-onboarding/ to packages/werkstatt-site/src/onboarding/templates/.</item>
 </CHANGE_SUMMARY>
 */
 
