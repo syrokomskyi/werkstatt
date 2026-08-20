@@ -148,7 +148,7 @@ The command exits non-zero on errors. This is also run as a CI gate in the root 
 | `@warpgogol/forge` | `packages/forge/extract.config.yaml` | `git@github.com:syrokomskyi/forge.git` | public |
 | `@warpgogol/werkstatt` | `packages/werkstatt/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt.git` | public |
 | `@warpgogol/werkstatt-shared` | `packages/werkstatt-shared/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-shared.git` | public |
-| `@warpgogol/werkstatt-phaser` | `packages/werkstatt-phaser/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-phaser.git` | public |
-| `@warpgogol/werkstatt-godot` | `packages/werkstatt-godot/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-godot.git` | public |
+| `@warpgogol/werkstatt-phaser-game` | `packages/werkstatt-phaser-game/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-phaser-game.git` | public |
+| `@warpgogol/werkstatt-godot-game` | `packages/werkstatt-godot-game/extract.config.yaml` | `git@github.com:syrokomskyi/werkstatt-godot-game.git` | public |
 
 Note: `@warpgogol/werkstatt-site` is NOT published to npm (excluded by design — it is a site-composition plugin consumed only within the monorepo).

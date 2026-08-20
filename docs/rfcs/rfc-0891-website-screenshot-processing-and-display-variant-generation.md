@@ -138,7 +138,7 @@ The raw screenshot is typically very tall (e.g. 3708×27210). The display varian
    - `cropTop = --crop-offset` (default: 0, top of page)
    - `cropLeft = 0` (or centered if narrower than 16:9)
 3. Resize the cropped region to 1280×720.
-4. Convert to WebP with quality 80.
+4. Convert to WebP with quality 100 (lossy, not lossless).
 
 **Small raw images:** If the raw image is smaller than 1280×720, `resize(1280, 720, { fit: "cover" })` upscales it. This is an accepted trade-off — raw screenshots are typically 3708×27210, so smaller-than-display is an edge case. The operator can inspect the output and re-capture if needed.
 
@@ -282,7 +282,7 @@ const cropTop = cropOffset;
 const displayBuffer = await sharp(rawFilePath)
   .extract({ left: cropLeft, top: cropTop, width: cropWidth, height: cropHeight })
   .resize(1280, 720, { fit: "cover" })
-  .webp({ quality: 80 })
+  .webp({ quality: 100 })
   .toBuffer();
 ```
 
@@ -310,7 +310,7 @@ const displayBuffer = await sharp(rawFilePath)
 
 - **Crop quality**: The top-crop strategy assumes the most relevant content is at the top of the page (hero section, navigation). This is true for most landing pages but may not be ideal for all sites. The `--crop-offset` flag allows manual adjustment.
 - **sharp memory usage**: Processing a 3708×27210 image requires loading the full image into memory. sharp is efficient (uses libvips streaming), but very large images (>50000px tall) may cause memory pressure. This is unlikely for website screenshots but should be monitored.
-- **WebP quality**: Quality 80 is a balance between file size and visual quality. For screenshots with text, lower quality may produce artifacts. The quality is not configurable via a flag to keep the command simple — if needed, a future RFC can add `--quality`.
+- **WebP quality**: Quality 100 (lossy, not lossless) preserves maximum visual fidelity for screenshots with text. File sizes are larger than quality 80 but still significantly smaller than PNG/JPEG originals. The quality is not configurable via a flag to keep the command simple — if needed, a future RFC can add `--quality`.
 - **R2 download fallback**: If the cache clone local copy is missing, the command downloads from R2 private. This adds network latency. The operator should ensure the cache clone copy exists (which it does after `nachweis.screenshot.ingest`).
 - **Command idempotency**: Running `nachweis.screenshot.process` twice with the same raw screenshot produces the same display variant (deterministic crop + resize + WebP). The R2 upload overwrites the previous display variant. The Bordbuch entry is appended each time (append-only). This is acceptable — reprocessing is intentional and produces a new Bordbuch event.
 - **Concurrent execution**: Two agents running `nachweis.screenshot.process` on the same evidence-source simultaneously could conflict on the evidence-source file write and R2 upload. System and bordbuch locks (acquired before state mutation, same pattern as `nachweis.screenshot.upload`) serialize the Bordbuch append and file commit. The R2 upload itself is idempotent (last writer wins). This is the same concurrency model as all existing nachweis commands — accepted as the standard pattern.

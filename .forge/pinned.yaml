@@ -89,9 +89,9 @@ pinned:
   - path: packages/werkstatt-shared/extract.config.yaml
     mode: protect
     reason: Shared infrastructure extraction config — required for npm publication (RFC-0868)
-  - path: packages/werkstatt-phaser/extract.config.yaml
+  - path: packages/werkstatt-phaser-game/extract.config.yaml
     mode: protect
     reason: Phaser plugin extraction config — required for npm publication (RFC-0773)
-  - path: packages/werkstatt-godot/extract.config.yaml
+  - path: packages/werkstatt-godot-game/extract.config.yaml
     mode: protect
     reason: Godot plugin extraction config — required for npm publication
