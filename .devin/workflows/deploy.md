@@ -275,10 +275,10 @@ pnpm exec werkstatt run leitstand.dev-deploy --site <siteId> --release <releaseI
 
 ### `leitstand.propagate` fails with "Unexpected positional argument" or "Unknown flag '--channel'"
 
-`leitstand.propagate` does NOT accept `--channel` (removed in RFC-0628) or `--site` (read from release manifest). The only required flag is `--release`:
+`leitstand.propagate` does NOT accept `--channel` (removed in RFC-0628). It requires both `--site` and `--release`:
 
 ```sh
-pnpm exec werkstatt run leitstand.propagate --release <releaseId>
+pnpm exec werkstatt run leitstand.propagate --site <siteId> --release <releaseId>
 ```
 
 ### `leitstand.propagate` fails with "must be in state 'ready'"
