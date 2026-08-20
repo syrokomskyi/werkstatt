@@ -681,8 +681,11 @@ describe("RFC-0872: nachweis.withdraw conditional consent", () => {
     await writePbpEntity(cachePath, "de", "consent", "cert-rec", {
       type: "consent",
       slug: "cert-rec",
-      consentStatus: "granted",
-      grantedAt: "2026-01-01T00:00:00Z",
+      consentScope: {
+        document: { status: "granted", grantedAt: "2026-01-01T00:00:00Z", method: "none" },
+        screenshot: { status: "not_requested", grantedAt: null, method: "none" },
+        websiteLink: { status: "not_requested", grantedAt: null, method: "none" },
+      },
     });
 
     const { runNachweisWithdraw } = await import("../nachweis/nachweis-withdraw.ts");
@@ -706,7 +709,7 @@ describe("RFC-0872: nachweis.withdraw conditional consent", () => {
       "cert-rec.md",
     );
     const rawConsent = await readFile(consentFile, "utf8");
-    expect(rawConsent).toContain("revoked");
+    expect(rawConsent).toContain("denied");
   });
 
   it("does NOT revoke consent for technical-assessment-v1", async () => {
@@ -727,8 +730,11 @@ describe("RFC-0872: nachweis.withdraw conditional consent", () => {
     await writePbpEntity(cachePath, "de", "consent", "tech-rec", {
       type: "consent",
       slug: "tech-rec",
-      consentStatus: "granted",
-      grantedAt: "2026-01-01T00:00:00Z",
+      consentScope: {
+        document: { status: "granted", grantedAt: "2026-01-01T00:00:00Z", method: "none" },
+        screenshot: { status: "not_requested", grantedAt: null, method: "none" },
+        websiteLink: { status: "not_requested", grantedAt: null, method: "none" },
+      },
     });
 
     const { runNachweisWithdraw } = await import("../nachweis/nachweis-withdraw.ts");

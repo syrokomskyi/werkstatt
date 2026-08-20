@@ -503,10 +503,12 @@ describe("RFC-0707: nachweis.validate", () => {
       purposes: ["nachweis"],
       channels: ["web"],
       dataElements: ["name"],
-      method: "verified_business_email",
-      grantedAt: null,
       evidenceRef: null,
-      consentStatus: "granted",
+      consentScope: {
+        document: { status: "granted", grantedAt: null, method: "verified_business_email" },
+        screenshot: { status: "not_requested", grantedAt: null, method: "none" },
+        websiteLink: { status: "not_requested", grantedAt: null, method: "none" },
+      },
     });
 
     const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
@@ -602,10 +604,12 @@ describe("RFC-0707: nachweis.consent.update", () => {
       purposes: ["nachweis"],
       channels: ["web"],
       dataElements: ["name"],
-      method: "none",
-      grantedAt: null,
       evidenceRef: null,
-      consentStatus: "not_requested",
+      consentScope: {
+        document: { status: "not_requested", grantedAt: null, method: "none" },
+        screenshot: { status: "not_requested", grantedAt: null, method: "none" },
+        websiteLink: { status: "not_requested", grantedAt: null, method: "none" },
+      },
     });
 
     const { runNachweisConsentUpdate } = await import("../nachweis/nachweis-consent.ts");
@@ -1217,10 +1221,16 @@ describe("RFC-0715: nachweis.validate consent matching by c.id fallback", () => 
       purposes: ["nachweis"],
       channels: ["web"],
       lawfulBasis: "consent",
-      method: "verified_business_email",
-      grantedAt: "2026-08-01T00:00:00.000Z",
       evidenceRef: "test-record",
-      consentStatus: "granted",
+      consentScope: {
+        document: {
+          status: "granted",
+          grantedAt: "2026-08-01T00:00:00.000Z",
+          method: "verified_business_email",
+        },
+        screenshot: { status: "not_requested", grantedAt: null, method: "none" },
+        websiteLink: { status: "not_requested", grantedAt: null, method: "none" },
+      },
     });
 
     const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
