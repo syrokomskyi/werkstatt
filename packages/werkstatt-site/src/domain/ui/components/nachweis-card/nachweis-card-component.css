@@ -728,7 +728,7 @@
 /* ========================================================================== */
 
 .nachweis-card--compact {
-  padding: var(--ds-space-4);
+  padding: var(--ds-space-5);
 }
 
 .nachweis-card--compact .nachweis-card__title {
