@@ -1,7 +1,7 @@
 ---
 id: RFC-0890
 title: "Raw website screenshot ingestion and archival for Nachweis evidence"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes: []
 supersededBy:
@@ -348,23 +348,23 @@ The `mediaType` is derived from `metadata.format`, not from the file extension. 
 
 ## Acceptance criteria
 
-- [ ] `PbpWebsiteScreenshot` schema includes optional `rawArtifact` sub-object with `sha256`, `mediaType`, `originalFilename`, `width`, `height`, `r2Key`, `localPath`, `capturedAt` fields
-- [ ] `PbpRawScreenshotArtifact` interface defined in `packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts`
-- [ ] `nachweis.screenshot.ingest` command registered with `--system`, `--slug`, `--file`, `--dry-run`, `--json`, `--captured-at` flags
-- [ ] `nachweis.screenshot.ingest` copies the raw file to cache clone at `trust/evidence/screenshots/{slug}/raw/{originalFilename}`
-- [ ] `nachweis.screenshot.ingest` uploads the raw file to R2 private at `{systemId}/screenshots/{slug}/raw/{originalFilename}`
-- [ ] `nachweis.screenshot.ingest` computes SHA-256 of the raw file
-- [ ] `nachweis.screenshot.ingest` detects actual media type from file content via sharp metadata (not file extension)
-- [ ] `nachweis.screenshot.ingest` reads image dimensions (width, height) via sharp metadata
-- [ ] `nachweis.screenshot.ingest` extracts `capturedAt` from `CaptureX_YYYY-MM-DD_HHMMSS_domain.ext` filename pattern
-- [ ] `nachweis.screenshot.ingest` updates `EvidenceSource.websiteScreenshot.rawArtifact` with metadata
-- [ ] `nachweis.screenshot.ingest` appends a `nachweis-record` Bordbuch entry with raw screenshot metadata
-- [ ] `nachweis.screenshot.ingest` `--dry-run` mode computes metadata without copying or uploading
-- [ ] `nachweis.screenshot.ingest` is idempotent — re-ingesting the same SHA-256 skips upload and Bordbuch append, returns existing metadata
-- [ ] `nachweis.screenshot.ingest` `--captured-at` flag accepts ISO 8601 with timezone and overrides filename-parsed value
-- [ ] `PbpWebsiteScreenshot` schema allows display fields to be absent when `rawArtifact` is present (ingest before upload)
-- [ ] `trust/evidence/screenshots/` added to cache clone `.gitignore` template
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpWebsiteScreenshot` schema includes optional `rawArtifact` sub-object with `sha256`, `mediaType`, `originalFilename`, `width`, `height`, `r2Key`, `localPath`, `capturedAt` fields (evidence: packages/werkstatt-site/src/domain/pbp/schemas/evidence-source.ts:152-188)
+- [x] `PbpRawScreenshotArtifact` interface defined in `packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts` (evidence: packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts:120-130)
+- [x] `nachweis.screenshot.ingest` command registered with `--system`, `--slug`, `--file`, `--dry-run`, `--json`, `--captured-at` flags (evidence: packages/werkstatt/src/nachweis/nachweis.module.ts:501-534)
+- [x] `nachweis.screenshot.ingest` copies the raw file to cache clone at `trust/evidence/screenshots/{slug}/raw/{originalFilename}` (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:172-173)
+- [x] `nachweis.screenshot.ingest` uploads the raw file to R2 private at `{systemId}/screenshots/{slug}/raw/{originalFilename}` (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:169)
+- [x] `nachweis.screenshot.ingest` computes SHA-256 of the raw file (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:105)
+- [x] `nachweis.screenshot.ingest` detects actual media type from file content via sharp metadata (not file extension) (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:594-606)
+- [x] `nachweis.screenshot.ingest` reads image dimensions (width, height) via sharp metadata (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:600-606)
+- [x] `nachweis.screenshot.ingest` extracts `capturedAt` from `CaptureX_YYYY-MM-DD_HHMMSS_domain.ext` filename pattern (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:568-580)
+- [x] `nachweis.screenshot.ingest` updates `EvidenceSource.websiteScreenshot.rawArtifact` with metadata (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:180-194)
+- [x] `nachweis.screenshot.ingest` appends a `nachweis-record` Bordbuch entry with raw screenshot metadata (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:210-227)
+- [x] `nachweis.screenshot.ingest` `--dry-run` mode computes metadata without copying or uploading (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:161-168)
+- [x] `nachweis.screenshot.ingest` is idempotent — re-ingesting the same SHA-256 skips upload and Bordbuch append, returns existing metadata (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:125-142)
+- [x] `nachweis.screenshot.ingest` `--captured-at` flag accepts ISO 8601 with timezone and overrides filename-parsed value (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-ingest.ts:153-158)
+- [x] `PbpWebsiteScreenshot` schema allows display fields to be absent when `rawArtifact` is present (ingest before upload) (evidence: packages/werkstatt-site/src/domain/pbp/schemas/evidence-source.ts:166-188)
+- [x] `trust/evidence/screenshots/` added to cache clone `.gitignore` template (evidence: packages/werkstatt-site/src/onboarding/templates/runtime/gitignore.template:49-50)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0890 exit code 0)
 
 ## Implementation notes for agents
 
