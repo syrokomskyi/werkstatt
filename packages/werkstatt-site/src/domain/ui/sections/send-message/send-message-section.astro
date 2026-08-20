@@ -39,7 +39,7 @@ const sectionId = await resolveSectionAnchor(Astro.props, "send-message");
 const props = cast<SendMessageSectionContent>(pageOverride);
 const formId = props.formId ?? "send-message";
 const endpoint = props.endpoint ?? "/api/send-message";
-const bodyAlign = props.body?.align ?? "center";
+const bodyAlign = props.body?.align ?? "left";
 
 const siteLabels = await getSiteSectionLabels<Record<string, unknown>>(
   lang,
@@ -104,7 +104,7 @@ const hasChecklist = checklistItems.length > 0;
       sectionNumber={sectionNumber}
       heading={need("header.heading", props.header?.heading)}
       subheading={props.header?.subheading}
-      align={props.header?.align ?? "center"}
+      align={props.header?.align ?? "left"}
       level={props.header?.level ?? 2}
       hideSectionNumber={props.header?.hideSectionNumber}
       id="send-message-title"

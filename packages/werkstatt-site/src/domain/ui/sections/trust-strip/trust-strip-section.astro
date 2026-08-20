@@ -27,7 +27,7 @@ const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const props = cast<TrustStripSectionContent>(pageOverride);
 const body = need("body", props.body);
 const headerId = props.header?.heading ? "trust-strip-title" : undefined;
-const ctaAlign = props.header?.align ?? "center";
+const ctaAlign = props.header?.align ?? "left";
 
 let ctaHref: string | null = null;
 if (props.cta?.target) {
@@ -56,7 +56,7 @@ if (props.cta?.target) {
         sectionNumber={sectionNumber}
         heading={props.header.heading}
         subheading={props.header.subheading}
-        align={props.header.align ?? "center"}
+        align={props.header.align ?? "left"}
         level={props.header.level ?? 2}
         hideSectionNumber={props.header.hideSectionNumber}
         id={headerId}
@@ -68,7 +68,7 @@ if (props.cta?.target) {
     items={body.items}
     note={body.note}
     iconColor={body.iconColor}
-    align={body.align ?? "center"}
+    align={body.align ?? "left"}
     itemAlign={body.itemAlign}
     hideMarkers={body.hideMarkers}
     effects={body.effects}

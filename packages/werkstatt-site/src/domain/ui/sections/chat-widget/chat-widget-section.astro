@@ -17,7 +17,12 @@ integrations.chat (engineering-owned); the launcher carries the RFC-0177 legal n
 
 import { getCollection } from "astro:content";
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
-import { cast, need, resolveSectionAnchor, resolveSemanticTarget } from "@warpgogol/werkstatt-site/share";
+import {
+  cast,
+  need,
+  resolveSectionAnchor,
+  resolveSemanticTarget,
+} from "@warpgogol/werkstatt-site/share";
 import { ChatWidgetConfigSchema, CHAT_CONFIG_SCRIPT_ID } from "@warpgogol/werkstatt-site/chat";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
@@ -75,7 +80,7 @@ const privacyPolicyLabel = props.privacyPolicyLabel;
           sectionNumber={sectionNumber}
           heading={props.header.heading}
           subheading={props.header.subheading}
-          align={props.header.align ?? "center"}
+          align={props.header.align ?? "left"}
           level={props.header.level ?? 2}
           hideSectionNumber={props.header.hideSectionNumber}
           id="chat-widget-title"

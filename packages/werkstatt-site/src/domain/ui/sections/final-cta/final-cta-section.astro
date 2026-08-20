@@ -45,7 +45,7 @@ const ctaGroup = need("ctaGroup", props.ctaGroup);
     sectionNumber={sectionNumber}
     heading={need("header.heading", props.header?.heading)}
     subheading={props.header?.subheading}
-    align={props.header?.align ?? "center"}
+    align={props.header?.align ?? "left"}
     level={props.header?.level ?? 2}
     hideSectionNumber={props.header?.hideSectionNumber}
     id="final-cta-title"
@@ -55,10 +55,10 @@ const ctaGroup = need("ctaGroup", props.ctaGroup);
     props.body && (
       <SectionParagraphs
         paragraphs={props.body.paragraphs}
-        align={props.body.align ?? "center"}
+        align={props.body.align ?? "left"}
         lang={lang}
       />
     )
   }
-  <SectionCtaGroup align={ctaGroup.align ?? "center"} items={ctaGroup.items} lang={lang} />
+  <SectionCtaGroup align={ctaGroup.align ?? "left"} items={ctaGroup.items} lang={lang} />
 </SectionShell>
