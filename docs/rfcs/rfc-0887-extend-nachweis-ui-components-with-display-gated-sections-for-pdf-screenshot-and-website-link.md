@@ -166,7 +166,7 @@ const websiteScreenshot = props.websiteScreenshot;
 const pdfUrl = props.pdfUrl;
 const pdfSha256 = props.pdfSha256;
 const domain = websiteUrl ? new URL(websiteUrl).hostname.replace(/^www\./, "") : undefined;
-const captureDate = websiteScreenshot?.sha256 ? formatDate(observedAt) : undefined;
+const captureDate = websiteScreenshot?.capturedAt;
 ---
 
 <!-- PDF document section: render only when display.document === "visible" && pdfUrl -->
