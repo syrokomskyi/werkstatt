@@ -815,6 +815,15 @@
   font-size: var(--ds-text-xs);
 }
 
+.nachweis-card__hash-code {
+  font-size: var(--ds-text-xs);
+  font-weight: var(--ds-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-color-text-quiet);
+  letter-spacing: 0.02em;
+  margin-left: var(--ds-space-2);
+}
+
 /* ========================================================================== */
 /* Reduced motion + print                                                      */
 /* ========================================================================== */

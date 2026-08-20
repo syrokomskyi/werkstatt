@@ -61,6 +61,7 @@ interface NachweisAttestationRecord {
   // RFC-0892: website meta fields
   websiteTagline?: string;
   websiteFooterTagline?: string;
+  sourceHashes?: string[];
 }
 
 interface NachweisTechnicalAssessmentRecord {
@@ -268,12 +269,24 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
         status: "published",
       });
     } else {
+      const sourceHashes = data.items
+        ? Object.values(data.items)
+            .map((item) => item.sha256)
+            .filter((h): h is string => !!h)
+        : [];
+      const screenshotHash =
+        typeof (data.websiteScreenshot as Record<string, unknown> | undefined)?.sha256 === "string"
+          ? ((data.websiteScreenshot as Record<string, unknown>).sha256 as string)
+          : undefined;
+      const allHashes = [...sourceHashes, ...(screenshotHash ? [screenshotHash] : [])];
+
       records.push({
         variant: "attestation",
         slug,
         title: data.name ?? slug,
         result: "",
         status: "published",
+        ...(allHashes.length > 0 ? { sourceHashes: allHashes } : {}),
         ...(data.display?.websiteLink === "visible" || data.display?.websiteLink === "hidden"
           ? { display: { websiteLink: data.display.websiteLink as "visible" | "hidden" } }
           : {}),

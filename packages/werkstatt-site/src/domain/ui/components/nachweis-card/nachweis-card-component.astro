@@ -64,6 +64,7 @@ interface NachweisAttestationCardProps {
   // RFC-0892: website meta fields
   websiteTagline?: string;
   websiteFooterTagline?: string;
+  sourceHashes?: string[];
   lang?: string;
 }
 
@@ -350,6 +351,11 @@ function getLiveCheckUrl(
           </span>
           {props.verifiedByLabel && (
             <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
+          )}
+          {props.sourceHashes && props.sourceHashes.length > 0 && (
+            <span class="nachweis-card__hash-code" title={`SHA-256: ${props.sourceHashes[0]}`}>
+              {props.sourceHashes[0].slice(0, 8)}
+            </span>
           )}
         </p>
 
