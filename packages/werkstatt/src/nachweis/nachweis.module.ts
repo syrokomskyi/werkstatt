@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0707/RFC-0714/RFC-0715/RFC-0873: Nachweis kernel module — registers 13 nachweis.* commands with lazy-loaded handlers.</purpose>
+<purpose>RFC-0707/RFC-0714/RFC-0715/RFC-0873/RFC-0886: Nachweis kernel module — registers 14 nachweis.* commands with lazy-loaded handlers.</purpose>
 <keywords>nachweis, module, kernel, commands, registration</keywords>
 <responsibilities>
   <item>Registers nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw, nachweis.approve, nachweis.public-derivative.</item>
@@ -8,6 +8,7 @@
   <item>RFC-0874: Registers nachweis.measure.lighthouse for reproducible Lighthouse assessment measurement.</item>
   <item>RFC-0875: Registers nachweis.measure.cloudflare-agent-readiness for Cloudflare URL Scanner Agent Readiness assessment.</item>
   <item>RFC-0715: Registers nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature.</item>
+  <item>RFC-0886: Registers nachweis.screenshot.upload for website screenshot upload to R2.</item>
   <item>Uses dynamic imports for lazy loading (same pattern as evidence-module.ts and bordbuch.module.ts).</item>
   <item>Declares correct scopes, flags, reads/writes for each command.</item>
 </responsibilities>
@@ -24,6 +25,7 @@
   <item>RFC-0873: add nachweis.assessment.ingest command registration.</item>
   <item>RFC-0874: add nachweis.measure.lighthouse command registration.</item>
   <item>RFC-0875: add nachweis.measure.cloudflare-agent-readiness command registration.</item>
+  <item>RFC-0886: add nachweis.screenshot.upload command registration, add --scope flag to nachweis.consent.update.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -50,6 +52,7 @@ export function createNachweisModule(): KernelModule {
       const { runNachweisLighthouseMeasure } = await import("./nachweis-lighthouse-measure.ts");
       const { runNachweisCloudflareAgentReadinessMeasure } =
         await import("./nachweis-cloudflare-agent-readiness-measure.ts");
+      const { runNachweisScreenshotUpload } = await import("./nachweis-screenshot-upload.ts");
 
       registry.registerCommand({
         name: "nachweis.ingest",
@@ -117,7 +120,7 @@ export function createNachweisModule(): KernelModule {
       registry.registerCommand({
         name: "nachweis.consent.update",
         description:
-          "RFC-0707: Update PBP Consent entity status and append nachweis-consent Bordbuch entry.",
+          "RFC-0707/RFC-0886: Update PBP Consent entity's consentScope[scope] and append nachweis-consent Bordbuch entry. Granular per-aspect consent via --scope flag.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -125,6 +128,11 @@ export function createNachweisModule(): KernelModule {
         flags: {
           system: { kind: "string", description: "Target system ID" },
           "consent-id": { kind: "string", required: true, description: "Consent entity ID (slug)" },
+          scope: {
+            kind: "string",
+            required: true,
+            description: "Consent scope aspect (document|screenshot|websiteLink)",
+          },
           status: {
             kind: "string",
             required: true,
@@ -449,6 +457,34 @@ export function createNachweisModule(): KernelModule {
         reads: [],
         writes: [],
         execute: runNachweisVerifySignature,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.screenshot.upload",
+        description:
+          "RFC-0886: Upload a website screenshot to R2 and update EvidenceSource.websiteScreenshot. Supports .webp, .png, .jpg, .jpeg.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: {
+            kind: "string",
+            required: true,
+            description: "Evidence-source slug to attach the screenshot to",
+          },
+          file: {
+            kind: "string",
+            required: true,
+            description: "Path to the screenshot file (.webp, .png, .jpg, .jpeg)",
+          },
+          "dry-run": { kind: "boolean", description: "Skip R2 upload and entity update" },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisScreenshotUpload,
       });
     },
   };

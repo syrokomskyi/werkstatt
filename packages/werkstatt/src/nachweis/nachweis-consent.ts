@@ -1,10 +1,11 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0707: nachweis.consent.update command handler — updates PBP Consent entity and appends Bordbuch entry.</purpose>
-<keywords>nachweis, consent, update, bordbuch, pbp</keywords>
+<purpose>RFC-0707/RFC-0886: nachweis.consent.update command handler — updates PBP Consent entity's consentScope[scope] and appends Bordbuch entry.</purpose>
+<keywords>nachweis, consent, update, bordbuch, pbp, scope, granular</keywords>
 <responsibilities>
-  <item>Updates PBP Consent entity's consentScope field in cache clone.</item>
-  <item>Appends nachweis-consent Bordbuch entry with metadata (previous/new status, method, actor).</item>
+  <item>Updates PBP Consent entity's consentScope[scope] field in cache clone (RFC-0886: granular per-aspect consent).</item>
+  <item>Accepts --scope flag (document|screenshot|websiteLink) to select which consent aspect to update.</item>
+  <item>Appends nachweis-consent Bordbuch entry with metadata (consentId, scope, previous/new status, method, actor).</item>
   <item>Acquires system and bordbuch locks before modifying state.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
 </responsibilities>
@@ -14,6 +15,8 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.consent.update command handler.</item>
+  <item>RFC-0885: update consentScope instead of consentStatus (document aspect only).</item>
+  <item>RFC-0886: add --scope flag for granular per-aspect consent (document|screenshot|websiteLink).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -52,11 +55,22 @@ export async function runNachweisConsentUpdate(
   const { workspaceRoot, logger } = context;
   const systemId = flagString(input, "system") ?? context.site?.name;
   const consentId = flagString(input, "consent-id");
+  const scope = flagString(input, "scope");
   const newStatus = flagString(input, "status");
   const method = flagString(input, "method") ?? "none";
 
   if (!systemId) throw new Error("[nachweis.consent.update] --system is required");
   if (!consentId) throw new Error("[nachweis.consent.update] --consent-id is required");
+  if (!scope)
+    throw new Error(
+      "[nachweis.consent.update] --scope is required (document|screenshot|websiteLink)",
+    );
+  const VALID_SCOPES = new Set(["document", "screenshot", "websiteLink"]);
+  if (!VALID_SCOPES.has(scope)) {
+    throw new Error(
+      `[nachweis.consent.update] invalid --scope '${scope}'. Must be one of: document, screenshot, websiteLink`,
+    );
+  }
   if (!newStatus) throw new Error("[nachweis.consent.update] --status is required");
 
   const entitled = await isNachweisEntitled(workspaceRoot, systemId);
@@ -80,11 +94,8 @@ export async function runNachweisConsentUpdate(
 
   const raw = await fs.readFile(consentFile, "utf8");
   const { data, content } = parseMarkdownFrontmatter(raw);
-  const previousScope =
-    (data.consentScope as { document?: { status?: string } } | undefined) ?? undefined;
-  const previousStatus = previousScope?.document?.status ?? "not_requested";
 
-  // RFC-0885: Update consentScope — per-aspect granular consent
+  // RFC-0886: Read consentScope for the requested scope aspect
   const existingScope =
     (data.consentScope as
       | {
@@ -93,20 +104,29 @@ export async function runNachweisConsentUpdate(
           websiteLink?: { status?: string; grantedAt?: string | null; method?: string };
         }
       | undefined) ?? {};
+  const previousStatus =
+    existingScope[scope as "document" | "screenshot" | "websiteLink"]?.status ?? "not_requested";
+
   const now = new Date().toISOString();
   const defaultEntry = { status: "not_requested", grantedAt: null, method: "none" };
   const docEntry = existingScope.document ?? defaultEntry;
   const screenshotEntry = existingScope.screenshot ?? defaultEntry;
   const websiteLinkEntry = existingScope.websiteLink ?? defaultEntry;
 
+  // RFC-0886: Update only the requested scope aspect, preserve others
+  const newScopeEntry = {
+    status: newStatus,
+    grantedAt:
+      newStatus === "granted"
+        ? now
+        : (existingScope[scope as "document" | "screenshot" | "websiteLink"]?.grantedAt ?? null),
+    method,
+  };
+
   data.consentScope = {
-    document: {
-      status: newStatus,
-      grantedAt: newStatus === "granted" ? now : (docEntry.grantedAt ?? null),
-      method,
-    },
-    screenshot: screenshotEntry,
-    websiteLink: websiteLinkEntry,
+    document: scope === "document" ? newScopeEntry : docEntry,
+    screenshot: scope === "screenshot" ? newScopeEntry : screenshotEntry,
+    websiteLink: scope === "websiteLink" ? newScopeEntry : websiteLinkEntry,
   };
   delete data.consentStatus;
   delete data.grantedAt;
@@ -116,7 +136,7 @@ export async function runNachweisConsentUpdate(
   await fs.writeFile(consentFile, updatedContent, "utf8");
 
   logger.info(
-    `[nachweis.consent.update] updated consent '${consentId}': ${previousStatus} → ${newStatus}`,
+    `[nachweis.consent.update] updated consent '${consentId}' ${scope}: ${previousStatus} → ${newStatus}`,
   );
 
   // Append Bordbuch entry
@@ -142,12 +162,13 @@ export async function runNachweisConsentUpdate(
       workspaceRoot,
       systemId,
       "nachweis-consent",
-      `Consent '${consentId}' updated: ${previousStatus} → ${newStatus}`,
+      `Consent '${consentId}' ${scope}: ${previousStatus} → ${newStatus}`,
       "agent",
       {
         writerRole: "nachweis",
         metadata: {
           consentId,
+          scope,
           previousStatus,
           newStatus,
           method,
@@ -165,11 +186,12 @@ export async function runNachweisConsentUpdate(
     data: {
       consentId,
       systemId,
+      scope,
       previousStatus,
       newStatus,
       bordbuchEventId,
     },
     exitCode: 0,
-    summary: `[nachweis.consent.update] ${systemId}: consent '${consentId}' ${previousStatus} → ${newStatus} (bordbuch: ${bordbuchEventId})`,
+    summary: `[nachweis.consent.update] ${systemId}: consent '${consentId}' ${scope}: ${previousStatus} → ${newStatus} (bordbuch: ${bordbuchEventId})`,
   };
 }

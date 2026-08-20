@@ -24,6 +24,7 @@
   <item>RFC-0871: add n3-timestamp-qualification-evidence-missing violation for eidas-qualified records without qualificationEvidenceRef.</item>
   <item>RFC-0872: replace evaluateGate with policy-driven evaluateGateV2, add technical-assessment validation, locale drift check.</item>
   <item>RFC-0880: add NACHWEIS-SLUG-01 check for mandatory slug in Nachweis evidence records.</item>
+  <item>RFC-0886: add NACHWEIS-DISPLAY-CONSENT-01 check for display↔consent consistency (warning, not hard failure).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -365,6 +366,29 @@ export async function runNachweisValidate(
           message: `EvidenceSource '${slug}' has kind '${kind}' but has an assessment field (only technical-assessment allows assessment)`,
           recordId: slug,
         });
+      }
+    }
+
+    // RFC-0886: NACHWEIS-DISPLAY-CONSENT-01 — display↔consent consistency
+    // For each visible display aspect, the corresponding consentScope aspect must have status "granted".
+    // This is a warning (does not fail the command), reported in the result.
+    const display = (evidenceRecord?.data as Record<string, unknown>)?.display as
+      Record<string, string> | undefined;
+    if (display) {
+      const consentScope = (consentRecord?.data as Record<string, unknown>)?.consentScope as
+        Record<string, { status?: string }> | undefined;
+      const aspects = ["document", "screenshot", "websiteLink"];
+      for (const aspect of aspects) {
+        if (display[aspect] === "visible") {
+          const aspectConsent = consentScope?.[aspect]?.status;
+          if (aspectConsent !== "granted") {
+            violations.push({
+              rule: "NACHWEIS-DISPLAY-CONSENT-01",
+              message: `EvidenceSource '${slug}' has display.${aspect} 'visible' but consentScope.${aspect}.status is '${aspectConsent ?? "not_requested"}' (expected 'granted')`,
+              recordId: slug,
+            });
+          }
+        }
       }
     }
 

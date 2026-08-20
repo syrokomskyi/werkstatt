@@ -11,6 +11,7 @@
   <item>RFC-0872: provides policy-driven publication gate V2 types and policy resolution.</item>
   <item>RFC-0873: provides AssessmentBundleV1 types, Zod schema, and assessment R2 path resolution.</item>
   <item>ADR-0054: implements the technical-assessment evidence profile decision — policy-driven gate, assessment metadata, canonical raw artifact requirement.</item>
+  <item>RFC-0886: adds display-consent-consistent gate condition, per-aspect consent evaluation, screenshot R2 path helper, NachweisScreenshotUploadResult interface.</item>
 </responsibilities>
 <non-goals>
   <item>Does not implement command handlers — those live in nachweis-*.ts files.</item>
@@ -24,6 +25,7 @@
   <item>RFC-0714: add NachweisApproveResult, NachweisPublicDerivativeResult interfaces and resolveNachweisPublicR2Path helper.</item>
   <item>RFC-0872: add NachweisPublicationGateV2, policy resolution, extend NachweisManifestEntry, replace legacy NachweisPublicationGate.</item>
   <item>RFC-0873: add AssessmentBundleV1, assessmentBundleV1Schema, AssessmentIngestResult, resolveAssessmentR2Path, mediaTypeToExt, extend uploadToR2 with optional contentType.</item>
+  <item>RFC-0886: add display-consent-consistent gate condition, per-aspect consent evaluation in evaluateGateV2, resolveNachweisScreenshotR2Path, NachweisScreenshotUploadResult, extend NachweisConsentUpdateResult with scope, extend NachweisManifestEntry with display and websiteUrl.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -80,6 +82,9 @@ export interface NachweisManifestEntry {
   observationId?: string;
   observedAt?: string;
   assessmentProviderId?: string;
+  // RFC-0886: display and website fields for Nachweis evidence kinds
+  display?: { document: string; screenshot: string; websiteLink: string };
+  websiteUrl?: string;
 }
 
 export interface NachweisManifest {
@@ -107,6 +112,8 @@ export const GATE_CONDITION_IDS = [
   "canonical-raw-artifact-verified",
   "assessment-metadata-valid",
   "execution-authorization-basis-present",
+  // RFC-0886: display↔consent consistency
+  "display-consent-consistent",
 ] as const;
 
 export type GateConditionId = (typeof GATE_CONDITION_IDS)[number];
@@ -158,6 +165,8 @@ const REQUIRED_CONDITIONS: Record<NachweisPublicationPolicyId, Set<GateCondition
     "legal-content-check-passed",
     "consent-granted",
     "public-derivative-ready",
+    // RFC-0886: display↔consent consistency (attestation-v1 only)
+    "display-consent-consistent",
   ]),
   "operational-measurement-v1": new Set<GateConditionId>([
     "source-integrity-verified",
@@ -268,9 +277,14 @@ export function evaluateGateV2(
     | undefined;
   const assessment = input.evidenceData.assessment as Record<string, unknown> | undefined;
 
-  const consentGranted =
-    (input.consentData?.consentScope as { document?: { status?: string } } | undefined | null)
-      ?.document?.status === "granted";
+  // RFC-0886: per-aspect consent logic — all visible display aspects must have granted consent
+  const display = input.evidenceData.display as Record<string, string> | undefined;
+  const consentScope = input.consentData?.consentScope as
+    Record<string, { status?: string }> | undefined;
+  const aspects = ["document", "screenshot", "websiteLink"];
+  const visibleAspects = aspects.filter((a) => display?.[a] === "visible");
+  const consentGranted = visibleAspects.every((a) => consentScope?.[a]?.status === "granted");
+  const displayConsentConsistent = consentGranted;
   const sourceIntegrityVerified =
     items != null && Object.values(items).some((item) => item.sha256 != null);
   const recordApproved = input.bordbuchEntries.some(
@@ -305,6 +319,7 @@ export function evaluateGateV2(
     "canonical-raw-artifact-verified": canonicalRawArtifactVerified,
     "assessment-metadata-valid": assessmentMetadataValid,
     "execution-authorization-basis-present": executionAuthorizationBasisPresent,
+    "display-consent-consistent": displayConsentConsistent,
   };
 
   const conditions: NachweisGateConditionResult[] = (
@@ -342,8 +357,20 @@ export interface NachweisViolation {
 export interface NachweisConsentUpdateResult {
   consentId: string;
   systemId: string;
+  scope: string;
   previousStatus: string;
   newStatus: string;
+  bordbuchEventId: string;
+}
+
+// RFC-0886: Screenshot upload result
+export interface NachweisScreenshotUploadResult {
+  slug: string;
+  systemId: string;
+  sha256: string;
+  mediaType: string;
+  storage: "public";
+  r2Key: string;
   bordbuchEventId: string;
 }
 
@@ -400,6 +427,15 @@ export function resolveNachweisPublicR2Path(
   version: number,
 ): string {
   return `${systemId}/public/${recordId}/v${version}/public.pdf`;
+}
+
+// RFC-0886: R2 path for website screenshots — separate path prefix from evidence PDFs
+export function resolveNachweisScreenshotR2Path(
+  systemId: string,
+  slug: string,
+  ext: string,
+): string {
+  return `${systemId}/screenshots/${slug}/website-screenshot${ext}`;
 }
 
 export async function uploadToR2(

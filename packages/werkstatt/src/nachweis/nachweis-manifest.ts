@@ -9,6 +9,7 @@
   <item>Writes empty manifest (records: []) when no published records exist.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
   <item>RFC-0872: include observation identity fields for technical-assessment records.</item>
+  <item>RFC-0886: include display and websiteUrl fields in manifest entries for Nachweis evidence kinds.</item>
 </responsibilities>
 <non-goals>
   <item>Does not publish records — that is nachweis.publish.</item>
@@ -19,6 +20,7 @@
   <item>RFC-0707: initial nachweis.manifest.generate command handler.</item>
   <item>RFC-0871: read Bordbuch to resolve timestampAssurance per record, default rfc3161 for legacy entries.</item>
   <item>RFC-0872: add technical-assessment kind, include observation identity fields in manifest entries.</item>
+  <item>RFC-0886: include display and websiteUrl fields in manifest entries.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -153,6 +155,17 @@ export async function runNachweisManifestGenerate(
               )?.id as string | undefined,
             }
           : {}),
+        // RFC-0886: display and websiteUrl fields
+        ...(data.display
+          ? {
+              display: data.display as {
+                document: string;
+                screenshot: string;
+                websiteLink: string;
+              },
+            }
+          : {}),
+        ...(data.websiteUrl ? { websiteUrl: data.websiteUrl as string } : {}),
       });
     }
   }
