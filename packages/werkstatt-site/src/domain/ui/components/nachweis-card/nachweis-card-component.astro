@@ -504,7 +504,14 @@ function getLiveCheckUrl(
           <div class="nachweis-card__meta-item">
             <dt>{t.subject}</dt>
             <dd>
-              <a href={props.subjectUrl} rel="noopener noreferrer">
+              <a
+                href={
+                  getLiveCheckUrl(props.provider.id, props.subjectUrl, props.providerReportUrl) ??
+                  props.subjectUrl
+                }
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 {props.subjectUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
               </a>
             </dd>
