@@ -167,6 +167,9 @@ export {
   type PbpEvidenceSource,
   type PbpEvidenceKind,
   type PbpEvidenceArtifactRole,
+  type PbpEvidenceDisplayAspect,
+  type PbpEvidenceDisplay,
+  type PbpWebsiteScreenshot,
   type NachweisAssessmentExecutionMode,
   type NachweisAssessmentAuthorizationBasis,
   type NachweisAssessmentDimensionStatus,
@@ -195,11 +198,13 @@ export {
 export {
   type PbpConsent,
   type PbpConsentMethod,
-  type PbpConsentStatus,
+  type PbpConsentScopeStatus,
+  type PbpConsentScopeEntry,
+  type PbpConsentScope,
   PBP_CONSENT_METHODS,
   isPbpConsentMethod,
-  PBP_CONSENT_STATUSES,
-  isPbpConsentStatus,
+  PBP_CONSENT_SCOPE_STATUSES,
+  isPbpConsentScopeStatus,
   CONSENT_SCHEMA_ID,
 } from "./entities/consent.js";
 

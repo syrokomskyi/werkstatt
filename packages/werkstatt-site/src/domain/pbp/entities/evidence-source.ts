@@ -5,6 +5,7 @@
  * @see RFC-0416
  * @see RFC-0706 (Nachweisregister evidence kind + items extensions)
  * @see RFC-0872 (technical-assessment kind, artifact roles, assessment field)
+ * @see RFC-0885 (display control, website fields)
  * @see ADR-0028 (Nachweisregister as PBP trust-layer extension)
  * @see ADR-0054 (technical assessments as first-class Nachweisregister evidence profile)
  */
@@ -105,6 +106,24 @@ export interface NachweisTechnicalAssessmentV1 {
   providerReportUrl?: string;
 }
 
+// RFC-0885: display control aspects for Nachweis evidence kinds
+export type PbpEvidenceDisplayAspect = "visible" | "hidden";
+
+// RFC-0885: display control for evidence rendering
+export interface PbpEvidenceDisplay {
+  document: PbpEvidenceDisplayAspect;
+  screenshot: PbpEvidenceDisplayAspect;
+  websiteLink: PbpEvidenceDisplayAspect;
+}
+
+// RFC-0885: client website screenshot artifact
+export interface PbpWebsiteScreenshot {
+  sha256: string;
+  mediaType: string;
+  storage: "private" | "public";
+  url?: string;
+}
+
 export interface PbpEvidenceSource extends PbpEntity {
   type: "evidence-source";
   name: string;
@@ -128,4 +147,10 @@ export interface PbpEvidenceSource extends PbpEntity {
   >;
   // RFC-0872: normalized technical assessment metadata
   assessment?: NachweisTechnicalAssessmentV1;
+  // RFC-0885: display control — required for Nachweis evidence kinds, rejected for others
+  display?: PbpEvidenceDisplay;
+  // RFC-0885: client website link
+  websiteUrl?: string;
+  // RFC-0885: client website screenshot
+  websiteScreenshot?: PbpWebsiteScreenshot;
 }

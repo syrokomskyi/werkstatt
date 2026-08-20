@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>PBP Consent entity for granular consent management (RFC-0706, ADR-0028, Nachweisregister).</purpose>
+<purpose>PBP Consent entity for granular consent management (RFC-0706, RFC-0885, ADR-0028, Nachweisregister).</purpose>
 <non-goals>
   <item>Does not define consent lifecycle commands — those belong to RFC-0707.</item>
   <item>Does not define R2 storage integration — that belongs to RFC-0707.</item>
@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0706 — PbpConsent entity for Nachweisregister consent management.</item>
+  <item>RFC-0885 — Replaced consentStatus/grantedAt/method with consentScope (per-aspect granular consent).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,20 +30,31 @@ export function isPbpConsentMethod(value: string): value is PbpConsentMethod {
   return PBP_CONSENT_METHODS.includes(value as PbpConsentMethod);
 }
 
-export type PbpConsentStatus =
-  "not_requested" | "requested" | "partially_granted" | "granted" | "revoked" | "expired";
+// RFC-0885: per-aspect consent scope status
+export type PbpConsentScopeStatus = "not_requested" | "granted" | "denied";
 
-export const PBP_CONSENT_STATUSES: readonly PbpConsentStatus[] = [
+export const PBP_CONSENT_SCOPE_STATUSES: readonly PbpConsentScopeStatus[] = [
   "not_requested",
-  "requested",
-  "partially_granted",
   "granted",
-  "revoked",
-  "expired",
+  "denied",
 ] as const;
 
-export function isPbpConsentStatus(value: string): value is PbpConsentStatus {
-  return PBP_CONSENT_STATUSES.includes(value as PbpConsentStatus);
+export function isPbpConsentScopeStatus(value: string): value is PbpConsentScopeStatus {
+  return PBP_CONSENT_SCOPE_STATUSES.includes(value as PbpConsentScopeStatus);
+}
+
+// RFC-0885: per-aspect consent scope entry
+export interface PbpConsentScopeEntry {
+  status: PbpConsentScopeStatus;
+  grantedAt: string | null;
+  method: PbpConsentMethod;
+}
+
+// RFC-0885: granular consent scope for document, screenshot, websiteLink aspects
+export interface PbpConsentScope {
+  document: PbpConsentScopeEntry;
+  screenshot: PbpConsentScopeEntry;
+  websiteLink: PbpConsentScopeEntry;
 }
 
 export interface PbpConsent extends PbpEntity {
@@ -52,10 +64,8 @@ export interface PbpConsent extends PbpEntity {
   purposes: string[];
   channels: string[];
   dataElements: string[];
-  method: PbpConsentMethod;
-  grantedAt: string | null;
   evidenceRef: string | null;
-  // Named consentStatus (not status) to avoid conflict with PbpEntity.status: PbpEntityStatus
-  consentStatus: PbpConsentStatus;
   withdrawalContact?: string;
+  // RFC-0885: granular per-aspect consent scope (replaces consentStatus/grantedAt/method)
+  consentScope: PbpConsentScope;
 }
