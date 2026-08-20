@@ -30,6 +30,12 @@
   overflow: hidden;
 }
 
+.nachweis-card[data-screenshot-aspect="portrait"] {
+  width: calc(270px + 2 * var(--ds-space-5));
+  max-width: 100%;
+  justify-self: start;
+}
+
 .nachweis-card:hover {
   box-shadow: var(--ds-shadow-md);
 }
