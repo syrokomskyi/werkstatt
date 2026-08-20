@@ -5,7 +5,7 @@
 <responsibilities>
   <item>Reads PBP EvidenceSource, Consent, and Claim entities from the cache clone.</item>
   <item>Checks EvidenceSource items for sha256 on Nachweis kinds.</item>
-  <item>Checks Consent entities with consentStatus granted have grantedAt set.</item>
+  <item>Checks Consent entities with consentScope.document.status granted have grantedAt set.</item>
   <item>Checks Claim entities for valid BCP 47 statementLang tags.</item>
   <item>Enforces publication gate: no published record without all conditions met.</item>
   <item>Delegates bordbuch hash-chain validation to bordbuch.validate.</item>
@@ -191,15 +191,17 @@ export async function runNachweisValidate(
     }
   }
 
-  // Check Consent entities with consentStatus granted have grantedAt set
+  // RFC-0885: Check Consent entities with consentScope.document.status granted have grantedAt set
   for (const c of consents) {
-    const consentStatus = c.data.consentStatus as string | undefined;
-    if (consentStatus === "granted") {
-      const grantedAt = c.data.grantedAt;
+    const scope = c.data.consentScope as
+      { document?: { status?: string; grantedAt?: string | null } } | undefined;
+    const docStatus = scope?.document?.status;
+    if (docStatus === "granted") {
+      const grantedAt = scope?.document?.grantedAt;
       if (grantedAt == null || grantedAt === "") {
         violations.push({
           rule: "consent-granted-without-timestamp",
-          message: `Consent '${c.id}' has consentStatus 'granted' but grantedAt is null`,
+          message: `Consent '${c.id}' has consentScope.document.status 'granted' but grantedAt is null`,
           recordId: c.id,
         });
       }

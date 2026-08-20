@@ -268,7 +268,9 @@ export function evaluateGateV2(
     | undefined;
   const assessment = input.evidenceData.assessment as Record<string, unknown> | undefined;
 
-  const consentGranted = input.consentData?.consentStatus === "granted";
+  const consentGranted =
+    (input.consentData?.consentScope as { document?: { status?: string } } | undefined | null)
+      ?.document?.status === "granted";
   const sourceIntegrityVerified =
     items != null && Object.values(items).some((item) => item.sha256 != null);
   const recordApproved = input.bordbuchEntries.some(

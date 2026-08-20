@@ -127,7 +127,23 @@ export async function runNachweisWithdraw(
   if (shouldRevokeConsent && existsSync(consentFile)) {
     const rawConsent = await fs.readFile(consentFile, "utf8");
     const { data: consentData, content: consentContent } = parseMarkdownFrontmatter(rawConsent);
-    consentData.consentStatus = "revoked";
+    const existingScope =
+      (consentData.consentScope as
+        | {
+            document?: { status?: string; grantedAt?: string | null; method?: string };
+            screenshot?: { status?: string; grantedAt?: string | null; method?: string };
+            websiteLink?: { status?: string; grantedAt?: string | null; method?: string };
+          }
+        | undefined) ?? {};
+    const defaultEntry = { status: "not_requested", grantedAt: null, method: "none" };
+    consentData.consentScope = {
+      document: { status: "denied", grantedAt: null, method: "none" },
+      screenshot: existingScope.screenshot ?? defaultEntry,
+      websiteLink: existingScope.websiteLink ?? defaultEntry,
+    };
+    delete consentData.consentStatus;
+    delete consentData.grantedAt;
+    delete consentData.method;
     const updatedConsent = stringifyMarkdownFrontmatter(consentContent, consentData);
     await fs.writeFile(consentFile, updatedConsent, "utf8");
     consentRevoked = true;
