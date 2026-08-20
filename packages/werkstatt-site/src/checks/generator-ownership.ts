@@ -681,6 +681,16 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/werkstatt/src/nachweis/nachweis-manifest.ts",
   },
 
+  // RFC-0891: Nachweis display screenshot variants (processed from raw via nachweis.screenshot.process).
+  // conditional: true — only generated when screenshots are processed.
+  {
+    path: "public/nachweis-screenshots/{slug}.webp",
+    command: "nachweis.screenshot.process",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts",
+    conditional: true,
+  },
+
   // RFC-0171: Decap CMS admin config (conditional — only for cms-git adapter sites).
   {
     path: "public/admin/config.yml",
