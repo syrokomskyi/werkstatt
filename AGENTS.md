@@ -330,3 +330,7 @@ Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guar
 - **SHA-256:** Computed from the file, stored in `websiteScreenshot.sha256`.
 - **Dry-run:** `--dry-run` skips R2 upload and entity update, returns the computed hash and R2 key.
 - **Bordbuch:** Appends a `nachweis-record` entry with `screenshotSha256` and `mediaType` metadata.
+
+## Test helper conventions (nachweis)
+
+- **`readPbpEntity` in test files must use `parseMarkdownFrontmatter` from `@warpgogol/werkstatt-shared/content`.** Naive line-by-line YAML parsing (splitting on `:` and `JSON.parse`) fails on multi-line YAML that `stringifyMarkdownFrontmatter` produces — nested objects like `consentScope` are written as multi-line YAML maps, not inline JSON. The helper should be: `const { parseMarkdownFrontmatter } = await import("@warpgogol/werkstatt-shared/content"); const { data } = parseMarkdownFrontmatter(raw); return data as Record<string, unknown>;`
