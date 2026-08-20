@@ -9,6 +9,7 @@
   <item>RFC-0875: Registers nachweis.measure.cloudflare-agent-readiness for Cloudflare URL Scanner Agent Readiness assessment.</item>
   <item>RFC-0715: Registers nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature.</item>
   <item>RFC-0886: Registers nachweis.screenshot.upload for website screenshot upload to R2.</item>
+  <item>RFC-0890: Registers nachweis.screenshot.ingest for raw screenshot ingestion to R2 private + cache clone.</item>
   <item>Uses dynamic imports for lazy loading (same pattern as evidence-module.ts and bordbuch.module.ts).</item>
   <item>Declares correct scopes, flags, reads/writes for each command.</item>
 </responsibilities>
@@ -26,6 +27,7 @@
   <item>RFC-0874: add nachweis.measure.lighthouse command registration.</item>
   <item>RFC-0875: add nachweis.measure.cloudflare-agent-readiness command registration.</item>
   <item>RFC-0886: add nachweis.screenshot.upload command registration, add --scope flag to nachweis.consent.update.</item>
+  <item>RFC-0890: add nachweis.screenshot.ingest command registration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -53,6 +55,7 @@ export function createNachweisModule(): KernelModule {
       const { runNachweisCloudflareAgentReadinessMeasure } =
         await import("./nachweis-cloudflare-agent-readiness-measure.ts");
       const { runNachweisScreenshotUpload } = await import("./nachweis-screenshot-upload.ts");
+      const { runNachweisScreenshotIngest } = await import("./nachweis-screenshot-ingest.ts");
 
       registry.registerCommand({
         name: "nachweis.ingest",
@@ -493,6 +496,41 @@ export function createNachweisModule(): KernelModule {
         reads: [],
         writes: [],
         execute: runNachweisScreenshotUpload,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.screenshot.ingest",
+        description:
+          "RFC-0890: Ingest a raw full-page screenshot to R2 private storage and cache clone. Detects image metadata via sharp, parses CaptureX filename for capturedAt, idempotent by SHA-256.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: {
+            kind: "string",
+            required: true,
+            description: "Evidence-source slug to attach the raw screenshot to",
+          },
+          file: {
+            kind: "string",
+            required: true,
+            description: "Path to the raw screenshot file",
+          },
+          "captured-at": {
+            kind: "string",
+            description: "ISO 8601 capture timestamp (overrides filename-parsed value)",
+          },
+          "dry-run": {
+            kind: "boolean",
+            description: "Compute metadata without copying or uploading",
+          },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisScreenshotIngest,
       });
     },
   };
