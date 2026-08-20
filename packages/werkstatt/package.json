@@ -226,6 +226,10 @@
       "types": "./src/subdomain/subdomain.module.ts",
       "default": "./src/subdomain/subdomain.module.ts"
     },
+    "./customdomain-module": {
+      "types": "./src/customdomain/customdomain.module.ts",
+      "default": "./src/customdomain/customdomain.module.ts"
+    },
     "./dns-module": {
       "types": "./src/dns/dns.module.ts",
       "default": "./src/dns/dns.module.ts"
