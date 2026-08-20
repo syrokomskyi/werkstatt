@@ -15,9 +15,11 @@ owners:
 reviewers: []
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
+enhancedAt: 2026-08-20
 implementedAt:
 closedAt:
-supersedes: []
+supersedes:
+  - RFC-0865
 supersededBy:
 amends: []
 amendedBy: []
@@ -33,6 +35,7 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-49
+  - DNA-52
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -114,8 +117,8 @@ The `leitstand.rollback` command is changed to use Cloudflare's native `wrangler
 
 ## Architectural fit
 
-- **DNA-49 (Fleet propagation / Leitstand):** This RFC updates the rollback path within the Leitstand. The `leitstand.rollback` command remains part of the Leitstand command surface, but the `--gate-decision` requirement is removed for rollback specifically. The `evaluateRollback()` certification authority function is no longer called by `leitstand.rollback` — it remains available for other deployment commands (`leitstand.propagate`, `leitstand.promote`) that deploy new artifacts.
-- **DNA-52 (Release artifact store):** Site rollback no longer resolves artifacts from the store. The `RollbackInput.distPath` field is removed — `wrangler rollback` does not need a local `dist/` directory. This reduces storage pressure at scale.
+- **DNA-49 (Fleet propagation / Leitstand):** This RFC supersedes RFC-0865's connection of `leitstand.rollback` to the certification authority. The current `leitstand.rollback` already calls `evaluateRollbackRequest` with hardcoded degenerate values (`rollbackArtifactHash: ""`, `rollbackArtifactReadinessVerified: true`, `sharedOutageDetected: false`) — the `--gate-decision` flag is not even registered in the command flags (`leitstand.module.ts:227-231`). The call is already a formality, not a real certification gate. This RFC formally removes the `evaluateRollback()` call from `leitstand.rollback` and removes `release.rollback` entirely. The `evaluateRollback()` function remains available for other deployment commands (`leitstand.propagate`, `leitstand.promote`) that deploy new artifacts. DNA-49 is amended: rollback is no longer connected to the certification authority.
+- **DNA-52 (Release artifact store):** This RFC amends DNA-52 by removing the rollback workflow from the artifact store resolution requirement. Site rollback no longer resolves artifacts from the store — `wrangler rollback` operates on Cloudflare's server-side version history, not local artifacts. The `RollbackInput.distPath` field is removed. Other workflows (release, deployment, Notausgang) continue to resolve artifacts through the store unchanged.
 - **DNA-73 (Sequential deployment pipeline enforcement):** Not amended. Rollback is not a deployment pipeline step (Dev → Alt → Main). It is an emergency operation that restores a previous version on a specific channel. The `--all` flag remains rejected for rollback in this RFC — fleet-level rollback is a non-goal, deferred to a separate RFC.
 - **RFC-0806 (Service deployment pipeline):** The `leitstand.service.rollback` command introduced by RFC-0806 is removed and unified into `leitstand.rollback --service <id>`.
 - **RFC-0865 (CERT-007 deployment authority):** The `evaluateRollback()` function remains in the codebase for potential future use, but `leitstand.rollback` no longer calls it.
@@ -155,7 +158,7 @@ Removed flags:
 
 ### TypeScript contracts
 
-The `RollbackInput` interface is simplified — `distPath`, `workerName`, `url`, `secretsFilePath`, `nodeModulesBinPath`, and `toReleaseId` are removed. The adapter's `rollback()` method no longer re-deploys; it calls `runWranglerRollback` directly.
+The `RollbackInput` interface is simplified — `distPath`, `url`, `secretsFilePath`, `nodeModulesBinPath`, and `toReleaseId` are removed. `workerName` is retained because `wrangler rollback` needs it to identify the Worker. The adapter's `rollback()` method no longer re-deploys; it calls `runWranglerRollback` directly.
 
 ```ts
 // packages/werkstatt/src/leitstand/adapter.ts
@@ -163,7 +166,7 @@ The `RollbackInput` interface is simplified — `distPath`, `workerName`, `url`,
 export interface RollbackInput {
   systemId: string;
   channel: "dev" | "alt" | "main";
-  // For sites: wrangler config dir from system-config.yaml
+  // For sites: temp directory with minimal wrangler.json (name only)
   // For services: services/<id>/ directory with wrangler.jsonc
   wranglerConfigDir: string;
   workerName: string;
@@ -182,6 +185,14 @@ export interface RollbackResult {
 ```
 
 The `DeploymentAdapter` interface `rollback()` method signature changes from `Promise<PropagationResult>` to `Promise<RollbackResult>`.
+
+**Site wrangler config resolution**: Sites don't have a persistent `wrangler.json` in the cache clone — the wrangler config is generated during build and lives in `releases/<id>/dist/server/wrangler.json`. For native `wrangler rollback`, a minimal `wrangler.json` with just `{"name": "<workerName>"}` is written to a temporary directory. The `workerName` is read from `system-config.yaml` at `deployment.channels.<channel>.workerName` (falling back to `systemId`). This is sufficient because `wrangler rollback` only needs the Worker name to identify which Cloudflare Worker to roll back — it does not need bindings, routes, or other config.
+
+**Service wrangler config resolution**: Services have a persistent `wrangler.jsonc` at `services/<id>/wrangler.jsonc`. `wrangler rollback` runs directly in the service directory, same as the current `leitstand.service.rollback` implementation.
+
+**Effect record compatibility**: The existing `LeitstandRollbackData` interface has `rolledBackFrom`, `rolledBackTo`, `deploymentUrl`, `purgeResult`, `releaseState`. The new shape simplifies this to `target`, `systemId`/`serviceId`, `channel`, `workerName`, `rollbackState`, `startedAt`, `completedAt`, `operationId`. The deployment effect record written to `systems-cache/{id}/deployment-operations/` preserves backward-compatible fields (`candidateId`, `state`, `channel`, `timestamp`) so `leitstand.status` continues to work without changes. `rolledBackTo` is no longer populated (native rollback doesn't expose the target version ID). `purgeResult` is preserved if cache purging is performed.
+
+**Cache purging**: The current `runLeitstandRollback` performs CDN cache purging after rollback (`leitstand-commands.ts:1380-1389`). With native `wrangler rollback`, Cloudflare does not automatically purge the CDN cache. Cache purging logic is preserved for site rollbacks — after `wrangler rollback` succeeds, the command purges the CDN cache using the same `purgeCacheByUrls` helper, using the channel URL from `system-config.yaml` and any routes from the behavior snapshot of the most recent deployment. Service rollbacks do not purge cache (services use `*.workers.dev` URLs which are not CDN-cached).
 
 The `runLeitstandRollback` command handler (`packages/werkstatt/src/leitstand/leitstand-commands.ts`) is restructured:
 
@@ -204,14 +215,18 @@ export async function runLeitstandRollback(
   }
 
   if (siteId) {
-    // Resolve site wrangler config dir from system-config.yaml
-    // Call runWranglerRollback with the site's wrangler config directory
+    // 1. Read system-config.yaml → deployment.channels.<channel>.workerName
+    // 2. Write minimal wrangler.json ({"name": "<workerName>"}) to temp dir
+    // 3. Call runWranglerRollback with the temp dir
+    // 4. Purge CDN cache for the channel URL
+    // 5. Write deployment effect record (candidateId, state, channel, timestamp)
   } else {
-    // Resolve service dir from services/registry.yaml
-    // Call runWranglerRollback with the service directory
+    // 1. Read services/registry.yaml → serviceEntry.workerName
+    // 2. Verify services/<id>/wrangler.jsonc exists
+    // 3. Call runWranglerRollback with services/<id>/ directory
+    // 4. Record rollback state in services/registry.yaml
   }
 
-  // Write deployment effect record (rollback event)
   // Return result
 }
 ```
@@ -283,7 +298,8 @@ For a failed rollback:
 - **Site or service not found in registry:** Throws with a clear error message indicating the ID was not found.
 - **Site has no wrangler config:** Throws if the site's system-config.yaml does not resolve to a wrangler config directory.
 - **Service has no `wrangler.jsonc`:** Throws if `services/<id>/wrangler.jsonc` does not exist — not a Cloudflare Worker service.
-- **Lock acquisition failure:** If another operation holds the lock for the same site or service, the command waits and retries per existing lock semantics.
+- **Lock acquisition failure:** For services, the command uses `acquireServiceLock` (same as `leitstand.service.rollback`). For sites, the command uses the existing `werkstatt.lock` primitive with the site's system ID as the lock key.
+- **Temp directory cleanup:** The minimal `wrangler.json` written to a temp directory for site rollback is cleaned up in a `finally` block, even if `wrangler rollback` fails.
 
 ## Rollout
 
@@ -292,7 +308,7 @@ For a failed rollback:
 - **Migration for `leitstand.service.rollback` callers:** Replace `leitstand.service.rollback --service <id>` with `leitstand.rollback --service <id>`.
 - **Migration for `release.rollback` callers:** `release.rollback` is removed. It only wrote an effect record without performing a real rollback. Callers should use `leitstand.rollback` instead.
 - **No build pipeline integration:** Rollback is an on-demand emergency operation, not part of the standard build/deploy pipeline.
-- **AGENTS.md update:** The rollback section in AGENTS.md is updated to reflect the unified command and removed `--gate-decision` requirement.
+- **AGENTS.md updates:** Root `AGENTS.md` §Deployment commands — update the `leitstand.rollback` description (remove `--gate-decision`, `--to-release`; add `--site`/`--service` duality). Remove the `release.rollback` and `leitstand.service.rollback` entries from the command list. `packages/werkstatt/AGENTS.md` — update the Leitstand section if it references the old rollback flags.
 - **Command manifest regeneration:** After implementation, `command.manifest.generate` is run to update the command registry.
 
 ## Alternatives considered
@@ -324,9 +340,11 @@ For a failed rollback:
 - [ ] `--to-release` flag is rejected by `leitstand.rollback`
 - [ ] `leitstand.service.rollback` command registration is removed from `leitstand.module.ts`
 - [ ] `release.rollback` command registration is removed from the release module
-- [ ] `RollbackInput` interface in `adapter.ts` no longer contains `distPath`, `toReleaseId`, `url`, `secretsFilePath`, `nodeModulesBinPath`
+- [ ] `RollbackInput` interface in `adapter.ts` no longer contains `distPath`, `toReleaseId`, `url`, `secretsFilePath`, `nodeModulesBinPath` (but retains `workerName`)
 - [ ] `cloudflare-workers.ts` adapter `rollback()` method calls `runWranglerRollback` instead of `runWranglerDeployWithRetry`
-- [ ] Deployment effect record is written after rollback with `state: "rolled-back"`
+- [ ] Deployment effect record is written after site rollback with `state: "rolled-back"`, preserving `candidateId`, `channel`, `timestamp` for `leitstand.status` compatibility
+- [ ] CDN cache purge is performed after site rollback (not after service rollback)
+- [ ] Minimal `wrangler.json` temp file is cleaned up after site rollback
 - [ ] `--json` output format matches the documented shape (evidence: test or command output)
 - [ ] `AGENTS.md` updated — rollback section reflects unified command, no `--gate-decision`, no `--to-release`
 - [ ] `rfc.validate` passes on this file with zero RFC-specific errors
@@ -343,4 +361,4 @@ For a failed rollback:
 - When implementing, reuse the existing `runWranglerRollback` function from `packages/werkstatt/src/leitstand/service-deploy-helpers.ts` — do not create a duplicate.
 - When implementing the site rollback path, resolve the wrangler config directory from the site's `system-config.yaml` (the same resolution logic used by `leitstand.propagate` and `leitstand.promote`).
 - When implementing the service rollback path, reuse the service directory resolution from `services/registry.yaml` (the same logic currently in `runLeitstandServiceRollback`).
-- The `evaluateRollback` function in `packages/werkstatt/src/certification/deployment/authority.ts` and `evaluateRollbackRequest` in `packages/werkstatt/src/leitstand/deploy-helpers.ts` MUST NOT be deleted — they remain available for other deployment commands. Only the call from `leitstand.rollback` is removed.
+- The `evaluateRollback` function in `packages/werkstatt/src/certification/deployment/authority.ts` and `evaluateRollbackRequest` in `packages/werkstatt/src/leitstand/deploy-helpers.ts` MUST NOT be deleted — they remain available for other deployment commands. Only the call from `leitstand.rollback` and `release.rollback` is removed. After implementation, verify no other command calls `evaluateRollbackRequest` — if none do, the function becomes dead code and should be noted as a candidate for future cleanup (but not deleted in this RFC).
