@@ -1361,6 +1361,7 @@
     "@syrokomskyi/axiom-study": "link:../../../pipelines/packages/axiom/axiom-study"
   },
   "devDependencies": {
+    "@astrojs/markdown-remark": "^7.0.0",
     "@cloudflare/workers-types": "^5.20260801.1",
     "@types/node": "^24.0.0",
     "astro": "^7.2.0",

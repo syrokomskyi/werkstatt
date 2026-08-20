@@ -349,6 +349,7 @@
     "@ai-sdk/anthropic": "^4.0.27",
     "@ai-sdk/openai": "^4.0.27",
     "@astrojs/compiler": "^4.0.0",
+    "@astrojs/markdown-remark": "^7.0.0",
     "@aws-sdk/client-s3": "^3.1101.0",
     "@libp2p/identify": "^4.1.12",
     "@libp2p/kad-dht": "^16.4.2",
