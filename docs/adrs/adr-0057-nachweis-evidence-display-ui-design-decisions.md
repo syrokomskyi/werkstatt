@@ -5,7 +5,7 @@ title: "Nachweis evidence display UI design decisions"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-20
@@ -20,7 +20,8 @@ related:
   - RFC-0887
   - ADR-0028
   - ADR-0054
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0057: Nachweis evidence display UI design decisions
