@@ -4,13 +4,9 @@
     "rootDir": ".",
     "outDir": "dist",
     "noEmit": true,
+    "skipLibCheck": true,
     "allowImportingTsExtensions": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/**/__tests__/**",
-    "dist/**",
-    "node_modules/**"
-  ]
+  "exclude": ["src/**/*.test.ts", "src/**/__tests__/**", "dist/**", "node_modules/**"]
 }
