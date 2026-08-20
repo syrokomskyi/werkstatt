@@ -64,6 +64,7 @@ interface NachweisAttestationCardProps {
   // RFC-0892: website meta fields
   websiteTagline?: string;
   websiteFooterTagline?: string;
+  lang?: string;
 }
 
 interface NachweisTechnicalAssessmentCardProps {
@@ -89,11 +90,13 @@ interface NachweisTechnicalAssessmentCardProps {
   status?: "draft" | "preview" | "published" | "withdrawn";
   compact?: boolean;
   providerReportUrl?: string;
+  lang?: string;
 }
 
 type NachweisCardProps = NachweisAttestationCardProps | NachweisTechnicalAssessmentCardProps;
 
 const props = Astro.props as NachweisCardProps;
+const lang = props.lang ?? "de";
 
 const headingId = `nachweis-card-${props.slug}-title`;
 
@@ -115,7 +118,8 @@ function safeHostname(url: string): string | undefined {
 function formatDate(iso: string): string {
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString("de-DE", {
+    const locale = lang === "uk" ? "uk-UA" : "de-DE";
+    return d.toLocaleDateString(locale, {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -155,6 +159,76 @@ const providerBadgeAriaLabel = `${providerBadgeText} — ${providerLabel}`;
 function hasScoreDimensions(dims: NachweisAssessmentDimension[]): boolean {
   return dims.some((d) => d.score !== undefined);
 }
+
+const i18nLabels: Record<
+  string,
+  {
+    scope: string;
+    limitations: string;
+    source: string;
+    whatIsDocumented: string;
+    whatWasNotVerified: string;
+    statusPublished: string;
+    statusPreview: string;
+    statusDraft: string;
+    statusWithdrawn: string;
+    subject: string;
+    observedAt: string;
+    method: string;
+    runs: (n: number) => string;
+    execution: string;
+    executionOperator: string;
+    executionProvider: string;
+    liveCheck: string;
+    hashes: (n: number) => string;
+    verificationLevel: string;
+  }
+> = {
+  de: {
+    scope: "Geltungsbereich:",
+    limitations: "Einschränkungen:",
+    source: "Quelle:",
+    whatIsDocumented: "Was dokumentiert wird",
+    whatWasNotVerified: "Was nicht geprüft wurde",
+    statusPublished: "Veröffentlicht",
+    statusPreview: "Vorschau",
+    statusDraft: "Entwurf",
+    statusWithdrawn: "Zurückgezogen",
+    subject: "Prüfling",
+    observedAt: "Beobachtet am",
+    method: "Methode",
+    runs: (n) => `Lauf${n !== 1 ? "e" : ""}`,
+    execution: "Ausführung",
+    executionOperator: "Operator-ausgeführt",
+    executionProvider: "Anbieter-ausgeführt",
+    liveCheck: "Live-Prüfung",
+    hashes: (n) => `Hash${n !== 1 ? "es" : ""}`,
+    verificationLevel: "Verification Level",
+  },
+  uk: {
+    scope: "Область:",
+    limitations: "Обмеження:",
+    source: "Джерело:",
+    whatIsDocumented: "Що задокументовано",
+    whatWasNotVerified: "Що не перевірено",
+    statusPublished: "Опубліковано",
+    statusPreview: "Попередній перегляд",
+    statusDraft: "Чернетка",
+    statusWithdrawn: "Відкликано",
+    subject: "Об'єкт перевірки",
+    observedAt: "Спостережено",
+    method: "Метод",
+    runs: (n) => `запуск${n !== 1 ? "ів" : ""}`,
+    execution: "Виконання",
+    executionOperator: "Виконано оператором",
+    executionProvider: "Виконано провайдером",
+    liveCheck: "Перевірка",
+    hashes: (n) => `хеш${n !== 1 ? "ів" : ""}`,
+    verificationLevel: "Рівень перевірки",
+  },
+};
+
+const t = i18nLabels[lang] ?? i18nLabels.de;
 
 const defaultGlassEffects: Effect[] = [
   { kind: "glass", enabled: true, blur: 16, saturate: 180, tintOpacity: 0.6 },
@@ -218,7 +292,7 @@ function getLiveCheckUrl(
 
       {props.scope && (
         <p class="nachweis-card__scope">
-          <span class="nachweis-card__label">Geltungsbereich:</span>
+          <span class="nachweis-card__label">{t.scope}</span>
           {props.scope}
         </p>
       )}
@@ -227,7 +301,7 @@ function getLiveCheckUrl(
 
       {props.limitations && (
         <p class="nachweis-card__limitations">
-          <span class="nachweis-card__label">Einschränkungen:</span>
+          <span class="nachweis-card__label">{t.limitations}</span>
           {props.limitations}
         </p>
       )}
@@ -240,7 +314,7 @@ function getLiveCheckUrl(
 
       {props.source && (
         <p class="nachweis-card__source">
-          <span class="nachweis-card__label">Quelle:</span>
+          <span class="nachweis-card__label">{t.source}</span>
           <cite>{props.source}</cite>
         </p>
       )}
@@ -248,13 +322,13 @@ function getLiveCheckUrl(
       <dl class="nachweis-card__verification">
         {props.verifiedScope && (
           <div class="nachweis-card__entry">
-            <dt>Was dokumentiert wird</dt>
+            <dt>{t.whatIsDocumented}</dt>
             <dd>{props.verifiedScope}</dd>
           </div>
         )}
         {props.notVerifiedScope && (
           <div class="nachweis-card__entry">
-            <dt>Was nicht geprüft wurde</dt>
+            <dt>{t.whatWasNotVerified}</dt>
             <dd>{props.notVerifiedScope}</dd>
           </div>
         )}
@@ -269,10 +343,10 @@ function getLiveCheckUrl(
       <div class="nachweis-card__footer-row">
         <p class="nachweis-card__status" data-status={props.status}>
           <span class="nachweis-card__status-text">
-            {props.status === "published" && "Veröffentlicht"}
-            {props.status === "preview" && "Vorschau"}
-            {props.status === "draft" && "Entwurf"}
-            {props.status === "withdrawn" && "Zurückgezogen"}
+            {props.status === "published" && t.statusPublished}
+            {props.status === "preview" && t.statusPreview}
+            {props.status === "draft" && t.statusDraft}
+            {props.status === "withdrawn" && t.statusWithdrawn}
           </span>
           {props.verifiedByLabel && (
             <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
@@ -428,7 +502,7 @@ function getLiveCheckUrl(
       {!props.compact && (
         <dl class="nachweis-card__meta-grid">
           <div class="nachweis-card__meta-item">
-            <dt>Prüfling</dt>
+            <dt>{t.subject}</dt>
             <dd>
               <a href={props.subjectUrl} rel="noopener noreferrer">
                 {props.subjectUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
@@ -436,24 +510,22 @@ function getLiveCheckUrl(
             </dd>
           </div>
           <div class="nachweis-card__meta-item">
-            <dt>Beobachtet am</dt>
+            <dt>{t.observedAt}</dt>
             <dd>
               <time datetime={props.observedAt}>{formatDate(props.observedAt)}</time>
             </dd>
           </div>
           <div class="nachweis-card__meta-item">
-            <dt>Methode</dt>
+            <dt>{t.method}</dt>
             <dd>
-              {props.methodology.id}@{props.methodology.version} · {props.methodology.runCount} Lauf
-              {props.methodology.runCount !== 1 ? "e" : ""}
+              {props.methodology.id}@{props.methodology.version} · {props.methodology.runCount}{" "}
+              {t.runs(props.methodology.runCount)}
             </dd>
           </div>
           <div class="nachweis-card__meta-item">
-            <dt>Ausführung</dt>
+            <dt>{t.execution}</dt>
             <dd>
-              {props.executionMode === "operator-run"
-                ? "Operator-ausgeführt"
-                : "Anbieter-ausgeführt"}
+              {props.executionMode === "operator-run" ? t.executionOperator : t.executionProvider}
             </dd>
           </div>
         </dl>
@@ -467,7 +539,7 @@ function getLiveCheckUrl(
             rel="noopener noreferrer"
             target="_blank"
           >
-            Live-Prüfung
+            {t.liveCheck}
             <span class="nachweis-card__live-check-arrow" aria-hidden="true">
               →
             </span>
@@ -484,16 +556,16 @@ function getLiveCheckUrl(
         <span class="nachweis-card__status-indicator" data-status={props.status ?? "published"}>
           <span class="nachweis-card__status-dot" aria-hidden="true" />
           <span class="nachweis-card__status-text">
-            {(props.status ?? "published") === "published" && "Veröffentlicht"}
-            {props.status === "preview" && "Vorschau"}
-            {props.status === "draft" && "Entwurf"}
-            {props.status === "withdrawn" && "Zurückgezogen"}
+            {(props.status ?? "published") === "published" && t.statusPublished}
+            {props.status === "preview" && t.statusPreview}
+            {props.status === "draft" && t.statusDraft}
+            {props.status === "withdrawn" && t.statusWithdrawn}
           </span>
         </span>
         <span
           class="nachweis-card__n-level"
           data-level={props.verificationLevel}
-          aria-label={`Verification Level ${props.verificationLevel}`}
+          aria-label={`${t.verificationLevel} ${props.verificationLevel}`}
         >
           {Array.from({ length: 3 }, (_, i) => (
             <span
@@ -515,10 +587,7 @@ function getLiveCheckUrl(
             >
               0
             </span>
-            <span class="nachweis-card__hash-suffix">
-              {" "}
-              Hash{props.sourceHashes.length !== 1 ? "es" : ""}
-            </span>
+            <span class="nachweis-card__hash-suffix"> {t.hashes(props.sourceHashes.length)}</span>
           </span>
         )}
       </footer>

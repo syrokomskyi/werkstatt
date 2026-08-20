@@ -353,7 +353,7 @@ if (limit !== undefined && limit > 0) {
         <ul class="nachweis-list__items" role="list">
           {records.map((record) => (
             <li class="nachweis-list__item">
-              <NachweisCard {...record} compact={listVariant === "compact"} />
+              <NachweisCard {...record} compact={listVariant === "compact"} lang={lang} />
             </li>
           ))}
         </ul>
