@@ -17,6 +17,7 @@
   <item>RFC-0871: replace qualifiedTimestamp prop with structured timestamp prop carrying assurance metadata.</item>
   <item>RFC-0876: add technical-assessment variant with observation history section.</item>
   <item>RFC-0887: add display-gated PDF, screenshot, and website link sections to attestation variant.</item>
+  <item>ADR-0057: screenshot caption identifies as homepage capture with capture date.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -248,7 +249,9 @@ function formatDate(iso: string): string {
               />
               <figcaption>
                 {captureDate && (
-                  <time datetime={websiteScreenshot.capturedAt}>Aufgenommen am {captureDate}</time>
+                  <time datetime={websiteScreenshot.capturedAt}>
+                    Homepage-Aufnahme vom {captureDate}
+                  </time>
                 )}
               </figcaption>
             </figure>
