@@ -81,6 +81,14 @@
     <rule>For `.astro` files, the two blocks and any `@ai-invariant` live inside the frontmatter (after the opening `---`), using `/* */` comment style.</rule>
   </astro-handling>
 
+  <game-file-comment-syntax>
+    <rule>For `.gd` files (GDScript), each line of `MODULE_CONTRACT` and `CHANGE_SUMMARY` must be prefixed with `# `.</rule>
+    <rule>For `.tscn` and `.tres` files (Godot Scene/Resource), each line must be prefixed with `; `.</rule>
+    <rule>For `.cs` files (C#), the blocks must be inside a `/* ... */` block comment.</rule>
+    <rule>`compass.validate` enforces these via `COMPASS-SYNTAX-01`.</rule>
+    <rule>`compass.summary.trim` preserves the correct prefix when rebuilding `CHANGE_SUMMARY` blocks.</rule>
+  </game-file-comment-syntax>
+
   <agent-runtime-transition rfc="RFC-0855">
     <rule>New high-risk component graph, lifecycle, effect, isolation, certification-authority, evolution, packet-transition, path-policy, git-boundary, and lease-token source files use standard coverage plus precise `@ai-invariant` statements.</rule>
     <rule>`CHANGE_SUMMARY` must identify the active packet and governing decision without copying the packet body into source comments.</rule>
