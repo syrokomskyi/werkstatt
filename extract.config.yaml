@@ -14,6 +14,8 @@ preservePackages:
   - "@warpgogol/werkstatt"
   - "@warpgogol/werkstatt-shared"
   - "@warpgogol/forge"
+stubPackages:
+  - "@warpgogol/werkstatt-site"
 packageManager: "pnpm"
 
 ci:
