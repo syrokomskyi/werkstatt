@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
+enhancedAt: 2026-08-20
 implementedAt:
 closedAt:
 supersedes: []
@@ -50,17 +51,21 @@ commands:
   added: []
   changed:
     - pbp.content.validate
+    - nachweis.consent.update
+    - nachweis.withdraw
+    - nachweis.validate
   removed: []
 appsImpacted: []
 packagesImpacted:
   - werkstatt-site
+  - werkstatt
 successSignals:
   - "display, consentScope, websiteUrl, websiteScreenshot fields present on Nachweis EvidenceSource entities"
   - "consentStatus field removed from PbpConsent; consentScope with per-aspect status/grantedAt/method replaces it"
   - "pbp.content.validate accepts new schema shape and rejects entities missing required Nachweis display/consentScope fields"
 nonGoals:
-  - "Does not define kernel commands for consent updates or screenshot upload — those belong to RFC-0886"
-  - "Does not define publication gate logic for display↔consent consistency — that belongs to RFC-0886"
+  - "Does not define new kernel commands for granular consent updates or screenshot upload — those belong to RFC-0886. Existing commands (nachweis.consent.update, nachweis.withdraw) are updated minimally to use consentScope instead of removed fields."
+  - "Does not define publication gate logic for display↔consent consistency — that belongs to RFC-0886. The existing consent-granted gate condition is updated minimally to check consentScope.document.status."
   - "Does not define UI components for rendering evidence display — that belongs to RFC-0887"
   - "Does not define ADR-level UI design decisions — that belongs to ADR-0057"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
@@ -163,8 +168,8 @@ export interface PbpEvidenceSource extends PbpEntity {
   publication?: { visibility: "public" | "private"; publishedAt?: string };
   items?: Record<string, { /* existing fields unchanged */ }>;
   assessment?: NachweisTechnicalAssessmentV1;
-  // RFC-0885: display control for Nachweis evidence kinds
-  display: PbpEvidenceDisplay;
+  // RFC-0885: display control — required for Nachweis evidence kinds, rejected for others
+  display?: PbpEvidenceDisplay;
   // RFC-0885: client website link
   websiteUrl?: string;
   // RFC-0885: client website screenshot
@@ -172,7 +177,7 @@ export interface PbpEvidenceSource extends PbpEntity {
 }
 ```
 
-`display` is required for Nachweis evidence kinds (`client-statement`, `project-confirmation`, `certificate`, `operational-evidence`, `technical-assessment`). `websiteUrl` and `websiteScreenshot` are optional (not every client has a live website).
+`display` is optional in the TypeScript interface and Zod schema. A `superRefine` requires it for Nachweis evidence kinds (`client-statement`, `project-confirmation`, `certificate`, `operational-evidence`, `technical-assessment`) and rejects it for non-Nachweis kinds (`external-web-sources`, `verified-record`, `third-party-registry`). `websiteUrl` and `websiteScreenshot` are optional (not every client has a live website).
 
 #### Consent extensions
 
@@ -230,11 +235,13 @@ const pbpWebsiteScreenshotSchema = z.object({
 });
 
 // Added to evidenceSourceSchema.extend({...}):
-//   display: pbpEvidenceDisplaySchema,
+//   display: pbpEvidenceDisplaySchema.optional(),
 //   websiteUrl: nonEmptyString.optional(),
 //   websiteScreenshot: pbpWebsiteScreenshotSchema.optional(),
 
-// superRefine: display is required for NACHWEIS_EVIDENCE_KINDS
+// superRefine additions:
+//   - display is required for NACHWEIS_EVIDENCE_KINDS
+//   - display is rejected (must be absent) for non-Nachweis evidence kinds
 ```
 
 ```ts
@@ -262,18 +269,29 @@ const pbpConsentScopeSchema = z.object({
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts` | Entity types extended with `display`, `websiteUrl`, `websiteScreenshot` |
-| `packages/werkstatt-site/src/domain/pbp/schemas/evidence-source.ts` | Zod schema extended with new fields and superRefine for Nachweis display requirement |
+| `packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts` | Entity types extended with `display?`, `websiteUrl?`, `websiteScreenshot?` |
+| `packages/werkstatt-site/src/domain/pbp/schemas/evidence-source.ts` | Zod schema extended with new fields and superRefine for Nachweis display requirement/rejection |
 | `packages/werkstatt-site/src/domain/pbp/entities/consent.ts` | Entity types: remove `consentStatus`/`grantedAt`/`method`, add `consentScope` |
 | `packages/werkstatt-site/src/domain/pbp/schemas/consent.ts` | Zod schema: remove old fields, add `consentScope` with per-aspect entries |
+| `packages/werkstatt/src/nachweis/nachweis-io.ts` | `evaluateGateV2`: update `consent-granted` condition to check `consentScope.document.status` |
+| `packages/werkstatt/src/nachweis/nachweis-consent.ts` | `nachweis.consent.update`: write `consentScope.document` instead of `consentStatus`/`method`/`grantedAt` |
+| `packages/werkstatt/src/nachweis/nachweis-withdraw.ts` | `nachweis.withdraw`: set `consentScope.document.status` to `denied` instead of `consentStatus` to `revoked` |
+| `packages/werkstatt/src/nachweis/nachweis-validate.ts` | `nachweis.validate`: check `consentScope.document.status` and `grantedAt` instead of `consentStatus`/`grantedAt` |
+| `packages/werkstatt/src/migrators/registry.ts` | Register RFC-0885 migrator for consent and evidence-source entity transformation |
+| `packages/werkstatt/src/migrators/rfc-0885.ts` | New migrator: transform existing Nachweis consent and evidence-source entities |
+| `packages/werkstatt/src/tests-handoff/nachweis-commands.test.ts` | Update test fixtures: replace `consentStatus`/`grantedAt`/`method` with `consentScope` |
+| `packages/werkstatt/src/tests-handoff/nachweis-rfc-0872.test.ts` | Update test fixtures: replace `consentStatus`/`grantedAt` with `consentScope` |
 
 ### Output format
 
-`pbp.content.validate --json` output shape is unchanged — it reports diagnostics. New validation rules emit `PBP-CONTENT-XX` diagnostics for:
+`pbp.content.validate --json` output shape is unchanged — it reports violations. The validation mechanism is Zod schema parsing (`pbpSchema.parse(doc.frontmatter)` in `content-pbp.ts`). Schema changes produce Zod error messages for:
 
-- Missing `display` field on Nachweis evidence kinds
-- Missing `consentScope` field on Nachweis consent entities
-- `granted` scope entry with null `grantedAt`
+- Missing `display` field on Nachweis evidence kinds (via `.superRefine()`)
+- `display` field present on non-Nachweis evidence kinds (via `.superRefine()`)
+- Missing `consentScope` field on consent entities (`.strict()` rejects unknown old fields and requires new fields)
+- `granted` scope entry with null `grantedAt` (via `.refine()` on `consentSchema`)
+
+The command code (`content-pbp.ts`) does not change — it already calls `pbpSchema.parse()`. The schemas it consumes change, so the command's validation behavior changes automatically.
 
 ### Failure modes
 
@@ -285,11 +303,21 @@ const pbpConsentScopeSchema = z.object({
 ## Rollout
 
 1. **Schema change**: Update entity types and Zod schemas in `packages/werkstatt-site/src/domain/pbp/`.
-2. **Migrator**: Register a migrator that transforms existing Nachweis evidence entities:
-   - `consentStatus: "granted"` → `consentScope: { document: { status: "granted", grantedAt: <old grantedAt>, method: <old method> }, screenshot: { status: "not_requested", grantedAt: null, method: "none" }, websiteLink: { status: "not_requested", grantedAt: null, method: "none" } }`
-   - Add `display: { document: "visible", screenshot: "hidden", websiteLink: "hidden" }` to existing EvidenceSource entities (safe defaults: document visible, others hidden).
-3. **Validation**: `pbp.content.validate` enforces the new schema shape.
-4. **Downstream RFCs**: RFC-0886 (kernel commands) and RFC-0887 (UI) build on this schema.
+2. **Engine-side updates**: Update `evaluateGateV2`, `nachweis.consent.update`, `nachweis.withdraw`, and `nachweis.validate` in `packages/werkstatt/src/nachweis/` to use `consentScope` instead of removed fields.
+3. **Migrator**: Register a migrator (`packages/werkstatt/src/migrators/rfc-0885.ts`) that transforms existing Nachweis entities:
+   - **Consent mapping** (old `consentStatus` → new `consentScope`):
+     | Old `consentStatus` | `consentScope.document` | `consentScope.screenshot` | `consentScope.websiteLink` |
+     | --- | --- | --- | --- |
+     | `not_requested` | `{ status: "not_requested", grantedAt: null, method: "none" }` | same | same |
+     | `requested` | `{ status: "not_requested", grantedAt: null, method: "none" }` | same | same |
+     | `partially_granted` | `{ status: "granted", grantedAt: <old grantedAt>, method: <old method> }` | `not_requested` | `not_requested` |
+     | `granted` | `{ status: "granted", grantedAt: <old grantedAt>, method: <old method> }` | `not_requested` | `not_requested` |
+     | `revoked` | `{ status: "denied", grantedAt: null, method: "none" }` | `not_requested` | `not_requested` |
+     | `expired` | `{ status: "not_requested", grantedAt: null, method: "none" }` | same | same |
+   - **EvidenceSource mapping**: Add `display: { document: "visible", screenshot: "hidden", websiteLink: "hidden" }` to existing Nachweis EvidenceSource entities (safe defaults: document visible, others hidden). Non-Nachweis evidence kinds are not touched.
+4. **Test updates**: Update test fixtures in `packages/werkstatt/src/tests-handoff/nachweis-commands.test.ts` and `nachweis-rfc-0872.test.ts` to use `consentScope` instead of `consentStatus`/`grantedAt`/`method`.
+5. **Validation**: `pbp.content.validate` enforces the new schema shape.
+6. **Downstream RFCs**: RFC-0886 (kernel commands for granular consent, screenshot upload, per-artifact gates) and RFC-0887 (UI components) build on this schema.
 
 ## Alternatives considered
 
@@ -301,20 +329,28 @@ const pbpConsentScopeSchema = z.object({
 ## Risks
 
 - **Migration risk**: Existing Nachweis entities in Sternsystem repos will fail validation until migrated. The migrator must run during mission materialization.
-- **Agent misinterpretation**: Agents may attempt to set `display` on non-Nachweis evidence kinds. The schema superRefine enforces this, but agents should be aware that `display` is required only for `NACHWEIS_EVIDENCE_KINDS`.
+- **Agent misinterpretation**: Agents may attempt to set `display` on non-Nachweis evidence kinds. The schema superRefine rejects this — `display` is required for `NACHWEIS_EVIDENCE_KINDS` and must be absent for non-Nachweis kinds.
 - **Schema strictness**: `.strict()` on both schemas means any entity with old fields (`consentStatus`, top-level `grantedAt`, top-level `method`) is rejected without a compatibility reader. This is intentional — the migrator handles the transition.
+- **Engine breakage**: The existing `nachweis.consent.update`, `nachweis.withdraw`, and `nachweis.validate` commands reference removed fields. This RFC updates them minimally to use `consentScope`. Full granular consent commands are deferred to RFC-0886.
+- **Security/privacy**: `websiteUrl` and `websiteScreenshot` publish client website data. The `consentScope.websiteLink` and `consentScope.screenshot` aspects control consent for publishing these elements. The publication gate (RFC-0886) must check these consent scopes before publishing — this dependency is explicit but enforcement belongs to RFC-0886.
 
 ## Acceptance criteria
 
 - [ ] `PbpEvidenceDisplay`, `PbpWebsiteScreenshot` types defined in `evidence-source.ts` entity
 - [ ] `PbpConsentScope`, `PbpConsentScopeEntry`, `PbpConsentScopeStatus` types defined in `consent.ts` entity
-- [ ] `PbpEvidenceSource` interface includes `display`, `websiteUrl?`, `websiteScreenshot?` fields
+- [ ] `PbpEvidenceSource` interface includes `display?`, `websiteUrl?`, `websiteScreenshot?` fields
 - [ ] `PbpConsent` interface includes `consentScope` field; old `consentStatus`, `grantedAt`, `method` fields removed
-- [ ] Zod schema `evidenceSourceSchema` validates new fields with `.strict()`
+- [ ] Zod schema `evidenceSourceSchema` validates new fields with `.strict()`; `superRefine` requires `display` for Nachweis kinds and rejects it for non-Nachweis kinds
 - [ ] Zod schema `consentSchema` validates `consentScope` with per-aspect entries; rejects old fields
 - [ ] `pbp.content.validate` rejects Nachweis EvidenceSource entities missing `display`
+- [ ] `pbp.content.validate` rejects non-Nachweis EvidenceSource entities with `display`
 - [ ] `pbp.content.validate` rejects PbpConsent entities with old `consentStatus` field
-- [ ] Migrator registered for existing Nachweis entities (consentStatus→consentScope, add default display)
+- [ ] `evaluateGateV2` in `nachweis-io.ts` checks `consentScope.document.status` instead of `consentStatus`
+- [ ] `nachweis.consent.update` writes `consentScope.document` instead of `consentStatus`/`method`/`grantedAt`
+- [ ] `nachweis.withdraw` sets `consentScope.document.status` to `denied` instead of `consentStatus` to `revoked`
+- [ ] `nachweis.validate` checks `consentScope.document.status` and `grantedAt` instead of `consentStatus`/`grantedAt`
+- [ ] Migrator registered for existing Nachweis entities (complete consentStatus→consentScope mapping, add default display)
+- [ ] Test fixtures updated in `nachweis-commands.test.ts` and `nachweis-rfc-0872.test.ts`
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
