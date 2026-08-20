@@ -68,6 +68,8 @@ For each document, run the full pipeline inline. The pipeline differs for RFCs a
 
 Execute these steps **in order**, invoking each skill inline via the `skill` tool. Do not stop between steps. Do not ask the operator "shall I proceed?" between steps — the operator's invocation of this skill IS the instruction to proceed through the entire pipeline.
 
+**Critical:** Each invoked skill (audit, enhance, plan, implement) has its own "Stop" instruction at the end. That "Stop" means **the sub-skill is complete** — it does NOT mean the pipeline should halt. After a sub-skill completes, immediately proceed to the next pipeline step. The only valid reasons to halt the pipeline are: (1) an error checkpoint after 2 failed auto-fix attempts, (2) `stopAfter: plan` limit reached, or (3) the pipeline is fully complete.
+
 **Step 1 — Audit**
 
 Invoke `fo-idea-audit` on the RFC. Pass the RFC id. Wait for it to complete (persist + commit the audit report).
