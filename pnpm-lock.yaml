@@ -381,8 +381,8 @@ importers:
         specifier: link:../../../pipelines/packages/axiom/axiom-study
         version: link:../../../pipelines/packages/axiom/axiom-study
       better-sqlite3:
-        specifier: ^13.0.2
-        version: 13.0.2
+        specifier: ^13.0.3
+        version: 13.0.3
       lighthouse:
         specifier: 13.4.1
         version: 13.4.1(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(yauzl@2.10.0)
@@ -3246,8 +3246,8 @@ packages:
     resolution: {integrity: sha512-bopVNp6ugyA150DDuZfPFdt1KZ5a94ZDiwX4hMgZDzF+GttD80lEy8kj98kbyhLXnPvhtIo93mdnLIjpCAeeOw==}
     engines: {node: '>=10.0.0'}
 
-  better-sqlite3@13.0.2:
-    resolution: {integrity: sha512-jW6oufeDhXZaiX9Lw5A+oerVClx4iFrI6uDj1zu7SqUAjak9vbJvA0NEcKLNxHiQHb6kYCoFzzXYV0YOauhV3g==}
+  better-sqlite3@13.0.3:
+    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
     engines: {node: '>=22'}
 
   big.js@6.2.2:
@@ -9592,7 +9592,7 @@ snapshots:
 
   basic-ftp@5.3.1: {}
 
-  better-sqlite3@13.0.2:
+  better-sqlite3@13.0.3:
     dependencies:
       node-addon-api: 8.9.1
     optional: true
