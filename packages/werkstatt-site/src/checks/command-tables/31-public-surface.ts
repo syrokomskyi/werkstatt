@@ -37,6 +37,7 @@ import {
   runSecurityTxtValidate,
 } from "../public-surface.ts";
 import { runCspOriginsValidate } from "../csp-origins.ts";
+import { runIconReferencesValidate } from "../icon-references.ts";
 
 export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
@@ -102,6 +103,17 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     ],
     modulePaths: ["public-surface/icons.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runPublicIconsValidate,
+  },
+  {
+    name: "icon.references.validate",
+    description:
+      "Validate that VendorIconConfig references in content resolve to generated icon components (RFC-0893).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/src/content/**/*.md", "<app>/src/content/**/*.yaml"],
+    modulePaths: ["icon-references.ts"],
+    execute: runIconReferencesValidate,
   },
   {
     name: "public.artifact.generate",

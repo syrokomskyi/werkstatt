@@ -34,23 +34,8 @@ export interface StandardListItem {
   icon?: VendorIconConfig;
 }
 
-/**
- * Convert a PascalCase icon name into the generated file path segment.
- * Handles optional "Icon" suffix and maps to kebab-case.
- */
-export function resolveIconFileName(name: string): string {
-  let base = name;
-  if (base.endsWith("Icon")) {
-    base = base.slice(0, -4);
-  }
-  const kebab = base
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
-    .toLowerCase()
-    .replace(/^icon-/, "");
-  const first = kebab.charAt(0);
-  return `${first}/${kebab}-icon.astro`;
-}
+export { resolveIconFileName } from "./resolve-icon-file-name.ts";
+import { resolveIconFileName } from "./resolve-icon-file-name.ts";
 
 const allIconModules = (
   import.meta as unknown as {

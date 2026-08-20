@@ -28,7 +28,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { resolveIconFileName } from "../domain/ui/icons/icon-resolver.ts";
+import { resolveIconFileName } from "../domain/ui/icons/resolve-icon-file-name.ts";
 import { passResult, failResult } from "./result-helpers.ts";
 import {
   collectMarkdownFilesSafe,

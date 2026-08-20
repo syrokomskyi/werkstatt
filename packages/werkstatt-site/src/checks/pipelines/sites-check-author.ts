@@ -247,6 +247,7 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "ai.policy.validate" },
   { command: "security.txt.validate" },
   { command: "public.icons.validate" },
+  { command: "icon.references.validate" },
   { command: "not-found.validate" },
   { command: "headers.security.validate" },
   { command: "public.artifact.validate" },

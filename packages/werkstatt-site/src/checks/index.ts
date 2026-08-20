@@ -74,6 +74,7 @@ export { runContentCoverageValidate } from "./content-coverage.ts";
 export { runContentVoiceLint, matchesForbiddenPhrase } from "./content-voice.ts";
 export { runPbpContentValidate } from "./content-pbp.ts";
 export { runContentReferencesValidate } from "./content-references.ts";
+export { runIconReferencesValidate } from "./icon-references.ts";
 export * from "./audit-validators.ts";
 export { runAuditLlm } from "./audit-llm.ts";
 export { runAppQaValidate } from "./app-qa.ts";
