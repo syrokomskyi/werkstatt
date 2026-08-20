@@ -28,6 +28,8 @@
 import type { KernelPipelineStep } from "@warpgogol/werkstatt/kernel";
 
 export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
+  // Pre-flight: detect corrupted pnpm store before any generator runs
+  { command: "pnpm.store.health-check" },
   // RFC-0571: regenerate root config files from templates before any validation or codegen
   { command: "config.regenerate" },
   // RFC-0557: validate workpiece @warpgogol/* imports resolve from root node_modules before any generators run
@@ -182,6 +184,7 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
 // import.meta.glob — without it, the video section renders nothing in dev.
 // The command has a warm cache (.cache/video/) so cache-hit runs are ~300ms.
 export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
+  { command: "pnpm.store.health-check" },
   { command: "config.regenerate" },
   { command: "workpiece.imports.validate" },
   { command: "yaml.contract.lint" },

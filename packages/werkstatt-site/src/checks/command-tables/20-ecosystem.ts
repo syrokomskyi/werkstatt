@@ -49,6 +49,7 @@ import { runWorkspaceWriteBoundaryLint } from "../workspace-write-boundary.ts";
 import { runGateCatalogGenerate, runGateCatalogValidate } from "../gate-catalog.ts";
 import { runTemplateImportsValidate } from "../template-imports-validate.ts";
 import { runWorkpieceImportsValidate } from "../workpiece-imports-validate.ts";
+import { runPnpmStoreHealthCheck } from "../pnpm-store-health-check.ts";
 import { runTemplateDepsDrift } from "../template-deps-drift.ts";
 import { runTemplatePeerDepsValidate } from "../template-peer-deps-validate.ts";
 import { runPlatformCommitDisciplineValidate } from "../platform-commit-discipline.ts";
@@ -123,6 +124,27 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: ["pnpm-workspace.yaml", "packages/*/package.json"],
     execute: runWorkspaceDiscoveryValidate,
+  },
+  {
+    name: "pnpm.store.health-check",
+    description:
+      "Probe pnpm store health by running `pnpm licenses list --prod --json` in the workpiece. Detects ERR_PNPM_MISSING_PACKAGE_INDEX_FILE (stale store index) before the heavy build pipeline starts, with a clear fix hint.",
+    scope: "workspace",
+    flags: {
+      site: {
+        kind: "string",
+        required: false,
+        description: "Site id to resolve workpiece.",
+      },
+      "workpiece-dir": {
+        kind: "string",
+        required: false,
+        description: "Override workpiece directory path (relative to workspace root).",
+      },
+    },
+    reads: ["missions/*/workpiece/package.json", "missions/*/workpiece/node_modules"],
+    cacheable: false,
+    execute: runPnpmStoreHealthCheck,
   },
   {
     name: "template.imports.validate",

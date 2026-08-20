@@ -33,6 +33,7 @@ export {
 export { runEcosystemCommit } from "./ecosystem-commit.ts";
 export { runTemplateImportsValidate } from "./template-imports-validate.ts";
 export { runWorkpieceImportsValidate } from "./workpiece-imports-validate.ts";
+export { runPnpmStoreHealthCheck } from "./pnpm-store-health-check.ts";
 export type {
   EcosystemCommitInput,
   EcosystemCommitResult,
