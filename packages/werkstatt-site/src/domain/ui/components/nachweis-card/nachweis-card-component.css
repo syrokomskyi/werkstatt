@@ -431,10 +431,10 @@
   background: var(--ds-color-danger-bright);
 }
 
-/* Checklist (Cloudflare style) */
+/* Checklist (Agent Readiness style) — unified with score-bars */
 .nachweis-card__checklist {
   display: grid;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-3);
   margin: 0 0 var(--ds-space-5);
 }
 
@@ -442,20 +442,18 @@
   display: flex;
   align-items: center;
   gap: var(--ds-space-3);
-  padding: var(--ds-space-2) var(--ds-space-3);
-  border-radius: var(--ds-radius-1);
-  background: var(--ds-color-surface);
+  padding: var(--ds-space-2) 0;
 }
 
 .nachweis-card__check-icon {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: var(--ds-radius-round);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--ds-text-sm);
+  font-size: var(--ds-text-xs);
   font-weight: var(--ds-font-weight-bold);
 }
 
@@ -477,13 +475,25 @@
 .nachweis-card__check-label {
   flex: 1;
   font-size: var(--ds-text-sm);
-  font-weight: var(--ds-font-weight-medium);
-  color: var(--ds-color-text);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-text-muted);
 }
 
 .nachweis-card__check-score {
-  font-size: var(--ds-text-xs);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-font-weight-bold);
   font-variant-numeric: tabular-nums;
+}
+
+.nachweis-card__check-item[data-status="pass"] .nachweis-card__check-score {
+  color: var(--ds-color-success-solid);
+}
+
+.nachweis-card__check-item[data-status="fail"] .nachweis-card__check-score {
+  color: var(--ds-color-danger-bright);
+}
+
+.nachweis-card__check-item[data-status="not-checked"] .nachweis-card__check-score {
   color: var(--ds-color-text-quiet);
 }
 
