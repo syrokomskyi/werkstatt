@@ -148,6 +148,7 @@ const pbpEvidenceDisplaySchema = z.object({
   document: pbpEvidenceDisplayAspectSchema,
   screenshot: pbpEvidenceDisplayAspectSchema,
   websiteLink: pbpEvidenceDisplayAspectSchema,
+  hashCode: pbpEvidenceDisplayAspectSchema.optional(),
 });
 
 // RFC-0890: raw screenshot artifact (the original full-page capture)

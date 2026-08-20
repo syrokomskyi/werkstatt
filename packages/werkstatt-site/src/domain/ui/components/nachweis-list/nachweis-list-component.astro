@@ -62,6 +62,7 @@ interface NachweisAttestationRecord {
   websiteTagline?: string;
   websiteFooterTagline?: string;
   sourceHashes?: string[];
+  displayHashCode?: "visible" | "hidden";
 }
 
 interface NachweisTechnicalAssessmentRecord {
@@ -290,6 +291,9 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
         result: "",
         status: "published",
         ...(allHashes.length > 0 ? { sourceHashes: allHashes } : {}),
+        ...((data.display as Record<string, unknown> | undefined)?.hashCode === "visible"
+          ? { displayHashCode: "visible" as const }
+          : {}),
         ...(data.display?.websiteLink === "visible" || data.display?.websiteLink === "hidden"
           ? { display: { websiteLink: data.display.websiteLink as "visible" | "hidden" } }
           : {}),

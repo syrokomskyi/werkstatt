@@ -65,6 +65,7 @@ interface NachweisAttestationCardProps {
   websiteTagline?: string;
   websiteFooterTagline?: string;
   sourceHashes?: string[];
+  displayHashCode?: "visible" | "hidden";
   lang?: string;
 }
 
@@ -354,11 +355,13 @@ function getLiveCheckUrl(
               <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
             )}
           </p>
-          {props.sourceHashes && props.sourceHashes.length > 0 && (
-            <p class="nachweis-card__hash-code" title={`SHA-256: ${props.sourceHashes[0]}`}>
-              {props.sourceHashes[0].slice(0, 6)}
-            </p>
-          )}
+          {props.displayHashCode === "visible" &&
+            props.sourceHashes &&
+            props.sourceHashes.length > 0 && (
+              <p class="nachweis-card__hash-code" title={`SHA-256: ${props.sourceHashes[0]}`}>
+                {props.sourceHashes[0].slice(0, 6)}
+              </p>
+            )}
         </div>
 
         {showWebsiteLink && websiteDomain && (
