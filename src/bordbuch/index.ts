@@ -29,6 +29,8 @@ export {
 export {
   appendBordbuchEntry,
   readBordbuch,
+  resolveBordbuchPath,
+  resolveBordbuchProjectionDir,
   validateWriterRole,
   computeEntryHash,
   DEPRECATED_KIND_MIGRATIONS,

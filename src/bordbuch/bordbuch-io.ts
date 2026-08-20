@@ -28,7 +28,7 @@ import {
   type BordbuchEntryKind,
 } from "@warpgogol/werkstatt/schemas";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
-import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath, resolveActiveWorkpieceDir } from "../sternsystem/registry-io.ts";
 import { gitExec } from "../werkstatt/git-exec.ts";
 import { cacheCloneCommit } from "../mission/mission-git-commit.ts";
 
@@ -40,6 +40,26 @@ export async function resolveBordbuchPath(
 ): Promise<string> {
   const cachePath = resolveCacheClonePath(workspaceRoot, systemId);
   return path.join(cachePath, BORDBUCH_PATH);
+}
+
+/**
+ * Workpiece-aware: during an active mission, bordbuch projections (bordbuch.json,
+ * bordbuch/index.html, status.generated.yaml) must be written to the workpiece
+ * directory so that astro build includes them in the site output. Without this,
+ * projections land in the cache clone and are invisible to the build — the same
+ * circular dependency pattern as resolveNachweisCachePath.
+ *
+ * The bordbuch ledger itself (events.ndjson) stays in the cache clone — it is
+ * an append-only artifact, not a workpiece file. Only the generated projections
+ * need to be workpiece-aware.
+ */
+export async function resolveBordbuchProjectionDir(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<string> {
+  const workpieceDir = await resolveActiveWorkpieceDir(workspaceRoot, systemId);
+  if (workpieceDir) return workpieceDir;
+  return resolveCacheClonePath(workspaceRoot, systemId);
 }
 
 const WRITER_ROLE_KINDS: Record<string, BordbuchEntryKind[]> = {
