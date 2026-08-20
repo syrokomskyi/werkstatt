@@ -1,7 +1,7 @@
 ---
 id: RFC-0885
 title: "Extend PBP evidence schema with display control, granular consent, and website fields"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes: []
 supersededBy:
