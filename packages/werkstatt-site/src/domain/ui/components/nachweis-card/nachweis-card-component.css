@@ -30,10 +30,20 @@
   overflow: hidden;
 }
 
-.nachweis-card[data-screenshot-aspect="portrait"] {
+.nachweis-card[data-variant="attestation"][data-screenshot-aspect="landscape"] {
+  flex: 1 1 320px;
+  max-width: 480px;
+}
+
+.nachweis-card[data-variant="technical-assessment"] {
+  flex: 1 1 360px;
+  max-width: 480px;
+}
+
+.nachweis-card[data-variant="attestation"][data-screenshot-aspect="portrait"] {
   width: calc(270px + 2 * var(--ds-space-5));
   max-width: 100%;
-  justify-self: start;
+  flex: 0 0 auto;
 }
 
 .nachweis-card:hover {
