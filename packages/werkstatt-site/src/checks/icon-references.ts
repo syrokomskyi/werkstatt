@@ -55,15 +55,15 @@ async function directoryExists(dirPath: string): Promise<boolean> {
   }
 }
 
-async function collectAstroFiles(dirPath: string): Promise<string[]> {
+async function walkFilesWithExtension(dirPath: string, extensions: string[]): Promise<string[]> {
   try {
     const entries = await readdir(dirPath, { withFileTypes: true });
     const results: string[] = [];
     for (const entry of entries) {
       const fullPath = join(dirPath, entry.name);
       if (entry.isDirectory()) {
-        results.push(...(await collectAstroFiles(fullPath)));
-      } else if (entry.isFile() && entry.name.endsWith(".astro")) {
+        results.push(...(await walkFilesWithExtension(fullPath, extensions)));
+      } else if (entry.isFile() && extensions.some((ext) => entry.name.endsWith(ext))) {
         results.push(fullPath);
       }
     }
@@ -93,15 +93,22 @@ function isVendorIconConfigLike(
 ): obj is { vendor: string; collection: string; name: string } {
   if (typeof obj !== "object" || obj === null || Array.isArray(obj)) return false;
   const o = obj as Record<string, unknown>;
-  return "vendor" in o && "collection" in o && "name" in o;
+  return (
+    "vendor" in o &&
+    "collection" in o &&
+    "name" in o &&
+    typeof o.vendor === "string" &&
+    typeof o.collection === "string" &&
+    typeof o.name === "string"
+  );
 }
 
 function isPartialIconConfig(obj: unknown): boolean {
   if (typeof obj !== "object" || obj === null || Array.isArray(obj)) return false;
   const o = obj as Record<string, unknown>;
-  const hasVendor = "vendor" in o;
-  const hasCollection = "collection" in o;
-  const hasName = "name" in o;
+  const hasVendor = "vendor" in o && typeof o.vendor === "string";
+  const hasCollection = "collection" in o && typeof o.collection === "string";
+  const hasName = "name" in o && typeof o.name === "string";
   return hasVendor && !(hasVendor && hasCollection && hasName);
 }
 
@@ -161,24 +168,6 @@ function findLineForIconRef(source: string, obj: Record<string, unknown>): numbe
   return 1;
 }
 
-async function collectYamlFiles(dirPath: string): Promise<string[]> {
-  try {
-    const entries = await readdir(dirPath, { withFileTypes: true });
-    const results: string[] = [];
-    for (const entry of entries) {
-      const fullPath = join(dirPath, entry.name);
-      if (entry.isDirectory()) {
-        results.push(...(await collectYamlFiles(fullPath)));
-      } else if (entry.isFile() && (entry.name.endsWith(".yaml") || entry.name.endsWith(".yml"))) {
-        results.push(fullPath);
-      }
-    }
-    return results;
-  } catch {
-    return [];
-  }
-}
-
 export async function runIconReferencesValidate(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -191,7 +180,7 @@ export async function runIconReferencesValidate(
   const genExists = await directoryExists(genDir);
   let astroFiles: string[] = [];
   if (genExists) {
-    astroFiles = await collectAstroFiles(genDir);
+    astroFiles = await walkFilesWithExtension(genDir, [".astro"]);
   }
 
   const availableIcons = buildAvailableIconIndex(astroFiles, genDir);
@@ -216,7 +205,9 @@ export async function runIconReferencesValidate(
   ];
 
   const mdFiles = (await Promise.all(contentDirs.map((d) => collectMarkdownFilesSafe(d)))).flat();
-  const yamlFiles = (await Promise.all(contentDirs.map((d) => collectYamlFiles(d)))).flat();
+  const yamlFiles = (
+    await Promise.all(contentDirs.map((d) => walkFilesWithExtension(d, [".yaml", ".yml"])))
+  ).flat();
 
   const allRefs: ExtractedIconRef[] = [];
   const seen = new WeakSet<object>();
