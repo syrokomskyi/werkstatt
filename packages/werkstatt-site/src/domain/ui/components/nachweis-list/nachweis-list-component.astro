@@ -17,6 +17,7 @@
   <item>RFC-0876: add variant, kindFilter, limit props; compact rendering path.</item>
   <item>RFC-0876: load published records from getCollection at build time.</item>
   <item>RFC-0880: remove file-path fallback, require explicit slug in frontmatter.</item>
+  <item>RFC-0887: pass through display/websiteUrl from evidence-source data to cards.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -52,6 +53,9 @@ interface NachweisAttestationRecord {
   status: "draft" | "preview" | "published" | "withdrawn";
   verifiedByLabel?: string;
   verifiedDate?: string;
+  // RFC-0887: display control and website link passthrough
+  display?: { websiteLink: "visible" | "hidden" };
+  websiteUrl?: string;
 }
 
 interface NachweisTechnicalAssessmentRecord {
@@ -121,6 +125,9 @@ interface EvidenceSourceData {
   name?: string;
   slug?: string;
   items?: Record<string, { sha256?: string }>;
+  // RFC-0887: display control and website fields
+  display?: { document?: string; screenshot?: string; websiteLink?: string };
+  websiteUrl?: string;
   assessment?: {
     profile?: string;
     seriesId?: string;
@@ -232,6 +239,10 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
         title: data.name ?? slug,
         result: "",
         status: "published",
+        ...(data.display?.websiteLink === "visible" || data.display?.websiteLink === "hidden"
+          ? { display: { websiteLink: data.display.websiteLink as "visible" | "hidden" } }
+          : {}),
+        ...(typeof data.websiteUrl === "string" ? { websiteUrl: data.websiteUrl } : {}),
       });
     }
   }
