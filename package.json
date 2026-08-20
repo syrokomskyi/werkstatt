@@ -367,6 +367,7 @@
     "@typescript-eslint/typescript-estree": "^8.65.0",
     "@warpgogol/forge": "^2.9.1",
     "@warpgogol/werkstatt-shared": "*",
+    "@warpgogol/werkstatt-site": "*",
     "ai": "^7.0.47",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
