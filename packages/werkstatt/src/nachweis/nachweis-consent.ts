@@ -3,7 +3,7 @@
 <purpose>RFC-0707: nachweis.consent.update command handler — updates PBP Consent entity and appends Bordbuch entry.</purpose>
 <keywords>nachweis, consent, update, bordbuch, pbp</keywords>
 <responsibilities>
-  <item>Updates PBP Consent entity's consentStatus field in cache clone.</item>
+  <item>Updates PBP Consent entity's consentScope field in cache clone.</item>
   <item>Appends nachweis-consent Bordbuch entry with metadata (previous/new status, method, actor).</item>
   <item>Acquires system and bordbuch locks before modifying state.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
@@ -80,16 +80,37 @@ export async function runNachweisConsentUpdate(
 
   const raw = await fs.readFile(consentFile, "utf8");
   const { data, content } = parseMarkdownFrontmatter(raw);
-  const previousStatus = (data.consentStatus as string | undefined) ?? "not_requested";
+  const previousScope =
+    (data.consentScope as { document?: { status?: string } } | undefined) ?? undefined;
+  const previousStatus = previousScope?.document?.status ?? "not_requested";
 
-  // Update consent fields
-  data.consentStatus = newStatus;
-  data.method = method;
-  if (newStatus === "granted") {
-    data.grantedAt = new Date().toISOString();
-  } else if (newStatus === "revoked") {
-    // Keep grantedAt as-is for audit trail
-  }
+  // RFC-0885: Update consentScope — per-aspect granular consent
+  const existingScope =
+    (data.consentScope as
+      | {
+          document?: { status?: string; grantedAt?: string | null; method?: string };
+          screenshot?: { status?: string; grantedAt?: string | null; method?: string };
+          websiteLink?: { status?: string; grantedAt?: string | null; method?: string };
+        }
+      | undefined) ?? {};
+  const now = new Date().toISOString();
+  const defaultEntry = { status: "not_requested", grantedAt: null, method: "none" };
+  const docEntry = existingScope.document ?? defaultEntry;
+  const screenshotEntry = existingScope.screenshot ?? defaultEntry;
+  const websiteLinkEntry = existingScope.websiteLink ?? defaultEntry;
+
+  data.consentScope = {
+    document: {
+      status: newStatus,
+      grantedAt: newStatus === "granted" ? now : (docEntry.grantedAt ?? null),
+      method,
+    },
+    screenshot: screenshotEntry,
+    websiteLink: websiteLinkEntry,
+  };
+  delete data.consentStatus;
+  delete data.grantedAt;
+  delete data.method;
 
   const updatedContent = stringifyMarkdownFrontmatter(content, data);
   await fs.writeFile(consentFile, updatedContent, "utf8");
