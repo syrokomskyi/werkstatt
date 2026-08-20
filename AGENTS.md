@@ -346,6 +346,21 @@ Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guar
 - **Bordbuch:** Appends a `nachweis-record` entry with `rawScreenshotSha256`, `mediaType`, `originalFilename`, `width`, `height` metadata.
 - **Relationship to `nachweis.screenshot.upload`:** The two commands are independent — either can run first. `upload` populates display fields; `ingest` populates `rawArtifact`. `upload` must not overwrite an existing `rawArtifact`.
 
+## nachweis.screenshot.process (RFC-0891)
+
+`nachweis.screenshot.process` transforms a raw full-page screenshot into a 16:9 display variant (1280x720, WebP) and uploads it to R2 public storage. It reads `websiteScreenshot.rawArtifact` from the evidence-source entity.
+
+- **R2 path:** `{systemId}/screenshots/{slug}/website-screenshot.webp` — public storage, always `.webp`.
+- **Raw file resolution:** Checks cache clone local path first (`{cachePath}/trust/evidence/screenshots/{slug}/raw/{originalFilename}`), falls back to R2 private download via `downloadFromR2(rawArtifact.r2Key)`.
+- **Crop strategy:** 16:9 region from the top of the raw image. `cropHeight = min(round(rawWidth * 9 / 16), rawHeight)`. If `cropHeight === rawHeight` (portrait images), `cropWidth = round(rawHeight * 16 / 9)` and the crop is centered horizontally.
+- **Sharp pipeline:** `.extract({ left, top, width, height }).resize(1280, 720, { fit: "cover" }).webp({ quality: 80 })`. Uses dynamic `import("sharp")` — no static dependency in `werkstatt` (DNA-64).
+- **`--crop-offset` flag:** Vertical crop offset in pixels (default: 0). Fails with max-offset error if `cropOffset + cropHeight > rawHeight`.
+- **Entity update:** Updates `websiteScreenshot` with `{ sha256, mediaType: "image/webp", storage: "public", url: r2Key, capturedAt }`. Preserves `rawArtifact` — does not delete or overwrite it.
+- **`capturedAt` propagation:** Copied from `rawArtifact.capturedAt` to the display variant. If `rawArtifact.capturedAt` is unset, `capturedAt` is `null`.
+- **Dry-run:** `--dry-run` computes crop dimensions and returns metadata without uploading or updating the entity.
+- **Bordbuch:** Appends a `nachweis-record` entry with `displaySha256`, `displayMediaType`, `displayWidth`, `displayHeight`, `rawSha256`, `r2Key` metadata.
+- **Relationship to `nachweis.screenshot.ingest`:** `ingest` (RFC-0890) must run first to populate `rawArtifact`. `process` reads `rawArtifact` and produces the display variant. `process` must not overwrite `rawArtifact`.
+
 ## Test helper conventions (nachweis)
 
 - **`readPbpEntity` in test files must use `parseMarkdownFrontmatter` from `@warpgogol/werkstatt-shared/content`.** Naive line-by-line YAML parsing (splitting on `:` and `JSON.parse`) fails on multi-line YAML that `stringifyMarkdownFrontmatter` produces — nested objects like `consentScope` are written as multi-line YAML maps, not inline JSON. The helper should be: `const { parseMarkdownFrontmatter } = await import("@warpgogol/werkstatt-shared/content"); const { data } = parseMarkdownFrontmatter(raw); return data as Record<string, unknown>;`
