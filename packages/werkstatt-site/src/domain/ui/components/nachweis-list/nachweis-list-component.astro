@@ -18,6 +18,7 @@
   <item>RFC-0876: load published records from getCollection at build time.</item>
   <item>RFC-0880: remove file-path fallback, require explicit slug in frontmatter.</item>
   <item>RFC-0887: pass through display/websiteUrl from evidence-source data to cards.</item>
+  <item>RFC-0892: pass through websiteTagline/websiteFooterTagline from evidence-source data to cards.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -56,6 +57,10 @@ interface NachweisAttestationRecord {
   // RFC-0887: display control and website link passthrough
   display?: { websiteLink: "visible" | "hidden" };
   websiteUrl?: string;
+  websiteScreenshot?: { url?: string; capturedAt?: string };
+  // RFC-0892: website meta fields
+  websiteTagline?: string;
+  websiteFooterTagline?: string;
 }
 
 interface NachweisTechnicalAssessmentRecord {
@@ -128,6 +133,10 @@ interface EvidenceSourceData {
   // RFC-0887: display control and website fields
   display?: { document?: string; screenshot?: string; websiteLink?: string };
   websiteUrl?: string;
+  websiteScreenshot?: { url?: string; capturedAt?: string };
+  // RFC-0892: website meta fields
+  websiteTagline?: string;
+  websiteFooterTagline?: string;
   assessment?: {
     profile?: string;
     seriesId?: string;
@@ -243,6 +252,20 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
           ? { display: { websiteLink: data.display.websiteLink as "visible" | "hidden" } }
           : {}),
         ...(typeof data.websiteUrl === "string" ? { websiteUrl: data.websiteUrl } : {}),
+        ...(data.display?.screenshot === "visible" && data.websiteScreenshot?.url
+          ? {
+              websiteScreenshot: {
+                url: data.websiteScreenshot.url,
+                ...(data.websiteScreenshot.capturedAt
+                  ? { capturedAt: data.websiteScreenshot.capturedAt }
+                  : {}),
+              },
+            }
+          : {}),
+        ...(typeof data.websiteTagline === "string" ? { websiteTagline: data.websiteTagline } : {}),
+        ...(typeof data.websiteFooterTagline === "string"
+          ? { websiteFooterTagline: data.websiteFooterTagline }
+          : {}),
       });
     }
   }

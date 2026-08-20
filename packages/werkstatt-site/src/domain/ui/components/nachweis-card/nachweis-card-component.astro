@@ -17,6 +17,8 @@
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0876: add discriminated union with technical-assessment variant.</item>
   <item>RFC-0887: add website link indicator to attestation variant.</item>
+  <item>RFC-0891: add website screenshot thumbnail to attestation variant.</item>
+  <item>RFC-0892: add websiteTagline and websiteFooterTagline to attestation variant.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -58,6 +60,10 @@ interface NachweisAttestationCardProps {
   // RFC-0887: display control and website link
   display?: { websiteLink: "visible" | "hidden" };
   websiteUrl?: string;
+  websiteScreenshot?: { url?: string; capturedAt?: string };
+  // RFC-0892: website meta fields
+  websiteTagline?: string;
+  websiteFooterTagline?: string;
 }
 
 interface NachweisTechnicalAssessmentCardProps {
@@ -96,6 +102,7 @@ const showWebsiteLink =
   props.variant === "attestation" && props.display?.websiteLink === "visible" && props.websiteUrl;
 const websiteDomain =
   props.variant === "attestation" && props.websiteUrl ? safeHostname(props.websiteUrl) : undefined;
+const showScreenshot = props.variant === "attestation" && props.websiteScreenshot?.url;
 
 function safeHostname(url: string): string | undefined {
   try {
@@ -135,9 +142,14 @@ const providerInitials: Record<string, string> = {
   cloudflare: "CF",
 };
 
-const providerLabel = providerLabels[props.provider.id] ?? props.provider.name;
+const providerLabel =
+  props.variant === "technical-assessment"
+    ? (providerLabels[props.provider.id] ?? props.provider.name)
+    : "";
 const providerBadgeText =
-  providerInitials[props.provider.id] ?? props.provider.name.slice(0, 2).toUpperCase();
+  props.variant === "technical-assessment"
+    ? (providerInitials[props.provider.id] ?? props.provider.name.slice(0, 2).toUpperCase())
+    : "";
 const providerBadgeAriaLabel = `${providerBadgeText} — ${providerLabel}`;
 
 function hasScoreDimensions(dims: NachweisAssessmentDimension[]): boolean {
@@ -179,7 +191,27 @@ function getLiveCheckUrl(
         {props.title}
       </h2>
 
+      {props.websiteTagline && <p class="nachweis-card__tagline">{props.websiteTagline}</p>}
+
       <p class="nachweis-card__result">{props.result}</p>
+
+      {showScreenshot && (
+        <figure class="nachweis-card__screenshot">
+          <img
+            src={props.websiteScreenshot!.url}
+            alt={`Screenshot von ${websiteDomain ?? "der Website"}`}
+            loading="lazy"
+            decoding="async"
+            width="1280"
+            height="720"
+          />
+          {props.websiteFooterTagline && (
+            <figcaption class="nachweis-card__footer-tagline">
+              {props.websiteFooterTagline}
+            </figcaption>
+          )}
+        </figure>
+      )}
 
       {props.scope && (
         <p class="nachweis-card__scope">
@@ -231,32 +263,34 @@ function getLiveCheckUrl(
         </p>
       )}
 
-      <p class="nachweis-card__status" data-status={props.status}>
-        <span class="nachweis-card__status-text">
-          {props.status === "published" && "Veröffentlicht"}
-          {props.status === "preview" && "Vorschau"}
-          {props.status === "draft" && "Entwurf"}
-          {props.status === "withdrawn" && "Zurückgezogen"}
-        </span>
-        {props.verifiedByLabel && (
-          <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
-        )}
-      </p>
-
-      {showWebsiteLink && websiteDomain && (
-        <a
-          class="nachweis-card__website-link"
-          href={props.websiteUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-          aria-label={`Website besuchen: ${websiteDomain}`}
-        >
-          <span class="nachweis-card__website-link-icon" aria-hidden="true">
-            ↗
+      <div class="nachweis-card__footer-row">
+        <p class="nachweis-card__status" data-status={props.status}>
+          <span class="nachweis-card__status-text">
+            {props.status === "published" && "Veröffentlicht"}
+            {props.status === "preview" && "Vorschau"}
+            {props.status === "draft" && "Entwurf"}
+            {props.status === "withdrawn" && "Zurückgezogen"}
           </span>
-          {websiteDomain}
-        </a>
-      )}
+          {props.verifiedByLabel && (
+            <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
+          )}
+        </p>
+
+        {showWebsiteLink && websiteDomain && (
+          <a
+            class="nachweis-card__website-link"
+            href={props.websiteUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+            aria-label={`Website besuchen: ${websiteDomain}`}
+          >
+            <span class="nachweis-card__website-link-icon" aria-hidden="true">
+              ↗
+            </span>
+            {websiteDomain}
+          </a>
+        )}
+      </div>
     </EffectHost>
   )
 }

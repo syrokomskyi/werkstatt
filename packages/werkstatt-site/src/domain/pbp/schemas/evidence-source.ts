@@ -9,6 +9,7 @@
   <item>ADR-0056 — Added superRefine requiring slug for Nachweis evidence kinds at schema level.</item>
   <item>RFC-0885 — Added display, websiteUrl, websiteScreenshot fields with superRefine for display requirement/rejection.</item>
   <item>RFC-0890 — Added rawArtifact sub-object, made display fields optional, added superRefine for display-or-raw requirement.</item>
+  <item>RFC-0892 — Added websiteTagline and websiteFooterTagline optional fields for Nachweis card display.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -248,6 +249,10 @@ export const evidenceSourceSchema = pbpEntitySchema
     websiteUrl: nonEmptyString.optional(),
     // RFC-0885: client website screenshot
     websiteScreenshot: pbpWebsiteScreenshotSchema.optional(),
+    // RFC-0892: client website header tagline (or footer logo tagline)
+    websiteTagline: nonEmptyString.optional(),
+    // RFC-0892: client website footer tagline (bottom-right corner)
+    websiteFooterTagline: nonEmptyString.optional(),
   })
   .strict()
   .superRefine((data, ctx) => {
