@@ -64,6 +64,7 @@ import type {
   DeploymentLimits,
   PropagateInput,
   RollbackInput,
+  RollbackResult,
   HealthInput,
 } from "./adapter.ts";
 import {
@@ -87,7 +88,6 @@ import {
   authorizeAndDeploy,
   verifyDurableSync,
   authorizeMainPromotion,
-  evaluateRollbackRequest,
   buildEffectRecord,
   writeDeploymentEffectRecord,
   makeR2ConfigFromEnv,
@@ -143,16 +143,17 @@ const nullAdapter: DeploymentAdapter = {
       healthChecks: [],
     };
   },
-  async rollback(input: RollbackInput): Promise<PropagationResult> {
+  async rollback(input: RollbackInput): Promise<RollbackResult> {
     const now = new Date().toISOString();
     return {
       systemId: input.systemId,
-      releaseId: input.toReleaseId,
+      channel: input.channel,
       state: "succeeded",
-      deploymentUrl: input.url,
+      workerName: input.workerName,
       startedAt: now,
       completedAt: now,
-      healthChecks: [],
+      stdout: "",
+      stderr: "",
     };
   },
   async health(_input: HealthInput) {
@@ -1261,178 +1262,255 @@ export async function runLeitstandStatus(
   };
 }
 
-// §5.3: leitstand.rollback (RFC-0627: auto-detect channel from release state, auto-step)
+// §5.3: leitstand.rollback (RFC-0895: native wrangler rollback, unified site+service)
 export interface LeitstandRollbackData {
-  systemId: string;
-  channel: Channel;
-  rolledBackFrom: string;
-  rolledBackTo: string;
-  state: "succeeded" | "failed";
-  deploymentUrl: string;
+  command: "leitstand.rollback";
+  target: "site" | "service";
+  systemId?: string;
+  serviceId?: string;
+  channel?: Channel;
+  workerName: string;
+  rollbackState: "succeeded" | "failed";
+  startedAt: string;
+  completedAt: string;
+  operationId: string;
   purgeResult?: PurgeResult;
-  releaseState: string;
 }
 
 export async function runLeitstandRollback(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandRollbackData>> {
-  const systemId = flagSite(input);
-  const toReleaseId = flagString(input, "to-release");
-  if (!systemId) throw new Error("[leitstand.rollback] --site is required");
-  if (!toReleaseId) throw new Error("[leitstand.rollback] --to-release is required");
-
+  const { workspaceRoot, logger } = context;
+  const siteId = flagSite(input);
+  const serviceId = flagString(input, "service");
   const channel = parseChannel(flagString(input, "channel"), "main");
 
-  const rollbackEval = await evaluateRollbackRequest({
-    candidateId: systemId,
-    failedGate: "dev-deploy",
-    rollbackCandidateId: toReleaseId,
-    rollbackArtifactHash: "" as Sha256Digest,
-    rollbackArtifactReadinessVerified: true,
-    sharedOutageDetected: false,
-  });
-
-  if (!rollbackEval.ok) {
-    return {
-      data: {
-        systemId,
-        channel,
-        rolledBackFrom: "",
-        rolledBackTo: toReleaseId,
-        state: "failed",
-        deploymentUrl: "",
-        releaseState: "",
-      },
-      summary: `[leitstand.rollback] denied: ${rollbackEval.ruleId} — ${rollbackEval.message}`,
-      exitCode: 1,
-    } as unknown as KernelCommandResult<LeitstandRollbackData>;
+  // Reject removed flags
+  if (flagString(input, "gate-decision")) {
+    throw new Error(
+      "[leitstand.rollback] --gate-decision is no longer supported for rollback (RFC-0895)",
+    );
+  }
+  if (flagString(input, "to-release")) {
+    throw new Error(
+      "[leitstand.rollback] --to-release is no longer supported for rollback (RFC-0895)",
+    );
   }
 
-  if (!rollbackEval.rollbackAuthorized) {
-    return {
-      data: {
-        systemId,
-        channel,
-        rolledBackFrom: "",
-        rolledBackTo: toReleaseId,
-        state: "failed",
-        deploymentUrl: "",
-        releaseState: "",
-      },
-      summary: `[leitstand.rollback] not authorized: ${rollbackEval.reason}`,
-      exitCode: 1,
-    } as unknown as KernelCommandResult<LeitstandRollbackData>;
+  // Exactly one of --site or --service required
+  if (!siteId && !serviceId) {
+    throw new Error("[leitstand.rollback] --site or --service is required");
+  }
+  if (siteId && serviceId) {
+    throw new Error("[leitstand.rollback] --site and --service are mutually exclusive");
   }
 
   const operationId = generateOperationId();
-  const now = new Date().toISOString();
-  const effectRecord = buildEffectRecord(
-    operationId,
-    systemId,
-    "dev-deploy",
-    channel,
-    "" as Sha256Digest,
-    operationId,
-    false,
-    null,
-    "rollback-authorized",
-    now,
-  );
-  const cacheCloneDir = resolveCacheClonePath(context.workspaceRoot, systemId);
-  await writeDeploymentEffectRecord(cacheCloneDir, effectRecord);
+  const startedAt = new Date().toISOString();
 
-  const systemConfig = await readSystemConfigSmart(context.workspaceRoot, systemId);
+  if (siteId) {
+    return runSiteRollback(workspaceRoot, siteId, channel, operationId, startedAt, logger);
+  } else {
+    return runServiceRollback(workspaceRoot, serviceId!, operationId, startedAt, logger);
+  }
+}
+
+async function runSiteRollback(
+  workspaceRoot: string,
+  systemId: string,
+  channel: Channel,
+  operationId: string,
+  startedAt: string,
+  logger: { info: (msg: string) => void },
+): Promise<KernelCommandResult<LeitstandRollbackData>> {
+  const systemConfig = await readSystemConfigSmart(workspaceRoot, systemId);
   if (!systemConfig.deployment) {
     throw new Error(
       `[leitstand.rollback] system '${systemId}' has no deployment config in system-config.yaml`,
     );
   }
-  const adapter = resolveAdapter(systemConfig.deployment.adapter);
+
   const channelConfig =
     channel === "dev"
       ? systemConfig.deployment.channels.dev
       : channel === "alt"
         ? systemConfig.deployment.channels.alt
         : systemConfig.deployment.channels.main;
-  const secretsFilePath = channelConfig?.secretsFile
-    ? path.join(context.workspaceRoot, channelConfig.secretsFile)
-    : undefined;
 
-  const distPath = path.join(context.workspaceRoot, "releases", toReleaseId, "dist");
+  const workerName = channelConfig?.workerName ?? systemId;
+  const channelUrl = channelConfig?.url ?? "";
 
-  let rollbackUrl = channelConfig?.url ?? "";
-  let rollbackState: "succeeded" | "failed" = "succeeded";
-  let purgeResult: PurgeResult | undefined;
+  // Create temp directory with minimal wrangler.json for wrangler rollback
+  const os = await import("node:os");
+  const tmpDir = await fs.mkdtemp(join(os.tmpdir(), "wrangler-rollback-"));
+  const wranglerConfigPath = join(tmpDir, "wrangler.json");
+  await fs.writeFile(wranglerConfigPath, JSON.stringify({ name: workerName }));
 
   try {
+    logger.info(
+      `[leitstand.rollback] rolling back ${workerName} (channel=${channel}) via wrangler rollback…`,
+    );
+
+    const adapter = resolveAdapter(systemConfig.deployment.adapter);
     const rollbackResult = await adapter.rollback({
       systemId,
-      toReleaseId,
       channel,
-      distPath,
-      workerName: channelConfig?.workerName ?? systemId,
-      url: rollbackUrl,
-      secretsFilePath,
+      wranglerConfigDir: tmpDir,
+      workerName,
     });
-    rollbackUrl = rollbackResult.deploymentUrl || rollbackUrl;
 
-    const secretsEnv = secretsFilePath ? await sourceDotenv(secretsFilePath) : {};
-    const env = { ...filterEnv(process.env), ...secretsEnv };
-    const zoneId = env["CLOUDFLARE_ZONE_ID"];
-    const apiToken = env["CLOUDFLARE_API_TOKEN"];
-    if (zoneId && apiToken) {
-      const snapshot = await readBehaviorSnapshot(context.workspaceRoot, toReleaseId);
-      const routes = snapshot?.routes ?? [];
-      const urls = collectPurgeUrls(rollbackUrl, routes);
-      purgeResult = await purgeCacheByUrls(zoneId, apiToken, urls);
+    // Purge CDN cache for site rollbacks
+    let purgeResult: PurgeResult | undefined;
+    if (rollbackResult.state === "succeeded" && channelUrl) {
+      const secretsEnv = channelConfig?.secretsFile
+        ? await sourceDotenv(join(workspaceRoot, channelConfig.secretsFile))
+        : {};
+      const env = { ...filterEnv(process.env), ...secretsEnv };
+      const zoneId = env["CLOUDFLARE_ZONE_ID"];
+      const apiToken = env["CLOUDFLARE_API_TOKEN"];
+      if (zoneId && apiToken) {
+        const urls = collectPurgeUrls(channelUrl, []);
+        purgeResult = await purgeCacheByUrls(zoneId, apiToken, urls);
+      }
     }
-  } catch (err) {
-    rollbackState = "failed";
-    return {
-      data: {
-        systemId,
-        channel,
-        rolledBackFrom: "",
-        rolledBackTo: toReleaseId,
-        state: "failed",
-        deploymentUrl: rollbackUrl,
-        releaseState: "rolled-back",
-        purgeResult,
-      },
-      summary: `[leitstand.rollback] failed: ${err instanceof Error ? err.message : String(err)}`,
-      exitCode: 1,
-    } as unknown as KernelCommandResult<LeitstandRollbackData>;
-  }
 
-  const finalEffectRecord = buildEffectRecord(
-    operationId,
-    systemId,
-    "dev-deploy",
-    channel,
-    "" as Sha256Digest,
-    operationId,
-    false,
-    null,
-    "rolled-back",
-    now,
-  );
-  await writeDeploymentEffectRecord(cacheCloneDir, finalEffectRecord);
+    // Write deployment effect record
+    const cacheCloneDir = resolveCacheClonePath(workspaceRoot, systemId);
+    const effectRecord = buildEffectRecord(
+      operationId,
+      systemId,
+      "dev-deploy",
+      channel,
+      "" as Sha256Digest,
+      operationId,
+      false,
+      null,
+      rollbackResult.state === "succeeded" ? "rolled-back" : "failed",
+      new Date().toISOString(),
+    );
+    await writeDeploymentEffectRecord(cacheCloneDir, effectRecord);
 
-  return {
-    data: {
+    const completedAt = new Date().toISOString();
+    const data: LeitstandRollbackData = {
+      command: "leitstand.rollback",
+      target: "site",
       systemId,
       channel,
-      rolledBackFrom: "",
-      rolledBackTo: toReleaseId,
-      state: rollbackState,
-      deploymentUrl: rollbackUrl,
-      releaseState: "rolled-back",
+      workerName,
+      rollbackState: rollbackResult.state,
+      startedAt,
+      completedAt,
+      operationId,
       purgeResult,
-    },
-    summary: `[leitstand.rollback] rolled back ${systemId} channel=${channel} to=${toReleaseId}`,
-    exitCode: 0,
-  } as unknown as KernelCommandResult<LeitstandRollbackData>;
+    };
+
+    if (rollbackResult.state === "failed") {
+      return {
+        data,
+        summary: `[leitstand.rollback] ${systemId}: wrangler rollback failed — ${rollbackResult.stderr.slice(-200)}`,
+        exitCode: 1,
+      } as unknown as KernelCommandResult<LeitstandRollbackData>;
+    }
+
+    return {
+      data,
+      summary: `[leitstand.rollback] ${systemId}: rolled back to previous deployment`,
+    } as unknown as KernelCommandResult<LeitstandRollbackData>;
+  } finally {
+    // Clean up temp directory
+    await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+async function runServiceRollback(
+  workspaceRoot: string,
+  serviceId: string,
+  operationId: string,
+  startedAt: string,
+  logger: { info: (msg: string) => void },
+): Promise<KernelCommandResult<LeitstandRollbackData>> {
+  const { readServicesRegistry, findServiceEntry } = await import("../sternsystem/registry-io.ts");
+  const {
+    runWranglerRollback,
+    parseEnvFile,
+    acquireServiceLock,
+    releaseServiceLock,
+    recordProdDeployState,
+  } = await import("./service-deploy-helpers.ts");
+
+  const registry = await readServicesRegistry(workspaceRoot);
+  const serviceEntry = findServiceEntry(registry, serviceId);
+  if (!serviceEntry) {
+    throw new Error(
+      `[leitstand.rollback] service '${serviceId}' not found in services/registry.yaml`,
+    );
+  }
+
+  const serviceDir = join(workspaceRoot, "services", serviceId);
+  if (!existsSync(serviceDir)) {
+    throw new Error(`[leitstand.rollback] services/${serviceId}/ does not exist`);
+  }
+
+  const wranglerPath = join(serviceDir, "wrangler.jsonc");
+  if (!existsSync(wranglerPath)) {
+    throw new Error(
+      `[leitstand.rollback] services/${serviceId}/wrangler.jsonc not found — not a Cloudflare Worker service`,
+    );
+  }
+
+  await acquireServiceLock(workspaceRoot, serviceId, operationId, "leitstand.rollback");
+
+  try {
+    const envPath = join(serviceDir, ".env");
+    const deployEnv = await parseEnvFile(envPath);
+
+    logger.info(
+      `[leitstand.rollback] rolling back ${serviceEntry.workerName} via wrangler rollback…`,
+    );
+    const wranglerResult = await runWranglerRollback(serviceDir, deployEnv);
+
+    if (wranglerResult.exitCode !== 0) {
+      const completedAt = new Date().toISOString();
+      return {
+        data: {
+          command: "leitstand.rollback",
+          target: "service",
+          serviceId,
+          workerName: serviceEntry.workerName,
+          rollbackState: "failed",
+          startedAt,
+          completedAt,
+          operationId,
+        },
+        summary: `[leitstand.rollback] ${serviceId}: wrangler rollback failed — ${wranglerResult.stderr.slice(-200)}`,
+        exitCode: 1,
+      } as unknown as KernelCommandResult<LeitstandRollbackData>;
+    }
+
+    await recordProdDeployState(workspaceRoot, serviceId, {
+      at: new Date().toISOString(),
+      state: "rolled-back",
+      operationId,
+    });
+
+    const completedAt = new Date().toISOString();
+    return {
+      data: {
+        command: "leitstand.rollback",
+        target: "service",
+        serviceId,
+        workerName: serviceEntry.workerName,
+        rollbackState: "succeeded",
+        startedAt,
+        completedAt,
+        operationId,
+      },
+      summary: `[leitstand.rollback] ${serviceId}: rolled back to previous deployment`,
+    } as unknown as KernelCommandResult<LeitstandRollbackData>;
+  } finally {
+    await releaseServiceLock(workspaceRoot, serviceId);
+  }
 }
 
 // §5.4: leitstand.health

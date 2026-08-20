@@ -51,18 +51,17 @@ export {
 } from "./deploy-execution.ts";
 export { runLeitstandServiceDevDeploy } from "./service-dev-deploy.ts";
 export { runLeitstandServicePromote } from "./service-promote.ts";
-export { runLeitstandServiceRollback } from "./service-rollback.ts";
 export type {
   PreDeployGateResult,
   ServiceDevDeployData,
   ServicePromoteData,
-  ServiceRollbackData,
 } from "./service-deploy-helpers.ts";
 export type {
   DeploymentAdapter,
   CommandRunner,
   PropagateInput,
   RollbackInput,
+  RollbackResult,
   HealthInput,
 } from "./adapter.ts";
 

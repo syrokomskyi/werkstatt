@@ -36,13 +36,20 @@ export interface PropagateInput {
 
 export interface RollbackInput {
   systemId: string;
-  toReleaseId: string;
   channel: "dev" | "alt" | "main";
-  distPath: string;
+  wranglerConfigDir: string;
   workerName: string;
-  url: string;
-  secretsFilePath: string | undefined;
-  nodeModulesBinPath?: string;
+}
+
+export interface RollbackResult {
+  systemId: string;
+  channel: "dev" | "alt" | "main";
+  state: "succeeded" | "failed";
+  workerName: string;
+  startedAt: string;
+  completedAt: string;
+  stdout: string;
+  stderr: string;
 }
 
 export interface HealthInput {
@@ -62,7 +69,7 @@ export interface DeploymentLimits {
 export interface DeploymentAdapter {
   name: string;
   propagate(input: PropagateInput): Promise<PropagationResult>;
-  rollback(input: RollbackInput): Promise<PropagationResult>;
+  rollback(input: RollbackInput): Promise<RollbackResult>;
   health(
     input: HealthInput,
   ): Promise<{ state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] }>;

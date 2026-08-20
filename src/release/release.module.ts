@@ -25,7 +25,6 @@ export function createReleaseModule(): KernelModule {
         runReleaseReady,
         runReleaseValidate,
         runReleaseList,
-        runReleaseRollback,
         runReleaseStateValidate,
         runDistDeterminismValidate,
       } = await import("./release-commands.ts");
@@ -89,24 +88,6 @@ export function createReleaseModule(): KernelModule {
         },
         reads: ["releases/*/release.yaml", "systems-cache/*/system-config.yaml"],
         execute: runReleaseList,
-      });
-      registry.registerCommand({
-        name: "release.rollback",
-        description:
-          "Mark a ready release as rolled-back and append Bordbuch entry (RFC-0357). Flags: --release.",
-        scope: "workspace",
-        supportsAllSites: false,
-        mutatesState: true,
-        flags: {
-          release: { kind: "string", required: true, description: "Release id to roll back." },
-        },
-        writes: [
-          "releases/{release}/release.yaml",
-          "systems-cache/{system}/bordbuch/events.ndjson",
-        ],
-        reads: ["releases/{release}/**", "systems-cache/{system}/system-config.yaml"],
-        cacheable: false,
-        execute: runReleaseRollback,
       });
       registry.registerCommand({
         name: "release.state.validate",
