@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: d4c16dea2d23d57e1ef5c4941068636801e991957b679a564fc43641057a2c2b
+  contentHash: d61cb11b6e94f4997e50360b43db621f31253c7810354d56a3d6535f90154a8b
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -216,6 +216,39 @@ commands:
     flags: {}
     reads:
       - <app>/public/.well-known/api-catalog
+      - <app>/src/agent-surface.generated.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: agent.ard-catalog.generate
+    description: Generate the ARD (Agentic Resource Discovery) ai-catalog.json
+      projection to public/.well-known/ai-catalog.json.
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - <app>/src/agent-surface.generated.yaml
+      - <app>/src/content/system.md
+    writes:
+      - <app>/public/.well-known/ai-catalog.json
+    validatesOutputs: []
+    pipelines: []
+  - name: agent.ard-catalog.validate
+    description: "Validate the ARD ai-catalog.json: well-formedness and
+      manifest↔catalog bijection (ARD-01..03)."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - <app>/public/.well-known/ai-catalog.json
       - <app>/src/agent-surface.generated.yaml
     writes: []
     validatesOutputs: []
@@ -6780,6 +6813,22 @@ commands:
       - <app>/src/middleware/language-redirect.ts
     validatesOutputs: []
     pipelines: []
+  - name: icon.references.validate
+    description: Validate that VendorIconConfig references in content resolve to
+      generated icon components (RFC-0893).
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - <app>/src/content/**/*.md
+      - <app>/src/content/**/*.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: icons.generate
     description: Generate Astro icon components for @warpgogol/werkstatt-site/ui
       package. Reads JSON files from packages/ui/src/assets/icons/lordicon/ and
@@ -7524,7 +7573,7 @@ commands:
     pipelines: []
   - name: leitstand.dev-deploy
     description: "Deploy workpiece to dev channel with Axiom verification gate
-      (RFC-0628). Flags: --site."
+      (RFC-0628). Flags: --site, [--release]."
     scope: workspace
     provider: workspace
     module: leitstand
@@ -7623,7 +7672,7 @@ commands:
     pipelines: []
   - name: leitstand.promote
     description: "Promote a verified alt-deployed release to the main channel with
-      live build-identity verification (RFC-0608). Flags: --release."
+      live build-identity verification (RFC-0608). Flags: --site, --release."
     scope: workspace
     provider: workspace
     module: leitstand
@@ -7672,7 +7721,7 @@ commands:
     pipelines: []
   - name: leitstand.propagate
     description: "Deploy a published release with verified Axiom evidence to the alt
-      channel (RFC-0628). Flags: --release."
+      channel (RFC-0628). Flags: --site, --release."
     scope: workspace
     provider: workspace
     module: leitstand
@@ -8935,8 +8984,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: nachweis.consent.update
-    description: "RFC-0707: Update PBP Consent entity status and append
-      nachweis-consent Bordbuch entry."
+    description: "RFC-0707/RFC-0886: Update PBP Consent entity's consentScope[scope]
+      and append nachweis-consent Bordbuch entry. Granular per-aspect consent
+      via --scope flag."
     scope: workspace
     provider: workspace
     module: nachweis
@@ -8951,6 +9001,10 @@ commands:
         kind: string
         required: true
         description: Consent entity ID (slug)
+      scope:
+        kind: string
+        required: true
+        description: Consent scope aspect (document|screenshot|websiteLink)
       status:
         kind: string
         required: true
@@ -9058,6 +9112,10 @@ commands:
       json:
         kind: boolean
         description: Output JSON result.
+      skip-bordbuch:
+        kind: boolean
+        description: "Internal: skip sichtpass Bordbuch append (used by nachweis.publish
+          and nachweis.withdraw)."
     reads: []
     writes:
       - <cache>/public/nachweise/manifest.json
@@ -9199,6 +9257,103 @@ commands:
         kind: string
         required: true
         description: Record slug to publish
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.screenshot.ingest
+    description: "RFC-0890: Ingest a raw full-page screenshot to R2 private storage
+      and cache clone. Detects image metadata via sharp, parses CaptureX
+      filename for capturedAt, idempotent by SHA-256."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Evidence-source slug to attach the raw screenshot to
+      file:
+        kind: string
+        required: true
+        description: Path to the raw screenshot file
+      captured-at:
+        kind: string
+        description: ISO 8601 capture timestamp (overrides filename-parsed value)
+      dry-run:
+        kind: boolean
+        description: Compute metadata without copying or uploading
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.screenshot.process
+    description: "RFC-0891: Process a raw full-page screenshot into a 16:9 display
+      variant (1280x720, WebP) and upload to R2 public. Reads rawArtifact from
+      evidence-source, crops from top, resizes, converts."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Evidence-source slug to process the screenshot for
+      dry-run:
+        kind: boolean
+        description: Compute crop dimensions without uploading or updating entity
+      crop-offset:
+        kind: string
+        description: "Vertical crop offset in pixels (default: 0, top of page)"
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.screenshot.upload
+    description: "RFC-0886: Upload a website screenshot to R2 and update
+      EvidenceSource.websiteScreenshot. Supports .webp, .png, .jpg, .jpeg."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Evidence-source slug to attach the screenshot to
+      file:
+        kind: string
+        required: true
+        description: Path to the screenshot file (.webp, .png, .jpg, .jpeg)
+      dry-run:
+        kind: boolean
+        description: Skip R2 upload and entity update
       json:
         kind: boolean
         description: Output JSON result.
@@ -10677,6 +10832,32 @@ commands:
     timeoutMs: null
     flags: {}
     reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: pnpm.store.health-check
+    description: Probe pnpm store health by running `pnpm licenses list --prod
+      --json` in the workpiece. Detects ERR_PNPM_MISSING_PACKAGE_INDEX_FILE
+      (stale store index) before the heavy build pipeline starts, with a clear
+      fix hint.
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      site:
+        kind: string
+        required: false
+        description: Site id to resolve workpiece.
+      workpiece-dir:
+        kind: string
+        required: false
+        description: Override workpiece directory path (relative to workspace root).
+    reads:
+      - missions/*/workpiece/package.json
+      - missions/*/workpiece/node_modules
     writes: []
     validatesOutputs: []
     pipelines: []

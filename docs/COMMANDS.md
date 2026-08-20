@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 776. Raw manifest entries: 776.
+Generated command rows: 783. Raw manifest entries: 783.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -24,6 +24,8 @@ Generated command rows: 776. Raw manifest entries: 776.
 | `adr.validate` | workspace | workspace | no | no | Validate ADR frontmatter schema, required markdown sections, referential integrity (supersedes/supersededBy), and id/filename consistency. Pass --id to validate a single file, or run without arguments for all. |
 | `agent.api-catalog.generate` | workspace | app | yes | no | Generate the RFC 9727 linkset+json API Catalog projection to public/.well-known/api-catalog (RFC-0783). |
 | `agent.api-catalog.validate` | workspace | app | no | no | Validate the API Catalog linkset: well-formedness and manifest↔linkset bijection (RFC-0783, AGC-01..03). |
+| `agent.ard-catalog.generate` | workspace | app | yes | no | Generate the ARD (Agentic Resource Discovery) ai-catalog.json projection to public/.well-known/ai-catalog.json. |
+| `agent.ard-catalog.validate` | workspace | app | no | no | Validate the ARD ai-catalog.json: well-formedness and manifest↔catalog bijection (ARD-01..03). |
 | `agent.capability.validate` | workspace | app | no | no | Validate the closed capability catalog (packages/werkstatt-site/src/domain/ontology/capabilities/) and enforce human-parity + gating for capabilities active on this app (RFC-0288, AGC-01..05). |
 | `agent.discovery-endpoints.generate` | workspace | app | yes | no | Generate agent discovery endpoint files: auth.md, agent-skills/index.json, oauth-protected-resource, oauth-authorization-server. |
 | `agent.dns-aid.generate` | workspace | app | yes | no | Generate the DNS-AID SVCB record declaration in systems-cache/<id>/dns-records.yaml from the Agent Surface Manifest (RFC-0786). |
@@ -357,6 +359,7 @@ Generated command rows: 776. Raw manifest entries: 776.
 | `i18n.config.validate` | workspace | workspace | no | no | Validate i18n configuration in src/content/assets/system.md. Checks default language, supported languages, and orphan content files (RFC-0038). |
 | `i18n.detect.implement` | workspace | workspace | yes | no | Auto-generate language detection middleware from system.md i18n config. Generates src/middleware/language-detect.ts and src/scripts/language-persist.ts (RFC-0038). |
 | `i18n.middleware.generate` | workspace | app | yes | no | Generate language-redirect middleware from system.md i18n config before Astro build (RFC-0055). |
+| `icon.references.validate` | workspace | app | no | no | Validate that VendorIconConfig references in content resolve to generated icon components (RFC-0893). |
 | `icons.generate` | workspace | workspace | no | no | Generate Astro icon components for @warpgogol/werkstatt-site/ui package. Reads JSON files from packages/ui/src/assets/icons/lordicon/ and outputs components to packages/ui/src/icons/gen/lordicon/. |
 | `identity.bootstrap` | workspace | workspace | yes | no | Generate operator keypair, write werkstatt.identity.json, issue self-ownership VC (RFC-0558). |
 | `identity.credential.issue` | workspace | workspace | yes | no | Issue a SiteOwnershipCredential or ActorDelegationCredential (RFC-0558). |
@@ -395,11 +398,11 @@ Generated command rows: 776. Raw manifest entries: 776.
 | `legal.scaffold` | workspace | app | yes | no | Generate Impressum and Datenschutz page+prose stubs for every DE/AT/CH locale in system.md i18n.supported. Merges nav targets and footer.legalIds/contactIds into the per-locale labels.md. Idempotent. Reads identity.legal.* from system.md; missing fields land as NEED_THIS_<FIELD> placeholders (RFC-0096). |
 | `legal.translation.validate` | workspace | app | no | no | Validate the RFC-0174 binding-language policy: every page `translation` block is internally consistent (status enum, binding never disabled, mandatory notice on while a locale is unofficial, binding-language file present, disabled locales have a fallback). |
 | `leitstand.certify` | workspace | workspace | no | no | Produce a GateDecisionV1 JSON file via certification orchestration (RFC-0866). Flags: --site, --gate, --release, --artifact-hash. |
-| `leitstand.dev-deploy` | workspace | workspace | no | no | Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --site. |
+| `leitstand.dev-deploy` | workspace | workspace | no | no | Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --site, [--release]. |
 | `leitstand.health` | workspace | workspace | no | no | Run health checks against a deployed channel (RFC-0379). Flags: --site, [--channel dev\|alt\|main]. |
 | `leitstand.pipeline.check` | workspace | workspace | no | no | Inspect deployment pipeline state for a release (RFC-0842). Flags: --release. |
-| `leitstand.promote` | workspace | workspace | yes | no | Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --release. |
-| `leitstand.propagate` | workspace | workspace | yes | no | Deploy a published release with verified Axiom evidence to the alt channel (RFC-0628). Flags: --release. |
+| `leitstand.promote` | workspace | workspace | yes | no | Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --site, --release. |
+| `leitstand.propagate` | workspace | workspace | yes | no | Deploy a published release with verified Axiom evidence to the alt channel (RFC-0628). Flags: --site, --release. |
 | `leitstand.rollback` | workspace | workspace | yes | no | Rollback to the previous published release; auto-detects channel from release state and auto-steps release state (RFC-0628). Flags: --site, [--to-release]. |
 | `leitstand.service.dev-deploy` | workspace | workspace | yes | no | Deploy a shared Cloudflare Worker service to the dev channel with pre-deploy gates, lock, and health check (RFC-0806). Flags: --service. |
 | `leitstand.service.promote` | workspace | workspace | yes | no | Promote a shared Cloudflare Worker service to production with pre-deploy gates, subdomain validation, lock, and health check (RFC-0806). Flags: --service. |
@@ -455,7 +458,7 @@ Generated command rows: 776. Raw manifest entries: 776.
 | `mobile.layout.check` | workspace | app | no | no | RFC-0838: Playwright mobile layout stability checks — horizontal overflow, rotation stability, CLS. |
 | `nachweis.approve` | workspace | workspace | yes | no | RFC-0714: Record human approval, verification level, and legal content check in a Bordbuch entry. Operator-invoked only. |
 | `nachweis.assessment.ingest` | workspace | workspace | yes | no | RFC-0873: Ingest a technical-assessment bundle (AssessmentBundleV1) — validate, hash artifacts, upload to R2, write PBP evidence-source, append Bordbuch entry. |
-| `nachweis.consent.update` | workspace | workspace | yes | no | RFC-0707: Update PBP Consent entity status and append nachweis-consent Bordbuch entry. |
+| `nachweis.consent.update` | workspace | workspace | yes | no | RFC-0707/RFC-0886: Update PBP Consent entity's consentScope[scope] and append nachweis-consent Bordbuch entry. Granular per-aspect consent via --scope flag. |
 | `nachweis.ingest` | workspace | workspace | yes | no | RFC-0707: Ingest a PDF evidence document — compute SHA-256, upload to R2, append Bordbuch entry. |
 | `nachweis.key.ensure` | workspace | workspace | yes | no | RFC-0715: Generate an Ed25519 keypair for Nachweis operator signatures. Writes private key to file, publishes public key JSON. |
 | `nachweis.manifest.generate` | workspace | workspace | yes | no | RFC-0707: Generate public/nachweise/manifest.json from published records (generatedAt: null per RFC-0602). |
@@ -463,6 +466,9 @@ Generated command rows: 776. Raw manifest entries: 776.
 | `nachweis.measure.lighthouse` | workspace | workspace | yes | no | RFC-0874: Run five sequential canonical Google Lighthouse runs, parse LHR JSON, aggregate categories, build AssessmentBundleV1, and delegate to nachweis.assessment.ingest. |
 | `nachweis.public-derivative` | workspace | workspace | yes | no | RFC-0714: Upload a public-derivative PDF to R2 and update evidence-source items.public.storage to public. Idempotent by SHA-256. |
 | `nachweis.publish` | workspace | workspace | yes | no | RFC-0707/RFC-0872: Enforce policy-driven publication gate V2 and transition record to published. Gate policy resolved by evidence kind; technical-assessment does not require consent or public derivative. |
+| `nachweis.screenshot.ingest` | workspace | workspace | yes | no | RFC-0890: Ingest a raw full-page screenshot to R2 private storage and cache clone. Detects image metadata via sharp, parses CaptureX filename for capturedAt, idempotent by SHA-256. |
+| `nachweis.screenshot.process` | workspace | workspace | yes | no | RFC-0891: Process a raw full-page screenshot into a 16:9 display variant (1280x720, WebP) and upload to R2 public. Reads rawArtifact from evidence-source, crops from top, resizes, converts. |
+| `nachweis.screenshot.upload` | workspace | workspace | yes | no | RFC-0886: Upload a website screenshot to R2 and update EvidenceSource.websiteScreenshot. Supports .webp, .png, .jpg, .jpeg. |
 | `nachweis.sign` | workspace | workspace | yes | no | RFC-0715: Sign a Nachweis record with an Ed25519 operator key. Appends nachweis-signed Bordbuch entry. Idempotent. |
 | `nachweis.timestamp` | workspace | workspace | yes | no | RFC-0715/RFC-0871: Obtain an RFC 3161 timestamp token for a signed Nachweis record. Requires nachweis.sign to have run first. Idempotent. RFC-0871: --timestamp-assurance distinguishes rfc3161 (default) from eidas-qualified (requires --qualification-evidence-ref). |
 | `nachweis.validate` | workspace | workspace | no | no | RFC-0707/RFC-0872: Validate PBP trust entities and enforce policy-driven publication gate V2 conditions (attestation-v1, operational-measurement-v1, technical-assessment-v1). |
@@ -540,6 +546,7 @@ Generated command rows: 776. Raw manifest entries: 776.
 | `platform.consistency.validate` | workspace | workspace | no | no | Validate that platformSemanticHash drift is accompanied by a version bump, and that versionBump RFCs correspond to actual version changes (RFC-0478). |
 | `playwright.chromium.ensure` | workspace | workspace | no | no | RFC-0647: Ensure Playwright Chromium is installed. Launches Chromium to verify; auto-installs if missing and PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is not set. Used by build.post pipeline (step 0) and mission.materialize. |
 | `playwright.preflight.check` | workspace | workspace | no | no | RFC-0813: Pre-flight check for Playwright Chromium. Fails fast (exitCode 1) if Chromium is not launchable. Does not auto-install — use playwright.chromium.ensure for that. Used by mission.validate before build.prepare. |
+| `pnpm.store.health-check` | workspace | workspace | no | no | Probe pnpm store health by running `pnpm licenses list --prod --json` in the workpiece. Detects ERR_PNPM_MISSING_PACKAGE_INDEX_FILE (stale store index) before the heavy build pipeline starts, with a clear fix hint. |
 | `preview.images.generate` | workspace | app | no | no | Generate build-time static PNG OG preview images for missing pages, using preset template layouts from site-kernel-checks. |
 | `preview.images.validate` | workspace | app | no | no | Validate every routable page resolves an OG preview image, using page-specific output or fallbacks, ensuring public/og-image.png is present. |
 | `print.contract.validate` | workspace | app | no | no | Validate page print frontmatter and site print labels against the RFC-0257 content contract (PRINT-CONTRACT-01..07). |
