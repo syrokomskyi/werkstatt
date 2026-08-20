@@ -74,9 +74,6 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.manifest.generate" },
   // RFC-0786: generate DNS-AID SVCB record declaration from the manifest.
   { command: "agent.dns-aid.generate" },
-  // RFC-0753: push DNS records to Cloudflare (requires CLOUDFLARE_API_TOKEN).
-  // dns.record.upsert is workspace-scoped; --site is auto-injected by the pipeline runner.
-  { command: "dns.record.upsert" },
   // RFC-0289: project the manifest into a static OpenAPI 3.1 document.
   { command: "agent.openapi.generate" },
   // RFC-0783: project the manifest into RFC 9727 API Catalog linkset+json.
@@ -166,6 +163,10 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "generated.stale.validate" },
   // RFC-0721: warn when system.md routes don't match committed behavior snapshot
   { command: "behavior.snapshot.staleness.check" },
+  // RFC-0753: push DNS records to Cloudflare (requires CLOUDFLARE_API_TOKEN).
+  // Moved to end of pipeline so DNS infrastructure operations don't block artifact generation.
+  // dns.record.upsert is workspace-scoped; --site is auto-injected by the pipeline runner.
+  { command: "dns.record.upsert" },
 ];
 
 // RFC-0597: codegen-only subset for dev-mode mission materialization.
