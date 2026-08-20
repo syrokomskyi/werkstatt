@@ -13,10 +13,10 @@
   <item>ADR-0054: implements the technical-assessment evidence profile decision — policy-driven gate, assessment metadata, canonical raw artifact requirement.</item>
   <item>RFC-0886: adds display-consent-consistent gate condition, per-aspect consent evaluation, screenshot R2 path helper, NachweisScreenshotUploadResult interface.</item>
   <item>RFC-0890: adds raw screenshot R2/local path helpers, CaptureX filename parser, sharp-based image metadata detection, NachweisScreenshotIngestResult interface.</item>
+  <item>RFC-0891: adds display screenshot R2 path helper, R2 download helper, NachweisScreenshotProcessResult interface.</item>
 </responsibilities>
 <non-goals>
   <item>Does not implement command handlers — those live in nachweis-*.ts files.</item>
-  <item>Does not implement R2 download — not needed for the pilot lifecycle.</item>
   <item>Does not implement multipart uploads — individual files are under the 5 MB threshold.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -28,6 +28,7 @@
   <item>RFC-0873: add AssessmentBundleV1, assessmentBundleV1Schema, AssessmentIngestResult, resolveAssessmentR2Path, mediaTypeToExt, extend uploadToR2 with optional contentType.</item>
   <item>RFC-0886: add display-consent-consistent gate condition, per-aspect consent evaluation in evaluateGateV2, resolveNachweisScreenshotR2Path, NachweisScreenshotUploadResult, extend NachweisConsentUpdateResult with scope, extend NachweisManifestEntry with display and websiteUrl.</item>
   <item>RFC-0890: add resolveNachweisRawScreenshotR2Path, resolveNachweisRawScreenshotLocalPath, parseCaptureXFilename, detectImageMetadata, NachweisScreenshotIngestResult.</item>
+  <item>RFC-0891: add resolveNachweisScreenshotDisplayR2Path, downloadFromR2, NachweisScreenshotProcessResult.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -452,6 +453,35 @@ export async function uploadToR2(
     body: fileBuffer,
     contentType: contentType ?? "application/pdf",
   });
+}
+
+// RFC-0891: Download a file from R2 private storage (used for raw screenshot fallback)
+export async function downloadFromR2(r2Path: string): Promise<Uint8Array> {
+  const config = resolveR2ConfigFromEnv(NACHWEIS_BUCKET, "R2_NACHWEIS");
+  const client = createR2Client(config);
+  const result = await client.getObject(r2Path);
+  return result.body;
+}
+
+// RFC-0891: R2 path for processed display screenshots — always .webp
+export function resolveNachweisScreenshotDisplayR2Path(systemId: string, slug: string): string {
+  return `${systemId}/screenshots/${slug}/website-screenshot.webp`;
+}
+
+// RFC-0891: Result of nachweis.screenshot.process command
+export interface NachweisScreenshotProcessResult {
+  slug: string;
+  systemId: string;
+  rawSha256: string;
+  rawDimensions: { width: number; height: number };
+  cropRegion: { left: number; top: number; width: number; height: number };
+  displaySha256: string;
+  displayMediaType: string;
+  displayWidth: number;
+  displayHeight: number;
+  r2Key: string;
+  capturedAt: string | null;
+  bordbuchEventId: string;
 }
 
 export function isMissingEnvError(err: unknown): err is MissingEnvError {
