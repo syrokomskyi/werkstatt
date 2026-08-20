@@ -170,6 +170,7 @@ export {
   type PbpEvidenceDisplayAspect,
   type PbpEvidenceDisplay,
   type PbpWebsiteScreenshot,
+  type PbpRawScreenshotArtifact,
   type NachweisAssessmentExecutionMode,
   type NachweisAssessmentAuthorizationBasis,
   type NachweisAssessmentDimensionStatus,

@@ -6,6 +6,7 @@
  * @see RFC-0706 (Nachweisregister evidence kind + items extensions)
  * @see RFC-0872 (technical-assessment kind, artifact roles, assessment field)
  * @see RFC-0885 (display control, website fields)
+ * @see RFC-0890 (raw screenshot artifact, optional display fields)
  * @see ADR-0028 (Nachweisregister as PBP trust-layer extension)
  * @see ADR-0054 (technical assessments as first-class Nachweisregister evidence profile)
  */
@@ -116,14 +117,29 @@ export interface PbpEvidenceDisplay {
   websiteLink: PbpEvidenceDisplayAspect;
 }
 
-// RFC-0885: client website screenshot artifact
-export interface PbpWebsiteScreenshot {
+// RFC-0890: raw screenshot artifact (the original full-page capture)
+export interface PbpRawScreenshotArtifact {
   sha256: string;
   mediaType: string;
-  storage: "private" | "public";
+  originalFilename: string;
+  width: number;
+  height: number;
+  r2Key?: string;
+  localPath?: string;
+  capturedAt?: string;
+}
+
+// RFC-0885: client website screenshot artifact
+// RFC-0890: display fields optional when only rawArtifact is present (ingest before upload)
+export interface PbpWebsiteScreenshot {
+  sha256?: string;
+  mediaType?: string;
+  storage?: "private" | "public";
   url?: string;
   // RFC-0887: capture date for UI display
   capturedAt?: string;
+  // RFC-0890: raw original artifact (populated by nachweis.screenshot.ingest)
+  rawArtifact?: PbpRawScreenshotArtifact;
 }
 
 export interface PbpEvidenceSource extends PbpEntity {

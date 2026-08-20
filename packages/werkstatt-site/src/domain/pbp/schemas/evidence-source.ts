@@ -8,6 +8,7 @@
   <item>RFC-0872 — Added technical-assessment kind, artifact role/canonical fields in items, assessment metadata schema.</item>
   <item>ADR-0056 — Added superRefine requiring slug for Nachweis evidence kinds at schema level.</item>
   <item>RFC-0885 — Added display, websiteUrl, websiteScreenshot fields with superRefine for display requirement/rejection.</item>
+  <item>RFC-0890 — Added rawArtifact sub-object, made display fields optional, added superRefine for display-or-raw requirement.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -148,15 +149,46 @@ const pbpEvidenceDisplaySchema = z.object({
   websiteLink: pbpEvidenceDisplayAspectSchema,
 });
 
-// RFC-0885: client website screenshot artifact
-const pbpWebsiteScreenshotSchema = z.object({
+// RFC-0890: raw screenshot artifact (the original full-page capture)
+const pbpRawScreenshotArtifactSchema = z.object({
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
   mediaType: nonEmptyString,
-  storage: z.enum(["private", "public"]),
-  url: nonEmptyString.optional(),
-  // RFC-0887: capture date for UI display
+  originalFilename: nonEmptyString,
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  r2Key: nonEmptyString.optional(),
+  localPath: nonEmptyString.optional(),
   capturedAt: nonEmptyString.optional(),
 });
+
+// RFC-0885: client website screenshot artifact
+// RFC-0890: display fields optional when only rawArtifact is present (ingest before upload)
+const pbpWebsiteScreenshotSchema = z
+  .object({
+    sha256: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
+    mediaType: nonEmptyString.optional(),
+    storage: z.enum(["private", "public"]).optional(),
+    url: nonEmptyString.optional(),
+    // RFC-0887: capture date for UI display
+    capturedAt: nonEmptyString.optional(),
+    // RFC-0890: raw original artifact (populated by nachweis.screenshot.ingest)
+    rawArtifact: pbpRawScreenshotArtifactSchema.optional(),
+  })
+  .superRefine((data, ctx) => {
+    const hasDisplay = data.sha256 != null && data.mediaType != null && data.storage != null;
+    const hasRaw = data.rawArtifact != null;
+    if (!hasDisplay && !hasRaw) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "websiteScreenshot must have either display variant (sha256, mediaType, storage) or rawArtifact (RFC-0890)",
+        path: ["rawArtifact"],
+      });
+    }
+  });
 
 // ADR-0056: Nachweis evidence kinds that require a mandatory slug at schema level.
 // Mirrors NACHWEIS_EVIDENCE_KINDS in packages/werkstatt/src/nachweis/nachweis-validate.ts.
