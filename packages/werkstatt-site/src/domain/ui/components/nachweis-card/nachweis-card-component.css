@@ -87,10 +87,13 @@
 
 .nachweis-card__footer-tagline {
   text-align: right;
-  font-size: var(--ds-text-sm);
+  font-size: var(--ds-text-xs);
   color: var(--ds-color-text-muted);
   margin: var(--ds-space-2) 0 var(--ds-space-4);
   line-height: var(--ds-line-height-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nachweis-card__label {
