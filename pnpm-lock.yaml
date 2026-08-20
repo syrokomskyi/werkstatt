@@ -258,9 +258,18 @@ importers:
       '@noble/ed25519':
         specifier: ^3.1.0
         version: 3.1.0
+      '@types/better-sqlite3':
+        specifier: ^7.6.13
+        version: 7.6.13
+      '@types/picomatch':
+        specifier: ^4.0.3
+        version: 4.0.3
       '@typescript-eslint/typescript-estree':
         specifier: ^8.65.0
         version: 8.65.0(typescript@6.0.3)
+      '@warpgogol/forge':
+        specifier: workspace:*
+        version: link:../forge
       '@warpgogol/werkstatt-shared':
         specifier: workspace:*
         version: link:../werkstatt-shared
@@ -337,15 +346,9 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
-      '@types/better-sqlite3':
-        specifier: ^7.6.13
-        version: 7.6.13
       '@types/node':
         specifier: ^24.0.0
         version: 24.13.3
-      '@types/picomatch':
-        specifier: ^4.0.3
-        version: 4.0.3
       '@types/semver':
         specifier: ^7.7.0
         version: 7.8.0
@@ -377,9 +380,6 @@ importers:
       '@syrokomskyi/axiom-study':
         specifier: link:../../../pipelines/packages/axiom/axiom-study
         version: link:../../../pipelines/packages/axiom/axiom-study
-      '@warpgogol/forge':
-        specifier: workspace:*
-        version: link:../forge
       better-sqlite3:
         specifier: ^13.0.2
         version: 13.0.2
