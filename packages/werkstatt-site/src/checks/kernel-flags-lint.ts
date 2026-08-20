@@ -582,6 +582,31 @@ function dedupeByName<T extends { name: string; flags?: Record<string, unknown> 
   return [...byName.values()];
 }
 
+/** KERNEL-FLAG-06: required flag not mentioned in the command description. */
+export function findRequiredFlagsNotInDescription(
+  registered: Array<{ name: string; description: string; flags?: Record<string, unknown> }>,
+): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+  for (const command of registered) {
+    if (!command.flags) continue;
+    for (const [flagName, rawSpec] of Object.entries(command.flags)) {
+      const spec = rawSpec as { required?: boolean };
+      if (!spec.required) continue;
+      const flagToken = `--${flagName}`;
+      if (!command.description.includes(flagToken)) {
+        diagnostics.push({
+          ruleId: "KERNEL-FLAG-06",
+          severity: "error",
+          message: `${command.name} declares --${flagName} as required but the description does not mention "${flagToken}".`,
+          fixHint: `Add "${flagToken}" to the description of ${command.name} in its registerCommand() call.`,
+          data: { command: command.name, flagName },
+        });
+      }
+    }
+  }
+  return diagnostics;
+}
+
 /** KERNEL-FLAG-05: ratchet which commands still lack a `flags` schema. */
 export function findHeuristicPathViolations(
   registered: Array<{ name: string; flags?: Record<string, unknown> }>,
@@ -645,6 +670,7 @@ export async function runKernelFlagsLint(
   const diagnostics: Diagnostic[] = [
     ...(await findUndeclaredFlagReads(workspaceRoot, registeredByName, flagSchemaSources)),
     ...findHeuristicPathViolations(registered, baseline),
+    ...findRequiredFlagsNotInDescription(registered),
   ];
 
   return diagnosticsResult("kernel.flags.lint", diagnostics);

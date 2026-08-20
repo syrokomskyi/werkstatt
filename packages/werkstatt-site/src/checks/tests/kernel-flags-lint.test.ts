@@ -5,6 +5,7 @@ import { join } from "node:path";
 import {
   findUndeclaredFlagReads,
   findHeuristicPathViolations,
+  findRequiredFlagsNotInDescription,
   type KernelFlagSchemaSourceEntry,
 } from "../kernel-flags-lint.ts";
 
@@ -97,5 +98,61 @@ describe("kernel.flags.lint (RFC-0260)", () => {
     expect(legacy?.severity).toBe("warning");
     expect(fresh?.severity).toBe("error");
     expect(diagnostics.every((d) => d.ruleId === "KERNEL-FLAG-05")).toBe(true);
+  });
+
+  it("KERNEL-FLAG-06: passes when all required flags are mentioned in description", () => {
+    const registered = [
+      {
+        name: "fixture.clean",
+        description: "Do something. Flags: --site, --release.",
+        flags: {
+          site: { kind: "string" as const, required: true, description: "x" },
+          release: { kind: "string" as const, required: true, description: "x" },
+          verbose: { kind: "boolean" as const, description: "x" },
+        },
+      },
+    ];
+    const diagnostics = findRequiredFlagsNotInDescription(registered);
+    expect(diagnostics).toEqual([]);
+  });
+
+  it("KERNEL-FLAG-06: fails when a required flag is missing from description", () => {
+    const registered = [
+      {
+        name: "fixture.missing",
+        description: "Do something. Flags: --release.",
+        flags: {
+          release: { kind: "string" as const, required: true, description: "x" },
+          site: { kind: "string" as const, required: true, description: "x" },
+        },
+      },
+    ];
+    const diagnostics = findRequiredFlagsNotInDescription(registered);
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0]?.ruleId).toBe("KERNEL-FLAG-06");
+    expect(diagnostics[0]?.severity).toBe("error");
+    expect(diagnostics[0]?.message).toContain("--site");
+    expect(diagnostics[0]?.data).toEqual({ command: "fixture.missing", flagName: "site" });
+  });
+
+  it("KERNEL-FLAG-06: skips commands without flags schema", () => {
+    const registered = [{ name: "fixture.no-flags", description: "Do something." }];
+    const diagnostics = findRequiredFlagsNotInDescription(registered);
+    expect(diagnostics).toEqual([]);
+  });
+
+  it("KERNEL-FLAG-06: ignores optional flags not in description", () => {
+    const registered = [
+      {
+        name: "fixture.optional",
+        description: "Do something. Flags: --site.",
+        flags: {
+          site: { kind: "string" as const, required: true, description: "x" },
+          dryRun: { kind: "boolean" as const, description: "x" },
+        },
+      },
+    ];
+    const diagnostics = findRequiredFlagsNotInDescription(registered);
+    expect(diagnostics).toEqual([]);
   });
 });
