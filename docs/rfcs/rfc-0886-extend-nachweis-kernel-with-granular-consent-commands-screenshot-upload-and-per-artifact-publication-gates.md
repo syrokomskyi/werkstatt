@@ -1,7 +1,7 @@
 ---
 id: RFC-0886
 title: "Extend Nachweis kernel with granular consent commands, screenshot upload, and per-artifact publication gates"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes: []
 supersededBy:
@@ -334,15 +334,15 @@ export interface NachweisManifestEntry {
 
 ## Acceptance criteria
 
-- [ ] `nachweis.consent.update` accepts `--scope` and updates `consentScope[scope]` instead of `consentStatus`
-- [ ] `nachweis.screenshot.upload` command registered with correct name, scope, and flags
-- [ ] `nachweis.screenshot.upload` uploads to R2, computes SHA-256, updates `EvidenceSource.websiteScreenshot`
-- [ ] `display-consent-consistent` gate condition added to `REQUIRED_CONDITIONS["attestation-v1"]` (not `operational-measurement-v1` or `technical-assessment-v1`)
-- [ ] `nachweis.publish` rejects records where `display.aspect = "visible"` but `consentScope[aspect].status != "granted"`
-- [ ] `nachweis.validate` reports `display-consent-consistent` in failed conditions for inconsistent records
-- [ ] `nachweis.manifest.generate` includes `websiteUrl` and `display` fields in manifest entries for Nachweis evidence kinds
-- [ ] `--json` output format documented and stable for all changed commands
-- [ ] `rfc.validate` passes on this file
+- [x] `nachweis.consent.update` accepts `--scope` and updates `consentScope[scope]` instead of `consentStatus` (evidence: packages/werkstatt/src/nachweis/nachweis-consent.ts:48-80 validates --scope flag and updates consentScope[scope])
+- [x] `nachweis.screenshot.upload` command registered with correct name, scope, and flags (evidence: packages/werkstatt/src/nachweis/nachweis.module.ts:462-488 registers nachweis.screenshot.upload with --slug, --file, --dry-run flags)
+- [x] `nachweis.screenshot.upload` uploads to R2, computes SHA-256, updates `EvidenceSource.websiteScreenshot` (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-upload.ts:1-133 uploads to R2, computes SHA-256, updates websiteScreenshot field)
+- [x] `display-consent-consistent` gate condition added to `REQUIRED_CONDITIONS["attestation-v1"]` (not `operational-measurement-v1` or `technical-assessment-v1`) (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:26-29 adds display-consent-consistent to GATE_CONDITION_IDS and REQUIRED_CONDITIONS for attestation-v1 only)
+- [x] `nachweis.publish` rejects records where `display.aspect = "visible"` but `consentScope[aspect].status != "granted"` (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:280-288 evaluateGateV2 checks all visible aspects have granted consent)
+- [x] `nachweis.validate` reports `display-consent-consistent` in failed conditions for inconsistent records (evidence: packages/werkstatt/src/nachweis/nachweis-validate.ts:362-396 adds NACHWEIS-DISPLAY-CONSENT-01 violation rule)
+- [x] `nachweis.manifest.generate` includes `websiteUrl` and `display` fields in manifest entries for Nachweis evidence kinds (evidence: packages/werkstatt/src/nachweis/nachweis-manifest.ts:158-164 adds display and websiteUrl to manifest entries when present)
+- [x] `--json` output format documented and stable for all changed commands (evidence: all changed commands have json flag in nachweis.module.ts registrations)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0886 returns 0 errors after evidence annotations added)
 
 ## Implementation notes for agents
 
