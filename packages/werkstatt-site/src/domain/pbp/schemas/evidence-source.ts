@@ -255,6 +255,8 @@ export const evidenceSourceSchema = pbpEntitySchema
     websiteTagline: nonEmptyString.optional(),
     // RFC-0892: client website footer tagline (bottom-right corner)
     websiteFooterTagline: nonEmptyString.optional(),
+    // RFC-0893: manual sort order for Nachweis card display (ascending, default 100)
+    sortOrder: z.number().int().optional(),
   })
   .strict()
   .superRefine((data, ctx) => {

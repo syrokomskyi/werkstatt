@@ -164,6 +164,7 @@ interface EvidenceSourceData {
       level?: string;
     }>;
   };
+  sortOrder?: number;
 }
 
 async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
@@ -294,6 +295,7 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
         ...(typeof data.websiteFooterTagline === "string"
           ? { websiteFooterTagline: data.websiteFooterTagline }
           : {}),
+        ...(typeof data.sortOrder === "number" ? { sortOrder: data.sortOrder } : {}),
       });
     }
   }
@@ -308,6 +310,11 @@ let records = loadedRecords;
 if (kindFilter && kindFilter.length > 0) {
   records = records.filter((r) => kindFilter.includes(r.variant));
 }
+records = records.sort((a, b) => {
+  const orderA = (a as { sortOrder?: number }).sortOrder ?? 100;
+  const orderB = (b as { sortOrder?: number }).sortOrder ?? 100;
+  return orderA - orderB;
+});
 if (limit !== undefined && limit > 0) {
   records = records.slice(0, limit);
 }
