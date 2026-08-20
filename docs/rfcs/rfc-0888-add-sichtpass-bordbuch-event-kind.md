@@ -1,7 +1,7 @@
 ---
 id: RFC-0888
 title: "Add sichtpass Bordbuch event kind for Sichtpass lifecycle audit trail"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes: []
 supersededBy:
@@ -257,17 +257,17 @@ Note: `writerRole` is not a field on the Bordbuch entry itself — it is passed 
 
 ## Acceptance criteria
 
-- [ ] `bordbuchEntryKindSchema` includes `"sichtpass"` in its enum
-- [ ] `nachweis.manifest.generate` appends a `sichtpass` Bordbuch entry after manifest file is written
-- [ ] `nachweis.publish` appends a `sichtpass` Bordbuch entry after manifest regeneration
-- [ ] `nachweis.publish` calls `nachweis.manifest.generate` with `--skip-bordbuch` to avoid duplicate entries
-- [ ] `nachweis.withdraw` calls `nachweis.manifest.generate` with `--skip-bordbuch` to avoid duplicate entries
-- [ ] `nachweis.manifest.generate` registers `--skip-bordbuch` boolean flag in `nachweis.module.ts` (hidden from CLI help)
-- [ ] `WRITER_ROLE_KINDS.nachweis` in `bordbuch-io.ts` includes `sichtpass`
-- [ ] `nachweis.withdraw` appends a `sichtpass` Bordbuch entry with `withdrawn: true` metadata
-- [ ] `bordbuch.generate` projection includes `sichtpass` events in the public timeline (automatic — `bordbuch-generate.ts` renders all event kinds without filtering)
-- [ ] `bordbuch.validate` accepts `sichtpass` entries without errors
-- [ ] `rfc.validate` passes on this file
+- [x] `bordbuchEntryKindSchema` includes `"sichtpass"` in its enum
+- [x] `nachweis.manifest.generate` appends a `sichtpass` Bordbuch entry after manifest file is written
+- [x] `nachweis.publish` appends a `sichtpass` Bordbuch entry after manifest regeneration
+- [x] `nachweis.publish` calls `nachweis.manifest.generate` with `--skip-bordbuch` to avoid duplicate entries
+- [x] `nachweis.withdraw` calls `nachweis.manifest.generate` with `--skip-bordbuch` to avoid duplicate entries
+- [x] `nachweis.manifest.generate` registers `--skip-bordbuch` boolean flag in `nachweis.module.ts` (hidden from CLI help)
+- [x] `WRITER_ROLE_KINDS.nachweis` in `bordbuch-io.ts` includes `sichtpass`
+- [x] `nachweis.withdraw` appends a `sichtpass` Bordbuch entry with `withdrawn: true` metadata
+- [x] `bordbuch.generate` projection includes `sichtpass` events in the public timeline (automatic — `bordbuch-generate.ts` renders all event kinds without filtering)
+- [x] `bordbuch.validate` accepts `sichtpass` entries without errors
+- [x] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
