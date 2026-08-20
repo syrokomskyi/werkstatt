@@ -779,6 +779,9 @@
   align-items: center;
   gap: var(--ds-space-2);
   margin: 0;
+  font-size: var(--ds-text-xs);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-text-muted);
 }
 
 .nachweis-card__footer-row {
