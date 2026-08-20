@@ -73,8 +73,13 @@ describe("icon.references.validate — RFC-0893", () => {
     );
 
     expect(result.exitCode).toBe(1);
-    const diag = (result.data as { diagnostics?: { message: string }[] }).diagnostics ?? [];
-    expect(diag.some((d) => d.message.includes("ICON-REF-01"))).toBe(true);
+    const diag =
+      (result.data as { diagnostics?: { ruleId: string; message: string; fixHint?: string }[] })
+        .diagnostics ?? [];
+    const iconRef01 = diag.find((d) => d.ruleId === "ICON-REF-01");
+    expect(iconRef01).toBeDefined();
+    expect(iconRef01?.fixHint).toBeDefined();
+    expect(iconRef01?.fixHint).toContain("icons.generate");
   });
 
   it("passes when icon exists", async () => {
@@ -117,8 +122,13 @@ describe("icon.references.validate — RFC-0893", () => {
     );
 
     expect(result.exitCode).toBe(1);
-    const diag = (result.data as { diagnostics?: { message: string }[] }).diagnostics ?? [];
-    expect(diag.some((d) => d.message.includes("ICON-REF-03"))).toBe(true);
+    const diag =
+      (result.data as { diagnostics?: { ruleId: string; message: string; fixHint?: string }[] })
+        .diagnostics ?? [];
+    const iconRef03 = diag.find((d) => d.ruleId === "ICON-REF-03");
+    expect(iconRef03).toBeDefined();
+    expect(iconRef03?.fixHint).toBeDefined();
+    expect(iconRef03?.fixHint).toContain("vendor");
   });
 
   it("emits ICON-REF-02 warning when icons/gen/ is empty", async () => {
@@ -133,6 +143,13 @@ describe("icon.references.validate — RFC-0893", () => {
     );
 
     expect(result.exitCode).toBe(0);
+    const diag =
+      (result.data as { diagnostics?: { ruleId: string; severity: string; fixHint?: string }[] })
+        .diagnostics ?? [];
+    const iconRef02 = diag.find((d) => d.ruleId === "ICON-REF-02");
+    expect(iconRef02).toBeDefined();
+    expect(iconRef02?.severity).toBe("warning");
+    expect(iconRef02?.fixHint).toContain("icons.generate");
   });
 
   it("does not flag objects with name field but no vendor as ICON-REF-03", async () => {
@@ -148,7 +165,7 @@ describe("icon.references.validate — RFC-0893", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    const diag = (result.data as { diagnostics?: { message: string }[] }).diagnostics ?? [];
-    expect(diag.some((d) => d.message.includes("ICON-REF-03"))).toBe(false);
+    const diag = (result.data as { diagnostics?: { ruleId: string }[] }).diagnostics ?? [];
+    expect(diag.some((d) => d.ruleId === "ICON-REF-03")).toBe(false);
   });
 });

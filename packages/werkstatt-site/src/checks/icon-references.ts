@@ -29,7 +29,8 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { resolveIconFileName } from "../domain/ui/icons/resolve-icon-file-name.ts";
-import { passResult, failResult } from "./result-helpers.ts";
+import { passResult, diagnosticsResult } from "./result-helpers.ts";
+import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 import {
   collectMarkdownFilesSafe,
   getContentDisciplinePaths,
@@ -174,8 +175,7 @@ export async function runIconReferencesValidate(
 ): Promise<KernelCommandResult> {
   const paths = getContentDisciplinePaths(context);
   const genDir = join(context.workspaceRoot, PACKAGE_ICONS_GEN_DIR);
-  const violations: string[] = [];
-  const warnings: string[] = [];
+  const diagnostics: Diagnostic[] = [];
 
   const genExists = await directoryExists(genDir);
   let astroFiles: string[] = [];
@@ -186,14 +186,13 @@ export async function runIconReferencesValidate(
   const availableIcons = buildAvailableIconIndex(astroFiles, genDir);
 
   if (!genExists || astroFiles.length === 0) {
-    warnings.push(
-      `ICON-REF-02: Generated icon directory ${genExists ? "is empty" : "does not exist"} (${PACKAGE_ICONS_GEN_DIR}). Run icons.generate first.`,
-    );
-    for (const w of warnings) context.logger.warn(w);
-    return passResult(
-      "icon.references.validate",
-      `Skipped — no generated icons to validate against (${astroFiles.length} icon file(s) found)`,
-    );
+    diagnostics.push({
+      ruleId: "ICON-REF-02",
+      severity: "warning",
+      message: `Generated icon directory ${genExists ? "is empty" : "does not exist"} (${PACKAGE_ICONS_GEN_DIR}). Icon reference validation skipped.`,
+      fixHint: `Run \`pnpm exec werkstatt run icons.generate --site <site-id>\` to generate icon components from JSON assets in src/assets/icons/.`,
+    });
+    return diagnosticsResult("icon.references.validate", diagnostics);
   }
 
   const contentDirs = [
@@ -229,31 +228,75 @@ export async function runIconReferencesValidate(
   }
 
   let checkedCount = 0;
+  const availableIconNames = [...availableIcons]
+    .map((p) =>
+      p
+        .replace(/\.astro$/, "")
+        .replace(/^[a-z]\//, "")
+        .replace(/-icon$/, ""),
+    )
+    .sort();
 
   for (const ref of allRefs) {
     const hasAllFields = ref.vendor && ref.collection && ref.name;
     if (!hasAllFields) {
-      violations.push(
-        `ICON-REF-03: ${ref.file}:${ref.line} — Malformed VendorIconConfig (missing vendor, collection, or name field).`,
-      );
+      const missing = [
+        !ref.vendor && "vendor",
+        !ref.collection && "collection",
+        !ref.name && "name",
+      ]
+        .filter(Boolean)
+        .join(", ");
+      diagnostics.push({
+        ruleId: "ICON-REF-03",
+        severity: "error",
+        file: ref.file,
+        line: ref.line,
+        message: `Malformed VendorIconConfig — missing field(s): ${missing}.`,
+        fixHint: `Add the missing field(s) (vendor, collection, name) to the icon config at ${ref.file}:${ref.line}. A valid icon config looks like: { vendor: lordicon, collection: doodle-outline, name: FlagHover }.`,
+      });
       continue;
     }
 
     checkedCount++;
 
     if (!iconExists(availableIcons, ref.vendor, ref.collection, ref.name)) {
-      violations.push(
-        `ICON-REF-01: ${ref.file}:${ref.line} — Icon '${ref.name}' (${ref.vendor}/${ref.collection}) does not exist in generated icon components.`,
+      const suggestions = availableIconNames
+        .filter((n) =>
+          n.toLowerCase().includes(
+            ref.name
+              .toLowerCase()
+              .replace(/hover$/i, "")
+              .slice(0, 4),
+          ),
+        )
+        .slice(0, 5);
+      const hintParts = [
+        `Either replace '${ref.name}' with an existing icon from ${ref.vendor}/${ref.collection}/ in packages/werkstatt-site/src/domain/ui/icons/gen/`,
+      ];
+      if (suggestions.length > 0) {
+        hintParts.push(`Possible matches: ${suggestions.join(", ")}`);
+      }
+      hintParts.push(
+        `Or add a new JSON asset to src/assets/icons/${ref.vendor}/${ref.collection}/ and run \`pnpm exec werkstatt run icons.generate --site <site-id>\`.`,
       );
+      diagnostics.push({
+        ruleId: "ICON-REF-01",
+        severity: "error",
+        file: ref.file,
+        line: ref.line,
+        message: `Icon '${ref.name}' (${ref.vendor}/${ref.collection}) does not exist in generated icon components.`,
+        fixHint: hintParts.join(" "),
+      });
     }
   }
 
-  for (const w of warnings) context.logger.warn(w);
+  if (diagnostics.length === 0) {
+    return passResult(
+      "icon.references.validate",
+      `Validated ${checkedCount} icon reference(s) against ${availableIcons.size} available icon(s)`,
+    );
+  }
 
-  return violations.length > 0
-    ? failResult("icon.references.validate", violations)
-    : passResult(
-        "icon.references.validate",
-        `Validated ${checkedCount} icon reference(s) against ${availableIcons.size} available icon(s)`,
-      );
+  return diagnosticsResult("icon.references.validate", diagnostics);
 }
