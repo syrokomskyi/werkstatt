@@ -551,6 +551,11 @@ describe("evidenceSourceSchema", () => {
       kind: "client-statement",
       authority: { kind: "platform" },
       slug: "cloudflare-cf-ar-01",
+      display: {
+        document: "visible",
+        screenshot: "visible",
+        websiteLink: "visible",
+      },
     };
     expect(evidenceSourceSchema.parse(valid)).toMatchObject({ slug: "cloudflare-cf-ar-01" });
   });
