@@ -399,13 +399,30 @@ function getLiveCheckUrl(
           {providerBadgeText}
         </a>
         <div class="nachweis-card__header-text">
-          <h2 id={headingId} class="nachweis-card__title">
-            {props.title}
-          </h2>
-          <p class="nachweis-card__subtitle">
-            {props.tool.name}
-            {props.tool.version && ` v${props.tool.version}`}
-          </p>
+          {(() => {
+            const dashIdx = props.title.indexOf(" — ");
+            if (dashIdx !== -1) {
+              return (
+                <>
+                  <h2 id={headingId} class="nachweis-card__title">
+                    {props.title.slice(0, dashIdx)}
+                  </h2>
+                  <p class="nachweis-card__subtitle">{props.title.slice(dashIdx + 3)}</p>
+                </>
+              );
+            }
+            return (
+              <h2 id={headingId} class="nachweis-card__title">
+                {props.title}
+              </h2>
+            );
+          })()}
+          {props.variant === "technical-assessment" && (
+            <p class="nachweis-card__subtitle-tool">
+              {props.tool.name}
+              {props.tool.version && ` v${props.tool.version}`}
+            </p>
+          )}
         </div>
       </header>
 

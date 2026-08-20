@@ -253,6 +253,13 @@
   line-height: var(--ds-line-height-sm);
 }
 
+.nachweis-card__subtitle-tool {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-color-text-muted);
+  margin: var(--ds-space-1) 0 0;
+  line-height: var(--ds-line-height-sm);
+}
+
 .nachweis-card__subtitle a {
   color: var(--ds-color-accent);
   text-decoration: underline;
