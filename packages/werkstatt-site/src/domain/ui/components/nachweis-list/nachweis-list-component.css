@@ -69,3 +69,26 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* Groups — multiple sub-lists within one section */
+.nachweis-list__groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+}
+
+.nachweis-list__group-label {
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-text-muted);
+  margin: 0 0 var(--ds-space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* CTA — link to full nachweise page */
+.nachweis-list__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--ds-space-6);
+}

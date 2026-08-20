@@ -91,12 +91,25 @@ interface NachweisTechnicalAssessmentRecord {
 
 type NachweisRecord = NachweisAttestationRecord | NachweisTechnicalAssessmentRecord;
 
+interface NachweisListGroup {
+  kindFilter: Array<"attestation" | "technical-assessment">;
+  limit?: number;
+  label?: string;
+}
+
+interface NachweisListCta {
+  label: string;
+  href: string;
+}
+
 interface NachweisListContent {
   records?: NachweisRecord[];
   emptyMessage?: string;
   variant?: "registry" | "compact";
   kindFilter?: Array<"attestation" | "technical-assessment">;
   limit?: number;
+  groups?: NachweisListGroup[];
+  cta?: NachweisListCta;
   header?: {
     heading: string;
     subheading?: string;
@@ -326,17 +339,35 @@ const overrideRecords = props.records ?? [];
 const loadedRecords =
   overrideRecords.length > 0 ? overrideRecords : await loadPublishedNachweisRecords();
 
-let records = loadedRecords;
-if (kindFilter && kindFilter.length > 0) {
-  records = records.filter((r) => kindFilter.includes(r.variant));
-}
-records = records.sort((a, b) => {
+const allSorted = loadedRecords.sort((a, b) => {
   const orderA = (a as { sortOrder?: number }).sortOrder ?? 100;
   const orderB = (b as { sortOrder?: number }).sortOrder ?? 100;
   return orderA - orderB;
 });
-if (limit !== undefined && limit > 0) {
-  records = records.slice(0, limit);
+
+function filterAndLimit(
+  recs: NachweisRecord[],
+  kf?: Array<"attestation" | "technical-assessment">,
+  lim?: number,
+): NachweisRecord[] {
+  let filtered = recs;
+  if (kf && kf.length > 0) {
+    filtered = filtered.filter((r) => kf.includes(r.variant));
+  }
+  if (lim !== undefined && lim > 0) {
+    filtered = filtered.slice(0, lim);
+  }
+  return filtered;
+}
+
+const groups = props.groups;
+const cta = props.cta;
+
+let records: NachweisRecord[];
+if (groups && groups.length > 0) {
+  records = groups.flatMap((g) => filterAndLimit(allSorted, g.kindFilter, g.limit));
+} else {
+  records = filterAndLimit(allSorted, kindFilter, limit);
 }
 ---
 
@@ -369,6 +400,25 @@ if (limit !== undefined && limit > 0) {
     {
       records.length === 0 ? (
         <p class="nachweis-list__empty">{emptyMessage}</p>
+      ) : groups && groups.length > 0 ? (
+        <div class="nachweis-list__groups">
+          {groups.map((group, gi) => {
+            const groupRecords = filterAndLimit(allSorted, group.kindFilter, group.limit);
+            if (groupRecords.length === 0) return null;
+            return (
+              <div class="nachweis-list__group" data-group-index={gi}>
+                {group.label && <h3 class="nachweis-list__group-label">{group.label}</h3>}
+                <ul class="nachweis-list__items" role="list">
+                  {groupRecords.map((record) => (
+                    <li class="nachweis-list__item">
+                      <NachweisCard {...record} compact={listVariant === "compact"} lang={lang} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
       ) : (
         <ul class="nachweis-list__items" role="list">
           {records.map((record) => (
@@ -377,6 +427,15 @@ if (limit !== undefined && limit > 0) {
             </li>
           ))}
         </ul>
+      )
+    }
+    {
+      cta && (
+        <div class="nachweis-list__cta">
+          <a class="section-cta section-cta--primary section-cta--md" href={cta.href}>
+            {cta.label}
+          </a>
+        </div>
       )
     }
   </div>
