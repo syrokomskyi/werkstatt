@@ -17065,7 +17065,7 @@ entries:
   - id: RFC-0887
     title: Extend Nachweis UI components with display-gated sections for PDF,
       screenshot, and website link
-    status: draft
+    status: accepted
     kind: architecture
     createdAt: 2026-08-20
     implementedAt: ""
@@ -17087,10 +17087,10 @@ entries:
     file: docs/rfcs/rfc-0887-extend-nachweis-ui-components-with-display-gated-sections-for-pdf-screenshot-and-website-link.md
   - id: RFC-0888
     title: Add sichtpass Bordbuch event kind for Sichtpass lifecycle audit trail
-    status: accepted
+    status: implemented
     kind: architecture
     createdAt: 2026-08-20
-    implementedAt: ""
+    implementedAt: 2026-08-20
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17105,7 +17105,7 @@ entries:
       - RFC-0885
       - RFC-0886
       - DNA-46
-    file: docs/rfcs/rfc-0888-add-sichtpass-bordbuch-event-kind.md
+    file: docs/rfcs/archive/implemented/rfc-0888-add-sichtpass-bordbuch-event-kind.md
   - id: RFC-0889
     title: "Amend RFC-0886: correct screenshot R2 path in JSON output example"
     status: accepted
