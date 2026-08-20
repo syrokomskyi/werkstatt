@@ -365,7 +365,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/picomatch": "^4.0.3",
     "@typescript-eslint/typescript-estree": "^8.65.0",
-    "@warpgogol/forge": "*",
+    "@warpgogol/forge": "^2.9.1",
     "@warpgogol/werkstatt-shared": "*",
     "ai": "^7.0.47",
     "ajv": "^8.20.0",

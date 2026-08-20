@@ -65,7 +65,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@warpgogol/forge": "*",
+    "@warpgogol/forge": "^2.9.1",
     "@warpgogol/werkstatt": "*"
   },
   "devDependencies": {
