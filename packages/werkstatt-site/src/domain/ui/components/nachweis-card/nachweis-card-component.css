@@ -800,6 +800,10 @@
   animation: nachweis-check-pulse 2.5s var(--ds-ease-standard) infinite;
 }
 
+.nachweis-card__status-text {
+  white-space: nowrap;
+}
+
 @keyframes nachweis-check-pulse {
   0%,
   100% {
