@@ -46,9 +46,12 @@ describe("phaser.secret.scan", () => {
 
   it("fails when GitHub token pattern is found (PHASER-04)", async () => {
     await mkdir(join(projectRoot, "src"), { recursive: true });
+    // Construct token dynamically to avoid triggering secret scanners on the test source itself.
+    const ghpPrefix = "ghp";
+    const ghpBody = "1234567890abcdefghijklmnopqrstuvwxyz1234";
     await writeFile(
       join(projectRoot, "src", "auth.ts"),
-      `const token = "ghp_1234567890abcdefghijklmnopqrstuvwxyz1234";\n`,
+      `const token = "${ghpPrefix}_${ghpBody}";\n`,
     );
 
     const result = await scanSecrets(projectRoot);
