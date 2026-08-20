@@ -5,12 +5,12 @@ title: "Nachweis evidence display UI design decisions"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes: []
 supersededBy:
