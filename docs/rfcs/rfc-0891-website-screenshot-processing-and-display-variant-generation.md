@@ -1,12 +1,13 @@
 ---
 id: RFC-0891
 title: "Website screenshot processing and 16:9 display variant generation for Nachweis"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
