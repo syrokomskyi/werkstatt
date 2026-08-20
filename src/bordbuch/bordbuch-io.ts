@@ -72,7 +72,14 @@ const WRITER_ROLE_KINDS: Record<string, BordbuchEntryKind[]> = {
   runtime: ["pseo", "indexnow.submit"],
   // RFC-0706 / ADR-0028: Nachweisregister trust lifecycle
   // RFC-0715: N3 cryptographic verification (operator signature + RFC 3161 timestamp)
-  nachweis: ["nachweis-record", "nachweis-consent", "nachweis-signed", "nachweis-timestamped"],
+  // RFC-0888: Sichtpass lifecycle audit trail
+  nachweis: [
+    "nachweis-record",
+    "nachweis-consent",
+    "nachweis-signed",
+    "nachweis-timestamped",
+    "sichtpass",
+  ],
 };
 
 export function validateWriterRole(writerRole: string, kind: BordbuchEntryKind): boolean {

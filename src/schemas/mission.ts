@@ -69,6 +69,8 @@ export const bordbuchEntryKindSchema = z.enum([
   // RFC-0715: N3 cryptographic verification (operator signature + RFC 3161 timestamp)
   "nachweis-signed",
   "nachweis-timestamped",
+  // RFC-0888: Sichtpass lifecycle audit trail
+  "sichtpass",
 ]);
 
 export const bordbuchEntryStatusSchema = z.enum(["done", "failed", "waiting", "escalated"]);

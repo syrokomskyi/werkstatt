@@ -111,6 +111,14 @@ export function createNachweisModule(): KernelModule {
         flags: {
           system: { kind: "string", description: "Target system ID" },
           json: { kind: "boolean", description: "Output JSON result." },
+          // RFC-0888: Internal coordination flag — set by nachweis.publish and
+          // nachweis.withdraw to prevent duplicate sichtpass Bordbuch entries.
+          // Not documented in CLI help.
+          "skip-bordbuch": {
+            kind: "boolean",
+            description:
+              "Internal: skip sichtpass Bordbuch append (used by nachweis.publish and nachweis.withdraw).",
+          },
         },
         reads: [],
         writes: ["<cache>/public/nachweise/manifest.json"],
