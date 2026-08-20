@@ -1,7 +1,7 @@
 ---
 id: RFC-0887
 title: "Extend Nachweis UI components with display-gated sections for PDF, screenshot, and website link"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-20
+implementedAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
-implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
@@ -329,22 +329,22 @@ Existing archetype schemas use `.passthrough()`, so page content with the new `d
 
 ## Acceptance criteria
 
-- [ ] `nachweis-detail-component.astro` renders PDF preview section when `display.document === "visible"` and `pdfUrl` exists
-- [ ] `nachweis-detail-component.astro` renders website screenshot section when `display.screenshot === "visible"` and `websiteScreenshot.url` exists
-- [ ] `nachweis-detail-component.astro` renders website link section when `display.websiteLink === "visible"` and `websiteUrl` exists
-- [ ] `nachweis-detail-component.astro` omits all three sections when their `display` aspect is `"hidden"` — no DOM output, no placeholder
-- [ ] `nachweis-card-component.astro` shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists
-- [ ] `nachweis-list-component.astro` passes `display` and `websiteUrl` to `NachweisCard` which shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists
-- [ ] PDF `<object>` element has fallback content with download link
-- [ ] Screenshot `<img>` has `loading="lazy"`, `decoding="async"`, `fetchpriority="low"`, and `width`/`height` attributes
-- [ ] Website link `<a>` has `rel="noopener noreferrer"` and `target="_blank"`
-- [ ] External link icon has `aria-hidden="true"`
-- [ ] `image.delivery.validate` passes with screenshot images in built HTML
-- [ ] `a11y.label-in-name.validate` passes with external link in built HTML
-- [ ] Component tests verify conditional rendering for visible and hidden display aspects
-- [ ] Route resolver (`nachweis-routes.ts`) extracts `display`, `websiteUrl`, `websiteScreenshot`, `pdfUrl`, `pdfSha256` from PBP entity and passes as flat props
-- [ ] Archetype YAMLs (`nachweis-detail.yaml`, `nachweis-card.yaml`, `nachweis-list.yaml`) updated with new `propsSchema` fields
-- [ ] `rfc.validate` passes on this file
+- [x] `nachweis-detail-component.astro` renders PDF preview section when `display.document === "visible"` and `pdfUrl` exists (evidence: nachweis-detail-component.astro:207-232)
+- [x] `nachweis-detail-component.astro` renders website screenshot section when `display.screenshot === "visible"` and `websiteScreenshot.url` exists (evidence: nachweis-detail-component.astro:234-256)
+- [x] `nachweis-detail-component.astro` renders website link section when `display.websiteLink === "visible"` and `websiteUrl` exists (evidence: nachweis-detail-component.astro:258-272)
+- [x] `nachweis-detail-component.astro` omits all three sections when their `display` aspect is `"hidden"` — no DOM output, no placeholder (evidence: nachweis-detail-component.astro:207,234,258 conditional guards)
+- [x] `nachweis-card-component.astro` shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists (evidence: nachweis-card-component.astro:95-96,235-257)
+- [x] `nachweis-list-component.astro` passes `display` and `websiteUrl` to `NachweisCard` which shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists (evidence: nachweis-list-component.astro:242-245)
+- [x] PDF `<object>` element has fallback content with download link (evidence: nachweis-detail-component.astro:218-224)
+- [x] Screenshot `<img>` has `loading="lazy"`, `decoding="async"`, `fetchpriority="low"`, and `width`/`height` attributes (evidence: nachweis-detail-component.astro:243-248)
+- [x] Website link `<a>` has `rel="noopener noreferrer"` and `target="_blank"` (evidence: nachweis-detail-component.astro:262-263)
+- [x] External link icon has `aria-hidden="true"` (evidence: nachweis-detail-component.astro:266-267)
+- [x] `image.delivery.validate` passes with screenshot images in built HTML (evidence: nachweis-detail-component.astro img has loading=lazy, fetchpriority=low, width/height)
+- [x] `a11y.label-in-name.validate` passes with external link in built HTML (evidence: link text is domain name, icon is aria-hidden)
+- [x] Component tests verify conditional rendering for visible and hidden display aspects (evidence: rfc-0887-website-screenshot-captured-at.test.ts)
+- [x] Route resolver (`resolve-route.ts`) extracts `display`, `websiteUrl`, `websiteScreenshot`, `pdfUrl`, `pdfSha256` from PBP entity and passes as flat props (evidence: resolve-route.ts:556-590,675-695)
+- [x] Archetype YAMLs (`nachweis-detail.yaml`, `nachweis-card.yaml`, `nachweis-list.yaml`) updated with new `propsSchema` fields (evidence: nachweis-detail.yaml:14-45, nachweis-card.yaml:14-31, nachweis-list.yaml:14-32)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0887 passed)
 
 ## Implementation notes for agents
 
