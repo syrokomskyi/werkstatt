@@ -28,6 +28,10 @@ propsSchema:
       notVerifiedScope: z.string().optional(),
       status: z.enum(["draft", "preview", "published", "withdrawn"]),
       verifiedByLabel: z.string().optional(),
+      display: z.object({
+        websiteLink: z.enum(["visible", "hidden"]),
+      }).optional(),
+      websiteUrl: z.string().optional(),
     }).passthrough()
 acceptedCosmicNames:
   - Nix

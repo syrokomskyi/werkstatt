@@ -42,6 +42,21 @@ propsSchema:
         }).optional(),
         verificationLevel: z.string().optional(),
       }).optional(),
+      display: z.object({
+        document: z.enum(["visible", "hidden"]),
+        screenshot: z.enum(["visible", "hidden"]),
+        websiteLink: z.enum(["visible", "hidden"]),
+      }).optional(),
+      websiteUrl: z.string().optional(),
+      websiteScreenshot: z.object({
+        sha256: z.string(),
+        mediaType: z.string(),
+        storage: z.enum(["private", "public"]),
+        url: z.string().optional(),
+        capturedAt: z.string().optional(),
+      }).optional(),
+      pdfUrl: z.string().optional(),
+      pdfSha256: z.string().optional(),
     }).passthrough()
 acceptedCosmicNames:
   - Kerberos
