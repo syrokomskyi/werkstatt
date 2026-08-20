@@ -343,6 +343,20 @@ function getLiveCheckUrl(
       )}
 
       <div class="nachweis-card__footer-row">
+        {showWebsiteLink && websiteDomain && (
+          <a
+            class="nachweis-card__website-link"
+            href={props.websiteUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <span class="nachweis-card__website-link-text">{websiteDomain}</span>
+            <span class="nachweis-card__website-link-arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        )}
+
         <div class="nachweis-card__status-block" data-status={props.status}>
           <p class="nachweis-card__status">
             <span class="nachweis-card__status-text">
@@ -363,20 +377,6 @@ function getLiveCheckUrl(
               </p>
             )}
         </div>
-
-        {showWebsiteLink && websiteDomain && (
-          <a
-            class="nachweis-card__website-link"
-            href={props.websiteUrl}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <span class="nachweis-card__website-link-text">{websiteDomain}</span>
-            <span class="nachweis-card__website-link-arrow" aria-hidden="true">
-              ↗
-            </span>
-          </a>
-        )}
       </div>
     </EffectHost>
   )

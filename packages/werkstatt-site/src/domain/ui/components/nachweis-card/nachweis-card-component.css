@@ -783,9 +783,9 @@
 
 .nachweis-card__footer-row {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
   margin-top: var(--ds-space-4);
   padding-top: var(--ds-space-3);
   border-top: 1px solid var(--ds-color-card-border);
@@ -882,9 +882,9 @@
   color: var(--ds-color-text-primary);
   text-decoration: underline;
   white-space: nowrap;
-  max-width: 60%;
+  max-width: 100%;
   overflow: hidden;
-  flex-shrink: 1;
+  flex-shrink: 0;
   min-width: 0;
 }
 
