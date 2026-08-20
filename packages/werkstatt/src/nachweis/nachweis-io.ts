@@ -624,7 +624,6 @@ const SHARP_FORMAT_TO_MEDIA_TYPE: Record<string, string> = {
 export async function detectImageMetadata(
   filePath: string,
 ): Promise<{ mediaType: string; width: number; height: number }> {
-  // @ts-expect-error — sharp is not a dependency of werkstatt (DNA-64); hoisted at runtime via monorepo node_modules
   const sharp = (await import("sharp")).default;
   const metadata = await sharp(filePath).metadata();
   const mediaType = SHARP_FORMAT_TO_MEDIA_TYPE[metadata.format ?? ""] ?? "application/octet-stream";

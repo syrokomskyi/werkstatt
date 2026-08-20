@@ -41,6 +41,7 @@ import {
 } from "@warpgogol/werkstatt-shared/content";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
+import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import {
   isNachweisEntitled,
   makeSkipResult,
@@ -158,7 +159,15 @@ export async function runNachweisScreenshotProcess(
     );
     rawBuffer = await downloadFromR2(r2Key);
     // Write to temp file for sharp to read
-    rawFilePath = path.join(cachePath, "trust", "evidence", "screenshots", slug, "raw", originalFilename);
+    rawFilePath = path.join(
+      cachePath,
+      "trust",
+      "evidence",
+      "screenshots",
+      slug,
+      "raw",
+      originalFilename,
+    );
     await fs.mkdir(path.dirname(rawFilePath), { recursive: true });
     await fs.writeFile(rawFilePath, rawBuffer);
   }
@@ -167,7 +176,6 @@ export async function runNachweisScreenshotProcess(
   const rawSha256 = createHash("sha256").update(rawBuffer).digest("hex");
 
   // Read raw image metadata via sharp
-  // @ts-expect-error — sharp is not a dependency of werkstatt (DNA-64); hoisted at runtime via monorepo node_modules
   const sharp = (await import("sharp")).default;
   const metadata = await sharp(rawFilePath).metadata();
   const rawWidth = metadata.width;
@@ -221,13 +229,20 @@ export async function runNachweisScreenshotProcess(
   const displayBuffer = await sharp(rawFilePath)
     .extract({ left: cropLeft, top: cropTop, width: cropWidth, height: cropHeight })
     .resize(1280, 720, { fit: "cover" })
-    .webp({ quality: 80 })
+    .webp({ quality: 100 })
     .toBuffer();
 
   const displaySha256 = createHash("sha256").update(displayBuffer).digest("hex");
 
-  // Upload to R2 public
+  // Upload to R2 public (backup/archive)
   await uploadToR2(new Uint8Array(displayBuffer), r2Key, "image/webp");
+
+  // Copy to public/ for serving from the site
+  const publicScreenshotDir = path.join(cachePath, "public", "nachweis-screenshots");
+  const publicScreenshotPath = path.join(publicScreenshotDir, `${slug}.webp`);
+  const publicUrl = `/nachweis-screenshots/${slug}.webp`;
+  await fs.mkdir(publicScreenshotDir, { recursive: true });
+  await writeFileIfChanged(publicScreenshotPath, Buffer.from(displayBuffer));
 
   // Update EvidenceSource.websiteScreenshot, preserving rawArtifact
   const { data: currentEvidence, content: evidenceContent } = parseMarkdownFrontmatter(
@@ -239,14 +254,14 @@ export async function runNachweisScreenshotProcess(
     sha256: displaySha256,
     mediaType: "image/webp",
     storage: "public",
-    url: r2Key,
+    url: publicUrl,
     ...(capturedAt ? { capturedAt } : {}),
   };
   const updatedContent = stringifyMarkdownFrontmatter(evidenceContent, currentEvidence);
   await fs.writeFile(evidenceFile, updatedContent, "utf8");
 
   logger.info(
-    `[nachweis.screenshot.process] processed display variant for '${slug}' to ${r2Key}`,
+    `[nachweis.screenshot.process] processed display variant for '${slug}' to ${publicUrl}`,
   );
 
   // Append Bordbuch entry
