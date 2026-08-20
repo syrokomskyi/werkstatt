@@ -27,3 +27,6 @@ overrides:
   '@warpgogol/werkstatt': 'workspace:*'
   '@warpgogol/werkstatt-shared': 'workspace:*'
   '@warpgogol/werkstatt-site': 'workspace:*'
+
+patchedDependencies:
+  '@vitest/utils@4.1.10': patches/@vitest__utils@4.1.10.patch
