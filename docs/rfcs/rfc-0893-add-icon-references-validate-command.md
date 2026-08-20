@@ -28,7 +28,8 @@ versionBump: minor
 commands:
   proposed:
     - icon.references.validate
-  added: []
+  added:
+    - icon.references.validate
   changed: []
   removed: []
 appsImpacted: []
@@ -188,14 +189,14 @@ The command does NOT modify any files. It is read-only with respect to all scann
 
 ## Acceptance criteria
 
-- [ ] TypeScript types and interfaces defined in `packages/werkstatt-site/src/checks/`
-- [ ] CLI command registered as `icon.references.validate` with scope `app` in command-tables file `31-public-surface.ts` (alongside `public.icons.validate`)
-- [ ] `--json` output format documented and stable
-- [ ] Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `public.icons.validate`
-- [ ] Unit tests cover: missing icon detected, existing icon passes, no icons passes, malformed config detected, empty `icons/gen/` emits ICON-REF-02
-- [ ] `packages/werkstatt-site/AGENTS.md` updated with command description in the notable check commands section
-- [ ] `docs/verification-plan.xml` updated with the new validator entry
-- [ ] `rfc.validate` passes on this file before merging
+- [x] TypeScript types and interfaces defined in `packages/werkstatt-site/src/checks/` (evidence: `packages/werkstatt-site/src/checks/icon-references.ts:39-45`, `build:check` passes for touched files)
+- [x] CLI command registered as `icon.references.validate` with scope `app` in command-tables file `31-public-surface.ts` (alongside `public.icons.validate`) (evidence: `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts:107-116`)
+- [x] `--json` output format documented and stable (evidence: `icon.references.validate` returns `KernelCommandResult` via `passResult`/`failResult`, JSON-serializable via `--json` CLI flag)
+- [x] Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `public.icons.validate` (evidence: `packages/werkstatt-site/src/checks/pipelines/sites-check-author.ts:250`)
+- [x] Unit tests cover: missing icon detected, existing icon passes, no icons passes, malformed config detected, empty `icons/gen/` emits ICON-REF-02 (evidence: `packages/werkstatt-site/src/checks/tests/icon-references.test.ts`, 5/5 tests pass via `vitest run`)
+- [x] `packages/werkstatt-site/AGENTS.md` updated with command description in the notable check commands section (evidence: `packages/werkstatt-site/AGENTS.md:98`)
+- [x] `docs/verification-plan.xml` updated with the new validator entry (evidence: `docs/verification-plan.xml:533-536`, entry `vm-38`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0893 --json` → 0 errors)
 
 ## Implementation notes for agents
 
