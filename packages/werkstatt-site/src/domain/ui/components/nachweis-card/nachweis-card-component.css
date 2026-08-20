@@ -821,7 +821,8 @@
   font-variant-numeric: tabular-nums;
   color: var(--ds-color-text-quiet);
   letter-spacing: 0.02em;
-  margin-left: var(--ds-space-2);
+  margin: var(--ds-space-1) 0 0;
+  line-height: 1;
 }
 
 /* ========================================================================== */

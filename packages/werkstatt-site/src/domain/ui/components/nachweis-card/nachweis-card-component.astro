@@ -342,22 +342,26 @@ function getLiveCheckUrl(
       )}
 
       <div class="nachweis-card__footer-row">
-        <p class="nachweis-card__status" data-status={props.status}>
-          <span class="nachweis-card__status-text">
-            {props.status === "published" && t.statusPublished}
-            {props.status === "preview" && t.statusPreview}
-            {props.status === "draft" && t.statusDraft}
-            {props.status === "withdrawn" && t.statusWithdrawn}
-          </span>
-          {props.verifiedByLabel && (
-            <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
-          )}
-          {props.sourceHashes && props.sourceHashes.length > 0 && (
-            <span class="nachweis-card__hash-code" title={`SHA-256: ${props.sourceHashes[0]}`}>
-              {props.sourceHashes[0].slice(0, 8)}
+        <div class="nachweis-card__status-block" data-status={props.status}>
+          <p class="nachweis-card__status">
+            <span class="nachweis-card__status-text">
+              {props.status === "published" && t.statusPublished}
+              {props.status === "preview" && t.statusPreview}
+              {props.status === "draft" && t.statusDraft}
+              {props.status === "withdrawn" && t.statusWithdrawn}
             </span>
-          )}
-        </p>
+            {props.verifiedByLabel && (
+              <span class="nachweis-card__verified-by">{props.verifiedByLabel}</span>
+            )}
+          </p>
+          {props.sourceHashes &&
+            props.sourceHashes.length > 0 &&
+            props.sourceHashes[0] !== "0".repeat(64) && (
+              <p class="nachweis-card__hash-code" title={`SHA-256: ${props.sourceHashes[0]}`}>
+                {props.sourceHashes[0].slice(0, 6)}
+              </p>
+            )}
+        </div>
 
         {showWebsiteLink && websiteDomain && (
           <a
