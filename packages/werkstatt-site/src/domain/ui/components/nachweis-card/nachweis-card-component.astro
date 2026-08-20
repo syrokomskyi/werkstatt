@@ -66,6 +66,7 @@ interface NachweisAttestationCardProps {
   websiteFooterTagline?: string;
   sourceHashes?: string[];
   displayHashCode?: "visible" | "hidden";
+  compact?: boolean;
   lang?: string;
 }
 
@@ -258,7 +259,7 @@ function getLiveCheckUrl(
     <EffectHost
       as="article"
       effects={defaultGlassEffects}
-      class="nachweis-card"
+      class:list={["nachweis-card", props.compact && "nachweis-card--compact"]}
       data-component="nachweis-card"
       data-variant="attestation"
       data-screenshot-aspect={props.websiteScreenshot?.aspectRatio ?? "landscape"}

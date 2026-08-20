@@ -18,6 +18,7 @@
 
 .nachweis-list {
   display: block;
+  width: 100%;
 }
 
 .nachweis-list__items {
@@ -26,6 +27,7 @@
   padding: 0;
   display: grid;
   gap: var(--ds-space-6);
+  width: 100%;
 }
 
 .nachweis-list__item {
@@ -56,20 +58,13 @@
 /* Compact variant — RFC-0876 */
 .nachweis-list--compact .nachweis-list__items {
   gap: var(--ds-space-5);
-  grid-template-columns: 1fr;
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
-@media (min-width: 768px) {
-  .nachweis-list--compact .nachweis-list__items {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .nachweis-list--compact .nachweis-list__items {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.nachweis-list--compact .nachweis-list__item {
+  display: contents;
 }
 
 /* Groups — multiple sub-lists within one section */
