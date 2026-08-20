@@ -87,7 +87,7 @@ export interface WerkstattPluginHooks {
  */
 export interface WerkstattPlugin {
   schema: "werkstatt/plugin@1";
-  /** Plugin id: "werkstatt-site" | "werkstatt-phaser" | "werkstatt-godot". */
+  /** Plugin id: "werkstatt-site" | "werkstatt-phaser-game" | "werkstatt-godot-game". */
   id: string;
   /** Forge stack profile id, e.g. "astro-typescript-turborepo". */
   profileId: string;
