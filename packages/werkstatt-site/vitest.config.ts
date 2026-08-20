@@ -15,5 +15,10 @@ export default defineConfig({
       "src/testing/unit/services/**/*.test.ts",
     ],
     environment: "happy-dom",
+    server: {
+      deps: {
+        external: [/tsx/],
+      },
+    },
   },
 });

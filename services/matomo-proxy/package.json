@@ -15,9 +15,9 @@
     "rollback": "werkstatt run leitstand.service.rollback --service matomo-proxy"
   },
   "devDependencies": {
-    "tsx": "^4.20.0",
-    "wrangler": "^4.118.0",
-    "vitest": "^4.1.10"
+    "tsx": "^4.23.12",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.118.0"
   },
   "dependencies": {
     "@warpgogol/werkstatt-shared": "workspace:*",

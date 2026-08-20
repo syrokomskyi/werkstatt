@@ -378,11 +378,6 @@ export const KERNEL_FLAG_SCHEMA_SOURCES: KernelFlagSchemaSourceEntry[] = [
     functionName: "runReleaseList",
   },
   {
-    command: "release.rollback",
-    file: "packages/os/site-kernel-handoff/src/release/release-commands.ts",
-    functionName: "runReleaseRollback",
-  },
-  {
     command: "leitstand.propagate",
     file: "packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts",
     functionName: "runLeitstandPropagate",

@@ -20,13 +20,30 @@
 </MODULE_CONTRACT>
 */
 
-import { describe, it, expect } from "vitest";
-import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
+import { describe, it, expect, vi } from "vitest";
+import { mkdtemp, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
-import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
 import { parse as yamlParse } from "yaml";
+import { createStandardCheckModule } from "../module.ts";
+
+// tsx's register hook conflicts with vitest's module system when tsImport is
+// called inside vitest. Mock loadWorkspaceConfig to bypass tsImport and
+// directly construct the config object using the already-imported module.
+vi.mock("@warpgogol/werkstatt/kernel/discovery", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@warpgogol/werkstatt/kernel/discovery")>();
+  return {
+    ...original,
+    loadWorkspaceConfig: async (workspaceRoot: string) => ({
+      name: "fixture",
+      modules: [createStandardCheckModule()],
+    }),
+  };
+});
+
+// Import after mock is set up
+const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
 
 interface UniRegistrySnapshot {
   schemaVersion: string;
@@ -40,25 +57,8 @@ function digestHex(registry: UniRegistrySnapshot): string {
 
 async function makeFixtureWorkspace(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "uni-reg-concurrency-"));
-  await mkdir(join(root, "tools"), { recursive: true });
   await writeFile(join(root, "package.json"), JSON.stringify({ name: "fixture-root" }), "utf8");
   await writeFile(join(root, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n", "utf8");
-
-  // Reference the real package sources by absolute file:// URL rather than the
-  // bare specifier "@warpgogol/werkstatt-site/checks" — the fixture root lives outside
-  // the monorepo's node_modules resolution chain (a real OS temp directory), so
-  // bare-specifier resolution from tools/kernel.config.mjs would fail there.
-  const checksIndexPath = join(import.meta.dirname, "..", "index.ts").replace(/\\/g, "/");
-  await writeFile(
-    join(root, "tools", "kernel.config.mjs"),
-    `import { createStandardCheckModule } from "file:///${checksIndexPath}";
-export default {
-  name: "fixture",
-  modules: [createStandardCheckModule()],
-};
-`,
-    "utf8",
-  );
   return root;
 }
 
