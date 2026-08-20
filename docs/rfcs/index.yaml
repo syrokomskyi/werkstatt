@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-20
-count: 871
+count: 872
 entries:
   - id: ""
     title: ""
@@ -17065,10 +17065,10 @@ entries:
   - id: RFC-0887
     title: Extend Nachweis UI components with display-gated sections for PDF,
       screenshot, and website link
-    status: accepted
+    status: implemented
     kind: architecture
     createdAt: 2026-08-20
-    implementedAt: ""
+    implementedAt: 2026-08-20
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17084,7 +17084,7 @@ entries:
       - RFC-0876
       - RFC-0885
       - RFC-0886
-    file: docs/rfcs/rfc-0887-extend-nachweis-ui-components-with-display-gated-sections-for-pdf-screenshot-and-website-link.md
+    file: docs/rfcs/archive/implemented/rfc-0887-extend-nachweis-ui-components-with-display-gated-sections-for-pdf-screenshot-and-website-link.md
   - id: RFC-0888
     title: Add sichtpass Bordbuch event kind for Sichtpass lifecycle audit trail
     status: implemented
@@ -17106,9 +17106,28 @@ entries:
       - RFC-0886
       - DNA-46
     file: docs/rfcs/archive/implemented/rfc-0888-add-sichtpass-bordbuch-event-kind.md
-  - id: RFC-0889
-    title: "Amend RFC-0886: correct screenshot R2 path in JSON output example"
-    status: accepted
+  - id: RFC-0890
+    title: Raw website screenshot ingestion and archival for Nachweis evidence
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0885
+      - RFC-0886
+      - RFC-0887
+      - DNA-46
+      - DNA-59
+    file: docs/rfcs/rfc-0890-raw-website-screenshot-ingestion-and-archival.md
+  - id: RFC-0891
+    title: Website screenshot processing and 16:9 display variant generation for
+      Nachweis
+    status: draft
     kind: architecture
     createdAt: 2026-08-20
     implementedAt: ""
@@ -17119,9 +17138,10 @@ entries:
       - RFC-0886
     amendedBy: []
     related:
-      - RFC-0872
       - RFC-0885
+      - RFC-0886
       - RFC-0887
+      - RFC-0890
       - DNA-46
       - DNA-59
-    file: docs/rfcs/rfc-0889-amend-rfc-0886-resolve-gate-scope-r2-path-and-storage-contradictions.md
+    file: docs/rfcs/rfc-0891-website-screenshot-processing-and-display-variant-generation.md
