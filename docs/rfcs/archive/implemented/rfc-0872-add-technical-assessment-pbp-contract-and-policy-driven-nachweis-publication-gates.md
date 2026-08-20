@@ -21,6 +21,7 @@ amends:
   - RFC-0714
 amendedBy:
   - RFC-0885
+  - RFC-0886
 related:
   - ADR-0028
   - ADR-0054
