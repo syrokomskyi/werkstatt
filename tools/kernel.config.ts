@@ -38,6 +38,7 @@
   <entry key="deploy.*">Registers workspace deploy commands: deploy.artifact.build, deploy.artifact.verify, deploy.atomic.swap, deploy.atomic.rollback, deploy.artifact.gc, deploy.status (RFC-0566).</entry>
   <entry key="evidence.*">Registers workspace evidence commands: evidence.sync, evidence.fetch (RFC-0651).</entry>
   <entry key="subdomain.*">Registers workspace subdomain commands: subdomain.register, subdomain.validate, subdomain.list (RFC-0752).</entry>
+  <entry key="customdomain.*">Registers workspace custom domain commands: customdomain.register, redirect.register (RFC-0896).</entry>
   <entry key="dns.*">Registers workspace DNS record commands: dns.record.upsert, dns.record.validate, dns.record.list, dns.record.delete, dns.records.schema.validate (RFC-0753).</entry>
   <entry key="nachweis.*">Registers workspace nachweis commands: nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw (RFC-0707).</entry>
   <entry key="exploration.*">Registers workspace exploration note commands: exploration.list, exploration.show, exploration.archive (RFC-0710).</entry>
@@ -72,6 +73,7 @@
   <item>RFC-0707: Register nachweisModule for nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw.</item>
   <item>RFC-0710: Register forgeExplorationModule for exploration.list, exploration.show, exploration.archive.</item>
   <item>RFC-0752: Register subdomainModule for subdomain.register, subdomain.validate, subdomain.list.</item>
+  <item>RFC-0896: Register customdomainModule for customdomain.register, redirect.register.</item>
   <item>RFC-0753: Register dnsModule for dns.record.upsert, dns.record.validate, dns.record.list, dns.record.delete, dns.records.schema.validate.</item>
   <item>RFC-0770: Register werkstatt-plugin module for werkstatt.plugin.validate.</item>
   <item>RFC-0808: Register forgeNotesModule for note.link.validate, note.frontmatter.validate, note.orphan.detect.</item>
@@ -139,6 +141,8 @@ export default defineKernelConfig({
       (await import("@warpgogol/werkstatt/leitstand-module")).createLeitstandModule(),
     subdomain: async () =>
       (await import("@warpgogol/werkstatt/subdomain-module")).createSubdomainModule(),
+    customdomain: async () =>
+      (await import("@warpgogol/werkstatt/customdomain-module")).createCustomdomainModule(),
     dns: async () => (await import("@warpgogol/werkstatt/dns-module")).createDnsModule(),
     notausgang: async () =>
       (await import("@warpgogol/werkstatt/notausgang-module")).createNotausgangModule(),
