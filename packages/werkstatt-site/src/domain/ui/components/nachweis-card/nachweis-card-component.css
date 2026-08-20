@@ -58,6 +58,9 @@
   color: var(--ds-color-text-muted);
   margin: 0 0 var(--ds-space-4);
   line-height: var(--ds-line-height-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nachweis-card__result {
