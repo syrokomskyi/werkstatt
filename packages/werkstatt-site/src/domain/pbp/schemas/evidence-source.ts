@@ -1,12 +1,13 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Zod schema for PbpEvidenceSource entity (RFC-0416, RFC-0466, RFC-0706, RFC-0872, ADR-0028).</purpose>
+<purpose>Zod schema for PbpEvidenceSource entity (RFC-0416, RFC-0466, RFC-0706, RFC-0872, RFC-0885, ADR-0028).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0466 — Zod schema for PbpEvidenceSource.</item>
   <item>RFC-0706 — Added 4 Nachweisregister evidence kind values, optional file-based evidence fields in items, made url/retrievedAt optional.</item>
   <item>RFC-0872 — Added technical-assessment kind, artifact role/canonical fields in items, assessment metadata schema.</item>
   <item>ADR-0056 — Added superRefine requiring slug for Nachweis evidence kinds at schema level.</item>
+  <item>RFC-0885 — Added display, websiteUrl, websiteScreenshot fields with superRefine for display requirement/rejection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -137,6 +138,24 @@ const technicalAssessmentSchema = z.object({
     .optional(),
 });
 
+// RFC-0885: display control aspect
+const pbpEvidenceDisplayAspectSchema = z.enum(["visible", "hidden"]);
+
+// RFC-0885: display control for evidence rendering
+const pbpEvidenceDisplaySchema = z.object({
+  document: pbpEvidenceDisplayAspectSchema,
+  screenshot: pbpEvidenceDisplayAspectSchema,
+  websiteLink: pbpEvidenceDisplayAspectSchema,
+});
+
+// RFC-0885: client website screenshot artifact
+const pbpWebsiteScreenshotSchema = z.object({
+  sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  mediaType: nonEmptyString,
+  storage: z.enum(["private", "public"]),
+  url: nonEmptyString.optional(),
+});
+
 // ADR-0056: Nachweis evidence kinds that require a mandatory slug at schema level.
 // Mirrors NACHWEIS_EVIDENCE_KINDS in packages/werkstatt/src/nachweis/nachweis-validate.ts.
 // Defined locally to avoid engine→stack import (werkstatt-site must not import from werkstatt).
@@ -189,6 +208,12 @@ export const evidenceSourceSchema = pbpEntitySchema
       .optional(),
     // RFC-0872: normalized technical assessment metadata
     assessment: technicalAssessmentSchema.optional(),
+    // RFC-0885: display control — required for Nachweis evidence kinds, rejected for others
+    display: pbpEvidenceDisplaySchema.optional(),
+    // RFC-0885: client website link
+    websiteUrl: nonEmptyString.optional(),
+    // RFC-0885: client website screenshot
+    websiteScreenshot: pbpWebsiteScreenshotSchema.optional(),
   })
   .strict()
   .superRefine((data, ctx) => {
@@ -202,6 +227,23 @@ export const evidenceSourceSchema = pbpEntitySchema
           path: ["slug"],
         });
       }
+    }
+    // RFC-0885: display MUST be present for Nachweis evidence kinds, MUST be absent for others
+    const isNachweisKind = NACHWEIS_EVIDENCE_KINDS.has(data.kind);
+    const hasDisplay = data.display != null;
+    if (isNachweisKind && !hasDisplay) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `display is required for Nachweis evidence kind '${data.kind}' (RFC-0885)`,
+        path: ["display"],
+      });
+    }
+    if (!isNachweisKind && hasDisplay) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `display is only allowed on Nachweis evidence kinds (got kind '${data.kind}') (RFC-0885)`,
+        path: ["display"],
+      });
     }
     // RFC-0872 section 3: assessment MUST be absent when kind !== "technical-assessment"
     if (data.kind !== "technical-assessment" && data.assessment != null) {
