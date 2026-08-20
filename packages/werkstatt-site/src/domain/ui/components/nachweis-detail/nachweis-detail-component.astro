@@ -16,6 +16,7 @@
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0871: replace qualifiedTimestamp prop with structured timestamp prop carrying assurance metadata.</item>
   <item>RFC-0876: add technical-assessment variant with observation history section.</item>
+  <item>RFC-0887: add display-gated PDF, screenshot, and website link sections to attestation variant.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -73,6 +74,22 @@ interface NachweisAttestationDetailContent {
   verifiedByLabel?: string;
   verifiedDate?: string;
   sichtpass?: Sichtpass;
+  // RFC-0887: display control fields
+  display?: {
+    document: "visible" | "hidden";
+    screenshot: "visible" | "hidden";
+    websiteLink: "visible" | "hidden";
+  };
+  websiteUrl?: string;
+  websiteScreenshot?: {
+    sha256: string;
+    mediaType: string;
+    storage: "private" | "public";
+    url?: string;
+    capturedAt?: string;
+  };
+  pdfUrl?: string;
+  pdfSha256?: string;
   background?: unknown;
   effects?: unknown;
   density?: "compact" | "normal" | "spacious";
@@ -119,6 +136,27 @@ const props = cast<NachweisDetailContent>(pageOverride);
 const sichtpassHeadingId = `nachweis-detail-${props.slug}-sichtpass`;
 const historyHeadingId = `nachweis-detail-${props.slug}-history`;
 const technicalHeadingId = `nachweis-detail-${props.slug}-technical`;
+const pdfHeadingId = `nachweis-detail-${props.slug}-pdf`;
+const screenshotHeadingId = `nachweis-detail-${props.slug}-screenshot`;
+
+// RFC-0887: display-gated section variables (attestation variant only)
+const display = props.variant === "attestation" ? props.display : undefined;
+const websiteUrl = props.variant === "attestation" ? props.websiteUrl : undefined;
+const websiteScreenshot = props.variant === "attestation" ? props.websiteScreenshot : undefined;
+const pdfUrl = props.variant === "attestation" ? props.pdfUrl : undefined;
+const pdfSha256 = props.variant === "attestation" ? props.pdfSha256 : undefined;
+const domain = websiteUrl ? safeHostname(websiteUrl) : undefined;
+const captureDate = websiteScreenshot?.capturedAt
+  ? formatDate(websiteScreenshot.capturedAt)
+  : undefined;
+
+function safeHostname(url: string): string | undefined {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return undefined;
+  }
+}
 
 function formatDate(iso: string): string {
   try {
@@ -162,7 +200,76 @@ function formatDate(iso: string): string {
           status={props.status}
           verifiedByLabel={props.verifiedByLabel}
           verifiedDate={props.verifiedDate}
+          display={display}
+          websiteUrl={websiteUrl}
         />
+
+        {display?.document === "visible" && pdfUrl && (
+          <section class="nachweis-detail__pdf" aria-labelledby={pdfHeadingId}>
+            <h2 id={pdfHeadingId} class="nachweis-detail__section-title">
+              PDF-Dokument
+            </h2>
+            <object
+              data={pdfUrl}
+              type="application/pdf"
+              width="100%"
+              class="nachweis-detail__pdf-viewer"
+            >
+              <p>
+                Ihr Browser kann kein PDF anzeigen.
+                <a href={pdfUrl} download>
+                  Dokument herunterladen
+                </a>
+              </p>
+            </object>
+            {pdfSha256 && (
+              <p class="nachweis-detail__pdf-hash">
+                <span class="sr-only">SHA-256-Hash: </span>
+                <code>{pdfSha256}</code>
+              </p>
+            )}
+          </section>
+        )}
+
+        {display?.screenshot === "visible" && websiteScreenshot?.url && (
+          <section class="nachweis-detail__screenshot" aria-labelledby={screenshotHeadingId}>
+            <h2 id={screenshotHeadingId} class="nachweis-detail__section-title">
+              Website-Screenshot
+            </h2>
+            <figure class="nachweis-detail__screenshot-figure">
+              <img
+                src={websiteScreenshot.url}
+                alt={`Screenshot von ${domain ?? "der Website"}`}
+                loading="lazy"
+                decoding="async"
+                fetchpriority="low"
+                width="1280"
+                height="720"
+              />
+              <figcaption>
+                {captureDate && (
+                  <time datetime={websiteScreenshot.capturedAt}>Aufgenommen am {captureDate}</time>
+                )}
+              </figcaption>
+            </figure>
+          </section>
+        )}
+
+        {display?.websiteLink === "visible" && websiteUrl && domain && (
+          <section class="nachweis-detail__website-link">
+            <a
+              href={websiteUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+              class="nachweis-detail__website-link-anchor"
+            >
+              <span class="nachweis-detail__website-link-icon" aria-hidden="true">
+                ↗
+              </span>
+              Website besuchen: {domain}
+            </a>
+          </section>
+        )}
 
         {props.sichtpass && (
           <section class="nachweis-detail__sichtpass" aria-labelledby={sichtpassHeadingId}>
