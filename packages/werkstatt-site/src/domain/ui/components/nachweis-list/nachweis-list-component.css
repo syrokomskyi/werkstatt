@@ -48,6 +48,10 @@
   flex-wrap: wrap;
 }
 
+.nachweis-list--registry .nachweis-list__item {
+  display: contents;
+}
+
 /* Compact variant — RFC-0876 */
 .nachweis-list--compact .nachweis-list__items {
   gap: var(--ds-space-4);
