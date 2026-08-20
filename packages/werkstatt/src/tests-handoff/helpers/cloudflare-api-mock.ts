@@ -26,6 +26,8 @@ export interface CloudflareMockHandlers {
   updateDns?: () => Response;
   deleteDns?: () => Response;
   purgeCache?: () => Response;
+  redirectRuleset?: () => Response;
+  createRedirectRule?: () => Response;
 }
 
 export function mockCloudflareResponse(ok: boolean, status: number, body: unknown): Response {
@@ -95,6 +97,23 @@ export function setupCloudflareApiMock(
     }
     if (url.includes("/purge_cache") && method === "POST") {
       return handlers.purgeCache?.() ?? cfSuccessResponse({ id: "purge-ok" });
+    }
+    if (
+      url.includes("/rulesets/phases/http_request_dynamic_redirect/entrypoint") &&
+      method === "GET"
+    ) {
+      return (
+        handlers.redirectRuleset?.() ??
+        cfSuccessResponse({
+          id: "ruleset-1",
+          name: "redirect",
+          phase: "http_request_dynamic_redirect",
+          rules: [],
+        })
+      );
+    }
+    if (url.includes("/rulesets/") && url.includes("/rules") && method === "POST") {
+      return handlers.createRedirectRule?.() ?? cfSuccessResponse({});
     }
     return defaultEmptyResponse;
   });
