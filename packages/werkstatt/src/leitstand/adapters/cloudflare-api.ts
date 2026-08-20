@@ -15,6 +15,7 @@ cloudflare-workers.ts (which wraps wrangler CLI) — this module uses the REST A
 <CHANGE_SUMMARY>
   <item>RFC-0752: initial Cloudflare REST API client — listDnsRecords, createDnsRecord, listWorkersRoutes, createWorkersRoute.</item>
   <item>RFC-0753: add pagination, retry, updateDnsRecord, deleteDnsRecord, generalized createDnsRecord for all record types.</item>
+  <item>RFC-0896: add getRedirectRuleset, createRedirectRule for Cloudflare Rulesets API (Redirect Rules).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -296,4 +297,105 @@ export async function createWorkersRoute(
   return body.result;
 }
 
-export type { CloudflareDnsRecord, CloudflareWorkersRoute };
+interface CloudflareRedirectRuleActionParameters {
+  status_code: number;
+  target_url: { expression: string };
+}
+
+interface CloudflareRedirectRule {
+  id: string;
+  description: string;
+  enabled: boolean;
+  action: "redirect";
+  expression: string;
+  action_parameters: CloudflareRedirectRuleActionParameters;
+}
+
+interface CloudflareRuleset {
+  id: string;
+  name: string;
+  phase: string;
+  rules: CloudflareRedirectRule[];
+}
+
+interface CloudflareSingleResultResponse<T> {
+  success: boolean;
+  errors: { code: number; message: string }[];
+  messages: { code: number; message: string }[];
+  result: T;
+}
+
+export async function getRedirectRuleset(
+  zoneId: string,
+  apiToken: string,
+): Promise<CloudflareRuleset> {
+  const response = await fetchWithRetry(
+    `${CLOUDFLARE_API_BASE}/zones/${zoneId}/rulesets/phases/http_request_dynamic_redirect/entrypoint`,
+    { headers: authHeaders(apiToken) },
+    "getRedirectRuleset",
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => `HTTP ${response.status}`);
+    throw new Error(
+      `[cloudflare-api] getRedirectRuleset failed: HTTP ${response.status}: ${errorText}`,
+    );
+  }
+
+  const body = (await response.json()) as CloudflareSingleResultResponse<CloudflareRuleset>;
+  if (!body.success) {
+    const errorMessages = body.errors.map((e) => `${e.code}: ${e.message}`).join(", ");
+    throw new Error(`[cloudflare-api] getRedirectRuleset API errors: ${errorMessages}`);
+  }
+
+  return body.result;
+}
+
+export async function createRedirectRule(
+  zoneId: string,
+  rulesetId: string,
+  apiToken: string,
+  rule: {
+    description: string;
+    expression: string;
+    action_parameters: CloudflareRedirectRuleActionParameters;
+  },
+): Promise<CloudflareRedirectRule> {
+  const response = await fetchWithRetry(
+    `${CLOUDFLARE_API_BASE}/zones/${zoneId}/rulesets/${rulesetId}/rules`,
+    {
+      method: "POST",
+      headers: authHeaders(apiToken),
+      body: JSON.stringify({
+        description: rule.description,
+        expression: rule.expression,
+        action: "redirect",
+        action_parameters: rule.action_parameters,
+        enabled: true,
+      }),
+    },
+    "createRedirectRule",
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => `HTTP ${response.status}`);
+    throw new Error(
+      `[cloudflare-api] createRedirectRule failed: HTTP ${response.status}: ${errorText}`,
+    );
+  }
+
+  const body = (await response.json()) as CloudflareSingleResultResponse<CloudflareRedirectRule>;
+  if (!body.success) {
+    const errorMessages = body.errors.map((e) => `${e.code}: ${e.message}`).join(", ");
+    throw new Error(`[cloudflare-api] createRedirectRule API errors: ${errorMessages}`);
+  }
+
+  return body.result;
+}
+
+export type {
+  CloudflareDnsRecord,
+  CloudflareWorkersRoute,
+  CloudflareRedirectRule,
+  CloudflareRuleset,
+};
