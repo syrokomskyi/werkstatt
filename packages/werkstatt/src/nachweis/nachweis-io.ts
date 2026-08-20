@@ -355,6 +355,7 @@ export interface NachweisViolation {
   rule: string;
   message: string;
   recordId?: string;
+  severity?: "error" | "warning";
 }
 
 export interface NachweisConsentUpdateResult {

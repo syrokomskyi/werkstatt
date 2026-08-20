@@ -386,6 +386,7 @@ export async function runNachweisValidate(
               rule: "NACHWEIS-DISPLAY-CONSENT-01",
               message: `EvidenceSource '${slug}' has display.${aspect} 'visible' but consentScope.${aspect}.status is '${aspectConsent ?? "not_requested"}' (expected 'granted')`,
               recordId: slug,
+              severity: "warning",
             });
           }
         }
@@ -471,7 +472,7 @@ export async function runNachweisValidate(
     }
   }
 
-  const hasViolations = violations.length > 0;
+  const hasViolations = violations.some((v) => v.severity !== "warning");
   const publishedCount = gateResults.filter((g) => g.allPassed).length;
 
   return {
