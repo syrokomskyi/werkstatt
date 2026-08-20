@@ -331,6 +331,21 @@ Agents MUST NOT use `git commit --no-verify` in cache clones to bypass this guar
 - **Dry-run:** `--dry-run` skips R2 upload and entity update, returns the computed hash and R2 key.
 - **Bordbuch:** Appends a `nachweis-record` entry with `screenshotSha256` and `mediaType` metadata.
 
+## nachweis.screenshot.ingest (RFC-0890)
+
+`nachweis.screenshot.ingest` ingests a raw full-page screenshot to R2 private storage and the cache clone local directory. It is the entry point for raw screenshot archival.
+
+- **R2 path:** `{systemId}/screenshots/{slug}/raw/{originalFilename}` — private storage, separate from the display variant.
+- **Local path:** `{cachePath}/trust/evidence/screenshots/{slug}/raw/{originalFilename}` — gitignored binary artifact.
+- **Image metadata:** Detected from file content via dynamic `import("sharp")` — mediaType, width, height. No static `sharp` dependency in `werkstatt` (DNA-64).
+- **Filename parsing:** `CaptureX_YYYY-MM-DD_HHMMSS_domain.ext` → `capturedAt: YYYY-MM-DDTHH:MM:SSZ`. Non-matching filenames leave `capturedAt` unset (not an error).
+- **`--captured-at` flag:** ISO 8601 with timezone (e.g. `2026-08-20T13:44:40Z`), overrides filename-parsed value.
+- **Idempotency:** Re-ingest of the same SHA-256 skips R2 upload, local copy, and Bordbuch append. Returns existing metadata with `alreadyIngested: true`.
+- **Schema:** Updates `EvidenceSource.websiteScreenshot.rawArtifact` with `{ sha256, mediaType, originalFilename, width, height, r2Key, localPath, capturedAt? }`. Display fields (`sha256`, `mediaType`, `storage`) are preserved if already present.
+- **Dry-run:** `--dry-run` computes metadata without copying or uploading.
+- **Bordbuch:** Appends a `nachweis-record` entry with `rawScreenshotSha256`, `mediaType`, `originalFilename`, `width`, `height` metadata.
+- **Relationship to `nachweis.screenshot.upload`:** The two commands are independent — either can run first. `upload` populates display fields; `ingest` populates `rawArtifact`. `upload` must not overwrite an existing `rawArtifact`.
+
 ## Test helper conventions (nachweis)
 
 - **`readPbpEntity` in test files must use `parseMarkdownFrontmatter` from `@warpgogol/werkstatt-shared/content`.** Naive line-by-line YAML parsing (splitting on `:` and `JSON.parse`) fails on multi-line YAML that `stringifyMarkdownFrontmatter` produces — nested objects like `consentScope` are written as multi-line YAML maps, not inline JSON. The helper should be: `const { parseMarkdownFrontmatter } = await import("@warpgogol/werkstatt-shared/content"); const { data } = parseMarkdownFrontmatter(raw); return data as Record<string, unknown>;`
