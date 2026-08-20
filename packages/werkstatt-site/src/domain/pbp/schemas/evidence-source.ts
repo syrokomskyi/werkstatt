@@ -6,6 +6,7 @@
   <item>Established by RFC-0466 — Zod schema for PbpEvidenceSource.</item>
   <item>RFC-0706 — Added 4 Nachweisregister evidence kind values, optional file-based evidence fields in items, made url/retrievedAt optional.</item>
   <item>RFC-0872 — Added technical-assessment kind, artifact role/canonical fields in items, assessment metadata schema.</item>
+  <item>ADR-0056 — Added superRefine requiring slug for Nachweis evidence kinds at schema level.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -136,6 +137,17 @@ const technicalAssessmentSchema = z.object({
     .optional(),
 });
 
+// ADR-0056: Nachweis evidence kinds that require a mandatory slug at schema level.
+// Mirrors NACHWEIS_EVIDENCE_KINDS in packages/werkstatt/src/nachweis/nachweis-validate.ts.
+// Defined locally to avoid engine→stack import (werkstatt-site must not import from werkstatt).
+const NACHWEIS_EVIDENCE_KINDS = new Set([
+  "client-statement",
+  "project-confirmation",
+  "certificate",
+  "operational-evidence",
+  "technical-assessment",
+]);
+
 export const evidenceSourceSchema = pbpEntitySchema
   .extend({
     type: z.literal("evidence-source"),
@@ -180,6 +192,17 @@ export const evidenceSourceSchema = pbpEntitySchema
   })
   .strict()
   .superRefine((data, ctx) => {
+    // ADR-0056: slug MUST be present and non-empty for Nachweis evidence kinds
+    if (NACHWEIS_EVIDENCE_KINDS.has(data.kind)) {
+      const slug = (data as Record<string, unknown>).slug as string | undefined;
+      if (typeof slug !== "string" || slug.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `slug is required for Nachweis evidence kind '${data.kind}' (RFC-0880, ADR-0056)`,
+          path: ["slug"],
+        });
+      }
+    }
     // RFC-0872 section 3: assessment MUST be absent when kind !== "technical-assessment"
     if (data.kind !== "technical-assessment" && data.assessment != null) {
       ctx.addIssue({

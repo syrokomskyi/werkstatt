@@ -499,6 +499,96 @@ describe("evidenceSourceSchema", () => {
     };
     expect(evidenceSourceSchema.parse(valid)).toMatchObject({ kind: "external-web-sources" });
   });
+
+  it("ADR-0056: rejects Nachweis kind without slug", () => {
+    const noSlug = {
+      schema: "pbp/evidence-source@1",
+      id: "warpgogol-evidence-2",
+      type: "evidence-source",
+      status: "published",
+      name: "Client Statement",
+      kind: "client-statement",
+      authority: { kind: "platform" },
+    };
+    expect(() => evidenceSourceSchema.parse(noSlug)).toThrow();
+  });
+
+  it("ADR-0056: rejects Nachweis kind with empty slug", () => {
+    const emptySlug = {
+      schema: "pbp/evidence-source@1",
+      id: "warpgogol-evidence-3",
+      type: "evidence-source",
+      status: "published",
+      name: "Client Statement",
+      kind: "client-statement",
+      authority: { kind: "platform" },
+      slug: "",
+    };
+    expect(() => evidenceSourceSchema.parse(emptySlug)).toThrow();
+  });
+
+  it("ADR-0056: rejects Nachweis kind with whitespace-only slug", () => {
+    const wsSlug = {
+      schema: "pbp/evidence-source@1",
+      id: "warpgogol-evidence-4",
+      type: "evidence-source",
+      status: "published",
+      name: "Client Statement",
+      kind: "client-statement",
+      authority: { kind: "platform" },
+      slug: "   ",
+    };
+    expect(() => evidenceSourceSchema.parse(wsSlug)).toThrow();
+  });
+
+  it("ADR-0056: accepts Nachweis kind with valid slug", () => {
+    const valid = {
+      schema: "pbp/evidence-source@1",
+      id: "warpgogol-evidence-5",
+      type: "evidence-source",
+      status: "published",
+      name: "Client Statement",
+      kind: "client-statement",
+      authority: { kind: "platform" },
+      slug: "cloudflare-cf-ar-01",
+    };
+    expect(evidenceSourceSchema.parse(valid)).toMatchObject({ slug: "cloudflare-cf-ar-01" });
+  });
+
+  it("ADR-0056: accepts non-Nachweis kind without slug", () => {
+    const valid = {
+      schema: "pbp/evidence-source@1",
+      id: "warpgogol-evidence-6",
+      type: "evidence-source",
+      status: "published",
+      name: "External Sources",
+      kind: "external-web-sources",
+      authority: { kind: "platform" },
+    };
+    expect(evidenceSourceSchema.parse(valid)).toMatchObject({ kind: "external-web-sources" });
+  });
+
+  it("ADR-0056: rejects all five Nachweis kinds without slug", () => {
+    const kinds = [
+      "client-statement",
+      "project-confirmation",
+      "certificate",
+      "operational-evidence",
+      "technical-assessment",
+    ];
+    for (const kind of kinds) {
+      const noSlug = {
+        schema: "pbp/evidence-source@1",
+        id: `test-${kind}`,
+        type: "evidence-source",
+        status: "published",
+        name: `Test ${kind}`,
+        kind,
+        authority: { kind: "platform" },
+      };
+      expect(() => evidenceSourceSchema.parse(noSlug)).toThrow();
+    }
+  });
 });
 
 describe("disclosureSchema", () => {
