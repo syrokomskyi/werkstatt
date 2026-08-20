@@ -12,6 +12,7 @@
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0876: add technical-assessment variant styles.</item>
   <item>RFC-0876: visual redesign with score gauges, traffic-light bars, provider branding.</item>
+  <item>RFC-0887: add website link indicator styles for attestation variant.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -762,4 +763,33 @@
   [data-nachweis-animate] [data-count-up] {
     opacity: 1;
   }
+}
+
+/* Website link indicator — RFC-0887 */
+
+.nachweis-card__website-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  margin-top: var(--ds-space-3);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-color-text-primary);
+  text-decoration: none;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-sm);
+  padding: var(--ds-space-1) var(--ds-space-3);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nachweis-card__website-link:hover,
+.nachweis-card__website-link:focus-visible {
+  background: var(--ds-color-surface-elevated);
+  border-color: var(--ds-color-border-strong);
+}
+
+.nachweis-card__website-link-icon {
+  font-size: 1.1em;
+  line-height: 1;
 }
