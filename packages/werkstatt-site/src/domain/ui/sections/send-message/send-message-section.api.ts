@@ -99,8 +99,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!UPSTASH_QSTASH_TOKEN) {
     return json({ ok: false, error: "delivery-not-configured" }, 503);
   }
-  const siteUrl =
-    import.meta.env.PUBLIC_SITE_URL ?? import.meta.env.SITE ?? new URL(request.url).origin;
+  const siteUrl = new URL(request.url).origin;
   const callbackUrl = new URL(CALLBACK_PATH, siteUrl).toString();
   const response = await fetch(
     buildQstashPublish(event, {

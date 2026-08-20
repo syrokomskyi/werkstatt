@@ -539,8 +539,6 @@ export async function runEnvLocalCheck(
 // ─── deploy.scripts.validate ──────────────────────────────────────────────
 
 const REQUIRED_DEPLOY_SCRIPTS = [
-  "build:main",
-  "build:alt",
   "deploy:main",
   "deploy:alt",
   "build:deploy:main",

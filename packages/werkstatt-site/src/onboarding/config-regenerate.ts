@@ -129,7 +129,7 @@ export async function runConfigRegenerate(
       content: applyTokens(readRuntimeTemplate("astro.config.template.mjs"), {
         ...tokens,
         SITE_LINE: tokens.DOMAIN
-          ? `  // [ALT-DEPLOY] PUBLIC_SITE_URL overrides the canonical domain for alt builds.\n  site: process.env.PUBLIC_SITE_URL || "https://${tokens.DOMAIN}",`
+          ? `  site: "https://${tokens.DOMAIN}",`
           : "  // site: omitted (no domain configured)",
       }),
     },

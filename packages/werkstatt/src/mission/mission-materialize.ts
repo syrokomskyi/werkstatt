@@ -304,7 +304,7 @@ async function generateFullBoilerplate(
     CLIENT_ID: systemId,
     DOMAIN: domain,
     SITE_LINE: domain
-      ? `  // [ALT-DEPLOY] PUBLIC_SITE_URL overrides the canonical domain for alt builds.\n  site: process.env.PUBLIC_SITE_URL || "https://${domain}",`
+      ? `  site: "https://${domain}",`
       : "  // site: omitted (no domain configured)",
   };
 
@@ -1194,7 +1194,8 @@ export async function runMissionMaterialize(
       const { GENERATOR_OWNERSHIP_MAP } =
         await import("@warpgogol/werkstatt-site/checks/generator-ownership");
       const registryOnlyNonConditional = GENERATOR_OWNERSHIP_MAP.filter(
-        (e) => e.markerPolicy === "registry-only" && !e.conditional,
+        (e: { markerPolicy: string; conditional: boolean }) =>
+          e.markerPolicy === "registry-only" && !e.conditional,
       );
       let restoredCount = 0;
       for (const entry of registryOnlyNonConditional) {
