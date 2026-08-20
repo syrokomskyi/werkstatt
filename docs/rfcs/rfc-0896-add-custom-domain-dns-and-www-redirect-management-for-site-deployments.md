@@ -282,17 +282,17 @@ interface RedirectRegisterResult {
 
 ## Acceptance criteria
 
-- [ ] `customdomain.register` command registered in `customdomain.module.ts` with `--site` flag
-- [ ] `redirect.register` command registered in `customdomain.module.ts` with `--site` flag
-- [ ] `customdomain.register` creates a proxied A record for the apex domain and a Workers route pointing to the site's Worker, idempotently
-- [ ] `redirect.register` creates a proxied CNAME record for `www.{apex}` and a Cloudflare Redirect Rule (301 to apex), idempotently
-- [ ] Both commands error on mismatched existing records with a descriptive fix hint
-- [ ] `runLeitstandPromote` calls `customdomain.register` and `redirect.register` before `executeDeployPhases`
-- [ ] `cloudflare-api.ts` extended with `getRedirectRuleset` and `createRedirectRule` functions for the Rulesets API
-- [ ] `--json` output format matches the documented shape
-- [ ] Unit tests for both commands covering: create, idempotent skip, mismatch error
-- [ ] `AGENTS.md` updated with custom domain and redirect registration pipeline step
-- [ ] `rfc.validate` passes on this file with zero RFC-specific errors
+- [x] `customdomain.register` command registered in `customdomain.module.ts` with `--site` flag (evidence: `customdomain.module.ts:30-43` registers command with `flags.site`)
+- [x] `redirect.register` command registered in `customdomain.module.ts` with `--site` flag (evidence: `customdomain.module.ts:45-58` registers command with `flags.site`)
+- [x] `customdomain.register` creates a proxied A record for the apex domain and a Workers route pointing to the site's Worker, idempotently (evidence: `customdomain-register.ts:101-180` checks existing then creates, `customdomain-helpers.ts:73-79` builds A record)
+- [x] `redirect.register` creates a proxied CNAME record for `www.{apex}` and a Cloudflare Redirect Rule (301 to apex), idempotently (evidence: `redirect-register.ts:92-170` checks existing then creates, `customdomain-helpers.ts:81-87` builds CNAME)
+- [x] Both commands error on mismatched existing records with a descriptive fix hint (evidence: `customdomain-register.ts:118-127` and `redirect-register.ts:108-117` throw with "Delete or fix the record manually before re-running")
+- [x] `runLeitstandPromote` calls `customdomain.register` and `redirect.register` before `executeDeployPhases` (evidence: `leitstand-commands.ts:1130-1158` calls both before `executeDeployPhases` at line 1160)
+- [x] `cloudflare-api.ts` extended with `getRedirectRuleset` and `createRedirectRule` functions for the Rulesets API (evidence: `cloudflare-api.ts:328-394` implements both functions)
+- [x] `--json` output format matches the documented shape (evidence: `CustomDomainRegisterResult` at `customdomain-register.ts:36-57` and `RedirectRegisterResult` at `redirect-register.ts:34-51`)
+- [x] Unit tests for both commands covering: create, idempotent skip, mismatch error (evidence: `customdomain-register.test.ts` 7 tests, `redirect-register.test.ts` 7 tests — all 14 pass)
+- [x] `AGENTS.md` updated with custom domain and redirect registration pipeline step (evidence: `AGENTS.md:446` updated with RFC-0896 note)
+- [x] `rfc.validate` passes on this file with zero RFC-specific errors (evidence: `rfc.validate --id RFC-0896` exit 0)
 
 ## Implementation notes for agents
 

@@ -443,7 +443,7 @@ The deployment pipeline is strictly ordered. Agents MUST NOT skip steps, reorder
 0. **Certify** — `leitstand.certify --site <id> --gate dev --release <releaseId> --artifact-hash sha256:...` — produces `GateDecisionV1` JSON at `systems-cache/{id}/gate-decisions/{release}-{gate}.json` from certification orchestration. Must be run before each deploy command. Repeat with `--gate alt` and `--gate main` for propagate and promote respectively.
 1. **Dev** — `leitstand.dev-deploy --site <id> --release <releaseId>` — deploys workpiece to dev channel. Runs 13-phase pipeline: build, wrangler deploy, build-identity, CDN purge (skipped for *.workers.dev), freshness, health, mission.check, evidence sync, bordbuch, system-state. Gate decision resolved at conventional path by default; `--gate-decision` overrides.
 2. **Alt** — `leitstand.propagate --site <id> --release <releaseId>` — deploys a verified release to alt channel. Requires R2 durable sync verification and Axiom evidence gate (commitSha + missionId match).
-3. **Main** — `leitstand.promote --site <id> --release <releaseId> --main-verification-decision <path>` — promotes an alt-deployed release to main channel. Verifies alt health before promoting. Requires `--main-verification-decision`.
+3. **Main** — `leitstand.promote --site <id> --release <releaseId> --main-verification-decision <path>` — promotes an alt-deployed release to main channel. Verifies alt health before promoting. Requires `--main-verification-decision`. Custom domain DNS and www→apex redirect are registered automatically during `leitstand.promote` via `customdomain.register` and `redirect.register` (RFC-0896).
 
 Rules:
 
