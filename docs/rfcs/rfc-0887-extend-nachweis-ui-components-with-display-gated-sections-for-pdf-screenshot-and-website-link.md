@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
+enhancedAt: 2026-08-20
 implementedAt:
 closedAt:
 supersedes: []
@@ -109,8 +110,8 @@ The `nachweis-detail` component is extended with three display-gated sections th
 
 ## Architectural fit
 
-- **DNA-46 (Mission lifecycle)**: UI components are site-stack code in `packages/werkstatt-site/src/domain/ui/`, deployed through missions.
-- **DNA-59 (Evidence preservation)**: Screenshot and PDF artifacts are served from R2 URLs stored in the entity fields.
+- **DNA-46 (Mission lifecycle)**: The new display-gated sections consume entity fields (`display`, `websiteUrl`, `websiteScreenshot`) that are populated through kernel commands (`nachweis.consent.update`, `nachweis.screenshot.upload` from RFC-0886) executed within missions. The UI components themselves are site-stack code deployed through missions, but the DNA-46 connection is deeper: the display state is not static config — it is the result of consent decisions recorded in the Bordbuch during a mission. The UI renders the current state of those mission-lifecycle-managed consent decisions.
+- **DNA-59 (Evidence preservation)**: The screenshot image served from `websiteScreenshot.url` is an R2-preserved artifact whose SHA-256 is recorded in the entity. The PDF artifact served via `<object data={pdfUrl}>` is the canonical raw artifact preserved in R2. The UI consumes R2 URLs and displays SHA-256 hashes alongside the PDF viewer, reinforcing the preservation contract by making the hash visible for verification.
 - **RFC-0708**: Amends the Nachweis UI components originally introduced by RFC-0708.
 - **ADR-0057**: Implements the UI design decisions defined in ADR-0057.
 - **RFC-0885**: Consumes the `display`, `websiteUrl`, and `websiteScreenshot` schema fields.
@@ -122,89 +123,165 @@ The `nachweis-detail` component is extended with three display-gated sections th
 
 No new CLI commands. This RFC is a UI component extension.
 
+### Prop flow
+
+The components do not receive a `PbpEvidenceSource` entity directly. The actual prop flow is:
+
+1. **Route resolver** (`packages/werkstatt-site/src/domain/share/astro/nachweis-routes.ts`) loads the PBP entity from the content collection and maps it to a flat `NachweisDetailContent` / `NachweisCardProps` object.
+2. **Page block** passes the flat object as `pageOverride` via `SectionProps`.
+3. **Component** casts `pageOverride` to its content interface (`NachweisAttestationDetailContent` for detail, `NachweisCardProps` for card).
+4. **`nachweis-list`** loads records via `getCollection("business-profile")` at build time, maps them to `NachweisRecord` objects, and passes them to `NachweisCard`.
+
+The new fields (`display`, `websiteUrl`, `websiteScreenshot`) must be added to:
+
+- `NachweisAttestationDetailContent` interface in `nachweis-detail-component.astro`
+- `NachweisCardProps` (attestation variant) in `nachweis-card-component.astro`
+- `EvidenceSourceData` interface and `loadPublishedNachweisRecords()` in `nachweis-list-component.astro`
+- The route resolver mapping in `nachweis-routes.ts`
+
 ### TypeScript contracts
 
 #### nachweis-detail component
 
 ```astro
 ---
-// packages/werkstatt-site/src/domain/ui/nachweis-detail.astro
+// packages/werkstatt-site/src/domain/ui/components/nachweis-detail/nachweis-detail-component.astro
 
-interface Props {
-  evidence: PbpEvidenceSource;
-  // ... existing props
+interface NachweisAttestationDetailContent {
+  // ... existing fields ...
+  // RFC-0887: display control fields
+  display?: { document: "visible" | "hidden"; screenshot: "visible" | "hidden"; websiteLink: "visible" | "hidden" };
+  websiteUrl?: string;
+  websiteScreenshot?: { sha256: string; mediaType: string; storage: "private" | "public"; url?: string };
+  // RFC-0887: PDF artifact URL and hash (extracted from items["canonical"] by route resolver)
+  pdfUrl?: string;
+  pdfSha256?: string;
 }
 
-const { evidence, ...rest } = Astro.props;
-const display = evidence.display; // { document, screenshot, websiteLink }
-const websiteUrl = evidence.websiteUrl;
-const websiteScreenshot = evidence.websiteScreenshot;
+const props = cast<NachweisAttestationDetailContent>(pageOverride);
+const display = props.display;
+const websiteUrl = props.websiteUrl;
+const websiteScreenshot = props.websiteScreenshot;
+const pdfUrl = props.pdfUrl;
+const pdfSha256 = props.pdfSha256;
+const domain = websiteUrl ? new URL(websiteUrl).hostname.replace(/^www\./, "") : undefined;
+const captureDate = websiteScreenshot?.sha256 ? formatDate(observedAt) : undefined;
 ---
 
-<!-- PDF document section: render only when display.document === "visible" -->
-{display?.document === "visible" && (
-  <section class="nachweis-pdf-section">
+<!-- PDF document section: render only when display.document === "visible" && pdfUrl -->
+{display?.document === "visible" && pdfUrl && (
+  <section class="nachweis-detail__pdf" aria-labelledby={pdfHeadingId}>
+    <h2 id={pdfHeadingId} class="nachweis-detail__section-title">PDF-Dokument</h2>
     <object data={pdfUrl} type="application/pdf" width="100%" height="600px">
-      <p>Your browser cannot display PDFs. <a href={pdfUrl} download>Download the document</a></p>
+      <p>Ihr Browser kann kein PDF anzeigen. <a href={pdfUrl} download>Dokument herunterladen</a></p>
     </object>
-    <p class="nachweis-pdf-hash">SHA-256: {canonicalItem.sha256}</p>
+    {pdfSha256 && (
+      <p class="nachweis-detail__pdf-hash">SHA-256: <code>{pdfSha256}</code></p>
+    )}
   </section>
 )}
 
-<!-- Website screenshot section: render only when display.screenshot === "visible" && websiteScreenshot -->
-{display?.screenshot === "visible" && websiteScreenshot && (
-  <section class="nachweis-screenshot-section">
-    <img
-      src={websiteScreenshot.url}
-      alt={`Homepage capture of ${domain}`}
-      loading="lazy"
-      decoding="async"
-      fetchpriority="low"
-      width="1280"
-      height="720"
-    />
-    <figcaption>Homepage capture — {captureDate}</figcaption>
+<!-- Website screenshot section: render only when display.screenshot === "visible" && websiteScreenshot?.url -->
+{display?.screenshot === "visible" && websiteScreenshot?.url && (
+  <section class="nachweis-detail__screenshot" aria-labelledby={screenshotHeadingId}>
+    <h2 id={screenshotHeadingId} class="nachweis-detail__section-title">Website-Screenshot</h2>
+    <figure class="nachweis-detail__screenshot-figure">
+      <img
+        src={websiteScreenshot.url}
+        alt={`Homepage-Aufnahme von ${domain}`}
+        loading="lazy"
+        decoding="async"
+        fetchpriority="low"
+        width="1280"
+        height="720"
+      />
+      <figcaption>Homepage-Aufnahme — {captureDate}</figcaption>
+    </figure>
   </section>
 )}
 
 <!-- Website link section: render only when display.websiteLink === "visible" && websiteUrl -->
 {display?.websiteLink === "visible" && websiteUrl && (
-  <section class="nachweis-website-link-section">
-    <a href={websiteUrl} rel="noopener noreferrer" target="_blank" class="nachweis-website-link">
-      <span class="nachweis-website-link-icon" aria-hidden="true">↗</span>
+  <section class="nachweis-detail__website-link">
+    <a href={websiteUrl} rel="noopener noreferrer" target="_blank" class="nachweis-detail__website-link-btn">
+      <span class="nachweis-detail__website-link-icon" aria-hidden="true">↗</span>
       {domain}
     </a>
   </section>
 )}
 ```
 
-#### nachweis-card and nachweis-list components
+Section ordering per ADR-0057: PDF document → website screenshot → website link → existing content (quote, metrics, sichtpass).
+
+#### nachweis-card component
 
 ```astro
 ---
-// packages/werkstatt-site/src/domain/ui/nachweis-card.astro
+// packages/werkstatt-site/src/domain/ui/components/nachweis-card/nachweis-card-component.astro
 
-// Show website link icon when display.websiteLink === "visible" && websiteUrl exists
-const showWebsiteLink = evidence.display?.websiteLink === "visible" && evidence.websiteUrl;
+interface NachweisAttestationCardProps {
+  // ... existing fields ...
+  // RFC-0887: display control for website link indicator
+  display?: { websiteLink: "visible" | "hidden" };
+  websiteUrl?: string;
+}
+
+const showWebsiteLink = props.display?.websiteLink === "visible" && props.websiteUrl;
+const websiteDomain = props.websiteUrl
+  ? new URL(props.websiteUrl).hostname.replace(/^www\./, "")
+  : undefined;
 ---
 
 {showWebsiteLink && (
-  <a href={evidence.websiteUrl} rel="noopener noreferrer" target="_blank" class="nachweis-card-website-link">
+  <a
+    href={props.websiteUrl}
+    rel="noopener noreferrer"
+    target="_blank"
+    class="nachweis-card__website-link"
+    aria-label={`Website besuchen: ${websiteDomain}`}
+  >
     <span aria-hidden="true">↗</span>
-    <span class="sr-only">Visit website</span>
+    <span class="sr-only">Website besuchen</span>
   </a>
 )}
 ```
+
+#### nachweis-list component
+
+```astro
+---
+// packages/werkstatt-site/src/domain/ui/components/nachweis-list/nachweis-list-component.astro
+
+// EvidenceSourceData extended with display/websiteUrl/websiteScreenshot
+interface EvidenceSourceData {
+  // ... existing fields ...
+  display?: { document: "visible" | "hidden"; screenshot: "visible" | "hidden"; websiteLink: "visible" | "hidden" };
+  websiteUrl?: string;
+  websiteScreenshot?: { sha256: string; mediaType: string; storage: "private" | "public"; url?: string };
+}
+
+// loadPublishedNachweisRecords() extracts display/websiteUrl and passes to NachweisCard
+// NachweisAttestationRecord extended with display/websiteUrl fields
+---
+```
+
+### i18n
+
+The existing Nachweis components use hardcoded German labels ("Sichtpass", "Quell-Hash (SHA-256)", "Technische Details", "Beobachtungshistorie"). The new sections follow this pattern: hardcoded German labels ("PDF-Dokument", "Website-Screenshot", "Website besuchen"). UK locale is handled at the content level via the existing locale overlay system, not at the component template level. This is consistent with the existing component architecture — component templates are German-first, content is locale-aware.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/domain/ui/nachweis-detail.astro` | Extended with PDF, screenshot, and website link sections |
-| `packages/werkstatt-site/src/domain/ui/nachweis-card.astro` | Extended with website link indicator |
-| `packages/werkstatt-site/src/domain/ui/nachweis-list.astro` | Extended with website link indicator |
-| `packages/werkstatt-site/src/domain/ui/nachweis-verify.astro` | No changes (verification page shows hashes, not display sections) |
-| `packages/werkstatt-site/src/domain/ui/nachweis-detail.css` | Styles for new sections (PDF viewer container, screenshot figure, link button) |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-detail/nachweis-detail-component.astro` | Extended with PDF, screenshot, and website link sections; `NachweisAttestationDetailContent` interface extended with `display`, `websiteUrl`, `websiteScreenshot`, `pdfUrl`, `pdfSha256` |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-detail/nachweis-detail-component.css` | Styles for new sections (PDF viewer container, screenshot figure, link button) |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-card/nachweis-card-component.astro` | Extended with website link indicator; `NachweisAttestationCardProps` extended with `display`, `websiteUrl` |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-list/nachweis-list-component.astro` | `EvidenceSourceData` interface extended with `display`, `websiteUrl`, `websiteScreenshot`; `loadPublishedNachweisRecords()` extracts and passes fields to `NachweisCard` |
+| `packages/werkstatt-site/src/domain/ui/components/nachweis-verify/nachweis-verify-component.astro` | No changes (verification page shows hashes, not display sections) |
+| `packages/werkstatt-site/src/domain/share/astro/nachweis-routes.ts` | Route resolver mapping extended to extract `display`, `websiteUrl`, `websiteScreenshot`, `pdfUrl`, `pdfSha256` from PBP entity and pass as flat props |
+| `packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-detail.yaml` | `propsSchema` extended with `display`, `websiteUrl`, `websiteScreenshot`, `pdfUrl`, `pdfSha256` fields |
+| `packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-card.yaml` | `propsSchema` extended with `display`, `websiteUrl` fields |
+| `packages/werkstatt-site/src/domain/ontology/archetypes/components/nachweis-list.yaml` | `propsSchema` `records` array item schema extended with `display`, `websiteUrl` fields |
 
 ### Output format
 

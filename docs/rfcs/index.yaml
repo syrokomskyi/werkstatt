@@ -1,6 +1,6 @@
 command: rfc.index.generate
-generatedAt: 2026-08-19
-count: 866
+generatedAt: 2026-08-20
+count: 871
 entries:
   - id: ""
     title: ""
@@ -13751,6 +13751,7 @@ entries:
     amends: []
     amendedBy:
       - RFC-0872
+      - RFC-0885
     related:
       - ADR-0028
       - RFC-0398
@@ -13776,6 +13777,7 @@ entries:
       - RFC-0714
       - RFC-0872
       - RFC-0873
+      - RFC-0886
     related:
       - ADR-0028
       - RFC-0706
@@ -13796,6 +13798,7 @@ entries:
     amendedBy:
       - RFC-0717
       - RFC-0876
+      - RFC-0887
     related:
       - ADR-0028
       - RFC-0706
@@ -16785,7 +16788,9 @@ entries:
       - RFC-0706
       - RFC-0707
       - RFC-0714
-    amendedBy: []
+    amendedBy:
+      - RFC-0885
+      - RFC-0886
     related:
       - ADR-0028
       - ADR-0054
@@ -17014,3 +17019,109 @@ entries:
       - RFC-0537
       - DNA-54
     file: docs/rfcs/archive/implemented/rfc-0884-add-engineering-checkpoint-protocol-for-session-end-visual-handoff.md
+  - id: RFC-0885
+    title: Extend PBP evidence schema with display control, granular consent, and
+      website fields
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: 2026-08-20
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0706
+      - RFC-0872
+    amendedBy: []
+    related:
+      - ADR-0028
+      - ADR-0054
+      - RFC-0707
+      - RFC-0708
+      - RFC-0876
+    file: docs/rfcs/archive/implemented/rfc-0885-extend-pbp-evidence-schema-with-display-control-granular-consent-and-website-fields.md
+  - id: RFC-0886
+    title: Extend Nachweis kernel with granular consent commands, screenshot upload,
+      and per-artifact publication gates
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: 2026-08-20
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0707
+      - RFC-0872
+    amendedBy: []
+    related:
+      - ADR-0028
+      - ADR-0054
+      - RFC-0706
+      - RFC-0708
+      - RFC-0876
+      - RFC-0885
+    file: docs/rfcs/archive/implemented/rfc-0886-extend-nachweis-kernel-with-granular-consent-commands-screenshot-upload-and-per-artifact-publication-gates.md
+  - id: RFC-0887
+    title: Extend Nachweis UI components with display-gated sections for PDF,
+      screenshot, and website link
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0708
+    amendedBy: []
+    related:
+      - ADR-0028
+      - ADR-0054
+      - ADR-0057
+      - RFC-0706
+      - RFC-0872
+      - RFC-0876
+      - RFC-0885
+      - RFC-0886
+    file: docs/rfcs/rfc-0887-extend-nachweis-ui-components-with-display-gated-sections-for-pdf-screenshot-and-website-link.md
+  - id: RFC-0888
+    title: Add sichtpass Bordbuch event kind for Sichtpass lifecycle audit trail
+    status: accepted
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0473
+    amendedBy: []
+    related:
+      - RFC-0460
+      - RFC-0706
+      - RFC-0707
+      - RFC-0872
+      - RFC-0885
+      - RFC-0886
+      - DNA-46
+    file: docs/rfcs/rfc-0888-add-sichtpass-bordbuch-event-kind.md
+  - id: RFC-0889
+    title: "Amend RFC-0886: correct screenshot R2 path in JSON output example"
+    status: accepted
+    kind: architecture
+    createdAt: 2026-08-20
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0886
+    amendedBy: []
+    related:
+      - RFC-0872
+      - RFC-0885
+      - RFC-0887
+      - DNA-46
+      - DNA-59
+    file: docs/rfcs/rfc-0889-amend-rfc-0886-resolve-gate-scope-r2-path-and-storage-contradictions.md
