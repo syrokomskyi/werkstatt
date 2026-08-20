@@ -11,6 +11,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
   <item>RFC-0876: add technical detail and observation history styles.</item>
+  <item>RFC-0887: add PDF viewer, screenshot figure, and website link styles.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -128,4 +129,115 @@
 .nachweis-detail__history-level {
   color: var(--ds-color-text-secondary);
   font-size: var(--ds-text-xs);
+}
+
+/* PDF document section — RFC-0887 */
+
+.nachweis-detail__pdf {
+  padding: var(--ds-space-6);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-surface);
+}
+
+.nachweis-detail__pdf-viewer {
+  width: 100%;
+  min-height: 400px;
+  max-height: 600px;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-sm);
+}
+
+@media (max-width: 768px) {
+  .nachweis-detail__pdf-viewer {
+    min-height: 300px;
+  }
+}
+
+.nachweis-detail__pdf-hash {
+  margin-top: var(--ds-space-3);
+  font-size: var(--ds-text-xs);
+  word-break: break-all;
+}
+
+.nachweis-detail__pdf-hash code {
+  font-family: ui-monospace, monospace;
+  background: var(--ds-color-surface-elevated);
+  padding: 0.125em 0.375em;
+  border-radius: var(--ds-radius-sm);
+}
+
+/* Screenshot section — RFC-0887 */
+
+.nachweis-detail__screenshot {
+  padding: var(--ds-space-6);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-surface);
+}
+
+.nachweis-detail__screenshot-figure {
+  margin: 0;
+}
+
+.nachweis-detail__screenshot-figure img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-color-border);
+}
+
+.nachweis-detail__screenshot-figure figcaption {
+  margin-top: var(--ds-space-2);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-color-text-secondary);
+}
+
+/* Website link section — RFC-0887 */
+
+.nachweis-detail__website-link {
+  display: flex;
+  align-items: center;
+}
+
+.nachweis-detail__website-link-anchor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-space-5);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-surface);
+  color: var(--ds-color-text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nachweis-detail__website-link-anchor:hover,
+.nachweis-detail__website-link-anchor:focus-visible {
+  background: var(--ds-color-surface-elevated);
+  border-color: var(--ds-color-border-strong);
+}
+
+.nachweis-detail__website-link-icon {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+/* Screen reader utility — RFC-0887 */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
