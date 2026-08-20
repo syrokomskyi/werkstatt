@@ -297,11 +297,19 @@ No command output — this RFC is UI-only. The rendered HTML output is verified 
 
 1. **Schema dependency**: RFC-0885 must be implemented first (schema fields exist on entities).
 2. **Kernel dependency**: RFC-0886 must be implemented first (screenshot upload populates `websiteScreenshot` field).
-3. **Component extension**: Add display-gated sections to `nachweis-detail.astro`.
-4. **Card/list extension**: Add website link indicator to `nachweis-card.astro` and `nachweis-list.astro`.
-5. **Styles**: Add CSS for new sections (PDF viewer container, screenshot figure, link button).
-6. **Tests**: Add component tests verifying conditional rendering (visible/hidden) and E2E tests verifying the full detail page.
-7. **Post-build checks**: Verify `image.delivery.validate` passes with screenshot images. Verify `a11y.label-in-name.validate` passes with external link.
+3. **Route resolver**: Extend `nachweis-routes.ts` to extract `display`, `websiteUrl`, `websiteScreenshot`, `pdfUrl`, `pdfSha256` from the PBP entity and pass as flat props to the page block.
+4. **Component extension**: Add display-gated sections to `nachweis-detail-component.astro`. Extend `NachweisAttestationDetailContent` interface.
+5. **Card extension**: Add website link indicator to `nachweis-card-component.astro`. Extend `NachweisAttestationCardProps` interface.
+6. **List extension**: Extend `EvidenceSourceData` and `loadPublishedNachweisRecords()` in `nachweis-list-component.astro` to extract and pass `display`/`websiteUrl` to `NachweisCard`.
+7. **Archetype YAMLs**: Update `propsSchema` in `nachweis-detail.yaml`, `nachweis-card.yaml`, and `nachweis-list.yaml` with new fields.
+8. **Styles**: Add CSS for new sections (PDF viewer container, screenshot figure, link button) to `nachweis-detail-component.css`.
+9. **Tests**: Add component tests verifying conditional rendering (visible/hidden) and E2E tests verifying the full detail page.
+10. **Post-build checks**: Verify `image.delivery.validate` passes with screenshot images. Verify `a11y.label-in-name.validate` passes with external link.
+11. **Compass sync**: Update `docs/styling.xml` if new UI sections require styling contract changes.
+
+### Migration path for existing page content
+
+Existing archetype schemas use `.passthrough()`, so page content with the new `display`/`websiteUrl`/`websiteScreenshot` fields will not break existing validation. Existing page content without these fields will continue to render without the new sections (defensive guards: `display?.document === "visible"` evaluates to `false` when `display` is `undefined`). No content migration is required — the new sections appear only when content authors add the new fields to evidence-source entities.
 
 ## Alternatives considered
 
@@ -312,17 +320,20 @@ No command output — this RFC is UI-only. The rendered HTML output is verified 
 ## Risks
 
 - **PDF viewer compatibility**: Some browsers (especially mobile) may not render `<object>` PDF viewers well. The fallback content (download link) ensures the document is always accessible. ADR-0057 documents this as an accepted trade-off.
+- **PDF viewer performance on mobile**: The `<object>` element with a PDF can be heavy on mobile devices, consuming significant memory and CPU. The fallback content (download link) is shown on browsers without PDF support, but browsers with PDF support will attempt to render the full viewer. Consider lazy-loading the `<object>` via `loading="lazy"` (supported on `<object>` in modern browsers) or deferring PDF rendering behind a user interaction ("Click to view PDF") in a future enhancement.
+- **PDF tracking privacy**: A PDF embedded via `<object>` can contain tracking content (embedded fonts, remote images, JavaScript). The PDF is served from R2 (first-party), not from a third-party, which mitigates third-party tracking. However, the PDF content itself is authored by the client and is not sanitized by the platform. This is an accepted trade-off — the PDF is a signed canonical document, and sanitizing it would break the signature.
 - **Screenshot aspect ratio**: Screenshots captured at different resolutions may have different aspect ratios. The `<img>` element with `width` and `height` attributes prevents CLS. The CSS uses `object-fit: contain` to handle varying ratios.
 - **External link icon accessibility**: The icon (`↗`) is decorative. The link text (domain name) provides the accessible name. `aria-hidden="true"` on the icon prevents screen readers from announcing it.
+- **Agent misinterpretation**: Agents may attempt to pass `PbpEvidenceSource` entities directly to the components instead of flattening the fields into the component's content interface. The prop flow section above documents the correct approach.
 
 ## Acceptance criteria
 
-- [ ] `nachweis-detail.astro` renders PDF preview section when `display.document === "visible"` and canonical PDF artifact exists
-- [ ] `nachweis-detail.astro` renders website screenshot section when `display.screenshot === "visible"` and `websiteScreenshot` exists
-- [ ] `nachweis-detail.astro` renders website link section when `display.websiteLink === "visible"` and `websiteUrl` exists
-- [ ] `nachweis-detail.astro` omits all three sections when their `display` aspect is `"hidden"` — no DOM output, no placeholder
-- [ ] `nachweis-card.astro` shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists
-- [ ] `nachweis-list.astro` shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists
+- [ ] `nachweis-detail-component.astro` renders PDF preview section when `display.document === "visible"` and `pdfUrl` exists
+- [ ] `nachweis-detail-component.astro` renders website screenshot section when `display.screenshot === "visible"` and `websiteScreenshot.url` exists
+- [ ] `nachweis-detail-component.astro` renders website link section when `display.websiteLink === "visible"` and `websiteUrl` exists
+- [ ] `nachweis-detail-component.astro` omits all three sections when their `display` aspect is `"hidden"` — no DOM output, no placeholder
+- [ ] `nachweis-card-component.astro` shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists
+- [ ] `nachweis-list-component.astro` passes `display` and `websiteUrl` to `NachweisCard` which shows website link indicator when `display.websiteLink === "visible"` and `websiteUrl` exists
 - [ ] PDF `<object>` element has fallback content with download link
 - [ ] Screenshot `<img>` has `loading="lazy"`, `decoding="async"`, `fetchpriority="low"`, and `width`/`height` attributes
 - [ ] Website link `<a>` has `rel="noopener noreferrer"` and `target="_blank"`
@@ -330,6 +341,8 @@ No command output — this RFC is UI-only. The rendered HTML output is verified 
 - [ ] `image.delivery.validate` passes with screenshot images in built HTML
 - [ ] `a11y.label-in-name.validate` passes with external link in built HTML
 - [ ] Component tests verify conditional rendering for visible and hidden display aspects
+- [ ] Route resolver (`nachweis-routes.ts`) extracts `display`, `websiteUrl`, `websiteScreenshot`, `pdfUrl`, `pdfSha256` from PBP entity and passes as flat props
+- [ ] Archetype YAMLs (`nachweis-detail.yaml`, `nachweis-card.yaml`, `nachweis-list.yaml`) updated with new `propsSchema` fields
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
