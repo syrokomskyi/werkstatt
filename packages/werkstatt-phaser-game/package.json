@@ -1,5 +1,5 @@
 {
-  "name": "@warpgogol/werkstatt-phaser",
+  "name": "@warpgogol/werkstatt-phaser-game",
   "version": "0.7.2",
   "private": false,
   "type": "module",
@@ -9,7 +9,7 @@
   "description": "Werkstatt Phaser plugin — Phaser + Vite + Turborepo stack.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/syrokomskyi/werkstatt-phaser.git"
+    "url": "git+https://github.com/syrokomskyi/werkstatt-phaser-game.git"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",

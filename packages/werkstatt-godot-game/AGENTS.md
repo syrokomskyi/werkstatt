@@ -1,4 +1,4 @@
-# `@warpgogol/werkstatt-godot` — Agent Guide
+# `@warpgogol/werkstatt-godot-game` — Agent Guide
 
 Werkstatt Godot plugin — Godot 4.x + C# stack. Implements the `werkstatt/plugin@1` contract for game projects using Godot 4.x with .NET 8+ and C#.
 
@@ -15,7 +15,7 @@ All 25 packets (000–240) are completed. The Godot profile identity and stack b
 | Field | Value |
 | --- | --- |
 | `schema` | `werkstatt/plugin@1` |
-| `id` | `werkstatt-godot` |
+| `id` | `werkstatt-godot-game` |
 | `profileId` | `godot-csharp` |
 | `moduleLoaders` | `checks`, `dev` |
 | `deployAdapters` | `itch-io`, `github-releases` |

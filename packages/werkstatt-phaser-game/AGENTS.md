@@ -2,7 +2,7 @@
 
 ## Проект
 
-`@warpgogol/werkstatt-phaser` — плагин Werkstatt для стека Phaser 3 + Vite + Turborepo. Реализует контракт `werkstatt/plugin@1`: валидаторы сцен и ассетов, проверка размера бандла, сканер секретов, хук сборки через Vite, адаптеры деплоя на GitHub Pages и Cloudflare Pages, хук скаффолда и хук release evidence.
+`@warpgogol/werkstatt-phaser-game` — плагин Werkstatt для стека Phaser 3 + Vite + Turborepo. Реализует контракт `werkstatt/plugin@1`: валидаторы сцен и ассетов, проверка размера бандла, сканер секретов, хук сборки через Vite, адаптеры деплоя на GitHub Pages и Cloudflare Pages, хук скаффолда и хук release evidence.
 
 Приоритеты при изменениях:
 
@@ -141,7 +141,7 @@ src/
 | Field | Value |
 | --- | --- |
 | `schema` | `werkstatt/plugin@1` |
-| `id` | `werkstatt-phaser` |
+| `id` | `werkstatt-phaser-game` |
 | `profileId` | `phaser-turborepo` |
 | `moduleLoaders` | `checks` |
 | `deployAdapters` | `github-pages`, `cloudflare-pages` |

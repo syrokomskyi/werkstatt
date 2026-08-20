@@ -31,7 +31,7 @@ import { GODOT_INVARIANTS } from "./invariants/godot-invariants.ts";
 
 export const werkstattGodotPlugin: WerkstattPlugin = {
   schema: "werkstatt/plugin@1",
-  id: "werkstatt-godot",
+  id: "werkstatt-godot-game",
   profileId: "godot-csharp",
   paths: godotPathConventions,
   moduleLoaders: {

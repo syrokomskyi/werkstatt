@@ -27,7 +27,7 @@ import { PHASER_INVARIANTS } from "./invariants/phaser-invariants.ts";
 
 export const werkstattPhaserPlugin: WerkstattPlugin = {
   schema: "werkstatt/plugin@1",
-  id: "werkstatt-phaser",
+  id: "werkstatt-phaser-game",
   profileId: "phaser-turborepo",
   paths: phaserPathConventions,
   moduleLoaders: {

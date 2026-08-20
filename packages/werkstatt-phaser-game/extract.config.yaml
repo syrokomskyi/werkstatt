@@ -1,9 +1,9 @@
-# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-phaser
-# Extracts packages/werkstatt-phaser from the werkstatt monorepo into a standalone private repo.
+# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-phaser-game
+# Extracts packages/werkstatt-phaser-game from the werkstatt monorepo into a standalone private repo.
 # RFC-0773: Engine publication pipeline via repo-extract to private npm.
 
-projectDir: packages/werkstatt-phaser
-destName: werkstatt-phaser
+projectDir: packages/werkstatt-phaser-game
+destName: werkstatt-phaser-game
 standalone: true
 
 workspacePrefixes:
@@ -11,7 +11,7 @@ workspacePrefixes:
 stripScopes:
   - "@warpgogol/"
 preservePackages:
-  - "@warpgogol/werkstatt-phaser"
+  - "@warpgogol/werkstatt-phaser-game"
   - "@warpgogol/werkstatt"
 packageManager: "pnpm"
 
@@ -35,5 +35,5 @@ postProcess:
     path: AGENTS.md
 
 git:
-  remote: git@github.com:syrokomskyi/werkstatt-phaser.git
+  remote: git@github.com:syrokomskyi/werkstatt-phaser-game.git
   autoPush: true

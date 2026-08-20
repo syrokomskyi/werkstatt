@@ -1,9 +1,9 @@
-# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-godot
-# Extracts packages/werkstatt-godot from the werkstatt monorepo into a standalone private repo.
+# extract.config.yaml — repo-extract standalone package export for @warpgogol/werkstatt-godot-game
+# Extracts packages/werkstatt-godot-game from the werkstatt monorepo into a standalone private repo.
 # RFC-0773: Engine publication pipeline via repo-extract to private npm.
 
-projectDir: packages/werkstatt-godot
-destName: werkstatt-godot
+projectDir: packages/werkstatt-godot-game
+destName: werkstatt-godot-game
 standalone: true
 
 workspacePrefixes:
@@ -11,7 +11,7 @@ workspacePrefixes:
 stripScopes:
   - "@warpgogol/"
 preservePackages:
-  - "@warpgogol/werkstatt-godot"
+  - "@warpgogol/werkstatt-godot-game"
   - "@warpgogol/werkstatt"
 packageManager: "pnpm"
 
@@ -35,5 +35,5 @@ postProcess:
     path: AGENTS.md
 
 git:
-  remote: git@github.com:syrokomskyi/werkstatt-godot.git
+  remote: git@github.com:syrokomskyi/werkstatt-godot-game.git
   autoPush: true
