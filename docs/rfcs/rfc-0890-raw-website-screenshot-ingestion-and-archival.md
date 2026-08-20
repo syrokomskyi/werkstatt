@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
+enhancedAt: 2026-08-20
 implementedAt:
 closedAt:
 supersedes: []
@@ -45,6 +46,8 @@ successSignals:
   - "capturedAt is extracted from CaptureX_YYYY-MM-DD_HHMMSS_domain.ext filename pattern"
   - "Raw screenshots are persisted in R2 private storage at {systemId}/screenshots/{slug}/raw/{filename}"
   - "Raw screenshots are copied to the cache clone at trust/evidence/screenshots/{slug}/raw/{filename} for local reprocessing"
+  - "Re-ingesting the same file (same SHA-256) is idempotent — skips upload and Bordbuch append, returns existing rawArtifact metadata"
+  - "ingest can run before upload — display fields (sha256, mediaType, storage) are optional when only rawArtifact is present"
 nonGoals:
   - "Does not crop, resize, or convert the raw screenshot — that belongs to RFC-0891"
   - "Does not upload a public display variant to R2 — that belongs to RFC-0891"
@@ -120,6 +123,13 @@ pnpm exec werkstatt run nachweis.screenshot.ingest \
   --slug client-xyz \
   --file ./screenshot.png \
   --json
+
+# Override capturedAt (ISO 8601 with timezone) when filename doesn't match CaptureX pattern
+pnpm exec werkstatt run nachweis.screenshot.ingest \
+  --system warpgogol-com \
+  --slug client-xyz \
+  --file ./manual-screenshot.png \
+  --captured-at 2026-08-20T13:44:40Z
 ```
 
 ### Filename pattern parsing
@@ -136,7 +146,7 @@ Extracted groups → ISO 8601:
 
 - `2026-08-20_134440` → `2026-08-20T13:44:40Z`
 
-If the filename does not match the pattern, `capturedAt` is left unset (not an error — the operator can set it manually or via a flag).
+If the filename does not match the pattern, `capturedAt` is left unset (not an error — the operator can set it manually or via the `--captured-at` flag). The `--captured-at` flag accepts ISO 8601 with timezone (e.g. `2026-08-20T13:44:40Z`) and overrides any filename-parsed value.
 
 ### TypeScript contracts
 
@@ -159,13 +169,25 @@ const pbpRawScreenshotArtifactSchema = z.object({
 
 const pbpWebsiteScreenshotSchema = z.object({
   // Display variant (existing fields — populated by nachweis.screenshot.upload or RFC-0891 processing)
-  sha256: z.string().regex(/^[a-f0-9]{64}$/),
-  mediaType: nonEmptyString,
-  storage: z.enum(["private", "public"]),
+  // RFC-0890: display fields are optional when only rawArtifact is present (ingest before upload)
+  sha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  mediaType: nonEmptyString.optional(),
+  storage: z.enum(["private", "public"]).optional(),
   url: nonEmptyString.optional(),
   capturedAt: nonEmptyString.optional(),
   // RFC-0890: raw original artifact (populated by nachweis.screenshot.ingest)
   rawArtifact: pbpRawScreenshotArtifactSchema.optional(),
+}).superRefine((data, ctx) => {
+  // RFC-0890: at least one of display variant or rawArtifact must be present
+  const hasDisplay = data.sha256 != null && data.mediaType != null && data.storage != null;
+  const hasRaw = data.rawArtifact != null;
+  if (!hasDisplay && !hasRaw) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "websiteScreenshot must have either display variant (sha256, mediaType, storage) or rawArtifact (RFC-0890)",
+      path: ["rawArtifact"],
+    });
+  }
 });
 ```
 
@@ -184,9 +206,10 @@ export interface PbpRawScreenshotArtifact {
 }
 
 export interface PbpWebsiteScreenshot {
-  sha256: string;
-  mediaType: string;
-  storage: "private" | "public";
+  // RFC-0890: display fields optional when only rawArtifact is present
+  sha256?: string;
+  mediaType?: string;
+  storage?: "private" | "public";
   url?: string;
   capturedAt?: string;
   rawArtifact?: PbpRawScreenshotArtifact;
@@ -223,6 +246,22 @@ interface NachweisScreenshotIngestResult {
 | `packages/werkstatt-site/src/domain/pbp/schemas/evidence-source.ts` | Add `pbpRawScreenshotArtifactSchema`, extend `pbpWebsiteScreenshotSchema` with `rawArtifact` |
 | `packages/werkstatt-site/src/domain/pbp/entities/evidence-source.ts` | Add `PbpRawScreenshotArtifact` interface, extend `PbpWebsiteScreenshot` |
 | `trust/evidence/screenshots/{slug}/raw/` | Cache clone directory for raw screenshot copies (gitignored) |
+
+### Idempotency
+
+`nachweis.screenshot.ingest` is idempotent by SHA-256. When re-ingesting the same file for an existing `rawArtifact`:
+
+1. Compute SHA-256 of the incoming file.
+2. If `websiteScreenshot.rawArtifact.sha256` already matches → skip R2 upload, skip local copy, skip Bordbuch append. Return the existing `rawArtifact` metadata with `bordbuchEventId: ""` and a summary indicating "already ingested".
+3. If the SHA-256 differs → overwrite the local copy and R2 object, update `rawArtifact` metadata, append a new Bordbuch entry. This handles the case where the operator re-captures and re-ingests a different screenshot for the same slug.
+
+This follows the same idempotency-by-hash pattern as `nachweis.public-derivative` (RFC-0714).
+
+### Ordering: ingest before upload
+
+`nachweis.screenshot.ingest` and `nachweis.screenshot.upload` are independent — either can run first. When ingest runs before upload, the `websiteScreenshot` object is created with only `rawArtifact` populated (display fields `sha256`, `mediaType`, `storage` are absent). The schema enforces that at least one of display variant or `rawArtifact` is present via `superRefine`.
+
+When `nachweis.screenshot.upload` subsequently runs, it populates the display fields (`sha256`, `mediaType`, `storage`, `url`) alongside the existing `rawArtifact`. The upload command must not overwrite or remove an existing `rawArtifact`.
 
 ### R2 and local storage paths
 
@@ -264,6 +303,7 @@ The cache clone directory `trust/evidence/screenshots/` is added to `.gitignore`
 - `nachweis.screenshot.ingest` fails when R2 credentials are missing (`MissingEnvError`), unless `--dry-run` is set.
 - `nachweis.screenshot.ingest` does NOT fail when the filename doesn't match the CaptureX pattern — `capturedAt` is left unset.
 - `nachweis.screenshot.ingest` does NOT fail when the file extension doesn't match the actual content — mediaType is detected from file content via sharp metadata.
+- `nachweis.screenshot.ingest` does NOT fail on re-ingestion of the same SHA-256 — it skips upload and returns existing metadata (idempotent).
 
 ### Image metadata detection
 
@@ -283,7 +323,7 @@ The `mediaType` is derived from `metadata.format`, not from the file extension. 
 1. **Schema dependency**: RFC-0885 must be implemented first (the `websiteScreenshot` field exists on `EvidenceSource`).
 2. **Schema extension**: Add `rawArtifact` optional sub-object to `PbpWebsiteScreenshot`. This is backward-compatible — existing entities without `rawArtifact` continue to validate.
 3. **Command implementation**: Implement `nachweis.screenshot.ingest` in `packages/werkstatt/src/nachweis/`.
-4. **sharp dependency**: Add `sharp` to `packages/werkstatt/package.json` devDependencies (already installed in the monorepo via `werkstatt-site`).
+4. **sharp dependency**: `sharp` is already a devDependency of `packages/werkstatt-site`. The command uses dynamic `import("sharp")` at the call site — no static import. Do NOT add `sharp` to `packages/werkstatt/package.json` — `werkstatt` is stack-agnostic (DNA-64) and must not declare stack-specific dependencies. The monorepo's hoisted `node_modules` makes `sharp` available at runtime via the dynamic import. Standalone `werkstatt` consumers (non-site) would need `sharp` installed in their environment, but the nachweis module is only used in site contexts.
 5. **Cache clone .gitignore**: Add `trust/evidence/screenshots/` to the cache clone's `.gitignore` template.
 6. **No migration**: Existing entities are unaffected — `rawArtifact` is optional. Existing `nachweis.screenshot.upload` usage continues to work for pre-processed display variants.
 7. **Pipeline integration**: `nachweis.screenshot.ingest` is NOT part of any build pipeline — it is an operator-initiated command run during missions.
@@ -303,6 +343,7 @@ The `mediaType` is derived from `metadata.format`, not from the file extension. 
 - **sharp native dependency**: Adding `sharp` to `werkstatt` means every environment using the engine needs sharp's native binaries. This is already the case for `werkstatt-site` (which has sharp as devDependency), so the monorepo already installs sharp. Standalone `werkstatt` consumers (non-site) would need to install sharp, but the nachweis module is only used in site contexts.
 - **Filename pattern fragility**: The CaptureX pattern may change if the capture tool is updated. The regex is conservative — unmatched filenames leave `capturedAt` unset rather than failing. The operator can pass `--captured-at` explicitly.
 - **Cache clone disk usage**: Raw screenshots in the cache clone consume local disk. The `.gitignore` entry prevents git bloat, but operators may need to manually clean old raw files. This is acceptable — the R2 copy is the durable backup.
+- **PII in raw screenshots**: Full-page screenshots may capture cookies, user data, session tokens, or sensitive UI elements. The R2 private copy is access-controlled. The cache clone copy at `trust/evidence/screenshots/{slug}/raw/` is a plain file on disk — it must not be exposed in public builds, served by the dev server, or included in logs. The `.gitignore` entry prevents accidental git tracking. Operators should review raw screenshots for sensitive content before ingestion.
 
 ## Acceptance criteria
 
@@ -318,13 +359,16 @@ The `mediaType` is derived from `metadata.format`, not from the file extension. 
 - [ ] `nachweis.screenshot.ingest` updates `EvidenceSource.websiteScreenshot.rawArtifact` with metadata
 - [ ] `nachweis.screenshot.ingest` appends a `nachweis-record` Bordbuch entry with raw screenshot metadata
 - [ ] `nachweis.screenshot.ingest` `--dry-run` mode computes metadata without copying or uploading
+- [ ] `nachweis.screenshot.ingest` is idempotent — re-ingesting the same SHA-256 skips upload and Bordbuch append, returns existing metadata
+- [ ] `nachweis.screenshot.ingest` `--captured-at` flag accepts ISO 8601 with timezone and overrides filename-parsed value
+- [ ] `PbpWebsiteScreenshot` schema allows display fields to be absent when `rawArtifact` is present (ingest before upload)
 - [ ] `trust/evidence/screenshots/` added to cache clone `.gitignore` template
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- Agents MUST add `sharp` to `packages/werkstatt/package.json` devDependencies before implementing the command. Use dynamic `import("sharp")` at the call site, same pattern as `image.variants.generate` in `werkstatt-site/src/checks/image-variants.ts`.
+- Agents MUST use dynamic `import("sharp")` at the call site, same pattern as `image.variants.generate` in `werkstatt-site/src/checks/image-variants.ts`. Do NOT add `sharp` to `packages/werkstatt/package.json` — it is already a devDependency of `werkstatt-site` and the monorepo hoists it.
 - Agents MUST NOT upload raw screenshots to R2 public storage — raw screenshots are always private.
 - Agents MUST NOT git-track raw screenshot files in the cache clone — the `trust/evidence/screenshots/` directory is gitignored.
 - Agents MUST NOT modify the existing `nachweis.screenshot.upload` command — it remains for pre-processed display variants.
