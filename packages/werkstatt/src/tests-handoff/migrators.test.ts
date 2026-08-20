@@ -28,6 +28,7 @@
   <item>RFC-0548: updated counts for rfc-0548 migrator registration.</item>
   <item>RFC-0572: updated counts for rfc-0572 migrator registration.</item>
   <item>RFC-0757: updated counts for rfc-0757 migrator registration.</item>
+  <item>RFC-0885: updated counts for rfc-0885 migrator registration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -39,8 +40,8 @@ import {
   allMigratorIds,
 } from "../migrators/registry.ts";
 
-test("registry is seeded with rfc-0479 through rfc-0757 migrators", () => {
-  expect(migratorRegistry.length).toBe(22);
+test("registry is seeded with rfc-0479 through rfc-0885 migrators", () => {
+  expect(migratorRegistry.length).toBe(23);
   expect(migratorRegistry[0].id).toBe("rfc-0479");
   expect(migratorRegistry[1].id).toBe("rfc-0481");
   expect(migratorRegistry[2].id).toBe("rfc-0483");
@@ -63,6 +64,7 @@ test("registry is seeded with rfc-0479 through rfc-0757 migrators", () => {
   expect(migratorRegistry[19].id).toBe("rfc-0548");
   expect(migratorRegistry[20].id).toBe("rfc-0572");
   expect(migratorRegistry[21].id).toBe("rfc-0757");
+  expect(migratorRegistry[22].id).toBe("rfc-0885");
 });
 
 test("numericRfcId parses RFC-NNNN format", () => {
@@ -73,7 +75,7 @@ test("numericRfcId parses RFC-NNNN format", () => {
 
 test("migratorsToApply returns migrators not in cursor", () => {
   const chain = migratorsToApply([]);
-  expect(chain.length).toBe(22);
+  expect(chain.length).toBe(23);
   expect(chain[0].id).toBe("rfc-0479");
   expect(chain[1].id).toBe("rfc-0481");
   expect(chain[2].id).toBe("rfc-0483");
@@ -96,6 +98,7 @@ test("migratorsToApply returns migrators not in cursor", () => {
   expect(chain[19].id).toBe("rfc-0548");
   expect(chain[20].id).toBe("rfc-0572");
   expect(chain[21].id).toBe("rfc-0757");
+  expect(chain[22].id).toBe("rfc-0885");
 });
 
 test("migratorsToApply excludes already-applied migrators", () => {
@@ -122,6 +125,7 @@ test("migratorsToApply excludes already-applied migrators", () => {
     "rfc-0548",
     "rfc-0572",
     "rfc-0757",
+    "rfc-0885",
   ]);
   expect(chain.length).toBe(0);
 });
@@ -151,5 +155,6 @@ test("allMigratorIds returns sorted ids", () => {
     "rfc-0548",
     "rfc-0572",
     "rfc-0757",
+    "rfc-0885",
   ]);
 });
