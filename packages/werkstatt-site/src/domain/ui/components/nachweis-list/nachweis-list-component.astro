@@ -272,13 +272,16 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
       const sourceHashes = data.items
         ? Object.values(data.items)
             .map((item) => item.sha256)
-            .filter((h): h is string => !!h)
+            .filter((h): h is string => !!h && h !== "0".repeat(64))
         : [];
       const screenshotHash =
         typeof (data.websiteScreenshot as Record<string, unknown> | undefined)?.sha256 === "string"
           ? ((data.websiteScreenshot as Record<string, unknown>).sha256 as string)
           : undefined;
-      const allHashes = [...sourceHashes, ...(screenshotHash ? [screenshotHash] : [])];
+      const allHashes = [
+        ...sourceHashes,
+        ...(screenshotHash && screenshotHash !== "0".repeat(64) ? [screenshotHash] : []),
+      ];
 
       records.push({
         variant: "attestation",

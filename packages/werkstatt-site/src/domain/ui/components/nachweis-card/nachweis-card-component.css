@@ -783,7 +783,7 @@
 
 .nachweis-card__footer-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--ds-space-3);
   margin-top: var(--ds-space-4);
