@@ -46,6 +46,7 @@
   gap: var(--ds-space-5);
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .nachweis-list--registry .nachweis-list__item {
@@ -56,6 +57,7 @@
 .nachweis-list--compact .nachweis-list__items {
   gap: var(--ds-space-4);
   grid-template-columns: 1fr;
+  align-items: start;
 }
 
 @media (min-width: 768px) {
