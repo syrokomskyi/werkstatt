@@ -17,7 +17,6 @@ import {
   runReleaseReady,
   runReleaseValidate,
   runReleaseList,
-  runReleaseRollback,
   runReleaseStateValidate,
 } from "./release-commands.ts";
 
@@ -30,8 +29,6 @@ export {
   type ReleaseValidateData,
   runReleaseList,
   type ReleaseListData,
-  runReleaseRollback,
-  type ReleaseRollbackData,
   runReleaseStateValidate,
   type ReleaseStateValidateData,
   type ReleaseStateCheck,
@@ -92,19 +89,6 @@ export function createReleaseModule(): KernelModule {
           site: { kind: "string", description: "Filter by Sternsystem id." },
         },
         execute: runReleaseList,
-      });
-      registry.registerCommand({
-        name: "release.rollback",
-        description:
-          "Mark a ready release as rolled-back and append Bordbuch entry (RFC-0357). Flags: --release.",
-        scope: "workspace",
-        supportsAllSites: false,
-        mutatesState: true,
-        flags: {
-          release: { kind: "string", required: true, description: "Release id to roll back." },
-        },
-        writes: ["releases/{release}/release.yaml", "systems/{system}/bordbuch/events.ndjson"],
-        execute: runReleaseRollback,
       });
       registry.registerCommand({
         name: "release.state.validate",

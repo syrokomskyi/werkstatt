@@ -19,9 +19,10 @@ import type {
   DeploymentAdapter,
   PropagateInput,
   RollbackInput,
+  RollbackResult,
   HealthInput,
 } from "../leitstand/adapter.ts";
-import type { PropagationResult, HealthCheck, } from "@warpgogol/werkstatt/schemas";
+import type { PropagationResult, HealthCheck } from "@warpgogol/werkstatt/schemas";
 import type { AuthorizeResult } from "../leitstand/deploy-helpers.ts";
 import type { DeploymentStaticConfig } from "@warpgogol/werkstatt/schemas";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
@@ -39,15 +40,16 @@ const nullAdapter: DeploymentAdapter = {
       healthChecks: [],
     };
   },
-  async rollback(input: RollbackInput): Promise<PropagationResult> {
+  async rollback(input: RollbackInput): Promise<RollbackResult> {
     return {
       systemId: input.systemId,
-      releaseId: input.toReleaseId,
+      channel: input.channel,
       state: "succeeded",
-      deploymentUrl: input.url,
+      workerName: input.workerName,
       startedAt: new Date().toISOString(),
       completedAt: new Date().toISOString(),
-      healthChecks: [],
+      stdout: "",
+      stderr: "",
     };
   },
   async health(

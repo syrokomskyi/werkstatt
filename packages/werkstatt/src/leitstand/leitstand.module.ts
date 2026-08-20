@@ -220,24 +220,29 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.rollback",
         description:
-          "Rollback to the previous published release; auto-detects channel from release state and auto-steps release state (RFC-0628). Flags: --site, [--to-release].",
+          "Rollback a site or service to its previous Cloudflare Worker deployment via native wrangler rollback (RFC-0895). Flags: --site OR --service (mutually exclusive), [--channel dev|alt|main].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
-          site: { kind: "string", required: true, description: "Sternsystem id." },
+          site: { kind: "string", description: "Sternsystem id." },
           system: { kind: "string", description: "Alias for --site." },
-          "to-release": { kind: "string", description: "Explicit target release id." },
+          service: { kind: "string", description: "Service id from services/registry.yaml." },
+          channel: {
+            kind: "string",
+            description: "Deployment channel for site rollback: dev, alt, or main (default).",
+          },
         },
         writes: [
           "systems-cache/{system}/system-state.yaml",
           "systems-cache/{system}/bordbuch/events.ndjson",
-          "releases/{release}/release.yaml",
+          "services/registry.yaml",
         ],
         reads: [
           "systems-cache/{system}/system-config.yaml",
           "systems-cache/{system}/system-state.yaml",
-          "releases/*/release.yaml",
+          "services/registry.yaml",
+          "services/{service}/**",
         ],
         cacheable: false,
         execute: runLeitstandRollback,
@@ -340,7 +345,6 @@ export function createLeitstandModule(): KernelModule {
 
       const { runLeitstandServiceDevDeploy } = await import("./service-dev-deploy.ts");
       const { runLeitstandServicePromote } = await import("./service-promote.ts");
-      const { runLeitstandServiceRollback } = await import("./service-rollback.ts");
       registry.registerCommand({
         name: "leitstand.service.dev-deploy",
         description:
@@ -384,24 +388,6 @@ export function createLeitstandModule(): KernelModule {
         writes: ["services/registry.yaml"],
         reads: ["services/registry.yaml", "services/{service}/**"],
         execute: runLeitstandServicePromote,
-      });
-      registry.registerCommand({
-        name: "leitstand.service.rollback",
-        description:
-          "Rollback a shared Cloudflare Worker service to its previous deployment via wrangler rollback (RFC-0806). Flags: --service.",
-        scope: "workspace",
-        supportsAllSites: false,
-        mutatesState: true,
-        flags: {
-          service: {
-            kind: "string",
-            required: true,
-            description: "Service id from the services: key in services/registry.yaml.",
-          },
-        },
-        writes: ["services/registry.yaml"],
-        reads: ["services/registry.yaml", "services/{service}/**"],
-        execute: runLeitstandServiceRollback,
       });
     },
   };

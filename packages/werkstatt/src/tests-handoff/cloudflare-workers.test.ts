@@ -69,12 +69,9 @@ test("adapter: rollback succeeds when wrangler exits 0", async () => {
   const adapter = createCloudflareWorkersAdapter(runner);
   const result = await adapter.rollback({
     systemId: "test-system",
-    toReleaseId: "test-system-r000002",
     channel: "main",
-    distPath: "/tmp/dist",
+    wranglerConfigDir: "/tmp",
     workerName: "test-system",
-    url: "https://test.example.com",
-    secretsFilePath: undefined,
   });
   expect(result.state).toBe("succeeded");
 });
@@ -264,12 +261,9 @@ test("RFC-0623: rollback retries on transient 502 error then succeeds", async ()
   const adapter = createCloudflareWorkersAdapter(runner);
   const promise = adapter.rollback({
     systemId: "test-system",
-    toReleaseId: "test-system-r000002",
     channel: "main",
-    distPath: "/tmp/dist",
+    wranglerConfigDir: "/tmp",
     workerName: "test-system",
-    url: "https://test.example.com",
-    secretsFilePath: undefined,
   });
   await vi.advanceTimersByTimeAsync(30_000);
   const result = await promise;

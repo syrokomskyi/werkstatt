@@ -26,8 +26,10 @@ import type {
   DeploymentAdapter,
   PropagateInput,
   RollbackInput,
+  RollbackResult,
   HealthInput,
 } from "../adapter.ts";
+import { runWranglerRollback } from "../service-deploy-helpers.ts";
 
 const TRANSIENT_ERROR_PATTERNS: readonly RegExp[] = [
   /\b502\b/,
@@ -281,50 +283,24 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
       };
     },
 
-    async rollback(input: RollbackInput): Promise<PropagationResult> {
+    async rollback(input: RollbackInput): Promise<RollbackResult> {
       const now = new Date().toISOString();
 
-      const secretsEnv = input.secretsFilePath ? await sourceDotenv(input.secretsFilePath) : {};
+      const env: Record<string, string> = { ...filterEnv(process.env) };
 
-      const env: Record<string, string> = { ...filterEnv(process.env), ...secretsEnv };
-      if (input.nodeModulesBinPath) {
-        env.PATH = `${input.nodeModulesBinPath}:${process.env.PATH ?? ""}`;
-      }
+      const result = await runWranglerRollback(input.wranglerConfigDir, env);
 
-      const serverDir = path.join(input.distPath, "server");
-      const wranglerConfigDir = existsSync(path.join(serverDir, "wrangler.json"))
-        ? serverDir
-        : input.distPath;
-
-      const wranglerArgs = [
-        "--yes",
-        "wrangler",
-        "deploy",
-        "--config",
-        "wrangler.json",
-        "--name",
-        input.workerName,
-      ];
-      if (input.secretsFilePath) {
-        wranglerArgs.push("--secrets-file", path.resolve(input.secretsFilePath));
-      }
-
-      const result = await runWranglerDeployWithRetry(runner, wranglerArgs, {
-        cwd: wranglerConfigDir,
-        env,
-      });
-
-      const deployedUrl = input.url || extractDeploymentUrl(result.stdout) || "";
       const state = result.exitCode === 0 ? "succeeded" : "failed";
 
       return {
         systemId: input.systemId,
-        releaseId: input.toReleaseId,
+        channel: input.channel,
         state,
-        deploymentUrl: deployedUrl,
+        workerName: input.workerName,
         startedAt: now,
         completedAt: new Date().toISOString(),
-        healthChecks: [],
+        stdout: result.stdout,
+        stderr: result.stderr,
       };
     },
 
