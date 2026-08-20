@@ -19,12 +19,14 @@
   <item>RFC-0511: added buildAiAgentProfileBlocks seven-block structure and participantType dispatch (human vs ai-agent).</item>
   <item>RFC-0512: inject SoftwareApplication JSON-LD for AI-agent profiles, extended Person JSON-LD for human profiles, and CollectionPage JSON-LD for team hub via extraGraphNodes.</item>
   <item>RFC-0513: add status badge to hero block tagline for non-active participants (former, retired, on-leave, temporarily-unavailable, suspended).</item>
+  <item>RFC-0887: inject display, websiteUrl, websiteScreenshot, pdfUrl, pdfSha256 from evidence-source entity into nachweis-detail block props.</item>
 </CHANGE_SUMMARY>
 */
 
 // RFC-0141: content reads flow through the Content Source Provider port (the single named
 // seam that owns the astro:content dependency), not astro:content directly.
 import { getCollection, getEntry } from "@warpgogol/werkstatt-site/content-source/astro";
+import { getEntryLanguage } from "@warpgogol/werkstatt-shared/share/content";
 import { EMPTY_RUNTIME_CONTEXT } from "../../runtime-context.ts";
 import { buildPage, type PageEntry, type ResolvedPage, type ShellBlockConfig } from "../../page.ts";
 import { readFileSync } from "node:fs";
@@ -551,6 +553,42 @@ function buildAiAgentProfileBlocks(
   return blocks;
 }
 
+// RFC-0887: Extract display, websiteUrl, websiteScreenshot, pdfUrl, pdfSha256
+// from the evidence-source entity matching the nachweis slug.
+async function resolveNachweisEvidenceProps(
+  slug: string,
+  lang: string,
+  defaultLang: string,
+): Promise<Record<string, unknown>> {
+  const entries = await getCollection("business-profile");
+  const langEntries = entries.filter((e: { id: string }) => {
+    const entryLang = getEntryLanguage(e.id);
+    return entryLang === lang;
+  });
+  const fallbackEntries =
+    langEntries.length > 0
+      ? langEntries
+      : entries.filter((e: { id: string }) => {
+          const entryLang = getEntryLanguage(e.id);
+          return entryLang === defaultLang;
+        });
+
+  for (const entry of fallbackEntries) {
+    const data = entry.data as Record<string, unknown>;
+    if (data.type !== "evidence-source") continue;
+    if (data.slug !== slug) continue;
+
+    const props: Record<string, unknown> = {};
+    if (data.display) props.display = data.display;
+    if (data.websiteUrl) props.websiteUrl = data.websiteUrl;
+    if (data.websiteScreenshot) props.websiteScreenshot = data.websiteScreenshot;
+    if (data.pdfUrl) props.pdfUrl = data.pdfUrl;
+    if (data.pdfSha256) props.pdfSha256 = data.pdfSha256;
+    return props;
+  }
+  return {};
+}
+
 export async function resolvePageRoute(options: ResolvePageRouteOptions): Promise<PageRouteData> {
   const { lang, slug, siteUrl, buildSemanticModel } = options;
 
@@ -669,7 +707,9 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
     }
 
     // RFC-0708: inject the evidence slug into the nachweis-detail/nachweis-verify block props
+    // RFC-0887: also inject display, websiteUrl, websiteScreenshot, pdfUrl, pdfSha256
     if (nachweisSlug) {
+      const evidenceProps = await resolveNachweisEvidenceProps(nachweisSlug, lang, defaultLang);
       const blocks = entryData.blocks as Array<Record<string, unknown>> | undefined;
       if (Array.isArray(blocks)) {
         entryData = {
@@ -678,7 +718,11 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
             block.type === "nachweis-detail" || block.type === "nachweis-verify"
               ? {
                   ...block,
-                  props: { ...(block.props as Record<string, unknown>), slug: nachweisSlug },
+                  props: {
+                    ...(block.props as Record<string, unknown>),
+                    slug: nachweisSlug,
+                    ...evidenceProps,
+                  },
                 }
               : block,
           ),
