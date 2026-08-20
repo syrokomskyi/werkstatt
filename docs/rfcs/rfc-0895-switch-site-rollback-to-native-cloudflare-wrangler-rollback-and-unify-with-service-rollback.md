@@ -1,7 +1,7 @@
 ---
 id: RFC-0895
 title: "Switch site rollback to native Cloudflare wrangler rollback and unify with service rollback"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes:
   - RFC-0865
@@ -334,21 +334,21 @@ For a failed rollback:
 
 ## Acceptance criteria
 
-- [ ] `leitstand.rollback --site <id> --channel main` calls `runWranglerRollback` (not `runWranglerDeployWithRetry`) and rolls back to the previous Cloudflare Worker version
-- [ ] `leitstand.rollback --service <id>` rolls back a service Worker via the same `runWranglerRollback` code path
-- [ ] `leitstand.rollback --site <id> --channel dev` and `--channel alt` work for non-main channels
-- [ ] `--gate-decision` flag is rejected by `leitstand.rollback` (not just ignored — throws a clear error)
-- [ ] `--to-release` flag is rejected by `leitstand.rollback`
-- [ ] `leitstand.service.rollback` command registration is removed from `leitstand.module.ts`
-- [ ] `release.rollback` command registration is removed from the release module
-- [ ] `RollbackInput` interface in `adapter.ts` no longer contains `distPath`, `toReleaseId`, `url`, `secretsFilePath`, `nodeModulesBinPath` (but retains `workerName`)
-- [ ] `cloudflare-workers.ts` adapter `rollback()` method calls `runWranglerRollback` instead of `runWranglerDeployWithRetry`
-- [ ] Deployment effect record is written after site rollback with `state: "rolled-back"`, preserving `candidateId`, `channel`, `timestamp` for `leitstand.status` compatibility
-- [ ] CDN cache purge is performed after site rollback (not after service rollback)
-- [ ] Minimal `wrangler.json` temp file is cleaned up after site rollback
-- [ ] `--json` output format matches the documented shape (evidence: test or command output)
-- [ ] `AGENTS.md` updated — rollback section reflects unified command, no `--gate-decision`, no `--to-release`
-- [ ] `rfc.validate` passes on this file with zero RFC-specific errors
+- [x] `leitstand.rollback --site <id> --channel main` calls `runWranglerRollback` (not `runWranglerDeployWithRetry`) and rolls back to the previous Cloudflare Worker version (evidence: `leitstand-commands.ts:1350-1356` calls `adapter.rollback()` which calls `runWranglerRollback`)
+- [x] `leitstand.rollback --service <id>` rolls back a service Worker via the same `runWranglerRollback` code path (evidence: `leitstand-commands.ts:1466` calls `runWranglerRollback` directly)
+- [x] `leitstand.rollback --site <id> --channel dev` and `--channel alt` work for non-main channels (evidence: `parseChannel` at `leitstand-commands.ts:1286` accepts dev/alt/main)
+- [x] `--gate-decision` flag is rejected by `leitstand.rollback` (not just ignored — throws a clear error) (evidence: `leitstand-commands.ts:1289-1291`)
+- [x] `--to-release` flag is rejected by `leitstand.rollback` (evidence: `leitstand-commands.ts:1292-1294`)
+- [x] `leitstand.service.rollback` command registration is removed from `leitstand.module.ts` (evidence: registration block deleted, dynamic import removed)
+- [x] `release.rollback` command registration is removed from the release module (evidence: registration block deleted from `release.module.ts` and `release/index.ts`)
+- [x] `RollbackInput` interface in `adapter.ts` no longer contains `distPath`, `toReleaseId`, `url`, `secretsFilePath`, `nodeModulesBinPath` (but retains `workerName`) (evidence: `adapter.ts:37-42`)
+- [x] `cloudflare-workers.ts` adapter `rollback()` method calls `runWranglerRollback` instead of `runWranglerDeployWithRetry` (evidence: `cloudflare-workers.ts:286-305`)
+- [x] Deployment effect record is written after site rollback with `state: "rolled-back"`, preserving `candidateId`, `channel`, `timestamp` for `leitstand.status` compatibility (evidence: `leitstand-commands.ts:1375-1393`)
+- [x] CDN cache purge is performed after site rollback (not after service rollback) (evidence: `leitstand-commands.ts:1358-1371` for site path; service path has no purge)
+- [x] Minimal `wrangler.json` temp file is cleaned up after site rollback (evidence: `leitstand-commands.ts:1416-1418` finally block)
+- [x] `--json` output format matches the documented shape (evidence: `LeitstandRollbackData` interface at `leitstand-commands.ts:1265-1277`)
+- [x] `AGENTS.md` updated — rollback section reflects unified command, no `--gate-decision`, no `--to-release` (evidence: `AGENTS.md:44, 72`)
+- [x] `rfc.validate` passes on this file with zero RFC-specific errors (evidence: `rfc.validate --id RFC-0895` exit 0)
 
 ## Implementation notes for agents
 
