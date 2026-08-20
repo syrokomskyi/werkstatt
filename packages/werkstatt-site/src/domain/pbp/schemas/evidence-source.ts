@@ -177,6 +177,8 @@ const pbpWebsiteScreenshotSchema = z
     capturedAt: nonEmptyString.optional(),
     // RFC-0890: raw original artifact (populated by nachweis.screenshot.ingest)
     rawArtifact: pbpRawScreenshotArtifactSchema.optional(),
+    // RFC-0892: display aspect ratio — "landscape" (16:9, default) or "portrait" (9:16 mobile)
+    aspectRatio: z.enum(["landscape", "portrait"]).optional(),
   })
   .superRefine((data, ctx) => {
     const hasDisplay = data.sha256 != null && data.mediaType != null && data.storage != null;

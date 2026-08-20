@@ -78,6 +78,14 @@
   aspect-ratio: 16 / 9;
 }
 
+.nachweis-card__screenshot[data-aspect-ratio="portrait"] {
+  aspect-ratio: 9 / 16;
+  max-height: 480px;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .nachweis-card__screenshot img {
   width: 100%;
   height: 100%;

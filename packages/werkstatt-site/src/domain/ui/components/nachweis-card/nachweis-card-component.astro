@@ -60,7 +60,7 @@ interface NachweisAttestationCardProps {
   // RFC-0887: display control and website link
   display?: { websiteLink: "visible" | "hidden" };
   websiteUrl?: string;
-  websiteScreenshot?: { url?: string; capturedAt?: string };
+  websiteScreenshot?: { url?: string; capturedAt?: string; aspectRatio?: "landscape" | "portrait" };
   // RFC-0892: website meta fields
   websiteTagline?: string;
   websiteFooterTagline?: string;
@@ -196,14 +196,17 @@ function getLiveCheckUrl(
       <p class="nachweis-card__result">{props.result}</p>
 
       {showScreenshot && (
-        <figure class="nachweis-card__screenshot">
+        <figure
+          class="nachweis-card__screenshot"
+          data-aspect-ratio={props.websiteScreenshot?.aspectRatio ?? "landscape"}
+        >
           <img
             src={props.websiteScreenshot!.url}
             alt={`Screenshot von ${websiteDomain ?? "der Website"}`}
             loading="lazy"
             decoding="async"
-            width="1280"
-            height="720"
+            width={props.websiteScreenshot?.aspectRatio === "portrait" ? 720 : 1280}
+            height={props.websiteScreenshot?.aspectRatio === "portrait" ? 1280 : 720}
           />
         </figure>
       )}

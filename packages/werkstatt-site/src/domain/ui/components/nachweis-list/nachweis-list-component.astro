@@ -57,7 +57,7 @@ interface NachweisAttestationRecord {
   // RFC-0887: display control and website link passthrough
   display?: { websiteLink: "visible" | "hidden" };
   websiteUrl?: string;
-  websiteScreenshot?: { url?: string; capturedAt?: string };
+  websiteScreenshot?: { url?: string; capturedAt?: string; aspectRatio?: "landscape" | "portrait" };
   // RFC-0892: website meta fields
   websiteTagline?: string;
   websiteFooterTagline?: string;
@@ -133,7 +133,7 @@ interface EvidenceSourceData {
   // RFC-0887: display control and website fields
   display?: { document?: string; screenshot?: string; websiteLink?: string };
   websiteUrl?: string;
-  websiteScreenshot?: { url?: string; capturedAt?: string };
+  websiteScreenshot?: { url?: string; capturedAt?: string; aspectRatio?: "landscape" | "portrait" };
   // RFC-0892: website meta fields
   websiteTagline?: string;
   websiteFooterTagline?: string;
@@ -283,6 +283,9 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
                 url: data.websiteScreenshot.url,
                 ...(data.websiteScreenshot.capturedAt
                   ? { capturedAt: data.websiteScreenshot.capturedAt }
+                  : {}),
+                ...(data.websiteScreenshot.aspectRatio
+                  ? { aspectRatio: data.websiteScreenshot.aspectRatio }
                   : {}),
               },
             }
