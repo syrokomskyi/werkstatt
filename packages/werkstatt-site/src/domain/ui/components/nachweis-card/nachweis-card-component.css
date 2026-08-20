@@ -791,20 +791,34 @@
   border-top: 1px solid var(--ds-color-card-border);
 }
 
-.nachweis-card__status[data-status="published"] .nachweis-card__status-text::before {
+.nachweis-card__status-block[data-status="published"] .nachweis-card__status-text::before {
   content: "✓";
   color: var(--ds-color-success);
   font-weight: var(--ds-font-weight-bold);
   margin-right: var(--ds-space-1);
+  display: inline-block;
+  animation: nachweis-check-pulse 2.5s var(--ds-ease-standard) infinite;
 }
 
-.nachweis-card__status[data-status="preview"] .nachweis-card__status-text::before {
+@keyframes nachweis-check-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.nachweis-card__status-block[data-status="preview"] .nachweis-card__status-text::before {
   content: "○";
   color: var(--ds-color-warning-strong);
   margin-right: var(--ds-space-1);
 }
 
-.nachweis-card__status[data-status="withdrawn"] .nachweis-card__status-text::before {
+.nachweis-card__status-block[data-status="withdrawn"] .nachweis-card__status-text::before {
   content: "✕";
   color: var(--ds-color-danger);
   margin-right: var(--ds-space-1);
@@ -831,6 +845,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .nachweis-card__status-indicator[data-status="published"] .nachweis-card__status-dot::after {
+    animation: none;
+  }
+
+  .nachweis-card__status-block[data-status="published"] .nachweis-card__status-text::before {
     animation: none;
   }
 
