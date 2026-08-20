@@ -10,6 +10,7 @@ workspacePrefixes:
   - "@warpgogol/"
 stripScopes:
   - "@warpgogol/"
+  - "@syrokomskyi/"
 preservePackages:
   - "@warpgogol/werkstatt-shared"
   - "@warpgogol/werkstatt"

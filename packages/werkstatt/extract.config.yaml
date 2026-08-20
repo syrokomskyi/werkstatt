@@ -31,12 +31,16 @@ excludePathSegments:
   - .npmrc
   - src/tests
   - pnpm-lock.yaml
+  - extracted-shims
 
 postProcess:
   - action: delete
     path: AGENTS.md
   - action: delete
     path: pnpm-lock.yaml
+  - action: copy
+    from: packages/werkstatt/extracted-shims/werkstatt-site.d.ts
+    to: src/types/werkstatt-site-shims.d.ts
 
 git:
   remote: git@github.com:syrokomskyi/werkstatt.git
