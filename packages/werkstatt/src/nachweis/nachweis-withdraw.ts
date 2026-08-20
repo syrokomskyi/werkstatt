@@ -18,6 +18,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.withdraw command handler.</item>
   <item>RFC-0872: conditionally revoke consent based on publication policy (only attestation-v1).</item>
+  <item>RFC-0888: pass --skip-bordbuch to manifest.generate and append sichtpass Bordbuch entry with withdrawn: true after manifest regeneration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -34,7 +35,10 @@ import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
 } from "@warpgogol/werkstatt-shared/content";
-import { appendBatchAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
+import {
+  appendBatchAndCommitBordbuch,
+  appendAndCommitBordbuch,
+} from "../bordbuch/bordbuch-commit-helper.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
@@ -207,17 +211,56 @@ export async function runNachweisWithdraw(
     await releaseLock(workspaceRoot, `system:${systemId}`);
   }
 
-  // Regenerate manifest
+  // Regenerate manifest — pass --skip-bordbuch to prevent duplicate sichtpass entry (RFC-0888)
   await executeKernelCommand({
     workspaceRoot,
     commandName: "nachweis.manifest.generate",
     siteName: systemId,
-    argv: [`--system=${systemId}`],
+    argv: [`--system=${systemId}`, "--skip-bordbuch"],
   });
 
   logger.info(
     `[nachweis.withdraw] withdrawn '${slug}' — manifest regenerated${consentRevoked ? " (consent revoked)" : " (no consent revocation — policy: " + policyId + ")"}`,
   );
+
+  // RFC-0888: Append sichtpass Bordbuch entry with withdrawn: true
+  const sichtpassOperationId = generateOperationId();
+  await acquireLock(
+    workspaceRoot,
+    `system:${systemId}`,
+    sichtpassOperationId,
+    "nachweis.withdraw",
+    "agent",
+  );
+  await acquireLock(
+    workspaceRoot,
+    `bordbuch:${systemId}`,
+    sichtpassOperationId,
+    "nachweis.withdraw",
+    "agent",
+  );
+  try {
+    await appendAndCommitBordbuch(
+      workspaceRoot,
+      systemId,
+      "sichtpass",
+      `Sichtpass manifest entry withdrawn for '${slug}'`,
+      "agent",
+      {
+        writerRole: "nachweis",
+        metadata: {
+          slug,
+          manifestVersion: "1.0.0",
+          withdrawn: true,
+          verificationLevel: "N0",
+        },
+      },
+      `Bordbuch: sichtpass ${systemId} ${slug} withdrawn`,
+    );
+  } finally {
+    await releaseLock(workspaceRoot, `bordbuch:${systemId}`);
+    await releaseLock(workspaceRoot, `system:${systemId}`);
+  }
 
   return {
     data: {

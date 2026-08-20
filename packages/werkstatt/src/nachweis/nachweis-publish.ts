@@ -19,6 +19,7 @@
   <item>RFC-0707: initial nachweis.publish command handler.</item>
   <item>RFC-0715: remove --pilot-n2-exception flag, require N3 only. N2 grandfathering: existing N2-published records remain valid.</item>
   <item>RFC-0872: replace legacy boolean gate with policy-driven V2 gate.</item>
+  <item>RFC-0888: pass --skip-bordbuch to manifest.generate and append sichtpass Bordbuch entry after manifest regeneration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -182,15 +183,63 @@ export async function runNachweisPublish(
     await releaseLock(workspaceRoot, `system:${systemId}`);
   }
 
-  // Regenerate manifest
+  // Regenerate manifest — pass --skip-bordbuch to prevent duplicate sichtpass entry (RFC-0888)
   await executeKernelCommand({
     workspaceRoot,
     commandName: "nachweis.manifest.generate",
     siteName: systemId,
-    argv: [`--system=${systemId}`],
+    argv: [`--system=${systemId}`, "--skip-bordbuch"],
   });
 
   logger.info(`[nachweis.publish] published '${slug}' — regenerating manifest`);
+
+  // RFC-0888: Append sichtpass Bordbuch entry for the published slug
+  const sichtpassOperationId = generateOperationId();
+  await acquireLock(
+    workspaceRoot,
+    `system:${systemId}`,
+    sichtpassOperationId,
+    "nachweis.publish",
+    "agent",
+  );
+  await acquireLock(
+    workspaceRoot,
+    `bordbuch:${systemId}`,
+    sichtpassOperationId,
+    "nachweis.publish",
+    "agent",
+  );
+  try {
+    await appendAndCommitBordbuch(
+      workspaceRoot,
+      systemId,
+      "sichtpass",
+      `Sichtpass manifest entry generated for '${slug}'`,
+      "agent",
+      {
+        writerRole: "nachweis",
+        metadata: {
+          slug,
+          manifestVersion: "1.0.0",
+          recordHash: (evidenceData.items as Record<string, { sha256?: string }> | undefined)
+            ? (Object.values(evidenceData.items as Record<string, { sha256?: string }>)[0]
+                ?.sha256 ?? "")
+            : "",
+          signaturePresent: bordbuchEntries.some(
+            (e) => e.kind === "nachweis-signed" && e.metadata?.slug === slug,
+          ),
+          timestampPresent: bordbuchEntries.some(
+            (e) => e.kind === "nachweis-timestamped" && e.metadata?.slug === slug,
+          ),
+          verificationLevel: "N3",
+        },
+      },
+      `Bordbuch: sichtpass ${systemId} ${slug} published`,
+    );
+  } finally {
+    await releaseLock(workspaceRoot, `bordbuch:${systemId}`);
+    await releaseLock(workspaceRoot, `system:${systemId}`);
+  }
 
   return {
     data: {

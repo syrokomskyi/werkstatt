@@ -21,12 +21,14 @@
   <item>RFC-0871: read Bordbuch to resolve timestampAssurance per record, default rfc3161 for legacy entries.</item>
   <item>RFC-0872: add technical-assessment kind, include observation identity fields in manifest entries.</item>
   <item>RFC-0886: include display and websiteUrl fields in manifest entries.</item>
+  <item>RFC-0888: append sichtpass Bordbuch entry after manifest file is written (unless --skip-bordbuch is set).</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -35,6 +37,8 @@ import type {
 import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-shared/content";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
+import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
+import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
   makeSkipResult,
@@ -61,6 +65,11 @@ const MANIFEST_OUTPUT_FILE = "manifest.json";
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
   return typeof v === "string" ? v : undefined;
+}
+
+function flagBool(input: KernelCommandInput, key: string): boolean {
+  const v = input.flags[key];
+  return v === true || v === "true";
 }
 
 export async function runNachweisManifestGenerate(
@@ -190,6 +199,55 @@ export async function runNachweisManifestGenerate(
   logger.info(
     `[nachweis.manifest.generate] wrote ${records.length} record(s) to ${MANIFEST_OUTPUT_DIR}/${MANIFEST_OUTPUT_FILE}`,
   );
+
+  // RFC-0888: Append sichtpass Bordbuch entry unless --skip-bordbuch is set
+  const skipBordbuch = flagBool(input, "skip-bordbuch");
+  if (!skipBordbuch) {
+    const manifestHash = createHash("sha256").update(manifestJson).digest("hex");
+    const sichtpassOperationId = generateOperationId();
+    await acquireLock(
+      workspaceRoot,
+      `system:${systemId}`,
+      sichtpassOperationId,
+      "nachweis.manifest.generate",
+      "agent",
+    );
+    await acquireLock(
+      workspaceRoot,
+      `bordbuch:${systemId}`,
+      sichtpassOperationId,
+      "nachweis.manifest.generate",
+      "agent",
+    );
+    try {
+      await appendAndCommitBordbuch(
+        workspaceRoot,
+        systemId,
+        "sichtpass",
+        `Sichtpass manifest regenerated for '${systemId}'`,
+        "agent",
+        {
+          writerRole: "nachweis",
+          metadata: {
+            slug: "__manifest__",
+            manifestVersion: MANIFEST_SCHEMA_VERSION,
+            recordHash: manifestHash,
+            signaturePresent: false,
+            timestampPresent: false,
+            verificationLevel: "N0",
+          },
+        },
+        `Bordbuch: sichtpass ${systemId} manifest-regenerated`,
+      );
+    } finally {
+      await releaseLock(workspaceRoot, `bordbuch:${systemId}`);
+      await releaseLock(workspaceRoot, `system:${systemId}`);
+    }
+  } else {
+    logger.info(
+      "[nachweis.manifest.generate] --skip-bordbuch set, skipping sichtpass Bordbuch entry",
+    );
+  }
 
   return {
     data: manifest,
