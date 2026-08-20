@@ -1,12 +1,13 @@
 ---
 id: RFC-0893
 title: "Add icon.references.validate command for build-time vendor icon existence checks"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
