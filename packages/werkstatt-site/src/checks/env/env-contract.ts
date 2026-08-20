@@ -575,7 +575,7 @@ export async function runDeployScriptsValidate(
           severity: "error",
           file: `${site.name}/package.json`,
           message: `Missing required deploy script "${script}" in ${site.name}/package.json (RFC-0388 Rule 6).`,
-          fixHint: `Add "${script}" to the scripts section. See packages/os/site-kernel-onboarding/src/templates/package.template.json for the canonical shape.`,
+          fixHint: `Add "${script}" to the scripts section. See packages/werkstatt-site/src/onboarding/templates/package.template.json for the canonical shape.`,
         });
       }
     }
