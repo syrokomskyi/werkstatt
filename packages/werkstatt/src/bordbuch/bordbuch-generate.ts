@@ -22,8 +22,7 @@ import type {
 import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
 import { stringify as yamlStringify } from "yaml";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
-import { readBordbuch } from "./bordbuch-io.ts";
-import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
+import { readBordbuch, resolveBordbuchProjectionDir } from "./bordbuch-io.ts";
 import {
   loadSurfaceModuleContexts,
   readVisibilityOutcomes,
@@ -79,7 +78,7 @@ async function buildProjection(
   systemId: string,
   entries: BordbuchEntry[],
 ): Promise<BordbuchProjection> {
-  const systemDir = await resolveCacheClonePath(workspaceRoot, systemId);
+  const systemDir = await resolveBordbuchProjectionDir(workspaceRoot, systemId);
   const moduleContexts = await loadSurfaceModuleContexts(systemDir).catch(() => ({
     modules: {},
     declaredBlueprints: [],
@@ -200,11 +199,11 @@ export async function runBordbuchGenerate(
     const entries = await readBordbuch(workspaceRoot, systemId);
     const projection = await buildProjection(workspaceRoot, systemId, entries);
 
-    const cachePath = await resolveCacheClonePath(workspaceRoot, systemId);
-    const baseDir = join(cachePath, "public", ".well-known");
+    const projectionDir = await resolveBordbuchProjectionDir(workspaceRoot, systemId);
+    const baseDir = join(projectionDir, "public", ".well-known");
     const jsonPath = join(baseDir, "bordbuch.json");
     const htmlPath = join(baseDir, "bordbuch", "index.html");
-    const statusPath = join(cachePath, "bordbuch", "status.generated.yaml");
+    const statusPath = join(projectionDir, "bordbuch", "status.generated.yaml");
 
     await mkdir(dirname(jsonPath), { recursive: true });
     await mkdir(dirname(htmlPath), { recursive: true });
