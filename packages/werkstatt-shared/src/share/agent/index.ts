@@ -27,3 +27,4 @@ export * from "./fleet-catalog.ts";
 export * from "./api-catalog.ts";
 export * from "./mcp-card.ts";
 export * from "./dns-aid.ts";
+export * from "./ard-catalog.ts";

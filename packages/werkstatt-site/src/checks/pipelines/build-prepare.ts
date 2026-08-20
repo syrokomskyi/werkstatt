@@ -83,6 +83,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.api-catalog.generate" },
   // RFC-0783: project the manifest into SEP-1649 MCP Server Card.
   { command: "agent.mcp-card.generate" },
+  // ARD (Agentic Resource Discovery) ai-catalog.json projection.
+  { command: "agent.ard-catalog.generate" },
   // Generate auth.md, agent-skills/index.json, oauth-protected-resource, oauth-authorization-server.
   { command: "agent.discovery-endpoints.generate" },
   // RFC-0290: generate the thin Agent Gate route re-exports (needs the manifest's action ids).

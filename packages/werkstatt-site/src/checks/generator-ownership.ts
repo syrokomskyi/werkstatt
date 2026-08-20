@@ -497,6 +497,14 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/werkstatt-site/src/checks/agent/agent-mcp-card.ts",
   },
 
+  // ARD (Agentic Resource Discovery) ai-catalog.json.
+  {
+    path: "public/.well-known/ai-catalog.json",
+    command: "agent.ard-catalog.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/agent/agent-ard-catalog.ts",
+  },
+
   // RFC-0287: Agent Knowledge files.
   {
     path: "public/api/agent/v1/*.json",

@@ -30,6 +30,10 @@ import { runAgentGateFixturesRun } from "../agent/agent-gate-fixtures.ts";
 import { runAgentSurfaceSign, runAgentSurfaceVerify } from "../agent/agent-surface-sign.ts";
 import { runAgentDnsAidGenerate, runAgentDnsAidValidate } from "../agent/agent-dns-aid.ts";
 import { runAgentDiscoveryEndpointsGenerate } from "../agent/agent-discovery-endpoints.ts";
+import {
+  runAgentArdCatalogGenerate,
+  runAgentArdCatalogValidate,
+} from "../agent/agent-ard-catalog.ts";
 
 export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
@@ -272,6 +276,30 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     reads: ["packages/agent-gate/src/**/*.ts"],
     modulePaths: ["agent/agent-gate-fixtures.ts"],
     execute: runAgentGateFixturesRun,
+  },
+  {
+    name: "agent.ard-catalog.generate",
+    description:
+      "Generate the ARD (Agentic Resource Discovery) ai-catalog.json projection to public/.well-known/ai-catalog.json.",
+    scope: "app",
+    supportsAllSites: true,
+    mutatesState: true,
+    writes: ["<app>/public/.well-known/ai-catalog.json"],
+    flags: {},
+    reads: ["<app>/src/agent-surface.generated.yaml", "<app>/src/content/system.md"],
+    modulePaths: ["agent/agent-ard-catalog.ts"],
+    execute: runAgentArdCatalogGenerate,
+  },
+  {
+    name: "agent.ard-catalog.validate",
+    description:
+      "Validate the ARD ai-catalog.json: well-formedness and manifest↔catalog bijection (ARD-01..03).",
+    scope: "app",
+    supportsAllSites: true,
+    flags: {},
+    reads: ["<app>/public/.well-known/ai-catalog.json", "<app>/src/agent-surface.generated.yaml"],
+    modulePaths: ["agent/agent-ard-catalog.ts"],
+    execute: runAgentArdCatalogValidate,
   },
   {
     name: "agent.discovery-endpoints.generate",
