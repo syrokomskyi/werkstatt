@@ -157,6 +157,9 @@ export * from "./generated-marker-validate.ts";
 // RFC-0187: Post-build unresolved content reference scan
 export { runDistContentReferencesValidate } from "./dist-content-references.ts";
 
+// Surface content reference resolution check
+export { runSurfaceContentRefsValidate } from "./surface-content-refs-validate.ts";
+
 // RFC-0089: Astro subpath exports lint
 export { runAstroExportsLint } from "./astro-exports.ts";
 

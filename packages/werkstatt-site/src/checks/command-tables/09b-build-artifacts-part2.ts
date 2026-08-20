@@ -18,6 +18,7 @@ import {
   runSurfaceStarmap,
 } from "../surface.ts";
 import { runSurfaceHubValidate } from "../surface-hub-validate.ts";
+import { runSurfaceContentRefsValidate } from "../surface-content-refs-validate.ts";
 import { runSurfaceIndustryValidate } from "../surface-industry-validate.ts";
 import { runSurfaceServiceValidate } from "../surface-service-validate.ts";
 import { runSurfaceIntersectionValidate } from "../surface-intersection-validate.ts";
@@ -122,6 +123,26 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     ],
     modulePaths: ["surface-hub-validate.ts"],
     execute: runSurfaceHubValidate,
+    gate: {
+      severity: "error",
+      phase: "author",
+      conditional: {
+        kind: "entitlement",
+        ref: "pseo",
+        description: "Only runs when pseo entitlement is active",
+      },
+    },
+  },
+  {
+    name: "surface.content-refs.validate",
+    description:
+      "Validate that every braceless content reference in surface.generated.yaml resolves against the content ref index — catches unresolvable refs before SSG render.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/src/surface.generated.yaml", "<app>/src/content-ref-index.generated.yaml"],
+    modulePaths: ["surface-content-refs-validate.ts"],
+    execute: runSurfaceContentRefsValidate,
     gate: {
       severity: "error",
       phase: "author",

@@ -112,6 +112,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "surface.validate" },
   // RFC-0490: depth-0 pillar hub configuration and commercial-promise guard
   { command: "surface.hub.validate" },
+  // Validate that content references in surface.generated.yaml resolve against the content ref index
+  { command: "surface.content-refs.validate" },
   // RFC-0500: ratgeber editorial knowledge hub validation
   { command: "ratgeber.hub.validate" },
   // RFC-0492: depth-1 industry dossier publication gate + claim policy (warn mode initially)

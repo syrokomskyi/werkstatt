@@ -2,10 +2,9 @@
 <MODULE_CONTRACT>
 <purpose>
 Implements dist.content-references.validate (RFC-0187, RFC-0529) — scans built HTML in
-apps/<id>/dist/ for residual {collection.file.field} brace tokens that were not
-resolved at render time. After RFC-0529, brace-delimited syntax is no longer supported;
-any brace token in rendered HTML indicates unmigrated content that was not converted
-to braceless syntax by content.ref-migrate.
+apps/<id>/dist/ for residual content reference tokens that were not resolved at render time.
+Catches both brace-delimited {collection.file.field} tokens (unmigrated content) and
+braceless collection.file.field references that leaked into visible text (unresolvable refs).
 </purpose>
 <non-goals>
   <item>Do not re-resolve references — a token in HTML is already broken; just report it.</item>
@@ -16,6 +15,7 @@ to braceless syntax by content.ref-migrate.
 <CHANGE_SUMMARY>
   <item>RFC-0187: Initial implementation.</item>
   <item>RFC-0529: updated messaging — brace tokens now indicate unmigrated content, not unresolved references. Add DIST-REF-02 diagnostic label and DIST-REF-01 braceless residual check.</item>
+  <item>Add DIST-REF-03: braceless content reference leak scan — catches unresolvable refs that passed through the render-time resolver as raw text.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +33,11 @@ import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 // RFC-0045 field paths can be arbitrarily deep, so no upper bound is imposed.
 const BRACE_TOKEN_SOURCE = "\\{([a-zA-Z][a-zA-Z0-9_-]*(?:\\.[a-zA-Z0-9_-]+){1,})\\}";
 
+// Braceless content reference pattern: collection.file.field
+// Only matches known content collections to avoid false positives from prose text.
+const BRACELESS_REF_SOURCE =
+  "\\b(business-profile|pages|prose|navigation|site|people)\\.([a-z0-9-/]+)\\.([a-zA-Z0-9_-]+(?:\\.[a-zA-Z0-9_-]+)*)\\b";
+
 interface TokenViolation {
   file: string;
   token: string;
@@ -47,16 +52,24 @@ async function collectDistHtmlFiles(dir: string): Promise<string[]> {
 }
 
 function segmentHint(token: string): string {
-  const segments = token.slice(1, -1).split(".");
+  // Strip braces if present (brace-delimited tokens start with {)
+  const inner = token.startsWith("{") ? token.slice(1, -1) : token;
+  const segments = inner.split(".");
   if (segments.length < 3) {
     return (
-      `Token has ${segments.length} segment(s) — minimum is 3: {collection.file.field}. ` +
+      `Token has ${segments.length} segment(s) — minimum is 3: collection.file.field. ` +
       `Add the missing collection or file segment.`
     );
   }
+  if (token.startsWith("{")) {
+    return (
+      `Brace-delimited syntax was removed by RFC-0529. ` +
+      `Run content.ref-migrate to convert to braceless collection.file.field syntax.`
+    );
+  }
   return (
-    `Brace-delimited syntax was removed by RFC-0529. ` +
-    `Run content.ref-migrate to convert to braceless collection.file.field syntax.`
+    `Unresolved braceless content reference — the collection, file, or field path does not exist ` +
+    `in the content ref index. Verify the reference points to a real frontmatter field.`
   );
 }
 
@@ -123,6 +136,19 @@ export async function runDistContentReferencesValidate(
       }
       tally.set(token, (tally.get(token) ?? 0) + 1);
     }
+
+    // RFC-0529: also scan for braceless content references that leaked into HTML.
+    // These are refs that were not resolved at render time and appear as raw text.
+    const bracelessPattern = new RegExp(BRACELESS_REF_SOURCE, "g");
+    while ((match = bracelessPattern.exec(src)) !== null) {
+      const token = match[0];
+      if (allowPattern && allowPattern.test(token)) {
+        suppressed.push(`${relative(paths.appDirectory, file).replace(/\\/g, "/")} — ${token}`);
+        continue;
+      }
+      tally.set(token, (tally.get(token) ?? 0) + 1);
+    }
+
     for (const [token, count] of tally) {
       violations.push({ file, token, count });
     }
@@ -138,9 +164,8 @@ export async function runDistContentReferencesValidate(
     const diagnostics = violations.slice(0, 50).map((v) => {
       const rel = relative(paths.appDirectory, v.file).replace(/\\/g, "/");
       const hint = segmentHint(v.token);
-      return (
-        `[DIST-REF-02] ${rel} — "${v.token}" appears ${v.count}× in rendered HTML. ` + `${hint}`
-      );
+      const label = v.token.startsWith("{") ? "DIST-REF-02" : "DIST-REF-03";
+      return `[${label}] ${rel} — "${v.token}" appears ${v.count}× in rendered HTML. ` + `${hint}`;
     });
     if (violations.length > 50) {
       diagnostics.push(`… and ${violations.length - 50} more violation(s).`);

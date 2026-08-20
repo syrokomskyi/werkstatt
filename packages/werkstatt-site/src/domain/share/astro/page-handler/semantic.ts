@@ -131,15 +131,28 @@ export async function substituteBlockPropReferences(
   defaultLang: string,
 ): Promise<ResolvedPage["blocks"]> {
   const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
-  return Promise.all(
+  const unresolved: Array<{ ref: string; error: string }> = [];
+  const result = await Promise.all(
     blocks.map(async (block) => ({
       ...block,
-      props: (await resolveReferencesDeep(index, block.props, lang, defaultLang, {
-        collection: "pages",
-        file: fileSlug,
-      })) as Record<string, unknown>,
+      props: (await resolveReferencesDeep(
+        index,
+        block.props,
+        lang,
+        defaultLang,
+        { collection: "pages", file: fileSlug },
+        (ref, error) => unresolved.push({ ref, error }),
+      )) as Record<string, unknown>,
     })),
   );
+  if (unresolved.length > 0) {
+    for (const { ref, error } of unresolved) {
+      console.warn(
+        `[content-ref] Unresolved reference in block props (page: ${fileSlug}, lang: ${lang}): "${ref}" — ${error}`,
+      );
+    }
+  }
+  return result;
 }
 
 /**

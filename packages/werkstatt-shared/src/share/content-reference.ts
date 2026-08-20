@@ -205,6 +205,7 @@ export function resolveReferencesInString(
   lang: string,
   defaultLang: string,
   sourceRef?: SourceRef,
+  onUnresolved?: (ref: string, error: string) => void,
 ): string {
   // RFC-0731: Check for this. as a pure reference (entire text is this.field.path)
   if (
@@ -219,6 +220,7 @@ export function resolveReferencesInString(
       if (result.resolved) {
         return formatValue(result.value);
       }
+      onUnresolved?.(text.trim(), result.error ?? "unresolved this. reference");
     }
   }
   THIS_SCAN_PATTERN.lastIndex = 0;
@@ -228,6 +230,7 @@ export function resolveReferencesInString(
     if (result.resolved) {
       return formatValue(result.value);
     }
+    onUnresolved?.(text, result.error ?? "unresolved reference");
     return text;
   }
 
@@ -310,9 +313,12 @@ export async function resolveReferencesDeep(
   lang: string,
   defaultLang: string,
   sourceRef?: SourceRef,
+  onUnresolved?: (ref: string, error: string) => void,
 ): Promise<unknown> {
   return substituteRefsDeep(data, (value) =>
-    Promise.resolve(resolveReferencesInString(index, value, lang, defaultLang, sourceRef)),
+    Promise.resolve(
+      resolveReferencesInString(index, value, lang, defaultLang, sourceRef, onUnresolved),
+    ),
   );
 }
 

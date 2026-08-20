@@ -165,7 +165,7 @@ export const COMPOSITE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "dist.content-references.validate",
     description:
-      "Scan every .html under apps/<id>/dist for residual {collection.file.field} brace tokens that were not resolved at render time (RFC-0187).",
+      "Scan every .html under apps/<id>/dist for residual {collection.file.field} brace tokens and braceless collection.file.field references that leaked into rendered HTML (RFC-0187, RFC-0529).",
     scope: "app",
     flags: {
       "allow-pattern": {
