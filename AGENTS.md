@@ -798,7 +798,7 @@ The Werkstatt engine is a family of private npm packages developed in this monor
 
 - **Engine** — `@warpgogol/werkstatt`: stack-agnostic lifecycle platform (kernel runtime, missions, mirrors, releases, Leitstand, Bordbuch, Notausgang, artifact store, evidence, deploy orchestration, consistency primitives, fingerprint, integrity, observability).
 - **Shared** — `@warpgogol/werkstatt-shared`: stack-agnostic shared infrastructure (checks, integration, ontology, passport, share, surface) extracted from the site plugin (RFC-0868). Consumed by both engine and plugins. MUST NOT import from any plugin.
-- **Plugin** — `@warpgogol/werkstatt-<stack>`: stack-specific package implementing the plugin contract (path conventions, validators, codegen, content handling, onboarding templates, deploy adapters, stack invariants). Plugins: `werkstatt-site` (Astro), `werkstatt-phaser-game` (Phaser), `werkstatt-godot-game` (Godot).
+- **Plugin** — `@warpgogol/werkstatt-<stack>`: stack-specific package implementing the plugin contract (path conventions, validators, codegen, content handling, onboarding templates, deploy adapters, stack invariants). Plugins: `werkstatt-site` (Astro), `werkstatt-phaser-game` (Phaser), `werkstatt-godot-game` (Godot), `werkstatt-knowledge` (knowledge systems).
 - **Workshop** — consumer monorepo (pnpm + Turborepo) that installs the engine + exactly one plugin from npm. Contains `forge.yaml`, `tools/kernel.config.ts`, `systems-cache/`, `missions/`, `docs/`, `.agents/`, hooks, CI.
 - **Project** — a Sternsystem discovered via `systems-cache/{id}/system-config.yaml` in the workshop, living outside the workshop in mirrors per RFC-0574.
 - **Stack profile** — a forge profile YAML declaring the workshop's stack. The profile id binds forge, the engine, and the plugin.
@@ -812,6 +812,7 @@ The Werkstatt engine is a family of private npm packages developed in this monor
 | `@warpgogol/werkstatt-site` | Site plugin: Astro engine modules + full site domain layer | `packages/werkstatt-site` |
 | `@warpgogol/werkstatt-phaser-game` | Phaser plugin (phaser-turborepo profile) | `packages/werkstatt-phaser-game` |
 | `@warpgogol/werkstatt-godot-game` | Godot plugin (godot-csharp profile) | `packages/werkstatt-godot-game` |
+| `@warpgogol/werkstatt-knowledge` | Knowledge plugin (knowledge-typescript-turborepo profile) | `packages/werkstatt-knowledge` |
 | `@warpgogol/forge` | Governance (unchanged, already published) | `packages/forge` |
 | `@warpgogol/repo-extract` | Extraction tool (unchanged, external) | external repo |
 

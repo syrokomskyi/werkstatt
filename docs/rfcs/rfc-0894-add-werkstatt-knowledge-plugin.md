@@ -1,7 +1,7 @@
 ---
 id: RFC-0894
 title: "Add werkstatt-knowledge plugin for evidence-backed knowledge systems"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt:
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes: []
 supersededBy:
@@ -212,20 +212,20 @@ KNO-001..028 from `PLUGIN-INVARIANTS.md`, covering: manifest validity, source ro
 
 ## Acceptance criteria
 
-- [ ] Package `@warpgogol/werkstatt-knowledge` created at `packages/werkstatt-knowledge/` with `package.json`, `tsconfig.json`, `eslint.config.js`
-- [ ] Plugin entry `src/index.ts` exports `werkstattKnowledgePlugin: WerkstattPlugin` with `schema: "werkstatt/plugin@1"`, `id: "werkstatt-knowledge"`, `profileId: "knowledge-typescript-turborepo"`
-- [ ] Path conventions: `contentDir: "knowledge"`, `distDir: ".generated/knowledge/dist"`, `entryPoints: ["knowledge/manifest.yaml", "knowledge/ontology/schema-registry.yaml"]`
-- [ ] Invariants KNO-001..028 exported from `src/invariants/knowledge-invariants.ts`
-- [ ] 5 kernel modules registered as `moduleLoaders`: `knowledge-source`, `knowledge-core`, `knowledge-extract`, `knowledge-materialize`, `knowledge-release`
-- [ ] All ~23 kernel commands registered with correct `name`, `description`, `scope`, `cacheable: false`
-- [ ] 5 hooks implemented: `materialize`, `build`, `checkGate`, `releaseEvidence`, `scaffoldProject`
-- [ ] `deployAdapters` absent/empty
-- [ ] Forge profile `knowledge-typescript-turborepo.yaml` created at `packages/forge/profiles/`
-- [ ] `packages/AGENTS.md` updated with `werkstatt-knowledge` entry
-- [ ] Root `AGENTS.md` updated with `werkstatt-knowledge` in plugin list and package taxonomy
-- [ ] `pnpm install` succeeds
-- [ ] `pnpm --filter @warpgogol/werkstatt-knowledge run typecheck` passes
-- [ ] `pnpm --filter @warpgogol/werkstatt-knowledge run test` passes
+- [x] Package `@warpgogol/werkstatt-knowledge` created at `packages/werkstatt-knowledge/` with `package.json`, `tsconfig.json`, `eslint.config.js` (evidence: `packages/werkstatt-knowledge/package.json`, `packages/werkstatt-knowledge/tsconfig.json`, `packages/werkstatt-knowledge/eslint.config.js`)
+- [x] Plugin entry `src/index.ts` exports `werkstattKnowledgePlugin: WerkstattPlugin` with `schema: "werkstatt/plugin@1"`, `id: "werkstatt-knowledge"`, `profileId: "knowledge-typescript-turborepo"` (evidence: `packages/werkstatt-knowledge/src/index.ts:10-30`)
+- [x] Path conventions: `contentDir: "knowledge"`, `distDir: ".generated/knowledge/dist"`, `entryPoints: ["knowledge/manifest.yaml", "knowledge/ontology/schema-registry.yaml"]` (evidence: `packages/werkstatt-knowledge/src/paths/knowledge-paths.ts`)
+- [x] Invariants KNO-001..028 exported from `src/invariants/knowledge-invariants.ts` (evidence: `packages/werkstatt-knowledge/src/invariants/knowledge-invariants.ts`)
+- [x] 5 kernel modules registered as `moduleLoaders`: `knowledge-source`, `knowledge-core`, `knowledge-extract`, `knowledge-materialize`, `knowledge-release` (evidence: `packages/werkstatt-knowledge/src/index.ts:17-23`)
+- [x] All ~23 kernel commands registered with correct `name`, `description`, `scope`, `cacheable: false` (evidence: `packages/werkstatt-knowledge/src/source/module.ts`, `packages/werkstatt-knowledge/src/core/module.ts`, `packages/werkstatt-knowledge/src/extract/module.ts`, `packages/werkstatt-knowledge/src/materialize/module.ts`, `packages/werkstatt-knowledge/src/release/module.ts`)
+- [x] 5 hooks implemented: `materialize`, `build`, `checkGate`, `releaseEvidence`, `scaffoldProject` (evidence: `packages/werkstatt-knowledge/src/hooks/index.ts`)
+- [x] `deployAdapters` absent/empty (evidence: `packages/werkstatt-knowledge/src/index.ts` — no `deployAdapters` field present)
+- [x] Forge profile `knowledge-typescript-turborepo.yaml` created at `packages/forge/profiles/` (evidence: `packages/forge/profiles/knowledge-typescript-turborepo.yaml`)
+- [x] `packages/AGENTS.md` updated with `werkstatt-knowledge` entry (evidence: `packages/AGENTS.md` — package ownership table includes `werkstatt-knowledge` row)
+- [x] Root `AGENTS.md` updated with `werkstatt-knowledge` in plugin list and package taxonomy (evidence: `AGENTS.md:801` — plugin list includes `werkstatt-knowledge`; `AGENTS.md:815` — package taxonomy table includes `werkstatt-knowledge` row)
+- [x] `pnpm install` succeeds (evidence: `pnpm install` — exit code 0)
+- [x] `pnpm --filter @warpgogol/werkstatt-knowledge run typecheck` passes (evidence: `pnpm --filter @warpgogol/werkstatt-knowledge run typecheck` — exit code 0)
+- [x] `pnpm --filter @warpgogol/werkstatt-knowledge run test` passes (evidence: `pnpm --filter @warpgogol/werkstatt-knowledge run test` — exit code 0)
 
 ## Implementation notes for agents
 
