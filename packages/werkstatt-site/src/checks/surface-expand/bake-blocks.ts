@@ -144,7 +144,6 @@ export function ctaBlock(
     props: {
       header: { heading },
       ctaGroup: {
-        align: "center",
         items: items.map((it) => ({
           label: it.label,
           variant: it.variant ?? "secondary",

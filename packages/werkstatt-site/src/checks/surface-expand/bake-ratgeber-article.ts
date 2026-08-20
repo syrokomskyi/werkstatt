@@ -239,7 +239,6 @@ export function bakeRatgeberArticle(
       props: {
         header: { heading: lbl.closing },
         ctaGroup: {
-          align: "center",
           items: [
             ...ctaBlocks.flatMap(
               (b) =>

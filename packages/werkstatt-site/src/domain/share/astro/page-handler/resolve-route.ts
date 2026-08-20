@@ -334,9 +334,8 @@ function buildHumanProfileBlocks(
       id: "cta",
       type: "final-cta",
       props: {
-        header: { heading: participant.cta.label, align: "center" },
+        header: { heading: participant.cta.label },
         ctaGroup: {
-          align: "center",
           items: [
             {
               label: participant.cta.label,
@@ -535,9 +534,8 @@ function buildAiAgentProfileBlocks(
       id: "cta",
       type: "final-cta",
       props: {
-        header: { heading: participant.cta.label, align: "center" },
+        header: { heading: participant.cta.label },
         ctaGroup: {
-          align: "center",
           items: [
             {
               label: participant.cta.label,
