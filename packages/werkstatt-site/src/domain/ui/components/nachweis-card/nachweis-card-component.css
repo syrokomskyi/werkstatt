@@ -884,12 +884,19 @@
   white-space: nowrap;
   max-width: 60%;
   overflow: hidden;
-  text-overflow: ellipsis;
   flex-shrink: 1;
+  min-width: 0;
+}
+
+.nachweis-card__website-link-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   min-width: 0;
 }
 
 .nachweis-card__website-link-arrow {
   font-size: 1em;
   line-height: 1;
+  flex-shrink: 0;
 }
