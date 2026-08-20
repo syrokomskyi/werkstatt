@@ -236,13 +236,9 @@ Semantic audit of RFC-XXXX (<title>). Verdict: <approved | needs-revision | reje
 
 Stage only the audit file — do not stage unrelated changes. Another agent may be working in a different session; `git add -A` or `git add .` is forbidden.
 
-### 8. Stop (skill-level)
+### 8. Stop
 
-Do not modify the RFC or any other file. Do not run `/fo-idea-plan` or `/fo-idea-implement` — those are separate skills with different purposes. Present the report.
-
-**"Stop" means the audit skill is complete — return control to the calling context.** If this skill was invoked standalone (by the operator directly), stop and present the report. If this skill was invoked as part of an orchestrator pipeline (e.g. `fo-idea-i-just-want-to-see-the-result`), the orchestrator continues to the next pipeline step automatically — do not halt the pipeline.
-
-If the user asks to fix the findings, suggest running `/fo-idea-enhance` — it reads the persisted audit and applies the fixes. The full pipeline is: create → audit → enhance → plan → implement.
+Do not modify the RFC or any other file. Do not run `/fo-idea-plan` or `/fo-idea-implement` — those are separate skills with different purposes. Present the report and stop. If the user asks to fix the findings, suggest running `/fo-idea-enhance` — it reads the persisted audit and applies the fixes. The full pipeline is: create → audit → enhance → plan → implement.
 
 ## Constraints
 
