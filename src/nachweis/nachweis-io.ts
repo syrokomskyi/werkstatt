@@ -35,7 +35,7 @@ import { z } from "zod";
 import { byteHashFile } from "@warpgogol/werkstatt/fingerprint";
 import { loadSystemManifest } from "@warpgogol/werkstatt-shared/content";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
-import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
+import { resolveCacheClonePath, resolveActiveWorkpieceDir } from "../sternsystem/registry-io.ts";
 
 const NACHWEIS_BUCKET = "nachweis";
 
@@ -433,6 +433,11 @@ export async function resolveNachweisCachePath(
   workspaceRoot: string,
   systemId: string,
 ): Promise<string> {
+  // Workpiece-aware: during an active mission, read from the workpiece directory
+  // so that agents can fix data issues and re-run validate without needing to
+  // reconcile first (which itself requires validate to pass — circular dependency).
+  const workpieceDir = await resolveActiveWorkpieceDir(workspaceRoot, systemId);
+  if (workpieceDir) return workpieceDir;
   return resolveCacheClonePath(workspaceRoot, systemId);
 }
 

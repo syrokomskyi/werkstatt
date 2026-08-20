@@ -218,7 +218,7 @@ export async function discoverSystems(workspaceRoot: string): Promise<DiscoveryR
 // workpiece. These functions check for an active mission workpiece and read/write
 // there. When no mission is active, they fall back to the cache clone.
 
-async function resolveActiveWorkpieceDir(
+export async function resolveActiveWorkpieceDir(
   workspaceRoot: string,
   systemId: string,
 ): Promise<string | null> {

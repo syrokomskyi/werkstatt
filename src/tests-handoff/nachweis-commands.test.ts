@@ -543,6 +543,30 @@ describe("RFC-0707: nachweis.validate", () => {
       [],
     );
   });
+
+  it("RFC-0880: reports NACHWEIS-SLUG-01 when evidence-source has nachweis kind but no slug", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "no-slug-record", {
+      kind: "certificate",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: { main: { sha256: "a".repeat(64) } },
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(1);
+    const slugViolation = expectData(result).violations.find((v) => v.rule === "NACHWEIS-SLUG-01");
+    expect(slugViolation).toBeTruthy();
+    expect(slugViolation?.recordId).toBe("no-slug-record");
+  });
 });
 
 describe("RFC-0707: nachweis.consent.update", () => {
