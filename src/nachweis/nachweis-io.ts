@@ -12,6 +12,7 @@
   <item>RFC-0873: provides AssessmentBundleV1 types, Zod schema, and assessment R2 path resolution.</item>
   <item>ADR-0054: implements the technical-assessment evidence profile decision — policy-driven gate, assessment metadata, canonical raw artifact requirement.</item>
   <item>RFC-0886: adds display-consent-consistent gate condition, per-aspect consent evaluation, screenshot R2 path helper, NachweisScreenshotUploadResult interface.</item>
+  <item>RFC-0890: adds raw screenshot R2/local path helpers, CaptureX filename parser, sharp-based image metadata detection, NachweisScreenshotIngestResult interface.</item>
 </responsibilities>
 <non-goals>
   <item>Does not implement command handlers — those live in nachweis-*.ts files.</item>
@@ -26,6 +27,7 @@
   <item>RFC-0872: add NachweisPublicationGateV2, policy resolution, extend NachweisManifestEntry, replace legacy NachweisPublicationGate.</item>
   <item>RFC-0873: add AssessmentBundleV1, assessmentBundleV1Schema, AssessmentIngestResult, resolveAssessmentR2Path, mediaTypeToExt, extend uploadToR2 with optional contentType.</item>
   <item>RFC-0886: add display-consent-consistent gate condition, per-aspect consent evaluation in evaluateGateV2, resolveNachweisScreenshotR2Path, NachweisScreenshotUploadResult, extend NachweisConsentUpdateResult with scope, extend NachweisManifestEntry with display and websiteUrl.</item>
+  <item>RFC-0890: add resolveNachweisRawScreenshotR2Path, resolveNachweisRawScreenshotLocalPath, parseCaptureXFilename, detectImageMetadata, NachweisScreenshotIngestResult.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -527,6 +529,81 @@ export function makeSkipResult(
     exitCode: 0,
     summary: `[${commandName}] skipped — nachweis entitlement not resolved for ${systemId}`,
   };
+}
+
+// RFC-0890: Raw screenshot ingestion result
+export interface NachweisScreenshotIngestResult {
+  slug: string;
+  systemId: string;
+  sha256: string;
+  mediaType: string;
+  originalFilename: string;
+  width: number;
+  height: number;
+  capturedAt: string | null;
+  r2Key: string;
+  localPath: string;
+  bordbuchEventId: string;
+  alreadyIngested: boolean;
+}
+
+// RFC-0890: R2 path for raw screenshots — private storage, separate from display variant
+export function resolveNachweisRawScreenshotR2Path(
+  systemId: string,
+  slug: string,
+  originalFilename: string,
+): string {
+  return `${systemId}/screenshots/${slug}/raw/${originalFilename}`;
+}
+
+// RFC-0890: Local cache clone path for raw screenshots
+export function resolveNachweisRawScreenshotLocalPath(
+  cachePath: string,
+  slug: string,
+  originalFilename: string,
+): string {
+  return path.join(cachePath, "trust", "evidence", "screenshots", slug, "raw", originalFilename);
+}
+
+// RFC-0890: Parse CaptureX filename pattern to extract capturedAt
+// Pattern: CaptureX_YYYY-MM-DD_HHMMSS_domain.ext
+const CAPTUREX_REGEX =
+  /^CaptureX_(\d{4})-(\d{2})-(\d{2})_(\d{2})(\d{2})(\d{2})_(.+)\.([a-zA-Z0-9]+)$/;
+
+export function parseCaptureXFilename(filename: string): { capturedAt: string } | null {
+  const match = filename.match(CAPTUREX_REGEX);
+  if (!match) return null;
+  const [, year, month, day, hour, minute, second] = match;
+  return {
+    capturedAt: `${year}-${month}-${day}T${hour}:${minute}:${second}Z`,
+  };
+}
+
+// RFC-0890: Detect image metadata (mediaType, width, height) from file content via sharp
+// Uses dynamic import to avoid static dependency on sharp in stack-agnostic werkstatt package
+const SHARP_FORMAT_TO_MEDIA_TYPE: Record<string, string> = {
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+  tiff: "image/tiff",
+  avif: "image/avif",
+  svg: "image/svg+xml",
+};
+
+export async function detectImageMetadata(
+  filePath: string,
+): Promise<{ mediaType: string; width: number; height: number }> {
+  // @ts-expect-error — sharp is not a dependency of werkstatt (DNA-64); hoisted at runtime via monorepo node_modules
+  const sharp = (await import("sharp")).default;
+  const metadata = await sharp(filePath).metadata();
+  const mediaType = SHARP_FORMAT_TO_MEDIA_TYPE[metadata.format ?? ""] ?? "application/octet-stream";
+  if (!metadata.width || !metadata.height) {
+    throw new Error(
+      `[nachweis] could not read image dimensions from ${filePath} (format: ${metadata.format ?? "unknown"})`,
+    );
+  }
+  return { mediaType, width: metadata.width, height: metadata.height };
 }
 
 // RFC-0873: Assessment bundle types and helpers
