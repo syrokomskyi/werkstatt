@@ -15,7 +15,7 @@ import type {
   QualitativeRubricV1,
   ChangeProfileV1,
   RiskRuleV1,
-  _CoverageManifestV1,
+  CoverageManifestV1,
 } from "../certification/evaluators/index.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import type { EvidenceEnvelopeV1 } from "../certification/index.ts";

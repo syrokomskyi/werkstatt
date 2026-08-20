@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   snapshotCanonicalJsonObjectV1,
   canonicalJsonHashV1,
-  _isCanonicalJsonObjectV1,
+  isCanonicalJsonObjectV1,
 } from "../fingerprint/canonical-json.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import { diagnosticSchema } from "../schemas/diagnostic.ts";

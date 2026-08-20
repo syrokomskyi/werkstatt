@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   validateIsolationAdapter,
   validateBridgeRequest,
-  _isolationAdapterV1Schema,
+  isolationAdapterV1Schema,
   attenuatedGrantSetV1Schema,
-  _capabilityBridgeRequestV1Schema,
+  capabilityBridgeRequestV1Schema,
   isolationConformanceResultV1Schema,
 } from "../schemas.ts";
 import type {

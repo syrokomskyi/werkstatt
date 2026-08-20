@@ -13,7 +13,7 @@ import {
   type HealthRequirementResultV1,
   type ScheduleWindowV1,
   type MonitorRecoveryStateV1,
-  type _CertificationHealth,
+  type CertificationHealth,
 } from "../certification/health/monitor.ts";
 
 const _D = "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;

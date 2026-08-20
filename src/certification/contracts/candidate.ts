@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   digestSchema,
   candidateIdSchema,
-  _schemaIdSchema,
+  schemaIdSchema,
   utcTimestampSchema,
   gateChannelSchema,
   environmentSchema,

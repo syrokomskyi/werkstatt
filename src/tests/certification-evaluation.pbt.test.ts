@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
-  _buildEvidenceIndex,
-  _selectRequirementEvidence,
+  buildEvidenceIndex,
+  selectRequirementEvidence,
   evaluateCertificationDecision,
   buildCertificationActionPack,
   computeDossierRoot,

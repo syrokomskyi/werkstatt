@@ -14,14 +14,14 @@ import type { BrokerPolicyV1, BrokerInvocationContextV1 } from "../isolation/bro
 import {
   createFakeSandboxAdapter,
   getFakeAdapterId,
-  _getFakeAdapterVersion,
+  getFakeAdapterVersion,
   getFakePropertyEvidence,
 } from "../isolation/providers/fake-sandbox.ts";
 import type {
   AttenuatedGrantSetV1,
   AttenuatedGrantV1,
   CapabilityBridgeRequestV1,
-  _SandboxedWorkloadCreateV1,
+  SandboxedWorkloadCreateV1,
 } from "../isolation/contracts.ts";
 
 const D =

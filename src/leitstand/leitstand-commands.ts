@@ -57,7 +57,6 @@ import { generateOperationId } from "../werkstatt/index.ts";
 import {
   readSystemConfigSmart,
   readSystemStateSmart,
-  _writeSystemStateSmart,
   resolveCacheClonePath,
 } from "../sternsystem/registry-io.ts";
 import type {
@@ -80,17 +79,10 @@ import {
   verifyCloudflareToken,
   BUILD_IDENTITY_PATH,
 } from "./cache-purge.ts";
-import { artifactStorePreflight, } from "../artifact-store/index.ts";
+import { artifactStorePreflight } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
 import type { SmokeRunResult } from "@warpgogol/werkstatt/testing/smoke";
 import type { SiteE2eRunResult } from "@warpgogol/werkstatt/testing/e2e";
-import {
-  _loadWorkshopSuppressions,
-  _loadWorkpieceSuppressions,
-  _mergeSuppressions,
-  _applySuppressions,
-  type _SuppressedFinding,
-} from "@warpgogol/werkstatt-shared/checks/suppressions-config";
 import {
   authorizeAndDeploy,
   verifyDurableSync,
@@ -102,63 +94,8 @@ import {
   resolveArtifactHash,
   resolveGateDecisionPath,
   flagSite,
-  type _AuthorizeOutcome,
 } from "./deploy-helpers.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
-
-async function _runSiteSmokeCheck(
-  workspaceRoot: string,
-  systemId: string,
-  deployedUrl: string,
-  logger: { info: (msg: string) => void; warn: (msg: string) => void },
-): Promise<SmokeRunResult | undefined> {
-  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
-  logger.info(`[smoke] running site.smoke.run for ${systemId} against ${deployedUrl}…`);
-  try {
-    const result = (await executeKernelCommand({
-      workspaceRoot,
-      commandName: "site.smoke.run",
-      argv: [`--site=${systemId}`, `--url=${deployedUrl}`],
-    })) as { exitCode?: number; data?: SmokeRunResult };
-    if (result.data) {
-      return result.data;
-    }
-    logger.warn(
-      `[smoke] site.smoke.run returned no data (exitCode=${result.exitCode ?? "unknown"})`,
-    );
-    return undefined;
-  } catch (err) {
-    logger.warn(
-      `[smoke] site.smoke.run failed: ${err instanceof Error ? err.message : String(err)}`,
-    );
-    return undefined;
-  }
-}
-
-async function _runSiteE2eCheck(
-  workspaceRoot: string,
-  systemId: string,
-  deployedUrl: string,
-  logger: { info: (msg: string) => void; warn: (msg: string) => void },
-): Promise<SiteE2eRunResult | undefined> {
-  const { executeKernelCommand } = await import("@warpgogol/werkstatt/kernel");
-  logger.info(`[e2e] running site.e2e.run for ${systemId} against ${deployedUrl}…`);
-  try {
-    const result = (await executeKernelCommand({
-      workspaceRoot,
-      commandName: "site.e2e.run",
-      argv: [`--site=${systemId}`, `--url=${deployedUrl}`],
-    })) as { exitCode?: number; data?: SiteE2eRunResult };
-    if (result.data) {
-      return result.data;
-    }
-    logger.warn(`[e2e] site.e2e.run returned no data (exitCode=${result.exitCode ?? "unknown"})`);
-    return undefined;
-  } catch (err) {
-    logger.warn(`[e2e] site.e2e.run failed: ${err instanceof Error ? err.message : String(err)}`);
-    return undefined;
-  }
-}
 
 function _logCacheDirSize(cacheDir: string, logger: { info: (msg: string) => void }): void {
   try {
