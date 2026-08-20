@@ -89,7 +89,7 @@
   text-align: right;
   font-size: var(--ds-text-sm);
   color: var(--ds-color-text-muted);
-  margin: var(--ds-space-2) 0 0;
+  margin: var(--ds-space-2) 0 var(--ds-space-4);
   line-height: var(--ds-line-height-body);
 }
 

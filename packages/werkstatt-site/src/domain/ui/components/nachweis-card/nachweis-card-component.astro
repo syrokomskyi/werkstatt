@@ -205,12 +205,11 @@ function getLiveCheckUrl(
             width="1280"
             height="720"
           />
-          {props.websiteFooterTagline && (
-            <figcaption class="nachweis-card__footer-tagline">
-              {props.websiteFooterTagline}
-            </figcaption>
-          )}
         </figure>
+      )}
+
+      {showScreenshot && props.websiteFooterTagline && (
+        <p class="nachweis-card__footer-tagline">{props.websiteFooterTagline}</p>
       )}
 
       {props.scope && (
