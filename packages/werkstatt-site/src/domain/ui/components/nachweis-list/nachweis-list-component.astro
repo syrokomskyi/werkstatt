@@ -174,31 +174,56 @@ async function loadPublishedNachweisRecords(): Promise<NachweisRecord[]> {
   const defaultLang = system.i18n?.default ?? "de";
 
   const entries = await getCollection("business-profile");
-  let langEntries = entries.filter((e: { id: string }) => {
+  const langEntries = entries.filter((e: { id: string }) => {
     const entryLang = getEntryLanguage(e.id);
     return entryLang === lang;
   });
-  if (langEntries.length === 0) {
-    langEntries = entries.filter((e: { id: string }) => {
-      const entryLang = getEntryLanguage(e.id);
-      return entryLang === defaultLang;
-    });
-  }
+  const defaultLangEntries = entries.filter((e: { id: string }) => {
+    const entryLang = getEntryLanguage(e.id);
+    return entryLang === defaultLang;
+  });
 
-  const records: NachweisRecord[] = [];
-  for (const entry of langEntries) {
-    const data = entry.data as EvidenceSourceData;
-    if (data.type !== "evidence-source") continue;
-    if (!data.kind || !NACHWEIS_EVIDENCE_KINDS.has(data.kind)) continue;
-    if (data.status !== "published") continue;
-
+  function filterEvidenceSource(e: { id: string; data: unknown }): {
+    entry: { id: string; data: EvidenceSourceData };
+    slug: string;
+  } | null {
+    const data = e.data as EvidenceSourceData;
+    if (data.type !== "evidence-source") return null;
+    if (!data.kind || !NACHWEIS_EVIDENCE_KINDS.has(data.kind)) return null;
+    if (data.status !== "published") return null;
     const slug = data.slug;
     if (typeof slug !== "string" || slug.trim() === "") {
       throw new Error(
-        `[nachweis-list] Evidence record ${entry.id} is missing required frontmatter "slug". ` +
+        `[nachweis-list] Evidence record ${e.id} is missing required frontmatter "slug". ` +
           `Run nachweis.validate to identify affected files.`,
       );
     }
+    return { entry: { id: e.id, data }, slug };
+  }
+
+  // Collect slugs available in the target language to avoid duplicates
+  const seenSlugs = new Set<string>();
+  const orderedEntries: Array<{ id: string; data: EvidenceSourceData }> = [];
+
+  for (const entry of langEntries) {
+    const filtered = filterEvidenceSource(entry);
+    if (!filtered) continue;
+    orderedEntries.push(filtered.entry);
+    seenSlugs.add(filtered.slug);
+  }
+
+  // Per-record fallback: fill missing records from the default language
+  for (const entry of defaultLangEntries) {
+    const filtered = filterEvidenceSource(entry);
+    if (!filtered) continue;
+    if (seenSlugs.has(filtered.slug)) continue;
+    orderedEntries.push(filtered.entry);
+  }
+
+  const records: NachweisRecord[] = [];
+  for (const entry of orderedEntries) {
+    const data = entry.data;
+    const slug = data.slug!;
 
     if (data.kind === "technical-assessment" && data.assessment) {
       const a = data.assessment;
