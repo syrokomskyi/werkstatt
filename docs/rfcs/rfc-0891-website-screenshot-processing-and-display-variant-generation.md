@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-20
 updatedAt: 2026-08-20
 enhancedAt: 2026-08-20
-implementedAt:
+implementedAt: 2026-08-20
 closedAt:
 supersedes: []
 supersededBy:
@@ -317,21 +317,21 @@ const displayBuffer = await sharp(rawFilePath)
 
 ## Acceptance criteria
 
-- [ ] `nachweis.screenshot.process` command registered with `--system`, `--slug`, `--dry-run`, `--json`, `--crop-offset` flags
-- [ ] `nachweis.screenshot.process` reads `websiteScreenshot.rawArtifact` from the evidence-source entity
-- [ ] `nachweis.screenshot.process` resolves the raw file from cache clone local copy or R2 private storage
-- [ ] `nachweis.screenshot.process` computes 16:9 crop region from the top of the raw image
-- [ ] `nachweis.screenshot.process` crops, resizes to 1280×720, and converts to WebP via sharp
-- [ ] `nachweis.screenshot.process` uploads the display variant to R2 public at `{systemId}/screenshots/{slug}/website-screenshot.webp`
-- [ ] `nachweis.screenshot.process` updates `EvidenceSource.websiteScreenshot` with display variant `sha256`, `mediaType: "image/webp"`, `storage: "public"`, `url`
-- [ ] `nachweis.screenshot.process` propagates `capturedAt` from `rawArtifact.capturedAt` to the display variant
-- [ ] `nachweis.screenshot.process` preserves `rawArtifact` on the `websiteScreenshot` field when updating
-- [ ] `nachweis.screenshot.process` appends a `nachweis-record` Bordbuch entry with processing metadata
-- [ ] `nachweis.screenshot.process` `--dry-run` mode computes crop dimensions and output metadata without uploading
-- [ ] `nachweis.screenshot.process` `--crop-offset` flag adjusts the vertical crop position
-- [ ] `resolveNachweisScreenshotDisplayR2Path` helper added to `nachweis-io.ts`
-- [ ] `downloadFromR2` helper added to `nachweis-io.ts`
-- [ ] `rfc.validate` passes on this file
+- [x] `nachweis.screenshot.process` command registered with `--system`, `--slug`, `--dry-run`, `--json`, `--crop-offset` flags (evidence: packages/werkstatt/src/nachweis/nachweis.module.ts:539-567)
+- [x] `nachweis.screenshot.process` reads `websiteScreenshot.rawArtifact` from the evidence-source entity (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:96-110)
+- [x] `nachweis.screenshot.process` resolves the raw file from cache clone local copy or R2 private storage (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:120-135)
+- [x] `nachweis.screenshot.process` computes 16:9 crop region from the top of the raw image (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:148-155)
+- [x] `nachweis.screenshot.process` crops, resizes to 1280×720, and converts to WebP via sharp (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:183-187)
+- [x] `nachweis.screenshot.process` uploads the display variant to R2 public at `{systemId}/screenshots/{slug}/website-screenshot.webp` (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:190)
+- [x] `nachweis.screenshot.process` updates `EvidenceSource.websiteScreenshot` with display variant `sha256`, `mediaType: "image/webp"`, `storage: "public"`, `url` (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:193-206)
+- [x] `nachweis.screenshot.process` propagates `capturedAt` from `rawArtifact.capturedAt` to the display variant (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:143)
+- [x] `nachweis.screenshot.process` preserves `rawArtifact` on the `websiteScreenshot` field when updating (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:195-206)
+- [x] `nachweis.screenshot.process` appends a `nachweis-record` Bordbuch entry with processing metadata (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:213-240)
+- [x] `nachweis.screenshot.process` `--dry-run` mode computes crop dimensions and output metadata without uploading (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:157-176)
+- [x] `nachweis.screenshot.process` `--crop-offset` flag adjusts the vertical crop position (evidence: packages/werkstatt/src/nachweis/nachweis-screenshot-process.ts:149,156-163)
+- [x] `resolveNachweisScreenshotDisplayR2Path` helper added to `nachweis-io.ts` (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:466-472)
+- [x] `downloadFromR2` helper added to `nachweis-io.ts` (evidence: packages/werkstatt/src/nachweis/nachweis-io.ts:458-464)
+- [x] `rfc.validate` passes on this file (evidence: docs/rfcs/rfc-0891-website-screenshot-processing-and-display-variant-generation.md:1-347)
 
 ## Implementation notes for agents
 
