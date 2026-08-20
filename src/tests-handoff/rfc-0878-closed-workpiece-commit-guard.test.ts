@@ -12,7 +12,6 @@
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { execSync } from "node:child_process";
 import fs from "node:fs/promises";
-import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { commitWorkpieceIfDirty } from "../mission/mission-git-commit.ts";
@@ -124,9 +123,7 @@ test("commitWorkpieceIfDirty throws on closed workpiece (defence-in-depth)", asy
   await fs.writeFile(path.join(workpieceDir, ".closed"), "2026-08-18T00:00:00.000Z\n");
   await fs.writeFile(path.join(workpieceDir, "dirty-file.txt"), "content\n");
 
-  expect(() => commitWorkpieceIfDirty(workpieceDir, "test-mission")).toThrow(
-    /closed.*RFC-0878/,
-  );
+  expect(() => commitWorkpieceIfDirty(workpieceDir, "test-mission")).toThrow(/closed.*RFC-0878/);
 });
 
 test("commitWorkpieceIfDirty succeeds on open workpiece (no .closed sentinel)", async () => {

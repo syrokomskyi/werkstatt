@@ -41,11 +41,7 @@ import {
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
-import {
-  readSystemState,
-  writeSystemState,
-  resolveCacheClonePath,
-} from "../sternsystem/registry-io.ts";
+import { readSystemState, writeSystemState } from "../sternsystem/registry-io.ts";
 import { runPipelinePhase, computeBuildInputHash } from "../handoff/build-pipeline-helpers.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
 import { checkBreaksCDeclaration } from "./breaks-c-helper.ts";
@@ -55,8 +51,6 @@ import {
 } from "../behavior-snapshot/behavior-snapshot-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import { executeKernelCommand } from "@warpgogol/werkstatt/kernel";
-import { buildEffectRecord, writeDeploymentEffectRecord } from "../leitstand/deploy-helpers.ts";
-import type { Sha256Digest } from "../fingerprint/primitives.ts";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import {
   releaseManifestSchema,

@@ -21,7 +21,6 @@ import type {
   KernelFlagValue,
 } from "@warpgogol/werkstatt/kernel";
 import { createDefaultIO, createKernelLogger } from "@warpgogol/werkstatt/kernel";
-import { expectData } from "./helpers/kernel-result-helpers.ts";
 
 // ── Mock state ──────────────────────────────────────────────────────────────
 

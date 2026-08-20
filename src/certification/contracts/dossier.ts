@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   digestSchema,
   eventIdSchema,
-  schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
   authoritySequenceSchema,
@@ -45,9 +44,7 @@ export const dossierManifestProjectionV1Schema = z
   })
   .strict();
 
-export type DossierManifestProjectionV1 = z.infer<
-  typeof dossierManifestProjectionV1Schema
->;
+export type DossierManifestProjectionV1 = z.infer<typeof dossierManifestProjectionV1Schema>;
 
 export const dossierIncidentV1Schema = z
   .object({

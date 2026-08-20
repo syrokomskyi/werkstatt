@@ -4,7 +4,6 @@ import type {
   CapabilityCandidateV1,
   EvolutionEvidenceBundleV1,
   TransitionRequestV1,
-  InspectionSnapshotV1,
   BoundedIntentV1,
   KillSwitchStateV1,
 } from "./contracts.ts";
@@ -26,9 +25,7 @@ const FORBIDDEN_SELF_CHANGE_SCOPES = new Set([
   "evaluator-policy",
 ]);
 
-export function checkSelfChangeBoundary(
-  intent: BoundedIntentV1,
-): GuardResultV1 {
+export function checkSelfChangeBoundary(intent: BoundedIntentV1): GuardResultV1 {
   if (FORBIDDEN_SELF_CHANGE_SCOPES.has(intent.scope)) {
     return {
       ok: false,
@@ -62,9 +59,7 @@ export function checkEvidenceImmutability(
   return { ok: true, ruleId: "", message: "" };
 }
 
-export function checkKillSwitch(
-  killSwitch: KillSwitchStateV1,
-): GuardResultV1 {
+export function checkKillSwitch(killSwitch: KillSwitchStateV1): GuardResultV1 {
   if (killSwitch.active) {
     return {
       ok: false,
@@ -89,9 +84,7 @@ export function checkAuthorityExpiry(
   return { ok: true, ruleId: "", message: "" };
 }
 
-export function checkShadowSideEffects(
-  evidence: EvolutionEvidenceBundleV1,
-): GuardResultV1 {
+export function checkShadowSideEffects(evidence: EvolutionEvidenceBundleV1): GuardResultV1 {
   if (evidence.observation.exposure === "shadow") {
     if (evidence.observation.incidents.some((i) => i.severity === "critical")) {
       return {
@@ -140,9 +133,7 @@ export function checkCanaryBoundaries(
   return { ok: true, ruleId: "", message: "" };
 }
 
-export function checkEvidencePoisoning(
-  evidence: EvolutionEvidenceBundleV1,
-): GuardResultV1 {
+export function checkEvidencePoisoning(evidence: EvolutionEvidenceBundleV1): GuardResultV1 {
   const allHashes: string[] = [
     evidence.definition.evidenceHash,
     evidence.evaluation.evidenceHash,

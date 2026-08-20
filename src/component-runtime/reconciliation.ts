@@ -4,7 +4,7 @@ import type {
   ResolvedComponentIdentityV1,
 } from "../component/contracts.ts";
 import { computeSetHash } from "../component/identity.ts";
-import { resolve, type ResolutionInputV1, type ResolutionResultV1 } from "./resolver.ts";
+import { resolve, type ResolutionInputV1 } from "./resolver.ts";
 import { createActivationTransaction, type ActivationTransaction } from "./activation.ts";
 import type { ComponentFiber } from "./fiber.ts";
 import type { Deadline } from "./fiber.ts";
@@ -68,7 +68,10 @@ export function computeReconciliationPlan(
 
   for (const [id, desired] of desiredComponents) {
     const current = currentComponents.get(id);
-    if (current && (current.version !== desired.version || current.artifactHash !== desired.artifactHash)) {
+    if (
+      current &&
+      (current.version !== desired.version || current.artifactHash !== desired.artifactHash)
+    ) {
       stopNewCalls.push(id);
       drain.push(id);
       unload.push(id);
@@ -142,16 +145,24 @@ export function reconcile(options: ReconcileOptions): ReconcileOutcome | Promise
   const planResult = computeReconciliationPlan(options.currentSet, resolution.set);
 
   if ("status" in planResult && planResult.status === "no-op") {
-    return { status: "no-op", currentSetHash: options.currentSet?.setHash ?? "sha256:" + "0".repeat(64) };
+    return {
+      status: "no-op",
+      currentSetHash: options.currentSet?.setHash ?? "sha256:" + "0".repeat(64),
+    };
   }
 
   if ("status" in planResult && planResult.status === "drift") {
-    return { status: "blocked", violations: [{
-      code: "RESOLUTION-08" as never,
-      componentId: null,
-      capability: null,
-      message: planResult.message,
-    }] };
+    return {
+      status: "blocked",
+      violations: [
+        {
+          code: "RESOLUTION-08" as never,
+          componentId: null,
+          capability: null,
+          message: planResult.message,
+        },
+      ],
+    };
   }
 
   const _plan = planResult as ReconciliationPlanV1;
@@ -164,16 +175,23 @@ export function reconcile(options: ReconcileOptions): ReconcileOutcome | Promise
     options.drainDeadline,
   );
 
-  return tx.prepare().then(() =>
-    tx.commit().then(() => ({
-      status: "committed" as const,
-      desiredSet: resolution.set,
-      transaction: tx,
-    })),
-  ).catch(() => {
-    if (tx.isQuarantined) {
-      return { status: "quarantined" as const, reason: tx.result.error ?? "unknown", transaction: tx };
-    }
-    return { status: "aborted" as const, reason: tx.result.error ?? "unknown", transaction: tx };
-  });
+  return tx
+    .prepare()
+    .then(() =>
+      tx.commit().then(() => ({
+        status: "committed" as const,
+        desiredSet: resolution.set,
+        transaction: tx,
+      })),
+    )
+    .catch(() => {
+      if (tx.isQuarantined) {
+        return {
+          status: "quarantined" as const,
+          reason: tx.result.error ?? "unknown",
+          transaction: tx,
+        };
+      }
+      return { status: "aborted" as const, reason: tx.result.error ?? "unknown", transaction: tx };
+    });
 }

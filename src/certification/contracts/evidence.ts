@@ -3,7 +3,6 @@ import { diagnosticSchema } from "../../schemas/diagnostic.ts";
 import {
   digestSchema,
   evidenceIdSchema,
-  schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
   authoritySequenceSchema,
@@ -14,7 +13,11 @@ export const payloadDescriptorV1Schema = z
   .object({
     payloadDigest: digestSchema,
     mediaType: z.string().min(1).max(256),
-    sizeBytes: z.number().int().nonnegative().max(1024 * 1024 * 1024),
+    sizeBytes: z
+      .number()
+      .int()
+      .nonnegative()
+      .max(1024 * 1024 * 1024),
     role: z.enum(["primary", "supplementary", "contextual"]),
     locator: safeLocatorSchema.optional(),
   })

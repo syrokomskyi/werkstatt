@@ -14,9 +14,8 @@ import {
   type LiveComponentObservation,
 } from "../reflection.ts";
 import type {
-  ConformanceEventV1,
-  ConformanceExpectationV1,
   ConformanceScenarioV1,
+  ConformanceExpectationV1,
   ConformanceTraceEntryV1,
   ConformanceMismatchV1,
   ConformanceResultV1,

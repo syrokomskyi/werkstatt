@@ -3,7 +3,6 @@ import {
   humanReadableIdSchema,
   digestSchema,
   utcTimestampSchema,
-  gateChannelSchema,
   environmentSchema,
 } from "../contracts/identifiers.ts";
 
@@ -21,19 +20,11 @@ export const siteQualityDimensionSchema = z.enum([
 
 export type SiteQualityDimension = z.infer<typeof siteQualityDimensionSchema>;
 
-export const certificationGateSchema = z.enum([
-  "dev-deploy",
-  "propagate-alt",
-  "promote-main",
-]);
+export const certificationGateSchema = z.enum(["dev-deploy", "propagate-alt", "promote-main"]);
 
 export type CertificationGate = z.infer<typeof certificationGateSchema>;
 
-export const requirementClassSchema = z.enum([
-  "required",
-  "conditional",
-  "advisory",
-]);
+export const requirementClassSchema = z.enum(["required", "conditional", "advisory"]);
 
 export type RequirementClass = z.infer<typeof requirementClassSchema>;
 
@@ -45,35 +36,19 @@ export const remediationClassSchema = z.enum([
 
 export type RemediationClass = z.infer<typeof remediationClassSchema>;
 
-export const driftActionSchema = z.enum([
-  "retry",
-  "incident-only",
-  "rollback",
-]);
+export const driftActionSchema = z.enum(["retry", "incident-only", "rollback"]);
 
 export type DriftAction = z.infer<typeof driftActionSchema>;
 
-export const ownerRoleSchema = z.enum([
-  "author-agent",
-  "platform-agent",
-  "operator-agent",
-]);
+export const ownerRoleSchema = z.enum(["author-agent", "platform-agent", "operator-agent"]);
 
 export type OwnerRole = z.infer<typeof ownerRoleSchema>;
 
-export const producerKindSchema = z.enum([
-  "kernel-command",
-  "evaluator-agent",
-  "remote-workload",
-]);
+export const producerKindSchema = z.enum(["kernel-command", "evaluator-agent", "remote-workload"]);
 
 export type ProducerKind = z.infer<typeof producerKindSchema>;
 
-export const versionSourceSchema = z.enum([
-  "package-version",
-  "module-hash",
-  "evaluator-profile",
-]);
+export const versionSourceSchema = z.enum(["package-version", "module-hash", "evaluator-profile"]);
 
 export type VersionSource = z.infer<typeof versionSourceSchema>;
 
@@ -175,9 +150,7 @@ export const certificationRequirementV1Schema = z
   })
   .strict();
 
-export type CertificationRequirementV1 = z.infer<
-  typeof certificationRequirementV1Schema
->;
+export type CertificationRequirementV1 = z.infer<typeof certificationRequirementV1Schema>;
 
 export const producerDeclarationV1Schema = z
   .object({
@@ -211,12 +184,9 @@ export const retentionPolicyV1Schema = z
     tombstoneAfterDays: z.number().int().nonnegative().max(36500),
   })
   .strict()
-  .refine(
-    (v) => v.minRetentionDays <= v.maxRetentionDays,
-    {
-      message: "CERT-PROFILE-01: minRetentionDays must not exceed maxRetentionDays",
-    },
-  );
+  .refine((v) => v.minRetentionDays <= v.maxRetentionDays, {
+    message: "CERT-PROFILE-01: minRetentionDays must not exceed maxRetentionDays",
+  });
 
 export type RetentionPolicyV1 = z.infer<typeof retentionPolicyV1Schema>;
 

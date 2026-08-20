@@ -1,24 +1,9 @@
 import type { Sha256Digest } from "../../fingerprint/primitives.ts";
 import { byteHash } from "../../fingerprint/primitives.ts";
-import type {
-  GateChannel,
-  CertificationStatus,
-} from "../contracts/identifiers.ts";
-import type {
-  GateDecisionV1,
-  MainVerificationDecisionV1,
-} from "../contracts/decisions.ts";
-import type {
-  DeploymentOperationStateV1,
-  DeploymentOperationEventV1,
-} from "../contracts/state.ts";
-import type {
-  DeploymentOperationState,
-} from "../state-machine.ts";
-import {
-  validateDeploymentTransition,
-  validateArtifactTransition,
-} from "../state-machine.ts";
+import type { GateChannel } from "../contracts/identifiers.ts";
+import type { GateDecisionV1, MainVerificationDecisionV1 } from "../contracts/decisions.ts";
+import type { DeploymentOperationState } from "../state-machine.ts";
+import { validateDeploymentTransition, validateArtifactTransition } from "../state-machine.ts";
 import type { ReleaseArtifactState } from "../../schemas/release.ts";
 
 export type CertificationGate = "dev-deploy" | "propagate-alt" | "promote-main";
@@ -99,8 +84,7 @@ export interface DeploymentAuthorizationFailureV1 {
 }
 
 export type DeploymentAuthorizationOutcomeV1 =
-  | DeploymentAuthorizationResultV1
-  | DeploymentAuthorizationFailureV1;
+  DeploymentAuthorizationResultV1 | DeploymentAuthorizationFailureV1;
 
 export function authorizeDeployment(
   input: DeploymentAuthorizationInputV1,
@@ -221,13 +205,9 @@ export interface MainVerificationFailureV1 {
   message: string;
 }
 
-export type MainVerificationOutcomeV1 =
-  | MainVerificationResultV1
-  | MainVerificationFailureV1;
+export type MainVerificationOutcomeV1 = MainVerificationResultV1 | MainVerificationFailureV1;
 
-export function verifyMainPromotion(
-  input: MainVerificationInputV1,
-): MainVerificationOutcomeV1 {
+export function verifyMainPromotion(input: MainVerificationInputV1): MainVerificationOutcomeV1 {
   if (input.mainVerificationDecision.candidateId !== input.candidateId) {
     return {
       ok: false,
@@ -283,18 +263,15 @@ export interface RollbackEvaluationFailureV1 {
   message: string;
 }
 
-export type RollbackEvaluationOutcomeV1 =
-  | RollbackEvaluationResultV1
-  | RollbackEvaluationFailureV1;
+export type RollbackEvaluationOutcomeV1 = RollbackEvaluationResultV1 | RollbackEvaluationFailureV1;
 
-export function evaluateRollback(
-  input: RollbackEvaluationInputV1,
-): RollbackEvaluationOutcomeV1 {
+export function evaluateRollback(input: RollbackEvaluationInputV1): RollbackEvaluationOutcomeV1 {
   if (input.sharedOutageDetected) {
     return {
       ok: true,
       rollbackAuthorized: false,
-      reason: "shared infrastructure outage detected — rollback to equally affected candidate is not useful",
+      reason:
+        "shared infrastructure outage detected — rollback to equally affected candidate is not useful",
       rollbackCandidateId: input.rollbackCandidateId,
     };
   }
@@ -350,13 +327,9 @@ export interface CrashRecoveryFailureV1 {
   message: string;
 }
 
-export type CrashRecoveryOutcomeV1 =
-  | CrashRecoveryResultV1
-  | CrashRecoveryFailureV1;
+export type CrashRecoveryOutcomeV1 = CrashRecoveryResultV1 | CrashRecoveryFailureV1;
 
-export function evaluateCrashRecovery(
-  state: CrashRecoveryStateV1,
-): CrashRecoveryOutcomeV1 {
+export function evaluateCrashRecovery(state: CrashRecoveryStateV1): CrashRecoveryOutcomeV1 {
   if (state.verificationCompleted && !state.statePersisted) {
     return {
       ok: true,
@@ -484,10 +457,7 @@ export function isForceBypassRequested(input: {
   graceRequested: boolean;
 }): boolean {
   return (
-    input.forceRequested ||
-    input.skipRequested ||
-    input.waiverRequested ||
-    input.graceRequested
+    input.forceRequested || input.skipRequested || input.waiverRequested || input.graceRequested
   );
 }
 

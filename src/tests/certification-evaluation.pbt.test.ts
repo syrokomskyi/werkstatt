@@ -1,7 +1,5 @@
 import { describe, it, expect } from "vitest";
 import {
-  buildEvidenceIndex,
-  selectRequirementEvidence,
   evaluateCertificationDecision,
   buildCertificationActionPack,
   computeDossierRoot,
@@ -14,9 +12,12 @@ import type {
 } from "../certification/index.ts";
 import type { Sha256Digest } from "../fingerprint/primitives.ts";
 
-const D = "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
-const D1 = "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
-const D2 = "sha256:2222222222222222222222222222222222222222222222222222222222222222" as string as Sha256Digest;
+const D =
+  "sha256:0000000000000000000000000000000000000000000000000000000000000000" as string as Sha256Digest;
+const D1 =
+  "sha256:1111111111111111111111111111111111111111111111111111111111111111" as string as Sha256Digest;
+const D2 =
+  "sha256:2222222222222222222222222222222222222222222222222222222222222222" as string as Sha256Digest;
 
 function makeRequirement(id: string, mandatory: boolean): ResolvedRequirementV1 {
   return {
@@ -27,7 +28,9 @@ function makeRequirement(id: string, mandatory: boolean): ResolvedRequirementV1 
   };
 }
 
-function makePolicyBundle(requirements: readonly ResolvedRequirementV1[]): CertificationPolicyBundleV1 {
+function makePolicyBundle(
+  requirements: readonly ResolvedRequirementV1[],
+): CertificationPolicyBundleV1 {
   return {
     schema: "werkstatt/certification-policy-bundle@1",
     policyBundleId: "pb-test",
@@ -274,14 +277,23 @@ describe("certification-evaluation PBT: status precedence truth table", () => {
         if (statuses[i] === "pass") {
           evidence.push(makeEvidence(`ev-pass-${i}`, "cand-1", [`req-${i}`], i + 1));
         } else if (statuses[i] === "fail") {
-          evidence.push(makeEvidence(`ev-fail-${i}`, "cand-1", [`req-${i}`], i + 1, [
-            { severity: "error", ruleId: "RULE-01", message: "fail" },
-          ]));
+          evidence.push(
+            makeEvidence(`ev-fail-${i}`, "cand-1", [`req-${i}`], i + 1, [
+              { severity: "error", ruleId: "RULE-01", message: "fail" },
+            ]),
+          );
         } else if (statuses[i] === "stale") {
-          evidence.push(makeEvidence(
-            `ev-stale-${i}`, "cand-1", [`req-${i}`], i + 1, [],
-            "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z",
-          ));
+          evidence.push(
+            makeEvidence(
+              `ev-stale-${i}`,
+              "cand-1",
+              [`req-${i}`],
+              i + 1,
+              [],
+              "2026-01-01T00:00:00Z",
+              "2026-01-01T00:00:00Z",
+            ),
+          );
         }
       }
       const result = evaluateCertificationDecision({
@@ -353,9 +365,9 @@ describe("certification-evaluation PBT: dossier root properties", () => {
 
   it("dossier root is deterministic for same input", () => {
     for (let trial = 0; trial < 50; trial++) {
-      const hashes = Array(10).fill(null).map((_, i) =>
-        `sha256:${String(i).padStart(64, "0")}` as string as Sha256Digest,
-      );
+      const hashes = Array(10)
+        .fill(null)
+        .map((_, i) => `sha256:${String(i).padStart(64, "0")}` as string as Sha256Digest);
       const r1 = computeDossierRoot("cand-1", hashes);
       const r2 = computeDossierRoot("cand-1", hashes);
       expect(r1).toBe(r2);
@@ -452,14 +464,62 @@ describe("certification-evaluation PBT: action-pack determinism", () => {
 
   it("action pack is invariant under requirement permutation", () => {
     const requirements = [
-      { requirementId: "req-a", status: "fail" as const, selectedEvidenceId: null, selectedEvidenceHash: null, reasonCode: "CERT-OK", reasonMessage: "" },
-      { requirementId: "req-b", status: "stale" as const, selectedEvidenceId: null, selectedEvidenceHash: null, reasonCode: "CERT-EVIDENCE-02", reasonMessage: "" },
-      { requirementId: "req-c", status: "incomplete" as const, selectedEvidenceId: null, selectedEvidenceHash: null, reasonCode: "CERT-EVIDENCE-01", reasonMessage: "" },
+      {
+        requirementId: "req-a",
+        status: "fail" as const,
+        selectedEvidenceId: null,
+        selectedEvidenceHash: null,
+        reasonCode: "CERT-OK",
+        reasonMessage: "",
+      },
+      {
+        requirementId: "req-b",
+        status: "stale" as const,
+        selectedEvidenceId: null,
+        selectedEvidenceHash: null,
+        reasonCode: "CERT-EVIDENCE-02",
+        reasonMessage: "",
+      },
+      {
+        requirementId: "req-c",
+        status: "incomplete" as const,
+        selectedEvidenceId: null,
+        selectedEvidenceHash: null,
+        reasonCode: "CERT-EVIDENCE-01",
+        reasonMessage: "",
+      },
     ];
     const meta = new Map([
-      ["req-a", { remediationClass: "product-fix" as const, description: "fix a", verificationCommand: "pnpm test", anchors: [makeAnchor("a-1")], dependencies: [] }],
-      ["req-b", { remediationClass: "infrastructure-retry" as const, description: "retry b", verificationCommand: "pnpm build", anchors: [makeAnchor("b-1")], dependencies: [] }],
-      ["req-c", { remediationClass: "policy-defect" as const, description: "fix c policy", verificationCommand: "pnpm lint", anchors: [makeAnchor("c-1")], dependencies: [] }],
+      [
+        "req-a",
+        {
+          remediationClass: "product-fix" as const,
+          description: "fix a",
+          verificationCommand: "pnpm test",
+          anchors: [makeAnchor("a-1")],
+          dependencies: [],
+        },
+      ],
+      [
+        "req-b",
+        {
+          remediationClass: "infrastructure-retry" as const,
+          description: "retry b",
+          verificationCommand: "pnpm build",
+          anchors: [makeAnchor("b-1")],
+          dependencies: [],
+        },
+      ],
+      [
+        "req-c",
+        {
+          remediationClass: "policy-defect" as const,
+          description: "fix c policy",
+          verificationCommand: "pnpm lint",
+          anchors: [makeAnchor("c-1")],
+          dependencies: [],
+        },
+      ],
     ]);
 
     const baseline = buildCertificationActionPack({
@@ -481,7 +541,9 @@ describe("certification-evaluation PBT: action-pack determinism", () => {
         createdAt: "2026-06-01T00:00:00Z",
       });
       if ("tasks" in baseline && "tasks" in permuted) {
-        expect(permuted.tasks.map((t) => t.taskId).sort()).toEqual(baseline.tasks.map((t) => t.taskId).sort());
+        expect(permuted.tasks.map((t) => t.taskId).sort()).toEqual(
+          baseline.tasks.map((t) => t.taskId).sort(),
+        );
       }
     }
   });

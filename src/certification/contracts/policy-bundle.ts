@@ -1,10 +1,5 @@
 import { z } from "zod";
-import {
-  digestSchema,
-  schemaIdSchema,
-  humanReadableIdSchema,
-  utcTimestampSchema,
-} from "./identifiers.ts";
+import { digestSchema, humanReadableIdSchema, utcTimestampSchema } from "./identifiers.ts";
 
 export const producerManifestV1Schema = z
   .object({
@@ -101,6 +96,4 @@ export const certificationPolicyBundleV1Schema = z
   })
   .strict();
 
-export type CertificationPolicyBundleV1 = z.infer<
-  typeof certificationPolicyBundleV1Schema
->;
+export type CertificationPolicyBundleV1 = z.infer<typeof certificationPolicyBundleV1Schema>;

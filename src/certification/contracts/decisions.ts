@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   digestSchema,
   decisionIdSchema,
-  schemaIdSchema,
   humanReadableIdSchema,
   utcTimestampSchema,
   authoritySequenceSchema,
@@ -68,9 +67,7 @@ export const mainVerificationDecisionV1Schema = z
   })
   .strict();
 
-export type MainVerificationDecisionV1 = z.infer<
-  typeof mainVerificationDecisionV1Schema
->;
+export type MainVerificationDecisionV1 = z.infer<typeof mainVerificationDecisionV1Schema>;
 
 export const certificationHealthDecisionV1Schema = z
   .object({
@@ -85,6 +82,4 @@ export const certificationHealthDecisionV1Schema = z
   })
   .strict();
 
-export type CertificationHealthDecisionV1 = z.infer<
-  typeof certificationHealthDecisionV1Schema
->;
+export type CertificationHealthDecisionV1 = z.infer<typeof certificationHealthDecisionV1Schema>;
