@@ -10,6 +10,7 @@
   <item>RFC-0715: Registers nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature.</item>
   <item>RFC-0886: Registers nachweis.screenshot.upload for website screenshot upload to R2.</item>
   <item>RFC-0890: Registers nachweis.screenshot.ingest for raw screenshot ingestion to R2 private + cache clone.</item>
+  <item>RFC-0891: Registers nachweis.screenshot.process for raw-to-display screenshot processing (crop, resize, WebP).</item>
   <item>Uses dynamic imports for lazy loading (same pattern as evidence-module.ts and bordbuch.module.ts).</item>
   <item>Declares correct scopes, flags, reads/writes for each command.</item>
 </responsibilities>
@@ -28,6 +29,7 @@
   <item>RFC-0875: add nachweis.measure.cloudflare-agent-readiness command registration.</item>
   <item>RFC-0886: add nachweis.screenshot.upload command registration, add --scope flag to nachweis.consent.update.</item>
   <item>RFC-0890: add nachweis.screenshot.ingest command registration.</item>
+  <item>RFC-0891: add nachweis.screenshot.process command registration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -56,6 +58,7 @@ export function createNachweisModule(): KernelModule {
         await import("./nachweis-cloudflare-agent-readiness-measure.ts");
       const { runNachweisScreenshotUpload } = await import("./nachweis-screenshot-upload.ts");
       const { runNachweisScreenshotIngest } = await import("./nachweis-screenshot-ingest.ts");
+      const { runNachweisScreenshotProcess } = await import("./nachweis-screenshot-process.ts");
 
       registry.registerCommand({
         name: "nachweis.ingest",
@@ -531,6 +534,36 @@ export function createNachweisModule(): KernelModule {
         reads: [],
         writes: [],
         execute: runNachweisScreenshotIngest,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.screenshot.process",
+        description:
+          "RFC-0891: Process a raw full-page screenshot into a 16:9 display variant (1280x720, WebP) and upload to R2 public. Reads rawArtifact from evidence-source, crops from top, resizes, converts.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: {
+            kind: "string",
+            required: true,
+            description: "Evidence-source slug to process the screenshot for",
+          },
+          "dry-run": {
+            kind: "boolean",
+            description: "Compute crop dimensions without uploading or updating entity",
+          },
+          "crop-offset": {
+            kind: "string",
+            description: "Vertical crop offset in pixels (default: 0, top of page)",
+          },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisScreenshotProcess,
       });
     },
   };

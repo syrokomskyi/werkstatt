@@ -11,6 +11,7 @@
   <item>RFC-0873: add assessment bundle types, Zod schema, and nachweis.assessment.ingest handler export.</item>
   <item>RFC-0874: add nachweis.measure.lighthouse handler and type exports.</item>
   <item>RFC-0875: add nachweis.measure.cloudflare-agent-readiness handler and type exports.</item>
+  <item>RFC-0891: add nachweis.screenshot.process handler and NachweisScreenshotProcessResult type export.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -48,6 +49,7 @@ export {
   type AssessmentBundleArtifact,
   type AssessmentBundleV1,
   type AssessmentIngestResult,
+  type NachweisScreenshotProcessResult,
   assessmentBundleV1Schema,
   mediaTypeToExt,
   resolveAssessmentR2Path,
@@ -64,6 +66,7 @@ export { runNachweisPublicDerivative } from "./nachweis-public-derivative.ts";
 export { runNachweisAssessmentIngest } from "./nachweis-assessment-ingest.ts";
 export { runNachweisLighthouseMeasure } from "./nachweis-lighthouse-measure.ts";
 export { runNachweisCloudflareAgentReadinessMeasure } from "./nachweis-cloudflare-agent-readiness-measure.ts";
+export { runNachweisScreenshotProcess } from "./nachweis-screenshot-process.ts";
 export type {
   LighthouseCategoryProjection,
   LighthouseRunResult,
