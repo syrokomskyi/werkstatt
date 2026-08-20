@@ -33,6 +33,8 @@ excludePathSegments:
 postProcess:
   - action: delete
     path: AGENTS.md
+  - action: delete
+    path: pnpm-lock.yaml
 
 git:
   remote: git@github.com:syrokomskyi/werkstatt-knowledge.git
