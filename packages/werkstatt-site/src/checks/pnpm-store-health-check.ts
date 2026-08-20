@@ -63,8 +63,6 @@ function resolveWorkpieceDir(
     searchDirs.push(join(missionsDir, state));
   }
 
-  let missionWorkpieceDir: string | null = null;
-
   for (const searchDir of searchDirs) {
     if (!existsSync(searchDir)) continue;
     let entries;
@@ -85,7 +83,20 @@ function resolveWorkpieceDir(
           const raw = readFileSync(missionFile, "utf-8");
           const data = parseYaml(raw) as { systemId?: string };
           if (data.systemId === site) {
-            missionWorkpieceDir = candidate;
+            return candidate;
+          }
+        } catch {
+          // continue
+        }
+      }
+      // Fallback: check system.json for id (legacy convention)
+      const systemFile = join(searchDir, entry.name, "system.json");
+      if (existsSync(systemFile)) {
+        try {
+          const raw = readFileSync(systemFile, "utf-8");
+          const data = JSON.parse(raw) as { id?: string };
+          if (data.id === site) {
+            return candidate;
           }
         } catch {
           // continue
@@ -94,7 +105,7 @@ function resolveWorkpieceDir(
     }
   }
 
-  return missionWorkpieceDir;
+  return null;
 }
 
 export async function runPnpmStoreHealthCheck(

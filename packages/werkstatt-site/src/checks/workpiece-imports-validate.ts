@@ -99,12 +99,13 @@ export async function runWorkpieceImportsValidate(
       ) as KernelCommandResult<WorkpieceImportsValidateData>;
     }
 
-    // Find mission directory containing a workpiece for this site
-    // Also search archive subdirectories — release.prepare runs on closed missions
+    // Find mission directory containing a workpiece for this site.
+    // Search active missions first, then archives as fallback (release.prepare
+    // runs on closed missions). Return immediately on first match — active
+    // missions must take priority over archived ones.
     const { readdir } = await import("node:fs/promises");
     let found = false;
     let missionWorkpieceDir: string | null = null;
-    const matchingMissions: string[] = [];
     const searchDirs = [missionsDir];
     for (const state of ["archive/closed", "archive/aborted"]) {
       searchDirs.push(join(missionsDir, state));
@@ -148,17 +149,14 @@ export async function runWorkpieceImportsValidate(
               }
             }
           }
-          if (matches) matchingMissions.push(join(searchDir, entry.name));
+          if (matches) {
+            missionWorkpieceDir = candidate;
+            found = true;
+            break;
+          }
         }
       }
-    }
-
-    if (matchingMissions.length > 0) {
-      // Pick the latest mission by directory name (mission IDs are sequential)
-      matchingMissions.sort();
-      const latest = matchingMissions[matchingMissions.length - 1]!;
-      missionWorkpieceDir = join(latest, "workpiece");
-      found = true;
+      if (found) break;
     }
 
     if (!found || !missionWorkpieceDir) {

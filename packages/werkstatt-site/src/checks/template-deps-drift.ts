@@ -111,7 +111,8 @@ export async function runTemplateDepsDrift(
     }
 
     const { readdir } = await import("node:fs/promises");
-    const matchingMissions: string[] = [];
+    let found = false;
+    let foundMissionDir: string | null = null;
     const searchDirs = [missionsDir];
     for (const state of ["archive/closed", "archive/aborted"]) {
       searchDirs.push(join(missionsDir, state));
@@ -152,12 +153,17 @@ export async function runTemplateDepsDrift(
               }
             }
           }
-          if (matches) matchingMissions.push(join(searchDir, entry.name));
+          if (matches) {
+            foundMissionDir = join(searchDir, entry.name);
+            found = true;
+            break;
+          }
         }
       }
+      if (found) break;
     }
 
-    if (matchingMissions.length === 0) {
+    if (!found || !foundMissionDir) {
       diagnostics.push({
         ruleId: "TEMPLATE-DEPS-DRIFT-02",
         severity: "error",
@@ -167,9 +173,7 @@ export async function runTemplateDepsDrift(
       return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<TemplateDepsDriftData>;
     }
 
-    matchingMissions.sort();
-    const latest = matchingMissions[matchingMissions.length - 1]!;
-    workpiecePkgPath = join(latest, "workpiece", "package.json");
+    workpiecePkgPath = join(foundMissionDir, "workpiece", "package.json");
   }
 
   let workpieceRaw: string;
