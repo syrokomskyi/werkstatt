@@ -102,7 +102,7 @@ function isPartialIconConfig(obj: unknown): boolean {
   const hasVendor = "vendor" in o;
   const hasCollection = "collection" in o;
   const hasName = "name" in o;
-  return (hasVendor || hasCollection || hasName) && !(hasVendor && hasCollection && hasName);
+  return hasVendor && !(hasVendor && hasCollection && hasName);
 }
 
 function extractIconRefs(

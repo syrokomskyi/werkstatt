@@ -134,4 +134,21 @@ describe("icon.references.validate — RFC-0893", () => {
 
     expect(result.exitCode).toBe(0);
   });
+
+  it("does not flag objects with name field but no vendor as ICON-REF-03", async () => {
+    await createIconFile("lordicon", "doodle-outline", "clock-time-hover-icon");
+    await writeContentMd(
+      "pages/test.md",
+      "pageId: test\ntitle: Test\nparties:\n  - name: Sveta Svega Kim\n    kind: Person\n    role: creator\n  - name: VEO\n    kind: AIPlatform\n    role: aiPlatform\n",
+    );
+
+    const result = await runIconReferencesValidate(
+      testInput(),
+      makeTestSiteContext(workspaceRoot, appDir),
+    );
+
+    expect(result.exitCode).toBe(0);
+    const diag = (result.data as { diagnostics?: { message: string }[] }).diagnostics ?? [];
+    expect(diag.some((d) => d.message.includes("ICON-REF-03"))).toBe(false);
+  });
 });
