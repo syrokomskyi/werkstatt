@@ -811,27 +811,15 @@
 
 .nachweis-card__website-link {
   display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
+  align-items: baseline;
+  gap: 0.3em;
   margin: 0;
   font-size: var(--ds-text-sm);
   color: var(--ds-color-text-primary);
-  text-decoration: none;
-  border: 1px solid var(--ds-color-border);
-  border-radius: var(--ds-radius-sm);
-  padding: var(--ds-space-1) var(--ds-space-3);
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
+  text-decoration: underline;
 }
 
-.nachweis-card__website-link:hover,
-.nachweis-card__website-link:focus-visible {
-  background: var(--ds-color-surface-elevated);
-  border-color: var(--ds-color-border-strong);
-}
-
-.nachweis-card__website-link-icon {
-  font-size: 1.1em;
+.nachweis-card__website-link-arrow {
+  font-size: 1em;
   line-height: 1;
 }
