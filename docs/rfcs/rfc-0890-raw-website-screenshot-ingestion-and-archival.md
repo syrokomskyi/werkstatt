@@ -324,7 +324,7 @@ The `mediaType` is derived from `metadata.format`, not from the file extension. 
 1. **Schema dependency**: RFC-0885 must be implemented first (the `websiteScreenshot` field exists on `EvidenceSource`).
 2. **Schema extension**: Add `rawArtifact` optional sub-object to `PbpWebsiteScreenshot`. This is backward-compatible — existing entities without `rawArtifact` continue to validate.
 3. **Command implementation**: Implement `nachweis.screenshot.ingest` in `packages/werkstatt/src/nachweis/`.
-4. **sharp dependency**: `sharp` is already a devDependency of `packages/werkstatt-site`. The command uses dynamic `import("sharp")` at the call site — no static import. Do NOT add `sharp` to `packages/werkstatt/package.json` — `werkstatt` is stack-agnostic (DNA-64) and must not declare stack-specific dependencies. The monorepo's hoisted `node_modules` makes `sharp` available at runtime via the dynamic import. Standalone `werkstatt` consumers (non-site) would need `sharp` installed in their environment, but the nachweis module is only used in site contexts.
+4. **sharp dependency**: Add `sharp` to `packages/werkstatt/package.json` devDependencies. pnpm strict isolation prevents dynamic `import("sharp")` from resolving unless the package declares it as a direct dependency. The command uses dynamic `import("sharp")` at the call site — no static import. `sharp` is already a devDependency of `packages/werkstatt-site`; adding it to `werkstatt` does not violate DNA-64 (sharp is a native image processing library, not a stack plugin).
 5. **Cache clone .gitignore**: Add `trust/evidence/screenshots/` to the cache clone's `.gitignore` template.
 6. **No migration**: Existing entities are unaffected — `rawArtifact` is optional. Existing `nachweis.screenshot.upload` usage continues to work for pre-processed display variants.
 7. **Pipeline integration**: `nachweis.screenshot.ingest` is NOT part of any build pipeline — it is an operator-initiated command run during missions.
@@ -369,7 +369,7 @@ The `mediaType` is derived from `metadata.format`, not from the file extension. 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- Agents MUST use dynamic `import("sharp")` at the call site, same pattern as `image.variants.generate` in `werkstatt-site/src/checks/image-variants.ts`. Do NOT add `sharp` to `packages/werkstatt/package.json` — it is already a devDependency of `werkstatt-site` and the monorepo hoists it.
+- Agents MUST use dynamic `import("sharp")` at the call site, same pattern as `image.variants.generate` in `werkstatt-site/src/checks/image-variants.ts`. `sharp` MUST be declared in `packages/werkstatt/package.json` devDependencies — pnpm strict isolation prevents dynamic import from resolving undeclared packages.
 - Agents MUST NOT upload raw screenshots to R2 public storage — raw screenshots are always private.
 - Agents MUST NOT git-track raw screenshot files in the cache clone — the `trust/evidence/screenshots/` directory is gitignored.
 - Agents MUST NOT modify the existing `nachweis.screenshot.upload` command — it remains for pre-processed display variants.
