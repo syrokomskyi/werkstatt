@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: d61cb11b6e94f4997e50360b43db621f31253c7810354d56a3d6535f90154a8b
+  contentHash: 81760f49b024c2c87c8a3f59834af2ec1ec969637082af22b0fb36f5e6686c2a
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -3778,6 +3778,25 @@ commands:
         description: ISO 8601 timestamp to use as build time (defaults to now).
     reads:
       - <app>/src/content/business-profile/**/*.md
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: customdomain.register
+    description: "Register proxied A record and Workers route for a site apex domain
+      (RFC-0896). Idempotent. Flags: --site."
+    scope: workspace
+    provider: workspace
+    module: customdomain
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      site:
+        kind: string
+        required: true
+        description: System id from systems-cache/{system}/system-config.yaml.
+    reads:
+      - systems-cache/{system}/system-config.yaml
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -7764,9 +7783,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: leitstand.rollback
-    description: "Rollback to the previous published release; auto-detects channel
-      from release state and auto-steps release state (RFC-0628). Flags: --site,
-      [--to-release]."
+    description: "Rollback a site or service to its previous Cloudflare Worker
+      deployment via native wrangler rollback (RFC-0895). Flags: --site OR
+      --service (mutually exclusive), [--channel dev|alt|main]."
     scope: workspace
     provider: workspace
     module: leitstand
@@ -7776,22 +7795,25 @@ commands:
     flags:
       site:
         kind: string
-        required: true
         description: Sternsystem id.
       system:
         kind: string
         description: Alias for --site.
-      to-release:
+      service:
         kind: string
-        description: Explicit target release id.
+        description: Service id from services/registry.yaml.
+      channel:
+        kind: string
+        description: "Deployment channel for site rollback: dev, alt, or main (default)."
     reads:
       - systems-cache/{system}/system-config.yaml
       - systems-cache/{system}/system-state.yaml
-      - releases/*/release.yaml
+      - services/registry.yaml
+      - services/{service}/**
     writes:
       - systems-cache/{system}/system-state.yaml
       - systems-cache/{system}/bordbuch/events.ndjson
-      - releases/{release}/release.yaml
+      - services/registry.yaml
     validatesOutputs: []
     pipelines: []
   - name: leitstand.service.dev-deploy
@@ -7836,27 +7858,6 @@ commands:
       skip-health-check:
         kind: boolean
         description: Skip post-deploy health check.
-    reads:
-      - services/registry.yaml
-      - services/{service}/**
-    writes:
-      - services/registry.yaml
-    validatesOutputs: []
-    pipelines: []
-  - name: leitstand.service.rollback
-    description: "Rollback a shared Cloudflare Worker service to its previous
-      deployment via wrangler rollback (RFC-0806). Flags: --service."
-    scope: workspace
-    provider: workspace
-    module: leitstand
-    mutatesState: true
-    requiresNetwork: false
-    timeoutMs: null
-    flags:
-      service:
-        kind: string
-        required: true
-        description: "Service id from the services: key in services/registry.yaml."
     reads:
       - services/registry.yaml
       - services/{service}/**
@@ -11612,6 +11613,25 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: redirect.register
+    description: "Register proxied CNAME and Redirect Rule (301) for www.{apex} →
+      apex (RFC-0896). Idempotent. Flags: --site."
+    scope: workspace
+    provider: workspace
+    module: customdomain
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      site:
+        kind: string
+        required: true
+        description: System id from systems-cache/{system}/system-config.yaml.
+    reads:
+      - systems-cache/{system}/system-config.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: release.list
     description: "List releases, optionally filtered by site (RFC-0357). Flags: [--site]."
     scope: workspace
@@ -11676,28 +11696,6 @@ commands:
     writes:
       - releases/{release}/release.yaml
       - systems-cache/{system}/system-state.yaml
-      - systems-cache/{system}/bordbuch/events.ndjson
-    validatesOutputs: []
-    pipelines: []
-  - name: release.rollback
-    description: "Mark a ready release as rolled-back and append Bordbuch entry
-      (RFC-0357). Flags: --release."
-    scope: workspace
-    provider: workspace
-    module: release
-    mutatesState: true
-    requiresNetwork: false
-    timeoutMs: null
-    flags:
-      release:
-        kind: string
-        required: true
-        description: Release id to roll back.
-    reads:
-      - releases/{release}/**
-      - systems-cache/{system}/system-config.yaml
-    writes:
-      - releases/{release}/release.yaml
       - systems-cache/{system}/bordbuch/events.ndjson
     validatesOutputs: []
     pipelines: []
