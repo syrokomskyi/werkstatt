@@ -1250,3 +1250,224 @@ describe("RFC-0715: nachweis.validate consent matching by c.id fallback", () => 
     expect(consentCondition!.status).toBe("pass");
   });
 });
+
+// ── SHA256 validation regression tests ──────────────────────────────────────
+
+describe("nachweis sha256 validation: empty string and invalid format", () => {
+  const VALID_SHA256 = "a".repeat(64);
+  const INVALID_SHA256 = "not-a-hash";
+
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(join(tmpdir(), "nachweis-sha256-XXXX-"));
+    workspaceRoot = tmpDir;
+    await writeFile(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
+  });
+
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it("reports evidence-missing-sha256 for empty string sha256", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: { main: { sha256: "" } },
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(1);
+    const shaViolation = expectData(result).violations.find(
+      (v) => v.rule === "evidence-missing-sha256",
+    );
+    expect(shaViolation).toBeTruthy();
+  });
+
+  it("reports evidence-missing-sha256 for invalid format sha256", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: { main: { sha256: INVALID_SHA256 } },
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(1);
+    const shaViolation = expectData(result).violations.find(
+      (v) => v.rule === "evidence-missing-sha256",
+    );
+    expect(shaViolation).toBeTruthy();
+  });
+
+  it("does not report evidence-missing-sha256 for valid sha256", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: { main: { sha256: VALID_SHA256 } },
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    const shaViolation = expectData(result).violations.find(
+      (v) => v.rule === "evidence-missing-sha256",
+    );
+    expect(shaViolation).toBeUndefined();
+  });
+});
+
+describe("nachweis gate: source-integrity-verified requires ALL items to have valid sha256", () => {
+  const VALID_SHA256 = "b".repeat(64);
+
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(join(tmpdir(), "nachweis-gate-sha256-XXXX-"));
+    workspaceRoot = tmpDir;
+    await writeFile(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
+  });
+
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it("gate fails source-integrity-verified when one item has sha256 and another does not", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: {
+        main: { sha256: VALID_SHA256 },
+        secondary: {},
+      },
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    const gate = expectData(result).gateResults.find((g) => g.slug === "test-record");
+    expect(gate).toBeTruthy();
+    const integrityCondition = gate!.conditions.find((c) => c.id === "source-integrity-verified");
+    expect(integrityCondition).toBeTruthy();
+    expect(integrityCondition!.status).toBe("fail");
+  });
+
+  it("gate fails source-integrity-verified when one item has sha256 and another has empty string", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: {
+        main: { sha256: VALID_SHA256 },
+        secondary: { sha256: "" },
+      },
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    const gate = expectData(result).gateResults.find((g) => g.slug === "test-record");
+    expect(gate).toBeTruthy();
+    const integrityCondition = gate!.conditions.find((c) => c.id === "source-integrity-verified");
+    expect(integrityCondition).toBeTruthy();
+    expect(integrityCondition!.status).toBe("fail");
+  });
+
+  it("gate passes source-integrity-verified when all items have valid sha256", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: {
+        main: { sha256: VALID_SHA256 },
+        secondary: { sha256: "c".repeat(64) },
+      },
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    const gate = expectData(result).gateResults.find((g) => g.slug === "test-record");
+    expect(gate).toBeTruthy();
+    const integrityCondition = gate!.conditions.find((c) => c.id === "source-integrity-verified");
+    expect(integrityCondition).toBeTruthy();
+    expect(integrityCondition!.status).toBe("pass");
+  });
+
+  it("gate fails source-integrity-verified when items is empty", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: {},
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    const gate = expectData(result).gateResults.find((g) => g.slug === "test-record");
+    expect(gate).toBeTruthy();
+    const integrityCondition = gate!.conditions.find((c) => c.id === "source-integrity-verified");
+    expect(integrityCondition).toBeTruthy();
+    expect(integrityCondition!.status).toBe("fail");
+  });
+});
