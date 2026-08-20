@@ -44,6 +44,12 @@ import { resolveCacheClonePath, resolveActiveWorkpieceDir } from "../sternsystem
 
 const NACHWEIS_BUCKET = "nachweis";
 
+const SHA256_HEX_RE = /^[a-f0-9]{64}$/;
+
+export function isValidSha256Hex(value: unknown): value is string {
+  return typeof value === "string" && SHA256_HEX_RE.test(value);
+}
+
 export interface NachweisRecord {
   recordId: string;
   slug: string;
@@ -289,7 +295,9 @@ export function evaluateGateV2(
   const consentGranted = visibleAspects.every((a) => consentScope?.[a]?.status === "granted");
   const displayConsentConsistent = consentGranted;
   const sourceIntegrityVerified =
-    items != null && Object.values(items).some((item) => item.sha256 != null);
+    items != null &&
+    Object.keys(items).length > 0 &&
+    Object.values(items).every((item) => isValidSha256Hex(item.sha256));
   const recordApproved = input.bordbuchEntries.some(
     (e) => e.kind === "nachweis-record" && e.summary.includes("approved"),
   );
@@ -304,7 +312,8 @@ export function evaluateGateV2(
   const canonicalRawArtifactVerified =
     items != null &&
     Object.values(items).some(
-      (item) => item.role === "raw-result" && item.canonical === true && item.sha256 != null,
+      (item) =>
+        item.role === "raw-result" && item.canonical === true && isValidSha256Hex(item.sha256),
     );
   const assessmentMetadataValid = assessment != null && validateAssessmentMetadata(assessment);
   const executionAuthorizationBasisPresent =

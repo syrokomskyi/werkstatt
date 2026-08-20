@@ -52,6 +52,7 @@ import {
   resolveNachweisPublicationPolicy,
   evaluateGateV2,
   validateAssessmentMetadata,
+  isValidSha256Hex,
   type NachweisPublicationGateV2,
   type NachweisValidateResult,
   type NachweisViolation,
@@ -182,10 +183,10 @@ export async function runNachweisValidate(
       continue;
     }
     for (const [itemKey, item] of Object.entries(items)) {
-      if (item.sha256 == null) {
+      if (!isValidSha256Hex(item.sha256)) {
         violations.push({
           rule: "evidence-missing-sha256",
-          message: `EvidenceSource '${es.id}' item '${itemKey}' is missing sha256`,
+          message: `EvidenceSource '${es.id}' item '${itemKey}' is missing or has invalid sha256`,
           recordId: es.id,
         });
       }
@@ -307,7 +308,11 @@ export async function runNachweisValidate(
       }
       if (items != null && hasCanonicalRaw) {
         for (const [itemKey, item] of Object.entries(items)) {
-          if (item.role === "raw-result" && item.canonical === true && item.sha256 == null) {
+          if (
+            item.role === "raw-result" &&
+            item.canonical === true &&
+            !isValidSha256Hex(item.sha256)
+          ) {
             violations.push({
               rule: "TECHNICAL_ASSESSMENT_HASH_REQUIRED",
               message: `EvidenceSource '${slug}' canonical raw-result item '${itemKey}' is missing sha256`,
@@ -331,7 +336,7 @@ export async function runNachweisValidate(
         // logical item key for different hashes
         const canonicalHashes = new Map<string, string>();
         for (const [itemKey, item] of Object.entries(items)) {
-          if (item.canonical === true && item.sha256 != null) {
+          if (item.canonical === true && isValidSha256Hex(item.sha256)) {
             const existing = canonicalHashes.get(item.sha256);
             if (existing !== undefined && existing !== itemKey) {
               violations.push({
