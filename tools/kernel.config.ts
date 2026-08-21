@@ -170,6 +170,9 @@ export default defineKernelConfig({
     "werkstatt-shared-validate": async () =>
       (await import("@warpgogol/werkstatt/os/werkstatt-shared-validate-module"))
         .werkstattSharedValidateModule,
+    "werkstatt-commands-validate": async () =>
+      (await import("@warpgogol/werkstatt/os/werkstatt-commands-validate-module"))
+        .werkstattCommandsValidateModule,
   },
   pipelines: {
     // Workspace-level pipelines
