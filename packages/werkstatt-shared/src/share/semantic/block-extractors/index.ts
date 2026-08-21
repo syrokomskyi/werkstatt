@@ -500,3 +500,27 @@ for (const blockType of PASSPORT_NOOP_TYPES) {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// Site-specific block types that have no semantic text to extract but must be
+// registered so page.blocks.extract.validate does not fail.
+// ---------------------------------------------------------------------------
+const SITE_NOOP_TYPES = [
+  "nachweis-list",
+  "nachweis-detail",
+  "nachweis-verify",
+  "gratitude",
+  "open-source-registry",
+  "mountain-journey",
+  "dynamic-status-block",
+  "service-metadata-block",
+] as const;
+
+for (const blockType of SITE_NOOP_TYPES) {
+  BLOCK_EXTRACTORS.register<Record<string, unknown>>({
+    blockType,
+    extract() {
+      return { heading: "" };
+    },
+  });
+}
