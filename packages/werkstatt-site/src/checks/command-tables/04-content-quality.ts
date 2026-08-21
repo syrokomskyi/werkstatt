@@ -64,6 +64,7 @@ import {
   runSourceMonitorStatus,
   runSourceMonitorRun,
 } from "../source-monitor.ts";
+import { runBlockIdGenerate } from "../block-id-generate.ts";
 import { runDerivedPricesMaterialize } from "../derived-prices-materialize.ts";
 import { runRateSnapshotResolve } from "../rate-snapshot-resolve.ts";
 import { runCurrencyPricingCompile } from "../currency-pricing-compile.ts";
@@ -886,5 +887,19 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: false,
     cacheable: false,
     execute: runSourceMonitorRun,
+  },
+  /* RFC-0914 */
+  {
+    name: "block.id.generate",
+    description:
+      "One-time migration command that backfills missing block ids in page content files using slugId(heading) with suffix deduplication (RFC-0914).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    mutatesState: true,
+    reads: ["<app>/src/content/pages/**/*.md"],
+    writes: ["<app>/src/content/pages/**/*.md"],
+    modulePaths: ["block-id-generate.ts", "result-helpers.ts", "lib/i18n.ts"],
+    execute: runBlockIdGenerate,
   },
 ];
