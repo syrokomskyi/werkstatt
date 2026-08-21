@@ -15,6 +15,7 @@
   <item>RFC-0822: add ENV-PERSIST-01 warning when cache clone lacks .env* but active workpiece has them.</item>
   <item>RFC-0870: add STERN-MANIFEST-01 check for missing committed generated manifests in cache clone HEAD.</item>
   <item>RFC-0902: add STERN-ID-TLD rule rejecting IDs ending in a known TLD suffix.</item>
+  <item>Fix: checkBundleContract uses git ls-files instead of filesystem scan, excludes COMMITTED_MANIFEST_PATHS from generated file check.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,7 +29,6 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { StarCatalog } from "@warpgogol/werkstatt-shared/ontology/cosmic";
 import { systemPinSchema } from "@warpgogol/werkstatt/schemas";
 import {
@@ -137,27 +137,20 @@ async function checkBundleContract(
   const violations: SternsystemViolation[] = [];
   if (!existsSync(cacheDir)) return violations;
 
-  const entries = await collectFiles(cacheDir, {
-    withDirs: true,
-    ignore: (name) => name === ".git",
-  });
+  let trackedFiles: string[] = [];
+  try {
+    const output = execSync("git ls-files", {
+      cwd: cacheDir,
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    trackedFiles = output.split("\n").filter(Boolean);
+  } catch {
+    return violations;
+  }
 
-  for (const abs of entries) {
-    const rel = path.relative(cacheDir, abs);
-    const name = path.basename(abs);
-    const stat = await fs.stat(abs).catch(() => undefined);
-    if (!stat) continue;
-
-    if (stat.isDirectory()) {
-      if (FORBIDDEN_PATTERNS.includes(name)) {
-        violations.push({
-          systemId,
-          rule: "bundle-contract",
-          message: `${systemId}: cache clone contains forbidden path: ${rel}/`,
-        });
-      }
-      continue;
-    }
+  for (const rel of trackedFiles) {
+    const name = path.basename(rel);
 
     if (FORBIDDEN_PATTERNS.includes(name)) {
       violations.push({
@@ -166,7 +159,7 @@ async function checkBundleContract(
         message: `${systemId}: cache clone contains forbidden file: ${rel}`,
       });
     }
-    if (name.includes(".generated.")) {
+    if (name.includes(".generated.") && !COMMITTED_MANIFEST_PATHS.includes(rel)) {
       violations.push({
         systemId,
         rule: "bundle-contract",
