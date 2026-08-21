@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,7 +25,6 @@ amendedBy: []
 related:
   - DNA-5
   - DNA-17
-  - DNA-19
   - RFC-0706
   - RFC-0708
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
@@ -33,7 +33,6 @@ related:
 satisfies:
   - DNA-5
   - DNA-17
-  - DNA-19
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -51,7 +50,6 @@ appsImpacted:
   - warpgogol-com
 packagesImpacted:
   - werkstatt-site
-  - werkstatt-shared
 successSignals:
   - Gratitude section renders on /nachweise page with client testimonial cards
   - PBP client-testimonial entities validate against schema
@@ -90,18 +88,18 @@ The PBP (business-profile) content collection already hosts trust-domain entitie
 
 1. **No PBP entity for client testimonials.** The trust domain lacks a dedicated entity type for client gratitude. Testimonials cannot be authored as content files, validated against a schema, or loaded dynamically from the content collection.
 2. **No UI section for displaying testimonials.** The section catalog has no archetype for gratitude/testimonial cards. The `social-proof` section (cosmicName: Enceladus) uses paragraphs body kind — it cannot render structured quote cards with author metadata.
-3. **Closed ontology vocabularies (DNA-19) block ad-hoc extension.** Adding a new `semanticRole` requires a superseding RFC; without one, the section manifest cannot declare a valid role.
+3. **No archetype for gratitude cards.** The section catalog has no archetype with a `semanticRole` for client gratitude. A new archetype file is needed to register the semantic role and bind it to a cosmic name.
 
 ## Decision
 
-The PBP trust domain gains a new `client-testimonial` entity type, and the UI section catalog gains a new `gratitude-section` archetype (cosmicName: Prometheus, semanticRole: client-gratitude) that loads published client-testimonial entities from the business-profile content collection and renders them as glass-effect quote cards on the Nachweise page.
+The PBP trust domain gains a new `client-testimonial` entity type, and the UI section catalog gains a new `gratitude-section` archetype (cosmicName: Gonggong, semanticRole: client-gratitude) that loads published client-testimonial entities from the business-profile content collection and renders them as quote cards on the Nachweise page.
 
 ## Architectural fit
 
 - **DNA-5 (Mirror Quintet):** The new `gratitude-section` ships with all five artifacts: `.astro` component, `manifest.yaml`, content schema (via props.types.generate), `.css`, and content `.md` template.
-- **DNA-17 (Uni manifest contract):** The section manifest declares `id`, `cosmicName: Prometheus`, `layer: section`, `semanticId: client-gratitude`, `role`, `version`, `intent[]`, `industryFit[]`, and `contentSchemaKey`.
-- **DNA-19 (Closed ontology vocabularies):** This RFC extends the `SemanticRole` enum with `client-gratitude` — permitted only via superseding RFC.
-- **RFC-0706 / RFC-0708:** The `client-testimonial` entity follows the same PBP content collection pattern as `evidence-source` entities: frontmatter-validated, slug-keyed, locale-mirrored, loaded via `getCollection("business-profile")`.
+- **DNA-17 (Uni manifest contract):** The section manifest declares `id`, `cosmicName: Gonggong`, `layer: section`, `semanticId: client-gratitude`, `role`, `version`, `intent[]`, `industryFit[]`, and `contentSchemaKey`.
+- **RFC-0706 / RFC-0708:** The `client-testimonial` entity follows the same PBP content collection pattern as `evidence-source` entities: frontmatter-validated, id-keyed, locale-mirrored, loaded via `getCollection("business-profile")`.
+- **SemanticRole (RFC-0084):** `SemanticRole` is an open string type (`type SemanticRole = string`), with the archetype catalog as the authoritative source of valid values. Adding a new archetype with `semanticRole: client-gratitude` is the normal extension mechanism — no closed-vocabulary extension is needed.
 - **Scaling Playbook:** The section is opt-in per site via page block configuration (DNA-9). Sites without testimonials simply omit the block.
 
 ## Design
@@ -113,27 +111,31 @@ New Zod schema in `packages/werkstatt-site/src/domain/pbp/schemas/client-testimo
 ```ts
 export const clientTestimonialSchema = pbpEntitySchema.extend({
   type: z.literal("client-testimonial"),
-  slug: nonEmptyString,
   name: nonEmptyString,
   quote: nonEmptyString,
   authorName: nonEmptyString,
   authorRole: nonEmptyString.optional(),
   authorOrganization: nonEmptyString.optional(),
   evidenceRef: nonEmptyString.optional(),
-  status: z.enum(["published", "draft"]),
 }).strict();
 ```
 
-Registered in `packages/werkstatt-site/src/domain/pbp/schemas/index.ts` as `pbpSchemaById["client-testimonial"]`.
+The `status` field is inherited from `pbpEntitySchema` (`pbpEntityStatusSchema`: `draft`, `published`, `suspended`, `retired`, `superseded`) — no narrowing is needed. Testimonials follow the same lifecycle as other PBP entities.
 
-Content files live at `src/content/business-profile/{lang}/trust/testimonials/{slug}.md`.
+The `evidenceRef` field is an opaque string (an evidence-source entity ID). It is not validated as a hard reference — if the referenced evidence-source is deleted, the link renders as a broken anchor but does not crash the build.
+
+New TypeScript interface file at `packages/werkstatt-site/src/domain/pbp/entities/client-testimonial.ts` exports `PbpClientTestimonial` and `CLIENT_TESTIMONIAL_SCHEMA_ID` (following the pattern of `entities/evidence-source.ts`, `entities/claim.ts`).
+
+Registered in `packages/werkstatt-site/src/domain/pbp/schemas/index.ts` in both `pbpSchemaById` and the `pbpEntityDiscriminatedUnion` array (collection-level validation).
+
+Content files live at `src/content/business-profile/{lang}/trust/testimonials/{id}.md`.
 
 ### UI section: gratitude-section
 
 New section at `packages/werkstatt-site/src/domain/ui/sections/gratitude/`:
 
-- `gratitude-section.astro` — renders glass-effect quote cards in a 2-column grid
-- `gratitude-section.manifest.yaml` — cosmicName: Prometheus, semanticRole: client-gratitude
+- `gratitude-section.astro` — renders quote cards in a 2-column grid
+- `gratitude-section.manifest.yaml` — cosmicName: Gonggong, semanticRole: client-gratitude
 - `gratitude-section.css` — card styles using `--ds-*` tokens
 - `gratitude-section.types.generated.ts` — generated from manifest propsSchema
 
@@ -147,30 +149,55 @@ The section loads published `client-testimonial` entities via `getCollection("bu
 
 ### Ontology extension
 
-`packages/werkstatt-shared/src/ontology/cosmic/planet-catalog.ts` — `Prometheus` is already in PlanetCatalog (unused).
+`packages/werkstatt-shared/src/ontology/cosmic/planet-catalog.ts` — `Gonggong` is already in PlanetCatalog and unused by any existing section archetype.
 
-`packages/werkstatt-shared/src/ontology/enums.ts` — add `client-gratitude` to `SemanticRole` enum.
+`packages/werkstatt-site/src/domain/ontology/archetypes/sections/gratitude.yaml` — new archetype file with `semanticRole: client-gratitude`, `acceptedCosmicNames: [Gonggong]`.
 
-`packages/werkstatt-site/src/domain/ontology/archetypes/sections/gratitude.yaml` — new archetype file with `semanticRole: client-gratitude`, `acceptedCosmicNames: [Prometheus]`.
+`SemanticRole` is an open string type (RFC-0084) — no changes to `packages/werkstatt-shared/src/ontology/enums.ts` are needed. The new `client-gratitude` role is derived from the archetype's `semanticRole` field at registry build time.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
+| `packages/werkstatt-site/src/domain/pbp/entities/client-testimonial.ts` | New TypeScript interface and schema ID constant |
 | `packages/werkstatt-site/src/domain/pbp/schemas/client-testimonial.ts` | New Zod schema for client-testimonial entity |
-| `packages/werkstatt-site/src/domain/pbp/schemas/index.ts` | Register schema in pbpSchemaById |
+| `packages/werkstatt-site/src/domain/pbp/schemas/index.ts` | Register schema in `pbpSchemaById` and `pbpEntityDiscriminatedUnion` |
 | `packages/werkstatt-site/src/domain/ui/sections/gratitude/gratitude-section.astro` | New section component |
-| `packages/werkstatt-site/src/domain/ui/sections/gratitude/gratitude-section.manifest.yaml` | Section manifest |
+| `packages/werkstatt-site/src/domain/ui/sections/gratitude/gratitude-section.manifest.yaml` | Section manifest (cosmicName: Gonggong) |
 | `packages/werkstatt-site/src/domain/ui/sections/gratitude/gratitude-section.css` | Section styles |
-| `packages/werkstatt-shared/src/ontology/enums.ts` | Add client-gratitude to SemanticRole |
-| `packages/werkstatt-site/src/domain/ontology/archetypes/sections/gratitude.yaml` | New archetype definition |
-| `missions/*/workpiece/src/content/business-profile/{lang}/trust/testimonials/*.md` | Content entity files |
+| `packages/werkstatt-site/src/domain/ontology/archetypes/sections/gratitude.yaml` | New archetype definition (semanticRole: client-gratitude, acceptedCosmicNames: [Gonggong]) |
+| `missions/*/workpiece/src/content/business-profile/{lang}/trust/testimonials/{id}.md` | Content entity files |
 | `missions/*/workpiece/src/content/pages/{lang}/nachweise.md` | Add gratitude block after nachweis-intro |
+| `docs/requirements.xml` | Add client-testimonial entity and gratitude-section to PBP and UI ontology requirements |
+| `docs/technology.xml` | Add gratitude-section to section catalog technology inventory |
+
+## CLI surface
+
+```sh
+# Generate section type definitions
+pnpm exec werkstatt run props.types.generate --app warpgogol-com
+
+# Rebuild the uni registry (includes new archetype)
+pnpm exec werkstatt run uni.registry.build --app warpgogol-com
+
+# Validate PBP content (includes new client-testimonial entities)
+pnpm exec werkstatt run pbp.content.validate --app warpgogol-com
+```
+
+All commands are scope `app`, exit 0 on success, exit 1 on validation failure. No `--json` output is needed — these are codegen and validation commands with standard text output.
+
+## Failure modes
+
+- **PBP-SCHEMA-01:** `client-testimonial` entity fails Zod validation → `pbp.content.validate` emits error with field path. Fix: correct the frontmatter.
+- **COSMIC-NAME-DUPLICATE:** If `Gonggong` is already assigned to another section → `uni.registry.build` fails. Fix: select a different unused planet name.
+- **Empty collection:** If no published testimonials exist for the active locale → section is hidden (not rendered in DOM). No error is emitted.
+- **Missing locale:** If a testimonial exists in DE but not UK → section renders on `/de/nachweise`, hidden on `/uk/nachweise`. `mirroring.validate` emits a warning.
 
 ## Rollout
 
 - **Opt-in per site:** The gratitude section is added to a page via block configuration in `nachweise.md`. Sites without testimonials simply omit the block — no flag day.
-- **Content authoring:** Client-testimonial entities are created as `.md` files in `src/content/business-profile/{lang}/trust/testimonials/`. The `pbp.content.validate` command validates them against the new schema automatically.
+- **Empty state:** When zero published testimonials exist for the active locale, the section is not rendered at all (no DOM element, no placeholder). This is per-locale: if DE has 3 testimonials and UK has 0, the section is visible on `/de/nachweise` and hidden on `/uk/nachweise`.
+- **Content authoring:** Client-testimonial entities are created as `.md` files in `src/content/business-profile/{lang}/trust/testimonials/`. The `pbp.content.validate` command validates them against the new schema automatically. Content authoring (real client quotes) requires human authoring — agents MUST NOT fabricate testimonials.
 - **Generated files:** Run `props.types.generate` to generate `gratitude-section.types.generated.ts`. Run `uni.registry.build` to include the new section in the registry.
 - **No migration:** Existing sites are unaffected — no existing entity types or sections change.
 
@@ -184,24 +211,25 @@ The section loads published `client-testimonial` entities via `getCollection("bu
 
 ## Risks
 
-- **Ontology extension (DNA-19):** Adding `client-gratitude` to `SemanticRole` is a closed-vocabulary extension. Future removal or rename requires a superseding RFC. Risk is low — the role is narrowly scoped.
 - **Agent misinterpretation:** Agents might confuse `client-testimonial` with `evidence-source` and try to render testimonials on Nachweis detail pages. The RFC explicitly scopes testimonials to the Nachweise listing page only.
-- **Content maintenance:** Testimonials are locale-mirrored (DNA-11). Each testimonial must exist in all supported languages. The `mirroring.validate` command enforces this automatically.
+- **Content maintenance:** Testimonials are locale-mirrored (DNA-11). Each testimonial should exist in all supported languages. The `mirroring.validate` command enforces this automatically. Partial locale coverage is handled per-locale (section hidden for locales with zero testimonials).
 - **Performance:** The section loads all published testimonials via `getCollection`. For sites with many testimonials, this is O(n) at build time — acceptable for static generation.
+- **Anti-fabrication:** Agents MUST NOT fabricate client testimonials. Content authoring requires real quotes from real clients — this is a human-authored content task, not an agent task.
 
 ## Acceptance criteria
 
-- [ ] `client-testimonial` Zod schema defined in `packages/werkstatt-site/src/domain/pbp/schemas/client-testimonial.ts` and registered in `pbpSchemaById`
-- [ ] `gratitude-section.astro` component renders glass-effect quote cards with author metadata
-- [ ] `gratitude-section.manifest.yaml` declares cosmicName `Prometheus` and semanticRole `client-gratitude`
-- [ ] `client-gratitude` added to `SemanticRole` enum in `packages/werkstatt-shared/src/ontology/enums.ts`
-- [ ] `gratitude.yaml` archetype created in `packages/werkstatt-site/src/domain/ontology/archetypes/sections/`
-- [ ] `props.types.generate` produces `gratitude-section.types.generated.ts` without errors
-- [ ] `uni.registry.build` includes gratitude-section in the registry
+- [ ] `client-testimonial` Zod schema defined in `packages/werkstatt-site/src/domain/pbp/schemas/client-testimonial.ts` and registered in `pbpSchemaById` and `pbpEntityDiscriminatedUnion`
+- [ ] `PbpClientTestimonial` interface and `CLIENT_TESTIMONIAL_SCHEMA_ID` exported from `packages/werkstatt-site/src/domain/pbp/entities/client-testimonial.ts`
+- [ ] `gratitude-section.astro` component renders quote cards with author metadata (cards contain elements with class `gratitude-card`)
+- [ ] `gratitude-section.manifest.yaml` declares cosmicName `Gonggong` and semanticRole `client-gratitude`
+- [ ] `gratitude.yaml` archetype created in `packages/werkstatt-site/src/domain/ontology/archetypes/sections/` with `acceptedCosmicNames: [Gonggong]`
+- [ ] `props.types.generate --app warpgogol-com` produces `gratitude-section.types.generated.ts` without errors
+- [ ] `uni.registry.build --app warpgogol-com` includes gratitude-section in the registry
 - [ ] Gratitude block added to `nachweise.md` (DE + UK) after `nachweis-intro`, before `nachweis-attestation-list`
-- [ ] At least one `client-testimonial` content entity created per locale (DE + UK)
-- [ ] `/nachweise` page renders the gratitude section with testimonial cards on dev server
-- [ ] `rfc.validate` passes on this file before merging
+- [ ] At least one `client-testimonial` content entity created per locale (DE + UK) — **requires human authoring** (real client quotes, not agent-fabricated)
+- [ ] `/de/nachweise` page renders the gratitude section with testimonial cards on dev server
+- [ ] Section is hidden on `/uk/nachweise` when no UK testimonials exist (empty state)
+- [ ] `rfc.validate --id RFC-0900` passes on this file before merging
 
 ## Implementation notes for agents
 
@@ -211,4 +239,5 @@ The section loads published `client-testimonial` entities via `getCollection("bu
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0900 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - The `client-testimonial` entity is NOT an evidence-source. Agents MUST NOT render testimonials on Nachweis detail pages or mix them with evidence-source lists.
 - The `gratitude-section` loads entities via `getCollection("business-profile")` at build time — no client-side fetching.
-- Content files for testimonials MUST be placed in `src/content/business-profile/{lang}/trust/testimonials/{slug}.md`, not in the `evidence/` subdirectory.
+- Content files for testimonials MUST be placed in `src/content/business-profile/{lang}/trust/testimonials/{id}.md`, not in the `evidence/` subdirectory.
+- Agents MUST NOT fabricate client testimonials. Content authoring requires real quotes from real clients — this is a human-authored content task.
