@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-21
-updatedAt: 2026-08-21
+updatedAt: 2026-08-22
+enhancedAt: 2026-08-22
 implementedAt:
 closedAt:
 supersedes: []
@@ -22,7 +23,6 @@ supersededBy:
 amends: []
 amendedBy: []
 related:
-  - DNA-72
   - RFC-0026
   - RFC-0162
   - RFC-0206
@@ -54,6 +54,7 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/werkstatt-site"
+  - "@warpgogol/werkstatt-shared"
 successSignals:
   - "seo.meta-uniqueness.validate fails when two indexable pages share an identical <title> or meta description within one language"
   - "seo.anchor-text.validate fails on generic anchor text (\"click here\", \"hier klicken\", \"тут\") in rendered HTML"
@@ -94,12 +95,12 @@ The 2026-08-21 SEO audit confirmed that presence-level metadata enforcement is c
 
 ## Decision
 
-The workshop gains two post-build validators: `seo.meta-uniqueness.validate`, which fails when two indexable rendered pages in the same language share an identical `<title>` or meta description, and `seo.anchor-text.validate`, which fails when rendered internal links use generic anchor text from a built-in de/uk/en stop-list that sites may extend via `system.md`.
+The workshop gains two post-build validators: `seo.meta-uniqueness.validate`, which fails when two indexable rendered pages in the same language share an identical `<title>` or meta description, and `seo.anchor-text.validate`, which fails when rendered internal links use generic anchor text from a built-in de/uk stop-list that sites may extend via `system.md`.
 
 ## Architectural fit
 
-- **DNA-72 (validator config location)** — the anchor-text stop-list has built-in defaults in the validator; a site extends (not replaces) it via `system.md` `seo.anchorText.extraStopPhrases`.
 - **RFC-0026 / RFC-0162 (related)** — presence gates; this RFC adds the distinctiveness layer on top, reusing the same rendered-HTML scan infrastructure (`collectRenderedHtml`, noindex/redirect filtering) as `seo.meta.validate`.
+- **System manifest extension** — the `seo.anchorText.extraStopPhrases` extension point is a new typed optional field on `SystemManifest` in `@warpgogol/werkstatt-shared`, following the existing pattern of typed optional fields (`knowledge?`, `businessModel?`, `ui?`).
 - **Site OS operator model** — both commands are app-scoped postbuild validators in `SITES_CHECK_POSTBUILD_PIPELINE`, consistent with the existing SEO audit family (`05-seo-audit.ts` command table).
 
 ## Design
@@ -131,7 +132,7 @@ interface PageMeta {
 // system.md extension point (optional):
 interface SeoConfig {
   anchorText?: {
-    /** Added to the built-in de/uk/en stop-list. */
+    /** Added to the built-in de/uk stop-list. */
     extraStopPhrases?: Record<string, string[]>; // lang -> phrases
   };
 }
@@ -139,22 +140,28 @@ interface SeoConfig {
 // Built-in defaults (non-exhaustive example):
 // de: ["hier", "hier klicken", "mehr", "mehr erfahren", "link"]
 // uk: ["тут", "натисніть тут", "детальніше", "посилання"]
-// en: ["click here", "here", "read more", "link", "this page"]
+// en is omitted — no site in the fleet uses English as a content language.
+// Add en when an English-language site is onboarded; the system.md extension
+// point handles site-local needs in the meantime.
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-site/src/checks/audit/validators/` | Home of both new validators |
-| `packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts` | Registration |
+| `packages/werkstatt-site/src/checks/audit/validators/seo-meta-uniqueness.ts` | Uniqueness validator implementation |
+| `packages/werkstatt-site/src/checks/audit/validators/seo-anchor-text.ts` | Anchor-text validator implementation |
+| `packages/werkstatt-site/src/checks/audit-validators.ts` | Re-export barrel — export both new validator functions |
+| `packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts` | Command registration |
+| `packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts` | Pipeline wiring |
+| `packages/werkstatt-shared/src/content/system-manifest.ts` | Add `seo?` field to `SystemManifest` interface |
 | `dist/client/**/*.html` (workpiece) | Read-only scan target |
 | `src/content/system.md` (workpiece) | Optional `seo.anchorText.extraStopPhrases` extension |
 | Site content files | Never modified by the validators — diagnostics only |
 
 ### Output format
 
-Standard Diagnostic envelope. Rules:
+Standard Diagnostic envelope (`{ command, status, count, findings[], ... }`). When `--json` is passed, the kernel wraps the result in the standard command JSON shape (`{ commandName, data, exitCode, ok, summary }`). Rules:
 
 | Rule | Severity | Condition |
 | --- | --- | --- |
@@ -167,8 +174,11 @@ Each diagnostic names the colliding files (for uniqueness) or the file and ancho
 
 ### Failure modes
 
-- Error diagnostics exit 1 — error from day one (operator decision 2026-08-21). warpgogol-com content is greened inside this RFC's rollout (duplicate titles/descriptions rewritten, generic anchors replaced) before the validators join the pipeline as error.
+- `SEO-UNIQ-01`, `SEO-UNIQ-02`, and `SEO-ANCHOR-01` exit 1 — error from day one (operator decision 2026-08-21). `SEO-ANCHOR-02` is a warning (exit 0). warpgogol-com content is greened inside this RFC's rollout (duplicate titles/descriptions rewritten, generic anchors replaced) before the validators join the pipeline as error.
 - `noindex` pages, HTML redirect pages, and `.well-known` artifacts are excluded (same filters as `seo.meta.validate`) — utility pages may share boilerplate legitimately.
+- **Performance:** each validator independently calls `collectRenderedHtml(audit.distDirectory)`, reading all HTML files into memory. For warpgogol-com (~124 pages) this is acceptable. The double-scan cost is consistent with the existing SEO validator family pattern (`seo.meta.validate`, `seo.structured-data.validate`, `seo.domain.validate` each scan independently).
+- **Single-page sites:** uniqueness is trivially satisfied with one page — no collision is possible. The validator returns pass without special-casing.
+- **`lang` extraction chain:** prefer `<html lang>` attribute; fall back to route prefix (first path segment matching a supported locale); fall back to `i18n.default` from the system manifest. Root-level pages without a language prefix (e.g. `/impressum`) are assigned the manifest's default language.
 - Anchor matching is whole-text only: a descriptive sentence containing "hier" does not trigger SEO-ANCHOR-01; a link whose entire text is "hier" does.
 
 ## Rollout
@@ -194,11 +204,11 @@ Each diagnostic names the colliding files (for uniqueness) or the file and ancho
 ## Acceptance criteria
 
 - [ ] `seo.meta-uniqueness.validate` registered (app scope, postbuild) with SEO-UNIQ-01/02 (evidence: command table + handler)
-- [ ] `seo.anchor-text.validate` registered (app scope, postbuild) with SEO-ANCHOR-01/02 and built-in de/uk/en stop-lists (evidence: command table + handler)
+- [ ] `seo.anchor-text.validate` registered (app scope, postbuild) with SEO-ANCHOR-01/02 and built-in de/uk stop-lists (evidence: command table + handler)
 - [ ] `system.md` supports `seo.anchorText.extraStopPhrases` extension (evidence: system-manifest schema + test)
 - [ ] Both validators wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
 - [ ] Unit tests: same-language collision fails, translation pair does not collide, noindex excluded, whole-text anchor matching only (evidence: test file)
-- [ ] warpgogol-com content greened and passes both validators (evidence: probe run output)
+- [ ] warpgogol-com content greened and passes both validators — content decisions (rewriting duplicate titles, replacing generic anchors) are human authoring tasks, not mechanical agent edits (evidence: probe run output)
 - [ ] `AGENTS.md` updated where agent behavior rules changed
 - [ ] `rfc.validate` passes on this file before merging
 
