@@ -1,7 +1,7 @@
 ---
 id: RFC-0899
 title: "Workshop-level access protection for dev and alt subdomains"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
