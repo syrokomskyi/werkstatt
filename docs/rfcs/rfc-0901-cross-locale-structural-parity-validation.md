@@ -25,6 +25,9 @@ related:
   - RFC-0732
   - RFC-0734
   - RFC-0174
+  - RFC-0914
+dependsOn:
+  - RFC-0914
 satisfies:
   - DNA-11
 versionBump: minor
@@ -95,6 +98,8 @@ The kernel gains three commands that form a **translation parity contour**:
 
 - **DNA-11 (Language mirroring):** This RFC extends DNA-11 from file-level presence to structural-level parity. `mirroring.validate` answers "does the file exist?"; `translation.parity.validate` answers "does the file have the same structure?". Both are enforced; structural parity is a stricter superset of file presence.
 
+- **RFC-0914 (Mandatory semantic block IDs):** This RFC depends on RFC-0914. With mandatory block IDs, the parity validator matches blocks by `blockId` directly — no index-based fallback needed. RFC-0914 must be implemented before this RFC.
+
 - **RFC-0097 (per-page locale scoping):** Same mechanism — a page may declare `locales` in `system.md` to restrict which locales it must exist in. Structural parity respects this: a DE-only page is not checked for UK parity.
 
 - **RFC-0684 (Axiom suppression layer):** The suppression mechanism follows the same pattern as `axiom-suppressions.yaml` — ruleId + conditions + reason, stored in a YAML config file, validated by a companion command. The key difference: suppressions are per-workpiece (not workshop-level), because translation parity findings are content-specific, not infrastructure-specific.
@@ -112,9 +117,11 @@ The kernel gains three commands that form a **translation parity contour**:
 ```sh
 # Validate structural parity across locales
 pnpm exec werkstatt run translation.parity.validate --site warpgogol-com
+pnpm exec werkstatt run translation.parity.validate --site warpgogol-com --source-locale uk
 
 # Generate review manifest for unsuppressed findings
 pnpm exec werkstatt run translation.parity.review --site warpgogol-com
+pnpm exec werkstatt run translation.parity.review --site warpgogol-com --source-locale uk
 
 # Add a suppression record
 pnpm exec werkstatt run translation.parity.suppress --site warpgogol-com \
@@ -123,6 +130,8 @@ pnpm exec werkstatt run translation.parity.suppress --site warpgogol-com \
   --section "Haftung für Links" \
   --reason "DE has additional TMG §5 disclaimer not required under Ukrainian law"
 ```
+
+**`--source-locale` flag** (on `validate` and `review` only): Overrides the source locale for comparison. Defaults to `defaultLang` from `system.md`. Operators can set `--source-locale uk` when authoring in Ukrainian but `defaultLang = de` — the Ukrainian text is the source of truth, and the German translation is checked for structural parity against it. `suppress` does not accept `--source-locale` — suppression records are source-locale-independent.
 
 ### Content directories covered
 
@@ -162,15 +171,15 @@ Three hierarchical checks, applied per matched file pair. File-level presence is
 
 | Rule ID                  | What it checks                       | Level     |
 | ------------------------ | ------------------------------------ | --------- |
-| `PARITY-SECTION-COUNT`   | H2 section count matches             | file      |
-| `PARITY-PARAGRAPH-COUNT` | Paragraph count per section matches  | section   |
+| `PARITY-SECTION-COUNT`   | Block count matches                  | file      |
+| `PARITY-PARAGRAPH-COUNT` | Paragraph count per block matches    | block     |
 | `PARITY-SENTENCE-COUNT`  | Sentence count per paragraph matches | paragraph |
 
-**Section splitting:** Uses `splitMarkdownSections` from `@warpgogol/werkstatt-shared/share/semantic/extract` (already exists, level 2 = H2).
+**Block matching:** Uses `loadSemanticSiteModel` from `@warpgogol/werkstatt-site/content` to load the semantic page model per locale. Blocks are matched by `blockId` (language-neutral, mandatory per RFC-0914). Since RFC-0914 makes block IDs mandatory, no index-based fallback is needed — all blocks have explicit, stable IDs.
 
-**Paragraph counting:** A paragraph is a block of text separated by one or more blank lines within a section body.
+**Paragraph counting:** Uses `extractParagraphs` from `@warpgogol/werkstatt-shared/share/semantic/extract` on each block's body. A paragraph is a block of text separated by one or more blank lines.
 
-**Sentence splitting:** Locale-aware sentence boundary detection. Abbreviation lists per locale to avoid false splits. Abbreviation matching has priority over the general boundary rule — a known abbreviation never triggers a sentence break:
+**Sentence splitting:** Locale-aware sentence boundary detection via `splitSentences` (new function in `@warpgogol/werkstatt-shared/share/semantic/extract`). Abbreviation lists per locale to avoid false splits. Abbreviation matching has priority over the general boundary rule — a known abbreviation never triggers a sentence break:
 
 - `de`: `z.B.`, `etc.`, `Nr.`, `Abs.`, `§`, `S.`, `ca.`, `u.a.`, `vgl.`, `bspw.`
 - `uk`: `т.д.`, `т.п.`, `п.`, `ст.`, `див.`, `пор.`, `напр.`, `ім.`, `о.`
@@ -286,9 +295,10 @@ interface ParityValidateResult {
 | Path | Role |
 | --- | --- |
 | `src/content/{domain}/{lang}/*.md` | Scanned for structural parity |
-| `src/content/system.md` | Read for `pages[].locales` scoping (RFC-0097) |
+| `src/content/system.md` | Read for `pages[].locales` scoping (RFC-0097) and `defaultLang` |
 | `translation-parity.suppressions.yaml` (workpiece root) | Suppression records, git-tracked |
-| `packages/werkstatt-shared/src/share/semantic/extract.ts` | `splitMarkdownSections`, `extractParagraphs` — existing, reused; `splitSentences` — new function added here (natural extension of existing semantic extraction utilities) |
+| `packages/werkstatt-shared/src/share/semantic/extract.ts` | `extractParagraphs` — existing, reused; `splitSentences` — new function added here |
+| `packages/werkstatt-site/src/content/semantic-loader.ts` | `loadSemanticSiteModel` — existing, reused for block-level matching by `blockId` |
 | `packages/werkstatt-site/src/checks/translation-parity.ts` | New module: validate, review, suppress command handlers, suppression Zod schema (only consumer is this command — no cross-package export needed) |
 | `packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts` | Command registration for all three `translation.parity.*` commands |
 | `translation-parity-review.yaml` (workpiece root) | Review manifest written by `translation.parity.review` (generated, git-tracked) |
@@ -420,7 +430,7 @@ The following `docs/*.xml` files require synchronization during implementation:
 ## Acceptance criteria
 
 - [ ] `translation.parity.validate` command registered with `scope: app` in `packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts`
-- [ ] Detects H2 section count mismatches between locale variants
+- [ ] Detects block count mismatches between locale variants (using `loadSemanticSiteModel` + `blockId` matching per RFC-0914)
 - [ ] Detects paragraph count mismatches per section
 - [ ] Detects sentence count mismatches per paragraph
 - [ ] Legal documents (`impressum.md`, `datenschutz.md`, `agb.md`, `widerruf.md`, `barrierefreiheit.md`) produce error-severity diagnostics
@@ -434,7 +444,7 @@ The following `docs/*.xml` files require synchronization during implementation:
 - [ ] `--json` output format documented and stable
 - [ ] Each finding includes `sourceFile`, `targetFile`, `fixHint`, and `missingItems` for agent-actionable remediation
 - [ ] `sourceExcerpt` includes the source-locale text of missing sections/paragraphs so agents can translate without re-reading files
-- [ ] `translation.parity.suppress` accepts finding fields directly (`--file`, `--ruleId`, `--section`) so agents can suppress without manual YAML editing
+- [ ] `translation.parity.validate` and `translation.parity.review` accept `--source-locale` flag (default = `defaultLang` from `system.md`)
 - [ ] Each command handler returns `KernelCommandResult` with `exitCode` explicitly set on every return path, `summary` prefixed with `[command.name]`, and `nextSteps` non-empty on failure (DNA-82)
 - [ ] Unit tests cover: section count, paragraph count, sentence count, suppression matching, stale suppression detection, locale scoping, legal vs non-legal severity
 - [ ] `rfc.validate` passes on this file before merging
@@ -443,6 +453,7 @@ The following `docs/*.xml` files require synchronization during implementation:
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
+- Agents MUST NOT implement this RFC before RFC-0914 is implemented — mandatory block IDs are a prerequisite for block-level matching.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0901 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - The sentence-splitting abbreviation lists must be extensible without code changes — consider a config file or a constant map that operators can extend per-site.
