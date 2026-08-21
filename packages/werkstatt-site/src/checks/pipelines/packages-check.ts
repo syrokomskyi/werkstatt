@@ -185,6 +185,8 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "observability.mcp.validate" },
   // RFC-0364: semantic fingerprint governance — warning mode during migration.
   { command: "fingerprint.usage.lint", args: ["--mode", "warning"] },
+  // RFC-0916: canonical utility provenance governance — warning mode during migration.
+  { command: "utility.provenance.validate", args: ["--mode", "warning"] },
   // RFC-0364: validate fingerprint fixture pairs.
   { command: "fingerprint.fixtures.validate" },
   // RFC-0478: platform semantic hash drift guard and version bump enforcement.

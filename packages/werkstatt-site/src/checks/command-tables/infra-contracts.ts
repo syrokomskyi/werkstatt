@@ -33,6 +33,7 @@ import { runYamlContractLint } from "../yaml-contract-lint.ts";
 import { runYamlParseValidate } from "../yaml-parse-validate.ts";
 import { runCommandReadsValidate } from "../command-reads-validate.ts";
 import { runPlaywrightChromiumEnsure } from "../playwright-chromium-ensure.ts";
+import { runUtilityProvenanceValidate } from "../utility-provenance.ts";
 import { runPlaywrightPreflightCheck } from "../playwright-preflight.ts";
 import { runMethodologiesValidate } from "../methodologies-validate.ts";
 import { runSuppressionsValidate } from "../suppressions-validate.ts";
@@ -234,6 +235,22 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     },
     reads: ["packages/**/*.ts", "packages/**/*.tsx", "packages/fingerprint/allowlist.json"],
     execute: runFingerprintUsageLint,
+  },
+  {
+    name: "utility.provenance.validate",
+    description:
+      "Scan packages TS files for reimplemented canonical utilities outside their canonical paths (RFC-0916, DNA-88). " +
+      "Use --mode warning (default) or --mode fail.",
+    scope: "workspace",
+    flags: {
+      mode: {
+        kind: "string",
+        default: "warning",
+        description: "Diagnostic mode: warning or fail.",
+      },
+    },
+    reads: ["packages/**/*.ts", "packages/werkstatt-shared/src/share/utility-registry.yaml"],
+    execute: runUtilityProvenanceValidate,
   },
   {
     name: "fingerprint.fixtures.validate",

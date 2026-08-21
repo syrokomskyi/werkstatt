@@ -1,0 +1,27 @@
+utilities:
+  - id: slug
+    canonicalPath: packages/werkstatt-shared/src/share/slug/
+    forbiddenImports:
+      - "@sindresorhus/slugify"
+      - "cyrillic-to-translit-js"
+      - "github-slugger"
+    functionNames:
+      - slugify
+      - toSlug
+      - makeSlug
+      - createSlug
+      - slugUrl
+      - slugId
+    patterns:
+      - id: nkfd-diacritic-strip
+        regex: "\\.normalize\\(.{0,5}NFKD.{0,5}\\)\\.replace"
+        description: NFKD normalize + diacritic strip + non-alphanumeric replace (legacy custom slugify pattern)
+    allowlist:
+      - path: packages/werkstatt-shared/src/share/slug/
+        reason: Canonical slug module — owns all slug generation logic (RFC-0915, DNA-88)
+      - path: packages/werkstatt-shared/src/share/semantic/extract.ts
+        reason: CHANGE_SUMMARY comment references slugify removal — no function definition remains
+      - path: packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts
+        reason: Test file intentionally contains forbidden patterns to validate the provenance validator (RFC-0916)
+      - path: packages/werkstatt-site/src/checks/utility-provenance.ts
+        reason: Validator implementation references forbidden imports/function names in string literals for detection logic (RFC-0916)
