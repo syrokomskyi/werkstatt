@@ -11,12 +11,15 @@
 </CHANGE_SUMMARY>
 */
 
+import { join } from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
+import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
+import { buildAuditResult } from "../helpers.ts";
 import type { Diagnostic } from "../types.ts";
 import { defaultLanguageFromManifest } from "../../lib/i18n.ts";
 import {
@@ -33,7 +36,11 @@ interface InternalLink {
   isInNav: boolean;
 }
 
-function extractPageLanguage(routePath: string, defaultLanguage: string, supportedLanguages: string[]): string {
+function extractPageLanguage(
+  routePath: string,
+  defaultLanguage: string,
+  supportedLanguages: string[],
+): string {
   const segments = routePath.split("/").filter(Boolean);
   if (segments.length > 0 && supportedLanguages.includes(segments[0])) {
     return segments[0];
@@ -41,7 +48,11 @@ function extractPageLanguage(routePath: string, defaultLanguage: string, support
   return defaultLanguage;
 }
 
-function extractLinkLanguage(href: string, defaultLanguage: string, supportedLanguages: string[]): string | null {
+function extractLinkLanguage(
+  href: string,
+  defaultLanguage: string,
+  supportedLanguages: string[],
+): string | null {
   try {
     const url = new URL(href, "https://example.invalid");
     const segments = url.pathname.split("/").filter(Boolean);
@@ -83,7 +94,8 @@ function extractInternalLinks(html: string): InternalLink[] {
 
     const hasHreflang = /\bhreflang\s*=/i.test(fullTag);
 
-    const isInNav = /<nav[\s>]/i.test(html.slice(0, linkRe.lastIndex)) &&
+    const isInNav =
+      /<nav[\s>]/i.test(html.slice(0, linkRe.lastIndex)) &&
       /<\/nav>/i.test(html.slice(linkRe.lastIndex));
 
     links.push({ href, hasHreflang, isInNav });
@@ -94,9 +106,12 @@ function extractInternalLinks(html: string): InternalLink[] {
 
 function getSupportedLanguages(manifest: Record<string, unknown>): string[] {
   const i18n = (manifest.i18n ?? {}) as Record<string, unknown>;
-  const languages = i18n.languages;
-  if (Array.isArray(languages)) {
-    return languages.map((l) => String(l));
+  const supported = i18n.supported;
+  if (supported && typeof supported === "object" && !Array.isArray(supported)) {
+    return Object.keys(supported as Record<string, unknown>);
+  }
+  if (Array.isArray(supported)) {
+    return supported.map((l) => String(l));
   }
   const defaultLang = defaultLanguageFromManifest(manifest);
   return defaultLang ? [defaultLang] : [];
@@ -107,15 +122,18 @@ export async function runSeoCrossLangLinksValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const started = Date.now();
-  const audit = await loadAuditAppContext(context);
+  const paths = requireAstroSitePaths(context);
+  const distDir = join(paths.appDirectory, "dist", "client");
+  const siteName = context.site!.name;
+  const { manifest: systemManifest } = await loadSystemManifest(paths.contentDirectory);
   const findings: Diagnostic[] = [];
 
-  const htmlFiles = await collectRenderedHtml(audit.distDirectory);
+  const htmlFiles = await collectRenderedHtml(distDir);
   if (htmlFiles.length === 0) {
     const result = buildAuditResult({
       command: "seo.cross-lang-links.validate",
-      app: audit.siteName,
-      workspaceRoot: audit.workspaceRoot,
+      app: siteName,
+      workspaceRoot: context.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
     });
@@ -126,14 +144,15 @@ export async function runSeoCrossLangLinksValidate(
     };
   }
 
-  const defaultLanguage = defaultLanguageFromManifest(audit.systemManifest);
-  const supportedLanguages = getSupportedLanguages(audit.systemManifest);
+  const manifest = systemManifest as unknown as Record<string, unknown>;
+  const defaultLanguage = defaultLanguageFromManifest(manifest);
+  const supportedLanguages = getSupportedLanguages(manifest);
 
   if (supportedLanguages.length <= 1) {
     const result = buildAuditResult({
       command: "seo.cross-lang-links.validate",
-      app: audit.siteName,
-      workspaceRoot: audit.workspaceRoot,
+      app: siteName,
+      workspaceRoot: context.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
     });
@@ -149,7 +168,7 @@ export async function runSeoCrossLangLinksValidate(
       continue;
     }
 
-    const routePath = getRoutePathForHtml(audit.distDirectory, page.file, page.html);
+    const routePath = getRoutePathForHtml(distDir, page.file, page.html);
     const pageLanguage = extractPageLanguage(routePath, defaultLanguage, supportedLanguages);
 
     const links = extractInternalLinks(page.html);
@@ -184,8 +203,8 @@ export async function runSeoCrossLangLinksValidate(
 
   const result = buildAuditResult({
     command: "seo.cross-lang-links.validate",
-    app: audit.siteName,
-    workspaceRoot: audit.workspaceRoot,
+    app: siteName,
+    workspaceRoot: context.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });

@@ -11,12 +11,15 @@
 </CHANGE_SUMMARY>
 */
 
+import { join } from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
+import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
+import { buildAuditResult } from "../helpers.ts";
 import type { Diagnostic } from "../types.ts";
 import { readAstroSiteUrl } from "../../lib/astro-site-url.ts";
 import {
@@ -39,7 +42,8 @@ function extractOrigin(url: string): string | null {
 
 function extractAllHreflangHrefs(html: string): string[] {
   const hrefs: string[] = [];
-  const re = /<link[^>]+rel=["']alternate["'][^>]+hreflang=["'][^"']*["'][^>]+href=["']([^"']+)["']/gi;
+  const re =
+    /<link[^>]+rel=["']alternate["'][^>]+hreflang=["'][^"']*["'][^>]+href=["']([^"']+)["']/gi;
   let match: RegExpExecArray | null;
   while ((match = re.exec(html)) !== null) {
     hrefs.push(match[1]);
@@ -68,15 +72,17 @@ export async function runSeoDomainValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const started = Date.now();
-  const audit = await loadAuditAppContext(context);
+  const paths = requireAstroSitePaths(context);
+  const distDir = join(paths.appDirectory, "dist", "client");
+  const siteName = context.site!.name;
   const findings: Diagnostic[] = [];
 
-  const htmlFiles = await collectRenderedHtml(audit.distDirectory);
+  const htmlFiles = await collectRenderedHtml(distDir);
   if (htmlFiles.length === 0) {
     const result = buildAuditResult({
       command: "seo.domain.validate",
-      app: audit.siteName,
-      workspaceRoot: audit.workspaceRoot,
+      app: siteName,
+      workspaceRoot: context.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
     });
@@ -87,7 +93,7 @@ export async function runSeoDomainValidate(
     };
   }
 
-  const siteUrl = await readAstroSiteUrl(audit.appDirectory);
+  const siteUrl = await readAstroSiteUrl(paths.appDirectory);
   const expectedOrigin = siteUrl ? extractOrigin(siteUrl) : null;
 
   if (!expectedOrigin) {
@@ -95,9 +101,8 @@ export async function runSeoDomainValidate(
       finding({
         ruleId: "SEO-DOMAIN-CONFIG-01",
         severity: "warning",
-        file: undefined,
-        message: "Astro.site is not configured — SEO-DOMAIN-01 through SEO-DOMAIN-04 are skipped. Only SEO-DOMAIN-05 (dev/staging pattern check) runs.",
-        evidence: [{ kind: "config", file: "astro.config.mjs" }],
+        message:
+          "Astro.site is not configured — SEO-DOMAIN-01 through SEO-DOMAIN-04 are skipped. Only SEO-DOMAIN-05 (dev/staging pattern check) runs.",
       }),
     );
   }
@@ -199,8 +204,8 @@ export async function runSeoDomainValidate(
 
   const result = buildAuditResult({
     command: "seo.domain.validate",
-    app: audit.siteName,
-    workspaceRoot: audit.workspaceRoot,
+    app: siteName,
+    workspaceRoot: context.workspaceRoot,
     findings,
     runtimeMs: Date.now() - started,
   });
