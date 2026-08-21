@@ -876,6 +876,17 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/werkstatt/src/integrity/integrity-commands.ts",
     conditional: true,
   },
+
+  // block.id.generate — RFC-0914: one-time migration command that backfills
+  // missing blocks[].id in existing page content files. Not a codegen generator;
+  // conditional: true skips absence checks (no new file is created).
+  {
+    path: "src/content/pages/**/*.md",
+    command: "block.id.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/block-id-generate.ts",
+    conditional: true,
+  },
 ];
 
 // ---------------------------------------------------------------------------
