@@ -58,7 +58,44 @@ const HELPER_RETURN_PATTERN = new RegExp(
   `return\\s+(?:await\\s+)?(${[...HELPER_FUNCTIONS].join("|")})\\s*\\(`,
 );
 
-const COMMAND_RESULT_KEY_PATTERN = /\b(?:exitCode|summary)\s*:/;
+function hasCommandResultKeys(returnText: string): boolean {
+  let depth = 0;
+  let inString: string | null = null;
+  for (let i = 0; i < returnText.length; i++) {
+    const ch = returnText[i];
+    if (inString) {
+      if (ch === "\\") {
+        i++;
+        continue;
+      }
+      if (ch === inString) inString = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") {
+      inString = ch;
+      continue;
+    }
+    if (ch === "{") depth++;
+    if (ch === "}") depth--;
+    if (depth === 1 && ch === ":") {
+      let j = i - 1;
+      while (j >= 0 && /\s/.test(returnText[j])) j--;
+      const keyEnd = j + 1;
+      if (j >= 0 && (returnText[j] === '"' || returnText[j] === "'")) {
+        const quote = returnText[j];
+        j--;
+        while (j >= 0 && returnText[j] !== quote) j--;
+        const key = returnText.slice(j + 1, keyEnd - 1);
+        if (key === "exitCode" || key === "summary") return true;
+        continue;
+      }
+      while (j >= 0 && /[\w$-]/.test(returnText[j])) j--;
+      const key = returnText.slice(j + 1, keyEnd);
+      if (key === "exitCode" || key === "summary") return true;
+    }
+  }
+  return false;
+}
 
 function shouldExcludeFile(fileName: string): boolean {
   return EXCLUDE_SUFFIXES.some((suffix) => fileName.endsWith(suffix));
@@ -143,7 +180,7 @@ function analyzeReturnObject(
     };
   }
 
-  if (!COMMAND_RESULT_KEY_PATTERN.test(returnText)) {
+  if (!hasCommandResultKeys(returnText)) {
     return {
       exitCodePresent: true,
       exitCodeValue: null,
