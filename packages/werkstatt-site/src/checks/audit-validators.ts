@@ -22,3 +22,5 @@ export { runAnalyticsConfigValidate } from "./audit/validators/analytics-config.
 export { runFirstPartyDataValidate } from "./audit/validators/first-party-data.ts";
 export { runInfraBriefValidate } from "./audit/validators/infra-brief.ts";
 export { runWikidataValidate } from "./audit/validators/wikidata.ts";
+export { runSeoDomainValidate } from "./audit/validators/seo-domain.ts";
+export { runSeoCrossLangLinksValidate } from "./audit/validators/seo-cross-lang-links.ts";

@@ -72,7 +72,7 @@ const currencies = await loadTargetCurrencies(`${process.cwd()}/src/content/busi
 const data = await resolvePageRoute({
   lang: lang!,
   slug: slug ?? "",
-  siteUrl: Astro.site?.toString() ?? Astro.url.origin,
+  siteUrl: Astro.site?.toString(),
   buildSemanticModel: async ({ pageId, semanticType, lang, url, fallbackFrontmatter, breadcrumbs, collectionItems, surfaceId, depth }) => {
     const profile = await buildPbpSemanticProfile(
       lang,
@@ -120,6 +120,7 @@ const contentBlocks = sectionBlocks.filter((b) => b.planetName !== "Thebe");
   biome={data.biome}
   alternateLinks={data.alternateLinks}
   semanticPage={data.semanticPage ?? undefined}
+  canonicalUrl={data.semanticPage?.url}
   skipLinkLabel={data.skipLinkLabel}
   globalStylesheetUrl={globalStylesheetUrl}
   orchestratorConfig={data.orchestratorConfig}

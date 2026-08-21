@@ -24,6 +24,8 @@ import {
   runFirstPartyDataValidate,
   runInfraBriefValidate,
   runWikidataValidate,
+  runSeoDomainValidate,
+  runSeoCrossLangLinksValidate,
 } from "../audit-validators.ts";
 import { runAuditLlm } from "../audit-llm.ts";
 import { runAppQaValidate } from "../app-qa.ts";
@@ -230,6 +232,26 @@ export const SEO_AUDIT_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runLighthouseBudgetCheck,
+  },
+  {
+    name: "seo.domain.validate",
+    description:
+      "RFC-0898: Validate canonical, og:url, hreflang, and JSON-LD url origins against Astro.site; detect dev/staging hostname leakage (SEO-DOMAIN-01..05).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html", "<app>/astro.config.mjs"],
+    execute: runSeoDomainValidate,
+  },
+  {
+    name: "seo.cross-lang-links.validate",
+    description:
+      "RFC-0898: Validate internal links do not cross language boundaries without hreflang (SEO-XLANG-01).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html", "<app>/src/content/system.md"],
+    execute: runSeoCrossLangLinksValidate,
   },
   {
     name: "mobile.layout.check",
