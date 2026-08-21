@@ -53,7 +53,22 @@ export function extractParagraphs(markdown: string): string[] {
 }
 
 const SENTENCE_ABBREVIATIONS: Record<string, string[]> = {
-  de: ["z.B.", "etc.", "Nr.", "Abs.", "§", "S.", "ca.", "u.a.", "vgl.", "bspw."],
+  de: [
+    "z.B.",
+    "z. B.",
+    "z.",
+    "etc.",
+    "Nr.",
+    "Abs.",
+    "§",
+    "S.",
+    "ca.",
+    "u.a.",
+    "u. a.",
+    "u.",
+    "vgl.",
+    "bspw.",
+  ],
   uk: ["т.д.", "т.п.", "п.", "ст.", "див.", "пор.", "напр.", "ім.", "о."],
   en: ["e.g.", "i.e.", "etc.", "vs.", "Mr.", "Mrs.", "Dr.", "Inc.", "Ltd."],
 };
@@ -65,7 +80,7 @@ function escapeRegex(text: string): string {
 function buildAbbreviationPattern(abbreviations: string[]): RegExp | undefined {
   if (abbreviations.length === 0) return undefined;
   const sorted = [...abbreviations].sort((a, b) => b.length - a.length);
-  return new RegExp(`(${sorted.map(escapeRegex).join("|")})$`);
+  return new RegExp(`(?:^|[^a-zA-Zа-яА-ЯёЁїЇіІєЄäöüÄÖÜß])(${sorted.map(escapeRegex).join("|")})$`);
 }
 
 export function splitSentences(text: string, locale: string = "en"): string[] {
@@ -74,7 +89,6 @@ export function splitSentences(text: string, locale: string = "en"): string[] {
 
   const abbreviations = SENTENCE_ABBREVIATIONS[locale] ?? SENTENCE_ABBREVIATIONS.en;
   const abbrevPattern = buildAbbreviationPattern(abbreviations);
-  const isCyrillicLocale = locale === "uk";
 
   const sentences: string[] = [];
   let current = "";
@@ -99,13 +113,19 @@ export function splitSentences(text: string, locale: string = "en"): string[] {
 
     if (abbrevPattern && abbrevPattern.test(beforeAbbrCheck)) continue;
 
-    if (!isCyrillicLocale) {
-      const afterWhitespace = chars
-        .slice(i + 1)
-        .join("")
-        .match(/^\s*([A-ZА-ЯЁЇІЄ])/);
-      if (!afterWhitespace) continue;
-    }
+    // Skip numbered list markers (e.g., "1. ", "2. ") — a period after
+    // digits is a list marker, not a sentence boundary. After normalizeWhitespace
+    // newlines are spaces, so we check the token before the period.
+    const beforePeriod = current.slice(0, -1);
+    const lastSpaceIdx = Math.max(beforePeriod.lastIndexOf(" "), beforePeriod.lastIndexOf("\n"));
+    const tokenBeforePeriod = beforePeriod.slice(lastSpaceIdx + 1).trim();
+    if (/^\d+$/.test(tokenBeforePeriod)) continue;
+
+    const afterWhitespace = chars
+      .slice(i + 1)
+      .join("")
+      .match(/^\s*([A-ZÄÖÜА-ЯЁЇІЄ])/);
+    if (!afterWhitespace) continue;
 
     sentences.push(current.trim());
     current = "";

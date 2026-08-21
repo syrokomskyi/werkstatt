@@ -329,17 +329,18 @@ function compareSections(
   severity: "error" | "warning",
 ): ParityFinding[] {
   const findings: ParityFinding[] = [];
-  const sourceMap = new Map(sourceSections.map((s) => [s.id, s]));
-  const targetMap = new Map(targetSections.map((s) => [s.id, s]));
 
-  // Section count mismatch — find missing sections
-  const missingSections = sourceSections.filter((s) => !targetMap.has(s.id));
-  const extraSections = targetSections.filter((s) => !sourceMap.has(s.id));
+  // Section count mismatch — compare by position, not by heading slug
+  // (translated headings produce different slugIds, so ID matching would
+  // report all sections as missing even when the structure is identical)
+  if (sourceSections.length !== targetSections.length) {
+    const missingCount = sourceSections.length - targetSections.length;
+    const missingSections = missingCount > 0 ? sourceSections.slice(targetSections.length) : [];
+    const extraSections = missingCount < 0 ? targetSections.slice(sourceSections.length) : [];
 
-  if (missingSections.length > 0 || extraSections.length > 0) {
     const missingItems: MissingItem[] = missingSections.map((s, i) => ({
       type: "section" as const,
-      index: sourceSections.indexOf(s),
+      index: targetSections.length + i,
       heading: s.heading || undefined,
       sourceText: s.heading ? `## ${s.heading}\n\n${s.body}` : s.body,
     }));
@@ -350,12 +351,12 @@ function compareSections(
       .map((h) => `'${h}'`);
 
     const message =
-      missingSections.length > 0
+      missingCount > 0
         ? `${fileRel}: section count mismatch (${sourceLocale}=${sourceSections.length}, ${targetLocale}=${targetSections.length})`
         : `${fileRel}: target has ${extraSections.length} extra section(s) not in source`;
 
     const fixHint =
-      missingSections.length > 0
+      missingCount > 0
         ? `Translate ${missingSections.length} missing section(s) from ${sourceLocale} to ${targetLocale}: ${missingHeadings.join(", ")}. Add them to the target file.`
         : `Remove ${extraSections.length} extra section(s) from ${targetLocale} file or add them to ${sourceLocale} file.`;
 
@@ -377,21 +378,21 @@ function compareSections(
     return findings;
   }
 
-  // Sections match — check paragraph count per section
-  for (const sourceSection of sourceSections) {
-    const targetSection = targetMap.get(sourceSection.id);
-    if (!targetSection) continue;
+  // Sections match by count — compare paragraph/sentence counts per section by position
+  for (let i = 0; i < sourceSections.length; i++) {
+    const sourceSection = sourceSections[i];
+    const targetSection = targetSections[i];
 
     const sourceParagraphs = extractParagraphs(sourceSection.body);
     const targetParagraphs = extractParagraphs(targetSection.body);
 
     if (sourceParagraphs.length !== targetParagraphs.length) {
-      const missingCount = sourceParagraphs.length - targetParagraphs.length;
+      const missingParaCount = sourceParagraphs.length - targetParagraphs.length;
       const missingItems: MissingItem[] =
-        missingCount > 0
-          ? sourceParagraphs.slice(targetParagraphs.length).map((p, i) => ({
+        missingParaCount > 0
+          ? sourceParagraphs.slice(targetParagraphs.length).map((p, j) => ({
               type: "paragraph" as const,
-              index: targetParagraphs.length + i,
+              index: targetParagraphs.length + j,
               heading: sourceSection.heading || undefined,
               sourceText: p,
             }))
@@ -410,11 +411,11 @@ function compareSections(
         severity,
         message: `${fileRel}: paragraph count mismatch in section "${sourceSection.heading}" (${sourceLocale}=${sourceParagraphs.length}, ${targetLocale}=${targetParagraphs.length})`,
         fixHint:
-          missingCount > 0
-            ? `Add ${missingCount} missing paragraph(s) to section "${sourceSection.heading}" in ${targetLocale} locale.`
-            : `Remove ${Math.abs(missingCount)} extra paragraph(s) from section "${sourceSection.heading}" in ${targetLocale} locale.`,
+          missingParaCount > 0
+            ? `Add ${missingParaCount} missing paragraph(s) to section "${sourceSection.heading}" in ${targetLocale} locale.`
+            : `Remove ${Math.abs(missingParaCount)} extra paragraph(s) from section "${sourceSection.heading}" in ${targetLocale} locale.`,
         sourceExcerpt:
-          missingCount > 0
+          missingParaCount > 0
             ? sourceParagraphs.slice(targetParagraphs.length).join("\n\n")
             : undefined,
         missingItems,
@@ -428,12 +429,12 @@ function compareSections(
       const targetSentences = splitSentences(targetParagraphs[p], targetLocale);
 
       if (sourceSentences.length !== targetSentences.length) {
-        const missingCount = sourceSentences.length - targetSentences.length;
+        const missingSentCount = sourceSentences.length - targetSentences.length;
         const missingItems: MissingItem[] =
-          missingCount > 0
-            ? sourceSentences.slice(targetSentences.length).map((s, i) => ({
+          missingSentCount > 0
+            ? sourceSentences.slice(targetSentences.length).map((s, j) => ({
                 type: "sentence" as const,
-                index: targetSentences.length + i,
+                index: targetSentences.length + j,
                 heading: sourceSection.heading || undefined,
                 sourceText: s,
               }))
@@ -452,11 +453,13 @@ function compareSections(
           severity,
           message: `${fileRel}: sentence count mismatch in section "${sourceSection.heading}" paragraph ${p + 1} (${sourceLocale}=${sourceSentences.length}, ${targetLocale}=${targetSentences.length})`,
           fixHint:
-            missingCount > 0
-              ? `Add ${missingCount} missing sentence(s) to section "${sourceSection.heading}" paragraph ${p + 1} in ${targetLocale} locale.`
-              : `Remove ${Math.abs(missingCount)} extra sentence(s) from section "${sourceSection.heading}" paragraph ${p + 1} in ${targetLocale} locale.`,
+            missingSentCount > 0
+              ? `Add ${missingSentCount} missing sentence(s) to section "${sourceSection.heading}" paragraph ${p + 1} in ${targetLocale} locale.`
+              : `Remove ${Math.abs(missingSentCount)} extra sentence(s) from section "${sourceSection.heading}" paragraph ${p + 1} in ${targetLocale} locale.`,
           sourceExcerpt:
-            missingCount > 0 ? sourceSentences.slice(targetSentences.length).join(" ") : undefined,
+            missingSentCount > 0
+              ? sourceSentences.slice(targetSentences.length).join(" ")
+              : undefined,
           missingItems,
         });
       }
