@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -91,7 +92,7 @@ After the merge, `commitCacheCloneIfDirty` runs `git add -A` (via `commitDirIfDi
 
 ### Guard 1: Reconcile-freshness gate in `mission.close`
 
-Add a SHA comparison check in `mission.close` after the `reconciledAt` existence check and before the state transition. The check compares the current workpiece HEAD against the `commitSha` recorded in `evidence/reconciliation-report.json` (written by `mission.reconcile`).
+Add a SHA comparison check in `mission.close` after the `reconciledAt` existence check and before the state transition. The check compares the current workpiece HEAD against the `workpieceHeadAtReconcile` field recorded in `evidence/reconciliation-report.json` (written by `mission.reconcile`). The existing `commitSha` field is the cache clone HEAD after merge — it will never equal the workpiece HEAD because the cache clone has a merge commit (`git merge --no-ff`) and may have additional bordbuch/config commits. The new `workpieceHeadAtReconcile` field records the workpiece HEAD at the moment reconcile completed, enabling an exact apples-to-apples comparison.
 
 If the workpiece HEAD differs from the reconciled SHA, `mission.close` blocks with a clear error:
 
@@ -104,7 +105,7 @@ Run mission.reconcile --mission warpgogol-m000082 to transfer them to the cache 
 then re-run mission.close.
 ```
 
-The guard is placed after `commitWorkpieceIfDirty` (so dirty workpieces are auto-committed first) and after `countOperatorCommits` (so zero-commit missions still pass with `--allow-no-op`). It reads `evidence/reconciliation-report.json` — if the report is missing or unreadable, the guard falls back to comparing `manifest.reconciledAt` timestamp against the workpiece's last commit timestamp.
+The guard is placed after `commitWorkpieceIfDirty` (so dirty workpieces are auto-committed first) and after `countOperatorCommits` (so zero-commit missions still pass with `--allow-no-op`). It reads `evidence/reconciliation-report.json` — if the report is missing or unreadable, the guard **blocks close** (fail-closed). A missing report means the reconciliation evidence is unavailable, and the guard cannot verify freshness. The operator must re-run `mission.reconcile` to regenerate the report. This is safer than fail-open, which would silently allow close with potentially unreconciled commits.
 
 An escape hatch `--skip-reconcile-check` is provided for edge cases (e.g., operator knows the workpiece was manually synced), but it emits a bordbuch audit entry and a warning.
 
@@ -114,25 +115,27 @@ After the `git merge --no-ff FETCH_HEAD` in `mission.reconcile`, if the merge mo
 
 The restoration logic:
 
-1. Before the merge, read the current cache-clone `.gitignore` and extract the cache-clone-only section (everything after a sentinel comment `# CACHE-CLONE-ONLY — do not remove`).
-2. After the merge, check if `.gitignore` was modified by the merge.
-3. If yes, re-append the cache-clone-only section to the merged `.gitignore`.
-4. `git add .gitignore` so the next commit includes the restoration.
+1. After the merge, check if `.gitignore` contains the sentinel comment `# CACHE-CLONE-ONLY — do not remove`.
+2. If the sentinel is missing (the merge overwrote `.gitignore` with the workpiece version), re-append the cache-clone-only patterns (sourced from the exported `FORBIDDEN_PATTERNS` constant in `sternsystem-validate.ts` plus the generated-file patterns) to the merged `.gitignore`.
+3. `git add .gitignore` so the next commit includes the restoration.
 
-The sentinel comment makes the restoration idempotent: if the section already exists (e.g., from a previous restore), it is not duplicated.
+The sentinel comment makes the restoration idempotent: if the section already exists (e.g., from a previous restore or if the merge did not modify `.gitignore`), it is not duplicated.
 
 After the `.gitignore` is restored, run `git rm --cached` on any forbidden/generated files that were re-tracked by the merge's `git add -A`. This is a targeted cleanup, not a blanket `git add -A` — only files matching the cache-clone-only patterns are untracked.
 
 ### What changes in each command
 
 **`mission.close`** (`mission-close.ts`):
-- New check after `commitWorkpieceIfDirty` and `countOperatorCommits`: read `evidence/reconciliation-report.json`, compare `commitSha` against workpiece HEAD.
+
+- New check after `commitWorkpieceIfDirty` and `countOperatorCommits`: read `evidence/reconciliation-report.json`, compare `workpieceHeadAtReconcile` against current workpiece HEAD.
 - New `--skip-reconcile-check` flag (escape hatch with bordbuch audit).
 - `CloseReportReconcile` gains `freshnessChecked: boolean` and `unreconciledCommits: number` fields.
 
 **`mission.reconcile`** (`mission-materialization-commands.ts`):
+
 - After `git merge --no-ff FETCH_HEAD`, call `restoreCacheCloneGitignore(systemDir)` to re-append cache-clone-only `.gitignore` patterns.
 - After restoration, call `untrackForbiddenGeneratedFiles(systemDir)` to `git rm --cached` any files that were re-tracked by the merge.
+- Record `workpieceHeadAtReconcile` (workpiece HEAD at reconcile time) in `evidence/reconciliation-report.json` for the freshness gate in `mission.close`.
 - Both operations are logged and included in the reconciliation report.
 
 ## Architectural fit
@@ -155,26 +158,40 @@ const skipReconcileCheck = flagBoolean(input, "skip-reconcile-check");
 
 if (!skipReconcileCheck) {
   const reconcileReportPath = path.join(evidenceDir, "reconciliation-report.json");
-  let reconciledSha: string | null = null;
+  let reconciledWorkpieceSha: string | null = null;
   try {
-    const report = JSON.parse(await fs.readFile(reconcilePath, "utf8"));
-    reconciledSha = report.commitSha ?? null;
+    const report = JSON.parse(await fs.readFile(reconcileReportPath, "utf8"));
+    reconciledWorkpieceSha = report.workpieceHeadAtReconcile ?? null;
   } catch {
-    // Report missing — fall back to timestamp comparison
+    // Report missing or unreadable — fail-closed
+    throw new Error(
+      `[mission.close] mission '${missionId}' reconciliation report not found or unreadable.\n` +
+      `Cannot verify reconcile freshness — re-run mission.reconcile --mission ${missionId}\n` +
+      `to regenerate the report, then re-run mission.close.\n` +
+      `If you are certain the workpiece is already synced, re-run with --skip-reconcile-check.`
+    );
+  }
+
+  if (!reconciledWorkpieceSha) {
+    throw new Error(
+      `[mission.close] mission '${missionId}' reconciliation report missing workpieceHeadAtReconcile field.\n` +
+      `Re-run mission.reconcile --mission ${missionId} to regenerate the report.\n` +
+      `If you are certain the workpiece is already synced, re-run with --skip-reconcile-check.`
+    );
   }
 
   const workpieceHead = gitExec(workpieceDir, "rev-parse HEAD");
-  
-  if (reconciledSha && workpieceHead !== reconciledSha) {
+
+  if (workpieceHead !== reconciledWorkpieceSha) {
     // Count unreconciled commits
     const count = parseInt(
-      gitExec(workpieceDir, `rev-list --count ${reconciledSha}..${workpieceHead}`),
+      gitExec(workpieceDir, `rev-list --count ${reconciledWorkpieceSha}..${workpieceHead}`),
       10,
     );
     throw new Error(
       `[mission.close] mission '${missionId}' has ${count} unreconciled commit(s) —\n` +
       `  workpiece HEAD:    ${workpieceHead.slice(0, 12)}\n` +
-      `  reconciled SHA:    ${reconciledSha.slice(0, 12)}\n` +
+      `  reconciled SHA:    ${reconciledWorkpieceSha.slice(0, 12)}\n` +
       `Run mission.reconcile --mission ${missionId} to transfer them to the cache clone,\n` +
       `then re-run mission.close.\n` +
       `If you are certain the workpiece is already synced, re-run with --skip-reconcile-check.`
@@ -185,16 +202,18 @@ if (!skipReconcileCheck) {
 
 ### Cache-clone `.gitignore` preservation (mission-materialization-commands.ts)
 
+````ts
 ```ts
+// Reuse the forbidden-file list from sternsystem-validate.ts (single source of truth)
+import { FORBIDDEN_PATTERNS } from "../sternsystem/sternsystem-validate.ts";
+
 const CACHE_CLONE_GITIGNORE_SENTINEL = "# CACHE-CLONE-ONLY — do not remove";
-const CACHE_CLONE_ONLY_PATTERNS = [
-  "# Forbidden files — not git content in cache clones (RFC-0903)",
-  "package.json",
-  "astro.config.mjs",
-  "tsconfig.json",
-  "wrangler.jsonc",
-  "",
-  "# Generated files — regenerated on every build, not git content",
+
+// Generated files — regenerated on every build, not git content in cache clones.
+// These are NOT in FORBIDDEN_PATTERNS (which is basename-based) because they are
+// path-specific. Keep in sync with COMMITTED_MANIFEST_PATHS exclusions in
+// sternsystem-validate.ts.
+const CACHE_CLONE_GENERATED_PATTERNS = [
   "behavior.snapshot.generated.yaml",
   "bordbuch/status.generated.yaml",
   "public/.well-known/bordbuch/status.generated.yaml",
@@ -209,17 +228,23 @@ const CACHE_CLONE_ONLY_PATTERNS = [
   "src/surface.generated.yaml",
 ];
 
+// Combined list for .gitignore restoration and git rm --cached
+const CACHE_CLONE_ONLY_PATTERNS = [
+  ...FORBIDDEN_PATTERNS.filter((p) => p !== "dist" && p !== "node_modules" && p !== "packages"),
+  ...CACHE_CLONE_GENERATED_PATTERNS,
+];
+
 function restoreCacheCloneGitignore(systemDir: string): boolean {
   const gitignorePath = path.join(systemDir, ".gitignore");
   const content = fs.readFileSync(gitignorePath, "utf8");
-  
+
   // Check if sentinel already present (idempotent)
   if (content.includes(CACHE_CLONE_GITIGNORE_SENTINEL)) {
     return false; // Already has cache-clone-only section
   }
-  
+
   // Append sentinel + patterns
-  const newContent = content.trimEnd() + "\n\n" + 
+  const newContent = content.trimEnd() + "\n\n" +
     CACHE_CLONE_GITIGNORE_SENTINEL + "\n" +
     CACHE_CLONE_ONLY_PATTERNS.join("\n") + "\n";
   fs.writeFileSync(gitignorePath, newContent);
@@ -227,30 +252,30 @@ function restoreCacheCloneGitignore(systemDir: string): boolean {
 }
 
 function untrackForbiddenGeneratedFiles(systemDir: string): string[] {
-  const patterns = [
-    "package.json", "astro.config.mjs", "tsconfig.json", "wrangler.jsonc",
-    "behavior.snapshot.generated.yaml", "bordbuch/status.generated.yaml",
-    "public/.well-known/bordbuch/status.generated.yaml",
-    "src/agent-capabilities.generated.json", "src/agent-capabilities.generated.yaml",
-    "src/agent-surface.generated.json", "src/agent-surface.generated.yaml",
-    "src/entitlements.generated.yaml", "src/env.schema.generated.mjs",
-    "src/freshness.generated.yaml", "src/styles/biome.generated.css",
-    "src/surface.generated.yaml",
-  ];
   const untracked: string[] = [];
-  for (const pattern of patterns) {
-    try {
-      execSync(`git rm --cached --quiet ${JSON.stringify(pattern)}`, {
-        cwd: systemDir, stdio: "pipe", encoding: "utf-8",
-      });
-      untracked.push(pattern);
-    } catch {
-      // File not tracked — skip
+  // Single git rm --cached call for all patterns (batch for performance)
+  const args = CACHE_CLONE_ONLY_PATTERNS.map((p) => JSON.stringify(p)).join(" ");
+  try {
+    execSync(`git rm --cached --quiet ${args}`, {
+      cwd: systemDir, stdio: "pipe", encoding: "utf-8",
+    });
+    untracked.push(...CACHE_CLONE_ONLY_PATTERNS);
+  } catch {
+    // Batch failed — fall back to per-pattern (some may not be tracked)
+    for (const pattern of CACHE_CLONE_ONLY_PATTERNS) {
+      try {
+        execSync(`git rm --cached --quiet ${JSON.stringify(pattern)}`, {
+          cwd: systemDir, stdio: "pipe", encoding: "utf-8",
+        });
+        untracked.push(pattern);
+      } catch {
+        // File not tracked — skip
+      }
     }
   }
   return untracked;
 }
-```
+````
 
 ### CloseReport extension
 
@@ -283,6 +308,7 @@ const report = {
   copiedPaths,
   autoResolvedPaths,
   // NEW fields:
+  workpieceHeadAtReconcile: string | null, // workpiece HEAD at reconcile time (for freshness gate)
   gitignoreRestored: boolean,           // was .gitignore cache-clone section restored
   forbiddenFilesUntracked: string[],    // files that were git rm --cached'd
   mirrorSync: mirrorSync.attempted ? mirrorSync : undefined,
@@ -296,25 +322,42 @@ const report = {
 | `packages/werkstatt/src/mission/mission-close.ts` | Reconcile-freshness gate, `--skip-reconcile-check` flag, `CloseReportReconcile` extension |
 | `packages/werkstatt/src/mission/mission-materialization-commands.ts` | Post-merge `.gitignore` restoration, `untrackForbiddenGeneratedFiles`, reconciliation report extension |
 | `packages/werkstatt/src/mission/cache-clone-gitignore.ts` | New module: `CACHE_CLONE_ONLY_PATTERNS`, `restoreCacheCloneGitignore`, `untrackForbiddenGeneratedFiles` |
+| `packages/werkstatt/src/sternsystem/sternsystem-validate.ts` | Export `FORBIDDEN_PATTERNS` constant for reuse by cache-clone-gitignore module |
+| `AGENTS.md` (root) | Update mission lifecycle discipline section with `--skip-reconcile-check` flag documentation |
 
 ### Failure modes
 
-- **Reconciliation report missing** — the freshness gate falls back to allowing close (same behavior as today) but logs a warning. This is a safe fallback: the report is written by reconcile, so its absence means reconcile was never run, which is already caught by the `reconciledAt` check.
-- **Workpiece HEAD cannot be resolved** — the gate skips (safe fallback, logs warning). This should not happen in practice since `commitWorkpieceIfDirty` just ran.
+- **Reconciliation report missing** — the freshness gate **blocks close** (fail-closed). The operator must re-run `mission.reconcile` to regenerate the report. This is safer than fail-open: a missing report means freshness cannot be verified, and allowing close would risk silent data loss (the exact bug this RFC fixes).
+- **Workpiece HEAD cannot be resolved** — the gate throws an error (fail-closed). This should not happen in practice since `commitWorkpieceIfDirty` just ran and the workpiece has `.git`.
 - **`.gitignore` restoration fails** — non-fatal: the merge proceeds, and `sternsystem.validate` will catch the `bundle-contract` violations. The operator can fix manually. A warning is logged.
 - **`git rm --cached` fails for a file** — non-fatal: the file may not be tracked (good outcome) or may have a different name. The function continues to the next pattern.
 - **`--skip-reconcile-check` used** — close proceeds, but a bordbuch audit entry is written and a warning is logged. The `CloseReportReconcile.freshnessChecked` is `false`.
 
+## CLI surface
+
+```sh
+# mission.close with freshness gate (default behavior — no new flags needed)
+pnpm exec werkstatt run mission.close --mission <missionId>
+
+# mission.close with escape hatch for edge cases
+pnpm exec werkstatt run mission.close --mission <missionId> --skip-reconcile-check
+
+# mission.reconcile (unchanged CLI — .gitignore restoration is automatic)
+pnpm exec werkstatt run mission.reconcile --mission <missionId>
+```
+
 ## Rollout
 
-1. Create `packages/werkstatt/src/mission/cache-clone-gitignore.ts` with the pattern constants and restoration functions.
-2. Add the reconcile-freshness gate to `mission-close.ts` after `commitWorkpieceIfDirty` and `countOperatorCommits`.
-3. Add `--skip-reconcile-check` flag parsing and bordbuch audit entry.
-4. Extend `CloseReportReconcile` with `freshnessChecked`, `unreconciledCommits`, `workpieceHead`, `reconciledSha`.
-5. Add post-merge `.gitignore` restoration and `untrackForbiddenGeneratedFiles` call to `mission.reconcile` in `mission-materialization-commands.ts`.
-6. Extend the reconciliation report with `gitignoreRestored` and `forbiddenFilesUntracked`.
-7. Unit tests: freshness gate blocks on SHA mismatch, freshness gate passes on match, `.gitignore` restoration is idempotent, `untrackForbiddenGeneratedFiles` untracks tracked files and skips untracked.
-8. Integration test: simulate the `m000080` scenario (reconcile, add commits, attempt close) and verify the gate blocks.
+1. Export `FORBIDDEN_PATTERNS` from `sternsystem-validate.ts`.
+2. Create `packages/werkstatt/src/mission/cache-clone-gitignore.ts` with the pattern constants and restoration functions.
+3. Add the reconcile-freshness gate to `mission-close.ts` after `commitWorkpieceIfDirty` and `countOperatorCommits`.
+4. Add `--skip-reconcile-check` flag parsing and bordbuch audit entry.
+5. Extend `CloseReportReconcile` with `freshnessChecked`, `unreconciledCommits`, `workpieceHead`, `reconciledSha`.
+6. Add post-merge `.gitignore` restoration and `untrackForbiddenGeneratedFiles` call to `mission.reconcile` in `mission-materialization-commands.ts`.
+7. Add `workpieceHeadAtReconcile` field to reconciliation report (record workpiece HEAD at reconcile time).
+8. Extend the reconciliation report with `gitignoreRestored` and `forbiddenFilesUntracked`.
+9. Unit tests: freshness gate blocks on SHA mismatch, freshness gate passes on match, freshness gate blocks on missing report (fail-closed), `.gitignore` restoration is idempotent, `untrackForbiddenGeneratedFiles` untracks tracked files and skips untracked.
+10. Integration test: simulate the `m000080` scenario (reconcile, add commits, attempt close) and verify the gate blocks.
 
 ## Alternatives considered
 
@@ -342,8 +385,9 @@ const report = {
 
 ## Acceptance criteria
 
-- [ ] `mission.close` blocks when workpiece HEAD != reconciled SHA with a message directing to `mission.reconcile` (evidence: unit test + integration test)
-- [ ] `mission.close` passes when workpiece HEAD == reconciled SHA (evidence: unit test)
+- [ ] `mission.close` blocks when workpiece HEAD != `workpieceHeadAtReconcile` from reconciliation report with a message directing to `mission.reconcile` (evidence: unit test + integration test)
+- [ ] `mission.close` passes when workpiece HEAD == `workpieceHeadAtReconcile` (evidence: unit test)
+- [ ] `mission.close` blocks when reconciliation report is missing or lacks `workpieceHeadAtReconcile` (fail-closed) (evidence: unit test)
 - [ ] `--skip-reconcile-check` bypasses the gate and writes a bordbuch audit entry (evidence: unit test)
 - [ ] `CloseReportReconcile` includes `freshnessChecked`, `unreconciledCommits`, `workpieceHead`, `reconciledSha` (evidence: type definition + test)
 - [ ] `mission.reconcile` restores cache-clone-only `.gitignore` patterns after merge when the merge overwrote them (evidence: unit test)
@@ -351,8 +395,9 @@ const report = {
 - [ ] `.gitignore` restoration is idempotent — running it twice does not duplicate the section (evidence: unit test)
 - [ ] Reconciliation report includes `gitignoreRestored` and `forbiddenFilesUntracked` (evidence: type definition + test)
 - [ ] After `mission.close`, `sternsystem.validate` reports zero `bundle-contract` violations without manual intervention (evidence: integration test)
-- [ ] `AGENTS.md` updated where agent behavior rules changed
+- [ ] `AGENTS.md` (root) updated with `--skip-reconcile-check` flag documentation in mission lifecycle discipline section (evidence: AGENTS.md diff)
 - [ ] `rfc.validate` passes on this file before merging
+- [ ] `FORBIDDEN_PATTERNS` exported from `sternsystem-validate.ts` and reused in `cache-clone-gitignore.ts` (evidence: import statement + typecheck pass)
 
 ## Implementation notes for agents
 
