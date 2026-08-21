@@ -31,7 +31,9 @@ related:
   - RFC-0906
   - RFC-0907
   - RFC-0908
-# RFC-0910, RFC-0911, RFC-0912 are sibling drafts of this batch.
+  - RFC-0910
+  - RFC-0911
+  - RFC-0912
 batch: seo-indexing-hardening
 dependsOn: []
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
