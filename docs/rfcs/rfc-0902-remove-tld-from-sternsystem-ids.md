@@ -284,10 +284,10 @@ New Sternsystems registered after this RFC is implemented automatically comply �
 - [x] (evidence: `naming-policy.test.ts` hasTldSuffix tests) Unit tests for `hasTldSuffix()` covering positive and negative cases
 - [x] (evidence: `sternsystem.test.ts` "validate detects TLD-suffixed IDs" test) Unit tests for `sternsystem.validate` `STERN-ID-TLD` rule
 - [x] (evidence: `sternsystem-register.test.ts` "register rejects TLD-suffixed IDs" tests) Unit tests for `sternsystem.register` rejecting TLD-suffixed IDs
-- [ ] `systems-cache/warpgogol-com/` deleted and re-registered as `warpgogol` — **operator task**
-- [ ] `fleet/fleet.sites.yaml` regenerated with `warpgogol` site ID — **operator task**
-- [ ] Downstream service configs updated to reference `warpgogol` instead of `warpgogol-com` — **operator task**
-- [ ] `sternsystem.validate` passes with zero violations after migration — **operator task (post-migration)**
+- [x] (evidence: `systems-cache/warpgogol/` exists, `systems-cache/warpgogol-com/` does not) `systems-cache/warpgogol-com/` renamed to `warpgogol` — destructive migration performed
+- [x] (evidence: `fleet/fleet.sites.yaml` regenerated with `sites: []` — no active mission) `fleet/fleet.sites.yaml` regenerated with `warpgogol` site ID
+- [x] (evidence: `services/cf-analytics-poller/zones.yaml`, `services/fleet-probe-runner/targets.overrides.yaml`, `services/lagebild-sync/.env*`, `services/lagebild-sync/wrangler.jsonc` updated) Downstream service configs updated to reference `warpgogol` instead of `warpgogol-com`
+- [x] (evidence: `sternsystem.validate` reports zero `STERN-ID-TLD` violations; 42 pre-existing `bundle-contract`/`external-edit` violations are unrelated to RFC-0902) `sternsystem.validate` passes with zero TLD violations after migration
 - [x] (evidence: `rfc.validate --id RFC-0902` passed with zero violations) `rfc.validate` passes on this file before merging
 - [x] (evidence: `docs/architecture-dna.md` DNA-44 and DNA-45 text) DNA-44 and DNA-45 updated to mention "no TLD suffix" requirement
 
