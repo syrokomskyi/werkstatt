@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 783. Raw manifest entries: 783.
+Generated command rows: 792. Raw manifest entries: 792.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -143,6 +143,7 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `cloudflare.assets.validate` | workspace | app | no | no | Post-build guard: fail if rendered HTML references an /_astro/* asset missing from the deployable dist/client directory (RFC-0152). |
 | `cloudflare.regional-services.validate` | workspace | app | no | no | Validate live Cloudflare Regional Services configuration for hostnames declared in system.md deployment.cloudflare (RFC-0182). |
 | `cloudflare.residency.validate` | workspace | app | no | no | Fail if an app's wrangler.jsonc declares kv_namespaces or queues. Cloudflare KV/Queues cannot be EU-pinned; EU-resident delivery uses Upstash (RFC-0181). |
+| `cloudflare.workers.import.lint` | workspace | workspace | no | no | Static lint (CF-IMPORT-01): forbids static import from "cloudflare:workers" in packages source files. The cloudflare:workers module is only available in the Cloudflare Workers runtime — a static import causes ERR_UNSUPPORTED_ESM_URL_SCHEME during Astro SSR build. Use dynamic import() in a try/catch instead. |
 | `cms.schema.generate` | workspace | app | yes | no | Generate the git-based (Decap) CMS admin config from the content schemas (RFC-0171). No-op for filesystem-adapter apps. |
 | `cms.schema.parity` | workspace | app | no | no | Fail when the committed Decap CMS config diverges from the content schemas (RFC-0171). No-op pass for filesystem-adapter apps. |
 | `command.args.validate` | workspace | workspace | no | no | RFC-0610: statically analyze command registrations and handler source code for flag-only argument compliance. ARG-COMPLIANCE-01: handler reads removed input.args field. ARG-COMPLIANCE-02: command registered with empty flags but handler reads named flag. ARG-COMPLIANCE-03: handler uses dual-path fallback with input.args[0]. |
@@ -207,6 +208,7 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `css.important.lint` | workspace | app | no | no | Lint CSS files for forbidden !important declarations to maintain cascade hygiene. |
 | `css.mobile-layout.lint` | workspace | app | no | no | Lint CSS and Astro inline styles for mobile layout anti-patterns (100vh, 100vw, fixed widths, negative margins, fixed-position overflow, nowrap without overflow-wrap). |
 | `currency-pricing.compile` | workspace | app | no | no | Validate the CurrencyPricingPolicy for the business — target currencies registered, ratePolicyRefs resolve, derivationContractRefs resolve, currentUses valid for current phase. RFC-0741. |
+| `customdomain.register` | workspace | workspace | no | no | Register proxied A record and Workers route for a site apex domain (RFC-0896). Idempotent. Flags: --site. |
 | `dedup.helper.lint` | workspace | workspace | no | no | DEDUP-01: fails when a reserved shared-helper identifier (fileExists, collectFiles, readJsonFile, getLineColumn, collectMarkdownFiles, discoverWorkspacePackages) is re-declared locally instead of imported from its canonical home (RFC-0303). |
 | `demand.map.report` | workspace | app | yes | no | Generate the query → volume → intent demand map from versioned demand-signal records (RFC-0280). |
 | `demand.modifier.lint` | workspace | app | no | no | Scan the demands collection and fail when a demand slug is an intent modifier (price, urgent, near, best, etc.). RFC-0238. |
@@ -231,7 +233,7 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `dht.status` | workspace | workspace | no | no | RFC-0565: report local DHT node status including config, cache entries, identity bootstrap state, and SWIM configuration. Local-only query — no network I/O. Use --json for machine-readable output. |
 | `diagnostic.shape.lint` | workspace | workspace | no | no | Lint @warpgogol/site-kernel-checks for RFC-0203 diagnostic shape: DSL-02 fails on an unregistered ruleId; DSL-03 on an empty ruleId; DSL-01 on an unreadable source dir; DSL-04 ratchets resultFromViolations/failResult shim usage against a shrink-only baseline (RFC-0261). Pass --write-baseline to regenerate the DSL-04 baseline. |
 | `dispatcher.sync.validate` | workspace | app | no | no | Validate that dispatcher registrations match actual content and schema files. |
-| `dist.content-references.validate` | workspace | app | no | no | Scan every .html under apps/<id>/dist for residual {collection.file.field} brace tokens that were not resolved at render time (RFC-0187). |
+| `dist.content-references.validate` | workspace | app | no | no | Scan every .html under apps/<id>/dist for residual {collection.file.field} brace tokens and braceless collection.file.field references that leaked into rendered HTML (RFC-0187, RFC-0529). |
 | `dist.determinism.validate` | workspace | workspace | no | no | Report non-deterministic files in a dist directory by comparing stable vs byte hashes (RFC-0656). Flags: --release, --mission. |
 | `dist.generated-marker.strip` | workspace | app | yes | no | Post-build cleanup: remove the RFC-0081 GENERATED_MARKER from every text artifact under apps/<id>/dist/client (RFC-0185). |
 | `dist.generated-marker.validate` | workspace | app | no | no | Post-build guard: fail if any text artifact under apps/<id>/dist/client still contains the RFC-0081 GENERATED_MARKER (RFC-0185). |
@@ -397,16 +399,18 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `legal.processors.validate` | workspace | app | no | no | Fail if a configured chat widget or external destination is not named (processor + recipients) in the Datenschutz/Privacy Policy, or no studio↔client DPA reference is present. No-op pass when nothing is configured (RFC-0177). |
 | `legal.scaffold` | workspace | app | yes | no | Generate Impressum and Datenschutz page+prose stubs for every DE/AT/CH locale in system.md i18n.supported. Merges nav targets and footer.legalIds/contactIds into the per-locale labels.md. Idempotent. Reads identity.legal.* from system.md; missing fields land as NEED_THIS_<FIELD> placeholders (RFC-0096). |
 | `legal.translation.validate` | workspace | app | no | no | Validate the RFC-0174 binding-language policy: every page `translation` block is internally consistent (status enum, binding never disabled, mandatory notice on while a locale is unofficial, binding-language file present, disabled locales have a fallback). |
+| `leitstand.access.protect` | workspace | workspace | yes | no | RFC-0899: Set ACCESS_PIN secret on dev and alt channel Workers for Basic Auth access protection. Flags: --site, [--pin]. |
+| `leitstand.access.status` | workspace | workspace | no | no | RFC-0899: Report access protection status (PIN set or not) for a Sternsystem. Flags: --site. |
+| `leitstand.access.unprotect` | workspace | workspace | yes | no | RFC-0899: Remove ACCESS_PIN secret from dev and alt channel Workers. Flags: --site. |
 | `leitstand.certify` | workspace | workspace | no | no | Produce a GateDecisionV1 JSON file via certification orchestration (RFC-0866). Flags: --site, --gate, --release, --artifact-hash. |
 | `leitstand.dev-deploy` | workspace | workspace | no | no | Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --site, [--release]. |
 | `leitstand.health` | workspace | workspace | no | no | Run health checks against a deployed channel (RFC-0379). Flags: --site, [--channel dev\|alt\|main]. |
 | `leitstand.pipeline.check` | workspace | workspace | no | no | Inspect deployment pipeline state for a release (RFC-0842). Flags: --release. |
 | `leitstand.promote` | workspace | workspace | yes | no | Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --site, --release. |
 | `leitstand.propagate` | workspace | workspace | yes | no | Deploy a published release with verified Axiom evidence to the alt channel (RFC-0628). Flags: --site, --release. |
-| `leitstand.rollback` | workspace | workspace | yes | no | Rollback to the previous published release; auto-detects channel from release state and auto-steps release state (RFC-0628). Flags: --site, [--to-release]. |
+| `leitstand.rollback` | workspace | workspace | yes | no | Rollback a site or service to its previous Cloudflare Worker deployment via native wrangler rollback (RFC-0895). Flags: --site OR --service (mutually exclusive), [--channel dev\|alt\|main]. |
 | `leitstand.service.dev-deploy` | workspace | workspace | yes | no | Deploy a shared Cloudflare Worker service to the dev channel with pre-deploy gates, lock, and health check (RFC-0806). Flags: --service. |
 | `leitstand.service.promote` | workspace | workspace | yes | no | Promote a shared Cloudflare Worker service to production with pre-deploy gates, subdomain validation, lock, and health check (RFC-0806). Flags: --service. |
-| `leitstand.service.rollback` | workspace | workspace | yes | no | Rollback a shared Cloudflare Worker service to its previous deployment via wrangler rollback (RFC-0806). Flags: --service. |
 | `leitstand.status` | workspace | workspace | no | no | Print deployment state for all channels (RFC-0627). Flags: --site, [--channel dev\|alt\|main]. |
 | `lighthouse.budget.check` | workspace | app | no | no | Post-build Lighthouse performance budget check. |
 | `lighthouse.validate` | workspace | app | no | no | Performance lint that runs against source — heavy lighthouse runs live in postbuild. |
@@ -464,6 +468,7 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `nachweis.manifest.generate` | workspace | workspace | yes | no | RFC-0707: Generate public/nachweise/manifest.json from published records (generatedAt: null per RFC-0602). |
 | `nachweis.measure.cloudflare-agent-readiness` | workspace | workspace | yes | no | RFC-0875: Submit an Unlisted Cloudflare URL Scanner scan with Agent Readiness enabled, poll for completion, parse dimensions, build AssessmentBundleV1, and delegate to nachweis.assessment.ingest. |
 | `nachweis.measure.lighthouse` | workspace | workspace | yes | no | RFC-0874: Run five sequential canonical Google Lighthouse runs, parse LHR JSON, aggregate categories, build AssessmentBundleV1, and delegate to nachweis.assessment.ingest. |
+| `nachweis.props.coverage.lint` | workspace | workspace | no | no | Static lint (NACHWEIS-PROPS-01): cross-references required props in nachweis-detail and nachweis-card component interfaces against prop assignments in resolveNachweisEvidenceProps. Flags required fields that the resolver never assigns, preventing runtime crashes from undefined prop access. |
 | `nachweis.public-derivative` | workspace | workspace | yes | no | RFC-0714: Upload a public-derivative PDF to R2 and update evidence-source items.public.storage to public. Idempotent by SHA-256. |
 | `nachweis.publish` | workspace | workspace | yes | no | RFC-0707/RFC-0872: Enforce policy-driven publication gate V2 and transition record to published. Gate policy resolved by evidence kind; technical-assessment does not require consent or public derivative. |
 | `nachweis.screenshot.ingest` | workspace | workspace | yes | no | RFC-0890: Ingest a raw full-page screenshot to R2 private storage and cache clone. Detects image metadata via sharp, parses CaptureX filename for capturedAt, idempotent by SHA-256. |
@@ -582,10 +587,10 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `ratgeber.policy.validate` | workspace | app | no | no | RFC-0503: validate ratgeber editorial policy page existence, required H2 sections, review cadence, and article status workflow. Checks policy page exists in all supported languages with 5 required sections, published articles are not stale (reviewedAt > 3 months warning), published articles have required fields, and no review-required article appears in the surface artifact. |
 | `ratgeber.provenance.validate` | workspace | app | no | no | RFC-0502: validate ratgeber editorial provenance — author IDs, source IDs, claim IDs, and Quellen section coverage. Checks that every article's authorId resolves to an author record, every sourceId resolves to a source descriptor, every claimId exists in the article's claim sidecar, and every sourceId appears in the Quellen section. |
 | `redirect.map.validate` | workspace | app | no | no | Validate generated _redirects retirement policy: source not live, target exists, no chains, generated marker present (RFC-0318). |
+| `redirect.register` | workspace | workspace | no | no | Register proxied CNAME and Redirect Rule (301) for www.{apex} → apex (RFC-0896). Idempotent. Flags: --site. |
 | `release.list` | workspace | workspace | no | no | List releases, optionally filtered by site (RFC-0357). Flags: [--site]. |
 | `release.prepare` | workspace | workspace | yes | no | Prepare a release candidate from a validated mission (RFC-0357). Flags: --mission, [--semver]. |
 | `release.ready` | workspace | workspace | yes | no | Mark a prepared release as ready with discipline gates and artifact storage (RFC-0357, RFC-0724). Flags: --release. |
-| `release.rollback` | workspace | workspace | yes | no | Mark a ready release as rolled-back and append Bordbuch entry (RFC-0357). Flags: --release. |
 | `release.state.validate` | workspace | workspace | no | no | Validate release pipeline consistency between mission.yaml, close-report.json, release.yaml, bordbuch, and registry.yaml (RFC-0655). Flags: --mission, --release, --site. |
 | `release.validate` | workspace | workspace | no | no | Validate a release artifact (RFC-0357). Flags: --release. |
 | `rfc.acceptance.run` | workspace | workspace | no | no | RFC-0268: execute the acceptance: probes declared in an RFC's frontmatter and report pass/fail per probe (RFC-ACC-01 failed probe, RFC-ACC-02 accepted/implemented RFC with zero probes). Requires --id <rfc-id> or --status <status>; never runs automatically inside build pipelines. |
@@ -637,6 +642,8 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `semantic.drift.validate` | workspace | app | no | no | Validate SEO metadata fields for drift, duplication, and length issues. |
 | `semantic.parity` | workspace | app | no | no | Rebuild the llms projections from the consolidated semantic model and assert they match the generated public/llms.txt + llms-full.txt byte-for-byte (RFC-0146 guard). |
 | `semantic.targets.validate` | workspace | app | no | no | Validate authored and generated semantic pageId targets against the app route registry before render (RFC-0250). |
+| `seo.cross-lang-links.validate` | workspace | app | no | no | RFC-0898: Validate internal links do not cross language boundaries without hreflang (SEO-XLANG-01). |
+| `seo.domain.validate` | workspace | app | no | no | RFC-0898: Validate canonical, og:url, hreflang, and JSON-LD url origins against Astro.site; detect dev/staging hostname leakage (SEO-DOMAIN-01..05). |
 | `seo.internal-linking.validate` | workspace | app | no | no | Validate internal-linking thresholds and key-page coverage against linking-plan.yaml (RFC-0074). |
 | `seo.meta.validate` | workspace | app | no | no | Validate rendered Open Graph / Twitter Card meta on every indexable page; og:url must match canonical (RFC-0162). |
 | `seo.structured-data.validate` | workspace | app | no | no | Validate rendered JSON-LD blocks against required structured data declarations (RFC-0074). |
@@ -697,6 +704,7 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `suppressions.validate` | workspace | workspace | no | no | RFC-0684: validates the workshop-level Axiom suppression config at systems/axiom-suppressions.yaml. Checks schema, conflicting rules (same ruleId + same conditions), broad patterns, and unknown rule IDs (from evidence). Diagnostics: SUPPRESS-VAL-01 (file not found, warning), SUPPRESS-VAL-02 (schema violation), SUPPRESS-VAL-03 (conflicting rules), SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId, warning), SUPPRESS-VAL-06 (messagePattern/descriptionPattern without titlePattern, warning), SUPPRESS-VAL-07 (titlePattern containing ruleId prefix, warning, RFC-0695). |
 | `surface.artifact.ready` | workspace | app | yes | no | Mark an approved master-locale PSEO enriched artifact ready for derived translation with a contentHash stamp (RFC-0272). |
 | `surface.breaker.evaluate` | workspace | app | yes | no | Evaluate PSEO safety tripwires, freeze affected scopes, demote autonomy, and open escalations on trips (RFC-0283). |
+| `surface.content-refs.validate` | workspace | app | no | no | Validate that every braceless content reference in surface.generated.yaml resolves against the content ref index — catches unresolvable refs before SSG render. |
 | `surface.context.validate` | workspace | app | no | no | Validate Programmatic Surface module contexts: master locale, published locales, module entitlements, and Blueprint ownership (RFC-0271). |
 | `surface.contract.validate` | workspace | workspace | no | no | Validate generated C-surfaces (URL schema, JSON-LD types, sitemap shape) against declarative contract (RFC-0480). Flags: --app. |
 | `surface.doorway-risk.report` | workspace | app | no | no | RFC-0492: diagnostic report flagging depth-4 city pages on the website-local surface that lack unique local context fields (localDemandContext, uniqueIntro, uniqueFaq, localEvidence). Fails surface.validate when the flagged share exceeds the blueprint's doorwayMaxFlaggedShare threshold. |
@@ -780,6 +788,7 @@ Generated command rows: 783. Raw manifest entries: 783.
 | `warpgogol.check-hints.validate` | workspace | app | no | no | Validate the public .well-known/warpgogol-check.json hints artifact (RFC-0295). |
 | `werk.record.validate` | workspace | app | no | no | Validate anchored, consented Werk records and their axis bindings before they can back public pages (RFC-0281). |
 | `werkstatt.autonomy.validate` | workspace | workspace | no | no | Scan packages/werkstatt/src/** for forbidden @warpgogol/* imports (excluding self-imports and shared schema packages). Enforces DNA-64 engine/plugin boundary (RFC-0772). |
+| `werkstatt.commands.validate` | workspace | workspace | no | no | Statically analyze kernel command handler return statements for DNA-82 compliance: explicit exitCode, [command.name]-prefixed summary, nextSteps on failure. Enforces RFC-0903. |
 | `werkstatt.lock.recover` | workspace | workspace | yes | no | Classify and clean stale locks and staging artifacts (RFC-0362). Flags: --scope, --purge. |
 | `werkstatt.lock.status` | workspace | workspace | no | no | Report all Werkstatt locks, their age, owner, and staleness (RFC-0362). |
 | `werkstatt.operation.validate` | workspace | workspace | no | no | Validate that mutating Werkstatt commands use shared lock/idempotency/atomic-write helpers (RFC-0362). |
