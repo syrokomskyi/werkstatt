@@ -8,8 +8,9 @@ owners:
   - architecture
 reviewers:
   - human:andrii-syrokomskyi
-createdAt: 2026-08-22
+createdAt: 2026-08-21
 updatedAt: 2026-08-22
+enhancedAt: 2026-08-22
 implementedAt:
 closedAt:
 supersedes: []
@@ -36,7 +37,6 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - "@warpgogol/werkstatt-site"
-  - "@warpgogol/werkstatt-shared"
 liveSpec: true
 successSignals:
   - "redirect.shadow.validate detects Cloudflare Worker routes that intercept _redirects sources or targets before deployment"
@@ -50,6 +50,7 @@ nonGoals:
   - "Do not validate redirect chains — that is owned by redirect.map.validate (REDIR-06)"
   - "Do not replace redirect.map.validate — this RFC extends it with Worker-shadow awareness"
   - "Do not validate Cloudflare Pages _redirects syntax — that is owned by redirect.map.validate (REDIR-01..06)"
+  - "Do not add a --mode=warning/error flag — shadowed redirects are silent failures that cause Google indexing issues; fail-hard from day one is the correct policy. A config escape hatch for RSHAD-02 may be added in a follow-up RFC if false positives emerge in practice."
 ---
 
 # RFC-0905: Redirect effectiveness in Worker-first deployments
@@ -86,7 +87,7 @@ The kernel gains one new post-build validator and one existing validator is enha
    - Static files in `dist/client/` — if a file exists at the redirect source path (with or without trailing slash, with `/index.html` suffix), the redirect is shadowed and will never fire.
    - Worker route patterns (from `wrangler.toml` / `wrangler.jsonc` route declarations) — if a Worker route pattern matches a redirect source, the Worker may intercept the request before `_redirects` is evaluated.
 
-2. **`redirect.map.validate`** (enhanced) — REDIR-04 is extended: in addition to checking that the redirect source is not in the sitemap, it also checks that no static file in `dist/client/` exists at the redirect source path. This is a subset of `redirect.shadow.validate` but is added to `redirect.map.validate` because the check is cheap and belongs logically with the existing REDIR-04 "source is not live" check.
+2. **`redirect.map.validate`** (enhanced) — REDIR-04 is extended: in addition to checking that the redirect source is not in the sitemap, it also checks that no static file in `dist/client/` exists at the redirect source path. This is a subset of `redirect.shadow.validate` but is added to `redirect.map.validate` because the check is cheap and belongs logically with the existing REDIR-04 "source is not live" check. REDIR-07 and RSHAD-01 MUST share a common `checkStaticFileShadow` helper function to prevent implementation drift between the two validators.
 
 Both validators are integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `redirect.map.validate`.
 
@@ -236,6 +237,7 @@ interface RedirectShadowResult {
 - If `dist/client/` is missing → skip with info message (not built yet).
 - If `wrangler.toml` / `wrangler.jsonc` is missing → skip Worker route check (RSHAD-02) with info message. Static file check (RSHAD-01) still runs.
 - If deployment adapter is not `cloudflare-workers` or `cloudflare-pages` → skip Worker route check (RSHAD-02). Static file check (RSHAD-01) still runs.
+- `wrangler.toml` / `wrangler.jsonc` path is resolved via `loadPublicContext(context)` — same app directory resolution as `redirect.map.validate`. The validator checks for `wrangler.toml` first, then `wrangler.jsonc`.
 - If violations found → `exitCode: 1`, diagnostics emitted. RSHAD-01 and RSHAD-02 are errors; RSHAD-03 is a warning.
 - If no violations → `exitCode: 0`, summary with `checkedRules` count.
 
@@ -267,7 +269,7 @@ robots.page.validate
 
 **Performance:** `redirect.shadow.validate` scans `dist/client/` for file existence at each redirect source path. This is O(R) where R is the number of redirect rules — a file-existence check, not a full directory scan. Performance impact is negligible.
 
-**False positive rate:** RSHAD-01 (static file shadow) has no false positives by design — if a static file exists at a redirect source path, the redirect is always shadowed. RSHAD-02 (Worker route shadow) could produce false positives if the Worker fetch handler processes `_redirects` before static-file lookup — but this is exactly the condition we want to detect, so the error is correct unless the Worker is known to handle redirects. A follow-up RFC can add a config escape hatch if needed.
+**False positive rate:** RSHAD-01 (static file shadow) has no false positives by design — if a static file exists at a redirect source path, the redirect is always shadowed. RSHAD-02 (Worker route shadow) could produce false positives if the Worker fetch handler processes `_redirects` before static-file lookup. However, the current Worker middleware chain (access-protection → tombstone → language-redirect → markdown-negotiation) does NOT process `_redirects` — `_redirects` is a Cloudflare Pages infrastructure feature evaluated independently. If a Worker route pattern matches a redirect source, the Worker intercepts the request before Pages can evaluate `_redirects`, so RSHAD-02 is correct by default. A follow-up RFC can add a `--skip-worker-shadow` flag or config escape hatch if false positives emerge in practice.
 
 **Maintenance burden:** One new file (~200 lines) plus pipeline registration, tests, and a small enhancement to `managed-public.ts`. The Worker route parsing is a simple glob-to-regex conversion.
 
@@ -295,4 +297,6 @@ robots.page.validate
 - Agents MUST use `diagnosticsResult` from `../result-helpers.ts` for output, consistent with existing validators.
 - Agents MUST resolve the deployment adapter via `resolveDeploymentAdapter` (already in `managed-public.ts`) to determine whether to check Worker routes.
 - Agents MUST normalize redirect source paths consistently with `normalizeUrlPath` in `managed-public.ts`.
+- Agents MUST extract `checkStaticFileShadow` as a shared helper used by both REDIR-07 (in `redirect.map.validate`) and RSHAD-01 (in `redirect.shadow.validate`) to prevent implementation drift.
+- Agents MUST resolve `wrangler.toml` / `wrangler.jsonc` via `loadPublicContext(context)` — same app directory resolution as `redirect.map.validate`.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
