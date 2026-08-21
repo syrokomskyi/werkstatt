@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-21
-count: 882
+count: 884
 entries:
   - id: ""
     title: ""
@@ -7004,6 +7004,7 @@ entries:
       - RFC-0561
       - RFC-0574
       - RFC-0790
+      - RFC-0902
     related:
       - RFC-0007
       - RFC-0078
@@ -15288,6 +15289,7 @@ entries:
       - RFC-0472
     amendedBy:
       - RFC-0794
+      - RFC-0902
     related:
       - DNA-1
       - DNA-44
@@ -17313,3 +17315,38 @@ entries:
       - RFC-0734
       - RFC-0174
     file: docs/rfcs/rfc-0901-cross-locale-structural-parity-validation.md
+  - id: RFC-0902
+    title: Remove TLD suffix from Sternsystem IDs — business ID only
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-21
+    implementedAt: 2026-08-21
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0354
+      - RFC-0790
+    amendedBy: []
+    related:
+      - DNA-44
+      - DNA-45
+    file: docs/rfcs/archive/implemented/rfc-0902-remove-tld-from-sternsystem-ids.md
+  - id: RFC-0903
+    title: "Standardize kernel command output: exitCode, summary, nextSteps"
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-21
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0542
+      - RFC-0579
+      - RFC-0609
+      - RFC-0260
+      - DNA-35
+    file: docs/rfcs/rfc-0903-standardize-kernel-command-output-exitcode-summary-nextsteps.md
