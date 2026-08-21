@@ -63,6 +63,7 @@ export { claimSchema } from "./claim.js";
 export { evidenceSourceSchema } from "./evidence-source.js";
 export { disclosureSchema } from "./disclosure.js";
 export { consentSchema } from "./consent.js";
+export { clientTestimonialSchema } from "./client-testimonial.js";
 export { publicDocumentSchema } from "./public-document.js";
 export {
   pbpCurrencyPricingPolicySchema,
@@ -112,6 +113,7 @@ import { claimSchema as _claim } from "./claim.js";
 import { evidenceSourceSchema as _evidenceSource } from "./evidence-source.js";
 import { disclosureSchema as _disclosure } from "./disclosure.js";
 import { consentSchema as _consent } from "./consent.js";
+import { clientTestimonialSchema as _clientTestimonial } from "./client-testimonial.js";
 import { publicDocumentSchema as _publicDocument } from "./public-document.js";
 import { pbpCurrencyPricingPolicySchema as _currencyPricingPolicy } from "./currency-pricing-policy.js";
 import {
@@ -147,6 +149,7 @@ export const pbpSchemaById: Record<string, z.ZodType> = {
   [pbpSchemaId("evidence-source")]: _evidenceSource,
   [pbpSchemaId("disclosure")]: _disclosure,
   [pbpSchemaId("consent")]: _consent,
+  [pbpSchemaId("client-testimonial")]: _clientTestimonial,
   [pbpSchemaId("public-document")]: _publicDocument,
   [pbpSchemaId("currency-pricing-policy")]: _currencyPricingPolicy,
   [pbpSchemaId("rate-policy")]: _ratePolicy,
@@ -183,6 +186,7 @@ export const pbpEntityDiscriminatedUnion = z.discriminatedUnion("schema", [
   _evidenceSource,
   _disclosure,
   _consent,
+  _clientTestimonial,
   _publicDocument,
   _currencyPricingPolicy,
   _ratePolicy,

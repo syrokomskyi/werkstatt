@@ -209,6 +209,12 @@ export {
   CONSENT_SCHEMA_ID,
 } from "./entities/consent.js";
 
+// RFC-0900: Client testimonial entity (client gratitude display)
+export {
+  type PbpClientTestimonial,
+  CLIENT_TESTIMONIAL_SCHEMA_ID,
+} from "./entities/client-testimonial.js";
+
 export {
   type PbpCredential,
   type PbpCredentialKind,
