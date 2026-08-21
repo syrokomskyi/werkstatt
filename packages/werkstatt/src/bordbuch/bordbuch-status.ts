@@ -65,5 +65,14 @@ export async function runBordbuchStatus(
       latestDeploy,
     },
     summary: `[bordbuch.status] ${systemId}: ${entries.length} entries, ${openEscalations.length} open escalation(s)`,
+    nextSteps:
+      openEscalations.length > 0
+        ? [
+            {
+              action: `Resolve the ${openEscalations.length} open escalation(s) for ${systemId}`,
+              kind: "optional",
+            },
+          ]
+        : undefined,
   };
 }

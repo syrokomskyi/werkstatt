@@ -236,6 +236,12 @@ export async function runBordbuchRepair(
           orphans,
         },
         summary: `[bordbuch.repair] ${systemId}: dry-run — ${orphans.length} repair(s) planned`,
+        nextSteps: [
+          {
+            action: `Apply repairs: pnpm exec werkstatt run bordbuch.repair --site ${systemId}`,
+            kind: "optional",
+          },
+        ],
       };
     }
 
@@ -252,6 +258,12 @@ export async function runBordbuchRepair(
         dryRun: false,
       },
       summary: `[bordbuch.repair] ${systemId}: inserted ${orphans.length} mission-open event(s), recomputed ${recomputedHashes} hashes`,
+      nextSteps: [
+        {
+          action: `Commit the repaired bordbuch: pnpm exec werkstatt run bordbuch.commit --site ${systemId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `bordbuch:${systemId}`);
