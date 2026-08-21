@@ -1,6 +1,6 @@
 command: rfc.index.generate
 generatedAt: 2026-08-21
-count: 884
+count: 897
 entries:
   - id: ""
     title: ""
@@ -1001,6 +1001,7 @@ entries:
     amendedBy:
       - RFC-0159
       - RFC-0160
+      - RFC-0914
     related:
       - DNA-22
       - DNA-24
@@ -3028,7 +3029,8 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0910
     related:
       - RFC-0147
       - RFC-0148
@@ -6252,7 +6254,8 @@ entries:
       - RFC-0049
       - RFC-0165
       - RFC-0184
-    amendedBy: []
+    amendedBy:
+      - RFC-0906
     related:
       - RFC-0143
       - RFC-0160
@@ -9421,7 +9424,8 @@ entries:
     amends:
       - RFC-0355
       - RFC-0472
-    amendedBy: []
+    amendedBy:
+      - RFC-0913
     related:
       - DNA-44
       - DNA-45
@@ -15822,7 +15826,8 @@ entries:
     supersedes: []
     supersededBy: ""
     amends: []
-    amendedBy: []
+    amendedBy:
+      - RFC-0913
     related:
       - RFC-0480
       - RFC-0644
@@ -17298,7 +17303,7 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0900-add-client-testimonial-pbp-entity-and-gratitude-section-for-client-gratitude-display-on-nachweise-page.md
   - id: RFC-0901
     title: Cross-locale structural parity validation for translated content
-    status: draft
+    status: accepted
     kind: command
     createdAt: 2026-08-21
     implementedAt: ""
@@ -17309,11 +17314,13 @@ entries:
     amendedBy: []
     related:
       - DNA-11
+      - DNA-82
       - RFC-0097
       - RFC-0684
       - RFC-0732
       - RFC-0734
       - RFC-0174
+      - RFC-0914
     file: docs/rfcs/rfc-0901-cross-locale-structural-parity-validation.md
   - id: RFC-0902
     title: Remove TLD suffix from Sternsystem IDs — business ID only
@@ -17334,10 +17341,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0902-remove-tld-from-sternsystem-ids.md
   - id: RFC-0903
     title: "Standardize kernel command output: exitCode, summary, nextSteps"
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-21
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17349,4 +17356,257 @@ entries:
       - RFC-0609
       - RFC-0260
       - DNA-35
-    file: docs/rfcs/rfc-0903-standardize-kernel-command-output-exitcode-summary-nextsteps.md
+    file: docs/rfcs/archive/implemented/rfc-0903-standardize-kernel-command-output-exitcode-summary-nextsteps.md
+  - id: RFC-0904
+    title: Pre-deploy header compatibility validators
+    status: accepted
+    kind: architecture
+    createdAt: 2026-08-21
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-67
+      - DNA-83
+      - RFC-0831
+      - RFC-0315
+    file: docs/rfcs/rfc-0904-pre-deploy-header-compatibility-validators.md
+  - id: RFC-0905
+    title: Redirect effectiveness in Worker-first deployments
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-22
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-73
+      - RFC-0318
+      - RFC-0574
+      - RFC-0589
+      - RFC-0495
+      - RFC-0904
+    file: docs/rfcs/rfc-0905-redirect-effectiveness-in-worker-first-deployments.md
+  - id: RFC-0906
+    title: Canonical URL trailing-slash parity between HTML and sitemap
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-22
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0317
+    amendedBy: []
+    related:
+      - DNA-58
+      - RFC-0317
+      - RFC-0898
+      - RFC-0160
+      - RFC-0904
+    file: docs/rfcs/rfc-0906-canonical-url-trailing-slash-parity.md
+  - id: RFC-0907
+    title: "Sitemap integrity validators: placeholder expansion and route coverage"
+    status: draft
+    kind: command
+    createdAt: 2026-08-22
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-58
+      - RFC-0317
+      - RFC-0318
+      - RFC-0383
+      - RFC-0906
+    file: docs/rfcs/rfc-0907-sitemap-integrity-validators.md
+  - id: RFC-0908
+    title: Host canonicalization and URL normalization validators
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-22
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-73
+      - RFC-0317
+      - RFC-0898
+      - RFC-0905
+      - RFC-0906
+      - RFC-0904
+    file: docs/rfcs/rfc-0908-host-canonicalization-and-url-normalization-validators.md
+  - id: RFC-0909
+    title: Search engine verification surface and automated sitemap submission
+    status: draft
+    kind: command
+    createdAt: 2026-08-21
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-40
+      - DNA-72
+      - RFC-0311
+      - RFC-0753
+      - RFC-0898
+      - RFC-0905
+      - RFC-0906
+      - RFC-0907
+      - RFC-0908
+      - RFC-0910
+      - RFC-0911
+      - RFC-0912
+    file: docs/rfcs/rfc-0909-search-engine-verification-surface-and-automated-sitemap-submission.md
+  - id: RFC-0910
+    title: Canonical entity identity URLs in JSON-LD
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-21
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0163
+    amendedBy: []
+    related:
+      - DNA-85
+      - DNA-86
+      - RFC-0160
+      - RFC-0163
+      - RFC-0898
+      - RFC-0906
+      - RFC-0908
+      - RFC-0909
+      - RFC-0911
+      - RFC-0912
+    file: docs/rfcs/rfc-0910-canonical-entity-identity-urls-in-json-ld.md
+  - id: RFC-0911
+    title: "SEO metadata quality gates: cross-page title and description uniqueness
+      plus anchor-text lint"
+    status: draft
+    kind: command
+    createdAt: 2026-08-21
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-72
+      - RFC-0026
+      - RFC-0162
+      - RFC-0206
+      - RFC-0909
+      - RFC-0910
+      - RFC-0912
+    file: docs/rfcs/rfc-0911-seo-metadata-quality-gates-cross-page-title-and-description-uniqueness-plus-anchor-text-lint.md
+  - id: RFC-0912
+    title: Video structured data and video sitemap for opted-in content videos
+    status: draft
+    kind: command
+    createdAt: 2026-08-21
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - RFC-0172
+      - RFC-0210
+      - RFC-0498
+      - RFC-0907
+      - RFC-0909
+      - RFC-0910
+      - RFC-0911
+    file: docs/rfcs/rfc-0912-video-structured-data-and-video-sitemap-for-opted-in-content-videos.md
+  - id: RFC-0913
+    title: Mission close reconcile-freshness guard and cache-clone .gitignore
+      preservation
+    status: draft
+    kind: architecture
+    createdAt: 2026-08-21
+    implementedAt: ""
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0477
+      - RFC-0820
+    amendedBy: []
+    related:
+      - RFC-0355
+      - RFC-0356
+      - RFC-0568
+      - RFC-0797
+    file: docs/rfcs/rfc-0913-mission-close-reconcile-freshness-guard-and-cache-clone-gitignore-preservation.md
+  - id: RFC-0914
+    title: Mandatory semantic block IDs for all content sections
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-21
+    implementedAt: 2026-08-21
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends:
+      - RFC-0048
+    amendedBy: []
+    related:
+      - DNA-11
+      - DNA-24
+      - RFC-0048
+      - RFC-0097
+      - RFC-0901
+    file: docs/rfcs/archive/implemented/rfc-0914-mandatory-semantic-block-ids-for-all-content-sections.md
+  - id: RFC-0915
+    title: Consolidate slug generation into werkstatt-shared as canonical utility
+    status: implemented
+    kind: architecture
+    createdAt: 2026-08-21
+    implementedAt: 2026-08-21
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-53
+      - DNA-74
+      - RFC-0916
+    file: docs/rfcs/archive/implemented/rfc-0915-consolidate-slug-generation-into-werkstatt-shared-as-canonical-utility.md
+  - id: RFC-0916
+    title: Utility provenance validator for canonical shared utilities
+    status: implemented
+    kind: command
+    createdAt: 2026-08-21
+    implementedAt: 2026-08-21
+    closedAt: ""
+    supersedes: []
+    supersededBy: ""
+    amends: []
+    amendedBy: []
+    related:
+      - DNA-53
+      - DNA-74
+      - RFC-0915
+    file: docs/rfcs/archive/implemented/rfc-0916-utility-provenance-validator-for-canonical-shared-utilities.md
