@@ -1,4 +1,4 @@
-- siteId: warpgogol-com
+- siteId: warpgogol
   zoneId: REPLACE_WITH_CLOUDFLARE_ZONE_ID
   workerScripts:
     - warpgogol-com
