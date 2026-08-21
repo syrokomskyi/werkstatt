@@ -58,7 +58,7 @@ export function diagnosticsResult(
   return {
     data: { command, status, diagnostics, summary },
     exitCode: summary.error > 0 ? 1 : 0,
-    summary: `${command}: ${summary.error} error(s), ${summary.warning} warning(s)`,
+    summary: `[${command}] ${summary.error} error(s), ${summary.warning} warning(s)`,
     nextSteps: resolvedNextSteps,
   };
 }
@@ -88,7 +88,7 @@ export function passResult(
   return {
     data: { command, status: "pass", diagnostics: [], summary: emptySummary() },
     exitCode: 0,
-    summary: summary ?? `${command}: OK`,
+    summary: summary ?? `[${command}] OK`,
     nextSteps,
   };
 }
@@ -115,7 +115,7 @@ export function failResult(
       summary: { error: diagnostics.length, warning: 0, info: 0 },
     },
     exitCode: 1,
-    summary: `${command}: ${violations.length} violation(s)`,
+    summary: `[${command}] ${violations.length} violation(s)`,
     nextSteps: nextSteps ?? defaultFailNextSteps(command),
   };
 }
