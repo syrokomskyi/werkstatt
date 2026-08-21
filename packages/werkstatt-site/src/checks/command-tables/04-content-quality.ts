@@ -69,6 +69,11 @@ import { runDerivedPricesMaterialize } from "../derived-prices-materialize.ts";
 import { runRateSnapshotResolve } from "../rate-snapshot-resolve.ts";
 import { runCurrencyPricingCompile } from "../currency-pricing-compile.ts";
 import { runDeploymentGateValidate } from "../deployment-gate.ts";
+import {
+  runTranslationParityValidate,
+  runTranslationParityReview,
+  runTranslationParitySuppress,
+} from "../translation-parity.ts";
 
 export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
@@ -901,5 +906,76 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     writes: ["<app>/src/content/pages/**/*.md"],
     modulePaths: ["block-id-generate.ts", "result-helpers.ts", "lib/i18n.ts"],
     execute: runBlockIdGenerate,
+  },
+  /* RFC-0901: Cross-locale structural parity validation */
+  {
+    name: "translation.parity.validate",
+    description:
+      "Validate cross-locale structural parity (section/paragraph/sentence counts) for translated content (RFC-0901).",
+    scope: "app",
+    flags: {
+      "source-locale": {
+        kind: "string",
+        required: false,
+        description: "Override source locale for comparison (defaults to i18n.default).",
+      },
+    },
+    supportsAllSites: true,
+    reads: [
+      "<app>/src/content/pages/**/*.md",
+      "<app>/src/content/prose/**/*.md",
+      "<app>/src/content/business-profile/**/*.md",
+      "<app>/src/content/system.md",
+      "<workpiece>/translation-parity.suppressions.yaml",
+    ],
+    modulePaths: ["translation-parity.ts", "result-helpers.ts", "lib/i18n.ts"],
+    execute: runTranslationParityValidate,
+  },
+  {
+    name: "translation.parity.review",
+    description:
+      "Generate a review manifest of unsuppressed parity findings for agent/human review (RFC-0901).",
+    scope: "app",
+    flags: {
+      "source-locale": {
+        kind: "string",
+        required: false,
+        description: "Override source locale for comparison (defaults to i18n.default).",
+      },
+    },
+    supportsAllSites: true,
+    reads: [
+      "<app>/src/content/pages/**/*.md",
+      "<app>/src/content/prose/**/*.md",
+      "<app>/src/content/business-profile/**/*.md",
+      "<app>/src/content/system.md",
+      "<workpiece>/translation-parity.suppressions.yaml",
+    ],
+    writes: ["<workpiece>/translation-parity-review.yaml"],
+    modulePaths: ["translation-parity.ts", "result-helpers.ts", "lib/i18n.ts"],
+    execute: runTranslationParityReview,
+  },
+  {
+    name: "translation.parity.suppress",
+    description:
+      "Add a suppression record to translation-parity.suppressions.yaml for an intentional structural difference (RFC-0901).",
+    scope: "app",
+    flags: {
+      file: { kind: "string", required: true, description: "Content-relative file path." },
+      ruleId: {
+        kind: "string",
+        required: true,
+        description:
+          "Parity rule ID (PARITY-SECTION-COUNT, PARITY-PARAGRAPH-COUNT, PARITY-SENTENCE-COUNT).",
+      },
+      section: { kind: "string", required: false, description: "Section heading (optional)." },
+      reason: { kind: "string", required: true, description: "Justification for suppression." },
+    },
+    supportsAllSites: false,
+    mutatesState: true,
+    reads: ["<workpiece>/translation-parity.suppressions.yaml"],
+    writes: ["<workpiece>/translation-parity.suppressions.yaml"],
+    modulePaths: ["translation-parity.ts", "result-helpers.ts"],
+    execute: runTranslationParitySuppress,
   },
 ];

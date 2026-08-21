@@ -47,6 +47,14 @@ Rules:
 - The external packages `@sindresorhus/slugify`, `cyrillic-to-translit-js`, and `github-slugger` are dependencies of this package only — no other package may declare them as direct dependencies.
 - Enforcement: `utility.provenance.validate` (RFC-0916) scans for reimplementations outside the canonical path.
 
+### Semantic extraction (RFC-0901)
+
+Location: `packages/werkstatt-shared/src/share/semantic/` — exported via `@warpgogol/werkstatt-shared/share/semantic`.
+
+| Export | Purpose |
+| --- | --- |
+| `splitSentences(text, locale?)` | Locale-aware sentence boundary detection with abbreviation handling for `de`, `uk`, `en` (RFC-0901) |
+
 ### Utility registry (RFC-0916)
 
 Location: `packages/werkstatt-shared/src/share/utility-registry.yaml`

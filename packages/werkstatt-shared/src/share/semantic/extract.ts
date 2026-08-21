@@ -52,6 +52,70 @@ export function extractParagraphs(markdown: string): string[] {
     .filter(Boolean);
 }
 
+const SENTENCE_ABBREVIATIONS: Record<string, string[]> = {
+  de: ["z.B.", "etc.", "Nr.", "Abs.", "§", "S.", "ca.", "u.a.", "vgl.", "bspw."],
+  uk: ["т.д.", "т.п.", "п.", "ст.", "див.", "пор.", "напр.", "ім.", "о."],
+  en: ["e.g.", "i.e.", "etc.", "vs.", "Mr.", "Mrs.", "Dr.", "Inc.", "Ltd."],
+};
+
+function escapeRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildAbbreviationPattern(abbreviations: string[]): RegExp | undefined {
+  if (abbreviations.length === 0) return undefined;
+  const sorted = [...abbreviations].sort((a, b) => b.length - a.length);
+  return new RegExp(`(${sorted.map(escapeRegex).join("|")})$`);
+}
+
+export function splitSentences(text: string, locale: string = "en"): string[] {
+  const normalized = text.trim();
+  if (!normalized) return [];
+
+  const abbreviations = SENTENCE_ABBREVIATIONS[locale] ?? SENTENCE_ABBREVIATIONS.en;
+  const abbrevPattern = buildAbbreviationPattern(abbreviations);
+  const isCyrillicLocale = locale === "uk";
+
+  const sentences: string[] = [];
+  let current = "";
+
+  const chars = [...normalized];
+  for (let i = 0; i < chars.length; i++) {
+    const char = chars[i];
+    current += char;
+
+    if (char !== "." && char !== "!" && char !== "?") continue;
+
+    const nextChar = chars[i + 1];
+    if (nextChar === undefined) {
+      sentences.push(current.trim());
+      current = "";
+      continue;
+    }
+
+    if (nextChar !== " " && nextChar !== "\n" && nextChar !== "\t") continue;
+
+    const beforeAbbrCheck = current.trimEnd();
+
+    if (abbrevPattern && abbrevPattern.test(beforeAbbrCheck)) continue;
+
+    if (!isCyrillicLocale) {
+      const afterWhitespace = chars
+        .slice(i + 1)
+        .join("")
+        .match(/^\s*([A-ZА-ЯЁЇІЄ])/);
+      if (!afterWhitespace) continue;
+    }
+
+    sentences.push(current.trim());
+    current = "";
+  }
+
+  if (current.trim()) sentences.push(current.trim());
+
+  return sentences.filter(Boolean);
+}
+
 export function extractListFacts(markdown: string): string[] {
   return markdown
     .split("\n")

@@ -339,6 +339,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   // Content naming and mirroring
   { command: "naming.content.lint" },
   { command: "mirroring.validate" },
+  // RFC-0901: Cross-locale structural parity validation
+  { command: "translation.parity.validate" },
   // RFC-0090: Page filenames must derive from pageId via pageIdToContentFileSlug
   { command: "content.filename.validate" },
   // SEO
