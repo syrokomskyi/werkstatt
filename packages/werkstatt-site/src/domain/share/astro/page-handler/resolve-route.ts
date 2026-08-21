@@ -43,6 +43,7 @@ import {
   resolveLocalizedPagePath,
   localizeUrl,
 } from "../routes.ts";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "../canonical-url.ts";
 import { getSurfaceEntryByPageId, getSurfaceEntries } from "../surface-routes.ts";
 import { getParticipantsForSection, participantPageId, type ParticipantView } from "../people.ts";
 import {
@@ -1110,9 +1111,16 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
     pageSystemConfig?.routes?.[lang] ??
     pageSystemConfig?.routes?.[defaultLang] ??
     "";
+  // RFC-0906: use canonicalPageUrl instead of localizeUrl to ensure the page URL
+  // has a trailing slash, matching the sitemap/feed/llms canonical URLs.
+  const canonicalOpts: CanonicalUrlOptions = {
+    baseUrl: origin,
+    defaultLanguage: defaultLang,
+    supportedLanguages: supportedLangs,
+    trailingSlash: "always",
+  };
   const pageUrl = new URL(
-    localizeUrl(lang, canonicalSlug, { defaultLanguage: defaultLang }),
-    origin,
+    canonicalPageUrl({ lang, route: canonicalSlug, kind: "html" }, canonicalOpts),
   );
 
   // RFC-0490: for "collection"-typed surface pages (depth-0 pillar hub), compute
