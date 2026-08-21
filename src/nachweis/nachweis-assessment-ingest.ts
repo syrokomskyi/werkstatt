@@ -517,5 +517,11 @@ export async function runNachweisAssessmentIngest(
     },
     exitCode: 0,
     summary: `[nachweis.assessment.ingest] ${systemId}: ingested '${bundle.slug}' (${bundle.seriesId}/${bundle.observationId}, ${bundle.artifacts.length} artifacts, bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Validate the nachweis: pnpm exec werkstatt run nachweis.validate --site ${systemId}`,
+        kind: "optional",
+      },
+    ],
   };
 }

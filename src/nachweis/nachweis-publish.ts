@@ -135,6 +135,12 @@ export async function runNachweisPublish(
       },
       exitCode: 1,
       summary: `[nachweis.publish] ${systemId}: gate failed for '${slug}' — policy: ${gate.policyId}, failed: ${failedConditions.join(", ")}`,
+      nextSteps: [
+        {
+          action: `Fix the failed gate conditions (${failedConditions.join(", ")}), then re-run: pnpm exec werkstatt run nachweis.publish --site ${systemId} --slug ${slug}`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -250,5 +256,11 @@ export async function runNachweisPublish(
     },
     exitCode: 0,
     summary: `[nachweis.publish] ${systemId}: published '${slug}' (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Verify the published nachweis: pnpm exec werkstatt run nachweis.verify-signature --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -269,5 +269,11 @@ export async function runNachweisScreenshotIngest(
     },
     exitCode: 0,
     summary: `[nachweis.screenshot.ingest] ${systemId}: raw screenshot for '${slug}' ingested (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Upload the screenshot: pnpm exec werkstatt run nachweis.screenshot.upload --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

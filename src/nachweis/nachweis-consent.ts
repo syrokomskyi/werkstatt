@@ -193,5 +193,11 @@ export async function runNachweisConsentUpdate(
     },
     exitCode: 0,
     summary: `[nachweis.consent.update] ${systemId}: consent '${consentId}' ${scope}: ${previousStatus} → ${newStatus} (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Validate the nachweis: pnpm exec werkstatt run nachweis.validate --site ${systemId}`,
+        kind: "optional",
+      },
+    ],
   };
 }

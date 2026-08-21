@@ -109,6 +109,12 @@ export async function runNachweisVerifySignature(
       },
       exitCode: 1,
       summary: `[nachweis.verify-signature] ${systemId}: FAIL — no signature found for '${slug}'`,
+      nextSteps: [
+        {
+          action: `Sign the nachweis: pnpm exec werkstatt run nachweis.sign --site ${systemId} --slug ${slug}`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -128,6 +134,12 @@ export async function runNachweisVerifySignature(
       },
       exitCode: 1,
       summary: `[nachweis.verify-signature] ${systemId}: FAIL — incomplete signature metadata for '${slug}'`,
+      nextSteps: [
+        {
+          action: `Re-sign the nachweis: pnpm exec werkstatt run nachweis.sign --site ${systemId} --slug ${slug}`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -169,5 +181,13 @@ export async function runNachweisVerifySignature(
     },
     exitCode: signatureValid ? 0 : 1,
     summary: `[nachweis.verify-signature] ${systemId}: ${signatureValid ? "PASS" : "FAIL"} — '${slug}' (signature: ${signatureValid}, timestamp: ${timestampVerified}, assurance: ${timestampAssurance})`,
+    nextSteps: signatureValid
+      ? undefined
+      : [
+          {
+            action: `Re-sign the nachweis: pnpm exec werkstatt run nachweis.sign --site ${systemId} --slug ${slug}`,
+            kind: "required",
+          },
+        ],
   };
 }

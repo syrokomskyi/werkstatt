@@ -204,5 +204,11 @@ export async function runNachweisPublicDerivative(
     },
     exitCode: 0,
     summary: `[nachweis.public-derivative] ${systemId}: public derivative for '${slug}' uploaded (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Validate the nachweis: pnpm exec werkstatt run nachweis.validate --site ${systemId}`,
+        kind: "optional",
+      },
+    ],
   };
 }
