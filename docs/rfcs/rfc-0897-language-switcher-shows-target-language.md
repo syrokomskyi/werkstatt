@@ -1,7 +1,7 @@
 ---
 id: RFC-0897
 title: "Language switcher shows target language instead of current language"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
