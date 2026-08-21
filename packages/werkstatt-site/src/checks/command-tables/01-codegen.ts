@@ -99,6 +99,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/pages/[...slug].astro",
       "<app>/src/pages/[lang]/[...slug].astro",
       "<app>/src/middleware.ts",
+      "<app>/src/middleware/access-protection.ts",
       "<app>/src/content.config.ts",
       "<app>/src/env.d.ts",
     ],

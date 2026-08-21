@@ -176,6 +176,14 @@ export async function runGenerateRoutes(
       ),
     },
     {
+      // RFC-0899: access-protection middleware (static re-export from werkstatt-shared).
+      absolutePath: path.join(paths.srcDirectory, "middleware", "access-protection.ts"),
+      content: applyTokens(
+        readTemplate("src/middleware/access-protection.ts.template"),
+        routesTokens,
+      ),
+    },
+    {
       absolutePath: path.join(paths.srcDirectory, "content.config.ts"),
       content: applyTokens(readTemplate("src/content.config.template.ts"), routesTokens),
     },

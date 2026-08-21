@@ -11,15 +11,18 @@
   <item>RFC-0569: chain dev-normalize middleware in dev mode for egress parity.</item>
   <item>RFC-0589: chain retired-tombstone middleware first for 410 Gone handling.</item>
   <item>RFC-0785: chain markdown-negotiation middleware for agent content negotiation.</item>
+  <item>RFC-0899: chain access-protection middleware first for dev/alt subdomain auth gate.</item>
 </CHANGE_SUMMARY>
 */
-// @ai-invariant: High-risk module. Middleware chain. Tombstone middleware runs first, then language redirect, then markdown negotiation.
+// @ai-invariant: High-risk module. Middleware chain. Access protection runs first, then tombstone, then language redirect, then markdown negotiation.
+// RFC-0899: access-protection middleware gates dev/alt subdomains with Basic Auth PIN.
 // RFC-0569: dev-normalize middleware applies egress text normalization in dev mode.
 // RFC-0589: retired-tombstone middleware returns 410 Gone for retired page routes.
 // RFC-0785: markdown-negotiation middleware serves .md twins for Accept: text/markdown requests.
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sequence } from "astro:middleware";
+import accessProtectionMiddleware from "./middleware/access-protection";
 import languageRedirectMiddleware from "./middleware/language-redirect";
 import tombstoneMiddleware from "./middleware/retired-tombstones";
 import markdownNegotiationMiddleware from "./middleware/markdown-negotiation";
@@ -37,5 +40,5 @@ const devNormalize = import.meta.env.DEV
   : null;
 
 export const onRequest = import.meta.env.DEV
-  ? sequence(tombstoneMiddleware, languageRedirectMiddleware, markdownNegotiationMiddleware, devNormalize!)
-  : sequence(tombstoneMiddleware, languageRedirectMiddleware, markdownNegotiationMiddleware);
+  ? sequence(accessProtectionMiddleware, tombstoneMiddleware, languageRedirectMiddleware, markdownNegotiationMiddleware, devNormalize!)
+  : sequence(accessProtectionMiddleware, tombstoneMiddleware, languageRedirectMiddleware, markdownNegotiationMiddleware);

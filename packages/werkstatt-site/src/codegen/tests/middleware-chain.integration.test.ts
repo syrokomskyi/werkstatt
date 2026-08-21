@@ -60,6 +60,14 @@ declare module "@warpgogol/werkstatt-shared/share/middleware" {
   export function createLanguageRedirectMiddleware(opts: { supportedLangs: string[]; defaultLang: string }): any;
 }
 
+declare module "@warpgogol/werkstatt-shared/share/middleware/access-protection" {
+  export const accessProtectionMiddleware: any;
+}
+
+declare module "cloudflare:workers" {
+  export const env: Record<string, unknown>;
+}
+
 declare module "@warpgogol/werkstatt-site/share/semantic" {
   export function markdownTwinUrlPath(pathname: string, opts: { supportedLangs: string[] }): string;
 }
@@ -153,6 +161,12 @@ function generateMiddlewareChain(tmpDir: string): void {
     { ...baseTokens, TOMBSTONE_PREFIXES: '["old-page"]' },
   );
   fs.writeFileSync(path.join(middlewareDir, "retired-tombstones.ts"), tombstonesContent);
+
+  const accessProtectionContent = applyTokens(
+    readTemplate(APP_BOILERPLATE_TEMPLATES, "src/middleware/access-protection.ts.template"),
+    baseTokens,
+  );
+  fs.writeFileSync(path.join(middlewareDir, "access-protection.ts"), accessProtectionContent);
 
   const mdNegotiationContent = applyTokens(
     readTemplate(SERVICE_TEMPLATES, "src/middleware/markdown-negotiation.ts.template"),
