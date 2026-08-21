@@ -24,7 +24,10 @@ import { workshopCapacitySchema } from "./types.ts";
 import { loadDhtConfig } from "./config.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtPut } from "./node.ts";
 import { signBytes, verifyBytes } from "@warpgogol/werkstatt-shared/passport/sign";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-shared/passport";
+import {
+  WerkstattIdentityConfigSchema,
+  type WerkstattIdentityConfig,
+} from "@warpgogol/werkstatt-shared/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 const PASSPORT_SIGNING_KEY_ENV = "PASSPORT_SIGNING_KEY";
@@ -83,7 +86,13 @@ export async function runDhtCapacityPublish(
         diagnostics: ["dht.capacity.publish: --workshop-id flag is required"],
       },
       exitCode: 1,
-      summary: "dht.capacity.publish: --workshop-id flag is required",
+      summary: "[dht.capacity.publish] --workshop-id flag is required",
+      nextSteps: [
+        {
+          action: "Provide the --workshop-id flag and re-run dht.capacity.publish",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -97,7 +106,13 @@ export async function runDhtCapacityPublish(
         diagnostics: ["dht.capacity.publish: --available-slots flag is required"],
       },
       exitCode: 1,
-      summary: "dht.capacity.publish: --available-slots flag is required",
+      summary: "[dht.capacity.publish] --available-slots flag is required",
+      nextSteps: [
+        {
+          action: "Provide the --available-slots flag and re-run dht.capacity.publish",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -122,7 +137,13 @@ export async function runDhtCapacityPublish(
         ],
       },
       exitCode: 1,
-      summary: `dht.capacity.publish: identity not bootstrapped`,
+      summary: `[dht.capacity.publish] identity not bootstrapped`,
+      nextSteps: [
+        {
+          action: "Run identity.bootstrap first (RFC-0558), then re-run dht.capacity.publish",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -142,7 +163,13 @@ export async function runDhtCapacityPublish(
         ],
       },
       exitCode: 1,
-      summary: `dht.capacity.publish: ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      summary: `[dht.capacity.publish] ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      nextSteps: [
+        {
+          action: `Set the ${PASSPORT_SIGNING_KEY_ENV} environment variable and re-run dht.capacity.publish`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -162,7 +189,10 @@ export async function runDhtCapacityPublish(
         ],
       },
       exitCode: 1,
-      summary: `dht.capacity.publish: DHT not initialized`,
+      summary: `[dht.capacity.publish] DHT not initialized`,
+      nextSteps: [
+        { action: "Run dht.node.init first, then re-run dht.capacity.publish", kind: "required" },
+      ],
     };
   }
 
@@ -197,7 +227,14 @@ export async function runDhtCapacityPublish(
         ],
       },
       exitCode: 1,
-      summary: `dht.capacity.publish: signing failed`,
+      summary: `[dht.capacity.publish] signing failed`,
+      nextSteps: [
+        {
+          action:
+            "Check the PASSPORT_SIGNING_KEY environment variable and re-run dht.capacity.publish",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -216,7 +253,13 @@ export async function runDhtCapacityPublish(
         diagnostics: [`dht.capacity.publish: capacity entry failed schema validation`],
       },
       exitCode: 1,
-      summary: `dht.capacity.publish: schema validation failed`,
+      summary: `[dht.capacity.publish] schema validation failed`,
+      nextSteps: [
+        {
+          action: "Check the capacity entry fields and re-run dht.capacity.publish",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -237,7 +280,14 @@ export async function runDhtCapacityPublish(
         ],
       },
       exitCode: 1,
-      summary: `dht.capacity.publish: DHT node startup failed`,
+      summary: `[dht.capacity.publish] DHT node startup failed`,
+      nextSteps: [
+        {
+          action:
+            "Check the DHT configuration and network connectivity, then re-run dht.capacity.publish",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -254,7 +304,7 @@ export async function runDhtCapacityPublish(
         capacity,
       },
       exitCode: 0,
-      summary: `dht.capacity.publish: published capacity for ${workshopId} (${slots} slots)`,
+      summary: `[dht.capacity.publish] published capacity for ${workshopId} (${slots} slots)`,
     };
   } finally {
     await stopDhtNode(node);
