@@ -110,6 +110,12 @@ export async function runBordbuchAppend(
         hash: entry.hash,
       },
       summary: `[bordbuch.append] appended ${entry.id} to ${systemId} Bordbuch`,
+      nextSteps: [
+        {
+          action: `Commit the bordbuch: pnpm exec werkstatt run bordbuch.commit --site ${systemId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `bordbuch:${systemId}`);

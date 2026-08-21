@@ -123,6 +123,12 @@ export async function runBordbuchCommit(
     return {
       data: result,
       summary: `[bordbuch.commit] committed ${result.filesCommitted.length} bordbuch projection files for ${systemId}`,
+      nextSteps: [
+        {
+          action: `Push to remote: pnpm exec werkstatt run sternsystem.sync --id ${systemId}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -131,6 +137,12 @@ export async function runBordbuchCommit(
     return {
       data: result,
       summary: `[bordbuch.commit] git operation failed for ${systemId}: ${result.error}`,
+      nextSteps: [
+        {
+          action: `Check git status and resolve the conflict, then re-run: pnpm exec werkstatt run bordbuch.commit --site ${systemId}`,
+          kind: "required",
+        },
+      ],
     };
   }
 

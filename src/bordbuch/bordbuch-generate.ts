@@ -221,6 +221,12 @@ export async function runBordbuchGenerate(
 
     return {
       summary: `[bordbuch.generate] wrote bordbuch.json, bordbuch/index.html, status.generated.yaml for ${systemId}`,
+      nextSteps: [
+        {
+          action: `Commit the bordbuch projections: pnpm exec werkstatt run bordbuch.commit --site ${systemId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `bordbuch:${systemId}`);
