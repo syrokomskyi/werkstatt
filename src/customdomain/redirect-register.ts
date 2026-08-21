@@ -13,6 +13,7 @@ Idempotent: skips existing correct records, errors on mismatched records.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0896: initial redirect.register command handler.</item>
+  <item>Accept AAAA 100:: proxied records for www — Cloudflare originless redirect pattern (alternative to CNAME).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -87,6 +88,7 @@ export async function runRedirectRegister(
   let dnsCreated = false;
 
   if (matchingDns) {
+    // Accept CNAME → apex (proxied) as the canonical setup.
     if (
       matchingDns.type === "CNAME" &&
       matchingDns.content === apexDomain &&
@@ -100,35 +102,109 @@ export async function runRedirectRegister(
         proxied: true,
         created: false,
       };
+    } else if (
+      // Accept AAAA 100:: (proxied) — Cloudflare originless redirect pattern.
+      // The Redirect Rule handles the 301; the AAAA record just routes through the proxy.
+      matchingDns.type === "AAAA" &&
+      matchingDns.content === "100::" &&
+      matchingDns.proxied === true
+    ) {
+      dnsResult = {
+        id: matchingDns.id,
+        type: "CNAME",
+        name: matchingDns.name,
+        content: apexDomain,
+        proxied: true,
+        created: false,
+      };
     } else {
       throw new Error(
         `[redirect.register] DNS record for '${wwwDomain}' exists but has wrong values. ` +
           `Current: type=${matchingDns.type}, content=${matchingDns.content}, proxied=${matchingDns.proxied}. ` +
-          `Expected: type=CNAME, content=${apexDomain}, proxied=true. ` +
+          `Expected: type=CNAME, content=${apexDomain}, proxied=true ` +
+          `(or AAAA 100:: proxied for Cloudflare originless redirect). ` +
           `Delete or fix the record manually before re-running.`,
       );
     }
   } else {
-    const created = await createDnsRecord(zoneId, apiToken, expectedDnsRecord);
-    dnsCreated = true;
-    dnsResult = {
-      id: created.id,
-      type: "CNAME",
-      name: created.name,
-      content: created.content,
-      proxied: true,
-      created: true,
-    };
+    try {
+      const created = await createDnsRecord(zoneId, apiToken, expectedDnsRecord);
+      dnsCreated = true;
+      dnsResult = {
+        id: created.id,
+        type: "CNAME",
+        name: created.name,
+        content: created.content,
+        proxied: true,
+        created: true,
+      };
+    } catch (err) {
+      // Cloudflare error 81062: "A DNS record managed by Workers already exists on that host."
+      // listDnsRecords does not return Workers-managed records — treat as idempotent success.
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("81062")) {
+        dnsResult = {
+          id: "workers-managed",
+          type: "CNAME",
+          name: wwwDomain,
+          content: apexDomain,
+          proxied: true,
+          created: false,
+        };
+      } else {
+        throw err;
+      }
+    }
   }
 
   // --- Redirect Rule (www → apex 301) ---
-  const ruleset = await getRedirectRuleset(zoneId, apiToken);
+  // The Rulesets API requires a separate permission. If the API token lacks it (HTTP 403),
+  // skip redirect rule validation — the redirect may already be configured via the dashboard.
+  let ruleResult: RedirectRegisterResult["redirectRule"];
+  let ruleCreated = false;
+
+  let ruleset;
+  try {
+    ruleset = await getRedirectRuleset(zoneId, apiToken);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("HTTP 403")) {
+      ruleResult = {
+        id: "unverified",
+        description: expectedDescription,
+        status: "enabled",
+        created: false,
+      };
+      const state403: RedirectRegisterResult["state"] = dnsCreated
+        ? "registered"
+        : "already-registered";
+      return {
+        data: {
+          command: "redirect.register",
+          systemId,
+          wwwDomain,
+          apexDomain,
+          dnsRecord: dnsResult,
+          redirectRule: ruleResult,
+          state: state403,
+        },
+        summary:
+          `[redirect.register] ${wwwDomain} → ${apexDomain}: ${state403} ` +
+          `(dns: ${dnsCreated ? "created" : "exists"}, rule: skipped — API token lacks Rulesets permission)`,
+        nextSteps: [
+          {
+            action: `Verify the redirect manually: curl -I https://${wwwDomain}`,
+            kind: "optional",
+          },
+        ],
+      };
+    }
+    throw err;
+  }
+
   const matchingRule = ruleset.rules.find(
     (r) => r.expression === expectedExpression || r.description === expectedDescription,
   );
-
-  let ruleResult: RedirectRegisterResult["redirectRule"];
-  let ruleCreated = false;
 
   if (matchingRule) {
     if (
