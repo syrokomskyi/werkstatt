@@ -304,9 +304,6 @@ async function generateFullBoilerplate(
   const tokens: Record<string, string> = {
     CLIENT_ID: systemId,
     DOMAIN: domain,
-    SITE_LINE: domain
-      ? `  site: "https://${domain}",`
-      : "  // site: omitted (no domain configured)",
   };
 
   // Step 1: Write template files into staging directory
@@ -314,7 +311,13 @@ async function generateFullBoilerplate(
     { dest: "package.json", content: applyTokens(readTemplate("package.template.json"), tokens) },
     {
       dest: "astro.config.mjs",
-      content: applyTokens(readRuntimeTemplate("astro.config.template.mjs"), tokens),
+      content: applyTokens(
+        readRuntimeTemplate("astro.config.template.mjs").replace(
+          "// WG_SITE_LINE",
+          domain ? `  site: "https://${domain}",` : "  // site: omitted (no domain configured)",
+        ),
+        tokens,
+      ),
     },
     {
       dest: "wrangler.jsonc",
