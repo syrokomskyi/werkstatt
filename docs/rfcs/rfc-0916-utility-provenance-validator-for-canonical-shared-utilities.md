@@ -258,16 +258,16 @@ No flag day — warning mode allows existing violations to be detected without b
 
 ## Acceptance criteria
 
-- [ ] `utility.provenance.validate` command is registered in `command-tables/infra-contracts.ts` with `--mode` flag (evidence: `packages/werkstatt-site/src/checks/command-tables/infra-contracts.ts`)
-- [ ] `utility-registry.yaml` exists at `packages/werkstatt-shared/src/share/utility-registry.yaml` with slug utility entry (evidence: `packages/werkstatt-shared/src/share/utility-registry.yaml:1`)
-- [ ] `utility.provenance.validate` is registered in `PACKAGES_CHECK_PIPELINE` with `--mode warning` (evidence: `packages/werkstatt-site/src/checks/pipelines/packages-check.ts`)
-- [ ] Command detects import-based violations (UTIL-PROV-01) — unit test with forbidden import outside canonical path (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts`)
-- [ ] Command detects name-based violations (UTIL-PROV-02) — unit test with `function slugify()` outside canonical path (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts`)
-- [ ] Command detects pattern-based violations (UTIL-PROV-03) — unit test with NFKD + replace pattern outside canonical path (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts`)
-- [ ] Allowlisted files do not produce violations — unit test with allowlisted file (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts`)
-- [ ] `--json` output format matches the documented shape with `ruleId`, `severity`, `file`, `message`, `fixHint`, `data` fields (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts`)
-- [ ] `build:check` passes with the new command in the pipeline (evidence: `pnpm run build:check` exit code 0)
-- [ ] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0916` exit code 0)
+- [x] `utility.provenance.validate` command is registered in `command-tables/infra-contracts.ts` with `--mode` flag (evidence: `packages/werkstatt-site/src/checks/command-tables/infra-contracts.ts:240`)
+- [x] `utility-registry.yaml` exists at `packages/werkstatt-shared/src/share/utility-registry.yaml` with slug utility entry (evidence: `packages/werkstatt-shared/src/share/utility-registry.yaml:1`)
+- [x] `utility.provenance.validate` is registered in `PACKAGES_CHECK_PIPELINE` with `--mode warning` (evidence: `packages/werkstatt-site/src/checks/pipelines/packages-check.ts:189`)
+- [x] Command detects import-based violations (UTIL-PROV-01) — unit test with forbidden import outside canonical path (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts:109`)
+- [x] Command detects name-based violations (UTIL-PROV-02) — unit test with `function slugify()` outside canonical path (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts:122`)
+- [x] Command detects pattern-based violations (UTIL-PROV-03) — unit test with NFKD + replace pattern outside canonical path (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts:135`)
+- [x] Allowlisted files do not produce violations — unit test with allowlisted file (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts:151`)
+- [x] `--json` output format matches the documented shape with `ruleId`, `severity`, `file`, `message`, `fixHint`, `data` fields (evidence: `packages/werkstatt-site/src/checks/tests/utility-provenance.test.ts:204`)
+- [x] `build:check` passes with the new command in the pipeline (evidence: `pnpm run build:check` exit code 0)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0916` exit code 0)
 
 ## Implementation notes for agents
 
