@@ -17246,10 +17246,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0897-language-switcher-shows-target-language.md
   - id: RFC-0898
     title: Canonical URL hardening and cross-language link validator
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-21
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17258,13 +17258,14 @@ entries:
     related:
       - RFC-0317
       - RFC-0162
-    file: docs/rfcs/rfc-0898-canonical-url-hardening-and-cross-language-link-validator.md
+      - DNA-61
+    file: docs/rfcs/archive/implemented/rfc-0898-canonical-url-hardening-and-cross-language-link-validator.md
   - id: RFC-0899
     title: Workshop-level access protection for dev and alt subdomains
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-21
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17274,7 +17275,7 @@ entries:
       - RFC-0842
       - RFC-0851
       - RFC-0865
-    file: docs/rfcs/rfc-0899-workshop-level-access-protection-for-dev-alt-subdomains.md
+    file: docs/rfcs/archive/implemented/rfc-0899-workshop-level-access-protection-for-dev-alt-subdomains.md
   - id: RFC-0900
     title: Add client-testimonial PBP entity and gratitude-section for client
       gratitude display on Nachweise page
