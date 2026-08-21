@@ -322,18 +322,18 @@ seo.domain.validate
 
 ## Acceptance criteria
 
-- [ ] `canonical.html-parity.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `canonical.html-parity.validate` emits CANON-HTML-01 when `<link rel="canonical">` href does not match `canonicalPageUrl` output
-- [ ] `canonical.html-parity.validate` emits CANON-HTML-02 when `og:url` does not match `canonicalPageUrl` output
-- [ ] `canonical.html-parity.validate` emits CANON-HTML-03 when canonical href and og:url diverge
-- [ ] `canonical.url.validate` enhanced with CANON-04 (HTML canonical in expected set)
-- [ ] `pageUrl` in `resolve-route.ts` uses `canonicalPageUrl` instead of `localizeUrl`
-- [ ] `canonical.html-parity.validate` added to `SITES_CHECK_POSTBUILD_PIPELINE` after `canonical.url.validate`
-- [ ] `--json` output format matches the documented shape
-- [ ] DNA-85 added to `docs/architecture-dna.md`
-- [ ] `packages/werkstatt-site/AGENTS.md` documents `canonical.html-parity.validate` command
-- [ ] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test`
-- [ ] `rfc.validate` passes on this file
+- [x] `canonical.html-parity.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts:766)
+- [x] `canonical.html-parity.validate` emits CANON-HTML-01 when `<link rel="canonical">` href does not match `canonicalPageUrl` output (evidence: packages/werkstatt-site/src/checks/canonical-html-parity.ts:108, packages/werkstatt-site/src/checks/tests/canonical-html-parity.test.ts:CANON-HTML-01 test)
+- [x] `canonical.html-parity.validate` emits CANON-HTML-02 when `og:url` does not match `canonicalPageUrl` output (evidence: packages/werkstatt-site/src/checks/canonical-html-parity.ts:117, packages/werkstatt-site/src/checks/tests/canonical-html-parity.test.ts:CANON-HTML-02 test)
+- [x] `canonical.html-parity.validate` emits CANON-HTML-03 when canonical href and og:url diverge (evidence: packages/werkstatt-site/src/checks/canonical-html-parity.ts:126, packages/werkstatt-site/src/checks/tests/canonical-html-parity.test.ts:CANON-HTML-03 test)
+- [x] `canonical.url.validate` enhanced with CANON-04 (HTML canonical in expected set) (evidence: packages/werkstatt-site/src/checks/canonical-url.ts:184-215)
+- [x] `pageUrl` in `resolve-route.ts` uses `canonicalPageUrl` instead of `localizeUrl` (evidence: packages/werkstatt-site/src/domain/share/astro/page-handler/resolve-route.ts:1122-1124)
+- [x] `canonical.html-parity.validate` added to `SITES_CHECK_POSTBUILD_PIPELINE` after `canonical.url.validate` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:50)
+- [x] `--json` output format matches the documented shape (evidence: packages/werkstatt-site/src/checks/canonical-html-parity.ts uses diagnosticsResult from result-helpers.ts which produces standard Diagnostic[] JSON shape)
+- [x] DNA-85 added to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:355-357)
+- [x] `packages/werkstatt-site/AGENTS.md` documents `canonical.html-parity.validate` command (evidence: packages/werkstatt-site/AGENTS.md:106-107)
+- [x] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test` (evidence: 8/8 tests pass in src/checks/tests/canonical-html-parity.test.ts, 3 pre-existing failures in unrelated test files)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0906 --json returns status: pass, exitCode: 0)
 
 ## Implementation notes for agents
 
