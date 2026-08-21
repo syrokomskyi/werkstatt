@@ -31,10 +31,14 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-function makeSystemEntry(defaultLang: string, supported: Record<string, unknown>) {
+function makeSystemEntry(
+  defaultLang: string,
+  supported: Record<string, unknown>,
+  pages?: Array<{ pageId?: string; routes?: Record<string, string> }>,
+) {
   return {
     id: "system",
-    data: { i18n: { default: defaultLang, supported } },
+    data: { i18n: { default: defaultLang, supported }, ...(pages ? { pages } : {}) },
   };
 }
 
@@ -67,17 +71,14 @@ describe("nachweisVerifyPageId", () => {
 
 describe("getNachweisRoutes", () => {
   it("generates correct route for published evidence record with slug", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true, en: true }),
-      [
-        makeEvidenceEntry("de/iso-9001", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "iso-9001",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true, en: true }), [
+      makeEvidenceEntry("de/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+    ]);
 
     const routes = await getNachweisRoutes();
 
@@ -89,32 +90,26 @@ describe("getNachweisRoutes", () => {
   });
 
   it("throws when slug is absent from frontmatter", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true }),
-      [
-        makeEvidenceEntry("de/no-slug", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true }), [
+      makeEvidenceEntry("de/no-slug", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+      }),
+    ]);
 
     await expect(getNachweisRoutes()).rejects.toThrow(/missing required frontmatter "slug"/);
   });
 
   it("generates routes without leading or trailing slashes", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true, en: true }),
-      [
-        makeEvidenceEntry("de/iso-9001", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "iso-9001",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true, en: true }), [
+      makeEvidenceEntry("de/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+    ]);
 
     const routes = await getNachweisRoutes();
 
@@ -127,17 +122,14 @@ describe("getNachweisRoutes", () => {
   });
 
   it("generates routes for all supported languages", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true, en: true, uk: true }),
-      [
-        makeEvidenceEntry("de/iso-9001", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "iso-9001",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true, en: true, uk: true }), [
+      makeEvidenceEntry("de/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+    ]);
 
     const routes = await getNachweisRoutes();
 
@@ -145,23 +137,20 @@ describe("getNachweisRoutes", () => {
   });
 
   it("excludes draft records", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true }),
-      [
-        makeEvidenceEntry("de/draft-cert", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "draft",
-          slug: "draft-cert",
-        }),
-        makeEvidenceEntry("de/published-cert", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "published-cert",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true }), [
+      makeEvidenceEntry("de/draft-cert", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "draft",
+        slug: "draft-cert",
+      }),
+      makeEvidenceEntry("de/published-cert", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "published-cert",
+      }),
+    ]);
 
     const routes = await getNachweisRoutes();
 
@@ -170,22 +159,19 @@ describe("getNachweisRoutes", () => {
   });
 
   it("excludes non-evidence-source types", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true }),
-      [
-        makeEvidenceEntry("de/business", {
-          type: "business",
-          status: "published",
-          slug: "business",
-        }),
-        makeEvidenceEntry("de/cert", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "cert",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true }), [
+      makeEvidenceEntry("de/business", {
+        type: "business",
+        status: "published",
+        slug: "business",
+      }),
+      makeEvidenceEntry("de/cert", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "cert",
+      }),
+    ]);
 
     const routes = await getNachweisRoutes();
 
@@ -194,23 +180,20 @@ describe("getNachweisRoutes", () => {
   });
 
   it("excludes non-Nachweis evidence kinds", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true }),
-      [
-        makeEvidenceEntry("de/other-kind", {
-          type: "evidence-source",
-          kind: "some-other-kind",
-          status: "published",
-          slug: "other-kind",
-        }),
-        makeEvidenceEntry("de/client-statement", {
-          type: "evidence-source",
-          kind: "client-statement",
-          status: "published",
-          slug: "client-statement",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true }), [
+      makeEvidenceEntry("de/other-kind", {
+        type: "evidence-source",
+        kind: "some-other-kind",
+        status: "published",
+        slug: "other-kind",
+      }),
+      makeEvidenceEntry("de/client-statement", {
+        type: "evidence-source",
+        kind: "client-statement",
+        status: "published",
+        slug: "client-statement",
+      }),
+    ]);
 
     const routes = await getNachweisRoutes();
 
@@ -219,20 +202,40 @@ describe("getNachweisRoutes", () => {
   });
 
   it("only reads default-language entries", async () => {
+    setupCollections(makeSystemEntry("de", { de: true, en: true }), [
+      makeEvidenceEntry("de/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+      makeEvidenceEntry("en/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+    ]);
+
+    const routes = await getNachweisRoutes();
+
+    expect(routes).toHaveLength(1);
+  });
+
+  it("uses localized route patterns from system.md pages[]", async () => {
     setupCollections(
-      makeSystemEntry("de", { de: true, en: true }),
+      makeSystemEntry("de", { de: true, uk: true }, [
+        {
+          pageId: "nachweis-detail",
+          routes: { de: "nachweise/[slug]", uk: "dokazy/[slug]" },
+        },
+      ]),
       [
-        makeEvidenceEntry("de/iso-9001", {
+        makeEvidenceEntry("de/nicaragua-project", {
           type: "evidence-source",
-          kind: "certificate",
+          kind: "project-confirmation",
           status: "published",
-          slug: "iso-9001",
-        }),
-        makeEvidenceEntry("en/iso-9001", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "iso-9001",
+          slug: "nicaragua-project",
         }),
       ],
     );
@@ -240,22 +243,21 @@ describe("getNachweisRoutes", () => {
     const routes = await getNachweisRoutes();
 
     expect(routes).toHaveLength(1);
+    expect(routes[0].routes.de).toBe("nachweise/nicaragua-project");
+    expect(routes[0].routes.uk).toBe("dokazy/nicaragua-project");
   });
 });
 
 describe("getNachweisVerifyRoutes", () => {
   it("generates verify routes with version suffix", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true, en: true }),
-      [
-        makeEvidenceEntry("de/iso-9001", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "iso-9001",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true, en: true }), [
+      makeEvidenceEntry("de/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+    ]);
 
     const routes = await getNachweisVerifyRoutes();
 
@@ -268,17 +270,14 @@ describe("getNachweisVerifyRoutes", () => {
   });
 
   it("generates verify routes without leading or trailing slashes", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true, en: true }),
-      [
-        makeEvidenceEntry("de/iso-9001", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "iso-9001",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true, en: true }), [
+      makeEvidenceEntry("de/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+    ]);
 
     const routes = await getNachweisVerifyRoutes();
 
@@ -291,17 +290,14 @@ describe("getNachweisVerifyRoutes", () => {
   });
 
   it("generates verify routes for all supported languages", async () => {
-    setupCollections(
-      makeSystemEntry("de", { de: true, en: true, uk: true }),
-      [
-        makeEvidenceEntry("de/iso-9001", {
-          type: "evidence-source",
-          kind: "certificate",
-          status: "published",
-          slug: "iso-9001",
-        }),
-      ],
-    );
+    setupCollections(makeSystemEntry("de", { de: true, en: true, uk: true }), [
+      makeEvidenceEntry("de/iso-9001", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+        slug: "iso-9001",
+      }),
+    ]);
 
     const routes = await getNachweisVerifyRoutes();
 
@@ -309,17 +305,39 @@ describe("getNachweisVerifyRoutes", () => {
   });
 
   it("throws when slug is absent", async () => {
+    setupCollections(makeSystemEntry("de", { de: true }), [
+      makeEvidenceEntry("de/no-slug", {
+        type: "evidence-source",
+        kind: "certificate",
+        status: "published",
+      }),
+    ]);
+
+    await expect(getNachweisVerifyRoutes()).rejects.toThrow(/missing required frontmatter "slug"/);
+  });
+
+  it("uses localized verify route patterns from system.md pages[]", async () => {
     setupCollections(
-      makeSystemEntry("de", { de: true }),
+      makeSystemEntry("de", { de: true, uk: true }, [
+        {
+          pageId: "nachweis-verify",
+          routes: { de: "nachweise/verify/[version]", uk: "dokazy/verify/[version]" },
+        },
+      ]),
       [
-        makeEvidenceEntry("de/no-slug", {
+        makeEvidenceEntry("de/nicaragua-project", {
           type: "evidence-source",
-          kind: "certificate",
+          kind: "project-confirmation",
           status: "published",
+          slug: "nicaragua-project",
         }),
       ],
     );
 
-    await expect(getNachweisVerifyRoutes()).rejects.toThrow(/missing required frontmatter "slug"/);
+    const routes = await getNachweisVerifyRoutes();
+
+    expect(routes).toHaveLength(1);
+    expect(routes[0].routes.de).toBe("nachweise/verify/v1");
+    expect(routes[0].routes.uk).toBe("dokazy/verify/v1");
   });
 });

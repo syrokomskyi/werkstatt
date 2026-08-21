@@ -63,6 +63,7 @@ export interface NachweisVerifyRouteEntry {
 
 interface SystemView {
   i18n?: { default?: string; supported?: Record<string, unknown> };
+  pages?: Array<{ pageId?: string; routes?: Record<string, string> }>;
 }
 
 interface EvidenceSourceData {
@@ -82,7 +83,10 @@ interface PublishedNachweisEntry {
  * to published EvidenceSource records with Nachweis evidence kinds in the
  * default language. Used by both getNachweisRoutes and getNachweisVerifyRoutes.
  */
-async function loadPublishedNachweisEntries(): Promise<PublishedNachweisEntry[]> {
+async function loadPublishedNachweisEntries(): Promise<{
+  entries: PublishedNachweisEntry[];
+  routePatterns: Record<string, Record<string, string>>;
+}> {
   const systemEntries = await getCollection("system");
   const system = (systemEntries.find((e: { id: string }) => e.id === "system")?.data ??
     {}) as SystemView;
@@ -91,6 +95,13 @@ async function loadPublishedNachweisEntries(): Promise<PublishedNachweisEntry[]>
   }
   const defaultLang = system.i18n.default;
   const supportedLangs = Object.keys(system.i18n.supported ?? { [defaultLang]: true });
+
+  const routePatterns: Record<string, Record<string, string>> = {};
+  for (const page of system.pages ?? []) {
+    if (page.pageId && page.routes) {
+      routePatterns[page.pageId] = page.routes;
+    }
+  }
 
   const entries = await getCollection("business-profile");
   const defaultLangEntries = entries.filter((e: { id: string }) => {
@@ -116,7 +127,7 @@ async function loadPublishedNachweisEntries(): Promise<PublishedNachweisEntry[]>
     }
     result.push({ slug, supportedLangs });
   }
-  return result;
+  return { entries: result, routePatterns };
 }
 
 /**
@@ -125,11 +136,13 @@ async function loadPublishedNachweisEntries(): Promise<PublishedNachweisEntry[]>
  * route is generated for them.
  */
 export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
-  const published = await loadPublishedNachweisEntries();
+  const { entries: published, routePatterns } = await loadPublishedNachweisEntries();
+  const detailPatterns = routePatterns["nachweis-detail"] ?? {};
   return published.map(({ slug, supportedLangs }) => {
     const routes: Record<string, string> = {};
     for (const lang of supportedLangs) {
-      routes[lang] = `nachweise/${slug}`;
+      const pattern = detailPatterns[lang] ?? `nachweise/[slug]`;
+      routes[lang] = pattern.replace("[slug]", slug);
     }
     return {
       pageId: nachweisPageId(slug),
@@ -145,12 +158,14 @@ export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
  * Draft records are excluded.
  */
 export async function getNachweisVerifyRoutes(): Promise<NachweisVerifyRouteEntry[]> {
-  const published = await loadPublishedNachweisEntries();
+  const { entries: published, routePatterns } = await loadPublishedNachweisEntries();
+  const verifyPatterns = routePatterns["nachweis-verify"] ?? {};
   return published.map(({ slug, supportedLangs }) => {
     const version = "v1";
     const routes: Record<string, string> = {};
     for (const lang of supportedLangs) {
-      routes[lang] = `nachweise/verify/${version}`;
+      const pattern = verifyPatterns[lang] ?? `nachweise/verify/[version]`;
+      routes[lang] = pattern.replace("[version]", version);
     }
     return {
       pageId: nachweisVerifyPageId(slug, version),

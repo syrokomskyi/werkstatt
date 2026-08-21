@@ -950,7 +950,7 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
   // slug comes from the registry entry's per-language routes (it carries the localized slug for each
   // supported language). Without this, the language switcher fell back to "" → the home page.
   const targetSlug =
-    pageSystemConfig?.routes?.[targetLang] ?? routeEntry?.routes?.[targetLang] ?? "";
+    routeEntry?.routes?.[targetLang] ?? pageSystemConfig?.routes?.[targetLang] ?? "";
   const localizedSiblingPath = localizeUrl(targetLang, targetSlug, {
     defaultLanguage: defaultLang,
   });
