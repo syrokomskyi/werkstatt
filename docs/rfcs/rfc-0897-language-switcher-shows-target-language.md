@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -35,6 +36,7 @@ successSignals:
 nonGoals:
   - "Do not change the visual style, icon, or layout of the language switcher"
   - "Do not add a dropdown or multi-language selector — the single-button cycle pattern is preserved"
+  - "Do not address single-language sites where nextLang === lang — the button shows the same language code, which is pre-existing behavior unchanged by this RFC"
 ---
 
 # RFC-0897: Language switcher shows target language instead of current language
@@ -57,7 +59,7 @@ The language switcher button displays the **target** language code (`nextLang.to
 
 ## Architectural fit
 
-- **DNA-8 (Page → section → component → content hierarchy):** The component contract is unchanged — only the displayed text source changes from `lang` to `nextLang`. Both variables are already available in the component scope.
+- **DNA-8 (Page → section → component → content hierarchy):** This RFC modifies a leaf component within the DNA-8 hierarchy without changing the hierarchy itself. The `lang-switcher-component.astro` remains a child component consumed by the header section, which is composed into pages. The component contract (props, imports, content resolution) is unchanged — only the displayed text source changes from `lang` to `nextLang`. Both variables are already available in the component scope. The RFC satisfies DNA-8 by preserving the existing hierarchy while adjusting component-internal display logic.
 - **Component Contracts:** The `lang-switcher-component.astro` is a shared UI component in `packages/werkstatt-site/src/domain/ui/components/lang-switcher/`. All sites consume it through the header component. No site-specific changes needed.
 
 ## Design
@@ -79,6 +81,7 @@ The `aria-label` already uses `nextLang.toUpperCase()` via the `content.switchAr
 
 ## Rollout
 
+- **Already applied:** The code change is already present in `lang-switcher-component.astro` (line 88: `{nextLang.toUpperCase()}`). This RFC serves as the retrospective architectural decision record for that change. The implementation step verifies the current state and stamps — no code edit is needed.
 - **Default behavior:** The change takes effect on the next build of any site using the shared header component. No migration path needed — all sites automatically get the updated behavior.
 - **No flag day:** The change is purely visual text content within an existing component. No data format changes, no API changes.
 - **New apps:** Automatically comply from day one.
@@ -98,7 +101,8 @@ The `aria-label` already uses `nextLang.toUpperCase()` via the `content.switchAr
 - [ ] `lang-switcher-component.astro` displays `nextLang.toUpperCase()` instead of `lang.toUpperCase()`
 - [ ] `aria-label` continues to reference the target language correctly
 - [ ] No visual style changes (icon, layout, CSS unchanged)
-- [ ] `a11y.label-in-name.validate` passes — visible text is included in aria-label
+- [ ] `a11y.label-in-name.validate` passes — visible text is included in aria-label (post-build, RFC-0832)
+- [ ] `a11y.label-in-name.component.validate` passes — component source passes label-in-name static analysis (pre-build, RFC-0836)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
