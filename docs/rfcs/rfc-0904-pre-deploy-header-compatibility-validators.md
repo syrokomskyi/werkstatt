@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -23,7 +24,7 @@ amends: []
 amendedBy: []
 related:
   - DNA-67
-  - DNA-81
+  - DNA-83
   - RFC-0831
   - RFC-0315
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
@@ -31,7 +32,7 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-67
-  - DNA-81
+  - DNA-83
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -105,7 +106,7 @@ Two classes of `_headers` misconfiguration are undetectable before deployment to
 **2. `_headers` path coverage gaps.** The `_headers` file contains path patterns (e.g., `/nachweis-pdfs/*`, `/_astro/*`) that apply headers to matching files in `dist/client/`. Two sub-problems exist:
 
 - **Orphan patterns:** path patterns declared in `_headers` that match no files in `dist/client/` — dead rules that clutter the configuration.
-- **Uncovered typed files:** files of specific types (`.pdf`, `.mp4`, `.webm`, `.svg`) in `dist/client/` that have no matching `_headers` path pattern — these files will be served without correct `Content-Type` or `Cache-Control` headers, potentially breaking functionality or caching behaviour.
+- **Uncovered typed files:** files of specific types (`.pdf`, `.mp4`, `.webm`, `.svg`) in `dist/client/` that have no matching `_headers` path pattern — these files will be served without explicit `Cache-Control` headers. Cloudflare Pages infers `Content-Type` from file extension automatically, so the risk is missing cache policy, not content type. The tracked types are binary/media formats that benefit from explicit long-lived caching (matching the `/_astro/*` and `/*.mp4` patterns already in `_headers.template`). HTML, CSS, JS, and image formats are excluded because the `_headers.template` already covers them via `/*`, `/*.css`, `/*.js`, `/*.svg`, `/*.webp`, `/*.png`, `/*.jpg` patterns.
 
 Neither `headers.security.validate` (author-time, checks header presence only) nor `csp.origins.validate` (post-build, checks external origin coverage only) covers these cases. The gap means CSP/headers problems are only discovered after deployment, when the production site fails to display content correctly.
 
@@ -113,7 +114,7 @@ Neither `headers.security.validate` (author-time, checks header presence only) n
 
 The kernel gains two new post-build validators in `packages/werkstatt-site/src/checks/`:
 
-1. **`csp.elements.validate`** — scans rendered HTML in `dist/client/` for `<object>`, `<embed>`, `<iframe>`, `<frame>`, `<audio>`, `<video>`, and `<source>` elements, cross-references each against the corresponding CSP directive (`object-src`, `frame-src`, `media-src`) parsed from `public/_headers`, and emits errors when a directive blocks an element present in the built output. Falls back to `default-src` when a specific directive is absent.
+1. **`csp.elements.validate`** — scans rendered HTML in `dist/client/` for `<object>`, `<embed>`, `<iframe>`, `<audio>`, `<video>`, and `<source>` elements, cross-references each against the corresponding CSP directive (`object-src`, `frame-src`, `media-src`) parsed from `public/_headers`, and emits errors when a directive blocks an element present in the built output. Falls back to `default-src` when a specific directive is absent.
 
 2. **`headers.coverage.validate`** — cross-references `_headers` path patterns against files in `dist/client/`, emitting warnings for orphan patterns (HDR-COV-01) and errors for typed files without matching path patterns (HDR-COV-02).
 
@@ -124,7 +125,7 @@ Both validators are integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `csp.
 **Architecture DNA:**
 
 - **DNA-67** (Pre-deploy Lighthouse parity gate) — establishes the principle that every issue deterministically checkable at build time MUST have a build-time validator. This RFC extends the same philosophy to CSP/headers: issues observable post-deploy that can be deterministically detected pre-deploy MUST be caught pre-deploy.
-- **DNA-81** (new, established by this RFC) — Pre-deploy header compatibility gate: every CSP directive that controls HTML element loading MUST be cross-referenced against built HTML before deployment, and every `_headers` path pattern MUST correspond to actual files in the build output.
+- **DNA-83** (new, established by this RFC) — Pre-deploy header compatibility gate: every CSP directive that controls HTML element loading MUST be cross-referenced against built HTML before deployment, and every `_headers` path pattern MUST correspond to actual files in the build output.
 
 **Existing RFCs:**
 
@@ -155,7 +156,7 @@ pnpm exec werkstatt run headers.coverage.validate --app warpgogol-com
 pnpm exec werkstatt run headers.coverage.validate --app warpgogol-com --json
 ```
 
-Both commands accept `--app <id>` (required, single-site scope) and `--json` (machine-readable output). No additional flags.
+Both commands accept `--app <id>` (optional, single-site scope) and `--json` (machine-readable output). Both commands set `supportsAllSites: true` — `--all` runs across all sites, same convention as `csp.origins.validate`. No additional flags.
 
 ### TypeScript contracts
 
@@ -173,10 +174,12 @@ const ELEMENT_DIRECTIVE_MAP: Record<string, string> = {
   embed: "object-src",
   applet: "object-src",
   iframe: "frame-src",
-  frame: "frame-src",
   audio: "media-src",
   video: "media-src",
-  source: "media-src", // <source> inside <video>/<audio> inherits media-src
+  // <source> directive depends on parent element:
+  //  - inside <video>/<audio> → media-src
+  //  - inside <picture> → img-src (inherits from <img>)
+  // Resolved at check time via parentElement traversal, not a static map entry.
 };
 
 // Rules: CSP-EL-01 (object-src), CSP-EL-02 (frame-src), CSP-EL-03 (media-src)
@@ -184,11 +187,15 @@ const ELEMENT_DIRECTIVE_MAP: Record<string, string> = {
 // Logic:
 // 1. Parse CSP from public/_headers
 // 2. Walk dist/client/**/*.html via parse5 (reuse extractOriginsFromHtml pattern)
-// 3. For each <object>, <embed>, <iframe>, <frame>, <audio>, <video>, <source>:
-//    a. Resolve directive = ELEMENT_DIRECTIVE_MAP[tagName] or fallback to default-src
+// 3. For each <object>, <embed>, <iframe>, <audio>, <video>, <source>:
+//    a. Resolve directive = ELEMENT_DIRECTIVE_MAP[tagName]
+//       - For <source>: check parentElement — <video>/<audio> → media-src,
+//         <picture> → img-src. Fallback to default-src if no parent.
 //    b. If directive value is 'none' → error (element blocked)
 //    c. If directive has specific sources and element has data/src URL:
-//       - Same-origin URL: check if 'self' is in source list → error if missing
+//       - Same-origin URL: check if 'self' is in source list OR if the explicit
+//         site origin (e.g. https://warpgogol.com) is in source list → error if
+//         neither is present
 //       - External URL: check if origin is in source list → error if missing
 //    d. If directive absent → fallback to default-src, same logic
 ```
@@ -210,6 +217,13 @@ interface HeadersCoverageResult {
 
 // Logic:
 // 1. Parse _headers path patterns (lines starting with /)
+//    Cloudflare _headers uses glob-like patterns: /*, /nachweis-pdfs/*,
+//    /_astro/*, /.well-known/*. Convert to minimatch-compatible patterns:
+//    - /*  → matches all files in dist/client/ root (non-recursive)
+//    - /dir/* → matches files directly under dir/ (non-recursive)
+//    - /*.ext → matches root-level files with that extension
+//    Use picomatch for matching, same library used by image.delivery.validate
+//    pagePattern (RFC-0881).
 // 2. For each pattern, glob dist/client/ for matching files
 // 3. If zero matches → HDR-COV-01 warning
 // 4. For each file in dist/client/ with extension in tracked types:
@@ -223,38 +237,42 @@ interface HeadersCoverageResult {
 | --- | --- |
 | `packages/werkstatt-site/src/checks/csp-elements.ts` | New file: `csp.elements.validate` command implementation |
 | `packages/werkstatt-site/src/checks/headers-coverage.ts` | New file: `headers.coverage.validate` command implementation |
-| `packages/werkstatt-site/src/checks/module.ts` | Modified: register both new commands in kernel module |
+| `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` | Modified: register both new commands in command table |
 | `packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts` | Modified: add both commands to `SITES_CHECK_POSTBUILD_PIPELINE` |
 | `packages/werkstatt-site/src/tests/csp-elements.test.ts` | New file: unit tests for `csp.elements.validate` |
 | `packages/werkstatt-site/src/tests/headers-coverage.test.ts` | New file: unit tests for `headers.coverage.validate` |
 | `public/_headers` | Read-only: CSP and path patterns parsed from here |
-| `dist/client/**/*.html` | Read-only: scanned for `<object>`, `<embed>`, `<iframe>`, `<frame>`, `<audio>`, `<video>`, `<source>` elements |
+| `dist/client/**/*.html` | Read-only: scanned for `<object>`, `<embed>`, `<iframe>`, `<audio>`, `<video>`, `<source>` elements |
 | `dist/client/**` | Read-only: file listing for path coverage cross-reference |
-| `docs/architecture-dna.md` | Modified: add DNA-81 entry |
+| `docs/architecture-dna.md` | Modified: add DNA-83 entry |
 | `packages/werkstatt-site/AGENTS.md` | Modified: document both new commands in Check commands section |
+| `docs/verification-plan.xml` | Modified: add CSP-EL-01..03 and HDR-COV-01..02 rule IDs to verification plan |
 
 ### Output format
+
+Both commands use `diagnosticsResult` from `@warpgogol/werkstatt-shared/checks/result-helpers`, which returns `KernelCommandResult<CheckResult>` with shape `{ data: { command, status, diagnostics, summary }, exitCode, summary }`. The `diagnostics` array contains `Diagnostic` objects (from `@warpgogol/werkstatt/schemas`) with fields `ruleId`, `severity`, `message`, `file?`, `line?`, `fixHint?`.
 
 **`csp.elements.validate --json`:**
 
 ```json
 {
-  "command": "csp.elements.validate",
-  "status": "fail",
-  "diagnostics": [
-    {
-      "ruleId": "CSP-EL-01",
-      "severity": "error",
-      "file": "dist/client/nachweise/nicaragua-projekt/index.html",
-      "line": 42,
-      "message": "CSP object-src 'none' blocks <object> element with data=\"/nachweis-pdfs/nicaragua-projekt.pdf\"",
-      "fixHint": "Change object-src to 'self' in public/_headers to allow same-origin PDF embedding"
-    }
-  ],
   "data": {
-    "checkedElements": 1,
-    "violations": 1
-  }
+    "command": "csp.elements.validate",
+    "status": "fail",
+    "diagnostics": [
+      {
+        "ruleId": "CSP-EL-01",
+        "severity": "error",
+        "file": "dist/client/nachweise/nicaragua-projekt/index.html",
+        "line": 42,
+        "message": "CSP object-src 'none' blocks <object> element with data=\"/nachweis-pdfs/nicaragua-projekt.pdf\"",
+        "fixHint": "Change object-src to 'self' in public/_headers to allow same-origin PDF embedding"
+      }
+    ],
+    "summary": { "error": 1, "warning": 0, "info": 0 }
+  },
+  "exitCode": 1,
+  "summary": "csp.elements.validate: 1 error(s), 0 warning(s)"
 }
 ```
 
@@ -262,30 +280,30 @@ interface HeadersCoverageResult {
 
 ```json
 {
-  "command": "headers.coverage.validate",
-  "status": "fail",
-  "diagnostics": [
-    {
-      "ruleId": "HDR-COV-01",
-      "severity": "warning",
-      "file": "public/_headers",
-      "line": 15,
-      "message": "Path pattern /old-pdfs/* matches no files in dist/client/",
-      "fixHint": "Remove orphan path pattern or add files matching it"
-    },
-    {
-      "ruleId": "HDR-COV-02",
-      "severity": "error",
-      "file": "dist/client/nachweis-pdfs/nicaragua-projekt.pdf",
-      "line": 0,
-      "message": "File .pdf has no matching _headers path pattern — will be served without correct Content-Type or Cache-Control",
-      "fixHint": "Add a path pattern for *.pdf files to public/_headers with appropriate Content-Type and Cache-Control"
-    }
-  ],
   "data": {
-    "orphanPatterns": 1,
-    "uncoveredFiles": 1
-  }
+    "command": "headers.coverage.validate",
+    "status": "fail",
+    "diagnostics": [
+      {
+        "ruleId": "HDR-COV-01",
+        "severity": "warning",
+        "file": "public/_headers",
+        "line": 15,
+        "message": "Path pattern /old-pdfs/* matches no files in dist/client/",
+        "fixHint": "Remove orphan path pattern or add files matching it"
+      },
+      {
+        "ruleId": "HDR-COV-02",
+        "severity": "error",
+        "file": "dist/client/nachweis-pdfs/nicaragua-projekt.pdf",
+        "message": "File .pdf has no matching _headers path pattern — will be served without explicit Cache-Control",
+        "fixHint": "Add a path pattern for *.pdf files to public/_headers with appropriate Cache-Control"
+      }
+    ],
+    "summary": { "error": 1, "warning": 1, "info": 0 }
+  },
+  "exitCode": 1,
+  "summary": "headers.coverage.validate: 1 error(s), 1 warning(s)"
 }
 ```
 
@@ -307,7 +325,7 @@ interface HeadersCoverageResult {
 - If uncovered typed files found (HDR-COV-02) → `exitCode: 1`, diagnostics emitted.
 - If no issues → `exitCode: 0`, summary with counts.
 
-Both commands follow the existing `diagnosticsResult` pattern used by `csp.origins.validate` and `headers.security.validate`.
+Both commands follow the existing `diagnosticsResult` pattern used by `headers.security.validate` (see `packages/werkstatt-site/src/checks/public-surface/security.ts:361`). The `diagnosticsResult` helper from `@warpgogol/werkstatt-shared/checks/result-helpers` wraps `Diagnostic[]` into `CheckResult` with `exitCode: 1` when any error-severity diagnostic is present.
 
 ## Rollout
 
@@ -350,19 +368,20 @@ dist.generated-marker.validate
 
 ## Acceptance criteria
 
-- [ ] `csp.elements.validate` command registered in `packages/werkstatt-site/src/checks/module.ts` with correct name and scope
-- [ ] `headers.coverage.validate` command registered in `packages/werkstatt-site/src/checks/module.ts` with correct name and scope
+- [ ] `csp.elements.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true`
+- [ ] `headers.coverage.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true`
 - [ ] `csp.elements.validate` emits CSP-EL-01 for `object-src 'none'` blocking `<object>` in a test fixture
 - [ ] `csp.elements.validate` emits CSP-EL-02 for `frame-src 'none'` blocking `<iframe>` in a test fixture
 - [ ] `csp.elements.validate` emits CSP-EL-03 for `media-src 'none'` blocking `<video>` in a test fixture
-- [ ] `csp.elements.validate` passes when `object-src 'self'` and `<object data="/path.pdf">` is same-origin
 - [ ] `headers.coverage.validate` emits HDR-COV-01 (warning) for orphan path patterns
 - [ ] `headers.coverage.validate` emits HDR-COV-02 (error) for uncovered `.pdf` files
 - [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `csp.origins.validate` and before `dist.generated-marker.validate`
 - [ ] `--json` output format matches the documented shape for both commands
-- [ ] DNA-81 added to `docs/architecture-dna.md`
+- [ ] DNA-83 added to `docs/architecture-dna.md`
 - [ ] `packages/werkstatt-site/AGENTS.md` documents both new commands in Check commands section
-- [ ] `warpgogol-com` passes both validators after `object-src 'self'` fix
+- [ ] `csp.elements.validate` passes when `object-src 'self'` and `<object data="/path.pdf">` is same-origin (verified via unit test with fixture HTML, not real build)
+- [ ] `headers.coverage.validate` passes when all tracked file types have matching `_headers` patterns (verified via unit test with fixture `_headers` and dist structure)
+- [ ] `csp.elements.validate` correctly maps `<source>` inside `<picture>` to `img-src` (not `media-src`) in a test fixture
 - [ ] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test`
 - [ ] `rfc.validate` passes on this file
 
@@ -373,7 +392,7 @@ dist.generated-marker.validate
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `pnpm exec werkstatt run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `pnpm exec werkstatt run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- Agents MUST add DNA-81 to `docs/architecture-dna.md` as part of the implementation.
+- Agents MUST add DNA-83 to `docs/architecture-dna.md` as part of the implementation.
 - Agents MUST reuse the parse5-based HTML walking pattern from `csp-origins.ts` (`extractOriginsFromHtml`) — do not introduce a new HTML parser.
 - Agents MUST use `diagnosticsResult` from `../result-helpers.ts` for output, consistent with existing validators.
 - Agents MUST NOT add an escape-hatch config file in v1 — if false positives emerge, escalate via a follow-up RFC.
