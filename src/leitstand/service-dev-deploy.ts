@@ -120,6 +120,12 @@ export async function runLeitstandServiceDevDeploy(
         data: failedData,
         exitCode: 1,
         summary: `[leitstand.service.dev-deploy] ${serviceId}: pre-deploy gate '${failedGate.command}' failed — ${failedGate.summary}`,
+        nextSteps: [
+          {
+            action: `Fix the failing gate '${failedGate.command}' for ${serviceId}, then re-run leitstand.service.dev-deploy`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -155,6 +161,12 @@ export async function runLeitstandServiceDevDeploy(
         data: failedData,
         exitCode: 1,
         summary: `[leitstand.service.dev-deploy] ${serviceId}: wrangler deploy failed — ${wranglerResult.stderr.slice(-200)}`,
+        nextSteps: [
+          {
+            action: `Check the wrangler deploy error for ${serviceId}, fix the issue, then re-run leitstand.service.dev-deploy`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -210,6 +222,7 @@ export async function runLeitstandServiceDevDeploy(
 
     return {
       data,
+      exitCode: 0,
       summary: `[leitstand.service.dev-deploy] ${serviceId}: dev-deployed (${healthState})`,
       nextSteps: [
         {

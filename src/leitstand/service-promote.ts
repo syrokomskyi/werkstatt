@@ -107,6 +107,12 @@ export async function runLeitstandServicePromote(
         data: failedData,
         exitCode: 1,
         summary: `[leitstand.service.promote] ${serviceId}: pre-deploy gate '${failedGate.command}' failed — ${failedGate.summary}`,
+        nextSteps: [
+          {
+            action: `Fix the failing gate '${failedGate.command}' for ${serviceId}, then re-run leitstand.service.promote`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -149,6 +155,12 @@ export async function runLeitstandServicePromote(
               data: failedData,
               exitCode: 1,
               summary: `[leitstand.service.promote] ${serviceId}: subdomain.register failed — ${registerResult.summary ?? "unknown error"}`,
+              nextSteps: [
+                {
+                  action: `Fix the subdomain registration for ${serviceId}, then re-run leitstand.service.promote`,
+                  kind: "required",
+                },
+              ],
             };
           }
         }
@@ -229,6 +241,12 @@ export async function runLeitstandServicePromote(
         data: failedData,
         exitCode: 1,
         summary: `[leitstand.service.promote] ${serviceId}: wrangler deploy failed — ${wranglerResult.stderr.slice(-200)}`,
+        nextSteps: [
+          {
+            action: `Check the wrangler deploy error for ${serviceId}, fix the issue, then re-run leitstand.service.promote`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -276,6 +294,12 @@ export async function runLeitstandServicePromote(
         data: failedData,
         exitCode: 1,
         summary: `[leitstand.service.promote] ${serviceId}: smoke tests failed — promotion blocked`,
+        nextSteps: [
+          {
+            action: `Fix the failing smoke tests for ${serviceId}, then re-run leitstand.service.promote`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -309,6 +333,7 @@ export async function runLeitstandServicePromote(
 
     return {
       data,
+      exitCode: 0,
       summary: `[leitstand.service.promote] ${serviceId}: promoted to production (${healthState})`,
       nextSteps: [
         {
